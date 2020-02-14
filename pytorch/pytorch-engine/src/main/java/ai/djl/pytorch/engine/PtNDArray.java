@@ -18,6 +18,8 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.NDUtils;
 import ai.djl.ndarray.index.NDIndex;
+import ai.djl.ndarray.index.NDIndexBooleans;
+import ai.djl.ndarray.index.NDIndexElement;
 import ai.djl.ndarray.index.NDIndexFullSlice;
 import ai.djl.ndarray.internal.NDFormat;
 import ai.djl.ndarray.types.DataType;
@@ -195,12 +197,40 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray get(NDIndex index) {
-        // TODO add full support of index and refactor NDIndex
-        NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
+        // TODO find a better way to improve the speed
         if (isScalar()) {
             return this;
         }
-        return JniUtils.get(this, 0, fullSlice.getMin()[0]);
+        // use booleanMask for NDIndexBooleans case
+        List<NDIndexElement> indices = index.getIndices();
+        if (!indices.isEmpty() && indices.get(0) instanceof NDIndexBooleans) {
+            if (indices.size() != 1) {
+                throw new IllegalArgumentException(
+                        "get() currently didn't support more that one boolean NDArray");
+            }
+            return booleanMask(((NDIndexBooleans) indices.get(0)).getIndex());
+        }
+
+        NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
+        PtNDArray afterSlice = this;
+        if (fullSlice != null) {
+            long[] min = fullSlice.getMin();
+            long[] max = fullSlice.getMax();
+            long[] step = fullSlice.getStep();
+            for (int dim = 0; dim < min.length; dim++) {
+                // Skip the dimension no need for slice
+                if (step[dim] == 1 && getShape().get(dim) == max[dim] - min[dim]) {
+                    continue;
+                }
+                PtNDArray indicesNd =
+                        (PtNDArray) this.getManager().arange(min[dim], max[dim], step[dim]);
+                afterSlice = JniUtils.get(afterSlice, dim, indicesNd);
+            }
+            return afterSlice.squeeze(fullSlice.getToSqueeze().stream().mapToInt(i -> i).toArray());
+        } else {
+            throw new UnsupportedOperationException(
+                    "get() currently supports all, fixed, and slices indices");
+        }
     }
 
     /** {@inheritDoc} */
@@ -213,6 +243,16 @@ public class PtNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray duplicate() {
         return JniUtils.clone(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PtNDArray booleanMask(NDArray index) {
+        if (index.getShape().equals(getShape())) {
+            return JniUtils.booleanMask(this, (PtNDArray) index);
+        } else {
+            throw new UnsupportedOperationException("Not supported for shape mismatch");
+        }
     }
 
     /** {@inheritDoc} */

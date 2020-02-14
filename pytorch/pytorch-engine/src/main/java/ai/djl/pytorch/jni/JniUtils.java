@@ -142,9 +142,17 @@ public final class JniUtils {
                         copy));
     }
 
-    public static PtNDArray get(PtNDArray ndArray, long dim, long start) {
+    public static PtNDArray get(PtNDArray ndArray, long dim, PtNDArray indicesNd) {
         return new PtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchGet(ndArray.getHandle(), dim, start));
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchIndexSelect(
+                        ndArray.getHandle(), dim, indicesNd.getHandle()));
+    }
+
+    public static PtNDArray booleanMask(PtNDArray ndArray, PtNDArray indicesNd) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchMaskedSelect(ndArray.getHandle(), indicesNd.getHandle()));
     }
 
     public static PtNDArray clone(PtNDArray ndArray) {

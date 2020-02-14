@@ -102,7 +102,9 @@ public final class PyTorchLibrary {
             int[] device,
             boolean requiredGrad);
 
-    public native Pointer torchGet(Pointer handle, long dim, long start);
+    public native Pointer torchIndexSelect(Pointer handle, long dim, Pointer indexHandle);
+
+    public native Pointer torchMaskedSelect(Pointer handle, Pointer maskHandle);
 
     public native void torchDeleteTensor(Pointer handle);
 

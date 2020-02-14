@@ -74,10 +74,19 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_tensorClone
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGet
-  (JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim, jlong jstart) {
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexSelect
+  (JNIEnv *env, jobject jthis, jobject jhandle, jlong jdim, jobject jindex_handle) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-  const auto* result_ptr = new torch::Tensor(tensor_ptr->narrow(jdim, jstart, 1).squeeze(jdim));
+  const auto* index_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jindex_handle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->index_select(jdim, *index_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMaskedSelect
+  (JNIEnv *env, jobject jthis, jobject jhandle, jobject jmasked_handle) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  const auto* index_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jmasked_handle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->masked_select(*index_ptr));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 
