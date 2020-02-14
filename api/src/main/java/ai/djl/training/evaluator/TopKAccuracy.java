@@ -22,11 +22,11 @@ import java.util.stream.IntStream;
 /**
  * {@code TopKAccuracy} is an {@link Evaluator} that computes the accuracy of the top k predictions.
  *
- * <p>{@code TopKAccuracy} differs from {@link Accuracy} in that it considers the prediction to be
- * `True` as long as the ground truth label is in the top K predicated labels. If `top_k = 1`, then
- * {@code TopKAccuracy} is identical to {@code Accuracy}.
+ * <p>{@code TopKAccuracy} differs from {@link AbstractAccuracy} in that it considers the prediction
+ * to be `True` as long as the ground truth label is in the top K predicated labels. If `top_k = 1`,
+ * then {@code TopKAccuracy} is identical to {@code Accuracy}.
  */
-public class TopKAccuracy extends Accuracy {
+public class TopKAccuracy extends AbstractAccuracy {
 
     private int topK;
 

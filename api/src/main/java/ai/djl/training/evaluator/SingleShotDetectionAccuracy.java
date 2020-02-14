@@ -20,12 +20,12 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.util.Pair;
 
 /**
- * {@code SingleShotDetectionAccuracy} is an implementation of {@link Accuracy}. It is used while
- * training a Single Shot Detection (SSD) model for object detection. It uses the targets computed
- * by {@link MultiBoxTarget}, and computes the class prediction accuracy against the computed
- * targets.
+ * {@code SingleShotDetectionAccuracy} is an implementation of {@link AbstractAccuracy}. It is used
+ * while training a Single Shot Detection (SSD) model for object detection. It uses the targets
+ * computed by {@link MultiBoxTarget}, and computes the class prediction accuracy against the
+ * computed targets.
  */
-public class SingleShotDetectionAccuracy extends Accuracy {
+public class SingleShotDetectionAccuracy extends AbstractAccuracy {
     private MultiBoxTarget multiBoxTarget = new MultiBoxTarget.Builder().build();
 
     /**

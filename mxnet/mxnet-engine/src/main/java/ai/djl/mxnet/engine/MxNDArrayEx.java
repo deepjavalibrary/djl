@@ -105,13 +105,13 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rsub(Number n) {
-        return array.sub(n).negi();
+        return array.sub(n).neg();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rsub(NDArray b) {
-        return array.sub(b).negi();
+        return array.sub(b).neg();
     }
 
     /** {@inheritDoc} */

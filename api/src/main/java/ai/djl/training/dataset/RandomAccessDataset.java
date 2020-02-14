@@ -124,7 +124,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
         double sum = Arrays.stream(ratio).sum();
         int from = 0;
         for (int i = 0; i < ratio.length - 1; ++i) {
-            int to = from + (int) (indices[i] / sum * size);
+            int to = from + (int) (ratio[i] / sum * size);
             ret[i] = new SubDataset(this, indices, from, to);
             from += to;
         }
