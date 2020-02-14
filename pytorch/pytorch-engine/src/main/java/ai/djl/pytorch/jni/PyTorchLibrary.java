@@ -71,13 +71,27 @@ public final class PyTorchLibrary {
 
     public native Pointer torchAdd(Pointer self, Pointer other);
 
+    public native void torchAddi(Pointer self, Pointer other);
+
     public native Pointer torchSub(Pointer self, Pointer other);
+
+    public native void torchSubi(Pointer self, Pointer other);
 
     public native Pointer torchMul(Pointer self, Pointer other);
 
+    public native void torchMuli(Pointer self, Pointer other);
+
     public native Pointer torchDiv(Pointer self, Pointer other);
 
+    public native void torchDivi(Pointer self, Pointer other);
+
+    public native Pointer torchRemainder(Pointer self, Pointer other);
+
+    public native void torchRemainderi(Pointer self, Pointer other);
+
     public native Pointer torchPow(Pointer self, Pointer exponent);
+
+    public native void torchPowi(Pointer self, Pointer exponent);
 
     public native Pointer torchMatmul(Pointer self, Pointer other);
 
@@ -213,7 +227,9 @@ public final class PyTorchLibrary {
 
     public native Pointer torchLte(Pointer self, Pointer other);
 
-    public native Pointer torchNeg(Pointer self, boolean inplace);
+    public native Pointer torchNeg(Pointer self);
+
+    public native void torchNegi(Pointer self);
 
     public native Pointer normalize(Pointer handle, float[] mean, float[] std);
 

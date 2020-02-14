@@ -274,10 +274,18 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchAdd(ndArray1.getHandle(), ndArray2.getHandle()));
     }
 
+    public static void addi(PtNDArray ndArray1, PtNDArray ndArray2) {
+        PyTorchLibrary.LIB.torchAddi(ndArray1.getHandle(), ndArray2.getHandle());
+    }
+
     public static PtNDArray sub(PtNDArray ndArray1, PtNDArray ndArray2) {
         return new PtNDArray(
                 ndArray1.getManager(),
                 PyTorchLibrary.LIB.torchSub(ndArray1.getHandle(), ndArray2.getHandle()));
+    }
+
+    public static void subi(PtNDArray ndArray1, PtNDArray ndArray2) {
+        PyTorchLibrary.LIB.torchSubi(ndArray1.getHandle(), ndArray2.getHandle());
     }
 
     public static PtNDArray mul(PtNDArray ndArray1, PtNDArray ndArray2) {
@@ -286,16 +294,38 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchMul(ndArray1.getHandle(), ndArray2.getHandle()));
     }
 
+    public static void muli(PtNDArray ndArray1, PtNDArray ndArray2) {
+        PyTorchLibrary.LIB.torchMuli(ndArray1.getHandle(), ndArray2.getHandle());
+    }
+
     public static PtNDArray div(PtNDArray ndArray1, PtNDArray ndArray2) {
         return new PtNDArray(
                 ndArray1.getManager(),
                 PyTorchLibrary.LIB.torchDiv(ndArray1.getHandle(), ndArray2.getHandle()));
     }
 
+    public static void divi(PtNDArray ndArray1, PtNDArray ndArray2) {
+        PyTorchLibrary.LIB.torchDivi(ndArray1.getHandle(), ndArray2.getHandle());
+    }
+
+    public static PtNDArray remainder(PtNDArray ndArray1, PtNDArray ndArray2) {
+        return new PtNDArray(
+                ndArray1.getManager(),
+                PyTorchLibrary.LIB.torchRemainder(ndArray1.getHandle(), ndArray2.getHandle()));
+    }
+
+    public static void remainderi(PtNDArray ndArray1, PtNDArray ndArray2) {
+        PyTorchLibrary.LIB.torchRemainderi(ndArray1.getHandle(), ndArray2.getHandle());
+    }
+
     public static PtNDArray pow(PtNDArray ndArray1, PtNDArray ndArray2) {
         return new PtNDArray(
                 ndArray1.getManager(),
                 PyTorchLibrary.LIB.torchPow(ndArray1.getHandle(), ndArray2.getHandle()));
+    }
+
+    public static void powi(PtNDArray ndArray1, PtNDArray ndArray2) {
+        PyTorchLibrary.LIB.torchPowi(ndArray1.getHandle(), ndArray2.getHandle());
     }
 
     public static PtNDArray matmul(PtNDArray ndArray1, PtNDArray ndArray2) {
@@ -542,13 +572,13 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchLte(self.getHandle(), other.getHandle()));
     }
 
-    public static PtNDArray neg(PtNDArray self, boolean inplace) {
-        PyTorchLibrary.LIB.torchNeg(self.getHandle(), inplace);
-        if (inplace) {
-            return self;
-        }
+    public static PtNDArray neg(PtNDArray ndArray) {
         return new PtNDArray(
-                self.getManager(), PyTorchLibrary.LIB.torchNeg(self.getHandle(), inplace));
+                ndArray.getManager(), PyTorchLibrary.LIB.torchNeg(ndArray.getHandle()));
+    }
+
+    public static void negi(PtNDArray ndArray) {
+        PyTorchLibrary.LIB.torchNegi(ndArray.getHandle());
     }
 
     public static PtNDArray normal(

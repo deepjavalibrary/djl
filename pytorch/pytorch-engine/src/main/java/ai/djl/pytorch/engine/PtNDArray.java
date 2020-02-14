@@ -417,13 +417,15 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray mod(Number n) {
+        // TODO PyTorch known issue https://github.com/pytorch/pytorch/issues/24753
+        // Current implementation only allow number have the same type fo tensor
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray mod(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.remainder(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
@@ -441,73 +443,79 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray addi(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return addi(manager.create(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray addi(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        JniUtils.addi(this, (PtNDArray) other);
+        return this;
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray subi(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return subi(manager.create(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray subi(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        JniUtils.subi(this, (PtNDArray) other);
+        return this;
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray muli(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return muli(manager.create(n));
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray muli(NDArray others) {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDArray muli(NDArray other) {
+        JniUtils.muli(this, (PtNDArray) other);
+        return this;
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray divi(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return divi(manager.create(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray divi(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        JniUtils.divi(this, (PtNDArray) other);
+        return this;
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray modi(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return modi(manager.create(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray modi(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        JniUtils.remainderi(this, (PtNDArray) other);
+        return this;
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray powi(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return powi(manager.create(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray powi(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        JniUtils.powi(this, (PtNDArray) other);
+        return this;
     }
 
     /** {@inheritDoc} */
@@ -569,13 +577,14 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray neg() {
-        return JniUtils.neg(this, false);
+        return JniUtils.neg(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray negi() {
-        return JniUtils.neg(this, true);
+        JniUtils.negi(this);
+        return this;
     }
 
     /** {@inheritDoc} */
