@@ -44,7 +44,7 @@ public class CudaUtilsTest {
 
         Assert.assertTrue(cudaVersion >= 9020, "cuda 9.2+ required.");
 
-        List<String> supportedSm = Arrays.asList("3.7", "5.2", "6.0", "6.1", "7.0", "7.5");
+        List<String> supportedSm = Arrays.asList("37", "52", "60", "61", "70", "75");
         Assert.assertTrue(supportedSm.contains(smVersion), "Unsupported cuda sm: " + smVersion);
     }
 }
