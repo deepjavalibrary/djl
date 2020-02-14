@@ -10,7 +10,6 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <classifier/>
     </properties>
 
     <repositories>
@@ -64,18 +63,11 @@
         </dependency>
         <dependency>
             <!--
-                See: https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for more detail.
+                See https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
             -->
             <groupId>ai.djl.mxnet</groupId>
-            <artifactId>mxnet-native-mkl</artifactId>
+            <artifactId>mxnet-native-auto</artifactId>
             <version>1.6.0-c-SNAPSHOT</version>
-            <classifier>${classifier}</classifier>
-            <!--
-                supported classifier:
-                <classifier>osx-x86_64</classifier>
-                <classifier>linux-x86_64</classifier>
-                <classifier>win-x86_64</classifier>
-            -->
             <scope>runtime</scope>
         </dependency>
 
@@ -86,41 +78,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>osx-x86_64</id>
-            <activation>
-                <os>
-                    <family>mac</family>
-                </os>
-            </activation>
-            <properties>
-                <classifier>osx-x86_64</classifier>
-            </properties>
-        </profile>
-        <profile>
-            <id>linux-x86_64</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                    <name>Linux</name>
-                </os>
-            </activation>
-            <properties>
-                <classifier>linux-x86_64</classifier>
-            </properties>
-        </profile>
-        <profile>
-            <id>win-x86_64</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>
-            <properties>
-                <classifier>win-x86_64</classifier>
-            </properties>
-        </profile>
-    </profiles>
 </project>

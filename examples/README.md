@@ -64,15 +64,7 @@ The following command executes an object detection example:
 DJL is engine agnostic, so it's capable of supporting different backends. Only
 the MXNet engine backend implementation is currently supported.
 
-With MXNet, you can choose different versions of the native MXNet library.
-The supplied examples will automatically choose a proper MXNet native library for you when using gradle build. You may need to
-manually change the MXNet library version for GPU support in [pom.xml](pom.xml) if you use maven.
-
-MXNet Engine is platform specific, you must specify proper <i>classifier</i> for your operating system.
-See [MXNet Engine](../mxnet/mxnet-engine/README.md) for detail.
-
-The following MXNet versions are available:
-* mxnet-native-mkl
-* mxnet-native-cu92mkl - if you have Nvidia CUDA 9.2 installed
-* mxnet-native-cu101mkl - if you have Nvidia CUDA 10.1 installed
-* mxnet-native-cu102mkl - if you have Nvidia CUDA 10.2 installed
+With MXNet, you can choose different builds of the native MXNet library.
+We recommend the automatic engine selection which downloads the best engine for your platform and available hardware during the first runtime.
+Activate the automatic selection by adding `ai.djl.mxnet:mxnet-native-auto:1.6.0-c-SNAPSHOT` as a dependency.
+You can also see [MXNet Engine](../mxnet/mxnet-engine/README.md) for further options.

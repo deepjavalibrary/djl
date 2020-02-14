@@ -21,7 +21,7 @@ dependencies {
     implementation project(":model-zoo")
     implementation project(":mxnet:mxnet-model-zoo")
 
-    runtimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
+    runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}-SNAPSHOT"
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
