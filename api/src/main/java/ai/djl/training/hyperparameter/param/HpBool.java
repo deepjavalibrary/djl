@@ -20,7 +20,7 @@ public class HpBool extends HpCategorical<Boolean> {
     /**
      * Constructs a {@link HpBool}.
      *
-     * @param name the name of the hyperparameter.
+     * @param name the name of the hyperparameter
      */
     public HpBool(String name) {
         super(name, Arrays.asList(false, true));

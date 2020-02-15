@@ -118,7 +118,7 @@ public class Parameter implements AutoCloseable {
     /**
      * Gets the values of this {@code Parameter} as an {@link NDArray}.
      *
-     * @return an {@link NDArray} that contains values of this {@code Parameter}.
+     * @return an {@link NDArray} that contains values of this {@code Parameter}
      */
     public NDArray getArray() {
         if (!isInitialized()) {

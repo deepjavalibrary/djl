@@ -109,7 +109,7 @@ public class MxGradientCollector implements GradientCollector {
     /**
      * Computes the gradients of the NDArray w.r.t variables.
      *
-     * @param array the target/head array to run backward on.
+     * @param array the target/head array to run backward on
      * @param retainGraph whether to retain the computation graph for another backward pass on the
      *     same graph. By default the computation history is cleared.
      */

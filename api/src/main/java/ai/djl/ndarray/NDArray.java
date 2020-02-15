@@ -1589,7 +1589,7 @@ public interface NDArray extends AutoCloseable {
      * </pre>
      *
      * @param n the number to be compared
-     * @return the maximum of this {@code NDArray} and a number element-wise.
+     * @return the maximum of this {@code NDArray} and a number element-wise
      */
     NDArray maximum(Number n);
 

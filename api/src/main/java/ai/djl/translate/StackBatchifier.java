@@ -145,7 +145,7 @@ public class StackBatchifier implements Batchifier {
      * @param array a batch of {@code NDArray}
      * @param numOfSlices the number of desired slices
      * @param evenSplit whether to force all slices to have the same number of elements
-     * @return an NDList even if `numOfSlice` is 1.
+     * @return an NDList even if `numOfSlice` is 1
      */
     private NDList split(NDArray array, int numOfSlices, boolean evenSplit) {
         int batchSize = Math.toIntExact(array.size(0));

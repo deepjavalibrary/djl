@@ -631,7 +631,7 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
      * rather than a list.
      *
-     * @param stop the end of the interval. The interval does not include this value.
+     * @param stop the end of the interval. The interval does not include this value
      * @return a new instance of {@link NDArray}
      */
     default NDArray arange(int stop) {
@@ -646,7 +646,7 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
      * rather than a list.
      *
-     * @param stop the end of the interval. The interval does not include this value.
+     * @param stop the end of the interval. The interval does not include this value
      * @return a new instance of {@link NDArray}
      */
     default NDArray arange(double stop) {
@@ -661,8 +661,8 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
      * rather than a list.
      *
-     * @param start the start of interval. The interval includes this value.
-     * @param stop the end of interval. The interval does not include this value.
+     * @param start the start of interval. The interval includes this value
+     * @param stop the end of interval. The interval does not include this value
      * @return a new instance of {@link NDArray}
      */
     default NDArray arange(int start, int stop) {
@@ -677,8 +677,8 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
      * rather than a list.
      *
-     * @param start the start of interval. The interval includes this value.
-     * @param stop the end of interval. The interval does not include this value.
+     * @param start the start of interval. The interval includes this value
+     * @param stop the end of interval. The interval does not include this value
      * @return a new instance of {@link NDArray}
      */
     default NDArray arange(double start, double stop) {
@@ -693,8 +693,8 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
      * rather than a list.
      *
-     * @param start the start of interval. The interval includes this value.
-     * @param stop the end of interval. The interval does not include this value.
+     * @param start the start of interval. The interval includes this value
+     * @param stop the end of interval. The interval does not include this value
      * @param step the spacing between values
      * @return a new instance of {@link NDArray}
      */
@@ -710,8 +710,8 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
      * rather than a list.
      *
-     * @param start the start of interval. The interval includes this value.
-     * @param stop the end of interval. The interval does not include this value.
+     * @param start the start of interval. The interval includes this value
+     * @param stop the end of interval. The interval does not include this value
      * @param step the spacing between values
      * @return a new instance of {@link NDArray}
      */
@@ -727,8 +727,8 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
      * rather than a list.
      *
-     * @param start the start of interval. The interval includes this value.
-     * @param stop the end of interval. The interval does not include this value.
+     * @param start the start of interval. The interval includes this value
+     * @param stop the end of interval. The interval does not include this value
      * @param step the spacing between values
      * @param dataType the {@link DataType} of the {@link NDArray}
      * @param device the {@link Device} of the {@link NDArray}
@@ -746,8 +746,8 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
      * rather than a list.
      *
-     * @param start the start of interval. The interval includes this value.
-     * @param stop the end of interval. The interval does not include this value.
+     * @param start the start of interval. The interval includes this value
+     * @param stop the end of interval. The interval does not include this value
      * @param step the spacing between values
      * @param dataType the {@link DataType} of the {@link NDArray}
      * @param device the {@link Device} of the {@link NDArray}

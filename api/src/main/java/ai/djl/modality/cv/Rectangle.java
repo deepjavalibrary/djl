@@ -118,7 +118,7 @@ public class Rectangle implements BoundingBox {
     /**
      * Returns the left x-coordinate of the Rectangle.
      *
-     * @return the left x-coordinate of the Rectangle.
+     * @return the left x-coordinate of the Rectangle
      */
     public double getX() {
         return point.getX();
@@ -127,7 +127,7 @@ public class Rectangle implements BoundingBox {
     /**
      * Returns the top y-coordinate of the Rectangle.
      *
-     * @return the top y-coordinate of the Rectangle.
+     * @return the top y-coordinate of the Rectangle
      */
     public double getY() {
         return point.getY();
@@ -136,7 +136,7 @@ public class Rectangle implements BoundingBox {
     /**
      * Returns the width of the Rectangle.
      *
-     * @return the width of the Rectangle.
+     * @return the width of the Rectangle
      */
     public double getWidth() {
         return width;
@@ -145,7 +145,7 @@ public class Rectangle implements BoundingBox {
     /**
      * Returns the height of the Rectangle.
      *
-     * @return the height of the Rectangle.
+     * @return the height of the Rectangle
      */
     public double getHeight() {
         return height;

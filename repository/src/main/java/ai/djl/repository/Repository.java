@@ -166,7 +166,7 @@ public interface Repository {
      * Returns an {@link InputStream} for an item in a repository.
      *
      * @param item the item to open
-     * @param path the path to a file if the item is a zipped directory. Otherwise, pass null.
+     * @param path the path to a file if the item is a zipped directory. Otherwise, pass null
      * @return the file stream
      * @throws IOException if it failed to open the stream
      */
@@ -176,7 +176,7 @@ public interface Repository {
      * Returns the path to a file for the item.
      *
      * @param item the item to find the path for
-     * @param path the path to a file if the item is a zipped directory. Otherwise, pass null.
+     * @param path the path to a file if the item is a zipped directory. Otherwise, pass null
      * @return the file path
      * @throws IOException if it failed to find the path
      */

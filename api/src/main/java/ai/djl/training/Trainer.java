@@ -103,7 +103,7 @@ public interface Trainer extends AutoCloseable {
     /**
      * Returns the Metrics param used for benchmarking.
      *
-     * @return the the Metrics param used for benchmarking.
+     * @return the the Metrics param used for benchmarking
      */
     Metrics getMetrics();
 

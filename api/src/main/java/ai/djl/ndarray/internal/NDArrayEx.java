@@ -253,7 +253,7 @@ public interface NDArrayEx {
      * @param dilate the convolution dilate: (w,), (h, w) or (d, h, w). Defaults to 1 for each
      *     dimension
      * @param numFilters the convolution filter(channel) number
-     * @param numGroups the number of group partitions. Defaults to 1.
+     * @param numGroups the number of group partitions. Defaults to 1
      * @param layout the layout for input, output and weight. Empty for default layout: NCW for 1d,
      *     NCHW for 2d and NCDHW for 3d. NHWC and NDHWC are only supported on GPU
      * @param noBias whether to disable bias parameter. Defaults to false

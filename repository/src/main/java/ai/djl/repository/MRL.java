@@ -93,7 +93,7 @@ public class MRL {
     /**
      * Sets the groupId.
      *
-     * @param groupId the new groupId.
+     * @param groupId the new groupId
      */
     public void setGroupId(String groupId) {
         this.groupId = groupId;

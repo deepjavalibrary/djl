@@ -28,7 +28,7 @@ public class HpCategorical<T> extends Hyperparameter<T> {
      * Constructs a {@link HpCategorical}.
      *
      * @param name the name of the hyperparameters
-     * @param categories the valid values for the hyperparameter.
+     * @param categories the valid values for the hyperparameter
      */
     public HpCategorical(String name, List<T> categories) {
         super(name);
