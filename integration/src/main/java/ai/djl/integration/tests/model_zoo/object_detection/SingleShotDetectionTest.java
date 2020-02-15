@@ -130,7 +130,7 @@ public class SingleShotDetectionTest {
 
     private ZooModel<BufferedImage, DetectedObjects> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        if (!Engine.getInstance().getEngineName().equals("MXNet")) {
+        if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
             throw new SkipException("Model not supported");
         }
         Map<String, String> criteria = new ConcurrentHashMap<>();

@@ -33,7 +33,7 @@ public class ModelTest {
 
     @Test
     public void testModelSaveAndLoad() throws IOException, MalformedModelException {
-        if (!Engine.getInstance().getEngineName().equals("MXNet")) {
+        if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
             throw new SkipException("Model not supported");
         }
         SequentialBlock block = new SequentialBlock();

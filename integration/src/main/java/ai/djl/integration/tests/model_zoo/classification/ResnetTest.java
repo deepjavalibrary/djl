@@ -131,7 +131,7 @@ public class ResnetTest {
 
     private ZooModel<BufferedImage, Classifications> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        if (!Engine.getInstance().getEngineName().equals("MXNet")) {
+        if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
             throw new SkipException("Model not supported");
         }
         Map<String, String> criteria = new ConcurrentHashMap<>();
