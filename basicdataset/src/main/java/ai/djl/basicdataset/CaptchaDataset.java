@@ -143,13 +143,12 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
     /** {@inheritDoc} */
     @Override
     public void useDefaultArtifact() throws IOException {
-        artifact = repository.resolve(getMrl(), "1.0", null);
+        artifact = repository.resolve(getMrl(), "1.1", null);
     }
 
     /** {@inheritDoc} */
     @Override
     public void prepareData(Usage usage) throws IOException {
-
         items = new ArrayList<>();
         for (String filenameWithExtension :
                 repository.listDirectory(getArtifactItem(), getUsagePath())) {
@@ -164,14 +163,13 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
     }
 
     private String getUsagePath() {
-        String prefix = "captchaImage/";
         switch (usage) {
             case TRAIN:
-                return prefix + "train";
+                return "train";
             case TEST:
-                return prefix + "test";
+                return "test";
             case VALIDATION:
-                return prefix + "validate";
+                return "validate";
             default:
                 throw new IllegalArgumentException("Invalid usage");
         }

@@ -36,15 +36,15 @@ public class CaptchaTest {
         try (Model model = Model.newInstance()) {
             model.setBlock(Blocks.identityBlock());
 
-            CaptchaDataset mnist =
+            CaptchaDataset captchaDataset =
                     new CaptchaDataset.Builder()
                             .optUsage(Dataset.Usage.TEST)
                             .setSampling(32, true)
                             .build();
 
-            mnist.prepare();
+            captchaDataset.prepare();
             try (Trainer trainer = model.newTrainer(config)) {
-                for (Batch batch : trainer.iterateDataset(mnist)) {
+                for (Batch batch : trainer.iterateDataset(captchaDataset)) {
                     Assert.assertEquals(batch.getData().size(), 1);
                     Assert.assertEquals(batch.getLabels().size(), 6);
                     batch.close();
