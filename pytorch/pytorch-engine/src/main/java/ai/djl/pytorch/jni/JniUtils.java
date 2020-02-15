@@ -18,7 +18,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
-import ai.djl.pytorch.engine.IValue;
 import ai.djl.pytorch.engine.PtDeviceType;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
@@ -27,8 +26,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A class containing utilities to interact with the PyTorch Engine's Java Native Interface (JNI)
@@ -694,81 +691,5 @@ public final class JniUtils {
 
     public static void enableInferenceMode(PtSymbolBlock block) {
         PyTorchLibrary.LIB.moduleEval(block.getHandle());
-    }
-
-    public static IValue moduleForward(PtSymbolBlock block, IValue[] inputs) {
-        // TODO: reconsider the usage of IValue
-        // Currently, only map Tensor to IValue
-        Pointer[] iValueHandles = new Pointer[inputs.length];
-        for (int i = 0; i < inputs.length; i++) {
-            iValueHandles[i] = inputs[i].getHandle();
-        }
-        return new IValue(
-                inputs[0].getManager(),
-                PyTorchLibrary.LIB.moduleForward(block.getHandle(), iValueHandles));
-    }
-
-    public static IValue createIValueFromNDArray(PtNDArray ndArray) {
-        return new IValue(
-                ndArray.getManager(),
-                PyTorchLibrary.LIB.iValueCreateFromTensor(ndArray.getHandle()));
-    }
-
-    public static PtNDArray iValueToNDArray(PtNDManager manager, IValue iValue) {
-        Pointer ndHandle = PyTorchLibrary.LIB.iValueToTensor(iValue.getHandle());
-        return new PtNDArray(manager, ndHandle);
-    }
-
-    public static NDList iValueToNDList(IValue iValue) {
-        Pointer[] ndHandles = PyTorchLibrary.LIB.iValueToTensorList(iValue.getHandle());
-        NDList list = new NDList();
-        for (Pointer handle : ndHandles) {
-            list.add(new PtNDArray(iValue.getManager(), handle));
-        }
-        return list;
-    }
-
-    public static IValue[] iValueToIValueArray(IValue iValue) {
-        Pointer[] iValueHandles = PyTorchLibrary.LIB.iValueToList(iValue.getHandle());
-        IValue[] iValues = new IValue[iValueHandles.length];
-        for (int i = 0; i < iValueHandles.length; i++) {
-            iValues[i] = new IValue(iValue.getManager(), iValueHandles[i]);
-        }
-        return iValues;
-    }
-
-    public static Map<IValue, IValue> iValueToIValueMap(IValue iValue) {
-        Pointer[] iValueHandles = PyTorchLibrary.LIB.iValueToMap(iValue.getHandle());
-        Map<IValue, IValue> map = new ConcurrentHashMap<>();
-        for (int i = 0; i < iValueHandles.length; i += 2) {
-            map.put(
-                    new IValue(iValue.getManager(), iValueHandles[i]),
-                    new IValue(iValue.getManager(), iValueHandles[i + 1]));
-        }
-        return map;
-    }
-
-    public static String iValueToString(IValue iValue) {
-        return PyTorchLibrary.LIB.iValueToString(iValue.getHandle());
-    }
-
-    public static boolean iValueIsString(IValue iValue) {
-        return PyTorchLibrary.LIB.iValueIsString(iValue.getHandle());
-    }
-
-    public static boolean iValueIsNDArray(IValue iValue) {
-        return PyTorchLibrary.LIB.iValueIsTensor(iValue.getHandle());
-    }
-
-    public static boolean iValueIsNDList(IValue iValue) {
-        return PyTorchLibrary.LIB.iValueIsTensorList(iValue.getHandle());
-    }
-
-    public static boolean iValueIsList(IValue iValue) {
-        return PyTorchLibrary.LIB.iValueIsList(iValue.getHandle());
-    }
-
-    public static boolean iValueIsMap(IValue iValue) {
-        return PyTorchLibrary.LIB.iValueIsMap(iValue.getHandle());
     }
 }

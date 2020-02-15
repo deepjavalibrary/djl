@@ -21,6 +21,7 @@ import ai.djl.nn.BlockList;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
+import ai.djl.pytorch.jni.IValueUtils;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.NativeResource;
 import ai.djl.pytorch.jni.Pointer;
@@ -77,18 +78,7 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        IValue[] iValues =
-                inputs.stream()
-                        .map(input -> IValue.fromNDArray((PtNDArray) input))
-                        .toArray(IValue[]::new);
-        IValue result = JniUtils.moduleForward(this, iValues);
-        if (result.isNDArray()) {
-            return new NDList(new NDList(result.toNDArray()));
-        } else if (result.isNDList()) {
-            return result.toNDList();
-        } else {
-            throw new UnsupportedOperationException("Unsupported IValue type");
-        }
+        return IValueUtils.forward(this, inputs);
     }
 
     @Override

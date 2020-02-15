@@ -42,7 +42,7 @@ public final class NDUtils {
     }
 
     /**
-     * Check two critieria of concat input: 1. no scalar 2. dimensions of all the array must be the
+     * Check two criteria of concat input: 1. no scalar 2. dimensions of all the array must be the
      * same.
      *
      * @param list input {@link NDList}
