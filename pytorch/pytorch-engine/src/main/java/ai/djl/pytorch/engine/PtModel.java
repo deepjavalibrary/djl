@@ -18,12 +18,10 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.types.DataType;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
-import ai.djl.util.PairList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,7 +39,6 @@ import java.util.stream.Collectors;
  */
 public class PtModel extends BaseModel {
 
-    PtNDManager manager;
     /**
      * Constructs a new Model on a given device.
      *
@@ -50,25 +47,22 @@ public class PtModel extends BaseModel {
     PtModel(Device device) {
         device = Device.defaultIfNull(device);
         manager = PtNDManager.getSystemManager().newSubManager(device);
+        dataType = DataType.FLOAT32;
     }
 
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException, MalformedModelException {
         modelDir = modelPath.toAbsolutePath();
-        Path modelFile = modelDir.resolve(modelName + ".pt");
-        if (Files.notExists(modelFile)) {
-            throw new FileNotFoundException(".pt file not found in: " + modelPath);
+        this.modelName = modelName;
+        if (block == null) {
+            Path modelFile = modelDir.resolve(modelName + ".pt");
+            if (Files.notExists(modelFile)) {
+                throw new FileNotFoundException(".pt file not found in: " + modelPath);
+            }
+            block = JniUtils.loadModule((PtNDManager) manager, modelFile);
         }
-        block = JniUtils.loadModule(manager, modelFile);
-    }
-
-    @Override
-    public void save(Path modelPath, String modelName) throws IOException {}
-
-    @Override
-    public PtNDManager getNDManager() {
-        return manager;
+        readParameters(options);
     }
 
     @Override
@@ -80,16 +74,6 @@ public class PtModel extends BaseModel {
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
         // TODO: modify copy
         return new PtPredictor<>(this, translator, false);
-    }
-
-    @Override
-    public PairList<String, Shape> describeInput() {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public PairList<String, Shape> describeOutput() {
-        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -114,18 +98,12 @@ public class PtModel extends BaseModel {
     }
 
     @Override
-    public void setDataType(DataType dataType) {}
-
-    @Override
-    public DataType getDataType() {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
     public void cast(DataType dataType) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
-    public void close() {}
+    public void close() {
+        manager.close();
+    }
 }

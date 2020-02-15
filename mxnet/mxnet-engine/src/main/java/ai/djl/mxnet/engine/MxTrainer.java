@@ -65,7 +65,7 @@ public class MxTrainer implements Trainer {
      */
     MxTrainer(MxModel model, TrainingConfig trainingConfig) {
         this.model = model;
-        manager = model.getNDManager().newSubManager();
+        manager = (MxNDManager) model.getNDManager().newSubManager();
         devices = trainingConfig.getDevices();
         loss = trainingConfig.getLossFunction();
         if (loss == null) {

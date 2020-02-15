@@ -130,6 +130,7 @@ public class SingleShotDetectionTest {
 
     private ZooModel<BufferedImage, DetectedObjects> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
+        // TODO: PyTorch: disable due to the device mismatch on ParameterServer
         if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
             throw new SkipException("Model not supported");
         }

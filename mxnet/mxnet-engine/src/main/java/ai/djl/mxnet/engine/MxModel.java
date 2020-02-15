@@ -21,24 +21,16 @@ import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.translate.Translator;
-import ai.djl.util.Pair;
-import ai.djl.util.PairList;
-import ai.djl.util.Utils;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,12 +50,6 @@ import org.slf4j.LoggerFactory;
 public class MxModel extends BaseModel {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
-
-    private static final int MODEL_VERSION = 1;
-
-    private MxNDManager manager;
-    private DataType dataType;
-    private PairList<String, Shape> inputData;
     // the variable is used to avoid ParameterStore copy for the first time
     private AtomicBoolean first;
 
@@ -110,65 +96,13 @@ public class MxModel extends BaseModel {
                 throw new FileNotFoundException(
                         "Symbol file not found in: " + modelPath + ", please set block manually.");
             }
-            Symbol symbol = Symbol.load(manager, symbolFile.toAbsolutePath().toString());
+            Symbol symbol =
+                    Symbol.load((MxNDManager) manager, symbolFile.toAbsolutePath().toString());
             // TODO: change default name "data" to model-specific one
             block = new MxSymbolBlock(manager, symbol);
         }
         loadParameters(modelName, options);
         // TODO: Check if Symbol has all names that params file have
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void save(Path modelPath, String modelName) throws IOException {
-        if (Files.notExists(modelPath)) {
-            Files.createDirectories(modelPath);
-        }
-
-        if (block == null || !block.isInitialized()) {
-            throw new IllegalStateException("Model has not be trained or loaded yet.");
-        }
-
-        String epochValue = getProperty("Epoch");
-        int epoch =
-                epochValue == null
-                        ? Utils.getCurrentEpoch(modelPath, modelName) + 1
-                        : Integer.parseInt(epochValue);
-
-        Path paramFile = modelPath.resolve(String.format("%s-%04d.params", modelName, epoch));
-        try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(paramFile))) {
-            dos.writeBytes("DJL@");
-            dos.writeInt(MODEL_VERSION);
-            dos.writeUTF(modelName);
-            dos.writeUTF(dataType.name());
-            inputData = block.describeInput();
-            dos.writeInt(inputData.size());
-            for (Pair<String, Shape> desc : inputData) {
-                String name = desc.getKey();
-                if (name == null) {
-                    dos.writeUTF("");
-                } else {
-                    dos.writeUTF(name);
-                }
-                dos.write(desc.getValue().getEncoded());
-            }
-
-            dos.writeInt(properties.size());
-            for (Map.Entry<String, String> entry : properties.entrySet()) {
-                dos.writeUTF(entry.getKey());
-                dos.writeUTF(entry.getValue());
-            }
-
-            block.saveParameters(dos);
-        }
-        this.modelName = modelName;
-        modelDir = modelPath.toAbsolutePath();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public MxNDManager getNDManager() {
-        return manager;
     }
 
     /** {@inheritDoc} */
@@ -194,39 +128,8 @@ public class MxModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public void setDataType(DataType dataType) {
-        this.dataType = dataType;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public DataType getDataType() {
-        return dataType;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void cast(DataType dataType) {
         throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PairList<String, Shape> describeInput() {
-        if (inputData == null) {
-            inputData = block.describeInput();
-        }
-        return inputData;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PairList<String, Shape> describeOutput() {
-        List<String> names = inputData.keys();
-        Shape[] outputShapes =
-                block.getOutputShapes(
-                        manager, inputData.values().toArray(new Shape[inputData.size()]));
-        return new PairList<>(names, Arrays.asList(outputShapes));
     }
 
     /** {@inheritDoc} */
@@ -259,51 +162,17 @@ public class MxModel extends BaseModel {
         manager.close();
     }
 
-    /** {@inheritDoc} */
-    @SuppressWarnings("deprecation")
-    @Override
-    protected void finalize() throws Throwable {
-        if (manager.isOpen()) {
-            logger.warn("MxModel was not closed explicitly.");
-            manager.close();
-        }
-        super.finalize();
-    }
-
     @SuppressWarnings("PMD.UseConcurrentHashMap")
     private void loadParameters(String modelName, Map<String, String> options)
             throws IOException, MalformedModelException {
-        Path paramFile;
-        if (Files.isRegularFile(modelDir)) {
-            paramFile = modelDir;
-        } else {
-            String epochOption = null;
-            if (options != null) {
-                epochOption = options.get("epoch");
-            }
-            int epoch;
-            if (epochOption == null) {
-                epoch = Utils.getCurrentEpoch(modelDir, modelName);
-                if (epoch == -1) {
-                    throw new IOException(
-                            "Parameter file not found in: "
-                                    + modelDir
-                                    + ". If you only specified model path, make sure path name match"
-                                    + "your saved model file name.");
-                }
-            } else {
-                epoch = Integer.parseInt(epochOption);
-            }
-
-            paramFile = modelDir.resolve(String.format("%s-%04d.params", modelName, epoch));
-        }
-        logger.debug("Try to load model from {}", paramFile);
-        if (readParameters(paramFile)) {
+        if (readParameters(options)) {
             return;
         }
         logger.debug("DJL formatted model not found, try to find MXNet model");
+        Path paramFile = paramPathResolver(options);
         NDList paramNDlist =
-                JnaUtils.loadNdArray(manager, paramFile.toAbsolutePath(), manager.getDevice());
+                JnaUtils.loadNdArray(
+                        (MxNDManager) manager, paramFile.toAbsolutePath(), manager.getDevice());
 
         MxSymbolBlock symbolBlock = (MxSymbolBlock) block;
 
@@ -326,45 +195,6 @@ public class MxModel extends BaseModel {
         // TODO: Find a better to infer model DataType from SymbolBlock.
         dataType = paramNDlist.head().getDataType();
         logger.debug("MXNet Model {} ({}) loaded successfully.", modelName, dataType);
-    }
-
-    private boolean readParameters(Path paramFile) throws IOException, MalformedModelException {
-        try (DataInputStream dis = new DataInputStream(Files.newInputStream(paramFile))) {
-            byte[] buf = new byte[4];
-            dis.readFully(buf);
-            if (!"DJL@".equals(new String(buf, StandardCharsets.US_ASCII))) {
-                return false;
-            }
-
-            int version = dis.readInt();
-            if (version != MODEL_VERSION) {
-                throw new IOException("Unsupported model version: " + version);
-            }
-
-            modelName = dis.readUTF();
-            logger.debug("Loading model parameter: {}", modelName);
-
-            dataType = DataType.valueOf(dis.readUTF());
-
-            int numberOfInputs = dis.readInt();
-            inputData = new PairList<>();
-            for (int i = 0; i < numberOfInputs; ++i) {
-                String inputName = dis.readUTF(); // input name
-                Shape shape = Shape.decode(dis);
-                inputData.add(inputName, shape);
-            }
-
-            int numberOfProperties = dis.readInt();
-            for (int i = 0; i < numberOfProperties; ++i) {
-                String key = dis.readUTF();
-                String value = dis.readUTF();
-                properties.put(key, value);
-            }
-
-            block.loadParameters(manager, dis);
-            logger.debug("DJL model loaded successfully");
-        }
-        return true;
     }
 
     /** {@inheritDoc} */
