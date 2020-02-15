@@ -47,15 +47,26 @@ public class ImageClassificationTranslator extends ImageTranslator<Classificatio
         return new Classifications(synset, probabilitiesNd);
     }
 
-    /** A Builder to construct a {@link ImageClassificationTranslator}. */
+    /**
+     * Creates a builder to build a {@code ImageClassificationTranslator}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /** A Builder to construct a {@code ImageClassificationTranslator}. */
     public static class Builder extends BaseBuilder<Builder> {
 
         private String synsetArtifactName;
 
+        Builder() {}
+
         /**
          * Sets the name of the synset file listing the potential classes for an image.
          *
-         * @param synsetArtifactName a file listing the potential classes for an image.
+         * @param synsetArtifactName a file listing the potential classes for an image
          * @return the builder
          */
         public Builder setSynsetArtifactName(String synsetArtifactName) {
@@ -72,7 +83,7 @@ public class ImageClassificationTranslator extends ImageTranslator<Classificatio
         /**
          * Builds the {@link ImageClassificationTranslator} with the provided data.
          *
-         * @return an {@link ImageClassificationTranslator}.
+         * @return an {@link ImageClassificationTranslator}
          */
         public ImageClassificationTranslator build() {
             if (synsetArtifactName == null) {

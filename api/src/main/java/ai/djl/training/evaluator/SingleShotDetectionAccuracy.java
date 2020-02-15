@@ -26,7 +26,8 @@ import ai.djl.util.Pair;
  * computed targets.
  */
 public class SingleShotDetectionAccuracy extends AbstractAccuracy {
-    private MultiBoxTarget multiBoxTarget = new MultiBoxTarget.Builder().build();
+
+    private MultiBoxTarget multiBoxTarget = MultiBoxTarget.builder().build();
 
     /**
      * Creates a new instance of {@link SingleShotDetectionAccuracy} with the given name.

@@ -178,12 +178,12 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
     /** A builder for a {@link ai.djl.basicdataset.CaptchaDataset}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
-        private Repository repository;
-        private Artifact artifact;
-        private Usage usage;
+        Repository repository;
+        Artifact artifact;
+        Usage usage;
 
         /** Constructs a new builder. */
-        public Builder() {
+        Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
             pipeline = new Pipeline(new ToTensor());

@@ -76,8 +76,10 @@ public class Nag extends Optimizer {
     /** The Builder to construct an {@link Nag} object. */
     public static final class Builder extends OptimizerBuilder<Builder> {
 
-        private LearningRateTracker learningRateTracker;
-        private float momentum;
+        LearningRateTracker learningRateTracker;
+        float momentum;
+
+        Builder() {}
 
         /**
          * Sets the {@link LearningRateTracker} for this optimizer.

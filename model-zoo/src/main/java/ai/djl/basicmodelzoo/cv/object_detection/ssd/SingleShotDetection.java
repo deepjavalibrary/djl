@@ -44,6 +44,7 @@ import java.util.List;
  * Detection (SSD) model for object detection.
  */
 public final class SingleShotDetection extends AbstractBlock {
+
     private static final byte VERSION = 1;
     private List<Block> features;
     private List<Block> classPredictionBlocks;
@@ -257,13 +258,13 @@ public final class SingleShotDetection extends AbstractBlock {
         for (int i = 0; i < 2; i++) {
             sequentialBlock
                     .add(
-                            new Conv2D.Builder()
+                            Conv2D.builder()
                                     .setKernel(new Shape(3, 3))
                                     .setNumFilters(numFilters)
                                     .optPad(new Shape(1, 1))
                                     .build())
-                    .add(new BatchNorm.Builder().build())
-                    .add(Activation.reluBlock());
+                    .add(BatchNorm.builder().build())
+                    .add(Activation::relu);
         }
         sequentialBlock.add(
                 new LambdaBlock(
@@ -285,7 +286,7 @@ public final class SingleShotDetection extends AbstractBlock {
      * @return a class prediction block used in an SSD
      */
     public static Conv2D getClassPredictionBlock(int numAnchors, int numClasses) {
-        return new Conv2D.Builder()
+        return Conv2D.builder()
                 .setKernel(new Shape(3, 3))
                 .setNumFilters((numClasses + 1) * numAnchors)
                 .optPad(new Shape(1, 1))
@@ -299,15 +300,25 @@ public final class SingleShotDetection extends AbstractBlock {
      * @return a anchor prediction block used in an SSD
      */
     public static Conv2D getAnchorPredictionBlock(int numAnchors) {
-        return new Conv2D.Builder()
+        return Conv2D.builder()
                 .setKernel(new Shape(3, 3))
                 .setNumFilters(4 * numAnchors)
                 .optPad(new Shape(1, 1))
                 .build();
     }
 
+    /**
+     * Creates a builder to build a {@link SingleShotDetection}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The Builder to construct a {@link SingleShotDetection}. */
     public static class Builder {
+
         private Block network;
         private int numFeatures = -1;
         private List<Block> features;
@@ -318,6 +329,8 @@ public final class SingleShotDetection extends AbstractBlock {
         private List<MultiBoxPrior> multiBoxPriors = new ArrayList<>();
         private int numClasses;
         private boolean globalPool = true;
+
+        Builder() {}
 
         /**
          * Sets the list of sizes of generated anchor boxes.
@@ -433,8 +446,7 @@ public final class SingleShotDetection extends AbstractBlock {
                 int numAnchors = size.size() + ratio.size() - 1;
                 classPredictionBlocks.add(getClassPredictionBlock(numAnchors, numClasses));
                 anchorPredictionBlocks.add(getAnchorPredictionBlock(numAnchors));
-                multiBoxPriors.add(
-                        new MultiBoxPrior.Builder().setSizes(size).setRatios(ratio).build());
+                multiBoxPriors.add(MultiBoxPrior.builder().setSizes(size).setRatios(ratio).build());
             }
             return new SingleShotDetection(this);
         }

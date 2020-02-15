@@ -26,6 +26,7 @@ import java.util.Map;
  */
 @SuppressWarnings("PMD.LooseCoupling")
 public class Artifact {
+
     private transient String metadataVersion;
     private transient String groupId;
     private transient String artifactId;

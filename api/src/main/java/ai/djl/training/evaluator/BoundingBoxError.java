@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BoundingBoxError extends Evaluator {
 
     private Map<String, Float> ssdBoxPredictionError;
-    private MultiBoxTarget multiBoxTarget = new MultiBoxTarget.Builder().build();
+    private MultiBoxTarget multiBoxTarget = MultiBoxTarget.builder().build();
 
     /**
      * Creates an BoundingBoxError evaluator.

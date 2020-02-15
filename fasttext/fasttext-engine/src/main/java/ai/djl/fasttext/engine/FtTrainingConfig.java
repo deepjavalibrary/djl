@@ -396,6 +396,8 @@ public class FtTrainingConfig implements TrainingConfig {
         int threads = -1;
         String loss;
 
+        Builder() {}
+
         /**
          * Sets the output directory.
          *

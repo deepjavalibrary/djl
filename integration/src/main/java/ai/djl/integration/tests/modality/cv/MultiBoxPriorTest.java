@@ -28,7 +28,7 @@ public class MultiBoxPriorTest {
             List<Float> sizes = Arrays.asList(0.2f, 0.272f);
             List<Float> ratios = Arrays.asList(1f, 2f, 0.5f);
             MultiBoxPrior multiBoxPriors =
-                    new MultiBoxPrior.Builder().setSizes(sizes).setRatios(ratios).build();
+                    MultiBoxPrior.builder().setSizes(sizes).setRatios(ratios).build();
             NDArray anchors =
                     multiBoxPriors.generateAnchorBoxes(
                             manager.arange(3.0 * 512.0 * 512.0).reshape(new Shape(1, 3, 512, 512)));

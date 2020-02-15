@@ -40,6 +40,7 @@ import java.io.IOException;
  * \tanh(c_t) \end{array}\end{split} $$
  */
 public class LSTM extends RecurrentCell {
+
     private static final byte VERSION = 1;
 
     private boolean clipLstmState;
@@ -148,6 +149,15 @@ public class LSTM extends RecurrentCell {
         for (Parameter parameter : parameters) {
             parameter.load(manager, is);
         }
+    }
+
+    /**
+     * Creates a builder to build a {@link LSTM}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
     }
 
     /** The Builder to construct a {@link LSTM} type of {@link Block}. */

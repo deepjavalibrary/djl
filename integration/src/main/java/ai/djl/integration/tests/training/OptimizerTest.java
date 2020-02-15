@@ -28,10 +28,7 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.optimizer.Adam;
-import ai.djl.training.optimizer.Nag;
 import ai.djl.training.optimizer.Optimizer;
-import ai.djl.training.optimizer.Sgd;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.translate.Batchifier;
 import org.testng.annotations.Test;
@@ -44,7 +41,7 @@ public class OptimizerTest {
     @Test
     public void testSgd() {
         Optimizer sgd =
-                new Sgd.Builder()
+                Optimizer.sgd()
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .build();
 
@@ -54,7 +51,7 @@ public class OptimizerTest {
                         .optInitializer(Initializer.ONES)
                         .optOptimizer(sgd)
                         .optDevices(devices);
-        Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
+        Block block = Linear.builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance(devices[0])) {
             model.setBlock(block);
 
@@ -75,7 +72,7 @@ public class OptimizerTest {
     @Test
     public void testSgdWithMomentum() {
         Optimizer optim =
-                new Sgd.Builder()
+                Optimizer.sgd()
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .optMomentum(0.9f)
                         .build();
@@ -86,7 +83,7 @@ public class OptimizerTest {
                         .optInitializer(Initializer.ONES)
                         .optOptimizer(optim)
                         .optDevices(devices);
-        Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
+        Block block = Linear.builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance(devices[0])) {
             model.setBlock(block);
 
@@ -114,7 +111,7 @@ public class OptimizerTest {
     @Test
     public void testNag() {
         Optimizer optim =
-                new Nag.Builder()
+                Optimizer.nag()
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .setMomentum(0.9f)
                         .build();
@@ -126,7 +123,7 @@ public class OptimizerTest {
                         .optInitializer(Initializer.ONES)
                         .optOptimizer(optim)
                         .optDevices(devices);
-        Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
+        Block block = Linear.builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance(devices[0])) {
             model.setBlock(block);
 
@@ -148,7 +145,7 @@ public class OptimizerTest {
     @Test
     public void testAdam() {
         Optimizer optim =
-                new Adam.Builder()
+                Optimizer.adam()
                         .optLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
                         .build();
 
@@ -158,7 +155,7 @@ public class OptimizerTest {
                         .optInitializer(Initializer.ONES)
                         .optOptimizer(optim)
                         .optDevices(devices);
-        Block block = new Linear.Builder().setOutChannels(CHANNELS).build();
+        Block block = Linear.builder().setOutChannels(CHANNELS).build();
         try (Model model = Model.newInstance(devices[0])) {
             model.setBlock(block);
 

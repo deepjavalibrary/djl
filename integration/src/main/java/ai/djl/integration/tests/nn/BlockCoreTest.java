@@ -62,7 +62,7 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
         long outSize = 3;
-        Block block = new Linear.Builder().setOutChannels(outSize).build();
+        Block block = Linear.builder().setOutChannels(outSize).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 
@@ -82,7 +82,7 @@ public class BlockCoreTest {
             }
         }
 
-        block = new Linear.Builder().setOutChannels(outSize).optBias(false).build();
+        block = Linear.builder().setOutChannels(outSize).optBias(false).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 
@@ -107,7 +107,7 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
         long outSize = 3;
-        Block block = new Linear.Builder().setOutChannels(outSize).build();
+        Block block = Linear.builder().setOutChannels(outSize).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 
@@ -130,7 +130,7 @@ public class BlockCoreTest {
             }
         }
 
-        block = new Linear.Builder().setOutChannels(outSize).optBias(false).build();
+        block = Linear.builder().setOutChannels(outSize).optBias(false).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 
@@ -157,7 +157,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
-        Block block = new BatchNorm.Builder().optAxis(1).build();
+        Block block = BatchNorm.builder().optAxis(1).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 
@@ -181,7 +181,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
-        Block block = new Dropout.Builder().optProbability(.5f).build();
+        Block block = Dropout.builder().optProbability(.5f).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 
@@ -237,11 +237,7 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
         Block block =
-                new Conv1D.Builder()
-                        .setKernel(new Shape(2))
-                        .setNumFilters(1)
-                        .optBias(false)
-                        .build();
+                Conv1D.builder().setKernel(new Shape(2)).setNumFilters(1).optBias(false).build();
 
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
@@ -272,7 +268,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
-        Block block = new Conv2D.Builder().setKernel(new Shape(2, 2)).setNumFilters(1).build();
+        Block block = Conv2D.builder().setKernel(new Shape(2, 2)).setNumFilters(1).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 
@@ -303,7 +299,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
-        Block block = new Conv3D.Builder().setKernel(new Shape(2, 2, 2)).setNumFilters(1).build();
+        Block block = Conv3D.builder().setKernel(new Shape(2, 2, 2)).setNumFilters(1).build();
         try (Model model = Model.newInstance()) {
             model.setBlock(block);
 
@@ -344,7 +340,7 @@ public class BlockCoreTest {
                         .optDevices(getDevices());
 
         Block block =
-                new RNN.Builder()
+                RNN.builder()
                         .setStateSize(5)
                         .setNumStackedLayers(1)
                         .setActivation(RNN.Activation.TANH)
@@ -374,7 +370,7 @@ public class BlockCoreTest {
                         .optDevices(getDevices());
 
         Block block =
-                new RNN.Builder()
+                RNN.builder()
                         .setStateSize(5)
                         .setNumStackedLayers(1)
                         .setActivation(RNN.Activation.RELU)
@@ -407,7 +403,7 @@ public class BlockCoreTest {
                         .optInitializer(Initializer.ONES)
                         .optDevices(getDevices());
 
-        Block block = new LSTM.Builder().setStateSize(4).setNumStackedLayers(1).build();
+        Block block = LSTM.builder().setStateSize(4).setNumStackedLayers(1).build();
         try (Model model = Model.newInstance(config.getDevices()[0])) {
             model.setBlock(block);
 
@@ -439,7 +435,7 @@ public class BlockCoreTest {
                         .optInitializer(Initializer.ONES)
                         .optDevices(getDevices());
 
-        GRU block = new GRU.Builder().setStateSize(4).setNumStackedLayers(1).build();
+        GRU block = GRU.builder().setStateSize(4).setNumStackedLayers(1).build();
         try (Model model = Model.newInstance(config.getDevices()[0])) {
             model.setBlock(block);
 
@@ -470,8 +466,8 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
         SequentialBlock block = new SequentialBlock();
         block.add(x -> new NDList(x.singletonOrThrow().mul(6.5f)));
-        block.add(new Linear.Builder().setOutChannels(10).build());
-        block.add(new Linear.Builder().setOutChannels(5).build());
+        block.add(Linear.builder().setOutChannels(10).build());
+        block.add(Linear.builder().setOutChannels(5).build());
 
         Assert.assertEquals(block.getChildren().size(), 3);
         Assert.assertEquals(block.getDirectParameters().size(), 0);
@@ -479,7 +475,7 @@ public class BlockCoreTest {
 
         block.addAll(
                 Arrays.asList(
-                        new Linear.Builder().setOutChannels(3).build(),
+                        Linear.builder().setOutChannels(3).build(),
                         new LambdaBlock(x -> new NDList(x.singletonOrThrow().div(2f)))));
         Assert.assertEquals(block.getChildren().size(), 5);
         Assert.assertEquals(block.getParameters().size(), 6);
@@ -515,9 +511,9 @@ public class BlockCoreTest {
                                         list.get(0).singletonOrThrow(),
                                         list.get(1).singletonOrThrow(),
                                         list.get(2).singletonOrThrow()));
-        block.add(new Linear.Builder().setOutChannels(3).build());
+        block.add(Linear.builder().setOutChannels(3).build());
         block.add(x -> new NDList(x.singletonOrThrow().sum()));
-        block.add(new Linear.Builder().setOutChannels(2).build());
+        block.add(Linear.builder().setOutChannels(2).build());
 
         Assert.assertEquals(block.getChildren().size(), 3);
         Assert.assertEquals(block.getDirectParameters().size(), 0);

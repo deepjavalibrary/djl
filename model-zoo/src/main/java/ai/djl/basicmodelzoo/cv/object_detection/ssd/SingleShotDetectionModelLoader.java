@@ -56,12 +56,11 @@ public class SingleShotDetectionModelLoader
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings("unchecked")
     public Translator<BufferedImage, DetectedObjects> getTranslator(Artifact artifact) {
         Map<String, Object> arguments = artifact.getArguments();
         Pipeline pipeline = new Pipeline();
         pipeline.add(new ToTensor());
-        return new SingleShotDetectionTranslator.Builder()
+        return SingleShotDetectionTranslator.builder()
                 .setPipeline(pipeline)
                 .setSynsetArtifactName("synset.txt")
                 .optThreshold(((Double) arguments.get("threshold")).floatValue())
@@ -106,7 +105,7 @@ public class SingleShotDetectionModelLoader
         }
 
         Block ssdBlock =
-                new SingleShotDetection.Builder()
+                SingleShotDetection.builder()
                         .setNumClasses(numClasses)
                         .setNumFeatures(numFeatures)
                         .optGlobalPool(globalPool)

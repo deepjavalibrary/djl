@@ -69,7 +69,7 @@ public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage,
                                 new float[] {0.485f, 0.456f, 0.406f},
                                 new float[] {0.229f, 0.224f, 0.225f}));
 
-        return new ImageClassificationTranslator.Builder()
+        return ImageClassificationTranslator.builder()
                 .setPipeline(pipeline)
                 .setSynsetArtifactName("classes.txt")
                 .build();

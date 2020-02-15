@@ -14,6 +14,7 @@ package ai.djl.modality.cv;
 
 import ai.djl.ndarray.NDArray;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,6 +36,7 @@ import java.util.List;
  * per pixel is \(n + m - 1\).
  */
 public class MultiBoxPrior {
+
     private List<Float> sizes;
     private List<Float> ratios;
     private List<Float> steps;
@@ -51,7 +53,6 @@ public class MultiBoxPrior {
         this.sizes = builder.sizes;
         this.ratios = builder.ratios;
         this.steps = builder.steps;
-        this.ratios = builder.ratios;
         this.offsets = builder.offsets;
         this.clip = builder.clip;
     }
@@ -66,13 +67,25 @@ public class MultiBoxPrior {
         return input.getNDArrayInternal().multiBoxPrior(sizes, ratios, steps, offsets, clip).head();
     }
 
+    /**
+     * Creates a builder to build a {@code MultiBoxPrior}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The Builder to construct a {@link MultiBoxPrior} object. */
     public static final class Builder {
-        List<Float> sizes = Arrays.asList(1f);
-        List<Float> ratios = Arrays.asList(1f);
+
+        List<Float> sizes = Collections.singletonList(1f);
+        List<Float> ratios = Collections.singletonList(1f);
         List<Float> steps = Arrays.asList(-1f, -1f);
         List<Float> offsets = Arrays.asList(0.5f, 0.5f);
         boolean clip;
+
+        Builder() {}
 
         /**
          * Sets the sizes of the anchor boxes to be generated around each pixel.

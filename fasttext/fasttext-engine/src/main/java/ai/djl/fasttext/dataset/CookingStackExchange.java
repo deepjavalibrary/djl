@@ -50,7 +50,7 @@ public class CookingStackExchange extends FtDataset {
         Usage usage;
 
         /** Constructs a new builder. */
-        public Builder() {
+        Builder() {
             repository = FtDatasets.REPOSITORY;
             usage = Usage.TRAIN;
         }

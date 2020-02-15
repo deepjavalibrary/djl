@@ -167,7 +167,7 @@ public final class Mnist extends ArrayDataset implements ZooDataset {
         private Usage usage;
 
         /** Constructs a new builder. */
-        public Builder() {
+        Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
             pipeline = new Pipeline(new ToTensor());

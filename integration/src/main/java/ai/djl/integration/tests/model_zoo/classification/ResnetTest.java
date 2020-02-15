@@ -58,7 +58,7 @@ public class ResnetTest {
                         .optInitializer(Initializer.ONES);
 
         Block resNet50 =
-                new ResNetV1.Builder()
+                ResNetV1.builder()
                         .setImageShape(new Shape(1, 28, 28))
                         .setNumLayers(50)
                         .setOutSize(10)

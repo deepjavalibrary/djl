@@ -92,6 +92,8 @@ public final class ImageFolder extends AbstractImageFolder {
     /** A builder for the {@link ImageFolder}. */
     public static final class Builder extends ImageFolderBuilder<Builder> {
 
+        Builder() {}
+
         /** {@inheritDoc} */
         @Override
         protected Builder self() {

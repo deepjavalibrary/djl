@@ -144,13 +144,24 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
         return NDImageUtils.resize(image, rescaledWidth, rescaledHeight);
     }
 
+    /**
+     * Creates a builder to build a {@code InstanceSegmentationTranslator}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The builder for Instance Segmentation translator. */
     public static class Builder extends BaseBuilder<Builder> {
 
-        private String synsetArtifactName;
-        private float threshold = 0.3f;
-        private int shortEdge = 600;
-        private int maxEdge = 1000;
+        String synsetArtifactName;
+        float threshold = 0.3f;
+        int shortEdge = 600;
+        int maxEdge = 1000;
+
+        Builder() {}
 
         /**
          * Sets the name for the synset.

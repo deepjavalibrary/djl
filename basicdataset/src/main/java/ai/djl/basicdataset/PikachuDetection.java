@@ -190,7 +190,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         Flag flag;
 
         /** Constructs a new builder. */
-        public Builder() {
+        Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
             flag = Flag.COLOR;

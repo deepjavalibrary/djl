@@ -96,7 +96,7 @@ public class SingleShotDetectionTest {
                             NDArray classPredictions = output.get(1).softmax(-1).transpose(0, 2, 1);
                             NDArray boundingBoxPredictions = output.get(2);
                             MultiBoxDetection multiBoxDetection =
-                                    new MultiBoxDetection.Builder().build();
+                                    MultiBoxDetection.builder().build();
                             NDList detections =
                                     multiBoxDetection.detection(
                                             new NDList(
@@ -111,7 +111,7 @@ public class SingleShotDetectionTest {
     private Dataset getDataset() throws IOException {
         Pipeline pipeline = new Pipeline(new ToTensor());
         PikachuDetection pikachuDetection =
-                new PikachuDetection.Builder()
+                PikachuDetection.builder()
                         .optUsage(Dataset.Usage.TEST)
                         .optPipeline(pipeline)
                         .setSampling(32, true)

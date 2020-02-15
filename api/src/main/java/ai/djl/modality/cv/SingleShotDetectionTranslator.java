@@ -89,6 +89,15 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         return new DetectedObjects(retNames, retProbs, retBB);
     }
 
+    /**
+     * Creates a builder to build a {@code SingleShotDetectionTranslator}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The builder for SSD translator. */
     public static class Builder extends BaseBuilder<Builder> {
 
@@ -97,6 +106,8 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         private List<String> classes;
         private double imageWidth;
         private double imageHeight;
+
+        Builder() {}
 
         /**
          * Sets the threshold for prediction accuracy.

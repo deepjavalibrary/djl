@@ -34,6 +34,15 @@ public class GRU extends RecurrentCell {
         gates = 3;
     }
 
+    /**
+     * Creates a builder to build a {@link GRU}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The Builder to construct a {@link GRU} type of {@link Block}. */
     public static final class Builder extends BaseBuilder<Builder> {
 

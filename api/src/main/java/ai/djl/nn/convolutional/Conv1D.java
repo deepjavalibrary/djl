@@ -72,11 +72,20 @@ public class Conv1D extends Convolution {
         return NUM_DIMENSIONS;
     }
 
+    /**
+     * Creates a builder to build a {@code Conv1D}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The Builder to construct a {@link Conv1D} type of {@link Block}. */
     public static final class Builder extends ConvolutionBuilder<Builder> {
 
         /** Creates a builder that can build a {@link Conv1D} block. */
-        public Builder() {
+        Builder() {
             stride = new Shape(1);
             pad = new Shape(0);
             dilate = new Shape(1);

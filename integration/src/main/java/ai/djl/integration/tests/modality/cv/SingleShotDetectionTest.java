@@ -88,7 +88,7 @@ public class SingleShotDetectionTest {
             sizes.add(Arrays.asList(0.88f, 0.961f));
 
             SingleShotDetection ssd =
-                    new SingleShotDetection.Builder()
+                    SingleShotDetection.builder()
                             .setNumClasses(1)
                             .setNumFeatures(3)
                             .optGlobalPool(true)

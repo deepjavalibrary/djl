@@ -37,7 +37,7 @@ public class CaptchaTest {
             model.setBlock(Blocks.identityBlock());
 
             CaptchaDataset captchaDataset =
-                    new CaptchaDataset.Builder()
+                    CaptchaDataset.builder()
                             .optUsage(Dataset.Usage.TEST)
                             .setSampling(32, true)
                             .build();

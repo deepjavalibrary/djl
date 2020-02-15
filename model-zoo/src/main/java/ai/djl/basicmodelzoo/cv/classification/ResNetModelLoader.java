@@ -66,7 +66,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
 
         Pipeline pipeline = new Pipeline();
         pipeline.add(new CenterCrop()).add(new Resize(width, height)).add(new ToTensor());
-        return new ImageClassificationTranslator.Builder()
+        return ImageClassificationTranslator.builder()
                 .setPipeline(pipeline)
                 .setSynsetArtifactName("synset.txt")
                 .build();
@@ -85,7 +85,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
                                 .mapToLong(Double::longValue)
                                 .toArray());
         Builder blockBuilder =
-                new ResNetV1.Builder()
+                ResNetV1.builder()
                         .setNumLayers((int) ((double) arguments.get("numLayers")))
                         .setOutSize((long) ((double) arguments.get("outSize")))
                         .setImageShape(shape);

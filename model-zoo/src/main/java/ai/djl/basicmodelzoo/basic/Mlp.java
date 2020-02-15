@@ -53,14 +53,12 @@ public class Mlp extends SequentialBlock {
      * @param activation the activation function to use
      */
     public Mlp(int input, int output, int[] hidden, Function<NDList, NDList> activation) {
-
         add(Blocks.batchFlattenBlock(input));
-
         for (int hiddenSize : hidden) {
-            add(new Linear.Builder().setOutChannels(hiddenSize).build());
+            add(Linear.builder().setOutChannels(hiddenSize).build());
             add(activation);
         }
 
-        add(new Linear.Builder().setOutChannels(output).build());
+        add(Linear.builder().setOutChannels(output).build());
     }
 }

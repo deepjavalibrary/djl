@@ -40,7 +40,7 @@ public class Cifar10Test {
 
             Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
             Cifar10 cifar10 =
-                    new Cifar10.Builder()
+                    Cifar10.builder()
                             .optManager(model.getNDManager())
                             .optUsage(Usage.TEST)
                             .optRepository(repository)
@@ -68,7 +68,7 @@ public class Cifar10Test {
             model.setBlock(Blocks.identityBlock());
 
             Cifar10 cifar10 =
-                    new Cifar10.Builder()
+                    Cifar10.builder()
                             .optManager(model.getNDManager())
                             .optUsage(Usage.TEST)
                             .setSampling(32, true)

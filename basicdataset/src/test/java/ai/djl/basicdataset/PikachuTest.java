@@ -34,7 +34,7 @@ public class PikachuTest {
     public void testPikachuRemote() throws IOException {
         PikachuDetection pikachu =
                 new PikachuDetectionUnitTest(
-                        new PikachuDetection.Builder()
+                        PikachuDetection.builder()
                                 .optUsage(Dataset.Usage.TEST)
                                 .setSampling(1, true));
         pikachu.prepare();

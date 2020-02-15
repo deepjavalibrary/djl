@@ -69,7 +69,7 @@ public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints
                                 new float[] {0.485f, 0.456f, 0.406f},
                                 new float[] {0.229f, 0.224f, 0.225f}));
 
-        return new SimplePoseTranslator.Builder()
+        return SimplePoseTranslator.builder()
                 .setPipeline(pipeline)
                 .optThreshold((float) threshold)
                 .build();

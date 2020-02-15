@@ -34,7 +34,7 @@ public class ImageNetTest {
                 Repository.newInstance(
                         "test", System.getProperty("user.home") + "/Desktop/testImagenet");
         ImageNet imagenet =
-                new ImageNet.Builder()
+                ImageNet.builder()
                         .optUsage(Usage.VALIDATION)
                         .setRepository(repository)
                         .setSampling(32, true)

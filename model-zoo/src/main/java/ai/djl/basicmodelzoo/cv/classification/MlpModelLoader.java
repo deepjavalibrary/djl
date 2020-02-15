@@ -64,7 +64,7 @@ public class MlpModelLoader extends BaseModelLoader<BufferedImage, Classificatio
 
         Pipeline pipeline = new Pipeline();
         pipeline.add(new CenterCrop()).add(new Resize(width, height)).add(new ToTensor());
-        return new ImageClassificationTranslator.Builder()
+        return ImageClassificationTranslator.builder()
                 .optFlag(NDImageUtils.Flag.valueOf(flag))
                 .setPipeline(pipeline)
                 .setSynsetArtifactName("synset.txt")

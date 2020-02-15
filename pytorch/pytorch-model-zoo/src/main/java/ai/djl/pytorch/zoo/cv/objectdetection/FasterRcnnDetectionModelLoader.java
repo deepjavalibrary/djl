@@ -64,7 +64,7 @@ public class FasterRcnnDetectionModelLoader
         Pipeline pipeline = new Pipeline();
         pipeline.add(new Resize(width, height)).add(new ToTensor());
 
-        return new SingleShotDetectionTranslator.Builder()
+        return SingleShotDetectionTranslator.builder()
                 .setPipeline(pipeline)
                 .setSynsetArtifactName("classes.txt")
                 .optThreshold((float) threshold)

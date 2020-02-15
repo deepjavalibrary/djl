@@ -194,13 +194,13 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     /** A builder to construct a {@link CocoDetection}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
-        private Flag flag;
-        private Repository repository;
-        private Artifact artifact;
-        private Usage usage;
+        Flag flag;
+        Repository repository;
+        Artifact artifact;
+        Usage usage;
 
         /** Constructs a new builder. */
-        public Builder() {
+        Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
             pipeline = new Pipeline(new ToTensor());

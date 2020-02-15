@@ -87,11 +87,22 @@ public class Dropout extends ParameterBlock {
         }
     }
 
+    /**
+     * Creates a builder to build a {@link Dropout}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The Builder to construct a {@link Dropout} type of {@link ai.djl.nn.Block}. */
     public static final class Builder {
 
         private float probability = 0.5f;
         private int[] sharedAxes = {};
+
+        Builder() {}
 
         /**
          * Sets the probability or the fraction of the input that gets dropped out during training

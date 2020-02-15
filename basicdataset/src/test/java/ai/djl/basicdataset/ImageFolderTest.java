@@ -49,7 +49,7 @@ public class ImageFolderTest {
             model.setBlock(Blocks.identityBlock());
 
             ImageFolder dataset =
-                    new ImageFolder.Builder()
+                    ImageFolder.builder()
                             .setRepository(repository)
                             .optPipeline(
                                     new Pipeline().add(new Resize(100, 100)).add(new ToTensor()))

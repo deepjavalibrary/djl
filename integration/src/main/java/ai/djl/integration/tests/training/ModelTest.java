@@ -32,8 +32,8 @@ public class ModelTest {
     @Test
     public void testModelSaveAndLoad() throws IOException, MalformedModelException {
         SequentialBlock block = new SequentialBlock();
-        block.add(new Conv2D.Builder().setKernel(new Shape(1, 1)).setNumFilters(10).build());
-        block.add(new BatchNorm.Builder().build());
+        block.add(Conv2D.builder().setKernel(new Shape(1, 1)).setNumFilters(10).build());
+        block.add(BatchNorm.builder().build());
         try (Model saveModel = Model.newInstance();
                 Model loadModel = Model.newInstance()) {
             block.setInitializer(new XavierInitializer());

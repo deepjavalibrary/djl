@@ -133,7 +133,7 @@ public final class TrainWithOptimizers {
             block.removeLastBlock();
             newBlock.add(block);
             newBlock.add(x -> new NDList(x.singletonOrThrow().squeeze()));
-            newBlock.add(new Linear.Builder().setOutChannels(10).build());
+            newBlock.add(Linear.builder().setOutChannels(10).build());
             newBlock.add(Blocks.batchFlattenBlock());
             model.setBlock(newBlock);
             if (!preTrained) {
@@ -155,7 +155,7 @@ public final class TrainWithOptimizers {
             // construct new ResNet50 without pre-trained weights
             Model model = Model.newInstance();
             Block resNet50 =
-                    new ResNetV1.Builder()
+                    ResNetV1.builder()
                             .setImageShape(new Shape(3, Cifar10.IMAGE_HEIGHT, Cifar10.IMAGE_WIDTH))
                             .setNumLayers(50)
                             .setOutSize(10)

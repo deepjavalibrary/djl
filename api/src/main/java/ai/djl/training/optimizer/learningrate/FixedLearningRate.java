@@ -32,8 +32,20 @@ class FixedLearningRate extends LearningRateTracker {
     public float getNewLearningRate(int numUpdate) {
         return baseLearningRate;
     }
+
+    /**
+     * Creates a builder to build a {@code FixedLearningRate}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The Builder to construct an {@link FixedLearningRate} object. */
     public static final class Builder extends LrBaseBuilder<Builder> {
+
+        Builder() {}
 
         /** {@inheritDoc} */
         @Override

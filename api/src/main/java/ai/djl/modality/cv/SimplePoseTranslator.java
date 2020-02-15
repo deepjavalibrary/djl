@@ -80,10 +80,21 @@ public class SimplePoseTranslator extends ImageTranslator<Joints> {
         return new Joints(joints);
     }
 
+    /**
+     * Creates a builder to build a {@code SimplePoseTranslator}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The builder for Pose Estimation translator. */
     public static class Builder extends BaseBuilder<Builder> {
 
         float threshold;
+
+        Builder() {}
 
         /** {@inheritDoc} */
         @Override

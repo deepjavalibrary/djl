@@ -41,6 +41,15 @@ public class RNN extends RecurrentCell {
         gates = 1;
     }
 
+    /**
+     * Creates a builder to build a {@link RNN}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The Builder to construct a {@link RNN} type of {@link Block}. */
     public static final class Builder extends BaseBuilder<Builder> {
 

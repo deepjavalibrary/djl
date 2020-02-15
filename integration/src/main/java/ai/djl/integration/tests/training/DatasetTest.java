@@ -273,7 +273,7 @@ public class DatasetTest {
             ExecutorService executor = Executors.newFixedThreadPool(5);
 
             Cifar10 cifar10 =
-                    new Cifar10.Builder()
+                    Cifar10.builder()
                             .optManager(manager)
                             .setSampling(100, true)
                             .optUsage(Dataset.Usage.TEST)

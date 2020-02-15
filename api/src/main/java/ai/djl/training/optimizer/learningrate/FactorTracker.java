@@ -69,9 +69,12 @@ public class FactorTracker extends LearningRateTracker {
 
     /** The Builder to construct an {@link FactorTracker} object. */
     public static final class Builder extends LrBaseBuilder<Builder> {
-        private int step;
-        private float factor = 1;
-        private float stopFactorLearningRate = 1e-8f;
+
+        int step;
+        float factor = 1;
+        float stopFactorLearningRate = 1e-8f;
+
+        Builder() {}
 
         /** {@inheritDoc} */
         @Override
