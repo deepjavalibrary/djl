@@ -147,8 +147,8 @@ public class MRL {
         /** The default set of {@link Anchor}s for natural language processing {@link Model}s. */
         interface NLP {
 
-            Anchor QUESTION_ANSWER = new Anchor("model/nlp/qa");
-            Anchor TEXT_CLASSIFICATION = new Anchor("model/nlp/textclassification");
+            Anchor QUESTION_ANSWER = new Anchor("model/nlp/question_answer");
+            Anchor TEXT_CLASSIFICATION = new Anchor("model/nlp/text_classification");
         }
     }
 }
