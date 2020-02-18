@@ -44,7 +44,7 @@ public class PtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public boolean hasCapability(String capability) {
-        return false;
+        return JniUtils.hasCapability(capability);
     }
 
     /** {@inheritDoc} */

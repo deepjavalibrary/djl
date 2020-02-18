@@ -13,6 +13,7 @@
 package ai.djl.pytorch.jni;
 
 import ai.djl.Device;
+import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
@@ -43,6 +44,14 @@ public final class JniUtils {
             throw new UnsupportedOperationException("Type not supported");
         } else {
             return 1;
+        }
+    }
+
+    public static boolean hasCapability(String capability) {
+        if (capability.equals(StandardCapabilities.CUDA)) {
+            return PyTorchLibrary.LIB.torchCudaAvailable();
+        } else {
+            throw new UnsupportedOperationException("Unsupported capability: " + capability);
         }
     }
 

@@ -20,3 +20,8 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchManualSeed
 (JNIEnv *env, jobject jthis, jlong jseed) {
   torch::manual_seed(jseed);
 }
+
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchCudaAvailable
+  (JNIEnv *env, jobject jthis) {
+  return torch::cuda::is_available();
+}
