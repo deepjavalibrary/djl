@@ -35,7 +35,7 @@ public class Criteria<I, O> {
     private Device device;
     private String modelZooName;
     private String modelLoaderName;
-    private Map<String, String> options;
+    private Map<String, String> filters;
     private Map<String, Object> arguments;
     private Translator<I, O> translator;
     private Progress progress;
@@ -48,7 +48,7 @@ public class Criteria<I, O> {
         this.device = builder.device;
         this.modelZooName = builder.modelZooName;
         this.modelLoaderName = builder.modelLoaderName;
-        this.options = builder.options;
+        this.filters = builder.filters;
         this.arguments = builder.arguments;
         this.translator = builder.translator;
         this.progress = builder.progress;
@@ -118,12 +118,12 @@ public class Criteria<I, O> {
     }
 
     /**
-     * Returns the search conditions that must match the properties of the model.
+     * Returns the search filters that must match the properties of the model.
      *
-     * @return the search conditions that must match the properties of the model.
+     * @return the search filters that must match the properties of the model.
      */
-    public Map<String, String> getOptions() {
-        return options;
+    public Map<String, String> getFilters() {
+        return filters;
     }
 
     /**
@@ -172,7 +172,7 @@ public class Criteria<I, O> {
         Device device;
         String modelZooName;
         String modelLoaderName;
-        Map<String, String> options;
+        Map<String, String> filters;
         Map<String, Object> arguments;
         Translator<I, O> translator;
         Progress progress;
@@ -188,7 +188,7 @@ public class Criteria<I, O> {
             engine = parent.engine;
             device = parent.device;
             modelZooName = parent.modelZooName;
-            options = parent.options;
+            filters = parent.filters;
             arguments = parent.arguments;
             progress = parent.progress;
         }
@@ -262,28 +262,28 @@ public class Criteria<I, O> {
         }
 
         /**
-         * Sets the extra search conditions for this criteria.
+         * Sets the extra search filters for this criteria.
          *
-         * @param options the extra search conditions
+         * @param filters the extra search filters
          * @return this {@code Builder}
          */
-        public Builder<I, O> optOptions(Map<String, String> options) {
-            this.options = options;
+        public Builder<I, O> optFilters(Map<String, String> filters) {
+            this.filters = filters;
             return this;
         }
 
         /**
-         * Sets an extra search condition for this criteria.
+         * Sets an extra search filter for this criteria.
          *
          * @param key the search key
          * @param value the search value
          * @return this {@code Builder}
          */
-        public Builder<I, O> optOption(String key, String value) {
-            if (options == null) {
-                options = new HashMap<>();
+        public Builder<I, O> optFilter(String key, String value) {
+            if (filters == null) {
+                filters = new HashMap<>();
             }
-            options.put(key, value);
+            filters.put(key, value);
             return this;
         }
 

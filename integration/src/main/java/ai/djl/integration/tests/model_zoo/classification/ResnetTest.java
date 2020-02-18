@@ -137,8 +137,8 @@ public class ResnetTest {
                         .setTypes(BufferedImage.class, Classifications.class)
                         .optModelZooName(BasicModelZoo.NAME)
                         .optModelLoaderName("resnet")
-                        .optOption("layers", "50")
-                        .optOption("dataset", "cifar10")
+                        .optFilter("layers", "50")
+                        .optFilter("dataset", "cifar10")
                         .build();
 
         return ModelZoo.loadModel(criteria);

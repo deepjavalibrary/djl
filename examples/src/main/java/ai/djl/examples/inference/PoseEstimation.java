@@ -77,10 +77,10 @@ public final class PoseEstimation {
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(BufferedImage.class, DetectedObjects.class)
-                        .optOption("size", "512")
-                        .optOption("backbone", "resnet50")
-                        .optOption("flavor", "v1")
-                        .optOption("dataset", "voc")
+                        .optFilter("size", "512")
+                        .optFilter("backbone", "resnet50")
+                        .optFilter("flavor", "v1")
+                        .optFilter("dataset", "voc")
                         .optProgress(new ProgressBar())
                         .build();
 
@@ -115,9 +115,9 @@ public final class PoseEstimation {
                 Criteria.builder()
                         .optApplication(Application.CV.POSE_ESTIMATION)
                         .setTypes(BufferedImage.class, Joints.class)
-                        .optOption("backbone", "resnet18")
-                        .optOption("flavor", "v1b")
-                        .optOption("dataset", "imagenet")
+                        .optFilter("backbone", "resnet18")
+                        .optFilter("flavor", "v1b")
+                        .optFilter("dataset", "imagenet")
                         .build();
 
         try (ZooModel<BufferedImage, Joints> pose = ModelZoo.loadModel(criteria)) {

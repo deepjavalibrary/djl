@@ -52,6 +52,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class SingleShotDetectionTest {
+
     @Test
     public void testLoadPredict()
             throws IOException, ModelNotFoundException, TranslateException,
@@ -136,8 +137,8 @@ public class SingleShotDetectionTest {
                         .setTypes(BufferedImage.class, DetectedObjects.class)
                         .optModelZooName(BasicModelZoo.NAME)
                         .optModelLoaderName("ssd")
-                        .optOption("flavor", "tiny")
-                        .optOption("dataset", "pikachu")
+                        .optFilter("flavor", "tiny")
+                        .optFilter("dataset", "pikachu")
                         .build();
 
         return ModelZoo.loadModel(criteria);

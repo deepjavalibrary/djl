@@ -13,6 +13,8 @@
 package ai.djl.pytorch.zoo.cv.objectdetection;
 
 import ai.djl.Application;
+import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.SingleShotDetectionTranslator;
 import ai.djl.modality.cv.transform.Resize;
@@ -21,10 +23,15 @@ import ai.djl.pytorch.zoo.PtModelZoo;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
+import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
+import ai.djl.util.Progress;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,7 +44,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @see ai.djl.pytorch.engine.PtSymbolBlock
  */
-public class FasterRcnnDetectionModelLoader extends BaseModelLoader {
+public class FasterRcnnDetectionModelLoader
+        extends BaseModelLoader<BufferedImage, DetectedObjects> {
 
     private static final Application APPLICATION = Application.CV.OBJECT_DETECTION;
     private static final String GROUP_ID = PtModelZoo.GROUP_ID;
@@ -60,6 +68,31 @@ public class FasterRcnnDetectionModelLoader extends BaseModelLoader {
     @Override
     public Application getApplication() {
         return APPLICATION;
+    }
+
+    /**
+     * Loads the model with the given search filters.
+     *
+     * @param filters the search filters to match against the loaded model
+     * @param device the device the loaded model should use
+     * @param progress the progress tracker to update while loading the model
+     * @return the loaded model
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     * @throws MalformedModelException if the model data is malformed
+     */
+    @Override
+    public ZooModel<BufferedImage, DetectedObjects> loadModel(
+            Map<String, String> filters, Device device, Progress progress)
+            throws IOException, ModelNotFoundException, MalformedModelException {
+        Criteria<BufferedImage, DetectedObjects> criteria =
+                Criteria.builder()
+                        .setTypes(BufferedImage.class, DetectedObjects.class)
+                        .optFilters(filters)
+                        .optDevice(device)
+                        .optProgress(progress)
+                        .build();
+        return loadModel(criteria);
     }
 
     private static final class FactoryImpl

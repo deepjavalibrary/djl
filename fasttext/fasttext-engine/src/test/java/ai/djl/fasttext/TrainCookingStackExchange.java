@@ -12,7 +12,6 @@
  */
 package ai.djl.fasttext;
 
-import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ModelException;
@@ -24,9 +23,7 @@ import ai.djl.fasttext.engine.Word2VecTranslator;
 import ai.djl.fasttext.zoo.FtModelZoo;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
-import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.util.ProgressBar;
@@ -72,14 +69,8 @@ public class TrainCookingStackExchange {
     public void testTextClassification()
             throws IOException, TranslateException, MalformedModelException,
                     ModelNotFoundException {
-        Criteria<String, Classifications> criteria =
-                Criteria.builder()
-                        .optApplication(Application.NLP.TEXT_CLASSIFICATION)
-                        .setTypes(String.class, Classifications.class)
-                        .optModelZooName(FtModelZoo.NAME)
-                        .optModelLoaderName(FtModelZoo.COOKING_STACKEXCHANGE.getName())
-                        .build();
-        try (ZooModel<String, Classifications> model = ModelZoo.loadModel(criteria)) {
+        try (ZooModel<String, Classifications> model =
+                FtModelZoo.COOKING_STACKEXCHANGE.loadModel()) {
             try (Predictor<String, Classifications> predictor = model.newPredictor()) {
                 Classifications result =
                         predictor.predict("Which baking dish is best to bake a banana bread ?");
@@ -93,14 +84,8 @@ public class TrainCookingStackExchange {
     public void testWord2Vec()
             throws IOException, TranslateException, MalformedModelException,
                     ModelNotFoundException {
-        Criteria<String, Classifications> criteria =
-                Criteria.builder()
-                        .optApplication(Application.NLP.TEXT_CLASSIFICATION)
-                        .setTypes(String.class, Classifications.class)
-                        .optModelZooName(FtModelZoo.NAME)
-                        .optModelLoaderName(FtModelZoo.COOKING_STACKEXCHANGE.getName())
-                        .build();
-        try (ZooModel<String, Classifications> model = ModelZoo.loadModel(criteria)) {
+        try (ZooModel<String, Classifications> model =
+                FtModelZoo.COOKING_STACKEXCHANGE.loadModel()) {
             Word2VecTranslator translator = new Word2VecTranslator();
             try (Predictor<String, float[]> predictor = model.newPredictor(translator)) {
                 float[] result = predictor.predict("bread");

@@ -55,8 +55,8 @@ public final class ActionRecognition {
                 Criteria.builder()
                         .optApplication(Application.CV.ACTION_RECOGNITION)
                         .setTypes(BufferedImage.class, Classifications.class)
-                        .optOption("backbone", "inceptionv3")
-                        .optOption("dataset", "ucf101")
+                        .optFilter("backbone", "inceptionv3")
+                        .optFilter("dataset", "ucf101")
                         .optProgress(new ProgressBar())
                         .build();
 
