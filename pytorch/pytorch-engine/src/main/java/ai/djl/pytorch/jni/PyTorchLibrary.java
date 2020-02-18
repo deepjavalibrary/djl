@@ -233,7 +233,7 @@ public final class PyTorchLibrary {
 
     public native void torchNegi(Pointer self);
 
-    public native Pointer normalize(Pointer handle, float[] mean, float[] std);
+    public native Pointer normalize(Pointer handle, Pointer mean, Pointer std);
 
     public native Pointer atNormal(
             double mean,
@@ -261,7 +261,7 @@ public final class PyTorchLibrary {
     // TODO to be removed once we have div and swapAxes operator
     public native Pointer toTensor(Pointer handle);
 
-    public native Pointer moduleLoad(String path);
+    public native Pointer moduleLoad(String path, int[] device);
 
     public native void moduleEval(Pointer handle);
 

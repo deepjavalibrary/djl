@@ -639,8 +639,16 @@ public final class JniUtils {
     }
 
     public static PtNDArray normalize(PtNDArray ndArray, float[] mean, float[] std) {
+        PtNDArray meanNDArray = (PtNDArray) ndArray.getManager().create(mean, new Shape(3, 1, 1));
+        PtNDArray stdNDArray = (PtNDArray) ndArray.getManager().create(std, new Shape(3, 1, 1));
+        if (ndArray.getShape().dimension() == 4) {
+            meanNDArray = meanNDArray.reshape(new Shape(1, 3, 1, 1));
+            stdNDArray = stdNDArray.reshape(new Shape(1, 3, 1, 1));
+        }
         return new PtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.normalize(ndArray.getHandle(), mean, std));
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.normalize(
+                        ndArray.getHandle(), meanNDArray.getHandle(), stdNDArray.getHandle()));
     }
 
     public static PtNDArray resize(PtNDArray ndArray, long[] size, boolean alignCorners) {
@@ -693,8 +701,11 @@ public final class JniUtils {
         PyTorchLibrary.LIB.torchDeleteModule(block.getHandle());
     }
 
-    public static PtSymbolBlock loadModule(PtNDManager manager, Path path) {
-        Pointer handle = PyTorchLibrary.LIB.moduleLoad(path.toString());
+    public static PtSymbolBlock loadModule(PtNDManager manager, Path path, Device device) {
+        Pointer handle =
+                PyTorchLibrary.LIB.moduleLoad(
+                        path.toString(),
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()});
         return new PtSymbolBlock(manager, handle);
     }
 

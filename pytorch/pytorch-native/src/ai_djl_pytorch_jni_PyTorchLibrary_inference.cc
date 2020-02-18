@@ -18,9 +18,10 @@
 // The file is the implementation for PyTorch inference operations
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad
-  (JNIEnv* env, jobject jthis, jstring jpath) {
+  (JNIEnv* env, jobject jthis, jstring jpath, jintArray jarray) {
   const std::string path_string((env)->GetStringUTFChars(jpath, JNI_FALSE));
-  const torch::jit::script::Module module = torch::jit::load(path_string);
+  const c10::Device device = utils::GetDeviceFromJDevice(env, jarray);
+  const torch::jit::script::Module module = torch::jit::load(path_string, device);
   const auto* module_ptr = new torch::jit::script::Module(module);
   return utils::CreatePointer<torch::jit::script::Module>(env, module_ptr);
 }
