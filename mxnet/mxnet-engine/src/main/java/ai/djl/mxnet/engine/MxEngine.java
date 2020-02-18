@@ -83,7 +83,7 @@ public class MxEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager(Device device) {
-        return MxNDManager.getSystemManager().newSubManager();
+        return MxNDManager.getSystemManager().newSubManager(device);
     }
 
     /** {@inheritDoc} */

@@ -62,7 +62,7 @@ public class PtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager(Device device) {
-        return PtNDManager.getSystemManager().newSubManager();
+        return PtNDManager.getSystemManager().newSubManager(device);
     }
 
     /** {@inheritDoc} */

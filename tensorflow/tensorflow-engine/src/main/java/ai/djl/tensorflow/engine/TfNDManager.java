@@ -14,6 +14,7 @@ package ai.djl.tensorflow.engine;
 
 import ai.djl.Device;
 import ai.djl.engine.Engine;
+import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -22,52 +23,46 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import org.tensorflow.Graph;
-import org.tensorflow.Session;
+import java.nio.ByteOrder;
+import org.tensorflow.EagerSession;
 import org.tensorflow.Tensor;
 import org.tensorflow.Tensors;
+import org.tensorflow.op.Ops;
+import org.tensorflow.op.image.DecodeJpeg;
 
-public class TfNDManager implements NDManager {
+public class TfNDManager extends BaseNDManager {
 
     static final TfNDManager SYSTEM_MANAGER = new SystemManager();
     private static int nameAssignment = 1;
+    EagerSession eagerSession;
+    Ops tf;
 
-    private NDManager parent;
-    private String uid;
-    private Device device;
-    Graph graph;
-    Session session;
-    private Map<String, AutoCloseable> resources;
-
-    private TfNDManager(NDManager parent, Device device, Graph graph) {
-        this.parent = parent;
-        this.device = device;
-        this.graph = graph;
-        resources = new ConcurrentHashMap<>();
-        uid = UUID.randomUUID().toString();
+    private TfNDManager(NDManager parent, Device device) {
+        super(parent, device);
     }
 
-    public static TfNDManager newBaseManager() {
-        return SYSTEM_MANAGER.newSubManager();
+    static TfNDManager getSystemManager() {
+        return SYSTEM_MANAGER;
     }
 
-    public static TfNDManager newBaseManager(Device device) {
-        return SYSTEM_MANAGER.newSubManager(device);
+    /** {@inheritDoc} */
+    @Override
+    public ByteBuffer allocateDirect(int capacity) {
+        return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     }
 
-    Graph getGraph() {
-        return graph;
-    }
-
-    Session getSession() {
-        TfNDManager f = this;
-        while (f.session == null) {
-            f = (TfNDManager) f.getParentManager();
+    EagerSession getEagerSession() {
+        if (eagerSession == null) {
+            eagerSession = EagerSession.options().async(true).build();
         }
-        return f.session;
+        return eagerSession;
+    }
+
+    Ops getTf() {
+        if (tf == null) {
+            tf = Ops.create(eagerSession);
+        }
+        return tf;
     }
 
     static int nextNameAssignment() {
@@ -76,8 +71,9 @@ public class TfNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public ByteBuffer allocateDirect(int capacity) {
-        return ByteBuffer.allocateDirect(capacity);
+    public NDArray create(byte[] data) {
+        return new TfNDArray(
+                this, tf.image.decodeJpeg(tf.constant(data), DecodeJpeg.channels((long) 3)));
     }
 
     /** {@inheritDoc} */
@@ -139,13 +135,57 @@ public class TfNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Device device) {
-        return null;
+        switch (dataType) {
+            case INT32:
+                return new TfNDArray(this, tf.zeros(tf.constant(shape.getShape()), Integer.class));
+            case INT64:
+                return new TfNDArray(this, tf.zeros(tf.constant(shape.getShape()), Long.class));
+            case FLOAT16:
+                return new TfNDArray(this, tf.zeros(tf.constant(shape.getShape()), Short.class));
+            case FLOAT64:
+                return new TfNDArray(this, tf.zeros(tf.constant(shape.getShape()), Double.class));
+            default:
+                return new TfNDArray(this, tf.zeros(tf.constant(shape.getShape()), Float.class));
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray ones(Shape shape, DataType dataType, Device device) {
-        return null;
+        return fill(shape, 1, dataType, device);
+    }
+
+    public NDArray fill(Shape shape, Number value, DataType dataType, Device device) {
+        switch (dataType) {
+            case INT32:
+                return new TfNDArray(
+                        this,
+                        tf.fill(tf.constant(shape.getShape()), tf.constant(value.intValue())));
+            case INT64:
+                return new TfNDArray(
+                        this,
+                        tf.fill(
+                                tf.constant(shape.getShape()).asOutput(),
+                                tf.constant(value.longValue())));
+            case FLOAT16:
+                return new TfNDArray(
+                        this,
+                        tf.fill(
+                                tf.constant(shape.getShape()).asOutput(),
+                                tf.constant(value.shortValue())));
+            case FLOAT64:
+                return new TfNDArray(
+                        this,
+                        tf.fill(
+                                tf.constant(shape.getShape()).asOutput(),
+                                tf.constant(value.doubleValue())));
+            default:
+                return new TfNDArray(
+                        this,
+                        tf.fill(
+                                tf.constant(shape.getShape()).asOutput(),
+                                tf.constant(value.floatValue())));
+        }
     }
 
     /** {@inheritDoc} */
@@ -213,20 +253,17 @@ public class TfNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public TfNDManager newSubManager(Device device) {
-        TfNDManager manager = new TfNDManager(this, device, graph);
-        resources.put(manager.uid, manager);
+        TfNDManager manager = new TfNDManager(this, device);
+        attach(manager.uid, manager);
+        // initialize eager sessions and operators only for sub managers
+        manager.getEagerSession();
+        manager.getTf();
         return manager;
     }
 
     @Override
     public boolean isOpen() {
         return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attach(String resourceId, AutoCloseable resource) {
-        resources.put(resourceId, resource);
     }
 
     /** {@inheritDoc} */
@@ -238,22 +275,14 @@ public class TfNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        for (AutoCloseable resource : resources.values()) {
-            try {
-                resource.close();
-            } catch (Exception ignore) {
-                // ignore
-            }
-        }
-        resources = null;
-        parent.detach(uid);
+        super.close();
+        eagerSession.close();
     }
 
     private static final class SystemManager extends TfNDManager {
 
         SystemManager() {
-            super(null, Device.defaultDevice(), new Graph());
-            session = new Session(graph);
+            super(null, Device.defaultDevice());
         }
 
         /** {@inheritDoc} */

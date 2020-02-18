@@ -15,11 +15,8 @@ package ai.djl.tensorflow.engine;
 import ai.djl.inference.BasePredictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
-import ai.djl.util.Pair;
-import ai.djl.util.PairList;
 import java.util.List;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
@@ -33,24 +30,17 @@ public class TfPredictor<I, O> extends BasePredictor<I, O> {
     /** {@inheritDoc} */
     @Override
     protected NDList forward(TranslatorContext ctx, NDList ndList) {
-        Session session = ((TfNDManager) model).getSession();
-        TfNDManager tfNDManager = (TfNDManager) manager;
+        Session session = ((TfModel) model).getSession();
         Session.Runner runner = session.runner();
         for (NDArray array : ndList) {
-            runner.feed(array.getName(), ((TfNDArray) array).getTensor());
+            runner.feed("serving_default_input_1:0", ((TfNDArray) array).getTensor());
         }
-        // TODO We can extract input name from describeInput in Model if NDList doesn't have names
-        PairList<String, Shape> dataDescs = model.describeOutput();
-        for (Pair<String, Shape> pair : dataDescs) {
-            runner.fetch(pair.getKey());
-        }
+        runner.fetch("StatefulPartitionedCall:0");
         List<Tensor<?>> result = runner.run();
 
         NDList resultNDList = new NDList();
-        for (int i = 0; i < result.size(); i++) {
-            NDArray array = tfNDManager.create(result.get(i));
-            array.setName(dataDescs.get(i).getKey());
-            resultNDList.add(array);
+        for (Tensor<?> tensor : result) {
+            resultNDList.add(((TfNDManager) model.getNDManager()).create(tensor));
         }
 
         return resultNDList;

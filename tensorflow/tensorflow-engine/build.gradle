@@ -1,0 +1,45 @@
+group "ai.djl.tensorflow"
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', 'build/generated-src']
+        }
+    }
+}
+
+checkstyleMain.source = 'src/main/java'
+pmdMain.source = 'src/main/java'
+def BINARY_ROOT = "${project.buildDir}/download"
+def TF_URL = "https://storage.googleapis.com/tensorflow-nightly/github/tensorflow/lib_package"
+def TF_LIB = "libtensorflow.jar"
+
+task downloadJar {
+    doLast {
+        println "downloading ${TF_LIB} to ${BINARY_ROOT}/"
+        File file = new File("${BINARY_ROOT}/${TF_LIB}")
+        file.parentFile.mkdirs()
+        if (!file.exists()) {
+            new URL("${TF_URL}/${TF_LIB}").withInputStream { downloadStream ->
+                file.withOutputStream { fileOut ->
+                    fileOut << downloadStream
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    api project(":api")
+    compile files("${BINARY_ROOT}/${TF_LIB}")
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
+}
+
+compileJava.dependsOn downloadJar

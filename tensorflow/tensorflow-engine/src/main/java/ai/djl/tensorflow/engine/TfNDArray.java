@@ -26,43 +26,55 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
+import org.tensorflow.Operand;
 import org.tensorflow.Operation;
-import org.tensorflow.Output;
 import org.tensorflow.Tensor;
+import org.tensorflow.op.Ops;
 import org.tensorflow.types.UInt8;
 
 public class TfNDArray implements NDArray {
 
     private String uid = UUID.randomUUID().toString();
     private Tensor<?> tensor;
-    private Output<?> out;
     private Shape shape;
     private TfNDManager manager;
+    private Ops tf;
+    private Operand<?> operand;
+    private String name;
+    private TfNDArrayEx tfNDArrayEx;
 
     TfNDArray(NDManager manager, Tensor<?> tensor) {
         this.manager = (TfNDManager) manager;
         this.manager.attach(getUid(), this);
         this.tensor = tensor;
+        this.tf = this.manager.getTf();
+        tfNDArrayEx = new TfNDArrayEx(this);
     }
 
-    TfNDArray(NDManager manager, Output<?> out) {
+    TfNDArray(NDManager manager, Operand<?> out) {
         this.manager = (TfNDManager) manager;
         this.manager.attach(getUid(), this);
-        this.out = out;
+        this.tensor = out.asOutput().tensor();
+        this.tf = this.manager.getTf();
+        tfNDArrayEx = new TfNDArrayEx(this);
     }
 
     public TfNDArray(NDManager manager, Shape shape, FloatBuffer data) {
         this.manager = (TfNDManager) manager;
         this.manager.attach(getUid(), this);
-        tensor = Tensor.create(shape.getShape(), data);
+        tensor = (Tensor<?>) Tensor.create(shape.getShape(), data);
         this.shape = shape;
+        this.tf = this.manager.getTf();
+        tfNDArrayEx = new TfNDArrayEx(this);
     }
 
     TfNDArray(NDManager manager, Shape shape, ByteBuffer data) {
         this.manager = (TfNDManager) manager;
-        tensor = Tensor.create(UInt8.class, shape.getShape(), data);
+        this.manager.attach(getUid(), this);
+        tensor = (Tensor<?>) Tensor.create(UInt8.class, shape.getShape(), data);
         this.shape = shape;
+        this.tf = this.manager.getTf();
+        tfNDArrayEx = new TfNDArrayEx(this);
     }
 
     /** {@inheritDoc} */
@@ -74,12 +86,14 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setName(String name) {}
+    public void setName(String name) {
+        this.name = name;
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -103,24 +117,14 @@ public class TfNDArray implements NDArray {
     @Override
     public Shape getShape() {
         if (shape == null) {
-            runToTensor();
+            // runToTensor();
             shape = new Shape(tensor.shape());
         }
         return shape;
     }
 
-    private void runToTensor() {
-        if (tensor == null) {
-            tensor = manager.getSession().runner().fetch(out.op().name()).run().get(0);
-        }
-    }
-
     public org.tensorflow.DataType getTfDataType() {
-        if (tensor != null) {
-            return tensor.dataType();
-        } else {
-            return out.dataType();
-        }
+        return tensor.dataType();
     }
 
     /** {@inheritDoc} */
@@ -144,7 +148,23 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
-        return null;
+        switch (dataType) {
+            case INT32:
+                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Integer.class));
+            case INT64:
+                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Long.class));
+            case FLOAT16:
+                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Short.class));
+            case FLOAT64:
+                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Double.class));
+            case BOOLEAN:
+                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Boolean.class));
+            case INT8:
+            case UINT8:
+                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Byte.class));
+            default:
+                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Float.class));
+        }
     }
 
     /** {@inheritDoc} */
@@ -160,7 +180,15 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
-        return null;
+        Shape sh = getShape();
+        DataType dType = getDataType();
+        long product = sh.size();
+        long len = dType.getNumOfBytes() * product;
+        ByteBuffer bb = manager.allocateDirect(Math.toIntExact(len));
+        tensor.writeTo(bb);
+        // reset buffer position for converting to other buffer type
+        bb.rewind();
+        return bb;
     }
 
     /** {@inheritDoc} */
@@ -200,25 +228,13 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray zerosLike() {
-        Operation op =
-                manager.getGraph()
-                        .opBuilder("ZerosLike", "ZerosLike_" + TfNDManager.nextNameAssignment())
-                        .setAttr("T", getTfDataType())
-                        .addInput(getOutput())
-                        .build();
-        return new TfNDArray(manager, op.output(0));
+        return new TfNDArray(manager, tf.zerosLike(asOperand()));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray onesLike() {
-        Operation op =
-                manager.getGraph()
-                        .opBuilder("OnesLike", "OnesLike_" + TfNDManager.nextNameAssignment())
-                        .setAttr("T", getTfDataType())
-                        .addInput(getOutput())
-                        .build();
-        return new TfNDArray(manager, op.output(0));
+        return new TfNDArray(manager, tf.onesLike(asOperand()));
     }
 
     /** {@inheritDoc} */
@@ -716,47 +732,18 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDList split(long[] indices, int axis) {
-        TfNDArray axisOp = (TfNDArray) manager.create(axis);
-        Operation op =
-                manager.getGraph()
-                        .opBuilder("Split", "Split_" + TfNDManager.nextNameAssignment())
-                        .setAttr("T", getTfDataType())
-                        .setAttr("num_split", size(axis))
-                        .addInput(axisOp.getOutput())
-                        .addInput(getOutput())
-                        .build();
-
-        NDArray[] result =
-                IntStream.range(0, op.numOutputs())
-                        .mapToObj((int i) -> new TfNDArray(manager, op.output(i)))
-                        .toArray(NDArray[]::new);
-        return new NDList(result);
+        return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDList split(long sections, int axis) {
-        if (axis < 0 || axis > getShape().dimension()) {
-            throw new IllegalArgumentException("Invalid axis value");
-        }
-        if (sections < 0 || sections > size(axis)) {
-            throw new IllegalArgumentException("Invalid numOutputs");
-        }
-        TfNDArray axisOp = (TfNDArray) manager.create(axis);
-        Operation op =
-                manager.getGraph()
-                        .opBuilder("Split", "Split_" + TfNDManager.nextNameAssignment())
-                        .setAttr("T", getTfDataType())
-                        .setAttr("num_split", sections)
-                        .addInput(axisOp.getOutput())
-                        .addInput(getOutput())
-                        .build();
-
-        NDArray[] result =
-                IntStream.range(0, op.numOutputs())
-                        .mapToObj((int i) -> new TfNDArray(manager, op.output(i)))
-                        .toArray(NDArray[]::new);
-        return new NDList(result);
+        NDList result = new NDList();
+        tf.split(tf.constant(axis), operand, sections)
+                .forEach(
+                        output -> {
+                            result.add(new TfNDArray(manager, output));
+                        });
+        return result;
     }
 
     /** {@inheritDoc} */
@@ -768,7 +755,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray reshape(Shape shape) {
-        return null;
+        return new TfNDArray(manager, tf.reshape(asOperand(), tf.constant(shape.getShape())));
     }
 
     @Override
@@ -779,7 +766,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray expandDims(int axis) {
-        return null;
+        return new TfNDArray(manager, tf.expandDims(asOperand(), tf.constant(axis)));
     }
 
     /** {@inheritDoc} */
@@ -831,29 +818,10 @@ public class TfNDArray implements NDArray {
     }
 
     /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
     public NDArray softmax(int[] axes, float temperature) {
-        Operation op =
-                manager.getGraph()
-                        .opBuilder("Softmax", "Softmax_" + TfNDManager.nextNameAssignment())
-                        .setAttr("T", getTfDataType())
-                        .addInput(getOutput())
-                        .build();
-
-        return new TfNDArray(manager, op.output(0));
-    }
-
-    Output<?> getOutput() {
-        if (out == null) {
-            Operation op =
-                    manager.getGraph()
-                            .opBuilder("Const", "Const_" + TfNDManager.nextNameAssignment())
-                            .setAttr("dtype", tensor.dataType())
-                            .setAttr("value", tensor)
-                            .build();
-            out = op.output(0);
-        }
-        return out;
+        return new TfNDArray(manager, tf.nn.softmax((Operand<? extends Number>) asOperand()));
     }
 
     @Override
@@ -990,13 +958,13 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray argMax() {
-        return null;
+        return argMax(0);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray argMax(int axis) {
-        return null;
+        return new TfNDArray(manager, tf.math.argMax(asOperand(), tf.constant(axis)));
     }
 
     /** {@inheritDoc} */
@@ -1056,7 +1024,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArrayEx getNDArrayInternal() {
-        return null;
+        return tfNDArrayEx;
     }
 
     /** {@inheritDoc} */
@@ -1066,6 +1034,21 @@ public class TfNDArray implements NDArray {
             tensor.close();
         }
         tensor = null;
+        operand = null;
+        tf = null;
+    }
+
+    Operand<?> asOperand() {
+        if (operand == null) {
+            Operation op =
+                    manager.getEagerSession()
+                            .opBuilder("Const", "Const_" + TfNDManager.nextNameAssignment())
+                            .setAttr("dtype", tensor.dataType())
+                            .setAttr("value", tensor)
+                            .build();
+            operand = op.output(0);
+        }
+        return operand;
     }
 
     public Tensor<?> getTensor() {

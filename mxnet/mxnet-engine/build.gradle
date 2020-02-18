@@ -18,6 +18,7 @@ dependencies {
         exclude group: "org.apache.logging.log4j", module: "log4j-slf4j-impl"
         exclude group: "ai.djl.pytorch", module: "pytorch-engine"
         exclude group: "ai.djl.pytorch", module: "pytorch-model-zoo"
+        exclude group: "ai.djl.tensorflow", module: "tensorflow-engine"
     }
 
     testImplementation("org.testng:testng:${testng_version}") {

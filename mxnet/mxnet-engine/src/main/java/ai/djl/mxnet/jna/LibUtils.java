@@ -48,12 +48,8 @@ import org.slf4j.LoggerFactory;
  *   <li>In the python path. These can be installed using pip.
  * </ol>
  */
-@SuppressWarnings({
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal",
-    "FinalClass",
-    "MissingJavadocMethod"
-})
-public class LibUtils {
+@SuppressWarnings("MissingJavadocMethod")
+public final class LibUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
 

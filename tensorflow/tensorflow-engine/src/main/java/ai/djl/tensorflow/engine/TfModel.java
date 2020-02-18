@@ -12,8 +12,8 @@
  */
 package ai.djl.tensorflow.engine;
 
-import ai.djl.MalformedModelException;
-import ai.djl.Model;
+import ai.djl.BaseModel;
+import ai.djl.Device;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -23,7 +23,6 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
 import ai.djl.util.PairList;
-import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -31,61 +30,52 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import org.tensorflow.Graph;
 import org.tensorflow.SavedModelBundle;
 import org.tensorflow.Session;
-import org.tensorflow.framework.MetaGraphDef;
-import org.tensorflow.framework.SignatureDef;
-import org.tensorflow.framework.TensorInfo;
-import org.tensorflow.framework.TensorShapeProto;
 
-public class TfModel implements Model {
-
+public class TfModel extends BaseModel {
     private Path modelDir;
     private SavedModelBundle bundle;
     private AtomicBoolean first = new AtomicBoolean(true);
+    private NDManager manager;
+    private Session session;
+    private Graph graph;
 
-    private PairList<String, Shape> constructDataDescFromModel(Map<String, TensorInfo> info) {
-        PairList<String, Shape> descs = new PairList<>();
-        for (Map.Entry<String, TensorInfo> entry : info.entrySet()) {
-            TensorInfo t = entry.getValue();
-            // StringBuilder layout = new StringBuilder();
-            long[] shape = new long[t.getTensorShape().getDimCount()];
-            int dimIter = 0;
-            for (TensorShapeProto.Dim dim : t.getTensorShape().getDimList()) {
-                // layout.append(dim.getName());
-                shape[dimIter] = dim.getSize();
-                dimIter++;
-            }
-            // TODO: Add DataType mapping from framework.DataType
-            // TODO: Add Layout mapping for the layout
-            descs.add(t.getName(), new Shape(shape));
-        }
-        return descs;
+    /**
+     * Constructs a new Model on a given device.
+     *
+     * @param device the device the model should be located on
+     */
+    TfModel(Device device) {
+        device = Device.defaultIfNull(device);
+        properties = new ConcurrentHashMap<>();
+        manager = TfNDManager.getSystemManager().newSubManager(device);
+        first = new AtomicBoolean(true);
     }
 
-    public void load(Path modelDir, String... tags) throws InvalidProtocolBufferException {
+    public void load(Path modelDir, String... tags) {
         if (tags == null || tags.length == 0) {
             tags = new String[] {"serve"};
         }
         bundle = SavedModelBundle.load(modelDir.toString(), tags);
-        SignatureDef sig =
-                MetaGraphDef.parseFrom(bundle.metaGraphDef())
-                        .getSignatureDefOrThrow("serving_default");
-        constructDataDescFromModel(sig.getInputsMap());
-        constructDataDescFromModel(sig.getOutputsMap());
+        graph = bundle.graph();
+        session = bundle.session();
     }
 
     /** {@inheritDoc} */
     @Override
-    public void load(Path modelPath, String modelName, Map<String, String> options)
-            throws IOException, MalformedModelException {
-        try {
-            load(modelPath);
-        } catch (InvalidProtocolBufferException e) {
-            throw new IOException(e);
+    public void load(Path modelPath, String modelName, Map<String, String> options) {
+        String[] tags;
+        if (options == null || options.isEmpty()) {
+            tags = new String[] {"serve"};
+        } else {
+            tags = options.values().toArray(new String[] {});
         }
+        load(modelPath, tags);
     }
 
     public void load(String modelDir, byte[] configProto, byte[] runOptions, String... tags) {
@@ -96,18 +86,20 @@ public class TfModel implements Model {
                         .withRunOptions(runOptions)
                         .withTags(tags)
                         .load();
+        graph = bundle.graph();
+        session = bundle.session();
     }
 
     /** {@inheritDoc} */
     @Override
     public void save(Path modelPath, String modelName) {}
 
-    public org.tensorflow.Graph getTensorflowGraph() {
-        return bundle.graph();
+    public Graph getGraph() {
+        return graph;
     }
 
     public Session getSession() {
-        return bundle.session();
+        return session;
     }
 
     private byte[] getMetaGraphDef() {
@@ -198,7 +190,7 @@ public class TfModel implements Model {
     /** {@inheritDoc} */
     @Override
     public NDManager getNDManager() {
-        return null;
+        return manager;
     }
 
     /** {@inheritDoc} */
@@ -219,5 +211,19 @@ public class TfModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public void close() {}
+    public void close() {
+        manager.close();
+        if (bundle != null) {
+            bundle.close();
+        }
+        if (graph != null) {
+            graph.close();
+        }
+        if (session != null) {
+            session.close();
+        }
+        bundle = null;
+        graph = null;
+        session = null;
+    }
 }

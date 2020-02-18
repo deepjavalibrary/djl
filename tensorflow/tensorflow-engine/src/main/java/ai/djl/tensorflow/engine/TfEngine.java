@@ -23,18 +23,20 @@ import org.tensorflow.TensorFlow;
  * href="https://www.tensorflow.org/">Tensorflow Deep Learning Framework</a>.
  *
  * <p>To get an instance of the {@code TfEngine} when it is not the default Engine, call {@link
- * Engine#getEngine(String)} with the Engine name "Tensorflow".
+ * Engine#getEngine(String)} with the Engine name "TensorFlow".
  */
 public class TfEngine extends Engine {
 
-    public static final String ENGINE_NAME = "Tensorflow";
+    public static final String ENGINE_NAME = "TensorFlow";
 
-    TfEngine() {}
+    TfEngine() {
+        LibUtils.loadLibrary();
+    }
 
     /** {@inheritDoc} */
     @Override
     public Model newModel(Device device) {
-        return null;
+        return new TfModel(device);
     }
 
     /** {@inheritDoc} */
@@ -58,13 +60,13 @@ public class TfEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager() {
-        return TfNDManager.newBaseManager();
+        return TfNDManager.getSystemManager().newSubManager();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager(Device device) {
-        return TfNDManager.newBaseManager(device);
+        return TfNDManager.getSystemManager().newSubManager(device);
     }
 
     /** {@inheritDoc} */
