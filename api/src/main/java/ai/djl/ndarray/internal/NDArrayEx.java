@@ -383,7 +383,18 @@ public interface NDArrayEx {
      */
     NDArray normalize(float[] mean, float[] std);
 
-    NDArray toTensor();
+    default NDArray toTensor() {
+        NDArray array = getArray();
+        int dim = array.getShape().dimension();
+        if (dim == 3) {
+            array = array.expandDims(0);
+        }
+        array = array.div(255.0).transpose(0, 3, 1, 2);
+        if (dim == 3) {
+            array = array.squeeze(0);
+        }
+        return array;
+    }
 
     NDArray resize(int width, int height);
 

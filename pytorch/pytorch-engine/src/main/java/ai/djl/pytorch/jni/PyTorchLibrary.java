@@ -258,9 +258,6 @@ public final class PyTorchLibrary {
 
     public native Pointer resize(Pointer handle, long[] size, boolean alignCorners);
 
-    // TODO to be removed once we have div and swapAxes operator
-    public native Pointer toTensor(Pointer handle);
-
     public native Pointer moduleLoad(String path, int[] device);
 
     public native void moduleEval(Pointer handle);

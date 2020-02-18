@@ -657,11 +657,6 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.resize(ndArray.getHandle(), size, alignCorners));
     }
 
-    public static PtNDArray toTensor(PtNDArray ndArray) {
-        return new PtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.toTensor(ndArray.getHandle()));
-    }
-
     public static DataType getDataType(PtNDArray ndArray) {
         int dataType = PyTorchLibrary.LIB.torchDType(ndArray.getHandle());
         return DataType.values()[dataType];
@@ -688,6 +683,10 @@ public final class JniUtils {
     }
 
     public static ByteBuffer getByteBuffer(PtNDArray ndArray) {
+        // Operation is CPU only
+        if (ndArray.getDevice() != Device.cpu()) {
+            ndArray = ndArray.toDevice(Device.cpu(), false);
+        }
         ByteBuffer bb = PyTorchLibrary.LIB.torchDataPtr(ndArray.getHandle());
         bb.order(ByteOrder.nativeOrder());
         return bb;
