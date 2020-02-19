@@ -50,7 +50,7 @@ public class TrainResNetTest {
 
             ExampleTrainingResult result = TrainResnetWithCifar10.runExample(args);
             Assert.assertTrue(result.getEvaluation("Accuracy") > 0.7f);
-            Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 0.9);
+            Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 1.0);
         }
     }
 
@@ -68,7 +68,7 @@ public class TrainResNetTest {
 
             ExampleTrainingResult result = TrainResnetWithCifar10.runExample(args);
             Assert.assertTrue(result.getEvaluation("Accuracy") > 0.6f);
-            Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 1.2);
+            Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 0.9);
         }
     }
 }
