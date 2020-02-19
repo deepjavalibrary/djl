@@ -13,9 +13,7 @@
 package ai.djl.mxnet.jna;
 
 import ai.djl.util.Utils;
-import ai.djl.util.cuda.CudaUtils;
 import com.sun.jna.Native;
-import com.sun.jna.Platform;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -26,10 +24,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -104,56 +103,73 @@ public class LibUtils {
     }
 
     private static synchronized String findLibraryInClasspath() {
-        URL url = LibUtils.class.getResource("/native/lib/mxnet.properties");
-        if (url == null) {
+        List<URL> urls;
+        try {
+            urls =
+                    Collections.list(
+                            Thread.currentThread()
+                                    .getContextClassLoader()
+                                    .getResources("native/lib/mxnet.properties"));
+        } catch (IOException e) {
+            urls = Collections.emptyList();
+        }
+
+        Platform systemPlatform = Platform.fromSystem();
+        List<Platform> jarPlatforms = new ArrayList<>();
+        try {
+            for (URL url : urls) {
+                jarPlatforms.add(new Platform(url));
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Failed to read MXNet native library jar properties", e);
+        }
+
+        // No native jars
+        if (urls.isEmpty()) {
             return null;
         }
 
+        // Use Matching jar
+        Optional<Platform> matching =
+                jarPlatforms
+                        .stream()
+                        .filter(jarPlatform -> jarPlatform.matches(systemPlatform))
+                        .findFirst();
+        if (matching.isPresent()) {
+            return loadLibraryFromClasspath(matching.get());
+        }
+
+        // Download MXNet if there is a placeholder jar
+        boolean hasPlaceholder = jarPlatforms.stream().anyMatch(Platform::isPlaceholder);
+        if (hasPlaceholder) {
+            try {
+                return downloadMxnet(systemPlatform);
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to download MXNet native library", e);
+            }
+        }
+
+        throw new IllegalStateException(
+                "Your MXNet native library jar does not match your operating system. Make sure that the Maven Dependency Classifier matches your system type.");
+    }
+
+    private static String loadLibraryFromClasspath(Platform platform) {
         Path tmp = null;
-        try (InputStream conf = url.openStream()) {
-            Properties prop = new Properties();
-            prop.load(conf);
-            // 1.6.0-c later should always has version property
-            String version = prop.getProperty("version", "1.6.0-c");
-            String osName = System.getProperty("os.name");
-            String osPrefix;
-            if (osName.startsWith("Win")) {
-                osPrefix = "win";
-            } else if (osName.startsWith("Mac")) {
-                osPrefix = "osx";
-            } else if (osName.startsWith("Linux")) {
-                osPrefix = "linux";
-            } else {
-                throw new AssertionError("Unsupported platform: " + osName);
-            }
-
-            if (prop.getProperty("placeholder") != null) {
-                try {
-                    return downloadMxnet(version, osPrefix);
-                } catch (IOException e) {
-                    throw new IllegalStateException("Failed to download MXNet native library", e);
-                }
-            }
-            String classifier = prop.getProperty("classifier", "");
-            if (!classifier.isEmpty()) {
-                if (!osPrefix.equals(classifier.split("-")[1])) {
-                    throw new IllegalStateException(
-                            "Your MXNet native library jar does not match your operating system. Make sure that the Maven Dependency Classifier matches your system type.");
-                }
-            }
-            String libs = prop.getProperty("libraries");
-            String[] files = libs.split(",");
-
+        try {
             String userHome = System.getProperty("user.home");
             String libName = System.mapLibraryName(LIB_NAME);
-            Path dir = Paths.get(userHome, ".mxnet/cache/" + version + classifier);
+            Path dir =
+                    Paths.get(
+                            userHome,
+                            ".mxnet/cache/" + platform.getVersion() + platform.getClassifier());
             Path path = dir.resolve(libName);
             if (Files.exists(path)) {
                 return path.toAbsolutePath().toString();
             }
             tmp = Paths.get(userHome, ".mxnet/cache/tmp");
             Files.createDirectories(tmp);
-            for (String file : files) {
+            for (String file : platform.getLibraries()) {
                 String libPath = "/native/lib/" + file;
                 try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
                     Files.copy(is, tmp.resolve(file));
@@ -176,7 +192,7 @@ public class LibUtils {
     private static String findLibraryInPath(String libPath) {
         String[] paths = libPath.split(File.pathSeparator);
         List<String> mappedLibNames;
-        if (Platform.isMac()) {
+        if (com.sun.jna.Platform.isMac()) {
             mappedLibNames = Arrays.asList("libmxnet.dylib", "libmxnet.jnilib", "libmxnet.so");
         } else {
             mappedLibNames = Collections.singletonList(System.mapLibraryName(LIB_NAME));
@@ -203,7 +219,7 @@ public class LibUtils {
 
     private static String searchPythonPath(String cmd) {
         String libName;
-        if (Platform.isMac()) {
+        if (com.sun.jna.Platform.isMac()) {
             // pip package use libmxnet.so instead of libmxnet.dylib, JNA by default only
             // load .dylib file, we have to use absolute path to load libmxnet.so
             libName = "libmxnet.so";
@@ -239,18 +255,13 @@ public class LibUtils {
         return null;
     }
 
-    private static String downloadMxnet(String version, String os) throws IOException {
-        String flavor;
-        String cudaArch;
-        if (CudaUtils.getGpuCount() > 0) {
-            flavor = "cu" + CudaUtils.getCudaVersionString() + "mkl";
-            cudaArch = CudaUtils.getComputeCapability(0);
-        } else {
-            flavor = "mkl";
-            cudaArch = null;
-        }
+    private static String downloadMxnet(Platform platform) throws IOException {
+        String version = platform.getVersion();
+        String flavor = platform.getFlavor();
+        String classifier = platform.getClassifier();
+        String cudaArch = platform.getCudaArch();
+        String os = platform.getOsPrefix();
 
-        String classifier = os + "-x86_64";
         String userHome = System.getProperty("user.home");
         String libName = System.mapLibraryName(LIB_NAME);
         Path dir = Paths.get(userHome, ".mxnet/cache/" + version + flavor + '-' + classifier);
