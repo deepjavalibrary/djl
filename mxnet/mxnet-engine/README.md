@@ -42,7 +42,7 @@ It will automatically determine the appropriate jars for your system based on th
 
 ```xml
     <dependency>
-      <groupId>org.apache.mxnet</groupId>
+      <groupId>ai.djl.mxnet</groupId>
       <artifactId>mxnet-native-auto</artifactId>
       <version>1.6.0-c</version>
       <scope>runtime</scope>
@@ -52,12 +52,12 @@ It will automatically determine the appropriate jars for your system based on th
 ### macOS
 For macOS, you can use the following library:
 
-- org.apache.mxnet:mxnet-native-mkl:1.6.0-c:osx-x86_64
+- ai.djl.mxnet:mxnet-native-mkl:1.6.0-c:osx-x86_64
 
     This package takes advantage of the Intel MKL library to boost performance.
 ```xml
     <dependency>
-      <groupId>org.apache.mxnet</groupId>
+      <groupId>ai.djl.mxnet</groupId>
       <artifactId>mxnet-native-mkl</artifactId>
       <classifier>osx-x86_64</classifier>
       <version>1.6.0-c</version>
@@ -70,13 +70,13 @@ For the Linux platform, you can choose between CPU, GPU. If you have Nvidia [CUD
 installed on your GPU machine, you can use one of the following library:
 
 GPU:
-- org.apache.mxnet:mxnet-native-cu102mkl:1.6.0-c:linux-x86_64 - CUDA 10.2
-- org.apache.mxnet:mxnet-native-cu101mkl:1.6.0-c:linux-x86_64 - CUDA 10.1
-- org.apache.mxnet:mxnet-native-cu92mkl:1.6.0-c:linux-x86_64 - CUDA 9.2
+- ai.djl.mxnet:mxnet-native-cu102mkl:1.6.0-c:linux-x86_64 - CUDA 10.2
+- ai.djl.mxnet:mxnet-native-cu101mkl:1.6.0-c:linux-x86_64 - CUDA 10.1
+- ai.djl.mxnet:mxnet-native-cu92mkl:1.6.0-c:linux-x86_64 - CUDA 9.2
 
 ```xml
     <dependency>
-      <groupId>org.apache.mxnet</groupId>
+      <groupId>ai.djl.mxnet</groupId>
       <artifactId>mxnet-native-cu102mkl</artifactId>
       <classifier>linux-x86_64</classifier>
       <version>1.6.0-c</version>
@@ -86,7 +86,7 @@ GPU:
 
 ```xml
     <dependency>
-      <groupId>org.apache.mxnet</groupId>
+      <groupId>ai.djl.mxnet</groupId>
       <artifactId>mxnet-native-cu101mkl</artifactId>
       <classifier>linux-x86_64</classifier>
       <version>1.6.0-c</version>
@@ -96,7 +96,7 @@ GPU:
 
 ```xml
     <dependency>
-      <groupId>org.apache.mxnet</groupId>
+      <groupId>ai.djl.mxnet</groupId>
       <artifactId>mxnet-native-cu92mkl</artifactId>
       <classifier>linux-x86_64</classifier>
       <version>1.6.0-c</version>
@@ -105,11 +105,11 @@ GPU:
 ```
 
 CPU
-- org.apache.mxnet:mxnet-native-mkl:1.6.0-c:linux-x86_64
+- ai.djl.mxnet:mxnet-native-mkl:1.6.0-c:linux-x86_64
 
 ```xml
     <dependency>
-      <groupId>org.apache.mxnet</groupId>
+      <groupId>ai.djl.mxnet</groupId>
       <artifactId>mxnet-native-mkl</artifactId>
       <classifier>linux-x86_64</classifier>
       <scope>runtime</scope>
@@ -122,14 +122,15 @@ CPU
 For the Windows platform, you can choose between CPU and GPU.
 
 GPU:
-- org.apache.mxnet:mxnet-native-cu102mkl:1.6.0-c:win-x86_64
+- ai.djl.mxnet:mxnet-native-cu102mkl:1.6.0-c:win-x86_64
 
     **Note:** The MXNet cu102mkl library only supports the sm_70 and sm_75 architectures.
-- org.apache.mxnet:mxnet-native-cu101mkl:1.6.0-c:win-x86_64
+
+- ai.djl.mxnet:mxnet-native-cu101mkl:1.6.0-c:win-x86_64
 
     **Note:** The MXNet cu101mkl library only supports the sm_37 and sm_70 architectures.
 
-- org.apache.mxnet:mxnet-native-cu92mkl:1.6.0-c:win-x86_64
+- ai.djl.mxnet:mxnet-native-cu92mkl:1.6.0-c:win-x86_64
 
     **Note:** The MXNet cu92mkl library only supports the sm_37 and sm_70 architectures.
 
@@ -137,7 +138,7 @@ GPU:
 
 ```xml
     <dependency>
-      <groupId>org.apache.mxnet</groupId>
+      <groupId>ai.djl.mxnet</groupId>
       <artifactId>mxnet-native-cu102mkl</artifactId>
       <classifier>win-x86_64</classifier>
       <version>1.6.0-c</version>
@@ -147,7 +148,7 @@ GPU:
 
 ```xml
     <dependency>
-      <groupId>org.apache.mxnet</groupId>
+      <groupId>ai.djl.mxnet</groupId>
       <artifactId>mxnet-native-cu101mkl</artifactId>
       <classifier>win-x86_64</classifier>
       <version>1.6.0-c</version>
@@ -157,7 +158,7 @@ GPU:
 
 ```xml
     <dependency>
-      <groupId>org.apache.mxnet</groupId>
+      <groupId>ai.djl.mxnet</groupId>
       <artifactId>mxnet-native-cu92mkl</artifactId>
       <classifier>win-x86_64</classifier>
       <version>1.6.0-c</version>
@@ -166,11 +167,11 @@ GPU:
 ```
 
 CPU
-- org.apache.mxnet:mxnet-native-mkl:1.6.0-c:win-x86_64
+- ai.djl.mxnet:mxnet-native-mkl:1.6.0-c:win-x86_64
 
 ```xml
     <dependency>
-      <groupId>org.apache.mxnet</groupId>
+      <groupId>ai.djl.mxnet</groupId>
       <artifactId>mxnet-native-mkl</artifactId>
       <classifier>win-x86_64</classifier>
       <scope>runtime</scope>
