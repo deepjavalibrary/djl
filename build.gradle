@@ -61,6 +61,11 @@ configure(javaProjects()) {
             if (gradle.startParameter.offline) {
                 systemProperty "offline", "true"
             }
+            // This is used to avoid overriding on default engine for modules:
+            // mxnet-engine, mxnet-model-zoo, api (MockEngine), basicdataset, fasttext, etc
+            if (project.name != "integration") {
+                systemProperties.remove("ai.djl.default_engine")
+            }
         }
     }
 

@@ -15,6 +15,7 @@ dependencies {
 
     testImplementation project(":mxnet:mxnet-engine")
     testRuntimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}-SNAPSHOT"
+    testImplementation project(":pytorch:pytorch-engine")
 }
 
 task syncS3(type: Exec) {

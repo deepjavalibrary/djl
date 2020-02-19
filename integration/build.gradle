@@ -74,7 +74,11 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0.7
+                if ("PyTorch" == System.getProperty("ai.djl.default_engine")) {
+                    minimum = 0.6
+                } else {
+                    minimum = 0.7
+                }
             }
         }
     }
