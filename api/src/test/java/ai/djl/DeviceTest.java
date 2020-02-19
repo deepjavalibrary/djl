@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 
 public class DeviceTest {
 
-    @Test(expectedExceptions = UnsupportedOperationException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testDevice() {
         Assert.assertEquals(Device.cpu(), new Device("cpu", 0));
         if (Device.getGpuCount() > 0) {

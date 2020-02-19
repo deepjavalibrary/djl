@@ -18,7 +18,6 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.basicdataset.PikachuDetection;
 import ai.djl.basicmodelzoo.BasicModelZoo;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.MultiBoxDetection;
@@ -50,7 +49,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class SingleShotDetectionTest {
@@ -131,10 +129,6 @@ public class SingleShotDetectionTest {
 
     private ZooModel<BufferedImage, DetectedObjects> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        // TODO: PyTorch: disable due to the device mismatch on ParameterServer
-        if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
-            throw new SkipException("Model not supported");
-        }
 
         Criteria<BufferedImage, DetectedObjects> criteria =
                 Criteria.builder()

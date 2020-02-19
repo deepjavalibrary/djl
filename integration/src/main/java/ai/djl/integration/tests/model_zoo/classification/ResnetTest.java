@@ -17,7 +17,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.integration.util.Assertions;
 import ai.djl.modality.Classifications;
@@ -47,7 +46,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class ResnetTest {
@@ -132,10 +130,6 @@ public class ResnetTest {
 
     private ZooModel<BufferedImage, Classifications> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        // TODO: PyTorch: disable due to the device mismatch on ParameterServer
-        if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
-            throw new SkipException("Model not supported");
-        }
 
         Criteria<BufferedImage, Classifications> criteria =
                 Criteria.builder()

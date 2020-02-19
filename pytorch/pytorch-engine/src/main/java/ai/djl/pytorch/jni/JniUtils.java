@@ -75,7 +75,10 @@ public final class JniUtils {
                         shape.getShape(),
                         dType.ordinal(),
                         layoutVal,
-                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
                         false));
     }
 
@@ -89,7 +92,10 @@ public final class JniUtils {
                         shape.getShape(),
                         dType.ordinal(),
                         layoutVal,
-                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
                         false));
     }
 
@@ -103,7 +109,10 @@ public final class JniUtils {
                         shape.getShape(),
                         dType.ordinal(),
                         layoutVal,
-                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
                         false));
     }
 
@@ -117,7 +126,10 @@ public final class JniUtils {
                         shape.getShape(),
                         dType.ordinal(),
                         layoutVal,
-                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
                         false));
     }
 
@@ -138,7 +150,10 @@ public final class JniUtils {
                         step,
                         dType.ordinal(),
                         layoutVal,
-                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
                         false));
     }
 
@@ -159,7 +174,10 @@ public final class JniUtils {
                         step,
                         dType.ordinal(),
                         layoutVal,
-                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
                         false));
     }
 
@@ -169,7 +187,10 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchTo(
                         ndArray.getHandle(),
                         dataType.ordinal(),
-                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
                         copy));
     }
 
@@ -602,7 +623,10 @@ public final class JniUtils {
                         size.getShape(),
                         dataType.ordinal(),
                         layoutMapper(SparseFormat.DENSE),
-                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
                         false));
     }
 
@@ -621,7 +645,10 @@ public final class JniUtils {
                         size.getShape(),
                         dataType.ordinal(),
                         layoutMapper(SparseFormat.DENSE),
-                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
                         false));
     }
 
@@ -634,7 +661,10 @@ public final class JniUtils {
                         m,
                         dataType.ordinal(),
                         layoutMapper(fmt),
-                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
                         false));
     }
 
@@ -708,7 +738,10 @@ public final class JniUtils {
         Pointer handle =
                 PyTorchLibrary.LIB.moduleLoad(
                         path.toString(),
-                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()});
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        });
         return new PtSymbolBlock(manager, handle);
     }
 

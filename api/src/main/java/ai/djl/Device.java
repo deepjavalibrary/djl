@@ -52,7 +52,7 @@ public class Device {
      */
     public Device(String deviceType, int deviceId) {
         if (Type.CPU.equals(deviceType)) {
-            throw new UnsupportedOperationException(
+            throw new IllegalArgumentException(
                     "CPU doesn't have device id, please use new Device(\"cpu\") instead");
         }
         this.deviceType = deviceType;
@@ -75,7 +75,7 @@ public class Device {
      */
     public int getDeviceId() {
         if (Type.CPU.equals(deviceType)) {
-            throw new UnsupportedOperationException("CPU doesn't have device id");
+            throw new IllegalStateException("CPU doesn't have device id");
         }
         return deviceId;
     }
