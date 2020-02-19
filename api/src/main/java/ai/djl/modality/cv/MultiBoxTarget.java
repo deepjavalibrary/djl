@@ -37,6 +37,7 @@ import ai.djl.ndarray.NDList;
  * threshold.
  */
 public class MultiBoxTarget {
+
     int minNegativeSamples;
     private float iouThreshold;
     private float negativeMiningRatio;
@@ -79,13 +80,25 @@ public class MultiBoxTarget {
                         minNegativeSamples);
     }
 
+    /**
+     * Creates a builder to build a {@code MultiBoxTarget}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The Builder to construct a {@link MultiBoxTarget} object. */
     public static final class Builder {
+
         int minNegativeSamples;
         float iouThreshold = 0.5f;
         float ignoreLabel = -1;
         float negativeMiningThreshold = 0.5f;
         float negativeMinigRatio = -1;
+
+        Builder() {}
 
         /**
          * Sets the minimum number of negative samples.

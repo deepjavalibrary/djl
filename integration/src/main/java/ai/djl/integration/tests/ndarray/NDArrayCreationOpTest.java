@@ -104,6 +104,39 @@ public class NDArrayCreationOpTest {
     }
 
     @Test
+    public void testDuplicate() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.zeros(new Shape(5));
+            NDArray expected = manager.create(new float[] {0f, 0f, 0f, 0f, 0f});
+            NDArray duplicate = array.duplicate();
+            Assert.assertEquals(duplicate, expected);
+            Assert.assertNotSame(duplicate, expected);
+
+            // test multi-dim
+            array = manager.ones(new Shape(2, 3));
+            expected = manager.create(new float[] {1f, 1f, 1f, 1f, 1f, 1f}, new Shape(2, 3));
+            Assert.assertEquals(array, expected);
+            duplicate = array.duplicate();
+            Assert.assertEquals(duplicate, expected);
+            Assert.assertNotSame(duplicate, expected);
+
+            // test scalar
+            array = manager.zeros(new Shape());
+            expected = manager.create(0f);
+            duplicate = array.duplicate();
+            Assert.assertEquals(duplicate, expected);
+            Assert.assertNotSame(duplicate, expected);
+
+            // test zero-dim
+            array = manager.zeros(new Shape(0, 1));
+            expected = manager.create(new Shape(0, 1));
+            duplicate = array.duplicate();
+            Assert.assertEquals(duplicate, expected);
+            Assert.assertNotSame(duplicate, expected);
+        }
+    }
+
+    @Test
     public void testZeros() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.zeros(new Shape(5));
@@ -201,7 +234,7 @@ public class NDArrayCreationOpTest {
     public void testArange() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(0, 10, 1);
-            NDArray expected = manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f});
+            NDArray expected = manager.create(new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
             Assert.assertEquals(array, expected);
             array = manager.arange(0, 10, 1);
             Assert.assertEquals(array, expected);
@@ -218,15 +251,15 @@ public class NDArrayCreationOpTest {
                                 3.4f, 3.7f, 4f, 4.3f, 4.6f, 4.9f, 5.2f
                             });
             Assertions.assertAlmostEquals(array, expected);
-            array = manager.arange(0, 2, 0.3);
+            array = manager.arange(0.0, 2.0, 0.3);
             expected = manager.create(new float[] {0f, 0.3f, 0.6f, 0.9f, 1.2f, 1.5f, 1.8f});
             Assertions.assertAlmostEquals(array, expected);
 
             // test 0 dimension
-            array = manager.arange(10, 0, 1);
+            array = manager.arange(10.0, 0.0, 1.0);
             expected = manager.create(new Shape(0));
             Assert.assertEquals(array, expected);
-            array = manager.arange(0, -2);
+            array = manager.arange(0.0, -2.0);
             Assert.assertEquals(array, expected);
         }
     }
@@ -253,7 +286,7 @@ public class NDArrayCreationOpTest {
     public void testLinspace() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.linspace(0.0, 9.0, 10, true, manager.getDevice());
-            NDArray expected = manager.arange(10);
+            NDArray expected = manager.arange(10.0);
             Assert.assertEquals(array, expected);
             array = manager.linspace(0.0, 10.0, 10, false, manager.getDevice());
             Assert.assertEquals(array, expected);

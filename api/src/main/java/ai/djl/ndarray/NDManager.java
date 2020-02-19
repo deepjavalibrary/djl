@@ -147,6 +147,28 @@ public interface NDManager extends AutoCloseable {
     /**
      * Creates and initializes a scalar {@link NDArray}.
      *
+     * @param data the {@link Number} that needs to be set
+     * @return a new instance of {@link NDArray}
+     */
+    default NDArray create(Number data) {
+        if (data instanceof Integer) {
+            return create(data.intValue());
+        } else if (data instanceof Float) {
+            return create(data.floatValue());
+        } else if (data instanceof Double) {
+            return create(data.doubleValue());
+        } else if (data instanceof Long) {
+            return create(data.longValue());
+        } else if (data instanceof Byte) {
+            return create(data.byteValue());
+        } else {
+            throw new IllegalArgumentException("Short conversion not supported!");
+        }
+    }
+
+    /**
+     * Creates and initializes a scalar {@link NDArray}.
+     *
      * @param data the float that needs to be set
      * @return a new instance of {@link NDArray}
      */
@@ -609,11 +631,26 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
      * rather than a list.
      *
-     * @param stop the end of the interval. The interval does not include this value.
+     * @param stop the end of the interval. The interval does not include this value
      * @return a new instance of {@link NDArray}
      */
-    default NDArray arange(Number stop) {
-        return arange(0, stop, 1, null, getDevice());
+    default NDArray arange(int stop) {
+        return arange(0, stop, 1, DataType.INT32, getDevice());
+    }
+
+    /**
+     * Returns evenly spaced values starting from 0.
+     *
+     * <p>Values are generated within the half-open interval [start, stop) (in other words, the
+     * interval including start but excluding stop). For integer arguments, the function is
+     * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
+     * rather than a list.
+     *
+     * @param stop the end of the interval. The interval does not include this value
+     * @return a new instance of {@link NDArray}
+     */
+    default NDArray arange(double stop) {
+        return arange(0.0, stop, 1.0, DataType.FLOAT32, getDevice());
     }
 
     /**
@@ -624,12 +661,28 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
      * rather than a list.
      *
-     * @param start the start of interval. The interval includes this value.
-     * @param stop the end of interval. The interval does not include this value.
+     * @param start the start of interval. The interval includes this value
+     * @param stop the end of interval. The interval does not include this value
      * @return a new instance of {@link NDArray}
      */
-    default NDArray arange(Number start, Number stop) {
-        return arange(start, stop, 1, null, getDevice());
+    default NDArray arange(int start, int stop) {
+        return arange(start, stop, 1, DataType.INT32, getDevice());
+    }
+
+    /**
+     * Returns evenly spaced values within a given interval with step 1.
+     *
+     * <p>Values are generated within the half-open interval [start, stop) (in other words, the
+     * interval including start but excluding stop). For integer arguments, the function is
+     * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
+     * rather than a list.
+     *
+     * @param start the start of interval. The interval includes this value
+     * @param stop the end of interval. The interval does not include this value
+     * @return a new instance of {@link NDArray}
+     */
+    default NDArray arange(double start, double stop) {
+        return arange(start, stop, 1.0, DataType.FLOAT32, getDevice());
     }
 
     /**
@@ -640,13 +693,13 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
      * rather than a list.
      *
-     * @param start the start of interval. The interval includes this value.
-     * @param stop the end of interval. The interval does not include this value.
+     * @param start the start of interval. The interval includes this value
+     * @param stop the end of interval. The interval does not include this value
      * @param step the spacing between values
      * @return a new instance of {@link NDArray}
      */
-    default NDArray arange(Number start, Number stop, Number step) {
-        return arange(start, stop, step, null, getDevice());
+    default NDArray arange(int start, int stop, int step) {
+        return arange(start, stop, step, DataType.INT32, getDevice());
     }
 
     /**
@@ -657,14 +710,50 @@ public interface NDManager extends AutoCloseable {
      * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
      * rather than a list.
      *
-     * @param start the start of interval. The interval includes this value.
-     * @param stop the end of interval. The interval does not include this value.
+     * @param start the start of interval. The interval includes this value
+     * @param stop the end of interval. The interval does not include this value
+     * @param step the spacing between values
+     * @return a new instance of {@link NDArray}
+     */
+    default NDArray arange(double start, double stop, double step) {
+        return arange(start, stop, step, DataType.FLOAT32, getDevice());
+    }
+
+    /**
+     * Returns evenly spaced values within a given interval.
+     *
+     * <p>Values are generated within the half-open interval [start, stop) (in other words, the
+     * interval including start but excluding stop). For integer arguments, the function is
+     * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
+     * rather than a list.
+     *
+     * @param start the start of interval. The interval includes this value
+     * @param stop the end of interval. The interval does not include this value
      * @param step the spacing between values
      * @param dataType the {@link DataType} of the {@link NDArray}
      * @param device the {@link Device} of the {@link NDArray}
      * @return a new instance of {@link NDArray}
      */
-    NDArray arange(Number start, Number stop, Number step, DataType dataType, Device device);
+    default NDArray arange(int start, int stop, int step, DataType dataType, Device device) {
+        return arange((double) start, (double) stop, (double) step, dataType, device);
+    }
+
+    /**
+     * Returns evenly spaced values within a given interval.
+     *
+     * <p>Values are generated within the half-open interval [start, stop) (in other words, the
+     * interval including start but excluding stop). For integer arguments, the function is
+     * equivalent to the Python built-in range function, but returns an instance of {@link NDArray}
+     * rather than a list.
+     *
+     * @param start the start of interval. The interval includes this value
+     * @param stop the end of interval. The interval does not include this value
+     * @param step the spacing between values
+     * @param dataType the {@link DataType} of the {@link NDArray}
+     * @param device the {@link Device} of the {@link NDArray}
+     * @return a new instance of {@link NDArray}
+     */
+    NDArray arange(double start, double stop, double step, DataType dataType, Device device);
 
     /**
      * Returns a 2-D array with ones on the diagonal and zeros elsewhere.
@@ -728,7 +817,21 @@ public interface NDManager extends AutoCloseable {
      * @param num the number of samples to generate
      * @return a new instance of {@link NDArray}
      */
-    default NDArray linspace(Number start, Number stop, int num) {
+    default NDArray linspace(int start, int stop, int num) {
+        return linspace(start, stop, num, true, getDevice());
+    }
+
+    /**
+     * Returns evenly spaced numbers over a specified interval.
+     *
+     * <p>Returns num evenly spaced samples, calculated over the interval [start, stop].
+     *
+     * @param start the starting value of the sequence
+     * @param stop the end value of the sequence
+     * @param num the number of samples to generate
+     * @return a new instance of {@link NDArray}
+     */
+    default NDArray linspace(double start, double stop, int num) {
         return linspace(start, stop, num, true, getDevice());
     }
 
@@ -745,7 +848,24 @@ public interface NDManager extends AutoCloseable {
      * @param device the {@link Device} of the {@link NDArray}
      * @return a new instance of {@link NDArray}
      */
-    NDArray linspace(Number start, Number stop, int num, boolean endpoint, Device device);
+    default NDArray linspace(int start, int stop, int num, boolean endpoint, Device device) {
+        return linspace((double) start, (double) stop, num, endpoint, device);
+    }
+
+    /**
+     * Returns evenly spaced numbers over a specified interval.
+     *
+     * <p>Returns num evenly spaced samples, calculated over the interval [start, stop].The endpoint
+     * of the interval can optionally be excluded.
+     *
+     * @param start the starting value of the sequence
+     * @param stop the end value of the sequence
+     * @param num the number of samples to generate
+     * @param endpoint if {@code true}, stop is the last sample, otherwise, it is not included
+     * @param device the {@link Device} of the {@link NDArray}
+     * @return a new instance of {@link NDArray}
+     */
+    NDArray linspace(double start, double stop, int num, boolean endpoint, Device device);
 
     /**
      * Draws samples from a uniform distribution.
@@ -761,8 +881,8 @@ public interface NDManager extends AutoCloseable {
      * @param shape the {@link Shape} of the {@link NDArray}
      * @return the drawn samples {@link NDArray}
      */
-    default NDArray randomUniform(Number low, Number high, Shape shape) {
-        return randomUniform(low, high, shape, null, getDevice());
+    default NDArray randomUniform(double low, double high, Shape shape) {
+        return randomUniform(low, high, shape, DataType.UNKNOWN, getDevice());
     }
 
     /**
@@ -781,7 +901,7 @@ public interface NDManager extends AutoCloseable {
      * @param device the {@link Device} of the {@link NDArray}
      * @return the drawn samples {@link NDArray}
      */
-    NDArray randomUniform(Number low, Number high, Shape shape, DataType dataType, Device device);
+    NDArray randomUniform(double low, double high, Shape shape, DataType dataType, Device device);
 
     /**
      * Draws random samples from a normal (Gaussian) distribution with mean 0 and standard deviation
@@ -794,7 +914,7 @@ public interface NDManager extends AutoCloseable {
      * @return the drawn samples {@link NDArray}
      */
     default NDArray randomNormal(Shape shape) {
-        return randomNormal(0f, 1f, shape, null, getDevice());
+        return randomNormal(0f, 1f, shape, DataType.UNKNOWN, getDevice());
     }
 
     /**
@@ -807,7 +927,7 @@ public interface NDManager extends AutoCloseable {
      * @return the drawn samples {@link NDArray}
      */
     default NDArray randomNormal(Shape shape, DataType dataType, Device device) {
-        return randomNormal(0f, 1f, shape, dataType, device);
+        return randomNormal(0.0, 1.0, shape, dataType, device);
     }
 
     /**
@@ -820,7 +940,7 @@ public interface NDManager extends AutoCloseable {
      * @param device the {@link Device} of the {@link NDArray}
      * @return the drawn samples {@link NDArray}
      */
-    NDArray randomNormal(Number loc, Number scale, Shape shape, DataType dataType, Device device);
+    NDArray randomNormal(double loc, double scale, Shape shape, DataType dataType, Device device);
 
     /**
      * Draw samples from a multinomial distribution.

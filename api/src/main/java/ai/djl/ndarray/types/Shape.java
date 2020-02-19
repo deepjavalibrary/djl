@@ -142,14 +142,14 @@ public class Shape {
      */
     public long size(int... dimensions) {
         int total = 1;
-        for (int d : dimensions) {
+        for (long d : dimensions) {
             if (d < 0 || d >= shape.length) {
                 throw new IllegalArgumentException("Invalid dimension " + d);
             }
-            if (shape[d] == -1) {
+            if (shape[Math.toIntExact(d)] == -1) {
                 return -1;
             }
-            total *= shape[d];
+            total *= shape[Math.toIntExact(d)];
         }
         return total;
     }
@@ -309,77 +309,6 @@ public class Shape {
             }
         }
         return 0;
-    }
-
-    /**
-     * Returns the number of columns in the matrix.
-     *
-     * @return the number of columns in the matrix
-     * @throws IllegalStateException Thrown if not a 2D matrix
-     */
-    public long columns() {
-        if (!isMatrix()) {
-            throw new IllegalStateException("Not a Matrix");
-        }
-        return shape[1];
-    }
-
-    /**
-     * Returns the number of rows in the matrix.
-     *
-     * @return the number of rows in the matrix
-     * @throws IllegalStateException Thrown if not a 2D matrix
-     */
-    public long rows() {
-        if (!isMatrix()) {
-            throw new IllegalStateException("Not a Matrix");
-        }
-        return shape[0];
-    }
-
-    /**
-     * Returns {@code true} if this NDArray is a matrix and the number of columns is 1.
-     *
-     * @return whether the NDArray is a matrix and the number of columns is 1
-     */
-    public boolean isColumnVector() {
-        return isMatrix() && columns() == 1 && size() > 1;
-    }
-
-    /**
-     * Returns {@code true} if this NDArray is a matrix and the number of rows is 1.
-     *
-     * @return whether the NDArray is a matrix and the number of rows is 1
-     */
-    public boolean isRowVector() {
-        return isMatrix() && rows() == 1 && size() > 1;
-    }
-
-    /**
-     * Returns {@code true} if this NDArray is a vector matrix.
-     *
-     * @return whether this NDArray is a vector matrix
-     */
-    public boolean isVectorMatrix() {
-        return isColumnVector() || isRowVector();
-    }
-
-    /**
-     * Returns whether the matrix has the same rows and columns.
-     *
-     * @return whether the matrix has the same rows and columns
-     */
-    public boolean isSquare() {
-        return isMatrix() && columns() == rows();
-    }
-
-    /**
-     * Returns {@code true} if the NDArray is a matrix.
-     *
-     * @return whether the NDArray is a matrix
-     */
-    public boolean isMatrix() {
-        return dimension() == 2;
     }
 
     /**

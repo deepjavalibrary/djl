@@ -15,6 +15,7 @@ package ai.djl.ndarray;
 import ai.djl.Device;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.internal.NDArrayEx;
+import ai.djl.ndarray.internal.NDFormat;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -27,6 +28,7 @@ import java.nio.LongBuffer;
 import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 /**
  * An interface representing an n-dimensional array.
@@ -164,14 +166,6 @@ public interface NDArray extends AutoCloseable {
      * @return the result {@code NDArray} with the new {@link DataType}
      */
     NDArray toType(DataType dataType, boolean copy);
-
-    /**
-     * Converts this {@code NDArray} into a 2-D {@link Matrix}.
-     *
-     * @return this {@code NDArray} as {@link Matrix}
-     * @throws IllegalStateException thrown if this {@code NDArray} is not a 2-D {@link Matrix}
-     */
-    Matrix toMatrix();
 
     /**
      * Attaches a gradient {@code NDArray} to this {@code NDArray} and marks it so {@link
@@ -1595,7 +1589,7 @@ public interface NDArray extends AutoCloseable {
      * </pre>
      *
      * @param n the number to be compared
-     * @return the maximum of this {@code NDArray} and a number element-wise.
+     * @return the maximum of this {@code NDArray} and a number element-wise
      */
     NDArray maximum(Number n);
 
@@ -2690,9 +2684,9 @@ public interface NDArray extends AutoCloseable {
      * @param sections this {@code NDArray} will be divided into N (sections) equal {@code NDArray}
      * @return an {@link NDList} with size(axis) {@code NDArray}s with {@link Shape} {@code
      *     this.shape.remove(axis) }
-     * @see NDArray#split(int, int)
+     * @see NDArray#split(long, int)
      */
-    default NDList split(int sections) {
+    default NDList split(long sections) {
         return split(sections, 0);
     }
 
@@ -2723,9 +2717,9 @@ public interface NDArray extends AutoCloseable {
      *     NDArray} is returned correspondingly.
      * @return an NDList with size(axis) {@code NDArray}s with {@link Shape} {@code
      *     this.shape.remove(axis) }
-     * @see NDArray#split(int[], int)
+     * @see NDArray#split(long[], int)
      */
-    default NDList split(int[] indices) {
+    default NDList split(long[] indices) {
         return split(indices, 0);
     }
 
@@ -2767,13 +2761,13 @@ public interface NDArray extends AutoCloseable {
      * @throws IllegalArgumentException thrown if the numOutputs does not equally divide the given
      *     axis
      */
-    default NDList split(int sections, int axis) {
+    default NDList split(long sections, int axis) {
         long axisSize = getShape().getShape()[axis];
         if (axisSize % sections != 0) {
             throw new IllegalArgumentException("array split does not result in an equal division");
         }
         long sectionSize = axisSize / sections;
-        int[] indices = IntStream.range(0, sections).map(i -> (int) (i * sectionSize)).toArray();
+        long[] indices = LongStream.range(0, sections).map(i -> i * sectionSize).toArray();
         return split(indices, axis);
     }
 
@@ -2819,7 +2813,7 @@ public interface NDArray extends AutoCloseable {
      * @return an {@link NDList} with numOutputs {@code NDArray}s with {@link Shape} {@code
      *     (this.shape.axis /= axis) }
      */
-    NDList split(int[] indices, int axis);
+    NDList split(long[] indices, int axis);
 
     /**
      * Flattens this {@code NDArray} into a 1-D {@code NDArray} in row-major order.
@@ -2890,6 +2884,14 @@ public interface NDArray extends AutoCloseable {
      *     the current shape
      */
     NDArray reshape(Shape shape);
+
+    /**
+     * Reshapes this {@code NDArray} to the match the {@link Shape} of the given {@code NDArray}.
+     *
+     * @param array the {@code NDArray} whose shape to match
+     * @return a reshaped {@code NDArray}
+     */
+    NDArray reshapeLike(NDArray array);
 
     /**
      * Expands the {@link Shape} of a {@code NDArray}.
@@ -4284,6 +4286,21 @@ public interface NDArray extends AutoCloseable {
      * @return an internal representative of Native {@code NDArray}
      */
     NDArrayEx getNDArrayInternal();
+
+    /**
+     * Runs the debug string representation of this {@code NDArray}.
+     *
+     * @param array {@link NDArray} array that is printable
+     * @param maxSize the maximum elements to print out
+     * @param maxDepth the maximum depth to print out
+     * @param maxRows the maximum rows to print out
+     * @param maxColumns the maximum columns to print out
+     * @return the debug string representation of this {@code NDArray}
+     */
+    default String toDebugString(
+            NDArray array, int maxSize, int maxDepth, int maxRows, int maxColumns) {
+        return NDFormat.format(array, maxSize, maxDepth, maxRows, maxColumns);
+    }
 
     /** {@inheritDoc} */
     @Override

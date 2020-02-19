@@ -64,8 +64,11 @@ public class MultiFactorTracker extends LearningRateTracker {
 
     /** The Builder to construct an {@link MultiFactorTracker} object. */
     public static final class Builder extends LrBaseBuilder<Builder> {
-        private int[] steps;
-        private float factor = 1;
+
+        int[] steps;
+        float factor = 1;
+
+        Builder() {}
 
         /** {@inheritDoc} */
         @Override

@@ -253,7 +253,7 @@ public interface NDArrayEx {
      * @param dilate the convolution dilate: (w,), (h, w) or (d, h, w). Defaults to 1 for each
      *     dimension
      * @param numFilters the convolution filter(channel) number
-     * @param numGroups the number of group partitions. Defaults to 1.
+     * @param numGroups the number of group partitions. Defaults to 1
      * @param layout the layout for input, output and weight. Empty for default layout: NCW for 1d,
      *     NCHW for 2d and NCDHW for 3d. NHWC and NDHWC are only supported on GPU
      * @param noBias whether to disable bias parameter. Defaults to false
@@ -319,7 +319,7 @@ public interface NDArrayEx {
      * @param useSequenceLength if set to true, this layer takes in an extra input parameter
      *     sequence_length to specify variable length sequence.
      * @param useBidirectional whether to use bidirectional recurrent layers
-     * @param stateOutputs whether to have the states as symbol outputs
+     * @param stateOutputs whether to include the state in the output
      * @param additional additional parameters
      * @return the output of the operation
      */
@@ -348,7 +348,7 @@ public interface NDArrayEx {
      * @param useSequenceLength if set to true, this layer takes in an extra input parameter
      *     sequence_length to specify variable length sequence.
      * @param useBidirectional whether to use bidirectional recurrent layers
-     * @param stateOutputs whether to have the states as symbol outputs
+     * @param stateOutputs whether to include the state in the output
      * @param lstmStateClipMin the minimum clip value of LSTM states
      * @param lstmStateClipMax the maximum clip value of LSTM states
      * @param additional additional parameters
@@ -383,7 +383,18 @@ public interface NDArrayEx {
      */
     NDArray normalize(float[] mean, float[] std);
 
-    NDArray toTensor();
+    default NDArray toTensor() {
+        NDArray array = getArray();
+        int dim = array.getShape().dimension();
+        if (dim == 3) {
+            array = array.expandDims(0);
+        }
+        array = array.div(255.0).transpose(0, 3, 1, 2);
+        if (dim == 3) {
+            array = array.squeeze(0);
+        }
+        return array;
+    }
 
     NDArray resize(int width, int height);
 
@@ -493,6 +504,25 @@ public interface NDArrayEx {
     }
 
     // TODO Add default implementation
+
+    /**
+     * Concats the parameters of a recurrent neural network as expected by the engine.
+     *
+     * @param arrays an {@link NDList} containing the the parameter arrays to be concatenated
+     * @param numArgs number of inputs to be concatenated
+     * @return the concatenated {@code NDArray} of parameters
+     */
+    NDArray rnnParameterConcat(NDList arrays, int numArgs);
+
+    /**
+     * Concats the parameters of a recurrent neural network as expected by the engine.
+     *
+     * @param arrays an {@link NDList} containing the the parameter arrays to be concatenated
+     * @param numArgs number of inputs to be concatenated
+     * @param dim the dimension to be concatenated
+     * @return the concatenated {@code NDArray} of parameters
+     */
+    NDArray rnnParameterConcat(NDList arrays, int numArgs, int dim);
 
     /**
      * Computes Multibox training targets.

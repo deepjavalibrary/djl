@@ -151,7 +151,7 @@ public class TfNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray arange(
-            Number start, Number stop, Number step, DataType dataType, Device device) {
+            double start, double stop, double step, DataType dataType, Device device) {
         return null;
     }
 
@@ -163,21 +163,21 @@ public class TfNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(Number start, Number stop, int num, boolean endpoint, Device device) {
+    public NDArray linspace(double start, double stop, int num, boolean endpoint, Device device) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
-            Number low, Number high, Shape shape, DataType dataType, Device device) {
+            double low, double high, Shape shape, DataType dataType, Device device) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
-            Number loc, Number scale, Shape shape, DataType dataType, Device device) {
+            double loc, double scale, Shape shape, DataType dataType, Device device) {
         return null;
     }
 

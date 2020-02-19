@@ -41,7 +41,7 @@ public class MnistTest {
             NDManager manager = model.getNDManager();
             Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
             Mnist mnist =
-                    new Mnist.Builder()
+                    Mnist.builder()
                             .optManager(manager)
                             .optUsage(Dataset.Usage.TEST)
                             .optRepository(repository)
@@ -70,7 +70,7 @@ public class MnistTest {
 
             NDManager manager = model.getNDManager();
             Mnist mnist =
-                    new Mnist.Builder()
+                    Mnist.builder()
                             .optManager(manager)
                             .optUsage(Dataset.Usage.TEST)
                             .setSampling(32, true)

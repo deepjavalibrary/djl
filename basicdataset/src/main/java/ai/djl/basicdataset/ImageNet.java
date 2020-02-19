@@ -49,8 +49,8 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
      *
      * @return a new builder
      */
-    public static ImageFolder.Builder builder() {
-        return new ImageFolder.Builder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
@@ -148,6 +148,8 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
     public static class Builder extends ImageFolderBuilder<Builder> {
 
         private Usage usage = Usage.TRAIN;
+
+        Builder() {}
 
         /**
          * Sets the optional usage.

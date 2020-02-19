@@ -12,6 +12,7 @@
  */
 package ai.djl.basicmodelzoo.cv.classification;
 
+import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
@@ -24,24 +25,25 @@ import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
-import ai.djl.repository.Anchor;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
-import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorFactory;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** Model loader for ResNet_V1. */
-public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifications> {
+public class ResNetModelLoader extends BaseModelLoader {
 
-    private static final Anchor BASE_ANCHOR = CV.IMAGE_CLASSIFICATION;
+    private static final Application APPLICATION = Application.CV.IMAGE_CLASSIFICATION;
     private static final String GROUP_ID = BasicModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "resnet";
     private static final String VERSION = "0.0.1";
@@ -52,32 +54,24 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
      * @param repository the repository to load the model from
      */
     public ResNetModelLoader(Repository repository) {
-        super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
+        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
+        map.put(Classifications.class, new FactoryImpl());
+        factories.put(BufferedImage.class, map);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Application getApplication() {
+        return APPLICATION;
     }
 
     /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
-    public Translator<BufferedImage, Classifications> getTranslator(Artifact artifact) {
-        Map<String, Object> arguments = artifact.getArguments();
-        List<Double> shape = (List<Double>) arguments.get("imageShape");
-        int width = shape.get(2).intValue();
-        int height = shape.get(1).intValue();
-
-        Pipeline pipeline = new Pipeline();
-        pipeline.add(new CenterCrop()).add(new Resize(width, height)).add(new ToTensor());
-        return new ImageClassificationTranslator.Builder()
-                .setPipeline(pipeline)
-                .setSynsetArtifactName("synset.txt")
-                .build();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    @SuppressWarnings("unchecked")
-    protected Model loadModel(Artifact artifact, Path modelPath, Device device)
+    public Model loadModel(Artifact artifact, Device device, Map<String, Object> override)
             throws IOException, MalformedModelException {
-        Map<String, Object> arguments = artifact.getArguments();
+        Map<String, Object> arguments = artifact.getArguments(override);
         Shape shape =
                 new Shape(
                         ((List<Double>) arguments.get("imageShape"))
@@ -85,7 +79,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
                                 .mapToLong(Double::longValue)
                                 .toArray());
         Builder blockBuilder =
-                new ResNetV1.Builder()
+                ResNetV1.builder()
                         .setNumLayers((int) ((double) arguments.get("numLayers")))
                         .setOutSize((long) ((double) arguments.get("outSize")))
                         .setImageShape(shape);
@@ -95,9 +89,33 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
         }
         Block block = blockBuilder.build();
 
+        Path dir = repository.getCacheDirectory();
+        String relativePath = artifact.getResourceUri().getPath();
+        Path modelPath = dir.resolve(relativePath);
+
         Model model = Model.newInstance(device);
         model.setBlock(block);
         model.load(modelPath, artifact.getName());
         return model;
+    }
+
+    private static final class FactoryImpl
+            implements TranslatorFactory<BufferedImage, Classifications> {
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public Translator<BufferedImage, Classifications> newInstance(
+                Map<String, Object> arguments) {
+            List<Double> shape = (List<Double>) arguments.get("imageShape");
+            int width = shape.get(2).intValue();
+            int height = shape.get(1).intValue();
+
+            Pipeline pipeline = new Pipeline();
+            pipeline.add(new CenterCrop()).add(new Resize(width, height)).add(new ToTensor());
+            return ImageClassificationTranslator.builder()
+                    .setPipeline(pipeline)
+                    .setSynsetArtifactName("synset.txt")
+                    .build();
+        }
     }
 }

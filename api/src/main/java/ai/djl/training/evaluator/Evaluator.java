@@ -117,7 +117,7 @@ public abstract class Evaluator {
                             + ")");
         }
         if (!checkDimOnly) {
-            if (labels.getShape() != predictions.getShape()) {
+            if (!labels.getShape().equals(predictions.getShape())) {
                 throw new IllegalArgumentException(
                         "The shape of labels("
                                 + labels.getShape()

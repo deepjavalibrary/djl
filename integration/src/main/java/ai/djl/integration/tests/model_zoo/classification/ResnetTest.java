@@ -12,10 +12,12 @@
  */
 package ai.djl.integration.tests.model_zoo.classification;
 
+import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.integration.util.Assertions;
 import ai.djl.modality.Classifications;
@@ -25,7 +27,9 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -42,9 +46,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class ResnetTest {
@@ -56,7 +59,7 @@ public class ResnetTest {
                         .optInitializer(Initializer.ONES);
 
         Block resNet50 =
-                new ResNetV1.Builder()
+                ResNetV1.builder()
                         .setImageShape(new Shape(1, 28, 28))
                         .setNumLayers(50)
                         .setOutSize(10)
@@ -129,10 +132,22 @@ public class ResnetTest {
 
     private ZooModel<BufferedImage, Classifications> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("layers", "50");
-        criteria.put("dataset", "cifar10");
-        return BasicModelZoo.RESNET.loadModel(criteria);
+        // TODO: PyTorch: disable due to the device mismatch on ParameterServer
+        if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
+            throw new SkipException("Model not supported");
+        }
+
+        Criteria<BufferedImage, Classifications> criteria =
+                Criteria.builder()
+                        .optApplication(Application.CV.IMAGE_CLASSIFICATION)
+                        .setTypes(BufferedImage.class, Classifications.class)
+                        .optModelZooName(BasicModelZoo.NAME)
+                        .optModelLoaderName("resnet")
+                        .optOption("layers", "50")
+                        .optOption("dataset", "cifar10")
+                        .build();
+
+        return ModelZoo.loadModel(criteria);
     }
 
     private static class TestTranslator implements Translator<NDList, NDList> {

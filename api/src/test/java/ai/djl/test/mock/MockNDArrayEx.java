@@ -328,7 +328,6 @@ public class MockNDArrayEx implements NDArrayEx {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDList rnn(
             NDList inputs,
@@ -343,7 +342,6 @@ public class MockNDArrayEx implements NDArrayEx {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public NDList lstm(
             NDList inputs,
@@ -405,6 +403,16 @@ public class MockNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray concat(NDList arrays, int axis) {
+        return null;
+    }
+
+    @Override
+    public NDArray rnnParameterConcat(NDList arrays, int numArgs) {
+        return null;
+    }
+
+    @Override
+    public NDArray rnnParameterConcat(NDList arrays, int numArgs, int dim) {
         return null;
     }
 

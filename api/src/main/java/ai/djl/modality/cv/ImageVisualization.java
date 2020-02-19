@@ -66,7 +66,7 @@ public final class ImageVisualization {
     /**
      * Draws alpha masks on segmented items in image.
      *
-     * @param image Buffered image to draw masks upon.
+     * @param image Buffered image to draw masks upon
      * @param mask Mask using which the parameters are added
      */
     private static void drawMask(BufferedImage image, Mask mask) {

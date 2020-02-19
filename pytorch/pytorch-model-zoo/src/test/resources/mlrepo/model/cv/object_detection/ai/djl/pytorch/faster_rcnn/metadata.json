@@ -1,0 +1,39 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "faster_rcnn",
+  "type": "cv",
+  "name": "Object detection",
+  "description": "Faster RCNN object detection",
+  "website": "http://www.djl.ai/pytorch/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "faster_rcnn_resnet50",
+      "properties": {
+        "backbone": "resnet50",
+        "dataset": "coco"
+      },
+      "files": {
+        "classes": {
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/pytorch/classes_coco.txt",
+          "sha1Hash": "e13cfd97ff597af11296f636dd0cb8c7596acb7b",
+          "size": 675,
+          "name": "classes.txt"
+        },
+        "model": {
+          "uri": "0.0.1/faster_rcnn_resnet50.pt.gz",
+          "sha1Hash": "4f52a45cbdf70250e0ad4ed987d03b97a6ae608b",
+          "size": 155852374
+        }
+      }
+    }
+  ]
+}

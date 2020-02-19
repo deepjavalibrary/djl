@@ -134,6 +134,8 @@ public abstract class Optimizer {
         private float clipGrad = -1;
         private int beginNumUpdate;
 
+        protected OptimizerBuilder() {}
+
         /**
          * Sets the value used to rescale the gradient. This is used to alleviate the effect of
          * batching on the loss. Usually, the value is set to \( 1/batch_size \). Defaults to 1.

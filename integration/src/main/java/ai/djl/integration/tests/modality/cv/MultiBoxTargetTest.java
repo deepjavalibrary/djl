@@ -25,11 +25,12 @@ public class MultiBoxTargetTest {
     @Test
     public void testTargets() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray anchorBoxes = manager.arange(22840 * 4).reshape(new Shape(1, 22840, 4));
-            NDArray label = manager.arange(160).reshape(new Shape(32, 1, 5));
-            NDArray classPreds = manager.arange(32 * 22840 * 2).reshape(new Shape(32, 2, 22840));
+            NDArray anchorBoxes = manager.arange(22840.0 * 4.0).reshape(new Shape(1, 22840, 4));
+            NDArray label = manager.arange(160.0).reshape(new Shape(32, 1, 5));
+            NDArray classPreds =
+                    manager.arange(32.0 * 22840.0 * 2.0).reshape(new Shape(32, 2, 22840));
 
-            MultiBoxTarget multiBoxTarget = new MultiBoxTarget.Builder().build();
+            MultiBoxTarget multiBoxTarget = MultiBoxTarget.builder().build();
             NDList targets = multiBoxTarget.target(new NDList(anchorBoxes, label, classPreds));
 
             Assert.assertEquals(targets.get(0).getShape(), new Shape(32, 91360));
@@ -56,7 +57,7 @@ public class MultiBoxTargetTest {
                                     })
                             .reshape(1, 5, 4);
 
-            MultiBoxTarget multiBoxTarget = new MultiBoxTarget.Builder().build();
+            MultiBoxTarget multiBoxTarget = MultiBoxTarget.builder().build();
             NDList targets =
                     multiBoxTarget.target(
                             new NDList(

@@ -65,10 +65,7 @@ public class TimeMeasureTrainingListener implements TrainingListener {
     @Override
     public void onTrainingEnd(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
-
-        if (outputDir != null) {
-            dumpTrainingTimeInfo(metrics, outputDir);
-        }
+        dumpTrainingTimeInfo(metrics, outputDir);
     }
 
     private static void dumpTrainingTimeInfo(Metrics metrics, String logDir) {

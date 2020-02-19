@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 public class MultiBoxDetectionTest {
     @Test
     public void testDetections() {
-        MultiBoxDetection multiBoxDetection = new MultiBoxDetection.Builder().build();
+        MultiBoxDetection multiBoxDetection = MultiBoxDetection.builder().build();
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray anchors =
                     manager.create(

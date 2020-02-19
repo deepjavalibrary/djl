@@ -100,6 +100,16 @@ public class Adam extends Optimizer {
                 epsilon,
                 true);
     }
+
+    /**
+     * Creates a builder to build a {@code Adam}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The Builder to construct an {@link Adam} object. */
     public static final class Builder extends OptimizerBuilder<Builder> {
 
@@ -108,6 +118,8 @@ public class Adam extends Optimizer {
         private float beta1 = 0.9f;
         private float beta2 = 0.999f;
         private float epsilon = 1e-8f;
+
+        Builder() {}
 
         /** {@inheritDoc} */
         @Override

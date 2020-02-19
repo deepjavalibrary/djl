@@ -12,27 +12,40 @@
  */
 package ai.djl.fasttext;
 
+import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.ModelException;
 import ai.djl.fasttext.dataset.CookingStackExchange;
 import ai.djl.fasttext.engine.FtTrainer;
 import ai.djl.fasttext.engine.FtTrainingConfig;
+import ai.djl.fasttext.engine.TextClassificationTranslator;
 import ai.djl.fasttext.engine.Word2VecTranslator;
 import ai.djl.fasttext.zoo.FtModelZoo;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class TrainCookingStackExchange {
+
+    private static final Logger logger = LoggerFactory.getLogger(TrainCookingStackExchange.class);
 
     @Test
     public void testTrainTextClassification() throws IOException {
@@ -59,8 +72,14 @@ public class TrainCookingStackExchange {
     public void testTextClassification()
             throws IOException, TranslateException, MalformedModelException,
                     ModelNotFoundException {
-        try (ZooModel<String, Classifications> model =
-                FtModelZoo.COOKING_STACKEXCHANGE.loadModel()) {
+        Criteria<String, Classifications> criteria =
+                Criteria.builder()
+                        .optApplication(Application.NLP.TEXT_CLASSIFICATION)
+                        .setTypes(String.class, Classifications.class)
+                        .optModelZooName(FtModelZoo.NAME)
+                        .optModelLoaderName(FtModelZoo.COOKING_STACKEXCHANGE.getName())
+                        .build();
+        try (ZooModel<String, Classifications> model = ModelZoo.loadModel(criteria)) {
             try (Predictor<String, Classifications> predictor = model.newPredictor()) {
                 Classifications result =
                         predictor.predict("Which baking dish is best to bake a banana bread ?");
@@ -74,13 +93,51 @@ public class TrainCookingStackExchange {
     public void testWord2Vec()
             throws IOException, TranslateException, MalformedModelException,
                     ModelNotFoundException {
-        try (ZooModel<String, Classifications> model =
-                FtModelZoo.COOKING_STACKEXCHANGE.loadModel()) {
+        Criteria<String, Classifications> criteria =
+                Criteria.builder()
+                        .optApplication(Application.NLP.TEXT_CLASSIFICATION)
+                        .setTypes(String.class, Classifications.class)
+                        .optModelZooName(FtModelZoo.NAME)
+                        .optModelLoaderName(FtModelZoo.COOKING_STACKEXCHANGE.getName())
+                        .build();
+        try (ZooModel<String, Classifications> model = ModelZoo.loadModel(criteria)) {
             Word2VecTranslator translator = new Word2VecTranslator();
             try (Predictor<String, float[]> predictor = model.newPredictor(translator)) {
                 float[] result = predictor.predict("bread");
                 Assert.assertEquals(result.length, 100);
                 Assert.assertEquals(result[0], 0.038162477, 0.001);
+            }
+        }
+    }
+
+    @Test(enabled = false)
+    public void testBlazingText() throws IOException, ModelException, TranslateException {
+        if (!Boolean.getBoolean("nightly")) {
+            throw new SkipException("Nightly only");
+        }
+
+        URL url =
+                new URL(
+                        "https://djl-ai.s3.amazonaws.com/resources/test-models/blazingtext_classification.bin");
+        Path path = Paths.get("build/tmp/model");
+        Path modelFile = path.resolve("text_classification.bin");
+        if (!Files.exists(modelFile)) {
+            Files.createDirectories(path);
+            try (InputStream is = url.openStream()) {
+                Files.copy(is, modelFile);
+            }
+        }
+
+        TextClassificationTranslator translator = new TextClassificationTranslator();
+        try (Model model = Model.newInstance()) {
+            model.load(path, "text_classification.bin");
+            try (Predictor<String, Classifications> predictor = model.newPredictor(translator)) {
+                Classifications result =
+                        predictor.predict(
+                                "Convair was an american aircraft manufacturing company which later expanded into rockets and spacecraft .");
+
+                logger.info("{}", result);
+                Assert.assertEquals(result.item(0).getClassName(), "Company");
             }
         }
     }

@@ -68,7 +68,7 @@ public class MxParameterStoreTest {
             }
 
             TestOptimizer optimizer =
-                    new TestOptimizer.Builder()
+                    TestOptimizer.builder()
                             .setLearningRateTracker(LearningRateTracker.fixedLearningRate(lr))
                             .build();
 
@@ -118,9 +118,15 @@ public class MxParameterStoreTest {
             updateCount++;
         }
 
+        public static Builder builder() {
+            return new Builder();
+        }
+
         public static final class Builder extends OptimizerBuilder<Builder> {
 
             private LearningRateTracker learningRateTracker;
+
+            Builder() {}
 
             public MxParameterStoreTest.TestOptimizer.Builder setLearningRateTracker(
                     LearningRateTracker learningRateTracker) {

@@ -1,6 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
+
+NUM_PROC=1
+if [[ ! -z $(command -v nproc) ]]; then
+    NUM_PROC=$(nproc)
+elif [[ ! -z $(command -v sysctl) ]]; then
+    NUM_PROC=$(sysctl -n hw.ncpu)
+fi
 
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 if [[ ! -d "libtorch" ]]; then
@@ -21,6 +28,6 @@ mkdir build && cd build
 mkdir classes
 javac -sourcepath ../../pytorch-engine/src/main/java/ ../../pytorch-engine/src/main/java/ai/djl/pytorch/jni/PyTorchLibrary.java -h include -d classes
 cmake -DCMAKE_PREFIX_PATH=libtorch ..
-cmake --build . --config Release
+cmake --build . --config Release -- -j "${NUM_PROC}"
 
 popd

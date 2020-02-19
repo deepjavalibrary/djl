@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.Application.CV;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils.Flag;
@@ -107,7 +108,7 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
     /** {@inheritDoc} */
     @Override
     public MRL getMrl() {
-        return new MRL(MRL.Dataset.CV, BasicDatasets.GROUP_ID, ARTIFACT_ID);
+        return MRL.dataset(CV.IMAGE_CLASSIFICATION, BasicDatasets.GROUP_ID, ARTIFACT_ID);
     }
 
     /** {@inheritDoc} */
@@ -143,13 +144,12 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
     /** {@inheritDoc} */
     @Override
     public void useDefaultArtifact() throws IOException {
-        artifact = repository.resolve(getMrl(), "1.0", null);
+        artifact = repository.resolve(getMrl(), "1.1", null);
     }
 
     /** {@inheritDoc} */
     @Override
     public void prepareData(Usage usage) throws IOException {
-
         items = new ArrayList<>();
         for (String filenameWithExtension :
                 repository.listDirectory(getArtifactItem(), getUsagePath())) {
@@ -164,14 +164,13 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
     }
 
     private String getUsagePath() {
-        String prefix = "captchaImage/";
         switch (usage) {
             case TRAIN:
-                return prefix + "train";
+                return "train";
             case TEST:
-                return prefix + "test";
+                return "test";
             case VALIDATION:
-                return prefix + "validate";
+                return "validate";
             default:
                 throw new IllegalArgumentException("Invalid usage");
         }
@@ -180,12 +179,12 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
     /** A builder for a {@link ai.djl.basicdataset.CaptchaDataset}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
-        private Repository repository;
-        private Artifact artifact;
-        private Usage usage;
+        Repository repository;
+        Artifact artifact;
+        Usage usage;
 
         /** Constructs a new builder. */
-        public Builder() {
+        Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
             pipeline = new Pipeline(new ToTensor());

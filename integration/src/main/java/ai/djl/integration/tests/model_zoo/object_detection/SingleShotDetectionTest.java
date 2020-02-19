@@ -13,10 +13,12 @@
 
 package ai.djl.integration.tests.model_zoo.object_detection;
 
+import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.basicdataset.PikachuDetection;
 import ai.djl.basicmodelzoo.BasicModelZoo;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.MultiBoxDetection;
@@ -28,7 +30,9 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.SequentialBlock;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -45,9 +49,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class SingleShotDetectionTest {
@@ -94,14 +97,14 @@ public class SingleShotDetectionTest {
                             NDArray classPredictions = output.get(1).softmax(-1).transpose(0, 2, 1);
                             NDArray boundingBoxPredictions = output.get(2);
                             MultiBoxDetection multiBoxDetection =
-                                    new MultiBoxDetection.Builder().build();
+                                    MultiBoxDetection.builder().build();
                             NDList detections =
                                     multiBoxDetection.detection(
                                             new NDList(
                                                     classPredictions,
                                                     boundingBoxPredictions,
                                                     anchors));
-                            return detections.singletonOrThrow().split(new int[] {1, 2}, 2);
+                            return detections.singletonOrThrow().split(new long[] {1, 2}, 2);
                         }));
         return ssdPredict;
     }
@@ -109,7 +112,7 @@ public class SingleShotDetectionTest {
     private Dataset getDataset() throws IOException {
         Pipeline pipeline = new Pipeline(new ToTensor());
         PikachuDetection pikachuDetection =
-                new PikachuDetection.Builder()
+                PikachuDetection.builder()
                         .optUsage(Dataset.Usage.TEST)
                         .optPipeline(pipeline)
                         .setSampling(32, true)
@@ -128,9 +131,21 @@ public class SingleShotDetectionTest {
 
     private ZooModel<BufferedImage, DetectedObjects> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("flavor", "tiny");
-        criteria.put("dataset", "pikachu");
-        return BasicModelZoo.SSD.loadModel(criteria);
+        // TODO: PyTorch: disable due to the device mismatch on ParameterServer
+        if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
+            throw new SkipException("Model not supported");
+        }
+
+        Criteria<BufferedImage, DetectedObjects> criteria =
+                Criteria.builder()
+                        .optApplication(Application.CV.OBJECT_DETECTION)
+                        .setTypes(BufferedImage.class, DetectedObjects.class)
+                        .optModelZooName(BasicModelZoo.NAME)
+                        .optModelLoaderName("ssd")
+                        .optOption("flavor", "tiny")
+                        .optOption("dataset", "pikachu")
+                        .build();
+
+        return ModelZoo.loadModel(criteria);
     }
 }

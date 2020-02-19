@@ -35,7 +35,7 @@ public class NormalInitializer implements Initializer {
     /**
      * Creates a Normal initializer.
      *
-     * @param sigma the standard deviation of the normal distribution.
+     * @param sigma the standard deviation of the normal distribution
      */
     public NormalInitializer(double sigma) {
         this.sigma = sigma;

@@ -13,7 +13,6 @@
 package ai.djl.tensorflow.engine;
 
 import ai.djl.Device;
-import ai.djl.ndarray.Matrix;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -145,12 +144,6 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Matrix toMatrix() {
         return null;
     }
 
@@ -722,7 +715,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int[] indices, int axis) {
+    public NDList split(long[] indices, int axis) {
         TfNDArray axisOp = (TfNDArray) manager.create(axis);
         Operation op =
                 manager.getGraph()
@@ -742,7 +735,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int sections, int axis) {
+    public NDList split(long sections, int axis) {
         if (axis < 0 || axis > getShape().dimension()) {
             throw new IllegalArgumentException("Invalid axis value");
         }
@@ -776,6 +769,11 @@ public class TfNDArray implements NDArray {
     @Override
     public NDArray reshape(Shape shape) {
         return null;
+    }
+
+    @Override
+    public NDArray reshapeLike(NDArray array) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */

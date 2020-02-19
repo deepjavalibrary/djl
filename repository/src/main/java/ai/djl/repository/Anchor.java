@@ -13,6 +13,7 @@
 package ai.djl.repository;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,11 +24,12 @@ import java.util.List;
  * anchors translate to directories. Directories sharing a path prefix can be used to organize a
  * multi-level hierarchy of categories.
  *
- * <p>Some example paths are located in {@link MRL.Dataset} and {@link MRL.Model}.
- *
  * @see MRL
  */
-public class Anchor {
+class Anchor {
+
+    public static final Anchor MODEL = new Anchor("model");
+    public static final Anchor DATASET = new Anchor("dataset");
 
     private String[] path;
 
@@ -85,6 +87,16 @@ public class Anchor {
      */
     public String getPath() {
         return String.join("/", path);
+    }
+
+    /**
+     * Returns the parent {@code Anchor} of this anchor.
+     *
+     * @return the parent {@code Anchor} of this anchor
+     */
+    public Anchor getParent() {
+        String[] parent = Arrays.copyOfRange(path, 0, path.length - 1);
+        return new Anchor(parent);
     }
 
     /**

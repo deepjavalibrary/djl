@@ -19,7 +19,7 @@ import ai.djl.translate.Translator;
 import java.util.List;
 
 /**
- * The {@code Predictor} interface provides model inference functionality.
+ * The {@code Predictor} interface provides a session for model inference.
  *
  * <p>You can use a {@code Predictor}, with a specified {@link Translator}, to perform inference on
  * a {@link Model}. The following is example code that uses {@code Predictor}:
@@ -28,7 +28,7 @@ import java.util.List;
  * Model model = Model.load(modelDir, modelName);
  *
  * // User must implement Translator interface, read {@link Translator} for detail.
- * Translator translator = new MyTranslator();
+ * Translator&lt;String, String&gt; translator = new MyTranslator();
  *
  * try (Predictor&lt;String, String&gt; predictor = model.newPredictor(translator)) {
  *   String result = predictor.predict("What's up");

@@ -12,8 +12,9 @@
  */
 package ai.djl.mxnet.zoo;
 
+import ai.djl.mxnet.engine.MxEngine;
 import ai.djl.mxnet.zoo.cv.actionrecognition.ActionRecognitionModelLoader;
-import ai.djl.mxnet.zoo.cv.classification.Mlp;
+import ai.djl.mxnet.zoo.cv.classification.MlpModelLoader;
 import ai.djl.mxnet.zoo.cv.classification.Resnet;
 import ai.djl.mxnet.zoo.cv.classification.Resnext;
 import ai.djl.mxnet.zoo.cv.classification.SeResnext;
@@ -24,12 +25,9 @@ import ai.djl.mxnet.zoo.cv.poseestimation.SimplePoseModelLoader;
 import ai.djl.mxnet.zoo.cv.segmentation.InstanceSegmentationModelLoader;
 import ai.djl.mxnet.zoo.nlp.qa.BertQAModelLoader;
 import ai.djl.repository.Repository;
-import ai.djl.repository.zoo.ModelLoader;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * MxModelZoo is a repository that contains all MXNet models in {@link
@@ -43,7 +41,7 @@ public class MxModelZoo implements ModelZoo {
     private static final Repository REPOSITORY = Repository.newInstance("MxNet", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.mxnet";
 
-    public static final Mlp MLP = new Mlp(REPOSITORY);
+    public static final MlpModelLoader MLP = new MlpModelLoader(REPOSITORY);
     public static final SingleShotDetectionModelLoader SSD =
             new SingleShotDetectionModelLoader(REPOSITORY);
     public static final Resnet RESNET = new Resnet(REPOSITORY);
@@ -60,31 +58,7 @@ public class MxModelZoo implements ModelZoo {
 
     /** {@inheritDoc} */
     @Override
-    public List<ModelLoader<?, ?>> getModelLoaders() {
-        List<ModelLoader<?, ?>> list = new ArrayList<>();
-        try {
-            Field[] fields = MxModelZoo.class.getDeclaredFields();
-            for (Field field : fields) {
-                if (field.getType().isAssignableFrom(ModelLoader.class)) {
-                    list.add((ModelLoader<?, ?>) field.get(null));
-                }
-            }
-        } catch (ReflectiveOperationException e) {
-            // ignore
-        }
-        return list;
-    }
-
-    /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
-    @Override
-    public <I, O> ModelLoader<I, O> getModelLoader(String name) throws ModelNotFoundException {
-        try {
-            Field field = MxModelZoo.class.getDeclaredField(name);
-            return (ModelLoader<I, O>) field.get(null);
-        } catch (ReflectiveOperationException e) {
-            throw new ModelNotFoundException(
-                    "Model: " + name + " is not defined in MxModelZoo.", e);
-        }
+    public Set<String> getSupportedEngines() {
+        return Collections.singleton(MxEngine.ENGINE_NAME);
     }
 }

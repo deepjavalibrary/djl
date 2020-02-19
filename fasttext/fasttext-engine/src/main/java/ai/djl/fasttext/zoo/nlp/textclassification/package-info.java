@@ -12,7 +12,7 @@
  */
 
 /**
- * Contains classes for the {@link ai.djl.repository.MRL.Model.NLP#TEXT_CLASSIFICATION} models in
- * the {@link ai.djl.fasttext.zoo.FtModelZoo}.
+ * Contains classes for the {@link ai.djl.Application.NLP#TEXT_CLASSIFICATION} models in the {@link
+ * ai.djl.fasttext.zoo.FtModelZoo}.
  */
 package ai.djl.fasttext.zoo.nlp.textclassification;

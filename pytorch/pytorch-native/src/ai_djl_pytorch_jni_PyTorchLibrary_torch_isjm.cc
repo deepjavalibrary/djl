@@ -30,10 +30,17 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSqueeze__L
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSqueeze__Lai_djl_pytorch_jni_Pointer_2I
-  (JNIEnv *env, jobject jthis, jobject jhandle, jint axis) {
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSqueeze__Lai_djl_pytorch_jni_Pointer_2J
+  (JNIEnv *env, jobject jthis, jobject jhandle, jlong jaxis) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  const auto* result_ptr = new torch::Tensor(tensor_ptr->squeeze(axis));
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->squeeze(jaxis));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUnsqueeze
+  (JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->unsqueeze(jdim));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 
@@ -42,6 +49,14 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStack
   const std::vector<torch::Tensor> tensor_vec =
     utils::GetObjectVecFromJHandles<torch::Tensor>(env, jhandles);
   const torch::Tensor* result_ptr = new torch::Tensor(torch::stack(tensor_vec, jdim));
+  return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchCat
+  (JNIEnv* env, jobject jthis, jobjectArray jhandles, jlong jdim) {
+  const std::vector<torch::Tensor> tensor_vec =
+    utils::GetObjectVecFromJHandles<torch::Tensor>(env, jhandles);
+  const torch::Tensor* result_ptr = new torch::Tensor(torch::cat(tensor_vec, jdim));
   return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
 }
 
@@ -61,8 +76,8 @@ JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit
 JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit__Lai_djl_pytorch_jni_Pointer_2_3JJ
   (JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jindices, jlong jdim) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-  auto indices = env->GetLongArrayElements(jindices, JNI_FALSE);
-  auto tensors = tensor_ptr->split_with_sizes(c10::IntArrayRef(*indices), jdim);
+  const std::vector<int64_t> indices = utils::GetVecFromJLongArray(env, jindices);
+  auto tensors = tensor_ptr->split_with_sizes(indices, jdim);
   jobjectArray jarray = env->NewObjectArray(tensors.size(), env->FindClass(utils::POINTER_CLASS), nullptr);
   for (size_t i = 0; i < tensors.size(); ++i) {
     const auto* element_ptr = new torch::Tensor(tensors.at(i));
@@ -70,4 +85,19 @@ JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit
     env->SetObjectArrayElement(jarray, i, ptr);
   }
   return jarray;
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchPermute
+  (JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jdims) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const std::vector<int64_t> dims = utils::GetVecFromJLongArray(env, jdims);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->permute(dims));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTranspose
+  (JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim1, jlong jdim2) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->transpose(jdim1, jdim2));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }

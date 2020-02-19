@@ -13,18 +13,11 @@
 #include "../build/include/ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_utils.h"
 
-// The file is the implementation for PyTorch tensor reduction ops
+// The file is the implementation for PyTorch tensor other ops
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArgMax__Lai_djl_pytorch_jni_Pointer_2
-  (JNIEnv* env, jobject jthis, jobject jhandle) {
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFlatten
+  (JNIEnv* env, jobject jthis, jobject jhandle, jlong jstart_dim, jlong jend_dim) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  const auto* result_ptr = new torch::Tensor(tensor_ptr->argmax());
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
-}
-
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArgMax__Lai_djl_pytorch_jni_Pointer_2JZ
-  (JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim, jboolean jkeep_dim) {
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  const auto* result_ptr = new torch::Tensor(tensor_ptr->argmax(jdim, jkeep_dim == JNI_TRUE));
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->flatten(jstart_dim, jend_dim));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }

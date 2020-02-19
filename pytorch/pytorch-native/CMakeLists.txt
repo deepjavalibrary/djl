@@ -7,15 +7,18 @@ include_directories(${JNI_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 set(SOURCE_FILES
     build/include/ai_djl_pytorch_jni_PyTorchLibrary.h
-    "src /djl_pytorch_jni_utils.h"
-    "src /ai_djl_pytorch_jni_PyTorchLibrary_functional.cc"
-    "src /ai_djl_pytorch_jni_PyTorchLibrary_inference.cc"
-    "src /ai_djl_pytorch_jni_PyTorchLibrary_tensor_comparison.cc"
-    "src /ai_djl_pytorch_jni_PyTorchLibrary_tensor_core.cc"
-    "src /ai_djl_pytorch_jni_PyTorchLibrary_tensor_creation.cc"
-    "src /ai_djl_pytorch_jni_PyTorchLibrary_tensor_isjm.cc"
-    "src /ai_djl_pytorch_jni_PyTorchLibrary_tensor_pointwise.cc"
-    "src /ai_djl_pytorch_jni_PyTorchLibrary_tensor_reduction.cc")
+    "src/djl_pytorch_jni_utils.h"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_system.cc"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_nn_functional.cc"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_inference.cc"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_comparison.cc"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_tensor.cc"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_creation.cc"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_isjm.cc"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_pointwise.cc"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_reduction.cc"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_random_sampling.cc"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_other.cc")
 add_library(djl_torch SHARED ${SOURCE_FILES})
 target_link_libraries(djl_torch "${TORCH_LIBRARIES}")
 set_property(TARGET djl_torch PROPERTY CXX_STANDARD 14)

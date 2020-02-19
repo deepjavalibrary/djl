@@ -14,6 +14,7 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDUtils;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -21,7 +22,6 @@ import ai.djl.nn.pooling.PoolingConvention;
 import ai.djl.util.PairList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 /** {@code MxNDArrayEx} is the MXNet implementation of the {@link NDArrayEx}. */
 class MxNDArrayEx implements NDArrayEx {
@@ -105,13 +105,13 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rsub(Number n) {
-        return array.sub(n).negi();
+        return array.sub(n).neg();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rsub(NDArray b) {
-        return array.sub(b).negi();
+        return array.sub(b).neg();
     }
 
     /** {@inheritDoc} */
@@ -577,8 +577,8 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("num_layers", numStackedLayers);
         params.addParam("use_sequence_length", useSequenceLength);
         params.addParam("bidirectional", useBidirectional);
-        params.addParam("state_outputs", stateOutputs);
         params.addParam("mode", mode);
+        params.addParam("state_outputs", stateOutputs);
         params.addAll(additional);
 
         return getManager().invoke("RNN", inputs, params);
@@ -711,31 +711,30 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray concat(NDList list, int axis) {
-        NDArray[] arrays = list.toArray(new NDArray[0]);
-        if (Stream.of(arrays).allMatch(array -> array.getShape().dimension() == 0)) {
-            throw new IllegalArgumentException(
-                    "scalar(zero-dimensional) arrays cannot be concatenated");
-        }
-        int dimension = arrays[0].getShape().dimension();
-        for (int i = 1; i < arrays.length; i++) {
-            if (arrays[i].getShape().dimension() != dimension) {
-                throw new IllegalArgumentException(
-                        "all the input arrays must have same number of dimensions, but the array at index 0 has "
-                                + dimension
-                                + " dimension(s) and the array at index "
-                                + i
-                                + " has "
-                                + arrays[i].getShape().dimension()
-                                + " dimension(s)");
-            }
-        }
+        NDUtils.checkConcatInput(list);
+
         MxOpParams params = new MxOpParams();
         // MXNet backend use dim as argument name
         params.addParam("axis", axis);
-        NDArray[] srcArray = new NDArray[arrays.length + 1];
+        NDArray[] srcArray = new NDArray[list.size() + 1];
         srcArray[0] = array;
-        System.arraycopy(arrays, 0, srcArray, 1, arrays.length);
+        System.arraycopy(list.toArray(new NDArray[0]), 0, srcArray, 1, list.size());
         return getManager().invoke("_npi_concatenate", srcArray, params);
+    }
+
+    @Override
+    public NDArray rnnParameterConcat(NDList arrays, int numArgs) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("num_args", numArgs);
+        return getManager().invoke("_npi_rnn_param_concat", arrays, params).singletonOrThrow();
+    }
+
+    @Override
+    public NDArray rnnParameterConcat(NDList arrays, int numArgs, int dim) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("dim", dim);
+        params.addParam("num_args", numArgs);
+        return getManager().invoke("_npi_rnn_param_concat", arrays, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */

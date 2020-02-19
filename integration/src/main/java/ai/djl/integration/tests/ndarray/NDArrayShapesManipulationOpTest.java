@@ -30,7 +30,7 @@ public class NDArrayShapesManipulationOpTest {
             NDList result = array.split(2);
             Assert.assertEquals(result.get(0), manager.create(new float[] {1f, 2f}));
             Assert.assertEquals(result.get(1), manager.create(new float[] {3f, 4f}));
-            result = array.split(new int[] {2});
+            result = array.split(new long[] {2});
             Assert.assertEquals(result.get(0), manager.create(new float[] {1f, 2f}));
             Assert.assertEquals(result.get(1), manager.create(new float[] {3f, 4f}));
         }
@@ -199,7 +199,7 @@ public class NDArrayShapesManipulationOpTest {
             NDArray array1 = manager.create(new float[] {1f});
             NDArray array2 = manager.create(new float[] {2f});
             NDArray expected = manager.create(new float[] {1f, 2f});
-            // Assert.assertEquals(NDArrays.concat(new NDList(array1, array2),0), expected);
+            Assert.assertEquals(NDArrays.concat(new NDList(array1, array2), 0), expected);
             Assert.assertEquals(array1.concat(array2), expected);
 
             array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));

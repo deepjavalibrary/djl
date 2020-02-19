@@ -17,7 +17,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
-import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.ParallelBlock;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv2D;
@@ -59,7 +58,7 @@ public final class ResNetV1 {
         SequentialBlock resUnit = new SequentialBlock();
         if (bottleneck) {
             resUnit.add(
-                            new Conv2D.Builder()
+                            Conv2D.builder()
                                     .setKernel(new Shape(1, 1))
                                     .setNumFilters(numFilters / 4)
                                     .optStride(stride)
@@ -67,13 +66,13 @@ public final class ResNetV1 {
                                     .optBias(true)
                                     .build())
                     .add(
-                            new BatchNorm.Builder()
+                            BatchNorm.builder()
                                     .optEpsilon(1e-5f)
                                     .optMomentum(batchNormMomentum)
                                     .build())
-                    .add(Activation.reluBlock())
+                    .add(Activation::relu)
                     .add(
-                            new Conv2D.Builder()
+                            Conv2D.builder()
                                     .setKernel(new Shape(3, 3))
                                     .setNumFilters(numFilters / 4)
                                     .optStride(new Shape(1, 1))
@@ -81,13 +80,13 @@ public final class ResNetV1 {
                                     .optBias(false)
                                     .build())
                     .add(
-                            new BatchNorm.Builder()
+                            BatchNorm.builder()
                                     .optEpsilon(2E-5f)
                                     .optMomentum(batchNormMomentum)
                                     .build())
-                    .add(Activation.reluBlock())
+                    .add(Activation::relu)
                     .add(
-                            new Conv2D.Builder()
+                            Conv2D.builder()
                                     .setKernel(new Shape(1, 1))
                                     .setNumFilters(numFilters)
                                     .optStride(new Shape(1, 1))
@@ -95,14 +94,14 @@ public final class ResNetV1 {
                                     .optBias(true)
                                     .build())
                     .add(
-                            new BatchNorm.Builder()
+                            BatchNorm.builder()
                                     .optEpsilon(1E-5f)
                                     .optMomentum(batchNormMomentum)
                                     .build());
 
         } else {
             resUnit.add(
-                            new Conv2D.Builder()
+                            Conv2D.builder()
                                     .setKernel(new Shape(3, 3))
                                     .setNumFilters(numFilters)
                                     .optStride(stride)
@@ -110,13 +109,13 @@ public final class ResNetV1 {
                                     .optBias(false)
                                     .build())
                     .add(
-                            new BatchNorm.Builder()
+                            BatchNorm.builder()
                                     .optEpsilon(1E-5f)
                                     .optMomentum(batchNormMomentum)
                                     .build())
-                    .add(Activation.reluBlock())
+                    .add(Activation::relu)
                     .add(
-                            new Conv2D.Builder()
+                            Conv2D.builder()
                                     .setKernel(new Shape(3, 3))
                                     .setNumFilters(numFilters)
                                     .optStride(new Shape(1, 1))
@@ -124,7 +123,7 @@ public final class ResNetV1 {
                                     .optBias(false)
                                     .build())
                     .add(
-                            new BatchNorm.Builder()
+                            BatchNorm.builder()
                                     .optEpsilon(1E-5f)
                                     .optMomentum(batchNormMomentum)
                                     .build());
@@ -134,7 +133,7 @@ public final class ResNetV1 {
             shortcut.add(Blocks.identityBlock());
         } else {
             shortcut.add(
-                            new Conv2D.Builder()
+                            Conv2D.builder()
                                     .setKernel(new Shape(1, 1))
                                     .setNumFilters(numFilters)
                                     .optStride(stride)
@@ -142,7 +141,7 @@ public final class ResNetV1 {
                                     .optBias(false)
                                     .build())
                     .add(
-                            new BatchNorm.Builder()
+                            BatchNorm.builder()
                                     .optEpsilon(1E-5f)
                                     .optMomentum(batchNormMomentum)
                                     .build());
@@ -173,7 +172,7 @@ public final class ResNetV1 {
         SequentialBlock resNet = new SequentialBlock();
         if (height <= 32) {
             resNet.add(
-                    new Conv2D.Builder()
+                    Conv2D.builder()
                             .setKernel(new Shape(3, 3))
                             .setNumFilters(builder.filters[0])
                             .optStride(new Shape(1, 1))
@@ -182,7 +181,7 @@ public final class ResNetV1 {
                             .build());
         } else {
             resNet.add(
-                            new Conv2D.Builder()
+                            Conv2D.builder()
                                     .setKernel(new Shape(7, 7))
                                     .setNumFilters(builder.filters[0])
                                     .optStride(new Shape(2, 2))
@@ -190,20 +189,12 @@ public final class ResNetV1 {
                                     .optBias(false)
                                     .build())
                     .add(
-                            new BatchNorm.Builder()
+                            BatchNorm.builder()
                                     .optEpsilon(2E-5f)
                                     .optMomentum(builder.batchNormMomentum)
                                     .build())
                     .add(Activation.reluBlock())
-                    .add(
-                            new LambdaBlock(
-                                    arrays ->
-                                            new NDList(
-                                                    Pool.maxPool(
-                                                            arrays.singletonOrThrow(),
-                                                            new Shape(3, 3),
-                                                            new Shape(2, 2),
-                                                            new Shape(1, 1)))));
+                    .add(Pool.maxPool2DBlock(new Shape(3, 3), new Shape(2, 2), new Shape(1, 1)));
         }
         Shape resStride = new Shape(1, 1);
         for (int i = 0; i < numStages; i++) {
@@ -227,10 +218,19 @@ public final class ResNetV1 {
                 resStride = new Shape(2, 2);
             }
         }
-        return resNet.add(new LambdaBlock(arrays -> new NDList(Pool.globalAvgPool(arrays.head()))))
+        return resNet.add(Pool.globalAvgPool2DBlock())
                 .add(Blocks.batchFlattenBlock())
-                .add(new Linear.Builder().setOutChannels(builder.outSize).build())
+                .add(Linear.builder().setOutChannels(builder.outSize).build())
                 .add(Blocks.batchFlattenBlock());
+    }
+
+    /**
+     * Creates a builder to build a {@link ResNetV1}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
     }
 
     /** The Builder to construct a {@link ResNetV1} object. */
@@ -244,6 +244,8 @@ public final class ResNetV1 {
         boolean bottleneck;
         int[] units;
         int[] filters;
+
+        Builder() {}
 
         /**
          * Sets the number of layers in the network.

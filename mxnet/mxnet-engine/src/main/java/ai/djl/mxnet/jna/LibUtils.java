@@ -241,7 +241,7 @@ public class LibUtils {
         String flavor;
         String cudaArch;
         if (CudaUtils.getGpuCount() > 0) {
-            flavor = "cu" + CudaUtils.getCudaVersion() + "mkl";
+            flavor = "cu" + CudaUtils.getCudaVersionString() + "mkl";
             cudaArch = CudaUtils.getComputeCapability(0);
         } else {
             flavor = "mkl";

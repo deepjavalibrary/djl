@@ -55,7 +55,10 @@ public class CSVDataset extends RandomAccessDataset {
     }
 
     public static final class Builder extends BaseBuilder<Builder> {
+
         List<CSVRecord> csvRecords;
+
+        Builder(){}
 
         @Override
         protected Builder self() {

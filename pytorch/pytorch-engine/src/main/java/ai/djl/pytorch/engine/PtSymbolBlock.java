@@ -21,6 +21,7 @@ import ai.djl.nn.BlockList;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
+import ai.djl.pytorch.jni.IValueUtils;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.NativeResource;
 import ai.djl.pytorch.jni.Pointer;
@@ -77,7 +78,7 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        return JniUtils.moduleForward(this, inputs);
+        return IValueUtils.forward(this, inputs);
     }
 
     @Override

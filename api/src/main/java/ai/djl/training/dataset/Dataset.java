@@ -14,7 +14,7 @@ package ai.djl.training.dataset;
 
 import ai.djl.ndarray.NDManager;
 
-/** An interface to represent a dataset. Every dataset must implement this interface. */
+/** An interface to represent a set of sample data/label pairs to train a model. */
 public interface Dataset {
 
     /**

@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.Application.CV;
 import ai.djl.modality.cv.Rectangle;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.util.BufferedImageUtils;
@@ -74,7 +75,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     /** {@inheritDoc} */
     @Override
     public MRL getMrl() {
-        return new MRL(MRL.Dataset.CV, BasicDatasets.GROUP_ID, ARTIFACT_ID);
+        return MRL.dataset(CV.IMAGE_CLASSIFICATION, BasicDatasets.GROUP_ID, ARTIFACT_ID);
     }
 
     /** {@inheritDoc} */
@@ -194,13 +195,13 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     /** A builder to construct a {@link CocoDetection}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
-        private Flag flag;
-        private Repository repository;
-        private Artifact artifact;
-        private Usage usage;
+        Flag flag;
+        Repository repository;
+        Artifact artifact;
+        Usage usage;
 
         /** Constructs a new builder. */
-        public Builder() {
+        Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
             pipeline = new Pipeline(new ToTensor());

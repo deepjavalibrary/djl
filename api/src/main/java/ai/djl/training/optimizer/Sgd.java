@@ -77,8 +77,10 @@ public class Sgd extends Optimizer {
     /** The Builder to construct an {@link Sgd} object. */
     public static final class Builder extends OptimizerBuilder<Builder> {
 
-        private LearningRateTracker learningRateTracker;
-        private float momentum;
+        LearningRateTracker learningRateTracker;
+        float momentum;
+
+        Builder() {}
 
         /** {@inheritDoc} */
         @Override

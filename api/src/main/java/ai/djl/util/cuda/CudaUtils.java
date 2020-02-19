@@ -83,6 +83,21 @@ public final class CudaUtils {
     }
 
     /**
+     * Returns the version string of CUDA runtime.
+     *
+     * @return the version string of CUDA runtime
+     */
+    public static String getCudaVersionString() {
+        if (LIB == null) {
+            throw new IllegalStateException("No cuda library is loaded.");
+        }
+        int version = getCudaVersion();
+        int major = version / 1000;
+        int minor = version % 1000;
+        return String.valueOf(major) + minor;
+    }
+
+    /**
      * Returns the CUDA compute capability.
      *
      * @param device the GPU {@link Device} to retrieve

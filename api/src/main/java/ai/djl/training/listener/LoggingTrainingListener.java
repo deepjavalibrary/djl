@@ -62,30 +62,33 @@ public class LoggingTrainingListener implements TrainingListener {
     /** {@inheritDoc} */
     @Override
     public void onEpoch(Trainer trainer) {
-        Metrics metrics = trainer.getMetrics();
-        Loss loss = trainer.getLoss();
-        String status =
-                getEvaluatorsStatus(
-                        metrics,
-                        trainer.getEvaluators(),
-                        EvaluatorTrainingListener.TRAIN_EPOCH,
-                        Short.MAX_VALUE);
-        logger.info("Epoch {} finished.", numEpochs);
-        logger.info("Train: {}", status);
+        logger.info("Epoch {} finished.", numEpochs + 1);
 
-        String metricName =
-                EvaluatorTrainingListener.metricName(
-                        loss, EvaluatorTrainingListener.VALIDATE_EPOCH);
-        if (metrics.hasMetric(metricName)) {
-            status =
+        Metrics metrics = trainer.getMetrics();
+        if (metrics != null) {
+            Loss loss = trainer.getLoss();
+            String status =
                     getEvaluatorsStatus(
                             metrics,
                             trainer.getEvaluators(),
-                            EvaluatorTrainingListener.VALIDATE_EPOCH,
+                            EvaluatorTrainingListener.TRAIN_EPOCH,
                             Short.MAX_VALUE);
-            logger.info("Validate: {}", status);
-        } else {
-            logger.info("validation has not been run.");
+            logger.info("Train: {}", status);
+
+            String metricName =
+                    EvaluatorTrainingListener.metricName(
+                            loss, EvaluatorTrainingListener.VALIDATE_EPOCH);
+            if (metrics.hasMetric(metricName)) {
+                status =
+                        getEvaluatorsStatus(
+                                metrics,
+                                trainer.getEvaluators(),
+                                EvaluatorTrainingListener.VALIDATE_EPOCH,
+                                Short.MAX_VALUE);
+                logger.info("Validate: {}", status);
+            } else {
+                logger.info("validation has not been run.");
+            }
         }
 
         numEpochs++;
@@ -104,8 +107,11 @@ public class LoggingTrainingListener implements TrainingListener {
 
     private String getTrainingStatus(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
-        StringBuilder sb = new StringBuilder();
+        if (metrics == null) {
+            return "";
+        }
 
+        StringBuilder sb = new StringBuilder();
         sb.append(
                 getEvaluatorsStatus(
                         metrics,
@@ -157,6 +163,10 @@ public class LoggingTrainingListener implements TrainingListener {
         Metrics metrics = trainer.getMetrics();
         logger.info("Training: {} batches", trainDataSize);
         logger.info("Validation: {} batches", validateDataSize);
+
+        if (metrics == null) {
+            return;
+        }
 
         if (metrics.hasMetric("train")) {
             // possible no train metrics if only one iteration is executed

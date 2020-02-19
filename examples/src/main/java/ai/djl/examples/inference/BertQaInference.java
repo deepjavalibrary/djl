@@ -13,16 +13,16 @@
 
 package ai.djl.examples.inference;
 
+import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
-import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.mxnet.zoo.nlp.qa.QAInput;
+import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,13 +61,16 @@ public final class BertQaInference {
         logger.info("Paragraph: {}", input.getParagraph());
         logger.info("Question: {}", input.getQuestion());
 
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("backbone", "bert");
-        criteria.put("dataset", "book_corpus_wiki_en_uncased");
+        Criteria<QAInput, String> criteria =
+                Criteria.builder()
+                        .optApplication(Application.NLP.QUESTION_ANSWER)
+                        .setTypes(QAInput.class, String.class)
+                        .optOption("backbone", "bert")
+                        .optOption("dataset", "book_corpus_wiki_en_uncased")
+                        .optProgress(new ProgressBar())
+                        .build();
 
-        try (ZooModel<QAInput, String> model =
-                MxModelZoo.BERT_QA.loadModel(criteria, new ProgressBar())) {
-
+        try (ZooModel<QAInput, String> model = ModelZoo.loadModel(criteria)) {
             try (Predictor<QAInput, String> predictor = model.newPredictor()) {
                 return predictor.predict(input);
             }

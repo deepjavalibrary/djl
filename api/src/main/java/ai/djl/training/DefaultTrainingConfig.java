@@ -48,7 +48,7 @@ public class DefaultTrainingConfig implements TrainingConfig {
     public DefaultTrainingConfig(Loss loss) {
         // Defaults to initializer defined in https://arxiv.org/abs/1502.01852
         this.initializer = new XavierInitializer(RandomType.GAUSSIAN, FactorType.IN, 2);
-        optimizer = new Adam.Builder().build();
+        optimizer = Adam.builder().build();
         this.loss = loss;
         evaluators = new ArrayList<>();
         listeners = new ArrayList<>();

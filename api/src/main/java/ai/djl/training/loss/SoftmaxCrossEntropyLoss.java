@@ -68,7 +68,6 @@ public class SoftmaxCrossEntropyLoss extends Loss {
     public NDArray evaluate(NDList label, NDList prediction) {
         NDArray pred = prediction.singletonOrThrow();
         if (!fromLogit) {
-            // TODO: use numpy log softmax
             pred = pred.logSoftmax(classAxis);
         }
         NDArray loss;
@@ -76,8 +75,8 @@ public class SoftmaxCrossEntropyLoss extends Loss {
         if (sparseLabel) {
             loss = pred.getNDArrayInternal().pick(lab, classAxis, true).neg();
         } else {
-            lab = lab.reshape(pred.getShape());
-            loss = pred.mul(lab).sum(new int[] {classAxis});
+            lab = lab.reshapeLike(pred);
+            loss = pred.mul(lab).neg().sum(new int[] {classAxis}, true);
         }
         if (weight != 1) {
             loss = loss.mul(weight);

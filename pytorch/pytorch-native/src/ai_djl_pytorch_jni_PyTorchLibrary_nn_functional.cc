@@ -41,32 +41,10 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_resize
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_normalize
-  (JNIEnv* env, jobject jthis, jobject jhandle, jfloatArray jmean, jfloatArray jstd) {
+  (JNIEnv* env, jobject jthis, jobject jhandle, jobject jmean, jobject jstd) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  std::vector<float> mean = utils::GetVecFromJFloatArray(env, jmean);
-  std::vector<float> std = utils::GetVecFromJFloatArray(env, jstd);
-  torch::Tensor mean_tensor = torch::from_blob(mean.data(), {3, 1, 1});
-  torch::Tensor std_tensor = torch::from_blob(std.data(), {3, 1, 1});
-  if (tensor_ptr->dim() == 4) {
-    mean_tensor = mean_tensor.reshape({1, 3, 1, 1});
-    std_tensor = std_tensor.reshape({1, 3, 1, 1});
-  }
-  const auto* result_ptr = new torch::Tensor(tensor_ptr->sub(mean_tensor).div(std_tensor));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
-}
-
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_toTensor
-  (JNIEnv* env, jobject jthis, jobject jhandle) {
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  size_t dim = tensor_ptr->dim();
-  torch::Tensor temp_tensor = *tensor_ptr;
-  if (dim == 3) {
-    temp_tensor = temp_tensor.unsqueeze(0);
-  }
-  temp_tensor = temp_tensor.div(255.0).permute({0, 3, 1, 2});
-  if (dim == 3) {
-    temp_tensor = temp_tensor.squeeze(0);
-  }
-  const auto* result_ptr = new torch::Tensor(temp_tensor);
+  const auto* mean_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jmean);
+  const auto* std_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jstd);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->sub(*mean_ptr).div(*std_ptr));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }

@@ -15,6 +15,7 @@ package ai.djl.mxnet.integration;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.integration.util.Assertions;
+import ai.djl.modality.Classifications;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -25,6 +26,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.GradientCollector;
@@ -34,10 +36,9 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.util.Pair;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -46,7 +47,8 @@ public class MxSymbolBlockTest {
 
     @Test
     public void testForward() throws IOException, ModelNotFoundException, MalformedModelException {
-        Map<String, String> criteria = new ConcurrentHashMap<>();
+        Criteria<?, ?> criteria =
+                Criteria.builder().setTypes(BufferedImage.class, Classifications.class).build();
         try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
             NDManager manager = model.getNDManager();
 
@@ -66,9 +68,9 @@ public class MxSymbolBlockTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES);
-        Map<String, String> criteria = new ConcurrentHashMap<>();
+        Criteria<?, ?> criteria =
+                Criteria.builder().setTypes(BufferedImage.class, Classifications.class).build();
         try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
-
             model.getBlock().clear();
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
@@ -96,9 +98,9 @@ public class MxSymbolBlockTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES);
-        Map<String, String> criteria = new ConcurrentHashMap<>();
+        Criteria<?, ?> criteria =
+                Criteria.builder().setTypes(BufferedImage.class, Classifications.class).build();
         try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
-
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
 
@@ -125,15 +127,15 @@ public class MxSymbolBlockTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES);
-        Map<String, String> criteria = new ConcurrentHashMap<>();
+        Criteria<?, ?> criteria =
+                Criteria.builder().setTypes(BufferedImage.class, Classifications.class).build();
         try (Model model = MxModelZoo.MLP.loadModel(criteria)) {
             NDManager manager = model.getNDManager();
-
             SymbolBlock mlp = (SymbolBlock) model.getBlock();
             SequentialBlock newMlp = new SequentialBlock();
             mlp.removeLastBlock();
             newMlp.add(mlp);
-            Linear linear = new Linear.Builder().setOutChannels(10).build();
+            Linear linear = Linear.builder().setOutChannels(10).build();
 
             linear.setInitializer(Initializer.ONES);
             newMlp.add(linear);

@@ -29,7 +29,7 @@ public class NDArrayNumericOpTest {
             NDArray array = manager.create(data);
             data = DoubleStream.of(data).map(x -> -x).toArray();
             NDArray expected = manager.create(data);
-            Assert.assertEquals(array.neg(), expected);
+            Assertions.assertAlmostEquals(array.neg(), expected);
             Assertions.assertInPlaceEquals(array.negi(), expected, array);
             // test multi-dim
             data = new double[] {-2.2, 2.2, 3, -0.2, 2.76, 0.0002};
@@ -596,7 +596,7 @@ public class NDArrayNumericOpTest {
             NDArray expected = manager.create(data);
             Assertions.assertAlmostEquals(array.asinh(), expected);
             // test multi-dim
-            array = manager.arange(10).reshape(5, 1, 2);
+            array = manager.arange(10.0).reshape(5, 1, 2);
             expected =
                     manager.create(
                             new float[] {
@@ -624,7 +624,7 @@ public class NDArrayNumericOpTest {
             NDArray expected = manager.create(data);
             Assertions.assertAlmostEquals(array.acosh(), expected);
             // test multi-dim
-            array = manager.arange(10, 110, 10).reshape(2, 5);
+            array = manager.arange(10.0, 110.0, 10.0).reshape(2, 5);
             expected =
                     manager.create(
                             new float[] {

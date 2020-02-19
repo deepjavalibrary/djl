@@ -12,22 +12,23 @@
  */
 package ai.djl.mxnet.zoo.cv.actionrecognition;
 
+import ai.djl.Application;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.ImageClassificationTranslator;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;
-import ai.djl.repository.Anchor;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
-import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorFactory;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Model loader for Action Recognition models.
@@ -37,9 +38,9 @@ import java.util.Map;
  *
  * @see ai.djl.mxnet.engine.MxSymbolBlock
  */
-public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage, Classifications> {
+public class ActionRecognitionModelLoader extends BaseModelLoader {
 
-    private static final Anchor BASE_ANCHOR = CV.ACTION_RECOGNITION;
+    private static final Application APPLICATION = Application.CV.ACTION_RECOGNITION;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "action_recognition";
     private static final String VERSION = "0.0.1";
@@ -50,28 +51,40 @@ public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage,
      * @param repository the repository to load the model from
      */
     public ActionRecognitionModelLoader(Repository repository) {
-        super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
+        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
+        map.put(Classifications.class, new FactoryImpl());
+        factories.put(BufferedImage.class, map);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Translator<BufferedImage, Classifications> getTranslator(Artifact artifact) {
-        Map<String, Object> arguments = artifact.getArguments();
-        // 299 is the minimum length for inception, 224 for vgg
-        int width = ((Double) arguments.getOrDefault("width", 299d)).intValue();
-        int height = ((Double) arguments.getOrDefault("height", 299d)).intValue();
+    public Application getApplication() {
+        return APPLICATION;
+    }
 
-        Pipeline pipeline = new Pipeline();
-        pipeline.add(new Resize(width, height))
-                .add(new ToTensor())
-                .add(
-                        new Normalize(
-                                new float[] {0.485f, 0.456f, 0.406f},
-                                new float[] {0.229f, 0.224f, 0.225f}));
+    private static final class FactoryImpl
+            implements TranslatorFactory<BufferedImage, Classifications> {
 
-        return new ImageClassificationTranslator.Builder()
-                .setPipeline(pipeline)
-                .setSynsetArtifactName("classes.txt")
-                .build();
+        @Override
+        public Translator<BufferedImage, Classifications> newInstance(
+                Map<String, Object> arguments) {
+            // 299 is the minimum length for inception, 224 for vgg
+            int width = ((Double) arguments.getOrDefault("width", 299d)).intValue();
+            int height = ((Double) arguments.getOrDefault("height", 299d)).intValue();
+
+            Pipeline pipeline = new Pipeline();
+            pipeline.add(new Resize(width, height))
+                    .add(new ToTensor())
+                    .add(
+                            new Normalize(
+                                    new float[] {0.485f, 0.456f, 0.406f},
+                                    new float[] {0.229f, 0.224f, 0.225f}));
+
+            return ImageClassificationTranslator.builder()
+                    .setPipeline(pipeline)
+                    .setSynsetArtifactName("classes.txt")
+                    .build();
+        }
     }
 }

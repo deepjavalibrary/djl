@@ -179,11 +179,22 @@ public class Linear extends ParameterBlock {
         return result;
     }
 
+    /**
+     * Creates a builder to build a {@code Linear}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The Builder to construct a {@link Linear} type of {@link Block}. */
     public static final class Builder {
 
         private long outChannels;
         private boolean bias = true;
+
+        Builder() {}
 
         /**
          * Sets the number of output channels.

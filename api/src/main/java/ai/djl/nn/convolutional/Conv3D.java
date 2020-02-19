@@ -73,10 +73,20 @@ public class Conv3D extends Convolution {
         return NUM_DIMENSIONS;
     }
 
+    /**
+     * Creates a builder to build a {@code Conv3D}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The Builder to construct a {@link Conv3D} type of {@link Block}. */
     public static final class Builder extends ConvolutionBuilder<Builder> {
+
         /** Creates a builder that can build a {@link Conv3D} block. */
-        public Builder() {
+        Builder() {
             stride = new Shape(1, 1, 1);
             pad = new Shape(0, 0, 0);
             dilate = new Shape(1, 1, 1);

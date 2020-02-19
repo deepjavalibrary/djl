@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.Application.CV;
 import ai.djl.engine.Engine;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDArray;
@@ -72,7 +73,7 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
     /** {@inheritDoc} */
     @Override
     public MRL getMrl() {
-        return new MRL(MRL.Dataset.CV, BasicDatasets.GROUP_ID, ARTIFACT_ID);
+        return MRL.dataset(CV.IMAGE_CLASSIFICATION, BasicDatasets.GROUP_ID, ARTIFACT_ID);
     }
 
     /** {@inheritDoc} */
@@ -167,7 +168,7 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
         private Usage usage;
 
         /** Constructs a new builder. */
-        public Builder() {
+        Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
             pipeline = new Pipeline(new ToTensor());

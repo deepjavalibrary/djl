@@ -22,7 +22,7 @@ import ai.djl.repository.Repository;
  *
  * @see ai.djl.mxnet.engine.MxSymbolBlock
  */
-public class Mlp extends ImageClassificationModelLoader {
+public class MlpModelLoader extends ImageClassificationModelLoader {
 
     private static final String ARTIFACT_ID = "mlp";
     private static final String VERSION = "0.0.1";
@@ -32,7 +32,7 @@ public class Mlp extends ImageClassificationModelLoader {
      *
      * @param repository the repository to load the model from
      */
-    public Mlp(Repository repository) {
+    public MlpModelLoader(Repository repository) {
         super(repository, ARTIFACT_ID, VERSION);
     }
 }

@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.Application.CV;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils.Flag;
@@ -81,7 +82,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     /** {@inheritDoc} */
     @Override
     public MRL getMrl() {
-        return new MRL(MRL.Dataset.CV, BasicDatasets.GROUP_ID, ARTIFACT_ID);
+        return MRL.dataset(CV.OBJECT_DETECTION, BasicDatasets.GROUP_ID, ARTIFACT_ID);
     }
 
     /** {@inheritDoc} */
@@ -190,7 +191,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         Flag flag;
 
         /** Constructs a new builder. */
-        public Builder() {
+        Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
             flag = Flag.COLOR;

@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.inference;
 
+import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
@@ -20,8 +21,9 @@ import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.Joints;
 import ai.djl.modality.cv.Rectangle;
 import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.mxnet.zoo.MxModelZoo;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -31,8 +33,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,16 +73,19 @@ public final class PoseEstimation {
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
 
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("size", "512");
-        criteria.put("backbone", "resnet50");
-        criteria.put("flavor", "v1");
-        criteria.put("dataset", "voc");
+        Criteria<BufferedImage, DetectedObjects> criteria =
+                Criteria.builder()
+                        .optApplication(Application.CV.OBJECT_DETECTION)
+                        .setTypes(BufferedImage.class, DetectedObjects.class)
+                        .optOption("size", "512")
+                        .optOption("backbone", "resnet50")
+                        .optOption("flavor", "v1")
+                        .optOption("dataset", "voc")
+                        .optProgress(new ProgressBar())
+                        .build();
 
         DetectedObjects detectedObjects;
-        try (ZooModel<BufferedImage, DetectedObjects> ssd =
-                MxModelZoo.SSD.loadModel(criteria, new ProgressBar())) {
-
+        try (ZooModel<BufferedImage, DetectedObjects> ssd = ModelZoo.loadModel(criteria)) {
             try (Predictor<BufferedImage, DetectedObjects> predictor = ssd.newPredictor()) {
                 detectedObjects = predictor.predict(img);
             }
@@ -108,13 +111,16 @@ public final class PoseEstimation {
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
 
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("flavor", "v1b");
-        criteria.put("backbone", "resnet18");
-        criteria.put("dataset", "imagenet");
+        Criteria<BufferedImage, Joints> criteria =
+                Criteria.builder()
+                        .optApplication(Application.CV.POSE_ESTIMATION)
+                        .setTypes(BufferedImage.class, Joints.class)
+                        .optOption("backbone", "resnet18")
+                        .optOption("flavor", "v1b")
+                        .optOption("dataset", "imagenet")
+                        .build();
 
-        try (ZooModel<BufferedImage, Joints> pose = MxModelZoo.SIMPLE_POSE.loadModel(criteria)) {
-
+        try (ZooModel<BufferedImage, Joints> pose = ModelZoo.loadModel(criteria)) {
             try (Predictor<BufferedImage, Joints> predictor = pose.newPredictor()) {
                 Joints joints = predictor.predict(person);
                 saveJointsImage(person, joints);

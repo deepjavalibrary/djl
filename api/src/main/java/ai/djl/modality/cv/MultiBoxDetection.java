@@ -36,6 +36,7 @@ import ai.djl.ndarray.NDList;
  * class}, and the other four values represent the normalised co-ordinates of the box.
  */
 public class MultiBoxDetection {
+
     private boolean clip;
     private float threshold;
     private int backgroundId;
@@ -84,14 +85,27 @@ public class MultiBoxDetection {
                         forceSuppress,
                         nmsTopK);
     }
+
+    /**
+     * Creates a builder to build a {@code MultiBoxDetection}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The Builder to construct a {@link MultiBoxDetection} object. */
     public static final class Builder {
+
         boolean clip = true;
         private float threshold = 0.01f;
         int backgroundId;
         private float nmsThreashold = 0.5f;
         boolean forceSuppress;
         private int nmsTopK = -1;
+
+        Builder() {}
 
         /**
          * Sets the boolean parameter that indicates whether to clip out-of-boundary boxes. It is

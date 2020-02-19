@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.training.evaluator.AbstractAccuracy;
 import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.evaluator.TopKAccuracy;
 import org.testng.Assert;
@@ -32,7 +33,7 @@ public class EvaluatorTest {
                     manager.create(new float[] {0.3f, 0.7f, 0, 1, 0.4f, 0.6f}, new Shape(3, 2));
             NDArray labels = manager.create(new int[] {0, 1, 1}, new Shape(3));
 
-            Accuracy acc = new Accuracy();
+            AbstractAccuracy acc = new Accuracy();
             acc.addAccumulator("");
             acc.updateAccumulator("", new NDList(labels), new NDList(predictions));
             float accuracy = acc.getAccumulator("");

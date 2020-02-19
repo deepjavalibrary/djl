@@ -31,10 +31,7 @@ public class CocoTest {
     @Test(enabled = false)
     public void testCocoRemote() throws IOException {
         CocoDetection coco =
-                new CocoDetection.Builder()
-                        .optUsage(Dataset.Usage.TEST)
-                        .setSampling(1, true)
-                        .build();
+                CocoDetection.builder().optUsage(Dataset.Usage.TEST).setSampling(1, true).build();
         coco.prepare();
         try (Model model = Model.newInstance()) {
             TrainingConfig config =

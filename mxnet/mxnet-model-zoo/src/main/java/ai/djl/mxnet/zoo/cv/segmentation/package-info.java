@@ -12,7 +12,7 @@
  */
 
 /**
- * Contains classes for the {@link ai.djl.repository.MRL.Model.CV#INSTANCE_SEGMENTATION} models in
- * the {@link ai.djl.mxnet.zoo.MxModelZoo}.
+ * Contains classes for the {@link ai.djl.Application.CV#INSTANCE_SEGMENTATION} models in the {@link
+ * ai.djl.mxnet.zoo.MxModelZoo}.
  */
 package ai.djl.mxnet.zoo.cv.segmentation;

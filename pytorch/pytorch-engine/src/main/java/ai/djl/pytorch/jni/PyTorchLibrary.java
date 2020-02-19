@@ -18,13 +18,17 @@ import java.nio.ByteBuffer;
 @SuppressWarnings("MissingJavadocMethod")
 public final class PyTorchLibrary {
 
+    public static final PyTorchLibrary LIB = new PyTorchLibrary();
+
     static {
         System.loadLibrary("djl_torch"); // NOPMD
     }
 
-    public static final PyTorchLibrary LIB = new PyTorchLibrary();
-
     private PyTorchLibrary() {}
+
+    public native void torchManualSeed(long seed);
+
+    public native boolean torchCudaAvailable();
 
     public native long[] torchSizes(Pointer handle);
 
@@ -38,6 +42,8 @@ public final class PyTorchLibrary {
 
     public native Pointer torchTo(Pointer handle, int dType, int[] device, boolean copy);
 
+    public native Pointer tensorClone(Pointer handle);
+
     public native Pointer torchEmpty(
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 
@@ -48,15 +54,6 @@ public final class PyTorchLibrary {
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 
     public native Pointer torchArange(
-            int start,
-            int end,
-            int step,
-            int dType,
-            int layout,
-            int[] device,
-            boolean requiredGrad);
-
-    public native Pointer torchArange(
             double start,
             double end,
             double step,
@@ -65,9 +62,40 @@ public final class PyTorchLibrary {
             int[] device,
             boolean requiredGrad);
 
-    public native Pointer torchSub(Pointer handle, double scalar);
+    public native Pointer torchLinspace(
+            double start,
+            double end,
+            int step,
+            int dType,
+            int layout,
+            int[] device,
+            boolean requiredGrad);
 
-    public native Pointer torchDiv(Pointer handle, double scalar);
+    public native Pointer torchAdd(Pointer self, Pointer other);
+
+    public native void torchAddi(Pointer self, Pointer other);
+
+    public native Pointer torchSub(Pointer self, Pointer other);
+
+    public native void torchSubi(Pointer self, Pointer other);
+
+    public native Pointer torchMul(Pointer self, Pointer other);
+
+    public native void torchMuli(Pointer self, Pointer other);
+
+    public native Pointer torchDiv(Pointer self, Pointer other);
+
+    public native void torchDivi(Pointer self, Pointer other);
+
+    public native Pointer torchRemainder(Pointer self, Pointer other);
+
+    public native void torchRemainderi(Pointer self, Pointer other);
+
+    public native Pointer torchPow(Pointer self, Pointer exponent);
+
+    public native void torchPowi(Pointer self, Pointer exponent);
+
+    public native Pointer torchMatmul(Pointer self, Pointer other);
 
     public native Pointer torchReshape(Pointer handle, long[] shape);
 
@@ -76,6 +104,20 @@ public final class PyTorchLibrary {
     public native Pointer torchArgMax(Pointer handle);
 
     public native Pointer torchArgMax(Pointer handle, long dim, boolean keepDim);
+
+    public native Pointer torchArgMin(Pointer handle);
+
+    public native Pointer torchArgMin(Pointer handle, long dim, boolean keepDim);
+
+    public native Pointer torchArgSort(Pointer handle);
+
+    public native Pointer torchArgSort(Pointer handle, long dim, boolean keepDim);
+
+    public native Pointer torchSort(Pointer handle, long dim, boolean descending);
+
+    public native Pointer torchPermute(Pointer handle, long[] dims);
+
+    public native Pointer torchTranspose(Pointer handle, long axis1, long axis2);
 
     public native boolean contentEqual(Pointer handle1, Pointer handle2);
 
@@ -87,21 +129,49 @@ public final class PyTorchLibrary {
             int[] device,
             boolean requiredGrad);
 
-    public native Pointer torchGet(Pointer handle, long dim, long start);
+    public native Pointer torchIndexSelect(Pointer handle, long dim, Pointer indexHandle);
+
+    public native Pointer torchMaskedSelect(Pointer handle, Pointer maskHandle);
 
     public native void torchDeleteTensor(Pointer handle);
 
     public native void torchDeleteModule(Pointer handle);
 
+    public native Pointer torchMax(Pointer handle);
+
+    public native Pointer torchMax(Pointer self, Pointer other);
+
+    public native Pointer torchMax(Pointer handle, long dim, boolean keepDim);
+
+    public native Pointer torchMin(Pointer handle);
+
+    public native Pointer torchMin(Pointer self, Pointer other);
+
+    public native Pointer torchMin(Pointer handle, long dim, boolean keepDim);
+
+    public native Pointer torchMean(Pointer handle);
+
+    public native Pointer torchMean(Pointer handle, long dim, boolean keepDim);
+
+    public native Pointer torchSum(Pointer handle);
+
+    public native Pointer torchSum(Pointer handle, long[] dim, boolean keepDim);
+
+    public native Pointer torchFlatten(Pointer handle, long startDim, long endDim);
+
     public native Pointer[] torchSplit(Pointer handle, long size, long dim);
 
     public native Pointer[] torchSplit(Pointer handle, long[] indices, long dim);
 
+    public native Pointer torchUnsqueeze(Pointer handle, long dim);
+
     public native Pointer torchSqueeze(Pointer handle);
 
-    public native Pointer torchSqueeze(Pointer handle, int axis);
+    public native Pointer torchSqueeze(Pointer handle, long axis);
 
     public native Pointer torchStack(Pointer[] handles, long dim);
+
+    public native Pointer torchCat(Pointer[] handles, long dim);
 
     public native Pointer torchAbs(Pointer handle);
 
@@ -141,6 +211,12 @@ public final class PyTorchLibrary {
 
     public native Pointer torchTanh(Pointer handle);
 
+    public native Pointer torchAll(Pointer self);
+
+    public native Pointer torchAny(Pointer self);
+
+    public native Pointer torchNone(Pointer self);
+
     public native Pointer torchEq(Pointer self, Pointer other);
 
     public native Pointer torchNeq(Pointer self, Pointer other);
@@ -153,14 +229,36 @@ public final class PyTorchLibrary {
 
     public native Pointer torchLte(Pointer self, Pointer other);
 
-    public native Pointer normalize(Pointer handle, float[] mean, float[] std);
+    public native Pointer torchNeg(Pointer self);
+
+    public native void torchNegi(Pointer self);
+
+    public native Pointer normalize(Pointer handle, Pointer mean, Pointer std);
+
+    public native Pointer atNormal(
+            double mean,
+            double std,
+            long[] sizes,
+            int dType,
+            int layout,
+            int[] device,
+            boolean requiredGrad);
+
+    public native Pointer tensorUniform(
+            double from,
+            double to,
+            long[] sizes,
+            int dType,
+            int layout,
+            int[] device,
+            boolean requiredGrad);
+
+    public native Pointer torchEye(
+            int n, int m, int dType, int layout, int[] device, boolean requiredGrad);
 
     public native Pointer resize(Pointer handle, long[] size, boolean alignCorners);
 
-    // TODO to be removed once we have div and swapAxes operator
-    public native Pointer toTensor(Pointer handle);
-
-    public native Pointer moduleLoad(String path);
+    public native Pointer moduleLoad(String path, int[] device);
 
     public native void moduleEval(Pointer handle);
 
@@ -169,4 +267,22 @@ public final class PyTorchLibrary {
     public native Pointer iValueCreateFromTensor(Pointer tensorHandle);
 
     public native Pointer iValueToTensor(Pointer iValueHandle);
+
+    public native Pointer[] iValueToTensorList(Pointer iValueHandle);
+
+    public native Pointer[] iValueToList(Pointer iValueHandle);
+
+    public native Pointer[] iValueToMap(Pointer iValueHandle);
+
+    public native String iValueToString(Pointer iValueHandle);
+
+    public native boolean iValueIsString(Pointer iValueHandle);
+
+    public native boolean iValueIsTensor(Pointer iValueHandle);
+
+    public native boolean iValueIsTensorList(Pointer iValueHandle);
+
+    public native boolean iValueIsList(Pointer iValueHandle);
+
+    public native boolean iValueIsMap(Pointer iValueHandle);
 }

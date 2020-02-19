@@ -13,6 +13,7 @@
 
 package ai.djl.basicmodelzoo.cv.object_detection.ssd;
 
+import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
@@ -22,25 +23,27 @@ import ai.djl.modality.cv.SingleShotDetectionTranslator;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
-import ai.djl.repository.Anchor;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorFactory;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /** Model loader for SingleShotDetection(SSD). */
-public class SingleShotDetectionModelLoader
-        extends BaseModelLoader<BufferedImage, DetectedObjects> {
-    private static final Anchor BASE_ANCHOR = MRL.Model.CV.OBJECT_DETECTION;
+public class SingleShotDetectionModelLoader extends BaseModelLoader {
+
+    private static final Application APPLICATION = Application.CV.OBJECT_DETECTION;
     private static final String GROUP_ID = BasicModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "ssd";
     private static final String VERSION = "0.0.1";
@@ -51,29 +54,25 @@ public class SingleShotDetectionModelLoader
      * @param repository the repository to load the model from
      */
     public SingleShotDetectionModelLoader(Repository repository) {
-        super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
+        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
+        map.put(DetectedObjects.class, new FactoryImpl());
+        factories.put(BufferedImage.class, map);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Application getApplication() {
+        return APPLICATION;
     }
 
     /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
-    public Translator<BufferedImage, DetectedObjects> getTranslator(Artifact artifact) {
-        Map<String, Object> arguments = artifact.getArguments();
-        Pipeline pipeline = new Pipeline();
-        pipeline.add(new ToTensor());
-        return new SingleShotDetectionTranslator.Builder()
-                .setPipeline(pipeline)
-                .setSynsetArtifactName("synset.txt")
-                .optThreshold(((Double) arguments.get("threshold")).floatValue())
-                .build();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    @SuppressWarnings("unchecked")
-    protected Model loadModel(Artifact artifact, Path modelPath, Device device)
+    public Model loadModel(Artifact artifact, Device device, Map<String, Object> override)
             throws IOException, MalformedModelException {
-        Map<String, Object> arguments = artifact.getArguments();
+        Map<String, Object> arguments = artifact.getArguments(override);
+
         int numClasses = ((Double) arguments.get("outSize")).intValue();
         int numFeatures = ((Double) arguments.get("numFeatures")).intValue();
         boolean globalPool = (boolean) arguments.get("globalPool");
@@ -106,7 +105,7 @@ public class SingleShotDetectionModelLoader
         }
 
         Block ssdBlock =
-                new SingleShotDetection.Builder()
+                SingleShotDetection.builder()
                         .setNumClasses(numClasses)
                         .setNumFeatures(numFeatures)
                         .optGlobalPool(globalPool)
@@ -115,9 +114,29 @@ public class SingleShotDetectionModelLoader
                         .setBaseNetwork(baseBlock)
                         .build();
 
+        Path dir = repository.getCacheDirectory();
+        String relativePath = artifact.getResourceUri().getPath();
+        Path modelPath = dir.resolve(relativePath);
+
         Model model = Model.newInstance(device);
         model.setBlock(ssdBlock);
         model.load(modelPath, artifact.getName());
         return model;
+    }
+
+    private static final class FactoryImpl
+            implements TranslatorFactory<BufferedImage, DetectedObjects> {
+
+        @Override
+        public Translator<BufferedImage, DetectedObjects> newInstance(
+                Map<String, Object> arguments) {
+            Pipeline pipeline = new Pipeline();
+            pipeline.add(new ToTensor());
+            return SingleShotDetectionTranslator.builder()
+                    .setPipeline(pipeline)
+                    .setSynsetArtifactName("synset.txt")
+                    .optThreshold(((Double) arguments.get("threshold")).floatValue())
+                    .build();
+        }
     }
 }

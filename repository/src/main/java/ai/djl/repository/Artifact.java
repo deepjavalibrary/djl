@@ -26,6 +26,7 @@ import java.util.Map;
  */
 @SuppressWarnings("PMD.LooseCoupling")
 public class Artifact {
+
     private transient String metadataVersion;
     private transient String groupId;
     private transient String artifactId;
@@ -177,12 +178,20 @@ public class Artifact {
     /**
      * Returns the artifact arguments.
      *
+     * @param override the override configurations to the default arguments
      * @return the artifact arguments
      * @see Repository
      */
-    public Map<String, Object> getArguments() {
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getArguments(Map<String, Object> override) {
         if (arguments == null) {
+            if (override != null) {
+                return override;
+            }
             return Collections.emptyMap();
+        }
+        if (override != null) {
+            ((Map<String, Object>) arguments.clone()).putAll(override);
         }
         return arguments;
     }

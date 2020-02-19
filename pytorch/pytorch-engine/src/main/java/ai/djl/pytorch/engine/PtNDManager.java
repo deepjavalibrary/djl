@@ -120,57 +120,52 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray arange(int start, int stop, int step, DataType dataType, Device device) {
+        return arange((double) start, (double) stop, (double) step, dataType, device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray arange(
-            Number start, Number stop, Number step, DataType dataType, Device device) {
-        if (start instanceof Float
-                || start instanceof Double
-                || stop instanceof Float
-                || stop instanceof Double
-                || step instanceof Float
-                || step instanceof Double) {
-            return JniUtils.arange(
-                    this,
-                    start.doubleValue(),
-                    stop.doubleValue(),
-                    step.doubleValue(),
-                    dataType,
-                    device,
-                    SparseFormat.DENSE);
+            double start, double stop, double step, DataType dataType, Device device) {
+        if (Math.signum(stop - start) != Math.signum(step)) {
+            return create(new Shape(0), dataType, device);
         }
-        return JniUtils.arange(
-                this,
-                start.intValue(),
-                stop.intValue(),
-                step.intValue(),
-                dataType,
-                device,
-                SparseFormat.DENSE);
+        return JniUtils.arange(this, start, stop, step, dataType, device, SparseFormat.DENSE);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray eye(int rows, int cols, int k, DataType dataType, Device device) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (k != 0) {
+            throw new UnsupportedOperationException(
+                    "index of the diagonal is not supported in PyTorch");
+        }
+        return JniUtils.eye(this, rows, cols, dataType, device, SparseFormat.DENSE);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(Number start, Number stop, int num, boolean endpoint, Device device) {
-        throw new UnsupportedOperationException("Not implemented");
+    public NDArray linspace(double start, double stop, int num, boolean endpoint, Device device) {
+        if (!endpoint) {
+            throw new UnsupportedOperationException("endpoint only support true");
+        }
+        return JniUtils.linspace(
+                this, start, stop, num, DataType.FLOAT32, device, SparseFormat.DENSE);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
-            Number low, Number high, Shape shape, DataType dataType, Device device) {
-        throw new UnsupportedOperationException("Not implemented");
+            double low, double high, Shape shape, DataType dataType, Device device) {
+        return JniUtils.uniform(this, low, high, shape, dataType, device);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
-            Number loc, Number scale, Shape shape, DataType dataType, Device device) {
-        throw new UnsupportedOperationException("Not implemented");
+            double loc, double scale, Shape shape, DataType dataType, Device device) {
+        return JniUtils.normal(this, loc, scale, shape, dataType, device);
     }
 
     /** {@inheritDoc} */

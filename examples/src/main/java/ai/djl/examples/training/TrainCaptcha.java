@@ -132,7 +132,7 @@ public final class TrainCaptcha {
 
     private static Block getBlock() {
         Block resnet =
-                new ResNetV1.Builder()
+                ResNetV1.builder()
                         .setNumLayers(50)
                         .setImageShape(
                                 new Shape(

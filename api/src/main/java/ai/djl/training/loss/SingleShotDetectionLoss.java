@@ -26,7 +26,7 @@ import java.util.Arrays;
  */
 public class SingleShotDetectionLoss extends AbstractCompositeLoss {
 
-    private MultiBoxTarget multiBoxTarget = new MultiBoxTarget.Builder().build();
+    private MultiBoxTarget multiBoxTarget = MultiBoxTarget.builder().build();
 
     /** Base class for metric with abstract update methods. */
     public SingleShotDetectionLoss() {

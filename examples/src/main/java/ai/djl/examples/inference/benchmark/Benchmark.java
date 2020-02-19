@@ -12,7 +12,6 @@
  */
 package ai.djl.examples.inference.benchmark;
 
-import ai.djl.ModelException;
 import ai.djl.examples.inference.benchmark.util.AbstractBenchmark;
 import ai.djl.examples.inference.benchmark.util.Arguments;
 import ai.djl.inference.Predictor;
@@ -25,8 +24,16 @@ import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 
-public final class Benchmark extends AbstractBenchmark<Classifications> {
+public final class Benchmark extends AbstractBenchmark<BufferedImage, Classifications> {
+
+    BufferedImage img;
+    Predictor<BufferedImage, Classifications> predictor;
+
+    public Benchmark() {
+        super(BufferedImage.class, Classifications.class);
+    }
 
     public static void main(String[] args) {
         if (new Benchmark().runBenchmark(args)) {
@@ -37,24 +44,29 @@ public final class Benchmark extends AbstractBenchmark<Classifications> {
 
     /** {@inheritDoc} */
     @Override
-    public Classifications predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelException, TranslateException {
+    protected void initialize(
+            ZooModel<BufferedImage, Classifications> model, Arguments arguments, Metrics metrics)
+            throws IOException {
         Path imageFile = arguments.getImageFile();
-        BufferedImage img = BufferedImageUtils.fromFile(imageFile);
+        img = BufferedImageUtils.fromFile(imageFile);
+        predictor = model.newPredictor();
+        predictor.setMetrics(metrics);
+    }
 
-        try (ZooModel<BufferedImage, Classifications> model = loadModel(arguments, metrics)) {
-            Classifications predictResult = null;
-            try (Predictor<BufferedImage, Classifications> predictor = model.newPredictor()) {
-                predictor.setMetrics(metrics); // Let predictor collect metrics
+    /** {@inheritDoc} */
+    @Override
+    protected CompletableFuture<Classifications> predict(
+            ZooModel<BufferedImage, Classifications> model, Arguments arguments, Metrics metrics)
+            throws TranslateException {
 
-                for (int i = 0; i < iteration; ++i) {
-                    predictResult = predictor.predict(img);
+        Classifications result = predictor.predict(img);
+        MemoryTrainingListener.collectMemoryInfo(metrics);
+        return CompletableFuture.completedFuture(result);
+    }
 
-                    progressBar.update(i);
-                    MemoryTrainingListener.collectMemoryInfo(metrics);
-                }
-            }
-            return predictResult;
-        }
+    /** {@inheritDoc} */
+    @Override
+    protected void clean() {
+        predictor.close();
     }
 }

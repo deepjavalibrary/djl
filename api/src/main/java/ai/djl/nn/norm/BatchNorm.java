@@ -147,6 +147,15 @@ public class BatchNorm extends ParameterBlock {
         runningVar.load(manager, is);
     }
 
+    /**
+     * Creates a builder to build a {@code BatchNorm}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** The Builder to construct a {@link BatchNorm}. */
     public static final class Builder {
 
@@ -155,6 +164,8 @@ public class BatchNorm extends ParameterBlock {
         private float momentum = .9f;
         private boolean center = true;
         private boolean scale = true;
+
+        Builder() {}
 
         /**
          * Set the axis in which channel is specified. Defaults to 1.

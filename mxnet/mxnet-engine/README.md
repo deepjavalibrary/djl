@@ -35,6 +35,20 @@ All current provided MXNet native libraries are built with [MKLDNN](https://gith
 
 Choose a native library based on your platform and needs:
 
+### Automatic (Recommended)
+
+We offer an automatic option that will download the jars the first time you run DJL.
+It will automatically determine the appropriate jars for your system based on the platform and GPU support.
+
+```xml
+    <dependency>
+      <groupId>org.apache.mxnet</groupId>
+      <artifactId>mxnet-native-auto</artifactId>
+      <version>1.6.0-c</version>
+      <scope>runtime</scope>
+    </dependency>
+```
+
 ### macOS
 For macOS, you can use the following library:
 

@@ -13,7 +13,6 @@
 package ai.djl.test.mock;
 
 import ai.djl.Device;
-import ai.djl.ndarray.Matrix;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -123,12 +122,6 @@ public class MockNDArray implements NDArray {
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
         return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Matrix toMatrix() {
-        return null;
     }
 
     /** {@inheritDoc} */
@@ -752,7 +745,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int sections, int axis) {
+    public NDList split(long sections, int axis) {
         NDList list = new NDList();
         for (int i = 0; i < sections; i++) {
             list.add(new MockNDArray(manager, device, getShape().slice(1), dataType, sparseFormat));
@@ -762,7 +755,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int[] indices, int axis) {
+    public NDList split(long[] indices, int axis) {
         return null;
     }
 
@@ -775,6 +768,11 @@ public class MockNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray reshape(Shape shape) {
+        return null;
+    }
+
+    @Override
+    public NDArray reshapeLike(NDArray array) {
         return null;
     }
 

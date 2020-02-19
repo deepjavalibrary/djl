@@ -118,7 +118,7 @@ public class Parameter implements AutoCloseable {
     /**
      * Gets the values of this {@code Parameter} as an {@link NDArray}.
      *
-     * @return an {@link NDArray} that contains values of this {@code Parameter}.
+     * @return an {@link NDArray} that contains values of this {@code Parameter}
      */
     public NDArray getArray() {
         if (!isInitialized()) {
@@ -240,8 +240,8 @@ public class Parameter implements AutoCloseable {
     /**
      * Loads parameter NDArrays from InputStream.
      *
-     * <p>Currently, we cannot deserialize into the exact subclass of NDArray. The SparseNDArray and
-     * Matrix will be loaded as NDArray only.
+     * <p>Currently, we cannot deserialize into the exact subclass of NDArray. The SparseNDArray
+     * will be loaded as NDArray only.
      *
      * @param manager the NDManager
      * @param dis the InputStream

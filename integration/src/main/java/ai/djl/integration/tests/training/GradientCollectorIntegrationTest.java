@@ -31,7 +31,6 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.training.listener.EvaluatorTrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
-import ai.djl.training.optimizer.Sgd;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -76,7 +75,7 @@ public class GradientCollectorIntegrationTest {
         int epochs = 10;
 
         Optimizer optimizer =
-                new Sgd.Builder()
+                Optimizer.sgd()
                         .setLearningRateTracker(LearningRateTracker.fixedLearningRate(.03f))
                         .build();
 
@@ -87,7 +86,7 @@ public class GradientCollectorIntegrationTest {
                         .optOptimizer(optimizer);
 
         try (Model model = Model.newInstance()) {
-            Linear block = new Linear.Builder().setOutChannels(1).build();
+            Linear block = Linear.builder().setOutChannels(1).build();
             model.setBlock(block);
 
             NDManager manager = model.getNDManager();

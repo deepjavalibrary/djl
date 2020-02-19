@@ -99,7 +99,7 @@ public abstract class LearningRateTracker {
      *     ai.djl.training.optimizer.learningrate.MultiFactorTracker.Builder}
      */
     public static FixedLearningRate fixedLearningRate(float learningRate) {
-        return new FixedLearningRate.Builder().optBaseLearningRate(learningRate).build();
+        return FixedLearningRate.builder().optBaseLearningRate(learningRate).build();
     }
 
     /** The Builder to construct a {@link LearningRateTracker}. */

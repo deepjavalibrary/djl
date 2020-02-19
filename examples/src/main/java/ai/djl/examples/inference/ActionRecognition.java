@@ -12,11 +12,13 @@
  */
 package ai.djl.examples.inference;
 
+import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.mxnet.zoo.MxModelZoo;
+import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -24,8 +26,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,13 +51,16 @@ public final class ActionRecognition {
         Path imageFile = Paths.get("src/test/resources/action_discus_throw.png");
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
-        Map<String, String> criteria = new ConcurrentHashMap<>();
-        criteria.put("backbone", "inceptionv3");
-        criteria.put("dataset", "ucf101");
+        Criteria<BufferedImage, Classifications> criteria =
+                Criteria.builder()
+                        .optApplication(Application.CV.ACTION_RECOGNITION)
+                        .setTypes(BufferedImage.class, Classifications.class)
+                        .optOption("backbone", "inceptionv3")
+                        .optOption("dataset", "ucf101")
+                        .optProgress(new ProgressBar())
+                        .build();
 
-        try (ZooModel<BufferedImage, Classifications> inception =
-                MxModelZoo.ACTION_RECOGNITION.loadModel(criteria, new ProgressBar())) {
-
+        try (ZooModel<BufferedImage, Classifications> inception = ModelZoo.loadModel(criteria)) {
             try (Predictor<BufferedImage, Classifications> action = inception.newPredictor()) {
                 return action.predict(img);
             }

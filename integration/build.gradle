@@ -17,17 +17,11 @@ dependencies {
     api("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
-
     runtimeOnly project(":mxnet:mxnet-engine")
     runtimeOnly project(":mxnet:mxnet-model-zoo")
-    runtimeOnly "ai.djl.mxnet:${getMXNetNativeLib()}"
+    runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}-SNAPSHOT"
     runtimeOnly project(":pytorch:pytorch-engine")
-}
-
-test {
-    doFirst {
-        systemProperty "ai.djl.default.engine", "MXNet"
-    }
+    runtimeOnly project(":pytorch:pytorch-model-zoo")
 }
 
 task copyDependencies(type: Copy) {
@@ -80,7 +74,11 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0.7
+                if ("PyTorch" == System.getProperty("ai.djl.default_engine")) {
+                    minimum = 0.6
+                } else {
+                    minimum = 0.7
+                }
             }
         }
     }

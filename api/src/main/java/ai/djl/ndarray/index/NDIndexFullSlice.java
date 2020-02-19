@@ -64,7 +64,7 @@ public class NDIndexFullSlice {
     /**
      * Returns the slice step for each axis.
      *
-     * @return the slice step for each axis.
+     * @return the slice step for each axis
      */
     public long[] getStep() {
         return step;

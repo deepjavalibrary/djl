@@ -125,7 +125,7 @@ public final class TrainPikachu {
             List<String> classes = new ArrayList<>();
             classes.add("pikachu");
             SingleShotDetectionTranslator translator =
-                    new SingleShotDetectionTranslator.Builder()
+                    SingleShotDetectionTranslator.builder()
                             .setPipeline(pipeline)
                             .setClasses(classes)
                             .optThreshold(detectionThreshold)
@@ -147,7 +147,7 @@ public final class TrainPikachu {
             throws IOException {
         Pipeline pipeline = new Pipeline(new ToTensor());
         PikachuDetection pikachuDetection =
-                new PikachuDetection.Builder()
+                PikachuDetection.builder()
                         .optUsage(usage)
                         .optMaxIteration(arguments.getMaxIterations())
                         .optPipeline(pipeline)
@@ -184,7 +184,7 @@ public final class TrainPikachu {
         sizes.add(Arrays.asList(0.71f, 0.79f));
         sizes.add(Arrays.asList(0.88f, 0.961f));
 
-        return new SingleShotDetection.Builder()
+        return SingleShotDetection.builder()
                 .setNumClasses(1)
                 .setNumFeatures(3)
                 .optGlobalPool(true)
@@ -205,14 +205,14 @@ public final class TrainPikachu {
                             NDArray classPredictions = output.get(1).softmax(-1).transpose(0, 2, 1);
                             NDArray boundingBoxPredictions = output.get(2);
                             MultiBoxDetection multiBoxDetection =
-                                    new MultiBoxDetection.Builder().build();
+                                    MultiBoxDetection.builder().build();
                             NDList detections =
                                     multiBoxDetection.detection(
                                             new NDList(
                                                     classPredictions,
                                                     boundingBoxPredictions,
                                                     anchors));
-                            return detections.singletonOrThrow().split(new int[] {1, 2}, 2);
+                            return detections.singletonOrThrow().split(new long[] {1, 2}, 2);
                         }));
         return ssdPredict;
     }

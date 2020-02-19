@@ -12,14 +12,12 @@
  */
 package ai.djl.fasttext.zoo;
 
+import ai.djl.fasttext.engine.FtEngine;
 import ai.djl.fasttext.zoo.nlp.textclassification.TextClassificationModelLoader;
 import ai.djl.repository.Repository;
-import ai.djl.repository.zoo.ModelLoader;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.Set;
 
 /** FtModelZoo is a repository that contains all fastText models for DJL. */
 public class FtModelZoo implements ModelZoo {
@@ -35,31 +33,7 @@ public class FtModelZoo implements ModelZoo {
 
     /** {@inheritDoc} */
     @Override
-    public List<ModelLoader<?, ?>> getModelLoaders() {
-        List<ModelLoader<?, ?>> list = new ArrayList<>();
-        try {
-            Field[] fields = FtModelZoo.class.getDeclaredFields();
-            for (Field field : fields) {
-                if (field.getType().isAssignableFrom(ModelLoader.class)) {
-                    list.add((ModelLoader<?, ?>) field.get(null));
-                }
-            }
-        } catch (ReflectiveOperationException e) {
-            // ignore
-        }
-        return list;
-    }
-
-    /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
-    @Override
-    public <I, O> ModelLoader<I, O> getModelLoader(String name) throws ModelNotFoundException {
-        try {
-            Field field = FtModelZoo.class.getDeclaredField(name);
-            return (ModelLoader<I, O>) field.get(null);
-        } catch (ReflectiveOperationException e) {
-            throw new ModelNotFoundException(
-                    "Model: " + name + " is not defined in MxModelZoo.", e);
-        }
+    public Set<String> getSupportedEngines() {
+        return Collections.singleton(FtEngine.ENGINE_NAME);
     }
 }

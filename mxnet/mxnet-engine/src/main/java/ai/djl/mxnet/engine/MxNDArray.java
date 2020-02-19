@@ -15,16 +15,15 @@ package ai.djl.mxnet.engine;
 import ai.djl.Device;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.jna.NativeResource;
-import ai.djl.ndarray.Matrix;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.NDUtils;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.index.NDIndexBooleans;
 import ai.djl.ndarray.index.NDIndexElement;
 import ai.djl.ndarray.index.NDIndexFullSlice;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.ndarray.internal.NDFormat;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -202,15 +201,6 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
         // TODO support copy
         return duplicate(getManager(), getShape(), dataType, getDevice(), getName());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Matrix toMatrix() {
-        if (!shape.isMatrix()) {
-            throw new IllegalStateException("NDArray is not a matrix");
-        }
-        return new MxMatrix(this);
     }
 
     /**
@@ -1103,11 +1093,11 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList split(int[] indices, int axis) {
+    public NDList split(long[] indices, int axis) {
         MxOpParams params = new MxOpParams();
         // follow the numpy behavior
         if (indices[0] != 0) {
-            int[] tempIndices = new int[indices.length + 1];
+            long[] tempIndices = new long[indices.length + 1];
             tempIndices[0] = 0;
             System.arraycopy(indices, 0, tempIndices, 1, indices.length);
             indices = tempIndices;
@@ -1130,6 +1120,14 @@ public class MxNDArray extends NativeResource implements NDArray {
         MxOpParams params = new MxOpParams();
         params.addParam("newshape", shape);
         return manager.invoke("_np_reshape", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray reshapeLike(NDArray array) {
+        MxOpParams params = new MxOpParams();
+        return manager.invoke("_npx_reshape_like", new NDList(this, array), params)
+                .singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -1452,7 +1450,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray transpose(int... dimensions) {
-        if (Arrays.stream(dimensions).anyMatch((int d) -> d < 0)) {
+        if (Arrays.stream(dimensions).anyMatch(d -> d < 0)) {
             throw new UnsupportedOperationException(
                     "Passing -1 for broadcasting the dimension is not currently supported");
         }
@@ -1480,12 +1478,19 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray argMax() {
         // TODO MXNet engine bug
+        if (isEmpty()) {
+            throw new IllegalArgumentException("attempt to get argMax of an empty NDArray");
+        }
         return manager.invoke("_npi_argmax", this, null).toType(DataType.INT64, false);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray argMax(int axis) {
+        if (isEmpty()) {
+            Shape newShape = NDUtils.getShapeFromEmptyNDArrayForReductionOp(getShape(), axis);
+            return manager.create(newShape, DataType.INT64);
+        }
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         // TODO MXNet engine bug
@@ -1509,6 +1514,10 @@ public class MxNDArray extends NativeResource implements NDArray {
     @Override
     public NDArray argMin(int axis) {
         // TODO switch to MXNet numpy argmin
+        if (isEmpty()) {
+            Shape newShape = NDUtils.getShapeFromEmptyNDArrayForReductionOp(getShape(), axis);
+            return manager.create(newShape, DataType.INT64);
+        }
         NDArray array = (isScalar()) ? reshape(1) : this;
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
@@ -1632,23 +1641,10 @@ public class MxNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return toDebugString(MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
-    }
-
-    /**
-     * Runs the debug string representation of this {@code NDArray}.
-     *
-     * @param maxSize the maximum elements to print out
-     * @param maxDepth the maximum depth to print out
-     * @param maxRows the maximum rows to print out
-     * @param maxColumns the maximum columns to print out
-     * @return the debug string representation of this {@code NDArray}
-     */
-    public String toDebugString(int maxSize, int maxDepth, int maxRows, int maxColumns) {
         if (isReleased()) {
             return "This array is already closed";
         }
-        return NDFormat.format(this, maxSize, maxDepth, maxRows, maxColumns);
+        return toDebugString(this, MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
     }
 
     /** {@inheritDoc} */

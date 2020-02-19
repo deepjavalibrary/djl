@@ -12,21 +12,22 @@
  */
 package ai.djl.mxnet.zoo.cv.objectdetection;
 
+import ai.djl.Application;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.SingleShotDetectionTranslator;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.mxnet.zoo.MxModelZoo;
-import ai.djl.repository.Anchor;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
-import ai.djl.repository.MRL.Model.CV;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorFactory;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Model loader for Single Shot Detection (SSD) models.
@@ -36,10 +37,9 @@ import java.util.Map;
  *
  * @see ai.djl.mxnet.engine.MxSymbolBlock
  */
-public class SingleShotDetectionModelLoader
-        extends BaseModelLoader<BufferedImage, DetectedObjects> {
+public class SingleShotDetectionModelLoader extends BaseModelLoader {
 
-    private static final Anchor BASE_ANCHOR = CV.OBJECT_DETECTION;
+    private static final Application APPLICATION = Application.CV.OBJECT_DETECTION;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "ssd";
     private static final String VERSION = "0.0.1";
@@ -50,25 +50,37 @@ public class SingleShotDetectionModelLoader
      * @param repository the repository to load the model from
      */
     public SingleShotDetectionModelLoader(Repository repository) {
-        super(repository, new MRL(BASE_ANCHOR, GROUP_ID, ARTIFACT_ID), VERSION);
+        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
+        map.put(DetectedObjects.class, new FactoryImpl());
+        factories.put(BufferedImage.class, map);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Translator<BufferedImage, DetectedObjects> getTranslator(Artifact artifact) {
-        Map<String, Object> arguments = artifact.getArguments();
-        int width = ((Double) arguments.getOrDefault("width", 512d)).intValue();
-        int height = ((Double) arguments.getOrDefault("height", 512d)).intValue();
-        double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
+    public Application getApplication() {
+        return APPLICATION;
+    }
 
-        Pipeline pipeline = new Pipeline();
-        pipeline.add(new Resize(width, height)).add(new ToTensor());
+    private static final class FactoryImpl
+            implements TranslatorFactory<BufferedImage, DetectedObjects> {
 
-        return new SingleShotDetectionTranslator.Builder()
-                .setPipeline(pipeline)
-                .setSynsetArtifactName("classes.txt")
-                .optThreshold((float) threshold)
-                .optRescaleSize(width, height)
-                .build();
+        @Override
+        public Translator<BufferedImage, DetectedObjects> newInstance(
+                Map<String, Object> arguments) {
+            int width = ((Double) arguments.getOrDefault("width", 512d)).intValue();
+            int height = ((Double) arguments.getOrDefault("height", 512d)).intValue();
+            double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
+
+            Pipeline pipeline = new Pipeline();
+            pipeline.add(new Resize(width, height)).add(new ToTensor());
+
+            return SingleShotDetectionTranslator.builder()
+                    .setPipeline(pipeline)
+                    .setSynsetArtifactName("classes.txt")
+                    .optThreshold((float) threshold)
+                    .optRescaleSize(width, height)
+                    .build();
+        }
     }
 }

@@ -40,7 +40,7 @@ public class Mask extends Rectangle {
     /**
      * Returns the probability for each pixel.
      *
-     * @return the probability for each pixel.
+     * @return the probability for each pixel
      */
     public float[][] getProbDist() {
         return probDist;

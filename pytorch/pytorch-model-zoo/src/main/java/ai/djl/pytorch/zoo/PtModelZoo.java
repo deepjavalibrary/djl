@@ -12,14 +12,13 @@
  */
 package ai.djl.pytorch.zoo;
 
+import ai.djl.pytorch.engine.PtEngine;
 import ai.djl.pytorch.zoo.cv.classification.Resnet;
+import ai.djl.pytorch.zoo.cv.objectdetection.FasterRcnnDetectionModelLoader;
 import ai.djl.repository.Repository;
-import ai.djl.repository.zoo.ModelLoader;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * PtModelZoo is a repository that contains all MXNet models in {@link
@@ -34,34 +33,12 @@ public class PtModelZoo implements ModelZoo {
     public static final String GROUP_ID = "ai.djl.pytorch";
 
     public static final Resnet RESNET = new Resnet(REPOSITORY);
+    public static final FasterRcnnDetectionModelLoader FASTER_RCNN =
+            new FasterRcnnDetectionModelLoader(REPOSITORY);
 
     /** {@inheritDoc} */
     @Override
-    public List<ModelLoader<?, ?>> getModelLoaders() {
-        List<ModelLoader<?, ?>> list = new ArrayList<>();
-        try {
-            Field[] fields = PtModelZoo.class.getDeclaredFields();
-            for (Field field : fields) {
-                if (field.getType().isAssignableFrom(ModelLoader.class)) {
-                    list.add((ModelLoader<?, ?>) field.get(null));
-                }
-            }
-        } catch (ReflectiveOperationException e) {
-            // ignore
-        }
-        return list;
-    }
-
-    /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
-    @Override
-    public <I, O> ModelLoader<I, O> getModelLoader(String name) throws ModelNotFoundException {
-        try {
-            Field field = PtModelZoo.class.getDeclaredField(name);
-            return (ModelLoader<I, O>) field.get(null);
-        } catch (ReflectiveOperationException e) {
-            throw new ModelNotFoundException(
-                    "Model: " + name + " is not defined in PtModelZoo.", e);
-        }
+    public Set<String> getSupportedEngines() {
+        return Collections.singleton(PtEngine.ENGINE_NAME);
     }
 }

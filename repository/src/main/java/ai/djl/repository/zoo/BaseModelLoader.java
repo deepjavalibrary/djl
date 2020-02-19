@@ -21,23 +21,22 @@ import ai.djl.repository.Metadata;
 import ai.djl.repository.Repository;
 import ai.djl.repository.VersionRange;
 import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Progress;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Shared code for the {@link ModelLoader} implementations.
- *
- * @param <I> the input type to the loaded model
- * @param <O> the output type of the loaded model
- */
-public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
+/** Shared code for the {@link ModelLoader} implementations. */
+public abstract class BaseModelLoader implements ModelLoader {
 
     protected Repository repository;
     protected MRL mrl;
     protected String version;
+    protected Map<Type, Map<Type, TranslatorFactory<?, ?>>> factories = new ConcurrentHashMap<>();
 
     private Metadata metadata;
 
@@ -54,36 +53,44 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         this.version = version;
     }
 
-    /**
-     * Returns the default {@link Translator} to use for the loaded model.
-     *
-     * @param artifact the artifact of the model to load that informs the default translator
-     * @return the default translator
-     */
-    public abstract Translator<I, O> getTranslator(Artifact artifact);
+    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return mrl.getArtifactId();
+    }
 
     /** {@inheritDoc} */
     @Override
-    public ZooModel<I, O> loadModel(Map<String, String> criteria, Device device, Progress progress)
+    public <I, O> ZooModel<I, O> loadModel(Criteria<I, O> criteria)
             throws IOException, ModelNotFoundException, MalformedModelException {
-        Artifact artifact = match(criteria);
+        Artifact artifact = match(criteria.getOptions());
         if (artifact == null) {
             throw new ModelNotFoundException("Model not found.");
         }
 
-        repository.prepare(artifact, progress);
+        Progress progress = criteria.getProgress();
+        Map<String, Object> override = criteria.getArguments();
 
+        repository.prepare(artifact, progress);
         if (progress != null) {
             progress.reset("Loading", 2);
             progress.update(1);
         }
-        try {
-            Path dir = repository.getCacheDirectory();
-            String relativePath = artifact.getResourceUri().getPath();
-            Path modelPath = dir.resolve(relativePath);
 
-            Model model = loadModel(artifact, modelPath, device);
-            return new ZooModel<>(model, getTranslator(artifact));
+        try {
+            Model model = loadModel(artifact, criteria.getDevice(), override);
+            Translator<I, O> translator = criteria.getTranslator();
+            if (translator == null) {
+                TranslatorFactory<I, O> factory = getTranslatorFactory(criteria);
+                if (factory == null) {
+                    throw new ModelNotFoundException("No matching default translator found.");
+                }
+
+                Map<String, Object> arguments = artifact.getArguments(override);
+                translator = factory.newInstance(arguments);
+            }
+
+            return new ZooModel<>(model, translator);
         } finally {
             if (progress != null) {
                 progress.end();
@@ -91,8 +98,22 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         }
     }
 
-    protected Model loadModel(Artifact artifact, Path modelPath, Device device)
+    /**
+     * Loads the model with the given configurations.
+     *
+     * @param artifact the model artifacts to be loaded
+     * @param device the device to load the model onto
+     * @param override the override configurations
+     * @return the loaded model
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws MalformedModelException if the model data is malformed
+     */
+    public Model loadModel(Artifact artifact, Device device, Map<String, Object> override)
             throws IOException, MalformedModelException {
+        Path dir = repository.getCacheDirectory();
+        String relativePath = artifact.getResourceUri().getPath();
+        Path modelPath = dir.resolve(relativePath);
+
         Model model = Model.newInstance(device);
         model.load(modelPath, artifact.getName());
         return model;
@@ -163,5 +184,14 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         }
         sb.append("\n]");
         return sb.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    private <I, O> TranslatorFactory<I, O> getTranslatorFactory(Criteria<I, O> criteria) {
+        Map<Type, TranslatorFactory<?, ?>> map = factories.get(criteria.getInputClass());
+        if (map == null) {
+            return null;
+        }
+        return (TranslatorFactory<I, O>) map.get(criteria.getOutputClass());
     }
 }

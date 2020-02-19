@@ -12,6 +12,7 @@
  */
 package ai.djl.fasttext.dataset;
 
+import ai.djl.Application;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 
@@ -40,7 +41,7 @@ public class CookingStackExchange extends FtDataset {
     /** {@inheritDoc} */
     @Override
     public MRL getMrl() {
-        return new MRL(MRL.Dataset.NLP, FtDatasets.GROUP_ID, ARTIFACT_ID);
+        return MRL.dataset(Application.NLP.TEXT_CLASSIFICATION, FtDatasets.GROUP_ID, ARTIFACT_ID);
     }
 
     /** A builder to construct a {@link CookingStackExchange}. */
@@ -50,7 +51,7 @@ public class CookingStackExchange extends FtDataset {
         Usage usage;
 
         /** Constructs a new builder. */
-        public Builder() {
+        Builder() {
             repository = FtDatasets.REPOSITORY;
             usage = Usage.TRAIN;
         }

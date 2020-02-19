@@ -34,23 +34,6 @@ public class ShapeTest {
     }
 
     @Test
-    public void matrixTest() {
-        Shape shape = new Shape();
-        Assert.assertTrue(shape.isScalar());
-        shape = new Shape(1, 100);
-        Assert.assertTrue(shape.isRowVector());
-        Assert.assertFalse(shape.isColumnVector());
-        shape = new Shape(100, 1);
-        Assert.assertTrue(shape.isColumnVector());
-        Shape shapeNotMatrix = new Shape(1, 1, 1);
-        Assert.assertThrows(IllegalStateException.class, shapeNotMatrix::rows);
-        Assert.assertThrows(IllegalStateException.class, shapeNotMatrix::columns);
-        Assert.assertEquals(shape.rows(), 100);
-        Assert.assertEquals(shape.columns(), 1);
-        Assert.assertNotEquals(shape, null);
-    }
-
-    @Test
     public void testHasLayout() {
         Shape withLayout =
                 new Shape(

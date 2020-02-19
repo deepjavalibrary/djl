@@ -45,7 +45,7 @@ import ai.djl.inference.Predictor;
  *     public Classification processOutput(TranslatorContext ctx, NDList list) throws TranslateException {
  *         Model model = ctx.getModel();
  *         NDArray array = list.get(0).at(0);
- *         NDArray sorted = array.argsort(-1, false);
+ *         NDArray sorted = array.argSort(-1, false);
  *         NDArray top = sorted.at(0);
  *
  *         float[] probabilities = array.toFloatArray();
