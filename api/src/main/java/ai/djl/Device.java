@@ -26,11 +26,22 @@ import java.util.Objects;
  */
 public class Device {
 
-    private static final Device CPU = new Device(Type.CPU, 0);
+    private static final Device CPU = new Device(Type.CPU);
     private static final Device GPU = new Device(Type.GPU, 0);
 
     private String deviceType;
     private int deviceId;
+
+    /**
+     * Creates a {@code Device} with basic information.
+     *
+     * @param deviceType the device type, typically CPU or GPU choose which GPU to process the
+     *     NDArray
+     */
+    public Device(String deviceType) {
+        this.deviceType = deviceType;
+        this.deviceId = ("cpu".equals(deviceType) ? -1 : 0);
+    }
 
     /**
      * Creates a {@code Device} with basic information.
@@ -40,6 +51,10 @@ public class Device {
      *     choose which GPU to process the NDArray
      */
     public Device(String deviceType, int deviceId) {
+        if (Type.CPU.equals(deviceType)) {
+            throw new UnsupportedOperationException(
+                    "CPU doesn't have device id, please use new Device(\"cpu\") instead");
+        }
         this.deviceType = deviceType;
         this.deviceId = deviceId;
     }
@@ -59,12 +74,18 @@ public class Device {
      * @return the {@code deviceId} of the Device
      */
     public int getDeviceId() {
+        if (Type.CPU.equals(deviceType)) {
+            throw new UnsupportedOperationException("CPU doesn't have device id");
+        }
         return deviceId;
     }
 
     /** {@inheritDoc} */
     @Override
     public String toString() {
+        if (Type.CPU.equals(deviceType)) {
+            return deviceType + "()";
+        }
         return deviceType + '(' + deviceId + ')';
     }
 
@@ -78,6 +99,9 @@ public class Device {
             return false;
         }
         Device device = (Device) o;
+        if (Type.CPU.equals(deviceType)) {
+            return Objects.equals(deviceType, device.deviceType);
+        }
         return deviceId == device.deviceId && Objects.equals(deviceType, device.deviceType);
     }
 
@@ -94,16 +118,6 @@ public class Device {
      */
     public static Device cpu() {
         return CPU;
-    }
-
-    /**
-     * Returns a new instance of CPU {@code Device} with the specified {@code deviceId}.
-     *
-     * @param deviceId the CPU device ID
-     * @return a new instance of CPU {@code Device} with the specified {@code deviceId}
-     */
-    public static Device cpu(int deviceId) {
-        return new Device(Type.CPU, deviceId);
     }
 
     /**

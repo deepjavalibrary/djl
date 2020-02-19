@@ -21,6 +21,8 @@ import ai.djl.util.PairList;
 /** An internal helper for creating the MXNet operator parameters. */
 public class MxOpParams extends PairList<String, Object> {
 
+    // mxnet cpu take index
+    private static final String MXNET_CPU = "cpu(0)";
     /**
      * Sets the Shape parameter.
      *
@@ -36,7 +38,7 @@ public class MxOpParams extends PairList<String, Object> {
      * @param device the device to use for the operation
      */
     public void setDevice(Device device) {
-        setParam("ctx", device.toString());
+        setParam("ctx", ("cpu".equals(device.getDeviceType()) ? MXNET_CPU : device.toString()));
     }
 
     /**

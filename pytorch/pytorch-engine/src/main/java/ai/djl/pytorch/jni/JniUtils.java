@@ -664,7 +664,11 @@ public final class JniUtils {
 
     public static Device getDevice(PtNDArray ndArray) {
         int[] device = PyTorchLibrary.LIB.torchDevice(ndArray.getHandle());
-        return new Device(PtDeviceType.fromDeviceType(device[0]), device[1]);
+        String deviceType = PtDeviceType.fromDeviceType(device[0]);
+        if (Device.Type.CPU.equals(deviceType)) {
+            return new Device(Device.Type.CPU);
+        }
+        return new Device(deviceType, device[1]);
     }
 
     public static SparseFormat getSparseFormat(PtNDArray ndArray) {

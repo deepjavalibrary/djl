@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 
 public class DeviceTest {
 
-    @Test
+    @Test(expectedExceptions = UnsupportedOperationException.class)
     public void testDevice() {
         Assert.assertEquals(Device.cpu(), new Device("cpu", 0));
         if (Device.getGpuCount() > 0) {
@@ -26,11 +26,11 @@ public class DeviceTest {
         } else {
             Assert.assertEquals(Device.cpu(), Device.defaultDevice());
         }
-        Assert.assertEquals(Device.cpu(1), new Device("cpu", 1));
+        Assert.assertEquals(Device.cpu(), new Device("cpu"));
         Assert.assertEquals(Device.gpu(), new Device("gpu", 0));
         Assert.assertEquals(Device.gpu(3), new Device("gpu", 3));
-        Assert.assertEquals(Device.cpu(), new Device("cpu", 0));
         Assert.assertNotEquals(Device.cpu(), Device.gpu());
-        Assert.assertNotEquals(new Device("cpu", 1), Device.cpu());
+        // throw UnsupportedOperationException exception
+        new Device("cpu", 0);
     }
 }

@@ -60,7 +60,7 @@ public class MxParameterStoreTest {
                     if (numGpus > 0) {
                         device = Device.gpu(j);
                     } else {
-                        device = Device.cpu(j);
+                        device = Device.cpu();
                     }
                     weights[i][j] = w.toDevice(device, true);
                     grads[i][j] = g.toDevice(device, true);

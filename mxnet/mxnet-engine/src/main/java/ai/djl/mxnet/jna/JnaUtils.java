@@ -327,7 +327,7 @@ public final class JnaUtils {
     public static Pointer createNdArray(
             Device device, Shape shape, DataType dtype, int size, boolean delayedAlloc) {
         int deviceType = MxDeviceType.toDeviceType(device);
-        int deviceId = device.getDeviceId();
+        int deviceId = (deviceType != 1) ? device.getDeviceId() : -1;
         int delay = delayedAlloc ? 1 : 0;
 
         PointerByReference ref = new PointerByReference();
@@ -349,7 +349,7 @@ public final class JnaUtils {
             boolean delayedAlloc) {
         int[] shapeArray = Arrays.stream(shape.getShape()).mapToInt(Math::toIntExact).toArray();
         int deviceType = MxDeviceType.toDeviceType(device);
-        int deviceId = device.getDeviceId();
+        int deviceId = (deviceType != 1) ? device.getDeviceId() : -1;
         int delay = delayedAlloc ? 1 : 0;
         PointerByReference ref = new PointerByReference();
         IntBuffer auxDTypesInt =
@@ -518,7 +518,12 @@ public final class JnaUtils {
         IntBuffer deviceType = IntBuffer.allocate(1);
         IntBuffer deviceId = IntBuffer.allocate(1);
         checkCall(LIB.MXNDArrayGetContext(ndArray, deviceType, deviceId));
-        return new Device(MxDeviceType.fromDeviceType(deviceType.get(0)), deviceId.get(0));
+        String deviceTypeStr = MxDeviceType.fromDeviceType(deviceType.get(0));
+        // CPU is special case which don't have device id
+        if (Device.Type.CPU.equals(deviceTypeStr)) {
+            return new Device(Device.Type.CPU);
+        }
+        return new Device(deviceTypeStr, deviceId.get(0));
     }
 
     public static Shape getShape(Pointer ndArray) {

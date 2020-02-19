@@ -27,7 +27,7 @@ public class DatasetUtilsTest {
     @Test
     public void testSplitEven() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            Device[] devices = new Device[] {Device.cpu(0), Device.cpu(1), Device.cpu(2)};
+            Device[] devices = new Device[] {Device.cpu(), Device.cpu(), Device.cpu()};
 
             NDArray data = manager.randomUniform(0, 1, new Shape(6, 5, 5, 3));
             NDArray label = manager.zeros(new Shape(6, 1));
@@ -53,7 +53,7 @@ public class DatasetUtilsTest {
     @Test
     public void testSplitUnevenData() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            Device[] devices = new Device[] {Device.cpu(0), Device.cpu(1), Device.cpu(2)};
+            Device[] devices = new Device[] {Device.cpu(), Device.cpu(), Device.cpu()};
 
             NDArray data = manager.randomUniform(0, 1, new Shape(7, 5, 5, 3));
             NDArray label = manager.zeros(new Shape(7, 1));
@@ -85,7 +85,7 @@ public class DatasetUtilsTest {
     @Test
     public void testSplitSmallerBatchSize() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            Device[] devices = new Device[] {Device.cpu(0), Device.cpu(1), Device.cpu(2)};
+            Device[] devices = new Device[] {Device.cpu(), Device.cpu(), Device.cpu()};
 
             NDArray data = manager.randomUniform(0, 1, new Shape(2, 5, 5, 3));
             NDArray label = manager.zeros(new Shape(7, 1));
