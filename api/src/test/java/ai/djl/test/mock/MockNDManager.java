@@ -65,8 +65,7 @@ public class MockNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray arange(
-            double start, double stop, double step, DataType dataType, Device device) {
+    public NDArray arange(float start, float stop, float step, DataType dataType, Device device) {
         return null;
     }
 
@@ -78,21 +77,21 @@ public class MockNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(double start, double stop, int num, boolean endPoint, Device device) {
+    public NDArray linspace(float start, float stop, int num, boolean endPoint, Device device) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
-            double low, double high, Shape shape, DataType dataType, Device device) {
+            float low, float high, Shape shape, DataType dataType, Device device) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
-            double loc, double scale, Shape shape, DataType dataType, Device device) {
+            float loc, float scale, Shape shape, DataType dataType, Device device) {
         return null;
     }
 

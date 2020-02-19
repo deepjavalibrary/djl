@@ -63,7 +63,7 @@ public class XavierInitializer implements Initializer {
 
     private RandomType randomType;
     private FactorType factorType;
-    private double magnitude;
+    private float magnitude;
 
     /**
      * Initializes a Xavier initializer.
@@ -72,7 +72,7 @@ public class XavierInitializer implements Initializer {
      * @param factorType the factor type, can be one of AVG, IN, or OUT
      * @param magnitude the scale of the random number
      */
-    public XavierInitializer(RandomType randomType, FactorType factorType, double magnitude) {
+    public XavierInitializer(RandomType randomType, FactorType factorType, float magnitude) {
         this.randomType = randomType;
         this.factorType = factorType;
         this.magnitude = magnitude;
@@ -80,14 +80,14 @@ public class XavierInitializer implements Initializer {
 
     /** Creates a new instance of {@code XavierInitializer}. */
     public XavierInitializer() {
-        this(RandomType.UNIFORM, FactorType.AVG, 3);
+        this(RandomType.UNIFORM, FactorType.AVG, 3f);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray initialize(NDManager manager, Shape shape, DataType dataType) {
 
-        double hwScale;
+        float hwScale;
         long dimension = shape.dimension();
         if (dimension < 2) {
             throw new IllegalArgumentException(
@@ -95,17 +95,17 @@ public class XavierInitializer implements Initializer {
                             + dimension
                             + ", it requires shape to be at least 2D.");
         } else if (dimension == 2) {
-            hwScale = 1.0;
+            hwScale = 1.0f;
         } else {
             Shape shapeSliced = shape.slice(2);
             hwScale = shapeSliced.size();
         }
-        double fanIn = shape.get(1) * hwScale;
-        double fanOut = shape.head() * hwScale;
-        double factor;
+        float fanIn = shape.get(1) * hwScale;
+        float fanOut = shape.head() * hwScale;
+        float factor;
         switch (factorType) {
             case AVG:
-                factor = (fanIn + fanOut) / 2.0;
+                factor = (fanIn + fanOut) / 2.0f;
                 break;
             case IN:
                 factor = fanIn;
@@ -121,13 +121,13 @@ public class XavierInitializer implements Initializer {
             throw new IllegalStateException(
                     "Xavier initializer factor is 0, please check your input shape.");
         }
-        double scale = StrictMath.sqrt(magnitude / factor);
+        float scale = (float) StrictMath.sqrt(magnitude / factor);
 
         switch (randomType) {
             case UNIFORM:
                 return manager.randomUniform(-scale, scale, shape, dataType, manager.getDevice());
             case GAUSSIAN:
-                return manager.randomNormal(0, scale, shape, dataType, manager.getDevice());
+                return manager.randomNormal(0f, scale, shape, dataType, manager.getDevice());
             default:
                 throw new IllegalArgumentException("Invalid randomType");
         }

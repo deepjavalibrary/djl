@@ -121,13 +121,12 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray arange(int start, int stop, int step, DataType dataType, Device device) {
-        return arange((double) start, (double) stop, (double) step, dataType, device);
+        return arange((float) start, (float) stop, (float) step, dataType, device);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray arange(
-            double start, double stop, double step, DataType dataType, Device device) {
+    public NDArray arange(float start, float stop, float step, DataType dataType, Device device) {
         if (Math.signum(stop - start) != Math.signum(step)) {
             return create(new Shape(0), dataType, device);
         }
@@ -146,7 +145,7 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(double start, double stop, int num, boolean endpoint, Device device) {
+    public NDArray linspace(float start, float stop, int num, boolean endpoint, Device device) {
         if (!endpoint) {
             throw new UnsupportedOperationException("endpoint only support true");
         }
@@ -157,14 +156,14 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray randomUniform(
-            double low, double high, Shape shape, DataType dataType, Device device) {
+            float low, float high, Shape shape, DataType dataType, Device device) {
         return JniUtils.uniform(this, low, high, shape, dataType, device);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomNormal(
-            double loc, double scale, Shape shape, DataType dataType, Device device) {
+            float loc, float scale, Shape shape, DataType dataType, Device device) {
         return JniUtils.normal(this, loc, scale, shape, dataType, device);
     }
 

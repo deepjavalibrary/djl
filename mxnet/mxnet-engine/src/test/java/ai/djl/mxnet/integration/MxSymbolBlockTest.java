@@ -165,7 +165,7 @@ public class MxSymbolBlockTest {
         trainer.initialize(inputShape);
 
         NDArray data = manager.ones(inputShape);
-        NDArray label = manager.arange(0, 10);
+        NDArray label = manager.arange(0f, 10f);
         NDArray pred;
         try (GradientCollector gradCol = trainer.newGradientCollector()) {
             pred = trainer.forward(new NDList(data)).singletonOrThrow();

@@ -54,17 +54,17 @@ public final class PyTorchLibrary {
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 
     public native Pointer torchArange(
-            double start,
-            double end,
-            double step,
+            float start,
+            float end,
+            float step,
             int dType,
             int layout,
             int[] device,
             boolean requiredGrad);
 
     public native Pointer torchLinspace(
-            double start,
-            double end,
+            float start,
+            float end,
             int step,
             int dType,
             int layout,

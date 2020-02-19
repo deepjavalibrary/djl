@@ -35,7 +35,6 @@ public class NDArrayCreationOpTest {
             NDArray array = manager.create(-100f);
             Assert.assertEquals(array.getFloat(), -100f);
             Assert.assertEquals(array.getShape(), new Shape());
-
             // test zero-dim
             array = manager.create(new float[] {}, new Shape(1, 0));
             Assert.assertEquals(array.getShape(), new Shape(1, 0));
@@ -240,10 +239,10 @@ public class NDArrayCreationOpTest {
             Assert.assertEquals(array, expected);
             array = manager.arange(10);
             Assert.assertEquals(array, expected);
-            array = manager.arange(3.5);
+            array = manager.arange(3.5f);
             expected = manager.create(new float[] {0f, 1f, 2f, 3f});
             Assert.assertEquals(array, expected);
-            array = manager.arange(0.1, 5.4, 0.3);
+            array = manager.arange(0.1f, 5.4f, 0.3f);
             expected =
                     manager.create(
                             new float[] {
@@ -251,15 +250,15 @@ public class NDArrayCreationOpTest {
                                 3.4f, 3.7f, 4f, 4.3f, 4.6f, 4.9f, 5.2f
                             });
             Assertions.assertAlmostEquals(array, expected);
-            array = manager.arange(0.0, 2.0, 0.3);
+            array = manager.arange(0.0f, 2.0f, 0.3f);
             expected = manager.create(new float[] {0f, 0.3f, 0.6f, 0.9f, 1.2f, 1.5f, 1.8f});
             Assertions.assertAlmostEquals(array, expected);
 
             // test 0 dimension
-            array = manager.arange(10.0, 0.0, 1.0);
+            array = manager.arange(10.0f, 0.0f, 1.0f);
             expected = manager.create(new Shape(0));
             Assert.assertEquals(array, expected);
-            array = manager.arange(0.0, -2.0);
+            array = manager.arange(0.0f, -2.0f);
             Assert.assertEquals(array, expected);
         }
     }
@@ -285,10 +284,10 @@ public class NDArrayCreationOpTest {
     @Test
     public void testLinspace() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray array = manager.linspace(0.0, 9.0, 10, true, manager.getDevice());
-            NDArray expected = manager.arange(10.0);
+            NDArray array = manager.linspace(0.0f, 9.0f, 10, true, manager.getDevice());
+            NDArray expected = manager.arange(10.0f);
             Assert.assertEquals(array, expected);
-            array = manager.linspace(0.0, 10.0, 10, false, manager.getDevice());
+            array = manager.linspace(0.0f, 10.0f, 10, false, manager.getDevice());
             Assert.assertEquals(array, expected);
             array = manager.linspace(10, 0, 10, false, manager.getDevice());
             expected = manager.create(new float[] {10f, 9f, 8f, 7f, 6f, 5f, 4f, 3f, 2f, 1f});

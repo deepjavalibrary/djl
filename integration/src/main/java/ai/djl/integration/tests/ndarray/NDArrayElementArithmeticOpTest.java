@@ -393,13 +393,13 @@ public class NDArrayElementArithmeticOpTest {
             Assert.assertEquals(NDArrays.dot(lhs, rhs), expected);
             // test 1D * ND
             lhs = manager.create(new float[] {1f, 2f});
-            rhs = manager.arange(1.0, 5.0).reshape(2, 2);
+            rhs = manager.arange(1.0f, 5.0f).reshape(2, 2);
             expected = manager.create(new float[] {7f, 10f});
             Assert.assertEquals(lhs.dot(rhs), expected);
             Assert.assertEquals(NDArrays.dot(lhs, rhs), expected);
             // test MD * ND
             lhs = manager.create(new float[] {1f, 2f}, new Shape(2, 1));
-            rhs = manager.arange(1.0, 5.0).reshape(2, 1, 2);
+            rhs = manager.arange(1.0f, 5.0f).reshape(2, 1, 2);
             expected =
                     manager.create(
                             new float[] {1f, 2f, 3f, 4f, 2f, 4f, 6f, 8f}, new Shape(2, 2, 2));

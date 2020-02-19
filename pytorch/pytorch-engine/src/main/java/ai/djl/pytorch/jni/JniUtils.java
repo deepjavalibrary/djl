@@ -123,9 +123,9 @@ public final class JniUtils {
 
     public static PtNDArray arange(
             PtNDManager manager,
-            double start,
-            double stop,
-            double step,
+            float start,
+            float stop,
+            float step,
             DataType dType,
             Device device,
             SparseFormat fmt) {
@@ -144,8 +144,8 @@ public final class JniUtils {
 
     public static PtNDArray linspace(
             PtNDManager manager,
-            double start,
-            double stop,
+            float start,
+            float stop,
             int step,
             DataType dType,
             Device device,

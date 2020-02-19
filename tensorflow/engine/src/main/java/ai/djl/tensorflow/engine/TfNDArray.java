@@ -832,7 +832,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes, double temperature) {
+    public NDArray softmax(int[] axes, float temperature) {
         Operation op =
                 manager.getGraph()
                         .opBuilder("Softmax", "Softmax_" + TfNDManager.nextNameAssignment())
@@ -857,7 +857,7 @@ public class TfNDArray implements NDArray {
     }
 
     @Override
-    public NDArray logSoftmax(int[] axes, double temperature) {
+    public NDArray logSoftmax(int[] axes, float temperature) {
         return null;
     }
 

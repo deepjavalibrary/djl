@@ -1243,13 +1243,13 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes, double temperature) {
+    public NDArray softmax(int[] axes, float temperature) {
         return softmaxHelper(axes, temperature, "_npx_softmax");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logSoftmax(int[] axes, double temperature) {
+    public NDArray logSoftmax(int[] axes, float temperature) {
         return softmaxHelper(axes, temperature, "_npx_log_softmax");
     }
 

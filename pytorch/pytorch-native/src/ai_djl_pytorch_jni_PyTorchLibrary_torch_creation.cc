@@ -91,9 +91,9 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchOnes(
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArange(
   JNIEnv* env,
   jobject jthis,
-  jdouble jstart,
-  jdouble jend,
-  jdouble jstep,
+  jfloat jstart,
+  jfloat jend,
+  jfloat jstep,
   jint jdtype,
   jint jlayout,
   jintArray jdevice,
@@ -106,8 +106,8 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArange(
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLinspace(
   JNIEnv* env,
   jobject jthis,
-  jdouble jstart,
-  jdouble jend,
+  jfloat jstart,
+  jfloat jend,
   jint jstep,
   jint jdtype,
   jint jlayout,
