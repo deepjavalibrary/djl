@@ -14,7 +14,7 @@ package ai.djl.pytorch.zoo;
 
 import ai.djl.pytorch.engine.PtEngine;
 import ai.djl.pytorch.zoo.cv.classification.Resnet;
-import ai.djl.pytorch.zoo.cv.objectdetection.FasterRcnnDetectionModelLoader;
+import ai.djl.pytorch.zoo.cv.objectdetection.SingleShotDetectionModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 import java.util.Collections;
@@ -33,8 +33,11 @@ public class PtModelZoo implements ModelZoo {
     public static final String GROUP_ID = "ai.djl.pytorch";
 
     public static final Resnet RESNET = new Resnet(REPOSITORY);
-    public static final FasterRcnnDetectionModelLoader FASTER_RCNN =
-            new FasterRcnnDetectionModelLoader(REPOSITORY);
+    // Disable fastrcnn until the torchvision issue fixed
+    //    public static final FasterRcnnDetectionModelLoader FASTER_RCNN =
+    //            new FasterRcnnDetectionModelLoader(REPOSITORY);
+    public static final SingleShotDetectionModelLoader SSD =
+            new SingleShotDetectionModelLoader(REPOSITORY);
 
     /** {@inheritDoc} */
     @Override

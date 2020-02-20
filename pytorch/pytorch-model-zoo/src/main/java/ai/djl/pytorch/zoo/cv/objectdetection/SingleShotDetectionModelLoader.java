@@ -17,6 +17,7 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.SingleShotDetectionTranslator;
+import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.pytorch.zoo.PtModelZoo;
@@ -37,19 +38,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Model loader for Faster RCNN Detection models.
+ * Model loader for Single Shot Detection models.
  *
  * <p>The model was trained on PyTorch and loaded in DJL in {@link
- * ai.djl.pytorch.engine.PtSymbolBlock}.
+ * ai.djl.pytorch.engine.PtSymbolBlock}. See <a href="https://arxiv.org/pdf/1512.02325.pdf">SSD</a>.
  *
  * @see ai.djl.pytorch.engine.PtSymbolBlock
  */
-public class FasterRcnnDetectionModelLoader
+public class SingleShotDetectionModelLoader
         extends BaseModelLoader<BufferedImage, DetectedObjects> {
 
     private static final Application APPLICATION = Application.CV.OBJECT_DETECTION;
     private static final String GROUP_ID = PtModelZoo.GROUP_ID;
-    private static final String ARTIFACT_ID = "faster_rcnn";
+    private static final String ARTIFACT_ID = "ssd";
     private static final String VERSION = "0.0.1";
 
     /**
@@ -57,7 +58,7 @@ public class FasterRcnnDetectionModelLoader
      *
      * @param repository the repository to load the model from
      */
-    public FasterRcnnDetectionModelLoader(Repository repository) {
+    public SingleShotDetectionModelLoader(Repository repository) {
         super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
         Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
         map.put(DetectedObjects.class, new FactoryImpl());
@@ -70,17 +71,6 @@ public class FasterRcnnDetectionModelLoader
         return APPLICATION;
     }
 
-    /**
-     * Loads the model with the given search filters.
-     *
-     * @param filters the search filters to match against the loaded model
-     * @param device the device the loaded model should use
-     * @param progress the progress tracker to update while loading the model
-     * @return the loaded model
-     * @throws IOException for various exceptions loading data from the repository
-     * @throws ModelNotFoundException if no model with the specified criteria is found
-     * @throws MalformedModelException if the model data is malformed
-     */
     @Override
     public ZooModel<BufferedImage, DetectedObjects> loadModel(
             Map<String, String> filters, Device device, Progress progress)
@@ -101,12 +91,17 @@ public class FasterRcnnDetectionModelLoader
         @Override
         public Translator<BufferedImage, DetectedObjects> newInstance(
                 Map<String, Object> arguments) {
-            int width = ((Double) arguments.getOrDefault("width", 800)).intValue();
-            int height = ((Double) arguments.getOrDefault("height", 800)).intValue();
-            double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
+            int width = ((Double) arguments.getOrDefault("width", 300)).intValue();
+            int height = ((Double) arguments.getOrDefault("height", 300)).intValue();
+            double threshold = ((Double) arguments.getOrDefault("threshold", 0.4d));
 
             Pipeline pipeline = new Pipeline();
-            pipeline.add(new Resize(width, height)).add(new ToTensor());
+            pipeline.add(new Resize(width, height))
+                    .add(
+                            new Normalize(
+                                    new float[] {0.485f, 0.456f, 0.406f},
+                                    new float[] {0.229f, 0.224f, 0.225f}))
+                    .add(new ToTensor());
 
             return SingleShotDetectionTranslator.builder()
                     .setPipeline(pipeline)

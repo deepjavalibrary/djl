@@ -1,7 +1,7 @@
 {
   "metadataVersion": "0.1",
   "groupId": "ai.djl.pytorch",
-  "artifactId": "faster_rcnn",
+  "artifactId": "ssd",
   "type": "cv",
   "name": "Object detection",
   "description": "Faster RCNN object detection",
@@ -16,22 +16,23 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "faster_rcnn_resnet50",
+      "name": "ssd_300_resnet50",
       "properties": {
+        "size": "300",
         "backbone": "resnet50",
         "dataset": "coco"
       },
       "files": {
         "classes": {
-          "uri": "classes_coco.txt",
-          "sha1Hash": "e13cfd97ff597af11296f636dd0cb8c7596acb7b",
-          "size": 675,
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/pytorch/classes_coco.txt",
+          "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
+          "size": 620,
           "name": "classes.txt"
         },
         "model": {
-          "uri": "0.0.1/faster_rcnn_resnet50.pt.gz",
-          "sha1Hash": "4f52a45cbdf70250e0ad4ed987d03b97a6ae608b",
-          "size": 155852374
+          "uri": "0.0.1/ssd_300_resnet50.pt.gz",
+          "sha1Hash": "e3adf1e4f9bde1a5f7e323fcf77aa35982ce93cf",
+          "size": 85433336
         }
       }
     }

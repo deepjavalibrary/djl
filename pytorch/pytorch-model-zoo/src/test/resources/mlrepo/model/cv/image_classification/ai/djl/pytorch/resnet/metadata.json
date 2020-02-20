@@ -37,6 +37,31 @@
           "size": 95229629
         }
       }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "traced_resnet18",
+      "properties": {
+        "layers": "18",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/pytorch/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "size": 31675
+        },
+        "model": {
+          "uri": "0.0.1/traced_resnet18.pt.gz",
+          "sha1Hash": "5f2090128b4dd2aac5bc7394ba4d46fe4a608a89",
+          "size": 43482267
+        }
+      }
     }
   ]
 }
