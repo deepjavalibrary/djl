@@ -16,6 +16,8 @@ dependencies {
     testImplementation project(":mxnet:mxnet-model-zoo")
     testImplementation(project(":integration")) {
         exclude group: "org.apache.logging.log4j", module: "log4j-slf4j-impl"
+        exclude group: "ai.djl.pytorch", module: "pytorch-engine"
+        exclude group: "ai.djl.pytorch", module: "pytorch-model-zoo"
     }
 
     testImplementation("org.testng:testng:${testng_version}") {
