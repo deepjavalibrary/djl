@@ -81,13 +81,6 @@ public final class TrainPikachu {
             RandomAccessDataset pikachuDetectionTest = getDataset(Dataset.Usage.TEST, arguments);
 
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
-            config.addTrainingListeners(
-                    TrainingListener.Defaults.logging(
-                            TrainPikachu.class.getSimpleName(),
-                            arguments.getBatchSize(),
-                            (int) pikachuDetectionTrain.getNumIterations(),
-                            (int) pikachuDetectionTest.getNumIterations(),
-                            arguments.getOutputDir()));
 
             ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
@@ -163,7 +156,8 @@ public final class TrainPikachu {
                 .setBatchSize(arguments.getBatchSize())
                 .addEvaluator(new SingleShotDetectionAccuracy("classAccuracy"))
                 .addEvaluator(new BoundingBoxError("boundingBoxError"))
-                .optDevices(Device.getDevices(arguments.getMaxGpus()));
+                .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                .addTrainingListeners(TrainingListener.Defaults.logging(arguments.getOutputDir()));
     }
 
     public static Block getSsdTrainBlock() {

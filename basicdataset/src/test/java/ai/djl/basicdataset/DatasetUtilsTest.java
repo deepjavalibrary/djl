@@ -31,7 +31,8 @@ public class DatasetUtilsTest {
 
             NDArray data = manager.randomUniform(0, 1, new Shape(6, 5, 5, 3));
             NDArray label = manager.zeros(new Shape(6, 1));
-            Batch batch = new Batch(manager, new NDList(data), new NDList(label), Batchifier.STACK);
+            Batch batch =
+                    new Batch(manager, new NDList(data), new NDList(label), 6, Batchifier.STACK);
 
             Batch[] split = batch.split(devices, true);
 
@@ -57,7 +58,8 @@ public class DatasetUtilsTest {
 
             NDArray data = manager.randomUniform(0, 1, new Shape(7, 5, 5, 3));
             NDArray label = manager.zeros(new Shape(7, 1));
-            Batch batch = new Batch(manager, new NDList(data), new NDList(label), Batchifier.STACK);
+            Batch batch =
+                    new Batch(manager, new NDList(data), new NDList(label), 7, Batchifier.STACK);
 
             Batch[] split = batch.split(devices, false);
 
@@ -89,7 +91,8 @@ public class DatasetUtilsTest {
 
             NDArray data = manager.randomUniform(0, 1, new Shape(2, 5, 5, 3));
             NDArray label = manager.zeros(new Shape(7, 1));
-            Batch batch = new Batch(manager, new NDList(data), new NDList(label), Batchifier.STACK);
+            Batch batch =
+                    new Batch(manager, new NDList(data), new NDList(label), 7, Batchifier.STACK);
 
             Batch[] split = batch.split(devices, false);
 

@@ -31,33 +31,10 @@ public class LoggingTrainingListener implements TrainingListener {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingTrainingListener.class);
 
-    private String name;
-    private int batchSize;
-    private int trainDataSize;
-    private int validateDataSize;
-    private int trainingProgress;
-    private int validateProgress;
-
     private int numEpochs;
 
     private ProgressBar trainingProgressBar;
     private ProgressBar validateProgressBar;
-
-    /**
-     * Constructs a {@link LoggingTrainingListener}.
-     *
-     * @param name the name of the listener
-     * @param batchSize the size of training batches
-     * @param trainDataSize the total number of elements in the training dataset
-     * @param validateDataSize the total number of elements in the validation dataset
-     */
-    public LoggingTrainingListener(
-            String name, int batchSize, int trainDataSize, int validateDataSize) {
-        this.name = name;
-        this.batchSize = batchSize;
-        this.trainDataSize = trainDataSize;
-        this.validateDataSize = validateDataSize;
-    }
 
     /** {@inheritDoc} */
     @Override
@@ -92,20 +69,21 @@ public class LoggingTrainingListener implements TrainingListener {
         }
 
         numEpochs++;
-        trainingProgress = 0;
-        validateProgress = 0;
     }
 
     /** {@inheritDoc} */
     @Override
     public void onTrainingBatch(Trainer trainer, BatchData batchData) {
         if (trainingProgressBar == null) {
-            trainingProgressBar = new ProgressBar("Training", trainDataSize);
+            trainingProgressBar =
+                    new ProgressBar("Training", batchData.getBatch().getProgressTotal());
         }
-        trainingProgressBar.update(trainingProgress++, getTrainingStatus(trainer));
+        trainingProgressBar.update(
+                batchData.getBatch().getProgress(),
+                getTrainingStatus(trainer, batchData.getBatch().getSize()));
     }
 
-    private String getTrainingStatus(Trainer trainer) {
+    private String getTrainingStatus(Trainer trainer, int batchSize) {
         Metrics metrics = trainer.getMetrics();
         if (metrics == null) {
             return "";
@@ -121,7 +99,7 @@ public class LoggingTrainingListener implements TrainingListener {
 
         if (metrics.hasMetric("train")) {
             float batchTime = metrics.latestMetric("train").getValue().longValue() / 1_000_000_000f;
-            sb.append(String.format(", speed: %.2f images/sec", (float) batchSize / batchTime));
+            sb.append(String.format(", speed: %.2f images/sec", batchSize / batchTime));
         }
         return sb.toString();
     }
@@ -130,9 +108,10 @@ public class LoggingTrainingListener implements TrainingListener {
     @Override
     public void onValidationBatch(Trainer trainer, BatchData batchData) {
         if (validateProgressBar == null) {
-            validateProgressBar = new ProgressBar("Validating", validateDataSize);
+            validateProgressBar =
+                    new ProgressBar("Validating", batchData.getBatch().getProgressTotal());
         }
-        validateProgressBar.update(validateProgress++);
+        validateProgressBar.update(batchData.getBatch().getProgress());
     }
 
     /** {@inheritDoc} */
@@ -145,7 +124,7 @@ public class LoggingTrainingListener implements TrainingListener {
         } else {
             devicesMsg = devices.size() + " GPUs";
         }
-        logger.info("Running {} on: {}.", name, devicesMsg);
+        logger.info("Training on: {}.", devicesMsg);
 
         long init = System.nanoTime();
         String engineName = Engine.getInstance().getEngineName();
@@ -161,8 +140,6 @@ public class LoggingTrainingListener implements TrainingListener {
     @Override
     public void onTrainingEnd(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
-        logger.info("Training: {} batches", trainDataSize);
-        logger.info("Validation: {} batches", validateDataSize);
 
         if (metrics == null) {
             return;

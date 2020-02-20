@@ -79,13 +79,6 @@ public final class TrainResnetWithCifar10 {
 
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
-            config.addTrainingListeners(
-                    TrainingListener.Defaults.logging(
-                            TrainResnetWithCifar10.class.getSimpleName(),
-                            arguments.getBatchSize(),
-                            (int) trainDataset.getNumIterations(),
-                            (int) validationDataset.getNumIterations(),
-                            arguments.getOutputDir()));
 
             ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
@@ -178,7 +171,8 @@ public final class TrainResnetWithCifar10 {
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
                 .setBatchSize(arguments.getBatchSize())
-                .optDevices(Device.getDevices(arguments.getMaxGpus()));
+                .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                .addTrainingListeners(TrainingListener.Defaults.logging(arguments.getOutputDir()));
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)

@@ -69,13 +69,6 @@ public final class TrainMnist {
 
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
-            config.addTrainingListeners(
-                    TrainingListener.Defaults.logging(
-                            TrainMnist.class.getSimpleName(),
-                            arguments.getBatchSize(),
-                            (int) trainingSet.getNumIterations(),
-                            (int) validateSet.getNumIterations(),
-                            arguments.getOutputDir()));
 
             ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
@@ -109,7 +102,8 @@ public final class TrainMnist {
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
                 .setBatchSize(arguments.getBatchSize())
-                .optDevices(Device.getDevices(arguments.getMaxGpus()));
+                .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                .addTrainingListeners(TrainingListener.Defaults.logging(arguments.getOutputDir()));
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)

@@ -83,13 +83,6 @@ public final class TrainWithOptimizers {
 
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
-            config.addTrainingListeners(
-                    TrainingListener.Defaults.logging(
-                            TrainWithOptimizers.class.getSimpleName(),
-                            arguments.getBatchSize(),
-                            (int) trainDataset.getNumIterations(),
-                            (int) validationDataset.getNumIterations(),
-                            arguments.getOutputDir()));
 
             ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
@@ -183,7 +176,8 @@ public final class TrainWithOptimizers {
                 .addEvaluator(new Accuracy())
                 .optOptimizer(setupOptimizer(arguments))
                 .setBatchSize(arguments.getBatchSize())
-                .optDevices(Device.getDevices(arguments.getMaxGpus()));
+                .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                .addTrainingListeners(TrainingListener.Defaults.logging(arguments.getOutputDir()));
     }
 
     private static Optimizer setupOptimizer(OptimizerArguments arguments) {

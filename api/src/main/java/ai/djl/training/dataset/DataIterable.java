@@ -27,6 +27,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +55,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
     // for multithreading
     private Queue<Future<Batch>> queue;
     private long count;
+    private AtomicInteger progressCounter;
 
     /**
      * Creates a new instance of {@code DataIterable} with the given parameters.
@@ -88,6 +90,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
         this.executor = executor;
         this.maxIteration = maxIteration;
         this.device = device;
+        progressCounter = new AtomicInteger(0);
 
         sample = sampler.sample(dataset);
         if (executor != null) {
@@ -133,7 +136,8 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
             // single thread data loading with blocking fetch
             List<Long> indices = sample.next();
             try {
-                return fetch(indices);
+                int progress = progressCounter.getAndAdd(indices.size());
+                return fetch(indices, progress);
             } catch (IOException e) {
                 logger.error(e.getMessage());
                 throw new IllegalStateException("Data loading failed", e);
@@ -151,11 +155,12 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
         }
     }
 
-    private Batch fetch(List<Long> indices) throws IOException {
+    private Batch fetch(List<Long> indices, int progress) throws IOException {
         NDManager subManager = manager.newSubManager();
-        NDList[] data = new NDList[indices.size()];
-        NDList[] labels = new NDList[indices.size()];
-        for (int i = 0; i < indices.size(); i++) {
+        int batchSize = indices.size();
+        NDList[] data = new NDList[batchSize];
+        NDList[] labels = new NDList[batchSize];
+        for (int i = 0; i < batchSize; i++) {
             Record record = dataset.get(subManager, indices.get(i));
             data[i] = record.getData();
             // apply transform
@@ -180,7 +185,14 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
             batchData = batchData.asInDevice(device, false);
             batchLabels = batchLabels.asInDevice(device, false);
         }
-        return new Batch(subManager, batchData, batchLabels, batchifier);
+        return new Batch(
+                subManager,
+                batchData,
+                batchLabels,
+                batchSize,
+                batchifier,
+                progress,
+                dataset.size());
     }
 
     private void preFetch() {
@@ -197,15 +209,17 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
     class PreFetchCallable implements Callable<Batch> {
 
         private List<Long> indices;
+        private int progress;
 
         public PreFetchCallable(List<Long> indices) {
             this.indices = indices;
+            progress = progressCounter.getAndAdd(indices.size());
         }
 
         /** {@inheritDoc} */
         @Override
         public Batch call() throws IOException {
-            return fetch(indices);
+            return fetch(indices, progress);
         }
     }
 }

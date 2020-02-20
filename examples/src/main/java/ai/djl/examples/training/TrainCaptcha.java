@@ -67,13 +67,6 @@ public final class TrainCaptcha {
 
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
-            config.addTrainingListeners(
-                    TrainingListener.Defaults.logging(
-                            TrainCaptcha.class.getSimpleName(),
-                            arguments.getBatchSize(),
-                            (int) trainingSet.getNumIterations(),
-                            (int) validateSet.getNumIterations(),
-                            arguments.getOutputDir()));
 
             ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
@@ -109,7 +102,9 @@ public final class TrainCaptcha {
         DefaultTrainingConfig config =
                 new DefaultTrainingConfig(loss)
                         .setBatchSize(arguments.getBatchSize())
-                        .optDevices(Device.getDevices(arguments.getMaxGpus()));
+                        .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                        .addTrainingListeners(
+                                TrainingListener.Defaults.logging(arguments.getOutputDir()));
 
         for (int i = 0; i < CaptchaDataset.CAPTCHA_LENGTH; i++) {
             config.addEvaluator(new Accuracy("acc_digit_" + i, i));

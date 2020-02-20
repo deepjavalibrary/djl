@@ -15,6 +15,7 @@ package ai.djl.training.listener;
 import ai.djl.Device;
 import ai.djl.ndarray.NDList;
 import ai.djl.training.Trainer;
+import ai.djl.training.dataset.Batch;
 import java.util.Map;
 
 /**
@@ -70,27 +71,46 @@ public interface TrainingListener {
     interface Defaults {
 
         /**
+         * A basic {@link TrainingListener} set with minimal recommended functionality.
+         *
+         * @return the new set of listeners
+         */
+        static TrainingListener[] basic() {
+            return new TrainingListener[] {
+                new EpochTrainingListener(),
+                new EvaluatorTrainingListener(),
+                new DivergenceCheckTrainingListener()
+            };
+        }
+
+        /**
          * A default {@link TrainingListener} set including batch output logging.
          *
-         * @param name the name of the {@link LoggingTrainingListener}
-         * @param batchSize the size of training batches
-         * @param trainDataSize the total number of elements in the training dataset
-         * @param validateDataSize the total number of elements in the validation dataset
+         * @return the new set of listeners
+         */
+        static TrainingListener[] logging() {
+            return new TrainingListener[] {
+                new EpochTrainingListener(),
+                new EvaluatorTrainingListener(),
+                new DivergenceCheckTrainingListener(),
+                new LoggingTrainingListener()
+            };
+        }
+
+        /**
+         * A default {@link TrainingListener} set including batch output logging and output
+         * directory.
+         *
          * @param outputDir the output directory to store created log files
          * @return the new set of listeners
          */
-        static TrainingListener[] logging(
-                String name,
-                int batchSize,
-                int trainDataSize,
-                int validateDataSize,
-                String outputDir) {
+        static TrainingListener[] logging(String outputDir) {
             return new TrainingListener[] {
                 new EpochTrainingListener(),
                 new MemoryTrainingListener(outputDir),
                 new EvaluatorTrainingListener(),
                 new DivergenceCheckTrainingListener(),
-                new LoggingTrainingListener(name, batchSize, trainDataSize, validateDataSize),
+                new LoggingTrainingListener(),
                 new TimeMeasureTrainingListener(outputDir)
             };
         }
@@ -99,18 +119,30 @@ public interface TrainingListener {
     /** A class to pass data from the batch into the training listeners. */
     class BatchData {
 
+        private Batch batch;
         private Map<Device, NDList> labels;
         private Map<Device, NDList> predictions;
 
         /**
          * Constructs a new {@link BatchData}.
          *
+         * @param batch the original batch
          * @param labels the labels for each device
          * @param predictions the predictions for each device
          */
-        public BatchData(Map<Device, NDList> labels, Map<Device, NDList> predictions) {
+        public BatchData(Batch batch, Map<Device, NDList> labels, Map<Device, NDList> predictions) {
+            this.batch = batch;
             this.labels = labels;
             this.predictions = predictions;
+        }
+
+        /**
+         * Returns the original batch.
+         *
+         * @return the original batch
+         */
+        public Batch getBatch() {
+            return batch;
         }
 
         /**
