@@ -93,7 +93,7 @@ public final class CudaUtils {
         }
         int version = getCudaVersion();
         int major = version / 1000;
-        int minor = version % 1000;
+        int minor = (version / 10) % 10;
         return String.valueOf(major) + minor;
     }
 
