@@ -24,7 +24,7 @@ public class BenchmarkTest {
             "-c",
             "2",
             "-i",
-            "/Volumes/Unix/projects/Joule/examples/src/test/resources/segmentation.jpg",
+            "src/test/resources/segmentation.jpg",
             "-r",
             "{'layers':'18','flavor':'v1'}"
         };
@@ -37,7 +37,7 @@ public class BenchmarkTest {
             "-c",
             "2",
             "-i",
-            "/Volumes/Unix/projects/Joule/examples/src/test/resources/segmentation.jpg",
+            "src/test/resources/segmentation.jpg",
             "-r",
             "{'layers':'18','flavor':'v1'}",
             "-t",
