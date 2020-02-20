@@ -77,8 +77,8 @@ public class BertQATranslator implements Translator<QAInput, String> {
         // Get Probability distribution
         NDArray startProb = startLogits.softmax(-1);
         NDArray endProb = endLogits.softmax(-1);
-        int startIdx = (int) startProb.argMax(1).getFloat();
-        int endIdx = (int) endProb.argMax(1).getFloat();
+        int startIdx = (int) startProb.argMax(1).getLong();
+        int endIdx = (int) endProb.argMax(1).getLong();
         return tokens.subList(startIdx, endIdx + 1).toString();
     }
 }

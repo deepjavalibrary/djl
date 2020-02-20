@@ -102,6 +102,21 @@ public interface ModelLoader<I, O> {
      * Loads the model with the given search filters.
      *
      * @param filters the search filters to match against the loaded model
+     * @param progress the progress tracker to update while loading the model
+     * @return the loaded model
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     * @throws MalformedModelException if the model data is malformed
+     */
+    default ZooModel<I, O> loadModel(Map<String, String> filters, Progress progress)
+            throws MalformedModelException, ModelNotFoundException, IOException {
+        return loadModel(filters, null, progress);
+    }
+
+    /**
+     * Loads the model with the given search filters.
+     *
+     * @param filters the search filters to match against the loaded model
      * @param device the device the loaded model should use
      * @param progress the progress tracker to update while loading the model
      * @return the loaded model
