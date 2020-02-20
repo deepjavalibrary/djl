@@ -25,11 +25,11 @@ import ai.djl.ndarray.types.Shape;
  */
 public class NormalInitializer implements Initializer {
 
-    private double sigma;
+    private float sigma;
 
     /** Creates an instance of {@code NormalInitializer} with a default sigma of 0.01. */
     public NormalInitializer() {
-        this.sigma = 0.01;
+        this.sigma = 0.01f;
     }
 
     /**
@@ -37,13 +37,13 @@ public class NormalInitializer implements Initializer {
      *
      * @param sigma the standard deviation of the normal distribution
      */
-    public NormalInitializer(double sigma) {
+    public NormalInitializer(float sigma) {
         this.sigma = sigma;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray initialize(NDManager manager, Shape shape, DataType dataType) {
-        return manager.randomNormal(0.0, sigma, shape, dataType, manager.getDevice());
+        return manager.randomNormal(0.0f, sigma, shape, dataType, manager.getDevice());
     }
 }

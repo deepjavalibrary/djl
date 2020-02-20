@@ -192,7 +192,7 @@ public abstract class AbstractBenchmark<I, O> {
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(input, output)
-                        .optOptions(arguments.getCriteria())
+                        .optFilters(arguments.getCriteria())
                         .optProgress(new ProgressBar());
 
         String modelName = arguments.getModelName();

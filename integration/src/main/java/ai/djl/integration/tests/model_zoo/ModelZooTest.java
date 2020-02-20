@@ -16,7 +16,6 @@ import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.repository.Artifact;
-import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 import java.io.IOException;
@@ -44,11 +43,11 @@ public class ModelZooTest {
             return;
         }
 
-        List<ModelLoader> list = ModelZoo.getModelZoo(BasicModelZoo.NAME).getModelLoaders();
-        for (ModelLoader modelLoader : list) {
+        List<ModelLoader<?, ?>> list = ModelZoo.getModelZoo(BasicModelZoo.NAME).getModelLoaders();
+        for (ModelLoader<?, ?> modelLoader : list) {
             List<Artifact> artifacts = modelLoader.listModels();
             for (Artifact artifact : artifacts) {
-                Model model = ((BaseModelLoader) modelLoader).loadModel(artifact, null, null);
+                Model model = modelLoader.loadModel(artifact.getProperties());
                 model.close();
             }
         }

@@ -59,10 +59,10 @@ public final class ObjectDetection {
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(BufferedImage.class, DetectedObjects.class)
-                        .optOption("size", "512")
-                        .optOption("backbone", "resnet50")
-                        .optOption("flavor", "v1")
-                        .optOption("dataset", "voc")
+                        .optFilter("size", "512")
+                        .optFilter("backbone", "resnet50")
+                        .optFilter("flavor", "v1")
+                        .optFilter("dataset", "voc")
                         .optProgress(new ProgressBar())
                         .build();
 

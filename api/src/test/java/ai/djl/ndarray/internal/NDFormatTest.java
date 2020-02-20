@@ -32,7 +32,7 @@ public class NDFormatTest {
             array.set(data);
 
             String str = NDFormat.format(array, 100, 10, 10, 20);
-            Assert.assertEquals(str, "ND: (3) cpu(0) uint8" + LF + "[0x7F, 0x80, 0x01]" + LF);
+            Assert.assertEquals(str, "ND: (3) cpu() uint8" + LF + "[0x7F, 0x80, 0x01]" + LF);
         }
     }
 
@@ -43,7 +43,7 @@ public class NDFormatTest {
             NDArray array = manager.create(data);
 
             String str = NDFormat.format(array, 100, 10, 10, 20);
-            Assert.assertEquals(str, "ND: (3) cpu(0) int8" + LF + "[ 127, -128,    1]" + LF);
+            Assert.assertEquals(str, "ND: (3) cpu() int8" + LF + "[ 127, -128,    1]" + LF);
         }
     }
 
@@ -56,7 +56,7 @@ public class NDFormatTest {
             String str = NDFormat.format(array, 100, 10, 10, 20);
             Assert.assertEquals(
                     str,
-                    "ND: (3) cpu(0) int32"
+                    "ND: (3) cpu() int32"
                             + LF
                             + "[ 2.14748365e+09, -2.14748365e+09,  1.00000000e+00]"
                             + LF);
@@ -64,12 +64,12 @@ public class NDFormatTest {
             data = new int[] {1, -256, 1000};
             array = manager.create(data);
             str = NDFormat.format(array, 100, 10, 10, 20);
-            Assert.assertEquals(str, "ND: (3) cpu(0) int32" + LF + "[   1, -256, 1000]" + LF);
+            Assert.assertEquals(str, "ND: (3) cpu() int32" + LF + "[   1, -256, 1000]" + LF);
             // test corner case where log10 produce -inf
             data = new int[] {0, 0};
             array = manager.create(data);
             str = NDFormat.format(array, 100, 10, 10, 20);
-            Assert.assertEquals(str, "ND: (2) cpu(0) int32" + LF + "[ 0,  0]" + LF);
+            Assert.assertEquals(str, "ND: (2) cpu() int32" + LF + "[ 0,  0]" + LF);
         }
     }
 
@@ -82,7 +82,7 @@ public class NDFormatTest {
             String str = NDFormat.format(array, 100, 10, 10, 20);
             Assert.assertEquals(
                     str,
-                    "ND: (3) cpu(0) int64"
+                    "ND: (3) cpu() int64"
                             + LF
                             + "[ 9.22337204e+18, -9.22337204e+18,  1.00000000e+00]"
                             + LF);
@@ -98,7 +98,7 @@ public class NDFormatTest {
             String str = NDFormat.format(array, 100, 10, 10, 20);
             Assert.assertEquals(
                     str,
-                    "ND: (4) cpu(0) float64"
+                    "ND: (4) cpu() float64"
                             + LF
                             + "[       -inf,  1.79769313e+308,         nan, -1.00000000e+00]"
                             + LF);
@@ -106,14 +106,14 @@ public class NDFormatTest {
             data = new double[] {Double.NEGATIVE_INFINITY, Double.NaN, -1};
             array = manager.create(data);
             str = NDFormat.format(array, 100, 10, 10, 20);
-            Assert.assertEquals(str, "ND: (3) cpu(0) float64" + LF + "[-inf,  nan,  -1.]" + LF);
+            Assert.assertEquals(str, "ND: (3) cpu() float64" + LF + "[-inf,  nan,  -1.]" + LF);
 
             data = new double[] {123., 0.123, Double.NEGATIVE_INFINITY};
             array = manager.create(data, new Shape(3, 1));
             str = NDFormat.format(array, 100, 10, 10, 20);
             Assert.assertEquals(
                     str,
-                    "ND: (3, 1) cpu(0) float64"
+                    "ND: (3, 1) cpu() float64"
                             + LF
                             + "[[123.   ],"
                             + LF
@@ -127,12 +127,12 @@ public class NDFormatTest {
             data = new double[] {0.123, Double.NEGATIVE_INFINITY};
             array = manager.create(data);
             str = NDFormat.format(array, 100, 10, 10, 20);
-            Assert.assertEquals(str, "ND: (2) cpu(0) float64" + LF + "[0.123,  -inf]" + LF);
+            Assert.assertEquals(str, "ND: (2) cpu() float64" + LF + "[0.123,  -inf]" + LF);
 
             data = new double[] {1., 2., 100};
             array = manager.create(data);
             str = NDFormat.format(array, 100, 10, 10, 20);
-            Assert.assertEquals(str, "ND: (3) cpu(0) float64" + LF + "[  1.,   2., 100.]" + LF);
+            Assert.assertEquals(str, "ND: (3) cpu() float64" + LF + "[  1.,   2., 100.]" + LF);
         }
     }
 }

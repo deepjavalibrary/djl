@@ -99,7 +99,7 @@ public class GradientCollectorIntegrationTest {
             // add noise
             label.add(
                     manager.randomNormal(
-                            0, 0.01, label.getShape(), DataType.FLOAT32, manager.getDevice()));
+                            0f, 0.01f, label.getShape(), DataType.FLOAT32, manager.getDevice()));
 
             int sampling = config.getDevices().length * batchSize;
             ArrayDataset dataset =

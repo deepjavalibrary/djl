@@ -13,12 +13,19 @@
 package ai.djl.mxnet.zoo.nlp.qa;
 
 import ai.djl.Application;
+import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
+import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
+import ai.djl.util.Progress;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @see ai.djl.mxnet.engine.MxSymbolBlock
  */
-public class BertQAModelLoader extends BaseModelLoader {
+public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
 
     private static final Application APPLICATION = Application.NLP.QUESTION_ANSWER;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
@@ -51,6 +58,31 @@ public class BertQAModelLoader extends BaseModelLoader {
         Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
         map.put(String.class, new FactoryImpl());
         factories.put(QAInput.class, map);
+    }
+
+    /**
+     * Loads the model with the given search filters.
+     *
+     * @param filters the search filters to match against the loaded model
+     * @param device the device the loaded model should use
+     * @param progress the progress tracker to update while loading the model
+     * @return the loaded model
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     * @throws MalformedModelException if the model data is malformed
+     */
+    @Override
+    public ZooModel<QAInput, String> loadModel(
+            Map<String, String> filters, Device device, Progress progress)
+            throws IOException, ModelNotFoundException, MalformedModelException {
+        Criteria<QAInput, String> criteria =
+                Criteria.builder()
+                        .setTypes(QAInput.class, String.class)
+                        .optFilters(filters)
+                        .optDevice(device)
+                        .optProgress(progress)
+                        .build();
+        return loadModel(criteria);
     }
 
     /** {@inheritDoc} */

@@ -67,6 +67,8 @@ public final class Benchmark extends AbstractBenchmark<BufferedImage, Classifica
     /** {@inheritDoc} */
     @Override
     protected void clean() {
-        predictor.close();
+        if (predictor != null) {
+            predictor.close();
+        }
     }
 }

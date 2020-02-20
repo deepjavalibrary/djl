@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** Shared code for the {@link ModelLoader} implementations. */
-public abstract class BaseModelLoader implements ModelLoader {
+public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
 
     protected Repository repository;
     protected MRL mrl;
@@ -61,34 +61,39 @@ public abstract class BaseModelLoader implements ModelLoader {
 
     /** {@inheritDoc} */
     @Override
-    public <I, O> ZooModel<I, O> loadModel(Criteria<I, O> criteria)
+    public <S, T> ZooModel<S, T> loadModel(Criteria<S, T> criteria)
             throws IOException, ModelNotFoundException, MalformedModelException {
-        Artifact artifact = match(criteria.getOptions());
+        Artifact artifact = match(criteria.getFilters());
         if (artifact == null) {
             throw new ModelNotFoundException("Model not found.");
         }
 
-        Progress progress = criteria.getProgress();
         Map<String, Object> override = criteria.getArguments();
-
-        repository.prepare(artifact, progress);
-        if (progress != null) {
-            progress.reset("Loading", 2);
-            progress.update(1);
-        }
-
+        Progress progress = criteria.getProgress();
+        Map<String, Object> arguments = artifact.getArguments(override);
         try {
-            Model model = loadModel(artifact, criteria.getDevice(), override);
-            Translator<I, O> translator = criteria.getTranslator();
+            Translator<S, T> translator = criteria.getTranslator();
             if (translator == null) {
-                TranslatorFactory<I, O> factory = getTranslatorFactory(criteria);
+                TranslatorFactory<S, T> factory = getTranslatorFactory(criteria);
                 if (factory == null) {
                     throw new ModelNotFoundException("No matching default translator found.");
                 }
 
-                Map<String, Object> arguments = artifact.getArguments(override);
                 translator = factory.newInstance(arguments);
             }
+
+            repository.prepare(artifact, progress);
+            if (progress != null) {
+                progress.reset("Loading", 2);
+                progress.update(1);
+            }
+
+            Path dir = repository.getCacheDirectory();
+            String relativePath = artifact.getResourceUri().getPath();
+            Path modelPath = dir.resolve(relativePath);
+
+            Model model = createModel(criteria.getDevice(), arguments);
+            model.load(modelPath, artifact.getName());
 
             return new ZooModel<>(model, translator);
         } finally {
@@ -98,31 +103,14 @@ public abstract class BaseModelLoader implements ModelLoader {
         }
     }
 
-    /**
-     * Loads the model with the given configurations.
-     *
-     * @param artifact the model artifacts to be loaded
-     * @param device the device to load the model onto
-     * @param override the override configurations
-     * @return the loaded model
-     * @throws IOException for various exceptions loading data from the repository
-     * @throws MalformedModelException if the model data is malformed
-     */
-    public Model loadModel(Artifact artifact, Device device, Map<String, Object> override)
-            throws IOException, MalformedModelException {
-        Path dir = repository.getCacheDirectory();
-        String relativePath = artifact.getResourceUri().getPath();
-        Path modelPath = dir.resolve(relativePath);
-
-        Model model = Model.newInstance(device);
-        model.load(modelPath, artifact.getName());
-        return model;
-    }
-
     /** {@inheritDoc} */
     @Override
     public List<Artifact> listModels() throws IOException, ModelNotFoundException {
         return getMetadata().getArtifacts();
+    }
+
+    protected Model createModel(Device device, Map<String, Object> arguments) {
+        return Model.newInstance(device);
     }
 
     /**
@@ -134,7 +122,8 @@ public abstract class BaseModelLoader implements ModelLoader {
      * @throws IOException for errors while loading the model
      * @throws ModelNotFoundException if the metadata to get artifacts from is not found
      */
-    public Artifact match(Map<String, String> criteria) throws IOException, ModelNotFoundException {
+    protected Artifact match(Map<String, String> criteria)
+            throws IOException, ModelNotFoundException {
         List<Artifact> list = search(criteria);
         if (list.isEmpty()) {
             return null;
@@ -150,7 +139,7 @@ public abstract class BaseModelLoader implements ModelLoader {
      * @throws IOException for errors while loading the model
      * @throws ModelNotFoundException if the metadata to get artifacts from is not found
      */
-    public List<Artifact> search(Map<String, String> criteria)
+    private List<Artifact> search(Map<String, String> criteria)
             throws IOException, ModelNotFoundException {
         return getMetadata().search(VersionRange.parse(version), criteria);
     }
@@ -187,11 +176,11 @@ public abstract class BaseModelLoader implements ModelLoader {
     }
 
     @SuppressWarnings("unchecked")
-    private <I, O> TranslatorFactory<I, O> getTranslatorFactory(Criteria<I, O> criteria) {
+    private <S, T> TranslatorFactory<S, T> getTranslatorFactory(Criteria<S, T> criteria) {
         Map<Type, TranslatorFactory<?, ?>> map = factories.get(criteria.getInputClass());
         if (map == null) {
             return null;
         }
-        return (TranslatorFactory<I, O>) map.get(criteria.getOutputClass());
+        return (TranslatorFactory<S, T>) map.get(criteria.getOutputClass());
     }
 }

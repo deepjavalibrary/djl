@@ -135,10 +135,10 @@ public final class TrainWithOptimizers {
             // currently only MxEngine support removeLastBlock
             builder.optEngine(MxEngine.ENGINE_NAME).optModelZooName(MxModelZoo.NAME);
             if (options == null) {
-                builder.optOption("layers", "50");
-                builder.optOption("flavor", "v1");
+                builder.optFilter("layers", "50");
+                builder.optFilter("flavor", "v1");
             } else {
-                builder.optOptions(options);
+                builder.optFilters(options);
             }
 
             Model model = ModelZoo.loadModel(builder.build());
@@ -159,11 +159,11 @@ public final class TrainWithOptimizers {
         if (preTrained) {
             builder.optModelZooName(BasicModelZoo.NAME);
             if (options == null) {
-                builder.optOption("layers", "50");
-                builder.optOption("flavor", "v1");
-                builder.optOption("dataset", "cifar10");
+                builder.optFilter("layers", "50");
+                builder.optFilter("flavor", "v1");
+                builder.optFilter("dataset", "cifar10");
             } else {
-                builder.optOptions(options);
+                builder.optFilters(options);
             }
             // load pre-trained imperative ResNet50 from DJL model zoo
             return ModelZoo.loadModel(builder.build());

@@ -31,7 +31,8 @@ public class MultiBoxPriorTest {
                     MultiBoxPrior.builder().setSizes(sizes).setRatios(ratios).build();
             NDArray anchors =
                     multiBoxPriors.generateAnchorBoxes(
-                            manager.arange(3.0 * 512.0 * 512.0).reshape(new Shape(1, 3, 512, 512)));
+                            manager.arange(3.0f * 512.0f * 512.0f)
+                                    .reshape(new Shape(1, 3, 512, 512)));
             Assert.assertEquals(anchors.getShape(), new Shape(1, 1048576, 4));
         }
     }

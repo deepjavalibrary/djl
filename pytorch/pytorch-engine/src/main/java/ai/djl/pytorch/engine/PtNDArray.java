@@ -943,7 +943,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray softmax(int[] axes, double temperature) {
+    public PtNDArray softmax(int[] axes, float temperature) {
         if (temperature != 1.0) {
             throw new UnsupportedOperationException("PyTorch softmax didn't suuport temperature");
         }
@@ -952,7 +952,7 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray logSoftmax(int[] axes, double temperature) {
+    public PtNDArray logSoftmax(int[] axes, float temperature) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

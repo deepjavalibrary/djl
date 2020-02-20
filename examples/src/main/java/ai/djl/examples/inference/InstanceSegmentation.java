@@ -59,9 +59,9 @@ public final class InstanceSegmentation {
                 Criteria.builder()
                         .optApplication(Application.CV.INSTANCE_SEGMENTATION)
                         .setTypes(BufferedImage.class, DetectedObjects.class)
-                        .optOption("backbone", "resnet18")
-                        .optOption("flavor", "v1b")
-                        .optOption("dataset", "coco")
+                        .optFilter("backbone", "resnet18")
+                        .optFilter("flavor", "v1b")
+                        .optFilter("dataset", "coco")
                         .optProgress(new ProgressBar())
                         .build();
 

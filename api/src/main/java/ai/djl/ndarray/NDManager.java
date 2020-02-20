@@ -649,8 +649,8 @@ public interface NDManager extends AutoCloseable {
      * @param stop the end of the interval. The interval does not include this value
      * @return a new instance of {@link NDArray}
      */
-    default NDArray arange(double stop) {
-        return arange(0.0, stop, 1.0, DataType.FLOAT32, getDevice());
+    default NDArray arange(float stop) {
+        return arange(0.0f, stop, 1.0f, DataType.FLOAT32, getDevice());
     }
 
     /**
@@ -681,8 +681,8 @@ public interface NDManager extends AutoCloseable {
      * @param stop the end of interval. The interval does not include this value
      * @return a new instance of {@link NDArray}
      */
-    default NDArray arange(double start, double stop) {
-        return arange(start, stop, 1.0, DataType.FLOAT32, getDevice());
+    default NDArray arange(float start, float stop) {
+        return arange(start, stop, 1.0f, DataType.FLOAT32, getDevice());
     }
 
     /**
@@ -715,7 +715,7 @@ public interface NDManager extends AutoCloseable {
      * @param step the spacing between values
      * @return a new instance of {@link NDArray}
      */
-    default NDArray arange(double start, double stop, double step) {
+    default NDArray arange(float start, float stop, float step) {
         return arange(start, stop, step, DataType.FLOAT32, getDevice());
     }
 
@@ -735,7 +735,7 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray arange(int start, int stop, int step, DataType dataType, Device device) {
-        return arange((double) start, (double) stop, (double) step, dataType, device);
+        return arange((float) start, (float) stop, (float) step, dataType, device);
     }
 
     /**
@@ -753,7 +753,7 @@ public interface NDManager extends AutoCloseable {
      * @param device the {@link Device} of the {@link NDArray}
      * @return a new instance of {@link NDArray}
      */
-    NDArray arange(double start, double stop, double step, DataType dataType, Device device);
+    NDArray arange(float start, float stop, float step, DataType dataType, Device device);
 
     /**
      * Returns a 2-D array with ones on the diagonal and zeros elsewhere.
@@ -831,7 +831,7 @@ public interface NDManager extends AutoCloseable {
      * @param num the number of samples to generate
      * @return a new instance of {@link NDArray}
      */
-    default NDArray linspace(double start, double stop, int num) {
+    default NDArray linspace(float start, float stop, int num) {
         return linspace(start, stop, num, true, getDevice());
     }
 
@@ -849,7 +849,7 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray linspace(int start, int stop, int num, boolean endpoint, Device device) {
-        return linspace((double) start, (double) stop, num, endpoint, device);
+        return linspace((float) start, (float) stop, num, endpoint, device);
     }
 
     /**
@@ -865,7 +865,7 @@ public interface NDManager extends AutoCloseable {
      * @param device the {@link Device} of the {@link NDArray}
      * @return a new instance of {@link NDArray}
      */
-    NDArray linspace(double start, double stop, int num, boolean endpoint, Device device);
+    NDArray linspace(float start, float stop, int num, boolean endpoint, Device device);
 
     /**
      * Draws samples from a uniform distribution.
@@ -881,7 +881,7 @@ public interface NDManager extends AutoCloseable {
      * @param shape the {@link Shape} of the {@link NDArray}
      * @return the drawn samples {@link NDArray}
      */
-    default NDArray randomUniform(double low, double high, Shape shape) {
+    default NDArray randomUniform(float low, float high, Shape shape) {
         return randomUniform(low, high, shape, DataType.UNKNOWN, getDevice());
     }
 
@@ -901,7 +901,7 @@ public interface NDManager extends AutoCloseable {
      * @param device the {@link Device} of the {@link NDArray}
      * @return the drawn samples {@link NDArray}
      */
-    NDArray randomUniform(double low, double high, Shape shape, DataType dataType, Device device);
+    NDArray randomUniform(float low, float high, Shape shape, DataType dataType, Device device);
 
     /**
      * Draws random samples from a normal (Gaussian) distribution with mean 0 and standard deviation
@@ -914,7 +914,7 @@ public interface NDManager extends AutoCloseable {
      * @return the drawn samples {@link NDArray}
      */
     default NDArray randomNormal(Shape shape) {
-        return randomNormal(0f, 1f, shape, DataType.UNKNOWN, getDevice());
+        return randomNormal(0f, 1f, shape, DataType.FLOAT32, getDevice());
     }
 
     /**
@@ -927,7 +927,7 @@ public interface NDManager extends AutoCloseable {
      * @return the drawn samples {@link NDArray}
      */
     default NDArray randomNormal(Shape shape, DataType dataType, Device device) {
-        return randomNormal(0.0, 1.0, shape, dataType, device);
+        return randomNormal(0.0f, 1.0f, shape, dataType, device);
     }
 
     /**
@@ -940,7 +940,7 @@ public interface NDManager extends AutoCloseable {
      * @param device the {@link Device} of the {@link NDArray}
      * @return the drawn samples {@link NDArray}
      */
-    NDArray randomNormal(double loc, double scale, Shape shape, DataType dataType, Device device);
+    NDArray randomNormal(float loc, float scale, Shape shape, DataType dataType, Device device);
 
     /**
      * Draw samples from a multinomial distribution.

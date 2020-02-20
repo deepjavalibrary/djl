@@ -832,13 +832,13 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes, double temperature) {
+    public NDArray softmax(int[] axes, float temperature) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logSoftmax(int[] axes, double temperature) {
+    public NDArray logSoftmax(int[] axes, float temperature) {
         return null;
     }
 

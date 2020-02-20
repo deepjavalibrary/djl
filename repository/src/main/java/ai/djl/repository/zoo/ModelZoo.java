@@ -47,13 +47,13 @@ public interface ModelZoo {
      *
      * @return the list of all available model families
      */
-    default List<ModelLoader> getModelLoaders() {
-        List<ModelLoader> list = new ArrayList<>();
+    default List<ModelLoader<?, ?>> getModelLoaders() {
+        List<ModelLoader<?, ?>> list = new ArrayList<>();
         try {
             Field[] fields = getClass().getDeclaredFields();
             for (Field field : fields) {
                 if (ModelLoader.class.isAssignableFrom(field.getType())) {
-                    list.add((ModelLoader) field.get(null));
+                    list.add((ModelLoader<?, ?>) field.get(null));
                 }
             }
         } catch (ReflectiveOperationException e) {
@@ -68,8 +68,8 @@ public interface ModelZoo {
      * @param name the name of the model
      * @return the {@link ModelLoader} of the model
      */
-    default ModelLoader getModelLoader(String name) {
-        for (ModelLoader loader : getModelLoaders()) {
+    default ModelLoader<?, ?> getModelLoader(String name) {
+        for (ModelLoader<?, ?> loader : getModelLoaders()) {
             if (name.equals(loader.getName())) {
                 return loader;
             }
@@ -112,7 +112,7 @@ public interface ModelZoo {
 
             Application application = criteria.getApplication();
             String modelLoaderName = criteria.getModelLoaderName();
-            for (ModelLoader loader : zoo.getModelLoaders()) {
+            for (ModelLoader<?, ?> loader : zoo.getModelLoaders()) {
                 if (modelLoaderName != null && !modelLoaderName.equals(loader.getName())) {
                     // filter out by model loader name
                     continue;

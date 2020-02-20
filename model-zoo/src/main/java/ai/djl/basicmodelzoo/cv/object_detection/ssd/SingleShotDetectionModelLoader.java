@@ -23,17 +23,19 @@ import ai.djl.modality.cv.SingleShotDetectionTranslator;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
+import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
+import ai.djl.util.Progress;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +43,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /** Model loader for SingleShotDetection(SSD). */
-public class SingleShotDetectionModelLoader extends BaseModelLoader {
+public class SingleShotDetectionModelLoader
+        extends BaseModelLoader<BufferedImage, DetectedObjects> {
 
     private static final Application APPLICATION = Application.CV.OBJECT_DETECTION;
     private static final String GROUP_ID = BasicModelZoo.GROUP_ID;
@@ -66,13 +69,34 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader {
         return APPLICATION;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Loads the model with the given search filters.
+     *
+     * @param filters the search filters to match against the loaded model
+     * @param device the device the loaded model should use
+     * @param progress the progress tracker to update while loading the model
+     * @return the loaded model
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     * @throws MalformedModelException if the model data is malformed
+     */
+    @Override
+    public ZooModel<BufferedImage, DetectedObjects> loadModel(
+            Map<String, String> filters, Device device, Progress progress)
+            throws IOException, ModelNotFoundException, MalformedModelException {
+        Criteria<BufferedImage, DetectedObjects> criteria =
+                Criteria.builder()
+                        .setTypes(BufferedImage.class, DetectedObjects.class)
+                        .optFilters(filters)
+                        .optDevice(device)
+                        .optProgress(progress)
+                        .build();
+        return loadModel(criteria);
+    }
+
     @Override
     @SuppressWarnings("unchecked")
-    public Model loadModel(Artifact artifact, Device device, Map<String, Object> override)
-            throws IOException, MalformedModelException {
-        Map<String, Object> arguments = artifact.getArguments(override);
-
+    protected Model createModel(Device device, Map<String, Object> arguments) {
         int numClasses = ((Double) arguments.get("outSize")).intValue();
         int numFeatures = ((Double) arguments.get("numFeatures")).intValue();
         boolean globalPool = (boolean) arguments.get("globalPool");
@@ -114,13 +138,8 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader {
                         .setBaseNetwork(baseBlock)
                         .build();
 
-        Path dir = repository.getCacheDirectory();
-        String relativePath = artifact.getResourceUri().getPath();
-        Path modelPath = dir.resolve(relativePath);
-
         Model model = Model.newInstance(device);
         model.setBlock(ssdBlock);
-        model.load(modelPath, artifact.getName());
         return model;
     }
 
