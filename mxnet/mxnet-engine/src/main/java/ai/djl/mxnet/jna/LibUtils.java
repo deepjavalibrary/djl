@@ -159,6 +159,8 @@ public class LibUtils {
                     Files.copy(is, tmp.resolve(file));
                 }
             }
+
+            Utils.deleteQuietly(dir);
             Files.move(tmp, dir);
             tmp = null;
             return path.toAbsolutePath().toString();
@@ -313,6 +315,8 @@ public class LibUtils {
                     }
                 }
             }
+
+            Utils.deleteQuietly(dir);
             Files.move(tmp, dir);
             tmp = null;
             return path.toAbsolutePath().toString();
