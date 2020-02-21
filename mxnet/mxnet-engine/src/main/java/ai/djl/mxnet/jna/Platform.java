@@ -24,7 +24,7 @@ import java.util.Properties;
  */
 public class Platform {
 
-    private static final String DEFAULT_VERSION = "1.6.0-c";
+    private static final String DEFAULT_VERSION = "1.6.0";
 
     private String version;
     private String osPrefix;
@@ -65,7 +65,7 @@ public class Platform {
         try (InputStream conf = url.openStream()) {
             Properties prop = new Properties();
             prop.load(conf);
-            // 1.6.0-c later should always has version property
+            // 1.6.0 later should always has version property
             version = prop.getProperty("version", DEFAULT_VERSION);
             placeholder = prop.getProperty("placeholder") != null;
             String flavorPrefixedClassifier = prop.getProperty("classifier", "");
