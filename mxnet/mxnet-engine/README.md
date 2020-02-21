@@ -4,11 +4,11 @@
 
 This module contains the MXNet implementation of the Deep Java Library (DJL) EngineProvider.
 
-We don't recommend that developers use classes in this module directly. Use of these classes will couple your code with MXNet and make switching between frameworks difficult. Even so, developers are not restricted from using engine-specific features. For more information, see [NDManager#invoke()](https://javadoc.djl.ai/api/0.2.1/ai/djl/ndarray/NDManager.html#invoke-java.lang.String-ai.djl.ndarray.NDList-ai.djl.ndarray.NDList-ai.djl.util.PairList-).
+We don't recommend that developers use classes in this module directly. Use of these classes will couple your code with MXNet and make switching between frameworks difficult. Even so, developers are not restricted from using engine-specific features. For more information, see [NDManager#invoke()](https://javadoc.djl.ai/api/0.3.0/ai/djl/ndarray/NDManager.html#invoke-java.lang.String-ai.djl.ndarray.NDList-ai.djl.ndarray.NDList-ai.djl.util.PairList-).
 
 ## Documentation
 
-The latest javadocs can be found on the [djl.ai website](https://javadoc.djl.ai/mxnet-engine/0.2.1/index.html).
+The latest javadocs can be found on the [djl.ai website](https://javadoc.djl.ai/mxnet-engine/0.3.0/index.html).
 
 You can also build the latest javadocs locally using the following command:
 
@@ -25,7 +25,7 @@ You can pull the MXNet engine from the central Maven repository by including the
 <dependency>
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-engine</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
