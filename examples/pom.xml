@@ -55,7 +55,7 @@
         </dependency>
         <dependency>
             <!--
-                See https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
+                See https://github.com/awslabs/djl/blob/v0.3.0/mxnet/mxnet-engine/README.md for more MXNet library selection options
             -->
             <groupId>ai.djl.mxnet</groupId>
             <artifactId>mxnet-native-auto</artifactId>

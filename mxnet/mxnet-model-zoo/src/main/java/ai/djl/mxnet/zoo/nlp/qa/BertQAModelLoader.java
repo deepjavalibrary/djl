@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block.
  *
  * <p>See <a href="https://arxiv.org/pdf/1810.04805.pdf">the BERT paper</a> or the <a
- * href="https://github.com/awslabs/djl/blob/master/jupyter/BERTQA.ipynb">jupyter demo</a> for more
+ * href="https://github.com/awslabs/djl/blob/v0.3.0/jupyter/BERTQA.ipynb">jupyter demo</a> for more
  * information about BERT.
  *
  * @see ai.djl.mxnet.engine.MxSymbolBlock

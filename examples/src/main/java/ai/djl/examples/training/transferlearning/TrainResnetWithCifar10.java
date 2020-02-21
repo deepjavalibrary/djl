@@ -57,7 +57,7 @@ import org.apache.commons.cli.ParseException;
  * An example of training an image classification (ResNet for Cifar10) model.
  *
  * <p>See this <a
- * href="https://github.com/awslabs/djl/blob/master/examples/docs/train_cifar10_resnet.md">doc</a>
+ * href="https://github.com/awslabs/djl/blob/v0.3.0/examples/docs/train_cifar10_resnet.md">doc</a>
  * for information about this example.
  */
 public final class TrainResnetWithCifar10 {

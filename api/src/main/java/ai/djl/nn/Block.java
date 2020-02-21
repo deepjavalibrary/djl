@@ -100,7 +100,7 @@ import java.util.List;
  * fully-trained model.
  *
  * <p>See this tutorial on <a
- * href="https://github.com/awslabs/djl/blob/master/jupyter/tutorial/create_your_first_network.ipynb">creating
+ * href="https://github.com/awslabs/djl/blob/v0.3.0/jupyter/tutorial/create_your_first_network.ipynb">creating
  * your first network</a>.
  */
 public interface Block {

@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * latencies, CPU and GPU memory consumption, losses, etc.
  *
  * <p>For more details about using the metrics, see the <a
- * href="https://github.com/awslabs/djl/blob/master/docs/how_to_collect_metrics.md">metrics
+ * href="https://github.com/awslabs/djl/blob/v0.3.0/docs/how_to_collect_metrics.md">metrics
  * tutorial</a>.
  */
 public class Metrics {

@@ -38,7 +38,7 @@ import org.apache.commons.cli.ParseException;
  * An example of training an image classification (MNIST) model.
  *
  * <p>See this <a
- * href="https://github.com/awslabs/djl/blob/master/examples/docs/train_mnist_mlp.md">doc</a> for
+ * href="https://github.com/awslabs/djl/blob/v0.3.0/examples/docs/train_mnist_mlp.md">doc</a> for
  * information about this example.
  */
 public final class TrainMnist {

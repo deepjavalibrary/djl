@@ -39,18 +39,18 @@ import java.util.List;
  *
  * <ul>
  *   <li><a
- *       href="https://github.com/awslabs/djl/blob/master/jupyter/tutorial/image_classification_with_your_model.ipynb">Inference
+ *       href="https://github.com/awslabs/djl/blob/v0.3.0/jupyter/tutorial/image_classification_with_your_model.ipynb">Inference
  *       with a custom trained model</a>
  *   <li><a
- *       href="https://github.com/awslabs/djl/blob/master/jupyter/object_detection_with_model_zoo.ipynb">Inference
+ *       href="https://github.com/awslabs/djl/blob/v0.3.0/jupyter/object_detection_with_model_zoo.ipynb">Inference
  *       with a model zoo model</a>
  *   <li><a
- *       href="https://github.com/awslabs/djl/blob/master/jupyter/load_mxnet_model.ipynb">Inference
+ *       href="https://github.com/awslabs/djl/blob/v0.3.0/jupyter/load_mxnet_model.ipynb">Inference
  *       with an MXNet model</a>
  * </ul>
  *
  * <p>For information about running multi-threaded inference, see <a
- * href="https://github.com/awslabs/djl/blob/master/examples/docs/multithread_inference.md">here</a>.
+ * href="https://github.com/awslabs/djl/blob/v0.3.0/examples/docs/multithread_inference.md">here</a>.
  *
  * @param <I> the input type
  * @param <O> the output type

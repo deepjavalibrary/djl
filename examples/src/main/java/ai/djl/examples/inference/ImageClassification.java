@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * An example of inference using an image classification model.
  *
  * <p>See this <a
- * href="https://github.com/awslabs/djl/blob/master/examples/docs/image_classification.md">doc</a>
+ * href="https://github.com/awslabs/djl/blob/v0.3.0/examples/docs/image_classification.md">doc</a>
  * for information about this example.
  */
 public final class ImageClassification {

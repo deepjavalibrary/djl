@@ -34,13 +34,13 @@ import java.util.List;
  *
  * <ul>
  *   <li><a
- *       href="https://github.com/awslabs/djl/blob/master/jupyter/tutorial/train_your_first_model.ipynb">Training
+ *       href="https://github.com/awslabs/djl/blob/v0.3.0/jupyter/tutorial/train_your_first_model.ipynb">Training
  *       your first model</a>
  *   <li><a
- *       href="https://github.com/awslabs/djl/blob/master/jupyter/transfer_learning_on_cifar10.ipynb">Training
+ *       href="https://github.com/awslabs/djl/blob/v0.3.0/jupyter/transfer_learning_on_cifar10.ipynb">Training
  *       using transfer learning</a>
  *   <li><a
- *       href="https://github.com/awslabs/djl/blob/master/jupyter/load_mxnet_model.ipynb">Inference
+ *       href="https://github.com/awslabs/djl/blob/v0.3.0/jupyter/load_mxnet_model.ipynb">Inference
  *       with an MXNet model</a>
  * </ul>
  */
