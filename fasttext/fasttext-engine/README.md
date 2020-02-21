@@ -18,7 +18,7 @@ This is a shallow wrapper around [JFastText](https://github.com/vinhkhuc/JFastTe
 
 ## Documentation
 
-The latest javadocs can be found on the [djl.ai website](https://javadoc.djl.ai/fasttext-engine/0.2.1/index.html).
+The latest javadocs can be found on the [djl.ai website](https://javadoc.djl.ai/fasttext-engine/0.3.0/index.html).
 
 You can also build the latest javadocs locally using the following command:
 
@@ -35,7 +35,7 @@ You can pull the fastText engine from the central Maven repository by including 
 <dependency>
     <groupId>ai.djl.fasttext</groupId>
     <artifactId>fasttext-engine</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <scope>runtime</scope>
 </dependency>
 ```

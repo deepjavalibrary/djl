@@ -7,7 +7,7 @@ can be used for inference out of the box.
 
 ## Documentation
 
-The latest javadocs can be found on the [djl.ai website](https://javadoc.djl.ai/model-zoo/0.2.1/index.html).
+The latest javadocs can be found on the [djl.ai website](https://javadoc.djl.ai/model-zoo/0.3.0/index.html).
 
 You can also build the latest javadocs locally using the following command:
 
@@ -23,7 +23,7 @@ You can pull the model zoo from the central Maven repository by including the fo
 <dependency>
     <groupId>ai.djl</groupId>
     <artifactId>model-zoo</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
