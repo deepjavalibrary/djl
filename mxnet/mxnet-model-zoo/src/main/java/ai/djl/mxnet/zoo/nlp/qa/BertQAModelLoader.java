@@ -56,8 +56,8 @@ public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
     public BertQAModelLoader(Repository repository) {
         super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
         Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
-        map.put(String.class, new FactoryImpl());
-        factories.put(QAInput.class, map);
+        map.put(QAInput.class, new FactoryImpl());
+        factories.put(String.class, map);
     }
 
     /**

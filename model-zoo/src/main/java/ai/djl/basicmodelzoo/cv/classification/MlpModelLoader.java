@@ -19,7 +19,9 @@ import ai.djl.Model;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.basic.Mlp;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.FileTranslatorFactory;
 import ai.djl.modality.cv.ImageClassificationTranslator;
+import ai.djl.modality.cv.UrlTranslatorFactory;
 import ai.djl.modality.cv.transform.CenterCrop;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -37,6 +39,8 @@ import ai.djl.util.Progress;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,9 +60,14 @@ public class MlpModelLoader extends BaseModelLoader<BufferedImage, Classificatio
      */
     public MlpModelLoader(Repository repository) {
         super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        FactoryImpl factory = new FactoryImpl();
+
         Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
-        map.put(Classifications.class, new FactoryImpl());
-        factories.put(BufferedImage.class, map);
+        map.put(BufferedImage.class, factory);
+        map.put(Path.class, new FileTranslatorFactory<>(factory));
+        map.put(URL.class, new UrlTranslatorFactory<>(factory));
+
+        factories.put(Classifications.class, map);
     }
 
     /** {@inheritDoc} */

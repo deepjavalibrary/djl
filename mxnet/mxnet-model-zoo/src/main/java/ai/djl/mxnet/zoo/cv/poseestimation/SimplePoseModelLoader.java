@@ -15,8 +15,10 @@ package ai.djl.mxnet.zoo.cv.poseestimation;
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.modality.cv.FileTranslatorFactory;
 import ai.djl.modality.cv.Joints;
 import ai.djl.modality.cv.SimplePoseTranslator;
+import ai.djl.modality.cv.UrlTranslatorFactory;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -34,6 +36,8 @@ import ai.djl.util.Progress;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -59,9 +63,14 @@ public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints
      */
     public SimplePoseModelLoader(Repository repository) {
         super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        FactoryImpl factory = new FactoryImpl();
+
         Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
-        map.put(Joints.class, new FactoryImpl());
-        factories.put(BufferedImage.class, map);
+        map.put(BufferedImage.class, factory);
+        map.put(Path.class, new FileTranslatorFactory<>(factory));
+        map.put(URL.class, new UrlTranslatorFactory<>(factory));
+
+        factories.put(Joints.class, map);
     }
 
     /** {@inheritDoc} */

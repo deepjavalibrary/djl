@@ -48,8 +48,8 @@ public class TextClassificationModelLoader extends BaseModelLoader<String, Class
     public TextClassificationModelLoader(Repository repository) {
         super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
         Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
-        map.put(Classifications.class, new FactoryImpl());
-        factories.put(String.class, map);
+        map.put(String.class, new FactoryImpl());
+        factories.put(Classifications.class, map);
     }
 
     /** {@inheritDoc} */

@@ -177,10 +177,10 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
 
     @SuppressWarnings("unchecked")
     private <S, T> TranslatorFactory<S, T> getTranslatorFactory(Criteria<S, T> criteria) {
-        Map<Type, TranslatorFactory<?, ?>> map = factories.get(criteria.getInputClass());
+        Map<Type, TranslatorFactory<?, ?>> map = factories.get(criteria.getOutputClass());
         if (map == null) {
             return null;
         }
-        return (TranslatorFactory<S, T>) map.get(criteria.getOutputClass());
+        return (TranslatorFactory<S, T>) map.get(criteria.getInputClass());
     }
 }
