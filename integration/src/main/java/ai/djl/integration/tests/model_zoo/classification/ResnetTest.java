@@ -45,7 +45,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class ResnetTest {
@@ -82,10 +81,12 @@ public class ResnetTest {
                 NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
                 NDArray expectedAtIndex1 = manager.ones(new Shape(16, 16, 3, 3));
                 NDArray expectedAtIndex87 = manager.ones(new Shape(32));
-                Assert.assertEquals(parameters.get(0).getValue().getArray(), expectedAtIndex0);
+                Assertions.assertAlmostEquals(
+                        parameters.get(0).getValue().getArray(), expectedAtIndex0);
                 Assertions.assertAlmostEquals(
                         parameters.get(1).getValue().getArray(), expectedAtIndex1);
-                Assert.assertEquals(parameters.get(87).getValue().getArray(), expectedAtIndex87);
+                Assertions.assertAlmostEquals(
+                        parameters.get(87).getValue().getArray(), expectedAtIndex87);
             }
         }
     }
