@@ -1,0 +1,17 @@
+
+plugins {
+    id 'maven-publish'
+    id 'signing'
+}
+
+group = "ai.djl.pytorch"
+
+def VERSION = "1.4.0"
+
+task buildJNI(type:Exec) {
+    if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
+        commandLine "build.cmd"
+    } else {
+        commandLine 'bash', 'build.sh'
+    }
+}

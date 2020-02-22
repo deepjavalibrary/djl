@@ -37,7 +37,7 @@ JNIEXPORT jintArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDevice
   if (nullptr == result) {
     return nullptr;
   }
-  int temp_device[] = {static_cast<int>(tensor_ptr->device().type()), tensor_ptr->device().index()};
+  jint temp_device[] = {static_cast<int>(tensor_ptr->device().type()), tensor_ptr->device().index()};
   env->SetIntArrayRegion(result, 0, 2, temp_device);
   return result;
 }
