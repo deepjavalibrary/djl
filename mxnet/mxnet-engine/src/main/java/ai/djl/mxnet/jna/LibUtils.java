@@ -313,7 +313,7 @@ public class LibUtils {
                     String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
                     if ("win".equals(os)) {
                         if ("libmxnet.dll".equals(fileName)) {
-                            continue;
+                            fileName = "mxnet.dll";
                         } else if ("libcumxnet.dll".equals(fileName)) {
                             fileName = "mxnet.dll";
                         } else if (fileName.startsWith("mxnet_")
