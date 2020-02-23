@@ -66,8 +66,8 @@ cd mxnet/native
 # Publish to build/repo folder
 ./gradlew publish
 
-# If the artifact is large, increase the socket timeout
-./gradlew publish -Psnapshot -Dorg.gradle.internal.http.socketTimeout=120000 -Dorg.gradle.internal.http.connectionTimeout=60000
+# Publish to sonatype snapshot repo
+./gradlew publish -Psnapshot
 ```
 
 ### Step 4: Use GitHub action to publish MXNet native library

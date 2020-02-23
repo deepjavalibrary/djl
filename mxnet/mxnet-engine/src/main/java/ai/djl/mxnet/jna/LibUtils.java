@@ -24,11 +24,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -107,18 +105,7 @@ public final class LibUtils {
                                     .getContextClassLoader()
                                     .getResources("native/lib/mxnet.properties"));
         } catch (IOException e) {
-            urls = Collections.emptyList();
-        }
-
-        Platform systemPlatform = Platform.fromSystem();
-        List<Platform> jarPlatforms = new ArrayList<>();
-        try {
-            for (URL url : urls) {
-                jarPlatforms.add(new Platform(url));
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(
-                    "Failed to read MXNet native library jar properties", e);
+            return null;
         }
 
         // No native jars
@@ -126,24 +113,34 @@ public final class LibUtils {
             return null;
         }
 
-        // Use Matching jar
-        Optional<Platform> matching =
-                jarPlatforms
-                        .stream()
-                        .filter(jarPlatform -> jarPlatform.matches(systemPlatform))
-                        .findFirst();
-        if (matching.isPresent()) {
-            return loadLibraryFromClasspath(matching.get());
-        }
-
-        // Download MXNet if there is a placeholder jar
-        boolean hasPlaceholder = jarPlatforms.stream().anyMatch(Platform::isPlaceholder);
-        if (hasPlaceholder) {
-            try {
-                return downloadMxnet(systemPlatform);
-            } catch (IOException e) {
-                throw new IllegalStateException("Failed to download MXNet native library", e);
+        Platform systemPlatform = Platform.fromSystem();
+        try {
+            Platform matching = null;
+            Platform placeholder = null;
+            for (URL url : urls) {
+                Platform platform = Platform.fromUrl(url);
+                if (platform.isPlaceholder()) {
+                    placeholder = platform;
+                } else if (platform.matches(systemPlatform)) {
+                    matching = platform;
+                    break;
+                }
             }
+
+            if (matching != null) {
+                return loadLibraryFromClasspath(matching);
+            }
+
+            if (placeholder != null) {
+                try {
+                    return downloadMxnet(placeholder);
+                } catch (IOException e) {
+                    throw new IllegalStateException("Failed to download MXNet native library", e);
+                }
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Failed to read MXNet native library jar properties", e);
         }
 
         throw new IllegalStateException(

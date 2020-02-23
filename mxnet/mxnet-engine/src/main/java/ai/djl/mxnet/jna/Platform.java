@@ -22,9 +22,7 @@ import java.util.Properties;
  * The platform contains information regarding the version, os, and build flavor of the MXNet native
  * code.
  */
-public class Platform {
-
-    private static final String DEFAULT_VERSION = "1.6.0";
+public final class Platform {
 
     private String version;
     private String osPrefix;
@@ -34,48 +32,41 @@ public class Platform {
     private boolean placeholder;
 
     /** Constructor used only for {@link Platform#fromSystem()}. */
-    Platform() {
-        String osName = System.getProperty("os.name");
-        if (osName.startsWith("Win")) {
-            osPrefix = "win";
-        } else if (osName.startsWith("Mac")) {
-            osPrefix = "osx";
-        } else if (osName.startsWith("Linux")) {
-            osPrefix = "linux";
-        } else {
-            throw new AssertionError("Unsupported platform: " + osName);
-        }
-        if (CudaUtils.getGpuCount() > 0) {
-            flavor = "cu" + CudaUtils.getCudaVersionString() + "mkl";
-            cudaArch = CudaUtils.getComputeCapability(0);
-        } else {
-            flavor = "mkl";
-            cudaArch = null;
-        }
-        version = DEFAULT_VERSION;
-    }
+    private Platform() {}
 
     /**
-     * Constructor for loading from mxnet.properties files.
+     * Returns the platform that parsed from mxnet.properties file.
      *
      * @param url the url to the mxnet.properties file
+     * @return the platform that parsed from mxnet.properties file
      * @throws IOException if the file could not be read
      */
-    public Platform(URL url) throws IOException {
+    public static Platform fromUrl(URL url) throws IOException {
+        Platform platform = Platform.fromSystem();
         try (InputStream conf = url.openStream()) {
             Properties prop = new Properties();
             prop.load(conf);
             // 1.6.0 later should always has version property
-            version = prop.getProperty("version", DEFAULT_VERSION);
-            placeholder = prop.getProperty("placeholder") != null;
+            platform.version = prop.getProperty("version");
+            if (platform.version == null) {
+                throw new IllegalArgumentException(
+                        "version key is required in mxnet.properties file.");
+            }
+            platform.placeholder = prop.getProperty("placeholder") != null;
             String flavorPrefixedClassifier = prop.getProperty("classifier", "");
-            libraries = prop.getProperty("libraries", "").split(",");
+            String libraryList = prop.getProperty("libraries", "");
+            if (libraryList.isEmpty()) {
+                platform.libraries = new String[0];
+            } else {
+                platform.libraries = libraryList.split(",");
+            }
 
-            if (!"".equals(flavorPrefixedClassifier)) {
-                flavor = flavorPrefixedClassifier.split("-")[0];
-                osPrefix = flavorPrefixedClassifier.split("-")[1];
+            if (!flavorPrefixedClassifier.isEmpty()) {
+                platform.flavor = flavorPrefixedClassifier.split("-")[0];
+                platform.osPrefix = flavorPrefixedClassifier.split("-")[1];
             }
         }
+        return platform;
     }
 
     /**
@@ -84,7 +75,26 @@ public class Platform {
      * @return the platform for the current system
      */
     public static Platform fromSystem() {
-        return new Platform();
+        Platform platform = new Platform();
+        String osName = System.getProperty("os.name");
+        if (osName.startsWith("Win")) {
+            platform.osPrefix = "win";
+        } else if (osName.startsWith("Mac")) {
+            platform.osPrefix = "osx";
+        } else if (osName.startsWith("Linux")) {
+            platform.osPrefix = "linux";
+        } else {
+            throw new AssertionError("Unsupported platform: " + osName);
+        }
+
+        if (CudaUtils.getGpuCount() > 0) {
+            platform.flavor = "cu" + CudaUtils.getCudaVersionString() + "mkl";
+            platform.cudaArch = CudaUtils.getComputeCapability(0);
+        } else {
+            platform.flavor = "mkl";
+            platform.cudaArch = null;
+        }
+        return platform;
     }
 
     /**

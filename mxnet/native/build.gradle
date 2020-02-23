@@ -96,51 +96,45 @@ flavorNames.each { flavor ->
     // This means that publishing from the main project does not publish the native jars
     // and the native jars have to be published separately
     if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
-        addPublication(flavor, artifactsNames)
-    }
-}
+        publishing.publications.create("${flavor}", MavenPublication) {
+            artifactId "mxnet-native-${flavor}"
+            from components.java
+            artifacts = artifactsNames
+            artifact jar
+            artifact javadocJar
+            artifact sourcesJar
+            pom {
+                name = "MXNet native library"
+                description = "MXNet Engine native library binary distribution"
+                url = "http://www.djl.ai/mxnet/native"
+                packaging = "jar"
 
-def addPublication(flavor, artifactsNames) {
-    publishing.publications.create("${flavor}", MavenPublication) {
-        artifactId "mxnet-native-${flavor}"
-        from components.java
-        artifacts = artifactsNames
-        artifact jar
-        artifact javadocJar
-        artifact sourcesJar
-        pom {
-            name = "MXNet native library"
-            description = "MXNet Engine native library binary distribution"
-            url = "http://www.djl.ai/mxnet/native"
-            packaging = "jar"
-
-            licenses {
-                license {
-                    name = 'The Apache License, Version 2.0'
-                    url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                    }
                 }
-            }
 
-            scm {
-                connection = "scm:git:git@github.com:awslabs/djl.git"
-                developerConnection = "scm:git:git@github.com:awslabs/djl.git"
-                url = "https://github.com/awslabs/djl"
-                tag = "HEAD"
-            }
+                scm {
+                    connection = "scm:git:git@github.com:awslabs/djl.git"
+                    developerConnection = "scm:git:git@github.com:awslabs/djl.git"
+                    url = "https://github.com/awslabs/djl"
+                    tag = "HEAD"
+                }
 
-            developers {
-                developer {
-                    name = "DJL.AI Team"
-                    email = "djl-dev@amazon.com"
-                    organization = "Amazon AI"
-                    organizationUrl = "https://amazon.com"
+                developers {
+                    developer {
+                        name = "DJL.AI Team"
+                        email = "djl-dev@amazon.com"
+                        organization = "Amazon AI"
+                        organizationUrl = "https://amazon.com"
+                    }
                 }
             }
         }
     }
 }
-
-addPublication("auto", [])
 
 publishing.repositories {
     maven {
@@ -236,5 +230,7 @@ task downloadMxnetNativeLib() {
             }
             into("${BINARY_ROOT}/cu102mkl/win/native/lib")
         }
+
+        new File("${BINARY_ROOT}/auto").mkdirs()
     }
 }
