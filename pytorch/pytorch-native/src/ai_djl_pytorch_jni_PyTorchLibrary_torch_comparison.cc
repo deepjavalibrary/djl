@@ -23,7 +23,7 @@ JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_contentEqual
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchEq
-  (JNIEnv *env, jobject jthis, jobject jself, jobject jother) {
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
   auto tensor_ptr1 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
   auto tensor_ptr2 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
   const auto* result_ptr = new torch::Tensor(tensor_ptr1->eq(*tensor_ptr2));
@@ -31,7 +31,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchEq
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNeq
-  (JNIEnv *env, jobject jthis, jobject jself, jobject jother) {
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
   auto tensor_ptr1 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
   auto tensor_ptr2 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
   const auto* result_ptr = new torch::Tensor(tensor_ptr1->eq(*tensor_ptr2).logical_not_());
@@ -39,7 +39,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNeq
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGt
-  (JNIEnv *env, jobject jthis, jobject jself, jobject jother) {
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
   auto tensor_ptr1 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
   auto tensor_ptr2 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
   const auto* result_ptr = new torch::Tensor(tensor_ptr1->gt(*tensor_ptr2));
@@ -47,7 +47,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGt
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGte
-  (JNIEnv *env, jobject jthis, jobject jself, jobject jother) {
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
   auto tensor_ptr1 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
   auto tensor_ptr2 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
   const auto* result_ptr = new torch::Tensor(tensor_ptr1->ge(*tensor_ptr2));
@@ -55,7 +55,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGte
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLt
-  (JNIEnv *env, jobject jthis, jobject jself, jobject jother) {
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
   auto tensor_ptr1 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
   auto tensor_ptr2 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
   const auto* result_ptr = new torch::Tensor(tensor_ptr1->lt(*tensor_ptr2));
@@ -63,7 +63,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLt
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLte
-  (JNIEnv *env, jobject jthis, jobject jself, jobject jother) {
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
   auto tensor_ptr1 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
   auto tensor_ptr2 = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
   const auto* result_ptr = new torch::Tensor(tensor_ptr1->le(*tensor_ptr2));

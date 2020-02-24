@@ -194,11 +194,10 @@ public final class JniUtils {
                         copy));
     }
 
-    public static PtNDArray get(PtNDArray ndArray, long dim, PtNDArray indicesNd) {
+    public static PtNDArray slice(PtNDArray ndArray, long dim, long start, long stop, long step) {
         return new PtNDArray(
                 ndArray.getManager(),
-                PyTorchLibrary.LIB.torchIndexSelect(
-                        ndArray.getHandle(), dim, indicesNd.getHandle()));
+                PyTorchLibrary.LIB.torchSlice(ndArray.getHandle(), dim, start, stop, step));
     }
 
     public static PtNDArray booleanMask(PtNDArray ndArray, PtNDArray indicesNd) {

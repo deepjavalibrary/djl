@@ -221,12 +221,7 @@ public class PtNDArray extends NativeResource implements NDArray {
                 if (step[dim] == 1 && getShape().get(dim) == max[dim] - min[dim]) {
                     continue;
                 }
-                PtNDArray indicesNd =
-                        (PtNDArray)
-                                this.getManager()
-                                        .arange(min[dim], max[dim], step[dim])
-                                        .toType(DataType.INT64, false);
-                afterSlice = JniUtils.get(afterSlice, dim, indicesNd);
+                afterSlice = JniUtils.slice(afterSlice, dim, min[dim], max[dim], step[dim]);
             }
             return afterSlice.squeeze(fullSlice.getToSqueeze().stream().mapToInt(i -> i).toArray());
         } else {

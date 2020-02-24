@@ -129,7 +129,7 @@ public final class PyTorchLibrary {
             int[] device,
             boolean requiredGrad);
 
-    public native Pointer torchIndexSelect(Pointer handle, long dim, Pointer indexHandle);
+    public native Pointer torchSlice(Pointer handle, long dim, long start, long end, long step);
 
     public native Pointer torchMaskedSelect(Pointer handle, Pointer maskHandle);
 

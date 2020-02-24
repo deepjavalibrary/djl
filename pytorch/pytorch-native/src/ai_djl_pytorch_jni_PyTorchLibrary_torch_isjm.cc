@@ -24,14 +24,14 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchReshape
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSqueeze__Lai_djl_pytorch_jni_Pointer_2
-  (JNIEnv *env, jobject jthis, jobject jhandle) {
+  (JNIEnv* env, jobject jthis, jobject jhandle) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->squeeze());
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSqueeze__Lai_djl_pytorch_jni_Pointer_2J
-  (JNIEnv *env, jobject jthis, jobject jhandle, jlong jaxis) {
+  (JNIEnv* env, jobject jthis, jobject jhandle, jlong jaxis) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->squeeze(jaxis));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);

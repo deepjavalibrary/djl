@@ -74,11 +74,10 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_tensorClone
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexSelect
-  (JNIEnv *env, jobject jthis, jobject jhandle, jlong jdim, jobject jindex_handle) {
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSlice
+  (JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim, jlong jstart, jlong jend, jlong jstep) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-  const auto* index_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jindex_handle);
-  const auto* result_ptr = new torch::Tensor(tensor_ptr->index_select(jdim, *index_ptr));
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->slice(jdim, jstart, jend, jstep));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 

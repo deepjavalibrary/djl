@@ -32,7 +32,8 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_resize
     temp_tensor = temp_tensor.unsqueeze(0);
   }
   temp_tensor = temp_tensor.permute({0, 3, 1, 2});
-  torch::Tensor result = torch::upsample_bilinear2d(temp_tensor, size_vec, jalign_corners == JNI_TRUE).permute({0, 2, 3, 1});
+  torch::Tensor result = torch::upsample_bilinear2d(temp_tensor, size_vec, jalign_corners == JNI_TRUE).permute(
+    {0, 2, 3, 1});
   if (dim == 3) {
     result = result.squeeze(0);
   }
