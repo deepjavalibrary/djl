@@ -16,6 +16,7 @@ import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.modality.cv.FileTranslatorFactory;
+import ai.djl.modality.cv.InputStreamTranslatorFactory;
 import ai.djl.modality.cv.Joints;
 import ai.djl.modality.cv.SimplePoseTranslator;
 import ai.djl.modality.cv.UrlTranslatorFactory;
@@ -35,6 +36,7 @@ import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Progress;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.file.Path;
@@ -69,6 +71,7 @@ public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints
         map.put(BufferedImage.class, factory);
         map.put(Path.class, new FileTranslatorFactory<>(factory));
         map.put(URL.class, new UrlTranslatorFactory<>(factory));
+        map.put(InputStream.class, new InputStreamTranslatorFactory<>(factory));
 
         factories.put(Joints.class, map);
     }

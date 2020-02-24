@@ -12,35 +12,35 @@
  */
 package ai.djl.modality.cv;
 
-import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.awt.image.BufferedImage;
-import java.nio.file.Path;
+import java.io.InputStream;
+import javax.imageio.ImageIO;
 
 /**
- * Built-in {@code Translator} that provides image pre-processing from file path.
+ * Built-in {@code Translator} that provides image pre-processing from {@code InputStream}.
  *
  * @param <T> the output object type
  */
-public class FileTranslator<T> implements Translator<Path, T> {
+public class InputStreamTranslator<T> implements Translator<InputStream, T> {
 
     private Translator<BufferedImage, T> translator;
 
     /**
-     * Creates a {@code FileTranslator} instance.
+     * Creates a {@code UrlTranslator} instance.
      *
      * @param translator a {@code Translator} that can process image
      */
-    public FileTranslator(Translator<BufferedImage, T> translator) {
+    public InputStreamTranslator(Translator<BufferedImage, T> translator) {
         this.translator = translator;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList processInput(TranslatorContext ctx, Path input) throws Exception {
-        BufferedImage image = BufferedImageUtils.fromFile(input);
+    public NDList processInput(TranslatorContext ctx, InputStream input) throws Exception {
+        BufferedImage image = ImageIO.read(input);
         return translator.processInput(ctx, image);
     }
 

@@ -21,6 +21,7 @@ import ai.djl.basicmodelzoo.cv.classification.ResNetV1.Builder;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.FileTranslatorFactory;
 import ai.djl.modality.cv.ImageClassificationTranslator;
+import ai.djl.modality.cv.InputStreamTranslatorFactory;
 import ai.djl.modality.cv.UrlTranslatorFactory;
 import ai.djl.modality.cv.transform.CenterCrop;
 import ai.djl.modality.cv.transform.Resize;
@@ -39,6 +40,7 @@ import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Progress;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.file.Path;
@@ -67,6 +69,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
         map.put(BufferedImage.class, factory);
         map.put(Path.class, new FileTranslatorFactory<>(factory));
         map.put(URL.class, new UrlTranslatorFactory<>(factory));
+        map.put(InputStream.class, new InputStreamTranslatorFactory<>(factory));
 
         factories.put(Classifications.class, map);
     }
