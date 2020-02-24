@@ -49,8 +49,8 @@ public class TrainResNetTest {
             String[] args = {"-e", "10", "-g", "4", "-s", "-p"};
 
             ExampleTrainingResult result = TrainResnetWithCifar10.runExample(args);
-            Assert.assertTrue(result.getEvaluation("Accuracy") > 0.7f);
-            Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 1.0);
+            Assert.assertTrue(result.getEvaluation("Accuracy") > 0.75f);
+            Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 1.1);
         }
     }
 
@@ -67,7 +67,7 @@ public class TrainResNetTest {
             String[] args = {"-e", "10", "-g", "4"};
 
             ExampleTrainingResult result = TrainResnetWithCifar10.runExample(args);
-            Assert.assertTrue(result.getEvaluation("Accuracy") > 0.6f);
+            Assert.assertTrue(result.getEvaluation("Accuracy") > 0.7f);
             Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 0.9);
         }
     }
