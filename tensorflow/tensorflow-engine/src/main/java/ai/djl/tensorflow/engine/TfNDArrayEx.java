@@ -384,8 +384,8 @@ public class TfNDArrayEx implements NDArrayEx {
     @SuppressWarnings("unchecked")
     private <T> NDArray stackHelper(NDList arrays, int axis) {
         ArrayList<Operand<T>> operands = new ArrayList<>(arrays.size());
-        for (NDArray array : arrays) {
-            operands.add((Operand<T>) ((TfNDArray) array).asOperand());
+        for (NDArray ndArray : arrays) {
+            operands.add((Operand<T>) ((TfNDArray) ndArray).asOperand());
         }
         return new TfNDArray(manager, tf.stack(operands, Stack.axis((long) axis)));
     }

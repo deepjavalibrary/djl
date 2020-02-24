@@ -24,11 +24,17 @@ import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.util.Arrays;
 import org.tensorflow.EagerSession;
+import org.tensorflow.Operand;
 import org.tensorflow.Tensor;
 import org.tensorflow.Tensors;
 import org.tensorflow.op.Ops;
-import org.tensorflow.op.image.DecodeJpeg;
+import org.tensorflow.op.core.Constant;
 
 public class TfNDManager extends BaseNDManager {
 
@@ -72,26 +78,44 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray create(byte[] data) {
-        return new TfNDArray(
-                this, tf.image.decodeJpeg(tf.constant(data), DecodeJpeg.channels((long) 3)));
+        return new TfNDArray(this, Tensor.create(data));
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray create(float[] data, Shape shape) {
+    public NDArray create(float[] data) {
+        return new TfNDArray(this, Tensors.create(data));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(int[] data) {
+        return new TfNDArray(this, Tensors.create(data));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(int data) {
+        // create scalar tensor with int
+        return new TfNDArray(this, Tensors.create(data));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(float data) {
+        // create scalar tensor with float
         return new TfNDArray(this, Tensors.create(data));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(Shape shape, DataType dataType, Device device) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(int data) {
-        return new TfNDArray(this, Tensors.create(data));
+        return new TfNDArray(
+                this,
+                tf.empty(
+                        tf.constant(
+                                Arrays.stream(shape.getShape()).mapToInt(i -> (int) i).toArray()),
+                        TfDataType.toPrimitiveClass(dataType)));
     }
 
     public TfNDArray create(Tensor<?> tensor) {
@@ -100,6 +124,43 @@ public class TfNDManager extends BaseNDManager {
 
     public TfNDArray create(ByteBuffer data, Shape shape) {
         return new TfNDArray(this, shape, data);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public TfNDArray create(Buffer data, Shape shape, DataType dataType) {
+        int size = data.remaining();
+        // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
+        DataType inputType = DataType.fromBuffer(data);
+
+        int numOfBytes = inputType.getNumOfBytes();
+        ByteBuffer buf = allocateDirect(size * numOfBytes);
+
+        switch (inputType) {
+            case FLOAT32:
+                buf.asFloatBuffer().put((FloatBuffer) data);
+                break;
+            case FLOAT64:
+                buf.asDoubleBuffer().put((DoubleBuffer) data);
+                break;
+            case UINT8:
+            case INT8:
+            case BOOLEAN:
+                buf.put((ByteBuffer) data);
+                break;
+            case INT32:
+                buf.asIntBuffer().put((IntBuffer) data);
+                break;
+            case INT64:
+                buf.asLongBuffer().put((LongBuffer) data);
+                break;
+            case FLOAT16:
+            default:
+                throw new AssertionError("Show never happen");
+        }
+        buf.rewind();
+        return new TfNDArray(
+                this, Tensor.create(TfDataType.toPrimitiveClass(inputType), shape.getShape(), buf));
     }
 
     /** {@inheritDoc} */
@@ -135,18 +196,9 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Device device) {
-        switch (dataType) {
-            case INT32:
-                return new TfNDArray(this, tf.zeros(tf.constant(shape.getShape()), Integer.class));
-            case INT64:
-                return new TfNDArray(this, tf.zeros(tf.constant(shape.getShape()), Long.class));
-            case FLOAT16:
-                return new TfNDArray(this, tf.zeros(tf.constant(shape.getShape()), Short.class));
-            case FLOAT64:
-                return new TfNDArray(this, tf.zeros(tf.constant(shape.getShape()), Double.class));
-            default:
-                return new TfNDArray(this, tf.zeros(tf.constant(shape.getShape()), Float.class));
-        }
+        return new TfNDArray(
+                this,
+                tf.zeros(tf.constant(shape.getShape()), TfDataType.toPrimitiveClass(dataType)));
     }
 
     /** {@inheritDoc} */
@@ -191,13 +243,35 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray arange(float start, float stop, float step, DataType dataType, Device device) {
-        return null;
+        return new TfNDArray(
+                this,
+                tf.range(
+                        toConstant(start, dataType),
+                        toConstant(stop, dataType),
+                        toConstant(step, dataType)));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray eye(int rows, int cols, int k, DataType dataType, Device device) {
-        return null;
+        return eyeHelper(rows, cols, k, dataType, device);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> NDArray eyeHelper(int rows, int cols, int k, DataType dataType, Device device) {
+        Operand<T> diagnal =
+                ((TfNDArray) ones(new Shape(Math.min(rows, cols)), dataType, device)).asOperand();
+
+        Operand<T> value = ((TfNDArray) zeros(new Shape(1))).asOperand();
+        Operand<T> output =
+                tf.matrixDiagV2(
+                        diagnal, tf.constant(k), tf.constant(rows), tf.constant(cols), value);
+        return new TfNDArray(this, output);
+    }
+
+    @SuppressWarnings("unchecked")
+    <T extends Number> Constant<T> toConstant(Number n, DataType jType) {
+        return TfNDArray.getConstant(n, jType, tf);
     }
 
     /** {@inheritDoc} */

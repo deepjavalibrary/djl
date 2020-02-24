@@ -13,6 +13,7 @@
 package ai.djl.tensorflow.engine;
 
 import ai.djl.Device;
+import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -30,9 +31,15 @@ import org.tensorflow.Operand;
 import org.tensorflow.Operation;
 import org.tensorflow.Tensor;
 import org.tensorflow.op.Ops;
+import org.tensorflow.op.core.Constant;
 import org.tensorflow.types.UInt8;
 
 public class TfNDArray implements NDArray {
+
+    private static final int MAX_SIZE = 100;
+    private static final int MAX_DEPTH = 10;
+    private static final int MAX_ROWS = 10;
+    private static final int MAX_COLUMNS = 20;
 
     private String uid = UUID.randomUUID().toString();
     private Tensor<?> tensor;
@@ -62,7 +69,7 @@ public class TfNDArray implements NDArray {
     public TfNDArray(NDManager manager, Shape shape, FloatBuffer data) {
         this.manager = (TfNDManager) manager;
         this.manager.attach(getUid(), this);
-        tensor = (Tensor<?>) Tensor.create(shape.getShape(), data);
+        tensor = Tensor.create(shape.getShape(), data);
         this.shape = shape;
         this.tf = this.manager.getTf();
         tfNDArrayEx = new TfNDArrayEx(this);
@@ -71,7 +78,7 @@ public class TfNDArray implements NDArray {
     TfNDArray(NDManager manager, Shape shape, ByteBuffer data) {
         this.manager = (TfNDManager) manager;
         this.manager.attach(getUid(), this);
-        tensor = (Tensor<?>) Tensor.create(UInt8.class, shape.getShape(), data);
+        tensor = Tensor.create(UInt8.class, shape.getShape(), data);
         this.shape = shape;
         this.tf = this.manager.getTf();
         tfNDArrayEx = new TfNDArrayEx(this);
@@ -148,23 +155,8 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
-        switch (dataType) {
-            case INT32:
-                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Integer.class));
-            case INT64:
-                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Long.class));
-            case FLOAT16:
-                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Short.class));
-            case FLOAT64:
-                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Double.class));
-            case BOOLEAN:
-                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Boolean.class));
-            case INT8:
-            case UINT8:
-                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Byte.class));
-            default:
-                return new TfNDArray(manager, tf.dtypes.cast(asOperand(), Float.class));
-        }
+        return new TfNDArray(
+                manager, tf.dtypes.cast(asOperand(), TfDataType.toPrimitiveClass(dataType)));
     }
 
     /** {@inheritDoc} */
@@ -246,13 +238,29 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public boolean contentEquals(Number number) {
-        return false;
+        if (number == null) {
+            return false;
+        }
+        try (NDArray result = eq(number)) {
+            return result.all().getBoolean();
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean contentEquals(NDArray other) {
-        return false;
+        if (other == null || (!shapeEquals(other))) {
+            return false;
+        }
+        if (getDataType() != other.getDataType()) {
+            return false;
+        }
+        return tf.reduceAll(
+                        ((TfNDArray) eq(other)).asOperand(),
+                        ((TfNDArray) manager.arange(0, getRank(), 1)).asOperand())
+                .asOutput()
+                .tensor()
+                .booleanValue();
     }
 
     /** {@inheritDoc} */
@@ -264,7 +272,8 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray eq(NDArray other) {
-        return null;
+        return new TfNDArray(
+                manager, tf.math.equal(asOperand(), ((TfNDArray) other).asOperand()).asOutput());
     }
 
     /** {@inheritDoc} */
@@ -522,13 +531,13 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray square() {
-        return null;
+        return new TfNDArray(manager, tf.math.square(asOperand()));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray cbrt() {
-        return null;
+        return new TfNDArray(manager, tf.math.pow(asOperand(), toConstant(1f / 3, getDataType())));
     }
 
     /** {@inheritDoc} */
@@ -821,7 +830,7 @@ public class TfNDArray implements NDArray {
     @SuppressWarnings("unchecked")
     @Override
     public NDArray softmax(int[] axes, float temperature) {
-        return new TfNDArray(manager, tf.nn.softmax((Operand<? extends Number>) asOperand()));
+        return new TfNDArray(manager, tf.nn.softmax(asOperand()));
     }
 
     @Override
@@ -951,12 +960,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public boolean shapeEquals(NDArray other) {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray argMax() {
         return argMax(0);
     }
@@ -1029,16 +1032,40 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof TfNDArray) {
+            return contentEquals((TfNDArray) obj);
+        }
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return 0;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        if (tensor == null) {
+            return "This array is already closed";
+        }
+        return toDebugString(this, MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void close() {
         if (tensor != null) {
             tensor.close();
         }
         tensor = null;
-        operand = null;
         tf = null;
     }
 
-    Operand<?> asOperand() {
+    @SuppressWarnings("unchecked")
+    <T> Operand<T> asOperand() {
         if (operand == null) {
             Operation op =
                     manager.getEagerSession()
@@ -1048,10 +1075,38 @@ public class TfNDArray implements NDArray {
                             .build();
             operand = op.output(0);
         }
-        return operand;
+        return (Operand<T>) operand;
     }
 
     public Tensor<?> getTensor() {
         return tensor;
+    }
+
+    int getRank() {
+        return tf.rank(asOperand()).asOutput().tensor().intValue();
+    }
+
+    private <T> Constant<T> toConstant(Number n, DataType jType) {
+        return getConstant(n, jType, tf);
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T> Constant<T> getConstant(Number n, DataType jType, Ops tf) {
+        switch (jType) {
+            case INT8:
+                return (Constant<T>) tf.constant(n.byteValue());
+            case INT32:
+                return (Constant<T>) tf.constant(n.intValue());
+            case INT64:
+                return (Constant<T>) tf.constant(n.longValue());
+            case FLOAT16:
+                return (Constant<T>) tf.constant(n.shortValue());
+            case FLOAT32:
+                return (Constant<T>) tf.constant(n.floatValue());
+            case FLOAT64:
+                return (Constant<T>) tf.constant(n.doubleValue());
+            default:
+                throw new EngineException("unsupported type");
+        }
     }
 }

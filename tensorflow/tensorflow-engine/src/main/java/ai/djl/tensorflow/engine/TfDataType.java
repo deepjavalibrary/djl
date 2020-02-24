@@ -12,9 +12,11 @@
  */
 package ai.djl.tensorflow.engine;
 
+import ai.djl.engine.EngineException;
 import ai.djl.ndarray.types.DataType;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.tensorflow.types.UInt8;
 
 public final class TfDataType {
 
@@ -49,5 +51,27 @@ public final class TfDataType {
 
     public static org.tensorflow.DataType toTf(DataType jType) {
         return toTf.get(jType);
+    }
+
+    public static Class<?> toPrimitiveClass(DataType jType) {
+        switch (jType) {
+            case UINT8:
+            case INT8:
+                return UInt8.class;
+            case INT32:
+                return Integer.class;
+            case INT64:
+                return Long.class;
+            case FLOAT16:
+                return Short.class;
+            case FLOAT32:
+                return Float.class;
+            case FLOAT64:
+                return Double.class;
+            case BOOLEAN:
+                return Boolean.class;
+            default:
+                throw new EngineException("Unsupported data type");
+        }
     }
 }
