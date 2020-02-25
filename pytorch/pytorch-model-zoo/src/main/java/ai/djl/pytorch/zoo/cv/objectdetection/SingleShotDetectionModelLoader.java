@@ -104,21 +104,22 @@ public class SingleShotDetectionModelLoader
         @Override
         public Translator<BufferedImage, DetectedObjects> newInstance(
                 Map<String, Object> arguments) {
-            int width = ((Double) arguments.getOrDefault("width", 300)).intValue();
-            int height = ((Double) arguments.getOrDefault("height", 300)).intValue();
+            int width = ((Double) arguments.getOrDefault("width", 300d)).intValue();
+            int height = ((Double) arguments.getOrDefault("height", 300d)).intValue();
             double threshold = ((Double) arguments.getOrDefault("threshold", 0.4d));
 
             Pipeline pipeline = new Pipeline();
             pipeline.add(new Resize(width, height))
+                    .add(new ToTensor())
                     .add(
                             new Normalize(
                                     new float[] {0.485f, 0.456f, 0.406f},
-                                    new float[] {0.229f, 0.224f, 0.225f}))
-                    .add(new ToTensor());
+                                    new float[] {0.229f, 0.224f, 0.225f}));
 
             return SingleShotDetectionTranslator.builder()
                     .setPipeline(pipeline)
                     .setSynsetArtifactName("classes.txt")
+                    .optOutputFormat("ptssd")
                     .optThreshold((float) threshold)
                     .optRescaleSize(width, height)
                     .build();

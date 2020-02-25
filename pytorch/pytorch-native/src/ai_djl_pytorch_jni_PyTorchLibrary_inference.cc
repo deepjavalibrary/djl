@@ -77,6 +77,19 @@ JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToLi
   return jarray;
 }
 
+JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToListFromTuple
+  (JNIEnv *env, jobject jthis, jobject jhandle) {
+  auto* ivalue_ptr = utils::GetPointerFromJHandle<c10::IValue>(env, jhandle);
+  auto ivalue_list = ivalue_ptr->toTuple()->elements();
+  jobjectArray jarray = env->NewObjectArray(ivalue_list.size(), env->FindClass(utils::POINTER_CLASS), nullptr);
+  for (size_t i = 0; i < ivalue_list.size(); ++i) {
+    const auto* element_ptr = new c10::IValue(ivalue_list.at(i));
+    auto ptr = utils::CreatePointer<c10::IValue>(env, element_ptr);
+    env->SetObjectArrayElement(jarray, i, ptr);
+  }
+  return jarray;
+}
+
 JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToTensorList
   (JNIEnv* env, jobject jthis, jobject jhandle) {
   auto* ivalue_ptr = utils::GetPointerFromJHandle<c10::IValue>(env, jhandle);
@@ -136,5 +149,10 @@ JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsList
 JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsMap
   (JNIEnv* env, jobject jthis, jobject jhandle) {
   return utils::GetPointerFromJHandle<c10::IValue>(env, jhandle)->isGenericDict();
+}
+
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsTuple
+  (JNIEnv *env, jobject jthis, jobject jhandle) {
+  return utils::GetPointerFromJHandle<c10::IValue>(env, jhandle)->isTuple();
 }
 

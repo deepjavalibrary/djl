@@ -287,8 +287,10 @@ public class NDIndex {
                 shape[i] = 1;
             } else if (ie instanceof NDIndexSlice) {
                 NDIndexSlice slice = (NDIndexSlice) ie;
-                min[i] = Optional.ofNullable(slice.getMin()).orElse(0L);
-                max[i] = Optional.ofNullable(slice.getMax()).orElse(target.size(i));
+                long rawMin = Optional.ofNullable(slice.getMin()).orElse(0L);
+                min[i] = rawMin < 0 ? Math.floorMod(rawMin, target.get(i)) : rawMin;
+                long rawMax = Optional.ofNullable(slice.getMax()).orElse(target.size(i));
+                max[i] = rawMax < 0 ? Math.floorMod(rawMax, target.get(i)) : rawMax;
                 step[i] = Optional.ofNullable(slice.getStep()).orElse(1L);
                 if (step[i] > 0) {
                     shape[i] = (max[i] - min[i] - 1) / (step[i] + 1);

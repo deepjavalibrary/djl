@@ -66,6 +66,16 @@ public final class IValueUtils {
     }
 
     /**
+     * Check IValue is a container of IValue Tuple.
+     *
+     * @param iValueHandle IValue {@link Pointer}
+     * @return result
+     */
+    public static boolean isTuple(Pointer iValueHandle) {
+        return PyTorchLibrary.LIB.iValueIsTuple(iValueHandle);
+    }
+
+    /**
      * Check IValue is a container of IValue Map.
      *
      * @param iValueHandle IValue {@link Pointer}
@@ -130,6 +140,9 @@ public final class IValueUtils {
      * @return IValue array
      */
     public static Pointer[] toIValueArray(Pointer iValueHandle) {
+        if (isTuple(iValueHandle)) {
+            return PyTorchLibrary.LIB.iValueToListFromTuple(iValueHandle);
+        }
         return PyTorchLibrary.LIB.iValueToList(iValueHandle);
     }
 
@@ -148,6 +161,33 @@ public final class IValueUtils {
         return map;
     }
 
+    private static NDList forwardHelper(Pointer iValueHandle, PtNDManager manager) {
+        NDList list = new NDList();
+        if (isNDArray(iValueHandle)) {
+            list.add(toNDArray(iValueHandle, manager));
+        } else if (isNDList(iValueHandle)) {
+            list.addAll(toNDList(iValueHandle, manager));
+        } else if (isTuple(iValueHandle) || isArray(iValueHandle)) {
+            // Try to extract from Tuple/List
+            Pointer[] results = toIValueArray(iValueHandle);
+            for (Pointer ptr : results) {
+                list.addAll(forwardHelper(ptr, manager));
+            }
+        } else if (isMap(iValueHandle)) {
+            // Only allows <String, NDArray> type of map
+            Map<Pointer, Pointer> map = toIValueMap(iValueHandle);
+            for (Map.Entry<Pointer, Pointer> entry : map.entrySet()) {
+                String name = toString(entry.getKey());
+                PtNDArray value = toNDArray(entry.getValue(), manager);
+                value.setName(name);
+                list.add(value);
+            }
+        } else {
+            throw new UnsupportedOperationException("Unsupported IValue type");
+        }
+        return list;
+    }
+
     /**
      * Run the forward of PyTorch module.
      *
@@ -161,12 +201,7 @@ public final class IValueUtils {
                         .map(input -> toIValuePointer((PtNDArray) input))
                         .toArray(Pointer[]::new);
         Pointer result = PyTorchLibrary.LIB.moduleForward(block.getHandle(), iValuesHandles);
-        if (isNDArray(result)) {
-            return new NDList(toNDArray(result, (PtNDManager) inputs.get(0).getManager()));
-        } else if (isNDList(result)) {
-            return toNDList(result, (PtNDManager) inputs.get(0).getManager());
-        } else {
-            throw new UnsupportedOperationException("Unsupported IValue type");
-        }
+        PtNDManager manager = (PtNDManager) inputs.get(0).getManager();
+        return forwardHelper(result, manager);
     }
 }

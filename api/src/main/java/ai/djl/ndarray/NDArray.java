@@ -3819,8 +3819,10 @@ public interface NDArray extends AutoCloseable {
      * [[1., 2., 3.],
      * ]
      * jshell&gt; array.swapAxes(0, 1);
-     * ND: (1, 3) cpu(0) float32
-     * [[1., 2., 3.],
+     * ND: (3, 1) cpu(0) float32
+     * [[1.],
+     *  [2.],
+     *  [3.],
      * ]
      * </pre>
      *

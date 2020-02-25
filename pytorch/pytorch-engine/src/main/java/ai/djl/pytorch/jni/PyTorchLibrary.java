@@ -272,6 +272,8 @@ public final class PyTorchLibrary {
 
     public native Pointer[] iValueToList(Pointer iValueHandle);
 
+    public native Pointer[] iValueToListFromTuple(Pointer iValueHandle);
+
     public native Pointer[] iValueToMap(Pointer iValueHandle);
 
     public native String iValueToString(Pointer iValueHandle);
@@ -285,4 +287,6 @@ public final class PyTorchLibrary {
     public native boolean iValueIsList(Pointer iValueHandle);
 
     public native boolean iValueIsMap(Pointer iValueHandle);
+
+    public native boolean iValueIsTuple(Pointer iValueHandle);
 }

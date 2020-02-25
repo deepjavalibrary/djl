@@ -61,8 +61,9 @@ public class PtModel extends BaseModel {
                 throw new FileNotFoundException(".pt file not found in: " + modelPath);
             }
             block = JniUtils.loadModule((PtNDManager) manager, modelFile, manager.getDevice());
+        } else {
+            readParameters(options);
         }
-        readParameters(options);
     }
 
     @Override

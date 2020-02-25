@@ -24,7 +24,7 @@
       },
       "files": {
         "classes": {
-          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/pytorch/classes_coco.txt",
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/pytorch/classes_coco.txt",
           "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
           "size": 620,
           "name": "classes.txt"
