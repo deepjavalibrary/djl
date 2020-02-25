@@ -32,9 +32,11 @@ JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDType
 
 JNIEXPORT jintArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDevice
   (JNIEnv* env, jobject jthis, jobject jhandle) {
+  Log log(env);
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   jintArray result = env->NewIntArray(2);
   if (nullptr == result) {
+    log.error("Unable to create int array");
     return nullptr;
   }
   jint temp_device[] = {static_cast<int>(tensor_ptr->device().type()), tensor_ptr->device().index()};

@@ -27,6 +27,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
 import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A class containing utilities to interact with the PyTorch Engine's Java Native Interface (JNI)
@@ -34,6 +36,9 @@ import java.util.Arrays;
  */
 @SuppressWarnings("MissingJavadocMethod")
 public final class JniUtils {
+
+    @SuppressWarnings("PMD.UnusedPrivateField")
+    private static final Logger logger = LoggerFactory.getLogger(JniUtils.class);
 
     private JniUtils() {}
 

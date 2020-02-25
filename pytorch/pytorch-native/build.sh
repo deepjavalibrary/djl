@@ -3,9 +3,9 @@
 set -e
 
 NUM_PROC=1
-if [[ ! -z $(command -v nproc) ]]; then
+if [[ -n $(command -v nproc) ]]; then
     NUM_PROC=$(nproc)
-elif [[ ! -z $(command -v sysctl) ]]; then
+elif [[ -n $(command -v sysctl) ]]; then
     NUM_PROC=$(sysctl -n hw.ncpu)
 fi
 

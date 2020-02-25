@@ -17,6 +17,7 @@
 #include <iostream>
 #include <c10/util/typeid.h>
 #include <torch/script.h>
+#include "djl_pytorch_jni_log.h"
 
 // The file is utilities that ared used for JNI
 
@@ -72,10 +73,11 @@ inline c10::ScalarType GetScalarTypeFromDType(jint dtype) {
 
 template<typename T>
 inline T* GetPointerFromJHandle(JNIEnv* env, jobject jhandle) {
+  Log log(env);
   jclass cls = env->FindClass(POINTER_CLASS);
   jmethodID get_value = env->GetMethodID(cls, "getValue", "()J");
   if (nullptr == get_value) {
-    std::cout << "getValue method not found!" << std::endl;
+    log.error("getValue method not found!");
   }
   jlong ptr = env->CallLongMethod(jhandle, get_value);
   return reinterpret_cast<T*>(ptr);
@@ -83,6 +85,7 @@ inline T* GetPointerFromJHandle(JNIEnv* env, jobject jhandle) {
 
 template<typename T>
 inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandles) {
+  Log log(env);
   jclass cls = env->FindClass(POINTER_CLASS);
   jmethodID get_value = env->GetMethodID(cls, "getValue", "()J");
   jsize length = env->GetArrayLength(jhandles);
@@ -91,7 +94,7 @@ inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandle
   for (auto i = 0; i < length; ++i) {
     jobject jhandle = env->GetObjectArrayElement(jhandles, i);
     if (nullptr == jhandle) {
-      std::cout << "Pointer not found!" << std::endl;
+      log.error("Pointer not found!");
     }
     jlong ptr = env->CallLongMethod(jhandle, get_value);
     vec.emplace_back(*(reinterpret_cast<T*>(ptr)));
@@ -101,15 +104,16 @@ inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandle
 
 template<typename T>
 inline jobject CreatePointer(JNIEnv* env, const T* ptr) {
+  Log log(env);
   jclass cls = env->FindClass(POINTER_CLASS);
   if (nullptr == cls) {
-    std::cout << "Pointer class not found!" << std::endl;
+    log.error("Pointer class not found!");
     return nullptr;
   }
   jmethodID init = env->GetMethodID(cls, "<init>", "(J)V");
   jobject new_obj = env->NewObject(cls, init, ptr);
   if (nullptr == new_obj) {
-    std::cout << "object created failed" << std::endl;
+    log.error("object created failed");
     return nullptr;
   }
   return new_obj;
