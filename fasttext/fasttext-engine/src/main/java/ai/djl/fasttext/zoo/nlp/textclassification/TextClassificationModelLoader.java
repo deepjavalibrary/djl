@@ -26,11 +26,10 @@ import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
+import ai.djl.util.Pair;
 import ai.djl.util.Progress;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /** Model loader for fastText cooking stackexchange models. */
 public class TextClassificationModelLoader extends BaseModelLoader<String, Classifications> {
@@ -47,9 +46,7 @@ public class TextClassificationModelLoader extends BaseModelLoader<String, Class
      */
     public TextClassificationModelLoader(Repository repository) {
         super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
-        Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
-        map.put(String.class, new FactoryImpl());
-        factories.put(Classifications.class, map);
+        factories.put(new Pair<>(String.class, Classifications.class), new FactoryImpl());
     }
 
     /** {@inheritDoc} */

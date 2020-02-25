@@ -24,11 +24,10 @@ import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
+import ai.djl.util.Pair;
 import ai.djl.util.Progress;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Model loader for BERT QA models.
@@ -55,9 +54,7 @@ public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
      */
     public BertQAModelLoader(Repository repository) {
         super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
-        Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
-        map.put(QAInput.class, new FactoryImpl());
-        factories.put(String.class, map);
+        factories.put(new Pair<>(QAInput.class, String.class), new FactoryImpl());
     }
 
     /**

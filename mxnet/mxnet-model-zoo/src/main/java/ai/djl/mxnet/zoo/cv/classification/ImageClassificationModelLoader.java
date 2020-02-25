@@ -34,15 +34,14 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
+import ai.djl.util.Pair;
 import ai.djl.util.Progress;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /** Model loader for Image Classification models. */
 public abstract class ImageClassificationModelLoader
@@ -63,13 +62,15 @@ public abstract class ImageClassificationModelLoader
         super(repository, MRL.model(APPLICATION, GROUP_ID, artifactId), version);
         FactoryImpl factory = new FactoryImpl();
 
-        Map<Type, TranslatorFactory<?, ?>> map = new ConcurrentHashMap<>();
-        map.put(BufferedImage.class, factory);
-        map.put(Path.class, new FileTranslatorFactory<>(factory));
-        map.put(URL.class, new UrlTranslatorFactory<>(factory));
-        map.put(InputStream.class, new InputStreamTranslatorFactory<>(factory));
-
-        factories.put(Classifications.class, map);
+        factories.put(new Pair<>(BufferedImage.class, Classifications.class), factory);
+        factories.put(
+                new Pair<>(Path.class, Classifications.class),
+                new FileTranslatorFactory<>(factory));
+        factories.put(
+                new Pair<>(URL.class, Classifications.class), new UrlTranslatorFactory<>(factory));
+        factories.put(
+                new Pair<>(InputStream.class, Classifications.class),
+                new InputStreamTranslatorFactory<>(factory));
     }
 
     /** {@inheritDoc} */

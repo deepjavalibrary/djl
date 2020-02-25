@@ -22,6 +22,7 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.VersionRange;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
+import ai.djl.util.Pair;
 import ai.djl.util.Progress;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -36,7 +37,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
     protected Repository repository;
     protected MRL mrl;
     protected String version;
-    protected Map<Type, Map<Type, TranslatorFactory<?, ?>>> factories = new ConcurrentHashMap<>();
+    protected Map<Pair<Type, Type>, TranslatorFactory<?, ?>> factories = new ConcurrentHashMap<>();
 
     private Metadata metadata;
 
@@ -177,10 +178,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
 
     @SuppressWarnings("unchecked")
     private <S, T> TranslatorFactory<S, T> getTranslatorFactory(Criteria<S, T> criteria) {
-        Map<Type, TranslatorFactory<?, ?>> map = factories.get(criteria.getOutputClass());
-        if (map == null) {
-            return null;
-        }
-        return (TranslatorFactory<S, T>) map.get(criteria.getInputClass());
+        return (TranslatorFactory<S, T>)
+                factories.get(new Pair<>(criteria.getInputClass(), criteria.getOutputClass()));
     }
 }
