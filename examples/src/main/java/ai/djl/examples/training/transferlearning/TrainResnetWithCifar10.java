@@ -26,7 +26,6 @@ import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.mxnet.engine.MxEngine;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
@@ -125,10 +124,10 @@ public final class TrainResnetWithCifar10 {
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(BufferedImage.class, Classifications.class)
                         .optProgress(new ProgressBar())
-                        .optModelLoaderName("resnet");
+                        .optArtifactId("resnet");
         if (isSymbolic) {
             // load the model
-            builder.optEngine(MxEngine.ENGINE_NAME).optModelZooName(MxModelZoo.NAME);
+            builder.optGroupId(MxModelZoo.GROUP_ID);
             if (options == null) {
                 builder.optFilter("layers", "50");
                 builder.optFilter("flavor", "v1");
@@ -151,7 +150,7 @@ public final class TrainResnetWithCifar10 {
         }
         // imperative resnet50
         if (preTrained) {
-            builder.optModelZooName(BasicModelZoo.NAME);
+            builder.optGroupId(BasicModelZoo.GROUP_ID);
             if (options == null) {
                 builder.optFilter("layers", "50");
                 builder.optFilter("flavor", "v1");

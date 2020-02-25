@@ -30,11 +30,11 @@ import java.util.Map;
 public interface ModelLoader<I, O> {
 
     /**
-     * Returns the name of the {@code ModelLoader}.
+     * Returns the artifact ID of the {@code ModelLoader}.
      *
-     * @return the name of the {@code ModelLoader}
+     * @return the artifact ID of the {@code ModelLoader}
      */
-    String getName();
+    String getArtifactId();
 
     /**
      * Returns the application of the {@code ModelLoader}.

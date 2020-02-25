@@ -36,6 +36,12 @@ public class BasicModelZoo implements ModelZoo {
 
     /** {@inheritDoc} */
     @Override
+    public String getGroupId() {
+        return GROUP_ID;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Set<String> getSupportedEngines() {
         Set<String> set = new HashSet<>();
         set.add("MXNet");

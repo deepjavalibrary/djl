@@ -136,8 +136,8 @@ public class ResnetTest {
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(BufferedImage.class, Classifications.class)
-                        .optModelZooName(BasicModelZoo.NAME)
-                        .optModelLoaderName("resnet")
+                        .optGroupId(BasicModelZoo.GROUP_ID)
+                        .optArtifactId("resnet")
                         .optFilter("layers", "50")
                         .optFilter("dataset", "cifar10")
                         .build();

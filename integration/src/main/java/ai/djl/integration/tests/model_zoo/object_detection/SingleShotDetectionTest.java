@@ -135,8 +135,8 @@ public class SingleShotDetectionTest {
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(BufferedImage.class, DetectedObjects.class)
-                        .optModelZooName(BasicModelZoo.NAME)
-                        .optModelLoaderName("ssd")
+                        .optGroupId(BasicModelZoo.GROUP_ID)
+                        .optArtifactId("ssd")
                         .optFilter("flavor", "tiny")
                         .optFilter("dataset", "pikachu")
                         .build();

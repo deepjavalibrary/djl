@@ -56,7 +56,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
 
     /** {@inheritDoc} */
     @Override
-    public String getName() {
+    public String getArtifactId() {
         return mrl.getArtifactId();
     }
 

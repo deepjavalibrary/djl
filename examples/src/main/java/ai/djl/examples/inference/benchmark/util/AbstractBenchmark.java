@@ -12,7 +12,6 @@
  */
 package ai.djl.examples.inference.benchmark.util;
 
-import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
@@ -190,16 +189,15 @@ public abstract class AbstractBenchmark<I, O> {
 
         Criteria.Builder<I, O> builder =
                 Criteria.builder()
-                        .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(input, output)
                         .optFilters(arguments.getCriteria())
                         .optProgress(new ProgressBar());
 
-        String modelName = arguments.getModelName();
-        if (modelName == null) {
-            modelName = "resnet";
+        String artifactId = arguments.getModelName();
+        if (artifactId == null) {
+            artifactId = "ai.djl.mxnet:resnet";
         }
-        builder.optModelLoaderName(modelName);
+        builder.optArtifactId(artifactId);
 
         ZooModel<I, O> model = ModelZoo.loadModel(builder.build());
         long delta = System.nanoTime() - begin;

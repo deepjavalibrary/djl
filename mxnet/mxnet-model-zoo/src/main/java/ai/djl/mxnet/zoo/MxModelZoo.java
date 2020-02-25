@@ -58,6 +58,12 @@ public class MxModelZoo implements ModelZoo {
 
     /** {@inheritDoc} */
     @Override
+    public String getGroupId() {
+        return GROUP_ID;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Set<String> getSupportedEngines() {
         return Collections.singleton(MxEngine.ENGINE_NAME);
     }

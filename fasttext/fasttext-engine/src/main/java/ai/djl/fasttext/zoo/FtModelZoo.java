@@ -33,6 +33,12 @@ public class FtModelZoo implements ModelZoo {
 
     /** {@inheritDoc} */
     @Override
+    public String getGroupId() {
+        return GROUP_ID;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Set<String> getSupportedEngines() {
         return Collections.singleton(FtEngine.ENGINE_NAME);
     }

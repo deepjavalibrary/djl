@@ -25,6 +25,16 @@ import java.util.Set;
 public interface ModelZoo {
 
     /**
+     * Returns the global unique identifier of the {@code ModelZoo}.
+     *
+     * <p>We recommend to use reverse DNS name as your model zoo group ID to make sure it's not
+     * conflict with other ModelZoos.
+     *
+     * @return the global unique identifier of the {@code ModelZoo}
+     */
+    String getGroupId();
+
+    /**
      * Returns the {@code ModelZoo} with the given name.
      *
      * @param name the name of ModelZoo to retrieve
@@ -70,7 +80,7 @@ public interface ModelZoo {
      */
     default ModelLoader<?, ?> getModelLoader(String name) {
         for (ModelLoader<?, ?> loader : getModelLoaders()) {
-            if (name.equals(loader.getName())) {
+            if (name.equals(loader.getArtifactId())) {
                 return loader;
             }
         }
@@ -97,24 +107,25 @@ public interface ModelZoo {
      */
     static <I, O> ZooModel<I, O> loadModel(Criteria<I, O> criteria)
             throws IOException, ModelNotFoundException, MalformedModelException {
-        String modelZooName = criteria.getModelZooName();
+        String groupId = criteria.getGroupId();
         ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
         for (ZooProvider provider : providers) {
-            if (modelZooName != null && !provider.getName().equals(modelZooName)) {
-                // filter out ZooProvider by supported Engine
+            ModelZoo zoo = provider.getModelZoo();
+            if (groupId != null && !zoo.getGroupId().equals(groupId)) {
+                // filter out ModelZoo by groupId
                 continue;
             }
-            ModelZoo zoo = provider.getModelZoo();
+
             Set<String> supportedEngine = zoo.getSupportedEngines();
             if (!supportedEngine.contains(criteria.getEngine())) {
                 continue;
             }
 
             Application application = criteria.getApplication();
-            String modelLoaderName = criteria.getModelLoaderName();
+            String artifactId = criteria.getArtifactId();
             for (ModelLoader<?, ?> loader : zoo.getModelLoaders()) {
-                if (modelLoaderName != null && !modelLoaderName.equals(loader.getName())) {
-                    // filter out by model loader name
+                if (artifactId != null && !artifactId.equals(loader.getArtifactId())) {
+                    // filter out by model loader artifactId
                     continue;
                 }
                 if (application != null && !loader.getApplication().equals(application)) {

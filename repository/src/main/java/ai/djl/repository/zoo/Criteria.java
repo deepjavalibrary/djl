@@ -33,8 +33,8 @@ public class Criteria<I, O> {
     private Class<O> outputClass;
     private String engine;
     private Device device;
-    private String modelZooName;
-    private String modelLoaderName;
+    private String groupId;
+    private String artifactId;
     private Map<String, String> filters;
     private Map<String, Object> arguments;
     private Translator<I, O> translator;
@@ -46,8 +46,8 @@ public class Criteria<I, O> {
         this.outputClass = builder.outputClass;
         this.engine = builder.engine;
         this.device = builder.device;
-        this.modelZooName = builder.modelZooName;
-        this.modelLoaderName = builder.modelLoaderName;
+        this.groupId = builder.groupId;
+        this.artifactId = builder.artifactId;
         this.filters = builder.filters;
         this.arguments = builder.arguments;
         this.translator = builder.translator;
@@ -100,21 +100,21 @@ public class Criteria<I, O> {
     }
 
     /**
-     * Returns the name of the {@link ModelZoo} to be searched.
+     * Returns the groupId of the {@link ModelZoo} to be searched.
      *
-     * @return the name of the {@link ModelZoo} to be searched
+     * @return the groupId of the {@link ModelZoo} to be searched
      */
-    public String getModelZooName() {
-        return modelZooName;
+    public String getGroupId() {
+        return groupId;
     }
 
     /**
-     * Returns the name of the {@link ModelLoader} to be searched.
+     * Returns the artifactId of the {@link ModelLoader} to be searched.
      *
-     * @return the name of the {@link ModelLoader} to be searched
+     * @return the artifactIds of the {@link ModelLoader} to be searched
      */
-    public String getModelLoaderName() {
-        return modelLoaderName;
+    public String getArtifactId() {
+        return artifactId;
     }
 
     /**
@@ -170,8 +170,8 @@ public class Criteria<I, O> {
         Class<O> outputClass;
         String engine;
         Device device;
-        String modelZooName;
-        String modelLoaderName;
+        String groupId;
+        String artifactId;
         Map<String, String> filters;
         Map<String, Object> arguments;
         Translator<I, O> translator;
@@ -187,7 +187,7 @@ public class Criteria<I, O> {
             application = parent.application;
             engine = parent.engine;
             device = parent.device;
-            modelZooName = parent.modelZooName;
+            groupId = parent.groupId;
             filters = parent.filters;
             arguments = parent.arguments;
             progress = parent.progress;
@@ -240,24 +240,30 @@ public class Criteria<I, O> {
         }
 
         /**
-         * Sets optional model zoo name for this criteria.
+         * Sets optional groupId of the {@link ModelZoo} for this criteria.
          *
-         * @param modelZooName the model zoo name
+         * @param groupId the groupId of the {@link ModelZoo}
          * @return this {@code Builder}
          */
-        public Builder<I, O> optModelZooName(String modelZooName) {
-            this.modelZooName = modelZooName;
+        public Builder<I, O> optGroupId(String groupId) {
+            this.groupId = groupId;
             return this;
         }
 
         /**
-         * Sets optional model name for this criteria.
+         * Sets optional artifactId of the {@link ModelLoader} for this criteria.
          *
-         * @param modelLoaderName the model loader name
+         * @param artifactId the artifactId of the {@link ModelLoader}
          * @return this {@code Builder}
          */
-        public Builder<I, O> optModelLoaderName(String modelLoaderName) {
-            this.modelLoaderName = modelLoaderName;
+        public Builder<I, O> optArtifactId(String artifactId) {
+            if (artifactId.contains(":")) {
+                String[] tokens = artifactId.split(":");
+                groupId = tokens[0];
+                this.artifactId = tokens[1];
+            } else {
+                this.artifactId = artifactId;
+            }
             return this;
         }
 
