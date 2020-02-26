@@ -95,6 +95,12 @@ public class TfNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray create(boolean[] data) {
+        return new TfNDArray(this, Tensors.create(data));
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray create(int data) {
         // create scalar tensor with int
         return new TfNDArray(this, Tensors.create(data));
@@ -110,6 +116,11 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray create(Shape shape, DataType dataType, Device device) {
+        if (shape.dimension() == 0) {
+            // TensorFlow does not support empty scalar(emtpy NDArray with 0 dimension)
+            // initialize with scalar 0
+            return create(0f).toType(dataType, false);
+        }
         return new TfNDArray(
                 this,
                 tf.empty(
@@ -160,7 +171,7 @@ public class TfNDManager extends BaseNDManager {
         }
         buf.rewind();
         return new TfNDArray(
-                this, Tensor.create(TfDataType.toPrimitiveClass(inputType), shape.getShape(), buf));
+                this, Tensor.create(TfDataType.toPrimitiveClass(dataType), shape.getShape(), buf));
     }
 
     /** {@inheritDoc} */

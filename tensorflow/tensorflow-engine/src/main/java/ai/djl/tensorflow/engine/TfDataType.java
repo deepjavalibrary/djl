@@ -32,6 +32,7 @@ public final class TfDataType {
         map.put(DataType.INT32, org.tensorflow.DataType.INT32);
         map.put(DataType.INT64, org.tensorflow.DataType.INT64);
         map.put(DataType.UINT8, org.tensorflow.DataType.UINT8);
+        map.put(DataType.BOOLEAN, org.tensorflow.DataType.BOOL);
         return map;
     }
 
@@ -42,6 +43,7 @@ public final class TfDataType {
         map.put(org.tensorflow.DataType.INT32, DataType.INT32);
         map.put(org.tensorflow.DataType.INT64, DataType.INT64);
         map.put(org.tensorflow.DataType.UINT8, DataType.UINT8);
+        map.put(org.tensorflow.DataType.BOOL, DataType.BOOLEAN);
         return map;
     }
 
