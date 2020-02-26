@@ -22,30 +22,10 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSoftmax
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_resize
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUpsampleBilinear2d
   (JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jsize, jboolean jalign_corners) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   const auto size_vec = utils::GetVecFromJLongArray(env, jsize);
-  size_t dim = tensor_ptr->dim();
-  torch::Tensor temp_tensor = *tensor_ptr;
-  if (dim == 3) {
-    temp_tensor = temp_tensor.unsqueeze(0);
-  }
-  temp_tensor = temp_tensor.permute({0, 3, 1, 2});
-  torch::Tensor result = torch::upsample_bilinear2d(temp_tensor, size_vec, jalign_corners == JNI_TRUE).permute(
-    {0, 2, 3, 1});
-  if (dim == 3) {
-    result = result.squeeze(0);
-  }
-  const auto* result_ptr = new torch::Tensor(result);
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
-}
-
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_normalize
-  (JNIEnv* env, jobject jthis, jobject jhandle, jobject jmean, jobject jstd) {
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  const auto* mean_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jmean);
-  const auto* std_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jstd);
-  const auto* result_ptr = new torch::Tensor(tensor_ptr->sub(*mean_ptr).div(*std_ptr));
+  const auto* result_ptr = new torch::Tensor(torch::upsample_bilinear2d(*tensor_ptr, size_vec, jalign_corners == JNI_TRUE));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
 }

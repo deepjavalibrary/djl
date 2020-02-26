@@ -798,6 +798,10 @@ class MxNDArrayEx implements NDArrayEx {
         return array;
     }
 
+    private MxNDManager getManager() {
+        return array.getManager();
+    }
+
     private Shape getGlobalPoolingShapes(long fillValue) {
         // determine pooling dimension according to input
         // input dimension minus 2 (batch and channel dim)
@@ -812,9 +816,5 @@ class MxNDArrayEx implements NDArrayEx {
         long[] shape = new long[poolDim];
         Arrays.fill(shape, fillValue);
         return new Shape(shape);
-    }
-
-    private MxNDManager getManager() {
-        return array.getManager();
     }
 }

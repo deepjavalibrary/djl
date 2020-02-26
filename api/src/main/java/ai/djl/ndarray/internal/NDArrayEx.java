@@ -14,6 +14,7 @@ package ai.djl.ndarray.internal;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Activation;
@@ -381,7 +382,15 @@ public interface NDArrayEx {
      * @param std the standard deviation for each channel
      * @return the result of normalization
      */
-    NDArray normalize(float[] mean, float[] std);
+    default NDArray normalize(float[] mean, float[] std) {
+        NDManager manager = getArray().getManager();
+        int dim = getArray().getShape().dimension();
+        Shape shape = (dim == 3) ? new Shape(3, 1, 1) : new Shape(1, 3, 1, 1);
+        try (NDArray meanArr = manager.create(mean, shape);
+                NDArray stdArr = manager.create(std, shape)) {
+            return getArray().sub(meanArr).divi(stdArr);
+        }
+    }
 
     default NDArray toTensor() {
         NDArray array = getArray();

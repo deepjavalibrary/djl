@@ -40,7 +40,7 @@ public class MultiBoxDetection {
     private boolean clip;
     private float threshold;
     private int backgroundId;
-    private float nmsThreashold;
+    private float nmsThreshold;
     private boolean forceSuppress;
     private int nmsTopK;
 
@@ -54,7 +54,7 @@ public class MultiBoxDetection {
         this.clip = builder.clip;
         this.threshold = builder.threshold;
         this.backgroundId = builder.backgroundId;
-        this.nmsThreashold = builder.nmsThreashold;
+        this.nmsThreshold = builder.nmsThreshold;
         this.forceSuppress = builder.forceSuppress;
         this.nmsTopK = builder.nmsTopK;
     }
@@ -81,7 +81,7 @@ public class MultiBoxDetection {
                         clip,
                         threshold,
                         backgroundId,
-                        nmsThreashold,
+                        nmsThreshold,
                         forceSuppress,
                         nmsTopK);
     }
@@ -101,7 +101,7 @@ public class MultiBoxDetection {
         boolean clip = true;
         private float threshold = 0.01f;
         int backgroundId;
-        private float nmsThreashold = 0.5f;
+        private float nmsThreshold = 0.5f;
         boolean forceSuppress;
         private int nmsTopK = -1;
 
@@ -168,11 +168,11 @@ public class MultiBoxDetection {
         /**
          * Sets the non-maximum suppression(NMS) threshold. Defaults to 0.5.
          *
-         * @param nmsThreashold the non-maximum suppression(NMS) threshold
+         * @param nmsThreshold the non-maximum suppression(NMS) threshold
          * @return this {@code Builder}
          */
-        public Builder optNmsThreashold(float nmsThreashold) {
-            this.nmsThreashold = nmsThreashold;
+        public Builder optNmsThreshold(float nmsThreshold) {
+            this.nmsThreshold = nmsThreshold;
             return this;
         }
 

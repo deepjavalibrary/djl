@@ -103,3 +103,19 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDeleteTensor
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   delete tensor_ptr;
 }
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLogicalXor
+  (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(torch::logical_xor(*self_ptr, *other_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLogicalNot
+  (JNIEnv* env, jobject jthis, jobject jhandle) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->logical_not());
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+
+}

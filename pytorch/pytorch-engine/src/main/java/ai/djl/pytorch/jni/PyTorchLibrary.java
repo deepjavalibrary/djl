@@ -53,6 +53,12 @@ public final class PyTorchLibrary {
     public native Pointer torchOnes(
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 
+    public native Pointer torchZerosLike(
+            Pointer handle, int dType, int layout, int[] device, boolean requiredGrad);
+
+    public native Pointer torchOnesLike(
+            Pointer handle, int dType, int layout, int[] device, boolean requiredGrad);
+
     public native Pointer torchArange(
             float start,
             float end,
@@ -96,6 +102,10 @@ public final class PyTorchLibrary {
     public native void torchPowi(Pointer self, Pointer exponent);
 
     public native Pointer torchMatmul(Pointer self, Pointer other);
+
+    public native Pointer torchLogicalXor(Pointer self, Pointer other);
+
+    public native Pointer torchLogicalNot(Pointer handle);
 
     public native Pointer torchReshape(Pointer handle, long[] shape);
 
@@ -233,8 +243,6 @@ public final class PyTorchLibrary {
 
     public native void torchNegi(Pointer self);
 
-    public native Pointer normalize(Pointer handle, Pointer mean, Pointer std);
-
     public native Pointer atNormal(
             double mean,
             double std,
@@ -256,7 +264,8 @@ public final class PyTorchLibrary {
     public native Pointer torchEye(
             int n, int m, int dType, int layout, int[] device, boolean requiredGrad);
 
-    public native Pointer resize(Pointer handle, long[] size, boolean alignCorners);
+    public native Pointer torchUpsampleBilinear2d(
+            Pointer handle, long[] shape, boolean alignCorners);
 
     public native Pointer moduleLoad(String path, int[] device);
 

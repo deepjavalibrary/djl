@@ -88,6 +88,34 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchOnes(
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
 }
 
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchZerosLike(
+  JNIEnv* env,
+  jobject jthis,
+  jobject jhandle,
+  jint jdtype,
+  jint jlayout,
+  jintArray jdevice,
+  jboolean jrequired_grad) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
+  const auto* result_ptr = new torch::Tensor(torch::zeros_like(*tensor_ptr, options));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchOnesLike(
+  JNIEnv* env,
+  jobject jthis,
+  jobject jhandle,
+  jint jdtype,
+  jint jlayout,
+  jintArray jdevice,
+  jboolean jrequired_grad) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
+  const auto* result_ptr = new torch::Tensor(torch::ones_like(*tensor_ptr, options));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArange(
   JNIEnv* env,
   jobject jthis,

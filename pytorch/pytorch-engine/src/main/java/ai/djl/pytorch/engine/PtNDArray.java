@@ -261,13 +261,13 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray zerosLike() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.zerosLike(this, getDataType(), getDevice(), SparseFormat.DENSE);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray onesLike() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.onesLike(this, getDataType(), getDevice(), SparseFormat.DENSE);
     }
 
     /** {@inheritDoc} */
@@ -906,13 +906,13 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray logicalXor(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.logicalXor(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray logicalNot() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.logicalNot(this);
     }
 
     /** {@inheritDoc} */

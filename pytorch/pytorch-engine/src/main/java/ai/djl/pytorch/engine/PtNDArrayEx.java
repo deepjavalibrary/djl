@@ -377,12 +377,6 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray normalize(float[] mean, float[] std) {
-        return JniUtils.normalize(array, mean, std);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PtNDArray resize(int width, int height) {
         if (array.isEmpty()) {
             throw new IllegalArgumentException("attempt to resize of an empty NDArray");
@@ -390,7 +384,19 @@ public class PtNDArrayEx implements NDArrayEx {
         if (array.getDataType() != DataType.FLOAT32) {
             array = array.toType(DataType.FLOAT32, true);
         }
-        return JniUtils.resize(array, new long[] {height, width}, true);
+        int dim = array.getShape().dimension();
+        NDArray temp = array;
+        if (dim == 3) {
+            temp = temp.expandDims(0);
+        }
+        temp = temp.transpose(0, 3, 1, 2);
+        NDArray result =
+                JniUtils.upsampleBilinear2d((PtNDArray) temp, new long[] {height, width}, true)
+                        .transpose(0, 2, 3, 1);
+        if (dim == 3) {
+            result = result.squeeze(0);
+        }
+        return (PtNDArray) result;
     }
 
     /** {@inheritDoc} */
@@ -481,9 +487,5 @@ public class PtNDArrayEx implements NDArrayEx {
     @Override
     public PtNDArray getArray() {
         return array;
-    }
-
-    private PtNDManager getManager() {
-        return array.getManager();
     }
 }
