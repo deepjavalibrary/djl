@@ -396,16 +396,6 @@ public class TfNDArrayEx implements NDArrayEx {
     }
 
     @Override
-    public NDArray rnnParameterConcat(NDList arrays, int numArgs) {
-        return null;
-    }
-
-    @Override
-    public NDArray rnnParameterConcat(NDList arrays, int numArgs, int dim) {
-        return null;
-    }
-
-    @Override
     public NDList multiBoxTarget(
             NDList inputs,
             float iouThreshold,

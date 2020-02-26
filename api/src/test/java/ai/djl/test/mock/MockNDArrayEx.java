@@ -406,16 +406,6 @@ public class MockNDArrayEx implements NDArrayEx {
         return null;
     }
 
-    @Override
-    public NDArray rnnParameterConcat(NDList arrays, int numArgs) {
-        return null;
-    }
-
-    @Override
-    public NDArray rnnParameterConcat(NDList arrays, int numArgs, int dim) {
-        return null;
-    }
-
     /** {@inheritDoc} */
     @Override
     public NDList multiBoxTarget(

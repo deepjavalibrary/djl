@@ -437,16 +437,6 @@ public class PtNDArrayEx implements NDArrayEx {
         return JniUtils.cat(srcArray, axis);
     }
 
-    @Override
-    public NDArray rnnParameterConcat(NDList arrays, int numArgs) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public NDArray rnnParameterConcat(NDList arrays, int numArgs, int dim) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
     /** {@inheritDoc} */
     @Override
     public NDList multiBoxTarget(
