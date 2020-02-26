@@ -168,7 +168,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.ones(new Shape(1));
      * jshell&gt; NDArrays.eq(array, 1);
-     * ND: (1) cpu(0) boolean
+     * ND: (1) cpu() boolean
      * [ true]
      * </pre>
      *
@@ -188,7 +188,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.ones(new Shape(1));
      * jshell&gt; NDArrays.eq(1, array);
-     * ND: (1) cpu(0) boolean
+     * ND: (1) cpu() boolean
      * [ true]
      * </pre>
      *
@@ -209,7 +209,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f, 3f});
      * jshell&gt; NDArray array2 = manager.arange(3f);
      * jshell&gt; NDArrays.eq(array1, array2);
-     * ND: (3) cpu(0) boolean
+     * ND: (3) cpu() boolean
      * [ true,  true, false]
      * </pre>
      *
@@ -229,7 +229,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(4f).reshape(2, 2);
      * jshell&gt; NDArrays.neq(array, 1);
-     * ND: (2, 2) cpu(0) boolean
+     * ND: (2, 2) cpu() boolean
      * [[ true, false],
      *  [ true,  true],
      * ]
@@ -251,7 +251,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(f4).reshape(2, 2);
      * jshell&gt; NDArrays.neq(1, array);
-     * ND: (2, 2) cpu(0) boolean
+     * ND: (2, 2) cpu() boolean
      * [[ true, false],
      *  [ true,  true],
      * ]
@@ -274,12 +274,12 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {1f, 3f});
      * jshell&gt; NDArrays.neq(array1, array2);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [false,  true]
      * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {1f, 3f, 1f, 4f}, new Shape(2, 2));
      * jshell&gt; NDArrays.neq(array1, array2); // broadcasting
-     * ND: (2, 2) cpu(0) boolean
+     * ND: (2, 2) cpu() boolean
      * [[false,  true],
      *  [false,  true],
      * ]
@@ -301,7 +301,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
      * jshell&gt; NDArrays.gt(array, 2f);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [ true, false]
      * </pre>
      *
@@ -321,7 +321,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
      * jshell&gt; NDArrays.gt(2f, array);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [false, false]
      * </pre>
      *
@@ -342,7 +342,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new float[] {4f, 2f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
      * jshell&gt; NDArrays.gt(array1, array2);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [ true, false]
      * </pre>
      *
@@ -362,7 +362,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
      * jshell&gt; NDArrays.gte(array, 2);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [ true, true]
      * </pre>
      *
@@ -382,7 +382,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {4f, 2f});
      * jshell&gt; NDArrays.gte(2, array);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [false,  true]
      * </pre>
      *
@@ -403,7 +403,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new float[] {4f, 2f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
      * jshell&gt; NDArrays.gte(array1, array2);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [ true, true]
      * </pre>
      *
@@ -423,7 +423,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.lt(array, 2f);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [ true, false]
      * </pre>
      *
@@ -443,7 +443,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.lt(2f, array);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [false, false]
      * </pre>
      *
@@ -464,7 +464,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
      * jshell&gt; NDArrays.lt(array1, array2);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [ true, false]
      * </pre>
      *
@@ -484,7 +484,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.lte(array, 2f);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [ true, true]
      * </pre>
      *
@@ -504,7 +504,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.lte(2f, array);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [false,  true]
      * </pre>
      *
@@ -525,7 +525,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 2f});
      * jshell&gt; NDArrays.lte(array1, array2)
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [ true, true]
      * </pre>
      *
@@ -555,11 +555,11 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(10f);
      * jshell&gt; NDArrays.where(array.lt(5), array, array.mul(10));
-     * ND: (10) cpu(0) float32
+     * ND: (10) cpu() float32
      * [ 0.,  1.,  2.,  3.,  4., 50., 60., 70., 80., 90.]
      * jshell&gt; NDArray array = manager.create(new float[]{0f, 1f, 2f, 0f, 2f, 4f, 0f, 3f, 6f}, new Shape(3, 3));
      * jshell&gt; NDArrays.where(array.lt(4), array, manager.create(-1f));
-     * ND: (3, 3) cpu(0) float32
+     * ND: (3, 3) cpu() float32
      * [[ 0.,  1.,  2.],
      *  [ 0.,  2., -1.],
      *  [ 0.,  3., -1.],
@@ -583,7 +583,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {2f, 3f, 4f});
      * jshell&gt; NDArrays.maximum(array, 3f);
-     * ND: (3) cpu(0) float32
+     * ND: (3) cpu() float32
      * [3., 3., 4.]
      * </pre>
      *
@@ -603,7 +603,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {2f, 3f, 4f});
      * jshell&gt; NDArrays.maximum(3f, array);
-     * ND: (3) cpu(0) float32
+     * ND: (3) cpu() float32
      * [3., 3., 4.]
      * </pre>
      *
@@ -626,12 +626,12 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new float[] {2f, 3f, 4f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {1f, 5f, 2f});
      * jshell&gt; NDArrays.maximum(array1, array2);
-     * ND: (3) cpu(0) float32
+     * ND: (3) cpu() float32
      * [2., 5., 4.]
      * jshell&gt; NDArray array1 = manager.eye(2);
      * jshell&gt; NDArray array2 = manager.create(new float[] {0.5f, 2f});
      * jshell&gt; NDArrays.maximum(array1, array2); // broadcasting
-     * ND: (2, 2) cpu(0) float32
+     * ND: (2, 2) cpu() float32
      * [[1. , 2. ],
      *  [0.5, 2. ],
      * ]
@@ -653,7 +653,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {2f, 3f, 4f});
      * jshell&gt; NDArrays.minimum(array, 3f);
-     * ND: (3) cpu(0) float32
+     * ND: (3) cpu() float32
      * [2., 3., 3.]
      * </pre>
      *
@@ -673,7 +673,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {2f, 3f, 4f});
      * jshell&gt; NDArrays.minimum(3f, array);
-     * ND: (3) cpu(0) float32
+     * ND: (3) cpu() float32
      * [2., 3., 3.]
      * </pre>
      *
@@ -696,12 +696,12 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new float[] {2f, 3f, 4f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {1f, 5f, 2f});
      * jshell&gt; NDArrays.minimum(array1, array2);
-     * ND: (3) cpu(0) float32
+     * ND: (3) cpu() float32
      * [1., 3., 2.]
      * jshell&gt; NDArray array1 = manager.eye(2);
      * jshell&gt; NDArray array2 = manager.create(new float[] {0.5f, 2f});
      * jshell&gt; NDArrays.minimum(array1, array2); // broadcasting
-     * ND: (2, 2) cpu(0) float32
+     * ND: (2, 2) cpu() float32
      * [[0.5, 0. ],
      *  [0. , 1. ],
      * ]
@@ -725,7 +725,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(3, 2));
      * jshell&gt; NDArray mask = manager.create(new boolean[] {true, false, true});
      * jshell&gt; NDArrays.booleanMask(array, mask);
-     * ND: (2, 2) cpu(0) float32
+     * ND: (2, 2) cpu() float32
      * [[1., 2.],
      *  [5., 6.],
      * ]
@@ -764,7 +764,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.add(array, 2f);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [3., 4.]
      * </pre>
      *
@@ -784,7 +784,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.add(2f, array);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [3., 4.]
      * </pre>
      *
@@ -806,7 +806,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.add(array, array, array);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [3., 6.]
      * </pre>
      *
@@ -833,7 +833,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; array.sub(2f);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [-1.,  0.]
      * </pre>
      *
@@ -853,7 +853,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.sub(3f, array);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [2., 1.]
      * </pre>
      *
@@ -876,7 +876,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.arange(9f).reshape(3, 3);
      * jshell&gt; NDArray array2 = manager.arange(3f);
      * jshell&gt; NDArrays.sub(array1, array2); // broadcasting
-     * ND: (3, 3) cpu(0) float32
+     * ND: (3, 3) cpu() float32
      * [[0., 0., 0.],
      *  [3., 3., 3.],
      *  [6., 6., 6.],
@@ -899,7 +899,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.mul(array, 3f);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [3., 6.]
      * </pre>
      *
@@ -919,7 +919,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.mul(3f, array);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [3., 6.]
      * </pre>
      *
@@ -941,7 +941,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.mul(array, array, array);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [1., 8.]
      * </pre>
      *
@@ -968,7 +968,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(5f);
      * jshell&gt; NDArrays.div(array, 4f);
-     * ND: (5) cpu(0) float32
+     * ND: (5) cpu() float32
      * [0.  , 0.25, 0.5 , 0.75, 1.  ]
      * </pre>
      *
@@ -988,7 +988,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(5f).add(1);
      * jshell&gt; NDArrays.div(4f, array);
-     * ND: (5) cpu(0) float32
+     * ND: (5) cpu() float32
      * [4.    , 2.    , 1.3333, 1.    , 0.8   ]
      * </pre>
      *
@@ -1011,7 +1011,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.arange(9f).reshape(3, 3);
      * jshell&gt; NDArray array2 = manager.ones(new Shape(3)).mul(10);
      * jshell&gt; NDArrays.div(array1, array2); // broadcasting
-     * ND: (3, 3) cpu(0) float32
+     * ND: (3, 3) cpu() float32
      * [[0. , 0.1, 0.2],
      *  [0.3, 0.4, 0.5],
      *  [0.6, 0.7, 0.8],
@@ -1034,7 +1034,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(7f);
      * jshell&gt; NDArrays.mod(array, 5f);
-     * ND: (7) cpu(0) float32
+     * ND: (7) cpu() float32
      * [0., 1., 2., 3., 4., 0., 1.]
      * </pre>
      *
@@ -1054,7 +1054,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(7f).add(1);
      * jshell&gt; NDArrays.mod(5f, array);
-     * ND: (7) cpu(0) float32
+     * ND: (7) cpu() float32
      * [0., 1., 2., 1., 0., 5., 5.]
      * </pre>
      *
@@ -1075,7 +1075,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new float[] {4f, 7f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
      * jshell&gt; NDArrays.mod(array1, array2);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [0., 1.]
      * </pre>
      *
@@ -1095,7 +1095,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(5f);
      * jshell&gt; NDArrays.pow(array, 4f);
-     * ND: (6) cpu(0) float32
+     * ND: (6) cpu() float32
      * [  0.,   1.,   8.,  27.,  64., 125.]
      * </pre>
      *
@@ -1115,7 +1115,7 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(5f);
      * jshell&gt; NDArrays.pow(4f, array);
-     * ND: (5) cpu(0) float32
+     * ND: (5) cpu() float32
      * [  1.,   4.,  16.,  64., 256.]
      * </pre>
      *
@@ -1138,7 +1138,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.arange(6f).reshape(3, 2);
      * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
      * jshell&gt; NDArrays.pow(array1, array2); // broadcasting
-     * ND: (3, 2) cpu(0) float32
+     * ND: (3, 2) cpu() float32
      * [[  0.,   1.],
      *  [  4.,  27.],
      *  [ 16., 125.],
@@ -1161,10 +1161,10 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.addi(array, 2f);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [3., 4.]
      * jshell&gt; array;
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [3., 4.]
      * </pre>
      *
@@ -1184,10 +1184,10 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.addi(2f, array);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [3., 4.]
      * jshell&gt; array;
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [3., 4.]
      * </pre>
      *
@@ -1211,10 +1211,10 @@ public final class NDArrays {
      * jshell&gt; NDArray array2 = manager.create(new float[] {3f, 4f});
      * jshell&gt; NDArray array3 = manager.create(new float[] {5f, 6f});
      * jshell&gt; NDArrays.addi(array1, array2, array3);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [9., 12.]
      * jshell&gt; array;
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [9., 12.]
      * </pre>
      *
@@ -1236,10 +1236,10 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.subi(array, 2f);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [-1.,  0.]
      * jshell&gt; array;
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [-1.,  0.]
      * </pre>
      *
@@ -1259,10 +1259,10 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.subi(3f, array);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [2., 1.]
      * jshell&gt; array;
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [2., 1.]
      * </pre>
      *
@@ -1285,7 +1285,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.arange(9f).reshape(3, 3);
      * jshell&gt; NDArray array2 = manager.arange(3f);
      * jshell&gt; NDArrays.subi(array1, array2); // broadcasting
-     * ND: (3, 3) cpu(0) float32
+     * ND: (3, 3) cpu() float32
      * [[0., 0., 0.],
      *  [3., 3., 3.],
      *  [6., 6., 6.],
@@ -1313,10 +1313,10 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.muli(array, 3f);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [3., 6.]
      * jshell&gt; array;
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [3., 6.]
      * </pre>
      *
@@ -1336,10 +1336,10 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.muli(3f, array);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [3., 6.]
      * jshell&gt; array;
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [3., 6.]
      * </pre>
      *
@@ -1363,10 +1363,10 @@ public final class NDArrays {
      * jshell&gt; NDArray array2 = manager.create(new float[] {3f, 4f});
      * jshell&gt; NDArray array3 = manager.create(new float[] {5f, 6f});
      * jshell&gt; NDArrays.muli(array1, array2, array3);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [15., 48.]
      * jshell&gt; array;
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [15., 48.]
      * </pre>
      *
@@ -1388,10 +1388,10 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(5f);
      * jshell&gt; NDArrays.divi(array, 4f);
-     * ND: (5) cpu(0) float32
+     * ND: (5) cpu() float32
      * [0.  , 0.25, 0.5 , 0.75, 1.  ]
      * jshell&gt; array;
-     * ND: (5) cpu(0) float32
+     * ND: (5) cpu() float32
      * [0.  , 0.25, 0.5 , 0.75, 1.  ]
      * </pre>
      *
@@ -1411,10 +1411,10 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(5f).add(1);
      * jshell&gt; NDArrays.divi(4f, array);
-     * ND: (5) cpu(0) float32
+     * ND: (5) cpu() float32
      * [4.    , 2.    , 1.3333, 1.    , 0.8   ]
      * jshell&gt; array;
-     * ND: (5) cpu(0) float32
+     * ND: (5) cpu() float32
      * [4.    , 2.    , 1.3333, 1.    , 0.8   ]
      * </pre>
      *
@@ -1437,7 +1437,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.arange(9f).reshape(3, 3);
      * jshell&gt; NDArray array2 = manager.ones(new Shape(3)).mul(10);
      * jshell&gt; NDArrays.divi(array1, array2); // broadcasting
-     * ND: (3, 3) cpu(0) float32
+     * ND: (3, 3) cpu() float32
      * [[0. , 0.1, 0.2],
      *  [0.3, 0.4, 0.5],
      *  [0.6, 0.7, 0.8],
@@ -1465,10 +1465,10 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(7f);
      * jshell&gt; NDArrays.modi(array, 5f);
-     * ND: (7) cpu(0) float32
+     * ND: (7) cpu() float32
      * [0., 1., 2., 3., 4., 0., 1.]
      * jshell&gt; array;
-     * ND: (7) cpu(0) float32
+     * ND: (7) cpu() float32
      * [0., 1., 2., 3., 4., 0., 1.]
      * </pre>
      *
@@ -1488,10 +1488,10 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(7f);
      * jshell&gt; NDArrays.modi(5f, array);
-     * ND: (7) cpu(0) float32
+     * ND: (7) cpu() float32
      * [0., 0., 1., 2., 1., 0., 5.]
      * jshell&gt; array;
-     * ND: (7) cpu(0) float32
+     * ND: (7) cpu() float32
      * [0., 0., 1., 2., 1., 0., 5.]
      * </pre>
      *
@@ -1512,10 +1512,10 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new float[] {4f, 7f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
      * jshell&gt; NDArrays.modi(array1, array2);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [0., 1.]
      * jshell&gt; array1;
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [0., 1.]
      * </pre>
      *
@@ -1535,10 +1535,10 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(5f);
      * jshell&gt; NDArrays.powi(array, 4f);
-     * ND: (6) cpu(0) float32
+     * ND: (6) cpu() float32
      * [  0.,   1.,   8.,  27.,  64., 125.]
      * jshell&gt; array;
-     * ND: (6) cpu(0) float32
+     * ND: (6) cpu() float32
      * [  0.,   1.,   8.,  27.,  64., 125.]
      * </pre>
      *
@@ -1558,10 +1558,10 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.arange(5f);
      * jshell&gt; NDArrays.powi(4f, array);
-     * ND: (5) cpu(0) float32
+     * ND: (5) cpu() float32
      * [  1.,   4.,  16.,  64., 256.]
      * jshell&gt; array;
-     * ND: (5) cpu(0) float32
+     * ND: (5) cpu() float32
      * [  1.,   4.,  16.,  64., 256.]
      * </pre>
      *
@@ -1584,13 +1584,13 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.arange(6f).reshape(3, 2);
      * jshell&gt; NDArray array2 = manager.create(new float[] {2f, 3f});
      * jshell&gt; NDArrays.powi(array1, array2); // broadcasting
-     * ND: (3, 2) cpu(0) float32
+     * ND: (3, 2) cpu() float32
      * [[  0.,   1.],
      *  [  4.,  27.],
      *  [ 16., 125.],
      * ]
      * jshell&gt; array1;
-     * ND: (3, 2) cpu(0) float32
+     * ND: (3, 2) cpu() float32
      * [[  0.,   1.],
      *  [  4.,  27.],
      *  [ 16., 125.],
@@ -1628,31 +1628,31 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f, 3f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {4f, 5f, 6f});
      * jshell&gt; NDArrays.dot(array1, array2); // inner product
-     * ND: () cpu(0) float32
+     * ND: () cpu() float32
      * 32.
      * jshell&gt; array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
      * jshell&gt; array2 = manager.create(new float[] {5f, 6f, 7f, 8f}, new Shape(2, 2));
      * jshell&gt; NDArrays.dot(array1, array2); // matrix multiplication
-     * ND: (2, 2) cpu(0) float32
+     * ND: (2, 2) cpu() float32
      * [[19., 22.],
      *  [43., 50.],
      * ]
      * jshell&gt; array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
      * jshell&gt; array2 = manager.create(5f);
      * jshell&gt; NDArrays.dot(array1, array2);
-     * ND: (2, 2) cpu(0) float32
+     * ND: (2, 2) cpu() float32
      * [[ 5., 10.],
      *  [15., 20.],
      * ]
      * jshell&gt; array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
      * jshell&gt; array2 = manager.create(new float[] {1f, 2f});
      * jshell&gt; NDArrays.dot(array1, array2);
-     * ND: (2) cpu(0) float32
+     * ND: (2) cpu() float32
      * [ 5., 11.]
      * jshell&gt; array1 = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f}, new Shape(2, 2, 2));
      * jshell&gt; array2 = manager.create(new float[] {1f, 2f, 3f ,4f}, new Shape(2, 2));
      * jshell&gt; NDArrays.dot(array1, array2);
-     * ND: (2, 2, 2) cpu(0) float32
+     * ND: (2, 2, 2) cpu() float32
      * [[[ 7., 10.],
      *   [15., 22.],
      *  ],
@@ -1680,7 +1680,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array2 = manager.create(new float[] {3f, 4f, 5f});
      * jshell&gt; NDArray array3 = manager.create(new float[] {6f, 7f, 8f});
      * jshell&gt; NDArrays.stack(new NDList(array1, array2, array3));
-     * ND: (3, 3) cpu(0) float32
+     * ND: (3, 3) cpu() float32
      * [[0., 1., 2.],
      *  [3., 4., 5.],
      *  [6., 7., 8.],
@@ -1709,14 +1709,14 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f, 2f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {3f, 4f, 5f});
      * jshell&gt; NDArrays.stack(new NDList(array1, array2), 0);
-     * ND: (2, 3) cpu(0) float32
+     * ND: (2, 3) cpu() float32
      * [[0., 1., 2.],
      *  [3., 4., 5.],
      * ]
      * jshell&gt; NDArray array1 = manager.create(new float[] {0f, 1f, 2f});
      * jshell&gt; NDArray array2 = manager.create(new float[] {3f, 4f, 5f});
      * jshell&gt; NDArrays.stack(new NDList(array1, array2), 1);
-     * ND: (3, 2) cpu(0) float32
+     * ND: (3, 2) cpu() float32
      * [[0., 3.],
      *  [1., 4.],
      *  [2., 5.],
@@ -1745,7 +1745,7 @@ public final class NDArrays {
      * jshell&gt; NDArray array2 = manager.create(new float[] {3f, 4f, 5f});
      * jshell&gt; NDArray array3 = manager.create(new float[] {6f, 7f, 8f});
      * jshell&gt; NDArrays.concat(new NDList(array1, array2, array3));
-     * ND: (9) cpu(0) float32
+     * ND: (9) cpu() float32
      * [0., 1., 2., 3., 4., 5., 6., 7., 8.]
      * </pre>
      *
@@ -1766,13 +1766,13 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
      * jshell&gt; NDArray array2 = manager.create(new float[] {5f, 6f}, new Shape(1, 2));
      * jshell&gt; NDArrays.concat(new NDList(array1, array2), 0);
-     * ND: (3, 2) cpu(0) float32
+     * ND: (3, 2) cpu() float32
      * [[1., 2.],
      *  [3., 4.],
      *  [5., 6.],
      * ]
      * jshell&gt; NDArrays.concat(new NDList(array1, array2.transpose()), 1);
-     * ND: (2, 3) cpu(0) float32
+     * ND: (2, 3) cpu() float32
      * [[1., 2., 5.],
      *  [3., 4., 6.],
      * ]
@@ -1799,12 +1799,12 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new boolean[] {true});
      * jshell&gt; NDArray array2 = manager.create(new boolean[] {false});
      * jshell&gt; NDArrays.logicalAnd(array1, array2);
-     * ND: (1) cpu(0) boolean
+     * ND: (1) cpu() boolean
      * [false]
      * jshell&gt; array1 = manager.create(new boolean[] {true, false});
      * jshell&gt; array2 = manager.create(new boolean[] {false, false});
      * jshell&gt; NDArrays.logicalAnd(array.gt(1), array.lt(4));
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [false, false]
      * </pre>
      *
@@ -1826,19 +1826,19 @@ public final class NDArrays {
      * jshell&gt; NDArray array1 = manager.create(new boolean[] {true});
      * jshell&gt; NDArray array2 = manager.create(new boolean[] {false});
      * jshell&gt; NDArrays.logicalOr(array1, array2);
-     * ND: (1) cpu(0) boolean
+     * ND: (1) cpu() boolean
      * [ true]
      * jshell&gt; array1 = manager.create(new boolean[] {true, false});
      * jshell&gt; array2 = manager.create(new boolean[] {false, false});
      * jshell&gt; NDArrays.logicalOr(array1, array2);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [ true, false]
      * </pre>
      *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(5f);
      * jshell&gt; NDArrays.logicalOr(array.lt(1), array.gt(3));
-     * ND: (5) cpu(0) boolean
+     * ND: (5) cpu() boolean
      * [ true, false, false, false,  true]
      * </pre>
      *
@@ -1859,19 +1859,19 @@ public final class NDArrays {
      * <pre>
      * jshell&gt; NDArray array = manager.create(new boolean[] {true});
      * jshell&gt; NDArrays.logicalXor(array1, array2);
-     * ND: (1) cpu(0) boolean
+     * ND: (1) cpu() boolean
      * [ true]
      * jshell&gt; array1 = manager.create(new boolean[] {true, false});
      * jshell&gt; array2 = manager.create(new boolean[] {false, false});
      * jshell&gt; NDArrays.logicalXor(array1, array2);
-     * ND: (2) cpu(0) boolean
+     * ND: (2) cpu() boolean
      * [ true, false]
      * </pre>
      *
      * <pre>
      * jshell&gt; NDArray array = manager.arange(5f);
      * jshell&gt; NDArrays.logicalXor(array.lt(1), array.gt(3));
-     * ND: (5) cpu(0) boolean
+     * ND: (5) cpu() boolean
      * [ true, false, false, false,  true]
      * </pre>
      *
