@@ -15,8 +15,8 @@
 
 // The file is the implementation for PyTorch tensor other ops
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFlatten
-  (JNIEnv* env, jobject jthis, jobject jhandle, jlong jstart_dim, jlong jend_dim) {
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFlatten(
+    JNIEnv* env, jobject jthis, jobject jhandle, jlong jstart_dim, jlong jend_dim) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->flatten(jstart_dim, jend_dim));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);

@@ -14,21 +14,22 @@
 #define DJL_TORCH_DJL_PYTORCH_JNI_LOG_H
 
 #include <jni.h>
-#include <string>
-#include <iostream>
+
 #include <cassert>
+#include <iostream>
+#include <string>
 
 static constexpr const char* const JNIUTILS_CLASS = "ai/djl/pytorch/jni/JniUtils";
 
 class Log {
-public:
+ public:
   Log(JNIEnv* env);
   void error(const std::string& message);
-private:
+
+ private:
   JNIEnv* env;
   const jobject logger;
   const jmethodID error_method;
 };
 
-
-#endif //DJL_TORCH_DJL_PYTORCH_JNI_LOG_H
+#endif  // DJL_TORCH_DJL_PYTORCH_JNI_LOG_H

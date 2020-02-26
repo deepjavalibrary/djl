@@ -28,8 +28,7 @@ static inline jmethodID get_info_method(JNIEnv* env, jobject log) {
   return method_id;
 }
 
-Log::Log(JNIEnv* env) : env(env), logger(get_log_object(env)), error_method(get_info_method(env, logger)) {
-}
+Log::Log(JNIEnv* env) : env(env), logger(get_log_object(env)), error_method(get_info_method(env, logger)) {}
 
 void Log::error(const std::string& message) {
   env->CallVoidMethod(logger, error_method, env->NewStringUTF(message.c_str()));

@@ -9,7 +9,7 @@ buildscript {
     }
 }
 
-apply plugin: FormatterPlugin
+apply plugin: JavaFormatterPlugin
 
 check.dependsOn verifyJava
 
@@ -19,7 +19,7 @@ import com.google.googlejavaformat.java.JavaFormatterOptions
 import com.google.googlejavaformat.java.Main
 import com.google.googlejavaformat.java.RemoveUnusedImports
 
-class FormatterPlugin implements Plugin<Project> {
+class JavaFormatterPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.task('formatJava') {
             doLast {

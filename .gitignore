@@ -1,6 +1,7 @@
 .gradle
 .DS_Store
 .idea
+.clang
 *.iml
 .ipynb_checkpoints
 build

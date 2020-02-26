@@ -10,18 +10,17 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+#include <torch/torch.h>
+
 #include "../build/include/ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_utils.h"
-#include <torch/torch.h>
 
 // The file is the implementation for PyTorch system-wide operations
 
-JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchManualSeed
-  (JNIEnv* env, jobject jthis, jlong jseed) {
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchManualSeed(JNIEnv* env, jobject jthis, jlong jseed) {
   torch::manual_seed(jseed);
 }
 
-JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchCudaAvailable
-  (JNIEnv* env, jobject jthis) {
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchCudaAvailable(JNIEnv* env, jobject jthis) {
   return torch::cuda::is_available();
 }

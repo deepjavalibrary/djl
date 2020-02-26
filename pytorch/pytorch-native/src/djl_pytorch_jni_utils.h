@@ -13,10 +13,12 @@
 #ifndef DJL_TORCH_DJL_PYTORCH_JNI_UTILS_H
 #define DJL_TORCH_DJL_PYTORCH_JNI_UTILS_H
 
-#include <jni.h>
-#include <iostream>
 #include <c10/util/typeid.h>
+#include <jni.h>
 #include <torch/script.h>
+
+#include <iostream>
+
 #include "djl_pytorch_jni_log.h"
 
 // The file is utilities that ared used for JNI
@@ -71,7 +73,7 @@ inline c10::ScalarType GetScalarTypeFromDType(jint dtype) {
   }
 }
 
-template<typename T>
+template <typename T>
 inline T* GetPointerFromJHandle(JNIEnv* env, jobject jhandle) {
   Log log(env);
   jclass cls = env->FindClass(POINTER_CLASS);
@@ -83,7 +85,7 @@ inline T* GetPointerFromJHandle(JNIEnv* env, jobject jhandle) {
   return reinterpret_cast<T*>(ptr);
 }
 
-template<typename T>
+template <typename T>
 inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandles) {
   Log log(env);
   jclass cls = env->FindClass(POINTER_CLASS);
@@ -102,7 +104,7 @@ inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandle
   return std::move(vec);
 }
 
-template<typename T>
+template <typename T>
 inline jobject CreatePointer(JNIEnv* env, const T* ptr) {
   Log log(env);
   jclass cls = env->FindClass(POINTER_CLASS);
@@ -151,22 +153,19 @@ inline c10::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
   return c10_device;
 }
 
-inline torch::TensorOptions CreateTensorOptions(JNIEnv* env,
-                                                jint jdtype,
-                                                jint jlayout,
-                                                jintArray jdevice,
-                                                jboolean jrequired_grad) {
+inline torch::TensorOptions CreateTensorOptions(
+    JNIEnv* env, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
   auto options = torch::TensorOptions()
-    .layout((jlayout == 0) ? torch::kStrided : torch::kSparse)
-    .device(device)
-    .requires_grad(JNI_TRUE == jrequired_grad);
+                     .layout((jlayout == 0) ? torch::kStrided : torch::kSparse)
+                     .device(device)
+                     .requires_grad(JNI_TRUE == jrequired_grad);
   // DJL's UNKNOWN type
   if (jdtype != 8) {
-   options = options.dtype(GetScalarTypeFromDType(jdtype));
+    options = options.dtype(GetScalarTypeFromDType(jdtype));
   }
   return options;
 }
-} // namespace utils
+}  // namespace utils
 
-#endif //DJL_TORCH_DJL_PYTORCH_JNI_UTILS_H
+#endif  // DJL_TORCH_DJL_PYTORCH_JNI_UTILS_H
