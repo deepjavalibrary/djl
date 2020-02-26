@@ -101,7 +101,6 @@ public final class TrainCaptcha {
 
         DefaultTrainingConfig config =
                 new DefaultTrainingConfig(loss)
-                        .setBatchSize(arguments.getBatchSize())
                         .optDevices(Device.getDevices(arguments.getMaxGpus()))
                         .addTrainingListeners(
                                 TrainingListener.Defaults.logging(arguments.getOutputDir()));

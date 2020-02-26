@@ -122,7 +122,6 @@ public class SingleShotDetectionTest {
 
     private TrainingConfig setupTrainingConfig() {
         return new DefaultTrainingConfig(new SingleShotDetectionLoss())
-                .setBatchSize(32)
                 .addEvaluator(new SingleShotDetectionAccuracy("classAccuracy"))
                 .addEvaluator(new BoundingBoxError("boundingBoxError"))
                 .optDevices(Device.getDevices(1));

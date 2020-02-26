@@ -35,7 +35,6 @@ public class DefaultTrainingConfig implements TrainingConfig {
     private Loss loss;
     private List<Evaluator> evaluators;
     private List<TrainingListener> listeners;
-    private int batchSize;
 
     /**
      * Creates an instance of {@code DefaultTrainingConfig} with the given {@link Loss}. {@code
@@ -110,17 +109,6 @@ public class DefaultTrainingConfig implements TrainingConfig {
         return this;
     }
 
-    /**
-     * Sets the size of a batch for training.
-     *
-     * @param batchSize the batch size
-     * @return this {@code DefaultTrainingConfig}
-     */
-    public DefaultTrainingConfig setBatchSize(int batchSize) {
-        this.batchSize = batchSize;
-        return this;
-    }
-
     /** {@inheritDoc} */
     @Override
     public Device[] getDevices() {
@@ -158,11 +146,5 @@ public class DefaultTrainingConfig implements TrainingConfig {
     @Override
     public List<TrainingListener> getTrainingListeners() {
         return listeners;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int getBatchSize() {
-        return batchSize;
     }
 }

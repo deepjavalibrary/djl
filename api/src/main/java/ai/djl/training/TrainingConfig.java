@@ -75,11 +75,4 @@ public interface TrainingConfig {
      * @return a list of {@link TrainingListener}s
      */
     List<TrainingListener> getTrainingListeners();
-
-    /**
-     * Gets the batch size that must be used during training.
-     *
-     * @return the batch size
-     */
-    int getBatchSize();
 }

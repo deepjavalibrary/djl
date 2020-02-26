@@ -84,6 +84,27 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
     }
 
     /**
+     * Fetches an iterator that can iterate through the {@link Dataset} with a custom sampler.
+     *
+     * @param manager the dataset to iterate through
+     * @param sampler the sampler to use to iterate through the dataset
+     * @return an {@link Iterable} of {@link Batch} that contains batches of data from the dataset
+     */
+    public Iterable<Batch> getData(NDManager manager, Sampler sampler) {
+        return new DataIterable(
+                this,
+                manager,
+                sampler,
+                batchifier,
+                pipeline,
+                targetPipeline,
+                executor,
+                prefetchNumber,
+                maxIteration,
+                device);
+    }
+
+    /**
      * Returns the size of this {@code Dataset}.
      *
      * @return the size of this {@code Dataset}

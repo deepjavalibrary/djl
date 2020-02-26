@@ -275,12 +275,6 @@ public class FtTrainingConfig implements TrainingConfig {
         return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public int getBatchSize() {
-        return 0;
-    }
-
     /**
      * Returns the fastText command in an array.
      *
