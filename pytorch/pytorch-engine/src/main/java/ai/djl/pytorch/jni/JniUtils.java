@@ -530,6 +530,15 @@ public final class JniUtils {
                 ndArray.getManager(), PyTorchLibrary.LIB.torchTrunc(ndArray.getHandle()));
     }
 
+    public static PtNDArray clip(PtNDArray ndArray, Number min, Number max) {
+        PtNDArray minNd = (PtNDArray) ndArray.getManager().create(min);
+        PtNDArray maxNd = (PtNDArray) ndArray.getManager().create(max);
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchClamp(
+                        ndArray.getHandle(), minNd.getHandle(), maxNd.getHandle()));
+    }
+
     public static PtNDArray exp(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchExp(ndArray.getHandle()));

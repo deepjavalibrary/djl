@@ -1044,7 +1044,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray clip(Number min, Number max) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.clip(this, min, max);
     }
 
     /** {@inheritDoc} */

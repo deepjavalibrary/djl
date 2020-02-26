@@ -124,7 +124,6 @@ public class SingleShotDetectionModelLoader
             return SingleShotDetectionTranslator.builder()
                     .setPipeline(pipeline)
                     .setSynsetArtifactName("classes.txt")
-                    .optOutputFormat("mxssd")
                     .optThreshold((float) threshold)
                     .optRescaleSize(width, height)
                     .build();

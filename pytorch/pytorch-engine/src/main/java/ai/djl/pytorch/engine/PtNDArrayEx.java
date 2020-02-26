@@ -40,13 +40,13 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public PtNDArray rdiv(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return rdiv(array.getManager().create(n));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rdiv(NDArray b) {
-        throw new UnsupportedOperationException("Not implemented");
+        return (PtNDArray) b.div(array);
     }
 
     /** {@inheritDoc} */

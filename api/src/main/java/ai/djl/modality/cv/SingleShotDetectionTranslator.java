@@ -15,7 +15,6 @@ package ai.djl.modality.cv;
 import ai.djl.Model;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Utils;
 import java.io.IOException;
@@ -28,12 +27,11 @@ import java.util.List;
  */
 public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjects> {
 
-    private float threshold;
-    private String synsetArtifactName;
-    private List<String> classes;
+    protected float threshold;
+    protected String synsetArtifactName;
+    protected List<String> classes;
     private double imageWidth;
     private double imageHeight;
-    private String outputFormat;
 
     /**
      * Creates the SSD translator from the given builder.
@@ -47,7 +45,6 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         this.classes = builder.classes;
         this.imageWidth = builder.imageWidth;
         this.imageHeight = builder.imageHeight;
-        this.outputFormat = builder.outputFormat;
     }
 
     /** {@inheritDoc} */
@@ -58,18 +55,7 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
             classes = model.getArtifact(synsetArtifactName, Utils::readLines);
         }
 
-        if ("ptssd".equals(outputFormat)) {
-            NDList reformattedList = new NDList();
-            // kill the 1st prediction as not needed
-            NDArray prob = list.get(1).swapAxes(0, 1).softmax(1).get(":, 1:");
-            NDArray boxes = list.get(0).swapAxes(0, 1);
-            reformattedList.add(prob.argMax(1));
-            reformattedList.add(prob.max(new int[] {1}));
-            reformattedList.add(boxes);
-            list = reformattedList;
-        }
-
-        int[] classIds = list.get(0).toType(DataType.INT32, false).toIntArray();
+        float[] classIds = list.get(0).toFloatArray();
         float[] probabilities = list.get(1).toFloatArray();
         NDArray boundingBoxes = list.get(2);
 
@@ -78,7 +64,7 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         List<BoundingBox> retBB = new ArrayList<>();
 
         for (int i = 0; i < classIds.length; ++i) {
-            int classId = classIds[i];
+            int classId = (int) classIds[i];
             double probability = probabilities[i];
             // classId starts from 0, -1 means background
             if (classId >= 0 && probability > threshold) {
@@ -120,9 +106,6 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         private List<String> classes;
         private double imageWidth;
         private double imageHeight;
-        private String outputFormat;
-
-        Builder() {}
 
         /**
          * Sets the threshold for prediction accuracy.
@@ -178,17 +161,6 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
             return this;
         }
 
-        /**
-         * Sets the optional output format name for different SSD model.
-         *
-         * @param format the name of the output format
-         * @return this builder
-         */
-        public Builder optOutputFormat(String format) {
-            this.outputFormat = format;
-            return this;
-        }
-
         /** {@inheritDoc} */
         @Override
         protected Builder self() {
@@ -209,6 +181,51 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
                         "You can only specify one of: synset artifact name or classes");
             }
             return new SingleShotDetectionTranslator(this);
+        }
+
+        /**
+         * Get threshold.
+         *
+         * @return threshold
+         */
+        public float getThreshold() {
+            return threshold;
+        }
+
+        /**
+         * Get symset artifact name.
+         *
+         * @return name
+         */
+        public String getSynsetArtifactName() {
+            return synsetArtifactName;
+        }
+
+        /**
+         * Get classes.
+         *
+         * @return classes
+         */
+        public List<String> getClasses() {
+            return classes;
+        }
+
+        /**
+         * Get resized image width.
+         *
+         * @return image width
+         */
+        public double getImageWidth() {
+            return imageWidth;
+        }
+
+        /**
+         * Get resized image height.
+         *
+         * @return image height
+         */
+        public double getImageHeight() {
+            return imageHeight;
         }
     }
 }

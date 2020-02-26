@@ -22,6 +22,60 @@
         "backbone": "resnet50",
         "dataset": "coco"
       },
+      "arguments": {
+        "width": 300,
+        "height": 300,
+        "threshold": 0.4,
+        "size": 300,
+        "feat_size": [
+          38,
+          19,
+          10,
+          5,
+          3,
+          1
+        ],
+        "steps": [
+          8,
+          16,
+          32,
+          64,
+          100,
+          300
+        ],
+        "scale": [
+          21,
+          45,
+          99,
+          153,
+          207,
+          261,
+          315
+        ],
+        "aspect_ratios": [
+          [
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2
+          ],
+          [
+            2
+          ]
+        ]
+      },
       "files": {
         "classes": {
           "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/pytorch/classes_coco.txt",

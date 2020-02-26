@@ -18,7 +18,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.modality.cv.FileTranslatorFactory;
 import ai.djl.modality.cv.InputStreamTranslatorFactory;
-import ai.djl.modality.cv.SingleShotDetectionTranslator;
 import ai.djl.modality.cv.UrlTranslatorFactory;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
@@ -104,9 +103,23 @@ public class SingleShotDetectionModelLoader
         @Override
         public Translator<BufferedImage, DetectedObjects> newInstance(
                 Map<String, Object> arguments) {
-            int width = ((Double) arguments.getOrDefault("width", 300d)).intValue();
-            int height = ((Double) arguments.getOrDefault("height", 300d)).intValue();
-            double threshold = ((Double) arguments.getOrDefault("threshold", 0.4d));
+            int width = (Integer) arguments.getOrDefault("width", 300);
+            int height = (Integer) arguments.getOrDefault("height", 300);
+            double threshold = (Double) arguments.getOrDefault("threshold", 0.4d);
+            int figSize = (Integer) arguments.getOrDefault("size", 300);
+            int[] featSize =
+                    (int[]) arguments.getOrDefault("feat_size", new int[] {38, 19, 10, 5, 3, 1});
+            int[] steps =
+                    (int[]) arguments.getOrDefault("steps", new int[] {8, 16, 32, 64, 100, 300});
+            int[] scale =
+                    (int[])
+                            arguments.getOrDefault(
+                                    "scale", new int[] {21, 45, 99, 153, 207, 261, 315});
+            int[][] aspectRatio =
+                    (int[][])
+                            arguments.getOrDefault(
+                                    "aspect_ratios",
+                                    new int[][] {{2}, {2, 3}, {2, 3}, {2, 3}, {2}, {2}});
 
             Pipeline pipeline = new Pipeline();
             pipeline.add(new Resize(width, height))
@@ -116,12 +129,11 @@ public class SingleShotDetectionModelLoader
                                     new float[] {0.485f, 0.456f, 0.406f},
                                     new float[] {0.229f, 0.224f, 0.225f}));
 
-            return SingleShotDetectionTranslator.builder()
+            return PtSSDTranslator.builder()
+                    .setBoxes(figSize, featSize, steps, scale, aspectRatio)
                     .setPipeline(pipeline)
                     .setSynsetArtifactName("classes.txt")
-                    .optOutputFormat("ptssd")
                     .optThreshold((float) threshold)
-                    .optRescaleSize(width, height)
                     .build();
         }
     }

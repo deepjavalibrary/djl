@@ -189,6 +189,8 @@ public final class PyTorchLibrary {
 
     public native Pointer torchCeil(Pointer handle);
 
+    public native Pointer torchClamp(Pointer handle, Pointer min, Pointer max);
+
     public native Pointer torchRound(Pointer handle);
 
     public native Pointer torchTrunc(Pointer handle);

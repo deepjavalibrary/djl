@@ -60,6 +60,15 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMuli
   self_ptr->mul_(*other_ptr);
 }
 
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchClamp
+  (JNIEnv *env, jobject jthis, jobject jself, jobject jmin, jobject jmax) {
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* min_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jmin);
+  const auto* max_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jmax);
+  const auto* result_ptr = new torch::Tensor(self_ptr->clamp(min_ptr->item(), max_ptr->item()));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDiv
   (JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
   const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
