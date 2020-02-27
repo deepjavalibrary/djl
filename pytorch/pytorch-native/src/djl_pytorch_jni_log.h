@@ -16,6 +16,7 @@
 #include <jni.h>
 #include <string>
 #include <iostream>
+#include <cassert>
 
 static constexpr const char* const JNIUTILS_CLASS = "ai/djl/pytorch/jni/JniUtils";
 
