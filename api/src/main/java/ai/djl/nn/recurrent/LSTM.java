@@ -41,7 +41,7 @@ import java.io.IOException;
  */
 public class LSTM extends RecurrentCell {
 
-    private static final byte VERSION = 1;
+    private static final byte VERSION = 2;
 
     private boolean clipLstmState;
     private double lstmStateClipMin;
@@ -54,7 +54,6 @@ public class LSTM extends RecurrentCell {
      */
     LSTM(Builder builder) {
         super(builder);
-        currentVersion = 1;
         mode = "lstm";
         gates = 4;
         clipLstmState = builder.clipLstmState;
@@ -133,6 +132,7 @@ public class LSTM extends RecurrentCell {
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
+        saveInputShapes(os);
         for (Parameter parameter : parameters) {
             parameter.save(os);
         }
@@ -143,7 +143,9 @@ public class LSTM extends RecurrentCell {
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
         byte version = is.readByte();
-        if (version != VERSION) {
+        if (version == VERSION) {
+            readInputShapes(is);
+        } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         for (Parameter parameter : parameters) {

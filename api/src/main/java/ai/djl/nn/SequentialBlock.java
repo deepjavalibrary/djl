@@ -38,7 +38,7 @@ import java.util.function.Function;
  */
 public class SequentialBlock extends AbstractBlock {
 
-    private static final byte VERSION = 1;
+    private static final byte VERSION = 2;
 
     private List<Block> blocks = new ArrayList<>();
 
@@ -167,6 +167,7 @@ public class SequentialBlock extends AbstractBlock {
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
+        saveInputShapes(os);
         for (Block block : blocks) {
             block.saveParameters(os);
         }
@@ -177,7 +178,9 @@ public class SequentialBlock extends AbstractBlock {
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
         byte version = is.readByte();
-        if (version != VERSION) {
+        if (version == VERSION) {
+            readInputShapes(is);
+        } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         for (Block block : blocks) {

@@ -12,6 +12,7 @@
  */
 package ai.djl.nn;
 
+import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
@@ -34,7 +35,7 @@ import java.util.function.Function;
  */
 public class LambdaBlock extends ParameterBlock {
 
-    private static final byte VERSION = 1;
+    private static final byte VERSION = 2;
 
     private Function<NDList, NDList> lambda;
 
@@ -87,14 +88,18 @@ public class LambdaBlock extends ParameterBlock {
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
+        saveInputShapes(os);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is)
+            throws IOException, MalformedModelException {
         byte version = is.readByte();
-        if (version != VERSION) {
-            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        if (version == VERSION) {
+            readInputShapes(is);
+        } else if (version != 1) {
+            throw new MalformedModelException("Unsupported encoding version: " + version);
         }
     }
 

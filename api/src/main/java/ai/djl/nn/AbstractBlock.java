@@ -17,6 +17,9 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -106,6 +109,21 @@ public abstract class AbstractBlock implements Block {
     @Override
     public void cast(DataType dataType) {
         throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    protected void saveInputShapes(DataOutputStream os) throws IOException {
+        os.writeInt(inputShapes.length);
+        for (Shape shape : inputShapes) {
+            os.write(shape.getEncoded());
+        }
+    }
+
+    protected void readInputShapes(DataInputStream is) throws IOException {
+        int len = is.readInt();
+        inputShapes = new Shape[len];
+        for (int i = 0; i < len; ++i) {
+            inputShapes[i] = Shape.decode(is);
+        }
     }
 
     private ParameterList getChildrenParameters() {

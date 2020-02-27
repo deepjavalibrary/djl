@@ -36,7 +36,6 @@ public class RNN extends RecurrentCell {
      */
     RNN(Builder builder) {
         super(builder);
-        currentVersion = 1;
         mode = builder.activation == Activation.RELU ? "rnn_relu" : "rnn_tanh";
         gates = 1;
     }

@@ -43,16 +43,9 @@ public class Conv3D extends Convolution {
     };
     private static final String STRING_LAYOUT = "NCDHW";
     private static final int NUM_DIMENSIONS = 5;
-    private static final byte VERSION = 1;
 
     Conv3D(Builder builder) {
         super(builder);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected byte getVersion() {
-        return VERSION;
     }
 
     /** {@inheritDoc} */

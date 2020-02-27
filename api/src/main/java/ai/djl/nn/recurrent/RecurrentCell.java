@@ -38,6 +38,9 @@ import java.util.List;
  * with both multi-layer and bidirectional support.
  */
 public abstract class RecurrentCell extends ParameterBlock {
+
+    private static final byte VERSION = 2;
+
     private static final LayoutType[] EXPECTED_LAYOUT = {
         LayoutType.BATCH, LayoutType.TIME, LayoutType.CHANNEL
     };
@@ -49,7 +52,6 @@ public abstract class RecurrentCell extends ParameterBlock {
     protected boolean useSequenceLength;
     protected boolean useBidirectional;
     protected int gates;
-    protected byte currentVersion = 1;
     protected boolean stateOutputs;
 
     protected Shape stateShape;
@@ -178,7 +180,8 @@ public abstract class RecurrentCell extends ParameterBlock {
     /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(currentVersion);
+        os.writeByte(VERSION);
+        saveInputShapes(os);
         for (Parameter parameter : parameters) {
             parameter.save(os);
         }
@@ -189,7 +192,9 @@ public abstract class RecurrentCell extends ParameterBlock {
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
         byte version = is.readByte();
-        if (version != this.currentVersion) {
+        if (version == VERSION) {
+            readInputShapes(is);
+        } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         for (Parameter parameter : parameters) {

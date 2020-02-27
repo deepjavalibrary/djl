@@ -29,7 +29,6 @@ public class GRU extends RecurrentCell {
 
     GRU(Builder builder) {
         super(builder);
-        currentVersion = 1;
         mode = "gru";
         gates = 3;
     }

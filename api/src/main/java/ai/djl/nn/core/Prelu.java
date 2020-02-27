@@ -40,7 +40,7 @@ import java.util.List;
  */
 public class Prelu extends ParameterBlock {
 
-    private static final byte VERSION = 1;
+    private static final byte VERSION = 2;
 
     private Parameter alpha;
 
@@ -85,6 +85,7 @@ public class Prelu extends ParameterBlock {
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
+        saveInputShapes(os);
         alpha.save(os);
     }
 
@@ -93,7 +94,9 @@ public class Prelu extends ParameterBlock {
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
         byte version = is.readByte();
-        if (version != VERSION) {
+        if (version == VERSION) {
+            readInputShapes(is);
+        } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         alpha.load(manager, is);

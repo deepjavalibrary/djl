@@ -12,6 +12,7 @@
  */
 package ai.djl.nn.norm;
 
+import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
@@ -36,7 +37,7 @@ import java.util.List;
  */
 public class Dropout extends ParameterBlock {
 
-    private static final byte VERSION = 1;
+    private static final byte VERSION = 2;
 
     private float probability;
     private int[] sharedAxes;
@@ -76,14 +77,18 @@ public class Dropout extends ParameterBlock {
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
+        saveInputShapes(os);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void loadParameters(NDManager manager, DataInputStream is) throws IOException {
+    public void loadParameters(NDManager manager, DataInputStream is)
+            throws IOException, MalformedModelException {
         byte version = is.readByte();
-        if (version != VERSION) {
-            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        if (version == VERSION) {
+            readInputShapes(is);
+        } else if (version != 1) {
+            throw new MalformedModelException("Unsupported encoding version: " + version);
         }
     }
 

@@ -35,6 +35,8 @@ import java.util.List;
 /** Computes N-D convolution on (N+2)-D input. */
 public abstract class Convolution extends ParameterBlock {
 
+    private static final byte VERSION = 2;
+
     protected Shape kernel;
     protected Shape stride;
     protected Shape pad;
@@ -65,13 +67,6 @@ public abstract class Convolution extends ParameterBlock {
             bias = new Parameter("bias", this, ParameterType.BIAS);
         }
     }
-
-    /**
-     * Gets the version of the {@code Convolution} block.
-     *
-     * @return the version
-     */
-    protected abstract byte getVersion();
 
     /**
      * Returns the expected layout of the input.
@@ -167,7 +162,8 @@ public abstract class Convolution extends ParameterBlock {
     /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(getVersion());
+        os.writeByte(VERSION);
+        saveInputShapes(os);
         weight.save(os);
         if (bias != null) {
             bias.save(os);
@@ -179,7 +175,9 @@ public abstract class Convolution extends ParameterBlock {
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
         byte version = is.readByte();
-        if (version != getVersion()) {
+        if (version == VERSION) {
+            readInputShapes(is);
+        } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         weight.load(manager, is);

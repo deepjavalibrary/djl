@@ -43,16 +43,9 @@ public class Conv2D extends Convolution {
 
     private static final String STRING_LAYOUT = "NCHW";
     private static final int NUM_DIMENSIONS = 4;
-    private static final byte VERSION = 1;
 
     Conv2D(Builder builder) {
         super(builder);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected byte getVersion() {
-        return VERSION;
     }
 
     /** {@inheritDoc} */

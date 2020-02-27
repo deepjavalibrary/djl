@@ -44,7 +44,8 @@ import java.util.List;
  */
 public final class SingleShotDetection extends AbstractBlock {
 
-    private static final byte VERSION = 1;
+    private static final byte VERSION = 2;
+
     private List<Block> features;
     private List<Block> classPredictionBlocks;
     private List<Block> anchorPredictionBlocks;
@@ -217,6 +218,7 @@ public final class SingleShotDetection extends AbstractBlock {
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
+        saveInputShapes(os);
         for (Block block : features) {
             block.saveParameters(os);
         }
@@ -232,8 +234,10 @@ public final class SingleShotDetection extends AbstractBlock {
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
         byte version = is.readByte();
-        if (version != VERSION) {
-            throw new IllegalArgumentException("Unsupported encoding version: " + version);
+        if (version == VERSION) {
+            readInputShapes(is);
+        } else if (version != 1) {
+            throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         for (Block block : features) {
             block.loadParameters(manager, is);
