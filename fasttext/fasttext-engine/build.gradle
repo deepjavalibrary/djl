@@ -7,7 +7,6 @@ repositories {
 }
 
 dependencies {
-    api "org.slf4j:slf4j-api:${slf4j_version}"
     api "com.github.vinhkhuc:jfasttext:0.4"
     api project(":api")
     api project(":basicdataset")

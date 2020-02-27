@@ -1,5 +1,4 @@
 dependencies {
-    api "org.slf4j:slf4j-api:${slf4j_version}"
     api "com.google.code.gson:gson:${gson_version}"
     api project(":api")
 

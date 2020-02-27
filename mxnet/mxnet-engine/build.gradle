@@ -7,7 +7,6 @@ repositories {
 }
 
 dependencies {
-    api "org.slf4j:slf4j-api:${slf4j_version}"
     api project(":api")
 
     testRuntimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}-SNAPSHOT"

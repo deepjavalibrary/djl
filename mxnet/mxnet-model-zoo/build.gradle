@@ -1,7 +1,6 @@
 group 'ai.djl.mxnet'
 
 dependencies {
-    api "org.slf4j:slf4j-api:${slf4j_version}"
     api project(":repository")
     api project(":mxnet:mxnet-engine")
 

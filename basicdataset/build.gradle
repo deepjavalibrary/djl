@@ -5,7 +5,6 @@ repositories {
 }
 
 dependencies {
-    api "org.slf4j:slf4j-api:${slf4j_version}"
     api project(":repository")
 
     testImplementation("org.testng:testng:${testng_version}") {
