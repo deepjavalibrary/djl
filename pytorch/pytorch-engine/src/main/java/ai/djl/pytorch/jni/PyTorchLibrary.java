@@ -21,7 +21,7 @@ public final class PyTorchLibrary {
     public static final PyTorchLibrary LIB = new PyTorchLibrary();
 
     static {
-        System.loadLibrary("djl_torch"); // NOPMD
+        LibUtils.loadLibrary();
     }
 
     private PyTorchLibrary() {}

@@ -10,8 +10,11 @@ apt install cmake g++
 
 ## Build
 
-- Use the following command to build pytorch JNI library:
+Use the following command to build pytorch JNI library:
 
+### Mac/Linux
 ```
-./build.sh
+./gradlew buildJNI
 ```
+
+The output file `torch_djl` will be copied to `pytorch-engine/build` folder

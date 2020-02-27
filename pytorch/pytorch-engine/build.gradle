@@ -10,6 +10,12 @@ dependencies {
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 
+jar {
+    includeEmptyDirs = false
+    // assume all djl_torch.* binary is here
+    from "${project.buildDir}/jnilib"
+}
+
 
 test {
     environment "PATH", "src/test/bin:${environment.PATH}"

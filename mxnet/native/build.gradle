@@ -187,7 +187,7 @@ task downloadMxnetNativeLib() {
         ]
 
         files.each { entry ->
-            project.logger.lifecycle("Downloaing ${url}/${entry.key}")
+            project.logger.lifecycle("Downloading ${url}/${entry.key}")
             def file = new File("${BINARY_ROOT}/${entry.value}")
             file.getParentFile().mkdirs()
             new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << new GZIPInputStream(i) } }
