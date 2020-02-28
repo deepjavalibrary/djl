@@ -193,7 +193,7 @@ public abstract class AbstractBenchmark<I, O> {
                         .optFilters(arguments.getCriteria())
                         .optProgress(new ProgressBar());
 
-        String artifactId = arguments.getModelName();
+        String artifactId = arguments.getArtifactId();
         if (artifactId == null) {
             artifactId = "ai.djl.mxnet:resnet";
         }

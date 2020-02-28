@@ -30,7 +30,7 @@ import org.apache.commons.cli.Options;
 public class Arguments {
 
     private String modelDir;
-    private String modelName;
+    private String artifactId;
     private String imageFile;
     private String outputDir;
     private Map<String, String> criteria;
@@ -40,7 +40,7 @@ public class Arguments {
 
     public Arguments(CommandLine cmd) {
         modelDir = cmd.getOptionValue("model-dir");
-        modelName = cmd.getOptionValue("model-name");
+        artifactId = cmd.getOptionValue("artifact-id");
         outputDir = cmd.getOptionValue("output-dir");
         imageFile = cmd.getOptionValue("image");
         if (cmd.hasOption("duration")) {
@@ -72,10 +72,10 @@ public class Arguments {
                         .build());
         options.addOption(
                 Option.builder("n")
-                        .longOpt("model-name")
+                        .longOpt("artifact-id")
                         .hasArg()
-                        .argName("MODEL-NAME")
-                        .desc("Model name.")
+                        .argName("ARTIFACT-ID")
+                        .desc("Model artifact id.")
                         .build());
         options.addOption(
                 Option.builder("i")
@@ -140,8 +140,8 @@ public class Arguments {
         return path;
     }
 
-    public String getModelName() {
-        return modelName;
+    public String getArtifactId() {
+        return artifactId;
     }
 
     public Path getImageFile() throws FileNotFoundException {
