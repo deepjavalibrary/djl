@@ -144,7 +144,8 @@ public interface ModelZoo {
                 }
             }
         }
-        throw new ModelNotFoundException("No matching model found.");
+        throw new ModelNotFoundException(
+                "No matching model with specified Input/Output type found.");
     }
 
     /**
