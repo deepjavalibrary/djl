@@ -47,6 +47,10 @@ java {
     withSourcesJar()
 }
 
+project.tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+
 signing {
     required(project.hasProperty("staging") || project.hasProperty("snapshot"))
     def signingKey = findProperty("signingKey")
