@@ -1408,7 +1408,7 @@ public interface NDArray extends AutoCloseable {
     NDArray muli(Number n);
 
     /**
-     * Multiplies this {@code NDArray} by other {@code NDArray}s element-wise in place.
+     * Multiplies this {@code NDArray} by other {@code NDArray} element-wise in place.
      *
      * <p>The shapes of this {@code NDArray} and other {@code NDArray}s must be broadcastable.
      *
@@ -1431,10 +1431,10 @@ public interface NDArray extends AutoCloseable {
      * ]
      * </pre>
      *
-     * @param others the other NDArrays to multiply with
+     * @param other the other NDArrays to multiply with
      * @return the result {@code NDArray}
      */
-    NDArray muli(NDArray others);
+    NDArray muli(NDArray other);
 
     /**
      * Divides this {@code NDArray} by a number element-wise in place.

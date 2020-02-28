@@ -15,6 +15,7 @@ package ai.djl.tensorflow.engine;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDUtils;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -28,7 +29,7 @@ import org.tensorflow.op.core.Stack;
 
 public class TfNDArrayEx implements NDArrayEx {
 
-    // private TfNDArray array;
+    private TfNDArray array;
     private TfNDManager manager;
     private Ops tf;
     private Operand<?> operand;
@@ -39,7 +40,7 @@ public class TfNDArrayEx implements NDArrayEx {
      * @param parent the {@link NDArray} to extend
      */
     TfNDArrayEx(TfNDArray parent) {
-        // this.array = parent;
+        this.array = parent;
         this.manager = (TfNDManager) parent.getManager();
         this.tf = manager.getTf();
         this.operand = parent.asOperand();
@@ -383,16 +384,28 @@ public class TfNDArrayEx implements NDArrayEx {
 
     @SuppressWarnings("unchecked")
     private <T> NDArray stackHelper(NDList arrays, int axis) {
-        ArrayList<Operand<T>> operands = new ArrayList<>(arrays.size());
+        ArrayList<Operand<T>> operands = new ArrayList<>(arrays.size() + 1);
+        operands.add(array.asOperand());
         for (NDArray ndArray : arrays) {
-            operands.add((Operand<T>) ((TfNDArray) ndArray).asOperand());
+            operands.add(((TfNDArray) ndArray).asOperand());
         }
         return new TfNDArray(manager, tf.stack(operands, Stack.axis((long) axis)));
     }
 
     @Override
     public NDArray concat(NDList arrays, int axis) {
-        return null;
+        NDUtils.checkConcatInput(arrays);
+        return concatHelper(arrays, axis);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> NDArray concatHelper(NDList arrays, int axis) {
+        ArrayList<Operand<T>> operands = new ArrayList<>(arrays.size() + 1);
+        operands.add(array.asOperand());
+        for (NDArray ndArray : arrays) {
+            operands.add(((TfNDArray) ndArray).asOperand());
+        }
+        return new TfNDArray(manager, tf.concat(operands, tf.constant(axis)));
     }
 
     @Override
