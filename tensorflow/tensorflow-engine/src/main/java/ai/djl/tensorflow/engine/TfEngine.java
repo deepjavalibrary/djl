@@ -16,6 +16,8 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tensorflow.TensorFlow;
 
 /**
@@ -25,12 +27,22 @@ import org.tensorflow.TensorFlow;
  * <p>To get an instance of the {@code TfEngine} when it is not the default Engine, call {@link
  * Engine#getEngine(String)} with the Engine name "TensorFlow".
  */
-public class TfEngine extends Engine {
+public final class TfEngine extends Engine {
+
+    private static final Logger logger = LoggerFactory.getLogger(TfEngine.class);
 
     public static final String ENGINE_NAME = "TensorFlow";
 
-    TfEngine() {
-        LibUtils.loadLibrary();
+    private TfEngine() {}
+
+    static TfEngine newInstance() {
+        try {
+            LibUtils.loadLibrary();
+            return new TfEngine();
+        } catch (Throwable e) {
+            logger.warn("Failed load TensorFlow native library.", e);
+        }
+        return null;
     }
 
     /** {@inheritDoc} */

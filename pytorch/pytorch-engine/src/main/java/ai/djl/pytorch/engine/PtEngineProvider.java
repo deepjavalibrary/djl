@@ -18,7 +18,7 @@ import ai.djl.engine.EngineProvider;
 /** {@code PtEngineProvider} is the PyTorch implementation of {@link EngineProvider}. */
 public class PtEngineProvider implements EngineProvider {
 
-    private static final Engine ENGINE = new PtEngine();
+    private static final Engine ENGINE = PtEngine.newInstance();
 
     /** {@inheritDoc} */
     @Override

@@ -33,19 +33,16 @@ import org.slf4j.LoggerFactory;
 public final class LibUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
+
     private static final String LIB_NAME = "djl_torch";
 
     private LibUtils() {}
 
     public static void loadLibrary() {
-        String libName = getLibName();
+        String libName = findOverrideLibrary();
         logger.debug("Loading pytorch library from: {}", libName);
 
         System.load(libName); // NOPMD
-    }
-
-    public static String getLibName() {
-        return LibUtils.findOverrideLibrary();
     }
 
     private static String findOverrideLibrary() {

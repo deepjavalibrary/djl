@@ -17,6 +17,9 @@ import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
 import ai.djl.pytorch.jni.JniUtils;
+import ai.djl.pytorch.jni.LibUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@code PtEngine} is an implementation of the {@link Engine} based on the <a
@@ -25,9 +28,23 @@ import ai.djl.pytorch.jni.JniUtils;
  * <p>To get an instance of the {@code PtEngine} when it is not the default Engine, call {@link
  * Engine#getEngine(String)} with the Engine name "PyTorch".
  */
-public class PtEngine extends Engine {
+public final class PtEngine extends Engine {
+
+    private static final Logger logger = LoggerFactory.getLogger(PtEngine.class);
 
     public static final String ENGINE_NAME = "PyTorch";
+
+    private PtEngine() {}
+
+    static Engine newInstance() {
+        try {
+            LibUtils.loadLibrary();
+            return new PtEngine();
+        } catch (Throwable t) {
+            logger.warn("Failed to load PyTorch native library", t);
+        }
+        return null;
+    }
 
     /** {@inheritDoc} */
     @Override

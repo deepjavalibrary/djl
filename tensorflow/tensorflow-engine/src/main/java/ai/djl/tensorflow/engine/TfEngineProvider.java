@@ -17,7 +17,7 @@ import ai.djl.engine.EngineProvider;
 
 public class TfEngineProvider implements EngineProvider {
 
-    private static final Engine ENGINE = new TfEngine();
+    private static final Engine ENGINE = TfEngine.newInstance();
 
     /** {@inheritDoc} */
     @Override

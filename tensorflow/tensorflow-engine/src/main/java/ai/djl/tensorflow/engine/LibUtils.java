@@ -27,46 +27,28 @@ import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("MissingJavadocMethod")
 public final class LibUtils {
-    private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
 
-    private static String extension;
+    private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
 
     private LibUtils() {}
 
-    public static String loadLibrary() {
-        String libName = getLibName();
+    public static void loadLibrary() {
+        String libName = getTensorFlowLib();
         logger.debug("Loading TensorFlow library from: {}", libName);
-        System.load(libName + "/libtensorflow_jni" + extension);
-        System.load(libName + "/libtensorflow_framework" + extension);
-        return libName;
+
+        System.load(libName + '/' + System.mapLibraryName("libtensorflow_jni"));
+        System.load(libName + '/' + System.mapLibraryName("libtensorflow_framework"));
     }
 
-    public static String getLibName() {
-        String libName;
-        try {
-            libName = LibUtils.getTensorFlowLib();
-        } catch (IOException | InterruptedException e) {
-            throw new IllegalStateException("Failed to find TensorFlow library", e);
-        }
-        return libName;
-    }
-
-    private static String getTensorFlowLib() throws IOException, InterruptedException {
-        boolean useGPU = false;
-        if (CudaUtils.getGpuCount() > 0) {
-            useGPU = true;
-        }
+    private static String getTensorFlowLib() {
         String osName = System.getProperty("os.name");
         if (osName.startsWith("Mac")) {
-            extension = ".dylib";
             return downloadTensorFlow("libtensorflow_jni-cpu-darwin-x86_64");
         } else if (osName.startsWith("Linux")) {
-            extension = ".so";
-            if (useGPU) {
+            if (CudaUtils.getGpuCount() > 0) {
                 return downloadTensorFlow("libtensorflow_jni-gpu-linux-x86_64");
-            } else {
-                return downloadTensorFlow("libtensorflow_jni-cpu-linux-x86_64");
             }
+            return downloadTensorFlow("libtensorflow_jni-cpu-linux-x86_64");
         } else if (osName.startsWith("Win")) {
             throw new EngineException(
                     "TensorFlow engine does not support Windows yet," + "please use MXNet engine");

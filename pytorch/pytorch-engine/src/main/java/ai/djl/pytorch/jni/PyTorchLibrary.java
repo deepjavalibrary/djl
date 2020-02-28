@@ -20,10 +20,6 @@ public final class PyTorchLibrary {
 
     public static final PyTorchLibrary LIB = new PyTorchLibrary();
 
-    static {
-        LibUtils.loadLibrary();
-    }
-
     private PyTorchLibrary() {}
 
     public native void torchManualSeed(long seed);

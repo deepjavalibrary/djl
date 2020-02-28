@@ -15,8 +15,6 @@ package ai.djl.engine;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,28 +39,31 @@ public abstract class Engine {
     private static final String DEFAULT_ENGINE = initEngine();
 
     private static synchronized String initEngine() {
+        Engine firstEngine = null;
         ServiceLoader<EngineProvider> loaders = ServiceLoader.load(EngineProvider.class);
-        List<EngineProvider> list = new ArrayList<>();
         for (EngineProvider provider : loaders) {
-            list.add(provider);
             Engine engine = provider.getEngine();
-            ALL_ENGINES.put(engine.getEngineName(), engine);
+            if (engine != null) {
+                if (firstEngine == null) {
+                    firstEngine = engine;
+                }
+                ALL_ENGINES.put(engine.getEngineName(), engine);
+            }
         }
 
-        if (list.isEmpty()) {
+        if (firstEngine == null) {
             return null;
         }
 
-        Engine engine = list.get(0).getEngine();
         String defaultEngine = System.getenv("DJL_DEFAULT_ENGINE");
         if (defaultEngine == null || defaultEngine.isEmpty()) {
             defaultEngine = System.getProperty("ai.djl.default_engine");
         }
         if (defaultEngine == null || defaultEngine.isEmpty()) {
-            if (list.size() > 1) {
+            if (ALL_ENGINES.size() > 1) {
                 logger.warn("More than one deep learning engines found.");
             }
-            defaultEngine = engine.getEngineName();
+            defaultEngine = firstEngine.getEngineName();
         } else if (!ALL_ENGINES.containsKey(defaultEngine)) {
             throw new EngineException("Unknown default engine: " + defaultEngine);
         }

@@ -28,21 +28,30 @@ import org.slf4j.LoggerFactory;
  * <p>To get an instance of the {@code MxEngine} when it is not the default Engine, call {@link
  * Engine#getEngine(String)} with the Engine name "MXNet".
  */
-public class MxEngine extends Engine {
+public final class MxEngine extends Engine {
 
     private static final Logger logger = LoggerFactory.getLogger(MxEngine.class);
 
     public static final String ENGINE_NAME = "MXNet";
 
     /** Constructs an MXNet Engine. */
-    MxEngine() {
-        // Workaround MXNet engine lazy initialization issue
-        JnaUtils.getAllOpNames();
+    private MxEngine() {}
 
-        JnaUtils.setNumpyMode(JnaUtils.NumpyMode.GLOBAL_ON);
+    static Engine newInstance() {
+        try {
+            // Workaround MXNet engine lazy initialization issue
+            JnaUtils.getAllOpNames();
 
-        // Workaround MXNet shutdown crash issue
-        Runtime.getRuntime().addShutdownHook(new Thread(JnaUtils::waitAll)); // NOPMD
+            JnaUtils.setNumpyMode(JnaUtils.NumpyMode.GLOBAL_ON);
+
+            // Workaround MXNet shutdown crash issue
+            Runtime.getRuntime().addShutdownHook(new Thread(JnaUtils::waitAll)); // NOPMD
+
+            return new MxEngine();
+        } catch (Throwable t) {
+            logger.warn("Failed to load MXNet native library", t);
+        }
+        return null;
     }
 
     /** {@inheritDoc} */
