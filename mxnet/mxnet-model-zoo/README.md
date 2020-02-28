@@ -60,6 +60,9 @@ The following is an example of the criteria to find a Resnet50-v1 model that has
 ``` 
 
 ### List of search criteria for each model
+
+See: [List available model](../../model-zoo/README.md#list-available-models).
+
 The following table illustrates the possible search criteria for all models in the model zoo:
 
 | Category | Application           | Model Family      | Criteria | Possible values                                            |

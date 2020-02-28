@@ -27,7 +27,6 @@ You can pull the model zoo from the central Maven repository by including the fo
 </dependency>
 ```
 
-
 ## Pre-trained models
 
 You can find the Multilayer Perceptrons (MLP) and Resnet50 pre-trained models in the model zoo.
@@ -41,24 +40,47 @@ to narrow down the model you want. If there are multiple models that match your 
 model found is returned. A *ModelNotFoundException* will be thrown if no matching model is found.
 
 The following is an example of the criteria to find a Resnet50-v1 model that has been trained on the imagenet dataset:
-```java
-    Map<String, String> criteria = new HashMap<>();
-    criteria.put("layers", "50");
-    criteria.put("flavor", "v1");
-    criteria.put("dataset", "cifar10");
 
-    ZooModel<BufferedImage, Classification> model = BasicModelZoo.RESNET.loadModel(criteria);
+```java
+    Criteria<BufferedImage, Classification> criteria =
+            Criteria.builder()
+                    .optApplication(Application.CV.OBJECT_DETECTION)
+                    .setTypes(BufferedImage.class, Classification.class)
+                    .optFilter("layer", "50")
+                    .optFilter("flavor", "v1")
+                    .optFilter("dataset", "cifar10")
+                    .build();
+
+    ZooModel<BufferedImage, Classification> ssd = ModelZoo.loadModel(criteria));
 ```
 
-### List of search criteria of each model
+If you already known which `ModelLoader` to use, you can simply do the following:
+```java
+    Map<String, String> filter = new HashMap<>();
+    filter.put("layers", "50");
+    filter.put("flavor", "v1");
+    filter.put("dataset", "cifar10");
 
-The following table illustrates the possible search criteria for all models in the model zoo:
+    ZooModel<BufferedImage, Classification> model = BasicModelZoo.RESNET.loadModel(filter);
+```
 
-| Category | Application           | Model Family      | Criteria | Possible values |
-|----------|-----------------------|-------------------|----------|-----------------|
-| CV       | Image Classification  | MLP               | dataset  | mnist, cifar10  |
-|          |                       | Resnet            | layers   | 50              |
-|          |                       |                   | flavor   | v1              |
+### List available models
+
+You can use [ModelZoo.listModels()](../repository/src/main/java/ai/djl/repository/zoo/ModelZoo.java) API to query available models.
+
+Use the following command to list built-in models in examples module:
+```shell script
+./gradlew :examples:run -Dmain=ai.djl.examples.inference.ListModels
+
+[INFO ] - CV.ACTION_RECOGNITION ai.djl.mxnet:action_recognition:0.0.1 {"backbone":"vgg16","dataset":"ucf101"}
+[INFO ] - CV.ACTION_RECOGNITION ai.djl.mxnet:action_recognition:0.0.1 {"backbone":"inceptionv3","dataset":"ucf101"}
+[INFO ] - CV.IMAGE_CLASSIFICATION ai.djl.zoo:resnet:0.0.1 {"layers":"50","flavor":"v1","dataset":"cifar10"}
+[INFO ] - CV.IMAGE_CLASSIFICATION ai.djl.zoo:mlp:0.0.2 {"dataset":"mnist"}
+[INFO ] - NLP.QUESTION_ANSWER ai.djl.mxnet:bertqa:0.0.1 {"backbone":"bert","dataset":"book_corpus_wiki_en_uncased"}
+
+...
+
+```
 
 ## Contributor Guides and Documentation
 

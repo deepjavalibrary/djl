@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /** Shared code for the {@link ModelLoader} implementations. */
 public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
@@ -107,7 +108,10 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
     /** {@inheritDoc} */
     @Override
     public List<Artifact> listModels() throws IOException, ModelNotFoundException {
-        return getMetadata().getArtifacts();
+        List<Artifact> list = getMetadata().getArtifacts();
+        return list.stream()
+                .filter(a -> version.equals(a.getVersion()))
+                .collect(Collectors.toList());
     }
 
     protected Model createModel(Device device, Map<String, Object> arguments) {

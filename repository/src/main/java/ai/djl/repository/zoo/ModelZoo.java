@@ -14,12 +14,16 @@ package ai.djl.repository.zoo;
 
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
+import ai.djl.repository.Artifact;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.TreeMap;
 
 /** An interface represents a collection of models. */
 public interface ModelZoo {
@@ -141,5 +145,38 @@ public interface ModelZoo {
             }
         }
         throw new ModelNotFoundException("No matching model found.");
+    }
+
+    /**
+     * Returns the available {@link Application} and their model artifact metadata.
+     *
+     * @return the available {@link Application} and their model artifact metadata
+     * @throws IOException if failed to download to repository metadata
+     * @throws ModelNotFoundException if failed to parse repository metadata
+     */
+    static Map<Application, List<Artifact>> listModels()
+            throws IOException, ModelNotFoundException {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
+        Map<Application, List<Artifact>> models =
+                new TreeMap<>(Comparator.comparing(Application::getPath));
+        ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
+        for (ZooProvider provider : providers) {
+            ModelZoo zoo = provider.getModelZoo();
+            List<ModelLoader<?, ?>> list = zoo.getModelLoaders();
+            for (ModelLoader<?, ?> loader : list) {
+                Application app = loader.getApplication();
+                final List<Artifact> artifacts = loader.listModels();
+                models.compute(
+                        app,
+                        (key, val) -> {
+                            if (val == null) {
+                                val = new ArrayList<>();
+                            }
+                            val.addAll(artifacts);
+                            return val;
+                        });
+            }
+        }
+        return models;
     }
 }

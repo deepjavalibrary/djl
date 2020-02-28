@@ -28,8 +28,6 @@ import java.util.Map;
 public class Artifact {
 
     private transient String metadataVersion;
-    private transient String groupId;
-    private transient String artifactId;
     private String version;
     private boolean snapshot;
     private String name;
@@ -56,42 +54,6 @@ public class Artifact {
      */
     public void setMetadataVersion(String metadataVersion) {
         this.metadataVersion = metadataVersion;
-    }
-
-    /**
-     * Returns the groupId.
-     *
-     * @return the groupId
-     */
-    public String getGroupId() {
-        return groupId;
-    }
-
-    /**
-     * Sets the groupId.
-     *
-     * @param groupId the new groupId
-     */
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
-
-    /**
-     * Returns the artifactId.
-     *
-     * @return the artifactId
-     */
-    public String getArtifactId() {
-        return artifactId;
-    }
-
-    /**
-     * Sets the artifactId.
-     *
-     * @param artifactId the new artifactId
-     */
-    public void setArtifactId(String artifactId) {
-        this.artifactId = artifactId;
     }
 
     /**
@@ -311,18 +273,26 @@ public class Artifact {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(100);
-        sb.append(name).append(':').append(version).append(" {");
+        if (metadata != null) {
+            sb.append(metadata.getGroupId())
+                    .append(':')
+                    .append(metadata.getArtifactId())
+                    .append(':');
+        } else {
+            sb.append(name).append(':');
+        }
+        sb.append(version).append(" {");
         if (properties != null) {
             boolean first = true;
             for (Map.Entry<String, String> entry : properties.entrySet()) {
                 if (first) {
                     first = false;
                 } else {
-                    sb.append(" ,");
+                    sb.append(',');
                 }
                 sb.append('"')
                         .append(entry.getKey())
-                        .append("\": \"")
+                        .append("\":\"")
                         .append(entry.getValue())
                         .append('"');
             }
