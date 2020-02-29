@@ -20,13 +20,17 @@ task compileJNI {
                 commandLine 'bash', 'build.sh'
             }
         }
-        def engineDir = "${project.parent.projectDir}/pytorch-engine/build/jnilib"
+        def engineDir = "${project.parent.projectDir}/pytorch-engine"
+        def publishDir = "${engineDir}/build/jnilib/native/jni"
         copy {
             from project.buildDir
             includeEmptyDirs = false
             include "**/*djl_torch.*"
-            into engineDir
+            into publishDir
         }
+        def versionName = String.format("${project.parent.version}-%s", new Date().format('yyyyMMdd'))
+        def propFile = file("${publishDir}/pytorch.properties")
+        propFile.text = "version=${versionName}\n"
     }
 }
 

@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.mxnet.jna;
+package ai.djl.util;
 
 import ai.djl.util.cuda.CudaUtils;
 import java.io.IOException;
@@ -35,9 +35,9 @@ public final class Platform {
     private Platform() {}
 
     /**
-     * Returns the platform that parsed from mxnet.properties file.
+     * Returns the platform that parsed from "engine".properties file.
      *
-     * @param url the url to the mxnet.properties file
+     * @param url the url to the "engine".properties file
      * @return the platform that parsed from mxnet.properties file
      * @throws IOException if the file could not be read
      */
@@ -50,7 +50,7 @@ public final class Platform {
             platform.version = prop.getProperty("version");
             if (platform.version == null) {
                 throw new IllegalArgumentException(
-                        "version key is required in mxnet.properties file.");
+                        "version key is required in <engine>.properties file.");
             }
             platform.placeholder = prop.getProperty("placeholder") != null;
             String flavorPrefixedClassifier = prop.getProperty("classifier", "");
@@ -86,21 +86,19 @@ public final class Platform {
         } else {
             throw new AssertionError("Unsupported platform: " + osName);
         }
-
         if (CudaUtils.getGpuCount() > 0) {
-            platform.flavor = "cu" + CudaUtils.getCudaVersionString() + "mkl";
+            platform.flavor = "cu" + CudaUtils.getCudaVersionString();
             platform.cudaArch = CudaUtils.getComputeCapability(0);
         } else {
-            platform.flavor = "mkl";
-            platform.cudaArch = null;
+            platform.flavor = "";
         }
         return platform;
     }
 
     /**
-     * Returns the MXNet version.
+     * Returns the Engine version.
      *
-     * @return the MXNet version
+     * @return the Engine version
      */
     public String getVersion() {
         return version;
@@ -167,26 +165,12 @@ public final class Platform {
      * @return true if the platforms match
      */
     public boolean matches(Platform other) {
-        if (osPrefix == null || other.osPrefix == null) {
+        if (!osPrefix.equals(other.osPrefix)) {
             return false;
         }
-        return osPrefix.equals(other.osPrefix) && flavor.equals(other.flavor);
-    }
-
-    /**
-     * Returns true the platforms are compatible (same os and only one has cuda).
-     *
-     * @param other the platform to compare it to
-     * @return true if the platforms are compatible
-     */
-    public boolean compatible(Platform other) {
-        if (osPrefix == null || other.osPrefix == null) {
+        if (flavor.startsWith("cu") != other.flavor.startsWith("cu")) {
             return false;
         }
-        // if both use cuda, the cuda must be the same
-        if (flavor.contains("cu") && other.flavor.contains("cu")) {
-            return osPrefix.equals(other.osPrefix) && flavor.equals(other.flavor);
-        }
-        return osPrefix.equals(other.osPrefix);
+        return flavor.startsWith(other.flavor) || other.flavor.startsWith(flavor);
     }
 }

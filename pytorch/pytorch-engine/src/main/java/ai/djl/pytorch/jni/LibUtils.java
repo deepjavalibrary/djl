@@ -12,9 +12,18 @@
  */
 package ai.djl.pytorch.jni;
 
+import ai.djl.util.Platform;
+import ai.djl.util.Utils;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,13 +44,21 @@ public final class LibUtils {
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
 
     private static final String LIB_NAME = "djl_torch";
+    private static final String NATIVE_LIB_NAME = "torch";
 
     private LibUtils() {}
 
     public static void loadLibrary() {
         String libName = findOverrideLibrary();
+        if (libName == null) {
+            String nativeLibDir = findNativeLibraryInClasspath();
+            if (nativeLibDir != null) {
+                libName = copyJniLibraryFromClasspath(Paths.get(nativeLibDir));
+            } else {
+                throw new IllegalStateException("Native library not found");
+            }
+        }
         logger.debug("Loading pytorch library from: {}", libName);
-
         System.load(libName); // NOPMD
     }
 
@@ -83,5 +100,102 @@ public final class LibUtils {
             }
         }
         return null;
+    }
+
+    private static synchronized String copyJniLibraryFromClasspath(Path nativeDir) {
+        String name = System.mapLibraryName(LIB_NAME);
+        Properties prop = new Properties();
+        try (InputStream stream =
+                LibUtils.class.getResourceAsStream("/native/jni/pytorch.properties")) {
+            prop.load(stream);
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot find pytorch property file", e);
+        }
+        String version = prop.getProperty("version");
+        Path path = nativeDir.resolve(version + name);
+        if (Files.exists(path)) {
+            return path.toAbsolutePath().toString();
+        }
+        try (InputStream stream = LibUtils.class.getResourceAsStream("/native/jni/" + name)) {
+            Files.copy(stream, path);
+            return path.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot copy jni files", e);
+        }
+    }
+
+    private static synchronized String findNativeLibraryInClasspath() {
+        List<URL> urls;
+        try {
+            urls =
+                    Collections.list(
+                            Thread.currentThread()
+                                    .getContextClassLoader()
+                                    .getResources("native/lib/pytorch.properties"));
+        } catch (IOException e) {
+            return null;
+        }
+        // No native jars
+        if (urls.isEmpty()) {
+            return null;
+        }
+
+        Platform systemPlatform = Platform.fromSystem();
+        try {
+            Platform matching = null;
+            for (URL url : urls) {
+                logger.debug(url.toString());
+                Platform platform = Platform.fromUrl(url);
+                if (platform.matches(systemPlatform)) {
+                    matching = platform;
+                    break;
+                }
+            }
+
+            if (matching != null) {
+                logger.debug("Find matching library");
+                return copyNativeLibraryFromClasspath(matching);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Failed to read PyTorch native library jar properties", e);
+        }
+        throw new IllegalStateException(
+                "Your PyTorch native library jar does not match your operating system. Make sure the Maven Dependency Classifier matches your system type.");
+    }
+
+    private static String copyNativeLibraryFromClasspath(Platform platform) {
+        Path tmp = null;
+        String version = platform.getVersion();
+        String flavor = platform.getFlavor();
+        String classifier = platform.getClassifier();
+        try {
+            String userHome = System.getProperty("user.home");
+            String libName = System.mapLibraryName(NATIVE_LIB_NAME);
+            Path dir = Paths.get(userHome, ".pytorch/cache/" + version + flavor + '-' + classifier);
+            Path path = dir.resolve(libName);
+            if (Files.exists(path)) {
+                return dir.toAbsolutePath().toString();
+            }
+            tmp = Paths.get(userHome, ".pytorch/cache/tmp");
+            Files.createDirectories(tmp);
+            for (String file : platform.getLibraries()) {
+                String libPath = "/native/lib/" + file;
+                try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
+                    Files.copy(is, tmp.resolve(file));
+                }
+            }
+
+            Utils.deleteQuietly(dir);
+            Files.move(tmp, dir);
+            tmp = null;
+            return dir.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to extract PyTorch native library", e);
+        } finally {
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
+        }
     }
 }

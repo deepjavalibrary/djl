@@ -12,6 +12,7 @@
  */
 package ai.djl.mxnet.jna;
 
+import ai.djl.util.Platform;
 import ai.djl.util.Utils;
 import com.sun.jna.Native;
 import java.io.BufferedReader;
@@ -251,6 +252,11 @@ public final class LibUtils {
     private static String downloadMxnet(Platform platform) throws IOException {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
+        if (flavor.isEmpty()) {
+            flavor = "mkl";
+        } else if (!flavor.endsWith("mkl")) {
+            flavor += "mkl"; // NOPMD
+        }
         String classifier = platform.getClassifier();
         String cudaArch = platform.getCudaArch();
         String os = platform.getOsPrefix();
