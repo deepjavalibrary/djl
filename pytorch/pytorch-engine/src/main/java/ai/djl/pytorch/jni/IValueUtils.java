@@ -104,7 +104,7 @@ public final class IValueUtils {
      */
     public static PtNDArray toNDArray(Pointer iValueHandle, PtNDManager manager) {
         Pointer ndHandle = PyTorchLibrary.LIB.iValueToTensor(iValueHandle);
-        return new PtNDArray(manager, ndHandle);
+        return manager.create(ndHandle);
     }
 
     /**
@@ -118,7 +118,7 @@ public final class IValueUtils {
         Pointer[] ndHandles = PyTorchLibrary.LIB.iValueToTensorList(iValueHandle);
         NDList list = new NDList();
         for (Pointer handle : ndHandles) {
-            list.add(new PtNDArray(manager, handle));
+            list.add(manager.create(handle));
         }
         return list;
     }

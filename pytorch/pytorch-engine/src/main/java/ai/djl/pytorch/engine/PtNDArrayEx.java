@@ -378,20 +378,20 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public PtNDArray resize(int width, int height) {
-        if (array.isEmpty()) {
+        NDArray result = array;
+        if (result.isEmpty()) {
             throw new IllegalArgumentException("attempt to resize of an empty NDArray");
         }
-        if (array.getDataType() != DataType.FLOAT32) {
-            array = array.toType(DataType.FLOAT32, true);
+        if (result.getDataType() != DataType.FLOAT32) {
+            result = result.toType(DataType.FLOAT32, true);
         }
-        int dim = array.getShape().dimension();
-        NDArray temp = array;
+        int dim = result.getShape().dimension();
         if (dim == 3) {
-            temp = temp.expandDims(0);
+            result = result.expandDims(0);
         }
-        temp = temp.transpose(0, 3, 1, 2);
-        NDArray result =
-                JniUtils.upsampleBilinear2d((PtNDArray) temp, new long[] {height, width}, true)
+        result = result.transpose(0, 3, 1, 2);
+        result =
+                JniUtils.upsampleBilinear2d((PtNDArray) result, new long[] {height, width}, true)
                         .transpose(0, 2, 3, 1);
         if (dim == 3) {
             result = result.squeeze(0);

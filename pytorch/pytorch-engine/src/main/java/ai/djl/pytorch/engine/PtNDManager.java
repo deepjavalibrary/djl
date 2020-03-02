@@ -22,6 +22,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.pytorch.jni.JniUtils;
+import ai.djl.pytorch.jni.Pointer;
 import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -48,6 +49,19 @@ public class PtNDManager extends BaseNDManager {
     @Override
     public ByteBuffer allocateDirect(int capacity) {
         return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
+    }
+
+    /**
+     * Creates an {@link PtNDArray} with the given Native Memory Pointer and attaches to this
+     * manager.
+     *
+     * @param handle the array's native memory pointer
+     * @return the created array
+     */
+    public PtNDArray create(Pointer handle) {
+        PtNDArray array = new PtNDArray(this, handle);
+        attach(array.getUid(), array);
+        return array;
     }
 
     /** {@inheritDoc} */
@@ -88,8 +102,11 @@ public class PtNDManager extends BaseNDManager {
             default:
                 throw new AssertionError("Show never happen");
         }
-        return JniUtils.createNdFromByteBuffer(
-                this, buf, shape, dataType, SparseFormat.DENSE, device);
+        PtNDArray array =
+                JniUtils.createNdFromByteBuffer(
+                        this, buf, shape, dataType, SparseFormat.DENSE, device);
+        attach(array.getUid(), array);
+        return array;
     }
 
     /** {@inheritDoc} */
@@ -187,8 +204,8 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDManager newSubManager(Device dev) {
-        PtNDManager manager = new PtNDManager(this, dev);
+    public PtNDManager newSubManager(Device device) {
+        PtNDManager manager = new PtNDManager(this, device);
         attach(manager.uid, manager);
         return manager;
     }

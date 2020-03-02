@@ -81,7 +81,7 @@ public class PtNDArray extends NativeResource implements NDArray {
      * @param manager the manager to attach the new array to
      * @param handle the pointer to the native PyTorch memory
      */
-    public PtNDArray(PtNDManager manager, Pointer handle) {
+    PtNDArray(PtNDManager manager, Pointer handle) {
         super(handle);
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
