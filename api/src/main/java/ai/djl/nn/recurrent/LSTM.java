@@ -77,8 +77,8 @@ public class LSTM extends RecurrentCell {
                             dropRate,
                             numStackedLayers,
                             useSequenceLength,
-                            useBidirectional,
-                            stateOutputs,
+                            isBidirectional(),
+                            true,
                             lstmStateClipMin,
                             lstmStateClipMax,
                             params);
@@ -91,8 +91,8 @@ public class LSTM extends RecurrentCell {
                             dropRate,
                             numStackedLayers,
                             useSequenceLength,
-                            useBidirectional,
-                            stateOutputs,
+                            isBidirectional(),
+                            true,
                             params);
         }
 

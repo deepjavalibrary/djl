@@ -50,7 +50,7 @@ public abstract class RecurrentCell extends ParameterBlock {
     protected int numStackedLayers;
     protected String mode;
     protected boolean useSequenceLength;
-    protected boolean useBidirectional;
+    protected int numDirections = 1;
     protected int gates;
     protected boolean stateOutputs;
 
@@ -67,31 +67,31 @@ public abstract class RecurrentCell extends ParameterBlock {
         dropRate = builder.dropRate;
         numStackedLayers = builder.numStackedLayers;
         useSequenceLength = builder.useSequenceLength;
-        useBidirectional = builder.useBidirectional;
         stateOutputs = builder.stateOutputs;
+        if (builder.useBidirectional) {
+            numDirections = 2;
+        }
 
-        for (int i = 0; i < numStackedLayers; i++) {
-            // Preserve this order of parameters. It is important to maintain this order as we
-            // concat the parameters.
-            parameters.add(
-                    new Parameter(String.format("l%d_i2h_weight", i), this, ParameterType.WEIGHT));
-            parameters.add(
-                    new Parameter(String.format("l%d_h2h_weight", i), this, ParameterType.WEIGHT));
-            parameters.add(
-                    new Parameter(String.format("l%d_i2h_bias", i), this, ParameterType.BIAS));
-            parameters.add(
-                    new Parameter(String.format("l%d_h2h_bias", i), this, ParameterType.BIAS));
-            if (useBidirectional) {
-                parameters.add(
-                        new Parameter(
-                                String.format("r%d_i2h_weight", i), this, ParameterType.WEIGHT));
-                parameters.add(
-                        new Parameter(
-                                String.format("r%d_h2h_weight", i), this, ParameterType.WEIGHT));
-                parameters.add(
-                        new Parameter(String.format("r%d_i2h_bias", i), this, ParameterType.BIAS));
-                parameters.add(
-                        new Parameter(String.format("r%d_h2h_bias", i), this, ParameterType.BIAS));
+        ParameterType[] parameterTypes = {ParameterType.WEIGHT, ParameterType.BIAS};
+        String[] directions = {"l"};
+        if (builder.useBidirectional) {
+            directions = new String[] {"l", "r"};
+        }
+        String[] gateStrings = {"i2h", "h2h"};
+
+        for (ParameterType parameterType : parameterTypes) {
+            for (int i = 0; i < numStackedLayers; i++) {
+                for (String direction : directions) {
+                    for (String gateString : gateStrings) {
+                        parameters.add(
+                                new Parameter(
+                                        String.format(
+                                                "%s_%s_%s_%s",
+                                                direction, i, gateString, parameterType.name()),
+                                        this,
+                                        parameterType));
+                    }
+                }
             }
         }
     }
@@ -124,8 +124,8 @@ public abstract class RecurrentCell extends ParameterBlock {
                         dropRate,
                         numStackedLayers,
                         useSequenceLength,
-                        useBidirectional,
-                        stateOutputs,
+                        isBidirectional(),
+                        true,
                         params);
 
         NDList result = new NDList(output.head().transpose(1, 0, 2));
@@ -140,7 +140,9 @@ public abstract class RecurrentCell extends ParameterBlock {
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         // Input shape at this point is TNC. Output Shape should be NTS
         Shape inputShape = inputs[0];
-        return new Shape[] {new Shape(inputShape.get(1), inputShape.get(0), stateSize)};
+        return new Shape[] {
+            new Shape(inputShape.get(1), inputShape.get(0), stateSize * numDirections)
+        };
     }
 
     /** {@inheritDoc} */
@@ -157,19 +159,23 @@ public abstract class RecurrentCell extends ParameterBlock {
         Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
         long batchSize = inputShape.get(0);
         inputs[0] = new Shape(inputShape.get(1), inputShape.get(0), inputShape.get(2));
-        stateShape = new Shape(numStackedLayers, batchSize, stateSize);
+        stateShape = new Shape(numStackedLayers * numDirections, batchSize, stateSize);
     }
 
     /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
+        int layer = Integer.parseInt(name.split("_")[1]);
         Shape shape = inputShapes[0];
-        long inputSize = shape.get(2);
-        if (name.contains("bias")) {
+        long inputs = shape.get(2);
+        if (layer > 0) {
+            inputs = stateSize * numDirections;
+        }
+        if (name.contains("BIAS")) {
             return new Shape(gates * stateSize);
         }
         if (name.contains("i2h")) {
-            return new Shape(gates * stateSize, inputSize);
+            return new Shape(gates * stateSize, inputs);
         }
         if (name.contains("h2h")) {
             return new Shape(gates * stateSize, stateSize);
@@ -200,6 +206,10 @@ public abstract class RecurrentCell extends ParameterBlock {
         for (Parameter parameter : parameters) {
             parameter.load(manager, is);
         }
+    }
+
+    protected boolean isBidirectional() {
+        return numDirections == 2;
     }
 
     protected NDList opInputs(ParameterStore parameterStore, NDList inputs) {
