@@ -143,6 +143,8 @@ public final class PyTorchLibrary {
 
     public native void torchDeleteModule(Pointer handle);
 
+    public native void torchDeleteIValue(Pointer handle);
+
     public native Pointer torchMax(Pointer handle);
 
     public native Pointer torchMax(Pointer self, Pointer other);

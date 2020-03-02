@@ -154,3 +154,9 @@ JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsTuple(
     JNIEnv* env, jobject jthis, jobject jhandle) {
   return utils::GetPointerFromJHandle<c10::IValue>(env, jhandle)->isTuple();
 }
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDeleteIValue(
+    JNIEnv* env, jobject jthis, jobject jhandle) {
+  auto* ivalue_ptr = utils::GetPointerFromJHandle<c10::IValue>(env, jhandle);
+  delete ivalue_ptr;
+}
