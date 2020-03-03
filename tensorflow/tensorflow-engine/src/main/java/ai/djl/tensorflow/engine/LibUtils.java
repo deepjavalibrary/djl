@@ -36,8 +36,8 @@ public final class LibUtils {
         String libName = getTensorFlowLib();
         logger.debug("Loading TensorFlow library from: {}", libName);
 
-        System.load(libName + '/' + System.mapLibraryName("libtensorflow_jni"));
-        System.load(libName + '/' + System.mapLibraryName("libtensorflow_framework"));
+        System.load(libName + '/' + System.mapLibraryName("tensorflow_jni"));
+        System.load(libName + '/' + System.mapLibraryName("tensorflow_framework"));
     }
 
     private static String getTensorFlowLib() {

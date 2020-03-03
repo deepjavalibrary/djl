@@ -48,139 +48,139 @@ public class TfNDArrayEx implements NDArrayEx {
 
     @Override
     public NDArray rdiv(Number n) {
-        return null;
+        return rdiv(manager.create(n));
     }
 
     @Override
     public NDArray rdiv(NDArray b) {
-        return null;
+        return b.div(array);
     }
 
     @Override
     public NDArray rdivi(Number n) {
-        return null;
+        return rdivi(manager.create(n));
     }
 
     @Override
     public NDArray rdivi(NDArray b) {
-        return null;
+        return b.divi(array);
     }
 
     @Override
     public NDArray rsub(Number n) {
-        return null;
+        return rsub(manager.create(n));
     }
 
     @Override
     public NDArray rsub(NDArray b) {
-        return null;
+        return b.sub(array);
     }
 
     @Override
     public NDArray rsubi(Number n) {
-        return null;
+        return rsubi(manager.create(n));
     }
 
     @Override
     public NDArray rsubi(NDArray b) {
-        return null;
+        return b.subi(array);
     }
 
     @Override
     public NDArray rmod(Number n) {
-        return null;
+        return rmod(manager.create(n));
     }
 
     @Override
     public NDArray rmod(NDArray b) {
-        return null;
+        return b.mod(array);
     }
 
     @Override
     public NDArray rmodi(Number n) {
-        return null;
+        return rmodi(manager.create(n));
     }
 
     @Override
     public NDArray rmodi(NDArray b) {
-        return null;
+        return b.modi(array);
     }
 
     @Override
     public NDArray rpow(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray rpowi(Number n) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray relu() {
-        return null;
+        return new TfNDArray(manager, tf.nn.relu(array.asOperand()));
     }
 
     @Override
     public NDArray sigmoid() {
-        return null;
+        return new TfNDArray(manager, tf.math.sigmoid(array.asOperand()));
     }
 
     @Override
     public NDArray tanh() {
-        return null;
+        return array.tanh();
     }
 
     @Override
     public NDArray softrelu() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray softsign() {
-        return null;
+        return new TfNDArray(manager, tf.nn.softsign(array.asOperand()));
     }
 
     @Override
     public NDArray leakyRelu(float alpha) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray elu(float alpha) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray selu() {
-        return null;
+        return new TfNDArray(manager, tf.nn.selu(array.asOperand()));
     }
 
     @Override
     public NDArray gelu() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray maxPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray globalMaxPool() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray sumPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray globalSumPool() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -190,12 +190,12 @@ public class TfNDArrayEx implements NDArrayEx {
             Shape pad,
             PoolingConvention poolingConvention,
             boolean countIncludePad) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray globalAvgPool() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -205,12 +205,12 @@ public class TfNDArrayEx implements NDArrayEx {
             Shape pad,
             PoolingConvention poolingConvention,
             int pValue) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray globalLpPool(int pValue) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -224,7 +224,9 @@ public class TfNDArrayEx implements NDArrayEx {
             float beta1,
             float beta2,
             float epsilon,
-            boolean lazyUpdate) {}
+            boolean lazyUpdate) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     @Override
     public void nagUpdate(
@@ -234,7 +236,9 @@ public class TfNDArrayEx implements NDArrayEx {
             float weightDecay,
             float rescaleGrad,
             float clipGrad,
-            float momentum) {}
+            float momentum) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     @Override
     public void sgdUpdate(
@@ -245,7 +249,9 @@ public class TfNDArrayEx implements NDArrayEx {
             float rescaleGrad,
             float clipGrad,
             float momentum,
-            boolean lazyUpdate) {}
+            boolean lazyUpdate) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     @Override
     public NDList convolution(
@@ -259,7 +265,7 @@ public class TfNDArrayEx implements NDArrayEx {
             String layout,
             boolean noBias,
             PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -269,7 +275,7 @@ public class TfNDArrayEx implements NDArrayEx {
             boolean flatten,
             boolean noBias,
             PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -279,12 +285,12 @@ public class TfNDArrayEx implements NDArrayEx {
             int embeddingSize,
             DataType dataType,
             PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDList prelu(NDList inputs, PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -293,7 +299,7 @@ public class TfNDArrayEx implements NDArrayEx {
             float probability,
             int[] sharedAxes,
             PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -305,7 +311,7 @@ public class TfNDArrayEx implements NDArrayEx {
             boolean center,
             boolean scale,
             PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -319,7 +325,7 @@ public class TfNDArrayEx implements NDArrayEx {
             boolean useBidirectional,
             boolean stateOutputs,
             PairList<String, Object> additional) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -334,17 +340,7 @@ public class TfNDArrayEx implements NDArrayEx {
             double lstmStateClipMin,
             double lstmStateClipMax,
             PairList<String, Object> additional) {
-        return null;
-    }
-
-    @Override
-    public NDArray normalize(float[] mean, float[] std) {
-        return null;
-    }
-
-    @Override
-    public NDArray toTensor() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @SuppressWarnings("unchecked")
@@ -359,17 +355,17 @@ public class TfNDArrayEx implements NDArrayEx {
 
     @Override
     public NDArray crop(int x, int y, int width, int height) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray where(NDArray condition, NDArray other) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -416,7 +412,7 @@ public class TfNDArrayEx implements NDArrayEx {
             float negativeMiningRatio,
             float negativeMiningThreshold,
             int minNegativeSamples) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -426,7 +422,7 @@ public class TfNDArrayEx implements NDArrayEx {
             List<Float> steps,
             List<Float> offsets,
             boolean clip) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -438,11 +434,11 @@ public class TfNDArrayEx implements NDArrayEx {
             float nmsThreshold,
             boolean forceSuppress,
             int nmsTopK) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public NDArray getArray() {
-        return null;
+        return array;
     }
 }
