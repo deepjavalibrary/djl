@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.inference.benchmark;
 
+import ai.djl.ModelException;
 import ai.djl.examples.inference.benchmark.util.AbstractBenchmark;
 import ai.djl.examples.inference.benchmark.util.Arguments;
 import ai.djl.inference.Predictor;
@@ -20,32 +21,24 @@ import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
+import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.concurrent.CompletableFuture;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MultithreadedBenchmark extends AbstractBenchmark<BufferedImage, Classifications> {
+public class MultithreadedBenchmark extends AbstractBenchmark {
 
     private static final Logger logger = LoggerFactory.getLogger(MultithreadedBenchmark.class);
-
-    BufferedImage img;
-    int numOfThreads;
-    AtomicInteger callableNumber;
-    AtomicInteger successThreads;
-    ExecutorService executorService;
-
-    public MultithreadedBenchmark() {
-        super(BufferedImage.class, Classifications.class);
-    }
 
     public static void main(String[] args) {
         if (new MultithreadedBenchmark().runBenchmark(args)) {
@@ -56,84 +49,86 @@ public class MultithreadedBenchmark extends AbstractBenchmark<BufferedImage, Cla
 
     /** {@inheritDoc} */
     @Override
-    protected void initialize(
-            ZooModel<BufferedImage, Classifications> model, Arguments arguments, Metrics metrics)
-            throws IOException {
+    public Classifications predict(Arguments arguments, Metrics metrics, int iteration)
+            throws IOException, ModelException {
         Path imageFile = arguments.getImageFile();
-        img = BufferedImageUtils.fromFile(imageFile);
+        BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
-        numOfThreads = arguments.getThreads();
-        callableNumber = new AtomicInteger();
-        successThreads = new AtomicInteger();
+        ZooModel<BufferedImage, Classifications> model = loadModel(arguments, metrics);
+
+        int numOfThreads = arguments.getThreads();
+        AtomicInteger counter = new AtomicInteger(iteration);
         logger.info("Multithreaded inference with {} threads.", numOfThreads);
-        metrics.addMetric("thread", numOfThreads);
-        executorService = Executors.newFixedThreadPool(numOfThreads);
-    }
 
-    /** {@inheritDoc} */
-    @Override
-    protected CompletableFuture<Classifications> predict(
-            ZooModel<BufferedImage, Classifications> model, Arguments arguments, Metrics metrics) {
-        PredictorSupplier supplier = new PredictorSupplier(model, metrics);
-        return CompletableFuture.supplyAsync(supplier, executorService);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void clean() {
-        executorService.shutdown();
-        if (successThreads.get() != callableNumber.get()) {
-            logger.error(
-                    "Only {}/{} threads finished.", successThreads.get(), callableNumber.get());
+        List<PredictorCallable> callables = new ArrayList<>(numOfThreads);
+        for (int i = 0; i < numOfThreads; ++i) {
+            callables.add(new PredictorCallable(model, img, metrics, counter, i, i == 0));
         }
+
+        Classifications classification = null;
+        ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
+        int successThreads = 0;
+        try {
+            List<Future<Classifications>> futures = executorService.invokeAll(callables);
+            for (Future<Classifications> future : futures) {
+                try {
+                    classification = future.get();
+                    ++successThreads;
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.error("", e);
+                }
+            }
+        } catch (InterruptedException e) {
+            logger.error("", e);
+        } finally {
+            executorService.shutdown();
+        }
+        if (successThreads != numOfThreads) {
+            logger.error("Only {}/{} threads finished.", successThreads, numOfThreads);
+        }
+
+        return classification;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected Options getOptions() {
-        Options options = super.getOptions();
-        options.addOption(
-                Option.builder("t")
-                        .longOpt("threads")
-                        .hasArg()
-                        .argName("NUMBER_THREADS")
-                        .desc("Number of inference threads.")
-                        .build());
-        return options;
-    }
-
-    private class PredictorSupplier implements Supplier<Classifications> {
+    private static class PredictorCallable implements Callable<Classifications> {
 
         private Predictor<BufferedImage, Classifications> predictor;
+        private BufferedImage img;
         private Metrics metrics;
         private String workerId;
         private boolean collectMemory;
+        private AtomicInteger counter;
 
-        public PredictorSupplier(ZooModel<BufferedImage, Classifications> model, Metrics metrics) {
+        public PredictorCallable(
+                ZooModel<BufferedImage, Classifications> model,
+                BufferedImage img,
+                Metrics metrics,
+                AtomicInteger counter,
+                int workerId,
+                boolean collectMemory) {
             this.predictor = model.newPredictor();
+            this.img = img;
             this.metrics = metrics;
-            int iteration = callableNumber.getAndIncrement();
-            this.workerId = String.format("%02d", iteration);
-            this.collectMemory = iteration == 0;
+            this.counter = counter;
+            this.workerId = String.format("%02d", workerId);
+            this.collectMemory = collectMemory;
             predictor.setMetrics(metrics);
         }
 
         /** {@inheritDoc} */
         @Override
-        public Classifications get() {
-            try {
-                Classifications result = predictor.predict(img);
+        public Classifications call() throws TranslateException {
+            Classifications result = null;
+            int count = 0;
+            while (counter.decrementAndGet() > 0) {
+                result = predictor.predict(img);
                 if (collectMemory) {
                     MemoryTrainingListener.collectMemoryInfo(metrics);
                 }
-                logger.debug("Worker-{}: finished.", workerId);
-                predictor.close();
-                successThreads.incrementAndGet();
-                return result;
-            } catch (Exception e) {
-                logger.error("Failed to classify with worker " + workerId, e);
-                return null;
+                logger.trace("Worker-{}: {} iteration finished.", workerId, ++count);
             }
+            logger.debug("Worker-{}: finished.", workerId);
+            return result;
         }
     }
 }
