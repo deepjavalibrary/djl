@@ -413,7 +413,6 @@
         <exclude name="DataflowAnomalyAnalysis"/>
         <exclude name="EmptyCatchBlock"/>
         <exclude name="EmptyIfStmt"/>
-        <exclude name="InvalidSlf4jMessageFormat"/>
         <exclude name="JumbledIncrementer"/>
         <exclude name="LoggerIsNotStaticFinal"/>
         <exclude name="MissingBreakInSwitch"/>
@@ -431,6 +430,7 @@
 
     <rule ref="category/java/multithreading.xml">
         <exclude name="AvoidSynchronizedAtMethodLevel"/>
+        <exclude name="DoNotUseThreads"/>
     </rule>
 
     <rule ref="category/java/performance.xml">
