@@ -46,7 +46,7 @@ public class Arguments {
         if (cmd.hasOption("duration")) {
             duration = Integer.parseInt(cmd.getOptionValue("duration"));
         }
-        iteration = -1;
+        iteration = 1;
         if (cmd.hasOption("iteration")) {
             iteration = Integer.parseInt(cmd.getOptionValue("iteration"));
         }

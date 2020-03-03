@@ -18,6 +18,7 @@ import ai.djl.engine.Engine;
 import ai.djl.examples.inference.benchmark.MultithreadedBenchmark;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
@@ -216,23 +217,30 @@ public abstract class AbstractBenchmark {
         return lastResult;
     }
 
-    protected ZooModel<BufferedImage, Classifications> loadModel(
+    protected ZooModel<BufferedImage, ? extends Classifications> loadModel(
             Arguments arguments, Metrics metrics) throws ModelException, IOException {
         long begin = System.nanoTime();
-
-        Criteria.Builder<BufferedImage, Classifications> builder =
-                Criteria.builder()
-                        .setTypes(BufferedImage.class, Classifications.class)
-                        .optFilters(arguments.getCriteria())
-                        .optProgress(new ProgressBar());
-
         String artifactId = arguments.getArtifactId();
         if (artifactId == null) {
             artifactId = "ai.djl.mxnet:resnet";
         }
+        Class<? extends Classifications> output;
+        if (artifactId.contains("ssd")) {
+            output = DetectedObjects.class;
+        } else {
+            output = Classifications.class;
+        }
+
+        Criteria.Builder<BufferedImage, ? extends Classifications> builder =
+                Criteria.builder()
+                        .setTypes(BufferedImage.class, output)
+                        .optFilters(arguments.getCriteria())
+                        .optProgress(new ProgressBar());
+
         builder.optArtifactId(artifactId);
 
-        ZooModel<BufferedImage, Classifications> model = ModelZoo.loadModel(builder.build());
+        ZooModel<BufferedImage, ? extends Classifications> model =
+                ModelZoo.loadModel(builder.build());
         long delta = System.nanoTime() - begin;
         logger.info(
                 "Model {} loaded in: {} ms.",

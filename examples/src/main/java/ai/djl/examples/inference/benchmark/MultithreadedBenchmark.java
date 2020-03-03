@@ -54,7 +54,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         Path imageFile = arguments.getImageFile();
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
 
-        ZooModel<BufferedImage, Classifications> model = loadModel(arguments, metrics);
+        ZooModel<BufferedImage, ? extends Classifications> model = loadModel(arguments, metrics);
 
         int numOfThreads = arguments.getThreads();
         AtomicInteger counter = new AtomicInteger(iteration);
@@ -92,7 +92,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
 
     private static class PredictorCallable implements Callable<Classifications> {
 
-        private Predictor<BufferedImage, Classifications> predictor;
+        private Predictor<BufferedImage, ? extends Classifications> predictor;
         private BufferedImage img;
         private Metrics metrics;
         private String workerId;
@@ -100,7 +100,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         private AtomicInteger counter;
 
         public PredictorCallable(
-                ZooModel<BufferedImage, Classifications> model,
+                ZooModel<BufferedImage, ? extends Classifications> model,
                 BufferedImage img,
                 Metrics metrics,
                 AtomicInteger counter,
