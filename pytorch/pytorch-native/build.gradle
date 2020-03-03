@@ -15,7 +15,7 @@ task compileJNI {
     doFirst {
         exec {
             if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
-                commandLine "build.cmd"
+                commandLine "${project.projectDir}/build.cmd"
             } else {
                 commandLine 'bash', 'build.sh'
             }
@@ -23,9 +23,9 @@ task compileJNI {
         def engineDir = "${project.parent.projectDir}/pytorch-engine"
         def publishDir = "${engineDir}/build/jnilib/native/jni"
         copy {
-            from project.buildDir
-            includeEmptyDirs = false
-            include "**/*djl_torch.*"
+            def tree = fileTree(project.buildDir)
+            tree.include("**/libdjl_torch.*", "**/djl_torch.dll")
+            from tree.files
             into publishDir
         }
         def versionName = String.format("${project.parent.version}-%s", new Date().format('yyyyMMdd'))
