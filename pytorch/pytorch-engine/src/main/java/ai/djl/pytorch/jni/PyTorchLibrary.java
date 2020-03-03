@@ -271,7 +271,7 @@ public final class PyTorchLibrary {
 
     public native void moduleEval(Pointer handle);
 
-    public native Pointer moduleForward(Pointer moduleHandle, Pointer[] iValuePointers);
+    public native Pointer moduleForward(Pointer moduleHandle, Pointer[] arrayHandles);
 
     public native Pointer iValueCreateFromTensor(Pointer tensorHandle);
 

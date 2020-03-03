@@ -34,11 +34,13 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleEval(
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
-    JNIEnv* env, jobject jthis, jobject module_handle, jobjectArray jivalue_ptr_array) {
+    JNIEnv* env, jobject jthis, jobject module_handle, jobjectArray tensor_ptrs) {
   auto ivalue_vec = std::vector<c10::IValue>();
-  for (auto i = 0; i < env->GetArrayLength(jivalue_ptr_array); ++i) {
-    auto ivalue = utils::GetPointerFromJHandle<c10::IValue>(env, env->GetObjectArrayElement(jivalue_ptr_array, i));
-    ivalue_vec.emplace_back(*ivalue);
+  size_t len = env->GetArrayLength(tensor_ptrs);
+  ivalue_vec.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, env->GetObjectArrayElement(tensor_ptrs, i));
+    ivalue_vec.emplace_back(*tensor_ptr);
   }
   auto* module_ptr = utils::GetPointerFromJHandle<torch::jit::script::Module>(env, module_handle);
   const auto* result_ptr = new c10::IValue(module_ptr->forward(ivalue_vec));

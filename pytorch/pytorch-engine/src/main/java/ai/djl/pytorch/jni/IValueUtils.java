@@ -17,7 +17,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.pytorch.engine.PtSymbolBlock;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -205,14 +204,12 @@ public final class IValueUtils {
      * @return result {@link NDList}
      */
     public static NDList forward(PtSymbolBlock block, NDList inputs) {
-        Pointer[] iValuesHandles =
+        Pointer[] arrayHandles =
                 inputs.stream()
-                        .map(input -> toIValuePointer((PtNDArray) input))
+                        .map(input -> ((PtNDArray) input).getHandle())
                         .toArray(Pointer[]::new);
 
-        Pointer result = PyTorchLibrary.LIB.moduleForward(block.getHandle(), iValuesHandles);
-        // free the iValuesHandles
-        Arrays.stream(iValuesHandles).forEach(PyTorchLibrary.LIB::torchDeleteIValue);
+        Pointer result = PyTorchLibrary.LIB.moduleForward(block.getHandle(), arrayHandles);
         PtNDManager manager = (PtNDManager) inputs.get(0).getManager();
         return forwardHelper(result, manager);
     }
