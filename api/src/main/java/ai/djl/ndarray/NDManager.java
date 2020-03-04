@@ -26,6 +26,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.nio.file.Path;
 
 /**
  * NDArray managers are used to create <I>NDArrays</I> (n-dimensional array on native engine).
@@ -556,6 +557,25 @@ public interface NDManager extends AutoCloseable {
     default NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
         return createRowSparse(data, dataShape, indices, shape, getDevice());
     }
+
+    /**
+     * Loads the NDArrays saved to a file.
+     *
+     * @param path the path to the file
+     * @return the loaded arrays
+     */
+    default NDList load(Path path) {
+        return load(path, getDevice());
+    }
+
+    /**
+     * Loads the NDArrays saved to a file.
+     *
+     * @param path the path to the file
+     * @param device the device to use for the loaded arrays
+     * @return the loaded arrays
+     */
+    NDList load(Path path, Device device);
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.

@@ -23,6 +23,7 @@ import ai.djl.mxnet.zoo.cv.classification.Squeezenet;
 import ai.djl.mxnet.zoo.cv.objectdetection.SingleShotDetectionModelLoader;
 import ai.djl.mxnet.zoo.cv.poseestimation.SimplePoseModelLoader;
 import ai.djl.mxnet.zoo.cv.segmentation.InstanceSegmentationModelLoader;
+import ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingModelLoader;
 import ai.djl.mxnet.zoo.nlp.qa.BertQAModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
@@ -53,6 +54,8 @@ public class MxModelZoo implements ModelZoo {
     public static final ActionRecognitionModelLoader ACTION_RECOGNITION =
             new ActionRecognitionModelLoader(REPOSITORY);
     public static final BertQAModelLoader BERT_QA = new BertQAModelLoader(REPOSITORY);
+    public static final GloveWordEmbeddingModelLoader GLOVE =
+            new GloveWordEmbeddingModelLoader(REPOSITORY);
 
     /** {@inheritDoc} */
     @Override

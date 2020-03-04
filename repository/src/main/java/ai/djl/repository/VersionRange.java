@@ -206,7 +206,7 @@ public final class VersionRange {
      * @return true if the artifact's version falls within this range
      */
     public boolean contains(Artifact artifact) {
-        return contains(artifact.getParsedVersion());
+        return artifact.getVersion() == null || contains(artifact.getParsedVersion());
     }
 
     /** {@inheritDoc} */

@@ -27,6 +27,7 @@ import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.translator.InputStreamTranslatorFactory;
 import ai.djl.modality.cv.translator.UrlTranslatorFactory;
 import ai.djl.modality.cv.util.NDImageUtils;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
@@ -106,7 +107,7 @@ public class MlpModelLoader extends BaseModelLoader<BufferedImage, Classificatio
     }
 
     @Override
-    protected Model createModel(Device device, Map<String, Object> arguments) {
+    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments) {
         int width = ((Double) arguments.getOrDefault("width", 28d)).intValue();
         int height = ((Double) arguments.getOrDefault("height", 28d)).intValue();
         int input = width * height;

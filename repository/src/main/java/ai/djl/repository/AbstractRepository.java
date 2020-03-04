@@ -54,7 +54,7 @@ public abstract class AbstractRepository implements Repository {
         return Paths.get(resolvePath(item, path)).toAbsolutePath();
     }
 
-    private URI resolvePath(Artifact.Item item, String path) throws IOException {
+    protected URI resolvePath(Artifact.Item item, String path) throws IOException {
         Artifact artifact = item.getArtifact();
         URI artifactUri = artifact.getResourceUri();
 

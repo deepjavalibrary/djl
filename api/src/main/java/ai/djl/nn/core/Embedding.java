@@ -24,6 +24,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
+import ai.djl.nn.convolutional.Conv2D.Builder;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
@@ -66,6 +67,36 @@ public class Embedding<T> extends ParameterBlock {
         for (T item : builder.items) {
             embedder.put(item, numItems++);
         }
+        inputShapes = new Shape[] {new Shape(-1)};
+    }
+
+    /**
+     * Constructs a pretrained embedding.
+     *
+     * @param embedding the embedding array
+     * @param items the items in the embedding (in matching order to the embedding array)
+     */
+    public Embedding(NDArray embedding, List<T> items) {
+        embeddingSize = Math.toIntExact(embedding.getShape().get(1));
+        useDefault = false;
+        dataType = embedding.getDataType();
+        this.embedding = new Parameter("embedding", this, ParameterType.WEIGHT);
+        this.embedding.setArray(embedding);
+        numItems = items.size();
+        embedder = new ConcurrentHashMap<>(numItems);
+        for (int i = 0; i < items.size(); i++) {
+            embedder.put(items.get(i), i);
+        }
+        inputShapes = new Shape[] {new Shape(-1)};
+    }
+
+    /**
+     * Creates a builder to build an {@link Embedding}.
+     *
+     * @return a new builder
+     */
+    public static Embedding.Builder<?> builder() {
+        return new Embedding.Builder<>();
     }
 
     /** {@inheritDoc} */
@@ -87,44 +118,6 @@ public class Embedding<T> extends ParameterBlock {
             return new Shape(numItems, embeddingSize);
         }
         throw new IllegalArgumentException("Invalid parameter name");
-    }
-
-    /**
-     * Finds the embedding of items as a {@link NDArray}.
-     *
-     * @param parameterStore the ParameterStore
-     * @param manager the manager to create the new NDArray
-     * @param items the items to retrieve the embeddings for
-     * @return a 3D NDArray where the first two embeddingSize correspond to the items, and the last
-     *     dimension is the embedding
-     */
-    public NDArray forward(ParameterStore parameterStore, NDManager manager, T[][] items) {
-        return forward(parameterStore, new NDList(manager.create(embed(items)))).singletonOrThrow();
-    }
-
-    /**
-     * Finds the embedding of items as a {@link NDArray}.
-     *
-     * @param parameterStore the ParameterStore
-     * @param manager the manager to create the new NDArray
-     * @param items the items to retrieve the embeddings for
-     * @return a 2D NDArray where the first dimension corresponds to the items, and the last
-     *     dimension is the embedding
-     */
-    public NDArray forward(ParameterStore parameterStore, NDManager manager, T[] items) {
-        return forward(parameterStore, new NDList(manager.create(embed(items)))).singletonOrThrow();
-    }
-
-    /**
-     * Finds the embedding of an item as a {@link NDArray}.
-     *
-     * @param parameterStore the ParameterStore
-     * @param manager the manager to create the new NDArray
-     * @param item the item to retrieve the embedding for
-     * @return the 1D NDArray of the embedding
-     */
-    public NDArray forward(ParameterStore parameterStore, NDManager manager, T item) {
-        return forward(parameterStore, new NDList(manager.create(embed(item)))).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -162,6 +155,16 @@ public class Embedding<T> extends ParameterBlock {
         embedding.load(manager, is);
     }
 
+    /**
+     * Returns whether an item is in the embedding.
+     *
+     * @param item the item to test
+     * @return true if the item is in the embedding
+     */
+    public boolean hasItem(T item) {
+        return embedder.containsKey(item);
+    }
+
     private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
         NDArray items = inputs.singletonOrThrow();
         Device device = items.getDevice();
@@ -176,15 +179,29 @@ public class Embedding<T> extends ParameterBlock {
         return ret;
     }
 
-    private int[][] embed(T[][] items) {
-        return Arrays.stream(items).map(this::embed).toArray(int[][]::new);
+    /**
+     * Embeds an array of items.
+     *
+     * @param manager the manager for the new embeddings
+     * @param items the items to embed
+     * @return the embedding {@link NDArray} of Shape(items.length)
+     */
+    public NDArray embed(NDManager manager, T[] items) {
+        return manager.create(Arrays.stream(items).mapToInt(this::embedHelper).toArray());
     }
 
-    private int[] embed(T[] items) {
-        return Arrays.stream(items).mapToInt(this::embed).toArray();
+    /**
+     * Embeds an item.
+     *
+     * @param manager the manager for the new embedding
+     * @param item the item to embed
+     * @return the embedding {@link NDArray} of Shape()
+     */
+    public NDArray embed(NDManager manager, T item) {
+        return manager.create(embedHelper(item));
     }
 
-    private int embed(T value) {
+    private int embedHelper(T value) {
         if (embedder.containsKey(value)) {
             return embedder.get(value);
         } else {
@@ -203,10 +220,40 @@ public class Embedding<T> extends ParameterBlock {
      */
     public static final class Builder<T> {
 
+        private Class<T> embeddingType;
         private Collection<T> items;
         private int embeddingSize;
         private boolean useDefault = true;
         private DataType dataType = DataType.FLOAT32;
+
+        Builder() {}
+
+        private Builder(Class<T> embeddingType, Builder<?> parent) {
+            this.embeddingType = embeddingType;
+            this.embeddingSize = parent.embeddingSize;
+            this.useDefault = parent.useDefault;
+            this.dataType = parent.dataType;
+        }
+
+        /**
+         * Returns the embedded type.
+         *
+         * @return the embedded type
+         */
+        public Class<T> getEmbeddingType() {
+            return embeddingType;
+        }
+
+        /**
+         * Creates a new {@link Builder} with the specified embedding type.
+         *
+         * @param embeddingType the embedding class
+         * @param <T> the embedding type
+         * @return a new {@link Builder} class with the specified embedding type
+         */
+        public <T> Builder<T> setType(Class<T> embeddingType) {
+            return new Builder<>(embeddingType, this);
+        }
 
         /**
          * Sets the collection of items that should feature embeddings.

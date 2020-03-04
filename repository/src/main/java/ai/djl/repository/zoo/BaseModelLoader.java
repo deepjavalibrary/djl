@@ -100,7 +100,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
             String relativePath = artifact.getResourceUri().getPath();
             Path modelPath = dir.resolve(relativePath);
 
-            Model model = createModel(criteria.getDevice(), arguments);
+            Model model = createModel(criteria.getDevice(), artifact, arguments);
             model.load(modelPath, artifact.getName());
 
             return new ZooModel<>(model, translator);
@@ -120,7 +120,8 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
                 .collect(Collectors.toList());
     }
 
-    protected Model createModel(Device device, Map<String, Object> arguments) {
+    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments)
+            throws IOException {
         return Model.newInstance(device);
     }
 

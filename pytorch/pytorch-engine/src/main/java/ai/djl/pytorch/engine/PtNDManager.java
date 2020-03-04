@@ -31,6 +31,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.nio.file.Path;
 
 /** {@code PtNDManager} is the PyTorch implementation of {@link NDManager}. */
 public class PtNDManager extends BaseNDManager {
@@ -117,6 +118,12 @@ public class PtNDManager extends BaseNDManager {
     @Override
     public NDArray createRowSparse(
             Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList load(Path path, Device device) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

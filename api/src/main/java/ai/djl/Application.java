@@ -44,5 +44,6 @@ public class Application {
     public interface NLP {
         Application QUESTION_ANSWER = new Application("nlp/question_answer");
         Application TEXT_CLASSIFICATION = new Application("nlp/text_classification");
+        Application WORD_EMBEDDING = new Application("nlp/word_embedding");
     }
 }

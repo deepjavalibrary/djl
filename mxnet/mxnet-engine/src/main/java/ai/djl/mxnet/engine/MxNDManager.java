@@ -28,6 +28,7 @@ import com.sun.jna.Pointer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.file.Path;
 
 /** {@code MxNDManager} is the MXNet implementation of {@link NDManager}. */
 public class MxNDManager extends BaseNDManager {
@@ -147,6 +148,12 @@ public class MxNDManager extends BaseNDManager {
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, dataNd, -1);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, indicesNd, 0);
         return sparse;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList load(Path path, Device device) {
+        return JnaUtils.loadNdArray(this, path, device);
     }
 
     /** {@inheritDoc} */

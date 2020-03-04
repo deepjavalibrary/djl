@@ -39,7 +39,6 @@ import ai.djl.nn.recurrent.GRU;
 import ai.djl.nn.recurrent.LSTM;
 import ai.djl.nn.recurrent.RNN;
 import ai.djl.training.DefaultTrainingConfig;
-import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
@@ -205,7 +204,8 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
         Embedding<Character> block =
-                new Embedding.Builder<Character>()
+                Embedding.builder()
+                        .setType(Character.class)
                         .setItems(Arrays.asList('a', 'b', 'c'))
                         .setEmbeddingSize(2)
                         .build();
@@ -218,14 +218,16 @@ public class BlockCoreTest {
                 trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
-                ParameterStore parameterStore = new ParameterStore(manager, false);
 
-                // TODO: use trainer.forward
                 Assert.assertEquals(
-                        block.forward(parameterStore, manager, 'x'),
+                        trainer.forward(new NDList(block.embed(manager, 'x'))).singletonOrThrow(),
                         manager.create(new int[] {1, 1}));
+
                 Assert.assertEquals(
-                        block.forward(parameterStore, manager, new Character[] {'a', 'b'}),
+                        trainer.forward(
+                                        new NDList(
+                                                block.embed(manager, new Character[] {'a', 'b'})))
+                                .singletonOrThrow(),
                         manager.create(new int[] {1, 1, 1, 1}, new Shape(2, 2)));
             }
         }

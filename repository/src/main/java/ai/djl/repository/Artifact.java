@@ -200,6 +200,9 @@ public class Artifact {
                 uri = uri.resolve(values + '/');
             }
         }
+        if (version == null) {
+            return uri;
+        }
         return uri.resolve(version + '/');
     }
 

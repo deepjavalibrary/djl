@@ -170,9 +170,7 @@ public class MxModel extends BaseModel {
         }
         logger.debug("DJL formatted model not found, try to find MXNet model");
         Path paramFile = paramPathResolver(options);
-        NDList paramNDlist =
-                JnaUtils.loadNdArray(
-                        (MxNDManager) manager, paramFile.toAbsolutePath(), manager.getDevice());
+        NDList paramNDlist = manager.load(paramFile);
 
         MxSymbolBlock symbolBlock = (MxSymbolBlock) block;
 

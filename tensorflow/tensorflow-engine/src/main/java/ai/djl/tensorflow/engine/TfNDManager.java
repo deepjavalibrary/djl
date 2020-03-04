@@ -28,6 +28,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.nio.file.Path;
 import java.util.Arrays;
 import org.tensorflow.EagerSession;
 import org.tensorflow.Operand;
@@ -185,6 +186,12 @@ public class TfNDManager extends BaseNDManager {
     @Override
     public NDArray createRowSparse(
             Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList load(Path path, Device device) {
         return null;
     }
 

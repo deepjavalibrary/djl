@@ -22,6 +22,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 
 public class MockNDManager implements NDManager {
 
@@ -48,6 +49,12 @@ public class MockNDManager implements NDManager {
     @Override
     public NDArray createRowSparse(
             Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList load(Path path, Device device) {
         return null;
     }
 

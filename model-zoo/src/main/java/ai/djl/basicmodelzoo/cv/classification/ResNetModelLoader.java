@@ -28,6 +28,7 @@ import ai.djl.modality.cv.translator.InputStreamTranslatorFactory;
 import ai.djl.modality.cv.translator.UrlTranslatorFactory;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
@@ -107,7 +108,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
     }
 
     @Override
-    protected Model createModel(Device device, Map<String, Object> arguments) {
+    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments) {
         @SuppressWarnings("unchecked")
         Shape shape =
                 new Shape(

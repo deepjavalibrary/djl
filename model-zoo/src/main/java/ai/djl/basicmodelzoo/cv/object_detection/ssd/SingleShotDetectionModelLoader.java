@@ -26,6 +26,7 @@ import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
 import ai.djl.modality.cv.translator.UrlTranslatorFactory;
 import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
@@ -109,7 +110,7 @@ public class SingleShotDetectionModelLoader
 
     @Override
     @SuppressWarnings("unchecked")
-    protected Model createModel(Device device, Map<String, Object> arguments) {
+    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments) {
         int numClasses = ((Double) arguments.get("outSize")).intValue();
         int numFeatures = ((Double) arguments.get("numFeatures")).intValue();
         boolean globalPool = (boolean) arguments.get("globalPool");

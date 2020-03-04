@@ -12,10 +12,15 @@
  */
 package ai.djl.repository;
 
+import ai.djl.repository.Artifact.Item;
 import ai.djl.util.Progress;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A {@code SimpleRepository} is a {@link Repository} containing only a single artifact without
@@ -72,19 +77,34 @@ public class SimpleRepository extends AbstractRepository {
 
     /** {@inheritDoc} */
     @Override
-    public Metadata locate(MRL mrl) {
-        // return new MatchAllMetadata();
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Artifact resolve(MRL mrl, String version, Map<String, String> filter) {
+    public Metadata locate(MRL mrl) throws IOException {
         Metadata metadata = new Metadata();
         metadata.setRepositoryUri(URI.create(""));
         Artifact artifact = new Artifact();
         artifact.setMetadata(metadata);
-        return artifact;
+        metadata.setArtifacts(Collections.singletonList(artifact));
+        artifact.setName(name);
+        Map<String, Item> files = new ConcurrentHashMap<>();
+        File[] fileList = path.toFile().listFiles();
+        if (fileList == null) {
+            throw new IllegalArgumentException("No files found in SimpleRepository");
+        }
+        for (File file : fileList) {
+            Item item = new Item();
+            item.setName(file.getName());
+            item.setSize(file.length());
+            item.setArtifact(artifact);
+            files.put(file.getName(), item);
+        }
+        artifact.setFiles(files);
+        return metadata;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
+            throws IOException {
+        return locate(mrl).getArtifacts().get(0);
     }
 
     /** {@inheritDoc} */
@@ -97,5 +117,11 @@ public class SimpleRepository extends AbstractRepository {
     @Override
     public Path getCacheDirectory() {
         return path;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected URI resolvePath(Item item, String path) throws IOException {
+        return this.path.resolve(item.getName()).toUri();
     }
 }
