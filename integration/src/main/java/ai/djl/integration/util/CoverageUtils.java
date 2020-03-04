@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -96,6 +97,9 @@ public final class CoverageUtils {
 
     private static List<Class<?>> getClasses(Class<?> clazz)
             throws IOException, ClassNotFoundException, URISyntaxException {
+        URL[] urls = ((URLClassLoader) clazz.getClassLoader()).getURLs();
+        ClassLoader cl = new TestClassLoader(urls, Thread.currentThread().getContextClassLoader());
+
         URL url = clazz.getProtectionDomain().getCodeSource().getLocation();
         String path = url.getPath();
 
@@ -118,8 +122,8 @@ public final class CoverageUtils {
                 className = className.replace(File.separatorChar, '.');
 
                 try {
-                    classList.add(Class.forName(className));
-                } catch (ExceptionInInitializerError | NoClassDefFoundError ignore) {
+                    classList.add(Class.forName(className, true, cl));
+                } catch (Error ignore) {
                     // ignore
                 }
             }
@@ -133,8 +137,8 @@ public final class CoverageUtils {
                         fileName = fileName.substring(0, fileName.lastIndexOf('.'));
                         fileName = fileName.replace('/', '.');
                         try {
-                            classList.add(Class.forName(fileName));
-                        } catch (ExceptionInInitializerError ignore) {
+                            classList.add(Class.forName(fileName, true, cl));
+                        } catch (Error ignore) {
                             // ignore
                         }
                     }
@@ -221,5 +225,25 @@ public final class CoverageUtils {
     private static Object newProxyInstance(Class<?> clazz) {
         return Proxy.newProxyInstance(
                 clazz.getClassLoader(), new Class[] {clazz}, (proxy, method, args) -> null);
+    }
+
+    private static final class TestClassLoader extends URLClassLoader {
+
+        public TestClassLoader(URL[] urls, ClassLoader parent) {
+            super(urls, parent);
+        }
+
+        @Override
+        public Class<?> loadClass(String name) throws ClassNotFoundException {
+            try {
+                return findClass(name);
+            } catch (ClassNotFoundException e) {
+                ClassLoader classLoader = getParent();
+                if (classLoader == null) {
+                    classLoader = getSystemClassLoader();
+                }
+                return classLoader.loadClass(name);
+            }
+        }
     }
 }
