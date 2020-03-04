@@ -117,6 +117,8 @@ task downloadPyTorchNativeLib() {
             delete(file)
             delete("${outputDir}/libtorch")
         }
+
+        new File("${BINARY_ROOT}/auto").mkdirs()
     }
 }
 

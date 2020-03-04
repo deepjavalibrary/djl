@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.zip.GZIPInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,10 +144,13 @@ public final class LibUtils {
         Platform systemPlatform = Platform.fromSystem();
         try {
             Platform matching = null;
+            Platform placeholder = null;
             for (URL url : urls) {
                 logger.debug(url.toString());
                 Platform platform = Platform.fromUrl(url);
-                if (platform.matches(systemPlatform)) {
+                if (platform.isPlaceholder()) {
+                    placeholder = platform;
+                } else if (platform.matches(systemPlatform)) {
                     matching = platform;
                     break;
                 }
@@ -155,6 +159,14 @@ public final class LibUtils {
             if (matching != null) {
                 logger.debug("Find matching library");
                 return copyNativeLibraryFromClasspath(matching);
+            }
+
+            if (placeholder != null) {
+                try {
+                    return downloadPyTorch(placeholder);
+                } catch (IOException e) {
+                    throw new IllegalStateException("Failed to download PyTorch native library", e);
+                }
             }
         } catch (IOException e) {
             throw new IllegalStateException(
@@ -192,6 +204,50 @@ public final class LibUtils {
             return dir.toAbsolutePath().toString();
         } catch (IOException e) {
             throw new IllegalStateException("Failed to extract PyTorch native library", e);
+        } finally {
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
+        }
+    }
+
+    private static String downloadPyTorch(Platform platform) throws IOException {
+        String version = platform.getVersion();
+        String flavor = platform.getFlavor();
+        String classifier = platform.getClassifier();
+        String os = platform.getOsPrefix();
+
+        String userHome = System.getProperty("user.home");
+        String libName = System.mapLibraryName(LIB_NAME);
+        Path dir = Paths.get(userHome, ".pytorch/cache/" + version + flavor + '-' + classifier);
+        Path path = dir.resolve(libName);
+        if (Files.exists(path)) {
+            return path.toAbsolutePath().toString();
+        }
+        // if files not found
+        Path tmp = Paths.get(userHome, ".pytorch/cache/tmp");
+        Files.createDirectories(tmp);
+        int pos = version.indexOf("-SNAPSHOT");
+        if (pos > 0) {
+            version = version.substring(0, pos);
+        }
+        String link = "https://djl-ai.s3.amazonaws.com/publish/pytorch-" + version;
+
+        try (InputStream is = new URL(link + "/files.txt").openStream()) {
+            List<String> lines = Utils.readLines(is);
+            for (String line : lines) {
+                if (line.startsWith(os + '/' + flavor + '/')) {
+                    URL url = new URL(link + '/' + line);
+                    String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
+                    try (InputStream fis = new GZIPInputStream(url.openStream())) {
+                        Files.copy(fis, tmp.resolve(fileName));
+                    }
+                }
+            }
+            Utils.deleteQuietly(dir);
+            Files.move(tmp, dir);
+            tmp = null;
+            return path.toAbsolutePath().toString();
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);
