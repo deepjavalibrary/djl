@@ -10,9 +10,12 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.modality.cv;
+package ai.djl.modality.cv.translator;
 
 import ai.djl.Model;
+import ai.djl.modality.cv.output.BoundingBox;
+import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.TranslatorContext;

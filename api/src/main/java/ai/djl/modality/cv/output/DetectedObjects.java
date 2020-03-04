@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.modality.cv;
+package ai.djl.modality.cv.output;
 
 import ai.djl.modality.Classifications;
 import java.util.List;
@@ -73,9 +73,9 @@ public class DetectedObjects extends Classifications {
         }
 
         /**
-         * Returns the {@link BoundingBox} of the detected object.
+         * Returns the {@link ai.djl.modality.cv.output.BoundingBox} of the detected object.
          *
-         * @return the {@link BoundingBox} of the detected object
+         * @return the {@link ai.djl.modality.cv.output.BoundingBox} of the detected object
          */
         public BoundingBox getBoundingBox() {
             return boundingBox;

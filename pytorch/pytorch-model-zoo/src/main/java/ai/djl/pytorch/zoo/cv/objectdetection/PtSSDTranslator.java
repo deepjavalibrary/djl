@@ -13,10 +13,10 @@
 package ai.djl.pytorch.zoo.cv.objectdetection;
 
 import ai.djl.Model;
-import ai.djl.modality.cv.BoundingBox;
-import ai.djl.modality.cv.DetectedObjects;
-import ai.djl.modality.cv.Rectangle;
-import ai.djl.modality.cv.SingleShotDetectionTranslator;
+import ai.djl.modality.cv.output.BoundingBox;
+import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.output.Rectangle;
+import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;

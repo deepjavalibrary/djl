@@ -14,7 +14,7 @@ package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
 import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.DetectedObjects;
+import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;

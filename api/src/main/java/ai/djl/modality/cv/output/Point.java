@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.modality.cv;
+package ai.djl.modality.cv.output;
 
 /**
  * A point representing a location in {@code (x,y)} coordinate space, specified in double precision.

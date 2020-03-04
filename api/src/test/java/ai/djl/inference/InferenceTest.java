@@ -16,7 +16,7 @@ import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.DetectedObjects;
+import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;

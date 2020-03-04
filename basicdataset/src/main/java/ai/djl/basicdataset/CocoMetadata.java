@@ -12,7 +12,7 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.modality.cv.Rectangle;
+import ai.djl.modality.cv.output.Rectangle;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;

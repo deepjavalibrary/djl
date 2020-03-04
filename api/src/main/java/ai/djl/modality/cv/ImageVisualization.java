@@ -12,7 +12,12 @@
  */
 package ai.djl.modality.cv;
 
-import ai.djl.modality.cv.Joints.Joint;
+import ai.djl.modality.cv.output.BoundingBox;
+import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.output.Joints;
+import ai.djl.modality.cv.output.Joints.Joint;
+import ai.djl.modality.cv.output.Mask;
+import ai.djl.modality.cv.output.Point;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.util.RandomUtils;
 import java.awt.BasicStroke;

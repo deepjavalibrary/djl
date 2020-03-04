@@ -13,7 +13,7 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Application.CV;
-import ai.djl.modality.cv.Rectangle;
+import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils;

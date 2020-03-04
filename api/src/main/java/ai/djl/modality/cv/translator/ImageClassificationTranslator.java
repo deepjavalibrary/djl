@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package ai.djl.modality.cv;
+package ai.djl.modality.cv.translator;
 
 import ai.djl.Model;
 import ai.djl.modality.Classifications;

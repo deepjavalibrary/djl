@@ -10,20 +10,20 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.modality.cv;
+package ai.djl.modality.cv.translator;
 
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import java.awt.image.BufferedImage;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.Map;
 
 /**
- * A factory class creates {@link Translator} that can process image from a URL.
+ * A factory class creates {@link Translator} that can process image from an {@code InputStream}.
  *
  * @param <T> the type of the output
  */
-public class UrlTranslatorFactory<T> implements TranslatorFactory<URL, T> {
+public class InputStreamTranslatorFactory<T> implements TranslatorFactory<InputStream, T> {
 
     private TranslatorFactory<BufferedImage, T> factory;
 
@@ -32,13 +32,13 @@ public class UrlTranslatorFactory<T> implements TranslatorFactory<URL, T> {
      *
      * @param factory a factory that can process image
      */
-    public UrlTranslatorFactory(TranslatorFactory<BufferedImage, T> factory) {
+    public InputStreamTranslatorFactory(TranslatorFactory<BufferedImage, T> factory) {
         this.factory = factory;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Translator<URL, T> newInstance(Map<String, Object> arguments) {
-        return new UrlTranslator<>(factory.newInstance(arguments));
+    public Translator<InputStream, T> newInstance(Map<String, Object> arguments) {
+        return new InputStreamTranslator<>(factory.newInstance(arguments));
     }
 }

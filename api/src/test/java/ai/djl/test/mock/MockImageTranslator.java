@@ -12,8 +12,8 @@
  */
 package ai.djl.test.mock;
 
-import ai.djl.modality.cv.DetectedObjects;
-import ai.djl.modality.cv.Rectangle;
+import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
