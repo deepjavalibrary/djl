@@ -214,15 +214,18 @@ public final class LibUtils {
     private static String downloadPyTorch(Platform platform) throws IOException {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
+        if (flavor.isEmpty()) {
+            flavor = "cpu";
+        }
         String classifier = platform.getClassifier();
         String os = platform.getOsPrefix();
 
         String userHome = System.getProperty("user.home");
-        String libName = System.mapLibraryName(LIB_NAME);
+        String libName = System.mapLibraryName(NATIVE_LIB_NAME);
         Path dir = Paths.get(userHome, ".pytorch/cache/" + version + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {
-            return path.toAbsolutePath().toString();
+            return dir.toAbsolutePath().toString();
         }
         // if files not found
         Path tmp = Paths.get(userHome, ".pytorch/cache/tmp");
@@ -236,7 +239,7 @@ public final class LibUtils {
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
             for (String line : lines) {
-                if (line.startsWith(os + '/' + flavor + '/')) {
+                if (line.startsWith(flavor + '/' + os + '/')) {
                     URL url = new URL(link + '/' + line);
                     String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
                     try (InputStream fis = new GZIPInputStream(url.openStream())) {
@@ -247,7 +250,7 @@ public final class LibUtils {
             Utils.deleteQuietly(dir);
             Files.move(tmp, dir);
             tmp = null;
-            return path.toAbsolutePath().toString();
+            return dir.toAbsolutePath().toString();
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);

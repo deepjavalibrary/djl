@@ -31,6 +31,12 @@ task compileJNI {
         def versionName = String.format("${project.parent.version}-%s", new Date().format('yyyyMMdd'))
         def propFile = file("${publishDir}/pytorch.properties")
         propFile.text = "version=${versionName}\n"
+        // for ide testing
+        def testDir = "${engineDir}/build/classes/java/main/native/jni"
+        copy {
+            from publishDir
+            into testDir
+        }
     }
 }
 
