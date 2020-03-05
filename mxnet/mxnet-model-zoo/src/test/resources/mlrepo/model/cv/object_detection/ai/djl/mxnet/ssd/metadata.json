@@ -82,6 +82,75 @@
           "size": 134511624
         }
       }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_512_mobilenet1.0_voc",
+      "properties": {
+        "size": "512",
+        "backbone": "mobilenet1.0",
+        "dataset": "voc"
+      },
+      "arguments": {
+        "width": 512,
+        "height": 512,
+        "threshold": 0.2
+      },
+      "files": {
+        "classes": {
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "size": 134,
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_mobilenet1.0-symbol.json",
+          "sha1Hash": "42fc3b27bff6431a7107eef728f984acf3c1afad",
+          "size": 161649,
+          "name": "ssd_512_mobilenet1.0_voc-symbol.json"
+        },
+        "parameters": {
+          "uri": "0.0.1/ssd_512_mobilenet1.0_voc-0000.params.gz",
+          "sha1Hash": "0d21b49f15e202b89cd1f2b5ca274c771e5bf6c3",
+          "size": 51415054
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_300_vgg16_atrous_voc",
+      "properties": {
+        "size": "300",
+        "backbone": "vgg16",
+        "flavor": "atrous",
+        "dataset": "voc"
+      },
+      "arguments": {
+        "width": 300,
+        "height": 300,
+        "threshold": 0.2
+      },
+      "files": {
+        "classes": {
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "size": 134,
+          "name": "classes.txt"
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_300_vgg16_atrous-symbol.json",
+          "sha1Hash": "2907f14ec41ff6d73f59ffd3f94c43a0d54c2db3",
+          "size": 106291,
+          "name": "ssd_300_vgg16_atrous_voc-symbol.json"
+        },
+        "parameters": {
+          "uri": "0.0.1/ssd_300_vgg16_atrous_voc-0000.params.gz",
+          "sha1Hash": "abfcfb20b155f2da8b94a17276cec47529dd6d7f",
+          "size": 97855902
+        }
+      }
     }
   ]
 }
