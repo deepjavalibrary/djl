@@ -443,14 +443,17 @@ public final class JnaUtils {
      */
 
     public static void freeNdArray(Pointer ndArray) {
+        checkNDArray(ndArray, "free");
         checkCall(LIB.MXNDArrayFree(ndArray));
     }
 
     public static void waitToRead(Pointer ndArray) {
+        checkNDArray(ndArray, "wait to read");
         checkCall(LIB.MXNDArrayWaitToRead(ndArray));
     }
 
     public static void waitToWrite(Pointer ndArray) {
+        checkNDArray(ndArray, "wait to write");
         checkCall(LIB.MXNDArrayWaitToWrite(ndArray));
     }
 
@@ -460,6 +463,8 @@ public final class JnaUtils {
 
     public static void syncCopyToCPU(Pointer ndArray, Pointer data, int len) {
         NativeSize size = new NativeSize(len);
+        checkNDArray(ndArray, "copy from");
+        checkNDArray(data, "copy to");
         checkCall(LIB.MXNDArraySyncCopyToCPU(ndArray, data, size));
     }
 
@@ -510,6 +515,7 @@ public final class JnaUtils {
 
     public static SparseFormat getStorageType(Pointer ndArray) {
         IntBuffer type = IntBuffer.allocate(1);
+        checkNDArray(ndArray, "get the storage type of");
         checkCall(LIB.MXNDArrayGetStorageType(ndArray, type));
         return SparseFormat.fromValue(type.get());
     }
@@ -517,6 +523,7 @@ public final class JnaUtils {
     public static Device getDevice(Pointer ndArray) {
         IntBuffer deviceType = IntBuffer.allocate(1);
         IntBuffer deviceId = IntBuffer.allocate(1);
+        checkNDArray(ndArray, "get the device of");
         checkCall(LIB.MXNDArrayGetContext(ndArray, deviceType, deviceId));
         String deviceTypeStr = MxDeviceType.fromDeviceType(deviceType.get(0));
         // CPU is special case which don't have device id
@@ -529,6 +536,7 @@ public final class JnaUtils {
     public static Shape getShape(Pointer ndArray) {
         IntBuffer dim = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
+        checkNDArray(ndArray, "get the shape of");
         checkCall(LIB.MXNDArrayGetShapeEx(ndArray, dim, ref));
         int nDim = dim.get();
         if (nDim == 0) {
@@ -540,6 +548,7 @@ public final class JnaUtils {
 
     public static DataType getDataType(Pointer ndArray) {
         IntBuffer dataType = IntBuffer.allocate(1);
+        checkNDArray(ndArray, "get the data type of");
         checkCall(LIB.MXNDArrayGetDType(ndArray, dataType));
         return DataType.values()[dataType.get()];
     }
@@ -669,6 +678,7 @@ public final class JnaUtils {
 
     public static Pointer getGradient(Pointer handle) {
         PointerByReference ref = new PointerByReference();
+        checkNDArray(handle, "get the gradient for");
         checkCall(LIB.MXNDArrayGetGrad(handle, ref));
         return ref.getValue();
     }
@@ -684,21 +694,25 @@ public final class JnaUtils {
     }
 
     public static void parameterStoreInit(Pointer handle, int num, String[] keys, NDList vals) {
+        checkNDArray(handle, "initialize the parameter store with");
         checkCall(LIB.MXKVStoreInitEx(handle, num, keys, toPointerArray(vals)));
     }
 
     public static void parameterStorePush(
             Pointer handle, int num, String[] keys, NDList vals, int priority) {
+        checkNDArray(handle, "push to the parameter store with");
         checkCall(LIB.MXKVStorePushEx(handle, num, keys, toPointerArray(vals), priority));
     }
 
     public static void parameterStorePull(
             Pointer handle, int num, int[] keys, NDList vals, int priority) {
+        checkNDArray(handle, "pull from the parameter store with");
         checkCall(LIB.MXKVStorePull(handle, num, keys, toPointerArray(vals), priority));
     }
 
     public static void parameterStorePull(
             Pointer handle, int num, String[] keys, NDList vals, int priority) {
+        checkNDArray(handle, "pull from the parameter store with");
         checkCall(LIB.MXKVStorePullEx(handle, num, keys, toPointerArray(vals), priority));
     }
 
@@ -1803,6 +1817,13 @@ public final class JnaUtils {
             valPointers[i] = ((MxNDArray) vals[i]).getHandle();
         }
         return new PointerArray(valPointers);
+    }
+
+    private static void checkNDArray(Pointer pointer, String msg) {
+        if (pointer == null) {
+            throw new IllegalArgumentException(
+                    "Tried to " + msg + " an MXNet NDArray that was already closed");
+        }
     }
 
     private static String getLastError() {
