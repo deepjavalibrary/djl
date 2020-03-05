@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@code PtPredictor} is the MXNet implementation of {@link Predictor}.
+ * {@code PtPredictor} is the Pytorch implementation of {@link Predictor}.
  *
  * @param <I> the input object
  * @param <O> the output object
@@ -30,7 +30,7 @@ public class PtPredictor<I, O> extends BasePredictor<I, O> {
     private static final Logger logger = LoggerFactory.getLogger(PtPredictor.class);
 
     /**
-     * Constructs a {@code MxPredictor}.
+     * Constructs a {@code PtPredictor}.
      *
      * @param model the model to predict with
      * @param translator the translator to convert with input and output
@@ -47,7 +47,7 @@ public class PtPredictor<I, O> extends BasePredictor<I, O> {
         if (manager.isOpen()) {
             if (logger.isDebugEnabled()) {
                 logger.warn(
-                        "MxPredictor was not closed explicitly: {}", getClass().getSimpleName());
+                        "PtPredictor was not closed explicitly: {}", getClass().getSimpleName());
             }
             close();
         }

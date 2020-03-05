@@ -17,33 +17,26 @@ import ai.djl.Device;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
-import ai.djl.util.PairList;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
-import org.tensorflow.Graph;
+import java.util.stream.Collectors;
 import org.tensorflow.SavedModelBundle;
-import org.tensorflow.Session;
 
 public class TfModel extends BaseModel {
     private Path modelDir;
-    private SavedModelBundle bundle;
     private AtomicBoolean first = new AtomicBoolean(true);
     private NDManager manager;
-    private Session session;
-    private Graph graph;
 
     /**
      * Constructs a new Model on a given device.
@@ -61,9 +54,8 @@ public class TfModel extends BaseModel {
         if (tags == null || tags.length == 0) {
             tags = new String[] {"serve"};
         }
-        bundle = SavedModelBundle.load(modelDir.toString(), tags);
-        graph = bundle.graph();
-        session = bundle.session();
+        SavedModelBundle bundle = SavedModelBundle.load(modelDir.toString(), tags);
+        block = new TfSymbolBlock(manager, bundle);
     }
 
     /** {@inheritDoc} */
@@ -80,62 +72,37 @@ public class TfModel extends BaseModel {
 
     public void load(String modelDir, byte[] configProto, byte[] runOptions, String... tags) {
         this.modelDir = Paths.get(modelDir);
-        bundle =
+        SavedModelBundle bundle =
                 SavedModelBundle.loader(modelDir)
                         .withConfigProto(configProto)
                         .withRunOptions(runOptions)
                         .withTags(tags)
                         .load();
-        graph = bundle.graph();
-        session = bundle.session();
+        block = new TfSymbolBlock(manager, bundle);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void save(Path modelPath, String modelName) {}
-
-    public Graph getGraph() {
-        return graph;
-    }
-
-    public Session getSession() {
-        return session;
-    }
-
-    private byte[] getMetaGraphDef() {
-        return bundle.metaGraphDef();
+    public void save(Path modelPath, String modelName) {
+        throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 
     /** {@inheritDoc} */
     @Override
     public Block getBlock() {
-        return null;
+        return block;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setBlock(Block block) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public String getName() {
-        return null;
+    public void setBlock(Block block) {
+        throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getProperty(String key) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setProperty(String key, String value) {}
 
     /** {@inheritDoc} */
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
-        return null;
+        throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 
     /** {@inheritDoc} */
@@ -143,50 +110,6 @@ public class TfModel extends BaseModel {
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
         return new TfPredictor<>(this, translator, first.getAndSet(false));
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public PairList<String, Shape> describeInput() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PairList<String, Shape> describeOutput() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String[] getArtifactNames() {
-        return new String[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <T> T getArtifact(String name, Function<InputStream, T> function) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public URL getArtifact(String artifactName) throws IOException {
-        if (artifactName == null) {
-            throw new IllegalArgumentException("artifactName cannot be null");
-        }
-        Path file = modelDir.resolve(artifactName);
-        if (Files.exists(file) && Files.isReadable(file)) {
-            return file.toUri().toURL();
-        }
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public InputStream getArtifactAsStream(String name) {
-        return null;
-    }
-
     /** {@inheritDoc} */
     @Override
     public NDManager getNDManager() {
@@ -195,12 +118,24 @@ public class TfModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public void setDataType(DataType dataType) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public DataType getDataType() {
-        return DataType.FLOAT32;
+    public String[] getArtifactNames() {
+        try {
+            List<Path> files =
+                    Files.walk(modelDir).filter(Files::isRegularFile).collect(Collectors.toList());
+            List<String> ret = new ArrayList<>(files.size());
+            for (Path path : files) {
+                String fileName = path.toFile().getName();
+                if (fileName.endsWith(".pb")) {
+                    // ignore model files.
+                    continue;
+                }
+                Path relative = modelDir.relativize(path);
+                ret.add(relative.toString());
+            }
+            return ret.toArray(new String[0]);
+        } catch (IOException e) {
+            throw new AssertionError("Failed list files", e);
+        }
     }
 
     /** {@inheritDoc} */
@@ -213,17 +148,6 @@ public class TfModel extends BaseModel {
     @Override
     public void close() {
         manager.close();
-        if (bundle != null) {
-            bundle.close();
-        }
-        if (graph != null) {
-            graph.close();
-        }
-        if (session != null) {
-            session.close();
-        }
-        bundle = null;
-        graph = null;
-        session = null;
+        block.clear();
     }
 }

@@ -36,6 +36,7 @@ task downloadJar {
 dependencies {
     api project(":api")
     compile files("${BINARY_ROOT}/${TF_LIB}")
+    compile group: 'org.tensorflow', name: 'proto', version: '1.15.0'
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }

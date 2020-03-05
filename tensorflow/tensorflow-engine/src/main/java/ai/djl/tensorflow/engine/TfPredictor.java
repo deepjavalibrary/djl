@@ -13,36 +13,44 @@
 package ai.djl.tensorflow.engine;
 
 import ai.djl.inference.BasePredictor;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
+import ai.djl.inference.Predictor;
 import ai.djl.translate.Translator;
-import ai.djl.translate.TranslatorContext;
-import java.util.List;
-import org.tensorflow.Session;
-import org.tensorflow.Tensor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * {@code PtPredictor} is the TensorFlow implementation of {@link Predictor}.
+ *
+ * @param <I> the input object
+ * @param <O> the output object
+ * @see Predictor
+ */
 public class TfPredictor<I, O> extends BasePredictor<I, O> {
 
+    private static final Logger logger = LoggerFactory.getLogger(TfPredictor.class);
+
+    /**
+     * Constructs a {@code TfPredictor}.
+     *
+     * @param model the model to predict with
+     * @param translator the translator to convert with input and output
+     * @param copy true if this is the first predictor created for the model (for thread safety)
+     */
     public TfPredictor(TfModel model, Translator<I, O> translator, boolean copy) {
         super(model, translator, copy);
     }
 
     /** {@inheritDoc} */
+    @SuppressWarnings("deprecation")
     @Override
-    protected NDList forward(TranslatorContext ctx, NDList ndList) {
-        Session session = ((TfModel) model).getSession();
-        Session.Runner runner = session.runner();
-        for (NDArray array : ndList) {
-            runner.feed("serving_default_input_1:0", ((TfNDArray) array).getTensor());
+    protected void finalize() throws Throwable {
+        if (manager.isOpen()) {
+            if (logger.isDebugEnabled()) {
+                logger.warn(
+                        "TfPredictor was not closed explicitly: {}", getClass().getSimpleName());
+            }
+            close();
         }
-        runner.fetch("StatefulPartitionedCall:0");
-        List<Tensor<?>> result = runner.run();
-
-        NDList resultNDList = new NDList();
-        for (Tensor<?> tensor : result) {
-            resultNDList.add(((TfNDManager) model.getNDManager()).create(tensor));
-        }
-
-        return resultNDList;
+        super.finalize();
     }
 }
