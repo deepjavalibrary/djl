@@ -163,11 +163,11 @@ public class EvaluatorTrainingListener implements TrainingListener {
         Metrics metrics = trainer.getMetrics();
         if (metrics != null) {
             for (Evaluator evaluator : trainer.getEvaluators()) {
-                float value =
-                        metrics.latestMetric(metricName(evaluator, VALIDATE_EPOCH))
-                                .getValue()
-                                .floatValue();
-                model.setProperty(evaluator.getName(), String.format("%.5f", value));
+                String metricName = metricName(evaluator, VALIDATE_EPOCH);
+                if (metrics.hasMetric(metricName)) {
+                    float value = metrics.latestMetric(metricName).getValue().floatValue();
+                    model.setProperty(evaluator.getName(), String.format("%.5f", value));
+                }
             }
         }
     }
