@@ -15,11 +15,13 @@ package ai.djl.repository.zoo;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.ndarray.NDList;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Metadata;
 import ai.djl.repository.Repository;
 import ai.djl.repository.VersionRange;
+import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -38,7 +40,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
     protected Repository repository;
     protected MRL mrl;
     protected String version;
-    protected Map<Pair<Type, Type>, TranslatorFactory<?, ?>> factories = new ConcurrentHashMap<>();
+    protected Map<Pair<Type, Type>, TranslatorFactory<?, ?>> factories;
 
     private Metadata metadata;
 
@@ -53,6 +55,10 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         this.repository = repository;
         this.mrl = mrl;
         this.version = version;
+        factories = new ConcurrentHashMap<>();
+        factories.put(
+                new Pair<>(NDList.class, NDList.class),
+                (TranslatorFactory<NDList, NDList>) arguments -> new NoopTranslator());
     }
 
     /** {@inheritDoc} */
