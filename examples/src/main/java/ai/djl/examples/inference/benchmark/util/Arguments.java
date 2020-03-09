@@ -12,8 +12,12 @@
  */
 package ai.djl.examples.inference.benchmark.util;
 
+import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.util.BufferedImageUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -37,12 +41,16 @@ public class Arguments {
     private int duration;
     private int iteration;
     private int threads;
+    private String inputClass;
+    private String outputClass;
 
     public Arguments(CommandLine cmd) {
         modelDir = cmd.getOptionValue("model-dir");
         artifactId = cmd.getOptionValue("artifact-id");
         outputDir = cmd.getOptionValue("output-dir");
         imageFile = cmd.getOptionValue("image");
+        inputClass = cmd.getOptionValue("input-class");
+        outputClass = cmd.getOptionValue("output-class");
         if (cmd.hasOption("duration")) {
             duration = Integer.parseInt(cmd.getOptionValue("duration"));
         }
@@ -76,6 +84,20 @@ public class Arguments {
                         .hasArg()
                         .argName("ARTIFACT-ID")
                         .desc("Model artifact id.")
+                        .build());
+        options.addOption(
+                Option.builder("ic")
+                        .longOpt("input-class")
+                        .hasArg()
+                        .argName("INPUT-CLASS")
+                        .desc("Input class type.")
+                        .build());
+        options.addOption(
+                Option.builder("oc")
+                        .longOpt("output-class")
+                        .hasArg()
+                        .argName("OUTPUT-CLASS")
+                        .desc("Output class type.")
                         .build());
         options.addOption(
                 Option.builder("i")
@@ -173,5 +195,32 @@ public class Arguments {
 
     public Map<String, String> getCriteria() {
         return criteria;
+    }
+
+    public Class<?> getInputClass() throws ClassNotFoundException {
+        if (inputClass == null) {
+            return BufferedImage.class;
+        }
+        return Class.forName(inputClass);
+    }
+
+    public Class<?> getOutputClass() throws ClassNotFoundException {
+        if (outputClass == null) {
+            if (artifactId != null && artifactId.contains("ssd")) {
+                return DetectedObjects.class;
+            }
+            return Classifications.class;
+        }
+        return Class.forName(outputClass);
+    }
+
+    public Object getInputData() throws IOException, ClassNotFoundException {
+        Class<?> klass = getInputClass();
+        if (klass == BufferedImage.class) {
+            return BufferedImageUtils.fromFile(getImageFile());
+        } else if (klass == float[].class) {
+            return null;
+        }
+        throw new IllegalArgumentException("Unsupported input class: " + klass);
     }
 }

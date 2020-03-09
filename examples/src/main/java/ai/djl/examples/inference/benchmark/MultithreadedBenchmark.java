@@ -17,14 +17,10 @@ import ai.djl.examples.inference.benchmark.util.AbstractBenchmark;
 import ai.djl.examples.inference.benchmark.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
-import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.translate.TranslateException;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -49,12 +45,10 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
 
     /** {@inheritDoc} */
     @Override
-    public Classifications predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelException {
-        Path imageFile = arguments.getImageFile();
-        BufferedImage img = BufferedImageUtils.fromFile(imageFile);
-
-        ZooModel<BufferedImage, ? extends Classifications> model = loadModel(arguments, metrics);
+    public Object predict(Arguments arguments, Metrics metrics, int iteration)
+            throws IOException, ModelException, ClassNotFoundException {
+        Object inputData = arguments.getInputData();
+        ZooModel<?, ?> model = loadModel(arguments, metrics);
 
         int numOfThreads = arguments.getThreads();
         AtomicInteger counter = new AtomicInteger(iteration);
@@ -62,15 +56,15 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
 
         List<PredictorCallable> callables = new ArrayList<>(numOfThreads);
         for (int i = 0; i < numOfThreads; ++i) {
-            callables.add(new PredictorCallable(model, img, metrics, counter, i, i == 0));
+            callables.add(new PredictorCallable(model, inputData, metrics, counter, i, i == 0));
         }
 
-        Classifications classification = null;
+        Object classification = null;
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
         int successThreads = 0;
         try {
-            List<Future<Classifications>> futures = executorService.invokeAll(callables);
-            for (Future<Classifications> future : futures) {
+            List<Future<Object>> futures = executorService.invokeAll(callables);
+            for (Future<Object> future : futures) {
                 try {
                     classification = future.get();
                     ++successThreads;
@@ -90,24 +84,26 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         return classification;
     }
 
-    private static class PredictorCallable implements Callable<Classifications> {
+    private static class PredictorCallable implements Callable<Object> {
 
-        private Predictor<BufferedImage, ? extends Classifications> predictor;
-        private BufferedImage img;
+        @SuppressWarnings("rawtypes")
+        private Predictor predictor;
+
+        private Object inputData;
         private Metrics metrics;
         private String workerId;
         private boolean collectMemory;
         private AtomicInteger counter;
 
         public PredictorCallable(
-                ZooModel<BufferedImage, ? extends Classifications> model,
-                BufferedImage img,
+                ZooModel<?, ?> model,
+                Object inputData,
                 Metrics metrics,
                 AtomicInteger counter,
                 int workerId,
                 boolean collectMemory) {
             this.predictor = model.newPredictor();
-            this.img = img;
+            this.inputData = inputData;
             this.metrics = metrics;
             this.counter = counter;
             this.workerId = String.format("%02d", workerId);
@@ -117,11 +113,12 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
 
         /** {@inheritDoc} */
         @Override
-        public Classifications call() throws TranslateException {
-            Classifications result = null;
+        @SuppressWarnings("unchecked")
+        public Object call() throws TranslateException {
+            Object result = null;
             int count = 0;
             while (counter.decrementAndGet() > 0) {
-                result = predictor.predict(img);
+                result = predictor.predict(inputData);
                 if (collectMemory) {
                     MemoryTrainingListener.collectMemoryInfo(metrics);
                 }

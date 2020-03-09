@@ -17,14 +17,10 @@ import ai.djl.examples.inference.benchmark.util.AbstractBenchmark;
 import ai.djl.examples.inference.benchmark.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
-import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.translate.TranslateException;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.file.Path;
 
 public final class Benchmark extends AbstractBenchmark {
 
@@ -37,20 +33,17 @@ public final class Benchmark extends AbstractBenchmark {
 
     /** {@inheritDoc} */
     @Override
-    public Classifications predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelException, TranslateException {
-        Path imageFile = arguments.getImageFile();
-        BufferedImage img = BufferedImageUtils.fromFile(imageFile);
-
-        try (ZooModel<BufferedImage, ? extends Classifications> model =
-                loadModel(arguments, metrics)) {
-            Classifications predictResult = null;
-            try (Predictor<BufferedImage, ? extends Classifications> predictor =
-                    model.newPredictor()) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Object predict(Arguments arguments, Metrics metrics, int iteration)
+            throws IOException, ModelException, TranslateException, ClassNotFoundException {
+        Object inputData = arguments.getInputData();
+        try (ZooModel<?, ?> model = loadModel(arguments, metrics)) {
+            Object predictResult = null;
+            try (Predictor predictor = model.newPredictor()) {
                 predictor.setMetrics(metrics); // Let predictor collect metrics
 
                 for (int i = 0; i < iteration; ++i) {
-                    predictResult = predictor.predict(img);
+                    predictResult = predictor.predict(inputData);
 
                     progressBar.update(i);
                     MemoryTrainingListener.collectMemoryInfo(metrics);

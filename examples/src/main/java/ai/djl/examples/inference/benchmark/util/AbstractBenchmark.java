@@ -17,15 +17,12 @@ import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.examples.inference.benchmark.MultithreadedBenchmark;
 import ai.djl.metric.Metrics;
-import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.Duration;
 import org.apache.commons.cli.CommandLine;
@@ -41,7 +38,7 @@ public abstract class AbstractBenchmark {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractBenchmark.class);
 
-    private Classifications lastResult;
+    private Object lastResult;
 
     protected ProgressBar progressBar;
 
@@ -55,9 +52,10 @@ public abstract class AbstractBenchmark {
      * @throws IOException if io error occurs when loading model.
      * @throws ModelException if specified model not found or there is a parameter error
      * @throws TranslateException if error occurs when processing input or output
+     * @throws ClassNotFoundException if input or output class cannot be loaded
      */
-    protected abstract Classifications predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelException, TranslateException;
+    protected abstract Object predict(Arguments arguments, Metrics metrics, int iteration)
+            throws IOException, ModelException, TranslateException, ClassNotFoundException;
 
     /**
      * Returns command line options.
@@ -213,34 +211,29 @@ public abstract class AbstractBenchmark {
      *
      * @return last predict result
      */
-    public Classifications getPredictResult() {
+    public Object getPredictResult() {
         return lastResult;
     }
 
-    protected ZooModel<BufferedImage, ? extends Classifications> loadModel(
-            Arguments arguments, Metrics metrics) throws ModelException, IOException {
+    protected ZooModel<?, ?> loadModel(Arguments arguments, Metrics metrics)
+            throws ModelException, IOException, ClassNotFoundException {
         long begin = System.nanoTime();
         String artifactId = arguments.getArtifactId();
         if (artifactId == null) {
             artifactId = "ai.djl.mxnet:resnet";
         }
-        Class<? extends Classifications> output;
-        if (artifactId.contains("ssd")) {
-            output = DetectedObjects.class;
-        } else {
-            output = Classifications.class;
-        }
+        Class<?> input = arguments.getInputClass();
+        Class<?> output = arguments.getOutputClass();
 
-        Criteria.Builder<BufferedImage, ? extends Classifications> builder =
+        Criteria.Builder<?, ?> builder =
                 Criteria.builder()
-                        .setTypes(BufferedImage.class, output)
+                        .setTypes(input, output)
                         .optFilters(arguments.getCriteria())
                         .optProgress(new ProgressBar());
 
         builder.optArtifactId(artifactId);
 
-        ZooModel<BufferedImage, ? extends Classifications> model =
-                ModelZoo.loadModel(builder.build());
+        ZooModel<?, ?> model = ModelZoo.loadModel(builder.build());
         long delta = System.nanoTime() - begin;
         logger.info(
                 "Model {} loaded in: {} ms.",
