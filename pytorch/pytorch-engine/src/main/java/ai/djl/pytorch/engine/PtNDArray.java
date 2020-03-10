@@ -1168,7 +1168,7 @@ public class PtNDArray extends NativeResource implements NDArray {
         if (isReleased()) {
             return "This array is already closed";
         }
-        return toDebugString(this, MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
+        return toDebugString(MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
     }
 
     /** {@inheritDoc} */
