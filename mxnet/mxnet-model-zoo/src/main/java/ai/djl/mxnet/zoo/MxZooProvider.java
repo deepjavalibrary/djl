@@ -22,12 +22,6 @@ public class MxZooProvider implements ZooProvider {
 
     /** {@inheritDoc} */
     @Override
-    public String getName() {
-        return MxModelZoo.NAME;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public ModelZoo getModelZoo() {
         return new MxModelZoo();
     }

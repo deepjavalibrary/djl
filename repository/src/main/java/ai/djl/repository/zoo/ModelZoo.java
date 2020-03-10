@@ -39,24 +39,6 @@ public interface ModelZoo {
     String getGroupId();
 
     /**
-     * Returns the {@code ModelZoo} with the given name.
-     *
-     * @param name the name of ModelZoo to retrieve
-     * @return the instance of {@code ModelZoo}
-     * @throws ZooProviderNotFoundException when the provider cannot be found
-     * @see ZooProvider
-     */
-    static ModelZoo getModelZoo(String name) {
-        ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
-        for (ZooProvider provider : providers) {
-            if (provider.getName().equals(name)) {
-                return provider.getModelZoo();
-            }
-        }
-        throw new ZooProviderNotFoundException("ZooProvider not found: " + name);
-    }
-
-    /**
      * Lists the available model families in the ModelZoo.
      *
      * @return the list of all available model families
@@ -132,7 +114,8 @@ public interface ModelZoo {
                     // filter out by model loader artifactId
                     continue;
                 }
-                if (application != null && !loader.getApplication().equals(application)) {
+                Application app = loader.getApplication();
+                if (application != null && app != null && !app.equals(application)) {
                     // filter out ModelLoader by application
                     continue;
                 }

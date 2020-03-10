@@ -23,12 +23,6 @@ public class FtZooProvider implements ZooProvider {
 
     /** {@inheritDoc} */
     @Override
-    public String getName() {
-        return FtModelZoo.NAME;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public ModelZoo getModelZoo() {
         return new FtModelZoo();
     }

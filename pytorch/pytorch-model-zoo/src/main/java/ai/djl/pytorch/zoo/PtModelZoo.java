@@ -26,8 +26,6 @@ import java.util.Set;
  */
 public class PtModelZoo implements ModelZoo {
 
-    public static final String NAME = "PyTorch";
-
     private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
     private static final Repository REPOSITORY = Repository.newInstance("PyTorch", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.pytorch";

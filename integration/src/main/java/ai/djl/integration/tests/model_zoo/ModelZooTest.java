@@ -14,12 +14,13 @@ package ai.djl.integration.tests.model_zoo;
 
 import ai.djl.Model;
 import ai.djl.ModelException;
-import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
+import ai.djl.repository.zoo.ZooProvider;
 import java.io.IOException;
 import java.util.List;
+import java.util.ServiceLoader;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -43,12 +44,17 @@ public class ModelZooTest {
             return;
         }
 
-        List<ModelLoader<?, ?>> list = ModelZoo.getModelZoo(BasicModelZoo.NAME).getModelLoaders();
-        for (ModelLoader<?, ?> modelLoader : list) {
-            List<Artifact> artifacts = modelLoader.listModels();
-            for (Artifact artifact : artifacts) {
-                Model model = modelLoader.loadModel(artifact.getProperties());
-                model.close();
+        ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
+        for (ZooProvider provider : providers) {
+            ModelZoo zoo = provider.getModelZoo();
+            if (zoo != null) {
+                for (ModelLoader<?, ?> modelLoader : zoo.getModelLoaders()) {
+                    List<Artifact> artifacts = modelLoader.listModels();
+                    for (Artifact artifact : artifacts) {
+                        Model model = modelLoader.loadModel(artifact.getProperties());
+                        model.close();
+                    }
+                }
             }
         }
     }

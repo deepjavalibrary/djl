@@ -23,7 +23,9 @@ public interface ZooProvider {
      *
      * @return the name of the {@link ModelZoo}
      */
-    String getName();
+    default String getName() {
+        return getClass().getName();
+    }
 
     /**
      * Returns the instance of the {@link ModelZoo}.

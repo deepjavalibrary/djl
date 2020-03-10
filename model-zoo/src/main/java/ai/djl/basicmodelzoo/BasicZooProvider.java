@@ -23,12 +23,6 @@ public class BasicZooProvider implements ZooProvider {
 
     /** {@inheritDoc} */
     @Override
-    public String getName() {
-        return BasicModelZoo.NAME;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public ModelZoo getModelZoo() {
         return new BasicModelZoo();
     }

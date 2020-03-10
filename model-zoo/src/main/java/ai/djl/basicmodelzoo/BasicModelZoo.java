@@ -23,8 +23,6 @@ import java.util.Set;
 /** Model Zoo is a repository that contains all models for DJL. */
 public class BasicModelZoo implements ModelZoo {
 
-    public static final String NAME = "Basic";
-
     private static final String REPO_URL = "https://mlrepo.djl.ai/";
     private static final Repository REPOSITORY = Repository.newInstance("zoo", REPO_URL);
     public static final String GROUP_ID = "ai.djl.zoo";

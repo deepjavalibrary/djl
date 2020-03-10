@@ -22,12 +22,6 @@ public class PtZooProvider implements ZooProvider {
 
     /** {@inheritDoc} */
     @Override
-    public String getName() {
-        return PtModelZoo.NAME;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public ModelZoo getModelZoo() {
         return new PtModelZoo();
     }
