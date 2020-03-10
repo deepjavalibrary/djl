@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,7 @@ public final class LibUtils {
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
 
     private static final String LIB_NAME = "djl_torch";
+    private static final String NATIVE_LOADER = "native_loader";
     private static final String NATIVE_LIB_NAME = "torch";
 
     private LibUtils() {}
@@ -60,7 +62,38 @@ public final class LibUtils {
             }
         }
         logger.debug("Loading pytorch library from: {}", libName);
+        if (System.getProperty("os.name").startsWith("Win")) {
+            loadWinDependencies(libName);
+        }
         System.load(libName); // NOPMD
+    }
+
+    private static void loadWinDependencies(String libName) {
+        // load the native loader for global loading
+        Path libDir = Paths.get(libName).getParent();
+        if (libDir != null) {
+            System.load(
+                    libDir.resolve(System.mapLibraryName(NATIVE_LOADER))
+                            .toAbsolutePath()
+                            .toString());
+        } else {
+            throw new IllegalArgumentException("Folder not exist!");
+        }
+
+        try (Stream<Path> paths = Files.walk(libDir)) {
+            paths.filter(
+                            path -> {
+                                String name = path.getFileName().toString();
+                                return !"c10_cuda.dll".equals(name) && !"torch.dll".equals(name);
+                            })
+                    .map(path -> path.toAbsolutePath().toString())
+                    .forEach(NativeLoader::loadGlobal);
+            if (Files.exists(libDir.resolve("c10_cuda.dll"))) {
+                NativeLoader.loadGlobal(libDir.resolve("c10_cuda.dll").toAbsolutePath().toString());
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Folder not exist! " + libDir, e);
+        }
     }
 
     private static String findOverrideLibrary() {
@@ -105,6 +138,7 @@ public final class LibUtils {
 
     private static synchronized String copyJniLibraryFromClasspath(Path nativeDir) {
         String name = System.mapLibraryName(LIB_NAME);
+        String nativeLoaderName = System.mapLibraryName(NATIVE_LOADER);
         Properties prop = new Properties();
         try (InputStream stream =
                 LibUtils.class.getResourceAsStream("/native/jni/pytorch.properties")) {
@@ -117,8 +151,13 @@ public final class LibUtils {
         if (Files.exists(path)) {
             return path.toAbsolutePath().toString();
         }
-        try (InputStream stream = LibUtils.class.getResourceAsStream("/native/jni/" + name)) {
+        try {
+            InputStream stream = LibUtils.class.getResourceAsStream("/native/jni/" + name);
             Files.copy(stream, path);
+            stream.close();
+            stream = LibUtils.class.getResourceAsStream("/native/jni/" + nativeLoaderName);
+            Files.copy(stream, nativeDir.resolve(nativeLoaderName));
+            stream.close();
             return path.toAbsolutePath().toString();
         } catch (IOException e) {
             throw new IllegalStateException("Cannot copy jni files", e);
@@ -146,7 +185,6 @@ public final class LibUtils {
             Platform matching = null;
             Platform placeholder = null;
             for (URL url : urls) {
-                logger.debug(url.toString());
                 Platform platform = Platform.fromUrl(url);
                 if (platform.isPlaceholder()) {
                     placeholder = platform;
@@ -157,7 +195,6 @@ public final class LibUtils {
             }
 
             if (matching != null) {
-                logger.debug("Find matching library");
                 return copyNativeLibraryFromClasspath(matching);
             }
 

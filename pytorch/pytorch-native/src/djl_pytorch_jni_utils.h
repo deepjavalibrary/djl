@@ -21,7 +21,7 @@
 
 #include "djl_pytorch_jni_log.h"
 
-// The file is utilities that ared used for JNI
+// The file is utilities that are used for JNI
 
 namespace utils {
 

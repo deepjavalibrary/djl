@@ -24,7 +24,7 @@ task compileJNI {
         def publishDir = "${engineDir}/build/jnilib/native/jni"
         copy {
             def tree = fileTree(project.buildDir)
-            tree.include("**/libdjl_torch.*", "**/djl_torch.dll")
+            tree.include("**/libdjl_torch.*", "**/djl_torch.dll", "**/libnative_loader.*", "**/native_loader.dll")
             from tree.files
             into publishDir
         }

@@ -26,7 +26,7 @@ pushd .
 rm -rf build
 mkdir build && cd build
 mkdir classes
-javac -sourcepath ../../pytorch-engine/src/main/java/ ../../pytorch-engine/src/main/java/ai/djl/pytorch/jni/PyTorchLibrary.java -h include -d classes
+javac -sourcepath ../../pytorch-engine/src/main/java/ ../../pytorch-engine/src/main/java/ai/djl/pytorch/jni/PyTorchLibrary.java ../../pytorch-engine/src/main/java/ai/djl/pytorch/jni/NativeLoader.java -h include -d classes
 cmake -DCMAKE_PREFIX_PATH=libtorch ..
 cmake --build . --config Release -- -j "${NUM_PROC}"
 

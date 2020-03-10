@@ -18,7 +18,7 @@ jobs:
       - name: Compile JNI
         run: ./gradlew :pytorch:pytorch-native:compileJNI
       - name: Test with Gradle
-        run: ./gradlew :integration:test -Dai.djl.default_engine=PyTorch
+        run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: integration test results
         uses: actions/upload-artifact@v1
         if: always()

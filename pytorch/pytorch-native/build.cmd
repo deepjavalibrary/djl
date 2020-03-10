@@ -21,6 +21,6 @@ if exist %FILEPATH% (
 if exist build rd /q /s build
 md build\classes
 cd build
-javac -sourcepath ..\..\pytorch-engine\src\main\java\ ..\..\pytorch-engine\src\main\java\ai\djl\pytorch\jni\PyTorchLibrary.java -h include -d classes
+javac -sourcepath ..\..\pytorch-engine\src\main\java\ ..\..\pytorch-engine\src\main\java\ai\djl\pytorch\jni\PyTorchLibrary.java  ../../pytorch-engine/src/main/java/ai/djl/pytorch/jni/NativeLoader.java -h include -d classes
 cmake -DCMAKE_PREFIX_PATH=libtorch ..
 cmake --build . --config Release
