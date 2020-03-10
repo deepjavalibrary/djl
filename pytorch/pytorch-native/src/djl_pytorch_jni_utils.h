@@ -75,11 +75,11 @@ inline c10::ScalarType GetScalarTypeFromDType(jint dtype) {
 
 template <typename T>
 inline T* GetPointerFromJHandle(JNIEnv* env, jobject jhandle) {
-  Log log(env);
+  jclass jexception = env->FindClass("java.lang.NullPointerException");
   jclass cls = env->FindClass(POINTER_CLASS);
   jmethodID get_value = env->GetMethodID(cls, "getValue", "()J");
-  if (nullptr == get_value) {
-    log.error("getValue method not found!");
+  if (get_value == nullptr) {
+    env->ThrowNew(jexception, "getValue method not found!");
   }
   jlong ptr = env->CallLongMethod(jhandle, get_value);
   return reinterpret_cast<T*>(ptr);
@@ -87,7 +87,7 @@ inline T* GetPointerFromJHandle(JNIEnv* env, jobject jhandle) {
 
 template <typename T>
 inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandles) {
-  Log log(env);
+  jclass jexception = env->FindClass("java.lang.NullPointerException");
   jclass cls = env->FindClass(POINTER_CLASS);
   jmethodID get_value = env->GetMethodID(cls, "getValue", "()J");
   jsize length = env->GetArrayLength(jhandles);
@@ -95,8 +95,8 @@ inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandle
   vec.reserve(length);
   for (auto i = 0; i < length; ++i) {
     jobject jhandle = env->GetObjectArrayElement(jhandles, i);
-    if (nullptr == jhandle) {
-      log.error("Pointer not found!");
+    if (jhandle == nullptr) {
+      env->ThrowNew(jexception, "Pointer not found!");
     }
     jlong ptr = env->CallLongMethod(jhandle, get_value);
     vec.emplace_back(*(reinterpret_cast<T*>(ptr)));
@@ -106,17 +106,15 @@ inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandle
 
 template <typename T>
 inline jobject CreatePointer(JNIEnv* env, const T* ptr) {
-  Log log(env);
+  jclass jexception = env->FindClass("java.lang.NullPointerException");
   jclass cls = env->FindClass(POINTER_CLASS);
-  if (nullptr == cls) {
-    log.error("Pointer class not found!");
-    return nullptr;
+  if (cls == nullptr) {
+    env->ThrowNew(jexception, "Pointer class not found!");
   }
   jmethodID init = env->GetMethodID(cls, "<init>", "(J)V");
   jobject new_obj = env->NewObject(cls, init, ptr);
-  if (nullptr == new_obj) {
-    log.error("object created failed");
-    return nullptr;
+  if (new_obj == nullptr) {
+    env->ThrowNew(jexception, "object created failed");
   }
   return new_obj;
 }
@@ -144,7 +142,7 @@ inline std::vector<float> GetVecFromJFloatArray(JNIEnv* env, jfloatArray jarray)
 
 inline c10::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
   jint* device = env->GetIntArrayElements(jdevice, JNI_FALSE);
-  c10::DeviceType device_type = static_cast<c10::DeviceType>(*device);
+  auto device_type = static_cast<c10::DeviceType>(*device);
   int device_idx = *(device + 1);
   if (device_type == c10::DeviceType::CPU) {
     device_idx = -1;

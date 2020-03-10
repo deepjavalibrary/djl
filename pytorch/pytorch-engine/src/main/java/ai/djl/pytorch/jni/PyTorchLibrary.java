@@ -13,6 +13,7 @@
 package ai.djl.pytorch.jni;
 
 import java.nio.ByteBuffer;
+import java.util.Set;
 
 /** A class containing utilities to interact with the PyTorch Engine's JNI layer. */
 @SuppressWarnings("MissingJavadocMethod")
@@ -24,7 +25,7 @@ public final class PyTorchLibrary {
 
     public native void torchManualSeed(long seed);
 
-    public native boolean torchCudaAvailable();
+    public native void torchShowConfig(Set<String> set);
 
     public native long[] torchSizes(Pointer handle);
 

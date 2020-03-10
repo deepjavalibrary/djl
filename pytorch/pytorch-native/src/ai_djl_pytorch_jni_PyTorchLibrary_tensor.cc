@@ -33,7 +33,7 @@ JNIEXPORT jintArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDevice(
   Log log(env);
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   jintArray result = env->NewIntArray(2);
-  if (nullptr == result) {
+  if (result == nullptr) {
     log.error("Unable to create int array");
     return nullptr;
   }

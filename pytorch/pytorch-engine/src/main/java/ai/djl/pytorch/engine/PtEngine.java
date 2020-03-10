@@ -61,7 +61,7 @@ public final class PtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public boolean hasCapability(String capability) {
-        return JniUtils.hasCapability(capability);
+        return JniUtils.getFeatures().contains(capability);
     }
 
     /** {@inheritDoc} */

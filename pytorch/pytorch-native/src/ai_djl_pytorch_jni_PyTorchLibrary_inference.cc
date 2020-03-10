@@ -39,7 +39,8 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
   size_t len = env->GetArrayLength(tensor_ptrs);
   ivalue_vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
-    auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, env->GetObjectArrayElement(tensor_ptrs, i));
+    auto* tensor_ptr =
+        utils::GetPointerFromJHandle<const torch::Tensor>(env, env->GetObjectArrayElement(tensor_ptrs, i));
     ivalue_vec.emplace_back(*tensor_ptr);
   }
   auto* module_ptr = utils::GetPointerFromJHandle<torch::jit::script::Module>(env, module_handle);

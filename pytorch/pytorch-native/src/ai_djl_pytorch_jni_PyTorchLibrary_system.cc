@@ -21,6 +21,30 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchManualSeed(JN
   torch::manual_seed(jseed);
 }
 
-JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchCudaAvailable(JNIEnv* env, jobject jthis) {
-  return torch::cuda::is_available();
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchShowConfig(
+    JNIEnv* env, jobject jthis, jobject jset) {
+  jclass jexception = env->FindClass("java.lang.NullPointerException");
+  jclass set_class = env->FindClass("java/util/Set");
+  if (set_class == nullptr) {
+    env->ThrowNew(jexception, "Java Set class is not found");
+  }
+  jmethodID add_method_id = env->GetMethodID(set_class, "add", "(Ljava/lang/Object;)Z");
+  if (add_method_id == nullptr) {
+    env->ThrowNew(jexception, "The add method in Set is not found");
+  }
+  if (torch::cuda::is_available()) {
+    env->CallBooleanMethod(set_class, add_method_id, env->NewStringUTF("CUDA"));
+  }
+  if (torch::cuda::cudnn_is_available()) {
+    env->CallBooleanMethod(set_class, add_method_id, env->NewStringUTF("CUDNN"));
+  }
+  if (torch::hasMKL()) {
+    env->CallBooleanMethod(set_class, add_method_id, env->NewStringUTF("MKL"));
+  }
+  if (torch::hasMKLDNN()) {
+    env->CallBooleanMethod(set_class, add_method_id, env->NewStringUTF("MKLDNN"));
+  }
+  if (torch::hasOpenMP()) {
+    env->CallBooleanMethod(set_class, add_method_id, env->NewStringUTF("OPENMP"));
+  }
 }

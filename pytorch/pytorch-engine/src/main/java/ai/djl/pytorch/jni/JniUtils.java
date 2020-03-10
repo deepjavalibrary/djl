@@ -27,6 +27,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,24 +42,30 @@ public final class JniUtils {
     @SuppressWarnings("PMD.UnusedPrivateField")
     private static final Logger logger = LoggerFactory.getLogger(JniUtils.class);
 
+    private static Set<String> configs;
+
     private JniUtils() {}
 
     private static int layoutMapper(SparseFormat fmt) {
         if (fmt == SparseFormat.DENSE) {
-            return 0;
-        } else if (fmt == SparseFormat.UNDEFINED) {
-            throw new UnsupportedOperationException("Type not supported");
-        } else {
+            // enable MKLDNN by default
+            return JniUtils.getFeatures().contains(StandardCapabilities.MKLDNN) ? 2 : 0;
+        } else if (fmt == SparseFormat.COO) {
             return 1;
+        } else {
+            throw new IllegalArgumentException(
+                    "Current PyTorch only support SparseFormat.DENSE and SparseFormat.COO");
         }
     }
 
-    public static boolean hasCapability(String capability) {
-        if (capability.equals(StandardCapabilities.CUDA)) {
-            return PyTorchLibrary.LIB.torchCudaAvailable();
-        } else {
-            throw new UnsupportedOperationException("Unsupported capability: " + capability);
+    public static Set<String> getFeatures() {
+        if (configs != null) {
+            return configs;
         }
+        Set<String> features = new HashSet<>();
+        PyTorchLibrary.LIB.torchShowConfig(features);
+        configs = features;
+        return configs;
     }
 
     public static void setSeed(long seed) {

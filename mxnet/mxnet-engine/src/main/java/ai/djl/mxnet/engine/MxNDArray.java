@@ -243,7 +243,7 @@ public class MxNDArray extends NativeResource implements NDArray {
     }
 
     private MxNDArray createGradient(SparseFormat format) {
-        if (format == null || format == SparseFormat.UNDEFINED) {
+        if (format == null) {
             return (MxNDArray) zerosLike();
         }
         return (MxNDArray) manager.zeros(getShape(), getDataType(), getDevice());

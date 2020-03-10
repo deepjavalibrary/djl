@@ -16,7 +16,7 @@ package ai.djl.ndarray.types;
  * An enum representing Sparse matrix storage formats.
  *
  * <ul>
- *   <li>DENSE: No sparse format
+ *   <li>DENSE: Stride format
  *   <li>ROW_SPARSE: Row Sparse
  *   <li>CSR: Compressed Sparse Row
  * </ul>
@@ -24,7 +24,7 @@ package ai.djl.ndarray.types;
  * @see <a href="https://software.intel.com/en-us/node/471374">Sparse Matrix Storage Formats</a>
  */
 public enum SparseFormat {
-    UNDEFINED("undefined", -1),
+    // the dense format is accelerated by MKLDNN by default
     DENSE("default", 0),
     ROW_SPARSE("row_sparse", 1),
     CSR("csr", 2),
@@ -50,7 +50,7 @@ public enum SparseFormat {
                 return t;
             }
         }
-        throw new IllegalArgumentException("Unknown storage type: " + value);
+        throw new IllegalArgumentException("Unknown Sparse type: " + value);
     }
 
     /**
