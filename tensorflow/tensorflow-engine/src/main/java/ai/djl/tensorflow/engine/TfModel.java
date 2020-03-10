@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 import org.tensorflow.SavedModelBundle;
 
 public class TfModel extends BaseModel {
-    private Path modelDir;
     private AtomicBoolean first = new AtomicBoolean(true);
     private NDManager manager;
 
@@ -62,6 +61,7 @@ public class TfModel extends BaseModel {
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options) {
         String[] tags;
+        modelDir = modelPath.toAbsolutePath();
         if (options == null || options.isEmpty()) {
             tags = new String[] {"serve"};
         } else {

@@ -1308,7 +1308,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray argMax() {
-        return argMax(0);
+        return flatten().argMax(0);
     }
 
     /** {@inheritDoc} */

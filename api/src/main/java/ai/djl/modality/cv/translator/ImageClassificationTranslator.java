@@ -26,6 +26,7 @@ import java.util.List;
 public class ImageClassificationTranslator extends ImageTranslator<Classifications> {
 
     private String synsetArtifactName;
+    private boolean applySoftmax;
 
     /**
      * Constructs an Image Classification using {@link Builder}.
@@ -35,14 +36,17 @@ public class ImageClassificationTranslator extends ImageTranslator<Classificatio
     public ImageClassificationTranslator(Builder builder) {
         super(builder);
         this.synsetArtifactName = builder.synsetArtifactName;
+        this.applySoftmax = builder.applySoftmax;
     }
 
     /** {@inheritDoc} */
     @Override
     public Classifications processOutput(TranslatorContext ctx, NDList list) throws IOException {
         Model model = ctx.getModel();
-
-        NDArray probabilitiesNd = list.singletonOrThrow().softmax(0);
+        NDArray probabilitiesNd = list.singletonOrThrow();
+        if (applySoftmax) {
+            probabilitiesNd = probabilitiesNd.softmax(0);
+        }
         List<String> synset = model.getArtifact(synsetArtifactName, Utils::readLines);
         return new Classifications(synset, probabilitiesNd);
     }
@@ -60,6 +64,7 @@ public class ImageClassificationTranslator extends ImageTranslator<Classificatio
     public static class Builder extends BaseBuilder<Builder> {
 
         private String synsetArtifactName;
+        private boolean applySoftmax;
 
         Builder() {}
 
@@ -71,6 +76,18 @@ public class ImageClassificationTranslator extends ImageTranslator<Classificatio
          */
         public Builder setSynsetArtifactName(String synsetArtifactName) {
             this.synsetArtifactName = synsetArtifactName;
+            return this;
+        }
+
+        /**
+         * Sets whether to apply softmax when processing output. Some models already include softmax
+         * in the last layer, so don't apply softmax when processing model output.
+         *
+         * @param applySoftmax boolean whether to apply softmax
+         * @return the builder
+         */
+        public Builder optApplySoftmax(boolean applySoftmax) {
+            this.applySoftmax = applySoftmax;
             return this;
         }
 

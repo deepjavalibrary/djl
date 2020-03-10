@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * PtModelZoo is a repository that contains all MXNet models in {@link
+ * PtModelZoo is a repository that contains all PyTorch models in {@link
  * ai.djl.pytorch.engine.PtSymbolBlock} for DJL.
  */
 public class PtModelZoo implements ModelZoo {

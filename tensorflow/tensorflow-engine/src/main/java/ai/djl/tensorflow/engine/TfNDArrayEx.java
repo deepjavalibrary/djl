@@ -346,6 +346,14 @@ public class TfNDArrayEx implements NDArrayEx {
     @SuppressWarnings("unchecked")
     @Override
     public NDArray resize(int width, int height) {
+        if (array.getShape().dimension() == 3) {
+            return new TfNDArray(
+                    manager,
+                    tf.squeeze(
+                            tf.image.resizeBilinear(
+                                    ((TfNDArray) array.expandDims(0)).asOperand(),
+                                    tf.constant(new int[] {width, height}))));
+        }
         return new TfNDArray(
                 manager,
                 tf.image.resizeBilinear(
