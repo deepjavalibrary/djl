@@ -28,4 +28,10 @@ public class NoopTranslator implements Translator<NDList, NDList> {
     public NDList processOutput(TranslatorContext ctx, NDList list) {
         return list;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public Batchifier getBatchifier() {
+        return null;
+    }
 }
