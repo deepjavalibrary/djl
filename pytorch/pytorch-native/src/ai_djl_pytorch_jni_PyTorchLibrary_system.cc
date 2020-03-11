@@ -23,8 +23,8 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchManualSeed(JN
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchShowConfig(
     JNIEnv* env, jobject jthis, jobject jset) {
-  jclass jexception = env->FindClass("java.lang.NullPointerException");
-  jclass set_class = env->FindClass("java/util/Set");
+  jclass jexception = env->FindClass("java/lang/NullPointerException");
+  jclass set_class = env->GetObjectClass(jset);
   if (set_class == nullptr) {
     env->ThrowNew(jexception, "Java Set class is not found");
   }
@@ -32,19 +32,36 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchShowConfig(
   if (add_method_id == nullptr) {
     env->ThrowNew(jexception, "The add method in Set is not found");
   }
+  std::string feature;
+  jstring jfeature;
   if (torch::cuda::is_available()) {
-    env->CallBooleanMethod(set_class, add_method_id, env->NewStringUTF("CUDA"));
+    feature = "CUDA";
+    jfeature = env->NewStringUTF(feature.c_str());
+    env->CallBooleanMethod(jset, add_method_id, jfeature);
+    env->DeleteLocalRef(jfeature);
   }
   if (torch::cuda::cudnn_is_available()) {
-    env->CallBooleanMethod(set_class, add_method_id, env->NewStringUTF("CUDNN"));
+    feature = "CUDNN";
+    jfeature = env->NewStringUTF(feature.c_str());
+    env->CallBooleanMethod(jset, add_method_id, jfeature);
+    env->DeleteLocalRef(jfeature);
   }
   if (torch::hasMKL()) {
-    env->CallBooleanMethod(set_class, add_method_id, env->NewStringUTF("MKL"));
+    feature = "MKL";
+    jfeature = env->NewStringUTF(feature.c_str());
+    env->CallBooleanMethod(jset, add_method_id, jfeature);
+    env->DeleteLocalRef(jfeature);
   }
   if (torch::hasMKLDNN()) {
-    env->CallBooleanMethod(set_class, add_method_id, env->NewStringUTF("MKLDNN"));
+    feature = "MKLDNN";
+    jfeature = env->NewStringUTF(feature.c_str());
+    env->CallBooleanMethod(jset, add_method_id, jfeature);
+    env->DeleteLocalRef(jfeature);
   }
   if (torch::hasOpenMP()) {
-    env->CallBooleanMethod(set_class, add_method_id, env->NewStringUTF("OPENMP"));
+    feature = "OPENMP";
+    jfeature = env->NewStringUTF(feature.c_str());
+    env->CallBooleanMethod(jset, add_method_id, jfeature);
+    env->DeleteLocalRef(jfeature);
   }
 }

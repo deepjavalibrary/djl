@@ -75,7 +75,7 @@ inline c10::ScalarType GetScalarTypeFromDType(jint dtype) {
 
 template <typename T>
 inline T* GetPointerFromJHandle(JNIEnv* env, jobject jhandle) {
-  jclass jexception = env->FindClass("java.lang.NullPointerException");
+  jclass jexception = env->FindClass("java/lang/NullPointerException");
   jclass cls = env->FindClass(POINTER_CLASS);
   jmethodID get_value = env->GetMethodID(cls, "getValue", "()J");
   if (get_value == nullptr) {
@@ -87,7 +87,7 @@ inline T* GetPointerFromJHandle(JNIEnv* env, jobject jhandle) {
 
 template <typename T>
 inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandles) {
-  jclass jexception = env->FindClass("java.lang.NullPointerException");
+  jclass jexception = env->FindClass("java/lang/NullPointerException");
   jclass cls = env->FindClass(POINTER_CLASS);
   jmethodID get_value = env->GetMethodID(cls, "getValue", "()J");
   jsize length = env->GetArrayLength(jhandles);
@@ -106,7 +106,7 @@ inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandle
 
 template <typename T>
 inline jobject CreatePointer(JNIEnv* env, const T* ptr) {
-  jclass jexception = env->FindClass("java.lang.NullPointerException");
+  jclass jexception = env->FindClass("java/lang/NullPointerException");
   jclass cls = env->FindClass(POINTER_CLASS);
   if (cls == nullptr) {
     env->ThrowNew(jexception, "Pointer class not found!");

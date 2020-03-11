@@ -13,7 +13,6 @@
 package ai.djl.pytorch.jni;
 
 import ai.djl.Device;
-import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
@@ -48,8 +47,7 @@ public final class JniUtils {
 
     private static int layoutMapper(SparseFormat fmt) {
         if (fmt == SparseFormat.DENSE) {
-            // enable MKLDNN by default
-            return JniUtils.getFeatures().contains(StandardCapabilities.MKLDNN) ? 2 : 0;
+            return 0;
         } else if (fmt == SparseFormat.COO) {
             return 1;
         } else {

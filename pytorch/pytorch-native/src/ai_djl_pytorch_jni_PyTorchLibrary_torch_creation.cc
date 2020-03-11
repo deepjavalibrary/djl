@@ -20,13 +20,18 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(J
   const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
   auto options = torch::TensorOptions()
-                     .layout((jlayout == 0) ? torch::kStrided : torch::kSparse)
                      .requires_grad(JNI_TRUE == jrequired_grad);
   // DJL's UNKNOWN type
   if (jdtype != 8) {
     options = options.dtype(utils::GetScalarTypeFromDType(jdtype));
   }
   torch::Tensor data = torch::from_blob(env->GetDirectBufferAddress(jbuffer), shape_vec, options);
+  // from_blob doesn't support torch::kSparse and torch::kMkldnn, so explicit cast the type here
+  if (jlayout == 1) {
+    data = data.to_sparse();
+  } else if (jlayout == 2) {
+    data = data.to_mkldnn();
+  }
   // Don't change device unless data on CPU
   if (!device.is_cpu()) {
     data = data.to(device);
