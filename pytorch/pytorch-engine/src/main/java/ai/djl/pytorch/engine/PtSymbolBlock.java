@@ -70,11 +70,13 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void removeLastBlock() {
         throw new UnsupportedOperationException("Not supported for PyTorch");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
@@ -82,71 +84,85 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
         return IValueUtils.forward(this, inputs);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setInitializer(Initializer initializer) {
         throw new UnsupportedOperationException("Not supported for PyTorch");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setInitializer(Initializer initializer, String paramName) {
         throw new UnsupportedOperationException("Not supported for PyTorch");
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
         return new Shape[0];
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isInitialized() {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void cast(DataType dataType) {
         throw new UnsupportedOperationException("Not supported for PyTorch");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void clear() {
         throw new UnsupportedOperationException("Not supported for PyTorch");
     }
 
+    /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeInput() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public BlockList getChildren() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public ParameterList getParameters() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return new Shape[0];
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         throw new UnsupportedOperationException("Not supported for PyTorch");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {

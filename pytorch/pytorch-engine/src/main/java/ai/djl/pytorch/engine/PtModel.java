@@ -50,6 +50,7 @@ public class PtModel extends BaseModel {
         dataType = DataType.FLOAT32;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void load(Path modelPath, String modelName, Map<String, String> options)
             throws IOException, MalformedModelException {
@@ -66,17 +67,20 @@ public class PtModel extends BaseModel {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
         // TODO: modify copy
         return new PtPredictor<>(this, translator, false);
     }
 
+    /** {@inheritDoc} */
     @Override
     public String[] getArtifactNames() {
         try {
@@ -98,11 +102,13 @@ public class PtModel extends BaseModel {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void cast(DataType dataType) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         manager.close();

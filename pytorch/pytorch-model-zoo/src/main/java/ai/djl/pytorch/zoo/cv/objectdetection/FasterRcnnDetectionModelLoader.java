@@ -111,6 +111,7 @@ public class FasterRcnnDetectionModelLoader
     private static final class FactoryImpl
             implements TranslatorFactory<BufferedImage, DetectedObjects> {
 
+        /** {@inheritDoc} */
         @Override
         public Translator<BufferedImage, DetectedObjects> newInstance(
                 Map<String, Object> arguments) {
