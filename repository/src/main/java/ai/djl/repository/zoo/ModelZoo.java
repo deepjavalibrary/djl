@@ -97,6 +97,9 @@ public interface ModelZoo {
         ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
         for (ZooProvider provider : providers) {
             ModelZoo zoo = provider.getModelZoo();
+            if (zoo == null) {
+                continue;
+            }
             if (groupId != null && !zoo.getGroupId().equals(groupId)) {
                 // filter out ModelZoo by groupId
                 continue;
@@ -146,6 +149,9 @@ public interface ModelZoo {
         ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
         for (ZooProvider provider : providers) {
             ModelZoo zoo = provider.getModelZoo();
+            if (zoo == null) {
+                continue;
+            }
             List<ModelLoader<?, ?>> list = zoo.getModelLoaders();
             for (ModelLoader<?, ?> loader : list) {
                 Application app = loader.getApplication();
