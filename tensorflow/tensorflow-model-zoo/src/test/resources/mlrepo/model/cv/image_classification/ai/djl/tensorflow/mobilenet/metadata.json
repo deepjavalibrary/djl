@@ -1,10 +1,10 @@
 {
   "metadataVersion": "0.1",
   "groupId": "ai.djl.tensorflow",
-  "artifactId": "resnet",
+  "artifactId": "mobilenet",
   "type": "cv",
-  "name": "Resnet",
-  "description": "Resnet image classification",
+  "name": "MobileNet",
+  "description": "MobileNet image classification",
   "website": "http://www.djl.ai/tensorflow/model-zoo",
   "licenses": {
     "license": {
@@ -16,10 +16,9 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "resnet50",
+      "name": "mobilenet",
       "properties": {
-        "flavor": "v1",
-        "layers": "50",
+        "flavor": "v2",
         "dataset": "imagenet"
       },
       "arguments": {
@@ -33,10 +32,10 @@
           "size": 31675
         },
         "model": {
-          "uri": "0.0.1/resnet50v1.zip",
+          "uri": "0.0.1/mobilenetv2.zip",
           "name": "",
-          "sha1Hash": "d1912a3ee4a2d357d2d78f2e72394707950e82fe",
-          "size": 95366354
+          "sha1Hash": "f3c563cb110eab25d5e2dcd23faeb715d1a026e5",
+          "size": 15982749
         }
       }
     }

@@ -16,6 +16,7 @@ package ai.djl.tensorflow.zoo;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.tensorflow.engine.TfEngine;
+import ai.djl.tensorflow.zoo.cv.classification.MobileNet;
 import ai.djl.tensorflow.zoo.cv.classification.Resnet;
 import java.util.Collections;
 import java.util.Set;
@@ -31,6 +32,7 @@ public class TfModelZoo implements ModelZoo {
     public static final String GROUP_ID = "ai.djl.tensorflow";
 
     public static final Resnet RESNET = new Resnet(REPOSITORY);
+    public static final MobileNet MOBILENET = new MobileNet(REPOSITORY);
 
     /** {@inheritDoc} */
     @Override
