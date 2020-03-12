@@ -1,15 +1,5 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
-project(native_loader)
-find_package(JNI REQUIRED)
-include_directories(${JNI_INCLUDE_DIRS})
-set(SOURCE_FILES
-        build/include/ai_djl_pytorch_jni_NativeLoader.h
-        "src/djl_pytorch_jni_loader.cc")
-add_library(native_loader SHARED ${SOURCE_FILES})
-set_target_properties(native_loader PROPERTIES LINKER_LANGUAGE CXX)
-set_property(TARGET native_loader PROPERTY CXX_STANDARD 14)
-
 project(djl_torch)
 
 find_package(Torch REQUIRED)

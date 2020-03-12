@@ -46,7 +46,6 @@ public final class LibUtils {
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
 
     private static final String LIB_NAME = "djl_torch";
-    private static final String NATIVE_LOADER = "native_loader";
     private static final String NATIVE_LIB_NAME = "torch";
 
     private LibUtils() {}
@@ -69,28 +68,26 @@ public final class LibUtils {
     }
 
     private static void loadWinDependencies(String libName) {
-        // load the native loader for global loading
         Path libDir = Paths.get(libName).getParent();
-        if (libDir != null) {
-            System.load(
-                    libDir.resolve(System.mapLibraryName(NATIVE_LOADER))
-                            .toAbsolutePath()
-                            .toString());
-        } else {
-            throw new IllegalArgumentException("Folder not exist!");
+        if (libDir == null) {
+            throw new IllegalArgumentException("Invalid library path!");
         }
-
         try (Stream<Path> paths = Files.walk(libDir)) {
             paths.filter(
                             path -> {
                                 String name = path.getFileName().toString();
-                                return !"c10_cuda.dll".equals(name) && !"torch.dll".equals(name);
+                                return !"c10_cuda.dll".equals(name)
+                                        && !"torch.dll".equals(name)
+                                        && Files.isRegularFile(path)
+                                        && !name.endsWith("djl_torch.dll");
                             })
                     .map(path -> path.toAbsolutePath().toString())
-                    .forEach(NativeLoader::loadGlobal);
+                    .forEach(System::load);
             if (Files.exists(libDir.resolve("c10_cuda.dll"))) {
-                NativeLoader.loadGlobal(libDir.resolve("c10_cuda.dll").toAbsolutePath().toString());
+                // Windows System.load is global load
+                System.load(libDir.resolve("c10_cuda.dll").toAbsolutePath().toString());
             }
+            System.load(libDir.resolve("torch.dll").toAbsolutePath().toString());
         } catch (IOException e) {
             throw new IllegalArgumentException("Folder not exist! " + libDir, e);
         }
@@ -138,7 +135,6 @@ public final class LibUtils {
 
     private static synchronized String copyJniLibraryFromClasspath(Path nativeDir) {
         String name = System.mapLibraryName(LIB_NAME);
-        String nativeLoaderName = System.mapLibraryName(NATIVE_LOADER);
         Properties prop = new Properties();
         try (InputStream stream =
                 LibUtils.class.getResourceAsStream("/native/jni/pytorch.properties")) {
@@ -151,13 +147,8 @@ public final class LibUtils {
         if (Files.exists(path)) {
             return path.toAbsolutePath().toString();
         }
-        try {
-            InputStream stream = LibUtils.class.getResourceAsStream("/native/jni/" + name);
+        try (InputStream stream = LibUtils.class.getResourceAsStream("/native/jni/" + name)) {
             Files.copy(stream, path);
-            stream.close();
-            stream = LibUtils.class.getResourceAsStream("/native/jni/" + nativeLoaderName);
-            Files.copy(stream, nativeDir.resolve(nativeLoaderName));
-            stream.close();
             return path.toAbsolutePath().toString();
         } catch (IOException e) {
             throw new IllegalStateException("Cannot copy jni files", e);
