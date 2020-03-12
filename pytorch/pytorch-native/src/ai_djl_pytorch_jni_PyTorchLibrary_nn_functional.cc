@@ -11,22 +11,27 @@
  * and limitations under the License.
  */
 #include "../build/include/ai_djl_pytorch_jni_PyTorchLibrary.h"
+#include "djl_pytorch_jni_error.h"
 #include "djl_pytorch_jni_utils.h"
 
 // The file is the implementation for PyTorch neural network functional ops
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSoftmax(
     JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim, jint jdtype) {
+  API_BEGIN();
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->softmax(jdim, utils::GetScalarTypeFromDType(jdtype)));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUpsampleBilinear2d(
     JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jsize, jboolean jalign_corners) {
+  API_BEGIN();
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   const auto size_vec = utils::GetVecFromJLongArray(env, jsize);
   const auto* result_ptr =
       new torch::Tensor(torch::upsample_bilinear2d(*tensor_ptr, size_vec, jalign_corners == JNI_TRUE));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
 }

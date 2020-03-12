@@ -21,7 +21,8 @@ set(SOURCE_FILES
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_random_sampling.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_other.cc"
     "src/djl_pytorch_jni_log.cc"
-    "src/djl_pytorch_jni_log.h")
+    "src/djl_pytorch_jni_log.h"
+    "src/djl_pytorch_jni_error.h")
 add_library(djl_torch SHARED ${SOURCE_FILES})
 target_link_libraries(djl_torch "${TORCH_LIBRARIES}")
 set_property(TARGET djl_torch PROPERTY CXX_STANDARD 14)

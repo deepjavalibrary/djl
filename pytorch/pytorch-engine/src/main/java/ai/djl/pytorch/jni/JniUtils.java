@@ -47,7 +47,8 @@ public final class JniUtils {
 
     private static int layoutMapper(SparseFormat fmt) {
         if (fmt == SparseFormat.DENSE) {
-            return 0;
+            // Enable MKLDNN with environment variable
+            return Boolean.getBoolean("ai.djl.pytorch.use_mkldnn") ? 2 : 0;
         } else if (fmt == SparseFormat.COO) {
             return 1;
         } else {

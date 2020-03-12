@@ -11,16 +11,17 @@
  * and limitations under the License.
  */
 #include "../build/include/ai_djl_pytorch_jni_PyTorchLibrary.h"
+#include "djl_pytorch_jni_error.h"
 #include "djl_pytorch_jni_utils.h"
 
 // The file is the implementation for PyTorch tensor creation ops
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(JNIEnv* env, jobject jthis,
     jobject jbuffer, jlongArray jshape, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
+  API_BEGIN();
   const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
-  auto options = torch::TensorOptions()
-                     .requires_grad(JNI_TRUE == jrequired_grad);
+  auto options = torch::TensorOptions().requires_grad(JNI_TRUE == jrequired_grad);
   // DJL's UNKNOWN type
   if (jdtype != 8) {
     options = options.dtype(utils::GetScalarTypeFromDType(jdtype));
@@ -38,65 +39,82 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(J
   }
   const torch::Tensor* tensor_ptr = new torch::Tensor(data);
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
+  API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchEmpty(JNIEnv* env, jobject jthis,
     jlongArray jshape, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
+  API_BEGIN();
   const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const torch::Tensor* tensor_ptr = new torch::Tensor(torch::empty(shape_vec, options));
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
+  API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchZeros(JNIEnv* env, jobject jthis,
     jlongArray jshape, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
+  API_BEGIN();
   const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const torch::Tensor* tensor_ptr = new torch::Tensor(torch::zeros(shape_vec, options));
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
+  API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchOnes(JNIEnv* env, jobject jthis,
     jlongArray jshape, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
+  API_BEGIN();
   const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const auto* tensor_ptr = new torch::Tensor(torch::ones(shape_vec, options));
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
+  API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchZerosLike(JNIEnv* env, jobject jthis,
     jobject jhandle, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
+  API_BEGIN();
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const auto* result_ptr = new torch::Tensor(torch::zeros_like(*tensor_ptr, options));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchOnesLike(JNIEnv* env, jobject jthis,
     jobject jhandle, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
+  API_BEGIN();
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const auto* result_ptr = new torch::Tensor(torch::ones_like(*tensor_ptr, options));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArange(JNIEnv* env, jobject jthis, jfloat jstart,
     jfloat jend, jfloat jstep, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
+  API_BEGIN();
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const auto* tensor_ptr = new torch::Tensor(torch::arange(jstart, jend, jstep, options));
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
+  API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLinspace(JNIEnv* env, jobject jthis,
     jfloat jstart, jfloat jend, jint jstep, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
+  API_BEGIN();
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const auto* tensor_ptr = new torch::Tensor(torch::linspace(jstart, jend, jstep, options));
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
+  API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchEye(JNIEnv* env, jobject jthis, jint jn, jint jm,
     jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
+  API_BEGIN();
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const auto* tensor_ptr = new torch::Tensor(torch::eye(jn, jm, options));
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
+  API_END();
 }
