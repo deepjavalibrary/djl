@@ -62,7 +62,7 @@ configure(javaProjects()) {
             }
             // This is used to avoid overriding on default engine for modules:
             // mxnet-engine, mxnet-model-zoo, api (MockEngine), basicdataset, fasttext, etc
-            if (project.name != "integration") {
+            if (project.name != "integration" && project.name != "examples") {
                 systemProperties.remove("ai.djl.default_engine")
             }
         }

@@ -19,9 +19,16 @@ dependencies {
     implementation project(":api")
     implementation project(":basicdataset")
     implementation project(":model-zoo")
-    implementation project(":mxnet:mxnet-model-zoo")
 
-    runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}-SNAPSHOT"
+    if (System.getProperty("ai.djl.default_engine") == "PyTorch") {
+        runtimeOnly project(":pytorch:pytorch-model-zoo")
+        runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}-SNAPSHOT"
+    } else if (System.getProperty("ai.djl.default_engine") == "TensorFlow") {
+        runtimeOnly project(":tensorflow:tensorflow-model-zoo")
+    } else {
+        runtimeOnly project(":mxnet:mxnet-model-zoo")
+        runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}-SNAPSHOT"
+    }
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
