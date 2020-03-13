@@ -15,6 +15,7 @@ package ai.djl.mxnet.zoo.nlp.qa;
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;

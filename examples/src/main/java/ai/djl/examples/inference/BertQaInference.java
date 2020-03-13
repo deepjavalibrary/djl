@@ -16,7 +16,7 @@ package ai.djl.examples.inference;
 import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
-import ai.djl.mxnet.zoo.nlp.qa.QAInput;
+import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;

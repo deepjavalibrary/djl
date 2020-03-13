@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.mxnet.zoo.nlp.qa;
+package ai.djl.modality.nlp.qa;
 
 /** The input container for BERT QA model. */
 public class QAInput {

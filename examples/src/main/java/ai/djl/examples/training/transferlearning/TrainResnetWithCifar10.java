@@ -26,7 +26,6 @@ import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -120,7 +119,7 @@ public final class TrainResnetWithCifar10 {
                         .optArtifactId("resnet");
         if (isSymbolic) {
             // load the model
-            builder.optGroupId(MxModelZoo.GROUP_ID);
+            builder.optGroupId("ai.djl.mxnet");
             if (options == null) {
                 builder.optFilter("layers", "50");
                 builder.optFilter("flavor", "v1");

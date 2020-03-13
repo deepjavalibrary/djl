@@ -12,6 +12,7 @@
  */
 package ai.djl.mxnet.zoo.nlp.qa;
 
+import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
