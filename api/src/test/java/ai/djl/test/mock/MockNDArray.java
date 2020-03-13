@@ -541,6 +541,12 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sqrt() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray cbrt() {
         return null;
     }

@@ -593,6 +593,11 @@ public class PtNDArray extends NativeResource implements NDArray {
         return pow(2);
     }
 
+    @Override
+    public NDArray sqrt() {
+        return JniUtils.sqrt(this);
+    }
+
     /** {@inheritDoc} */
     @Override
     public PtNDArray cbrt() {

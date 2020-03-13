@@ -1730,6 +1730,22 @@ public interface NDArray extends AutoCloseable {
     NDArray square();
 
     /**
+     * Returns the square root of this {@code NDArray} element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {4f});
+     * jshell&gt; array.sqrt();
+     * ND: (1) cpu() float32
+     * [2., ]
+     * </pre>
+     *
+     * @return the result {@code NDArray}
+     */
+    NDArray sqrt();
+
+    /**
      * Returns the cube-root of this {@code NDArray} element-wise.
      *
      * <p>Examples

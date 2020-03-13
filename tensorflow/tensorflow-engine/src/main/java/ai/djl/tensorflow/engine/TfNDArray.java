@@ -779,6 +779,12 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sqrt() {
+        return new TfNDArray(manager, tf.math.sqrt(asOperand()));
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray cbrt() {
         return new TfNDArray(manager, tf.math.pow(asOperand(), toConstant(1f / 3, getDataType())));
     }

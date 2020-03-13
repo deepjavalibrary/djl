@@ -820,6 +820,12 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sqrt() {
+        return manager.invoke("_npi_sqrt", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray cbrt() {
         return manager.invoke("_npi_cbrt", this, null);
     }
