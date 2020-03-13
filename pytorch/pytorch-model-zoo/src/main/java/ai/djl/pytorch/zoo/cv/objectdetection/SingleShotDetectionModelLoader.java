@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -101,25 +102,46 @@ public class SingleShotDetectionModelLoader
             implements TranslatorFactory<BufferedImage, DetectedObjects> {
 
         @Override
+        @SuppressWarnings("unchecked")
         public Translator<BufferedImage, DetectedObjects> newInstance(
                 Map<String, Object> arguments) {
-            int width = (Integer) arguments.getOrDefault("width", 300);
-            int height = (Integer) arguments.getOrDefault("height", 300);
+            int width = ((Double) arguments.getOrDefault("width", 300)).intValue();
+            int height = ((Double) arguments.getOrDefault("height", 300)).intValue();
             double threshold = (Double) arguments.getOrDefault("threshold", 0.4d);
-            int figSize = (Integer) arguments.getOrDefault("size", 300);
-            int[] featSize =
-                    (int[]) arguments.getOrDefault("feat_size", new int[] {38, 19, 10, 5, 3, 1});
-            int[] steps =
-                    (int[]) arguments.getOrDefault("steps", new int[] {8, 16, 32, 64, 100, 300});
-            int[] scale =
-                    (int[])
-                            arguments.getOrDefault(
-                                    "scale", new int[] {21, 45, 99, 153, 207, 261, 315});
-            int[][] aspectRatio =
-                    (int[][])
-                            arguments.getOrDefault(
-                                    "aspect_ratios",
-                                    new int[][] {{2}, {2, 3}, {2, 3}, {2, 3}, {2}, {2}});
+            int figSize = ((Double) arguments.getOrDefault("size", 300)).intValue();
+            int[] featSize;
+            List<Double> list = (List<Double>) arguments.get("feat_size");
+            if (list == null) {
+                featSize = new int[] {38, 19, 10, 5, 3, 1};
+            } else {
+                featSize = list.stream().mapToInt(Double::intValue).toArray();
+            }
+            int[] steps;
+            list = (List<Double>) arguments.get("steps");
+            if (list == null) {
+                steps = new int[] {8, 16, 32, 64, 100, 300};
+            } else {
+                steps = list.stream().mapToInt(Double::intValue).toArray();
+            }
+
+            int[] scale;
+            list = (List<Double>) arguments.get("scale");
+            if (list == null) {
+                scale = new int[] {21, 45, 99, 153, 207, 261, 315};
+            } else {
+                scale = list.stream().mapToInt(Double::intValue).toArray();
+            }
+
+            int[][] aspectRatio;
+            List<List<Double>> ratio = (List<List<Double>>) arguments.get("aspect_ratios");
+            if (ratio == null) {
+                aspectRatio = new int[][] {{2}, {2, 3}, {2, 3}, {2, 3}, {2}, {2}};
+            } else {
+                aspectRatio = new int[ratio.size()][];
+                for (int i = 0; i < aspectRatio.length; ++i) {
+                    aspectRatio[i] = ratio.get(i).stream().mapToInt(Double::intValue).toArray();
+                }
+            }
 
             Pipeline pipeline = new Pipeline();
             pipeline.add(new Resize(width, height))
