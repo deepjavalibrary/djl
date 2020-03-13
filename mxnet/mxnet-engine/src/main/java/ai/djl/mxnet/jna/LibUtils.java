@@ -304,6 +304,18 @@ public final class LibUtils {
                 } else {
                     throw new AssertionError("Unsupported GPU operating system: " + os);
                 }
+
+                // check again in case fallback to cpu
+                if ("mkl".equals(flavor)) {
+                    dir =
+                            Paths.get(
+                                    userHome,
+                                    ".mxnet/cache/" + version + flavor + '-' + classifier);
+                    path = dir.resolve(libName);
+                    if (Files.exists(path)) {
+                        return path.toAbsolutePath().toString();
+                    }
+                }
             }
 
             for (String line : lines) {
