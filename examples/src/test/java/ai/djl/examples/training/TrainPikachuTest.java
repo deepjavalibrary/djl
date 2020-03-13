@@ -15,7 +15,6 @@ package ai.djl.examples.training;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.examples.training.util.ExampleTrainingResult;
-import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
@@ -52,7 +51,6 @@ public class TrainPikachuTest {
             Assert.assertTrue(result.getEvaluation("SingleShotDetectionLoss") < expectedLoss);
         }
 
-        JnaUtils.waitAll();
         // test predict
         int numberOfPikachus =
                 TrainPikachu.predict("build/model", "src/test/resources/pikachu.jpg");
