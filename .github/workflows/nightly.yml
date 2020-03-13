@@ -123,8 +123,6 @@ jobs:
         with:
           name: jnilib-Windows
           path: pytorch/pytorch-engine/build/jnilib
-      - name: Build with Gradle
-        run: ./gradlew build
       - name: Publish to snapshot repository
         run: ./gradlew publish -Psnapshot
         env:
