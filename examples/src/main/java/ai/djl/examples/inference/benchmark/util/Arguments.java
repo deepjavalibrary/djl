@@ -15,6 +15,8 @@ package ai.djl.examples.inference.benchmark.util;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.util.BufferedImageUtils;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.Shape;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.awt.image.BufferedImage;
@@ -24,6 +26,7 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -43,6 +46,7 @@ public class Arguments {
     private int threads;
     private String inputClass;
     private String outputClass;
+    private Shape inputShape;
 
     public Arguments(CommandLine cmd) {
         modelDir = cmd.getOptionValue("model-dir");
@@ -66,6 +70,12 @@ public class Arguments {
         if (cmd.hasOption("criteria")) {
             Type type = new TypeToken<Map<String, String>>() {}.getType();
             criteria = new Gson().fromJson(cmd.getOptionValue("criteria"), type);
+        }
+        if (cmd.hasOption("input-shape")) {
+            String shape = cmd.getOptionValue("input-shape");
+            String[] tokens = shape.split(",");
+            long[] shapes = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
+            inputShape = new Shape(shapes);
         }
     }
 
@@ -91,6 +101,13 @@ public class Arguments {
                         .hasArg()
                         .argName("INPUT-CLASS")
                         .desc("Input class type.")
+                        .build());
+        options.addOption(
+                Option.builder("is")
+                        .longOpt("input-shape")
+                        .hasArg()
+                        .argName("INPUT-SHAPE")
+                        .desc("Input data shape.")
                         .build());
         options.addOption(
                 Option.builder("oc")
@@ -218,9 +235,15 @@ public class Arguments {
         Class<?> klass = getInputClass();
         if (klass == BufferedImage.class) {
             return BufferedImageUtils.fromFile(getImageFile());
-        } else if (klass == float[].class) {
+        } else if (klass == float[].class || klass == NDList.class) {
+            // TODO: load data from input file
+            // Create empty NDArray from shape for now
             return null;
         }
         throw new IllegalArgumentException("Unsupported input class: " + klass);
+    }
+
+    public Shape getInputShape() {
+        return inputShape;
     }
 }

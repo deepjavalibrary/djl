@@ -17,12 +17,17 @@ import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.examples.inference.benchmark.MultithreadedBenchmark;
 import ai.djl.metric.Metrics;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.training.util.ProgressBar;
+import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
+import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.time.Duration;
 import org.apache.commons.cli.CommandLine;
@@ -215,6 +220,7 @@ public abstract class AbstractBenchmark {
         return lastResult;
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     protected ZooModel<?, ?> loadModel(Arguments arguments, Metrics metrics)
             throws ModelException, IOException, ClassNotFoundException {
         long begin = System.nanoTime();
@@ -224,14 +230,35 @@ public abstract class AbstractBenchmark {
         }
         Class<?> input = arguments.getInputClass();
         Class<?> output = arguments.getOutputClass();
+        Shape shape = arguments.getInputShape();
 
         Criteria.Builder<?, ?> builder =
                 Criteria.builder()
                         .setTypes(input, output)
                         .optFilters(arguments.getCriteria())
+                        .optArtifactId(artifactId)
                         .optProgress(new ProgressBar());
 
-        builder.optArtifactId(artifactId);
+        if (shape != null) {
+            builder.optTranslator(
+                    new Translator() {
+
+                        @Override
+                        public NDList processInput(TranslatorContext ctx, Object input) {
+                            return new NDList(ctx.getNDManager().create(shape));
+                        }
+
+                        @Override
+                        public Object processOutput(TranslatorContext ctx, NDList list) {
+                            return list.singletonOrThrow().toFloatArray();
+                        }
+
+                        @Override
+                        public Batchifier getBatchifier() {
+                            return null;
+                        }
+                    });
+        }
 
         ZooModel<?, ?> model = ModelZoo.loadModel(builder.build());
         long delta = System.nanoTime() - begin;
