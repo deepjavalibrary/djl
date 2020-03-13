@@ -15,3 +15,9 @@ You can switch the engine through setting the system property `ai.djl.default_en
 ```
 ./gradlew build -Dai.djl.default_engine=<Engine_Name>
 ```
+
+### Windows PowerShell
+
+```
+gradlew build "-Dai.djl.default_engine=<Engine_Name>"
+```

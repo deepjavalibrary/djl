@@ -16,47 +16,46 @@ import java.nio.ByteBuffer;
 import java.util.Set;
 
 /** A class containing utilities to interact with the PyTorch Engine's JNI layer. */
-@SuppressWarnings("MissingJavadocMethod")
-public final class PyTorchLibrary {
+final class PyTorchLibrary {
 
-    public static final PyTorchLibrary LIB = new PyTorchLibrary();
+    static final PyTorchLibrary LIB = new PyTorchLibrary();
 
     private PyTorchLibrary() {}
 
-    public native void torchManualSeed(long seed);
+    native void torchManualSeed(long seed);
 
-    public native void torchShowConfig(Set<String> set);
+    native void torchShowConfig(Set<String> set);
 
-    public native long[] torchSizes(Pointer handle);
+    native long[] torchSizes(Pointer handle);
 
-    public native ByteBuffer torchDataPtr(Pointer handle);
+    native ByteBuffer torchDataPtr(Pointer handle);
 
-    public native int torchDType(Pointer handle);
+    native int torchDType(Pointer handle);
 
-    public native int[] torchDevice(Pointer handle);
+    native int[] torchDevice(Pointer handle);
 
-    public native int torchLayout(Pointer handle);
+    native int torchLayout(Pointer handle);
 
-    public native Pointer torchTo(Pointer handle, int dType, int[] device, boolean copy);
+    native Pointer torchTo(Pointer handle, int dType, int[] device, boolean copy);
 
-    public native Pointer tensorClone(Pointer handle);
+    native Pointer tensorClone(Pointer handle);
 
-    public native Pointer torchEmpty(
+    native Pointer torchEmpty(
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 
-    public native Pointer torchZeros(
+    native Pointer torchZeros(
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 
-    public native Pointer torchOnes(
+    native Pointer torchOnes(
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 
-    public native Pointer torchZerosLike(
+    native Pointer torchZerosLike(
             Pointer handle, int dType, int layout, int[] device, boolean requiredGrad);
 
-    public native Pointer torchOnesLike(
+    native Pointer torchOnesLike(
             Pointer handle, int dType, int layout, int[] device, boolean requiredGrad);
 
-    public native Pointer torchArange(
+    native Pointer torchArange(
             float start,
             float end,
             float step,
@@ -65,7 +64,7 @@ public final class PyTorchLibrary {
             int[] device,
             boolean requiredGrad);
 
-    public native Pointer torchLinspace(
+    native Pointer torchLinspace(
             float start,
             float end,
             int step,
@@ -74,61 +73,61 @@ public final class PyTorchLibrary {
             int[] device,
             boolean requiredGrad);
 
-    public native Pointer torchAdd(Pointer self, Pointer other);
+    native Pointer torchAdd(Pointer self, Pointer other);
 
-    public native void torchAddi(Pointer self, Pointer other);
+    native void torchAddi(Pointer self, Pointer other);
 
-    public native Pointer torchSub(Pointer self, Pointer other);
+    native Pointer torchSub(Pointer self, Pointer other);
 
-    public native void torchSubi(Pointer self, Pointer other);
+    native void torchSubi(Pointer self, Pointer other);
 
-    public native Pointer torchMul(Pointer self, Pointer other);
+    native Pointer torchMul(Pointer self, Pointer other);
 
-    public native void torchMuli(Pointer self, Pointer other);
+    native void torchMuli(Pointer self, Pointer other);
 
-    public native Pointer torchDiv(Pointer self, Pointer other);
+    native Pointer torchDiv(Pointer self, Pointer other);
 
-    public native void torchDivi(Pointer self, Pointer other);
+    native void torchDivi(Pointer self, Pointer other);
 
-    public native Pointer torchRemainder(Pointer self, Pointer other);
+    native Pointer torchRemainder(Pointer self, Pointer other);
 
-    public native void torchRemainderi(Pointer self, Pointer other);
+    native void torchRemainderi(Pointer self, Pointer other);
 
-    public native Pointer torchPow(Pointer self, Pointer exponent);
+    native Pointer torchPow(Pointer self, Pointer exponent);
 
-    public native void torchPowi(Pointer self, Pointer exponent);
+    native void torchPowi(Pointer self, Pointer exponent);
 
-    public native Pointer torchMatmul(Pointer self, Pointer other);
+    native Pointer torchMatmul(Pointer self, Pointer other);
 
-    public native Pointer torchLogicalXor(Pointer self, Pointer other);
+    native Pointer torchLogicalXor(Pointer self, Pointer other);
 
-    public native Pointer torchLogicalNot(Pointer handle);
+    native Pointer torchLogicalNot(Pointer handle);
 
-    public native Pointer torchReshape(Pointer handle, long[] shape);
+    native Pointer torchReshape(Pointer handle, long[] shape);
 
-    public native Pointer torchSoftmax(Pointer handle, long dim, int dType);
+    native Pointer torchSoftmax(Pointer handle, long dim, int dType);
 
-    public native Pointer torchArgMax(Pointer handle);
+    native Pointer torchArgMax(Pointer handle);
 
-    public native Pointer torchArgMax(Pointer handle, long dim, boolean keepDim);
+    native Pointer torchArgMax(Pointer handle, long dim, boolean keepDim);
 
-    public native Pointer torchArgMin(Pointer handle);
+    native Pointer torchArgMin(Pointer handle);
 
-    public native Pointer torchArgMin(Pointer handle, long dim, boolean keepDim);
+    native Pointer torchArgMin(Pointer handle, long dim, boolean keepDim);
 
-    public native Pointer torchArgSort(Pointer handle);
+    native Pointer torchArgSort(Pointer handle);
 
-    public native Pointer torchArgSort(Pointer handle, long dim, boolean keepDim);
+    native Pointer torchArgSort(Pointer handle, long dim, boolean keepDim);
 
-    public native Pointer torchSort(Pointer handle, long dim, boolean descending);
+    native Pointer torchSort(Pointer handle, long dim, boolean descending);
 
-    public native Pointer torchPermute(Pointer handle, long[] dims);
+    native Pointer torchPermute(Pointer handle, long[] dims);
 
-    public native Pointer torchTranspose(Pointer handle, long axis1, long axis2);
+    native Pointer torchTranspose(Pointer handle, long axis1, long axis2);
 
-    public native boolean contentEqual(Pointer handle1, Pointer handle2);
+    native boolean contentEqual(Pointer handle1, Pointer handle2);
 
-    public native Pointer torchFromBlob(
+    native Pointer torchFromBlob(
             ByteBuffer data,
             long[] shape,
             int dType,
@@ -136,115 +135,115 @@ public final class PyTorchLibrary {
             int[] device,
             boolean requiredGrad);
 
-    public native Pointer torchSlice(Pointer handle, long dim, long start, long end, long step);
+    native Pointer torchSlice(Pointer handle, long dim, long start, long end, long step);
 
-    public native Pointer torchMaskedSelect(Pointer handle, Pointer maskHandle);
+    native Pointer torchMaskedSelect(Pointer handle, Pointer maskHandle);
 
-    public native void torchDeleteTensor(Pointer handle);
+    native void torchDeleteTensor(Pointer handle);
 
-    public native void torchDeleteModule(Pointer handle);
+    native void torchDeleteModule(Pointer handle);
 
-    public native void torchDeleteIValue(Pointer handle);
+    native void torchDeleteIValue(Pointer handle);
 
-    public native Pointer torchMax(Pointer handle);
+    native Pointer torchMax(Pointer handle);
 
-    public native Pointer torchMax(Pointer self, Pointer other);
+    native Pointer torchMax(Pointer self, Pointer other);
 
-    public native Pointer torchMax(Pointer handle, long dim, boolean keepDim);
+    native Pointer torchMax(Pointer handle, long dim, boolean keepDim);
 
-    public native Pointer torchMin(Pointer handle);
+    native Pointer torchMin(Pointer handle);
 
-    public native Pointer torchMin(Pointer self, Pointer other);
+    native Pointer torchMin(Pointer self, Pointer other);
 
-    public native Pointer torchMin(Pointer handle, long dim, boolean keepDim);
+    native Pointer torchMin(Pointer handle, long dim, boolean keepDim);
 
-    public native Pointer torchMean(Pointer handle);
+    native Pointer torchMean(Pointer handle);
 
-    public native Pointer torchMean(Pointer handle, long dim, boolean keepDim);
+    native Pointer torchMean(Pointer handle, long dim, boolean keepDim);
 
-    public native Pointer torchSum(Pointer handle);
+    native Pointer torchSum(Pointer handle);
 
-    public native Pointer torchSum(Pointer handle, long[] dim, boolean keepDim);
+    native Pointer torchSum(Pointer handle, long[] dim, boolean keepDim);
 
-    public native Pointer torchFlatten(Pointer handle, long startDim, long endDim);
+    native Pointer torchFlatten(Pointer handle, long startDim, long endDim);
 
-    public native Pointer[] torchSplit(Pointer handle, long size, long dim);
+    native Pointer[] torchSplit(Pointer handle, long size, long dim);
 
-    public native Pointer[] torchSplit(Pointer handle, long[] indices, long dim);
+    native Pointer[] torchSplit(Pointer handle, long[] indices, long dim);
 
-    public native Pointer torchUnsqueeze(Pointer handle, long dim);
+    native Pointer torchUnsqueeze(Pointer handle, long dim);
 
-    public native Pointer torchSqueeze(Pointer handle);
+    native Pointer torchSqueeze(Pointer handle);
 
-    public native Pointer torchSqueeze(Pointer handle, long axis);
+    native Pointer torchSqueeze(Pointer handle, long axis);
 
-    public native Pointer torchStack(Pointer[] handles, long dim);
+    native Pointer torchStack(Pointer[] handles, long dim);
 
-    public native Pointer torchCat(Pointer[] handles, long dim);
+    native Pointer torchCat(Pointer[] handles, long dim);
 
-    public native Pointer torchAbs(Pointer handle);
+    native Pointer torchAbs(Pointer handle);
 
-    public native Pointer torchFloor(Pointer handle);
+    native Pointer torchFloor(Pointer handle);
 
-    public native Pointer torchCeil(Pointer handle);
+    native Pointer torchCeil(Pointer handle);
 
-    public native Pointer torchClamp(Pointer handle, Pointer min, Pointer max);
+    native Pointer torchClamp(Pointer handle, Pointer min, Pointer max);
 
-    public native Pointer torchRound(Pointer handle);
+    native Pointer torchRound(Pointer handle);
 
-    public native Pointer torchTrunc(Pointer handle);
+    native Pointer torchTrunc(Pointer handle);
 
-    public native Pointer torchExp(Pointer handle);
+    native Pointer torchExp(Pointer handle);
 
-    public native Pointer torchLog(Pointer handle);
+    native Pointer torchLog(Pointer handle);
 
-    public native Pointer torchLog10(Pointer handle);
+    native Pointer torchLog10(Pointer handle);
 
-    public native Pointer torchLog2(Pointer handle);
+    native Pointer torchLog2(Pointer handle);
 
-    public native Pointer torchSin(Pointer handle);
+    native Pointer torchSin(Pointer handle);
 
-    public native Pointer torchCos(Pointer handle);
+    native Pointer torchCos(Pointer handle);
 
-    public native Pointer torchTan(Pointer handle);
+    native Pointer torchTan(Pointer handle);
 
-    public native Pointer torchASin(Pointer handle);
+    native Pointer torchASin(Pointer handle);
 
-    public native Pointer torchAcos(Pointer handle);
+    native Pointer torchAcos(Pointer handle);
 
-    public native Pointer torchAtan(Pointer handle);
+    native Pointer torchAtan(Pointer handle);
 
-    public native Pointer torchSqrt(Pointer handle);
+    native Pointer torchSqrt(Pointer handle);
 
-    public native Pointer torchSinh(Pointer handle);
+    native Pointer torchSinh(Pointer handle);
 
-    public native Pointer torchCosh(Pointer handle);
+    native Pointer torchCosh(Pointer handle);
 
-    public native Pointer torchTanh(Pointer handle);
+    native Pointer torchTanh(Pointer handle);
 
-    public native Pointer torchAll(Pointer self);
+    native Pointer torchAll(Pointer self);
 
-    public native Pointer torchAny(Pointer self);
+    native Pointer torchAny(Pointer self);
 
-    public native Pointer torchNone(Pointer self);
+    native Pointer torchNone(Pointer self);
 
-    public native Pointer torchEq(Pointer self, Pointer other);
+    native Pointer torchEq(Pointer self, Pointer other);
 
-    public native Pointer torchNeq(Pointer self, Pointer other);
+    native Pointer torchNeq(Pointer self, Pointer other);
 
-    public native Pointer torchGt(Pointer self, Pointer other);
+    native Pointer torchGt(Pointer self, Pointer other);
 
-    public native Pointer torchGte(Pointer self, Pointer other);
+    native Pointer torchGte(Pointer self, Pointer other);
 
-    public native Pointer torchLt(Pointer self, Pointer other);
+    native Pointer torchLt(Pointer self, Pointer other);
 
-    public native Pointer torchLte(Pointer self, Pointer other);
+    native Pointer torchLte(Pointer self, Pointer other);
 
-    public native Pointer torchNeg(Pointer self);
+    native Pointer torchNeg(Pointer self);
 
-    public native void torchNegi(Pointer self);
+    native void torchNegi(Pointer self);
 
-    public native Pointer atNormal(
+    native Pointer atNormal(
             double mean,
             double std,
             long[] sizes,
@@ -253,7 +252,7 @@ public final class PyTorchLibrary {
             int[] device,
             boolean requiredGrad);
 
-    public native Pointer tensorUniform(
+    native Pointer tensorUniform(
             double from,
             double to,
             long[] sizes,
@@ -262,41 +261,40 @@ public final class PyTorchLibrary {
             int[] device,
             boolean requiredGrad);
 
-    public native Pointer torchEye(
+    native Pointer torchEye(
             int n, int m, int dType, int layout, int[] device, boolean requiredGrad);
 
-    public native Pointer torchUpsampleBilinear2d(
-            Pointer handle, long[] shape, boolean alignCorners);
+    native Pointer torchUpsampleBilinear2d(Pointer handle, long[] shape, boolean alignCorners);
 
-    public native Pointer moduleLoad(String path, int[] device);
+    native Pointer moduleLoad(String path, int[] device);
 
-    public native void moduleEval(Pointer handle);
+    native void moduleEval(Pointer handle);
 
-    public native Pointer moduleForward(Pointer moduleHandle, Pointer[] arrayHandles);
+    native Pointer moduleForward(Pointer moduleHandle, Pointer[] arrayHandles);
 
-    public native Pointer iValueCreateFromTensor(Pointer tensorHandle);
+    native Pointer iValueCreateFromTensor(Pointer tensorHandle);
 
-    public native Pointer iValueToTensor(Pointer iValueHandle);
+    native Pointer iValueToTensor(Pointer iValueHandle);
 
-    public native Pointer[] iValueToTensorList(Pointer iValueHandle);
+    native Pointer[] iValueToTensorList(Pointer iValueHandle);
 
-    public native Pointer[] iValueToList(Pointer iValueHandle);
+    native Pointer[] iValueToList(Pointer iValueHandle);
 
-    public native Pointer[] iValueToListFromTuple(Pointer iValueHandle);
+    native Pointer[] iValueToListFromTuple(Pointer iValueHandle);
 
-    public native Pointer[] iValueToMap(Pointer iValueHandle);
+    native Pointer[] iValueToMap(Pointer iValueHandle);
 
-    public native String iValueToString(Pointer iValueHandle);
+    native String iValueToString(Pointer iValueHandle);
 
-    public native boolean iValueIsString(Pointer iValueHandle);
+    native boolean iValueIsString(Pointer iValueHandle);
 
-    public native boolean iValueIsTensor(Pointer iValueHandle);
+    native boolean iValueIsTensor(Pointer iValueHandle);
 
-    public native boolean iValueIsTensorList(Pointer iValueHandle);
+    native boolean iValueIsTensorList(Pointer iValueHandle);
 
-    public native boolean iValueIsList(Pointer iValueHandle);
+    native boolean iValueIsList(Pointer iValueHandle);
 
-    public native boolean iValueIsMap(Pointer iValueHandle);
+    native boolean iValueIsMap(Pointer iValueHandle);
 
-    public native boolean iValueIsTuple(Pointer iValueHandle);
+    native boolean iValueIsTuple(Pointer iValueHandle);
 }
