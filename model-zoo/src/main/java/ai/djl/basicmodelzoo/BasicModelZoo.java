@@ -44,7 +44,7 @@ public class BasicModelZoo implements ModelZoo {
         Set<String> set = new HashSet<>();
         set.add("MXNet");
         set.add("PyTorch");
-        set.add("Tensorflow");
+        set.add("TensorFlow");
         return set;
     }
 }
