@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 public class CoverageTest {
 
     @Test
-    public void test() throws IOException, ClassNotFoundException, URISyntaxException {
+    public void test() throws IOException, ReflectiveOperationException, URISyntaxException {
         // API
         CoverageUtils.testGetterSetters(Device.class);
 

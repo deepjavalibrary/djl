@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 public class MxCoverageTest {
 
     @Test
-    public void test() throws IOException, ClassNotFoundException, URISyntaxException {
+    public void test() throws IOException, ReflectiveOperationException, URISyntaxException {
         // mxnet-engine
         CoverageUtils.testGetterSetters(MxEngine.class);
 

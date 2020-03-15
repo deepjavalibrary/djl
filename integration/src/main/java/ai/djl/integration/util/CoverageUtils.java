@@ -15,6 +15,7 @@ package ai.djl.integration.util;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URISyntaxException;
@@ -41,7 +42,7 @@ public final class CoverageUtils {
     private CoverageUtils() {}
 
     public static void testGetterSetters(Class<?> baseClass)
-            throws IOException, ClassNotFoundException, URISyntaxException {
+            throws IOException, ReflectiveOperationException, URISyntaxException {
         List<Class<?>> list = getClasses(baseClass);
         for (Class<?> clazz : list) {
             Object obj = null;
@@ -96,8 +97,13 @@ public final class CoverageUtils {
     }
 
     private static List<Class<?>> getClasses(Class<?> clazz)
-            throws IOException, ClassNotFoundException, URISyntaxException {
-        URL[] urls = ((URLClassLoader) clazz.getClassLoader()).getURLs();
+            throws IOException, ReflectiveOperationException, URISyntaxException {
+        ClassLoader appClassLoader = clazz.getClassLoader();
+        Field field = appClassLoader.getClass().getDeclaredField("ucp");
+        field.setAccessible(true);
+        Object ucp = field.get(appClassLoader);
+        Method method = ucp.getClass().getDeclaredMethod("getURLs");
+        URL[] urls = (URL[]) method.invoke(ucp);
         ClassLoader cl = new TestClassLoader(urls, Thread.currentThread().getContextClassLoader());
 
         URL url = clazz.getProtectionDomain().getCodeSource().getLocation();

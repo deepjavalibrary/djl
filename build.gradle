@@ -41,6 +41,13 @@ configure(javaProjects()) {
 
     test {
         maxHeapSize = "1024m"
+        doFirst {
+            if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+                jvmArgs = [
+                        '--add-opens', "java.base/jdk.internal.loader=ALL-UNNAMED"
+                ]
+            }
+        }
 
         useTestNG() {
             // suiteXmlFiles << new File(rootDir, "testng.xml") //This is how to add custom testng.xml
