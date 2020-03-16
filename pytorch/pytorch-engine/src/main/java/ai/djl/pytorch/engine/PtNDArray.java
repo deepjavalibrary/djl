@@ -198,7 +198,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     public PtNDArray get(NDIndex index) {
         // TODO find a better way to improve the speed
         if (isScalar()) {
-            return this;
+            return (PtNDArray) duplicate();
         }
         // use booleanMask for NDIndexBooleans case
         List<NDIndexElement> indices = index.getIndices();

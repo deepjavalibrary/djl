@@ -101,6 +101,8 @@ inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandle
     jlong ptr = env->CallLongMethod(jhandle, get_value);
     vec.emplace_back(*(reinterpret_cast<T*>(ptr)));
   }
+  env->DeleteLocalRef(jexception);
+  env->DeleteLocalRef(cls);
   return std::move(vec);
 }
 
@@ -116,6 +118,8 @@ inline jobject CreatePointer(JNIEnv* env, const T* ptr) {
   if (new_obj == nullptr) {
     env->ThrowNew(jexception, "object created failed");
   }
+  env->DeleteLocalRef(jexception);
+  env->DeleteLocalRef(cls);
   return new_obj;
 }
 

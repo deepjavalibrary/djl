@@ -710,7 +710,7 @@ public final class JniUtils {
 
     public static ByteBuffer getByteBuffer(PtNDArray ndArray) {
         // Operation is CPU only
-        if (ndArray.getDevice() != Device.cpu()) {
+        if (!ndArray.getDevice().equals(Device.cpu())) {
             ndArray = ndArray.toDevice(Device.cpu(), false);
         }
         ByteBuffer bb = PyTorchLibrary.LIB.torchDataPtr(ndArray.getHandle());
