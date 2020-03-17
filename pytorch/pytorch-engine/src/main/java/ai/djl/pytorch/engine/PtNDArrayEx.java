@@ -401,12 +401,6 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray crop(int x, int y, int width, int height) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PtNDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
         throw new UnsupportedOperationException("Not implemented");
     }

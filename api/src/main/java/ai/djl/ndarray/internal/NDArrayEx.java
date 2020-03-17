@@ -407,7 +407,22 @@ public interface NDArrayEx {
 
     NDArray resize(int width, int height);
 
-    NDArray crop(int x, int y, int width, int height);
+    default NDArray crop(int x, int y, int width, int height) {
+        NDArray array = getArray();
+        StringBuilder sb = new StringBuilder(30);
+        if (array.getShape().dimension() == 4) {
+            sb.append(":,");
+        }
+        sb.append(y)
+                .append(':')
+                .append(y + height)
+                .append(',')
+                .append(x)
+                .append(':')
+                .append(x + width)
+                .append(",:");
+        return array.get(sb.toString());
+    }
 
     ////////////////////////////////////////
     // Miscellaneous

@@ -362,11 +362,6 @@ public class TfNDArrayEx implements NDArrayEx {
     }
 
     @Override
-    public NDArray crop(int x, int y, int width, int height) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
     public NDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
         throw new UnsupportedOperationException("Not implemented");
     }

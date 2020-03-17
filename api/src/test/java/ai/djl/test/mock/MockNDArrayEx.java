@@ -377,12 +377,6 @@ public class MockNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray crop(int x, int y, int width, int height) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
         return null;
     }
