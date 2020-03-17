@@ -98,8 +98,8 @@ public class PtSSDTranslator extends SingleShotDetectionTranslator {
                 }
                 String className = classes.get((int) classId);
                 double[] box = boundingBoxes.get(i).toDoubleArray();
-
-                Rectangle rect = new Rectangle(box[0], box[1], box[2], box[3]);
+                Rectangle rect =
+                        new Rectangle(box[0] - 0.5 * box[2], box[1] - 0.5 * box[3], box[2], box[3]);
                 retNames.add(className);
                 retProbs.add(probability);
                 retBB.add(rect);
