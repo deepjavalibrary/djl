@@ -108,7 +108,11 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMaskedSele
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDataPtr(
     JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
+  jclass jexception = env->FindClass("java/lang/IllegalStateException");
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  if (!tensor_ptr->is_contiguous()) {
+    env->ThrowNew(jexception, "currently only supports contiguous tensors");
+  }
   jobject buf = env->NewDirectByteBuffer(tensor_ptr->data_ptr(), tensor_ptr->nbytes());
   return buf;
   API_END();
