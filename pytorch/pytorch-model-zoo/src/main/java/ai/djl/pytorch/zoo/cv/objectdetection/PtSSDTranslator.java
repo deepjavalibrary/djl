@@ -73,13 +73,15 @@ public class PtSSDTranslator extends SingleShotDetectionTranslator {
         // kill the 1st prediction as not needed
         NDArray prob = list.get(1).swapAxes(0, 1).softmax(1).get(":, 1:");
         NDArray boundingBoxes = list.get(0).swapAxes(0, 1);
+        NDArray bbWH = boundingBoxes.get(":, 2:").mul(scaleWH).exp().mul(boxRecover.get(":, 2:"));
         NDArray bbXY =
                 boundingBoxes
                         .get(":, :2")
                         .mul(scaleXY)
                         .mul(boxRecover.get(":, 2:"))
-                        .add(boxRecover.get(":, :2"));
-        NDArray bbWH = boundingBoxes.get(":, 2:").mul(scaleWH).exp().mul(boxRecover.get(":, 2:"));
+                        .add(boxRecover.get(":, :2"))
+                        .sub(bbWH.mul(0.5f));
+
         boundingBoxes = NDArrays.concat(new NDList(bbXY, bbWH), 1);
         long[] classIds = prob.argMax(1).toLongArray();
         float[] probabilities = prob.max(new int[] {1}).toFloatArray();
@@ -98,8 +100,7 @@ public class PtSSDTranslator extends SingleShotDetectionTranslator {
                 }
                 String className = classes.get((int) classId);
                 double[] box = boundingBoxes.get(i).toDoubleArray();
-                Rectangle rect =
-                        new Rectangle(box[0] - 0.5 * box[2], box[1] - 0.5 * box[3], box[2], box[3]);
+                Rectangle rect = new Rectangle(box[0], box[1], box[2], box[3]);
                 retNames.add(className);
                 retProbs.add(probability);
                 retBB.add(rect);
