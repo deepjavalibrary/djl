@@ -17,6 +17,7 @@ import ai.djl.Model;
 import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Utils;
 import java.io.IOException;
@@ -27,6 +28,8 @@ public class ImageClassificationTranslator extends ImageTranslator<Classificatio
 
     private String synsetArtifactName;
     private boolean applySoftmax;
+
+    private List<String> synset;
 
     /**
      * Constructs an Image Classification using {@link Builder}.
@@ -41,13 +44,17 @@ public class ImageClassificationTranslator extends ImageTranslator<Classificatio
 
     /** {@inheritDoc} */
     @Override
+    public void prepare(NDManager manager, Model model) throws IOException {
+        synset = model.getArtifact(synsetArtifactName, Utils::readLines);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Classifications processOutput(TranslatorContext ctx, NDList list) throws IOException {
-        Model model = ctx.getModel();
         NDArray probabilitiesNd = list.singletonOrThrow();
         if (applySoftmax) {
             probabilitiesNd = probabilitiesNd.softmax(0);
         }
-        List<String> synset = model.getArtifact(synsetArtifactName, Utils::readLines);
         return new Classifications(synset, probabilitiesNd);
     }
 

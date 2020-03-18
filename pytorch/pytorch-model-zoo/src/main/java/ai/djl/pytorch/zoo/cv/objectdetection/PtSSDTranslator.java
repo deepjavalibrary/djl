@@ -60,17 +60,16 @@ public class PtSSDTranslator extends SingleShotDetectionTranslator {
 
     /** {@inheritDoc} */
     @Override
+    public void prepare(NDManager manager, Model model) throws IOException {
+        classes = model.getArtifact(synsetArtifactName, Utils::readLines);
+        boxRecover = boxRecover(model.getNDManager(), figSize, featSize, steps, scale, aspectRatio);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws IOException {
-        Model model = ctx.getModel();
         double scaleXY = 0.1;
         double scaleWH = 0.2;
-        if (classes == null) {
-            classes = model.getArtifact(synsetArtifactName, Utils::readLines);
-        }
-        if (boxRecover == null) {
-            boxRecover =
-                    boxRecover(model.getNDManager(), figSize, featSize, steps, scale, aspectRatio);
-        }
 
         // kill the 1st prediction as not needed
         NDArray prob = list.get(1).swapAxes(0, 1).softmax(1).get(":, 1:");

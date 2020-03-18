@@ -18,6 +18,7 @@ import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Utils;
 import java.io.IOException;
@@ -50,14 +51,14 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         this.imageHeight = builder.imageHeight;
     }
 
+    @Override
+    public void prepare(NDManager manager, Model model) throws IOException {
+        classes = model.getArtifact(synsetArtifactName, Utils::readLines);
+    }
+
     /** {@inheritDoc} */
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws IOException {
-        Model model = ctx.getModel();
-        if (classes == null) {
-            classes = model.getArtifact(synsetArtifactName, Utils::readLines);
-        }
-
         float[] classIds = list.get(0).toFloatArray();
         float[] probabilities = list.get(1).toFloatArray();
         NDArray boundingBoxes = list.get(2);

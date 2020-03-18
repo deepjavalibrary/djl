@@ -12,6 +12,7 @@
  */
 package ai.djl.mxnet.zoo.nlp.qa;
 
+import ai.djl.Model;
 import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -33,6 +34,8 @@ public class BertQATranslator implements Translator<QAInput, String> {
 
     private List<String> tokens;
 
+    private BertDataParser parser;
+
     BertQATranslator() {}
 
     /** {@inheritDoc} */
@@ -43,8 +46,13 @@ public class BertQATranslator implements Translator<QAInput, String> {
 
     /** {@inheritDoc} */
     @Override
+    public void prepare(NDManager manager, Model model) throws IOException {
+        parser = model.getArtifact("vocab.json", BertDataParser::parse);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDList processInput(TranslatorContext ctx, QAInput input) throws IOException {
-        BertDataParser parser = ctx.getModel().getArtifact("vocab.json", BertDataParser::parse);
         // pre-processing - tokenize sentence
         List<String> tokenQ = BertDataParser.tokenizer(input.getQuestion().toLowerCase());
         List<String> tokenA = BertDataParser.tokenizer(input.getParagraph().toLowerCase());

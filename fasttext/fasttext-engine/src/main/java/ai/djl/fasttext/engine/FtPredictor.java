@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class FtPredictor<I, O> implements Predictor<I, O> {
 
+    private boolean prepared;
     private FtModel model;
     private Translator<I, O> translator;
 
@@ -50,6 +51,10 @@ public class FtPredictor<I, O> implements Predictor<I, O> {
     @SuppressWarnings("PMD.AvoidRethrowingException")
     public O predict(I input) throws TranslateException {
         try {
+            if (!prepared) {
+                translator.prepare(null, model);
+                prepared = true;
+            }
             TranslatorContext ctx = new FtPredictorContext(model, input);
             return translator.processOutput(ctx, null);
         } catch (RuntimeException e) {

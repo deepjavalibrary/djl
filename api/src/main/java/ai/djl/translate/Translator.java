@@ -12,7 +12,10 @@
  */
 package ai.djl.translate;
 
+import ai.djl.Model;
 import ai.djl.inference.Predictor;
+import ai.djl.ndarray.NDManager;
+import java.io.IOException;
 
 /**
  * The {@code Translator} interface provides model pre-processing and postprocessing functionality.
@@ -79,4 +82,13 @@ public interface Translator<I, O> extends PreProcessor<I>, PostProcessor<O> {
     default Batchifier getBatchifier() {
         return Batchifier.STACK;
     }
+
+    /**
+     * Prepares the translator with the manager and model to use.
+     *
+     * @param manager the manager for the translator
+     * @param model the model to translate for
+     * @throws IOException if there is an error reading inputs for preparing the translator
+     */
+    default void prepare(NDManager manager, Model model) throws IOException {}
 }

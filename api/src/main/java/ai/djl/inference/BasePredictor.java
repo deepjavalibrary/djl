@@ -43,6 +43,7 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
     private Translator<I, O> translator;
     private long timestamp;
 
+    protected boolean prepared;
     protected Model model;
     protected NDManager manager;
     Metrics metrics;
@@ -77,6 +78,10 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
     @SuppressWarnings("PMD.AvoidRethrowingException")
     public List<O> batchPredict(List<I> inputs) throws TranslateException {
         try (PredictorContext context = new PredictorContext()) {
+            if (!prepared) {
+                translator.prepare(manager, model);
+                prepared = true;
+            }
             Batchifier batchifier = translator.getBatchifier();
             if (batchifier == null) {
                 List<O> ret = new ArrayList<>(inputs.size());

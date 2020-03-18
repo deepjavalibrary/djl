@@ -19,6 +19,7 @@ import ai.djl.modality.cv.output.Mask;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Transform;
@@ -44,6 +45,8 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
     private int rescaledWidth;
     private int rescaledHeight;
 
+    private List<String> classes;
+
     /**
      * Creates the Instance Segmentation translator from the given builder.
      *
@@ -65,6 +68,12 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
 
     /** {@inheritDoc} */
     @Override
+    public void prepare(NDManager manager, Model model) throws IOException {
+        classes = model.getArtifact(synsetArtifactName, Utils::readLines);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDList processInput(TranslatorContext ctx, BufferedImage image) {
         Pipeline pipeline = getPipeline();
         pipeline.insert(0, null, this);
@@ -76,8 +85,6 @@ public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObje
     /** {@inheritDoc} */
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws IOException {
-        Model model = ctx.getModel();
-        List<String> classes = model.getArtifact(synsetArtifactName, Utils::readLines);
 
         float[] ids = list.get(0).toFloatArray();
         float[] scores = list.get(1).toFloatArray();
