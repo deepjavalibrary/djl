@@ -41,6 +41,16 @@ public interface BoundingBox {
     Point getPoint();
 
     /**
+     * Gets the Intersection over Union (IoU) value between bounding boxes.
+     *
+     * <p>Also known as <a href="https://en.wikipedia.org/wiki/Jaccard_index">Jaccard index</a>
+     *
+     * @param box the bounding box to calculate
+     * @return the IoU value
+     */
+    double getIoU(BoundingBox box);
+
+    /**
      * Draws the bounding box using the {@link Graphics2D}.
      *
      * @param g the Graphics2D object of the image

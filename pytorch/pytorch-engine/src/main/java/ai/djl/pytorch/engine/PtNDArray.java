@@ -207,7 +207,7 @@ public class PtNDArray extends NativeResource implements NDArray {
                 throw new IllegalArgumentException(
                         "get() currently didn't support more that one boolean NDArray");
             }
-            return booleanMask(((NDIndexBooleans) indices.get(0)).getIndex());
+            return booleanMask(((NDIndexBooleans) indices.get(0)).getIndex(), 0);
         }
 
         NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
@@ -244,18 +244,25 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray booleanMask(NDArray index) {
-        if (index.getShape().equals(getShape())) {
-            return JniUtils.booleanMask(this, (PtNDArray) index);
-        } else {
-            throw new UnsupportedOperationException("Not supported for shape mismatch");
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PtNDArray booleanMask(NDArray index, int axis) {
-        throw new UnsupportedOperationException("Not implemented");
+        Shape indexShape = index.getShape();
+        if (indexShape.equals(getShape())) {
+            // Result is flattened since shape is undetermined
+            return JniUtils.booleanMask(this, (PtNDArray) index);
+        } else if (indexShape.equals(getShape().slice(axis))) {
+            // index will be broadcasted by default
+            PtNDArray flattedResult = JniUtils.booleanMask(this, (PtNDArray) index);
+            // Shape recovery
+            Shape remainder = getShape().slice(0, axis);
+            long selectedSize = flattedResult.getShape().size() / remainder.size();
+            return flattedResult.reshape(remainder.addAll(new Shape(selectedSize)));
+        } else {
+            throw new UnsupportedOperationException(
+                    "Not supported for shape not broadcastable "
+                            + indexShape.toString()
+                            + " vs "
+                            + getShape().toString());
+        }
     }
 
     /** {@inheritDoc} */
@@ -1078,7 +1085,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray broadcast(Shape shape) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.broadcast(this, shape);
     }
 
     /** {@inheritDoc} */

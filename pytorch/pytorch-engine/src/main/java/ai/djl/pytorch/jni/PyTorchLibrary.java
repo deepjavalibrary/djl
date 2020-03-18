@@ -77,6 +77,8 @@ final class PyTorchLibrary {
 
     native void torchAddi(Pointer self, Pointer other);
 
+    native Pointer torchExpand(Pointer self, long[] shape);
+
     native Pointer torchSub(Pointer self, Pointer other);
 
     native void torchSubi(Pointer self, Pointer other);

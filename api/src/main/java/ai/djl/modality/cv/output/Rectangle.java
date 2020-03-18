@@ -107,6 +107,20 @@ public class Rectangle implements BoundingBox {
 
     /** {@inheritDoc} */
     @Override
+    public double getIoU(BoundingBox box) {
+        Rectangle rec = (Rectangle) box;
+        // caculate intesection lrtb
+        double left = Math.max(getX(), rec.getX());
+        double top = Math.min(getY(), rec.getY());
+        double right = Math.min(getX() + getWidth(), rec.getX() + rec.getWidth());
+        double bottom = Math.min(getY() + getHeight(), rec.getY() + rec.getHeight());
+        double intersection = (right - left) * (bottom - top);
+        return intersection
+                / (getWidth() * getHeight() + rec.getWidth() * rec.getHeight() - intersection);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void draw(Graphics2D g, int imageWidth, int imageHeight) {
         int x = (int) (getX() * imageWidth);
         int y = (int) (getY() * imageHeight);

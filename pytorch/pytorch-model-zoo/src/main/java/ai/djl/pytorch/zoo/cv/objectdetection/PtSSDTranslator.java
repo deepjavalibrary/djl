@@ -27,6 +27,8 @@ import ai.djl.util.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A {@link PtSSDTranslator} that post-process the {@link NDArray} into {@link DetectedObjects} with
@@ -72,6 +74,11 @@ public class PtSSDTranslator extends SingleShotDetectionTranslator {
 
         // kill the 1st prediction as not needed
         NDArray prob = list.get(1).swapAxes(0, 1).softmax(1).get(":, 1:");
+        prob =
+                NDArrays.stack(
+                        new NDList(
+                                prob.argMax(1).toType(DataType.FLOAT32, false),
+                                prob.max(new int[] {1})));
         NDArray boundingBoxes = list.get(0).swapAxes(0, 1);
         NDArray bbWH = boundingBoxes.get(":, 2:").mul(scaleWH).exp().mul(boxRecover.get(":, 2:"));
         NDArray bbXY =
@@ -81,26 +88,40 @@ public class PtSSDTranslator extends SingleShotDetectionTranslator {
                         .mul(boxRecover.get(":, 2:"))
                         .add(boxRecover.get(":, :2"))
                         .sub(bbWH.mul(0.5f));
-
         boundingBoxes = NDArrays.concat(new NDList(bbXY, bbWH), 1);
-        long[] classIds = prob.argMax(1).toLongArray();
-        float[] probabilities = prob.max(new int[] {1}).toFloatArray();
-
+        // filter the result below the threshold
+        NDArray cutOff = prob.get(1).gte(threshold);
+        boundingBoxes = boundingBoxes.transpose().booleanMask(cutOff, 1).transpose();
+        prob = prob.booleanMask(cutOff, 1);
+        // start categorical filtering
+        long[] order = prob.get(1).argSort().toLongArray();
+        double desiredIoU = 0.45;
+        prob = prob.transpose();
         List<String> retNames = new ArrayList<>();
         List<Double> retProbs = new ArrayList<>();
         List<BoundingBox> retBB = new ArrayList<>();
 
-        for (int i = 0; i < classIds.length; ++i) {
-            long classId = classIds[i];
-            double probability = probabilities[i];
-            // classId starts from 0, -1 means background
-            if (classId >= 0 && probability > threshold) {
-                if (classId >= classes.size()) {
-                    throw new AssertionError("Unexpected index: " + classId);
+        Map<Integer, List<BoundingBox>> recorder = new ConcurrentHashMap<>();
+
+        for (int i = order.length - 1; i >= 0; i--) {
+            long currMaxLoc = order[i];
+            float[] classProb = prob.get(currMaxLoc).toFloatArray();
+            int classId = (int) classProb[0];
+            double probability = classProb[1];
+            double[] boxArr = boundingBoxes.get(currMaxLoc).toDoubleArray();
+            Rectangle rect = new Rectangle(boxArr[0], boxArr[1], boxArr[2], boxArr[3]);
+            List<BoundingBox> boxes = recorder.getOrDefault(classId, new ArrayList<>());
+            boolean belowIoU = true;
+            for (BoundingBox box : boxes) {
+                if (box.getIoU(rect) > desiredIoU) {
+                    belowIoU = false;
+                    break;
                 }
-                String className = classes.get((int) classId);
-                double[] box = boundingBoxes.get(i).toDoubleArray();
-                Rectangle rect = new Rectangle(box[0], box[1], box[2], box[3]);
+            }
+            if (belowIoU) {
+                boxes.add(rect);
+                recorder.put(classId, boxes);
+                String className = classes.get(classId);
                 retNames.add(className);
                 retProbs.add(probability);
                 retBB.add(rect);

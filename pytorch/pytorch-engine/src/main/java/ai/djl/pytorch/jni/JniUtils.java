@@ -234,6 +234,11 @@ public final class JniUtils {
                                 copy));
     }
 
+    public static PtNDArray broadcast(PtNDArray ndArray, Shape shape) {
+        return ndArray.getManager()
+                .create(PyTorchLibrary.LIB.torchExpand(ndArray.getHandle(), shape.getShape()));
+    }
+
     public static PtNDArray slice(PtNDArray ndArray, long dim, long start, long stop, long step) {
         return ndArray.getManager()
                 .create(PyTorchLibrary.LIB.torchSlice(ndArray.getHandle(), dim, start, stop, step));
@@ -294,10 +299,6 @@ public final class JniUtils {
     public static PtNDArray argMin(PtNDArray ndArray, long dim, boolean keepDim) {
         return ndArray.getManager()
                 .create(PyTorchLibrary.LIB.torchArgMin(ndArray.getHandle(), dim, keepDim));
-    }
-
-    public static PtNDArray argSort(PtNDArray ndArray) {
-        return ndArray.getManager().create(PyTorchLibrary.LIB.torchArgSort(ndArray.getHandle()));
     }
 
     public static PtNDArray argSort(PtNDArray ndArray, long dim, boolean keepDim) {
