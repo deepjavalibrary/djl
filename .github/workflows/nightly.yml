@@ -25,6 +25,18 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+      # Enable gradle cache: https://github.com/actions/cache/blob/master/examples.md#java---gradle
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - uses: actions/cache@v1
+        name: Cache gradle wrapper
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.jar') }}
       - name: Build with Gradle
         run: ./gradlew -Dnightly=true build jRR
       - name: API test results
@@ -88,6 +100,18 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+      # Enable gradle cache: https://github.com/actions/cache/blob/master/examples.md#java---gradle
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - uses: actions/cache@v1
+        name: Cache gradle wrapper
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.jar') }}
       - name: Compile JNI
         run: ./gradlew :pytorch:pytorch-native:compileJNI
       - name: Test with Gradle
@@ -108,6 +132,18 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+      # Enable gradle cache: https://github.com/actions/cache/blob/master/examples.md#java---gradle
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - uses: actions/cache@v1
+        name: Cache gradle wrapper
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.jar') }}
       - name: Download compiledJNI Linux
         uses: actions/download-artifact@v1
         with:
