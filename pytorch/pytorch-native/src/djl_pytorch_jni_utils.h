@@ -27,6 +27,8 @@ namespace utils {
 
 static constexpr const char* const POINTER_CLASS = "ai/djl/pytorch/jni/Pointer";
 
+static constexpr const jint RELEASE_MODE = JNI_ABORT;
+
 inline jint GetDTypeFromScalarType(const c10::ScalarType& type) {
   if (torch::kFloat32 == type) {
     return 0;
@@ -127,6 +129,7 @@ inline std::vector<int64_t> GetVecFromJLongArray(JNIEnv* env, jlongArray jarray)
   jlong* jarr = env->GetLongArrayElements(jarray, JNI_FALSE);
   jsize length = env->GetArrayLength(jarray);
   const std::vector<int64_t> vec(jarr, jarr + length);
+  env->ReleaseLongArrayElements(jarray, jarr, RELEASE_MODE);
   return vec;
 }
 
@@ -134,6 +137,7 @@ inline std::vector<int32_t> GetVecFromJIntArray(JNIEnv* env, jintArray jarray) {
   jint* jarr = env->GetIntArrayElements(jarray, JNI_FALSE);
   jsize length = env->GetArrayLength(jarray);
   const std::vector<int32_t> vec(jarr, jarr + length);
+  env->ReleaseIntArrayElements(jarray, jarr, RELEASE_MODE);
   return vec;
 }
 
@@ -141,6 +145,7 @@ inline std::vector<float> GetVecFromJFloatArray(JNIEnv* env, jfloatArray jarray)
   jfloat* jarr = env->GetFloatArrayElements(jarray, JNI_FALSE);
   jsize length = env->GetArrayLength(jarray);
   const std::vector<float> vec(jarr, jarr + length);
+  env->ReleaseFloatArrayElements(jarray, jarr, RELEASE_MODE);
   return vec;
 }
 
@@ -152,11 +157,13 @@ inline c10::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
     device_idx = -1;
   }
   c10::Device c10_device(device_type, device_idx);
+  env->ReleaseIntArrayElements(jdevice, device, RELEASE_MODE);
   return c10_device;
 }
 
 inline torch::TensorOptions CreateTensorOptions(
     JNIEnv* env, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
+  // it gets the device and collect jdevice memory
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
   auto options = torch::TensorOptions()
                      .layout((jlayout == 0) ? torch::kStrided : torch::kSparse)

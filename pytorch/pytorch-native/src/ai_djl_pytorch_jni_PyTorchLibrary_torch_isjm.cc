@@ -37,10 +37,10 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSqueeze__L
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSqueeze__Lai_djl_pytorch_jni_Pointer_2J(
-    JNIEnv* env, jobject jthis, jobject jhandle, jlong jaxis) {
+    JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim) {
   API_BEGIN();
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  const auto* result_ptr = new torch::Tensor(tensor_ptr->squeeze(jaxis));
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->squeeze(jdim));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
@@ -55,12 +55,12 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUnsqueeze(
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchExpand(
-  JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jshape) {
+    JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jshape) {
   API_BEGIN();
-    const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-    const auto* result_ptr = new torch::Tensor(tensor_ptr->expand(shape_vec));
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->expand(shape_vec));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
 

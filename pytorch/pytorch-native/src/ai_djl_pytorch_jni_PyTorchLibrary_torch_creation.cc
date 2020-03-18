@@ -16,9 +16,7 @@
 
 // The file is the implementation for PyTorch tensor creation ops
 
-void DeleteData(void* data) {
-  delete [] static_cast<jbyte*>(data);
-}
+void DeleteData(void* data) { delete[] static_cast<jbyte*>(data); }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(JNIEnv* env, jobject jthis,
     jobject jbuffer, jlongArray jshape, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
