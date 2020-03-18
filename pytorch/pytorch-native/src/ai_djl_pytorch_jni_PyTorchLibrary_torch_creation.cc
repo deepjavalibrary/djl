@@ -16,6 +16,10 @@
 
 // The file is the implementation for PyTorch tensor creation ops
 
+void DeleteData(void* data) {
+  delete [] static_cast<jbyte*>(data);
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(JNIEnv* env, jobject jthis,
     jobject jbuffer, jlongArray jshape, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
   API_BEGIN();
@@ -26,18 +30,21 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(J
   if (jdtype != 8) {
     options = options.dtype(utils::GetScalarTypeFromDType(jdtype));
   }
-  torch::Tensor data = torch::from_blob(env->GetDirectBufferAddress(jbuffer), shape_vec, options);
+  size_t len = env->GetDirectBufferCapacity(jbuffer);
+  auto* data = new jbyte[len];
+  std::memcpy(data, env->GetDirectBufferAddress(jbuffer), len);
+  torch::Tensor result = torch::from_blob(data, shape_vec, DeleteData, options);
   // from_blob doesn't support torch::kSparse and torch::kMkldnn, so explicit cast the type here
   if (jlayout == 1) {
-    data = data.to_sparse();
+    result = result.to_sparse();
   } else if (jlayout == 2) {
-    data = data.to_mkldnn();
+    result = result.to_mkldnn();
   }
   // Don't change device unless data on CPU
   if (!device.is_cpu()) {
-    data = data.to(device);
+    result = result.to(device);
   }
-  const torch::Tensor* tensor_ptr = new torch::Tensor(data);
+  const torch::Tensor* tensor_ptr = new torch::Tensor(result);
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
   API_END();
 }

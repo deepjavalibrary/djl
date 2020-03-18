@@ -102,11 +102,8 @@ public class PtNDManager extends BaseNDManager {
             default:
                 throw new AssertionError("Show never happen");
         }
-        PtNDArray array =
-                JniUtils.createNdFromByteBuffer(
-                        this, buf, shape, dataType, SparseFormat.DENSE, device);
-        attach(array.getUid(), array);
-        return array;
+        return JniUtils.createNdFromByteBuffer(
+                this, buf, shape, dataType, SparseFormat.DENSE, device);
     }
 
     /** {@inheritDoc} */
