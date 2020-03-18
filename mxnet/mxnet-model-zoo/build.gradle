@@ -1,8 +1,25 @@
 group 'ai.djl.mxnet'
 
+repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+}
+
 dependencies {
     api project(":repository")
     api project(":mxnet:mxnet-engine")
+
+    testRuntimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}-SNAPSHOT"
+    testImplementation project(":basicdataset")
+    testImplementation project(":model-zoo")
+    testImplementation(project(":integration")) {
+        exclude group: "org.apache.logging.log4j", module: "log4j-slf4j-impl"
+        exclude group: "ai.djl.pytorch", module: "pytorch-engine"
+        exclude group: "ai.djl.pytorch", module: "pytorch-model-zoo"
+        exclude group: "ai.djl.tensorflow", module: "tensorflow-engine"
+        exclude group: "ai.djl.tensorflow", module: "tensorflow-model-zoo"
+    }
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
