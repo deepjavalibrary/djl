@@ -69,4 +69,4 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.4.0/jnilib --acl public-read
+          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.4.0/jnilib
