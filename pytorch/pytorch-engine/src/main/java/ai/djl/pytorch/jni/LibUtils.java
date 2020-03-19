@@ -53,7 +53,7 @@ public final class LibUtils {
     public static void loadLibrary() {
         String libName = findOverrideLibrary();
         if (libName == null) {
-            String nativeLibDir = findNativeLibraryInClasspath();
+            String nativeLibDir = findNativeLibrary();
             if (nativeLibDir != null) {
                 libName = copyJniLibraryFromClasspath(Paths.get(nativeLibDir));
             } else {
@@ -133,7 +133,7 @@ public final class LibUtils {
         return null;
     }
 
-    private static synchronized String copyJniLibraryFromClasspath(Path nativeDir) {
+    private static String copyJniLibraryFromClasspath(Path nativeDir) {
         String name = System.mapLibraryName(LIB_NAME);
         Properties prop = new Properties();
         try (InputStream stream =
@@ -155,7 +155,7 @@ public final class LibUtils {
         }
     }
 
-    private static synchronized String findNativeLibraryInClasspath() {
+    private static synchronized String findNativeLibrary() {
         List<URL> urls;
         try {
             urls =

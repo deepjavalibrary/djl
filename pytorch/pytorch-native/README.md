@@ -14,7 +14,7 @@ apt install cmake g++
 
 ## Build
 
-Use the following command to build pytorch JNI library:
+Use the following task to build pytorch JNI library:
 
 ### Mac/Linux
 ```
@@ -25,3 +25,4 @@ Use the following command to build pytorch JNI library:
 ```
 gradlew compileJNI
 ```
+This task will send a Jni library copy to `pytorch-engine` model to test locally.
