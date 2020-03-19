@@ -53,7 +53,9 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
 
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
-        classes = model.getArtifact(synsetArtifactName, Utils::readLines);
+        if (classes == null) {
+            classes = model.getArtifact(synsetArtifactName, Utils::readLines);
+        }
     }
 
     /** {@inheritDoc} */
