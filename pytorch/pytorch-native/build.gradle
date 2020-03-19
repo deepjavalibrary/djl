@@ -11,6 +11,18 @@ boolean isRelease = project.hasProperty("release") || project.hasProperty("stagi
 version = VERSION + (isRelease ? "" : "-SNAPSHOT")
 def BINARY_ROOT = "${project.buildDir}/download"
 
+static def getSystemOs() {
+    if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
+        return "win"
+    } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
+        return "osx"
+    } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+        return "linux"
+    } else {
+        throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
+    }
+}
+
 task compileJNI {
     doFirst {
         exec {
@@ -21,7 +33,8 @@ task compileJNI {
             }
         }
         def engineDir = "${project.parent.projectDir}/pytorch-engine"
-        def publishDir = "${engineDir}/build/jnilib/native/jni"
+        def classifier = "${getSystemOs()}-x86_64"
+        def publishDir = "${engineDir}/build/classes/java/main/jnilib/native/${classifier}"
         copy {
             def tree = fileTree(project.buildDir)
             tree.include("**/libdjl_torch.*", "**/djl_torch.dll")
@@ -31,11 +44,11 @@ task compileJNI {
         def versionName = String.format("${project.parent.version}-%s", new Date().format('yyyyMMdd'))
         def propFile = file("${publishDir}/pytorch.properties")
         propFile.text = "version=${versionName}\n"
-        // for ide testing
-        def testDir = "${engineDir}/build/classes/java/main/native/jni"
+        // for nightly ci
+        def ciDir = "${project.buildDir}/jnilib/${classifier}/native/jni"
         copy {
             from publishDir
-            into testDir
+            into ciDir
         }
     }
 }

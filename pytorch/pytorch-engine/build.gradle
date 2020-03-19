@@ -10,10 +10,31 @@ dependencies {
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 
-jar {
-    includeEmptyDirs = false
-    // assume all djl_torch.* binary is here
-    from "${project.buildDir}/jnilib"
+processResources {
+    doLast {
+        def url = "https://djl-ai.s3.amazonaws.com/publish/pytorch-${pytorch_version}/jnilib"
+        def files = ["pytorch.properties-linux": "linux-x86_64",
+                     "pytorch.properties-osx": "osx-x86_64",
+                     "pytorch.properties-win": "win-x86_64",
+                     "libdjl_torch.so"   : "linux-x86_64",
+                     "libdjl_torch.dylib": "osx-x86_64",
+                     "djl_torch.dll"     : "win-x86_64"]
+        def classesDir = "${project.buildDir}/classes/java/main/jnilib"
+        files.each { entry ->
+            def name = entry.key
+            if (name.startsWith("pytorch.properties")) {
+                name = "pytorch.properties"
+            }
+            def classifier = entry.value
+            def downloadPath = new URL("${url}/${classifier}/native/jni/${name}")
+            def file = file("${classesDir}/native/${classifier}/${name}")
+            if (!file.exists()) {
+                project.logger.lifecycle("Downloading ${url}/${classifier}/native/jni/${name}")
+                file.getParentFile().mkdirs()
+                downloadPath.withInputStream { i -> file.withOutputStream { it << i } }
+            }
+        }
+    }
 }
 
 

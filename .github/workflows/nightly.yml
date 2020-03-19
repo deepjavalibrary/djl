@@ -83,7 +83,7 @@ jobs:
           name: repository
           path: repository/build/reports
 
-  build-pytorch-jni:
+  test-pytorch:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -102,20 +102,12 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Compile JNI
-        run: ./gradlew :pytorch:pytorch-native:compileJNI
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
-      - name: Upload compiled jni library
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: jnilib-${{ runner.os }}
-          path: pytorch/pytorch-engine/build/jnilib
 
   publish:
     runs-on: ubuntu-18.04
-    needs: [build, build-pytorch-jni]
+    needs: [build, test-pytorch]
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK 1.8
@@ -129,21 +121,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Download compiledJNI Linux
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-Linux
-          path: pytorch/pytorch-engine/build/jnilib
-      - name: Download compiledJNI Mac
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-macOS
-          path: pytorch/pytorch-engine/build/jnilib
-      - name: Download compiledJNI Windows
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-Windows
-          path: pytorch/pytorch-engine/build/jnilib
       - name: Publish to snapshot repository
         run: ./gradlew publish -Psnapshot
         env:

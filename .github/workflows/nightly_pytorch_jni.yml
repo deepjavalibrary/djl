@@ -10,7 +10,7 @@ on:
   repository_dispatch:
     types: [nightly-jni-build]
   schedule:
-    - cron:  '0 10 * * *'
+    - cron:  '0 5 * * *'
 
 jobs:
   build-pytorch-jni:
@@ -35,32 +35,6 @@ jobs:
         run: ./gradlew :pytorch:pytorch-native:compileJNI
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
-      - name: Upload compiled jni library
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: jnilib-${{ runner.os }}
-          path: pytorch/pytorch-engine/build/jnilib
-  publish:
-    runs-on: ubuntu-18.04
-    needs: [build-pytorch-jni]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Download compiledJNI Linux
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-Linux
-          path: jnilib/linux-x86_64
-      - name: Download compiledJNI Mac
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-macOS
-          path: jnilib/osx-x86_64
-      - name: Download compiledJNI Windows
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-Windows
-          path: jnilib/win-x86_64
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -69,4 +43,4 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.4.0/jnilib
+          aws s3 sync pytorch/pytorch-native/build/jnilib s3://djl-ai/publish/pytorch-1.4.0/jnilib

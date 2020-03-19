@@ -135,9 +135,11 @@ public final class LibUtils {
 
     private static String copyJniLibraryFromClasspath(Path nativeDir) {
         String name = System.mapLibraryName(LIB_NAME);
+        String classifier = Platform.fromSystem().getClassifier();
         Properties prop = new Properties();
         try (InputStream stream =
-                LibUtils.class.getResourceAsStream("/native/jni/pytorch.properties")) {
+                LibUtils.class.getResourceAsStream(
+                        "/jnilib/native/" + classifier + "/pytorch.properties")) {
             prop.load(stream);
         } catch (IOException e) {
             throw new IllegalStateException("Cannot find pytorch property file", e);
@@ -147,7 +149,8 @@ public final class LibUtils {
         if (Files.exists(path)) {
             return path.toAbsolutePath().toString();
         }
-        try (InputStream stream = LibUtils.class.getResourceAsStream("/native/jni/" + name)) {
+        try (InputStream stream =
+                LibUtils.class.getResourceAsStream("/jnilib/native/" + classifier + "/" + name)) {
             Files.copy(stream, path);
             return path.toAbsolutePath().toString();
         } catch (IOException e) {
