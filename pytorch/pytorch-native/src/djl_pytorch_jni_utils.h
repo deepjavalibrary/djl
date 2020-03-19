@@ -105,6 +105,7 @@ inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandle
   }
   env->DeleteLocalRef(jexception);
   env->DeleteLocalRef(cls);
+  env->DeleteLocalRef(jhandles);
   return std::move(vec);
 }
 

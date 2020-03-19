@@ -47,6 +47,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
         utils::GetPointerFromJHandle<const torch::Tensor>(env, env->GetObjectArrayElement(tensor_ptrs, i));
     ivalue_vec.emplace_back(*tensor_ptr);
   }
+  env->DeleteLocalRef(tensor_ptrs);
   auto* module_ptr = utils::GetPointerFromJHandle<torch::jit::script::Module>(env, module_handle);
   const auto* result_ptr = new c10::IValue(module_ptr->forward(ivalue_vec));
   return utils::CreatePointer<c10::IValue>(env, result_ptr);

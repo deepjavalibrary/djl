@@ -28,7 +28,7 @@ final class PyTorchLibrary {
 
     native long[] torchSizes(Pointer handle);
 
-    native ByteBuffer torchDataPtr(Pointer handle);
+    native byte[] torchDataPtr(Pointer handle);
 
     native int torchDType(Pointer handle);
 

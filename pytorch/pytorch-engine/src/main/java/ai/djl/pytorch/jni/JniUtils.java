@@ -714,9 +714,8 @@ public final class JniUtils {
         if (!ndArray.getDevice().equals(Device.cpu())) {
             ndArray = ndArray.toDevice(Device.cpu(), false);
         }
-        ByteBuffer bb = PyTorchLibrary.LIB.torchDataPtr(ndArray.getHandle());
-        bb.order(ByteOrder.nativeOrder());
-        return bb;
+        return ByteBuffer.wrap(PyTorchLibrary.LIB.torchDataPtr(ndArray.getHandle()))
+                .order(ByteOrder.nativeOrder());
     }
 
     public static void deleteNdArray(Pointer handle) {
