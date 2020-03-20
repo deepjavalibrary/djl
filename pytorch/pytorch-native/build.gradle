@@ -11,44 +11,67 @@ boolean isRelease = project.hasProperty("release") || project.hasProperty("stagi
 version = VERSION + (isRelease ? "" : "-SNAPSHOT")
 def BINARY_ROOT = "${project.buildDir}/download"
 
-static def getSystemOs() {
-    if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
-        return "win"
-    } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
-        return "osx"
-    } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
-        return "linux"
-    } else {
-        throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
+def downloadBuild(String os, String flavor) {
+    exec {
+        if (os == "win") {
+            commandLine "${project.projectDir}/build.cmd", "${flavor}"
+        } else {
+            commandLine 'bash', 'build.sh', "${flavor}"
+        }
+    }
+    def engineDir = "${project.parent.projectDir}/pytorch-engine"
+    def classifier = "${os}-x86_64"
+    def publishDir = "${engineDir}/build/classes/java/main/jnilib/${classifier}/${flavor}"
+    copy {
+        def tree = fileTree(project.buildDir)
+        tree.include("**/libdjl_torch.*", "**/djl_torch.dll")
+        from tree.files
+        into publishDir
+    }
+    def versionName = String.format("${project.parent.version}-%s", new Date().format('yyyyMMdd'))
+    def propFile = file("${publishDir}/pytorch.properties")
+    propFile.text = "version=${versionName}\n"
+    // for nightly ci
+    def ciDir = "${project.buildDir}/jnilib/${classifier}/${flavor}"
+    copy {
+        from publishDir
+        into ciDir
+    }
+}
+
+
+task releaseJNI {
+    doFirst {
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
+            downloadBuild("win", "cpu")
+            delete "${project.projectDir}/libtorch"
+            downloadBuild("win", "cu92")
+            delete "${project.projectDir}/libtorch"
+            downloadBuild("win", "cu101")
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
+            downloadBuild("osx", "cpu")
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            downloadBuild("linux", "cpu")
+            delete "${project.projectDir}/libtorch"
+            downloadBuild("linux", "cu92")
+            delete "${project.projectDir}/libtorch"
+            downloadBuild("linux", "cu101")
+        } else {
+            throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
+        }
     }
 }
 
 task compileJNI {
     doFirst {
-        exec {
-            if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
-                commandLine "${project.projectDir}/build.cmd"
-            } else {
-                commandLine 'bash', 'build.sh'
-            }
-        }
-        def engineDir = "${project.parent.projectDir}/pytorch-engine"
-        def classifier = "${getSystemOs()}-x86_64"
-        def publishDir = "${engineDir}/build/classes/java/main/jnilib/native/${classifier}"
-        copy {
-            def tree = fileTree(project.buildDir)
-            tree.include("**/libdjl_torch.*", "**/djl_torch.dll")
-            from tree.files
-            into publishDir
-        }
-        def versionName = String.format("${project.parent.version}-%s", new Date().format('yyyyMMdd'))
-        def propFile = file("${publishDir}/pytorch.properties")
-        propFile.text = "version=${versionName}\n"
-        // for nightly ci
-        def ciDir = "${project.buildDir}/jnilib/${classifier}/native/jni"
-        copy {
-            from publishDir
-            into ciDir
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
+            downloadBuild("win", "cpu")
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
+            downloadBuild("osx", "cpu")
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            downloadBuild("linux", "cpu")
+        } else {
+            throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
         }
     }
 }

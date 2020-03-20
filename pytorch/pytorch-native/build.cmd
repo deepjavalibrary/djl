@@ -5,7 +5,14 @@
 @rem choco install jdk8 -y
 
 set FILEPATH="libtorch"
-set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-1.4.0.zip"
+if %1 == "cpu" (
+    set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-1.4.0.zip"
+) else if %1 == "cu92" (
+    set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu92/libtorch-win-shared-with-deps-1.4.0.zip"
+) else if %1 == "cu101" (
+    set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu101/libtorch-win-shared-with-deps-1.4.0.zip"
+)
+
 
 if exist %FILEPATH% (
     echo Found %FILEPATH%

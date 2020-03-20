@@ -33,8 +33,8 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Workaround for startup run
         run: ./gradlew jar clean
-      - name: Compile JNI
-        run: ./gradlew :pytorch:pytorch-native:compileJNI
+      - name: Release JNI prep
+        run: ./gradlew :pytorch:pytorch-native:releaseJNI
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Upload compiled jni library
