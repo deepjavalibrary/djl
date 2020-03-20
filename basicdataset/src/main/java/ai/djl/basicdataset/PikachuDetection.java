@@ -43,7 +43,7 @@ import java.util.Map;
 
 /** Pikachu image detection dataset that contains multiple Pikachus in each image. */
 public class PikachuDetection extends RandomAccessDataset implements ZooDataset {
-
+    private static final String VERSION = "1.0";
     private static final String ARTIFACT_ID = "pikachu";
     private static final Gson GSON =
             new GsonBuilder()
@@ -118,7 +118,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     /** {@inheritDoc} */
     @Override
     public void useDefaultArtifact() throws IOException {
-        artifact = repository.resolve(getMrl(), "1.0", null);
+        artifact = repository.resolve(getMrl(), VERSION, null);
     }
 
     /** {@inheritDoc} */

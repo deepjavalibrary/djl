@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Pipeline;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -138,7 +139,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
             try {
                 int progress = progressCounter.getAndAdd(indices.size());
                 return fetch(indices, progress);
-            } catch (IOException e) {
+            } catch (IOException | TranslateException e) {
                 logger.error(e.getMessage());
                 throw new IllegalStateException("Data loading failed", e);
             }
@@ -155,7 +156,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
         }
     }
 
-    private Batch fetch(List<Long> indices, int progress) throws IOException {
+    private Batch fetch(List<Long> indices, int progress) throws IOException, TranslateException {
         NDManager subManager = manager.newSubManager();
         int batchSize = indices.size();
         NDList[] data = new NDList[batchSize];
@@ -218,7 +219,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
 
         /** {@inheritDoc} */
         @Override
-        public Batch call() throws IOException {
+        public Batch call() throws IOException, TranslateException {
             return fetch(indices, progress);
         }
     }

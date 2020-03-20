@@ -12,7 +12,6 @@
  */
 package ai.djl.modality.nlp;
 
-import ai.djl.ModelException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 
@@ -59,9 +58,9 @@ public interface WordEmbedding {
      * @param manager the manager for the embedding array
      * @param word the word to embed
      * @return the embedded word
-     * @throws ModelException if there is an error while trying to embed
+     * @throws EmbeddingException if there is an error while trying to embed
      */
-    default NDArray embedWord(NDManager manager, String word) throws ModelException {
+    default NDArray embedWord(NDManager manager, String word) throws EmbeddingException {
         return embedWord(preprocessWordToEmbed(manager, word));
     }
 
@@ -70,9 +69,9 @@ public interface WordEmbedding {
      *
      * @param word the word to embed
      * @return the embedded word
-     * @throws ModelException if there is an error while trying to embed
+     * @throws EmbeddingException if there is an error while trying to embed
      */
-    NDArray embedWord(NDArray word) throws ModelException;
+    NDArray embedWord(NDArray word) throws EmbeddingException;
 
     /**
      * Returns the closest matching word for a given embedding.

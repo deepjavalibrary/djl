@@ -12,8 +12,8 @@
  */
 package ai.djl.basicmodelzoo.nlp.embedding;
 
-import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
+import ai.djl.modality.nlp.EmbeddingException;
 import ai.djl.modality.nlp.WordEmbedding;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -63,11 +63,11 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
     }
 
     @Override
-    public NDArray embedWord(NDArray word) throws ModelException {
+    public NDArray embedWord(NDArray word) throws EmbeddingException {
         try {
             return predictor.predict(new NDList(word)).singletonOrThrow();
         } catch (TranslateException e) {
-            throw new ModelException("Could not embed word", e);
+            throw new EmbeddingException("Could not embed word", e);
         }
     }
 

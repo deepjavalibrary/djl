@@ -14,11 +14,11 @@ package ai.djl.mxnet.integration.modality.nlp;
 
 import ai.djl.ModelException;
 import ai.djl.basicmodelzoo.nlp.embedding.ModelZooWordEmbedding;
+import ai.djl.modality.nlp.EmbeddingException;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
 public class WordEmbeddingTest {
 
     @Test
-    public void testGlove() throws IOException, ModelException, TranslateException {
+    public void testGlove() throws IOException, ModelException, EmbeddingException {
         try (ZooModel<NDList, NDList> model = MxModelZoo.GLOVE.loadModel()) {
             try (ModelZooWordEmbedding wordEmbedding = new ModelZooWordEmbedding(model)) {
                 NDManager manager = model.getNDManager();
