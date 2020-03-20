@@ -38,11 +38,11 @@ jobs:
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Upload compiled jni library
-          uses: actions/upload-artifact@v1
-          if: always()
-          with:
-            name: jnilib-${{ runner.os }}
-            path: pytorch/pytorch-native/build/jnilib
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: jnilib-${{ runner.os }}
+          path: pytorch/pytorch-native/build/jnilib
   publish:
     runs-on: ubuntu-18.04
     needs: [build-pytorch-jni]
