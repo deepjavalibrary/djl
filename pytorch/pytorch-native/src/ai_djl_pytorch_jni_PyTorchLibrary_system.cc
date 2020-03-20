@@ -17,6 +17,16 @@
 
 // The file is the implementation for PyTorch system-wide operations
 
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetNumInteropThreads(
+    JNIEnv* env, jobject jthis, jint jthreads) {
+  torch::set_num_interop_threads(jthreads);
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetNumThreads(
+    JNIEnv* env, jobject jthis, jint jthreads) {
+  torch::set_num_threads(jthreads);
+}
+
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchManualSeed(JNIEnv* env, jobject jthis, jlong jseed) {
   torch::manual_seed(jseed);
 }

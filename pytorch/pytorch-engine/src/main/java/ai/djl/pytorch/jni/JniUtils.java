@@ -57,6 +57,14 @@ public final class JniUtils {
         }
     }
 
+    public static void setNumInteropThreads(int threads) {
+        PyTorchLibrary.LIB.torchSetNumInteropThreads(threads);
+    }
+
+    public static void setNumThreads(int threads) {
+        PyTorchLibrary.LIB.torchSetNumThreads(threads);
+    }
+
     public static Set<String> getFeatures() {
         if (configs != null) {
             return configs;
