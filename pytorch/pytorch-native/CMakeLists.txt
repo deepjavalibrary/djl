@@ -26,6 +26,11 @@ set(SOURCE_FILES
 add_library(djl_torch SHARED ${SOURCE_FILES})
 target_link_libraries(djl_torch "${TORCH_LIBRARIES}")
 set_property(TARGET djl_torch PROPERTY CXX_STANDARD 14)
+# We have to kill the default rpath and use current dir
+set(CMAKE_SKIP_RPATH TRUE)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set_target_properties(djl_torch PROPERTIES LINK_FLAGS "-Wl,-rpath,$ORIGIN")
+endif ()
 
 # The following code block is suggested to be used on Windows.
 # According to https://github.com/pytorch/pytorch/issues/25457,

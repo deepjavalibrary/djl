@@ -22,6 +22,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: Workaround for startup run
+        run: ./gradlew jar clean
       - name: Compile JNI
         run: ./gradlew :pytorch:pytorch-native:compileJNI
       - name: Test with Gradle

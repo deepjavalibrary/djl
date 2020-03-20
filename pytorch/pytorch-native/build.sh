@@ -31,7 +31,6 @@ cmake -DCMAKE_PREFIX_PATH=libtorch ..
 cmake --build . --config Release -- -j "${NUM_PROC}"
 
 if [[ $PLATFORM == 'darwin' ]]; then
-  install_name_tool -delete_rpath "${WORK_DIR}/libtorch/lib" libdjl_torch.dylib
   install_name_tool -add_rpath  @loader_path libdjl_torch.dylib
 fi
 
