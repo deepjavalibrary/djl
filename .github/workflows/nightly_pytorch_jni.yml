@@ -34,7 +34,7 @@ jobs:
       - name: Workaround for startup run
         run: ./gradlew jar clean
       - name: Release JNI prep
-        run: ./gradlew :pytorch:pytorch-native:releaseJNI
+        run: ./gradlew :pytorch:pytorch-native:compileJNI
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Upload compiled jni library
@@ -42,7 +42,7 @@ jobs:
         if: always()
         with:
           name: jnilib-${{ runner.os }}
-          path: pytorch/pytorch-native/build/jnilib
+          path: pytorch/pytorch-native/jnilib
   publish:
     runs-on: ubuntu-18.04
     needs: [build-pytorch-jni]

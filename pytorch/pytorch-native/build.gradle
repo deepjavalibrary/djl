@@ -32,30 +32,39 @@ def downloadBuild(String os, String flavor) {
     def propFile = file("${publishDir}/pytorch.properties")
     propFile.text = "version=${versionName}\n"
     // for nightly ci
-    def ciDir = "${project.buildDir}/jnilib/${classifier}/${flavor}"
+    def ciDir = "${project.projectDir}/jnilib/${classifier}/${flavor}"
     copy {
         from publishDir
         into ciDir
     }
 }
 
+def cleanBuild() {
+    delete "${project.projectDir}/build"
+    delete "${project.projectDir}/libtorch"
+}
+
 
 task releaseJNI {
     doFirst {
+        // You have to use an environment with CUDA persets for Linux and Windows
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
             downloadBuild("win", "cpu")
-            delete "${project.projectDir}/libtorch"
+            cleanBuild()
             downloadBuild("win", "cu92")
-            delete "${project.projectDir}/libtorch"
+            cleanBuild()
             downloadBuild("win", "cu101")
+            cleanBuild()
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
             downloadBuild("osx", "cpu")
+            cleanBuild()
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
             downloadBuild("linux", "cpu")
-            delete "${project.projectDir}/libtorch"
+            cleanBuild()
             downloadBuild("linux", "cu92")
-            delete "${project.projectDir}/libtorch"
+            cleanBuild()
             downloadBuild("linux", "cu101")
+            cleanBuild()
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
         }
@@ -72,6 +81,18 @@ task compileJNI {
             downloadBuild("linux", "cpu")
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
+        }
+    }
+}
+
+task compileJNIGPU {
+    doFirst {
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
+            downloadBuild("win", "cu101")
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            downloadBuild("linux", "cu101")
+        } else {
+            throw new IllegalStateException("Architecture not supported: " + System.properties['os.name'])
         }
     }
 }

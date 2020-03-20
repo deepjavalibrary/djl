@@ -12,7 +12,7 @@ You need to install `cmake` and C++ compiler on your machine in order to build
 apt install cmake g++
 ```
 
-## Build
+## CPU Build
 
 Use the following task to build pytorch JNI library:
 
@@ -26,3 +26,23 @@ Use the following task to build pytorch JNI library:
 gradlew compileJNI
 ```
 This task will send a Jni library copy to `pytorch-engine` model to test locally.
+
+## GPU build
+Note: PyTorch C++ library requires CUDA path set in the system.
+
+Use the following task to build pytorch JNI library for GPU:
+
+### Mac/Linux
+```
+./gradlew compileJNIGPU
+```
+
+## Windows
+```
+gradlew compileJNIGPU
+```
+
+The task will build CUDA 10.1 by default, you can change the flavor in `compileJNIGPU` to `cu92` to use CUDA 9.2.
+```
+downloadBuild("win", "cu92")
+```
