@@ -127,6 +127,7 @@ public abstract class ImageClassificationModelLoader
                     .optFlag(NDImageUtils.Flag.valueOf(flag))
                     .setPipeline(pipeline)
                     .setSynsetArtifactName("synset.txt")
+                    .optApplySoftmax(true)
                     .build();
         }
     }

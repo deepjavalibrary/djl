@@ -402,7 +402,10 @@ public interface NDArrayEx {
         if (dim == 3) {
             array = array.squeeze(0);
         }
-        return array;
+        // The network by default takes float32
+        return (!array.getDataType().equals(DataType.FLOAT32))
+                ? array.toType(DataType.FLOAT32, false)
+                : array;
     }
 
     NDArray resize(int width, int height);
