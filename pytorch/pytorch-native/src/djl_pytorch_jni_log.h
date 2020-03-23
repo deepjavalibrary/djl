@@ -23,7 +23,7 @@ static constexpr const char* const JNIUTILS_CLASS = "ai/djl/pytorch/jni/JniUtils
 
 class Log {
  public:
-  Log(JNIEnv* env);
+  explicit Log(JNIEnv* env);
   void error(const std::string& message);
 
  private:

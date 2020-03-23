@@ -16,6 +16,7 @@ import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.transform.CenterCrop;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -116,7 +117,8 @@ public abstract class ImageClassificationModelLoader
             String flag = (String) arguments.getOrDefault("flag", NDImageUtils.Flag.COLOR.name());
 
             Pipeline pipeline = new Pipeline();
-            pipeline.add(new Resize(width, height))
+            pipeline.add(new Resize(256, 256))
+                    .add(new CenterCrop(width, height))
                     .add(new ToTensor())
                     .add(
                             new Normalize(
