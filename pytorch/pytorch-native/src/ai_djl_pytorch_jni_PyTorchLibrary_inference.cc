@@ -19,6 +19,11 @@
 
 // The file is the implementation for PyTorch inference operations
 
+struct JITCallGuard {
+  // disable autograd by default
+  torch::autograd::AutoGradMode no_autograd_guard{false};
+};
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad(
     JNIEnv* env, jobject jthis, jstring jpath, jintArray jarray) {
   API_BEGIN();
@@ -49,7 +54,12 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
   }
   env->DeleteLocalRef(tensor_ptrs);
   auto* module_ptr = utils::GetPointerFromJHandle<torch::jit::script::Module>(env, module_handle);
-  const auto* result_ptr = new c10::IValue(module_ptr->forward(ivalue_vec));
+  auto output = [&]() {
+    // disable autograd
+    JITCallGuard guard;
+    return module_ptr->forward(ivalue_vec);
+  }();
+  const auto* result_ptr = new c10::IValue(output);
   return utils::CreatePointer<c10::IValue>(env, result_ptr);
   API_END();
 }
