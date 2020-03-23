@@ -11,31 +11,32 @@ dependencies {
 }
 
 processResources {
-//    doLast {
-//        def url = "https://djl-ai.s3.amazonaws.com/publish/pytorch-${pytorch_version}/jnilib"
-//        def files = ["linux-cpu" : ["pytorch.properties", "libdjl_torch.so"],
+    doLast {
+        def url = "https://djl-ai.s3.amazonaws.com/publish/pytorch-${pytorch_version}/jnilib"
+        def files = ["linux-cpu": ["pytorch.properties", "libdjl_torch.so"],
+//                     "win-cu92" : ["pytorch.properties", "djl_torch.dll"],
+//                     "win-cu101" : ["pytorch.properties", "djl_torch.dll"],
 //                     "linux-cu92" : ["pytorch.properties", "libdjl_torch.so"],
 //                     "linux-cu101" : ["pytorch.properties", "libdjl_torch.so"],
-//                     "osx-cpu" : ["pytorch.properties", "libdjl_torch.dylib"],
-//                     "win-cpu" : ["pytorch.properties", "djl_torch.dll"],
-//                     "win-cu92" : ["pytorch.properties", "djl_torch.dll"],
-//                     "win-cu101" : ["pytorch.properties", "djl_torch.dll"]]
-//        def classesDir = "${project.buildDir}/classes/java/main/jnilib"
-//        files.each { entry ->
-//            def nameList = entry.key.split("-")
-//            def flavor = nameList[1]
-//            def classifier = "${nameList[0]}-x86_64"
-//            entry.value.each { name ->
-//                def downloadPath = new URL("${url}/${classifier}/${flavor}/${name}")
-//                def file = file("${classesDir}/${classifier}/${flavor}/${name}")
-//                if (!file.exists()) {
-//                    project.logger.lifecycle("${url}/${classifier}/${flavor}/${name}")
-//                    file.getParentFile().mkdirs()
-//                    downloadPath.withInputStream { i -> file.withOutputStream { it << i } }
-//                }
-//            }
-//        }
-//    }
+                     "osx-cpu"  : ["pytorch.properties", "libdjl_torch.dylib"],
+                     "win-cpu"  : ["pytorch.properties", "djl_torch.dll"],
+        ]
+        def classesDir = "${project.buildDir}/classes/java/main/jnilib"
+        files.each { entry ->
+            def nameList = entry.key.split("-")
+            def flavor = nameList[1]
+            def classifier = "${nameList[0]}-x86_64"
+            entry.value.each { name ->
+                def downloadPath = new URL("${url}/${classifier}/${flavor}/${name}")
+                def file = file("${classesDir}/${classifier}/${flavor}/${name}")
+                if (!file.exists()) {
+                    project.logger.lifecycle("${url}/${classifier}/${flavor}/${name}")
+                    file.getParentFile().mkdirs()
+                    downloadPath.withInputStream { i -> file.withOutputStream { it << i } }
+                }
+            }
+        }
+    }
 }
 
 
