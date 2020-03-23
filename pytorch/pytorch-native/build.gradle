@@ -171,9 +171,17 @@ task downloadPyTorchNativeLib() {
                 from zipTree(file)
                 into outputDir
             }
+            // CPU dependencies
             copy {
                 from("${outputDir}/libtorch/lib/") {
-                    include "libc10.*", "c10.dll", "libc10_cuda.so", "c10_cuda.dll", "libiomp5*.*", "libcudart*.*", "*nvToolsExt*.*", "libgomp*.*", "libtorch.*", "cudnn*.dll", "torch.dll"
+                    include "libc10.*", "c10.dll", "libiomp5*.*", "libgomp*.*", "libtorch.*", "torch.dll"
+                }
+                into("${outputDir}/native/lib")
+            }
+            // GPU dependencies
+            copy {
+                from("${outputDir}/libtorch/lib/") {
+                    include "libc10_cuda.so", "c10_cuda.dll", "libcaffe2_nvrtc.so", "libnvrtc*.so.*", "libcudart*.*", "*nvToolsExt*.*", "cudnn*.dll", "caffe2_nvrtc.dll", "nvrtc64*.dll"
                 }
                 into("${outputDir}/native/lib")
             }
