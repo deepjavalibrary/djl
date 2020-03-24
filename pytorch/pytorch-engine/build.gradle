@@ -43,3 +43,15 @@ processResources {
 test {
     environment "PATH", "src/test/bin:${environment.PATH}"
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "PyTorch Engine Adapter"
+                description = "PyTorch Engine Adapter for DJL"
+                url = "http://www.djl.ai/pytorch/${project.name}"
+            }
+        }
+    }
+}

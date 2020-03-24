@@ -18,3 +18,15 @@ task syncS3(type: Exec) {
         return standardOutput.toString()
     }
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "PyTorch model zoo"
+                description = "PyTorch model zoo for DJL"
+                url = "http://www.djl.ai/pytorch/${project.name}"
+            }
+        }
+    }
+}
