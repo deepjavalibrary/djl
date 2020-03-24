@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.integration.util;
+package ai.djl.testing;
 
 import java.io.File;
 import java.io.IOException;

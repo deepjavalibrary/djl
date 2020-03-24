@@ -14,7 +14,6 @@ package ai.djl.mxnet.integration;
 
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.integration.util.Assertions;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -26,6 +25,7 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.ParameterStore;

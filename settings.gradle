@@ -17,3 +17,5 @@ include ':pytorch:pytorch-native'
 include ':fasttext:fasttext-engine'
 
 project(":examples").buildFileName = "djl.gradle"
+include 'testing'
+

@@ -12,10 +12,10 @@
  */
 package ai.djl.integration.tests.ndarray;
 
-import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.Assertions;
 import java.util.stream.DoubleStream;
 import org.testng.Assert;
 import org.testng.annotations.Test;

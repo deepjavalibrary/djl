@@ -14,13 +14,13 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.ParameterList;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv2D;
 import ai.djl.nn.norm.BatchNorm;
+import ai.djl.testing.Assertions;
 import ai.djl.training.initializer.XavierInitializer;
 import java.io.IOException;
 import java.nio.file.Paths;

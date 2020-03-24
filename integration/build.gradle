@@ -14,6 +14,7 @@ dependencies {
     api "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
     api project(":basicdataset")
     api project(":model-zoo")
+    api project(":testing")
     api("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }

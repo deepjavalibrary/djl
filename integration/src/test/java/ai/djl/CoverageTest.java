@@ -14,8 +14,8 @@ package ai.djl;
 
 import ai.djl.basicdataset.Cifar10;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
-import ai.djl.integration.util.CoverageUtils;
 import ai.djl.repository.Repository;
+import ai.djl.testing.CoverageUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import org.testng.annotations.Test;

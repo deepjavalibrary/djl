@@ -12,12 +12,12 @@
  */
 package ai.djl.integration.tests.modality.cv;
 
-import ai.djl.integration.util.Assertions;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.Assertions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

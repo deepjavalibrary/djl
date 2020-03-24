@@ -10,6 +10,7 @@
     <suppress checks="(MissingJavadocMethod|MissingJavadocType)" files="src[\\/](test|it)[\\/].*"/>
 
     <!--    Suppress javadoc in modules-->
+    <suppress checks="(MissingJavadocMethod|MissingJavadocType)" files="ai[\\/]djl[\\/]testing[\\/]"/>
     <suppress checks="(MissingJavadocMethod|MissingJavadocType)" files="ai[\\/]djl[\\/]integration[\\/]"/>
     <suppress checks="(MissingJavadocMethod|MissingJavadocType)" files="ai[\\/]djl[\\/]examples[\\/]"/>
     <suppress checks="(MissingJavadocMethod|MissingJavadocType)" files="ai[\\/]djl[\\/]mxnet[\\/]jnarator[\\/]"/>

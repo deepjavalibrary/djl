@@ -12,11 +12,11 @@
  */
 package ai.djl.integration.tests.training;
 
-import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.Assertions;
 import ai.djl.training.loss.Loss;
 import org.testng.Assert;
 import org.testng.annotations.Test;

@@ -14,7 +14,6 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.Device;
 import ai.djl.Model;
-import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -22,6 +21,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.core.Linear;
+import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;

@@ -13,7 +13,6 @@
 package ai.djl.integration.tests.ndarray;
 
 import ai.djl.engine.Engine;
-import ai.djl.integration.util.Assertions;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -21,6 +20,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.testing.Assertions;
 import java.nio.FloatBuffer;
 import java.util.stream.IntStream;
 import org.testng.Assert;

@@ -21,6 +21,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
 import ai.djl.repository.Repository;
+import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;

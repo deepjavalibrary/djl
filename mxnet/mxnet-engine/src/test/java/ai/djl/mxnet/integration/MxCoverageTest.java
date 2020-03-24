@@ -12,8 +12,8 @@
  */
 package ai.djl.mxnet.integration;
 
-import ai.djl.integration.util.CoverageUtils;
 import ai.djl.mxnet.engine.MxEngine;
+import ai.djl.testing.CoverageUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import org.testng.annotations.Test;

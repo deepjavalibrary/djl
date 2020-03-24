@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.Assertions;
 import ai.djl.training.dataset.Batch;
 import ai.djl.translate.Batchifier;
 import org.testng.Assert;

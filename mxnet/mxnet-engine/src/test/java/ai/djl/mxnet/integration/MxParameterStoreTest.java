@@ -15,11 +15,11 @@ package ai.djl.mxnet.integration;
 
 import ai.djl.Device;
 import ai.djl.Model;
-import ai.djl.integration.util.Assertions;
 import ai.djl.mxnet.engine.MxParameterServer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.Assertions;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
