@@ -14,7 +14,7 @@ apt install cmake g++
 
 ## CPU Build
 
-Use the following task to build pytorch JNI library:
+Use the following task to build PyTorch JNI library:
 
 ### Mac/Linux
 ```
@@ -45,4 +45,10 @@ gradlew compileJNIGPU
 The task will build CUDA 10.1 by default, you can change the flavor in `compileJNIGPU` to `cu92` to use CUDA 9.2.
 ```
 downloadBuild("win", "cu92")
+```
+
+### Format C++ code
+It uses clang-format to format the code.
+```
+./gradlew formatCpp
 ```

@@ -15,7 +15,7 @@ We try our best to maintain a stable master branch. If you experience issues wit
 
 ## Beginner tutorial
 
-To get started, we recommed that you follow our short [beginner tutorial](../jupyter/tutorial). It takes you through some of the basics of deep learning to create a model, train your model, and run inference using your trained model.
+To get started, we recommend that you follow our short [beginner tutorial](../jupyter/tutorial). It takes you through some of the basics of deep learning to create a model, train your model, and run inference using your trained model.
 
 ## Run examples
 
