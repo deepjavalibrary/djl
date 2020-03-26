@@ -24,14 +24,16 @@ The following pseudocode demonstrates running inference:
 
 ```java
     // Assume user uses a pre-trained model from model zoo, they just need to load it
-    Map<String, String> criteria = new HashMap<>();
-    criteria.put("layers", "18");
-    criteria.put("flavor", "v1");
+    Criteria<BufferedImage, Classifications> criteria =
+            Criteria.builder()
+                    .optApplication(Application.CV.OBJECT_DETECTION) // find object dection model
+                    .setTypes(BufferedImage.class, Classifications.class) // define input and putput
+                    .optFilter("backbone", "resnet50") // choose network architecture
+                    .build();
 
-    // Load pre-trained model from model zoo
-    try (Model<BufferedImage, Classifications> model = MxModelZoo.RESNET.loadModel(criteria)) {
+    try (ZooModel<BufferedImage, Classifications> model = ModelZoo.loadModel(criteria)) {
         try (Predictor<BufferedImage, Classifications> predictor = model.newPredictor()) {
-            BufferedImage img = readImage(); // read image
+            BufferedImage img = BufferedImageUtils.fromUrl("http://..."); // read image
             Classifications result = predictor.predict(img);
 
             // get the classification and probability
