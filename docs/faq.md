@@ -12,7 +12,11 @@
 
 ##### 2. Which DL engines can I run with DJL?
 While DJL is designed to be engine-agnostic and to run with the any engine, we currently
-support only the MxNet engine. We have plans for supporting TensorFlow and PyTorch engines in the near future. 
+support the following frameworks:
+- Apache MXNet
+- PyTorch (Currently only support inference)
+- TensorFlow (Experimental - inference only)
+- fastText
 
 ##### 3. Does DJL support inference on GPU?
 Yes. DJL does support inference on GPU. If GPUs are available, DJL automatically detects the GPU, and runs inference on a single GPU by default. 
@@ -47,6 +51,16 @@ This is not officially supported by DJL, but you can follow the steps outlined i
 to use other versions of MXNet or built your own customized version.
 
 ##### 8. I have a model trained and saved by another DL engine. Can I load that model on to DJL?
-While DJL is designed to be engine-agnostic, this feature is not officially supported by DJL yet. We are currently working to bring this feature to DJL soon. 
-
-
+While DJL is designed to be engine-agnostic, here is a list of the DJL engines and the formats they support:
+- MXNet
+    - MXNet symbolic model
+    - MXNet Gluon model - The model must be hybridized and exported to symbolic model before loading in DJL
+- PyTorch
+    - TorchScript model - You can find more details at (https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html) 
+- TensorFlow
+    - .pb format
+    - Keras model - DJL only supports the [SavedModel API](https://www.tensorflow.org/guide/keras/save_and_serialize). The .h5 format is currently not supported
+- fastText
+    - .bin format
+    - .ftz format
+    - [SageMaker BlazingText](https://docs.aws.amazon.com/sagemaker/latest/dg/blazingtext.html)
