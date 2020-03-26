@@ -245,7 +245,7 @@ public abstract class AbstractBenchmark {
 
                         @Override
                         public NDList processInput(TranslatorContext ctx, Object input) {
-                            return new NDList(ctx.getNDManager().create(shape));
+                            return new NDList(ctx.getNDManager().ones(shape));
                         }
 
                         @Override
