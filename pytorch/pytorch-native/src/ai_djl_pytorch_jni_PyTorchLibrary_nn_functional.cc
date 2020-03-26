@@ -19,19 +19,19 @@
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSoftmax(
     JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim, jint jdtype) {
   API_BEGIN();
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->softmax(jdim, utils::GetScalarTypeFromDType(jdtype)));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
   API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUpsampleBilinear2d(
     JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jsize, jboolean jalign_corners) {
   API_BEGIN();
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   const auto size_vec = utils::GetVecFromJLongArray(env, jsize);
   const auto* result_ptr =
       new torch::Tensor(torch::upsample_bilinear2d(*tensor_ptr, size_vec, jalign_corners == JNI_TRUE));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
   API_END();
 }

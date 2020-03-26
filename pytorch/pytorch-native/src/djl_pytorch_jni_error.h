@@ -14,6 +14,11 @@
 #ifndef DJL_TORCH_DJL_PYTORCH_JNI_ERROR_H
 #define DJL_TORCH_DJL_PYTORCH_JNI_ERROR_H
 
+/*
+ * Macros to guard beginning and end section of all functions
+ * every function starts with API_BEGIN()
+ * and finishes with API_END()
+ */
 #define API_BEGIN() \
   try {             \
   __func__

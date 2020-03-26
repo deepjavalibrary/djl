@@ -50,6 +50,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
   for (size_t i = 0; i < len; ++i) {
     auto* tensor_ptr =
         utils::GetPointerFromJHandle<const torch::Tensor>(env, env->GetObjectArrayElement(tensor_ptrs, i));
+    // IValue and Tensor are interchangeable
     ivalue_vec.emplace_back(*tensor_ptr);
   }
   env->DeleteLocalRef(tensor_ptrs);

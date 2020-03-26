@@ -41,7 +41,6 @@ JNIEXPORT jintArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDevice(
   jintArray result = env->NewIntArray(2);
   if (result == nullptr) {
     env->ThrowNew(jexception, "Unable to create int array");
-    return nullptr;
   }
   jint temp_device[] = {static_cast<int>(tensor_ptr->device().type()), tensor_ptr->device().index()};
   env->SetIntArrayRegion(result, 0, 2, temp_device);
@@ -51,6 +50,7 @@ JNIEXPORT jintArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDevice(
 
 JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLayout(JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
+  jclass jexception = env->FindClass("java/lang/IllegalStateException");
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   auto layout = tensor_ptr->layout();
   switch (layout) {
@@ -61,7 +61,7 @@ JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLayout(JNIEnv
     case torch::kMkldnn:
       return 2;
     default:
-      throw;
+      env->ThrowNew(jexception, "Internal PyTorch error, layout should only have kStrided, kSparse or kMkldnn");
   }
   API_END();
 }
@@ -110,8 +110,9 @@ JNIEXPORT jbyteArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDataPtr
   API_BEGIN();
   jclass jexception = env->FindClass("java/lang/IllegalStateException");
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  // Currently data_ptr() only support contiguous
   if (!tensor_ptr->is_contiguous()) {
-    env->ThrowNew(jexception, "currently only supports contiguous tensors");
+    env->ThrowNew(jexception, "Currently data_ptr() only supports contiguous tensors");
   }
   jbyteArray result = env->NewByteArray(tensor_ptr->nbytes());
   env->SetByteArrayRegion(result, 0, tensor_ptr->nbytes(), static_cast<const jbyte*>(tensor_ptr->data_ptr()));

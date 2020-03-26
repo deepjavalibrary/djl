@@ -21,7 +21,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchReshape(
   API_BEGIN();
   const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  // copy explicitly to make memory contiguous
+  // clone(copy) explicitly to make memory contiguous
   const auto* result_ptr = new torch::Tensor(tensor_ptr->reshape(shape_vec).clone());
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
@@ -118,7 +118,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchPermute(
   API_BEGIN();
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   const std::vector<int64_t> dims = utils::GetVecFromJLongArray(env, jdims);
-  // copy explicitly to make memory contiguous
+  // clone(copy) explicitly to make memory contiguous
   const auto* result_ptr = new torch::Tensor(tensor_ptr->permute(dims).clone());
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();

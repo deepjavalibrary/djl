@@ -20,7 +20,10 @@
 #include <string>
 
 static constexpr const char* const JNIUTILS_CLASS = "ai/djl/pytorch/jni/JniUtils";
-
+/**
+ * The Log class is for logging the C++ message with slf4j
+ * which helps the Java developer to debug.
+ */
 class Log {
  public:
   explicit Log(JNIEnv* env);

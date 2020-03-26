@@ -30,6 +30,8 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(J
   }
   size_t len = env->GetDirectBufferCapacity(jbuffer);
   auto* data = new jbyte[len];
+  // Since we can't control the lifecycle of direct byte buffer,
+  // we manually allocate a memory to hold the data
   std::memcpy(data, env->GetDirectBufferAddress(jbuffer), len);
   torch::Tensor result = torch::from_blob(data, shape_vec, DeleteData, options);
   // from_blob doesn't support torch::kSparse and torch::kMkldnn, so explicit cast the type here

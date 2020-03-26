@@ -94,6 +94,19 @@ public class NDArrayNumericOpTest {
             data = DoubleStream.of(data).map(Math::sqrt).toArray();
             NDArray expected = manager.create(data);
             Assertions.assertAlmostEquals(array.sqrt(), expected);
+            // test multi-dim
+            data = new double[] {6.0, 7.0, 8.0, 9.0, 10.0, 11.0};
+            array = manager.create(data, new Shape(2, 3));
+            data = DoubleStream.of(data).map(Math::sqrt).toArray();
+            expected = manager.create(data, new Shape(2, 3));
+            Assertions.assertAlmostEquals(array.sqrt(), expected);
+            // test scalar
+            array = manager.create(4f);
+            expected = manager.create(2f);
+            Assertions.assertAlmostEquals(array.sqrt(), expected);
+            // test zero-dim
+            array = manager.create(new Shape(1, 0, 2));
+            Assert.assertEquals(array.sqrt(), array);
         }
     }
 
