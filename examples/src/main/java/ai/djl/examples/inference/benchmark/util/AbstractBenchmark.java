@@ -250,7 +250,7 @@ public abstract class AbstractBenchmark {
 
                         @Override
                         public Object processOutput(TranslatorContext ctx, NDList list) {
-                            return list.singletonOrThrow().toFloatArray();
+                            return list.get(0).toFloatArray();
                         }
 
                         @Override
