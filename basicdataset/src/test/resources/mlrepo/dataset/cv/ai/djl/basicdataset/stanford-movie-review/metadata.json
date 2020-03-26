@@ -1,0 +1,22 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "stanford-movie-review",
+  "name": "stanford-movie-review",
+  "description": "A sentiment analysis dataset of IMDB movie reviews",
+  "website": "https://ai.stanford.edu/~amaas/data/sentiment/",
+  "artifacts": [
+    {
+      "version": "1.0",
+      "snapshot": false,
+      "files": {
+        "aclImdb": {
+          "uri": "1.0/aclImdb.zip",
+          "sha1Hash": "cd5f28ea7b6b33f68e1d8cf82938ba37eb929e39",
+          "size": 116689188
+        }
+      }
+    }
+  ],
+  "lastUpdated": "2020-04-02T10:23:09.761Z"
+}

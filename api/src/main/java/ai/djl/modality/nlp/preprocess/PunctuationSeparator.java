@@ -16,10 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-/**
- * {@code PunctuationSeparator} converts every character of the input tokens to it's respective
- * lower case character.
- */
+/** {@code PunctuationSeparator} separates punction into a separate token. */
 public class PunctuationSeparator implements TextProcessor {
 
     private static final String DEFAULT_PUNCTUATIONS = ".,!?";

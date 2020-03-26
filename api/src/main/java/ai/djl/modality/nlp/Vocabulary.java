@@ -35,7 +35,7 @@ public class Vocabulary {
     private String unknownToken;
 
     /**
-     * Create a {@code Vocabulary} object with ta {@link VocabularyBuilder}.
+     * Creates a {@code Vocabulary} object with a {@link VocabularyBuilder}.
      *
      * @param builder the {@link VocabularyBuilder} to build the vocabulary with
      */

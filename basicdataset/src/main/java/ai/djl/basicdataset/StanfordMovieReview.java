@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -12,17 +12,19 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.Application;
+import ai.djl.Application.NLP;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.dataset.ZooDataset;
 import ai.djl.training.dataset.Record;
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,24 +32,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@code TatoebaEnglishFrenchDataset} is a English-French machine translation dataset from The
- * Tatoeba Project (http://www.manythings.org/anki/).
+ * The {@link StanfordMovieReview} dataset contains a {@link
+ * ai.djl.Application.NLP#SENTIMENT_ANALYSIS} set of movie reviews and their sentiment ratings.
+ *
+ * <p>The data is sourced from reviews located on IMDB (see <a
+ * href="https://ai.stanford.edu/~amaas/data/sentiment/">here</a> for details).
  */
-public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDataset {
+public class StanfordMovieReview extends TextDataset implements ZooDataset {
     private static final String VERSION = "1.0";
-    private static final String ARTIFACT_ID = "tatoeba-en-fr";
+    private static final String ARTIFACT_ID = "stanford-movie-review";
 
     private Repository repository;
     private Artifact artifact;
     private Usage usage;
     private boolean prepared;
 
+    private List<Boolean> reviewSentiments;
+    private List<Integer> reviewImdbScore;
+
     /**
-     * Creates a new instance of {@code TatoebaEnglishFrenchDataset}.
+     * Creates a new instance of {@link StanfordMovieReview} with the given necessary
+     * configurations.
      *
-     * @param builder the builder object to build from
+     * @param builder a builder with the necessary configurations
      */
-    protected TatoebaEnglishFrenchDataset(Builder builder) {
+    protected StanfordMovieReview(Builder builder) {
         super(builder);
         this.repository = builder.repository;
         this.artifact = builder.artifact;
@@ -55,7 +64,7 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
     }
 
     /**
-     * Creates a new builder to build a {@link TatoebaEnglishFrenchDataset}.
+     * Creates a new builder to build a {@link StanfordMovieReview}.
      *
      * @return a new builder
      */
@@ -66,8 +75,7 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
     /** {@inheritDoc} */
     @Override
     public MRL getMrl() {
-        return MRL.dataset(
-                Application.NLP.MACHINE_TRANSLATION, BasicDatasets.GROUP_ID, ARTIFACT_ID);
+        return MRL.dataset(NLP.SENTIMENT_ANALYSIS, BasicDatasets.GROUP_ID, ARTIFACT_ID);
     }
 
     /** {@inheritDoc} */
@@ -111,15 +119,15 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
     public void prepareData(Usage usage) throws IOException {
         Path cacheDir = repository.getCacheDirectory();
         URI resourceUri = artifact.getResourceUri();
-        Path root = cacheDir.resolve(resourceUri.getPath());
+        Path root = cacheDir.resolve(resourceUri.getPath()).resolve("aclImdb").resolve("aclImdb");
 
         Path usagePath;
         switch (usage) {
             case TRAIN:
-                usagePath = Paths.get("fra-eng-train.txt");
+                usagePath = Paths.get("train");
                 break;
             case TEST:
-                usagePath = Paths.get("fra-eng-test.txt");
+                usagePath = Paths.get("test");
                 break;
             case VALIDATION:
             default:
@@ -127,25 +135,42 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
         }
         usagePath = root.resolve(usagePath);
 
-        List<String> sourceTextData = new ArrayList<>();
-        List<String> targetTextData = new ArrayList<>();
-        try (BufferedReader reader = Files.newBufferedReader(usagePath)) {
-            String row;
-            while ((row = reader.readLine()) != null) {
-                String[] text = row.split("\t");
-                sourceTextData.add(text[0]);
-                targetTextData.add(text[1]);
-            }
-        }
+        List<String> reviewTexts = new ArrayList<>();
+        reviewSentiments = new ArrayList<>();
+        reviewImdbScore = new ArrayList<>();
 
-        preprocess(sourceTextData, true);
-        preprocess(targetTextData, false);
+        prepareDataSentiment(usagePath.resolve("pos"), true, reviewTexts);
+        prepareDataSentiment(usagePath.resolve("neg"), false, reviewTexts);
+        preprocess(reviewTexts, true);
+    }
+
+    private void prepareDataSentiment(Path path, boolean sentiment, List<String> reviewTexts)
+            throws IOException {
+        File dir = path.toFile();
+        if (!dir.exists()) {
+            throw new IllegalArgumentException("Could not find Stanford Movie Review dataset");
+        }
+        File[] files = dir.listFiles(File::isFile);
+        if (files == null) {
+            throw new IllegalArgumentException(
+                    "Could not find files in Stanford Movie Review dataset");
+        }
+        for (File reviewFile : files) {
+            Path reviewPath = reviewFile.toPath();
+            String reviewText = new String(Files.readAllBytes(reviewPath), StandardCharsets.UTF_8);
+            String[] splitName = reviewFile.getName().split("\\.")[0].split("_");
+            reviewTexts.add(reviewText);
+            reviewSentiments.add(sentiment);
+            reviewImdbScore.add(Integer.parseInt(splitName[1]));
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public Record get(NDManager manager, long index) throws EmbeddingException {
-        return new Record(embedText(index, manager, true), embedText(index, manager, false));
+        NDList data = embedText(index, manager, true);
+        NDList label = new NDList(manager.create(reviewSentiments.get(Math.toIntExact(index))));
+        return new Record(data, label);
     }
 
     /** {@inheritDoc} */
@@ -154,21 +179,38 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
         return size;
     }
 
-    /** A builder for a {@link TatoebaEnglishFrenchDataset}. */
+    /** A builder for a {@link StanfordMovieReview}. */
     public static class Builder extends TextDataset.Builder<Builder> {
+
         private Repository repository;
         private Artifact artifact;
         private Usage usage;
 
         /** Constructs a new builder. */
-        Builder() {
+        public Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
         }
 
-        /** {@inheritDoc} */
-        @Override
-        public Builder self() {
+        /**
+         * Sets the optional repository.
+         *
+         * @param repository the repository
+         * @return this builder
+         */
+        public Builder setRepository(Repository repository) {
+            this.repository = repository;
+            return this;
+        }
+
+        /**
+         * Sets the optional artifact.
+         *
+         * @param artifact the artifact
+         * @return this builder
+         */
+        public Builder setArtifact(Artifact artifact) {
+            this.artifact = artifact;
             return this;
         }
 
@@ -178,40 +220,24 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
          * @param usage the usage
          * @return this builder
          */
-        public Builder optUsage(Usage usage) {
+        public Builder setUsage(Usage usage) {
             this.usage = usage;
-            return self();
+            return this;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected Builder self() {
+            return this;
         }
 
         /**
-         * Sets the optional repository.
+         * Builds the {@link StanfordMovieReview}.
          *
-         * @param repository the repository
-         * @return this builder
+         * @return the {@link StanfordMovieReview}
          */
-        public Builder optRepository(Repository repository) {
-            this.repository = repository;
-            return self();
-        }
-
-        /**
-         * Sets the optional artifact.
-         *
-         * @param artifact the artifact
-         * @return this builder
-         */
-        public Builder optArtifact(Artifact artifact) {
-            this.artifact = artifact;
-            return self();
-        }
-
-        /**
-         * Builds the {@link TatoebaEnglishFrenchDataset}.
-         *
-         * @return the {@link TatoebaEnglishFrenchDataset}
-         */
-        public TatoebaEnglishFrenchDataset build() {
-            return new TatoebaEnglishFrenchDataset(this);
+        public StanfordMovieReview build() {
+            return new StanfordMovieReview(this);
         }
     }
 }

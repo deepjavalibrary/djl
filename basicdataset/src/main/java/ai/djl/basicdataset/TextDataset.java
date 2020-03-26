@@ -25,7 +25,6 @@ import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.RandomAccessDataset;
-import ai.djl.training.dataset.Record;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,13 +68,7 @@ public abstract class TextDataset extends RandomAccessDataset {
         this.tokenizer = builder.tokenizer;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Record get(NDManager manager, long index) throws EmbeddingException {
-        return new Record(embedText(index, manager, true), embedText(index, manager, false));
-    }
-
-    private NDList embedText(long index, NDManager manager, boolean source)
+    protected NDList embedText(long index, NDManager manager, boolean source)
             throws EmbeddingException {
         NDList data = new NDList();
         NDList dataLengths = new NDList();
