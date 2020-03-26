@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.training.util;
+package ai.djl.training.util;
 
 import ai.djl.util.Progress;
 import java.io.IOException;
@@ -22,18 +22,42 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.GZIPInputStream;
 
+/** A utility class downloads the file from specified url. */
 public final class DownloadUtils {
 
     private DownloadUtils() {}
 
+    /**
+     * Downloads a file from specified url.
+     *
+     * @param url the url to download
+     * @param output the output location
+     * @throws IOException when IO operation fails in downloading
+     */
     public static void download(String url, String output) throws IOException {
         download(url, output, null);
     }
 
+    /**
+     * Downloads a file from specified url.
+     *
+     * @param url the url to download
+     * @param output the output location
+     * @param progress the progress tracker to show download progress
+     * @throws IOException when IO operation fails in downloading
+     */
     public static void download(String url, String output, Progress progress) throws IOException {
         download(new URL(url.trim()), Paths.get(output.trim()), progress);
     }
 
+    /**
+     * Downloads a file from specified url.
+     *
+     * @param url the url to download
+     * @param output the output location
+     * @param progress the progress tracker to show download progress
+     * @throws IOException when IO operation fails in downloading
+     */
     public static void download(URL url, Path output, Progress progress) throws IOException {
         if (Files.exists(output)) {
             return;
@@ -46,7 +70,7 @@ public final class DownloadUtils {
         if (progress != null) {
             long contentLength = conn.getContentLengthLong();
             if (contentLength > 0) {
-                progress.reset(output.toFile().getName(), contentLength);
+                progress.reset("Downloading", contentLength, output.toFile().getName());
             }
         }
         try (InputStream is = conn.getInputStream()) {

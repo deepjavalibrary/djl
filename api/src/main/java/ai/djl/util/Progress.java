@@ -21,7 +21,18 @@ public interface Progress {
      * @param message the message to be shown
      * @param max the max value that the progress tracking indicator can take
      */
-    void reset(String message, long max);
+    default void reset(String message, long max) {
+        reset(message, max, null);
+    }
+
+    /**
+     * Resets the progress tracking indicators, and sets the message and max to the given values.
+     *
+     * @param message the message to be shown
+     * @param max the max value that the progress tracking indicator can take
+     * @param trailingMessage the trailing message to be shown
+     */
+    void reset(String message, long max, String trailingMessage);
 
     /**
      * Starts tracking the progress of the progress tracking indicators at the given initial value.

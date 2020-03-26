@@ -23,6 +23,7 @@ public final class ProgressBar implements Progress {
     private static final int TOTAL_BAR_LENGTH = 40;
 
     private String message;
+    private String trailingMessage;
     private long max;
     private long progress;
     private int currentPercent;
@@ -43,11 +44,25 @@ public final class ProgressBar implements Progress {
         reset(message, max);
     }
 
+    /**
+     * Creates an instance of {@code ProgressBar} with the given maximum value, and displays the
+     * given message.
+     *
+     * @param message the message to be displayed
+     * @param max the maximum value
+     * @param trailingMessage the trailing message to be shown
+     */
+    public ProgressBar(String message, long max, String trailingMessage) {
+        reset(message, max);
+        this.trailingMessage = trailingMessage;
+    }
+
     /** {@inheritDoc} */
     @Override
-    public final void reset(String message, long max) {
+    public final void reset(String message, long max, String trailingMessage) {
         this.message = trimMessage(message);
         this.max = max;
+        this.trailingMessage = trailingMessage;
         currentPercent = 0;
         progress = 0;
     }
@@ -79,6 +94,9 @@ public final class ProgressBar implements Progress {
         }
 
         this.progress = progress;
+        if (additionalMessage == null) {
+            additionalMessage = trailingMessage;
+        }
         int percent = (int) ((progress + 1) * 100 / max);
         percent = Math.min(percent, 100);
         if (percent == currentPercent && percent > 0) {
