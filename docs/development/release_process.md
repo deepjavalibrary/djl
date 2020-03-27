@@ -32,11 +32,20 @@ Make a commit, get reviewed, and then merge it into github.
 aws s3 cp website/javadoc-index.html s3://javadoc-djl-ai/index.html
 ```
 
-### Step 1.4: Publish mxnet-native library to sonatype staging server
+### Step 1.4: Publish Native library to sonatype staging server
+
+#### MXNet
 
 Run the following command to trigger mxnet-native publishing job:
 ```shell script
 curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "mxnet-staging-pub"}'
+```
+
+#### PyTorch
+
+Run the following command to trigger pytorch-native publishing job:
+```shell script
+curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "pytorch-staging-pub"}'
 ```
 
 ### Step 1.5: Publish DJL library to sonatype staging server
