@@ -9,6 +9,7 @@ This folder contains tutorials that illustrate how to accomplish basic AI tasks 
 ## More Tutorial Notebooks
 
 - [Run object detection with model zoo](object_detection_with_model_zoo.ipynb)
+- [Load pre-trained PyTorch model](load_pytorch_model.ipynb)
 - [Load pre-trained MXNet model](load_mxnet_model.ipynb)
 - [Transfer learning example](transfer_learning_on_cifar10.ipynb)
 - [Question answering example](BERTQA.ipynb)

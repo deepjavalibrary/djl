@@ -8,8 +8,13 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - [Basic Dataset](../basicdataset/README.md) - Built-in datasets
 - [Model Zoo](../model-zoo/README.md) - Built-in engine-agnostic model zoo
 - [Repository API](../repository/README.md) - Repository utilities to build the model zoo and dataset
+#### MXNet
 - [MXNet Engine](../mxnet/mxnet-engine/README.md) - MXNet Engine implementation
 - [MXNet Model Zoo](../mxnet/mxnet-model-zoo/README.md) - MXNet symbolic model zoo
+
+#### PyTorch
+- [PyTorch Engine](../pytorc/pytorch-engine/README.md) - PyTorch Engine implementation
+- [PyTorch Model Zoo](../pytorc/pytorch-model-zoo/README.md) - PyTorch TorchScript model zoo
 
 ## [JavaDoc API Reference](https://javadoc.djl.ai/)
 
@@ -17,6 +22,7 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 
 - **[Beginner Jupyter Tutorial](../jupyter/tutorial)**
 - [Run object detection with model zoo](../jupyter/object_detection_with_model_zoo.ipynb)
+- [Load pre-trained PyTorch model](../jupyter/load_pytorch_model.ipynb)
 - [Load pre-trained MXNet model](../jupyter/load_mxnet_model.ipynb)
 - [Transfer learning example](../jupyter/transfer_learning_on_cifar10.ipynb)
 - [Question answering example](../jupyter/BERTQA.ipynb)

@@ -12,7 +12,7 @@ For a reference implementation, see [Multi-threaded Benchmark](../src/main/java/
 
 you need to set corresponding configuration based on the engine you want to use.
 
-### MXNet
+## MXNet
 
 ## Engine configuration
 To use MXNet Engine to run multi-threading, complete the following steps.
@@ -39,7 +39,7 @@ Please add the following parameter to your Java application:
 -DMXNET_THREAD_SAFE_INFERENCE=true
 ```
 
-### PyTorch
+## PyTorch
 
 Currently multithreading is experimental supported in PyTorch engine.
 There is no extra step to use this feature, but you might see random crash.
