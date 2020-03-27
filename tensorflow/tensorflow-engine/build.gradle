@@ -44,3 +44,7 @@ dependencies {
 }
 
 compileJava.dependsOn downloadJar
+
+test {
+    environment "PATH", "src/test/bin:${environment.PATH}"
+}
