@@ -11,6 +11,10 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 #### MXNet
 - [MXNet Engine](../mxnet/mxnet-engine/README.md) - MXNet Engine implementation
 - [MXNet Model Zoo](../mxnet/mxnet-model-zoo/README.md) - MXNet symbolic model zoo
+- [Pytorch Engine](../pytorch/pytorch-engine/README.md) - Pytorch Engine implementation
+- [Pytorch Model Zoo](../pytorch/pytorch-model-zoo/README.md) - PyTorch TorchScript model zoo
+- [TensorFlow Engine](../tensorflow/tensorflow-engine/README.md) - TensorFlow Engine implementation
+- [TensorFlow Model Zoo](../tensorflow/tensorflow-model-zoo/README.md) - TensorFlow SavedModel model zoo
 
 #### PyTorch
 - [PyTorch Engine](../pytorc/pytorch-engine/README.md) - PyTorch Engine implementation
