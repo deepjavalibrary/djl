@@ -142,7 +142,7 @@ public final class TrainPikachu {
         PikachuDetection pikachuDetection =
                 PikachuDetection.builder()
                         .optUsage(usage)
-                        .optMaxIteration(arguments.getMaxIterations())
+                        .optLimit(arguments.getLimit())
                         .optPipeline(pipeline)
                         .setSampling(arguments.getBatchSize(), true)
                         .build();

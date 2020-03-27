@@ -111,7 +111,7 @@ public final class TrainMnist {
                 Mnist.builder()
                         .optUsage(usage)
                         .setSampling(arguments.getBatchSize(), true)
-                        .optMaxIteration(arguments.getMaxIterations())
+                        .optLimit(arguments.getLimit())
                         .build();
         mnist.prepare(new ProgressBar());
         return mnist;

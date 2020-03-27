@@ -49,13 +49,11 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
     private Pipeline pipeline;
     private Pipeline targetPipeline;
     private ExecutorService executor;
-    private long maxIteration;
     private Device device;
 
     private Iterator<List<Long>> sample;
     // for multithreading
     private Queue<Future<Batch>> queue;
-    private long count;
     private AtomicInteger progressCounter;
 
     /**
@@ -69,7 +67,6 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
      * @param targetPipeline the pipeline of transforms to apply on the labels
      * @param executor an {@link ExecutorService}
      * @param preFetchNumber the number of samples to prefetch
-     * @param maxIteration the maximum number of iterations
      * @param device the {@link Device}
      */
     public DataIterable(
@@ -81,7 +78,6 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
             Pipeline targetPipeline,
             ExecutorService executor,
             int preFetchNumber,
-            long maxIteration,
             Device device) {
         this.dataset = dataset;
         this.manager = manager.newSubManager();
@@ -89,7 +85,6 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
         this.pipeline = pipeline;
         this.targetPipeline = targetPipeline;
         this.executor = executor;
-        this.maxIteration = maxIteration;
         this.device = device;
         progressCounter = new AtomicInteger(0);
 
@@ -112,10 +107,6 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
     /** {@inheritDoc} */
     @Override
     public boolean hasNext() {
-        if (++count > maxIteration) {
-            return false;
-        }
-
         if (executor != null) {
             if (queue.isEmpty()) {
                 manager.close();
@@ -137,7 +128,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
             // single thread data loading with blocking fetch
             List<Long> indices = sample.next();
             try {
-                int progress = progressCounter.getAndAdd(indices.size());
+                int progress = progressCounter.addAndGet(indices.size());
                 return fetch(indices, progress);
             } catch (IOException | TranslateException e) {
                 logger.error(e.getMessage());

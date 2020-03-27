@@ -118,7 +118,7 @@ public final class TrainCaptcha {
                 CaptchaDataset.builder()
                         .optUsage(usage)
                         .setSampling(arguments.getBatchSize(), true)
-                        .optMaxIteration(arguments.getMaxIterations())
+                        .optLimit(arguments.getLimit())
                         .build();
         dataset.prepare(new ProgressBar());
         return dataset;

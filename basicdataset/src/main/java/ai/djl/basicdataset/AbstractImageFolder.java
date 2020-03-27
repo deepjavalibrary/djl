@@ -68,7 +68,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
 
     /** {@inheritDoc} */
     @Override
-    public long size() {
+    protected long availableSize() {
         return items.size();
     }
 

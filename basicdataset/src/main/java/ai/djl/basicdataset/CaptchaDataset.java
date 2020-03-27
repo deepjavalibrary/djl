@@ -101,7 +101,7 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
 
     /** {@inheritDoc} */
     @Override
-    public long size() {
+    protected long availableSize() {
         return items.size();
     }
 

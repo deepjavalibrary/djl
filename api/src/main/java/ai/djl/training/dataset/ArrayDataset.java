@@ -64,7 +64,7 @@ public class ArrayDataset extends RandomAccessDataset {
 
     /** {@inheritDoc} */
     @Override
-    public long size() {
+    protected long availableSize() {
         return data[0].size(0);
     }
 

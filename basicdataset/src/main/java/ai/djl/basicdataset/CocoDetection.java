@@ -158,7 +158,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
     /** {@inheritDoc} */
     @Override
-    public long size() {
+    protected long availableSize() {
         return imagePaths.size();
     }
 

@@ -31,7 +31,7 @@ public class Arguments {
     private boolean isSymbolic;
     private boolean preTrained;
     private String outputDir;
-    private long maxIterations;
+    private long limit;
     private String modelDir;
     private Map<String, String> criteria;
 
@@ -58,10 +58,10 @@ public class Arguments {
         } else {
             outputDir = "build/model";
         }
-        if (cmd.hasOption("max-iterations")) {
-            maxIterations = Long.parseLong(cmd.getOptionValue("max-iterations"));
+        if (cmd.hasOption("max-batches")) {
+            limit = Long.parseLong(cmd.getOptionValue("max-batches")) * batchSize;
         } else {
-            maxIterations = Long.MAX_VALUE;
+            limit = Long.MAX_VALUE;
         }
         if (cmd.hasOption("model-dir")) {
             modelDir = cmd.getOptionValue("model-dir");
@@ -125,9 +125,9 @@ public class Arguments {
                         .build());
         options.addOption(
                 Option.builder("m")
-                        .longOpt("max-iterations")
+                        .longOpt("max-batches")
                         .hasArg()
-                        .argName("max-iterations")
+                        .argName("max-batches")
                         .desc(
                                 "Limit each epoch to a fixed number of iterations to test the training script")
                         .build());
@@ -176,8 +176,8 @@ public class Arguments {
         return outputDir;
     }
 
-    public long getMaxIterations() {
-        return maxIterations;
+    public long getLimit() {
+        return limit;
     }
 
     public Map<String, String> getCriteria() {

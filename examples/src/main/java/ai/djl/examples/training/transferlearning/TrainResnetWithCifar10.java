@@ -183,7 +183,7 @@ public final class TrainResnetWithCifar10 {
                 Cifar10.builder()
                         .optUsage(usage)
                         .setSampling(arguments.getBatchSize(), true)
-                        .optMaxIteration(arguments.getMaxIterations())
+                        .optLimit(arguments.getLimit())
                         .optPipeline(pipeline)
                         .build();
         cifar10.prepare(new ProgressBar());

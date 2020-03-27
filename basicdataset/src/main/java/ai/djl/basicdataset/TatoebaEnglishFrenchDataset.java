@@ -262,7 +262,7 @@ public class TatoebaEnglishFrenchDataset extends RandomAccessDataset implements 
 
     /** {@inheritDoc} */
     @Override
-    public long size() {
+    protected long availableSize() {
         return sourceSentences.size();
     }
 

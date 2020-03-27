@@ -36,7 +36,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
     protected Pipeline targetPipeline;
     protected ExecutorService executor;
     protected int prefetchNumber;
-    protected long maxIteration;
+    protected long limit;
     protected Device device;
 
     RandomAccessDataset() {}
@@ -54,7 +54,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
         this.targetPipeline = builder.targetPipeline;
         this.executor = builder.executor;
         this.prefetchNumber = builder.prefetchNumber;
-        this.maxIteration = builder.maxIteration;
+        this.limit = builder.limit;
         this.device = builder.device;
     }
 
@@ -82,7 +82,6 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
                 targetPipeline,
                 executor,
                 prefetchNumber,
-                maxIteration,
                 device);
     }
 
@@ -103,7 +102,6 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
                 targetPipeline,
                 executor,
                 prefetchNumber,
-                maxIteration,
                 device);
     }
 
@@ -112,21 +110,16 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
      *
      * @return the size of this {@code Dataset}
      */
-    public abstract long size();
+    public long size() {
+        return Math.min(limit, availableSize());
+    }
 
     /**
-     * Returns the number of iteration of the batch iterable.
+     * Returns the number of records available to be read in this {@code Dataset}.
      *
-     * @return the number of iteration of the batch iterable, -1 if number of iterations is unknown
+     * @return the number of records available to be read in this {@code Dataset}
      */
-    public long getNumIterations() {
-        int batchSize = sampler.getBatchSize();
-        if (batchSize == -1) {
-            return -1;
-        }
-        long iteration = size() / batchSize;
-        return Math.min(maxIteration, iteration);
-    }
+    protected abstract long availableSize();
 
     /**
      * Splits the dataset set into multiple portions.
@@ -172,7 +165,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
         protected Pipeline targetPipeline;
         protected ExecutorService executor;
         protected int prefetchNumber;
-        protected long maxIteration = Long.MAX_VALUE;
+        protected long limit = Long.MAX_VALUE;
         protected Device device;
 
         /**
@@ -270,7 +263,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
          * @param prefetchNumber the number of samples to prefetch at once
          * @return this {@code BaseBuilder}
          */
-        public T optExcutor(ExecutorService executor, int prefetchNumber) {
+        public T optExecutor(ExecutorService executor, int prefetchNumber) {
             this.executor = executor;
             this.prefetchNumber = prefetchNumber;
             return self();
@@ -288,13 +281,16 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
         }
 
         /**
-         * Sets the maximum number of iterations.
+         * Sets this dataset's limit.
          *
-         * @param maxIteration the maximum number of iterations
+         * <p>The limit is usually used for testing purposes to test only with a subset of the
+         * dataset.
+         *
+         * @param limit the limit of this dataset's records
          * @return this {@code BaseBuilder}
          */
-        public T optMaxIteration(long maxIteration) {
-            this.maxIteration = maxIteration;
+        public T optLimit(long limit) {
+            this.limit = limit;
             return self();
         }
 
@@ -329,18 +325,13 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
         }
 
         @Override
-        public long size() {
+        protected long availableSize() {
             return to - from;
         }
 
         @Override
         public Iterable<Batch> getData(NDManager manager) {
             return dataset.getData(manager);
-        }
-
-        @Override
-        public long getNumIterations() {
-            return dataset.getNumIterations();
         }
     }
 }
