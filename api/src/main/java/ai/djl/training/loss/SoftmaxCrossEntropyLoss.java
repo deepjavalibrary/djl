@@ -52,7 +52,8 @@ public class SoftmaxCrossEntropyLoss extends Loss {
      * @param weight the weight to apply on the loss value, default 1
      * @param classAxis the axis that represents the class probabilities, default -1
      * @param sparseLabel whether labels are integer array or probabilities, default true
-     * @param fromLogit whether labels are log probabilities or un-normalized numbers
+     * @param fromLogit whether predictions are log probabilities or un-normalized numbers, default
+     *     false
      */
     public SoftmaxCrossEntropyLoss(
             String name, float weight, int classAxis, boolean sparseLabel, boolean fromLogit) {
