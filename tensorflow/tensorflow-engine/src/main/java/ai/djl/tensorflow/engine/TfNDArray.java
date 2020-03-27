@@ -414,6 +414,7 @@ public class TfNDArray implements NDArray {
                 tf.math.lessEqual(asOperand(), ((TfNDArray) other).asOperand()).asOutput());
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray all() {
         return new TfNDArray(
@@ -422,6 +423,7 @@ public class TfNDArray implements NDArray {
                         asOperand(), ((TfNDArray) manager.arange(0, getRank(), 1)).asOperand()));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray any() {
         return new TfNDArray(
@@ -1038,6 +1040,7 @@ public class TfNDArray implements NDArray {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList split(long sections, int axis) {
         NDList result = new NDList();
@@ -1058,6 +1061,7 @@ public class TfNDArray implements NDArray {
         return new TfNDArray(manager, tf.reshape(asOperand(), tf.constant(shape.getShape())));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray reshapeLike(NDArray array) {
         throw new UnsupportedOperationException("Not implemented");
@@ -1179,6 +1183,7 @@ public class TfNDArray implements NDArray {
         return new TfNDArray(manager, tf.nn.softmax(asOperand()));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray logSoftmax(int[] axes, float temperature) {
         return new TfNDArray(manager, tf.nn.logSoftmax(asOperand()));

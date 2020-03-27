@@ -46,143 +46,171 @@ public class TfNDArrayEx implements NDArrayEx {
         this.operand = parent.asOperand();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rdiv(Number n) {
         return rdiv(manager.create(n));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rdiv(NDArray b) {
         return b.div(array);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rdivi(Number n) {
         return rdivi(manager.create(n));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rdivi(NDArray b) {
         return b.divi(array);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rsub(Number n) {
         return rsub(manager.create(n));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rsub(NDArray b) {
         return b.sub(array);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rsubi(Number n) {
         return rsubi(manager.create(n));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rsubi(NDArray b) {
         return b.subi(array);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rmod(Number n) {
         return rmod(manager.create(n));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rmod(NDArray b) {
         return b.mod(array);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rmodi(Number n) {
         return rmodi(manager.create(n));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rmodi(NDArray b) {
         return b.modi(array);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rpow(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray rpowi(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray relu() {
         return new TfNDArray(manager, tf.nn.relu(array.asOperand()));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sigmoid() {
         return new TfNDArray(manager, tf.math.sigmoid(array.asOperand()));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tanh() {
         return array.tanh();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray softrelu() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray softsign() {
         return new TfNDArray(manager, tf.nn.softsign(array.asOperand()));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray leakyRelu(float alpha) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray elu(float alpha) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray selu() {
         return new TfNDArray(manager, tf.nn.selu(array.asOperand()));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray gelu() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray maxPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray globalMaxPool() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sumPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray globalSumPool() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray avgPool(
             Shape kernel,
@@ -193,11 +221,13 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray globalAvgPool() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray lpPool(
             Shape kernel,
@@ -208,11 +238,13 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray globalLpPool(int pValue) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void adamUpdate(
             NDList inputs,
@@ -228,6 +260,7 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void nagUpdate(
             NDList inputs,
@@ -240,6 +273,7 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void sgdUpdate(
             NDList inputs,
@@ -253,6 +287,7 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList convolution(
             NDList inputs,
@@ -268,6 +303,7 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList fullyConnected(
             NDList inputs,
@@ -278,6 +314,7 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList embedding(
             NDList inputs,
@@ -288,11 +325,13 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList prelu(NDList inputs, PairList<String, Object> additional) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList dropout(
             NDList inputs,
@@ -302,6 +341,7 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList batchNorm(
             NDList inputs,
@@ -314,6 +354,7 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList rnn(
             NDList inputs,
@@ -328,6 +369,7 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList lstm(
             NDList inputs,
@@ -343,6 +385,7 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
     public NDArray resize(int width, int height) {
@@ -361,27 +404,30 @@ public class TfNDArrayEx implements NDArrayEx {
                         tf.constant(new int[] {width, height})));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray where(NDArray condition, NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray stack(NDList arrays) {
         return stack(arrays, 0);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray stack(NDList arrays, int axis) {
         return stackHelper(arrays, axis);
     }
 
-    @SuppressWarnings("unchecked")
     private <T> NDArray stackHelper(NDList arrays, int axis) {
         ArrayList<Operand<T>> operands = new ArrayList<>(arrays.size() + 1);
         operands.add(array.asOperand());
@@ -391,13 +437,13 @@ public class TfNDArrayEx implements NDArrayEx {
         return new TfNDArray(manager, tf.stack(operands, Stack.axis((long) axis)));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray concat(NDList arrays, int axis) {
         NDUtils.checkConcatInput(arrays);
         return concatHelper(arrays, axis);
     }
 
-    @SuppressWarnings("unchecked")
     private <T> NDArray concatHelper(NDList arrays, int axis) {
         ArrayList<Operand<T>> operands = new ArrayList<>(arrays.size() + 1);
         operands.add(array.asOperand());
@@ -407,6 +453,7 @@ public class TfNDArrayEx implements NDArrayEx {
         return new TfNDArray(manager, tf.concat(operands, tf.constant(axis)));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList multiBoxTarget(
             NDList inputs,
@@ -418,6 +465,7 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList multiBoxPrior(
             List<Float> sizes,
@@ -428,6 +476,7 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList multiBoxDetection(
             NDList inputs,
@@ -440,6 +489,7 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray getArray() {
         return array;

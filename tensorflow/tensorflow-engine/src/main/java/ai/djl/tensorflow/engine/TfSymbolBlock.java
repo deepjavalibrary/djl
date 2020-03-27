@@ -13,7 +13,6 @@
 
 package ai.djl.tensorflow.engine;
 
-import ai.djl.MalformedModelException;
 import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -29,7 +28,6 @@ import ai.djl.util.PairList;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.tensorflow.SavedModelBundle;
@@ -61,11 +59,13 @@ public class TfSymbolBlock implements SymbolBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void removeLastBlock() {
         throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
@@ -88,36 +88,43 @@ public class TfSymbolBlock implements SymbolBlock {
         return resultNDList;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setInitializer(Initializer initializer) {
         throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setInitializer(Initializer initializer, String paramName) {
         throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
         return new Shape[0];
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isInitialized() {
         return bundle != null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void cast(DataType dataType) {
         throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void clear() {
         bundle.close();
     }
 
+    /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeInput() {
         PairList<String, Shape> inputDescriptions = new PairList<>();
@@ -134,7 +141,7 @@ public class TfSymbolBlock implements SymbolBlock {
                             shapeProto
                                     .getDimList()
                                     .stream()
-                                    .mapToLong(dim -> dim.getSize())
+                                    .mapToLong(TensorShapeProto.Dim::getSize)
                                     .toArray()));
         }
         return inputDescriptions;
@@ -155,45 +162,51 @@ public class TfSymbolBlock implements SymbolBlock {
                             shapeProto
                                     .getDimList()
                                     .stream()
-                                    .mapToLong(dim -> dim.getSize())
+                                    .mapToLong(TensorShapeProto.Dim::getSize)
                                     .toArray()));
         }
         return outputDescription;
     }
 
+    /** {@inheritDoc} */
     @Override
     public BlockList getChildren() {
         throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
         throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 
+    /** {@inheritDoc} */
     @Override
     public ParameterList getParameters() {
         throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return new Shape[0];
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void saveParameters(DataOutputStream os) throws IOException {
+    public void saveParameters(DataOutputStream os) {
         throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void loadParameters(NDManager manager, DataInputStream is)
-            throws IOException, MalformedModelException {
+    public void loadParameters(NDManager manager, DataInputStream is) {
         throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 }

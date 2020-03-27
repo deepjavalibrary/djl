@@ -206,6 +206,7 @@ public class TfNDManager extends BaseNDManager {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
         return Engine.getEngine(TfEngine.ENGINE_NAME);
@@ -275,7 +276,6 @@ public class TfNDManager extends BaseNDManager {
         return eyeHelper(rows, cols, k, dataType, device);
     }
 
-    @SuppressWarnings("unchecked")
     public <T> NDArray eyeHelper(int rows, int cols, int k, DataType dataType, Device device) {
         Operand<T> diagnal =
                 ((TfNDArray) ones(new Shape(Math.min(rows, cols)), dataType, device)).asOperand();
@@ -287,7 +287,6 @@ public class TfNDManager extends BaseNDManager {
         return new TfNDArray(this, output);
     }
 
-    @SuppressWarnings("unchecked")
     <T extends Number> Constant<T> toConstant(Number n, DataType jType) {
         return TfNDArray.getConstant(n, jType, tf);
     }
@@ -353,6 +352,7 @@ public class TfNDManager extends BaseNDManager {
         return manager;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isOpen() {
         return false;

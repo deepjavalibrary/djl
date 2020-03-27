@@ -113,6 +113,7 @@ public class MockModel implements Model {
         return new String[] {"synset.txt"};
     }
 
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
     public <T> T getArtifact(String name, Function<InputStream, T> function) throws IOException {
