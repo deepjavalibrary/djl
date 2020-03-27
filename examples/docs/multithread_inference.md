@@ -41,8 +41,7 @@ Please add the following parameter to your Java application:
 
 ## PyTorch
 
-Currently multithreading is experimental supported in PyTorch engine.
-There is no extra step to use this feature, but you might see random crash.
+Currently PyTorch engine doesn't support multithreading inference. You may see random crash during the inference. 
 We expect to fix the issue in the future release.
 
-You might also check [how_to_optimize_inference_performance](../../docs/pytorch/how_to_optimize_inference_performance.md) to optimize the inference performance.
+You might also want to check out [how_to_optimize_inference_performance](https://github.com/awslabs/djl/blob/master/docs/pytorch/how_to_optimize_inference_performance.md) to optimize the inference performance.
