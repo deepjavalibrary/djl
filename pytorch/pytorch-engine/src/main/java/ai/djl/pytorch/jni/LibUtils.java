@@ -21,6 +21,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -157,7 +158,7 @@ public final class LibUtils {
         try (InputStream stream =
                 LibUtils.class.getResourceAsStream(
                         "/jnilib/" + classifier + "/" + flavor + "/" + name)) {
-            Files.copy(stream, path);
+            Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
             return path.toAbsolutePath().toString();
         } catch (IOException e) {
             throw new IllegalStateException("Cannot copy jni files", e);
@@ -231,7 +232,7 @@ public final class LibUtils {
             for (String file : platform.getLibraries()) {
                 String libPath = "/native/lib/" + file;
                 try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
-                    Files.copy(is, tmp.resolve(file));
+                    Files.copy(is, tmp.resolve(file), StandardCopyOption.REPLACE_EXISTING);
                 }
             }
 
@@ -280,7 +281,7 @@ public final class LibUtils {
                     URL url = new URL(link + '/' + line);
                     String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
                     try (InputStream fis = new GZIPInputStream(url.openStream())) {
-                        Files.copy(fis, tmp.resolve(fileName));
+                        Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
             }

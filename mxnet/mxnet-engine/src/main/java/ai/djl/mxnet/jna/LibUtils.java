@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -166,7 +167,7 @@ public final class LibUtils {
             for (String file : platform.getLibraries()) {
                 String libPath = "/native/lib/" + file;
                 try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
-                    Files.copy(is, tmp.resolve(file));
+                    Files.copy(is, tmp.resolve(file), StandardCopyOption.REPLACE_EXISTING);
                 }
             }
 
@@ -333,7 +334,7 @@ public final class LibUtils {
                         }
                     }
                     try (InputStream fis = new GZIPInputStream(url.openStream())) {
-                        Files.copy(fis, tmp.resolve(fileName));
+                        Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
             }
