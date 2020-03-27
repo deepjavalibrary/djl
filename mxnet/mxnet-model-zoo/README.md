@@ -99,4 +99,4 @@ in the `src/test/resources/mlrepo/model` folder.
 
 ## Contributor Guides and Documentation
 
-### [How to add new models to the MXNet model zoo](../docs/development/add_model_to_mxnet-model-zoo.md)
+### [How to add new models to the MXNet model zoo](../../docs/development/add_model_to_mxnet-model-zoo.md)
