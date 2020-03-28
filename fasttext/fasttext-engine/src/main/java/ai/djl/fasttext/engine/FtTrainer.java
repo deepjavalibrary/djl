@@ -22,6 +22,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
+import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.loss.Loss;
@@ -143,8 +144,14 @@ public class FtTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
-    public final <T extends Evaluator> T getEvaluator(Class<T> clazz) {
-        return null;
+    public TrainingResult getTrainingResult() {
+        TrainingResult result = new TrainingResult();
+        int epoch = config.getEpoch();
+        if (epoch <= 0) {
+            epoch = 5;
+        }
+        result.setEpoch(epoch);
+        return result;
     }
 
     /** {@inheritDoc} */

@@ -13,11 +13,12 @@
 package ai.djl.training.listener;
 
 import ai.djl.Device;
-import ai.djl.Model;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDList;
 import ai.djl.training.Trainer;
 import ai.djl.training.evaluator.Evaluator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link TrainingListener} that records evaluator results.
@@ -46,8 +47,8 @@ public class EvaluatorTrainingListener implements TrainingListener {
     public static final String VALIDATE_EPOCH = "validate/epoch";
 
     private int progressUpdateFrequency;
-
     private int progressCounter;
+    private Map<String, Float> latestEvaluations;
 
     /**
      * Constructs an {@link EvaluatorTrainingListener} that updates the training progress the
@@ -69,16 +70,27 @@ public class EvaluatorTrainingListener implements TrainingListener {
     public EvaluatorTrainingListener(int progressUpdateFrequency) {
         this.progressUpdateFrequency = progressUpdateFrequency;
         progressCounter = 0;
+        latestEvaluations = new ConcurrentHashMap<>();
     }
 
     /** {@inheritDoc} */
     @Override
     public void onEpoch(Trainer trainer) {
         Metrics metrics = trainer.getMetrics();
-        if (metrics != null) {
-            for (Evaluator evaluator : trainer.getEvaluators()) {
-                metrics.addMetric(
-                        metricName(evaluator, TRAIN_EPOCH), evaluator.getAccumulator(TRAIN_EPOCH));
+        for (Evaluator evaluator : trainer.getEvaluators()) {
+            float trainValue = evaluator.getAccumulator(TRAIN_EPOCH);
+            if (metrics != null) {
+                String key = metricName(evaluator, TRAIN_EPOCH);
+                metrics.addMetric(key, trainValue);
+            }
+
+            latestEvaluations.put("train_" + evaluator.getName(), trainValue);
+            float validateValue = evaluator.getAccumulator(VALIDATE_EPOCH);
+            latestEvaluations.put("validate_" + evaluator.getName(), validateValue);
+
+            if (evaluator == trainer.getLoss()) {
+                latestEvaluations.put("train_loss", trainValue);
+                latestEvaluations.put("validate_loss", validateValue);
             }
         }
         for (Evaluator evaluator : trainer.getEvaluators()) {
@@ -101,16 +113,17 @@ public class EvaluatorTrainingListener implements TrainingListener {
         Metrics metrics = trainer.getMetrics();
         if (metrics != null) {
             for (Evaluator evaluator : trainer.getEvaluators()) {
-                metrics.addMetric(
-                        metricName(evaluator, TRAIN_ALL), evaluator.getAccumulator(TRAIN_ALL));
+                String key = metricName(evaluator, TRAIN_ALL);
+                float value = evaluator.getAccumulator(TRAIN_ALL);
+                metrics.addMetric(key, value);
             }
 
             progressCounter++;
             if (progressCounter == progressUpdateFrequency) {
                 for (Evaluator evaluator : trainer.getEvaluators()) {
-                    metrics.addMetric(
-                            metricName(evaluator, TRAIN_PROGRESS),
-                            evaluator.getAccumulator(TRAIN_PROGRESS));
+                    String key = metricName(evaluator, TRAIN_PROGRESS);
+                    float value = evaluator.getAccumulator(TRAIN_PROGRESS);
+                    metrics.addMetric(key, value);
                 }
                 progressCounter = 0;
             }
@@ -124,9 +137,9 @@ public class EvaluatorTrainingListener implements TrainingListener {
         Metrics metrics = trainer.getMetrics();
         if (metrics != null) {
             for (Evaluator evaluator : trainer.getEvaluators()) {
-                metrics.addMetric(
-                        metricName(evaluator, VALIDATE_EPOCH),
-                        evaluator.getAccumulator(VALIDATE_EPOCH));
+                String key = metricName(evaluator, VALIDATE_EPOCH);
+                float value = evaluator.getAccumulator(VALIDATE_EPOCH);
+                metrics.addMetric(key, value);
             }
         }
     }
@@ -146,31 +159,17 @@ public class EvaluatorTrainingListener implements TrainingListener {
     /** {@inheritDoc} */
     @Override
     public void onTrainingBegin(Trainer trainer) {
-        trainer.getEvaluators()
-                .forEach(
-                        evaluator -> {
-                            evaluator.addAccumulator(TRAIN_EPOCH);
-                            evaluator.addAccumulator(TRAIN_PROGRESS);
-                            evaluator.addAccumulator(TRAIN_ALL);
-                            evaluator.addAccumulator(VALIDATE_EPOCH);
-                        });
+        for (Evaluator evaluator : trainer.getEvaluators()) {
+            evaluator.addAccumulator(TRAIN_EPOCH);
+            evaluator.addAccumulator(TRAIN_PROGRESS);
+            evaluator.addAccumulator(TRAIN_ALL);
+            evaluator.addAccumulator(VALIDATE_EPOCH);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
-    public void onTrainingEnd(Trainer trainer) {
-        Model model = trainer.getModel();
-        Metrics metrics = trainer.getMetrics();
-        if (metrics != null) {
-            for (Evaluator evaluator : trainer.getEvaluators()) {
-                String metricName = metricName(evaluator, VALIDATE_EPOCH);
-                if (metrics.hasMetric(metricName)) {
-                    float value = metrics.latestMetric(metricName).getValue().floatValue();
-                    model.setProperty(evaluator.getName(), String.format("%.5f", value));
-                }
-            }
-        }
-    }
+    public void onTrainingEnd(Trainer trainer) {}
 
     /**
      * Returns the metric created with the evaluator for the given stage.
@@ -192,5 +191,16 @@ public class EvaluatorTrainingListener implements TrainingListener {
             default:
                 throw new IllegalArgumentException("Invalid metric stage");
         }
+    }
+
+    /**
+     * Returns the latest evaluations.
+     *
+     * <p>The latest evaluations are updated on each epoch.
+     *
+     * @return the latest evaluations
+     */
+    public Map<String, Float> getLatestEvaluations() {
+        return latestEvaluations;
     }
 }

@@ -21,9 +21,11 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
+import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.loss.Loss;
+import java.util.Collections;
 import java.util.List;
 
 public class MockTrainer implements Trainer {
@@ -100,13 +102,13 @@ public class MockTrainer implements Trainer {
     /** {@inheritDoc} */
     @Override
     public List<Evaluator> getEvaluators() {
-        return null;
+        return Collections.emptyList();
     }
 
     /** {@inheritDoc} */
     @Override
-    public <T extends Evaluator> T getEvaluator(Class<T> clazz) {
-        return null;
+    public TrainingResult getTrainingResult() {
+        return new TrainingResult();
     }
 
     /** {@inheritDoc} */

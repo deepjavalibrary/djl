@@ -24,7 +24,9 @@ public class Accuracy extends AbstractAccuracy {
      * Creates a multiclass accuracy evaluator that computes accuracy across axis 1 along the 0th
      * index.
      */
-    public Accuracy() {}
+    public Accuracy() {
+        this("Accuracy", 0, 1);
+    }
 
     /**
      * Creates a multiclass accuracy evaluator that computes accuracy across axis 1 along given

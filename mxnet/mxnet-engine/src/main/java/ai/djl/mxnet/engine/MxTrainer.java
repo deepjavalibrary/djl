@@ -27,8 +27,11 @@ import ai.djl.training.ParameterServer;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
+import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.evaluator.Evaluator;
+import ai.djl.training.listener.EpochTrainingListener;
+import ai.djl.training.listener.EvaluatorTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.listener.TrainingListener.BatchData;
 import ai.djl.training.loss.Loss;
@@ -229,14 +232,17 @@ public class MxTrainer implements Trainer {
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings("unchecked")
-    public final <T extends Evaluator> T getEvaluator(Class<T> clazz) {
-        for (Evaluator evaluator : evaluators) {
-            if (clazz.isInstance(evaluator)) {
-                return (T) evaluator;
+    public TrainingResult getTrainingResult() {
+        TrainingResult result = new TrainingResult();
+        for (TrainingListener listener : listeners) {
+            if (listener instanceof EpochTrainingListener) {
+                result.setEpoch(((EpochTrainingListener) listener).getNumEpochs());
+            } else if (listener instanceof EvaluatorTrainingListener) {
+                EvaluatorTrainingListener l = (EvaluatorTrainingListener) listener;
+                result.setEvaluations(l.getLatestEvaluations());
             }
         }
-        return null;
+        return result;
     }
 
     /** {@inheritDoc} */

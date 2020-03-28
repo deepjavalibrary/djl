@@ -14,8 +14,8 @@ package ai.djl.examples.training;
 
 import ai.djl.ModelException;
 import ai.djl.examples.inference.ImageClassification;
-import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.modality.Classifications;
+import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
@@ -30,9 +30,9 @@ public class TrainMnistTest {
         if (Boolean.getBoolean("nightly")) {
             String[] args = new String[] {"-g", "1"};
 
-            ExampleTrainingResult result = TrainMnist.runExample(args);
-            float accuracy = result.getEvaluation("Accuracy");
-            float loss = result.getEvaluation("SoftmaxCrossEntropyLoss");
+            TrainingResult result = TrainMnist.runExample(args);
+            float accuracy = result.getValidateEvaluation("Accuracy");
+            float loss = result.getValidateLoss();
             Assert.assertTrue(accuracy > 0.9f, "Accuracy: " + accuracy);
             Assert.assertTrue(loss < 0.35f, "Loss: " + loss);
 

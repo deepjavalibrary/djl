@@ -31,11 +31,6 @@ public abstract class AbstractAccuracy extends Evaluator {
     protected int axis;
     protected int index;
 
-    /** Creates an accuracy evaluator that computes accuracy across axis 1 along the 0th index. */
-    public AbstractAccuracy() {
-        this("Accuracy", 0, 1);
-    }
-
     /**
      * Creates an accuracy evaluator that computes accuracy across axis 1 along given index.
      *
@@ -96,11 +91,7 @@ public abstract class AbstractAccuracy extends Evaluator {
     @Override
     public float getAccumulator(String key) {
         Long total = totalInstances.get(key);
-        if (total == null) {
-            throw new IllegalArgumentException("No evaluator found at that path");
-        }
-
-        if (total == 0) {
+        if (total == null || total == 0) {
             return Float.NaN;
         }
 

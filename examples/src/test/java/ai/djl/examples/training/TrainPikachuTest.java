@@ -14,7 +14,7 @@ package ai.djl.examples.training;
 
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
-import ai.djl.examples.training.util.ExampleTrainingResult;
+import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
@@ -45,10 +45,10 @@ public class TrainPikachuTest {
             args = new String[] {"-e", "1", "-m", "1", "-b", "32"};
         }
         // test train
-        ExampleTrainingResult result = TrainPikachu.runExample(args);
+        TrainingResult result = TrainPikachu.runExample(args);
 
         if (expectedLoss > 0) {
-            Assert.assertTrue(result.getEvaluation("SingleShotDetectionLoss") < expectedLoss);
+            Assert.assertTrue(result.getValidateLoss() < expectedLoss);
         }
 
         // test predict

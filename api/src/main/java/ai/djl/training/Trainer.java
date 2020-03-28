@@ -146,13 +146,11 @@ public interface Trainer extends AutoCloseable {
     List<Evaluator> getEvaluators();
 
     /**
-     * Gets the {@link Evaluator} that is an instance of the given {@link Class}.
+     * Returns the {@link TrainingResult}.
      *
-     * @param clazz the {@link Class} of the {@link Evaluator} sought
-     * @param <T> the type of the training evaluator
-     * @return the requested evaluator
+     * @return the {@code TrainingResult}
      */
-    <T extends Evaluator> T getEvaluator(Class<T> clazz);
+    TrainingResult getTrainingResult();
 
     /**
      * Gets the {@link NDManager} from the model.

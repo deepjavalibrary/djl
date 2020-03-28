@@ -17,7 +17,6 @@ import ai.djl.Model;
 import ai.djl.basicdataset.CaptchaDataset;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDArray;
@@ -27,6 +26,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
+import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.Dataset.Usage;
 import ai.djl.training.dataset.RandomAccessDataset;
@@ -54,8 +54,7 @@ public final class TrainCaptcha {
         TrainCaptcha.runExample(args);
     }
 
-    public static ExampleTrainingResult runExample(String[] args)
-            throws ParseException, IOException {
+    public static TrainingResult runExample(String[] args) throws ParseException, IOException {
         Arguments arguments = Arguments.parseArgs(args);
 
         try (Model model = Model.newInstance()) {
@@ -68,7 +67,6 @@ public final class TrainCaptcha {
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
 
-            ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
 
@@ -86,10 +84,15 @@ public final class TrainCaptcha {
                         arguments.getOutputDir(),
                         "captcha");
 
-                result = new ExampleTrainingResult(trainer);
+                TrainingResult result = trainer.getTrainingResult();
+                float accuracy = result.getValidateEvaluation("acc_digit_0");
+                model.setProperty("Epoch", String.valueOf(result.getEpoch()));
+                model.setProperty("Accuracy", String.format("%.5f", accuracy));
+                model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
+
+                model.save(Paths.get(arguments.getOutputDir()), "captcha");
+                return result;
             }
-            model.save(Paths.get(arguments.getOutputDir()), "captcha");
-            return result;
         }
     }
 

@@ -16,7 +16,6 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicdataset.Mnist;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDList;
@@ -29,6 +28,7 @@ import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.recurrent.LSTM;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
+import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
@@ -48,8 +48,7 @@ public final class TrainMnistWithLSTM {
         TrainMnistWithLSTM.runExample(args);
     }
 
-    public static ExampleTrainingResult runExample(String[] args)
-            throws IOException, ParseException {
+    public static TrainingResult runExample(String[] args) throws IOException, ParseException {
         Arguments arguments = Arguments.parseArgs(args);
 
         try (Model model = Model.newInstance()) {
@@ -64,7 +63,6 @@ public final class TrainMnistWithLSTM {
             config.addTrainingListeners(
                     TrainingListener.Defaults.logging(arguments.getOutputDir()));
 
-            ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
 
@@ -85,10 +83,15 @@ public final class TrainMnistWithLSTM {
                         arguments.getOutputDir(),
                         "lstm");
 
-                result = new ExampleTrainingResult(trainer);
+                TrainingResult result = trainer.getTrainingResult();
+                float accuracy = result.getValidateEvaluation("Accuracy");
+                model.setProperty("Epoch", String.valueOf(result.getEpoch()));
+                model.setProperty("Accuracy", String.format("%.5f", accuracy));
+                model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
+
+                model.save(Paths.get(arguments.getOutputDir()), "lstm");
+                return result;
             }
-            model.save(Paths.get(arguments.getOutputDir()), "lstm");
-            return result;
         }
     }
 

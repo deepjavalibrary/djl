@@ -17,13 +17,13 @@ import ai.djl.Model;
 import ai.djl.basicdataset.Mnist;
 import ai.djl.basicmodelzoo.basic.Mlp;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
+import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
@@ -52,8 +52,7 @@ public final class TrainWithHpo {
         TrainWithHpo.runExample(args);
     }
 
-    public static ExampleTrainingResult runExample(String[] args)
-            throws IOException, ParseException {
+    public static TrainingResult runExample(String[] args) throws IOException, ParseException {
         Arguments arguments = Arguments.parseArgs(args);
 
         // get training and validation dataset
@@ -72,31 +71,33 @@ public final class TrainWithHpo {
 
         for (int i = 0; i < hyperparameterTests; i++) {
             HpSet hpVals = hpOptimizer.nextConfig();
-            Pair<Model, ExampleTrainingResult> trained =
+            Pair<Model, TrainingResult> trained =
                     train(arguments, hpVals, trainingSet, validateSet);
             trained.getKey().close();
-            ExampleTrainingResult result = trained.getValue();
-            hpOptimizer.update(hpVals, result.getLoss());
+            float loss = trained.getValue().getValidateLoss();
+            hpOptimizer.update(hpVals, loss);
             logger.info(
-                    "--------- hp test {}/{} - Loss {} - {}",
-                    i,
-                    hyperparameterTests,
-                    result.getLoss(),
-                    hpVals);
+                    "--------- hp test {}/{} - Loss {} - {}", i, hyperparameterTests, loss, hpVals);
         }
 
         HpSet bestHpVals = hpOptimizer.getBest().getKey();
-        Pair<Model, ExampleTrainingResult> trained =
+        Pair<Model, TrainingResult> trained =
                 train(arguments, bestHpVals, trainingSet, validateSet);
-        ExampleTrainingResult result = trained.getValue();
+        TrainingResult result = trained.getValue();
+        float loss = result.getValidateLoss();
         try (Model model = trained.getKey()) {
-            logger.info("--------- FINAL_HP - Loss {} - {}", result.getLoss(), bestHpVals);
+            logger.info("--------- FINAL_HP - Loss {} - {}", loss, bestHpVals);
+
+            model.setProperty("Epoch", String.valueOf(result.getEpoch()));
+            model.setProperty(
+                    "Accuracy", String.format("%.5f", result.getValidateEvaluation("Accuracy")));
+            model.setProperty("Loss", String.format("%.5f", loss));
             model.save(Paths.get(arguments.getOutputDir()), "mlp");
         }
         return result;
     }
 
-    private static Pair<Model, ExampleTrainingResult> train(
+    private static Pair<Model, TrainingResult> train(
             Arguments arguments,
             HpSet hpVals,
             RandomAccessDataset trainingSet,
@@ -112,7 +113,6 @@ public final class TrainWithHpo {
         // setup training configuration
         DefaultTrainingConfig config = setupTrainingConfig(arguments);
 
-        ExampleTrainingResult result;
         try (Trainer trainer = model.newTrainer(config)) {
             trainer.setMetrics(new Metrics());
 
@@ -133,9 +133,9 @@ public final class TrainWithHpo {
                     arguments.getOutputDir(),
                     "mlp");
 
-            result = new ExampleTrainingResult(trainer);
+            TrainingResult result = trainer.getTrainingResult();
+            return new Pair<>(model, result);
         }
-        return new Pair<>(model, result);
     }
 
     private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {

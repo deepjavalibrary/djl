@@ -16,8 +16,8 @@ package ai.djl.examples.training;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.examples.training.transferlearning.TrainResnetWithCifar10;
-import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.training.TrainingResult;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
@@ -48,9 +48,9 @@ public class TrainResNetTest {
             // and only train 10 batch for unit test.
             String[] args = {"-e", "10", "-g", "4", "-s", "-p"};
 
-            ExampleTrainingResult result = TrainResnetWithCifar10.runExample(args);
-            Assert.assertTrue(result.getEvaluation("Accuracy") >= 0.7f);
-            Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 1.1);
+            TrainingResult result = TrainResnetWithCifar10.runExample(args);
+            Assert.assertTrue(result.getValidateEvaluation("Accuracy") >= 0.7f);
+            Assert.assertTrue(result.getValidateLoss() < 1.1);
         }
     }
 
@@ -66,9 +66,9 @@ public class TrainResNetTest {
             // and only train 10 batch for unit test.
             String[] args = {"-e", "10", "-g", "4"};
 
-            ExampleTrainingResult result = TrainResnetWithCifar10.runExample(args);
-            Assert.assertTrue(result.getEvaluation("Accuracy") >= 0.7f);
-            Assert.assertTrue(result.getEvaluation("SoftmaxCrossEntropyLoss") < 1);
+            TrainingResult result = TrainResnetWithCifar10.runExample(args);
+            Assert.assertTrue(result.getValidateEvaluation("Accuracy") >= 0.7f);
+            Assert.assertTrue(result.getValidateLoss() < 1);
         }
     }
 }

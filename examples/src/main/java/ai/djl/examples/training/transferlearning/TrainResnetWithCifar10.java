@@ -20,7 +20,6 @@ import ai.djl.basicdataset.Cifar10;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
@@ -38,6 +37,7 @@ import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
+import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
@@ -67,7 +67,7 @@ public final class TrainResnetWithCifar10 {
         TrainResnetWithCifar10.runExample(args);
     }
 
-    public static ExampleTrainingResult runExample(String[] args)
+    public static TrainingResult runExample(String[] args)
             throws IOException, ParseException, ModelNotFoundException, MalformedModelException {
         Arguments arguments = Arguments.parseArgs(args);
 
@@ -79,7 +79,6 @@ public final class TrainResnetWithCifar10 {
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
 
-            ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
 
@@ -99,10 +98,16 @@ public final class TrainResnetWithCifar10 {
                         arguments.getOutputDir(),
                         "resnetv1");
 
-                result = new ExampleTrainingResult(trainer);
+                TrainingResult result = trainer.getTrainingResult();
+                model.setProperty("Epoch", String.valueOf(result.getEpoch()));
+                model.setProperty(
+                        "Accuracy",
+                        String.format("%.5f", result.getValidateEvaluation("Accuracy")));
+                model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
+
+                model.save(Paths.get("build/model"), "resnetv1");
+                return result;
             }
-            model.save(Paths.get("build/model"), "resnetv1");
-            return result;
         }
     }
 

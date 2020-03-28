@@ -55,4 +55,13 @@ public class EpochTrainingListener implements TrainingListener {
     public void onTrainingEnd(Trainer trainer) {
         trainer.getModel().setProperty("Epoch", Integer.toString(numEpochs));
     }
+
+    /**
+     * Returns the number of epochs.
+     *
+     * @return the number of epochs
+     */
+    public int getNumEpochs() {
+        return numEpochs;
+    }
 }

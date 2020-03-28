@@ -51,8 +51,7 @@ public class BinaryAccuracy extends AbstractAccuracy {
      * @param index the index of the NDArray in labels to compute accuracy for
      */
     public BinaryAccuracy(String name, float threshold, int index) {
-        super(name, index);
-        this.threshold = threshold;
+        this(name, threshold, index, 1);
     }
 
     /**
@@ -62,13 +61,12 @@ public class BinaryAccuracy extends AbstractAccuracy {
      * @param threshold the value differentiating the posive and negative classes (usually 0 or .5)
      */
     public BinaryAccuracy(float threshold) {
-        super();
-        this.threshold = threshold;
+        this("BinaryAccuracy", threshold, 0, 1);
     }
 
     /** Creates a binary (two class) accuracy evaluator with 0 threshold. */
     public BinaryAccuracy() {
-        super();
+        this(0);
     }
 
     /** {@inheritDoc} */

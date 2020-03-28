@@ -18,7 +18,6 @@ import ai.djl.Model;
 import ai.djl.basicdataset.PikachuDetection;
 import ai.djl.basicmodelzoo.cv.object_detection.ssd.SingleShotDetection;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.ExampleTrainingResult;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
@@ -36,6 +35,7 @@ import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
+import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.BoundingBoxError;
@@ -70,8 +70,7 @@ public final class TrainPikachu {
         TrainPikachu.runExample(args);
     }
 
-    public static ExampleTrainingResult runExample(String[] args)
-            throws IOException, ParseException {
+    public static TrainingResult runExample(String[] args) throws IOException, ParseException {
         Arguments arguments = Arguments.parseArgs(args);
 
         try (Model model = Model.newInstance()) {
@@ -82,7 +81,6 @@ public final class TrainPikachu {
 
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
 
-            ExampleTrainingResult result;
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
 
@@ -96,10 +94,15 @@ public final class TrainPikachu {
                         arguments.getOutputDir(),
                         "ssd");
 
-                result = new ExampleTrainingResult(trainer);
+                TrainingResult result = trainer.getTrainingResult();
+                float accuracy = result.getValidateEvaluation("classAccuracy");
+                model.setProperty("Epoch", String.valueOf(result.getEpoch()));
+                model.setProperty("ClassAccuracy", String.format("%.5f", accuracy));
+                model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
+
+                model.save(Paths.get(arguments.getOutputDir()), "ssd");
+                return result;
             }
-            model.save(Paths.get(arguments.getOutputDir()), "ssd");
-            return result;
         }
     }
 
