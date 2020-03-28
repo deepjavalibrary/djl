@@ -18,3 +18,15 @@ task syncS3(type: Exec) {
         return standardOutput.toString()
     }
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "TensorFlow model zoo"
+                description = "TensorFlow model zoo for DJL"
+                url = "http://www.djl.ai/tensorflow/${project.name}"
+            }
+        }
+    }
+}

@@ -48,3 +48,15 @@ compileJava.dependsOn downloadJar
 test {
     environment "PATH", "src/test/bin:${environment.PATH}"
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "TensorFlow Engine Adapter"
+                description = "TensorFlow Engine Adapter for DJL"
+                url = "http://www.djl.ai/tensorflow/${project.name}"
+            }
+        }
+    }
+}
