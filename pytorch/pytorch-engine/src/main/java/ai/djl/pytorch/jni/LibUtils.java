@@ -268,11 +268,8 @@ public final class LibUtils {
         // if files not found
         Path tmp = Paths.get(userHome, ".pytorch/cache/tmp");
         Files.createDirectories(tmp);
-        int pos = version.indexOf("-SNAPSHOT");
-        if (pos > 0) {
-            version = version.substring(0, pos);
-        }
-        String link = "https://djl-ai.s3.amazonaws.com/publish/pytorch-" + version;
+        String[] versions = version.split("-");
+        String link = "https://djl-ai.s3.amazonaws.com/publish/pytorch-" + versions[0];
 
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
