@@ -25,6 +25,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import org.slf4j.Logger;
@@ -48,6 +50,9 @@ public final class LibUtils {
 
     private static final String LIB_NAME = "djl_torch";
     private static final String NATIVE_LIB_NAME = "torch";
+
+    private static final Pattern VERSION_PATTERN =
+            Pattern.compile("(\\d+\\.\\d+\\.\\d+(-\\w)?)(-SNAPSHOT)?(-\\d+)?");
 
     private LibUtils() {}
 
@@ -268,9 +273,12 @@ public final class LibUtils {
         // if files not found
         Path tmp = Paths.get(userHome, ".pytorch/cache/tmp");
         Files.createDirectories(tmp);
-        String[] versions = version.split("-");
-        String link = "https://djl-ai.s3.amazonaws.com/publish/pytorch-" + versions[0];
 
+        Matcher matcher = VERSION_PATTERN.matcher(version);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Unexpected version: " + version);
+        }
+        String link = "https://djl-ai.s3.amazonaws.com/publish/pytorch-" + matcher.group(1);
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
             for (String line : lines) {

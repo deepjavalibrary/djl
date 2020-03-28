@@ -56,6 +56,9 @@ public final class LibUtils {
     private static final String LIB_NAME = "mxnet";
     private static final Pattern PATH_PATTERN = Pattern.compile("\\s*'(.+)',");
 
+    private static final Pattern VERSION_PATTERN =
+            Pattern.compile("(\\d+\\.\\d+\\.\\d+(-\\w)?)(-SNAPSHOT)?(-\\d+)?");
+
     private LibUtils() {}
 
     public static MxnetLibrary loadLibrary() {
@@ -273,8 +276,11 @@ public final class LibUtils {
         Path tmp = Paths.get(userHome, ".mxnet/cache/tmp");
         Files.createDirectories(tmp);
 
-        String[] versions = version.split("-");
-        String link = "https://djl-ai.s3.amazonaws.com/publish/mxnet-" + versions[0];
+        Matcher matcher = VERSION_PATTERN.matcher(version);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Unexpected version: " + version);
+        }
+        String link = "https://djl-ai.s3.amazonaws.com/publish/mxnet-" + matcher.group(1);
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
             if (cudaArch != null) {
