@@ -273,11 +273,8 @@ public final class LibUtils {
         Path tmp = Paths.get(userHome, ".mxnet/cache/tmp");
         Files.createDirectories(tmp);
 
-        int pos = version.indexOf("-SNAPSHOT");
-        if (pos > 0) {
-            version = version.substring(0, pos);
-        }
-        String link = "https://djl-ai.s3.amazonaws.com/publish/mxnet-" + version;
+        String[] versions = version.split("-");
+        String link = "https://djl-ai.s3.amazonaws.com/publish/mxnet-" + versions[0];
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
             if (cudaArch != null) {
