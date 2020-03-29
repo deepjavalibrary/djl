@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.inference.benchmark.util;
 
+import ai.djl.engine.Engine;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.util.BufferedImageUtils;
@@ -180,7 +181,19 @@ public class Arguments {
     }
 
     public String getArtifactId() {
-        return artifactId;
+        if (artifactId != null) {
+            return artifactId;
+        }
+
+        switch (Engine.getInstance().getEngineName()) {
+            case "PyTorch":
+                return "ai.djl.pytorch:resnet";
+            case "TensorFlow":
+                return "ai.djl.tensorflow:resnet";
+            case "MXNet":
+            default:
+                return "ai.djl.mxnet:resnet";
+        }
     }
 
     public Path getImageFile() throws FileNotFoundException {

@@ -225,9 +225,6 @@ public abstract class AbstractBenchmark {
             throws ModelException, IOException, ClassNotFoundException {
         long begin = System.nanoTime();
         String artifactId = arguments.getArtifactId();
-        if (artifactId == null) {
-            artifactId = "ai.djl.mxnet:resnet";
-        }
         Class<?> input = arguments.getInputClass();
         Class<?> output = arguments.getOutputClass();
         Shape shape = arguments.getInputShape();
