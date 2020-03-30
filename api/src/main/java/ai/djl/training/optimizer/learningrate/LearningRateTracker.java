@@ -92,13 +92,12 @@ public abstract class LearningRateTracker {
     }
 
     /**
-     * Returns a new instance of {@link ai.djl.training.optimizer.learningrate.MultiFactorTracker}.
+     * Returns a new instance of {@code LearningRateTracker} with the fixed learning rate.
      *
      * @param learningRate the fixed learning rate
-     * @return the {@link MultiFactorTracker} {@link
-     *     ai.djl.training.optimizer.learningrate.MultiFactorTracker.Builder}
+     * @return a instance of {@code LearningRateTracker} with the fixed learning rate
      */
-    public static FixedLearningRate fixedLearningRate(float learningRate) {
+    public static LearningRateTracker fixedLearningRate(float learningRate) {
         return FixedLearningRate.builder().optBaseLearningRate(learningRate).build();
     }
 
