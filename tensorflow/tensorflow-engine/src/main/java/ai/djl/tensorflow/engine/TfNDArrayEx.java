@@ -26,6 +26,8 @@ import java.util.List;
 import org.tensorflow.Operand;
 import org.tensorflow.op.Ops;
 import org.tensorflow.op.core.Stack;
+import org.tensorflow.types.family.TNumber;
+import org.tensorflow.types.family.TType;
 
 public class TfNDArrayEx implements NDArrayEx {
 
@@ -400,7 +402,7 @@ public class TfNDArrayEx implements NDArrayEx {
         return new TfNDArray(
                 manager,
                 tf.image.resizeBilinear(
-                        (Operand<? extends Number>) operand,
+                        (Operand<? extends TNumber>) operand,
                         tf.constant(new int[] {width, height})));
     }
 
@@ -428,7 +430,7 @@ public class TfNDArrayEx implements NDArrayEx {
         return stackHelper(arrays, axis);
     }
 
-    private <T> NDArray stackHelper(NDList arrays, int axis) {
+    private <T extends TType> NDArray stackHelper(NDList arrays, int axis) {
         ArrayList<Operand<T>> operands = new ArrayList<>(arrays.size() + 1);
         operands.add(array.asOperand());
         for (NDArray ndArray : arrays) {
@@ -444,7 +446,7 @@ public class TfNDArrayEx implements NDArrayEx {
         return concatHelper(arrays, axis);
     }
 
-    private <T> NDArray concatHelper(NDList arrays, int axis) {
+    private <T extends TType> NDArray concatHelper(NDList arrays, int axis) {
         ArrayList<Operand<T>> operands = new ArrayList<>(arrays.size() + 1);
         operands.add(array.asOperand());
         for (NDArray ndArray : arrays) {

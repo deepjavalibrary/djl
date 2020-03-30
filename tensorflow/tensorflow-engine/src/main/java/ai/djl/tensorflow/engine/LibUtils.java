@@ -16,6 +16,7 @@ package ai.djl.tensorflow.engine;
 import ai.djl.engine.EngineException;
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -35,7 +36,7 @@ public final class LibUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
 
-    private static final String LIB_NAME = "tensorflow_jni";
+    private static final String LIB_NAME = "jnitensorflow";
     private static final Pattern VERSION_PATTERN =
             Pattern.compile("(\\d+\\.\\d+\\.\\d+(-\\w)?)(-SNAPSHOT)?(-\\d+)?");
 
@@ -45,7 +46,8 @@ public final class LibUtils {
         String libName = getTensorFlowLib();
         if (libName != null) {
             logger.debug("Loading TensorFlow library from: {}", libName);
-            System.load(libName);
+            String path = new File(libName).getParentFile().toString();
+            System.setProperty("org.bytedeco.javacpp.platform.preloadpath", path);
         }
     }
 

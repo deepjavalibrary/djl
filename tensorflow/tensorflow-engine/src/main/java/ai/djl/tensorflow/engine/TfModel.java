@@ -34,7 +34,8 @@ import java.util.stream.Collectors;
 import org.tensorflow.SavedModelBundle;
 
 public class TfModel extends BaseModel {
-    private AtomicBoolean first = new AtomicBoolean(true);
+
+    private AtomicBoolean first;
     private NDManager manager;
 
     /**

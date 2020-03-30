@@ -1,34 +1,30 @@
 group "ai.djl.tensorflow"
 
+repositories {
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+}
+
+configurations {
+    exclusion
+}
+
 dependencies {
-    api group: 'org.tensorflow', name: 'proto', version: '1.15.0'
-    api files("libs/libtensorflow.jar")
+    api "org.bytedeco:javacpp:1.5.2"
+    api "org.tensorflow:tensorflow-core-api:0.1.0-SNAPSHOT"
+    api "org.tensorflow:tensorflow-tools:0.1.0-SNAPSHOT"
+
+    exclusion "org.bytedeco:javacpp:1.5.2"
 }
 
 jar {
     from {
-        zipTree(file("libs/libtensorflow.jar"))
-    }
-}
-
-task downloadJar() {
-    doLast {
-        def url = "https://storage.googleapis.com/tensorflow-nightly/github/tensorflow/lib_package"
-        def fileName = "libtensorflow.jar"
-        def dir = file("libs")
-        dir.mkdirs()
-        def file = new File(dir, fileName)
-        if (!file.exists()) {
-            println "downloading ${url} ..."
-            new URL("${url}/${fileName}").withInputStream { downloadStream ->
-                file.withOutputStream { os ->
-                    os << downloadStream
-                }
-            }
+        (configurations.compileClasspath - configurations.exclusion).collect {
+            it.isDirectory() ? it : zipTree(it)
         }
     }
 }
-compileJava.dependsOn("downloadJar")
 
 publishing {
     publications {
@@ -37,6 +33,15 @@ publishing {
                 name = "TensorFlow 2.0 core api"
                 description = "TensorFlow 2.0 core api"
                 url = "http://www.djl.ai/tensorflow/${project.name}"
+
+                withXml {
+                    Node pomNode = asNode()
+                    pomNode.dependencies."*".findAll() {
+                        it.artifactId.text() == "tensorflow-core-api"
+                    }.each() {
+                        it.parent().remove(it)
+                    }
+                }
             }
         }
     }

@@ -48,7 +48,13 @@ import org.tensorflow.op.core.Prod;
 import org.tensorflow.op.core.Squeeze;
 import org.tensorflow.op.math.Mean;
 import org.tensorflow.op.nn.TopK;
-import org.tensorflow.types.UInt8;
+import org.tensorflow.tools.buffer.ByteDataBuffer;
+import org.tensorflow.tools.buffer.DataBuffers;
+import org.tensorflow.types.TBool;
+import org.tensorflow.types.TFloat32;
+import org.tensorflow.types.TInt64;
+import org.tensorflow.types.TUint8;
+import org.tensorflow.types.family.TType;
 
 public class TfNDArray implements NDArray {
 
@@ -70,7 +76,7 @@ public class TfNDArray implements NDArray {
         this.manager = (TfNDManager) manager;
         this.manager.attach(getUid(), this);
         this.tensor = tensor;
-        this.shape = new Shape(tensor.shape());
+        this.shape = new Shape(tensor.shape().asArray());
         this.tf = this.manager.getTf();
         tfNDArrayEx = new TfNDArrayEx(this);
     }
@@ -79,7 +85,7 @@ public class TfNDArray implements NDArray {
         this.manager = (TfNDManager) manager;
         this.manager.attach(getUid(), this);
         this.tensor = out.asOutput().tensor();
-        this.shape = new Shape(tensor.shape());
+        this.shape = new Shape(tensor.shape().asArray());
         this.tf = this.manager.getTf();
         tfNDArrayEx = new TfNDArrayEx(this);
     }
@@ -87,7 +93,7 @@ public class TfNDArray implements NDArray {
     public TfNDArray(NDManager manager, Shape shape, FloatBuffer data) {
         this.manager = (TfNDManager) manager;
         this.manager.attach(getUid(), this);
-        tensor = Tensor.create(shape.getShape(), data);
+        tensor = Tensor.of(TFloat32.DTYPE, toTfShape(shape), toDataBuffer(data));
         this.shape = shape;
         this.tf = this.manager.getTf();
         tfNDArrayEx = new TfNDArrayEx(this);
@@ -96,9 +102,9 @@ public class TfNDArray implements NDArray {
     TfNDArray(NDManager manager, Shape shape, ByteBuffer data) {
         this.manager = (TfNDManager) manager;
         this.manager.attach(getUid(), this);
-        tensor = Tensor.create(UInt8.class, shape.getShape(), data);
         this.shape = shape;
         this.tf = this.manager.getTf();
+        tensor = Tensor.of(TUint8.DTYPE, toTfShape(shape), DataBuffers.of(data));
         tfNDArrayEx = new TfNDArrayEx(this);
     }
 
@@ -143,12 +149,12 @@ public class TfNDArray implements NDArray {
     public Shape getShape() {
         if (shape == null) {
             // runToTensor();
-            shape = new Shape(tensor.shape());
+            shape = new Shape(tensor.shape().asArray());
         }
         return shape;
     }
 
-    public org.tensorflow.DataType getTfDataType() {
+    public org.tensorflow.DataType<? extends TType> getTfDataType() {
         return tensor.dataType();
     }
 
@@ -173,7 +179,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
-        Operand<?> output = tf.dtypes.cast(asOperand(), TfDataType.toPrimitiveClass(dataType));
+        Operand<?> output = tf.dtypes.cast(asOperand(), TfDataType.toTf(dataType));
         if (copy) {
             output = tf.deepCopy(output);
         }
@@ -197,11 +203,9 @@ public class TfNDArray implements NDArray {
         DataType dType = getDataType();
         long product = sh.size();
         long len = dType.getNumOfBytes() * product;
-        ByteBuffer bb = manager.allocateDirect(Math.toIntExact(len));
-        tensor.writeTo(bb);
-        // reset buffer position for converting to other buffer type
-        bb.rewind();
-        return bb;
+        byte[] buf = new byte[Math.toIntExact(len)];
+        tensor.rawData().read(buf);
+        return ByteBuffer.wrap(buf);
     }
 
     /** {@inheritDoc} */
@@ -283,7 +287,7 @@ public class TfNDArray implements NDArray {
         }
         ((TfNDArray) ndArray).tensor = tf.deepCopy(asOperand()).asOutput().tensor();
         ((TfNDArray) ndArray).operand = null;
-        ((TfNDArray) ndArray).shape = new Shape(tensor.shape());
+        ((TfNDArray) ndArray).shape = new Shape(tensor.shape().asArray());
     }
 
     /** {@inheritDoc} */
@@ -365,6 +369,7 @@ public class TfNDArray implements NDArray {
     public NDArray neq(Number other) {
         return neq(manager.create(other).toType(getDataType(), false));
     }
+
     /** {@inheritDoc} */
     @Override
     public NDArray neq(NDArray other) {
@@ -1049,7 +1054,7 @@ public class TfNDArray implements NDArray {
                         tf.constant(axis),
                         (long) sizes.size())
                 .forEach(output -> result.add(new TfNDArray(manager, output)));
-        return null;
+        return result;
     }
 
     /** {@inheritDoc} */
@@ -1159,6 +1164,7 @@ public class TfNDArray implements NDArray {
             k = (int) getShape().getShape()[axis];
             // do transpose
             if (axis < 0) {
+                // FIXME: This is dead code, why is here?
                 axis = axis + rank;
             }
 
@@ -1186,7 +1192,7 @@ public class TfNDArray implements NDArray {
             result = tf.linalg.transpose(result, ((TfNDArray) transposition).asOperand());
         }
         // always return long as indices type
-        return new TfNDArray(manager, tf.dtypes.cast(result, Long.class));
+        return new TfNDArray(manager, tf.dtypes.cast(result, TInt64.DTYPE));
     }
 
     /** {@inheritDoc} */
@@ -1216,13 +1222,13 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray isInfinite() {
-        return new TfNDArray(manager, tf.dtypes.cast(tf.math.isInf(asOperand()), Boolean.class));
+        return new TfNDArray(manager, tf.dtypes.cast(tf.math.isInf(asOperand()), TBool.DTYPE));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray isNaN() {
-        return new TfNDArray(manager, tf.dtypes.cast(tf.math.isNan(asOperand()), Boolean.class));
+        return new TfNDArray(manager, tf.dtypes.cast(tf.math.isNan(asOperand()), TBool.DTYPE));
     }
 
     /** {@inheritDoc} */
@@ -1432,7 +1438,7 @@ public class TfNDArray implements NDArray {
     }
 
     @SuppressWarnings("unchecked")
-    <T> Operand<T> asOperand() {
+    <T extends TType> Operand<T> asOperand() {
         if (operand == null) {
             Operation op =
                     manager.getEagerSession()
@@ -1450,15 +1456,26 @@ public class TfNDArray implements NDArray {
     }
 
     int getRank() {
-        return tf.rank(asOperand()).asOutput().tensor().intValue();
+        return tf.rank(asOperand()).asOutput().tensor().rawData().asInts().getInt(0);
     }
 
-    private <T> Constant<T> toConstant(Number n, DataType jType) {
+    private <T extends TType> Constant<T> toConstant(Number n, DataType jType) {
         return getConstant(n, jType, tf);
     }
 
+    public static org.tensorflow.tools.Shape toTfShape(Shape shape) {
+        return org.tensorflow.tools.Shape.of(shape.getShape());
+    }
+
+    public static ByteDataBuffer toDataBuffer(FloatBuffer buffer) {
+        // FIXME: find a better way or improve TF java implemenetation
+        ByteBuffer bb = ByteBuffer.allocate(buffer.remaining() * 4);
+        bb.asFloatBuffer().put(buffer);
+        return DataBuffers.of(bb);
+    }
+
     @SuppressWarnings("unchecked")
-    static <T> Constant<T> getConstant(Number n, DataType jType, Ops tf) {
+    static <T extends TType> Constant<T> getConstant(Number n, DataType jType, Ops tf) {
         switch (jType) {
             case INT8:
                 return (Constant<T>) tf.constant(n.byteValue());

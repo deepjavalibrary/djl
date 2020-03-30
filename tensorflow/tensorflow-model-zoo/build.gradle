@@ -1,5 +1,12 @@
 group 'ai.djl.tensorflow'
 
+repositories {
+    mavenLocal()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+}
+
 dependencies {
     api project(":tensorflow:tensorflow-engine")
 

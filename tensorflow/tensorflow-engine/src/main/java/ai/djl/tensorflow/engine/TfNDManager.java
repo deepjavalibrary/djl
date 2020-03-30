@@ -29,17 +29,23 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.file.Path;
-import java.util.Arrays;
 import org.tensorflow.EagerSession;
 import org.tensorflow.Operand;
 import org.tensorflow.Tensor;
-import org.tensorflow.Tensors;
 import org.tensorflow.op.Ops;
 import org.tensorflow.op.core.Constant;
+import org.tensorflow.tools.buffer.ByteDataBuffer;
+import org.tensorflow.tools.buffer.DataBuffers;
+import org.tensorflow.types.TBool;
+import org.tensorflow.types.TFloat32;
+import org.tensorflow.types.TInt32;
+import org.tensorflow.types.TUint8;
+import org.tensorflow.types.family.TType;
 
 public class TfNDManager extends BaseNDManager {
 
     static final TfNDManager SYSTEM_MANAGER = new SystemManager();
+
     private static int nameAssignment = 1;
     EagerSession eagerSession;
     Ops tf;
@@ -79,39 +85,43 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray create(byte[] data) {
-        return new TfNDArray(this, Tensor.create(data));
+        org.tensorflow.tools.Shape shape = org.tensorflow.tools.Shape.of(data.length);
+        return new TfNDArray(this, TUint8.tensorOf(shape, DataBuffers.of(data)));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(float[] data) {
-        return new TfNDArray(this, Tensors.create(data));
+        org.tensorflow.tools.Shape shape = org.tensorflow.tools.Shape.of(data.length);
+        return new TfNDArray(this, TFloat32.tensorOf(shape, DataBuffers.of(data)));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(int[] data) {
-        return new TfNDArray(this, Tensors.create(data));
+        org.tensorflow.tools.Shape shape = org.tensorflow.tools.Shape.of(data.length);
+        return new TfNDArray(this, TInt32.tensorOf(shape, DataBuffers.of(data)));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(boolean[] data) {
-        return new TfNDArray(this, Tensors.create(data));
+        org.tensorflow.tools.Shape shape = org.tensorflow.tools.Shape.of(data.length);
+        return new TfNDArray(this, TBool.tensorOf(shape, DataBuffers.of(data)));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(int data) {
         // create scalar tensor with int
-        return new TfNDArray(this, Tensors.create(data));
+        return new TfNDArray(this, TInt32.scalarOf(data));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(float data) {
         // create scalar tensor with float
-        return new TfNDArray(this, Tensors.create(data));
+        return new TfNDArray(this, TFloat32.scalarOf(data));
     }
 
     /** {@inheritDoc} */
@@ -122,12 +132,9 @@ public class TfNDManager extends BaseNDManager {
             // initialize with scalar 0
             return create(0f).toType(dataType, false);
         }
-        return new TfNDArray(
-                this,
-                tf.empty(
-                        tf.constant(
-                                Arrays.stream(shape.getShape()).mapToInt(i -> (int) i).toArray()),
-                        TfDataType.toPrimitiveClass(dataType)));
+
+        Tensor<?> tensor = Tensor.of(TfDataType.toTf(dataType), TfNDArray.toTfShape(shape));
+        return new TfNDArray(this, tensor);
     }
 
     public TfNDArray create(Tensor<?> tensor) {
@@ -171,8 +178,10 @@ public class TfNDManager extends BaseNDManager {
                 throw new AssertionError("Show never happen");
         }
         buf.rewind();
-        return new TfNDArray(
-                this, Tensor.create(TfDataType.toPrimitiveClass(dataType), shape.getShape(), buf));
+
+        ByteDataBuffer db = DataBuffers.of(buf);
+        Tensor<?> tensor = Tensor.of(TfDataType.toTf(dataType), TfNDArray.toTfShape(shape), db);
+        return new TfNDArray(this, tensor);
     }
 
     /** {@inheritDoc} */
@@ -216,8 +225,7 @@ public class TfNDManager extends BaseNDManager {
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Device device) {
         return new TfNDArray(
-                this,
-                tf.zeros(tf.constant(shape.getShape()), TfDataType.toPrimitiveClass(dataType)));
+                this, tf.zeros(tf.constant(shape.getShape()), TfDataType.toTf(dataType)));
     }
 
     /** {@inheritDoc} */
@@ -276,18 +284,19 @@ public class TfNDManager extends BaseNDManager {
         return eyeHelper(rows, cols, k, dataType, device);
     }
 
-    public <T> NDArray eyeHelper(int rows, int cols, int k, DataType dataType, Device device) {
-        Operand<T> diagnal =
+    private <T extends TType> NDArray eyeHelper(
+            int rows, int cols, int k, DataType dataType, Device device) {
+        Operand<T> diagonal =
                 ((TfNDArray) ones(new Shape(Math.min(rows, cols)), dataType, device)).asOperand();
 
         Operand<T> value = ((TfNDArray) zeros(new Shape(1))).asOperand();
         Operand<T> output =
-                tf.matrixDiagV2(
-                        diagnal, tf.constant(k), tf.constant(rows), tf.constant(cols), value);
+                tf.linalg.matrixDiag(
+                        diagonal, tf.constant(k), tf.constant(rows), tf.constant(cols), value);
         return new TfNDArray(this, output);
     }
 
-    <T extends Number> Constant<T> toConstant(Number n, DataType jType) {
+    <T extends TType> Constant<T> toConstant(Number n, DataType jType) {
         return TfNDArray.getConstant(n, jType, tf);
     }
 
