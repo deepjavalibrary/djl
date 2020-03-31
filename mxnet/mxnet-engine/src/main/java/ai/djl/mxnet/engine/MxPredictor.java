@@ -51,7 +51,7 @@ public class MxPredictor<I, O> extends BasePredictor<I, O> {
     @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
-        if (((MxNDManager) manager).isOpen()) {
+        if (manager != null && ((MxNDManager) manager).isOpen()) {
             if (logger.isDebugEnabled()) {
                 logger.warn(
                         "MxPredictor was not closed explicitly: {}", getClass().getSimpleName());

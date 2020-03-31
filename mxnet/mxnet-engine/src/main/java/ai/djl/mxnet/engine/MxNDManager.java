@@ -29,6 +29,10 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** {@code MxNDManager} is the MXNet implementation of {@link NDManager}. */
 public class MxNDManager extends BaseNDManager {
@@ -42,7 +46,9 @@ public class MxNDManager extends BaseNDManager {
      */
     private static final MxNDManager SYSTEM_MANAGER = new SystemManager();
 
+    private static final Map<Device, Queue<MxNDManager>> POOL = new ConcurrentHashMap<>();
     private static final NDArray[] EMPTY = new NDArray[0];
+    private static final int CACHE_SIZE = 30;
 
     private MxNDManager(NDManager parent, Device device) {
         super(parent, device);
@@ -265,7 +271,15 @@ public class MxNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public MxNDManager newSubManager(Device dev) {
-        MxNDManager manager = new MxNDManager(this, dev);
+        Queue<MxNDManager> queue =
+                POOL.computeIfAbsent(dev, d -> new ArrayBlockingQueue<>(CACHE_SIZE));
+        MxNDManager manager = queue.poll();
+        if (manager == null) {
+            manager = new MxNDManager(this, dev);
+        } else {
+            manager.parent = this;
+            manager.closed.set(false);
+        }
         attach(manager.uid, manager);
         return manager;
     }
@@ -358,6 +372,17 @@ public class MxNDManager extends BaseNDManager {
     @Override
     public Engine getEngine() {
         return Engine.getEngine(MxEngine.ENGINE_NAME);
+    }
+
+    @Override
+    public synchronized void close() {
+        if (!closed.get()) {
+            super.close();
+            Queue<MxNDManager> queue = POOL.get(device);
+            if (queue != null) {
+                queue.offer(this);
+            }
+        }
     }
 
     private NDArray fill(String opName, Device dev, Shape shape, DataType dataType) {

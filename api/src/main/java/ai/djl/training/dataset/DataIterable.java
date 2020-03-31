@@ -110,12 +110,14 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
         if (executor != null) {
             if (queue.isEmpty()) {
                 manager.close();
+                manager = null;
                 return false;
             }
             return true;
         }
         if (!sample.hasNext()) {
             manager.close();
+            manager = null;
             return false;
         }
         return true;

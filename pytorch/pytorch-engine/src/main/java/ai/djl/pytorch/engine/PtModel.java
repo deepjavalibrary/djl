@@ -112,5 +112,6 @@ public class PtModel extends BaseModel {
     @Override
     public void close() {
         manager.close();
+        manager = null;
     }
 }
