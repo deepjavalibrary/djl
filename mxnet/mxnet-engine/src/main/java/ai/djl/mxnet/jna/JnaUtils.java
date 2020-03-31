@@ -69,6 +69,7 @@ public final class JnaUtils {
     private static final MxnetLibrary LIB = LibUtils.loadLibrary();
 
     private static final Map<String, FunctionInfo> OPS = getNdArrayFunctions();
+    private static final Set<String> FEATURES = getFeaturesInternal();
 
     private JnaUtils() {}
 
@@ -221,6 +222,10 @@ public final class JnaUtils {
     /////////////////////////////////
 
     public static Set<String> getFeatures() {
+        return FEATURES;
+    }
+
+    private static Set<String> getFeaturesInternal() {
         PointerByReference ref = new PointerByReference();
         NativeSizeByReference outSize = new NativeSizeByReference();
         checkCall(LIB.MXLibInfoFeatures(ref, outSize));
