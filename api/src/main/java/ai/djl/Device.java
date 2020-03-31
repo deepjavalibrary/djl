@@ -15,7 +15,9 @@ package ai.djl;
 import ai.djl.engine.Engine;
 import ai.djl.engine.StandardCapabilities;
 import ai.djl.util.cuda.CudaUtils;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The {@code Device} class provides the specified assignment for CPU/GPU processing on the {@code
@@ -24,24 +26,15 @@ import java.util.Objects;
  * <p>Users can use this to specify whether to load/compute the {@code NDArray} on CPU/GPU with
  * deviceType and deviceId provided.
  */
-public class Device {
+public final class Device {
 
-    private static final Device CPU = new Device(Type.CPU);
-    private static final Device GPU = new Device(Type.GPU, 0);
+    private static final Map<String, Device> CACHE = new ConcurrentHashMap<>();
+
+    private static final Device CPU = new Device(Type.CPU, -1);
+    private static final Device GPU = Device.of(Type.GPU, 0);
 
     private String deviceType;
     private int deviceId;
-
-    /**
-     * Creates a {@code Device} with basic information.
-     *
-     * @param deviceType the device type, typically CPU or GPU choose which GPU to process the
-     *     NDArray
-     */
-    public Device(String deviceType) {
-        this.deviceType = deviceType;
-        this.deviceId = ("cpu".equals(deviceType) ? -1 : 0);
-    }
 
     /**
      * Creates a {@code Device} with basic information.
@@ -50,13 +43,24 @@ public class Device {
      * @param deviceId the deviceId on the hardware. For example, if you have multiple GPUs, you can
      *     choose which GPU to process the NDArray
      */
-    public Device(String deviceType, int deviceId) {
-        if (Type.CPU.equals(deviceType)) {
-            throw new IllegalArgumentException(
-                    "CPU doesn't have device id, please use new Device(\"cpu\") instead");
-        }
+    private Device(String deviceType, int deviceId) {
         this.deviceType = deviceType;
         this.deviceId = deviceId;
+    }
+
+    /**
+     * Returns a {@code Device} with device type and device id.
+     *
+     * @param deviceType the device type, typically CPU or GPU
+     * @param deviceId the deviceId on the hardware.
+     * @return a {@code Device} instance
+     */
+    public static Device of(String deviceType, int deviceId) {
+        if (Type.CPU.equals(deviceType)) {
+            return CPU;
+        }
+        String key = deviceType + '-' + deviceId;
+        return CACHE.computeIfAbsent(key, k -> new Device(deviceType, deviceId));
     }
 
     /**
@@ -136,7 +140,7 @@ public class Device {
      * @return a new instance of GPU {@code Device} with specified {@code deviceId}
      */
     public static Device gpu(int deviceId) {
-        return new Device(Type.GPU, deviceId);
+        return of(Type.GPU, deviceId);
     }
 
     /**
@@ -157,7 +161,7 @@ public class Device {
 
         Device[] devices = new Device[count];
         for (int i = 0; i < count; ++i) {
-            devices[i] = new Device(Type.GPU, i);
+            devices[i] = gpu(i);
         }
         return devices;
     }
@@ -197,9 +201,9 @@ public class Device {
      */
     public static Device defaultDevice() {
         if (getGpuCount() > 0) {
-            return Device.gpu();
+            return GPU;
         }
-        return Device.cpu();
+        return CPU;
     }
 
     /**
