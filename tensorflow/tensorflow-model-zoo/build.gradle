@@ -1,7 +1,6 @@
 group 'ai.djl.tensorflow'
 
 dependencies {
-    api project(":repository")
     api project(":tensorflow:tensorflow-engine")
 
     testImplementation("org.testng:testng:${testng_version}") {

@@ -1,7 +1,6 @@
 group 'ai.djl.pytorch'
 
 dependencies {
-    api project(":repository")
     api project(":pytorch:pytorch-engine")
 
     testImplementation("org.testng:testng:${testng_version}") {

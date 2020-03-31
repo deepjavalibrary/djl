@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    api project(":repository")
+    api project(":api")
     api project(":mxnet:mxnet-engine")
 
     testRuntimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}-SNAPSHOT"

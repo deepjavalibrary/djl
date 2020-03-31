@@ -76,12 +76,6 @@ jobs:
         with:
           name: mxnet-model-zoo
           path: mxnet/mxnet-model-zoo/build/reports
-      - name: repository test results
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: repository
-          path: repository/build/reports
 
   test-pytorch:
     runs-on: ${{ matrix.operating-system }}

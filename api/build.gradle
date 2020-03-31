@@ -1,4 +1,5 @@
 dependencies {
+    api "com.google.code.gson:gson:${gson_version}"
     api "net.java.dev.jna:jna:${jna_version}"
     api "org.slf4j:slf4j-api:${slf4j_version}"
 

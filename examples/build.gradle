@@ -13,8 +13,6 @@ repositories {
 dependencies {
     implementation "commons-cli:commons-cli:1.4"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
-    implementation "com.google.code.gson:gson:2.8.5"
-    implementation "ai.djl:api:0.5.0-SNAPSHOT"
     implementation "ai.djl:basicdataset:0.5.0-SNAPSHOT"
     implementation "ai.djl:model-zoo:0.5.0-SNAPSHOT"
     implementation "ai.djl.mxnet:mxnet-model-zoo:0.5.0-SNAPSHOT"

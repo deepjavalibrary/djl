@@ -1,7 +1,6 @@
 rootProject.name = 'djl'
 include ':api'
 include ':basicdataset'
-include ':repository'
 include ':examples'
 include ':integration'
 include ':model-zoo'
@@ -10,12 +9,12 @@ include ':mxnet:mxnet-engine'
 include ':mxnet:mxnet-model-zoo'
 include ':mxnet:native'
 include ':tensorflow:tensorflow-engine'
-include 'tensorflow:tensorflow-model-zoo'
+include ':tensorflow:tensorflow-model-zoo'
 include ':pytorch:pytorch-engine'
 include ':pytorch:pytorch-model-zoo'
 include ':pytorch:pytorch-native'
 include ':fasttext:fasttext-engine'
+include ':testing'
 
 project(":examples").buildFileName = "djl.gradle"
-include 'testing'
 

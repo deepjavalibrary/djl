@@ -15,8 +15,6 @@ repositories {
 dependencies {
     implementation "commons-cli:commons-cli:${commons_cli_version}"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
-    implementation "com.google.code.gson:gson:${gson_version}"
-    implementation project(":api")
     implementation project(":basicdataset")
     implementation project(":model-zoo")
 

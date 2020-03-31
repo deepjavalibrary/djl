@@ -10,7 +10,6 @@ dependencies {
     api "com.github.vinhkhuc:jfasttext:0.4"
     api project(":api")
     api project(":basicdataset")
-    api project(":model-zoo")
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
