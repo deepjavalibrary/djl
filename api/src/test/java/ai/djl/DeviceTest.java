@@ -18,19 +18,18 @@ import org.testng.annotations.Test;
 
 public class DeviceTest {
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void testDevice() {
-        Assert.assertEquals(Device.cpu(), new Device("cpu", 0));
+        Assert.assertEquals(Device.cpu(), Device.of("cpu", -1));
         if (Device.getGpuCount() > 0) {
             Assert.assertEquals(Device.gpu(), Device.defaultDevice());
         } else {
             Assert.assertEquals(Device.cpu(), Device.defaultDevice());
         }
-        Assert.assertEquals(Device.cpu(), new Device("cpu"));
-        Assert.assertEquals(Device.gpu(), new Device("gpu", 0));
-        Assert.assertEquals(Device.gpu(3), new Device("gpu", 3));
+        Assert.assertEquals(Device.gpu(), Device.of("gpu", 0));
+        Assert.assertEquals(Device.gpu(3), Device.of("gpu", 3));
         Assert.assertNotEquals(Device.cpu(), Device.gpu());
-        // throw UnsupportedOperationException exception
-        new Device("cpu", 0);
+        Device dev = Device.of("myDevice", 1);
+        Assert.assertEquals(dev.getDeviceType(), "myDevice");
     }
 }

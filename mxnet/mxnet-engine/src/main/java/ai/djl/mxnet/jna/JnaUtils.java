@@ -532,10 +532,7 @@ public final class JnaUtils {
         checkCall(LIB.MXNDArrayGetContext(ndArray, deviceType, deviceId));
         String deviceTypeStr = MxDeviceType.fromDeviceType(deviceType.get(0));
         // CPU is special case which don't have device id
-        if (Device.Type.CPU.equals(deviceTypeStr)) {
-            return new Device(Device.Type.CPU);
-        }
-        return new Device(deviceTypeStr, deviceId.get(0));
+        return Device.of(deviceTypeStr, deviceId.get(0));
     }
 
     public static Shape getShape(Pointer ndArray) {
