@@ -100,9 +100,11 @@ public class LSTM extends RecurrentCell {
         if (stateOutputs) {
             result.add(output.get(1));
         }
+        resetBeginState();
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected NDList opInputs(ParameterStore parameterStore, NDList inputs) {
         validateInputSize(inputs);
@@ -120,7 +122,11 @@ public class LSTM extends RecurrentCell {
             result.add(array);
         }
         // Adding state and stateCell
-        result.add(inputs.head().getManager().zeros(stateShape));
+        if (beginState != null) {
+            result.add(beginState);
+        } else {
+            result.add(inputs.head().getManager().zeros(stateShape));
+        }
         result.add(inputs.head().getManager().zeros(stateShape));
         if (useSequenceLength) {
             result.add(inputs.get(1));

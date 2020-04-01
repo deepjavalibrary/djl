@@ -10,17 +10,16 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.basicmodelzoo.nlp.embedding;
+package ai.djl.modality.nlp.embedding;
 
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
-import ai.djl.modality.nlp.EmbeddingException;
-import ai.djl.modality.nlp.WordEmbedding;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.core.Embedding;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.ParameterStore;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
 
@@ -48,11 +47,13 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean vocabularyContains(String word) {
         return embedding.hasItem(word);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray preprocessWordToEmbed(NDManager manager, String word) {
         if (embedding.hasItem(word)) {
@@ -61,6 +62,13 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
         return embedding.embed(manager, unknownToken);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public NDList embedWord(ParameterStore parameterStore, NDArray word) {
+        return embedding.forward(parameterStore, new NDList(word));
+    }
+
+    /** {@inheritDoc} */
     @Override
     public NDArray embedWord(NDArray word) throws EmbeddingException {
         try {
@@ -70,11 +78,13 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public String unembedWord(NDArray word) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         predictor.close();

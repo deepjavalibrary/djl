@@ -55,6 +55,7 @@ public abstract class RecurrentCell extends ParameterBlock {
     protected boolean stateOutputs;
 
     protected Shape stateShape;
+    protected NDArray beginState;
     protected List<Parameter> parameters = new ArrayList<>();
 
     /**
@@ -132,7 +133,21 @@ public abstract class RecurrentCell extends ParameterBlock {
         if (stateOutputs) {
             result.add(output.get(1));
         }
+        resetBeginState();
         return result;
+    }
+
+    /**
+     * Sets the initial {@link NDArray} value for the hidden state.
+     *
+     * @param beginState the {@link NDArray} value for the hidden state
+     */
+    public void setBeginState(NDArray beginState) {
+        this.beginState = beginState;
+    }
+
+    protected void resetBeginState() {
+        beginState = null;
     }
 
     /** {@inheritDoc} */
@@ -140,6 +155,12 @@ public abstract class RecurrentCell extends ParameterBlock {
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         // Input shape at this point is TNC. Output Shape should be NTS
         Shape inputShape = inputs[0];
+        if (stateOutputs) {
+            return new Shape[] {
+                new Shape(inputShape.get(1), inputShape.get(0), stateSize * numDirections),
+                stateShape
+            };
+        }
         return new Shape[] {
             new Shape(inputShape.get(1), inputShape.get(0), stateSize * numDirections)
         };
@@ -227,7 +248,11 @@ public abstract class RecurrentCell extends ParameterBlock {
             NDArray array = NDArrays.concat(parameterList);
             result.add(array);
         }
-        result.add(inputs.head().getManager().zeros(stateShape));
+        if (beginState != null) {
+            result.add(beginState);
+        } else {
+            result.add(inputs.head().getManager().zeros(stateShape));
+        }
         if (useSequenceLength) {
             result.add(inputs.get(1));
         }

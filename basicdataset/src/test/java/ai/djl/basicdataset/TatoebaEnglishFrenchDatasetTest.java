@@ -12,53 +12,33 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.modality.nlp.EmbeddingException;
-import ai.djl.modality.nlp.WordEmbedding;
+import ai.djl.modality.nlp.embedding.EmbeddingException;
+import ai.djl.modality.nlp.embedding.WordEmbedding;
 import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.training.ParameterStore;
 import ai.djl.training.dataset.Record;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TatoebaEnglishFrenchDatasetTest {
+
     @Test
     public void testGetDataWithPreTrainedEmbedding() throws IOException, EmbeddingException {
         try (NDManager manager = NDManager.newBaseManager()) {
             TatoebaEnglishFrenchDataset tatoebaEnglishFrenchDataset =
                     TatoebaEnglishFrenchDataset.builder()
-                            .setEmbedding(
-                                    new WordEmbedding() {
-                                        @Override
-                                        public boolean vocabularyContains(String word) {
-                                            return false;
-                                        }
-
-                                        @Override
-                                        public NDArray preprocessWordToEmbed(
-                                                NDManager manager, String word) {
-                                            return manager.zeros(new Shape());
-                                        }
-
-                                        @Override
-                                        public NDArray embedWord(NDArray word) {
-                                            return manager.zeros(new Shape(15));
-                                        }
-
-                                        @Override
-                                        public String unembedWord(NDArray wordEmbedding) {
-                                            return null;
-                                        }
-                                    },
-                                    false)
+                            .optSourceWordEmbedding(getWordEmbedding(manager), false)
+                            .optTargetWordEmbedding(getWordEmbedding(manager), false)
                             .setTokenizer(new SimpleTokenizer())
                             .setValidLength(true)
                             .setSampling(32, true)
                             .build();
             tatoebaEnglishFrenchDataset.prepare();
-
             Record record = tatoebaEnglishFrenchDataset.get(manager, 0);
             Assert.assertEquals(new Shape(10, 15), record.getData().get(0).getShape());
             Assert.assertEquals(new Shape(10), record.getData().get(1).getShape());
@@ -72,41 +52,47 @@ public class TatoebaEnglishFrenchDatasetTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             TatoebaEnglishFrenchDataset tatoebaEnglishFrenchDataset =
                     TatoebaEnglishFrenchDataset.builder()
-                            .setEmbedding(
-                                    new WordEmbedding() {
-                                        @Override
-                                        public boolean vocabularyContains(String word) {
-                                            return false;
-                                        }
-
-                                        @Override
-                                        public NDArray preprocessWordToEmbed(
-                                                NDManager manager, String word) {
-                                            return manager.zeros(new Shape());
-                                        }
-
-                                        @Override
-                                        public NDArray embedWord(NDArray word) {
-                                            return manager.zeros(new Shape(15));
-                                        }
-
-                                        @Override
-                                        public String unembedWord(NDArray wordEmbedding) {
-                                            return null;
-                                        }
-                                    },
-                                    true)
+                            .optEmbeddingSize(15)
                             .setTokenizer(new SimpleTokenizer())
                             .setValidLength(false)
                             .setSampling(32, true)
                             .build();
             tatoebaEnglishFrenchDataset.prepare();
-
             Record record = tatoebaEnglishFrenchDataset.get(manager, 0);
             Assert.assertEquals(new Shape(10), record.getData().get(0).getShape());
             Assert.assertEquals(record.getData().size(), 1);
             Assert.assertEquals(new Shape(12), record.getLabels().get(0).getShape());
             Assert.assertEquals(record.getLabels().size(), 1);
         }
+    }
+
+    private WordEmbedding getWordEmbedding(NDManager manager) {
+        return new WordEmbedding() {
+            @Override
+            public boolean vocabularyContains(String word) {
+                return false;
+            }
+
+            @Override
+            public NDArray preprocessWordToEmbed(NDManager manager, String word) {
+                return manager.zeros(new Shape());
+            }
+
+            @Override
+            public NDList embedWord(ParameterStore parameterStore, NDArray word)
+                    throws EmbeddingException {
+                return null;
+            }
+
+            @Override
+            public NDArray embedWord(NDArray word) {
+                return manager.zeros(new Shape(15));
+            }
+
+            @Override
+            public String unembedWord(NDArray wordEmbedding) {
+                return null;
+            }
+        };
     }
 }

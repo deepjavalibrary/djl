@@ -17,6 +17,7 @@ import ai.djl.Application.NLP;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.modality.nlp.embedding.WordEmbedding;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -39,8 +40,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A {@link ai.djl.repository.zoo.ModelLoader} for a {@link ai.djl.modality.nlp.WordEmbedding} based
- * on <a href="https://nlp.stanford.edu/projects/glove/">GloVe</a>.
+ * A {@link ai.djl.repository.zoo.ModelLoader} for a {@link WordEmbedding} based on <a
+ * href="https://nlp.stanford.edu/projects/glove/">GloVe</a>.
  */
 public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDList> {
 

@@ -10,10 +10,12 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.modality.nlp;
+package ai.djl.modality.nlp.embedding;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.training.ParameterStore;
 
 /**
  * A class to manage 1-D {@link NDArray} representations of words.
@@ -58,7 +60,8 @@ public interface WordEmbedding {
      * @param manager the manager for the embedding array
      * @param word the word to embed
      * @return the embedded word
-     * @throws EmbeddingException if there is an error while trying to embed
+     * @throws ai.djl.modality.nlp.embedding.EmbeddingException if there is an error while trying to
+     *     embed
      */
     default NDArray embedWord(NDManager manager, String word) throws EmbeddingException {
         return embedWord(preprocessWordToEmbed(manager, word));
@@ -66,10 +69,24 @@ public interface WordEmbedding {
 
     /**
      * Embeds the word after preprocessed using {@link #preprocessWordToEmbed(NDManager, String)}.
+     * This can be used while training.
+     *
+     * @param parameterStore the parameter block used while training
+     * @param word the word to embed
+     * @return the embedded word
+     * @throws ai.djl.modality.nlp.embedding.EmbeddingException if there is an error while trying to
+     *     embed
+     */
+    NDList embedWord(ParameterStore parameterStore, NDArray word) throws EmbeddingException;
+
+    /**
+     * Embeds the word after preprocessed using {@link #preprocessWordToEmbed(NDManager, String)}.
+     * This method must only be used for pre-trained word embeddings.
      *
      * @param word the word to embed
      * @return the embedded word
-     * @throws EmbeddingException if there is an error while trying to embed
+     * @throws ai.djl.modality.nlp.embedding.EmbeddingException if there is an error while trying to
+     *     embed
      */
     NDArray embedWord(NDArray word) throws EmbeddingException;
 

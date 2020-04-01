@@ -351,6 +351,7 @@ public class BlockCoreTest {
                         .setStateSize(4)
                         .setNumStackedLayers(1)
                         .setActivation(RNN.Activation.TANH)
+                        .optStateOutput(true)
                         .build();
         try (Model model = Model.newInstance(config.getDevices()[0])) {
             model.setBlock(block);
@@ -370,8 +371,10 @@ public class BlockCoreTest {
                                         0.9411f, 1f, 1f, 0.918f, -0.9883f, 1f, 1f, -0.4683f
                                     },
                                     new Shape(1, 2, 4));
-                    Assertions.assertAlmostEquals(result.singletonOrThrow(), expected);
-                    NDArray lossValue = loss.evaluate(new NDList(labels), result);
+                    Assertions.assertAlmostEquals(result.head(), expected);
+                    Assertions.assertAlmostEquals(result.size(), 2);
+                    NDArray lossValue =
+                            loss.evaluate(new NDList(labels), new NDList(result.head()));
                     Assertions.assertAlmostEquals(lossValue.getFloat(), -1.14439737);
 
                     collector.backward(lossValue);
@@ -545,7 +548,8 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(loss)
                         .optInitializer(new XavierInitializer())
                         .optDevices(getDevices());
-        Block block = LSTM.builder().setStateSize(4).setNumStackedLayers(1).build();
+        Block block =
+                LSTM.builder().setStateSize(4).setNumStackedLayers(1).optStateOutput(true).build();
         try (Model model = Model.newInstance(config.getDevices()[0])) {
             model.setBlock(block);
 
@@ -565,8 +569,9 @@ public class BlockCoreTest {
                                         -0.0266f, -0.6412f
                                     },
                                     new Shape(1, 2, 4));
-                    Assertions.assertAlmostEquals(result.singletonOrThrow(), expected);
-                    NDArray lossValue = loss.evaluate(new NDList(labels), result);
+                    Assertions.assertAlmostEquals(result.head(), expected);
+                    NDArray lossValue =
+                            loss.evaluate(new NDList(labels), new NDList(result.head()));
                     Assertions.assertAlmostEquals(lossValue.getFloat(), -0.03504385f);
 
                     collector.backward(lossValue);

@@ -12,6 +12,7 @@
  */
 package ai.djl.modality.nlp;
 
+import ai.djl.nn.core.Embedding;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -67,6 +68,21 @@ public class Vocabulary {
         for (String token : tokens) {
             addToken(token);
         }
+    }
+
+    /**
+     * Creates an {@link Embedding} based on the tokens in this {@code Vocabulary} with the given
+     * embedding size.
+     *
+     * @param embeddingSize the size of the embedding for each token
+     * @return an {@link Embedding} based on the tokens in this {@code Vocabulary}
+     */
+    public Embedding<String> newEmbedding(int embeddingSize) {
+        return Embedding.builder()
+                .setType(String.class)
+                .setEmbeddingSize(embeddingSize)
+                .setItems(tokens.keySet())
+                .build();
     }
 
     /**
