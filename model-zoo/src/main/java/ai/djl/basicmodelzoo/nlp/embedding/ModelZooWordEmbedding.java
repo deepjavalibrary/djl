@@ -12,6 +12,7 @@
  */
 package ai.djl.basicmodelzoo.nlp.embedding;
 
+import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.nlp.EmbeddingException;
 import ai.djl.modality.nlp.WordEmbedding;
@@ -20,12 +21,12 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.core.Embedding;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
 
 /** A {@link WordEmbedding} using a {@link ZooModel}. */
 public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
 
-    private ZooModel<NDList, NDList> model;
     private Predictor<NDList, NDList> predictor;
     private Embedding<String> embedding;
     private String unknownToken;
@@ -37,10 +38,9 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
      *     Embedding}&lt;{@link String}&gt;.
      */
     @SuppressWarnings("unchecked")
-    public ModelZooWordEmbedding(ZooModel<NDList, NDList> model) {
-        this.model = model;
+    public ModelZooWordEmbedding(Model model) {
         this.unknownToken = model.getProperty("unknownToken");
-        predictor = model.newPredictor();
+        predictor = model.newPredictor(new NoopTranslator());
         try {
             embedding = (Embedding<String>) model.getBlock();
         } catch (ClassCastException e) {
@@ -57,9 +57,8 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
     public NDArray preprocessWordToEmbed(NDManager manager, String word) {
         if (embedding.hasItem(word)) {
             return embedding.embed(manager, word);
-        } else {
-            return embedding.embed(manager, unknownToken);
         }
+        return embedding.embed(manager, unknownToken);
     }
 
     @Override
@@ -79,6 +78,5 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
     @Override
     public void close() {
         predictor.close();
-        model.close();
     }
 }
