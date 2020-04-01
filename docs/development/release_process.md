@@ -85,8 +85,11 @@ git checkout vX.X.X
 
 ```shell script
 cd examples
-./gradlew run
-mvn exec:java -Dexec.mainClass="ai.djl.examples.inference.ObjectDetection" 
+# By default it uses mxnet-engine
+# Please switch to pytorch, tensorflow engine to make sure all the engines pass the test 
+./gradlew run 
+mvn package 
+mvn exec:java -Dexec.mainClass="ai.djl.examples.inference.ObjectDetection"
 ```
 
 ### Step 2.2: Validate jupyter notebooks
