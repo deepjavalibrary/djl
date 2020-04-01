@@ -8,6 +8,7 @@ include ':mxnet:jnarator'
 include ':mxnet:mxnet-engine'
 include ':mxnet:mxnet-model-zoo'
 include ':mxnet:native'
+include ':tensorflow:tensorflow-api'
 include ':tensorflow:tensorflow-engine'
 include ':tensorflow:tensorflow-model-zoo'
 include ':pytorch:pytorch-engine'
@@ -17,4 +18,3 @@ include ':fasttext:fasttext-engine'
 include ':testing'
 
 project(":examples").buildFileName = "djl.gradle"
-

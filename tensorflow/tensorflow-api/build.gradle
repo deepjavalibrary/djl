@@ -1,0 +1,43 @@
+group "ai.djl.tensorflow"
+
+dependencies {
+    api group: 'org.tensorflow', name: 'proto', version: '1.15.0'
+    api files("libs/libtensorflow.jar")
+}
+
+jar {
+    from {
+        zipTree(file("libs/libtensorflow.jar"))
+    }
+}
+
+task downloadJar() {
+    doLast {
+        def url = "https://storage.googleapis.com/tensorflow-nightly/github/tensorflow/lib_package"
+        def fileName = "libtensorflow.jar"
+        def dir = file("libs")
+        dir.mkdirs()
+        def file = new File(dir, fileName)
+        if (!file.exists()) {
+            println "downloading ${url} ..."
+            new URL("${url}/${fileName}").withInputStream { downloadStream ->
+                file.withOutputStream { os ->
+                    os << downloadStream
+                }
+            }
+        }
+    }
+}
+compileJava.dependsOn("downloadJar")
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "TensorFlow 2.0 core api"
+                description = "TensorFlow 2.0 core api"
+                url = "http://www.djl.ai/tensorflow/${project.name}"
+            }
+        }
+    }
+}
