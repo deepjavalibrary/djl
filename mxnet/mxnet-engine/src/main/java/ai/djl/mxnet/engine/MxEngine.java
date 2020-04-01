@@ -18,6 +18,7 @@ import ai.djl.engine.Engine;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.jna.LibUtils;
 import ai.djl.ndarray.NDManager;
+import ai.djl.util.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,6 +100,7 @@ public final class MxEngine extends Engine {
     @Override
     public void setRandomSeed(int seed) {
         JnaUtils.randomSeed(seed);
+        RandomUtils.RANDOM.setSeed(seed);
     }
 
     /** {@inheritDoc} */
