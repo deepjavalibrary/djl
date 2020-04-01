@@ -295,7 +295,7 @@ public class MxTrainer implements Trainer {
     @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
-        if (manager != null && manager.isOpen()) {
+        if (manager.isOpen()) {
             if (logger.isDebugEnabled()) {
                 logger.warn("Model was not closed explicitly: {}", getClass().getSimpleName());
             }
@@ -311,7 +311,6 @@ public class MxTrainer implements Trainer {
 
         parameterStore.sync();
         manager.close();
-        manager = null;
     }
 
     private void addMetric(String metricName, long begin) {

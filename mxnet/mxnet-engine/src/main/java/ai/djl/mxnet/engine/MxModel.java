@@ -158,11 +158,8 @@ public class MxModel extends BaseModel {
     @Override
     public void close() {
         // TODO workaround for MXNet Engine crash issue
-        if (manager != null && manager.isOpen()) {
-            JnaUtils.waitAll();
-            manager.close();
-            manager = null;
-        }
+        JnaUtils.waitAll();
+        manager.close();
     }
 
     @SuppressWarnings("PMD.UseConcurrentHashMap")

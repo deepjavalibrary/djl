@@ -221,7 +221,7 @@ public abstract class BaseModel implements Model {
     @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
-        if (manager != null && manager.isOpen()) {
+        if (manager.isOpen()) {
             logger.warn("Model was not closed explicitly.");
             manager.close();
         }

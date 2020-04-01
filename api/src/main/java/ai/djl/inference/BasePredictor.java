@@ -182,7 +182,6 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
     @Override
     public void close() {
         manager.close();
-        manager = null;
     }
 
     private class PredictorContext implements TranslatorContext {
@@ -217,7 +216,6 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
         @Override
         public void close() {
             ctxManager.close();
-            ctxManager = null;
         }
 
         /** {@inheritDoc} */

@@ -25,6 +25,7 @@ import ai.djl.translate.TranslateException;
 /** A {@link WordEmbedding} using a {@link ZooModel}. */
 public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
 
+    private ZooModel<NDList, NDList> model;
     private Predictor<NDList, NDList> predictor;
     private Embedding<String> embedding;
     private String unknownToken;
@@ -37,6 +38,7 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
      */
     @SuppressWarnings("unchecked")
     public ModelZooWordEmbedding(ZooModel<NDList, NDList> model) {
+        this.model = model;
         this.unknownToken = model.getProperty("unknownToken");
         predictor = model.newPredictor();
         try {
@@ -55,8 +57,9 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
     public NDArray preprocessWordToEmbed(NDManager manager, String word) {
         if (embedding.hasItem(word)) {
             return embedding.embed(manager, word);
+        } else {
+            return embedding.embed(manager, unknownToken);
         }
-        return embedding.embed(manager, unknownToken);
     }
 
     @Override
@@ -76,5 +79,6 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
     @Override
     public void close() {
         predictor.close();
+        model.close();
     }
 }
