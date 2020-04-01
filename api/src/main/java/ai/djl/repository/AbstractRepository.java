@@ -12,8 +12,10 @@
  */
 package ai.djl.repository;
 
+import ai.djl.util.Hex;
 import ai.djl.util.Progress;
 import ai.djl.util.Utils;
+import ai.djl.util.ZipUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
