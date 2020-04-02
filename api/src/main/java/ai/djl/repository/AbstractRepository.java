@@ -90,9 +90,7 @@ public abstract class AbstractRepository implements Repository {
     /** {@inheritDoc} */
     @Override
     public void prepare(Artifact artifact, Progress progress) throws IOException {
-        Path cacheDir = getCacheDirectory();
-        URI resourceUri = artifact.getResourceUri();
-        Path resourceDir = cacheDir.resolve(resourceUri.getPath());
+        Path resourceDir = getResourceDirectory(artifact);
         if (Files.exists(resourceDir)) {
             // files have been downloaded already.
             return;

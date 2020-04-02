@@ -16,6 +16,8 @@ import ai.djl.repository.Artifact.Item;
 import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Progress;
 import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -68,10 +70,27 @@ public class SimpleRepository extends AbstractRepository {
 
     /** {@inheritDoc} */
     @Override
-    public Metadata locate(MRL mrl) {
-        File file = path.toFile();
+    public Metadata locate(MRL mrl) throws IOException {
+        File file = path.resolve("metadata.json").toFile();
+        if (file.exists() && file.isFile()) {
+            return metadataWithFile(file);
+        } else {
+            return metadataWithoutFile();
+        }
+    }
+
+    private Metadata metadataWithFile(File file) throws IOException {
+        try (Reader reader = Files.newBufferedReader(file.toPath())) {
+            Metadata metadata = GSON.fromJson(reader, Metadata.class);
+            metadata.setRepositoryUri(URI.create(""));
+            return metadata;
+        }
+    }
+
+    private Metadata metadataWithoutFile() {
         Metadata metadata = new Metadata.MatchAllMetadata();
         metadata.setRepositoryUri(URI.create(""));
+        File file = path.toFile();
         if (Files.isRegularFile(path)) {
             metadata.setArtifactId(file.getParentFile().getName());
         } else {
@@ -82,7 +101,11 @@ public class SimpleRepository extends AbstractRepository {
         }
 
         Artifact artifact = new Artifact();
-        artifact.setName(file.getName());
+        if (name == null) {
+            artifact.setName(file.getName());
+        } else {
+            artifact.setName(name);
+        }
         Map<String, Item> files = new ConcurrentHashMap<>();
         if (file.isDirectory()) {
             File[] fileList = file.listFiles();
@@ -104,13 +127,20 @@ public class SimpleRepository extends AbstractRepository {
 
     /** {@inheritDoc} */
     @Override
-    public Artifact resolve(MRL mrl, String version, Map<String, String> filter) {
+    public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
+            throws IOException {
         List<Artifact> artifacts = locate(mrl).getArtifacts();
         if (artifacts.isEmpty()) {
             return null;
         }
         // TODO: find highest version.
         return artifacts.get(0);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Path getResourceDirectory(Artifact artifact) throws IOException {
+        return path;
     }
 
     /** {@inheritDoc} */

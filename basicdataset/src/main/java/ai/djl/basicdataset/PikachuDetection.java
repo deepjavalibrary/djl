@@ -33,7 +33,6 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -124,9 +123,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     /** {@inheritDoc} */
     @Override
     public void prepareData(Usage usage) throws IOException {
-        Path cacheDir = repository.getCacheDirectory();
-        URI resourceUri = artifact.getResourceUri();
-        Path root = cacheDir.resolve(resourceUri.getPath());
+        Path root = repository.getResourceDirectory(artifact);
 
         Path usagePath;
         switch (usage) {

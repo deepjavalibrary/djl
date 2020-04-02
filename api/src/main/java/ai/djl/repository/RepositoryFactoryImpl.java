@@ -60,7 +60,11 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             if (Files.exists(path) && Files.isDirectory(path)) {
                 try {
                     if (Files.walk(path)
-                            .anyMatch(f -> f.endsWith("metadata.json") && Files.isRegularFile(f))) {
+                            .anyMatch(
+                                    f ->
+                                            f.endsWith("metadata.json")
+                                                    && Files.isRegularFile(f)
+                                                    && !f.getParent().equals(path))) {
                         return new LocalRepository(name, path);
                     }
                 } catch (IOException e) {

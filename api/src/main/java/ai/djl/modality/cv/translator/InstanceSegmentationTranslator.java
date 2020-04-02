@@ -31,10 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A {@link ImageTranslator} that post-process the {@link NDArray} into {@link DetectedObjects} with
- * boundaries at the detailed pixel level.
+ * A {@link BaseImageTranslator} that post-process the {@link NDArray} into {@link DetectedObjects}
+ * with boundaries at the detailed pixel level.
  */
-public class InstanceSegmentationTranslator extends ImageTranslator<DetectedObjects>
+public class InstanceSegmentationTranslator extends BaseImageTranslator<DetectedObjects>
         implements Transform {
 
     private String synsetArtifactName;

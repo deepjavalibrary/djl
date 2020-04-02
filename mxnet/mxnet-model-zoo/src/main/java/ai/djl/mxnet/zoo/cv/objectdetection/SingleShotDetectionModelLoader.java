@@ -18,10 +18,10 @@ import ai.djl.MalformedModelException;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.translator.FileTranslatorFactory;
-import ai.djl.modality.cv.translator.InputStreamTranslatorFactory;
 import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
-import ai.djl.modality.cv.translator.UrlTranslatorFactory;
+import ai.djl.modality.cv.translator.wrapper.FileTranslatorFactory;
+import ai.djl.modality.cv.translator.wrapper.InputStreamTranslatorFactory;
+import ai.djl.modality.cv.translator.wrapper.UrlTranslatorFactory;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
@@ -42,12 +42,20 @@ import java.nio.file.Path;
 import java.util.Map;
 
 /**
- * Model loader for Single Shot Detection (SSD) models.
+ * A {@link ai.djl.repository.zoo.ModelLoader} for Single Shot Detection (SSD) models.
  *
- * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
- * href="https://arxiv.org/pdf/1512.02325.pdf">SSD</a>.
+ * <p>These models were built as part of the <a
+ * href="https://gluon-cv.mxnet.io/model_zoo/detection.html">Gluon CV</a> library and imported into
+ * DJL.
  *
- * @see ai.djl.mxnet.engine.MxSymbolBlock
+ * <p>SSD is a model to solve {@link Application.CV#OBJECT_DETECTION}. Prior models before SSD
+ * typically used non-deep learning strategies to find object proposals and then would execute
+ * classification at those proposed locations. SSD integrated the proposal process into the model
+ * and then classifies at all of those locations in parallel. This both simplifies the model and
+ * training process while better leveraging the power of model DL engines. [<a
+ * href="https://arxiv.org/pdf/1512.02325.pdf">paper</a>]
+ *
+ * <p>Today, SSD is not typically used in favor of newer models which outperform it.
  */
 public class SingleShotDetectionModelLoader
         extends BaseModelLoader<BufferedImage, DetectedObjects> {

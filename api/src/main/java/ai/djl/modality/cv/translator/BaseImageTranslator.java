@@ -26,7 +26,7 @@ import java.awt.image.BufferedImage;
  *
  * @param <T> the output object type
  */
-public abstract class ImageTranslator<T> implements Translator<BufferedImage, T> {
+public abstract class BaseImageTranslator<T> implements Translator<BufferedImage, T> {
 
     private NDImageUtils.Flag flag;
     private Pipeline pipeline;
@@ -36,7 +36,7 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
      *
      * @param builder the data to build with
      */
-    public ImageTranslator(BaseBuilder<?> builder) {
+    public BaseImageTranslator(BaseBuilder<?> builder) {
         flag = builder.flag;
         pipeline = builder.pipeline;
     }
@@ -61,7 +61,7 @@ public abstract class ImageTranslator<T> implements Translator<BufferedImage, T>
     }
 
     /**
-     * A builder to extend for all classes extending the {@link ImageTranslator}.
+     * A builder to extend for all classes extending the {@link BaseImageTranslator}.
      *
      * @param <T> the concrete builder type
      */

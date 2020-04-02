@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.modality.cv.translator;
+package ai.djl.modality.cv.translator.wrapper;
 
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;

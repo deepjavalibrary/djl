@@ -96,9 +96,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
                 progress.update(1);
             }
 
-            Path dir = repository.getCacheDirectory();
-            String relativePath = artifact.getResourceUri().getPath();
-            Path modelPath = dir.resolve(relativePath);
+            Path modelPath = repository.getResourceDirectory(artifact);
 
             Model model = createModel(criteria.getDevice(), artifact, arguments);
             model.load(modelPath, artifact.getName(), criteria.getOptions());

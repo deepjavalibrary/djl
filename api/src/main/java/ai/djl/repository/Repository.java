@@ -78,6 +78,17 @@ public interface Repository {
      * Creates a new instance of a repository with a name and url.
      *
      * @param name the repository name
+     * @param path the repository location
+     * @return the new repository
+     */
+    static Repository newInstance(String name, Path path) {
+        return RepositoryFactoryImpl.getFactory().newInstance(name, path.toUri().toString());
+    }
+
+    /**
+     * Creates a new instance of a repository with a name and url.
+     *
+     * @param name the repository name
      * @param url the repository location
      * @return the new repository
      */
@@ -191,6 +202,17 @@ public interface Repository {
      * @throws IOException if it failed to ensure the creation of the cache directory
      */
     Path getCacheDirectory() throws IOException;
+
+    /**
+     * Returns the resource directory for the an artifact.
+     *
+     * @param artifact the artifact whose resource directory to return
+     * @return the resource directory path
+     * @throws IOException if it failed to ensure the creation of the cache directory
+     */
+    default Path getResourceDirectory(Artifact artifact) throws IOException {
+        return getCacheDirectory().resolve(artifact.getResourceUri().getPath());
+    }
 
     /**
      * Returns a list of {@link MRL}s in the repository.

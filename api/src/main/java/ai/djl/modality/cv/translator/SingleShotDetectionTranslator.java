@@ -12,30 +12,21 @@
  */
 package ai.djl.modality.cv.translator;
 
-import ai.djl.Model;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.translate.TranslatorContext;
-import ai.djl.util.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A {@link ImageTranslator} that post-process the {@link NDArray} into {@link DetectedObjects} with
- * boundaries.
+ * A {@link BaseImageTranslator} that post-process the {@link NDArray} into {@link DetectedObjects}
+ * with boundaries.
  */
-public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjects> {
-
-    protected float threshold;
-    protected String synsetArtifactName;
-    protected List<String> classes;
-    private double imageWidth;
-    private double imageHeight;
+public class SingleShotDetectionTranslator extends ObjectDetectionTranslator {
 
     /**
      * Creates the SSD translator from the given builder.
@@ -44,19 +35,6 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
      */
     public SingleShotDetectionTranslator(Builder builder) {
         super(builder);
-        this.threshold = builder.threshold;
-        this.synsetArtifactName = builder.synsetArtifactName;
-        this.classes = builder.classes;
-        this.imageWidth = builder.imageWidth;
-        this.imageHeight = builder.imageHeight;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void prepare(NDManager manager, Model model) throws IOException {
-        if (classes == null) {
-            classes = model.getArtifact(synsetArtifactName, Utils::readLines);
-        }
     }
 
     /** {@inheritDoc} */
@@ -108,66 +86,6 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
     /** The builder for SSD translator. */
     public static class Builder extends BaseBuilder<Builder> {
 
-        private float threshold = 0.2f;
-        private String synsetArtifactName;
-        private List<String> classes;
-        private double imageWidth;
-        private double imageHeight;
-
-        /**
-         * Sets the threshold for prediction accuracy.
-         *
-         * <p>Predictions below the threshold will be dropped.
-         *
-         * @param threshold the threshold for the prediction accuracy
-         * @return this builder
-         */
-        public Builder optThreshold(float threshold) {
-            this.threshold = threshold;
-            return this;
-        }
-
-        /**
-         * Sets the name for the synset.
-         *
-         * <p>Synset is used to convert the prediction classes to their actual names.
-         *
-         * <p>Set either the synset or the classes.
-         *
-         * @param synsetArtifactName the name of synset
-         * @return this builder
-         */
-        public Builder setSynsetArtifactName(String synsetArtifactName) {
-            this.synsetArtifactName = synsetArtifactName;
-            return this;
-        }
-
-        /**
-         * Sets the class list.
-         *
-         * <p>Set either the synset or the classes.
-         *
-         * @param classes the list of classes
-         * @return this builder
-         */
-        public Builder setClasses(List<String> classes) {
-            this.classes = classes;
-            return this;
-        }
-
-        /**
-         * Sets the optional rescale size.
-         *
-         * @param imageWidth the width to rescale images to
-         * @param imageHeight the height to rescale images to
-         * @return this builder
-         */
-        public Builder optRescaleSize(double imageWidth, double imageHeight) {
-            this.imageWidth = imageWidth;
-            this.imageHeight = imageHeight;
-            return this;
-        }
-
         /** {@inheritDoc} */
         @Override
         protected Builder self() {
@@ -180,59 +98,8 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
          * @return the new translator
          */
         public SingleShotDetectionTranslator build() {
-            if (synsetArtifactName == null && classes == null) {
-                throw new IllegalArgumentException(
-                        "You must specify a synset artifact name or classes");
-            } else if (synsetArtifactName != null && classes != null) {
-                throw new IllegalArgumentException(
-                        "You can only specify one of: synset artifact name or classes");
-            }
+            validate();
             return new SingleShotDetectionTranslator(this);
-        }
-
-        /**
-         * Get threshold.
-         *
-         * @return threshold
-         */
-        public float getThreshold() {
-            return threshold;
-        }
-
-        /**
-         * Get symset artifact name.
-         *
-         * @return name
-         */
-        public String getSynsetArtifactName() {
-            return synsetArtifactName;
-        }
-
-        /**
-         * Get classes.
-         *
-         * @return classes
-         */
-        public List<String> getClasses() {
-            return classes;
-        }
-
-        /**
-         * Get resized image width.
-         *
-         * @return image width
-         */
-        public double getImageWidth() {
-            return imageWidth;
-        }
-
-        /**
-         * Get resized image height.
-         *
-         * @return image height
-         */
-        public double getImageHeight() {
-            return imageHeight;
         }
     }
 }

@@ -10,37 +10,37 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.modality.cv.translator;
+package ai.djl.modality.cv.translator.wrapper;
 
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.awt.image.BufferedImage;
-import java.nio.file.Path;
+import java.net.URL;
 
 /**
- * Built-in {@code Translator} that provides image pre-processing from file path.
+ * Built-in {@code Translator} that provides image pre-processing from URL.
  *
  * @param <T> the output object type
  */
-public class FileTranslator<T> implements Translator<Path, T> {
+public class UrlTranslator<T> implements Translator<URL, T> {
 
     private Translator<BufferedImage, T> translator;
 
     /**
-     * Creates a {@code FileTranslator} instance.
+     * Creates a {@code UrlTranslator} instance.
      *
      * @param translator a {@code Translator} that can process image
      */
-    public FileTranslator(Translator<BufferedImage, T> translator) {
+    public UrlTranslator(Translator<BufferedImage, T> translator) {
         this.translator = translator;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList processInput(TranslatorContext ctx, Path input) throws Exception {
-        BufferedImage image = BufferedImageUtils.fromFile(input);
+    public NDList processInput(TranslatorContext ctx, URL input) throws Exception {
+        BufferedImage image = BufferedImageUtils.fromUrl(input);
         return translator.processInput(ctx, image);
     }
 

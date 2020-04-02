@@ -28,7 +28,6 @@ import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.Pipeline;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -127,9 +126,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     /** {@inheritDoc} */
     @Override
     public void prepareData(Usage usage) throws IOException {
-        Path cacheDir = repository.getCacheDirectory();
-        URI resourceUri = artifact.getResourceUri();
-        Path root = cacheDir.resolve(resourceUri.getPath());
+        Path root = repository.getResourceDirectory(artifact);
 
         Path jsonFile;
         switch (usage) {

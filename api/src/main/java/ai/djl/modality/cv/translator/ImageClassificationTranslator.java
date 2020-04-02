@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.List;
 
 /** A generic {@link ai.djl.translate.Translator} for Image Classification tasks. */
-public class ImageClassificationTranslator extends ImageTranslator<Classifications> {
+public class ImageClassificationTranslator extends BaseImageTranslator<Classifications> {
 
     private String synsetArtifactName;
     private boolean applySoftmax;

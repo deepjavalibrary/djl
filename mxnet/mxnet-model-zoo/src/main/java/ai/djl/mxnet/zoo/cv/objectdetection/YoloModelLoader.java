@@ -10,16 +10,15 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.mxnet.zoo.cv.actionrecognition;
+package ai.djl.mxnet.zoo.cv.objectdetection;
 
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
-import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.transform.Normalize;
+import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.translator.ImageClassificationTranslator;
+import ai.djl.modality.cv.translator.YoloTranslator;
 import ai.djl.modality.cv.translator.wrapper.FileTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.UrlTranslatorFactory;
@@ -43,64 +42,61 @@ import java.nio.file.Path;
 import java.util.Map;
 
 /**
- * Model loader for Action Recognition models.
+ * A {@link ai.djl.repository.zoo.ModelLoader} for YOLO models.
  *
- * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
- * href="https://arxiv.org/pdf/1608.00859.pdf">Reference paper</a>.
+ * <p>These models were built as part of the <a
+ * href="https://gluon-cv.mxnet.io/model_zoo/detection.html">Gluon CV</a> library and imported into
+ * DJL.
  *
- * @see ai.djl.mxnet.engine.MxSymbolBlock
+ * <p>Yolo is a model to solve {@link Application.CV#OBJECT_DETECTION}. Prior models like {@link
+ * SingleShotDetectionModelLoader} were built around classifiers and would classify at various
+ * locations in the image simultaneously. However, this is fairly inefficient. Yolo instead uses a
+ * regression that will predict both the bounding boxes and class probabilities leading to better
+ * performance and better precision, although it can increase localization errors (the boxes are
+ * less accurate). [<a href="https://arxiv.org/abs/1506.02640">paper</a>]
+ *
+ * <p>YOLO is currently the best object detection model in the DJL Model Zoo in terms of both
+ * performance and prediction quality.
  */
-public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage, Classifications> {
+public class YoloModelLoader extends BaseModelLoader<BufferedImage, DetectedObjects> {
 
-    private static final Application APPLICATION = Application.CV.ACTION_RECOGNITION;
+    private static final Application APPLICATION = Application.CV.OBJECT_DETECTION;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
-    private static final String ARTIFACT_ID = "action_recognition";
+    private static final String ARTIFACT_ID = "yolo";
     private static final String VERSION = "0.0.1";
 
     /**
-     * Creates the Model loader from the given repository.
+     * Constructs a {@link YoloModelLoader} given the repository, mrl, and version.
      *
      * @param repository the repository to load the model from
      */
-    public ActionRecognitionModelLoader(Repository repository) {
+    public YoloModelLoader(Repository repository) {
         super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
         FactoryImpl factory = new FactoryImpl();
 
-        factories.put(new Pair<>(BufferedImage.class, Classifications.class), factory);
+        factories.put(new Pair<>(BufferedImage.class, DetectedObjects.class), factory);
         factories.put(
-                new Pair<>(Path.class, Classifications.class),
+                new Pair<>(Path.class, DetectedObjects.class),
                 new FileTranslatorFactory<>(factory));
         factories.put(
-                new Pair<>(URL.class, Classifications.class), new UrlTranslatorFactory<>(factory));
+                new Pair<>(URL.class, DetectedObjects.class), new UrlTranslatorFactory<>(factory));
         factories.put(
-                new Pair<>(InputStream.class, Classifications.class),
+                new Pair<>(InputStream.class, DetectedObjects.class),
                 new InputStreamTranslatorFactory<>(factory));
     }
 
-    /** {@inheritDoc} */
     @Override
     public Application getApplication() {
         return APPLICATION;
     }
 
-    /**
-     * Loads the model with the given search filters.
-     *
-     * @param filters the search filters to match against the loaded model
-     * @param device the device the loaded model should use
-     * @param progress the progress tracker to update while loading the model
-     * @return the loaded model
-     * @throws IOException for various exceptions loading data from the repository
-     * @throws ModelNotFoundException if no model with the specified criteria is found
-     * @throws MalformedModelException if the model data is malformed
-     */
     @Override
-    public ZooModel<BufferedImage, Classifications> loadModel(
+    public ZooModel<BufferedImage, DetectedObjects> loadModel(
             Map<String, String> filters, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException {
-        Criteria<BufferedImage, Classifications> criteria =
+        Criteria<BufferedImage, DetectedObjects> criteria =
                 Criteria.builder()
-                        .setTypes(BufferedImage.class, Classifications.class)
+                        .setTypes(BufferedImage.class, DetectedObjects.class)
                         .optFilters(filters)
                         .optDevice(device)
                         .optProgress(progress)
@@ -109,27 +105,23 @@ public class ActionRecognitionModelLoader extends BaseModelLoader<BufferedImage,
     }
 
     private static final class FactoryImpl
-            implements TranslatorFactory<BufferedImage, Classifications> {
+            implements TranslatorFactory<BufferedImage, DetectedObjects> {
 
-        /** {@inheritDoc} */
         @Override
-        public Translator<BufferedImage, Classifications> newInstance(
+        public Translator<BufferedImage, DetectedObjects> newInstance(
                 Map<String, Object> arguments) {
-            // 299 is the minimum length for inception, 224 for vgg
-            int width = ((Double) arguments.getOrDefault("width", 299d)).intValue();
-            int height = ((Double) arguments.getOrDefault("height", 299d)).intValue();
+            int width = ((Double) arguments.getOrDefault("width", 512d)).intValue();
+            int height = ((Double) arguments.getOrDefault("height", 512d)).intValue();
+            double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
 
             Pipeline pipeline = new Pipeline();
-            pipeline.add(new Resize(width, height))
-                    .add(new ToTensor())
-                    .add(
-                            new Normalize(
-                                    new float[] {0.485f, 0.456f, 0.406f},
-                                    new float[] {0.229f, 0.224f, 0.225f}));
+            pipeline.add(new Resize(width, height)).add(new ToTensor());
 
-            return ImageClassificationTranslator.builder()
+            return YoloTranslator.builder()
                     .setPipeline(pipeline)
                     .setSynsetArtifactName("classes.txt")
+                    .optThreshold((float) threshold)
+                    .optRescaleSize(width, height)
                     .build();
         }
     }

@@ -21,6 +21,7 @@ import ai.djl.mxnet.zoo.cv.classification.SeResnext;
 import ai.djl.mxnet.zoo.cv.classification.Senet;
 import ai.djl.mxnet.zoo.cv.classification.Squeezenet;
 import ai.djl.mxnet.zoo.cv.objectdetection.SingleShotDetectionModelLoader;
+import ai.djl.mxnet.zoo.cv.objectdetection.YoloModelLoader;
 import ai.djl.mxnet.zoo.cv.poseestimation.SimplePoseModelLoader;
 import ai.djl.mxnet.zoo.cv.segmentation.InstanceSegmentationModelLoader;
 import ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingModelLoader;
@@ -43,6 +44,7 @@ public class MxModelZoo implements ModelZoo {
     public static final MlpModelLoader MLP = new MlpModelLoader(REPOSITORY);
     public static final SingleShotDetectionModelLoader SSD =
             new SingleShotDetectionModelLoader(REPOSITORY);
+    public static final YoloModelLoader YOLO = new YoloModelLoader(REPOSITORY);
     public static final Resnet RESNET = new Resnet(REPOSITORY);
     public static final Resnext RESNEXT = new Resnext(REPOSITORY);
     public static final Senet SENET = new Senet(REPOSITORY);

@@ -23,8 +23,10 @@ import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.List;
 
-/** A {@link ImageTranslator} that post-process the {@link NDArray} into human {@link Joints}. */
-public class SimplePoseTranslator extends ImageTranslator<Joints> {
+/**
+ * A {@link BaseImageTranslator} that post-process the {@link NDArray} into human {@link Joints}.
+ */
+public class SimplePoseTranslator extends BaseImageTranslator<Joints> {
 
     private float threshold;
 

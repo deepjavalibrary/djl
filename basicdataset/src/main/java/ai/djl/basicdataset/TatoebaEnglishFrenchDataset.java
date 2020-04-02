@@ -22,7 +22,6 @@ import ai.djl.repository.dataset.ZooDataset;
 import ai.djl.training.dataset.Record;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -109,9 +108,7 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
     /** {@inheritDoc} */
     @Override
     public void prepareData(Usage usage) throws IOException {
-        Path cacheDir = repository.getCacheDirectory();
-        URI resourceUri = artifact.getResourceUri();
-        Path root = cacheDir.resolve(resourceUri.getPath());
+        Path root = repository.getResourceDirectory(artifact);
 
         Path usagePath;
         switch (usage) {
