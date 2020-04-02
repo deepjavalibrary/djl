@@ -10,13 +10,13 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.mxnet.zoo.nlp.qa;
+package ai.djl.pytorch.zoo.nlp.qa;
 
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.modality.nlp.qa.QAInput;
-import ai.djl.mxnet.zoo.MxModelZoo;
+import ai.djl.pytorch.zoo.PtModelZoo;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
@@ -31,20 +31,18 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Model loader for BERT QA models.
+ * Model loader for PyTorch BERT QA models.
  *
- * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block.
+ * <p>The model was trained with PyTorch from https://github.com/huggingface/transformers.
  *
- * <p>See <a href="https://arxiv.org/pdf/1810.04805.pdf">the BERT paper</a> or the <a
- * href="https://github.com/awslabs/djl/blob/master/jupyter/BERTQA.ipynb">jupyter demo</a> for more
- * information about BERT.
+ * <p>See <a href="https://arxiv.org/pdf/1810.04805.pdf">the BERT paper</a>
  *
- * @see ai.djl.mxnet.engine.MxSymbolBlock
+ * @see ai.djl.pytorch.engine.PtSymbolBlock
  */
 public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
 
     private static final Application APPLICATION = Application.NLP.QUESTION_ANSWER;
-    private static final String GROUP_ID = MxModelZoo.GROUP_ID;
+    private static final String GROUP_ID = PtModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "bertqa";
     private static final String VERSION = "0.0.1";
 
@@ -93,8 +91,7 @@ public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
 
         @Override
         public Translator<QAInput, String> newInstance(Map<String, Object> arguments) {
-            int seqLength = (int) arguments.getOrDefault("seqLength", 384);
-            return MxBertQATranslator.builder().setSeqLength(seqLength).build();
+            return new PtBertQATranslator();
         }
     }
 }

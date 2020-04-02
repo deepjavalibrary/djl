@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.VocabWordEmbedding;
@@ -100,7 +101,8 @@ public abstract class TextDataset extends RandomAccessDataset {
      * @param source whether the text data provided is source or target
      */
     protected void preprocess(List<String> textData, boolean source) {
-        Vocabulary.VocabularyBuilder vocabularyBuilder = new Vocabulary.VocabularyBuilder();
+        SimpleVocabulary.VocabularyBuilder vocabularyBuilder =
+                new SimpleVocabulary.VocabularyBuilder();
         vocabularyBuilder.optMinFrequency(3);
         vocabularyBuilder.optReservedTokens(Arrays.asList("<pad>", "<bos>", "<eos>"));
 
@@ -122,7 +124,7 @@ public abstract class TextDataset extends RandomAccessDataset {
             tokenizedTextData.put(index, tokens);
             index++;
         }
-        Vocabulary vocabulary = vocabularyBuilder.build();
+        SimpleVocabulary vocabulary = vocabularyBuilder.build();
         index = 0;
         while (index < tokenizedTextData.size()) {
             List<String> tokenizedTextDatum = tokenizedTextData.get(index);

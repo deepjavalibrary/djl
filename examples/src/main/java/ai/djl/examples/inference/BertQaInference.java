@@ -57,7 +57,7 @@ public final class BertQaInference {
                         + "Which operated between December 2004 and April 2006.\n"
                         + "It ceased operations after its Japanese distributor folded.";
 
-        QAInput input = new QAInput(question, paragraph, 384);
+        QAInput input = new QAInput(question, paragraph);
         logger.info("Paragraph: {}", input.getParagraph());
         logger.info("Question: {}", input.getQuestion());
 

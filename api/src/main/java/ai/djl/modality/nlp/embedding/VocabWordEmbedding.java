@@ -12,6 +12,7 @@
  */
 package ai.djl.modality.nlp.embedding;
 
+import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -57,7 +58,7 @@ public class VocabWordEmbedding implements WordEmbedding {
      * @param vocabulary the {@link Vocabulary} based on which the embedding is built.
      * @param embeddingSize the size of the embedding for each word
      */
-    public VocabWordEmbedding(Vocabulary vocabulary, int embeddingSize) {
+    public VocabWordEmbedding(SimpleVocabulary vocabulary, int embeddingSize) {
         this(vocabulary.newEmbedding(embeddingSize), DEFAULT_UNKNOWN_TOKEN);
     }
 

@@ -10,26 +10,5 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.modality.nlp;
-
-/**
- * {@code Vocabulary} is a collection of tokens. The primary purpose of a vocabulary is the map a
- * token to an index.
- */
-public interface Vocabulary {
-    /**
-     * Returns the token corresponding to the given index.
-     *
-     * @param index the index
-     * @return the token corresponding to the given index
-     */
-    String getToken(long index);
-
-    /**
-     * Returns the index of the given token.
-     *
-     * @param token the token
-     * @return the index of the given token
-     */
-    long getIndex(String token);
-}
+/** Contains classes that deal with BERT for natural language pre-processing tasks. */
+package ai.djl.modality.nlp.bert;

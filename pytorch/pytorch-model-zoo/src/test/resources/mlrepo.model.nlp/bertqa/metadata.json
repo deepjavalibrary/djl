@@ -1,0 +1,38 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "bertqa",
+  "type": "nlp",
+  "name": "Question and Answer model",
+  "description": "BERT QA model",
+  "website": "http://www.djl.ai/pytorch/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "trace_bertqa",
+      "properties": {
+        "backbone": "bert",
+        "dataset": "SQuAD"
+      },
+      "files": {
+        "vocabulary": {
+          "uri": "https://mlrepo.djl.ai/model/nlp/qa/ai/djl/pytorch/bertqa/bert-base-uncased-vocab.txt",
+          "sha1Hash": "c3b4105373feaa5b0b2c332321c1e592d6f39658",
+          "size": 231508
+        },
+        "model": {
+          "uri": "0.0.1/trace_bertqa.pt.gz",
+          "sha1Hash": "4fdc863417776962c4880cb2aedf0aa5bd0c3f5b",
+          "size": 1245428791
+        }
+      }
+    }
+  ]
+}
