@@ -12,14 +12,8 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.modality.nlp.embedding.EmbeddingException;
-import ai.djl.modality.nlp.embedding.WordEmbedding;
 import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.Shape;
-import ai.djl.training.ParameterStore;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -35,8 +29,10 @@ public class StanfordMovieReviewTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             StanfordMovieReview dataset =
                     StanfordMovieReview.builder()
-                            .optSourceWordEmbedding(getWordEmbedding(manager), false)
-                            .optTargetWordEmbedding(getWordEmbedding(manager), false)
+                            .optSourceTextEmbedding(
+                                    TestUtils.getTextEmbedding(manager, EMBEDDING_SIZE), false)
+                            .optTargetTextEmbedding(
+                                    TestUtils.getTextEmbedding(manager, EMBEDDING_SIZE), false)
                             .setTokenizer(new SimpleTokenizer())
                             .setValidLength(true)
                             .setSampling(32, true)
@@ -66,41 +62,5 @@ public class StanfordMovieReviewTest {
             Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
             Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 0);
         }
-    }
-
-    private WordEmbedding getWordEmbedding(NDManager manager) {
-        return new WordEmbedding() {
-
-            /** {@inheritDoc} */
-            @Override
-            public boolean vocabularyContains(String word) {
-                return false;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public NDArray preprocessWordToEmbed(NDManager manager, String word) {
-                return manager.zeros(new Shape());
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public NDList embedWord(ParameterStore parameterStore, NDArray word)
-                    throws EmbeddingException {
-                return null;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public NDArray embedWord(NDArray word) {
-                return manager.zeros(new Shape(EMBEDDING_SIZE));
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public String unembedWord(NDArray wordEmbedding) {
-                return null;
-            }
-        };
     }
 }

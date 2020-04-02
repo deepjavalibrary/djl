@@ -15,14 +15,14 @@ package ai.djl.basicdataset;
 import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
+import ai.djl.modality.nlp.embedding.SimpleTextEmbedding;
+import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.VocabWordEmbedding;
-import ai.djl.modality.nlp.embedding.WordEmbedding;
 import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
 import ai.djl.modality.nlp.preprocess.PunctuationSeparator;
 import ai.djl.modality.nlp.preprocess.SentenceLengthNormalizer;
 import ai.djl.modality.nlp.preprocess.TextProcessor;
 import ai.djl.modality.nlp.preprocess.Tokenizer;
-import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.RandomAccessDataset;
@@ -39,11 +39,12 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>The {@code TextDataset} fetches the data in the form of {@link String}, processes the data as
  * required, and creates embeddings for the tokens. Embeddings can be either pre-trained or trained
- * on the go. Pre-trained {@link WordEmbedding} must be set in the {@link Builder}. If no embeddings
- * are set, the dataset creates {@link VocabWordEmbedding} from the {@link Vocabulary} created
- * within the dataset.
+ * on the go. Pre-trained {@link TextEmbedding} must be set in the {@link Builder}. If no embeddings
+ * are set, the dataset creates {@link VocabWordEmbedding} based {@link SimpleTextEmbedding} from
+ * the {@link Vocabulary} created within the dataset.
  */
 public abstract class TextDataset extends RandomAccessDataset {
+
     TextDatasetParameters textDatasetParameters = new TextDatasetParameters();
     private int embeddingSize;
     private boolean includeValidLength;
@@ -58,8 +59,8 @@ public abstract class TextDataset extends RandomAccessDataset {
      */
     public TextDataset(Builder<?> builder) {
         super(builder);
-        this.textDatasetParameters.sourceWordEmbedding = builder.sourceWordEmbedding;
-        this.textDatasetParameters.targetWordEmbedding = builder.targetWordEmbedding;
+        this.textDatasetParameters.sourceTextEmbedding = builder.sourceTextEmbedding;
+        this.textDatasetParameters.targetTextEmbedding = builder.targetTextEmbedding;
         this.textDatasetParameters.sourceTextProcessors = builder.sourceTextProcessors;
         this.textDatasetParameters.targetTextProcessors = builder.targetTextProcessors;
         this.textDatasetParameters.trainSourceEmbeddings = builder.trainSourceEmbedding;
@@ -72,25 +73,24 @@ public abstract class TextDataset extends RandomAccessDataset {
     protected NDList embedText(long index, NDManager manager, boolean source)
             throws EmbeddingException {
         NDList data = new NDList();
-        NDList dataLengths = new NDList();
 
         List<String> sentenceTokens = textDatasetParameters.getTextData(source).get(index);
-        Integer validLength = textDatasetParameters.getValidLengths(source).get(index);
-        for (String token : sentenceTokens) {
-            if (textDatasetParameters.trainEmbeddings(source)) {
-                data.add(
-                        textDatasetParameters
-                                .getWordEmbedding(source)
-                                .preprocessWordToEmbed(manager, token));
-            } else {
-                data.add(textDatasetParameters.getWordEmbedding(source).embedWord(manager, token));
-            }
-            dataLengths.add(manager.create(validLength));
+        if (textDatasetParameters.trainEmbeddings(source)) {
+            data.add(
+                    textDatasetParameters
+                            .getTextEmbedding(source)
+                            .preprocessTextToEmbed(manager, sentenceTokens));
+        } else {
+            data.add(
+                    textDatasetParameters
+                            .getTextEmbedding(source)
+                            .embedText(manager, sentenceTokens));
         }
         if (includeValidLength) {
-            return new NDList(NDArrays.stack(data), NDArrays.stack(dataLengths));
+            Integer validLength = textDatasetParameters.getValidLengths(source).get(index);
+            data.add(manager.create(validLength));
         }
-        return new NDList(NDArrays.stack(data));
+        return data;
     }
 
     /**
@@ -137,17 +137,20 @@ public abstract class TextDataset extends RandomAccessDataset {
             index++;
         }
         textDatasetParameters.setVocabulary(vocabulary, source);
-        if (textDatasetParameters.getWordEmbedding(source) == null) {
-            textDatasetParameters.setWordEmbedding(
-                    new VocabWordEmbedding(vocabulary.newEmbedding(embeddingSize)), source);
+        if (textDatasetParameters.getTextEmbedding(source) == null) {
+            textDatasetParameters.setTextEmbedding(
+                    new SimpleTextEmbedding(
+                            new VocabWordEmbedding(vocabulary.newEmbedding(embeddingSize))),
+                    source);
             textDatasetParameters.setTrainEmbeddings(true, source);
         }
     }
 
     /** Abstract Builder that helps build a {@link TextDataset}. */
     public abstract static class Builder<T extends Builder<T>> extends BaseBuilder<T> {
-        protected WordEmbedding sourceWordEmbedding;
-        protected WordEmbedding targetWordEmbedding;
+
+        protected TextEmbedding sourceTextEmbedding;
+        protected TextEmbedding targetTextEmbedding;
         protected boolean trainSourceEmbedding;
         protected boolean trainTargetEmbedding;
         protected boolean includeValidLength;
@@ -165,38 +168,38 @@ public abstract class TextDataset extends RandomAccessDataset {
                         new SentenceLengthNormalizer(12, true));
 
         /**
-         * Sets the required implementation of {@link WordEmbedding} to get the embeddings for the
+         * Sets the required implementation of {@link TextEmbedding} to get the embeddings for the
          * source.
          *
-         * @param wordEmbedding the implementation of {@link WordEmbedding} to source the embeddings
+         * @param textEmbedding the implementation of {@link TextEmbedding} to source the embeddings
          *     from
          * @param trainSourceEmbedding whether the embeddings need further training
          * @return this builder
          */
-        public T optSourceWordEmbedding(WordEmbedding wordEmbedding, boolean trainSourceEmbedding) {
-            this.sourceWordEmbedding = wordEmbedding;
+        public T optSourceTextEmbedding(TextEmbedding textEmbedding, boolean trainSourceEmbedding) {
+            this.sourceTextEmbedding = textEmbedding;
             this.trainSourceEmbedding = trainSourceEmbedding;
             return self();
         }
 
         /**
-         * Sets the required implementation of {@link WordEmbedding} to get the embeddings for the
+         * Sets the required implementation of {@link TextEmbedding} to get the embeddings for the
          * target.
          *
-         * @param wordEmbedding the implementation of {@link WordEmbedding} to source the embeddings
+         * @param textEmbedding the implementation of {@link TextEmbedding} to source the embeddings
          *     from
          * @param trainSourceEmbedding whether the embeddings need further training
          * @return this builder
          */
-        public T optTargetWordEmbedding(WordEmbedding wordEmbedding, boolean trainSourceEmbedding) {
-            this.targetWordEmbedding = wordEmbedding;
+        public T optTargetTextEmbedding(TextEmbedding textEmbedding, boolean trainSourceEmbedding) {
+            this.targetTextEmbedding = textEmbedding;
             this.trainTargetEmbedding = trainSourceEmbedding;
             return self();
         }
 
         /**
          * Sets the size of the embeddings. This value must be set if pre-trained {@link
-         * WordEmbedding} are not set
+         * TextEmbedding} are not set
          *
          * @param embeddingSize the size of the embeddings
          * @return this builder
@@ -286,14 +289,15 @@ public abstract class TextDataset extends RandomAccessDataset {
 
     /** Data class that contains parameters of the {@link TextDataset}. */
     private static class TextDatasetParameters {
+
         Map<Long, List<String>> sourceTextData = new ConcurrentHashMap<>();
         Map<Long, List<String>> targetTextData = new ConcurrentHashMap<>();
         Map<Long, Integer> sourceValidLengths = new ConcurrentHashMap<>();
         Map<Long, Integer> targetValidLengths = new ConcurrentHashMap<>();
         List<TextProcessor> sourceTextProcessors;
         List<TextProcessor> targetTextProcessors;
-        WordEmbedding sourceWordEmbedding;
-        WordEmbedding targetWordEmbedding;
+        TextEmbedding sourceTextEmbedding;
+        TextEmbedding targetTextEmbedding;
         Vocabulary sourceVocabulary;
         Vocabulary targetVocabulary;
         boolean trainSourceEmbeddings;
@@ -311,8 +315,8 @@ public abstract class TextDataset extends RandomAccessDataset {
             return source ? sourceTextProcessors : targetTextProcessors;
         }
 
-        public WordEmbedding getWordEmbedding(boolean source) {
-            return source ? sourceWordEmbedding : targetWordEmbedding;
+        public TextEmbedding getTextEmbedding(boolean source) {
+            return source ? sourceTextEmbedding : targetTextEmbedding;
         }
 
         public Vocabulary getVocabulary(boolean source) {
@@ -331,11 +335,11 @@ public abstract class TextDataset extends RandomAccessDataset {
             }
         }
 
-        public void setWordEmbedding(WordEmbedding wordEmbedding, boolean source) {
+        public void setTextEmbedding(TextEmbedding textEmbedding, boolean source) {
             if (source) {
-                sourceWordEmbedding = wordEmbedding;
+                sourceTextEmbedding = textEmbedding;
             } else {
-                targetWordEmbedding = wordEmbedding;
+                targetTextEmbedding = textEmbedding;
             }
         }
 
