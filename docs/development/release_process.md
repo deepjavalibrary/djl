@@ -34,6 +34,9 @@ aws s3 cp website/javadoc-index.html s3://javadoc-djl-ai/index.html
 
 ### Step 1.4: Publish Native library to sonatype staging server
 
+This step depends on if there is a new release for different engines.
+If nothing changes between previous and current version, you don't need to do this step.
+
 #### MXNet
 
 Run the following command to trigger mxnet-native publishing job:
