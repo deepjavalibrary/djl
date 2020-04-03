@@ -6,7 +6,7 @@ jar {
         def dir = file("${project.buildDir}/placeholder/native/lib")
         dir.mkdirs();
         def propFile = new File(dir, "tensorflow.properties")
-        propFile.text = "placeholder=true\nversion=${archiveVersion}\n"
+        propFile.text = "placeholder=true\nversion=${project.version}\n"
     }
 
     from "${project.buildDir}/placeholder"

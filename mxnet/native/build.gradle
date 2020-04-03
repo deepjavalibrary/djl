@@ -23,7 +23,7 @@ sourceSets {
 jar {
     def placeholder = "${project.buildDir}/placeholder"
     doFirst {
-        def versionName = archiveVersion.toString()
+        def versionName = project.version
         if (!isRelease) {
             versionName += String.format("-%s", new Date().format('yyyyMMdd'))
         }

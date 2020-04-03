@@ -101,7 +101,7 @@ task compileJNIGPU {
 jar {
     def placeholder = "${project.buildDir}/placeholder"
     doFirst {
-        def versionName = archiveVersion.toString()
+        def versionName = project.version
         if (!isRelease) {
             version += String.format("-%s", new Date().format('yyyyMMdd'))
         }
