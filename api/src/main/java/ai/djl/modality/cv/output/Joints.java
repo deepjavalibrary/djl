@@ -12,6 +12,7 @@
  */
 package ai.djl.modality.cv.output;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -19,8 +20,9 @@ import java.util.List;
  *
  * @see <a href="https://en.wikipedia.org/wiki/Articulated_body_pose_estimation">Wikipedia</a>
  */
-public class Joints {
+public class Joints implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private List<Joint> joints;
 
     /**
@@ -65,6 +67,7 @@ public class Joints {
      * @see Joints
      */
     public static class Joint extends Point {
+        private static final long serialVersionUID = 1L;
         private double confidence;
 
         /**

@@ -14,6 +14,7 @@ package ai.djl.modality;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,8 +26,9 @@ import java.util.stream.Collectors;
  * {@code Classifications} is the container that stores the classification results for
  * classification on a single input.
  */
-public class Classifications {
+public class Classifications implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     protected List<String> classNames;
     protected List<Double> probabilities;
 

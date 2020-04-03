@@ -20,6 +20,7 @@ import java.util.List;
  */
 public class DetectedObjects extends Classifications {
 
+    private static final long serialVersionUID = 1L;
     private List<BoundingBox> boundingBoxes;
 
     /**

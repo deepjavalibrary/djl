@@ -13,6 +13,11 @@
 package ai.djl.ndarray;
 
 import ai.djl.Device;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,6 +61,26 @@ public class NDList extends ArrayList<NDArray> implements AutoCloseable {
      */
     public NDList(Collection<NDArray> other) {
         super(other);
+    }
+
+    /**
+     * Decodes NDList from byte array.
+     *
+     * @param manager manager assigned to {@link NDArray}
+     * @param byteArray byte array to load from
+     * @return {@code NDList}
+     */
+    public static NDList decode(NDManager manager, byte[] byteArray) {
+        try (DataInputStream dis = new DataInputStream(new ByteArrayInputStream(byteArray))) {
+            int size = dis.readInt();
+            NDList list = new NDList(size);
+            for (int i = 0; i < size; i++) {
+                list.add(i, manager.decode(dis));
+            }
+            return list;
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Malformed data", e);
+        }
     }
 
     /**
@@ -183,6 +208,25 @@ public class NDList extends ArrayList<NDArray> implements AutoCloseable {
      */
     public void detach() {
         forEach(NDArray::detach);
+    }
+
+    /**
+     * Encodes the NDList to byte array.
+     *
+     * @return the byte array
+     */
+    public byte[] encode() {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            DataOutputStream dos = new DataOutputStream(baos);
+            dos.writeInt(size());
+            for (NDArray nd : this) {
+                dos.write(nd.encode());
+            }
+            dos.flush();
+            return baos.toByteArray();
+        } catch (IOException e) {
+            throw new IllegalStateException("NDList is not writable", e);
+        }
     }
 
     /** {@inheritDoc} */

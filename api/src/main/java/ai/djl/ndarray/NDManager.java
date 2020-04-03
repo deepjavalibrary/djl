@@ -20,6 +20,10 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.PairList;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -556,6 +560,31 @@ public interface NDManager extends AutoCloseable {
      */
     default NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
         return createRowSparse(data, dataShape, indices, shape, getDevice());
+    }
+
+    /**
+     * Decodes {@link NDArray} through byte array.
+     *
+     * @param bytes byte array to load from
+     * @return {@link NDArray}
+     */
+    default NDArray decode(byte[] bytes) {
+        try (DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes))) {
+            return decode(dis);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("NDArray decoding failed", e);
+        }
+    }
+
+    /**
+     * Decodes {@link NDArray} through {@link DataInputStream}.
+     *
+     * @param is input stream data to load from
+     * @return {@link NDArray}
+     * @throws IOException data is not readable
+     */
+    default NDArray decode(InputStream is) throws IOException {
+        return NDSerializer.decode(this, is);
     }
 
     /**

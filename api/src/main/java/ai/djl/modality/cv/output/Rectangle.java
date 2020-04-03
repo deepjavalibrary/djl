@@ -21,6 +21,7 @@ import java.awt.Graphics2D;
  */
 public class Rectangle implements BoundingBox {
 
+    private static final long serialVersionUID = 1L;
     private Point point;
     private double width;
     private double height;

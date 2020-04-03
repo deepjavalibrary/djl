@@ -40,6 +40,17 @@ import java.util.stream.LongStream;
 public interface NDArray extends AutoCloseable {
 
     /**
+     * Decodes {@code NDArray} from bytes.
+     *
+     * @param manager {@link NDManager} used to create this {@code NDArray}
+     * @param byteArray data used to decode
+     * @return decoded {@code NDArray}
+     */
+    static NDArray decode(NDManager manager, byte[] byteArray) {
+        return manager.decode(byteArray);
+    }
+
+    /**
      * Returns the {@link NDManager} used to create this {@code NDArray}.
      *
      * @return the {@link NDManager} used to create this {@code NDArray}
@@ -121,6 +132,15 @@ public interface NDArray extends AutoCloseable {
      */
     default boolean isScalar() {
         return getShape().isScalar();
+    }
+
+    /**
+     * Encodes {@code NDArray} to byte array.
+     *
+     * @return byte array
+     */
+    default byte[] encode() {
+        return NDSerializer.encode(this);
     }
 
     /**

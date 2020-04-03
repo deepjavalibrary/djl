@@ -719,4 +719,14 @@ public class NDArrayOtherOpTest {
             array.argMin();
         }
     }
+
+    @Test
+    public void testEncodeDecode() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.create(new long[] {0, 3, 4, 2}, new Shape(2, 2));
+            byte[] bytes = array.encode();
+            NDArray recovered = NDArray.decode(manager, bytes);
+            Assert.assertEquals(recovered, array);
+        }
+    }
 }
