@@ -15,17 +15,20 @@ package ai.djl.nn.recurrent;
 import ai.djl.nn.Block;
 
 /**
- * Applies GRU (Gated Recurrent Unit) recurrent layer to input.
+ * {@code GRU} is an abstract implementation of recurrent neural networks which applies GRU (Gated
+ * Recurrent Unit) recurrent layer to input.
  *
- * <p>Reference paper - Gated Recurrent Unit - Cho et al. 2014. http://arxiv.org/abs/1406.1078. The
- * definition of GRU here is slightly different from the paper but compatible with CUDNN.
+ * <p>Current implementation refers the [paper](http://arxiv.org/abs/1406.1078) - Gated Recurrent
+ * Unit. The definition of GRU here is slightly different from the paper but compatible with CUDNN.
+ *
+ * <p>The GRU operator is formulated as below:
  *
  * <p>$$ \begin{split}\begin{array}{ll} r_t = \mathrm{sigmoid}(W_{ir} x_t + b_{ir} + W_{hr}
  * h_{(t-1)} + b_{hr}) \\ z_t = \mathrm{sigmoid}(W_{iz} x_t + b_{iz} + W_{hz} h_{(t-1)} + b_{hz}) \\
  * n_t = \tanh(W_{in} x_t + b_{in} + r_t * (W_{hn} h_{(t-1)}+ b_{hn})) \\ h_t = (1 - z_t) * n_t +
  * z_t * h_{(t-1)} \\ \end{array}\end{split} $$
  */
-public class GRU extends RecurrentCell {
+public class GRU extends RecurrentBlock {
 
     GRU(Builder builder) {
         super(builder);

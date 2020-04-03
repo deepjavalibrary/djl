@@ -28,10 +28,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * Applies Long Short-Term Memory recurrent layer to input.
+ * {@code LSTM} is an implementation of recurrent neural networks which applies Long Short-Term
+ * Memory recurrent layer to input.
  *
  * <p>Reference paper - LONG SHORT-TERM MEMORY - Hochreiter, 1997.
  * http://www.bioinf.jku.at/publications/older/2604.pdf
+ *
+ * <p>The LSTM operator is formulated as below:
  *
  * <p>$$ \begin{split}\begin{array}{ll} i_t = \mathrm{sigmoid}(W_{ii} x_t + b_{ii} + W_{hi}
  * h_{(t-1)} + b_{hi}) \\ f_t = \mathrm{sigmoid}(W_{if} x_t + b_{if} + W_{hf} h_{(t-1)} + b_{hf}) \\
@@ -39,7 +42,7 @@ import java.io.IOException;
  * + b_{io} + W_{ho} h_{(t-1)} + b_{ho}) \\ c_t = f_t * c_{(t-1)} + i_t * g_t \\ h_t = o_t *
  * \tanh(c_t) \end{array}\end{split} $$
  */
-public class LSTM extends RecurrentCell {
+public class LSTM extends RecurrentBlock {
 
     private static final byte VERSION = 2;
 

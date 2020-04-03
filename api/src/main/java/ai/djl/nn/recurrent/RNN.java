@@ -15,11 +15,13 @@ package ai.djl.nn.recurrent;
 import ai.djl.nn.Block;
 
 /**
- * Applies a single-gate recurrent layer to input. Two kinds of activation function are supported:
- * ReLU and Tanh.
+ * {@code RNN} is an implementation of recurrent neural networks which applies a single-gate
+ * recurrent layer to input. Two kinds of activation function are supported: ReLU and Tanh.
  *
- * <p>Reference paper: Finding structure in time - Elman, 1988.
- * https://crl.ucsd.edu/~elman/Papers/fsit.pdf
+ * <p>Current implementation refers the [paper](https://crl.ucsd.edu/~elman/Papers/fsit.pdf),
+ * Finding structure in time - Elman, 1988.
+ *
+ * <p>The RNN operator is formulated as below:
  *
  * <p>With ReLU activation function: \(h_t = relu(W_{ih} * x_t + b_{ih} + W_{hh} * h_{(t-1)} +
  * b_{hh})\)
@@ -27,7 +29,7 @@ import ai.djl.nn.Block;
  * <p>With Tanh activation function: \(h_t = \tanh(W_{ih} * x_t + b_{ih} + W_{hh} * h_{(t-1)} +
  * b_{hh})\)
  */
-public class RNN extends RecurrentCell {
+public class RNN extends RecurrentBlock {
 
     /**
      * Creates a vanilla RNN block.
