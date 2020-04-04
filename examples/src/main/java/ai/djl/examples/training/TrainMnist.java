@@ -33,6 +33,7 @@ import ai.djl.training.util.ProgressBar;
 import java.io.IOException;
 import java.nio.file.Paths;
 import org.apache.commons.cli.ParseException;
+import ai.djl.ui.listener.*;
 
 /**
  * An example of training an image classification (MNIST) model.
@@ -105,6 +106,7 @@ public final class TrainMnist {
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                .addTrainingListeners(new UiTrainingListener())
                 .addTrainingListeners(TrainingListener.Defaults.logging(arguments.getOutputDir()));
     }
 

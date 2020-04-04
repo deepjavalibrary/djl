@@ -14,3 +14,12 @@ libs
 *.dylib
 *.dll
 *.class
+
+target/
+yarn-error.log
+stats.json
+coverage
+storybook-static
+node/
+node_modules/
+dist/
