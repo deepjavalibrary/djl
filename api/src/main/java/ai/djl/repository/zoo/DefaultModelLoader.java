@@ -15,72 +15,30 @@ package ai.djl.repository.zoo;
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
-import ai.djl.Model;
 import ai.djl.ndarray.NDList;
-import ai.djl.repository.Artifact;
+import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.translate.NoopTranslator;
-import ai.djl.translate.Translator;
 import ai.djl.util.Progress;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 /** A {@link ModelLoader} loads a particular {@link ZooModel} from a local folder. */
-public class LocalModelLoader implements ModelLoader<NDList, NDList> {
-
-    private Repository repository;
+public class DefaultModelLoader extends BaseModelLoader<NDList, NDList> {
 
     /**
      * Creates the model loader from the given repository.
      *
      * @param repository the repository to load the model from
+     * @param mrl the mrl of the model to load
      */
-    public LocalModelLoader(Repository repository) {
-        this.repository = repository;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getArtifactId() {
-        return repository.getName();
+    public DefaultModelLoader(Repository repository, MRL mrl) {
+        super(repository, mrl, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public Application getApplication() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    @SuppressWarnings("unchecked")
-    public <S, T> ZooModel<S, T> loadModel(Criteria<S, T> criteria)
-            throws IOException, ModelNotFoundException, MalformedModelException {
-        Progress progress = criteria.getProgress();
-        try {
-            Translator<S, T> translator = criteria.getTranslator();
-            if (translator == null) {
-                translator = (Translator<S, T>) new NoopTranslator();
-            }
-
-            if (progress != null) {
-                progress.reset("Loading", 2);
-                progress.update(1);
-            }
-
-            Path dir = repository.getCacheDirectory();
-            Model model = Model.newInstance(criteria.getDevice());
-            model.load(dir);
-
-            return new ZooModel<>(model, translator);
-        } finally {
-            if (progress != null) {
-                progress.end();
-            }
-        }
+        return Application.UNDEFINED;
     }
 
     /** {@inheritDoc} */
@@ -96,11 +54,5 @@ public class LocalModelLoader implements ModelLoader<NDList, NDList> {
                         .optProgress(progress)
                         .build();
         return loadModel(criteria);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<Artifact> listModels() {
-        return Collections.emptyList();
     }
 }

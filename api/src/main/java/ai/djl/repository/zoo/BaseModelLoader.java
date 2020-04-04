@@ -116,7 +116,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
     public List<Artifact> listModels() throws IOException, ModelNotFoundException {
         List<Artifact> list = getMetadata().getArtifacts();
         return list.stream()
-                .filter(a -> version.equals(a.getVersion()))
+                .filter(a -> version == null || version.equals(a.getVersion()))
                 .collect(Collectors.toList());
     }
 

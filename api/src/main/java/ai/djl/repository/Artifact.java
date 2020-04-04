@@ -284,7 +284,7 @@ public class Artifact {
         } else {
             sb.append(name).append(':');
         }
-        sb.append(version).append(" {");
+        sb.append(version == null ? "N/A" : version).append(" {");
         if (properties != null) {
             boolean first = true;
             for (Map.Entry<String, String> entry : properties.entrySet()) {

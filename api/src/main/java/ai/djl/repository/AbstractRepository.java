@@ -26,6 +26,8 @@ import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
@@ -147,6 +149,12 @@ public abstract class AbstractRepository implements Repository {
             throw new IOException("Failed initialize cache directory: " + dir.toString());
         }
         return dir;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<MRL> getResources() {
+        return Collections.emptyList();
     }
 
     private void download(Path tmp, URI baseUri, Artifact.Item item, Progress progress)

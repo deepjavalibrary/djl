@@ -182,6 +182,9 @@ public class Metadata {
      */
     public void setArtifacts(List<Artifact> artifacts) {
         this.artifacts = artifacts;
+        for (Artifact artifact : artifacts) {
+            artifact.setMetadata(this);
+        }
     }
 
     /**
@@ -236,6 +239,14 @@ public class Metadata {
      */
     public void setRepositoryUri(URI repositoryUri) {
         this.repositoryUri = repositoryUri;
+    }
+
+    /**
+     * Restores artifacts state.
+     *
+     * <p>This call is required after the metadata is restored back from JSON.
+     */
+    public final void init() {
         if (artifacts != null) {
             for (Artifact artifact : artifacts) {
                 artifact.setMetadata(this);

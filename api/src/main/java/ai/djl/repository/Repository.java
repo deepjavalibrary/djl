@@ -18,12 +18,9 @@ import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@code Repository} is a format for storing data {@link Artifact}s for various uses including deep
@@ -85,40 +82,17 @@ public interface Repository {
      * @return the new repository
      */
     static Repository newInstance(String name, String url) {
-        final Logger logger = LoggerFactory.getLogger(Repository.class);
-        URI uri = URI.create(url);
-        Path path = null;
-        if (!uri.isAbsolute()) {
-            path = Paths.get(url);
-        }
+        return RepositoryFactoryImpl.getFactory().newInstance(name, url);
+    }
 
-        String scheme = uri.getScheme();
-        if ("file".equalsIgnoreCase(scheme)) {
-            path = Paths.get(uri.getPath());
-        }
-
-        if (path != null) {
-            boolean isLocal;
-            try {
-                isLocal =
-                        Files.walk(path)
-                                .anyMatch(
-                                        f ->
-                                                "metadata.json".equals(f.toFile().getName())
-                                                        && f.toFile().isFile());
-            } catch (IOException e) {
-                isLocal = false;
-                logger.warn(
-                        "Failed determining if local or naked repository. Defaulting to naked", e);
-            }
-            if (isLocal) {
-                return new LocalRepository(name, path);
-            } else {
-                return new SimpleRepository(name, path);
-            }
-        } else {
-            return new RemoteRepository(name, uri);
-        }
+    /**
+     * Registers a {@link RepositoryFactory} to handle the specified url scheme.
+     *
+     * @param scheme the url scheme
+     * @param factory the {@link RepositoryFactory} to be registered
+     */
+    static void registerRepositoryFactory(String scheme, RepositoryFactory factory) {
+        RepositoryFactoryImpl.registerRepositoryFactory(scheme, factory);
     }
 
     /**
@@ -218,4 +192,14 @@ public interface Repository {
      * @throws IOException if it failed to ensure the creation of the cache directory
      */
     Path getCacheDirectory() throws IOException;
+
+    /**
+     * Returns a list of {@link MRL}s in the repository.
+     *
+     * <p>An empty list will be returned if underlying {@code Repository} implementation does not
+     * support this feature.
+     *
+     * @return a list of {@link MRL}s in the repository
+     */
+    List<MRL> getResources();
 }

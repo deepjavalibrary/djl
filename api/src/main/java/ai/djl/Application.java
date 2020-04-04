@@ -15,6 +15,8 @@ package ai.djl;
 /** A class contains common deep learning applications. */
 public class Application {
 
+    public static final Application UNDEFINED = new Application("undefined");
+
     private String path;
 
     Application(String path) {
