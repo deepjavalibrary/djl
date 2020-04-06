@@ -12,6 +12,8 @@
  */
 package ai.djl.repository;
 
+import java.util.Set;
+
 /** A interface responsible to create {@link ai.djl.repository.Repository} instances. */
 public interface RepositoryFactory {
 
@@ -23,4 +25,11 @@ public interface RepositoryFactory {
      * @return the new repository
      */
     Repository newInstance(String name, String url);
+
+    /**
+     * Returns a set of URI scheme that the {@code RepositoryFactory} supports.
+     *
+     * @return a set of URI scheme that the {@code RepositoryFactory} supports
+     */
+    Set<String> getSupportedScheme();
 }

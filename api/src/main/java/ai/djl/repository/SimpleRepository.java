@@ -13,6 +13,7 @@
 package ai.djl.repository;
 
 import ai.djl.repository.Artifact.Item;
+import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Progress;
 import java.io.File;
 import java.net.URI;
@@ -30,8 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see Repository
  */
 public class SimpleRepository extends AbstractRepository {
-
-    private static final String GROUP_ID = "ai.djl.localmodelzoo";
 
     private String name;
     private Path path;
@@ -71,16 +70,14 @@ public class SimpleRepository extends AbstractRepository {
     @Override
     public Metadata locate(MRL mrl) {
         File file = path.toFile();
-        Metadata metadata = new MatchAllMetadata();
-        metadata.setGroupId(GROUP_ID);
+        Metadata metadata = new Metadata.MatchAllMetadata();
+        metadata.setRepositoryUri(URI.create(""));
         if (Files.isRegularFile(path)) {
             metadata.setArtifactId(file.getParentFile().getName());
         } else {
             metadata.setArtifactId(file.getName());
         }
-        metadata.setRepositoryUri(URI.create(""));
         if (!Files.exists(path)) {
-            metadata.setArtifacts(Collections.emptyList());
             return metadata;
         }
 
@@ -97,7 +94,6 @@ public class SimpleRepository extends AbstractRepository {
                     item.setArtifact(artifact);
                     files.put(f.getName(), item);
                 }
-                artifact.setFiles(files);
             }
         }
         artifact.setFiles(files);
@@ -109,7 +105,12 @@ public class SimpleRepository extends AbstractRepository {
     /** {@inheritDoc} */
     @Override
     public Artifact resolve(MRL mrl, String version, Map<String, String> filter) {
-        return locate(mrl).getArtifacts().get(0);
+        List<Artifact> artifacts = locate(mrl).getArtifacts();
+        if (artifacts.isEmpty()) {
+            return null;
+        }
+        // TODO: find highest version.
+        return artifacts.get(0);
     }
 
     /** {@inheritDoc} */
@@ -137,16 +138,7 @@ public class SimpleRepository extends AbstractRepository {
             return Collections.emptyList();
         }
 
-        MRL mrl = new MRL(new Anchor(), GROUP_ID, path.toFile().getName());
+        MRL mrl = MRL.undefined(DefaultModelZoo.GROUP_ID, path.toFile().getName());
         return Collections.singletonList(mrl);
-    }
-
-    private static final class MatchAllMetadata extends Metadata {
-
-        /** {@inheritDoc} */
-        @Override
-        public List<Artifact> search(VersionRange versionRange, Map<String, String> filter) {
-            return getArtifacts();
-        }
     }
 }

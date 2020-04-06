@@ -11,7 +11,8 @@ configure([
         project(':tensorflow:tensorflow-engine'),
         project(':tensorflow:tensorflow-model-zoo'),
         project(':tensorflow:tensorflow-native-auto'),
-        project(':fasttext:fasttext-engine')]) {
+        project(':fasttext:fasttext-engine'),
+        project(':3rdparty:aws-ai')]) {
     apply plugin: "maven-publish"
     apply plugin: "signing"
 

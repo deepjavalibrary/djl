@@ -1,0 +1,29 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<p>This document is the API specification for the AWS AI toolkit for DJL.
+
+<p>The aws-ai module contains classes that make it easy for DJL to access AWS services.
+
+<p>You can use this toolkit to load models from AWS S3 bucket directly:
+
+<pre>
+    // Set model zoo search path, this path
+    System.setProperty("ai.djl.repository.zoo.location",
+            "s3://djl-misc/test/models/<b>resnet18</b>/<i>resent18_v1</i>");
+
+    Criteria&lt;BufferedImage, Classifications&gt; criteria =
+        Criteria.builder()
+                .optApplication(Application.CV.IMAGE_CLASSIFICATION)
+                .setTypes(BufferedImage.class, Classifications.class)
+                .optArtifactId("ai.djl.localmodelzoo:<b>resnet18</b>")
+                .optProgress(new ProgressBar())
+                .build();
+
+    ZooModel&lt;BufferedImage, Classifications&gt; model = ModelZoo.loadModel(criteria);
+</pre>
+
+</body>
+</html>

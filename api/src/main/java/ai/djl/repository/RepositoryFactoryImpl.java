@@ -17,7 +17,10 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +31,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
 
     private static final RepositoryFactory FACTORY = new RepositoryFactoryImpl();
 
-    private static final Map<String, RepositoryFactory> REGISTRY = new ConcurrentHashMap<>();
+    private static final Map<String, RepositoryFactory> REGISTRY = init();
 
     static RepositoryFactory getFactory() {
         return FACTORY;
@@ -64,7 +67,26 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         return new RemoteRepository(name, uri);
     }
 
-    static void registerRepositoryFactory(String scheme, RepositoryFactory factory) {
-        REGISTRY.put(scheme, factory);
+    /** {@inheritDoc} */
+    @Override
+    public Set<String> getSupportedScheme() {
+        return Collections.emptySet();
+    }
+
+    static void registerRepositoryFactory(RepositoryFactory factory) {
+        for (String scheme : factory.getSupportedScheme()) {
+            REGISTRY.put(scheme, factory);
+        }
+    }
+
+    private static Map<String, RepositoryFactory> init() {
+        Map<String, RepositoryFactory> registry = new ConcurrentHashMap<>();
+        ServiceLoader<RepositoryFactory> factories = ServiceLoader.load(RepositoryFactory.class);
+        for (RepositoryFactory factory : factories) {
+            for (String scheme : factory.getSupportedScheme()) {
+                registry.put(scheme, factory);
+            }
+        }
+        return registry;
     }
 }

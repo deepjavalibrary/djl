@@ -88,11 +88,10 @@ public interface Repository {
     /**
      * Registers a {@link RepositoryFactory} to handle the specified url scheme.
      *
-     * @param scheme the url scheme
      * @param factory the {@link RepositoryFactory} to be registered
      */
-    static void registerRepositoryFactory(String scheme, RepositoryFactory factory) {
-        RepositoryFactoryImpl.registerRepositoryFactory(scheme, factory);
+    static void registerRepositoryFactory(RepositoryFactory factory) {
+        RepositoryFactoryImpl.registerRepositoryFactory(factory);
     }
 
     /**

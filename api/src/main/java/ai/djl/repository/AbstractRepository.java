@@ -157,7 +157,7 @@ public abstract class AbstractRepository implements Repository {
         return Collections.emptyList();
     }
 
-    private void download(Path tmp, URI baseUri, Artifact.Item item, Progress progress)
+    protected void download(Path tmp, URI baseUri, Artifact.Item item, Progress progress)
             throws IOException {
         URI fileUri = URI.create(item.getUri());
         if (!fileUri.isAbsolute()) {
@@ -189,10 +189,8 @@ public abstract class AbstractRepository implements Repository {
                     Files.copy(zis, file);
                 } else if ("gzip".equals(extension)) {
                     Files.copy(new GZIPInputStream(pis), file);
-                } else if (extension.isEmpty()) {
-                    Files.copy(pis, file);
                 } else {
-                    throw new IOException("File type is not supported: " + extension);
+                    Files.copy(pis, file);
                 }
             }
             pis.validateChecksum(item);
@@ -203,7 +201,7 @@ public abstract class AbstractRepository implements Repository {
      * A {@code ProgressInputStream} is a wrapper around an {@link InputStream} that also uses
      * {@link Progress}.
      */
-    private static final class ProgressInputStream extends InputStream {
+    protected static final class ProgressInputStream extends InputStream {
 
         private DigestInputStream dis;
         private Progress progress;

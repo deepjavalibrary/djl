@@ -12,7 +12,9 @@
  */
 package ai.djl.repository;
 
+import ai.djl.repository.zoo.DefaultModelZoo;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -31,12 +33,12 @@ import java.util.stream.Collectors;
 public class Metadata {
 
     private String metadataVersion;
-    private String groupId;
-    private String artifactId;
+    protected String groupId;
+    protected String artifactId;
     private String name;
     private String description;
     private String website;
-    private List<Artifact> artifacts;
+    protected List<Artifact> artifacts;
     private String checksum;
     private Date lastUpdated;
 
@@ -251,6 +253,22 @@ public class Metadata {
             for (Artifact artifact : artifacts) {
                 artifact.setMetadata(this);
             }
+        }
+    }
+
+    /** A {@code Metadata} class that matches all any search criteria. */
+    public static final class MatchAllMetadata extends Metadata {
+
+        /** Creates a {@code MatchAllMetadata} instance. */
+        public MatchAllMetadata() {
+            groupId = DefaultModelZoo.GROUP_ID;
+            artifacts = Collections.emptyList();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public List<Artifact> search(VersionRange versionRange, Map<String, String> filter) {
+            return getArtifacts();
         }
     }
 }
