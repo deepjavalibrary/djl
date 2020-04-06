@@ -10,9 +10,18 @@
 <p>You can use this toolkit to load models from AWS S3 bucket directly:
 
 <pre>
-    // Set model zoo search path, this path
+    // Set model zoo search path system property. The value can be
+    // comma delimited url string. You can add multiple s3 url.
+    // The S3 url should point to a folder in your s3 bucket.
+    // In current implementation, DJL will only download files directly
+    // in that folder. The archive file like .zip, .tar.gz, .tgz, .tar.z
+    // files will be extracted automatically. This is useful for the models
+    // that are created by AWS SageMaker.
+    // The folder name will be interpreted as artifactId and modelName.
+    // If your model file has a different name then the folder name, you
+    // need use query string to tell DJL which model you want to load.
     System.setProperty("ai.djl.repository.zoo.location",
-            "s3://djl-misc/test/models/<b>resnet18</b>/<i>resent18_v1</i>");
+            "s3://djl-misc/test/models/<b>resnet18</b>?model_name=<i>resent18_v1</i>");
 
     Criteria&lt;BufferedImage, Classifications&gt; criteria =
         Criteria.builder()

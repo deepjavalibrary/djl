@@ -59,15 +59,25 @@ public class S3Repository extends AbstractRepository {
     private String name;
     private String bucket;
     private String prefix;
+    private String artifactId;
+    private String modelName;
 
     private Metadata metadata;
     private boolean resolved;
 
-    S3Repository(S3Client client, String name, String bucket, String prefix) {
+    S3Repository(
+            S3Client client,
+            String name,
+            String bucket,
+            String prefix,
+            String artifactId,
+            String modelName) {
         this.client = client;
         this.name = name;
         this.bucket = bucket;
         this.prefix = prefix;
+        this.artifactId = artifactId;
+        this.modelName = modelName;
     }
 
     /** {@inheritDoc} */
@@ -178,51 +188,8 @@ public class S3Repository extends AbstractRepository {
 
         try {
             resolved = true;
-            String artifactId;
-            String modelName;
-            String key;
-            if (prefix.isEmpty()) {
-                key = "/";
-                artifactId = bucket;
-                modelName = artifactId;
-            } else if (prefix.endsWith("/")) {
-                key = prefix;
-                String[] tokens = prefix.split("/");
-                artifactId = tokens[tokens.length - 1];
-                modelName = artifactId;
-            } else {
-                List<S3Object> list = listFiles(prefix, 1, false);
-                if (list.isEmpty()) {
-                    logger.debug("No object found in s3 bucket: " + prefix);
-                    return null;
-                }
-                S3Object obj = list.get(0);
-                String objName = obj.key();
-                if (objName.endsWith("/")) {
-                    objName = objName.substring(1, objName.length() - 1);
-                }
-                int pos = objName.indexOf('/', prefix.length() + 1);
-                if (pos == -1) {
-                    pos = objName.lastIndexOf('/');
-                }
-
-                key = objName.substring(0, pos + 1);
-                if ("/".equals(key)) {
-                    artifactId = bucket;
-                    modelName = artifactId;
-                } else {
-                    String[] tokens = key.split("/");
-                    artifactId = tokens[tokens.length - 1];
-                    if (key.length() < prefix.length()) {
-                        modelName = prefix.substring(key.length());
-                    } else {
-                        modelName = artifactId;
-                    }
-                }
-            }
-
-            List<S3Object> list = listFiles(key, 100, true); // only list one level
-            if (list.isEmpty()) {
+            Artifact artifact = listFiles();
+            if (artifact == null) {
                 logger.debug("No object found in s3 bucket.");
                 return null;
             }
@@ -231,7 +198,6 @@ public class S3Repository extends AbstractRepository {
             MRL mrl = MRL.model(Application.UNDEFINED, metadata.getGroupId(), artifactId);
             metadata.setRepositoryUri(mrl.toURI());
             metadata.setArtifactId(artifactId);
-            Artifact artifact = createArtifact(list);
             artifact.setName(modelName);
             metadata.setArtifacts(Collections.singletonList(artifact));
             return metadata;
@@ -240,20 +206,21 @@ public class S3Repository extends AbstractRepository {
         }
     }
 
-    private List<S3Object> listFiles(String key, int maxKeys, boolean delimiter) {
-        ListObjectsRequest.Builder builder =
-                ListObjectsRequest.builder().bucket(bucket).maxKeys(maxKeys).prefix(key);
-        if (delimiter) {
-            builder.delimiter("/");
-        }
-
-        ListObjectsRequest req = builder.build();
+    private Artifact listFiles() {
+        ListObjectsRequest req =
+                ListObjectsRequest.builder()
+                        .bucket(bucket)
+                        .maxKeys(100)
+                        .prefix(prefix)
+                        .delimiter("/")
+                        .build();
 
         ListObjectsResponse resp = client.listObjects(req);
-        return resp.contents();
-    }
+        List<S3Object> list = resp.contents();
+        if (list.isEmpty()) {
+            return null;
+        }
 
-    private Artifact createArtifact(List<S3Object> list) {
         Artifact artifact = new Artifact();
         Map<String, Artifact.Item> files = new ConcurrentHashMap<>();
         for (S3Object obj : list) {
