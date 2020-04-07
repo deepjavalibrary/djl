@@ -475,6 +475,31 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sequenceMask(NDArray sequenceLength, float value) {
+        if (getShape().dimension() < 3 || getShape().isScalar() || getShape().hasZeroDimension()) {
+            throw new IllegalArgumentException(
+                    "sequenceMask is not supported for NDArray with less than 3 dimensions");
+        }
+        Shape expectedSequenceLengthShape = new Shape(getShape().get(0));
+        if (!sequenceLength.getShape().equals(expectedSequenceLengthShape)) {
+            throw new IllegalArgumentException("SequenceLength must be of shape [batchSize]");
+        }
+        MxOpParams params = new MxOpParams();
+        params.add("value", value);
+        params.add("use_sequence_length", true);
+        params.add("axis", 1);
+        return manager.invoke("_npx_sequence_mask", new NDList(this, sequenceLength), params)
+                .head();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sequenceMask(NDArray sequenceLength) {
+        return sequenceMask(sequenceLength, 0);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray zerosLike() {
         MxOpParams params = new MxOpParams();
         params.addParam("fill_value", 0);

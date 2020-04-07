@@ -267,6 +267,18 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sequenceMask(NDArray sequenceLength, float value) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sequenceMask(NDArray sequenceLength) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray zerosLike() {
         return JniUtils.zerosLike(this, getDataType(), getDevice(), SparseFormat.DENSE);
     }

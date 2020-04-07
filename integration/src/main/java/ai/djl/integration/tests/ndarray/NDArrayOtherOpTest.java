@@ -312,6 +312,40 @@ public class NDArrayOtherOpTest {
         }
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testSequenceMask() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.create(new float[][] {{1, 2, 3}, {4, 5, 6}});
+            NDArray sequenceLength = manager.create(new float[] {1, 2});
+            NDArray expected = manager.create(new float[][] {{1, 0, 0}, {4, 5, 0}});
+            Assert.assertEquals(array.sequenceMask(sequenceLength), expected);
+            Assert.assertEquals(NDArrays.sequenceMask(array, sequenceLength), expected);
+
+            // test zero dimension
+            array = manager.create(new Shape(1, 0, 0));
+            sequenceLength = manager.create(new float[] {1});
+            array.sequenceMask(sequenceLength);
+        }
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testSequenceMaskWithScalarInput() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.create(new Shape());
+            NDArray sequenceLength = manager.create(new float[] {1});
+            array.sequenceMask(sequenceLength);
+        }
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testSequenceMaskWithScalarSequenceLength() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.create(new Shape(1, 1, 1));
+            NDArray sequenceLength = manager.create(new float[] {});
+            array.sequenceMask(sequenceLength);
+        }
+    }
+
     @Test
     public void testArgSort() {
         // TODO switch to numpy argsort

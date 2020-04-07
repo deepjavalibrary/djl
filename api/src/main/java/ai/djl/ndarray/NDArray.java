@@ -643,6 +643,33 @@ public interface NDArray extends AutoCloseable {
     NDArray booleanMask(NDArray index, int axis);
 
     /**
+     * Sets all elements outside the sequence to a constant value.
+     *
+     * <p>This function takes an n-dimensional input array of the form [batch_size,
+     * max_sequence_length, ....] and returns an array of the same shape. Parameter {@code
+     * sequenceLength} is used to handle variable-length sequences. sequence_length should be an
+     * input array of positive ints of dimension [batch_size].
+     *
+     * @param sequenceLength used to handle variable-length sequences
+     * @param value the constant value to be set
+     * @return the result {@code NDArray}
+     */
+    NDArray sequenceMask(NDArray sequenceLength, float value);
+
+    /**
+     * Sets all elements outside the sequence to 0.
+     *
+     * <p>This function takes an n-dimensional input array of the form [batch_size,
+     * max_sequence_length, ....] and returns an array of the same shape. Parameter {@code
+     * sequenceLength} is used to handle variable-length sequences. sequence_length should be an
+     * input array of positive ints of dimension [batch_size].
+     *
+     * @param sequenceLength used to handle variable-length sequences
+     * @return the result {@code NDArray}
+     */
+    NDArray sequenceMask(NDArray sequenceLength);
+
+    /**
      * Returns an {@code NDArray} of zeros with the same {@link Shape}, {@link DataType} and {@link
      * SparseFormat} as the input {@code NDArray}.
      *

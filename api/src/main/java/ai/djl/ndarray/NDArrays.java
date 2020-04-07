@@ -752,6 +752,40 @@ public final class NDArrays {
         return data.booleanMask(index, axis);
     }
 
+    /**
+     * Sets all elements of the given {@link NDArray} outside the sequence {@link NDArray} to a
+     * constant value.
+     *
+     * <p>This function takes an n-dimensional input array of the form [batch_size,
+     * max_sequence_length, ....] and returns an array of the same shape. Parameter {@code
+     * sequenceLength} is used to handle variable-length sequences. {@code sequenceLength} should be
+     * an input array of positive ints of dimension [batch_size].
+     *
+     * @param data the {@link NDArray} to operate on
+     * @param sequenceLength used to handle variable-length sequences
+     * @param value the constant value to be set
+     * @return the result {@link NDArray}
+     */
+    public static NDArray sequenceMask(NDArray data, NDArray sequenceLength, float value) {
+        return data.sequenceMask(sequenceLength, value);
+    }
+
+    /**
+     * Sets all elements of the given {@link NDArray} outside the sequence {@link NDArray} to 0.
+     *
+     * <p>This function takes an n-dimensional input array of the form [batch_size,
+     * max_sequence_length, ....] and returns an array of the same shape. Parameter {@code
+     * sequenceLength} is used to handle variable-length sequences. {@code sequenceLength} should be
+     * an input array of positive ints of dimension [batch_size].
+     *
+     * @param data the {@link NDArray} to operate on
+     * @param sequenceLength used to handle variable-length sequences
+     * @return the result {@link NDArray}
+     */
+    public static NDArray sequenceMask(NDArray data, NDArray sequenceLength) {
+        return data.sequenceMask(sequenceLength);
+    }
+
     ////////////////////////////////////////
     // Operations: Element Arithmetic
     ////////////////////////////////////////
