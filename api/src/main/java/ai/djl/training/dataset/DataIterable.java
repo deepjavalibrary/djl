@@ -109,13 +109,19 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
     public boolean hasNext() {
         if (executor != null) {
             if (queue.isEmpty()) {
-                manager.close();
+                String close = System.getProperty("ai.djl.dataiterator.autoclose", "true");
+                if (Boolean.parseBoolean(close)) {
+                    manager.close();
+                }
                 return false;
             }
             return true;
         }
         if (!sample.hasNext()) {
-            manager.close();
+            String close = System.getProperty("ai.djl.dataiterator.autoclose", "true");
+            if (Boolean.parseBoolean(close)) {
+                manager.close();
+            }
             return false;
         }
         return true;
