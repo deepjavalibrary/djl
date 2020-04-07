@@ -31,6 +31,27 @@ Execution failed for task ':api:verifyJava'.
 ```
 If you do fail the format check, the easiest way to resolve it is to run the gradle `formatJava` target to reformat your code.
 
+## Documentation Conventions
+
+DJL should have good and clear documentation for the sake of users learning about it and about deep learning.
+
+The most basic element of our documentation is the javadoc. Javadoc is required in most classes and methods by checkstyle. We try to follow the javadoc standards for the most part. The javadoc should begin with a sentence ending in period. Then, there should be an empty line and then optionally some additional paragraphs of description that each are prefixed with `<p>` and separated by newlines. Then, there should be the parameters, return values, and other attributes which do not end in a period.
+
+### Deep Learning Concepts
+
+DJL documentation will also coincide with various deep learning concepts that users may or may not be familiar with. Some of these include the various operations and blocks, activation functions, loss functions, optimizers, datasets, and models.
+
+For all of the topics that are associated with a particular method or class (and can be defined in that javadoc), you should try to include the following information:
+- 1-3 sentence summary of what the topic is (note that other terms in the summary should link to their respective definitions) assuming that users don't have familiarity with the topic
+- A link to the paper indicated with an anchor tag with the text "paper", possibly some additional anchor tags to other sources that help explain it
+- 1-3 sentence summary of historical context(when it was created and why).
+- 1-3 sentence guidance of why or why not to use it (pros and cons, is it still commonly used today)
+- A latex formula (if appropriate) should go after the above information and before any other miscellaneous information and the attributes
+
+The goal is not to explain everything. It is to explain just enough that a user who sees it has a high level understanding of what it is and how to act on the information.
+
+For larger topics which do not have a corresponding javadoc section, they should link to an outside source that helps explain it. If possible, that source should be the d2l-java book.
+
 ## Build
 
 This project uses a gradle wrapper, so you don't have to install gradle on your machine. You can just call the gradle wrapper using the following command:
