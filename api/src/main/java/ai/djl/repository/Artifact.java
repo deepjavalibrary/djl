@@ -218,10 +218,6 @@ public class Artifact {
         }
         for (Map.Entry<String, Item> file : files.entrySet()) {
             file.getValue().setArtifact(this);
-            if (file.getValue().name == null && "dir".equals(file.getValue().getType())) {
-                // FIXME: this is too hacky, should explicitly define in metadata.json file
-                file.getValue().name = file.getKey();
-            }
         }
         return files;
     }
