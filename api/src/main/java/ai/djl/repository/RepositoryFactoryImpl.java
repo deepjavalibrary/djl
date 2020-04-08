@@ -51,7 +51,12 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         }
 
         if ("file".equalsIgnoreCase(scheme)) {
-            Path path = Paths.get(uri.getPath());
+            Path path;
+            if (uri.isAbsolute()) {
+                path = Paths.get(uri);
+            } else {
+                path = Paths.get(uri.getPath());
+            }
             if (Files.exists(path) && Files.isDirectory(path)) {
                 try {
                     if (Files.walk(path)

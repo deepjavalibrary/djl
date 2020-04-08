@@ -22,9 +22,15 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 public class ListModelsTest {
+
+    @AfterClass
+    public void tearDown() {
+        System.setProperty("ai.djl.repository.zoo.location", "");
+    }
 
     @Test
     public void testListModels() throws ModelException, IOException {
