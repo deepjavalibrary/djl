@@ -45,7 +45,7 @@ public class RemoteRepository extends AbstractRepository {
      * @param name the repository name
      * @param uri the repository location
      */
-    public RemoteRepository(String name, URI uri) {
+    protected RemoteRepository(String name, URI uri) {
         this.name = name;
         this.uri = uri;
     }
@@ -81,6 +81,7 @@ public class RemoteRepository extends AbstractRepository {
         if (Files.exists(cacheFile)) {
             try (Reader reader = Files.newBufferedReader(cacheFile)) {
                 Metadata metadata = GSON.fromJson(reader, Metadata.class);
+                metadata.init();
                 Date lastUpdated = metadata.getLastUpdated();
                 if (Boolean.getBoolean("offline")
                         || System.currentTimeMillis() - lastUpdated.getTime() < ONE_DAY) {
@@ -93,6 +94,7 @@ public class RemoteRepository extends AbstractRepository {
         try (InputStream is = file.toURL().openStream()) {
             String json = Utils.toString(is);
             Metadata metadata = GSON.fromJson(json, Metadata.class);
+            metadata.init();
             metadata.setLastUpdated(new Date());
             try (Writer writer = Files.newBufferedWriter(cacheFile)) {
                 writer.write(GSON.toJson(metadata));

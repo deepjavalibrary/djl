@@ -3,16 +3,32 @@ The following are common problems you may face when using or developing DJL.
 	
 Please review this list before submitting an issue.
 
-## 1. IntelliJ throws the `No deep learning engine found` exception.
-The following exception may appear after running the `./gradlew clean` command:
+## 1. `No deep learning engine found` exception.
+These could be due to several reasons.
 ```
 16:57:55.313 [main] ERROR ai.djl.examples.training.util.AbstractTraining - Unexpected error
-ai.djl.engine.EngineException: No deep learning engine found in class path.
+ai.djl.engine.EngineException: No deep learning engine found.
 	at ai.djl.engine.Engine.getInstance(Engine.java:81) ~[main/:?]
 	at ai.djl.examples.training.util.Arguments.<init>(Arguments.java:42) ~[main/:?]
 	at ai.djl.examples.training.util.AbstractTraining.runExample(AbstractTraining.java:67) [main/:?]
 	at ai.djl.examples.training.TrainPikachu.main(TrainPikachu.java:72) [main/:?]
 ```
+
+#### 1. Engine dependency is missing
+DJL currently supports four engines: MXNet, PyTorch, TensorFlow(experimental) and FastText.
+Please includes at least one of those engines as dependencies.
+For example, add `ai.djl.mxnet:mxnet-engine:{version}` for gradle or 
+```
+<dependency>
+    <groupId>ai.djl.mxnet</groupId>
+    <artifactId>mxnet-engine</artifactId>
+    <version>{version}</version>
+</dependency>
+```
+for maven.
+
+#### 2. Intellij Issue
+The error may appear after running the `./gradlew clean` command:
 This issue is caused by a mismatch between IntelliJ and the Gradle runner.
 To fix this, navigate to: `Preferences-> Build Execution Deployment -> Build Tools -> Gradle`. Then, change the `Build and running using:` option to `Gradle`.
 
@@ -25,6 +41,21 @@ Then, right click the resources folder and select `Rebuild<default>`.
 
 ![FAQ1](https://djl-ai.s3.amazonaws.com/resources/images/FAQ_engine_not_found.png)
 
+#### 3. UnsatisfiedLinkError issue
+You might see the error when DJL try to load the native library for engines, some shared libraries are missing.
+Let's take PyTorch engine for example, DJL loads libtorch.dylib when creating the Engine instance.
+You can check library files on which libtorch.dylib depends by typing `otool -L libtorch.dylib` on mac `ldd libtorch.so` on ubuntu.
+```
+# in macos environment
+libtorch.dylib:
+	@rpath/libtorch.dylib (compatibility version 0.0.0, current version 0.0.0)
+	@rpath/libiomp5.dylib (compatibility version 5.0.0, current version 5.0.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1252.0.0)
+	@rpath/libc10.dylib (compatibility version 0.0.0, current version 0.0.0)
+	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 400.9.0)
+```
+It shows the `libtorch.dylib` depends on `libiomp5.dylib` and `libc10.dylib`. If one of them is missing, it throws `UnsatisfiedLinkError` exception.
+If you are using `ai.djl.{engine}:{engine}-native-auto`, please create an issue on the `https://github.com/awslabs/djl`.
 
 ## 2. IntelliJ throws the `No Log4j 2 configuration file found.` exception.
 The following exception may appear after running the `./gradlew clean` command:

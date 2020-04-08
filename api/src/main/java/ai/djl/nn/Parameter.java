@@ -21,7 +21,6 @@ import ai.djl.training.initializer.Initializer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -36,8 +35,6 @@ import java.util.UUID;
 public class Parameter implements AutoCloseable {
 
     private static final byte VERSION = 1;
-
-    private static final int BUFFER_SIZE = 81920;
 
     private String id;
     private String name;
@@ -206,35 +203,8 @@ public class Parameter implements AutoCloseable {
 
         dos.writeChar('P');
         dos.writeByte(VERSION);
-
         dos.writeUTF(getName());
-
-        dos.writeUTF(array.getSparseFormat().name());
-        dos.writeUTF(array.getDataType().name());
-
-        Shape shape = array.getShape();
-        dos.write(shape.getEncoded());
-
-        ByteBuffer bb = array.toByteBuffer();
-        int length = bb.remaining();
-        dos.writeInt(length);
-
-        if (length > 0) {
-            if (length > BUFFER_SIZE) {
-                byte[] buf = new byte[BUFFER_SIZE];
-                while (length > BUFFER_SIZE) {
-                    bb.get(buf);
-                    dos.write(buf);
-                    length = bb.remaining();
-                }
-            }
-
-            byte[] buf = new byte[length];
-            bb.get(buf);
-            dos.write(buf);
-        }
-
-        dos.flush();
+        dos.write(array.encode());
     }
 
     /**
@@ -270,32 +240,7 @@ public class Parameter implements AutoCloseable {
                     "Unexpected parameter name: " + parameterName + ", expected: " + name);
         }
 
-        dis.readUTF(); // ignore SparseFormat
-
-        // DataType - 1 byte
-        DataType dataType = DataType.valueOf(dis.readUTF());
-
-        // Shape
-        Shape shape = Shape.decode(dis);
-
-        // Data
-        int length = dis.readInt();
-        ByteBuffer data = manager.allocateDirect(length);
-
-        if (length > 0) {
-            byte[] buf = new byte[BUFFER_SIZE];
-            while (length > BUFFER_SIZE) {
-                dis.readFully(buf);
-                data.put(buf);
-                length -= BUFFER_SIZE;
-            }
-
-            dis.readFully(buf, 0, length);
-            data.put(buf, 0, length);
-            data.rewind();
-        }
-
-        array = manager.create(dataType.asDataType(data), shape);
+        array = manager.decode(dis);
     }
 
     /** {@inheritDoc} */

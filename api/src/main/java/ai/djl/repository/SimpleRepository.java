@@ -13,12 +13,14 @@
 package ai.djl.repository;
 
 import ai.djl.repository.Artifact.Item;
+import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Progress;
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,21 +40,10 @@ public class SimpleRepository extends AbstractRepository {
      *
      * <p>Use {@link Repository#newInstance(String, String)}.
      *
-     * @param path the path to the repository
-     */
-    public SimpleRepository(Path path) {
-        this(path.toFile().getName(), path);
-    }
-
-    /**
-     * (Internal) Constructs a SimpleRepository.
-     *
-     * <p>Use {@link Repository#newInstance(String, String)}.
-     *
      * @param name the name of the repository
      * @param path the path to the repository
      */
-    public SimpleRepository(String name, Path path) {
+    protected SimpleRepository(String name, Path path) {
         this.name = name;
         this.path = path;
     }
@@ -77,34 +68,49 @@ public class SimpleRepository extends AbstractRepository {
 
     /** {@inheritDoc} */
     @Override
-    public Metadata locate(MRL mrl) throws IOException {
-        Metadata metadata = new Metadata();
+    public Metadata locate(MRL mrl) {
+        File file = path.toFile();
+        Metadata metadata = new Metadata.MatchAllMetadata();
         metadata.setRepositoryUri(URI.create(""));
-        Artifact artifact = new Artifact();
-        artifact.setMetadata(metadata);
-        metadata.setArtifacts(Collections.singletonList(artifact));
-        artifact.setName(name);
-        Map<String, Item> files = new ConcurrentHashMap<>();
-        File[] fileList = path.toFile().listFiles();
-        if (fileList == null) {
-            throw new IllegalArgumentException("No files found in SimpleRepository");
+        if (Files.isRegularFile(path)) {
+            metadata.setArtifactId(file.getParentFile().getName());
+        } else {
+            metadata.setArtifactId(file.getName());
         }
-        for (File file : fileList) {
-            Item item = new Item();
-            item.setName(file.getName());
-            item.setSize(file.length());
-            item.setArtifact(artifact);
-            files.put(file.getName(), item);
+        if (!Files.exists(path)) {
+            return metadata;
+        }
+
+        Artifact artifact = new Artifact();
+        artifact.setName(file.getName());
+        Map<String, Item> files = new ConcurrentHashMap<>();
+        if (file.isDirectory()) {
+            File[] fileList = file.listFiles();
+            if (fileList != null) {
+                for (File f : fileList) {
+                    Item item = new Item();
+                    item.setName(f.getName());
+                    item.setSize(f.length());
+                    item.setArtifact(artifact);
+                    files.put(f.getName(), item);
+                }
+            }
         }
         artifact.setFiles(files);
+
+        metadata.setArtifacts(Collections.singletonList(artifact));
         return metadata;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
-            throws IOException {
-        return locate(mrl).getArtifacts().get(0);
+    public Artifact resolve(MRL mrl, String version, Map<String, String> filter) {
+        List<Artifact> artifacts = locate(mrl).getArtifacts();
+        if (artifacts.isEmpty()) {
+            return null;
+        }
+        // TODO: find highest version.
+        return artifacts.get(0);
     }
 
     /** {@inheritDoc} */
@@ -121,7 +127,18 @@ public class SimpleRepository extends AbstractRepository {
 
     /** {@inheritDoc} */
     @Override
-    protected URI resolvePath(Item item, String path) throws IOException {
+    protected URI resolvePath(Item item, String path) {
         return this.path.resolve(item.getName()).toUri();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<MRL> getResources() {
+        if (!Files.exists(path)) {
+            return Collections.emptyList();
+        }
+
+        MRL mrl = MRL.undefined(DefaultModelZoo.GROUP_ID, path.toFile().getName());
+        return Collections.singletonList(mrl);
     }
 }

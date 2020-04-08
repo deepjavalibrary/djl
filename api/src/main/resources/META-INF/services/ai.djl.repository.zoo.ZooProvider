@@ -1,1 +1,1 @@
-ai.djl.repository.zoo.LocalZooProvider
+ai.djl.repository.zoo.DefaultZooProvider

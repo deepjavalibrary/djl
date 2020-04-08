@@ -13,10 +13,13 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Application;
+import ai.djl.modality.nlp.embedding.EmbeddingException;
+import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.dataset.ZooDataset;
+import ai.djl.training.dataset.Record;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URI;
@@ -137,6 +140,12 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
 
         preprocess(sourceTextData, true);
         preprocess(targetTextData, false);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Record get(NDManager manager, long index) throws EmbeddingException {
+        return new Record(embedText(index, manager, true), embedText(index, manager, false));
     }
 
     /** {@inheritDoc} */

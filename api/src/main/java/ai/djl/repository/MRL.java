@@ -80,6 +80,17 @@ public class MRL {
     }
 
     /**
+     * Creates a dataset {@code MRL} with specified application.
+     *
+     * @param groupId the desired groupId
+     * @param artifactId the desired artifactId
+     * @return a dataset {@code MRL}
+     */
+    public static MRL undefined(String groupId, String artifactId) {
+        return new MRL(new Anchor(), groupId, artifactId);
+    }
+
+    /**
      * Returns the URI to the metadata location (used for {@link Repository} implementations).
      *
      * @return the URI to the metadata location

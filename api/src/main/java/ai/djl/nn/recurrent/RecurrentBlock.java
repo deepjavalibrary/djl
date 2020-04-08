@@ -34,10 +34,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are implemented,
- * with both multi-layer and bidirectional support.
+ * {@code RecurrentBlock} is an abstract implementation of recurrent neural networks.
+ *
+ * <p>Recurrent neural networks are neural networks with hidden states. They are very popular for
+ * natural language processing tasks, and other tasks which involve sequential data.
+ *
+ * <p>This [article](http://karpathy.github.io/2015/05/21/rnn-effectiveness/) written by Andrej
+ * Karpathy provides a detailed explanation of recurrent neural networks.
+ *
+ * <p>Currently, vanilla RNN, LSTM and GRU are implemented, with both multi-layer and bidirectional
+ * support.
  */
-public abstract class RecurrentCell extends ParameterBlock {
+public abstract class RecurrentBlock extends ParameterBlock {
 
     private static final byte VERSION = 2;
 
@@ -59,11 +67,11 @@ public abstract class RecurrentCell extends ParameterBlock {
     protected List<Parameter> parameters = new ArrayList<>();
 
     /**
-     * Creates a {@code RecurrentCell} object.
+     * Creates a {@code RecurrentBlock} object.
      *
      * @param builder the {@code Builder} that has the necessary configurations
      */
-    public RecurrentCell(BaseBuilder<?> builder) {
+    public RecurrentBlock(BaseBuilder<?> builder) {
         stateSize = builder.stateSize;
         dropRate = builder.dropRate;
         numStackedLayers = builder.numStackedLayers;
@@ -263,7 +271,7 @@ public abstract class RecurrentCell extends ParameterBlock {
         return new NDList(inputs.singletonOrThrow().transpose(1, 0, 2));
     }
 
-    /** The Builder to construct a {@link RecurrentCell} type of {@link ai.djl.nn.Block}. */
+    /** The Builder to construct a {@link RecurrentBlock} type of {@link ai.djl.nn.Block}. */
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 

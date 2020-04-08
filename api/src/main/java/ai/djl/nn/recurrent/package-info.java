@@ -14,6 +14,6 @@
 /**
  * Contains classes for recurrent neural network operations.
  *
- * @see ai.djl.nn.recurrent.RecurrentCell
+ * @see ai.djl.nn.recurrent.RecurrentBlock
  */
 package ai.djl.nn.recurrent;

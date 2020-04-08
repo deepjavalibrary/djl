@@ -214,6 +214,18 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sequenceMask(NDArray sequenceLength, float value) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sequenceMask(NDArray sequenceLength) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray zerosLike() {
         return null;
     }

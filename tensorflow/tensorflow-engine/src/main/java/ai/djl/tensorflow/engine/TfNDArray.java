@@ -301,6 +301,18 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sequenceMask(NDArray sequenceLength, float value) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sequenceMask(NDArray sequenceLength) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray zerosLike() {
         return new TfNDArray(manager, tf.zerosLike(asOperand()));
     }

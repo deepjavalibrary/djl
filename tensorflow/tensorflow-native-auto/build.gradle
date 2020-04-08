@@ -1,0 +1,25 @@
+group "ai.djl.tensorflow"
+version = "2.0.0-a"
+
+jar {
+    doFirst {
+        def dir = file("${project.buildDir}/placeholder/native/lib")
+        dir.mkdirs();
+        def propFile = new File(dir, "tensorflow.properties")
+        propFile.text = "placeholder=true\nversion=${project.version}\n"
+    }
+
+    from "${project.buildDir}/placeholder"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "TensorFlow 2.0 core api"
+                description = "TensorFlow 2.0 core api"
+                url = "http://www.djl.ai/tensorflow/${project.name}"
+            }
+        }
+    }
+}

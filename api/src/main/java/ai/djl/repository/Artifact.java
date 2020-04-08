@@ -17,6 +17,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -218,6 +219,7 @@ public class Artifact {
         for (Map.Entry<String, Item> file : files.entrySet()) {
             file.getValue().setArtifact(this);
             if (file.getValue().name == null && "dir".equals(file.getValue().getType())) {
+                // FIXME: this is too hacky, should explicitly define in metadata.json file
                 file.getValue().name = file.getKey();
             }
         }
@@ -284,7 +286,7 @@ public class Artifact {
         } else {
             sb.append(name).append(':');
         }
-        sb.append(version).append(" {");
+        sb.append(version == null ? "N/A" : version).append(" {");
         if (properties != null) {
             boolean first = true;
             for (Map.Entry<String, String> entry : properties.entrySet()) {
@@ -368,7 +370,7 @@ public class Artifact {
         public String getType() {
             if (type == null) {
                 getExtension();
-                if ("zip".equals(extension)) {
+                if ("zip".equals(extension) || "tar".equals(extension) || "tgz".equals(extension)) {
                     type = "dir";
                 } else {
                     type = "file";
@@ -412,21 +414,23 @@ public class Artifact {
          */
         public String getName() {
             if (name == null) {
-                if ("dir".equals(getType())) {
-                    name = "";
+                int pos = uri.lastIndexOf('/');
+                if (pos >= 0) {
+                    name = uri.substring(pos + 1);
                 } else {
-                    int pos = uri.lastIndexOf('/');
-                    if (pos >= 0) {
-                        name = uri.substring(pos + 1);
-                    } else {
-                        name = uri;
-                    }
-                    if (name.endsWith(".z") || name.endsWith(".gz") || name.endsWith(".zip")) {
-                        pos = name.lastIndexOf('.');
-                        if (pos > 0) {
-                            name = name.substring(0, pos);
-                        }
-                    }
+                    name = uri;
+                }
+                String fileName = uri.toLowerCase(Locale.ROOT);
+                if (fileName.endsWith(".tar.gz")) {
+                    name = name.substring(0, name.length() - 7);
+                } else if (fileName.endsWith(".tar.z")) {
+                    name = name.substring(0, name.length() - 6);
+                } else if (fileName.endsWith(".tgz") || fileName.endsWith(".zip")) {
+                    name = name.substring(0, name.length() - 4);
+                } else if (fileName.endsWith(".gz")) {
+                    name = name.substring(0, name.length() - 3);
+                } else if (fileName.endsWith(".z")) {
+                    name = name.substring(0, name.length() - 2);
                 }
             }
             return name;
@@ -448,9 +452,16 @@ public class Artifact {
          */
         public String getExtension() {
             if (extension == null) {
-                if (uri.endsWith(".zip")) {
+                String fileName = uri.toLowerCase(Locale.ROOT);
+                if (fileName.endsWith(".zip")) {
                     extension = "zip";
-                } else if (uri.endsWith(".gz") || uri.endsWith(".z")) {
+                } else if (fileName.endsWith(".tgz")
+                        || fileName.endsWith(".tar.gz")
+                        || fileName.endsWith(".tar.z")) {
+                    extension = "tgz";
+                } else if (fileName.endsWith(".tar")) {
+                    extension = "tar";
+                } else if (fileName.endsWith(".gz") || fileName.endsWith(".z")) {
                     extension = "gzip";
                 } else {
                     extension = "";

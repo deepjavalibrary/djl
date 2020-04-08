@@ -14,14 +14,19 @@
 package ai.djl.tensorflow.engine;
 
 import ai.djl.engine.EngineException;
+import ai.djl.util.Platform;
 import ai.djl.util.Utils;
-import ai.djl.util.cuda.CudaUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,58 +35,116 @@ public final class LibUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
 
+    private static final String LIB_NAME = "tensorflow_jni";
+    private static final Pattern VERSION_PATTERN =
+            Pattern.compile("(\\d+\\.\\d+\\.\\d+(-\\w)?)(-SNAPSHOT)?(-\\d+)?");
+
     private LibUtils() {}
 
     public static void loadLibrary() {
         String libName = getTensorFlowLib();
-        logger.debug("Loading TensorFlow library from: {}", libName);
-
-        System.load(libName + '/' + System.mapLibraryName("tensorflow_jni"));
-        System.load(libName + '/' + System.mapLibraryName("tensorflow_framework"));
-    }
-
-    private static String getTensorFlowLib() {
-        String osName = System.getProperty("os.name");
-        if (osName.startsWith("Mac")) {
-            return downloadTensorFlow("libtensorflow_jni-cpu-darwin-x86_64");
-        } else if (osName.startsWith("Linux")) {
-            if (CudaUtils.getGpuCount() > 0) {
-                return downloadTensorFlow("libtensorflow_jni-gpu-linux-x86_64");
-            }
-            return downloadTensorFlow("libtensorflow_jni-cpu-linux-x86_64");
-        } else if (osName.startsWith("Win")) {
-            throw new EngineException(
-                    "TensorFlow engine does not support Windows yet," + "please use MXNet engine");
-        } else {
-            throw new EngineException("OS not supported: " + osName);
+        if (libName != null) {
+            logger.debug("Loading TensorFlow library from: {}", libName);
+            System.load(libName);
         }
     }
 
-    private static String downloadTensorFlow(String fileName) {
-        String userHome = System.getProperty("user.home");
-        Path dir = Paths.get(userHome, ".tensorflow/cache/");
-        Path path = dir.resolve(fileName);
+    private static String getTensorFlowLib() {
+        URL url =
+                Thread.currentThread()
+                        .getContextClassLoader()
+                        .getResource("native/lib/tensorflow.properties");
+        if (url == null) {
+            // defer to tensorflow-core-api to handle loading native library.
+            return null;
+        }
+
+        try {
+            Platform platform = Platform.fromUrl(url);
+            return downloadTensorFlow(platform);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to download TensorFlow native library", e);
+        }
+    }
+
+    private static String downloadTensorFlow(Platform platform) throws IOException {
+        String version = platform.getVersion();
+        String os = platform.getOsPrefix();
+        String classifier = platform.getClassifier();
+        String cudaArch = platform.getCudaArch();
+        String flavor = platform.getFlavor();
+        if (flavor.isEmpty()) {
+            flavor = "cpu";
+        }
+
+        Path userHome = Paths.get(System.getProperty("user.home"));
+        String libName = System.mapLibraryName(LIB_NAME);
+        Path dir =
+                userHome.resolve(".tensorflow/cache/" + version + '-' + flavor + '-' + classifier);
+        Path path = dir.resolve(libName);
         if (Files.exists(path)) {
             return path.toAbsolutePath().toString();
         }
 
-        Path tmp = Paths.get(userHome, ".tensorflow/cache/tmp");
+        Path tmp = userHome.resolve(".tensorflow/cache/tmp");
+        Files.createDirectories(tmp);
 
-        String link =
-                "https://storage.googleapis.com/tensorflow-nightly/github/tensorflow/lib_package/";
-        try (InputStream is = new URL(link + fileName + ".tar.gz").openStream()) {
-            Files.createDirectories(tmp);
-            Path tarFile = tmp.resolve(fileName + ".tar.gz");
-            Files.copy(is, tarFile);
-            Files.createDirectories(path);
-            Runtime.getRuntime()
-                    .exec("tar -xzvf " + tarFile.toAbsolutePath() + " -C " + path.toAbsolutePath())
-                    .waitFor();
-            return path.toAbsolutePath().toString();
-        } catch (IOException | InterruptedException e) {
-            throw new IllegalStateException("Failed to download TensorFlow library", e);
-        } finally {
-            Utils.deleteQuietly(tmp);
+        Matcher matcher = VERSION_PATTERN.matcher(version);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Unexpected version: " + version);
         }
+        String link = "https://djl-ai.s3.amazonaws.com/publish/tensorflow-" + matcher.group(1);
+        try (InputStream is = new URL(link + "/files.txt").openStream()) {
+            List<String> lines = Utils.readLines(is);
+            boolean found = downloadFiles(lines, link, os, flavor, tmp);
+            if (!found && cudaArch != null) {
+                // fallback to cpu
+                flavor = "cpu";
+                dir =
+                        userHome.resolve(
+                                ".tensorflow/cache/" + version + '-' + flavor + '-' + classifier);
+                path = dir.resolve(libName);
+                if (Files.exists(path)) {
+                    logger.warn(
+                            "No matching CUDA flavor for {} found: {}/sm_{}, fallback to CPU.",
+                            os,
+                            flavor,
+                            cudaArch);
+                    return path.toAbsolutePath().toString();
+                }
+                found = downloadFiles(lines, link, os, flavor, tmp);
+            }
+
+            if (!found) {
+                throw new EngineException(
+                        "TensorFlow engine does not support this platform: " + os);
+            }
+
+            Utils.deleteQuietly(dir);
+            Files.move(tmp, dir);
+            tmp = null;
+            return path.toAbsolutePath().toString();
+        } finally {
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
+        }
+    }
+
+    private static boolean downloadFiles(
+            List<String> lines, String link, String os, String flavor, Path tmp)
+            throws IOException {
+        boolean found = false;
+        for (String line : lines) {
+            if (line.startsWith(os + '/' + flavor + '/')) {
+                found = true;
+                URL url = new URL(link + '/' + line);
+                String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
+                try (InputStream fis = new GZIPInputStream(url.openStream())) {
+                    Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+        }
+        return found;
     }
 }

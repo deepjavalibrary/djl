@@ -321,6 +321,20 @@ public class Shape {
     }
 
     /**
+     * Returns {@code true} if the NDArray contains zero dimensions.
+     *
+     * @return whether the NDArray contain zero dimensions
+     */
+    public boolean hasZeroDimension() {
+        for (int i = 0; i < dimension(); i++) {
+            if (shape[i] == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns {@code true} if a layout is set.
      *
      * @return whether a layout has been set

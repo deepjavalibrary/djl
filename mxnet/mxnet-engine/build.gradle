@@ -33,7 +33,8 @@ sourceSets {
 checkstyleMain.source = 'src/main/java'
 pmdMain.source = 'src/main/java'
 
-task jnarator(dependsOn: ":mxnet:jnarator:jar") {
+task jnarator(dependsOn: [":mxnet:jnarator:jar", "checkHeaderFile"]) {
+    outputs.dir "${project.buildDir}/generated-src"
     doLast {
         File jnaGenerator = project(":mxnet:jnarator").jar.outputs.files.singleFile
         javaexec {
@@ -75,24 +76,27 @@ def checkForUpdate(String path, String url) {
 }
 
 task checkHeaderFile() {
-    if (gradle.startParameter.offline) {
-        logger.warn("[\033[31mWARN\033[0m ] Ignore header validation in offline mode.")
-        return
+    outputs.files "${project.buildDir}/mxnet_c_api.h", "${project.buildDir}/nnvm_c_api.h"
+    doFirst {
+        if (gradle.startParameter.offline) {
+            logger.warn("[\033[31mWARN\033[0m ] Ignore header validation in offline mode.")
+            return
+        }
+
+        def mxnetUrl = "https://raw.githubusercontent.com/apache/incubator-mxnet/master/"
+        checkForUpdate("mxnet/c_api.h", "${mxnetUrl}/include/mxnet/c_api.h")
+        def content = new URL("https://github.com/apache/incubator-mxnet/tree/master/3rdparty").text
+
+        Pattern pattern = Pattern.compile("href=\"/apache/incubator-tvm/tree/([a-z0-9]+)\"")
+        Matcher m = pattern.matcher(content);
+        if (!m.find()) {
+            throw new GradleException("Failed to retrieve submodule hash for tvm from github")
+        }
+        String hash = m.group(1);
+
+        def nnvmUrl = "https://raw.githubusercontent.com/apache/incubator-tvm/${hash}"
+        checkForUpdate("nnvm/c_api.h", "${nnvmUrl}/nnvm/include/nnvm/c_api.h")
     }
-
-    def mxnetUrl = "https://raw.githubusercontent.com/apache/incubator-mxnet/master/"
-    checkForUpdate("mxnet/c_api.h", "${mxnetUrl}/include/mxnet/c_api.h")
-    def content = new URL("https://github.com/apache/incubator-mxnet/tree/master/3rdparty").text
-
-    Pattern pattern = Pattern.compile("href=\"/apache/incubator-tvm/tree/([a-z0-9]+)\"")
-    Matcher m = pattern.matcher(content);
-    if (!m.find()) {
-        throw new GradleException("Failed to retrieve submodule hash for tvm from github")
-    }
-    String hash = m.group(1);
-
-    def nnvmUrl = "https://raw.githubusercontent.com/apache/incubator-tvm/${hash}"
-    checkForUpdate("nnvm/c_api.h", "${nnvmUrl}/nnvm/include/nnvm/c_api.h")
 }
 
 compileJava.dependsOn(jnarator)

@@ -86,7 +86,10 @@ public abstract class Engine {
      */
     public static Engine getInstance() {
         if (DEFAULT_ENGINE == null) {
-            throw new EngineException("No deep learning engine found in class path.");
+            throw new EngineException(
+                    "No deep learning engine found."
+                            + System.lineSeparator()
+                            + "Please refer to https://github.com/awslabs/djl/blob/master/docs/development/troubleshooting.md for more details.");
         }
         return getEngine(DEFAULT_ENGINE);
     }

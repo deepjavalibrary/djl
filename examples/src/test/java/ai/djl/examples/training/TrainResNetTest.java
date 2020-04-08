@@ -15,6 +15,7 @@ package ai.djl.examples.training;
 
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.engine.Engine;
 import ai.djl.examples.training.transferlearning.TrainResnetWithCifar10;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.TrainingResult;
@@ -25,6 +26,7 @@ import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class TrainResNetTest {
+    private static final int SEED = 1234;
 
     @Test
     public void testTrainResNet()
@@ -48,7 +50,9 @@ public class TrainResNetTest {
             // and only train 10 batch for unit test.
             String[] args = {"-e", "10", "-g", "4", "-s", "-p"};
 
+            Engine.getInstance().setRandomSeed(SEED);
             TrainingResult result = TrainResnetWithCifar10.runExample(args);
+            Assert.assertTrue(result.getTrainEvaluation("Accuracy") >= 0.8f);
             Assert.assertTrue(result.getValidateEvaluation("Accuracy") >= 0.7f);
             Assert.assertTrue(result.getValidateLoss() < 1.1);
         }
@@ -66,8 +70,10 @@ public class TrainResNetTest {
             // and only train 10 batch for unit test.
             String[] args = {"-e", "10", "-g", "4"};
 
+            Engine.getInstance().setRandomSeed(SEED);
             TrainingResult result = TrainResnetWithCifar10.runExample(args);
-            Assert.assertTrue(result.getValidateEvaluation("Accuracy") >= 0.7f);
+            Assert.assertTrue(result.getTrainEvaluation("Accuracy") >= 0.9f);
+            Assert.assertTrue(result.getValidateEvaluation("Accuracy") >= 0.75f);
             Assert.assertTrue(result.getValidateLoss() < 1);
         }
     }

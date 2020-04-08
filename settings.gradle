@@ -11,10 +11,12 @@ include ':mxnet:native'
 include ':tensorflow:tensorflow-api'
 include ':tensorflow:tensorflow-engine'
 include ':tensorflow:tensorflow-model-zoo'
+include ':tensorflow:tensorflow-native-auto'
 include ':pytorch:pytorch-engine'
 include ':pytorch:pytorch-model-zoo'
 include ':pytorch:pytorch-native'
 include ':fasttext:fasttext-engine'
 include ':testing'
+include ':3rdparty:aws-ai'
 
 project(":examples").buildFileName = "djl.gradle"

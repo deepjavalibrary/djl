@@ -12,11 +12,14 @@
  */
 package ai.djl.modality.cv.output;
 
+import java.io.Serializable;
+
 /**
  * A point representing a location in {@code (x,y)} coordinate space, specified in double precision.
  */
-public class Point {
+public class Point implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private double x;
     private double y;
 

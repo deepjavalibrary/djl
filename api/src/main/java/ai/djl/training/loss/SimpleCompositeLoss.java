@@ -24,6 +24,10 @@ import java.util.List;
  * <p>This class can be used when the losses either accept a single index of the labels and
  * predictions or the entire lists. For more complicated composite losses, extend the {@link
  * AbstractCompositeLoss}.
+ *
+ * <p>For an example of using this loss, see <a
+ * href="https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/training/TrainCaptcha.java">the
+ * captcha training example.</a>
  */
 public class SimpleCompositeLoss extends AbstractCompositeLoss {
 

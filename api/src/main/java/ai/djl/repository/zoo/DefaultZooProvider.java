@@ -12,22 +12,15 @@
  */
 package ai.djl.repository.zoo;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-/** An {@link ZooProvider} implementation can load models from local directory. */
-public class LocalZooProvider implements ZooProvider {
+/** An {@link ZooProvider} implementation can load models from specified locations. */
+public class DefaultZooProvider implements ZooProvider {
 
     /** {@inheritDoc} */
     @Override
     public ModelZoo getModelZoo() {
-        String localRepoPath = System.getProperty("ai.djl.repository.zoo.location");
-        if (localRepoPath != null) {
-            Path path = Paths.get(localRepoPath);
-            if (Files.isDirectory(path)) {
-                return new LocalModelZoo(path);
-            }
+        String locations = System.getProperty("ai.djl.repository.zoo.location");
+        if (locations != null) {
+            return new DefaultModelZoo(locations);
         }
         return null;
     }

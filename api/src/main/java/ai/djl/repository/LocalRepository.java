@@ -17,8 +17,11 @@ import java.io.Reader;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@code LocalRepository} is a {@link Repository} located in a filesystem directory.
@@ -26,6 +29,8 @@ import java.util.Map;
  * @see Repository
  */
 public class LocalRepository extends AbstractRepository {
+
+    private static final Logger logger = LoggerFactory.getLogger(LocalRepository.class);
 
     private String name;
     private Path path;
@@ -35,21 +40,10 @@ public class LocalRepository extends AbstractRepository {
      *
      * <p>Use {@link Repository#newInstance(String, String)}.
      *
-     * @param path the path to the repository
-     */
-    public LocalRepository(Path path) {
-        this(path.toFile().getName(), path);
-    }
-
-    /**
-     * (Internal) Constructs a {@code LocalRepository} from the path with inferred name.
-     *
-     * <p>Use {@link Repository#newInstance(String, String)}.
-     *
      * @param name the name of the repository
      * @param path the path to the repository
      */
-    public LocalRepository(String name, Path path) {
+    protected LocalRepository(String name, Path path) {
         this.name = name;
         this.path = path;
     }
@@ -83,6 +77,7 @@ public class LocalRepository extends AbstractRepository {
         }
         try (Reader reader = Files.newBufferedReader(file)) {
             Metadata metadata = GSON.fromJson(reader, Metadata.class);
+            metadata.init();
             metadata.setRepositoryUri(uri);
             return metadata;
         }
@@ -100,5 +95,39 @@ public class LocalRepository extends AbstractRepository {
         }
         // TODO: find highest version.
         return artifacts.get(0);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<MRL> getResources() {
+        List<MRL> list = new ArrayList<>();
+        try {
+            Files.walk(path)
+                    .forEach(
+                            f -> {
+                                if (f.endsWith("metadata.json") && Files.isRegularFile(f)) {
+                                    Path relative = path.relativize(f);
+                                    List<String> tokens = new ArrayList<>();
+                                    for (Path p : relative) {
+                                        tokens.add(p.toString());
+                                    }
+                                    int size = tokens.size();
+                                    if (size < 5) {
+                                        logger.warn(
+                                                "Invalid repository path: " + relative.toString());
+                                        return;
+                                    }
+
+                                    Anchor anchor =
+                                            new Anchor(tokens.get(0), tokens.get(1), tokens.get(2));
+                                    String groupId = String.join(".", tokens.subList(3, size - 2));
+                                    String artifactId = tokens.get(size - 2);
+                                    list.add(new MRL(anchor, groupId, artifactId));
+                                }
+                            });
+        } catch (IOException e) {
+            logger.warn("", e);
+        }
+        return list;
     }
 }

@@ -40,6 +40,17 @@ import java.util.stream.LongStream;
 public interface NDArray extends AutoCloseable {
 
     /**
+     * Decodes {@code NDArray} from bytes.
+     *
+     * @param manager {@link NDManager} used to create this {@code NDArray}
+     * @param byteArray data used to decode
+     * @return decoded {@code NDArray}
+     */
+    static NDArray decode(NDManager manager, byte[] byteArray) {
+        return manager.decode(byteArray);
+    }
+
+    /**
      * Returns the {@link NDManager} used to create this {@code NDArray}.
      *
      * @return the {@link NDManager} used to create this {@code NDArray}
@@ -121,6 +132,15 @@ public interface NDArray extends AutoCloseable {
      */
     default boolean isScalar() {
         return getShape().isScalar();
+    }
+
+    /**
+     * Encodes {@code NDArray} to byte array.
+     *
+     * @return byte array
+     */
+    default byte[] encode() {
+        return NDSerializer.encode(this);
     }
 
     /**
@@ -621,6 +641,33 @@ public interface NDArray extends AutoCloseable {
      * @return the result {@code NDArray}
      */
     NDArray booleanMask(NDArray index, int axis);
+
+    /**
+     * Sets all elements outside the sequence to a constant value.
+     *
+     * <p>This function takes an n-dimensional input array of the form [batch_size,
+     * max_sequence_length, ....] and returns an array of the same shape. Parameter {@code
+     * sequenceLength} is used to handle variable-length sequences. sequence_length should be an
+     * input array of positive ints of dimension [batch_size].
+     *
+     * @param sequenceLength used to handle variable-length sequences
+     * @param value the constant value to be set
+     * @return the result {@code NDArray}
+     */
+    NDArray sequenceMask(NDArray sequenceLength, float value);
+
+    /**
+     * Sets all elements outside the sequence to 0.
+     *
+     * <p>This function takes an n-dimensional input array of the form [batch_size,
+     * max_sequence_length, ....] and returns an array of the same shape. Parameter {@code
+     * sequenceLength} is used to handle variable-length sequences. sequence_length should be an
+     * input array of positive ints of dimension [batch_size].
+     *
+     * @param sequenceLength used to handle variable-length sequences
+     * @return the result {@code NDArray}
+     */
+    NDArray sequenceMask(NDArray sequenceLength);
 
     /**
      * Returns an {@code NDArray} of zeros with the same {@link Shape}, {@link DataType} and {@link

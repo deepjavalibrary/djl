@@ -118,7 +118,9 @@ public interface ModelZoo {
                     continue;
                 }
                 Application app = loader.getApplication();
-                if (application != null && app != null && !app.equals(application)) {
+                if (application != null
+                        && app != Application.UNDEFINED
+                        && !app.equals(application)) {
                     // filter out ModelLoader by application
                     continue;
                 }

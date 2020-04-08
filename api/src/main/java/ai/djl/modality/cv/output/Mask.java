@@ -21,6 +21,7 @@ import java.awt.Graphics2D;
  */
 public class Mask extends Rectangle {
 
+    private static final long serialVersionUID = 1L;
     private float[][] probDist;
 
     /**

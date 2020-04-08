@@ -26,6 +26,8 @@ import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
@@ -149,7 +151,13 @@ public abstract class AbstractRepository implements Repository {
         return dir;
     }
 
-    private void download(Path tmp, URI baseUri, Artifact.Item item, Progress progress)
+    /** {@inheritDoc} */
+    @Override
+    public List<MRL> getResources() {
+        return Collections.emptyList();
+    }
+
+    protected void download(Path tmp, URI baseUri, Artifact.Item item, Progress progress)
             throws IOException {
         URI fileUri = URI.create(item.getUri());
         if (!fileUri.isAbsolute()) {
@@ -181,10 +189,8 @@ public abstract class AbstractRepository implements Repository {
                     Files.copy(zis, file);
                 } else if ("gzip".equals(extension)) {
                     Files.copy(new GZIPInputStream(pis), file);
-                } else if (extension.isEmpty()) {
-                    Files.copy(pis, file);
                 } else {
-                    throw new IOException("File type is not supported: " + extension);
+                    Files.copy(pis, file);
                 }
             }
             pis.validateChecksum(item);
@@ -195,7 +201,7 @@ public abstract class AbstractRepository implements Repository {
      * A {@code ProgressInputStream} is a wrapper around an {@link InputStream} that also uses
      * {@link Progress}.
      */
-    private static final class ProgressInputStream extends InputStream {
+    protected static final class ProgressInputStream extends InputStream {
 
         private DigestInputStream dis;
         private Progress progress;

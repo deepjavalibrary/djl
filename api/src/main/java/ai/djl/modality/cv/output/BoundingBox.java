@@ -13,9 +13,10 @@
 package ai.djl.modality.cv.output;
 
 import java.awt.Graphics2D;
+import java.io.Serializable;
 
 /** An interface representing a bounding box for the detected object. */
-public interface BoundingBox {
+public interface BoundingBox extends Serializable {
 
     /**
      * Returns the bounding {@code Rectangle} of this {@code BoundingBox}.
