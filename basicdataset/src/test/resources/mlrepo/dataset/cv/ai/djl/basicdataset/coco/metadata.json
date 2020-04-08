@@ -29,6 +29,7 @@
         },
         "annotations": {
           "uri": "http://images.cocodataset.org/annotations/annotations_trainval2017.zip",
+          "name": "annotations",
           "sha1Hash": "8551ee4bb5860311e79dace7e79cb91e432e78b3",
           "size": 252907541
         }

@@ -12,6 +12,7 @@
       "files": {
         "data": {
           "uri": "captchaImage.zip",
+          "name": "data",
           "sha1Hash": "575da8579b61de1b9d094f16cdfa0a8358394f45",
           "size": 43210912
         }
