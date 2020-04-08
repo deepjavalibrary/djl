@@ -33,27 +33,20 @@ Currently implemented features:
 
 ## Build and install DJL UI
 
-This component supports building with Maven (Gradle build WIP). To build, use the following commands in `ui` folder:
+This component supports building with Maven (Gradle build WIP). To build, use the following command:
 
 * Maven build
     ```sh
-    mvn install -DskipTests
+    mvn clean install -DskipTests -Pfrontend -f ui
     ```
 
 ## Build example project
 
-Example supports building with both Gradle and Maven. To build, use either of the following commands:
-
-* Gradle build
-    ```sh
-    cd ../examples
-    ./gradlew jar
-    ```
+To build, use the following command:
 
 * Maven build
     ```sh
-    cd ../examples
-    mvn package -DskipTests
+    mvn package -DskipTests -f examples
 
 ## Run example code
 
@@ -61,7 +54,7 @@ Run [Handwritten Digit Recognition](../examples/src/main/java/ai/djl/examples/tr
 
 * Maven
     ```sh
-    mvn exec:java -Dexec.mainClass="ai.djl.examples.training.TrainMnist"
+    mvn exec:java -Dexec.mainClass="ai.djl.examples.training.TrainMnist" -f examples
     ```
   
 ## Open browser
