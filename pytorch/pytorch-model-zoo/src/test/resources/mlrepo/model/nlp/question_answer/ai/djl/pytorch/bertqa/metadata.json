@@ -23,14 +23,14 @@
       },
       "files": {
         "vocabulary": {
-          "uri": "https://mlrepo.djl.ai/model/nlp/qa/ai/djl/pytorch/bertqa/bert-base-uncased-vocab.txt",
-          "sha1Hash": "c3b4105373feaa5b0b2c332321c1e592d6f39658",
-          "size": 231508
+          "uri": "0.0.1/bert-base-uncased-vocab.txt.gz",
+          "sha1Hash": "378bbf7dba96fac9f9223fbaf7dd0b879cd48abd",
+          "size": 109822
         },
         "model": {
           "uri": "0.0.1/trace_bertqa.pt.gz",
-          "sha1Hash": "4fdc863417776962c4880cb2aedf0aa5bd0c3f5b",
-          "size": 1245428791
+          "sha1Hash": "006ab2312561f7e7898399a50b763c9645d5e8d0",
+          "size": 1244419604
         }
       }
     }
