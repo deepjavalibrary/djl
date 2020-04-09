@@ -1741,11 +1741,7 @@ public final class JnaUtils {
     }
 
     public static void freeCachedOp(Pointer handle) {
-        if (useThreadSafePredictor()) {
-            checkCall(LIB.MXFreeCachedOpEX(handle, useThreadSafePredictorByte()));
-        } else {
-            checkCall(LIB.MXFreeCachedOp(handle));
-        }
+        checkCall(LIB.MXFreeCachedOp(handle));
     }
 
     public static MxNDArray[] cachedOpInvoke(
@@ -1758,21 +1754,9 @@ public final class JnaUtils {
         IntBuffer buf = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
         PointerByReference outSTypeRef = new PointerByReference();
-        if (useThreadSafePredictor()) {
-            checkCall(
-                    LIB.MXInvokeCachedOpEX(
-                            cachedOpHandle,
-                            inputs.length,
-                            array,
-                            buf,
-                            ref,
-                            outSTypeRef,
-                            useThreadSafePredictorByte()));
-        } else {
-            checkCall(
-                    LIB.MXInvokeCachedOpEx(
-                            cachedOpHandle, inputs.length, array, buf, ref, outSTypeRef));
-        }
+        checkCall(
+                LIB.MXInvokeCachedOpEx(
+                        cachedOpHandle, inputs.length, array, buf, ref, outSTypeRef));
         int numOutputs = buf.get();
         Pointer[] ptrArray = ref.getValue().getPointerArray(0, numOutputs);
         int[] sTypes = outSTypeRef.getValue().getIntArray(0, numOutputs);

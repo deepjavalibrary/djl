@@ -83,9 +83,9 @@ task checkHeaderFile() {
             return
         }
 
-        def mxnetUrl = "https://raw.githubusercontent.com/apache/incubator-mxnet/master/"
+        def mxnetUrl = "https://raw.githubusercontent.com/apache/incubator-mxnet/v1.7.x/"
         checkForUpdate("mxnet/c_api.h", "${mxnetUrl}/include/mxnet/c_api.h")
-        def content = new URL("https://github.com/apache/incubator-mxnet/tree/master/3rdparty").text
+        def content = new URL("https://github.com/apache/incubator-mxnet/tree/v1.7.x/3rdparty").text
 
         Pattern pattern = Pattern.compile("href=\"/apache/incubator-tvm/tree/([a-z0-9]+)\"")
         Matcher m = pattern.matcher(content);

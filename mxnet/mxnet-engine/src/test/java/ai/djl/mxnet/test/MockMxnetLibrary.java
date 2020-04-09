@@ -783,22 +783,6 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     /** {@inheritDoc} */
     @Override
-    public int MXNDArrayGetShape64(
-            Pointer handle, IntBuffer out_dim, PointerByReference out_pdata) {
-        if (functions.containsKey("MXNDArrayGetShape64")) {
-            return functions
-                    .get("MXNDArrayGetShape64")
-                    .apply(new Object[] {handle, out_dim, out_pdata});
-        }
-
-        out_dim.put(0, 3);
-        Pointer ptr = TestHelper.toPointer(new int[] {1, 2, 3});
-        out_pdata.setValue(ptr);
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public int MXNDArrayGetShapeEx(
             Pointer handle, IntBuffer out_dim, PointerByReference out_pdata) {
         if (functions.containsKey("MXNDArrayGetShapeEx")) {
@@ -1320,6 +1304,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int MXFreeCachedOp(Pointer handle) {
         if (functions.containsKey("MXFreeCachedOp")) {
@@ -1329,14 +1314,6 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     /** {@inheritDoc} */
-    @Override
-    public int MXFreeCachedOpEX(Pointer handle, byte thread_safe) {
-        if (functions.containsKey("MXFreeCachedOpEx")) {
-            return functions.get("MXFreeCachedOpEx").apply(new Object[] {handle, thread_safe});
-        }
-        return 0;
-    }
-
     @Override
     public int MXInvokeCachedOp(
             Pointer handle,
@@ -1361,42 +1338,6 @@ public class MockMxnetLibrary implements MxnetLibrary {
     }
 
     /** {@inheritDoc} */
-    @Override
-    public int MXInvokeCachedOpEX(
-            Pointer handle,
-            int num_inputs,
-            Pointer inputs,
-            IntBuffer num_outputs,
-            PointerByReference outputs,
-            PointerByReference out_stypes,
-            byte thread_safe) {
-        if (functions.containsKey("MXInvokeCachedOpEx")) {
-            return functions
-                    .get("MXInvokeCachedOpEx")
-                    .apply(
-                            new Object[] {
-                                handle,
-                                num_inputs,
-                                inputs,
-                                num_outputs,
-                                outputs,
-                                out_stypes,
-                                thread_safe
-                            });
-        }
-
-        num_outputs.put(0, 3);
-        PointerArray arr =
-                new PointerArray(
-                        TestHelper.toPointer("a"),
-                        TestHelper.toPointer("b"),
-                        TestHelper.toPointer("c"));
-        outputs.setValue(arr);
-        Pointer sTypes = TestHelper.toPointer(new int[] {0, 0, 1});
-        out_stypes.setValue(sTypes);
-        return 0;
-    }
-
     @Override
     public int MXInvokeCachedOpEx(
             Pointer handle,
@@ -1825,49 +1766,6 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
     /** {@inheritDoc} */
     @Override
-    public int MXSymbolInferShape64(
-            Pointer sym,
-            int num_args,
-            String[] keys,
-            long[] arg_ind_ptr,
-            long[] arg_shape_data,
-            NativeSizeByReference in_shape_size,
-            PointerByReference in_shape_ndim,
-            PointerByReference in_shape_data,
-            NativeSizeByReference out_shape_size,
-            PointerByReference out_shape_ndim,
-            PointerByReference out_shape_data,
-            NativeSizeByReference aux_shape_size,
-            PointerByReference aux_shape_ndim,
-            PointerByReference aux_shape_data,
-            IntBuffer complete) {
-        if (functions.containsKey("MXSymbolInferShape64")) {
-            return functions
-                    .get("MXSymbolInferShape64")
-                    .apply(
-                            new Object[] {
-                                sym,
-                                num_args,
-                                keys,
-                                arg_ind_ptr,
-                                arg_shape_data,
-                                in_shape_size,
-                                in_shape_ndim,
-                                in_shape_data,
-                                out_shape_size,
-                                out_shape_ndim,
-                                out_shape_data,
-                                aux_shape_size,
-                                aux_shape_ndim,
-                                aux_shape_data,
-                                complete
-                            });
-        }
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public int MXSymbolInferShapeEx(
             Pointer sym,
             int num_args,
@@ -1973,49 +1871,6 @@ public class MockMxnetLibrary implements MxnetLibrary {
         if (functions.containsKey("MXSymbolInferShapePartial")) {
             return functions
                     .get("MXSymbolInferShapePartial")
-                    .apply(
-                            new Object[] {
-                                sym,
-                                num_args,
-                                keys,
-                                arg_ind_ptr,
-                                arg_shape_data,
-                                in_shape_size,
-                                in_shape_ndim,
-                                in_shape_data,
-                                out_shape_size,
-                                out_shape_ndim,
-                                out_shape_data,
-                                aux_shape_size,
-                                aux_shape_ndim,
-                                aux_shape_data,
-                                complete
-                            });
-        }
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int MXSymbolInferShapePartial64(
-            Pointer sym,
-            int num_args,
-            String[] keys,
-            long[] arg_ind_ptr,
-            long[] arg_shape_data,
-            NativeSizeByReference in_shape_size,
-            PointerByReference in_shape_ndim,
-            PointerByReference in_shape_data,
-            NativeSizeByReference out_shape_size,
-            PointerByReference out_shape_ndim,
-            PointerByReference out_shape_data,
-            NativeSizeByReference aux_shape_size,
-            PointerByReference aux_shape_ndim,
-            PointerByReference aux_shape_data,
-            IntBuffer complete) {
-        if (functions.containsKey("MXSymbolInferShapePartial64")) {
-            return functions
-                    .get("MXSymbolInferShapePartial64")
                     .apply(
                             new Object[] {
                                 sym,
@@ -2209,6 +2064,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
             String quantized_dtype,
             byte calib_quantize,
             String quantize_mode,
+            String quantize_granularity,
             IntBuffer out_num_calib_names,
             PointerByReference out_calib_names) {
         if (functions.containsKey("MXQuantizeSymbol")) {
@@ -2228,6 +2084,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
                                 quantized_dtype,
                                 calib_quantize,
                                 quantize_mode,
+                                quantize_granularity,
                                 out_num_calib_names,
                                 out_calib_names
                             });
@@ -3877,6 +3734,34 @@ public class MockMxnetLibrary implements MxnetLibrary {
                                 opr_name
                             });
         }
+        return 0;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int MXKVStoreBroadcast(
+            Pointer handle,
+            int vnum,
+            int[] vkeys,
+            int onum,
+            int[] okeys,
+            PointerByReference vals,
+            PointerByReference outs,
+            int priority) {
+        return 0;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int MXKVStoreBroadcastEx(
+            Pointer handle,
+            int vnum,
+            String[] vkeys,
+            int onum,
+            String[] okeys,
+            PointerByReference vals,
+            PointerByReference outs,
+            int priority) {
         return 0;
     }
 
