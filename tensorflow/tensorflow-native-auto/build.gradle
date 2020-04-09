@@ -1,5 +1,7 @@
 group "ai.djl.tensorflow"
-version = "2.0.0-a"
+
+boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
+version = "2.0.0-a" + (isRelease ? "" : "-SNAPSHOT")
 
 jar {
     doFirst {
@@ -16,8 +18,8 @@ publishing {
     publications {
         maven(MavenPublication) {
             pom {
-                name = "TensorFlow 2.0 core api"
-                description = "TensorFlow 2.0 core api"
+                name = "TensorFlow 2.0 native library"
+                description = "TensorFlow 2.0 native library"
                 url = "http://www.djl.ai/tensorflow/${project.name}"
             }
         }
