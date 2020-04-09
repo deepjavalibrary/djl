@@ -16,8 +16,6 @@
 
 // The file is the implementation for PyTorch tensor creation ops
 
-void DeleteData(void* data) { delete[] static_cast<jbyte*>(data); }
-
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(JNIEnv* env, jobject jthis,
     jobject jbuffer, jlongArray jshape, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
   API_BEGIN();
@@ -28,12 +26,8 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(J
   if (jdtype != 8) {
     options = options.dtype(utils::GetScalarTypeFromDType(jdtype));
   }
-  size_t len = env->GetDirectBufferCapacity(jbuffer);
-  auto* data = new jbyte[len];
-  // Since we can't control the lifecycle of direct byte buffer,
-  // we manually allocate a memory to hold the data
-  std::memcpy(data, env->GetDirectBufferAddress(jbuffer), len);
-  torch::Tensor result = torch::from_blob(data, shape_vec, DeleteData, options);
+  // call the clone() to let tensor own the memory
+  torch::Tensor result = torch::from_blob(env->GetDirectBufferAddress(jbuffer), shape_vec, options).clone();
   // from_blob doesn't support torch::kSparse and torch::kMkldnn, so explicit cast the type here
   if (jlayout == 1) {
     result = result.to_sparse();
