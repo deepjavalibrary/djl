@@ -12,7 +12,7 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.modality.nlp.SimpleVocabulary;
+import ai.djl.basicdataset.utils.TextData;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.SimpleTextEmbedding;
@@ -30,8 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@code TextDataset} is an abstract dataset that can be used for datasets for natural language
@@ -45,11 +43,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class TextDataset extends RandomAccessDataset {
 
-    TextDatasetParameters textDatasetParameters = new TextDatasetParameters();
-    private int embeddingSize;
-    private boolean includeValidLength;
-    private Tokenizer tokenizer;
-    protected long size;
+    protected TextData sourceTextData;
+    protected TextData targetTextData;
 
     /**
      * Creates a new instance of {@link RandomAccessDataset} with the given necessary
@@ -59,91 +54,40 @@ public abstract class TextDataset extends RandomAccessDataset {
      */
     public TextDataset(Builder<?> builder) {
         super(builder);
-        this.textDatasetParameters.sourceTextEmbedding = builder.sourceTextEmbedding;
-        this.textDatasetParameters.targetTextEmbedding = builder.targetTextEmbedding;
-        this.textDatasetParameters.sourceTextProcessors = builder.sourceTextProcessors;
-        this.textDatasetParameters.targetTextProcessors = builder.targetTextProcessors;
-        this.textDatasetParameters.trainSourceEmbeddings = builder.trainSourceEmbedding;
-        this.textDatasetParameters.trainTargetEmbeddings = builder.trainTargetEmbedding;
-        this.includeValidLength = builder.includeValidLength;
-        this.embeddingSize = builder.embeddingSize;
-        this.tokenizer = builder.tokenizer;
+
+        sourceTextData = new TextData();
+        sourceTextData.setTextEmbedding(builder.sourceTextEmbedding);
+        sourceTextData.setTrainEmbedding(builder.trainSourceEmbedding);
+        sourceTextData.setIncludeValidLength(builder.includeValidLength);
+        sourceTextData.setTokenizer(builder.tokenizer);
+        sourceTextData.setEmbeddingSize(builder.embeddingSize);
+        sourceTextData.setTextProcessors(builder.sourceTextProcessors);
+
+        targetTextData = new TextData();
+        targetTextData.setTextEmbedding(builder.targetTextEmbedding);
+        targetTextData.setTrainEmbedding(builder.trainTargetEmbedding);
+        targetTextData.setIncludeValidLength(builder.includeValidLength);
+        targetTextData.setTokenizer(builder.tokenizer);
+        targetTextData.setEmbeddingSize(builder.embeddingSize);
+        targetTextData.setTextProcessors(builder.targetTextProcessors);
     }
 
     protected NDList embedText(long index, NDManager manager, boolean source)
             throws EmbeddingException {
-        NDList data = new NDList();
-
-        List<String> sentenceTokens = textDatasetParameters.getTextData(source).get(index);
-        if (textDatasetParameters.trainEmbeddings(source)) {
-            data.add(
-                    textDatasetParameters
-                            .getTextEmbedding(source)
-                            .preprocessTextToEmbed(manager, sentenceTokens));
-        } else {
-            data.add(
-                    textDatasetParameters
-                            .getTextEmbedding(source)
-                            .embedText(manager, sentenceTokens));
-        }
-        if (includeValidLength) {
-            Integer validLength = textDatasetParameters.getValidLengths(source).get(index);
-            data.add(manager.create(validLength));
-        }
-        return data;
+        TextData textData = source ? sourceTextData : targetTextData;
+        return textData.embedText(index, manager);
     }
 
     /**
      * Performs pre-processing steps on text data such as tokenising, applying {@link
      * TextProcessor}s, creating vocabulary, and word embeddings.
      *
-     * @param textData list of all unprocessed sentences in the dataset
+     * @param newTextData list of all unprocessed sentences in the dataset
      * @param source whether the text data provided is source or target
      */
-    protected void preprocess(List<String> textData, boolean source) {
-        SimpleVocabulary.VocabularyBuilder vocabularyBuilder =
-                new SimpleVocabulary.VocabularyBuilder();
-        vocabularyBuilder.optMinFrequency(3);
-        vocabularyBuilder.optReservedTokens(Arrays.asList("<pad>", "<bos>", "<eos>"));
-
-        size = textData.size();
-        Map<Long, List<String>> tokenizedTextData = textDatasetParameters.getTextData(source);
-        long index = 0;
-        for (String textDatum : textData) {
-            List<String> tokens = tokenizer.tokenize(textDatum);
-            for (TextProcessor processor : textDatasetParameters.getTextProcessors(source)) {
-                tokens = processor.preprocess(tokens);
-                if (processor instanceof SentenceLengthNormalizer) {
-                    textDatasetParameters.addToValidLengths(
-                            index,
-                            ((SentenceLengthNormalizer) processor).getLastValidLength(),
-                            source);
-                }
-            }
-            vocabularyBuilder.add(tokens);
-            tokenizedTextData.put(index, tokens);
-            index++;
-        }
-        SimpleVocabulary vocabulary = vocabularyBuilder.build();
-        index = 0;
-        while (index < tokenizedTextData.size()) {
-            List<String> tokenizedTextDatum = tokenizedTextData.get(index);
-            for (int j = 0; j < tokenizedTextDatum.size(); j++) {
-                if (!vocabulary.isKnownToken(tokenizedTextDatum.get(j))) {
-                    tokenizedTextDatum.set(j, vocabulary.getUnknownToken());
-                }
-            }
-            tokenizedTextData.put(index, tokenizedTextDatum);
-            index++;
-        }
-        textDatasetParameters.setVocabulary(vocabulary, source);
-        if (textDatasetParameters.getTextEmbedding(source) == null) {
-            textDatasetParameters.setTextEmbedding(
-                    new SimpleTextEmbedding(
-                            new VocabWordEmbedding(vocabulary.newEmbedding(embeddingSize))),
-                    source);
-            textDatasetParameters.setTrainEmbeddings(true, source);
-        }
+    protected void preprocess(List<String> newTextData, boolean source) {
+        TextData textData = source ? sourceTextData : targetTextData;
+        textData.preprocess(newTextData);
     }
 
     /** Abstract Builder that helps build a {@link TextDataset}. */
@@ -284,87 +228,6 @@ public abstract class TextDataset extends RandomAccessDataset {
             }
             targetTextProcessors.add(targetTextProcessor);
             return self();
-        }
-    }
-
-    /** Data class that contains parameters of the {@link TextDataset}. */
-    private static class TextDatasetParameters {
-
-        Map<Long, List<String>> sourceTextData = new ConcurrentHashMap<>();
-        Map<Long, List<String>> targetTextData = new ConcurrentHashMap<>();
-        Map<Long, Integer> sourceValidLengths = new ConcurrentHashMap<>();
-        Map<Long, Integer> targetValidLengths = new ConcurrentHashMap<>();
-        List<TextProcessor> sourceTextProcessors;
-        List<TextProcessor> targetTextProcessors;
-        TextEmbedding sourceTextEmbedding;
-        TextEmbedding targetTextEmbedding;
-        Vocabulary sourceVocabulary;
-        Vocabulary targetVocabulary;
-        boolean trainSourceEmbeddings;
-        boolean trainTargetEmbeddings;
-
-        public Map<Long, List<String>> getTextData(boolean source) {
-            return source ? sourceTextData : targetTextData;
-        }
-
-        public Map<Long, Integer> getValidLengths(boolean source) {
-            return source ? sourceValidLengths : targetValidLengths;
-        }
-
-        public List<TextProcessor> getTextProcessors(boolean source) {
-            return source ? sourceTextProcessors : targetTextProcessors;
-        }
-
-        public TextEmbedding getTextEmbedding(boolean source) {
-            return source ? sourceTextEmbedding : targetTextEmbedding;
-        }
-
-        public Vocabulary getVocabulary(boolean source) {
-            return source ? sourceVocabulary : targetVocabulary;
-        }
-
-        public boolean trainEmbeddings(boolean source) {
-            return source ? trainSourceEmbeddings : trainTargetEmbeddings;
-        }
-
-        public void setVocabulary(Vocabulary vocabulary, boolean source) {
-            if (source) {
-                sourceVocabulary = vocabulary;
-            } else {
-                targetVocabulary = vocabulary;
-            }
-        }
-
-        public void setTextEmbedding(TextEmbedding textEmbedding, boolean source) {
-            if (source) {
-                sourceTextEmbedding = textEmbedding;
-            } else {
-                targetTextEmbedding = textEmbedding;
-            }
-        }
-
-        public void addToSentence(Long index, List<String> sentence, boolean source) {
-            if (source) {
-                sourceTextData.put(index, sentence);
-            } else {
-                targetTextData.put(index, sentence);
-            }
-        }
-
-        public void addToValidLengths(Long index, Integer validLength, boolean source) {
-            if (source) {
-                sourceValidLengths.put(index, validLength);
-            } else {
-                targetValidLengths.put(index, validLength);
-            }
-        }
-
-        public void setTrainEmbeddings(boolean trainEmbeddings, boolean source) {
-            if (source) {
-                trainSourceEmbeddings = trainEmbeddings;
-            } else {
-                trainTargetEmbeddings = trainEmbeddings;
-            }
         }
     }
 }

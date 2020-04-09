@@ -151,7 +151,7 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
     /** {@inheritDoc} */
     @Override
     protected long availableSize() {
-        return size;
+        return sourceTextData.getSize();
     }
 
     /** A builder for a {@link TatoebaEnglishFrenchDataset}. */

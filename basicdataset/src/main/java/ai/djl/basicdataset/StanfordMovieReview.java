@@ -176,7 +176,7 @@ public class StanfordMovieReview extends TextDataset implements ZooDataset {
     /** {@inheritDoc} */
     @Override
     protected long availableSize() {
-        return size;
+        return sourceTextData.getSize();
     }
 
     /** A builder for a {@link StanfordMovieReview}. */
