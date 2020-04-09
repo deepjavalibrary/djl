@@ -66,7 +66,6 @@ public final class BertQaInference {
                         .optApplication(Application.NLP.QUESTION_ANSWER)
                         .setTypes(QAInput.class, String.class)
                         .optFilter("backbone", "bert")
-                        .optFilter("dataset", "book_corpus_wiki_en_uncased")
                         .optProgress(new ProgressBar())
                         .build();
 
