@@ -57,7 +57,7 @@ public final class ZipUtils {
      * Zips an input directory to a given file.
      *
      * @param src the input directory to zip
-     * @param dest the path to store the unzipped files
+     * @param dest the path to store the zipped files
      * @throws IOException for failures to zip the input directory
      */
     public static void zip(Path src, Path dest) throws IOException {

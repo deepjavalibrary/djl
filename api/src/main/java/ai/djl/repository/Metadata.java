@@ -12,12 +12,15 @@
  */
 package ai.djl.repository;
 
+import ai.djl.Application;
 import ai.djl.repository.zoo.DefaultModelZoo;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -38,10 +41,11 @@ public class Metadata {
     private String name;
     private String description;
     private String website;
+    private String application;
+    protected Map<String, License> licenses;
     protected List<Artifact> artifacts;
-    private String checksum;
     private Date lastUpdated;
-
+    private transient Application applicationClass;
     private transient URI repositoryUri;
 
     /**
@@ -169,6 +173,64 @@ public class Metadata {
     }
 
     /**
+     * Returns the {@link Application}.
+     *
+     * @return the {@link Application}
+     */
+    public Application getApplication() {
+        return applicationClass;
+    }
+
+    /**
+     * Returns the {@link Application} name.
+     *
+     * @return the {@link Application} name
+     */
+    public String getApplicatrionName() {
+        return application;
+    }
+
+    /**
+     * Sets the {@link Application}.
+     *
+     * @param application {@link Application}
+     */
+    public void setApplication(Application application) {
+        this.applicationClass = application;
+        this.application = application.getPath();
+    }
+
+    /**
+     * Returns the {@link License}.
+     *
+     * @return licenses in this metadata
+     */
+    public Map<String, License> getLicenses() {
+        return licenses;
+    }
+
+    /**
+     * Sets the {@link License}.
+     *
+     * @param licenses {@link License}
+     */
+    public void setLicense(Map<String, License> licenses) {
+        this.licenses = licenses;
+    }
+
+    /**
+     * Adds one {@link License}.
+     *
+     * @param license {@link License}
+     */
+    public void addLicense(License license) {
+        if (licenses == null) {
+            licenses = new ConcurrentHashMap<>();
+        }
+        licenses.put(license.getId(), license);
+    }
+
+    /**
      * Returns all the artifacts in the metadata.
      *
      * @return the artifacts in the metadata
@@ -190,21 +252,15 @@ public class Metadata {
     }
 
     /**
-     * Returns the metadata checksum.
+     * Adds one artifact for the metadata.
      *
-     * @return the checksum
+     * @param artifact the new artifact
      */
-    public String getChecksum() {
-        return checksum;
-    }
-
-    /**
-     * Sets the metadata checksum.
-     *
-     * @param checksum the new checksum
-     */
-    public void setChecksum(String checksum) {
-        this.checksum = checksum;
+    public void addArtifact(Artifact artifact) {
+        if (artifacts == null) {
+            artifacts = new ArrayList<>();
+        }
+        artifacts.add(artifact);
     }
 
     /**

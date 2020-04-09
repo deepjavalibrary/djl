@@ -310,8 +310,8 @@ public class Artifact {
         private String name;
         private String type;
         private long size;
-        private String extension;
-        private Artifact artifact;
+        private transient String extension;
+        private transient Artifact artifact;
 
         /**
          * Returns the URI of the item.
