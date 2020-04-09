@@ -107,6 +107,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
         return loadModel(criteria);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments) {
         @SuppressWarnings("unchecked")
@@ -135,6 +136,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
     private static final class FactoryImpl
             implements TranslatorFactory<BufferedImage, Classifications> {
 
+        /** {@inheritDoc} */
         @Override
         @SuppressWarnings("unchecked")
         public Translator<BufferedImage, Classifications> newInstance(

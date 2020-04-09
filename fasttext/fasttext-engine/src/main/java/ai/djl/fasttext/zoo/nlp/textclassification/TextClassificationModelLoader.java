@@ -82,6 +82,7 @@ public class TextClassificationModelLoader extends BaseModelLoader<String, Class
 
     private static final class FactoryImpl implements TranslatorFactory<String, Classifications> {
 
+        /** {@inheritDoc} */
         @Override
         public Translator<String, Classifications> newInstance(Map<String, Object> arguments) {
             return new TextClassificationTranslator();

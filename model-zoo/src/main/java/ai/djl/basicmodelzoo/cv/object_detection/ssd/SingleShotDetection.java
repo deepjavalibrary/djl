@@ -61,6 +61,7 @@ public final class SingleShotDetection extends AbstractBlock {
         multiBoxPriors = builder.multiBoxPriors;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
@@ -103,16 +104,19 @@ public final class SingleShotDetection extends AbstractBlock {
         return NDArrays.concat(new NDList(flattenOutput), 1);
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Parameter> getDirectParameters() {
         return Collections.emptyList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         throw new IllegalArgumentException("SSDBlock has no parameters");
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         // TODO: output shape is wrong
@@ -178,6 +182,7 @@ public final class SingleShotDetection extends AbstractBlock {
         return new Shape(dimensions);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
         beforeInitialize(inputShapes);
@@ -190,6 +195,7 @@ public final class SingleShotDetection extends AbstractBlock {
         return getOutputShapes(manager, inputShapes);
     }
 
+    /** {@inheritDoc} */
     @Override
     public BlockList getChildren() {
         int size = features.size() + classPredictionBlocks.size() + anchorPredictionBlocks.size();
@@ -215,6 +221,7 @@ public final class SingleShotDetection extends AbstractBlock {
         return children;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
@@ -230,6 +237,7 @@ public final class SingleShotDetection extends AbstractBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {

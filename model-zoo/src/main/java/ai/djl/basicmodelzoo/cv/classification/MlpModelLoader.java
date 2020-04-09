@@ -106,6 +106,7 @@ public class MlpModelLoader extends BaseModelLoader<BufferedImage, Classificatio
         return loadModel(criteria);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments) {
         int width = ((Double) arguments.getOrDefault("width", 28d)).intValue();
@@ -127,6 +128,7 @@ public class MlpModelLoader extends BaseModelLoader<BufferedImage, Classificatio
     private static final class FactoryImpl
             implements TranslatorFactory<BufferedImage, Classifications> {
 
+        /** {@inheritDoc} */
         @Override
         public Translator<BufferedImage, Classifications> newInstance(
                 Map<String, Object> arguments) {

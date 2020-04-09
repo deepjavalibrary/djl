@@ -67,6 +67,7 @@ public class TopKAccuracy extends AbstractAccuracy {
         this("Top_" + topK + "_Accuracy", 0, topK);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Pair<Long, NDArray> accuracyHelper(NDList labels, NDList predictions) {
         NDArray label = labels.get(index);

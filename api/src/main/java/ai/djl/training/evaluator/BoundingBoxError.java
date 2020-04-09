@@ -37,6 +37,7 @@ public class BoundingBoxError extends Evaluator {
         ssdBoxPredictionError = new ConcurrentHashMap<>();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray evaluate(NDList labels, NDList predictions) {
         NDArray anchors = predictions.get(0);
@@ -50,12 +51,14 @@ public class BoundingBoxError extends Evaluator {
         return boundingBoxLabels.sub(boundingBoxPredictions).mul(boundingBoxMasks).abs();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void addAccumulator(String key) {
         totalInstances.put(key, 0L);
         ssdBoxPredictionError.put(key, 0f);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void updateAccumulator(String key, NDList labels, NDList predictions) {
         NDArray boundingBoxError = evaluate(labels, predictions);
@@ -64,12 +67,14 @@ public class BoundingBoxError extends Evaluator {
         ssdBoxPredictionError.compute(key, (k, v) -> v + update);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void resetAccumulator(String key) {
         totalInstances.compute(key, (k, v) -> 0L);
         ssdBoxPredictionError.compute(key, (k, v) -> 0f);
     }
 
+    /** {@inheritDoc} */
     @Override
     public float getAccumulator(String key) {
         Long total = totalInstances.get(key);

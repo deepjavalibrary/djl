@@ -108,6 +108,7 @@ public class SingleShotDetectionModelLoader
         return loadModel(criteria);
     }
 
+    /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
     protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments) {
@@ -160,6 +161,7 @@ public class SingleShotDetectionModelLoader
     private static final class FactoryImpl
             implements TranslatorFactory<BufferedImage, DetectedObjects> {
 
+        /** {@inheritDoc} */
         @Override
         public Translator<BufferedImage, DetectedObjects> newInstance(
                 Map<String, Object> arguments) {

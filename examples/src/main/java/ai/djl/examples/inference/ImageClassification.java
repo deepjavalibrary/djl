@@ -81,12 +81,14 @@ public final class ImageClassification {
             classes = IntStream.range(0, 10).mapToObj(String::valueOf).collect(Collectors.toList());
         }
 
+        /** {@inheritDoc} */
         @Override
         public NDList processInput(TranslatorContext ctx, BufferedImage input) {
             NDArray array = BufferedImageUtils.toNDArray(ctx.getNDManager(), input, Flag.COLOR);
             return new NDList(NDImageUtils.toTensor(array));
         }
 
+        /** {@inheritDoc} */
         @Override
         public Classifications processOutput(TranslatorContext ctx, NDList list) {
             NDArray probabilities = list.singletonOrThrow().softmax(0);

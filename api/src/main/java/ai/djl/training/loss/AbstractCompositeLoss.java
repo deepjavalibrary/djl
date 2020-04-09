@@ -69,6 +69,7 @@ public abstract class AbstractCompositeLoss extends Loss {
         return NDArrays.add(lossComponents);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void addAccumulator(String key) {
         for (Loss component : components) {

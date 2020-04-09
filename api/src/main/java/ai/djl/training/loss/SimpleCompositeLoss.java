@@ -79,6 +79,7 @@ public class SimpleCompositeLoss extends AbstractCompositeLoss {
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Pair<NDList, NDList> inputForComponent(
             int componentIndex, NDList labels, NDList predictions) {

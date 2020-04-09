@@ -316,6 +316,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
             this.to = to;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Record get(NDManager manager, long index) throws IOException, TranslateException {
             if (index >= size()) {
@@ -324,11 +325,13 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
             return dataset.get(manager, indices[Math.toIntExact(index) + from]);
         }
 
+        /** {@inheritDoc} */
         @Override
         protected long availableSize() {
             return to - from;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Iterable<Batch> getData(NDManager manager) {
             return dataset.getData(manager);

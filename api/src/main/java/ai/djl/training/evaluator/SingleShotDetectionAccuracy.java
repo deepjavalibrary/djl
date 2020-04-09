@@ -38,6 +38,7 @@ public class SingleShotDetectionAccuracy extends AbstractAccuracy {
         super(name, 0);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Pair<Long, NDArray> accuracyHelper(NDList labels, NDList predictions) {
         NDArray anchors = predictions.get(0);

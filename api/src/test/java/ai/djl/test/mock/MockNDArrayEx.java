@@ -125,6 +125,7 @@ public class MockNDArrayEx implements NDArrayEx {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray tanh() {
         return null;
@@ -328,6 +329,7 @@ public class MockNDArrayEx implements NDArrayEx {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList rnn(
             NDList inputs,
@@ -342,6 +344,7 @@ public class MockNDArrayEx implements NDArrayEx {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList lstm(
             NDList inputs,
@@ -425,6 +428,7 @@ public class MockNDArrayEx implements NDArrayEx {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList multiBoxPrior(
             List<Float> sizes,

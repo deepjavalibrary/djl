@@ -64,17 +64,20 @@ public abstract class AbstractAccuracy extends Evaluator {
      */
     protected abstract Pair<Long, NDArray> accuracyHelper(NDList labels, NDList predictions);
 
+    /** {@inheritDoc} */
     @Override
     public NDArray evaluate(NDList labels, NDList predictions) {
         return accuracyHelper(labels, predictions).getValue();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void addAccumulator(String key) {
         totalInstances.put(key, 0L);
         correctInstances.put(key, 0L);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void updateAccumulator(String key, NDList labels, NDList predictions) {
         Pair<Long, NDArray> update = accuracyHelper(labels, predictions);
@@ -82,12 +85,14 @@ public abstract class AbstractAccuracy extends Evaluator {
         correctInstances.compute(key, (k, v) -> v + update.getValue().sum().getLong());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void resetAccumulator(String key) {
         totalInstances.compute(key, (k, v) -> 0L);
         correctInstances.compute(key, (k, v) -> 0L);
     }
 
+    /** {@inheritDoc} */
     @Override
     public float getAccumulator(String key) {
         Long total = totalInstances.get(key);

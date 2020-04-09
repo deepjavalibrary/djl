@@ -91,6 +91,7 @@ public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
 
     private static final class FactoryImpl implements TranslatorFactory<QAInput, String> {
 
+        /** {@inheritDoc} */
         @Override
         public Translator<QAInput, String> newInstance(Map<String, Object> arguments) {
             int seqLength = (int) arguments.getOrDefault("seqLength", 384);

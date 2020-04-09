@@ -322,6 +322,7 @@ public class PtNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList dropout(
             NDList inputs,

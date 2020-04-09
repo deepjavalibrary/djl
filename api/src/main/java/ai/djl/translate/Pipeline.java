@@ -187,6 +187,7 @@ public class Pipeline {
             this.index = index;
         }
 
+        /** {@inheritDoc} */
         @Override
         public int hashCode() {
             if (key == null) {
@@ -195,6 +196,7 @@ public class Pipeline {
             return key.hashCode();
         }
 
+        /** {@inheritDoc} */
         @Override
         public boolean equals(Object obj) {
             if (this == obj) {

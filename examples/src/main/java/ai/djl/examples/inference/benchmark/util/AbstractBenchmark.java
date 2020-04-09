@@ -240,16 +240,19 @@ public abstract class AbstractBenchmark {
             builder.optTranslator(
                     new Translator() {
 
+                        /** {@inheritDoc} */
                         @Override
                         public NDList processInput(TranslatorContext ctx, Object input) {
                             return new NDList(ctx.getNDManager().ones(shape));
                         }
 
+                        /** {@inheritDoc} */
                         @Override
                         public Object processOutput(TranslatorContext ctx, NDList list) {
                             return list.get(0).toFloatArray();
                         }
 
+                        /** {@inheritDoc} */
                         @Override
                         public Batchifier getBatchifier() {
                             return null;

@@ -84,6 +84,7 @@ public class SingleShotDetectionModelLoader
         return APPLICATION;
     }
 
+    /** {@inheritDoc} */
     @Override
     public ZooModel<BufferedImage, DetectedObjects> loadModel(
             Map<String, String> filters, Device device, Progress progress)
@@ -101,6 +102,7 @@ public class SingleShotDetectionModelLoader
     private static final class FactoryImpl
             implements TranslatorFactory<BufferedImage, DetectedObjects> {
 
+        /** {@inheritDoc} */
         @Override
         @SuppressWarnings("unchecked")
         public Translator<BufferedImage, DetectedObjects> newInstance(

@@ -789,6 +789,7 @@ public class MockNDArray implements NDArray {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray reshapeLike(NDArray array) {
         return null;

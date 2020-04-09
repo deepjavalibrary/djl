@@ -612,6 +612,7 @@ public class PtNDArray extends NativeResource implements NDArray {
         return pow(2);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sqrt() {
         return JniUtils.sqrt(this);
@@ -863,6 +864,7 @@ public class PtNDArray extends NativeResource implements NDArray {
         return JniUtils.reshape(this, shape.getShape());
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray reshapeLike(NDArray array) {
         throw new UnsupportedOperationException("Not implemented");

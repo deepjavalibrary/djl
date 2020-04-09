@@ -70,27 +70,33 @@ public class StanfordMovieReviewTest {
 
     private WordEmbedding getWordEmbedding(NDManager manager) {
         return new WordEmbedding() {
+
+            /** {@inheritDoc} */
             @Override
             public boolean vocabularyContains(String word) {
                 return false;
             }
 
+            /** {@inheritDoc} */
             @Override
             public NDArray preprocessWordToEmbed(NDManager manager, String word) {
                 return manager.zeros(new Shape());
             }
 
+            /** {@inheritDoc} */
             @Override
             public NDList embedWord(ParameterStore parameterStore, NDArray word)
                     throws EmbeddingException {
                 return null;
             }
 
+            /** {@inheritDoc} */
             @Override
             public NDArray embedWord(NDArray word) {
                 return manager.zeros(new Shape(EMBEDDING_SIZE));
             }
 
+            /** {@inheritDoc} */
             @Override
             public String unembedWord(NDArray wordEmbedding) {
                 return null;

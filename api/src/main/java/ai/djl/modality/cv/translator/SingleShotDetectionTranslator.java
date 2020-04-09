@@ -51,6 +51,7 @@ public class SingleShotDetectionTranslator extends ImageTranslator<DetectedObjec
         this.imageHeight = builder.imageHeight;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
         if (classes == null) {

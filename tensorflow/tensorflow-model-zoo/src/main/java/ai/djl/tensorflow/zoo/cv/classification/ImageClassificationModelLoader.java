@@ -105,6 +105,7 @@ public abstract class ImageClassificationModelLoader
     private static final class FactoryImpl
             implements TranslatorFactory<BufferedImage, Classifications> {
 
+        /** {@inheritDoc} */
         @Override
         public Translator<BufferedImage, Classifications> newInstance(
                 Map<String, Object> arguments) {

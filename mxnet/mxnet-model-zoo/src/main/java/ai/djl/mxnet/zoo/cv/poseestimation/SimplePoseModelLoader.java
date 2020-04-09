@@ -107,6 +107,7 @@ public class SimplePoseModelLoader extends BaseModelLoader<BufferedImage, Joints
 
     private static final class FactoryImpl implements TranslatorFactory<BufferedImage, Joints> {
 
+        /** {@inheritDoc} */
         @Override
         public Translator<BufferedImage, Joints> newInstance(Map<String, Object> arguments) {
             int width = ((Double) arguments.getOrDefault("width", 192d)).intValue();

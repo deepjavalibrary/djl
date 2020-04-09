@@ -36,6 +36,7 @@ public class BertTokenizer extends SimpleTokenizer {
         this.vocab = vocab;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<String> tokenize(String input) {
         List<String> ret = new LinkedList<>();

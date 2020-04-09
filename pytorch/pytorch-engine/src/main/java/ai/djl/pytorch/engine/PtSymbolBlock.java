@@ -60,6 +60,7 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
         JniUtils.enableInferenceMode(this);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         Pointer pointer = handle.getAndSet(null);

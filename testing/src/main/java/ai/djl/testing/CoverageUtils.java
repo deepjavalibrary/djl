@@ -239,6 +239,7 @@ public final class CoverageUtils {
             super(urls, parent);
         }
 
+        /** {@inheritDoc} */
         @Override
         public Class<?> loadClass(String name) throws ClassNotFoundException {
             try {
