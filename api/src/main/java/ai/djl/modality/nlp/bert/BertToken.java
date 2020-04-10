@@ -16,7 +16,7 @@ import java.util.List;
 
 /** BertToken contains all the information for Bert model after encoding question and paragraph. */
 public class BertToken {
-    private List<Long> indices;
+    private List<String> tokens;
     private List<Long> tokenType;
     private List<Long> attentionMask;
     private int validLength;
@@ -24,14 +24,14 @@ public class BertToken {
     /**
      * Creates an instance of BertToken which includes information for Bert model.
      *
-     * @param indices indices of input sequence tokens in the vocabulary.
+     * @param tokens indices of input sequence tokens in the vocabulary.
      * @param tokenType segment token indices to indicate first and second portions of the inputs.
      * @param attentionMask mask to avoid performing attention on padding token indices.
      * @param validLength length that indicates the original input sequence.
      */
     public BertToken(
-            List<Long> indices, List<Long> tokenType, List<Long> attentionMask, int validLength) {
-        this.indices = indices;
+            List<String> tokens, List<Long> tokenType, List<Long> attentionMask, int validLength) {
+        this.tokens = tokens;
         this.tokenType = tokenType;
         this.attentionMask = attentionMask;
         this.validLength = validLength;
@@ -42,8 +42,8 @@ public class BertToken {
      *
      * @return indices of input sequence tokens
      */
-    public List<Long> getIndices() {
-        return indices;
+    public List<String> getTokens() {
+        return tokens;
     }
 
     /**

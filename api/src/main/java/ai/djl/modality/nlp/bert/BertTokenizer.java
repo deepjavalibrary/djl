@@ -24,17 +24,7 @@ import java.util.stream.Collectors;
 /** BertTokenizer is a class to help you encode question and paragraph sentence. */
 public class BertTokenizer extends SimpleTokenizer {
 
-    private BertVocabulary vocab;
     private static final Pattern PATTERN = Pattern.compile("(\\S+?)([.,?!])?(\\s+|$)");
-
-    /**
-     * Creates BertTokenizer with BertVocabulary.
-     *
-     * @param vocab the input BertVocabulary
-     */
-    public BertTokenizer(BertVocabulary vocab) {
-        this.vocab = vocab;
-    }
 
     /** {@inheritDoc} */
     @Override
@@ -99,7 +89,7 @@ public class BertTokenizer extends SimpleTokenizer {
         Arrays.fill(attentionMaskArr, 1);
 
         return new BertToken(
-                tokens.stream().map(token -> vocab.getIndex(token)).collect(Collectors.toList()),
+                tokens,
                 Arrays.stream(tokenTypeArr).boxed().collect(Collectors.toList()),
                 Arrays.stream(attentionMaskArr).boxed().collect(Collectors.toList()),
                 validLength);
@@ -116,7 +106,7 @@ public class BertTokenizer extends SimpleTokenizer {
     public BertToken encode(String question, String paragraph, int maxLength) {
         BertToken bertToken = encode(question, paragraph);
         return new BertToken(
-                pad(bertToken.getIndices(), vocab.getIndex("[PAD]"), maxLength),
+                pad(bertToken.getTokens(), "[PAD]", maxLength),
                 pad(bertToken.getTokenTypes(), 0L, maxLength),
                 pad(bertToken.getAttentionMask(), 0L, maxLength),
                 bertToken.getValidLength());

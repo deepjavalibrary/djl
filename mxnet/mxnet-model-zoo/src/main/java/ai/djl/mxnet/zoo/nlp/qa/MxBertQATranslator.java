@@ -47,7 +47,7 @@ public class MxBertQATranslator extends QATranslator {
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
         vocabulary = model.getArtifact("vocab.json", MxBertVocabulary::parse);
-        tokenizer = new BertTokenizer(vocabulary);
+        tokenizer = new BertTokenizer();
     }
 
     /** {@inheritDoc} */
@@ -58,10 +58,12 @@ public class MxBertQATranslator extends QATranslator {
                         input.getQuestion().toLowerCase(),
                         input.getParagraph().toLowerCase(),
                         seqLength);
-        float[] indexesFloat = Utils.toFloatArray(token.getIndices());
+        tokens = token.getTokens();
+        List<Long> indices =
+                token.getTokens().stream().map(vocabulary::getIndex).collect(Collectors.toList());
+        float[] indexesFloat = Utils.toFloatArray(indices);
         float[] types = Utils.toFloatArray(token.getTokenTypes());
         int validLength = token.getValidLength();
-        tokens = token.getIndices().stream().map(vocabulary::getToken).collect(Collectors.toList());
 
         NDManager manager = ctx.getNDManager();
         NDArray data0 = manager.create(indexesFloat, new Shape(1, seqLength));

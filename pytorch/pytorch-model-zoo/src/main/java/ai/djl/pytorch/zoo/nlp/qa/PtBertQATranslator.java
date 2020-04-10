@@ -25,7 +25,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * The translator for {@link PtBertQATranslator}.
@@ -44,7 +43,7 @@ public class PtBertQATranslator extends QATranslator {
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
         vocabulary = model.getArtifact("bert-base-uncased-vocab.txt", PtBertVocabulary::parse);
-        tokenizer = new BertTokenizer(vocabulary);
+        tokenizer = new BertTokenizer();
     }
 
     /** {@inheritDoc} */
@@ -53,16 +52,15 @@ public class PtBertQATranslator extends QATranslator {
         BertToken token =
                 tokenizer.encode(
                         input.getQuestion().toLowerCase(), input.getParagraph().toLowerCase());
-
+        tokens = token.getTokens();
         NDManager manager = ctx.getNDManager();
-        long[] indices = token.getIndices().stream().mapToLong(i -> i).toArray();
+        long[] indices = tokens.stream().mapToLong(vocabulary::getIndex).toArray();
         long[] attentionMask = token.getAttentionMask().stream().mapToLong(i -> i).toArray();
         long[] tokenType = token.getTokenTypes().stream().mapToLong(i -> i).toArray();
         NDArray indicesArray = manager.create(indices, new Shape(1, indices.length));
         NDArray attentionMaskArray =
                 manager.create(attentionMask, new Shape(1, attentionMask.length));
         NDArray tokenTypeArray = manager.create(tokenType, new Shape(1, tokenType.length));
-        tokens = token.getIndices().stream().map(vocabulary::getToken).collect(Collectors.toList());
         return new NDList(indicesArray, attentionMaskArray, tokenTypeArray);
     }
 
