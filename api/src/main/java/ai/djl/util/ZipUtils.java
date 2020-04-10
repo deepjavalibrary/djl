@@ -12,12 +12,14 @@
  */
 package ai.djl.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /** Utilities for working with zip files. */
 public final class ZipUtils {
@@ -48,6 +50,39 @@ public final class ZipUtils {
                 Files.createDirectories(parentFile);
                 Files.copy(zis, file);
             }
+        }
+    }
+
+    /**
+     * Zips an input directory to a given file.
+     *
+     * @param src the input directory to zip
+     * @param dest the path to store the unzipped files
+     * @throws IOException for failures to zip the input directory
+     */
+    public static void zip(Path src, Path dest) throws IOException {
+        File srcFile = src.toFile();
+        int prefix = srcFile.getCanonicalPath().length() - srcFile.getName().length();
+        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(dest))) {
+            addToZip(prefix, srcFile, zos);
+        }
+    }
+
+    private static void addToZip(int prefix, File file, ZipOutputStream zos) throws IOException {
+        String name = file.getCanonicalPath().substring(prefix);
+        if (file.isDirectory()) {
+            ZipEntry entry = new ZipEntry(name + '/');
+            zos.putNextEntry(entry);
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    addToZip(prefix, f, zos);
+                }
+            }
+        } else if (file.isFile()) {
+            ZipEntry entry = new ZipEntry(name);
+            zos.putNextEntry(entry);
+            Files.copy(file.toPath(), zos);
         }
     }
 }
