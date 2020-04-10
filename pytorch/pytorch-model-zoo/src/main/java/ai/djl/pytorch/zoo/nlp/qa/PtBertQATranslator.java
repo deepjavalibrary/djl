@@ -57,16 +57,12 @@ public class PtBertQATranslator extends QATranslator {
         NDManager manager = ctx.getNDManager();
         long[] indices = token.getIndices().stream().mapToLong(i -> i).toArray();
         long[] attentionMask = token.getAttentionMask().stream().mapToLong(i -> i).toArray();
-        long[] tokenType = token.getTokenType().stream().mapToLong(i -> i).toArray();
+        long[] tokenType = token.getTokenTypes().stream().mapToLong(i -> i).toArray();
         NDArray indicesArray = manager.create(indices, new Shape(1, indices.length));
         NDArray attentionMaskArray =
                 manager.create(attentionMask, new Shape(1, attentionMask.length));
         NDArray tokenTypeArray = manager.create(tokenType, new Shape(1, tokenType.length));
-        tokens =
-                token.getIndices()
-                        .stream()
-                        .map(index -> vocabulary.getToken(index))
-                        .collect(Collectors.toList());
+        tokens = token.getIndices().stream().map(vocabulary::getToken).collect(Collectors.toList());
         return new NDList(indicesArray, attentionMaskArray, tokenTypeArray);
     }
 

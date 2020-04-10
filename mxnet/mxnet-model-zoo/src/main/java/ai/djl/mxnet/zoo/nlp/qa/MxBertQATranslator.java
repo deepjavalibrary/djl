@@ -59,13 +59,9 @@ public class MxBertQATranslator extends QATranslator {
                         input.getParagraph().toLowerCase(),
                         seqLength);
         float[] indexesFloat = Utils.toFloatArray(token.getIndices());
-        float[] types = Utils.toFloatArray(token.getTokenType());
+        float[] types = Utils.toFloatArray(token.getTokenTypes());
         int validLength = token.getValidLength();
-        tokens =
-                token.getIndices()
-                        .stream()
-                        .map(index -> vocabulary.getToken(index))
-                        .collect(Collectors.toList());
+        tokens = token.getIndices().stream().map(vocabulary::getToken).collect(Collectors.toList());
 
         NDManager manager = ctx.getNDManager();
         NDArray data0 = manager.create(indexesFloat, new Shape(1, seqLength));

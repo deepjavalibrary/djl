@@ -91,7 +91,7 @@ public class BertTokenizer extends SimpleTokenizer {
         List<String> tokens = new ArrayList<>(qToken);
         tokens.addAll(pToken);
 
-        int tokenTypeStartIdx = tokens.size();
+        int tokenTypeStartIdx = qToken.size();
         long[] tokenTypeArr = new long[tokens.size()];
         Arrays.fill(tokenTypeArr, tokenTypeStartIdx, tokenTypeArr.length, 1);
 
@@ -115,16 +115,10 @@ public class BertTokenizer extends SimpleTokenizer {
      */
     public BertToken encode(String question, String paragraph, int maxLength) {
         BertToken bertToken = encode(question, paragraph);
-        List<Long> indices = bertToken.getIndices();
-        List<Long> tokenType = bertToken.getTokenType();
-        List<Long> attentionMask = bertToken.getAttentionMask();
-
-        indices = pad(indices, vocab.getIndex("[PAD]"), maxLength);
-
         return new BertToken(
-                pad(indices, vocab.getIndex("[PAD]"), maxLength),
-                pad(tokenType, 0L, maxLength),
-                pad(attentionMask, 0L, maxLength),
+                pad(bertToken.getIndices(), vocab.getIndex("[PAD]"), maxLength),
+                pad(bertToken.getTokenTypes(), 0L, maxLength),
+                pad(bertToken.getAttentionMask(), 0L, maxLength),
                 bertToken.getValidLength());
     }
 }

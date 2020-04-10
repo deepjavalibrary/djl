@@ -51,7 +51,7 @@ public class BertToken {
      *
      * @return segment token indices
      */
-    public List<Long> getTokenType() {
+    public List<Long> getTokenTypes() {
         return tokenType;
     }
 
