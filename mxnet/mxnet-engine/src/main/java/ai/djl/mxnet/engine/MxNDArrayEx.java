@@ -507,7 +507,7 @@ class MxNDArrayEx implements NDArrayEx {
         MxOpParams params = new MxOpParams();
         params.addParam("input_dim", numItems);
         params.addParam("output_dim", embeddingSize);
-        params.addParam("sparse_grad", true);
+        params.addParam("sparse_grad", false);
         params.setDataType(dataType);
         params.addAll(additional);
 

@@ -128,7 +128,7 @@ public class Embedding<T> extends ParameterBlock {
 
         NDArrayEx ex = opInputs.head().getNDArrayInternal();
         NDList result = ex.embedding(opInputs, numItems, embeddingSize, dataType, params);
-        if (inputs.singletonOrThrow().getShape().dimension() == 0) {
+        if (inputs.head().getShape().dimension() == 0) {
             result = new NDList(result.singletonOrThrow().reshape(embeddingSize));
         }
         return result;
@@ -166,7 +166,7 @@ public class Embedding<T> extends ParameterBlock {
     }
 
     private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
-        NDArray items = inputs.singletonOrThrow();
+        NDArray items = inputs.head();
         Device device = items.getDevice();
 
         NDList ret = new NDList(2);

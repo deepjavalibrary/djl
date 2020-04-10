@@ -103,6 +103,29 @@ public class BlockCoreTest {
     }
 
     @Test
+    public void testLinearWithFlatten() throws IOException, MalformedModelException {
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+
+        long outSize = 10;
+        Block block = Linear.builder().setOutChannels(outSize).optFlatten(false).build();
+        try (Model model = Model.newInstance()) {
+            model.setBlock(block);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(10, 20, 12);
+                trainer.initialize(inputShape);
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.ones(inputShape);
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(result.getShape(), new Shape(10, 20, 10));
+                testEncode(manager, block);
+            }
+        }
+    }
+
+    @Test
     public void testLinearWithDefinedLayout() throws IOException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);

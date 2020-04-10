@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.training.ParameterStore;
@@ -111,6 +112,7 @@ public class LSTM extends RecurrentBlock {
     @Override
     protected NDList opInputs(ParameterStore parameterStore, NDList inputs) {
         validateInputSize(inputs);
+        long batchSize = inputs.head().getShape().get(0);
         inputs = updateInputLayoutToTNC(inputs);
         NDArray head = inputs.head();
         Device device = head.getDevice();
@@ -125,6 +127,7 @@ public class LSTM extends RecurrentBlock {
             result.add(array);
         }
         // Adding state and stateCell
+        Shape stateShape = new Shape(numStackedLayers * numDirections, batchSize, stateSize);
         if (beginState != null) {
             result.add(beginState);
         } else {

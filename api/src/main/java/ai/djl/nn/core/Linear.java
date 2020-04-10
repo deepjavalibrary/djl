@@ -38,29 +38,42 @@ import java.util.List;
  *
  * <p>It has the following shapes:
  *
+ * <p>If {@code flatten} is false:
+ *
  * <ul>
- *   <li>input X: [batchSize..., inChannels]
- *   <li>weight W: [outChannels, inChannels]
+ *   <li>input X: [batchSize, x1, x2, …, xn]
+ *   <li>weight W: [outChannels, x1 * x2 * … * xn]
  *   <li>Bias b: [outChannels]
- *   <li>output Y: [batchSize..., outChannels]
+ *   <li>output Y: [batchSize, outChannels]
+ * </ul>
+ *
+ * <p>If {@code flatten} is false:
+ *
+ * <ul>
+ *   <li>input X: [x1, x2, …, xn, input_dim]
+ *   <li>weight W: [outChannels, input_dim]
+ *   <li>Bias b: [outChannels]
+ *   <li>output Y: [x1, x2, …, xn, outChannels]
  * </ul>
  *
  * <p>The Linear block should be constructed using {@link Linear.Builder}.
  */
 public class Linear extends ParameterBlock {
 
-    private static final byte VERSION = 1;
+    private static final byte VERSION = 2;
 
     private long outChannels;
+    private long inputDimension;
+    private boolean flatten;
 
     private Shape inputShape;
-    private Shape inChannels;
 
     private Parameter weight;
     private Parameter bias;
 
     Linear(Builder builder) {
         outChannels = builder.outChannels;
+        flatten = builder.flatten;
         weight = new Parameter("weight", this, ParameterType.WEIGHT);
         if (builder.bias) {
             bias = new Parameter("bias", this, ParameterType.BIAS);
@@ -73,13 +86,16 @@ public class Linear extends ParameterBlock {
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
         inputs = opInputs(parameterStore, inputs);
         NDArrayEx ex = inputs.head().getNDArrayInternal();
-        return ex.fullyConnected(inputs, outChannels, false, bias == null, params);
+        return ex.fullyConnected(inputs, outChannels, flatten, bias == null, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
-        return new Shape[] {new Shape(inputs[0].get(0), outChannels)};
+        if (flatten) {
+            return new Shape[] {new Shape(inputs[0].get(0), outChannels)};
+        }
+        return new Shape[] {inputShape.addAll(new Shape(outChannels))};
     }
 
     /** {@inheritDoc} */
@@ -103,24 +119,31 @@ public class Linear extends ParameterBlock {
     public void beforeInitialize(Shape[] inputShapes) {
         this.inputShapes = inputShapes;
         Shape input = inputShapes[0];
-        if (input.isLayoutKnown()) {
-            inChannels = input.filterByLayoutType(t -> !t.equals(LayoutType.BATCH));
-            inputShape =
-                    input.map(
-                            pair ->
-                                    new Pair<>(
-                                            pair.getValue().equals(LayoutType.BATCH)
-                                                    ? Long.valueOf(-1)
-                                                    : pair.getKey(),
-                                            pair.getValue()));
-        } else if (input.dimension() > 1) {
-            inChannels = input.slice(1);
-            inputShape =
-                    new Shape(new long[] {-1}, new LayoutType[] {LayoutType.BATCH})
-                            .addAll(input.slice(1));
+        if (flatten) {
+            Shape inChannels;
+            if (input.isLayoutKnown()) {
+                inChannels = input.filterByLayoutType(t -> !t.equals(LayoutType.BATCH));
+                inputShape =
+                        input.map(
+                                pair ->
+                                        new Pair<>(
+                                                pair.getValue().equals(LayoutType.BATCH)
+                                                        ? Long.valueOf(-1)
+                                                        : pair.getKey(),
+                                                pair.getValue()));
+            } else if (input.dimension() > 1) {
+                inChannels = input.slice(1);
+                inputShape =
+                        new Shape(new long[] {-1}, new LayoutType[] {LayoutType.BATCH})
+                                .addAll(input.slice(1));
+            } else {
+                inChannels = input;
+                inputShape = input;
+            }
+            inputDimension = inChannels.size();
         } else {
-            inChannels = input.slice(0);
-            inputShape = input;
+            inputDimension = input.get(input.dimension() - 1);
+            inputShape = input.slice(0, input.dimension() - 1);
         }
     }
 
@@ -129,7 +152,7 @@ public class Linear extends ParameterBlock {
     public Shape getParameterShape(String name, Shape[] inputShapes) {
         switch (name) {
             case "weight":
-                return new Shape(outChannels).addAll(inChannels);
+                return new Shape(outChannels, inputDimension);
             case "bias":
                 return new Shape(outChannels);
             default:
@@ -141,7 +164,8 @@ public class Linear extends ParameterBlock {
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
-        os.write(inChannels.getEncoded());
+        os.writeBoolean(flatten);
+        os.writeLong(inputDimension);
         os.write(inputShape.getEncoded());
         weight.save(os);
         if (bias != null) {
@@ -154,10 +178,15 @@ public class Linear extends ParameterBlock {
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
         byte version = is.readByte();
-        if (version != VERSION) {
+        if (version == VERSION) {
+            flatten = is.readBoolean();
+            inputDimension = is.readLong();
+        } else if (version == 1) {
+            flatten = false;
+            inputDimension = Shape.decode(is).size();
+        } else {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
-        inChannels = Shape.decode(is);
         inputShape = Shape.decode(is);
         weight.load(manager, is);
         if (bias != null) {
@@ -193,6 +222,7 @@ public class Linear extends ParameterBlock {
 
         private long outChannels;
         private boolean bias = true;
+        private boolean flatten;
 
         Builder() {}
 
@@ -216,6 +246,21 @@ public class Linear extends ParameterBlock {
          */
         public Builder optBias(boolean bias) {
             this.bias = bias;
+            return this;
+        }
+
+        /**
+         * Sets the optional parameter that indicates whether the input tensor should be flattened.
+         *
+         * <p>If flatten is set to true, all but the first axis of input data are collapsed
+         * together. If false, all but the last axis of input data are kept the same, and the
+         * transformation applies on the last axis.
+         *
+         * @param flatten whether the input tensor should be flattened.
+         * @return this Builder
+         */
+        public Builder optFlatten(boolean flatten) {
+            this.flatten = flatten;
             return this;
         }
 

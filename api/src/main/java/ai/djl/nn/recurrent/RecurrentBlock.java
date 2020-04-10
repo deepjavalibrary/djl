@@ -61,8 +61,6 @@ public abstract class RecurrentBlock extends ParameterBlock {
     protected int numDirections = 1;
     protected int gates;
     protected boolean stateOutputs;
-
-    protected Shape stateShape;
     protected NDArray beginState;
     protected List<Parameter> parameters = new ArrayList<>();
 
@@ -119,6 +117,15 @@ public abstract class RecurrentBlock extends ParameterBlock {
         }
     }
 
+    /**
+     * Sets the parameter that indicates whether the output must include the hidden states.
+     *
+     * @param stateOutputs whether the output must include the hidden states.
+     */
+    public void setStateOutputs(boolean stateOutputs) {
+        this.stateOutputs = stateOutputs;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDList forward(
@@ -166,7 +173,7 @@ public abstract class RecurrentBlock extends ParameterBlock {
         if (stateOutputs) {
             return new Shape[] {
                 new Shape(inputShape.get(1), inputShape.get(0), stateSize * numDirections),
-                stateShape
+                new Shape(numStackedLayers * numDirections, inputShape.get(1), stateSize)
             };
         }
         return new Shape[] {
@@ -186,9 +193,7 @@ public abstract class RecurrentBlock extends ParameterBlock {
         this.inputShapes = inputs;
         Shape inputShape = inputs[0];
         Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
-        long batchSize = inputShape.get(0);
         inputs[0] = new Shape(inputShape.get(1), inputShape.get(0), inputShape.get(2));
-        stateShape = new Shape(numStackedLayers * numDirections, batchSize, stateSize);
     }
 
     /** {@inheritDoc} */
@@ -243,6 +248,7 @@ public abstract class RecurrentBlock extends ParameterBlock {
 
     protected NDList opInputs(ParameterStore parameterStore, NDList inputs) {
         validateInputSize(inputs);
+        long batchSize = inputs.head().getShape().get(0);
         inputs = updateInputLayoutToTNC(inputs);
         NDArray head = inputs.head();
         Device device = head.getDevice();
@@ -256,6 +262,7 @@ public abstract class RecurrentBlock extends ParameterBlock {
             NDArray array = NDArrays.concat(parameterList);
             result.add(array);
         }
+        Shape stateShape = new Shape(numStackedLayers * numDirections, batchSize, stateSize);
         if (beginState != null) {
             result.add(beginState);
         } else {

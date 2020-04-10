@@ -71,7 +71,9 @@ public class SequentialBlock extends AbstractBlock {
      * @return this block
      */
     public SequentialBlock add(Block block) {
-        blocks.add(block);
+        if (block != null) {
+            blocks.add(block);
+        }
         return this;
     }
 
@@ -98,7 +100,9 @@ public class SequentialBlock extends AbstractBlock {
      */
     public void replaceLastBlock(Block block) {
         removeLastBlock();
-        blocks.add(block);
+        if (block != null) {
+            blocks.add(block);
+        }
     }
 
     /** {@inheritDoc} */
