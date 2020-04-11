@@ -1,5 +1,10 @@
 # DJL - TensorFlow core api
 
-TensorFlow core java API 2.0 has not been officially released yet. We are releasing a tested
+TensorFlow core java API 2.x has not been officially released yet. We are releasing a tested
 nightly build of TensorFlow core java API under `ai.djl.tensorflow` group. Once TensorFlow officially
-release 2.0 API, we will switch to use official version.
+release 2.x API, we will switch to use official version.
+
+For more information please refer to:
+
+1. [TensorFlow Java API](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/java): stable 1.x version
+2. [New TensorFlow 2.x Java API](https://github.com/tensorflow/java): WIP 2.x version
