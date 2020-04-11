@@ -20,7 +20,6 @@ import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
 import ai.djl.modality.nlp.preprocess.PunctuationSeparator;
-import ai.djl.modality.nlp.preprocess.SentenceLengthNormalizer;
 import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.modality.nlp.preprocess.TextProcessor;
 import ai.djl.ndarray.NDList;
@@ -58,14 +57,12 @@ public abstract class TextDataset extends RandomAccessDataset {
         sourceTextData = new TextData();
         sourceTextData.setTextEmbedding(builder.sourceTextEmbedding);
         sourceTextData.setTrainEmbedding(builder.trainSourceEmbedding);
-        sourceTextData.setIncludeValidLength(builder.includeValidLength);
         sourceTextData.setEmbeddingSize(builder.embeddingSize);
         sourceTextData.setTextProcessors(builder.sourceTextProcessors);
 
         targetTextData = new TextData();
         targetTextData.setTextEmbedding(builder.targetTextEmbedding);
         targetTextData.setTrainEmbedding(builder.trainTargetEmbedding);
-        targetTextData.setIncludeValidLength(builder.includeValidLength);
         targetTextData.setEmbeddingSize(builder.embeddingSize);
         targetTextData.setTextProcessors(builder.targetTextProcessors);
     }
@@ -95,20 +92,17 @@ public abstract class TextDataset extends RandomAccessDataset {
         protected TextEmbedding targetTextEmbedding;
         protected boolean trainSourceEmbedding;
         protected boolean trainTargetEmbedding;
-        protected boolean includeValidLength;
         protected int embeddingSize;
         protected List<TextProcessor> sourceTextProcessors =
                 Arrays.asList(
                         new SimpleTokenizer(),
                         new LowerCaseConvertor(Locale.ENGLISH),
-                        new PunctuationSeparator(),
-                        new SentenceLengthNormalizer(10, false));
+                        new PunctuationSeparator());
         protected List<TextProcessor> targetTextProcessors =
                 Arrays.asList(
                         new SimpleTokenizer(),
                         new LowerCaseConvertor(Locale.ENGLISH),
-                        new PunctuationSeparator(),
-                        new SentenceLengthNormalizer(12, true));
+                        new PunctuationSeparator());
 
         /**
          * Sets the required implementation of {@link TextEmbedding} to get the embeddings for the
@@ -149,18 +143,6 @@ public abstract class TextDataset extends RandomAccessDataset {
          */
         public T optEmbeddingSize(int embeddingSize) {
             this.embeddingSize = embeddingSize;
-            return self();
-        }
-
-        /**
-         * Sets the required parameter whether to include the valid length as part of data in the
-         * {@code Record}.
-         *
-         * @param includeValidLength whether to include the valid length as part of data
-         * @return this builder
-         */
-        public T setValidLength(boolean includeValidLength) {
-            this.includeValidLength = includeValidLength;
             return self();
         }
 

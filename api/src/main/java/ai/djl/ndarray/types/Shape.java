@@ -105,6 +105,20 @@ public class Shape {
     }
 
     /**
+     * Returns a new shape altering the given dimension.
+     *
+     * @param shape the shape to update
+     * @param dimension the dimension to get the shape in
+     * @param value the value to set the dimension to
+     * @return a new shape with the update applied
+     */
+    public static Shape update(Shape shape, int dimension, long value) {
+        long[] newShape = shape.shape.clone();
+        newShape[dimension] = value;
+        return new Shape(newShape, shape.layout);
+    }
+
+    /**
      * Returns the dimensions of the {@code Shape}.
      *
      * @return the dimensions of the {@code Shape}

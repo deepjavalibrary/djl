@@ -14,7 +14,6 @@ package ai.djl.basicdataset;
 
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.training.dataset.Record;
 import java.io.IOException;
 import org.testng.Assert;
@@ -33,17 +32,14 @@ public class TatoebaEnglishFrenchDatasetTest {
                                     TestUtils.getTextEmbedding(manager, EMBEDDING_SIZE), false)
                             .optTargetTextEmbedding(
                                     TestUtils.getTextEmbedding(manager, EMBEDDING_SIZE), false)
-                            .setValidLength(true)
                             .setSampling(32, true)
                             .build();
             tatoebaEnglishFrenchDataset.prepare();
             Record record = tatoebaEnglishFrenchDataset.get(manager, 0);
             Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
             Assert.assertEquals(record.getData().get(0).getShape().get(1), EMBEDDING_SIZE);
-            Assert.assertEquals(record.getData().get(1).getShape(), new Shape());
             Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 2);
             Assert.assertEquals(record.getLabels().get(0).getShape().get(1), EMBEDDING_SIZE);
-            Assert.assertEquals(record.getLabels().get(1).getShape(), new Shape());
         }
     }
 
@@ -53,15 +49,15 @@ public class TatoebaEnglishFrenchDatasetTest {
             TatoebaEnglishFrenchDataset tatoebaEnglishFrenchDataset =
                     TatoebaEnglishFrenchDataset.builder()
                             .optEmbeddingSize(EMBEDDING_SIZE)
-                            .setValidLength(false)
                             .setSampling(32, true)
                             .build();
             tatoebaEnglishFrenchDataset.prepare();
+
             Record record = tatoebaEnglishFrenchDataset.get(manager, 0);
-            Assert.assertEquals(record.getData().get(0).getShape(), new Shape(10));
             Assert.assertEquals(record.getData().size(), 1);
-            Assert.assertEquals(record.getLabels().get(0).getShape(), new Shape(12));
+            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
             Assert.assertEquals(record.getLabels().size(), 1);
+            Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
         }
     }
 }

@@ -108,6 +108,23 @@ public class NDIndex {
     }
 
     /**
+     * Creates an {@link NDIndex} that just has one slice in the given axis.
+     *
+     * @param axis the axis to slice
+     * @param min the min of the slice
+     * @param max the max of the slice
+     * @return a new {@link NDIndex} with the given slice.
+     */
+    public static NDIndex sliceAxis(int axis, long min, long max) {
+        NDIndex ind = new NDIndex();
+        for (int i = 0; i < axis; i++) {
+            ind.addAllDim();
+        }
+        ind.addSliceDim(min, max);
+        return ind;
+    }
+
+    /**
      * Returns the number of dimensions specified in the Index.
      *
      * @return the number of dimensions specified in the Index
@@ -178,6 +195,17 @@ public class NDIndex {
     public NDIndex addBooleanIndex(NDArray index) {
         rank += index.getShape().dimension();
         indices.add(new NDIndexBooleans(index));
+        return this;
+    }
+
+    /**
+     * Appends a new index to get all values in the dimension.
+     *
+     * @return the updated {@link NDIndex}
+     */
+    public NDIndex addAllDim() {
+        rank++;
+        indices.add(new NDIndexAll());
         return this;
     }
 

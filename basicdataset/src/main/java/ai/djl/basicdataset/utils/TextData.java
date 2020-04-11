@@ -17,7 +17,6 @@ import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.SimpleTextEmbedding;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
-import ai.djl.modality.nlp.preprocess.SentenceLengthNormalizer;
 import ai.djl.modality.nlp.preprocess.TextProcessor;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -36,12 +35,10 @@ public class TextData {
 
     private List<TextProcessor> textProcessors;
     private TextEmbedding textEmbedding;
-    private boolean includeValidLength;
     private boolean trainEmbedding;
     private int embeddingSize;
 
     private List<List<String>> textData;
-    private List<Integer> validLengths;
     private int size;
 
     /**
@@ -64,10 +61,6 @@ public class TextData {
         } else {
             data.add(textEmbedding.embedText(manager, sentenceTokens));
         }
-        if (includeValidLength) {
-            Integer validLength = validLengths.get(iindex);
-            data.add(manager.create(validLength));
-        }
         return data;
     }
 
@@ -84,16 +77,12 @@ public class TextData {
 
         if (textData == null) {
             textData = new ArrayList<>();
-            validLengths = new ArrayList<>();
         }
         size = textData.size();
         for (String textDatum : newTextData) {
             List<String> tokens = Collections.singletonList(textDatum);
             for (TextProcessor processor : textProcessors) {
                 tokens = processor.preprocess(tokens);
-                if (processor instanceof SentenceLengthNormalizer) {
-                    validLengths.add(((SentenceLengthNormalizer) processor).getLastValidLength());
-                }
             }
             vocabularyBuilder.add(tokens);
             textData.add(tokens);
@@ -131,15 +120,6 @@ public class TextData {
      */
     public void setTextEmbedding(TextEmbedding textEmbedding) {
         this.textEmbedding = textEmbedding;
-    }
-
-    /**
-     * Sets whether to include the validLenght.
-     *
-     * @param includeValidLength true to include validLength
-     */
-    public void setIncludeValidLength(boolean includeValidLength) {
-        this.includeValidLength = includeValidLength;
     }
 
     /**

@@ -32,7 +32,6 @@ public class StanfordMovieReviewTest {
                                     TestUtils.getTextEmbedding(manager, EMBEDDING_SIZE), false)
                             .optTargetTextEmbedding(
                                     TestUtils.getTextEmbedding(manager, EMBEDDING_SIZE), false)
-                            .setValidLength(true)
                             .setSampling(32, true)
                             .build();
             dataset.prepare();
@@ -50,7 +49,6 @@ public class StanfordMovieReviewTest {
             StanfordMovieReview dataset =
                     StanfordMovieReview.builder()
                             .optEmbeddingSize(EMBEDDING_SIZE)
-                            .setValidLength(false)
                             .setSampling(32, true)
                             .build();
             dataset.prepare();
