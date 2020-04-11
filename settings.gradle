@@ -18,5 +18,6 @@ include ':pytorch:pytorch-native'
 include ':fasttext:fasttext-engine'
 include ':testing'
 include ':3rdparty:aws-ai'
+include ":model-uploader"
 
 project(":examples").buildFileName = "djl.gradle"
