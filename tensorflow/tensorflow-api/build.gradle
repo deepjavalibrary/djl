@@ -37,7 +37,7 @@ publishing {
                 withXml {
                     Node pomNode = asNode()
                     pomNode.dependencies."*".findAll() {
-                        it.artifactId.text() == "tensorflow-core-api"
+                        it.artifactId.text().startsWith("tensorflow-")
                     }.each() {
                         it.parent().remove(it)
                     }
