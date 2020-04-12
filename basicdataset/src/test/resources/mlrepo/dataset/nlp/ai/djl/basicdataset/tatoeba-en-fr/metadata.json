@@ -1,0 +1,33 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "tatoeba_en_fr",
+  "type": "nlp",
+  "name": "tatoeba_en_fr",
+  "description": "English-French Translation Dataset - Tatoeba Project",
+  "website": "http://www.djl.ai/basicdataset",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "1.0",
+      "snapshot": false,
+      "files": {
+        "train": {
+          "uri": "1.0/fra-eng-train.txt.gz",
+          "sha1Hash": "f646ded051ce23c202249696e7fc4d056db758dd",
+          "size": 2847542
+        },
+        "test": {
+          "uri": "1.0/fra-eng-test.txt.gz",
+          "sha1Hash": "84e33033961ec890e41dcad523911859ea9076e9",
+          "size": 828726
+        }
+      }
+    }
+  ]
+}
