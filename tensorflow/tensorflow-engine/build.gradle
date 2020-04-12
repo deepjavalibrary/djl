@@ -9,7 +9,6 @@ repositories {
 dependencies {
     api project(":api")
     api project(":tensorflow:tensorflow-api")
-    api "org.tensorflow:proto:1.15.0"
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"

@@ -14,6 +14,7 @@ package ai.djl.tensorflow.engine;
 
 import ai.djl.BaseModel;
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -21,6 +22,7 @@ import ai.djl.nn.Block;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
+import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,6 +34,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import org.tensorflow.SavedModelBundle;
+import org.tensorflow.proto.framework.ConfigProto;
+import org.tensorflow.proto.framework.RunOptions;
 
 public class TfModel extends BaseModel {
 
@@ -71,15 +75,22 @@ public class TfModel extends BaseModel {
         load(modelPath, tags);
     }
 
-    public void load(String modelDir, byte[] configProto, byte[] runOptions, String... tags) {
+    public void load(String modelDir, byte[] configProto, byte[] runOptions, String... tags)
+            throws MalformedModelException {
         this.modelDir = Paths.get(modelDir);
-        SavedModelBundle bundle =
-                SavedModelBundle.loader(modelDir)
-                        .withConfigProto(configProto)
-                        .withRunOptions(runOptions)
-                        .withTags(tags)
-                        .load();
-        block = new TfSymbolBlock(manager, bundle);
+        try {
+            ConfigProto proto = ConfigProto.parseFrom(configProto);
+            RunOptions options = RunOptions.parseFrom(runOptions);
+            SavedModelBundle bundle =
+                    SavedModelBundle.loader(modelDir)
+                            .withConfigProto(proto)
+                            .withRunOptions(options)
+                            .withTags(tags)
+                            .load();
+            block = new TfSymbolBlock(manager, bundle);
+        } catch (InvalidProtocolBufferException e) {
+            throw new MalformedModelException("Failed to parse SavedModel", e);
+        }
     }
 
     /** {@inheritDoc} */

@@ -13,7 +13,6 @@
 
 package ai.djl.tensorflow.engine;
 
-import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -25,7 +24,6 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
-import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.util.List;
@@ -33,10 +31,10 @@ import java.util.Map;
 import org.tensorflow.SavedModelBundle;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
-import org.tensorflow.framework.MetaGraphDef;
-import org.tensorflow.framework.SignatureDef;
-import org.tensorflow.framework.TensorInfo;
-import org.tensorflow.framework.TensorShapeProto;
+import org.tensorflow.proto.framework.MetaGraphDef;
+import org.tensorflow.proto.framework.SignatureDef;
+import org.tensorflow.proto.framework.TensorInfo;
+import org.tensorflow.proto.framework.TensorShapeProto;
 
 public class TfSymbolBlock implements SymbolBlock {
 
@@ -51,12 +49,7 @@ public class TfSymbolBlock implements SymbolBlock {
         this.bundle = bundle;
         // graph = bundle.graph();
         session = bundle.session();
-        try {
-            metaGraphDef = MetaGraphDef.parseFrom(bundle.metaGraphDef());
-
-        } catch (InvalidProtocolBufferException e) {
-            throw new EngineException("Failed to parse MetaGraphDef from saved model.", e);
-        }
+        metaGraphDef = bundle.metaGraphDef();
     }
 
     /** {@inheritDoc} */
@@ -132,7 +125,7 @@ public class TfSymbolBlock implements SymbolBlock {
         SignatureDef servingDefault =
                 metaGraphDef.getSignatureDefOrDefault(
                         "serving_default",
-                        signatureDefMap.get(signatureDefMap.keySet().toArray()[0]));
+                        signatureDefMap.get(signatureDefMap.keySet().iterator().next()));
         for (Map.Entry<String, TensorInfo> entry : servingDefault.getInputsMap().entrySet()) {
             TensorShapeProto shapeProto = entry.getValue().getTensorShape();
             inputDescriptions.add(
@@ -153,7 +146,7 @@ public class TfSymbolBlock implements SymbolBlock {
         SignatureDef servingDefault =
                 metaGraphDef.getSignatureDefOrDefault(
                         "serving_default",
-                        signatureDefMap.get(signatureDefMap.keySet().toArray()[0]));
+                        signatureDefMap.get(signatureDefMap.keySet().iterator().next()));
         for (Map.Entry<String, TensorInfo> entry : servingDefault.getOutputsMap().entrySet()) {
             TensorShapeProto shapeProto = entry.getValue().getTensorShape();
             outputDescription.add(
