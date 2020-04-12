@@ -420,6 +420,47 @@ public class NDArrayElementArithmeticOpTest {
         }
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testMatMul() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            // 2D * 2D
+            NDArray lhs = manager.create(new float[] {5, 10, -3, 4, 2, 7}, new Shape(2, 3));
+            NDArray rhs = manager.create(new float[] {2, 9, 3}, new Shape(3, 1));
+            NDArray expected = manager.create(new float[] {91, 47}, new Shape(2, 1));
+            Assert.assertEquals(lhs.matMul(rhs), expected);
+            // 3D * 2D
+            lhs = manager.arange(24f).reshape(2, 3, 4);
+            rhs = manager.arange(12f).reshape(4, 3);
+            expected =
+                    manager.create(
+                            new float[] {
+                                42, 48, 54, 114, 136, 158, 186, 224, 262, 258, 312, 366, 330, 400,
+                                470, 402, 488, 574
+                            },
+                            new Shape(2, 3, 3));
+            Assert.assertEquals(lhs.matMul(rhs), expected);
+            // 1D * 2D
+            lhs = manager.create(new float[] {2f, 7f});
+            rhs = manager.arange(6f).reshape(2, 3);
+            expected = manager.create(new float[] {21, 30, 39});
+            Assert.assertEquals(lhs.matMul(rhs), expected);
+            // scalar case, throw exception
+            lhs = manager.create(1f);
+            rhs = manager.arange(6f).reshape(2, 3);
+            expected = manager.create(new float[] {21, 30, 39});
+            Assert.assertEquals(lhs.matMul(rhs), expected);
+            // zero-dim
+            lhs = manager.create(new Shape(0, 3));
+            rhs = manager.create(new Shape(3, 0));
+            expected = manager.create(new Shape(0, 0));
+            Assert.assertEquals(lhs.matMul(rhs), expected);
+            lhs = manager.create(new Shape(3, 0));
+            rhs = manager.create(new Shape(0, 2));
+            expected = manager.zeros(new Shape(3, 2));
+            Assert.assertEquals(lhs.matMul(rhs), expected);
+        }
+    }
+
     @Test
     public void testDivScalar() {
         try (NDManager manager = NDManager.newBaseManager()) {

@@ -965,6 +965,12 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray matMul(NDArray other) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray clip(Number min, Number max) {
         return null;
     }

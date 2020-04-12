@@ -1339,6 +1339,12 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray dot(NDArray other) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray matMul(NDArray other) {
         return new TfNDArray(
                 manager, tf.linalg.matMul(asOperand(), ((TfNDArray) other).asOperand()));
     }

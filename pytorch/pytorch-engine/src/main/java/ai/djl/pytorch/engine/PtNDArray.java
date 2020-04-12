@@ -1064,6 +1064,14 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray dot(NDArray other) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public NDArray matMul(NDArray other) {
+        if (isScalar() || other.isScalar()) {
+            throw new IllegalArgumentException("scalar is not allowed for matMul()");
+        }
         return JniUtils.matmul(this, (PtNDArray) other);
     }
 

@@ -1705,6 +1705,59 @@ public final class NDArrays {
     }
 
     /**
+     * Product matrix of this {@code NDArray} and the other {@code NDArray}.
+     *
+     * <p>The behavior depends on the arguments in the following way.
+     *
+     * <ul>
+     *   <li>If both this {@code NDArray} and the other {@code NDArray} are 2-D {@code NDArray}s,
+     *       they are multiplied like conventional matrices
+     *   <li>If either this {@code NDArray} or the other {@code NDArray} is N-D {@code NDArray}, N
+     *       &gt; 2 , it is treated as a stack of matrices residing in the last two indexes and
+     *       broadcast accordingly.
+     *   <li>If this {@code NDArray} is 1-D {@code NDArray}, it is promoted to a matrix by
+     *       prepending a 1 to its dimensions. After matrix multiplication the prepended 1 is
+     *       removed.
+     *   <li>If other {@code NDArray} is 1-D {@code NDArray}, it is promoted to a matrix by
+     *       appending a 1 to its dimensions. After matrix multiplication the appended 1 is removed.
+     * </ul>
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.create(new float[] {1f, 0f, 0f, 1f}, new Shape(2, 2));
+     * jshell&gt; NDArray array2 = manager.create(new float[] {4f, 1f, 2f, 2f}, new Shape(2, 2));
+     * jshell&gt; NDArrays.matMul(array1, array2); // for 2-D arrays, it is the matrix product
+     * ND: (2, 2) cpu() float32
+     * [[4., 1.],
+     *  [2., 2.],
+     * ]
+     * jshell&gt; array1 = manager.create(new float[] {1f, 0f, 0f, 1f}, new Shape(2, 2));
+     * jshell&gt; array2 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.matMul(array1, array2);
+     * ND: (2) cpu() float32
+     * [1., 2.]
+     * jshell&gt; array1 = manager.create(new float[] {1f, 0f, 0f, 1f}, new Shape(2, 2));
+     * jshell&gt; array2 = manager.create(new float[] {1f, 2f});
+     * jshell&gt; NDArrays.matMul(array1, array2);
+     * ND: (2) cpu() float32
+     * [1., 2.]
+     * jshell&gt; array1 = manager.arange(2f * 2f * 4f).reshape(2, 2, 4);
+     * jshell&gt; array2 = manager.arange(2f * 2f * 4f).reshape(2, 4, 2);
+     * jshell&gt; NDArrays.matMul(array1, array2);
+     * ND: () cpu() float32
+     * 98.
+     * </pre>
+     *
+     * @param a the {@link NDArray} to perform matrix product with
+     * @param b the {@link NDArray} to perform matrix product with
+     * @return the result {@code NDArray}
+     */
+    public static NDArray matMul(NDArray a, NDArray b) {
+        return a.matMul(b);
+    }
+
+    /**
      * Joins a sequence of {@link NDArray}s in {@link NDList} along the first axis.
      *
      * <p>Examples

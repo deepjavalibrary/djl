@@ -1460,6 +1460,15 @@ public class MxNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray matMul(NDArray other) {
+        if (isScalar() || other.isScalar()) {
+            throw new IllegalArgumentException("scalar is not allowed for matMul()");
+        }
+        return manager.invoke("_npi_matmul", new NDArray[] {this, other}, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray clip(Number min, Number max) {
         MxOpParams params = new MxOpParams();
         params.addParam("a_min", min);
