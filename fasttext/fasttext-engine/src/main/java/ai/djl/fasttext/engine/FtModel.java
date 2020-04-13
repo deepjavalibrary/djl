@@ -62,7 +62,7 @@ public class FtModel implements Model {
      * @throws IOException Exception for file loading
      */
     @Override
-    public void load(Path modelPath, String modelName, Map<String, String> options)
+    public void load(Path modelPath, String modelName, Map<String, Object> options)
             throws IOException, MalformedModelException {
         if (Files.notExists(modelPath)) {
             throw new FileNotFoundException(

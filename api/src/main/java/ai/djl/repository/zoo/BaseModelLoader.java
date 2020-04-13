@@ -101,7 +101,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
             Path modelPath = dir.resolve(relativePath);
 
             Model model = createModel(criteria.getDevice(), artifact, arguments);
-            model.load(modelPath, artifact.getName());
+            model.load(modelPath, artifact.getName(), criteria.getOptions());
 
             return new ZooModel<>(model, translator);
         } finally {

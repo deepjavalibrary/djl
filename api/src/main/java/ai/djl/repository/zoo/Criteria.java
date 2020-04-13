@@ -37,6 +37,7 @@ public class Criteria<I, O> {
     private String artifactId;
     private Map<String, String> filters;
     private Map<String, Object> arguments;
+    private Map<String, Object> options;
     private Translator<I, O> translator;
     private Progress progress;
 
@@ -50,6 +51,7 @@ public class Criteria<I, O> {
         this.artifactId = builder.artifactId;
         this.filters = builder.filters;
         this.arguments = builder.arguments;
+        this.options = builder.options;
         this.translator = builder.translator;
         this.progress = builder.progress;
     }
@@ -136,6 +138,15 @@ public class Criteria<I, O> {
     }
 
     /**
+     * Returns the model loading options.
+     *
+     * @return the model loading options
+     */
+    public Map<String, Object> getOptions() {
+        return options;
+    }
+
+    /**
      * Returns the optional {@link Translator} to be used for {@link ZooModel}.
      *
      * @return the optional {@link Translator} to be used for {@link ZooModel}
@@ -174,6 +185,7 @@ public class Criteria<I, O> {
         String artifactId;
         Map<String, String> filters;
         Map<String, Object> arguments;
+        Map<String, Object> options;
         Translator<I, O> translator;
         Progress progress;
 
@@ -190,6 +202,7 @@ public class Criteria<I, O> {
             groupId = parent.groupId;
             filters = parent.filters;
             arguments = parent.arguments;
+            options = parent.options;
             progress = parent.progress;
         }
 
@@ -316,6 +329,32 @@ public class Criteria<I, O> {
                 arguments = new HashMap<>();
             }
             arguments.put(key, value);
+            return this;
+        }
+
+        /**
+         * Sets the model loading options for this criteria.
+         *
+         * @param options the model loading options
+         * @return this {@code Builder}
+         */
+        public Builder<I, O> optOptions(Map<String, Object> options) {
+            this.options = options;
+            return this;
+        }
+
+        /**
+         * Sets the optional model loading option for this criteria.
+         *
+         * @param key the model loading option key
+         * @param value the model loading option value
+         * @return this {@code Builder}
+         */
+        public Builder<I, O> optOption(String key, Object value) {
+            if (options == null) {
+                options = new HashMap<>();
+            }
+            options.put(key, value);
             return this;
         }
 

@@ -113,7 +113,7 @@ public interface Model extends AutoCloseable {
      * @throws IOException when IO operation fails in loading a resource
      * @throws MalformedModelException if model file is corrupted
      */
-    void load(Path modelPath, String modelName, Map<String, String> options)
+    void load(Path modelPath, String modelName, Map<String, Object> options)
             throws IOException, MalformedModelException;
 
     /**

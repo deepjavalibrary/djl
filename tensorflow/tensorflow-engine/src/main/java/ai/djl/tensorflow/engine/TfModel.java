@@ -14,7 +14,6 @@ package ai.djl.tensorflow.engine;
 
 import ai.djl.BaseModel;
 import ai.djl.Device;
-import ai.djl.MalformedModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -22,11 +21,9 @@ import ai.djl.nn.Block;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
-import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,43 +51,33 @@ public class TfModel extends BaseModel {
         first = new AtomicBoolean(true);
     }
 
-    public void load(Path modelDir, String... tags) {
-        if (tags == null || tags.length == 0) {
-            tags = new String[] {"serve"};
-        }
-        SavedModelBundle bundle = SavedModelBundle.load(modelDir.toString(), tags);
-        block = new TfSymbolBlock(manager, bundle);
-    }
-
     /** {@inheritDoc} */
     @Override
-    public void load(Path modelPath, String modelName, Map<String, String> options) {
-        String[] tags;
+    public void load(Path modelPath, String modelName, Map<String, Object> options) {
         modelDir = modelPath.toAbsolutePath();
-        if (options == null || options.isEmpty()) {
+        String[] tags = null;
+        ConfigProto proto = null;
+        RunOptions runOptions = null;
+        if (options != null) {
+            tags = (String[]) options.get("Tags");
+            proto = (ConfigProto) options.get("ConfigProto");
+            runOptions = (RunOptions) options.get("RunOptions");
+        }
+        if (tags == null) {
             tags = new String[] {"serve"};
-        } else {
-            tags = options.values().toArray(new String[] {});
         }
-        load(modelPath, tags);
-    }
 
-    public void load(String modelDir, byte[] configProto, byte[] runOptions, String... tags)
-            throws MalformedModelException {
-        this.modelDir = Paths.get(modelDir);
-        try {
-            ConfigProto proto = ConfigProto.parseFrom(configProto);
-            RunOptions options = RunOptions.parseFrom(runOptions);
-            SavedModelBundle bundle =
-                    SavedModelBundle.loader(modelDir)
-                            .withConfigProto(proto)
-                            .withRunOptions(options)
-                            .withTags(tags)
-                            .load();
-            block = new TfSymbolBlock(manager, bundle);
-        } catch (InvalidProtocolBufferException e) {
-            throw new MalformedModelException("Failed to parse SavedModel", e);
+        SavedModelBundle.Loader loader =
+                SavedModelBundle.loader(modelDir.toString()).withTags(tags);
+        if (proto != null) {
+            loader.withConfigProto(proto);
         }
+        if (runOptions != null) {
+            loader.withRunOptions(runOptions);
+        }
+
+        SavedModelBundle bundle = loader.load();
+        block = new TfSymbolBlock(manager, bundle);
     }
 
     /** {@inheritDoc} */

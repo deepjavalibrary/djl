@@ -228,12 +228,12 @@ public abstract class BaseModel implements Model {
         super.finalize();
     }
 
-    protected Path paramPathResolver(Map<String, String> options) throws IOException {
+    protected Path paramPathResolver(Map<String, Object> options) throws IOException {
         Path paramFile;
         if (Files.isRegularFile(modelDir)) {
             paramFile = modelDir;
         } else {
-            String epochOption = null;
+            Object epochOption = null;
             if (options != null) {
                 epochOption = options.get("epoch");
             }
@@ -248,7 +248,7 @@ public abstract class BaseModel implements Model {
                                     + "your saved model file name.");
                 }
             } else {
-                epoch = Integer.parseInt(epochOption);
+                epoch = Integer.parseInt(epochOption.toString());
             }
 
             paramFile = modelDir.resolve(String.format("%s-%04d.params", modelName, epoch));
@@ -256,7 +256,7 @@ public abstract class BaseModel implements Model {
         return paramFile;
     }
 
-    protected boolean readParameters(Map<String, String> options)
+    protected boolean readParameters(Map<String, Object> options)
             throws IOException, MalformedModelException {
         Path paramFile = paramPathResolver(options);
         logger.debug("Try to load model from {}", paramFile);
