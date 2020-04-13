@@ -21,9 +21,11 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.imageio.ImageIO;
 
 /**
@@ -49,7 +51,11 @@ public final class BufferedImageUtils {
      * @throws IOException if file is not found
      */
     public static BufferedImage fromFile(Path path) throws IOException {
-        return ImageIO.read(path.toAbsolutePath().toFile());
+        BufferedImage image = ImageIO.read(path.toAbsolutePath().toFile());
+        if (image == null) {
+            throw new IOException("Failed to read image from: " + path);
+        }
+        return image;
     }
 
     /**
@@ -60,7 +66,11 @@ public final class BufferedImageUtils {
      * @throws IOException if url is not found
      */
     public static BufferedImage fromUrl(URL url) throws IOException {
-        return ImageIO.read(url);
+        BufferedImage image = ImageIO.read(url);
+        if (image == null) {
+            throw new IOException("Failed to read image from: " + url);
+        }
+        return image;
     }
 
     /**
@@ -71,7 +81,11 @@ public final class BufferedImageUtils {
      * @throws IOException if url is not found
      */
     public static BufferedImage fromUrl(String url) throws IOException {
-        return ImageIO.read(new URL(url));
+        URI uri = URI.create(url);
+        if (uri.isAbsolute()) {
+            return fromUrl(uri.toURL());
+        }
+        return fromFile(Paths.get(url));
     }
 
     /**
