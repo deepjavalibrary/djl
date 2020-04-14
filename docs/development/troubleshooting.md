@@ -74,8 +74,12 @@ Then, right click the `log4j2.xml` file and select `Recompile log4j2.xml`.
 ![FAQ2](https://djl-ai.s3.amazonaws.com/resources/images/FAQ_log_recompile.png)
 
 ## 3. Build fails on Windows caused by "UnsatisfiedLinkError"
-DJL requires Visual C++ Redistributable Packages. If you encounter UnsatisfiedLinkError while building DJL on Windows, please download and install [Visual C++ Redistributable Packages](https://www.microsoft.com/en-in/download/details.aspx?id=48145) and try to build again. 
-If the issue continues to persist, you can use the [docker file](../../docker/windows/Dockerfile) provided by us. Please note that this docker will only work with Windows server 2019 by default. If you want it to work with other versions of Windows, you need to pass the version as an argument as follows:
+DJL requires Visual C++ Redistributable Packages. If you encounter UnsatisfiedLinkError while building
+DJL on Windows, please download and install
+[Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) and reboot. 
+If the issue continues to persist, you can use the [docker file](../../docker/windows/Dockerfile) provided by us.
+Please note that this docker will only work with Windows server 2019 by default. If you want it to work with other
+versions of Windows, you need to pass the version as an argument as follows:
 ```
 docker build --build-arg version=<YOUR_VERSION>
 ``` 
