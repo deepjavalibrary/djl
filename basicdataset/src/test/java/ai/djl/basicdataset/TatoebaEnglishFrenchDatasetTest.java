@@ -13,7 +13,6 @@
 package ai.djl.basicdataset;
 
 import ai.djl.modality.nlp.embedding.EmbeddingException;
-import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.dataset.Record;
@@ -34,7 +33,6 @@ public class TatoebaEnglishFrenchDatasetTest {
                                     TestUtils.getTextEmbedding(manager, EMBEDDING_SIZE), false)
                             .optTargetTextEmbedding(
                                     TestUtils.getTextEmbedding(manager, EMBEDDING_SIZE), false)
-                            .setTokenizer(new SimpleTokenizer())
                             .setValidLength(true)
                             .setSampling(32, true)
                             .build();
@@ -55,7 +53,6 @@ public class TatoebaEnglishFrenchDatasetTest {
             TatoebaEnglishFrenchDataset tatoebaEnglishFrenchDataset =
                     TatoebaEnglishFrenchDataset.builder()
                             .optEmbeddingSize(EMBEDDING_SIZE)
-                            .setTokenizer(new SimpleTokenizer())
                             .setValidLength(false)
                             .setSampling(32, true)
                             .build();

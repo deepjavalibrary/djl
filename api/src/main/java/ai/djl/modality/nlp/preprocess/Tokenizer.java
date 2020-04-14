@@ -12,12 +12,23 @@
  */
 package ai.djl.modality.nlp.preprocess;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * {@code Tokenizer} interface provides the ability to break-down sentences into embeddable tokens.
  */
-public interface Tokenizer {
+public interface Tokenizer extends TextProcessor {
+
+    /** {@inheritDoc} */
+    @Override
+    default List<String> preprocess(List<String> tokens) {
+        List<String> result = new ArrayList<>();
+        for (String toTokenize : tokens) {
+            result.addAll(tokenize(toTokenize));
+        }
+        return result;
+    }
 
     /**
      * Breaks down the given sentence into a list of tokens that can be represented by embeddings.

@@ -19,11 +19,11 @@ import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.VocabWordEmbedding;
 import ai.djl.modality.nlp.preprocess.SentenceLengthNormalizer;
 import ai.djl.modality.nlp.preprocess.TextProcessor;
-import ai.djl.modality.nlp.preprocess.Tokenizer;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -37,7 +37,6 @@ public class TextData {
     private List<TextProcessor> textProcessors;
     private TextEmbedding textEmbedding;
     private boolean includeValidLength;
-    private Tokenizer tokenizer;
     private boolean trainEmbedding;
     private int embeddingSize;
 
@@ -89,7 +88,7 @@ public class TextData {
         }
         size = textData.size();
         for (String textDatum : newTextData) {
-            List<String> tokens = tokenizer.tokenize(textDatum);
+            List<String> tokens = Collections.singletonList(textDatum);
             for (TextProcessor processor : textProcessors) {
                 tokens = processor.preprocess(tokens);
                 if (processor instanceof SentenceLengthNormalizer) {
@@ -142,15 +141,6 @@ public class TextData {
      */
     public void setIncludeValidLength(boolean includeValidLength) {
         this.includeValidLength = includeValidLength;
-    }
-
-    /**
-     * Sets the tokenizer.
-     *
-     * @param tokenizer the new tokenizer
-     */
-    public void setTokenizer(Tokenizer tokenizer) {
-        this.tokenizer = tokenizer;
     }
 
     /**

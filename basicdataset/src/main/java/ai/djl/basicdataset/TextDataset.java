@@ -21,8 +21,8 @@ import ai.djl.modality.nlp.embedding.VocabWordEmbedding;
 import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
 import ai.djl.modality.nlp.preprocess.PunctuationSeparator;
 import ai.djl.modality.nlp.preprocess.SentenceLengthNormalizer;
+import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.modality.nlp.preprocess.TextProcessor;
-import ai.djl.modality.nlp.preprocess.Tokenizer;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.RandomAccessDataset;
@@ -59,7 +59,6 @@ public abstract class TextDataset extends RandomAccessDataset {
         sourceTextData.setTextEmbedding(builder.sourceTextEmbedding);
         sourceTextData.setTrainEmbedding(builder.trainSourceEmbedding);
         sourceTextData.setIncludeValidLength(builder.includeValidLength);
-        sourceTextData.setTokenizer(builder.tokenizer);
         sourceTextData.setEmbeddingSize(builder.embeddingSize);
         sourceTextData.setTextProcessors(builder.sourceTextProcessors);
 
@@ -67,7 +66,6 @@ public abstract class TextDataset extends RandomAccessDataset {
         targetTextData.setTextEmbedding(builder.targetTextEmbedding);
         targetTextData.setTrainEmbedding(builder.trainTargetEmbedding);
         targetTextData.setIncludeValidLength(builder.includeValidLength);
-        targetTextData.setTokenizer(builder.tokenizer);
         targetTextData.setEmbeddingSize(builder.embeddingSize);
         targetTextData.setTextProcessors(builder.targetTextProcessors);
     }
@@ -98,15 +96,16 @@ public abstract class TextDataset extends RandomAccessDataset {
         protected boolean trainSourceEmbedding;
         protected boolean trainTargetEmbedding;
         protected boolean includeValidLength;
-        protected Tokenizer tokenizer;
         protected int embeddingSize;
         protected List<TextProcessor> sourceTextProcessors =
                 Arrays.asList(
+                        new SimpleTokenizer(),
                         new LowerCaseConvertor(Locale.ENGLISH),
                         new PunctuationSeparator(),
                         new SentenceLengthNormalizer(10, false));
         protected List<TextProcessor> targetTextProcessors =
                 Arrays.asList(
+                        new SimpleTokenizer(),
                         new LowerCaseConvertor(Locale.ENGLISH),
                         new PunctuationSeparator(),
                         new SentenceLengthNormalizer(12, true));
@@ -162,17 +161,6 @@ public abstract class TextDataset extends RandomAccessDataset {
          */
         public T setValidLength(boolean includeValidLength) {
             this.includeValidLength = includeValidLength;
-            return self();
-        }
-
-        /**
-         * Sets a {@link Tokenizer} to tokenize the input sentences.
-         *
-         * @param tokenizer the {@link Tokenizer} to be set
-         * @return this builder
-         */
-        public T setTokenizer(Tokenizer tokenizer) {
-            this.tokenizer = tokenizer;
             return self();
         }
 

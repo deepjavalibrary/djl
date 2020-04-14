@@ -12,7 +12,6 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
@@ -33,7 +32,6 @@ public class StanfordMovieReviewTest {
                                     TestUtils.getTextEmbedding(manager, EMBEDDING_SIZE), false)
                             .optTargetTextEmbedding(
                                     TestUtils.getTextEmbedding(manager, EMBEDDING_SIZE), false)
-                            .setTokenizer(new SimpleTokenizer())
                             .setValidLength(true)
                             .setSampling(32, true)
                             .build();
@@ -52,7 +50,6 @@ public class StanfordMovieReviewTest {
             StanfordMovieReview dataset =
                     StanfordMovieReview.builder()
                             .optEmbeddingSize(EMBEDDING_SIZE)
-                            .setTokenizer(new SimpleTokenizer())
                             .setValidLength(false)
                             .setSampling(32, true)
                             .build();
