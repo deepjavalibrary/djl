@@ -16,6 +16,7 @@ import ai.djl.util.Hex;
 import ai.djl.util.Progress;
 import ai.djl.util.Utils;
 import ai.djl.util.ZipUtils;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -31,6 +32,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 /**
  * The {@code AbstractRepository} is the shared base for implementers of the {@link Repository}
@@ -163,35 +167,72 @@ public abstract class AbstractRepository implements Repository {
         }
 
         try (InputStream is = fileUri.toURL().openStream()) {
-            ProgressInputStream pis = new ProgressInputStream(is, progress);
-            String fileName = item.getName();
-            String extension = item.getExtension();
-            if ("dir".equals(item.getType())) {
-                Path dir;
-                if (!fileName.isEmpty()) {
-                    // honer the name set in metadata.json
-                    dir = tmp.resolve(fileName);
-                    Files.createDirectories(dir);
-                } else {
-                    dir = tmp;
-                }
-                if (!"zip".equals(extension)) {
-                    throw new IOException("File type is not supported: " + extension);
-                }
-                ZipUtils.unzip(pis, dir);
+            save(is, tmp, baseUri, item, progress);
+        }
+    }
+
+    protected void save(
+            InputStream is, Path tmp, URI baseUri, Artifact.Item item, Progress progress)
+            throws IOException {
+        ProgressInputStream pis = new ProgressInputStream(is, progress);
+        String fileName = item.getName();
+        String extension = item.getExtension();
+        if ("dir".equals(item.getType())) {
+            Path dir;
+            if (!fileName.isEmpty()) {
+                // honer the name set in metadata.json
+                dir = tmp.resolve(fileName);
+                Files.createDirectories(dir);
             } else {
-                Path file = tmp.resolve(fileName);
-                if ("zip".equals(extension)) {
-                    ZipInputStream zis = new ZipInputStream(pis);
-                    zis.getNextEntry();
-                    Files.copy(zis, file);
-                } else if ("gzip".equals(extension)) {
-                    Files.copy(new GZIPInputStream(pis), file);
+                dir = tmp;
+            }
+            if ("zip".equals(extension)) {
+                ZipUtils.unzip(pis, dir);
+            } else if ("tgz".equals(extension)) {
+                untar(pis, dir, true);
+            } else if ("tar".equals(extension)) {
+                untar(pis, dir, false);
+            } else {
+                throw new IOException("File type is not supported: " + extension);
+            }
+        } else {
+            Path file = tmp.resolve(fileName);
+            if ("zip".equals(extension)) {
+                ZipInputStream zis = new ZipInputStream(pis);
+                zis.getNextEntry();
+                Files.copy(zis, file);
+            } else if ("gzip".equals(extension)) {
+                Files.copy(new GZIPInputStream(pis), file);
+            } else {
+                Files.copy(pis, file);
+            }
+        }
+        pis.validateChecksum(item);
+    }
+
+    private void untar(InputStream is, Path dir, boolean gzip) throws IOException {
+        InputStream bis;
+        if (gzip) {
+            bis = new GzipCompressorInputStream(new BufferedInputStream(is));
+        } else {
+            bis = new BufferedInputStream(is);
+        }
+        try (TarArchiveInputStream tis = new TarArchiveInputStream(bis)) {
+            TarArchiveEntry entry;
+            while ((entry = tis.getNextTarEntry()) != null) {
+                Path file = dir.resolve(entry.getName()).toAbsolutePath();
+                if (entry.isDirectory()) {
+                    Files.createDirectories(file);
                 } else {
-                    Files.copy(pis, file);
+                    Path parentFile = file.getParent();
+                    if (parentFile == null) {
+                        throw new AssertionError(
+                                "Parent path should never be null: " + file.toString());
+                    }
+                    Files.createDirectories(parentFile);
+                    Files.copy(tis, file);
                 }
             }
-            pis.validateChecksum(item);
         }
     }
 
@@ -199,7 +240,7 @@ public abstract class AbstractRepository implements Repository {
      * A {@code ProgressInputStream} is a wrapper around an {@link InputStream} that also uses
      * {@link Progress}.
      */
-    protected static final class ProgressInputStream extends InputStream {
+    private static final class ProgressInputStream extends InputStream {
 
         private DigestInputStream dis;
         private Progress progress;
@@ -246,6 +287,11 @@ public abstract class AbstractRepository implements Repository {
         }
 
         private void validateChecksum(Artifact.Item item) throws IOException {
+            String expectedHash = item.getSha1Hash();
+            if (expectedHash == null) {
+                return;
+            }
+
             // drain InputSteam to get correct sha1 hash
             Utils.toByteArray(dis);
             String sha1 = Hex.toHexString(dis.getMessageDigest().digest());

@@ -9,7 +9,6 @@ group "ai.djl.aws"
 dependencies {
     api platform("software.amazon.awssdk:bom:2.11.9")
     api "software.amazon.awssdk:s3"
-    api "org.apache.commons:commons-compress:1.20"
     api project(":api")
 
     testImplementation project(":mxnet:mxnet-engine")

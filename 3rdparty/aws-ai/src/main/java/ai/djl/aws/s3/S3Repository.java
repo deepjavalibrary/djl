@@ -19,22 +19,13 @@ import ai.djl.repository.MRL;
 import ai.djl.repository.Metadata;
 import ai.djl.repository.Repository;
 import ai.djl.util.Progress;
-import ai.djl.util.ZipUtils;
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipInputStream;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -130,39 +121,7 @@ public class S3Repository extends AbstractRepository {
         String key = item.getUri();
         GetObjectRequest req = GetObjectRequest.builder().bucket(bucket).key(key).build();
         try (ResponseInputStream<GetObjectResponse> is = client.getObject(req)) {
-            ProgressInputStream pis = new ProgressInputStream(is, progress);
-            String fileName = item.getName();
-            String extension = item.getExtension();
-            if ("dir".equals(item.getType())) {
-                Path dir;
-                if (!fileName.isEmpty()) {
-                    // honer the name set in metadata.json
-                    dir = tmp.resolve(fileName);
-                    Files.createDirectories(dir);
-                } else {
-                    dir = tmp;
-                }
-                if ("zip".equals(extension)) {
-                    ZipUtils.unzip(pis, dir);
-                } else if ("tgz".equals(extension)) {
-                    untar(pis, dir, true);
-                } else if ("tar".equals(extension)) {
-                    untar(pis, dir, false);
-                } else {
-                    throw new IOException("File type is not supported: " + extension);
-                }
-            } else {
-                Path file = tmp.resolve(fileName);
-                if ("zip".equals(extension)) {
-                    ZipInputStream zis = new ZipInputStream(pis);
-                    zis.getNextEntry();
-                    Files.copy(zis, file);
-                } else if ("gzip".equals(extension)) {
-                    Files.copy(new GZIPInputStream(pis), file);
-                } else {
-                    Files.copy(pis, file);
-                }
-            }
+            save(is, tmp, baseUri, item, progress);
         }
     }
 
@@ -238,31 +197,5 @@ public class S3Repository extends AbstractRepository {
         }
         artifact.setFiles(files);
         return artifact;
-    }
-
-    private void untar(InputStream is, Path dir, boolean gzip) throws IOException {
-        InputStream bis;
-        if (gzip) {
-            bis = new GzipCompressorInputStream(new BufferedInputStream(is));
-        } else {
-            bis = new BufferedInputStream(is);
-        }
-        try (TarArchiveInputStream tis = new TarArchiveInputStream(bis)) {
-            TarArchiveEntry entry;
-            while ((entry = tis.getNextTarEntry()) != null) {
-                Path file = dir.resolve(entry.getName()).toAbsolutePath();
-                if (entry.isDirectory()) {
-                    Files.createDirectories(file);
-                } else {
-                    Path parentFile = file.getParent();
-                    if (parentFile == null) {
-                        throw new AssertionError(
-                                "Parent path should never be null: " + file.toString());
-                    }
-                    Files.createDirectories(parentFile);
-                    Files.copy(tis, file);
-                }
-            }
-        }
     }
 }
