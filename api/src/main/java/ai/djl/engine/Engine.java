@@ -56,9 +56,7 @@ public abstract class Engine {
         }
 
         String defaultEngine = System.getenv("DJL_DEFAULT_ENGINE");
-        if (defaultEngine == null || defaultEngine.isEmpty()) {
-            defaultEngine = System.getProperty("ai.djl.default_engine");
-        }
+        defaultEngine = System.getProperty("ai.djl.default_engine", defaultEngine);
         if (defaultEngine == null || defaultEngine.isEmpty()) {
             if (ALL_ENGINES.size() > 1) {
                 logger.warn("More than one deep learning engines found.");
@@ -91,7 +89,7 @@ public abstract class Engine {
                             + System.lineSeparator()
                             + "Please refer to https://github.com/awslabs/djl/blob/master/docs/development/troubleshooting.md for more details.");
         }
-        return getEngine(DEFAULT_ENGINE);
+        return getEngine(System.getProperty("ai.djl.default_engine", DEFAULT_ENGINE));
     }
 
     /**
