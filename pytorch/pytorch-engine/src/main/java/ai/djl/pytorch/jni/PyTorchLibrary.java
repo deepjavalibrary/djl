@@ -277,6 +277,27 @@ final class PyTorchLibrary {
 
     native Pointer torchNNRelu(Pointer handle);
 
+    native Pointer torchNNConvNd(
+            int dim,
+            Pointer inputHandle,
+            Pointer weightHandle,
+            Pointer biasHandle,
+            long[] stride,
+            long[] pad,
+            long[] dilation,
+            int numGroup,
+            boolean bias);
+
+    native Pointer torchNNBatchNorm(
+            Pointer inputHandle,
+            Pointer weigthHandle,
+            Pointer biasHandle,
+            Pointer runningMeanHandle,
+            Pointer runningVarHandle,
+            boolean isTraining,
+            double momentum,
+            double eps);
+
     native Pointer moduleLoad(String path, int[] device);
 
     native void moduleEval(Pointer handle);

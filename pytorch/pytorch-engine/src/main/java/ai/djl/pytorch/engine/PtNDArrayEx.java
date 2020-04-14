@@ -291,7 +291,17 @@ public class PtNDArrayEx implements NDArrayEx {
             String layout,
             boolean noBias,
             PairList<String, Object> additional) {
-        throw new UnsupportedOperationException("Not implemented");
+        // TODO: numFilters and kernel not used
+        return new NDList(
+                JniUtils.convolution(
+                        (PtNDArray) inputs.get(0),
+                        (PtNDArray) inputs.get(1),
+                        noBias ? null : (PtNDArray) inputs.get(2),
+                        stride,
+                        pad,
+                        dilate,
+                        numGroups,
+                        noBias));
     }
 
     /** {@inheritDoc} */
@@ -306,7 +316,7 @@ public class PtNDArrayEx implements NDArrayEx {
                 JniUtils.fullyConnected(
                         (PtNDArray) inputs.get(0),
                         (PtNDArray) inputs.get(1),
-                        (PtNDArray) inputs.get(2),
+                        noBias ? null : (PtNDArray) inputs.get(2),
                         noBias);
         if (flatten) {
             long batchSize = result.getShape().get(0);
@@ -353,7 +363,18 @@ public class PtNDArrayEx implements NDArrayEx {
             boolean center,
             boolean scale,
             PairList<String, Object> additional) {
-        throw new UnsupportedOperationException("Not implemented");
+        // TODO: modify for training model
+        // TODO: axis center and scale are not used
+        return new NDList(
+                JniUtils.batchNorm(
+                        (PtNDArray) inputs.get(0),
+                        (PtNDArray) inputs.get(1),
+                        (PtNDArray) inputs.get(2),
+                        (PtNDArray) inputs.get(3),
+                        (PtNDArray) inputs.get(4),
+                        false,
+                        momentum,
+                        epsilon));
     }
 
     /** {@inheritDoc} */

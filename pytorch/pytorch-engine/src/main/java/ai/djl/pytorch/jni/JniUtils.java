@@ -695,12 +695,58 @@ public final class JniUtils {
                         PyTorchLibrary.LIB.torchNNLinear(
                                 ndArray.getHandle(),
                                 weight.getHandle(),
-                                bias.getHandle(),
+                                noBias ? null : bias.getHandle(),
                                 !noBias));
     }
 
     public static PtNDArray relu(PtNDArray ndArray) {
         return ndArray.getManager().create(PyTorchLibrary.LIB.torchNNRelu(ndArray.getHandle()));
+    }
+
+    public static PtNDArray convolution(
+            PtNDArray ndArray,
+            PtNDArray weight,
+            PtNDArray bias,
+            Shape stride,
+            Shape pad,
+            Shape dilation,
+            int numGroup,
+            boolean noBias) {
+        int dim = stride.dimension();
+        return ndArray.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchNNConvNd(
+                                dim,
+                                ndArray.getHandle(),
+                                weight.getHandle(),
+                                noBias ? null : bias.getHandle(),
+                                stride.getShape(),
+                                pad.getShape(),
+                                dilation.getShape(),
+                                numGroup,
+                                !noBias));
+    }
+
+    public static PtNDArray batchNorm(
+            PtNDArray ndArray,
+            PtNDArray gamma,
+            PtNDArray beta,
+            PtNDArray runningMean,
+            PtNDArray runningVar,
+            boolean isTraining,
+            double momentum,
+            double eps) {
+        return ndArray.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchNNBatchNorm(
+                                ndArray.getHandle(),
+                                gamma.getHandle(),
+                                beta.getHandle(),
+                                runningMean.getHandle(),
+                                runningVar.getHandle(),
+                                isTraining,
+                                momentum,
+                                eps));
     }
 
     public static DataType getDataType(PtNDArray ndArray) {
