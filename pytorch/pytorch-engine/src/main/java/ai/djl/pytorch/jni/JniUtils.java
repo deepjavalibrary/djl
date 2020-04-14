@@ -688,6 +688,21 @@ public final class JniUtils {
                                 ndArray.getHandle(), size, alignCorners));
     }
 
+    public static PtNDArray fullyConnected(
+            PtNDArray ndArray, PtNDArray weight, PtNDArray bias, boolean noBias) {
+        return ndArray.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchNNLinear(
+                                ndArray.getHandle(),
+                                weight.getHandle(),
+                                bias.getHandle(),
+                                !noBias));
+    }
+
+    public static PtNDArray relu(PtNDArray ndArray) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchNNRelu(ndArray.getHandle()));
+    }
+
     public static DataType getDataType(PtNDArray ndArray) {
         int dataType = PyTorchLibrary.LIB.torchDType(ndArray.getHandle());
         return DataType.values()[dataType];

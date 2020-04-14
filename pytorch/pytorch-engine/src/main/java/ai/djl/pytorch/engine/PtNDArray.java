@@ -837,7 +837,8 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDList split(long sections, int axis) {
-        return JniUtils.split(this, sections, axis);
+        long size = getShape().get(axis) / sections;
+        return JniUtils.split(this, size, axis);
     }
 
     /** {@inheritDoc} */

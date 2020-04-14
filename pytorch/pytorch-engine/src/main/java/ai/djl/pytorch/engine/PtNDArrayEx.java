@@ -124,7 +124,7 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public PtNDArray relu() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.relu(array);
     }
 
     /** {@inheritDoc} */
@@ -302,7 +302,17 @@ public class PtNDArrayEx implements NDArrayEx {
             boolean flatten,
             boolean noBias,
             PairList<String, Object> additional) {
-        throw new UnsupportedOperationException("Not implemented");
+        NDArray result =
+                JniUtils.fullyConnected(
+                        (PtNDArray) inputs.get(0),
+                        (PtNDArray) inputs.get(1),
+                        (PtNDArray) inputs.get(2),
+                        noBias);
+        if (flatten) {
+            long batchSize = result.getShape().get(0);
+            result = result.reshape(batchSize, outChannels);
+        }
+        return new NDList(result);
     }
 
     /** {@inheritDoc} */
