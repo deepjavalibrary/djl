@@ -101,11 +101,7 @@ public class SimpleRepository extends AbstractRepository {
         }
 
         Artifact artifact = new Artifact();
-        if (name == null) {
-            artifact.setName(file.getName());
-        } else {
-            artifact.setName(name);
-        }
+        artifact.setName(file.getName());
         Map<String, Item> files = new ConcurrentHashMap<>();
         if (file.isDirectory()) {
             File[] fileList = file.listFiles();
@@ -133,13 +129,12 @@ public class SimpleRepository extends AbstractRepository {
         if (artifacts.isEmpty()) {
             return null;
         }
-        // TODO: find highest version.
         return artifacts.get(0);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Path getResourceDirectory(Artifact artifact) throws IOException {
+    public Path getResourceDirectory(Artifact artifact) {
         return path;
     }
 
