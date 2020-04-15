@@ -13,22 +13,16 @@
 package ai.djl.basicdataset;
 
 import ai.djl.basicdataset.utils.TextData;
+import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
-import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
-import ai.djl.modality.nlp.preprocess.PunctuationSeparator;
-import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
-import ai.djl.modality.nlp.preprocess.TextProcessor;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.RandomAccessDataset;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * {@code TextDataset} is an abstract dataset that can be used for datasets for natural language
@@ -53,17 +47,12 @@ public abstract class TextDataset extends RandomAccessDataset {
      */
     public TextDataset(Builder<?> builder) {
         super(builder);
-        sourceTextData = new TextData();
-        sourceTextData.setTextEmbedding(builder.sourceTextEmbedding);
-        sourceTextData.setTrainEmbedding(builder.trainSourceEmbedding);
-        sourceTextData.setEmbeddingSize(builder.embeddingSize);
-        sourceTextData.setTextProcessors(builder.sourceTextProcessors);
-
-        targetTextData = new TextData();
-        targetTextData.setTextEmbedding(builder.targetTextEmbedding);
-        targetTextData.setTrainEmbedding(builder.trainTargetEmbedding);
-        targetTextData.setEmbeddingSize(builder.embeddingSize);
-        targetTextData.setTextProcessors(builder.targetTextProcessors);
+        sourceTextData =
+                new TextData(
+                        TextData.getDefaultConfiguration().update(builder.sourceConfiguration));
+        targetTextData =
+                new TextData(
+                        TextData.getDefaultConfiguration().update(builder.targetConfiguration));
     }
 
     protected NDList embedText(long index, NDManager manager, boolean source)
@@ -97,7 +86,7 @@ public abstract class TextDataset extends RandomAccessDataset {
 
     /**
      * Performs pre-processing steps on text data such as tokenising, applying {@link
-     * TextProcessor}s, creating vocabulary, and word embeddings.
+     * ai.djl.modality.nlp.preprocess.TextProcessor}s, creating vocabulary, and word embeddings.
      *
      * @param newTextData list of all unprocessed sentences in the dataset
      * @param source whether the text data provided is source or target
@@ -110,116 +99,28 @@ public abstract class TextDataset extends RandomAccessDataset {
     /** Abstract Builder that helps build a {@link TextDataset}. */
     public abstract static class Builder<T extends Builder<T>> extends BaseBuilder<T> {
 
-        protected TextEmbedding sourceTextEmbedding;
-        protected TextEmbedding targetTextEmbedding;
-        protected boolean trainSourceEmbedding;
-        protected boolean trainTargetEmbedding;
-        protected int embeddingSize;
-        protected List<TextProcessor> sourceTextProcessors =
-                Arrays.asList(
-                        new SimpleTokenizer(),
-                        new LowerCaseConvertor(Locale.ENGLISH),
-                        new PunctuationSeparator());
-        protected List<TextProcessor> targetTextProcessors =
-                Arrays.asList(
-                        new SimpleTokenizer(),
-                        new LowerCaseConvertor(Locale.ENGLISH),
-                        new LowerCaseConvertor(Locale.ENGLISH),
-                        new PunctuationSeparator());
+        private TextData.Configuration sourceConfiguration;
+        private TextData.Configuration targetConfiguration;
 
         /**
-         * Sets the required implementation of {@link TextEmbedding} to get the embeddings for the
-         * source.
+         * Sets the {@link TextData.Configuration} to use for the source text data.
          *
-         * @param textEmbedding the implementation of {@link TextEmbedding} to source the embeddings
-         *     from
-         * @param trainSourceEmbedding whether the embeddings need further training
+         * @param sourceConfiguration the {@link TextData.Configuration}
          * @return this builder
          */
-        public T optSourceTextEmbedding(TextEmbedding textEmbedding, boolean trainSourceEmbedding) {
-            this.sourceTextEmbedding = textEmbedding;
-            this.trainSourceEmbedding = trainSourceEmbedding;
+        public T setSourceConfiguration(Configuration sourceConfiguration) {
+            this.sourceConfiguration = sourceConfiguration;
             return self();
         }
 
         /**
-         * Sets the required implementation of {@link TextEmbedding} to get the embeddings for the
-         * target.
+         * Sets the {@link TextData.Configuration} to use for the target text data.
          *
-         * @param textEmbedding the implementation of {@link TextEmbedding} to source the embeddings
-         *     from
-         * @param trainSourceEmbedding whether the embeddings need further training
+         * @param targetConfiguration the {@link TextData.Configuration}
          * @return this builder
          */
-        public T optTargetTextEmbedding(TextEmbedding textEmbedding, boolean trainSourceEmbedding) {
-            this.targetTextEmbedding = textEmbedding;
-            this.trainTargetEmbedding = trainSourceEmbedding;
-            return self();
-        }
-
-        /**
-         * Sets the size of the embeddings. This value must be set if pre-trained {@link
-         * TextEmbedding} are not set
-         *
-         * @param embeddingSize the size of the embeddings
-         * @return this builder
-         */
-        public T optEmbeddingSize(int embeddingSize) {
-            this.embeddingSize = embeddingSize;
-            return self();
-        }
-
-        /**
-         * Sets the list of {@link TextProcessor}s to be used on the source input. The order of
-         * {@link TextProcessor} in the list can make a difference.
-         *
-         * @param sourceTextProcessors the list of {@link TextProcessor}s to be set
-         * @return this builder
-         */
-        public T optSourceTextProcessors(List<TextProcessor> sourceTextProcessors) {
-            this.sourceTextProcessors = sourceTextProcessors;
-            return self();
-        }
-
-        /**
-         * Sets a {@link TextProcessor} to be used on the source input. The order in which {@link
-         * TextProcessor} is added can make a difference.
-         *
-         * @param sourceTextProcessor the {@link TextProcessor} to be set
-         * @return this builder
-         */
-        public T addSourceTextProcessor(TextProcessor sourceTextProcessor) {
-            if (sourceTextProcessors == null) {
-                sourceTextProcessors = new ArrayList<>();
-            }
-            sourceTextProcessors.add(sourceTextProcessor);
-            return self();
-        }
-
-        /**
-         * Sets the list of {@link TextProcessor}s to be used on the target. The order of {@link
-         * TextProcessor} * in the list can make a difference.
-         *
-         * @param targetTextProcessors the list of {@link TextProcessor}s to be set
-         * @return this builder
-         */
-        public T optTargetTextProcessors(List<TextProcessor> targetTextProcessors) {
-            this.targetTextProcessors = targetTextProcessors;
-            return self();
-        }
-
-        /**
-         * Adds a {@link TextProcessor} to the existing list of {@link TextProcessor} to be used on
-         * the target. The order in which {@link TextProcessor} is added can make a difference.
-         *
-         * @param targetTextProcessor the {@link TextProcessor} to be set
-         * @return this builder
-         */
-        public T addTargetTextProcessor(TextProcessor targetTextProcessor) {
-            if (targetTextProcessors == null) {
-                targetTextProcessors = new ArrayList<>();
-            }
-            targetTextProcessors.add(targetTextProcessor);
+        public T setTargetConfiguration(Configuration targetConfiguration) {
+            this.targetConfiguration = targetConfiguration;
             return self();
         }
     }

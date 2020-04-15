@@ -17,6 +17,9 @@ import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableTextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
+import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
+import ai.djl.modality.nlp.preprocess.PunctuationSeparator;
+import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.modality.nlp.preprocess.TextProcessor;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -24,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * {@link TextData} is a utility for managing textual data within a {@link
@@ -41,6 +45,36 @@ public class TextData {
 
     private List<List<String>> textData;
     private int size;
+
+    /**
+     * Constructs a new {@link TextData}.
+     *
+     * @param config the configuration for the {@link TextData}
+     */
+    public TextData(Configuration config) {
+        this.textProcessors = config.textProcessors;
+        this.textEmbedding = config.textEmbedding;
+        this.trainEmbedding = config.trainEmbedding;
+        this.embeddingSize = config.embeddingSize;
+    }
+
+    /**
+     * Returns a good default {@link Configuration} to use for the constructor with defaults.
+     *
+     * @return a good default {@link Configuration} to use for the constructor with defaults
+     */
+    public static Configuration getDefaultConfiguration() {
+        List<TextProcessor> defaultTextProcessors =
+                Arrays.asList(
+                        new SimpleTokenizer(),
+                        new LowerCaseConvertor(Locale.ENGLISH),
+                        new PunctuationSeparator());
+
+        return new TextData.Configuration()
+                .setEmbeddingSize(15)
+                .setTrainEmbedding(false)
+                .setTextProcessors(defaultTextProcessors);
+    }
 
     /**
      * Embds the text at a given index to an NDList.
@@ -171,5 +205,75 @@ public class TextData {
      */
     public int getSize() {
         return size;
+    }
+
+    /**
+     * The configuration for creating a {@link TextData} value in a {@link
+     * ai.djl.training.dataset.Dataset}.
+     */
+    public static final class Configuration {
+
+        private List<TextProcessor> textProcessors;
+        private TextEmbedding textEmbedding;
+        private Boolean trainEmbedding;
+        private Integer embeddingSize;
+
+        /**
+         * Sets the {@link TextProcessor}s to use for the text data.
+         *
+         * @param textProcessors the {@link TextProcessor}s
+         * @return this configuration
+         */
+        public Configuration setTextProcessors(List<TextProcessor> textProcessors) {
+            this.textProcessors = textProcessors;
+            return this;
+        }
+
+        /**
+         * Sets the {@link TextEmbedding} to use to embed the text data.
+         *
+         * @param textEmbedding the {@link TextEmbedding}
+         * @return this configuration
+         */
+        public Configuration setTextEmbedding(TextEmbedding textEmbedding) {
+            this.textEmbedding = textEmbedding;
+            return this;
+        }
+
+        /**
+         * Sets whether to train the {@link TextEmbedding}.
+         *
+         * @param trainEmbedding true to train the {@link TextEmbedding}
+         * @return this configuration
+         */
+        public Configuration setTrainEmbedding(boolean trainEmbedding) {
+            this.trainEmbedding = trainEmbedding;
+            return this;
+        }
+
+        /**
+         * Sets the size for new {@link TextEmbedding}s.
+         *
+         * @param embeddingSize the embedding size
+         * @return this configuration
+         */
+        public Configuration setEmbeddingSize(int embeddingSize) {
+            this.embeddingSize = embeddingSize;
+            return this;
+        }
+
+        /**
+         * Updates this {@link Configuration} with the non-null values from another configuration.
+         *
+         * @param other the other configuration to use to update this
+         * @return this configuration after updating
+         */
+        public Configuration update(Configuration other) {
+            textProcessors = other.textProcessors != null ? other.textProcessors : textProcessors;
+            textEmbedding = other.textEmbedding != null ? other.textEmbedding : textEmbedding;
+            trainEmbedding = other.trainEmbedding != null ? other.trainEmbedding : trainEmbedding;
+            embeddingSize = other.embeddingSize != null ? other.embeddingSize : embeddingSize;
+            return this;
+        }
     }
 }

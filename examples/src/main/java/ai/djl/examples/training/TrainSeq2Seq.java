@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicdataset.TatoebaEnglishFrenchDataset;
 import ai.djl.basicdataset.TextDataset;
+import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.basicmodelzoo.nlp.SimpleSequenceDecoder;
 import ai.djl.basicmodelzoo.nlp.SimpleSequenceEncoder;
 import ai.djl.examples.training.util.Arguments;
@@ -145,7 +146,8 @@ public final class TrainSeq2Seq {
                                         .optIncludeValidLengths(true)
                                         .addPad(0, 0, (m) -> m.zeros(new Shape(1)))
                                         .build())
-                        .optEmbeddingSize(32)
+                        .setSourceConfiguration(new Configuration().setEmbeddingSize(32))
+                        .setTargetConfiguration(new Configuration().setEmbeddingSize(32))
                         .optUsage(usage)
                         .optLimit(arguments.getLimit())
                         .build();

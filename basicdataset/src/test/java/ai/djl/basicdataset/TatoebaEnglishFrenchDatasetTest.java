@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.Record;
@@ -28,10 +29,16 @@ public class TatoebaEnglishFrenchDatasetTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             TatoebaEnglishFrenchDataset tatoebaEnglishFrenchDataset =
                     TatoebaEnglishFrenchDataset.builder()
-                            .optSourceTextEmbedding(
-                                    TestUtils.getTextEmbedding(manager, EMBEDDING_SIZE), false)
-                            .optTargetTextEmbedding(
-                                    TestUtils.getTextEmbedding(manager, EMBEDDING_SIZE), false)
+                            .setSourceConfiguration(
+                                    new Configuration()
+                                            .setTextEmbedding(
+                                                    TestUtils.getTextEmbedding(
+                                                            manager, EMBEDDING_SIZE)))
+                            .setTargetConfiguration(
+                                    new Configuration()
+                                            .setTextEmbedding(
+                                                    TestUtils.getTextEmbedding(
+                                                            manager, EMBEDDING_SIZE)))
                             .setSampling(32, true)
                             .build();
             tatoebaEnglishFrenchDataset.prepare();
@@ -48,9 +55,21 @@ public class TatoebaEnglishFrenchDatasetTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             TatoebaEnglishFrenchDataset tatoebaEnglishFrenchDataset =
                     TatoebaEnglishFrenchDataset.builder()
-                            .optEmbeddingSize(EMBEDDING_SIZE)
+                            .setSourceConfiguration(
+                                    new Configuration()
+                                            .setTextEmbedding(
+                                                    TestUtils.getTextEmbedding(
+                                                            manager, EMBEDDING_SIZE))
+                                            .setEmbeddingSize(EMBEDDING_SIZE)
+                                            .setTrainEmbedding(true))
+                            .setTargetConfiguration(
+                                    new Configuration()
+                                            .setTextEmbedding(
+                                                    TestUtils.getTextEmbedding(
+                                                            manager, EMBEDDING_SIZE))
+                                            .setEmbeddingSize(EMBEDDING_SIZE)
+                                            .setTrainEmbedding(true))
                             .setSampling(32, true)
-                            .optEmbeddingSize(15)
                             .build();
             tatoebaEnglishFrenchDataset.prepare();
 
