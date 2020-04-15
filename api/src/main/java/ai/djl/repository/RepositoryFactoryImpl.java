@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,8 +31,9 @@ class RepositoryFactoryImpl implements RepositoryFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(RepositoryFactoryImpl.class);
 
+    private static final Pattern NAME_PATTERN = Pattern.compile("model_name=([^&]*)");
+    private static final Pattern ARTIFACT_PATTERN = Pattern.compile("artifact_id=([^&]*)");
     private static final RepositoryFactory FACTORY = new RepositoryFactoryImpl();
-
     private static final Map<String, RepositoryFactory> REGISTRY = init();
 
     static RepositoryFactory getFactory() {
@@ -72,6 +75,33 @@ class RepositoryFactoryImpl implements RepositoryFactory {
                 }
             }
             return new SimpleRepository(name, path);
+        } else if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
+            Path path = Paths.get(uri.getPath());
+            String fileName = path.toFile().getName();
+            String fileType = FilenameUtils.getFileType(fileName);
+            if ("tgz".equals(fileType) || "zip".equals(fileType) || "tar".equals(fileType)) {
+                String modelName = null;
+                String artifactId = null;
+                String query = uri.getQuery();
+                if (query != null) {
+                    Matcher matcher = NAME_PATTERN.matcher(query);
+                    if (matcher.find()) {
+                        modelName = matcher.group(1);
+                    }
+                    matcher = ARTIFACT_PATTERN.matcher(query);
+                    if (matcher.find()) {
+                        artifactId = matcher.group(1);
+                    }
+                }
+
+                if (artifactId == null) {
+                    artifactId = FilenameUtils.getNamePart(fileName);
+                }
+                if (modelName == null) {
+                    modelName = artifactId;
+                }
+                return new SimpleUrlRepository(name, uri, artifactId, modelName);
+            }
         }
         return new RemoteRepository(name, uri);
     }

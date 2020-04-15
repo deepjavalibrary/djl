@@ -71,16 +71,15 @@ public class SimpleRepository extends AbstractRepository {
     /** {@inheritDoc} */
     @Override
     public Metadata locate(MRL mrl) throws IOException {
-        File file = path.resolve("metadata.json").toFile();
-        if (file.exists() && file.isFile()) {
+        Path file = path.resolve("metadata.json");
+        if (Files.isRegularFile(file)) {
             return metadataWithFile(file);
-        } else {
-            return metadataWithoutFile();
         }
+        return metadataWithoutFile();
     }
 
-    private Metadata metadataWithFile(File file) throws IOException {
-        try (Reader reader = Files.newBufferedReader(file.toPath())) {
+    private Metadata metadataWithFile(Path file) throws IOException {
+        try (Reader reader = Files.newBufferedReader(file)) {
             Metadata metadata = GSON.fromJson(reader, Metadata.class);
             metadata.setRepositoryUri(URI.create(""));
             return metadata;

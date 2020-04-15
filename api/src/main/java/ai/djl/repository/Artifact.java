@@ -17,7 +17,6 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -416,18 +415,7 @@ public class Artifact {
                 } else {
                     name = uri;
                 }
-                String fileName = uri.toLowerCase(Locale.ROOT);
-                if (fileName.endsWith(".tar.gz")) {
-                    name = name.substring(0, name.length() - 7);
-                } else if (fileName.endsWith(".tar.z")) {
-                    name = name.substring(0, name.length() - 6);
-                } else if (fileName.endsWith(".tgz") || fileName.endsWith(".zip")) {
-                    name = name.substring(0, name.length() - 4);
-                } else if (fileName.endsWith(".gz")) {
-                    name = name.substring(0, name.length() - 3);
-                } else if (fileName.endsWith(".z")) {
-                    name = name.substring(0, name.length() - 2);
-                }
+                name = FilenameUtils.getNamePart(name);
             }
             return name;
         }
@@ -448,20 +436,7 @@ public class Artifact {
          */
         public String getExtension() {
             if (extension == null) {
-                String fileName = uri.toLowerCase(Locale.ROOT);
-                if (fileName.endsWith(".zip")) {
-                    extension = "zip";
-                } else if (fileName.endsWith(".tgz")
-                        || fileName.endsWith(".tar.gz")
-                        || fileName.endsWith(".tar.z")) {
-                    extension = "tgz";
-                } else if (fileName.endsWith(".tar")) {
-                    extension = "tar";
-                } else if (fileName.endsWith(".gz") || fileName.endsWith(".z")) {
-                    extension = "gzip";
-                } else {
-                    extension = "";
-                }
+                extension = FilenameUtils.getFileType(uri);
             }
             return extension;
         }

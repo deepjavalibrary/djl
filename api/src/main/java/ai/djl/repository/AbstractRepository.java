@@ -20,6 +20,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -233,6 +234,15 @@ public abstract class AbstractRepository implements Repository {
                     Files.copy(tis, file);
                 }
             }
+        }
+    }
+
+    protected static String md5hash(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            return Hex.toHexString(md.digest(input.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException e) {
+            throw new AssertionError("MD5 algorithm not found.", e);
         }
     }
 

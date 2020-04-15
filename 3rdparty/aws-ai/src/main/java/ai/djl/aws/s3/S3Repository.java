@@ -18,6 +18,7 @@ import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Metadata;
 import ai.djl.repository.Repository;
+import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Progress;
 import java.io.IOException;
 import java.net.URI;
@@ -154,10 +155,10 @@ public class S3Repository extends AbstractRepository {
             }
 
             metadata = new Metadata.MatchAllMetadata();
-            MRL mrl = MRL.model(Application.UNDEFINED, metadata.getGroupId(), artifactId);
+            String hash = md5hash("s3://" + bucket + '/' + prefix);
+            MRL mrl = MRL.model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
             metadata.setRepositoryUri(mrl.toURI());
             metadata.setArtifactId(artifactId);
-            artifact.setName(modelName);
             metadata.setArtifacts(Collections.singletonList(artifact));
             return metadata;
         } catch (SdkException e) {
@@ -181,6 +182,7 @@ public class S3Repository extends AbstractRepository {
         }
 
         Artifact artifact = new Artifact();
+        artifact.setName(modelName);
         Map<String, Artifact.Item> files = new ConcurrentHashMap<>();
         for (S3Object obj : list) {
             Artifact.Item item = new Artifact.Item();
