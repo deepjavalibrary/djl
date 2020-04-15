@@ -14,8 +14,8 @@ package ai.djl.mxnet.zoo.nlp.embedding.utils;
 
 import ai.djl.Device;
 import ai.djl.Model;
+import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.ndarray.NDArray;
-import ai.djl.nn.core.Embedding;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -49,7 +49,7 @@ public final class BuildModelZooWordEmbedding {
         NDArray idxToVec =
                 model.getNDManager().load(path.resolve("idx_to_vec.mx")).singletonOrThrow();
         List<String> idxToToken = Utils.readLines(path.resolve("idx_to_token.txt"));
-        Embedding<String> embedding = new Embedding<>(idxToVec, idxToToken);
+        TrainableWordEmbedding embedding = new TrainableWordEmbedding(idxToVec, idxToToken);
         model.setBlock(embedding);
         model.save(path, name);
     }

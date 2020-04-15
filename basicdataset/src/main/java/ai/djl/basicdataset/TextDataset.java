@@ -17,7 +17,6 @@ import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.SimpleTextEmbedding;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
-import ai.djl.modality.nlp.embedding.VocabWordEmbedding;
 import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
 import ai.djl.modality.nlp.preprocess.PunctuationSeparator;
 import ai.djl.modality.nlp.preprocess.SentenceLengthNormalizer;
@@ -38,8 +37,8 @@ import java.util.Locale;
  * <p>The {@code TextDataset} fetches the data in the form of {@link String}, processes the data as
  * required, and creates embeddings for the tokens. Embeddings can be either pre-trained or trained
  * on the go. Pre-trained {@link TextEmbedding} must be set in the {@link Builder}. If no embeddings
- * are set, the dataset creates {@link VocabWordEmbedding} based {@link SimpleTextEmbedding} from
- * the {@link Vocabulary} created within the dataset.
+ * are set, the dataset creates {@link ai.djl.modality.nlp.embedding.TrainableWordEmbedding} based
+ * {@link SimpleTextEmbedding} from the {@link Vocabulary} created within the dataset.
  */
 public abstract class TextDataset extends RandomAccessDataset {
 

@@ -12,7 +12,7 @@
  */
 package ai.djl.modality.nlp;
 
-import ai.djl.nn.core.Embedding;
+import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -68,17 +68,16 @@ public class SimpleVocabulary implements Vocabulary {
     }
 
     /**
-     * Creates an {@link Embedding} based on the tokens in this {@code Vocabulary} with the given
-     * embedding size.
+     * Creates an {@link TrainableWordEmbedding} based on the tokens in this {@code Vocabulary} with
+     * the given embedding size.
      *
      * @param embeddingSize the size of the embedding for each token
-     * @return an {@link Embedding} based on the tokens in this {@code Vocabulary}
+     * @return an {@link TrainableWordEmbedding} based on the tokens in this {@code Vocabulary}
      */
-    public Embedding<String> newEmbedding(int embeddingSize) {
-        return Embedding.builder()
-                .setType(String.class)
+    public TrainableWordEmbedding newEmbedding(int embeddingSize) {
+        return TrainableWordEmbedding.builder()
                 .setEmbeddingSize(embeddingSize)
-                .setItems(tokens.keySet())
+                .setItems(new ArrayList<>(tokens.keySet()))
                 .build();
     }
 
@@ -113,6 +112,15 @@ public class SimpleVocabulary implements Vocabulary {
             return unknownToken;
         }
         return indexToToken.get((int) index);
+    }
+
+    /**
+     * Returns all the tokens in the vocabulary.
+     *
+     * @return the token corresponding to the given index
+     */
+    public Set<String> getAllTokens() {
+        return new HashSet<>(indexToToken);
     }
 
     /**

@@ -14,7 +14,6 @@ package ai.djl.modality.nlp.embedding;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
-import ai.djl.training.ParameterStore;
 import java.util.List;
 
 /**
@@ -34,14 +33,14 @@ import java.util.List;
  * <p>In the second option, the embedding can be trained using the standard deep learning techniques
  * to better handle the current dataset. For this case, you need two methods. First, call {@link
  * #preprocessTextToEmbed(NDManager, List)} within your dataset. Then, the first step in your model
- * should be to call {@link #embedText(ParameterStore, NDArray)}.
+ * should be to call {@link #embedText(NDArray)}.
  */
 public interface TextEmbedding {
 
     /**
      * Preprocesses the text to embed into an {@link NDArray} to pass into the model.
      *
-     * <p>Make sure to call {@link #embedText(ParameterStore, NDArray)} after this.
+     * <p>Make sure to call {@link #embedText(NDArray)} after this.
      *
      * @param manager the manager for the new array
      * @param text the text to embed
@@ -71,20 +70,11 @@ public interface TextEmbedding {
     NDArray embedText(NDArray text) throws EmbeddingException;
 
     /**
-     * Embeds the text after preprocessed using {@link #preprocessTextToEmbed(NDManager, List)}.
-     *
-     * @param parameterStore the parameter block used while training
-     * @param text the text to embed
-     * @return the embedded text
-     * @throws EmbeddingException if there is an error while trying to embed
-     */
-    NDArray embedText(ParameterStore parameterStore, NDArray text) throws EmbeddingException;
-
-    /**
      * Returns the closest matching text for a given embedding.
      *
      * @param textEmbedding the text embedding to find the matching string text for.
      * @return text similar to the passed in embedding
+     * @throws EmbeddingException if the input is not unembeddable
      */
-    List<String> unembedText(NDArray textEmbedding);
+    List<String> unembedText(NDArray textEmbedding) throws EmbeddingException;
 }

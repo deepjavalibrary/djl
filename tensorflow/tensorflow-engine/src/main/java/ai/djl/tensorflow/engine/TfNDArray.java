@@ -192,6 +192,10 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public void attachGradient(SparseFormat sparseFormat) {}
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray getGradient() {
         throw new UnsupportedOperationException("Not implemented");
     }

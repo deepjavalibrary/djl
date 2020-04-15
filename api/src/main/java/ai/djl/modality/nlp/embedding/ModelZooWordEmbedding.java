@@ -19,7 +19,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.core.Embedding;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.training.ParameterStore;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
 
@@ -60,12 +59,6 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
             return embedding.embed(manager, word);
         }
         return embedding.embed(manager, unknownToken);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList embedWord(ParameterStore parameterStore, NDArray word) {
-        return embedding.forward(parameterStore, new NDList(word));
     }
 
     /** {@inheritDoc} */

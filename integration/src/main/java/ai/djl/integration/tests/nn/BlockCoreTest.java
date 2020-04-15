@@ -17,6 +17,7 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.integration.util.TestUtils;
+import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -31,7 +32,6 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv1D;
 import ai.djl.nn.convolutional.Conv2D;
 import ai.djl.nn.convolutional.Conv3D;
-import ai.djl.nn.core.Embedding;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.norm.Dropout;
@@ -224,14 +224,13 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testEmbedding() {
+    public void testEmbedding() throws IOException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
-        Embedding<Character> block =
-                Embedding.builder()
-                        .setType(Character.class)
-                        .setItems(Arrays.asList('a', 'b', 'c'))
+        TrainableWordEmbedding block =
+                TrainableWordEmbedding.builder()
+                        .setItems(Arrays.asList("a", "b", "c"))
                         .setEmbeddingSize(2)
                         .build();
         try (Model model = Model.newInstance()) {
@@ -245,15 +244,14 @@ public class BlockCoreTest {
                 NDManager manager = trainer.getManager();
 
                 Assert.assertEquals(
-                        trainer.forward(new NDList(block.embed(manager, 'x'))).singletonOrThrow(),
+                        trainer.forward(new NDList(block.embed(manager, "x"))).singletonOrThrow(),
                         manager.create(new int[] {1, 1}));
 
                 Assert.assertEquals(
-                        trainer.forward(
-                                        new NDList(
-                                                block.embed(manager, new Character[] {'a', 'b'})))
+                        trainer.forward(new NDList(block.embed(manager, new String[] {"a", "b"})))
                                 .singletonOrThrow(),
                         manager.create(new int[] {1, 1, 1, 1}, new Shape(2, 2)));
+                testEncode(manager, block);
             }
         }
     }

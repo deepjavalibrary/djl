@@ -159,6 +159,10 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public void attachGradient(SparseFormat sparseFormat) {}
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray getGradient() {
         throw new UnsupportedOperationException("Not implemented");
     }

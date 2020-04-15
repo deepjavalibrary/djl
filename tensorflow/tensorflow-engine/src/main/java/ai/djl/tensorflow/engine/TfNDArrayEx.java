@@ -322,6 +322,7 @@ public class TfNDArrayEx implements NDArrayEx {
             NDList inputs,
             int numItems,
             int embeddingSize,
+            boolean sparseGrad,
             DataType dataType,
             PairList<String, Object> additional) {
         throw new UnsupportedOperationException("Not implemented");

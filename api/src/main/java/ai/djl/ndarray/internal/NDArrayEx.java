@@ -284,6 +284,7 @@ public interface NDArrayEx {
             NDList inputs,
             int numItems,
             int embeddingSize,
+            boolean sparseGrad,
             DataType dataType,
             PairList<String, Object> additional);
 

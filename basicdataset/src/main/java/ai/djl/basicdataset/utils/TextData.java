@@ -16,7 +16,7 @@ import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.SimpleTextEmbedding;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
-import ai.djl.modality.nlp.embedding.VocabWordEmbedding;
+import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.modality.nlp.preprocess.SentenceLengthNormalizer;
 import ai.djl.modality.nlp.preprocess.TextProcessor;
 import ai.djl.ndarray.NDList;
@@ -110,8 +110,7 @@ public class TextData {
         }
         if (textEmbedding == null) {
             textEmbedding =
-                    new SimpleTextEmbedding(
-                            new VocabWordEmbedding(vocabulary.newEmbedding(embeddingSize)));
+                    new SimpleTextEmbedding(new TrainableWordEmbedding(vocabulary, embeddingSize));
             trainEmbedding = true;
         }
     }

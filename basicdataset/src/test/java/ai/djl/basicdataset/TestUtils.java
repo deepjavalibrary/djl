@@ -17,7 +17,6 @@ import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.training.ParameterStore;
 import java.util.List;
 
 public final class TestUtils {
@@ -34,12 +33,6 @@ public final class TestUtils {
             @Override
             public NDArray embedText(NDArray text) throws EmbeddingException {
                 return manager.zeros(text.getShape().addAll(new Shape(embeddingSize)));
-            }
-
-            @Override
-            public NDArray embedText(ParameterStore parameterStore, NDArray text)
-                    throws EmbeddingException {
-                return null;
             }
 
             @Override

@@ -128,6 +128,9 @@ public class MockNDArray implements NDArray {
     @Override
     public void attachGradient() {}
 
+    @Override
+    public void attachGradient(SparseFormat sparseFormat) {}
+
     /** {@inheritDoc} */
     @Override
     public NDArray getGradient() {

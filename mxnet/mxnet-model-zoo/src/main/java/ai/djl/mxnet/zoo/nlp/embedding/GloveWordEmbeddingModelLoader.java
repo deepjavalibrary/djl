@@ -17,6 +17,7 @@ import ai.djl.Application.NLP;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.modality.nlp.embedding.WordEmbedding;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDList;
@@ -74,15 +75,15 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDLis
         List<String> idxToToken =
                 Utils.readLines(
                         repository.openStream(artifact.getFiles().get("idx_to_token"), null));
-        Embedding<String> embedding =
-                Embedding.builder()
-                        .setType(String.class)
+        TrainableWordEmbedding wordEmbedding =
+                TrainableWordEmbedding.builder()
                         .setEmbeddingSize(
                                 Integer.parseInt(artifact.getProperties().get("dimensions")))
                         .setItems(idxToToken)
+                        .optUnknownToken((String) arguments.get("unknownToken"))
                         .optUseDefault(false)
                         .build();
-        model.setBlock(embedding);
+        model.setBlock(wordEmbedding);
         model.setProperty("unknownToken", (String) arguments.get("unknownToken"));
         return model;
     }

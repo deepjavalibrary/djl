@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.training.initializer.Initializer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -44,6 +45,7 @@ public class Parameter implements AutoCloseable {
     private Initializer initializer;
     private NDArray array;
     private boolean requireGrad;
+    private SparseFormat gradientFormat;
 
     /**
      * Creates a {@code Parameter} with the given name, and parameter type, and associated with the
@@ -54,7 +56,7 @@ public class Parameter implements AutoCloseable {
      * @param type the type of this {@code Parameter}
      */
     public Parameter(String name, Block block, ParameterType type) {
-        this(name, block, type, true);
+        this(name, block, type, true, SparseFormat.DENSE);
     }
 
     /**
@@ -67,12 +69,32 @@ public class Parameter implements AutoCloseable {
      * @param requireGrad whether this {@code Parameter} needs to compute gradients
      */
     public Parameter(String name, Block block, ParameterType type, boolean requireGrad) {
+        this(name, block, type, requireGrad, SparseFormat.DENSE);
+    }
+
+    /**
+     * Creates a {@code Parameter} with the given name, and parameter type, and associated with the
+     * given {@link Block}.
+     *
+     * @param name the name of the {@code Parameter}
+     * @param block the block with which this {@code Parameter} is associated
+     * @param type the type of this {@code Parameter}
+     * @param requireGrad whether this {@code Parameter} needs to compute gradients
+     * @param gradientFormat the {@link SparseFormat} of the gradient array
+     */
+    public Parameter(
+            String name,
+            Block block,
+            ParameterType type,
+            boolean requireGrad,
+            SparseFormat gradientFormat) {
         this.id = UUID.randomUUID().toString();
         this.name = name;
         this.block = block;
         this.type = type;
         this.requireGrad = requireGrad;
         this.initializer = type.getInitializer();
+        this.gradientFormat = gradientFormat;
     }
 
     /**
@@ -185,7 +207,7 @@ public class Parameter implements AutoCloseable {
         }
 
         if (requireGradient()) {
-            array.attachGradient();
+            array.attachGradient(gradientFormat);
         }
     }
 

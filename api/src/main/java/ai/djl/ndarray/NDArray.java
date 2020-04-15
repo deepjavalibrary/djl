@@ -195,6 +195,15 @@ public interface NDArray extends AutoCloseable {
     void attachGradient();
 
     /**
+     * Attaches a gradient {@code NDArray} with the given {@link SparseFormat} to this {@code
+     * NDArray} and marks it so {@link ai.djl.training.GradientCollector#backward(NDArray)} can
+     * compute the gradient with respect to it.
+     *
+     * @param sparseFormat the {@link SparseFormat} for the gradient
+     */
+    void attachGradient(SparseFormat sparseFormat);
+
+    /**
      * Returns the gradient {@code NDArray} attached to this {@code NDArray}.
      *
      * @return the gradient {@code NDArray}

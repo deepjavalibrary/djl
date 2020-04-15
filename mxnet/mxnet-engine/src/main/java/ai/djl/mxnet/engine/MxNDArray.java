@@ -232,6 +232,12 @@ public class MxNDArray extends NativeResource implements NDArray {
         attachGradient(GradReq.WRITE, null);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void attachGradient(SparseFormat sparseFormat) {
+        attachGradient(GradReq.WRITE, sparseFormat);
+    }
+
     private void attachGradient(GradReq gradReq, SparseFormat format) {
         // Does zerosLike support sparse?
         try (MxNDArray grad = createGradient(format)) {
@@ -246,7 +252,10 @@ public class MxNDArray extends NativeResource implements NDArray {
         if (format == null) {
             return (MxNDArray) zerosLike();
         }
-        return (MxNDArray) manager.zeros(getShape(), getDataType(), getDevice());
+        if (format == SparseFormat.DENSE) {
+            return (MxNDArray) manager.zeros(getShape(), getDataType(), getDevice());
+        }
+        return (MxNDArray) manager.zeros(getShape(), getDataType(), getDevice()).toSparse(format);
     }
 
     /** {@inheritDoc} */
