@@ -123,7 +123,7 @@ public class MxModel extends BaseModel {
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
         boolean firstPredictor = first.getAndSet(false);
         boolean shouldCopyParameters = !JnaUtils.useThreadSafePredictor() && !firstPredictor;
-        return new MxPredictor<>(this, translator, shouldCopyParameters);
+        return new Predictor<>(this, translator, shouldCopyParameters);
     }
 
     /** {@inheritDoc} */

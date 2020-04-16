@@ -14,9 +14,23 @@ package ai.djl.inference;
 
 import ai.djl.Model;
 import ai.djl.metric.Metrics;
+import ai.djl.ndarray.LazyNDArray;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.nn.Block;
+import ai.djl.training.ParameterStore;
+import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorContext;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@code Predictor} interface provides a session for model inference.
@@ -57,7 +71,34 @@ import java.util.List;
  * @see Model
  * @see Translator
  */
-public interface Predictor<I, O> extends AutoCloseable {
+public class Predictor<I, O> implements AutoCloseable {
+
+    private static final Logger logger = LoggerFactory.getLogger(Predictor.class);
+    private Translator<I, O> translator;
+    private long timestamp;
+
+    private boolean prepared;
+    private Model model;
+    private NDManager manager;
+    Metrics metrics;
+    private Block block;
+    private ParameterStore parameterStore;
+
+    /**
+     * Creates a new instance of {@code BasePredictor} with the given {@link Model} and {@link
+     * Translator}.
+     *
+     * @param model the model on which the predictions are based
+     * @param translator the translator to be used
+     * @param copy whether to copy the parameters to the parameter store
+     */
+    public Predictor(Model model, Translator<I, O> translator, boolean copy) {
+        this.model = model;
+        this.manager = model.getNDManager().newSubManager();
+        this.translator = translator;
+        block = model.getBlock();
+        parameterStore = new ParameterStore(manager, copy);
+    }
 
     /**
      * Predicts an item for inference.
@@ -66,7 +107,10 @@ public interface Predictor<I, O> extends AutoCloseable {
      * @return the output object defined by the user
      * @throws TranslateException if an error occurs during prediction
      */
-    O predict(I input) throws TranslateException;
+    @SuppressWarnings("PMD.AvoidRethrowingException")
+    public O predict(I input) throws TranslateException {
+        return batchPredict(Collections.singletonList(input)).get(0);
+    }
 
     /**
      * Predicts a batch for inference.
@@ -75,16 +119,181 @@ public interface Predictor<I, O> extends AutoCloseable {
      * @return a list of output objects defined by the user
      * @throws TranslateException if an error occurs during prediction
      */
-    List<O> batchPredict(List<I> inputs) throws TranslateException;
+    @SuppressWarnings("PMD.AvoidRethrowingException")
+    public List<O> batchPredict(List<I> inputs) throws TranslateException {
+        try (PredictorContext context = new PredictorContext()) {
+            if (!prepared) {
+                translator.prepare(manager, model);
+                prepared = true;
+            }
+            Batchifier batchifier = translator.getBatchifier();
+            if (batchifier == null) {
+                List<O> ret = new ArrayList<>(inputs.size());
+                for (I input : inputs) {
+                    timestamp = System.nanoTime();
+                    NDList ndList = translator.processInput(context, input);
+                    preprocessEnd(ndList);
+
+                    NDList result = forward(ndList);
+                    forwardEnd(result);
+
+                    ret.add(translator.processOutput(context, result));
+                    postProcessEnd();
+                }
+                return ret;
+            }
+
+            timestamp = System.nanoTime();
+            NDList inputBatch = processInputs(context, inputs);
+            preprocessEnd(inputBatch);
+
+            NDList result = forward(inputBatch);
+            forwardEnd(result);
+
+            return processOutputs(context, result);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new TranslateException(e);
+        } finally {
+            postProcessEnd();
+        }
+    }
 
     /**
      * Attaches a Metrics param to use for benchmark.
      *
      * @param metrics the Metrics class
      */
-    void setMetrics(Metrics metrics);
+    public void setMetrics(Metrics metrics) {
+        this.metrics = metrics;
+    }
+
+    private void waitToRead(NDList list) {
+        for (NDArray array : list) {
+            if (array instanceof LazyNDArray) {
+                ((LazyNDArray) array).waitToRead();
+            }
+        }
+    }
+
+    private NDList forward(NDList ndList) {
+        logger.trace("Predictor input data: {}", ndList);
+        return block.forward(parameterStore, ndList);
+    }
+
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    private NDList processInputs(TranslatorContext ctx, List<I> inputs) throws Exception {
+        int batchSize = inputs.size();
+        NDList[] preprocessed = new NDList[batchSize];
+        for (int i = 0; i < batchSize; ++i) {
+            preprocessed[i] = translator.processInput(ctx, inputs.get(i));
+        }
+        return translator.getBatchifier().batchify(preprocessed);
+    }
+
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    private List<O> processOutputs(TranslatorContext ctx, NDList list) throws Exception {
+        NDList[] unbatched = translator.getBatchifier().unbatchify(list);
+        List<O> outputs = new ArrayList<>(unbatched.length);
+        for (NDList output : unbatched) {
+            outputs.add(translator.processOutput(ctx, output));
+        }
+        return outputs;
+    }
+
+    private void preprocessEnd(NDList list) {
+        if (metrics != null) {
+            waitToRead(list);
+            long tmp = System.nanoTime();
+            long duration = tmp - timestamp;
+            timestamp = tmp;
+            metrics.addMetric("Preprocess", duration, "nano");
+        }
+    }
+
+    private void forwardEnd(NDList list) {
+        if (metrics != null) {
+            waitToRead(list);
+            long tmp = System.nanoTime();
+            long duration = tmp - timestamp;
+            timestamp = tmp;
+            metrics.addMetric("Inference", duration, "nano");
+        }
+    }
+
+    private void postProcessEnd() {
+        if (metrics != null) {
+            long tmp = System.nanoTime();
+            long duration = tmp - timestamp;
+            timestamp = tmp;
+            metrics.addMetric("Postprocess", duration, "nano");
+        }
+    }
 
     /** {@inheritDoc} */
     @Override
-    void close();
+    public void close() {
+        manager.close();
+    }
+
+    /** {@inheritDoc} */
+    @SuppressWarnings("deprecation")
+    @Override
+    protected void finalize() throws Throwable {
+        if (manager.isOpen()) {
+            if (logger.isDebugEnabled()) {
+                logger.warn("Predictor was not closed explicitly: {}", getClass().getSimpleName());
+            }
+            close();
+        }
+        super.finalize();
+    }
+
+    private class PredictorContext implements TranslatorContext {
+
+        private NDManager ctxManager;
+        private Map<String, Object> attachments;
+
+        PredictorContext() {
+            ctxManager = manager.newSubManager();
+            attachments = new ConcurrentHashMap<>();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Model getModel() {
+            return model;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public NDManager getNDManager() {
+            return ctxManager;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Metrics getMetrics() {
+            return metrics;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void close() {
+            ctxManager.close();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Object getAttachment(String key) {
+            return attachments.get(key);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void setAttachment(String key, Object value) {
+            attachments.put(key, value);
+        }
+    }
 }

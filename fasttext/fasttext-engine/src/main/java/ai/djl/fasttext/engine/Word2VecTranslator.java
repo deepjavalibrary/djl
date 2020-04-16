@@ -24,6 +24,7 @@ public class Word2VecTranslator implements Translator<String, float[]> {
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, String input) {
+        ctx.setAttachment("input", input);
         return null;
     }
 

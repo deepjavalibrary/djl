@@ -103,13 +103,13 @@ public class FtModel implements Model {
     /** {@inheritDoc} */
     @Override
     public Block getBlock() {
-        return null;
+        return FtBlockPlaceholder.PLACEHOLDER;
     }
 
     /** {@inheritDoc} */
     @Override
     public void setBlock(Block block) {
-        throw new UnsupportedOperationException("Fasttext doesn't support Block.");
+        throw new UnsupportedOperationException("Fasttext doesn't support setting the Block.");
     }
 
     /** {@inheritDoc} */
@@ -127,7 +127,7 @@ public class FtModel implements Model {
     /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new FtPredictor<>(this, translator);
+        return new Predictor<>(this, translator, false);
     }
 
     /** {@inheritDoc} */
@@ -185,7 +185,7 @@ public class FtModel implements Model {
     /** {@inheritDoc} */
     @Override
     public NDManager getNDManager() {
-        return null;
+        return FtNDManagerPlaceholder.PLACEHOLDER;
     }
 
     /** {@inheritDoc} */

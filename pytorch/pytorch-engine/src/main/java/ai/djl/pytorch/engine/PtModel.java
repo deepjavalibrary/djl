@@ -77,7 +77,7 @@ public class PtModel extends BaseModel {
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
         // TODO: modify copy
-        return new PtPredictor<>(this, translator, false);
+        return new Predictor<>(this, translator, false);
     }
 
     /** {@inheritDoc} */

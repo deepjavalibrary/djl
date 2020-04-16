@@ -107,7 +107,7 @@ public class TfModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new TfPredictor<>(this, translator, first.getAndSet(false));
+        return new Predictor<>(this, translator, first.getAndSet(false));
     }
     /** {@inheritDoc} */
     @Override

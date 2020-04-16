@@ -44,6 +44,7 @@ public class TextClassificationTranslator implements Translator<String, Classifi
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, String input) {
+        ctx.setAttachment("input", input);
         return null;
     }
 

@@ -13,7 +13,6 @@
 package ai.djl.test.mock;
 
 import ai.djl.Model;
-import ai.djl.inference.BasePredictor;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -92,7 +91,7 @@ public class MockModel implements Model {
     /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new BasePredictor<>(this, translator, !first.getAndSet(false));
+        return new Predictor<>(this, translator, !first.getAndSet(false));
     }
 
     /** {@inheritDoc} */
