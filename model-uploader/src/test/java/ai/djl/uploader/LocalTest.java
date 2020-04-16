@@ -16,11 +16,8 @@ package ai.djl.uploader;
 import ai.djl.Application;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.Metadata;
-import com.google.gson.Gson;
-import java.io.DataOutputStream;
+import ai.djl.uploader.util.TestUtils;
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -48,9 +45,9 @@ public class LocalTest {
     @Test
     public void testLocal() throws IOException {
         String[] content = {"Hello, this is model", "Hello, this is synset"};
-        writeTmpFile(modelDir, "resnet101.pt", content[0]);
-        writeTmpFile(modelDir, "synset.txt.gz", content[1]);
-        writeTmpFile(modelDir.resolve("inside"), "synset.txt", content[1]);
+        TestUtils.writeTmpFile(modelDir, "resnet101.pt", content[0]);
+        TestUtils.writeTmpFile(modelDir, "synset.txt.gz", content[1]);
+        TestUtils.writeTmpFile(modelDir.resolve("inside"), "synset.txt", content[1]);
         String description = "This is a test image clasisification";
         String name = "Image Classification";
         String groupId = "ai.djl.pytorch";
@@ -75,8 +72,7 @@ public class LocalTest {
                         Paths.get(
                                 "mlrepo/model",
                                 Application.CV.IMAGE_CLASSIFICATION.getPath(),
-                                "ai/djl",
-                                "pytorch",
+                                groupId.replace(".", "/"),
                                 artifactId));
         Assert.assertTrue(targetPath.resolve("metadata.json").toFile().exists());
         Assert.assertTrue(
@@ -88,7 +84,7 @@ public class LocalTest {
                 targetPath.resolve(artifactVersion + "/" + "synset.txt.gz").toFile().exists());
         Assert.assertTrue(
                 targetPath.resolve(artifactVersion + "/" + "inside.zip").toFile().exists());
-        Metadata metadata = readGson(targetPath.resolve("metadata.json"));
+        Metadata metadata = TestUtils.readGson(targetPath.resolve("metadata.json"));
         Assert.assertEquals(metadata.getName(), name);
         Assert.assertEquals(metadata.getDescription(), description);
         Assert.assertEquals(metadata.getGroupId(), groupId);
@@ -104,8 +100,8 @@ public class LocalTest {
     @Test
     public void testDataset() throws IOException {
         String[] content = {"Hello, this is dataset", "Hello, this is synset"};
-        writeTmpFile(modelDir, "dataset.csv", content[0]);
-        writeTmpFile(modelDir, "synset.txt", content[1]);
+        TestUtils.writeTmpFile(modelDir, "dataset.csv", content[0]);
+        TestUtils.writeTmpFile(modelDir, "synset.txt", content[1]);
         String description = "This is a test text dataset";
         String name = "Rich dataset";
         String groupId = "ai.djl.basicdataset";
@@ -141,9 +137,9 @@ public class LocalTest {
     @Test
     public void testMerge() throws IOException {
         String[] content = {"Hello, this is model", "Hello, this is synset"};
-        writeTmpFile(modelDir, "resnet101.pt", content[0]);
-        writeTmpFile(modelDir, "synset.txt.gz", content[1]);
-        writeTmpFile(modelDir.resolve("inside"), "synset.txt", content[1]);
+        TestUtils.writeTmpFile(modelDir, "resnet101.pt", content[0]);
+        TestUtils.writeTmpFile(modelDir, "synset.txt.gz", content[1]);
+        TestUtils.writeTmpFile(modelDir.resolve("inside"), "synset.txt", content[1]);
         String description = "This is a test image clasisification";
         String name = "Image Classification";
         String groupId = "ai.djl.pytorch";
@@ -165,15 +161,14 @@ public class LocalTest {
                 .buildLocal();
         // prepare the merge operation
         FileUtils.deleteDirectory(modelDir.toFile());
-        writeTmpFile(modelDir, "resnet50.pt", content[0]);
-        writeTmpFile(modelDir, "synset.txt", content[1]);
+        TestUtils.writeTmpFile(modelDir, "resnet50.pt", content[0]);
+        TestUtils.writeTmpFile(modelDir, "synset.txt", content[1]);
         Path targetPath =
                 destDir.resolve(
                         Paths.get(
                                 "mlrepo/model",
                                 Application.CV.IMAGE_CLASSIFICATION.getPath(),
-                                "ai/djl",
-                                "pytorch",
+                                groupId.replace(".", "/"),
                                 artifactId));
         String artifactName2 = "traced_resnet50";
         MetadataBuilder.builder()
@@ -197,7 +192,7 @@ public class LocalTest {
                         .exists());
         Assert.assertTrue(
                 targetPath.resolve("0.0.4" + "/" + artifactName2 + ".pt.gz").toFile().exists());
-        Metadata metadata = readGson(targetPath.resolve("metadata.json"));
+        Metadata metadata = TestUtils.readGson(targetPath.resolve("metadata.json"));
         List<Artifact> artifacts = metadata.getArtifacts();
         Assert.assertEquals(artifacts.size(), 2);
         Assert.assertEquals(artifacts.get(0).getName(), artifactName1);
@@ -211,20 +206,5 @@ public class LocalTest {
     public void removeFiles() {
         FileUtils.deleteQuietly(modelDir.toFile());
         FileUtils.deleteQuietly(destDir.toFile());
-    }
-
-    private void writeTmpFile(Path dir, String filename, String content) throws IOException {
-        Files.createDirectories(dir);
-        try (DataOutputStream dos =
-                new DataOutputStream(Files.newOutputStream(dir.resolve(filename)))) {
-            dos.writeUTF(content);
-        }
-    }
-
-    private Metadata readGson(Path path) throws IOException {
-        Gson gson = new Gson();
-        try (Reader reader = Files.newBufferedReader(path)) {
-            return gson.fromJson(reader, Metadata.class);
-        }
     }
 }
