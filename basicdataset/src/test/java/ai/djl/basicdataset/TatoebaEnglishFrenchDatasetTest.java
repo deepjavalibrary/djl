@@ -50,6 +50,7 @@ public class TatoebaEnglishFrenchDatasetTest {
                     TatoebaEnglishFrenchDataset.builder()
                             .optEmbeddingSize(EMBEDDING_SIZE)
                             .setSampling(32, true)
+                            .optEmbeddingSize(15)
                             .build();
             tatoebaEnglishFrenchDataset.prepare();
 

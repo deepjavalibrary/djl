@@ -14,8 +14,8 @@ package ai.djl.basicdataset.utils;
 
 import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
-import ai.djl.modality.nlp.embedding.SimpleTextEmbedding;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
+import ai.djl.modality.nlp.embedding.TrainableTextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.modality.nlp.preprocess.TextProcessor;
 import ai.djl.ndarray.NDList;
@@ -35,6 +35,7 @@ public class TextData {
 
     private List<TextProcessor> textProcessors;
     private TextEmbedding textEmbedding;
+    private SimpleVocabulary vocabulary;
     private boolean trainEmbedding;
     private int embeddingSize;
 
@@ -78,7 +79,6 @@ public class TextData {
         if (textData == null) {
             textData = new ArrayList<>();
         }
-        size = textData.size();
         for (String textDatum : newTextData) {
             List<String> tokens = Collections.singletonList(textDatum);
             for (TextProcessor processor : textProcessors) {
@@ -87,7 +87,7 @@ public class TextData {
             vocabularyBuilder.add(tokens);
             textData.add(tokens);
         }
-        SimpleVocabulary vocabulary = vocabularyBuilder.build();
+        vocabulary = vocabularyBuilder.build();
         for (int i = 0; i < textData.size(); i++) {
             List<String> tokenizedTextDatum = textData.get(i);
             for (int j = 0; j < tokenizedTextDatum.size(); j++) {
@@ -97,9 +97,11 @@ public class TextData {
             }
             textData.set(i, tokenizedTextDatum);
         }
+        size = textData.size();
         if (textEmbedding == null) {
             textEmbedding =
-                    new SimpleTextEmbedding(new TrainableWordEmbedding(vocabulary, embeddingSize));
+                    new TrainableTextEmbedding(
+                            new TrainableWordEmbedding(vocabulary, embeddingSize));
             trainEmbedding = true;
         }
     }
@@ -123,6 +125,15 @@ public class TextData {
     }
 
     /**
+     * Gets the {@link TextEmbedding} used to embed the data with.
+     *
+     * @return the {@link TextEmbedding}
+     */
+    public TextEmbedding getTextEmbedding() {
+        return textEmbedding;
+    }
+
+    /**
      * Sets whether to train the textEmbedding.
      *
      * @param trainEmbedding true to train the text embedding
@@ -138,6 +149,19 @@ public class TextData {
      */
     public void setEmbeddingSize(int embeddingSize) {
         this.embeddingSize = embeddingSize;
+    }
+
+    /**
+     * Gets the {@link SimpleVocabulary} built while preprocessing the text data.
+     *
+     * @return the {@link SimpleVocabulary}
+     */
+    public SimpleVocabulary getVocabulary() {
+        if (vocabulary == null) {
+            throw new IllegalStateException(
+                    "This method must be called after preprocess is called on this object");
+        }
+        return vocabulary;
     }
 
     /**

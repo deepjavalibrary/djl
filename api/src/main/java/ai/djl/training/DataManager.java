@@ -20,7 +20,7 @@ import ai.djl.training.dataset.Batch;
  * data from the dataset to be appropriate for the current model.
  */
 public class DataManager {
-    public static final DataManager DEFAULT_DATA_MANAGER = new DataManager() {};
+    public static final DataManager DEFAULT_DATA_MANAGER = new DataManager();
 
     /**
      * Fetches data from the given {@link Batch} in required form.

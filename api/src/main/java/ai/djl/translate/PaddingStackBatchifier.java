@@ -68,7 +68,7 @@ public final class PaddingStackBatchifier implements Batchifier {
                             padding.repeat(
                                     Shape.update(
                                             array.getShape(), dimIndex, maxSize - validLength));
-                    array = array.concat(paddingArray, dimIndex);
+                    array = array.concat(paddingArray.toType(array.getDataType(), false), dimIndex);
                 }
                 arrayValidLengths[j] = validLength;
                 inputs[j].set(arrayIndex, array);

@@ -13,9 +13,9 @@
 package ai.djl.basicdataset;
 
 import ai.djl.basicdataset.utils.TextData;
+import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
-import ai.djl.modality.nlp.embedding.SimpleTextEmbedding;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
@@ -37,7 +37,7 @@ import java.util.Locale;
  * <p>The {@code TextDataset} fetches the data in the form of {@link String}, processes the data as
  * required, and creates embeddings for the tokens. Embeddings can be either pre-trained or trained
  * on the go. Pre-trained {@link TextEmbedding} must be set in the {@link Builder}. If no embeddings
- * are set, the dataset creates {@link TrainableWordEmbedding} based {@link SimpleTextEmbedding}
+ * are set, the dataset creates {@link TrainableWordEmbedding} based {@link TrainableWordEmbedding}
  * from the {@link Vocabulary} created within the dataset.
  */
 public abstract class TextDataset extends RandomAccessDataset {
@@ -53,7 +53,6 @@ public abstract class TextDataset extends RandomAccessDataset {
      */
     public TextDataset(Builder<?> builder) {
         super(builder);
-
         sourceTextData = new TextData();
         sourceTextData.setTextEmbedding(builder.sourceTextEmbedding);
         sourceTextData.setTrainEmbedding(builder.trainSourceEmbedding);
@@ -71,6 +70,29 @@ public abstract class TextDataset extends RandomAccessDataset {
             throws EmbeddingException {
         TextData textData = source ? sourceTextData : targetTextData;
         return textData.embedText(index, manager);
+    }
+
+    /**
+     * Gets the word embedding used while pre-processing the dataset. This method must be called
+     * after preprocess has been called on this instance.
+     *
+     * @param source whether to get source or target text embedding
+     * @return the text embedding
+     */
+    public TextEmbedding getTextEmbedding(boolean source) {
+        TextData textData = source ? sourceTextData : targetTextData;
+        return textData.getTextEmbedding();
+    }
+
+    /**
+     * Gets the {@link SimpleVocabulary} built while preprocessing the text data.
+     *
+     * @param source whether to get source or target vocabulary
+     * @return the {@link SimpleVocabulary}
+     */
+    public SimpleVocabulary getVocabulary(boolean source) {
+        TextData textData = source ? sourceTextData : targetTextData;
+        return textData.getVocabulary();
     }
 
     /**
@@ -101,6 +123,7 @@ public abstract class TextDataset extends RandomAccessDataset {
         protected List<TextProcessor> targetTextProcessors =
                 Arrays.asList(
                         new SimpleTokenizer(),
+                        new LowerCaseConvertor(Locale.ENGLISH),
                         new LowerCaseConvertor(Locale.ENGLISH),
                         new PunctuationSeparator());
 

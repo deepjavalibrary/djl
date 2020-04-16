@@ -15,4 +15,4 @@
  * Contains classes for the natural language processing section ({@link ai.djl.Application.NLP}) of
  * the {@link ai.djl.basicmodelzoo.BasicModelZoo}.
  */
-package ai.djl.basicmodelzoo.nlp.embedding;
+package ai.djl.basicmodelzoo.nlp;

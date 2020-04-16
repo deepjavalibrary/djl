@@ -12,7 +12,6 @@
  */
 package ai.djl.modality.nlp;
 
-import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -65,20 +64,6 @@ public class SimpleVocabulary implements Vocabulary {
         for (String token : tokens) {
             addToken(token);
         }
-    }
-
-    /**
-     * Creates an {@link TrainableWordEmbedding} based on the tokens in this {@code Vocabulary} with
-     * the given embedding size.
-     *
-     * @param embeddingSize the size of the embedding for each token
-     * @return an {@link TrainableWordEmbedding} based on the tokens in this {@code Vocabulary}
-     */
-    public TrainableWordEmbedding newEmbedding(int embeddingSize) {
-        return TrainableWordEmbedding.builder()
-                .setEmbeddingSize(embeddingSize)
-                .setItems(new ArrayList<>(tokens.keySet()))
-                .build();
     }
 
     /**

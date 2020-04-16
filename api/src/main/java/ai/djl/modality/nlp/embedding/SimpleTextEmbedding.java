@@ -33,6 +33,7 @@ public class SimpleTextEmbedding implements TextEmbedding {
         this.wordEmbedding = wordEmbedding;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray preprocessTextToEmbed(NDManager manager, List<String> text) {
         NDList result = new NDList(text.size());
@@ -42,6 +43,7 @@ public class SimpleTextEmbedding implements TextEmbedding {
         return NDArrays.stack(result);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray embedText(NDArray text) throws EmbeddingException {
         NDList split = text.split(text.getShape().get(0));
@@ -52,6 +54,7 @@ public class SimpleTextEmbedding implements TextEmbedding {
         return NDArrays.stack(result);
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<String> unembedText(NDArray textEmbedding) throws EmbeddingException {
         NDList split = textEmbedding.split(textEmbedding.getShape().get(0));
