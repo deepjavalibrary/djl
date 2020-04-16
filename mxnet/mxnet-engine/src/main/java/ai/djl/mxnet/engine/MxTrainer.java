@@ -21,6 +21,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
+import ai.djl.training.DataManager;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
@@ -55,6 +56,7 @@ public class MxTrainer implements Trainer {
     private ParameterStore parameterStore;
     private List<Evaluator> evaluators;
     private Loss loss;
+    private DataManager dataManager;
     long batchBeginTime;
 
     private boolean gradientsChecked;
@@ -71,6 +73,7 @@ public class MxTrainer implements Trainer {
         manager = (MxNDManager) model.getNDManager().newSubManager();
         devices = trainingConfig.getDevices();
         loss = trainingConfig.getLossFunction();
+        dataManager = trainingConfig.getDataManager();
         if (loss == null) {
             throw new IllegalArgumentException("You must specify a loss for the trainer");
         }
@@ -120,8 +123,8 @@ public class MxTrainer implements Trainer {
                 new BatchData(batch, new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
         try (GradientCollector collector = newGradientCollector()) {
             for (Batch split : splits) {
-                NDList data = split.getData();
-                NDList labels = split.getLabels();
+                NDList data = dataManager.getData(split);
+                NDList labels = dataManager.getLabels(split);
                 NDList preds = forward(data);
                 long time = System.nanoTime();
                 NDArray lossValue = loss.evaluate(labels, preds);
@@ -164,8 +167,8 @@ public class MxTrainer implements Trainer {
         BatchData batchData =
                 new BatchData(batch, new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
         for (Batch split : splits) {
-            NDList data = split.getData();
-            NDList labels = split.getLabels();
+            NDList data = dataManager.getData(split);
+            NDList labels = dataManager.getLabels(split);
 
             NDList preds = forward(data);
             batchData.getLabels().put(labels.get(0).getDevice(), labels);
