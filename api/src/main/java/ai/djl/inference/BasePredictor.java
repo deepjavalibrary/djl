@@ -14,6 +14,8 @@ package ai.djl.inference;
 
 import ai.djl.Model;
 import ai.djl.metric.Metrics;
+import ai.djl.ndarray.LazyNDArray;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Block;
@@ -122,7 +124,13 @@ public class BasePredictor<I, O> implements Predictor<I, O> {
         this.metrics = metrics;
     }
 
-    protected void waitToRead(NDList list) {}
+    private void waitToRead(NDList list) {
+        for (NDArray array : list) {
+            if (array instanceof LazyNDArray) {
+                ((LazyNDArray) array).waitToRead();
+            }
+        }
+    }
 
     protected NDList forward(TranslatorContext ctx, NDList ndList) {
         logger.trace("Predictor input data: {}", ndList);

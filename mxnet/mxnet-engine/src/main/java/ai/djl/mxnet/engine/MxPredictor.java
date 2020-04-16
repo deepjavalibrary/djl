@@ -14,7 +14,6 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.inference.BasePredictor;
 import ai.djl.inference.Predictor;
-import ai.djl.ndarray.NDList;
 import ai.djl.translate.Translator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,12 +38,6 @@ public class MxPredictor<I, O> extends BasePredictor<I, O> {
      */
     MxPredictor(MxModel model, Translator<I, O> translator, boolean copy) {
         super(model, translator, copy);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void waitToRead(NDList list) {
-        list.forEach(a -> ((MxNDArray) a).waitToRead());
     }
 
     /** {@inheritDoc} */

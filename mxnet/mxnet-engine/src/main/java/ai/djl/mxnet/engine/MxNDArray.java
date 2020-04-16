@@ -15,6 +15,7 @@ package ai.djl.mxnet.engine;
 import ai.djl.Device;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.jna.NativeResource;
+import ai.djl.ndarray.LazyNDArray;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -42,7 +43,7 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 /** {@code MxNDArray} is the MXNet implementation of {@link NDArray}. */
-public class MxNDArray extends NativeResource implements NDArray {
+public class MxNDArray extends NativeResource implements LazyNDArray {
 
     private static final int MAX_SIZE = 100;
     private static final int MAX_DEPTH = 10;
@@ -1661,17 +1662,20 @@ public class MxNDArray extends NativeResource implements NDArray {
         }
     }
 
-    /** Runs the current NDArray and sleeps until the value is ready to read. */
+    /** {@inheritDoc} */
+    @Override
     public void waitToRead() {
         JnaUtils.waitToRead(getHandle());
     }
 
-    /** Runs the current NDArray and sleeps until the value is ready to write. */
+    /** {@inheritDoc} */
+    @Override
     public void waitToWrite() {
         JnaUtils.waitToWrite(getHandle());
     }
 
-    /** Runs all NDArrays and sleeps until their values are fully computed. */
+    /** {@inheritDoc} */
+    @Override
     public void waitAll() {
         JnaUtils.waitToRead(getHandle());
     }
