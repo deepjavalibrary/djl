@@ -1,2 +1,2 @@
-gluoncv==0.6.0
-mxnet==1.6.0
+gluoncv>=0.6.0
+mxnet>=1.6.0
