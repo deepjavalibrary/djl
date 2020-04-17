@@ -16,8 +16,8 @@ import ai.djl.Application;
 import ai.djl.uploader.arguments.GluonCvArgs;
 import java.io.IOException;
 
-public final class GluonCvExporter {
-    private String filePath = "gluoncv_import.py";
+public final class GluonCvMetaBuilder {
+    private String filePath = "python/mxnet/gluoncv_import.py";
     private String pythonPath = "python";
     private GluonCvArgs args;
     private String name;
@@ -26,56 +26,48 @@ public final class GluonCvExporter {
     private String baseDir;
     private Application application;
 
-    public GluonCvExporter optFilePath(String filePath) {
+    public GluonCvMetaBuilder optFilePath(String filePath) {
         this.filePath = filePath;
         return this;
     }
 
-    public GluonCvExporter optPythonPath(String pythonPath) {
+    public GluonCvMetaBuilder optPythonPath(String pythonPath) {
         this.pythonPath = pythonPath;
         return this;
     }
 
-    public GluonCvExporter setArgs(GluonCvArgs args) {
+    public GluonCvMetaBuilder setArgs(GluonCvArgs args) {
         this.args = args;
         return this;
     }
 
-    public GluonCvExporter setBaseDir(String baseDir) {
+    public GluonCvMetaBuilder setBaseDir(String baseDir) {
         this.baseDir = baseDir;
         return this;
     }
 
-    public GluonCvExporter setName(String name) {
+    public GluonCvMetaBuilder setName(String name) {
         this.name = name;
         return this;
     }
 
-    public GluonCvExporter setDescription(String description) {
+    public GluonCvMetaBuilder setDescription(String description) {
         this.description = description;
         return this;
     }
 
-    public GluonCvExporter setApplication(Application application) {
+    public GluonCvMetaBuilder setApplication(Application application) {
         this.application = application;
         return this;
     }
 
-    public GluonCvExporter setArtifactId(String artifactId) {
+    public GluonCvMetaBuilder setArtifactId(String artifactId) {
         this.artifactId = artifactId;
         return this;
     }
 
-    public void exportLocal(boolean external) throws IOException, InterruptedException {
-        ModelExporter.processSpawner(filePath, pythonPath, args);
-        if (external) {
-            prepareBuild().buildExternal();
-        } else {
-            prepareBuild().buildLocal();
-        }
-    }
-
-    private MetadataBuilder prepareBuild() {
+    public MetadataBuilder prepareBuild() throws IOException, InterruptedException {
+        Exporter.processSpawner(filePath, pythonPath, args);
         return MetadataBuilder.builder()
                 .setGroupId("ai.djl.mxnet")
                 .setApplication(application)
@@ -85,6 +77,6 @@ public final class GluonCvExporter {
                 .setDescription(description)
                 .setArtifactId(artifactId)
                 .setBaseDir(baseDir)
-                .addArgument("shape", args.getShape().toString());
+                .addArgument("shape", args.getShape());
     }
 }
