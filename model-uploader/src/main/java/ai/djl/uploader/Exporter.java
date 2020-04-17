@@ -15,7 +15,12 @@ package ai.djl.uploader;
 
 import ai.djl.uploader.arguments.Arguments;
 import ai.djl.uploader.arguments.GluonCvArgs;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import org.apache.commons.cli.CommandLine;
@@ -104,6 +109,16 @@ public final class Exporter {
         commands.add(filePath);
         commands.addAll(args.getArgs());
         Process p = new ProcessBuilder().command(commands).start();
-        p.waitFor();
+        int exitCode = p.waitFor();
+        if (exitCode != 0) {
+            InputStream errorStream = p.getErrorStream();
+            int c;
+            StringBuilder result = new StringBuilder();
+            while ((c = errorStream.read()) != -1) {
+                result.append((char) c);
+            }
+            throw new InterruptedIOException(result.toString());
+        }
+        p.destroy();
     }
 }

@@ -75,7 +75,7 @@ public class ExporterArguments {
         artifactId = cmd.getOptionValue("artifact-id");
         property = valueParser(cmd.getOptionValue("property"));
         argument = valueParser(cmd.getOptionValue("argument"));
-        artifactDir = cmd.getOptionValue("artifact-directory");
+        artifactDir = cmd.getOptionValue("input-directory");
         isRemote = cmd.hasOption("remote");
         pythonPath = cmd.getOptionValue("python-path");
         shape = cmd.getOptionValue("shape");
@@ -105,7 +105,6 @@ public class ExporterArguments {
         options.addOption("g", "groupid", true, "the groupId of the metadata");
         options.addOption("d", "description", true, "the description of the metadata");
         options.addOption("b", "input-directory", true, "the input directory");
-        options.addOption("ai", "artifact-id", true, "artifact id");
         options.addOption(
                 "ap",
                 "application",
@@ -193,6 +192,9 @@ public class ExporterArguments {
 
     private Map<String, String> valueParser(String value) {
         Map<String, String> result = new ConcurrentHashMap<>();
+        if (value == null) {
+            return result;
+        }
         String[] keyValues = value.split(",");
         for (String keyValue : keyValues) {
             String[] keyValueArray = keyValue.split(":");

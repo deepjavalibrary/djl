@@ -249,7 +249,7 @@ public final class MetadataBuilder {
      * @return builder
      */
     public MetadataBuilder addProperties(Map<String, String> properties) {
-        this.properties = properties;
+        this.properties = new LinkedHashMap<>(properties);
         return this;
     }
 
@@ -278,7 +278,7 @@ public final class MetadataBuilder {
      * @return builder
      */
     public MetadataBuilder addArguments(Map<String, Object> arguments) {
-        this.arguments = arguments;
+        this.arguments = new LinkedHashMap<>(arguments);
         return this;
     }
 

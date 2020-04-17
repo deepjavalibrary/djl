@@ -17,7 +17,7 @@ import ai.djl.uploader.arguments.GluonCvArgs;
 import java.io.IOException;
 
 public final class GluonCvMetaBuilder {
-    private String filePath = "gluoncv_import.py";
+    private String filePath = "python/mxnet/gluoncv_import.py";
     private String pythonPath = "python";
     private GluonCvArgs args;
     private String name;
