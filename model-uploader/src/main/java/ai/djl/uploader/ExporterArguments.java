@@ -45,6 +45,9 @@ public class ExporterArguments {
         if (cmd.hasOption("gluoncv")) {
             category = "gluoncv";
         }
+        if (cmd.hasOption("keras")) {
+            category = "keras";
+        }
         if (cmd.hasOption("model")) {
             category = "model";
         }
@@ -87,6 +90,7 @@ public class ExporterArguments {
                 new OptionGroup()
                         .addOption(new Option("dataset", false, "create dataset metadata"))
                         .addOption(new Option("gluoncv", false, "import gluoncv model"))
+                        .addOption(new Option("keras", false, "import keras model"))
                         .addOption(new Option("model", false, "import general model"));
         og.setRequired(true);
         options.addOptionGroup(og);
