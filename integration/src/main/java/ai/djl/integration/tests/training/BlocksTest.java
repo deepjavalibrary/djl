@@ -18,13 +18,13 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Blocks;
+import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class BlocksTest {
@@ -44,7 +44,7 @@ public class BlocksTest {
                 NDArray data = manager.randomUniform(0, 255, new Shape(10, 28, 28));
                 NDArray expected = data.reshape(10, 28 * 28);
                 NDArray result = model.getBlock().forward(parameterStore, new NDList(data)).head();
-                Assert.assertEquals(result, expected);
+                Assertions.assertAlmostEquals(result, expected);
             }
         }
     }
