@@ -332,6 +332,7 @@ public final class MetadataBuilder {
             huc.setRequestMethod("HEAD");
             int responseCode = huc.getResponseCode();
             if (HttpURLConnection.HTTP_OK == responseCode) {
+                Files.createDirectories(targetDir);
                 try (InputStream is = metadataURL.openStream()) {
                     Files.copy(is, metadata, StandardCopyOption.REPLACE_EXISTING);
                 }
@@ -379,9 +380,9 @@ public final class MetadataBuilder {
             artifact.setSnapshot(isSnapshot);
         }
         artifact.setFiles(constructFiles(destination));
-        if (!isDataSet && !artifact.getFiles().containsKey("model")) {
-            throw new IllegalStateException(
-                    "Model not found in files! " + artifact.getFiles().keySet());
+        Map<String, Artifact.Item> fileList = artifact.getFiles();
+        if (!isDataSet && !fileList.containsKey("model") && !fileList.containsKey("symbol")) {
+            throw new IllegalStateException("Model not found in files! " + fileList.keySet());
         }
         artifact.setVersion(artifactVersion);
         return artifact;
