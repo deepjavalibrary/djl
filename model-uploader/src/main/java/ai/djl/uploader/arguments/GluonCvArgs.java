@@ -12,8 +12,7 @@
  */
 package ai.djl.uploader.arguments;
 
-import ai.djl.ndarray.types.Shape;
-import ai.djl.uploader.Arguments;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,17 +20,17 @@ public final class GluonCvArgs implements Arguments {
 
     private String name;
     private String outputPath;
-    private Shape shape;
+    private String shape;
 
     public void setName(String name) {
         this.name = name;
     }
 
     public void setOutputPath(String outputPath) {
-        this.outputPath = outputPath;
+        this.outputPath = Paths.get(outputPath).resolve("gluoncv").toAbsolutePath().toString();
     }
 
-    public void setShape(Shape shape) {
+    public void setShape(String shape) {
         this.shape = shape;
     }
 
@@ -39,7 +38,7 @@ public final class GluonCvArgs implements Arguments {
         return name;
     }
 
-    public Shape getShape() {
+    public String getShape() {
         return shape;
     }
 
@@ -55,7 +54,7 @@ public final class GluonCvArgs implements Arguments {
         args.add("--output_path");
         args.add(outputPath);
         args.add("--shape");
-        args.add(shape.toString());
+        args.add(shape);
         return args;
     }
 }

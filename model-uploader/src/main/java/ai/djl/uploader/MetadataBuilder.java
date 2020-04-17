@@ -243,6 +243,17 @@ public final class MetadataBuilder {
     }
 
     /**
+     * Adds properties to the artifact.
+     *
+     * @param properties properties to classify the example
+     * @return builder
+     */
+    public MetadataBuilder addProperties(Map<String, String> properties) {
+        this.properties = new LinkedHashMap<>(properties);
+        return this;
+    }
+
+    /**
      * Adds an argument to the artifact.
      *
      * <p>Arguments are helpful for people to get the information of the model or dataset. Such as
@@ -261,14 +272,26 @@ public final class MetadataBuilder {
     }
 
     /**
+     * Adds arguments to the artifact.
+     *
+     * @param arguments arguments to use the model
+     * @return builder
+     */
+    public MetadataBuilder addArguments(Map<String, Object> arguments) {
+        this.arguments = new LinkedHashMap<>(arguments);
+        return this;
+    }
+
+    /**
      * Builds the metadata locally.
      *
      * <p>This function will create or update the metadata, compress all artifacts and copy them
      * into the formatted location in the repository.
      *
+     * @return Metadata
      * @throws IOException failed to create or copy files
      */
-    public void buildLocal() throws IOException {
+    public Metadata buildLocal() throws IOException {
         String fileName = "metadata.json";
         Path targetDir =
                 Paths.get(
@@ -293,6 +316,7 @@ public final class MetadataBuilder {
         try (BufferedWriter myWriter = Files.newBufferedWriter(metadataPath)) {
             myWriter.write(GSON.toJson(metadata, Metadata.class));
         }
+        return metadata;
     }
 
     /**
@@ -300,9 +324,10 @@ public final class MetadataBuilder {
      *
      * <p>If the metadata is not found in model zoo, a metadata will be created
      *
+     * @return Metadata
      * @throws IOException failed to create or copy files
      */
-    public void buildExternal() throws IOException {
+    public Metadata buildExternal() throws IOException {
         String fileName = "metadata.json";
         String groupPath = groupId.replace('.', '/');
         String reconstructedURI =
@@ -337,7 +362,7 @@ public final class MetadataBuilder {
                     Files.copy(is, metadata, StandardCopyOption.REPLACE_EXISTING);
                 }
             }
-            buildLocal();
+            return buildLocal();
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("The properties to create URL is invalid", e);
         }
