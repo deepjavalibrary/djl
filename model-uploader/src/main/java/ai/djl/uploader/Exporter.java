@@ -15,6 +15,7 @@ package ai.djl.uploader;
 
 import ai.djl.uploader.arguments.Arguments;
 import ai.djl.uploader.arguments.GluonCvArgs;
+import ai.djl.uploader.arguments.KerasArgs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
@@ -42,6 +43,8 @@ public final class Exporter {
                 metadataBuilder = dataset(arguments);
             } else if ("gluoncv".equals(category)) {
                 metadataBuilder = gluonCvImport(arguments);
+            } else if ("keras".equals(category)) {
+                metadataBuilder = kerasImport(arguments);
             } else {
                 metadataBuilder = readyToGoModel(arguments);
             }
@@ -70,6 +73,26 @@ public final class Exporter {
                         .setArgs(args)
                         .setBaseDir(arguments.getBaseDir())
                         .setArtifactId(arguments.getArtifactId())
+                        .setName(arguments.getName())
+                        .setDescription(arguments.getDescription());
+        String pythonPath = arguments.getPythonPath();
+        if (pythonPath != null) {
+            exporter.optPythonPath(pythonPath);
+        }
+        return exporter.prepareBuild();
+    }
+
+    public static MetadataBuilder kerasImport(ExporterArguments arguments)
+            throws IOException, InterruptedException {
+        KerasArgs args = new KerasArgs();
+        args.setArtifactPath(arguments.getArtifactDir());
+        KerasMetaBuilder exporter =
+                new KerasMetaBuilder()
+                        .setApplication(arguments.getApplication())
+                        .setArgs(args)
+                        .setBaseDir(arguments.getBaseDir())
+                        .setArtifactId(arguments.getArtifactId())
+                        .setArtifactName(arguments.getArtifactName())
                         .setName(arguments.getName())
                         .setDescription(arguments.getDescription());
         String pythonPath = arguments.getPythonPath();
