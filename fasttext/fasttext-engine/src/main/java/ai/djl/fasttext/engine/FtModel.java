@@ -14,6 +14,7 @@ package ai.djl.fasttext.engine;
 
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.fasttext.dataset.FtDataset;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -21,6 +22,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
+import ai.djl.training.TrainingResult;
 import ai.djl.translate.Translator;
 import ai.djl.util.PairList;
 import com.github.jfasttext.FastTextWrapper;
@@ -33,6 +35,8 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import org.bytedeco.javacpp.CharPointer;
+import org.bytedeco.javacpp.PointerPointer;
 
 /**
  * {@code FtModel} is the fastText implementation of {@link Model}.
@@ -96,6 +100,38 @@ public class FtModel implements Model {
         properties.put("model-type", fta.getModelName().getString());
     }
 
+    /**
+     * Train the fastText model.
+     *
+     * @param config the training configuration to use
+     * @param trainingSet the training dataset
+     * @param validateSet the validation dataset
+     * @return the result of the training
+     * @throws IOException when IO operation fails in loading a resource
+     */
+    public TrainingResult fit(FtTrainingConfig config, FtDataset trainingSet, FtDataset validateSet)
+            throws IOException {
+        Path outputDir = config.getOutputDir();
+        if (Files.notExists(outputDir)) {
+            Files.createDirectory(outputDir);
+        }
+        String fitModelName = config.getModelName();
+        Path modelFile = outputDir.resolve(fitModelName).toAbsolutePath();
+
+        String[] args = config.toCommand(trainingSet.getInputFile().toString());
+
+        fta.runCmd(args.length, new PointerPointer<CharPointer>(args));
+        setModelFile(modelFile);
+
+        TrainingResult result = new TrainingResult();
+        int epoch = config.getEpoch();
+        if (epoch <= 0) {
+            epoch = 5;
+        }
+        result.setEpoch(epoch);
+        return result;
+    }
+
     /** {@inheritDoc} */
     @Override
     public void save(Path modelDir, String modelName) {}
@@ -121,7 +157,8 @@ public class FtModel implements Model {
     /** {@inheritDoc} */
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
-        return new FtTrainer(this, trainingConfig);
+        throw new UnsupportedOperationException(
+                "FastText only supports training using FtModel.fit");
     }
 
     /** {@inheritDoc} */

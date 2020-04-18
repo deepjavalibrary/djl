@@ -16,7 +16,7 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.fasttext.dataset.CookingStackExchange;
-import ai.djl.fasttext.engine.FtTrainer;
+import ai.djl.fasttext.engine.FtModel;
 import ai.djl.fasttext.engine.FtTrainingConfig;
 import ai.djl.fasttext.engine.TextClassificationTranslator;
 import ai.djl.fasttext.engine.Word2VecTranslator;
@@ -46,7 +46,7 @@ public class TrainCookingStackExchange {
 
     @Test
     public void testTrainTextClassification() throws IOException {
-        try (Model model = Model.newInstance()) {
+        try (FtModel model = (FtModel) Model.newInstance()) {
             CookingStackExchange trainingSet = getDataset(Dataset.Usage.TRAIN);
             CookingStackExchange validateSet = getDataset(Dataset.Usage.TEST);
 
@@ -58,9 +58,7 @@ public class TrainCookingStackExchange {
                             .optLoss(FtTrainingConfig.FtLoss.HS)
                             .build();
 
-            try (FtTrainer trainer = (FtTrainer) model.newTrainer(config)) {
-                trainer.fit(trainingSet, validateSet);
-            }
+            model.fit(config, trainingSet, validateSet);
             Assert.assertTrue(Files.exists(Paths.get("build/cooking.bin")));
         }
     }

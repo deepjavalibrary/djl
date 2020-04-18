@@ -15,6 +15,7 @@ package ai.djl.engine;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
+import ai.djl.training.GradientCollector;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
@@ -146,6 +147,13 @@ public abstract class Engine {
      * @return a new top-level {@code NDManager}
      */
     public abstract NDManager newBaseManager(Device device);
+
+    /**
+     * Returns a new instance of {@link GradientCollector}.
+     *
+     * @return a new instance of {@link GradientCollector}
+     */
+    public abstract GradientCollector newGradientCollector();
 
     /**
      * Seeds the random number generator in DJL Engine.

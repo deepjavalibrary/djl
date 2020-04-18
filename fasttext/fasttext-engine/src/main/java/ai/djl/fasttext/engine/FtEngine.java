@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
+import ai.djl.training.GradientCollector;
 
 /**
  * The {@code FtEngine} is an implementation of the {@link Engine} based on the <a
@@ -65,6 +66,12 @@ public class FtEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return null;
+    }
+
+    @Override
+    public GradientCollector newGradientCollector() {
+        throw new UnsupportedOperationException(
+                "FastText only supports training using FtModel.fit");
     }
 
     /** {@inheritDoc} */

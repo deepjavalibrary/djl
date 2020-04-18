@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
+import ai.djl.training.GradientCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tensorflow.TensorFlow;
@@ -79,6 +80,12 @@ public final class TfEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return TfNDManager.getSystemManager().newSubManager(device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public GradientCollector newGradientCollector() {
+        throw new UnsupportedOperationException("TensorFlow does not support training yet");
     }
 
     /** {@inheritDoc} */

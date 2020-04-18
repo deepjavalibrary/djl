@@ -18,6 +18,7 @@ import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
+import ai.djl.training.GradientCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +88,12 @@ public final class PtEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return PtNDManager.getSystemManager().newSubManager(device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public GradientCollector newGradientCollector() {
+        throw new UnsupportedOperationException("PyTorch does not support training yet");
     }
 
     /** {@inheritDoc} */

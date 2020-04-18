@@ -115,7 +115,7 @@ public class MxModel extends BaseModel {
         }
         block.setInitializer(initializer);
 
-        return new MxTrainer(this, trainingConfig);
+        return new Trainer(this, trainingConfig);
     }
 
     /** {@inheritDoc} */

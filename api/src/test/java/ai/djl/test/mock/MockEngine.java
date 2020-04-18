@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
+import ai.djl.training.GradientCollector;
 
 public class MockEngine extends Engine {
 
@@ -55,6 +56,11 @@ public class MockEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return new MockNDManager();
+    }
+
+    @Override
+    public GradientCollector newGradientCollector() {
+        return null;
     }
 
     /** {@inheritDoc} */
