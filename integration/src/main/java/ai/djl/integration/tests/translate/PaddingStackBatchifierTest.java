@@ -33,7 +33,7 @@ public class PaddingStackBatchifierTest {
             Batchifier batchifier =
                     PaddingStackBatchifier.builder()
                             .optIncludeValidLengths(false)
-                            .addPad(0, 1, () -> manager.zeros(new Shape(10, 1)))
+                            .addPad(0, 1, (mngr) -> mngr.zeros(new Shape(10, 1)))
                             .build();
             NDList actual = batchifier.batchify(input);
 
@@ -59,7 +59,7 @@ public class PaddingStackBatchifierTest {
             Batchifier batchifier =
                     PaddingStackBatchifier.builder()
                             .optIncludeValidLengths(true)
-                            .addPad(0, 1, () -> manager.zeros(new Shape(10, 1)))
+                            .addPad(0, 1, (mngr) -> mngr.zeros(new Shape(10, 1)))
                             .build();
             NDList actual = batchifier.batchify(input);
 
@@ -81,7 +81,7 @@ public class PaddingStackBatchifierTest {
             Batchifier batchifier =
                     PaddingStackBatchifier.builder()
                             .optIncludeValidLengths(false)
-                            .addPad(0, 1, () -> manager.zeros(new Shape(10, 1)), 13)
+                            .addPad(0, 1, (mngr) -> mngr.zeros(new Shape(10, 1)), 13)
                             .build();
             NDList actual = batchifier.batchify(input);
 
@@ -99,7 +99,7 @@ public class PaddingStackBatchifierTest {
             Batchifier batchifier =
                     PaddingStackBatchifier.builder()
                             .optIncludeValidLengths(false)
-                            .addPad(0, 1, () -> manager.zeros(new Shape(10, 1)))
+                            .addPad(0, 1, (mngr) -> mngr.zeros(new Shape(10, 1)))
                             .build();
             NDList[] actual = batchifier.unbatchify(input);
 
@@ -121,7 +121,7 @@ public class PaddingStackBatchifierTest {
             Batchifier batchifier =
                     PaddingStackBatchifier.builder()
                             .optIncludeValidLengths(true)
-                            .addPad(0, 1, () -> manager.zeros(new Shape(4, 1)))
+                            .addPad(0, 1, (mngr) -> mngr.zeros(new Shape(4, 1)))
                             .build();
             NDList[] actual = batchifier.unbatchify(input);
 
@@ -144,7 +144,7 @@ public class PaddingStackBatchifierTest {
             Batchifier batchifier =
                     PaddingStackBatchifier.builder()
                             .optIncludeValidLengths(false)
-                            .addPad(0, 1, () -> manager.zeros(new Shape(10, 1)))
+                            .addPad(0, 1, (mngr) -> mngr.zeros(new Shape(10, 1)))
                             .build();
             NDList[] actual = batchifier.split(input, 3, false);
 
@@ -172,7 +172,7 @@ public class PaddingStackBatchifierTest {
             Batchifier batchifier =
                     PaddingStackBatchifier.builder()
                             .optIncludeValidLengths(true)
-                            .addPad(0, 1, () -> manager.zeros(new Shape(3, 1)))
+                            .addPad(0, 1, (mngr) -> mngr.zeros(new Shape(3, 1)))
                             .build();
             NDList[] actual = batchifier.split(input, 2, false);
 

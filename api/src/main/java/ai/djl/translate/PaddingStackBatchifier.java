@@ -19,7 +19,6 @@ import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * The padding stack batchifier is a {@link StackBatchifier} that also pads elements to reach the
@@ -29,7 +28,7 @@ public final class PaddingStackBatchifier implements Batchifier {
 
     private List<Integer> arraysToPad;
     private List<Integer> dimsToPad;
-    private List<Supplier<NDArray>> paddingSuppliers;
+    private List<NDArraySupplier> paddingSuppliers;
     private List<Integer> paddingSizes;
     private boolean includeValidLengths;
 
@@ -49,7 +48,7 @@ public final class PaddingStackBatchifier implements Batchifier {
             long[] arrayValidLengths = new long[inputs.length];
             int arrayIndex = arraysToPad.get(i);
             int dimIndex = dimsToPad.get(i);
-            NDArray padding = paddingSuppliers.get(i).get();
+            NDArray padding = paddingSuppliers.get(i).get(manager);
             long paddingSize = paddingSizes.get(i);
             long maxSize = -1;
             for (NDList input : inputs) {
@@ -144,7 +143,7 @@ public final class PaddingStackBatchifier implements Batchifier {
 
         private List<Integer> arraysToPad;
         private List<Integer> dimsToPad;
-        private List<Supplier<NDArray>> paddingSuppliers;
+        private List<NDArraySupplier> paddingSuppliers;
         private List<Integer> paddingSizes;
         private boolean includeValidLengths;
 
@@ -176,7 +175,7 @@ public final class PaddingStackBatchifier implements Batchifier {
          *     NTC, the padding shape should be N x 1 x C
          * @return this builder
          */
-        public Builder addPad(int array, int dim, Supplier<NDArray> supplier) {
+        public Builder addPad(int array, int dim, NDArraySupplier supplier) {
             return addPad(array, dim, supplier, -1);
         }
 
@@ -192,7 +191,7 @@ public final class PaddingStackBatchifier implements Batchifier {
          *     than this size
          * @return this builder
          */
-        public Builder addPad(int array, int dim, Supplier<NDArray> supplier, int paddingSize) {
+        public Builder addPad(int array, int dim, NDArraySupplier supplier, int paddingSize) {
             arraysToPad.add(array);
             dimsToPad.add(dim);
             paddingSuppliers.add(supplier);
