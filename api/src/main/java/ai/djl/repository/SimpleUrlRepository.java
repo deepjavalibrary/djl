@@ -120,7 +120,6 @@ public class SimpleUrlRepository extends AbstractRepository {
             resolved = true;
             conn = (HttpURLConnection) uri.toURL().openConnection();
             conn.setRequestMethod("HEAD");
-            conn.setConnectTimeout(100);
             int code = conn.getResponseCode();
             if (code != 200) {
                 logger.info("request error: " + code);
