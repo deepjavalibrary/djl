@@ -143,7 +143,7 @@ public final class TrainSeq2Seq {
                         .optBatchier(
                                 PaddingStackBatchifier.builder()
                                         .optIncludeValidLengths(true)
-                                        .addPad(0, 0, () -> manager.zeros(new Shape(1)))
+                                        .addPad(0, 0, (m) -> m.zeros(new Shape(1)))
                                         .build())
                         .optEmbeddingSize(32)
                         .optUsage(usage)
