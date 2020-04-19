@@ -28,12 +28,30 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Applies dropout operation to an input array.
+ * <p>A dropout layer benefits a network by allowing some units (neurons), and hence their
+ * respective connections, of a network to be randomly and temporarily removed by setting its
+ * value to 0 <b>only</b> during training by specified probability \(p\), usually set to 0.5. The
+ * use of dropout acts as if multiple networks with different architectures had been trained, and
+ * during test/inference, the removed unit's output is multiplied by \(p\) as an approximation of
+ * the averaged output of all the possible network architectures for that unit. The implementation
+ * of dropout gives state-of-the-art performances for diverse tasks as shown in the proposal's
+ * <a href="https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf">paper</a>, suggesting its
+ * general-use capability.
  *
- * <p>During training, each element of the input is set to zero with probability p. The whole array
- * is rescaled by 1/(1−p) to keep the expected sum of the input unchanged. During testing, this
- * dropout does not change the input if mode is ‘training’. If mode is ‘always’, the same
- * computation as during training will be applied.
+ * <p>The idea of dropout itself was proposed in 2014, with the purpose of improving the
+ * performance of large networks due to co-adaptation, where some connections are stronger and
+ * learned more while other connections become weaker and loses their impact on the prediction,
+ * resulting in network overfitting. It was also created as an alternative for costly networks,
+ * such as large or ensemble networks, by removing several units, hence creating different
+ * thinned network architectures and simulates multiple networks within a single network, greatly
+ * reducing the computation cost.
+ *
+ * <p>Dropout is recommended to be used when one is trying to optimize an overfitting network or
+ * when large dataset is available. It is still quite commonly used in many publications due to
+ * its generalization capability. However, using dropout may not prevent overfitting due to
+ * variation and limited size of the dataset, and it is reported that dropout layer increases
+ * training time by 2-3 times since different simulated multiple networks are trained for each
+ * iteration, thus resulting in noisy parameter updates.
  */
 public class Dropout extends ParameterBlock {
 
