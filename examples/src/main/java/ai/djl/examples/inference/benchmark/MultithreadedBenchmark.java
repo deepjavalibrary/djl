@@ -63,6 +63,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
         int successThreads = 0;
         try {
+            metrics.addMetric("mt_start", System.currentTimeMillis(), "mills");
             List<Future<Object>> futures = executorService.invokeAll(callables);
             for (Future<Object> future : futures) {
                 try {
@@ -94,6 +95,8 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         private String workerId;
         private boolean collectMemory;
         private AtomicInteger counter;
+        private int total;
+        private int steps;
 
         public PredictorCallable(
                 ZooModel<?, ?> model,
@@ -109,6 +112,8 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
             this.workerId = String.format("%02d", workerId);
             this.collectMemory = collectMemory;
             predictor.setMetrics(metrics);
+            total = counter.get();
+            steps = (int) Math.pow(10, Math.log10(total) - 1);
         }
 
         /** {@inheritDoc} */
@@ -117,12 +122,17 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         public Object call() throws TranslateException {
             Object result = null;
             int count = 0;
-            while (counter.decrementAndGet() > 0) {
+            int remaining;
+            while ((remaining = counter.decrementAndGet()) > 0) {
                 result = predictor.predict(inputData);
                 if (collectMemory) {
                     MemoryTrainingListener.collectMemoryInfo(metrics);
                 }
+                int processed = total - remaining;
                 logger.trace("Worker-{}: {} iteration finished.", workerId, ++count);
+                if (processed % steps == 0) {
+                    logger.info("Completed {} requests", processed);
+                }
             }
             logger.debug("Worker-{}: finished.", workerId);
             return result;

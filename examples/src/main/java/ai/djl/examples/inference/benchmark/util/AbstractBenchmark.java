@@ -125,6 +125,10 @@ public abstract class AbstractBenchmark {
                 progressBar = new ProgressBar("Iteration", iteration);
                 long begin = System.currentTimeMillis();
                 lastResult = predict(arguments, metrics, iteration);
+
+                if (metrics.hasMetric("mt_start")) {
+                    begin = metrics.getMetric("mt_start").get(0).getValue().longValue();
+                }
                 long totalTime = System.currentTimeMillis() - begin;
 
                 logger.info("Inference result: {}", lastResult);
@@ -141,6 +145,12 @@ public abstract class AbstractBenchmark {
                 }
 
                 if (metrics.hasMetric("Inference") && iteration > 1) {
+                    float totalP50 =
+                            metrics.percentile("Total", 50).getValue().longValue() / 1_000_000f;
+                    float totalP90 =
+                            metrics.percentile("Total", 90).getValue().longValue() / 1_000_000f;
+                    float totalP99 =
+                            metrics.percentile("Total", 99).getValue().longValue() / 1_000_000f;
                     float p50 =
                             metrics.percentile("Inference", 50).getValue().longValue() / 1_000_000f;
                     float p90 =
@@ -165,6 +175,10 @@ public abstract class AbstractBenchmark {
                     float postP99 =
                             metrics.percentile("Postprocess", 99).getValue().longValue()
                                     / 1_000_000f;
+                    logger.info(
+                            String.format(
+                                    "total P50: %.3f ms, P90: %.3f ms, P99: %.3f ms",
+                                    totalP50, totalP90, totalP99));
                     logger.info(
                             String.format(
                                     "inference P50: %.3f ms, P90: %.3f ms, P99: %.3f ms",

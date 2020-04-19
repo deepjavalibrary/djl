@@ -121,6 +121,7 @@ public class Predictor<I, O> implements AutoCloseable {
      */
     @SuppressWarnings("PMD.AvoidRethrowingException")
     public List<O> batchPredict(List<I> inputs) throws TranslateException {
+        long begin = System.nanoTime();
         try (PredictorContext context = new PredictorContext()) {
             if (!prepared) {
                 translator.prepare(manager, model);
@@ -131,6 +132,7 @@ public class Predictor<I, O> implements AutoCloseable {
                 List<O> ret = new ArrayList<>(inputs.size());
                 for (I input : inputs) {
                     timestamp = System.nanoTime();
+                    begin = timestamp;
                     NDList ndList = translator.processInput(context, input);
                     preprocessEnd(ndList);
 
@@ -138,7 +140,7 @@ public class Predictor<I, O> implements AutoCloseable {
                     forwardEnd(result);
 
                     ret.add(translator.processOutput(context, result));
-                    postProcessEnd();
+                    postProcessEnd(begin);
                 }
                 return ret;
             }
@@ -150,13 +152,13 @@ public class Predictor<I, O> implements AutoCloseable {
             NDList result = forward(inputBatch);
             forwardEnd(result);
 
-            return processOutputs(context, result);
+            List<O> ret = processOutputs(context, result);
+            postProcessEnd(begin);
+            return ret;
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new TranslateException(e);
-        } finally {
-            postProcessEnd();
         }
     }
 
@@ -222,12 +224,13 @@ public class Predictor<I, O> implements AutoCloseable {
         }
     }
 
-    private void postProcessEnd() {
+    private void postProcessEnd(long begin) {
         if (metrics != null) {
             long tmp = System.nanoTime();
             long duration = tmp - timestamp;
             timestamp = tmp;
             metrics.addMetric("Postprocess", duration, "nano");
+            metrics.addMetric("Total", tmp - begin, "nano");
         }
     }
 
