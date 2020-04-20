@@ -17,13 +17,13 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 
 /**
- * <p>{@code Conv3D} layer behaves just as {@link Convolution} does, with the distinction being it
- * operates of 3-dimensional data such as medical images or video data. The traversal of
- * each filter begins from {@link LayoutType#WIDTH} then to {@link LayoutType#HEIGHT}, and lastly
- * across each {@link LayoutType#DEPTH} in the specified {@code depth} size of the data.
+ * {@code Conv3D} layer behaves just as {@link Convolution} does, with the distinction being it
+ * operates of 3-dimensional data such as medical images or video data. The traversal of each filter
+ * begins from {@link LayoutType#WIDTH} then to {@link LayoutType#HEIGHT}, and lastly across each
+ * {@link LayoutType#DEPTH} in the specified {@code depth} size of the data.
  *
- * <p>The utilization of {@code Conv3D} layer allows deeper analysis of visual data such as those
- * in medical images, or even analysis on temporal data such as video data as a whole instead of
+ * <p>The utilization of {@code Conv3D} layer allows deeper analysis of visual data such as those in
+ * medical images, or even analysis on temporal data such as video data as a whole instead of
  * processing each frame with a {@link Conv2D} layer, despite this being a common practice in
  * computer vision researches. The benefit of utilizing this kind of layer is the maintaining of
  * serial data across 2-dimensional data, hence could be beneficial for research focus on such as

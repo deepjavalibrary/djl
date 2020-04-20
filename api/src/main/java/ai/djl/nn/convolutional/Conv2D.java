@@ -17,20 +17,19 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 
 /**
- * <p>Being the pioneer of convolution layers, {@code Conv2D} layer works on two dimensions of
- * input, {@link LayoutType#WIDTH} and {@link LayoutType#HEIGHT} as usually a {@code Conv2D}
- * layer is used to process data with two spatial dimensions, namely image. The concept itself
- * works just as how {@link Convolution} does, and each filter slides through an input data by
- * two directions, first traversing the {@link LayoutType#WIDTH} then traverses each row of the
- * data.
+ * Being the pioneer of convolution layers, {@code Conv2D} layer works on two dimensions of input,
+ * {@link LayoutType#WIDTH} and {@link LayoutType#HEIGHT} as usually a {@code Conv2D} layer is used
+ * to process data with two spatial dimensions, namely image. The concept itself works just as how
+ * {@link Convolution} does, and each filter slides through an input data by two directions, first
+ * traversing the {@link LayoutType#WIDTH} then traverses each row of the data.
  *
- * <p>First proposed by LeCun <i>et al.</i>'s <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf">
- * paper</a>, 2-dimensional convolution layer gained its rising interest with the publication of
- * <a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf">
- * paper</a> about AlexNet for image classification task. It is still commonly used in
- * image-related tasks and adapted in other tasks, including but not limited to 1-dimensional
- * data which may be transformed to 2-dimensional data, though {@link Conv1D} is now available
- * for use.
+ * <p>First proposed by LeCun <i>et al.</i>'s <a
+ * href="http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf">paper</a>, 2-dimensional convolution
+ * layer gained its rising interest with the publication of <a
+ * href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf">
+ * paper</a> about AlexNet for image classification task. It is still commonly used in image-related
+ * tasks and adapted in other tasks, including but not limited to 1-dimensional data which may be
+ * transformed to 2-dimensional data, though {@link Conv1D} is now available for use.
  *
  * <p>The input to a {@code Conv2D} is an {@link ai.djl.ndarray.NDList} with a single 4-D {@link
  * ai.djl.ndarray.NDArray}. The layout of the {@link ai.djl.ndarray.NDArray} must be "NCHW". The

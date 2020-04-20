@@ -31,36 +31,36 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * <p>In batch training (training with more than one samples per iteration), a batch
- * normalization layer works by normalizing the values of input data to have mean of 0 and
- * variance of 1. Since this may alter the representation of a layer, two parameters (\
- * (\gamma\) and \(\beta\)) are learned along the normalization process to respectively scale and
- * shift the normalized output (activations) to have any mean and variance so the network can
- * utilize non-linear transformations such as sigmoid function as described in the
- * <a href="https://arxiv.org/abs/1502.03167">paper</a>. During backpropagation, both \(\gamma\) and
+ * In batch training (training with more than one samples per iteration), a batch normalization
+ * layer works by normalizing the values of input data to have mean of 0 and variance of 1. Since
+ * this may alter the representation of a layer, two parameters (\ (\gamma\) and \(\beta\)) are
+ * learned along the normalization process to respectively scale and shift the normalized output
+ * (activations) to have any mean and variance so the network can utilize non-linear transformations
+ * such as sigmoid function as described in the <a
+ * href="https://arxiv.org/abs/1502.03167">paper</a>. During backpropagation, both \(\gamma\) and
  * \(\beta\) parameters are included following the chain-rule in derivation.
  *
  * <p>The problem of varying distribution of input data requires the training process of a deep
- * network to compensate for each different data distribution per batch, hence changing
- * parameters' values as new batch data is processed and changes distribution of the network's
- * (and each of its layers) activations. This condition is termed as internal covariate shift,
- * and such occurrence prevents the network to learn faster and generalize better to unseen data.
+ * network to compensate for each different data distribution per batch, hence changing parameters'
+ * values as new batch data is processed and changes distribution of the network's (and each of its
+ * layers) activations. This condition is termed as internal covariate shift, and such occurrence
+ * prevents the network to learn faster and generalize better to unseen data.
  *
  * <p>With batch normalization, one benefits by having faster learning process as batch
- * normalization allows larger learning rate without causing gradient problems on backpropagation
- * as all inputs are normalized and hence reducing the scale of weight update impact on
+ * normalization allows larger learning rate without causing gradient problems on backpropagation as
+ * all inputs are normalized and hence reducing the scale of weight update impact on
  * backpropagation. In some cases, the utilization of batch normalization layer regularizes the
- * network and reduces, even eliminates, the need for dropout, which in turn results in even
- * faster training process since dropout slows down training by 2-3 times. However, it was
- * reported that batch normalization may not be beneficial when small batch sizes are used.
+ * network and reduces, even eliminates, the need for dropout, which in turn results in even faster
+ * training process since dropout slows down training by 2-3 times. However, it was reported that
+ * batch normalization may not be beneficial when small batch sizes are used.
  *
- * <p>Formally, batch normalization is represented below:
- * <br>\(\hat{x} \:=\: \frac{x \:-\: \mu_{batch}}{\sqrt{\sigma^2_{batch} \:+\: \epsilon}}\),
- * <br>where \(\hat{x}\) is the normalized input, \(\mu_{batch}\) and \(\sigma^2_{batch}\)
- * respectively denote the mean and variance of a batch, and \(\epsilon\) (epsilon) is a constant
- * for numerical stability. The scale and shift operation can be formally defined as follows:
- * <br>\(y \:=\: \gamma\hat{x} \:+\: \beta\),
- * <br>where \(\gamma\) is the scale factor and \(\beta\) is the shift factor.
+ * <p>Formally, batch normalization is represented below: <br>
+ * \(\hat{x} \:=\: \frac{x \:-\: \mu_{batch}}{\sqrt{\sigma^2_{batch} \:+\: \epsilon}}\), <br>
+ * where \(\hat{x}\) is the normalized input, \(\mu_{batch}\) and \(\sigma^2_{batch}\) respectively
+ * denote the mean and variance of a batch, and \(\epsilon\) (epsilon) is a constant for numerical
+ * stability. The scale and shift operation can be formally defined as follows: <br>
+ * \(y \:=\: \gamma\hat{x} \:+\: \beta\), <br>
+ * where \(\gamma\) is the scale factor and \(\beta\) is the shift factor.
  */
 public class BatchNorm extends ParameterBlock {
 
