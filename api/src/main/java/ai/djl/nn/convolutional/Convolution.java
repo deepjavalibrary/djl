@@ -32,7 +32,45 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Computes N-D convolution on (N+2)-D input. */
+/**
+ * A convolution layer does a dot product calculation on each channel of \(k\)-channel input data by
+ * specified number of filters, each containing \(k\) kernels for calculating each channel in the
+ * input data and then summed per filter, hence the number of filters denote the number of output
+ * channels of a convolution layer. Some modifications may be set on a convolution layer, namely
+ * stride which shows the distance between each convolved input data in a channel, and padding which
+ * shows the preservation of input size (width and/or height and/or depth) by adding specified
+ * padding to the sides of the output. A convolution layer extracts features of input data with
+ * different representations where each representation lies per channel in the output, often known
+ * as feature map or feature vector.
+ *
+ * <p>While convolution process itself has been around for quite some time in mathematics, in 1998
+ * LeCun <i>et al.</i> implemented the very first convolution layers forming a network called
+ * LeNet-5 for character recognition task; details of the network's implementation can be find in
+ * LeNet-5's <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf">paper</a>. When other
+ * approaches at that time used handcrafted features with external stage of feature extraction,
+ * convolution layer performed feature extraction on its own with no human interference. This marks
+ * a new era of machine-extracted features, but it was not until 2012 that the published <a
+ * href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf">
+ * paper</a> of AlexNet marked the beginning of convolutional neural networks, which by the name
+ * itself heavily relies on convolution layer.
+ *
+ * <p>Convolution layer is usually used in image-related tasks due to its well-renowned performance
+ * as shown by existing works and currently, other non-image-related fields of study are beginning
+ * to incorporate convolution layer as an addition or replacement of previous approaches, with one
+ * example being time series processing with 1-dimensional convolution layer. Due to the nature of
+ * convolution that processes all points in the input data, it is computationally expensive, hence
+ * the use of GPU is strongly recommended for faster performance as opposed to using CPU. Note that
+ * it is also common to stack convolution layers with different output channels for more
+ * representations of the input data.
+ *
+ * <p>Current implementations of {@code Convolution} are {@link Conv1D} with input dimension of
+ * {@link LayoutType#WIDTH}, {@link Conv2D} with input dimension of {@link LayoutType#WIDTH} and
+ * {@link LayoutType#HEIGHT}, and lastly {@link Conv3D} with input dimension of {@link
+ * LayoutType#WIDTH}, {@link LayoutType#HEIGHT}, and {@link LayoutType#DEPTH}. These implementations
+ * share the same core principal as a {@code Convolution} layer does, with the difference being the
+ * number of input dimension each operates on as denoted by {@code ConvXD} for {@code X}
+ * dimension(s).
+ */
 public abstract class Convolution extends ParameterBlock {
 
     private static final byte VERSION = 2;

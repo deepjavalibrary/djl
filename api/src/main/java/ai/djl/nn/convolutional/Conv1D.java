@@ -17,7 +17,16 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 
 /**
- * Computes 1-D convolution on 3-D input.
+ * A {@code Conv1D} layer works similar to {@link Convolution} layer with the exception of the
+ * number of dimension it operates on being only one, which is {@link LayoutType#WIDTH}. The channel
+ * of the input data may be more than one, depending on what data is processed. Each filter slides
+ * through the data with only one direction of movement along the dimension itself.
+ *
+ * <p>Commonly, this kind of convolution layer, as proposed in this <a
+ * href="https://ieeexplore.ieee.org/document/7318926/">paper</a> is used in tasks utilizing serial
+ * data, enabling convolutional processing of 1-dimensional data such as time-series data (stock
+ * price, weather, ECG) and text/speech data without the need of transforming it to 2-dimensional
+ * data to be processed by {@link Conv2D}, though this is quite a common technique as well.
  *
  * <p>The input to a {@code Conv1D} is an {@link ai.djl.ndarray.NDList} with a single 3-D {@link
  * ai.djl.ndarray.NDArray}. The layout of the {@link ai.djl.ndarray.NDArray} must be "NCW". The
