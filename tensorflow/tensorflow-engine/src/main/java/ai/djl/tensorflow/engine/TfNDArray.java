@@ -1151,13 +1151,21 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray logicalAnd(NDArray n) {
-        return new TfNDArray(manager, tf.math.logicalAnd(asOperand(), ((TfNDArray) n).asOperand()));
+        return new TfNDArray(
+                manager,
+                tf.math.logicalAnd(
+                        tf.dtypes.cast(asOperand(), TBool.DTYPE),
+                        tf.dtypes.cast(((TfNDArray) n).asOperand(), TBool.DTYPE)));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray logicalOr(NDArray n) {
-        return new TfNDArray(manager, tf.math.logicalOr(asOperand(), ((TfNDArray) n).asOperand()));
+        return new TfNDArray(
+                manager,
+                tf.math.logicalOr(
+                        tf.dtypes.cast(asOperand(), TBool.DTYPE),
+                        tf.dtypes.cast(((TfNDArray) n).asOperand(), TBool.DTYPE)));
     }
 
     /** {@inheritDoc} */
@@ -1169,7 +1177,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray logicalNot() {
-        return new TfNDArray(manager, tf.math.logicalNot(asOperand()));
+        return new TfNDArray(manager, tf.math.logicalNot(tf.dtypes.cast(asOperand(), TBool.DTYPE)));
     }
 
     /** {@inheritDoc} */
