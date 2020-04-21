@@ -1,9 +1,11 @@
+import java.util.regex.Pattern
+
 task release {
     doLast {
         def collection = fileTree("jupyter").filter { it.name.endsWith(".ipynb") }
         collection += files("examples/build.gradle", "examples/pom.xml")
         collection.each { File file ->
-            file.text = file.text.replaceAll("-SNAPSHOT", "").replaceAll("%mavenRepo", "// %mavenRepo")
+            file.text = file.text.replaceAll("-SNAPSHOT", "").replaceAll("\"%mavenRepo", "\"// %mavenRepo")
         }
     }
 }
@@ -31,15 +33,16 @@ task increaseBuildVersion {
             throw new GradleException("targetVersion property is required.")
         }
         def targetVersion = project.property("targetVersion")
+        def releaseVersion = Pattern.quote(version.replaceAll("-SNAPSHOT", ""))
 
-        def collection = fileTree("jupyter").filter { it.name.endsWith(".ipynb") }
-        collection += files("examples/build.gradle", "examples/pom.xml")
-        collection.each { File file ->
-            file.text = file.text.replaceAll("${version}", "${targetVersion}-SNAPSHOT")
-        }
+        def file = new File("examples/build.gradle")
+        file.text = file.text.replaceAll("\"${releaseVersion}\"", "\"${targetVersion}-SNAPSHOT\"")
 
-        File file = new File("build.gradle")
-        def releaseVersion = version.replaceAll("-SNAPSHOT", "")
+        file = new File("examples/pom.xml")
+        file.text = file.text.replaceAll("<djl.version>${releaseVersion}</djl.version>",
+                "<djl.version>${targetVersion}-SNAPSHOT</djl.version>")
+
+        file = new File("build.gradle")
         file.text = file.text.replaceAll("\"${releaseVersion}\"", "\"${targetVersion}\"")
     }
 }

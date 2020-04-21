@@ -10,12 +10,14 @@ repositories {
     }
 }
 
+def DJL_VERSION = "0.5.0-SNAPSHOT"
+
 dependencies {
     implementation "commons-cli:commons-cli:1.4"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
-    implementation "ai.djl:basicdataset:0.5.0-SNAPSHOT"
-    implementation "ai.djl:model-zoo:0.5.0-SNAPSHOT"
-    implementation "ai.djl.mxnet:mxnet-model-zoo:0.5.0-SNAPSHOT"
+    implementation "ai.djl:basicdataset:${DJL_VERSION}"
+    implementation "ai.djl:model-zoo:${DJL_VERSION}"
+    implementation "ai.djl.mxnet:mxnet-model-zoo:${DJL_VERSION}"
 
     // See https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
     runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.7.0-a-SNAPSHOT"

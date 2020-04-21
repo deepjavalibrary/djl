@@ -19,9 +19,12 @@ cd djl
 
 Edit [README Release Notes section](../../README.md#release-notes) to add link to new release. 
 
-Update build version with the following command:
+Many of the documents are still pointing to the previous released version. We should update them the
+version we are going to release. For example, current version is 0.5.0-SNAPSHOT, but many of documents
+are using 0.4.0 (X.X.X), we should update build version with the following command:
 ```shell script
 cd djl
+# replace X.X.X with the previous released version number
 ./gradlew -PpreviousVersion=X.X.X iFV
 ```
 Make a commit, get reviewed, and then merge it into github.
