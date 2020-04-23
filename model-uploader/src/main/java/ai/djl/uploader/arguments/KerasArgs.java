@@ -13,16 +13,16 @@
 
 package ai.djl.uploader.arguments;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
 public class KerasArgs implements Arguments {
 
-    private String artifactPath;
+    private Path artifactPath;
     private String modelName;
 
-    public void setArtifactPath(String artifactPath) {
+    public void setArtifactPath(Path artifactPath) {
         this.artifactPath = artifactPath;
     }
 
@@ -30,12 +30,12 @@ public class KerasArgs implements Arguments {
         this.modelName = modelName;
     }
 
-    public String getArtifactPath() {
-        return Paths.get(artifactPath).resolve("keras").toAbsolutePath().toString();
+    public Path getArtifactPath() {
+        return artifactPath.resolve("keras").toAbsolutePath();
     }
 
     @Override
     public List<String> getArgs() {
-        return Arrays.asList("--input_path", artifactPath, "--model_name", modelName);
+        return Arrays.asList("--input_path", artifactPath.toString(), "--model_name", modelName);
     }
 }

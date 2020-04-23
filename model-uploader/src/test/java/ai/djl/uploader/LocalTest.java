@@ -56,7 +56,7 @@ public class LocalTest {
         String artifactName = "traced_resnet101";
         MetadataBuilder.builder()
                 .setBaseDir(destDir.toAbsolutePath().toString())
-                .setArtifactDir(modelDir.toAbsolutePath().toString())
+                .setArtifactDir(modelDir)
                 .setName(name)
                 .setDescription(description)
                 .setApplication(Application.CV.IMAGE_CLASSIFICATION)
@@ -110,7 +110,7 @@ public class LocalTest {
         String artifactName = "tatoeba_en_cn";
         MetadataBuilder.builder()
                 .setBaseDir(destDir.toAbsolutePath().toString())
-                .setArtifactDir(modelDir.toAbsolutePath().toString())
+                .setArtifactDir(modelDir)
                 .setName(name)
                 .setDescription(description)
                 .setApplication(Application.NLP.TEXT_CLASSIFICATION)
@@ -148,7 +148,7 @@ public class LocalTest {
         String artifactName1 = "traced_resnet101";
         MetadataBuilder.builder()
                 .setBaseDir(destDir.toAbsolutePath().toString())
-                .setArtifactDir(modelDir.toAbsolutePath().toString())
+                .setArtifactDir(modelDir)
                 .setName(name)
                 .setDescription(description)
                 .setApplication(Application.CV.IMAGE_CLASSIFICATION)
@@ -173,7 +173,7 @@ public class LocalTest {
         String artifactName2 = "traced_resnet50";
         MetadataBuilder.builder()
                 .setBaseDir(destDir.toAbsolutePath().toString())
-                .setArtifactDir(modelDir.toAbsolutePath().toString())
+                .setArtifactDir(modelDir)
                 .setName(name)
                 .setDescription(description)
                 .setApplication(Application.CV.IMAGE_CLASSIFICATION)

@@ -19,6 +19,8 @@ import ai.djl.uploader.arguments.KerasArgs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import org.apache.commons.cli.CommandLine;
@@ -74,6 +76,8 @@ public final class Exporter {
                         .setBaseDir(arguments.getBaseDir())
                         .setArtifactId(arguments.getArtifactId())
                         .setName(arguments.getName())
+                        .setProperties(arguments.getProperties())
+                        .setArguments(arguments.getArguments())
                         .setDescription(arguments.getDescription());
         String pythonPath = arguments.getPythonPath();
         if (pythonPath != null) {
@@ -85,12 +89,12 @@ public final class Exporter {
     public static MetadataBuilder kerasImport(ExporterArguments arguments)
             throws IOException, InterruptedException {
         KerasArgs args = new KerasArgs();
-        String artifactDir;
+        Path artifactDir;
         try {
             artifactDir = arguments.getArtifactDir();
         } catch (IOException e) {
             // case load by name
-            artifactDir = arguments.getBaseDir();
+            artifactDir = Paths.get(arguments.getBaseDir());
         }
         args.setArtifactPath(artifactDir);
         args.setModelName(arguments.getArtifactName());
@@ -120,8 +124,8 @@ public final class Exporter {
                 .setBaseDir(arguments.getBaseDir())
                 .setGroupId(arguments.getGroupId())
                 .setArtifactName(arguments.getArtifactName())
-                .addProperties(arguments.getProperty())
-                .addArguments(new LinkedHashMap<>(arguments.getArgument()));
+                .addProperties(arguments.getProperties())
+                .addArguments(new LinkedHashMap<>(arguments.getArguments()));
     }
 
     public static MetadataBuilder dataset(ExporterArguments arguments) throws IOException {

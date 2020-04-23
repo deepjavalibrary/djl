@@ -47,9 +47,12 @@ import org.slf4j.LoggerFactory;
 
 /** The {@code MetadataBuilder} is designed to help build up metadata for model or dataset. */
 public final class MetadataBuilder {
-    private static final Logger logger = LoggerFactory.getLogger(MetadataBuilder.class);
+
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    private static final Logger logger = LoggerFactory.getLogger(MetadataBuilder.class);
     private static final String METADATA_VERSION = "0.1";
+
     private String artifactVersion = "0.0.1";
     private License license = License.apache();
     private Boolean isSnapshot;
@@ -115,8 +118,8 @@ public final class MetadataBuilder {
      *
      * <p>example: Application.CV.IMAGE_CLASSIFICATION for image classification task
      *
-     * @param application
-     * @return
+     * @param application model's application
+     * @return this builder
      */
     public MetadataBuilder setApplication(Application application) {
         this.application = application;
@@ -156,10 +159,9 @@ public final class MetadataBuilder {
      * @param artifactDir full path to the directory
      * @return builder
      */
-    public MetadataBuilder setArtifactDir(String artifactDir) {
-        Path path = Paths.get(artifactDir);
-        if (Files.isDirectory(path)) {
-            this.artifactDir = path;
+    public MetadataBuilder setArtifactDir(Path artifactDir) {
+        if (Files.isDirectory(artifactDir)) {
+            this.artifactDir = artifactDir;
         } else {
             throw new IllegalArgumentException("File path is not a directory " + artifactDir);
         }
@@ -416,7 +418,7 @@ public final class MetadataBuilder {
     private Map<String, Artifact.Item> constructFiles(Path destination) throws IOException {
         File[] listFiles = artifactDir.toFile().listFiles();
         if (listFiles == null) {
-            throw new FileNotFoundException("File not found");
+            throw new FileNotFoundException("File not found in dir: " + artifactDir);
         }
         while (existCollideFile(listFiles, destination)) {
             String[] digits = artifactVersion.split("\\.");
