@@ -14,15 +14,20 @@
 package ai.djl.uploader;
 
 import ai.djl.Application;
+import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 
 public class ExporterArguments {
+
     private String category;
     private String baseDir;
     private Application application;
@@ -32,8 +37,8 @@ public class ExporterArguments {
     private String artifactId;
     private String artifactName;
     private boolean isRemote;
-    private Map<String, String> property;
-    private Map<String, String> argument;
+    private Map<String, String> properties;
+    private Map<String, Object> arguments;
     private String artifactDir;
     private String pythonPath;
     private String shape;
@@ -52,32 +57,40 @@ public class ExporterArguments {
             category = "model";
         }
         baseDir = cmd.getOptionValue("output-directory", System.getProperty("user.dir"));
-        String applicationName = cmd.getOptionValue("application");
-        if (applicationName == null) {
-            application = Application.UNDEFINED;
-        } else {
-            switch (applicationName) {
-                case "image classification":
-                    application = Application.CV.IMAGE_CLASSIFICATION;
-                    break;
-                case "object detection":
-                    application = Application.CV.OBJECT_DETECTION;
-                    break;
-                default:
-                    throw new IllegalArgumentException(
-                            "Unsupported application name " + applicationName);
-            }
-        }
-        description = cmd.getOptionValue("description", "No description provided");
-        name = cmd.getOptionValue("name", "No Name provided");
+        description = cmd.getOptionValue("description");
         groupId =
                 cmd.getOptionValue(
                         "groupid",
                         "dataset".equals(category) ? "ai.djl.basicdataset" : "ai.djl.model");
-        artifactName = cmd.getOptionValue("artifact-name");
         artifactId = cmd.getOptionValue("artifact-id");
-        property = valueParser(cmd.getOptionValue("property"));
-        argument = valueParser(cmd.getOptionValue("argument"));
+        artifactName = cmd.getOptionValue("artifact-name", artifactId);
+        name = cmd.getOptionValue("name", artifactName);
+
+        String applicationName = cmd.getOptionValue("application", Application.UNDEFINED.getPath());
+        if (Application.CV.IMAGE_CLASSIFICATION.getPath().equalsIgnoreCase(applicationName)) {
+            application = Application.CV.IMAGE_CLASSIFICATION;
+            if (description == null) {
+                description = name + " image classification model";
+            }
+        } else if (Application.CV.OBJECT_DETECTION.getPath().equalsIgnoreCase(applicationName)) {
+            application = Application.CV.OBJECT_DETECTION;
+            if (description == null) {
+                description = name + " object detection model";
+            }
+        } else if (Application.UNDEFINED.getPath().equalsIgnoreCase(applicationName)) {
+            application = Application.UNDEFINED;
+            if (description == null) {
+                description = name + " CV model";
+            }
+        } else {
+            throw new IllegalArgumentException("Unsupported application name " + applicationName);
+        }
+        properties = valueParser(cmd.getOptionValue("property"));
+        arguments = parseArguments(cmd.getOptionValue("argument"));
+        if (arguments.isEmpty() && "imagenet".equals(properties.get("dataset"))) {
+            arguments.put("width", 224);
+            arguments.put("height", 224);
+        }
         artifactDir = cmd.getOptionValue("input-directory");
         isRemote = cmd.hasOption("remote");
         pythonPath = cmd.getOptionValue("python-path");
@@ -95,15 +108,15 @@ public class ExporterArguments {
         og.setRequired(true);
         options.addOptionGroup(og);
         options.addRequiredOption(
-                "an",
-                "artifact-name",
-                true,
-                "the name of the artifact or the name of the model to import");
-        options.addRequiredOption(
                 "ai",
                 "artifact-id",
                 true,
                 "the way to categorize the artifact, for example, resnet50 has resnet as artifact id");
+        options.addOption(
+                "an",
+                "artifact-name",
+                true,
+                "the name of the artifact or the name of the model to import");
         options.addOption("o", "output-directory", true, "the output directory");
         options.addOption("n", "name", true, "the name of the metadata");
         options.addOption("g", "groupid", true, "the groupId of the metadata");
@@ -164,19 +177,19 @@ public class ExporterArguments {
         return artifactName;
     }
 
-    public Map<String, String> getProperty() {
-        return property;
+    public Map<String, String> getProperties() {
+        return properties;
     }
 
-    public Map<String, String> getArgument() {
-        return argument;
+    public Map<String, Object> getArguments() {
+        return arguments;
     }
 
-    public String getArtifactDir() throws IOException {
+    public Path getArtifactDir() throws IOException {
         if (artifactDir == null) {
             throw new IOException("Please specify --input-directory");
         }
-        return artifactDir;
+        return Paths.get(artifactDir);
     }
 
     public String getShape() throws IOException {
@@ -195,7 +208,7 @@ public class ExporterArguments {
     }
 
     private Map<String, String> valueParser(String value) {
-        Map<String, String> result = new ConcurrentHashMap<>();
+        Map<String, String> result = new LinkedHashMap<>(); // NOPMD
         if (value == null) {
             return result;
         }
@@ -205,5 +218,14 @@ public class ExporterArguments {
             result.put(keyValueArray[0], keyValueArray[1]);
         }
         return result;
+    }
+
+    private Map<String, Object> parseArguments(String value) {
+        Map<String, Object> result = new LinkedHashMap<>(); // NOPMD
+        if (value == null || value.isEmpty()) {
+            return result;
+        }
+        Type type = new TypeToken<Map<String, Object>>() {}.getType();
+        return MetadataBuilder.GSON.fromJson(value, type);
     }
 }
