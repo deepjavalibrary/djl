@@ -21,19 +21,24 @@ import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 public class ExporterTest {
-    private final String baseDir = System.getProperty("java.io.tmpdir");
+
     private Path modelDir;
     private Path destDir;
 
     @BeforeTest
     public void setUp() {
-        modelDir = Paths.get(baseDir, "uploader/model");
-        destDir = Paths.get(baseDir, "uploader/dest");
+        modelDir = Paths.get("build", "uploader/model");
+        destDir = Paths.get("build", "uploader/dest");
+        FileUtils.deleteQuietly(modelDir.toFile());
+        FileUtils.deleteQuietly(destDir.toFile());
+    }
+
+    @AfterMethod
+    public void removeFiles() {
         FileUtils.deleteQuietly(modelDir.toFile());
         FileUtils.deleteQuietly(destDir.toFile());
     }
@@ -56,7 +61,7 @@ public class ExporterTest {
             "-b",
             inputDir,
             "-ap",
-            "image classification",
+            "cv/image_classification",
             "-o",
             destPath
         };
@@ -71,12 +76,5 @@ public class ExporterTest {
         Assert.assertTrue(targetPath.resolve("metadata.json").toFile().exists());
         Assert.assertTrue(targetPath.resolve("0.0.1/" + artifactName + ".pt.gz").toFile().exists());
         Assert.assertTrue(targetPath.resolve("0.0.1/" + "synset.txt.gz").toFile().exists());
-    }
-
-    @AfterMethod
-    @AfterTest
-    public void removeFiles() {
-        FileUtils.deleteQuietly(modelDir.toFile());
-        FileUtils.deleteQuietly(destDir.toFile());
     }
 }

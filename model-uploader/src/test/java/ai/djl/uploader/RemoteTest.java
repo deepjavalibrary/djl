@@ -56,7 +56,7 @@ public class RemoteTest {
         String artifactName = "resnet1024";
         MetadataBuilder.builder()
                 .setBaseDir(destDir.toAbsolutePath().toString())
-                .setArtifactDir(modelDir.toAbsolutePath().toString())
+                .setArtifactDir(modelDir)
                 .setName(name)
                 .setDescription(description)
                 .setApplication(Application.CV.IMAGE_CLASSIFICATION)
