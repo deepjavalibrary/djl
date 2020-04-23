@@ -252,6 +252,14 @@ public final class JniUtils {
                 .create(PyTorchLibrary.LIB.torchSlice(ndArray.getHandle(), dim, start, stop, step));
     }
 
+    public static PtNDArray index(
+            PtNDArray ndArray, long[] minIndices, long[] maxIndices, long[] stepIndices) {
+        return ndArray.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchIndex(
+                                ndArray.getHandle(), minIndices, maxIndices, stepIndices));
+    }
+
     public static PtNDArray booleanMask(PtNDArray ndArray, PtNDArray indicesNd) {
         return ndArray.getManager()
                 .create(
@@ -362,11 +370,13 @@ public final class JniUtils {
 
     public static PtNDArray div(PtNDArray ndArray1, PtNDArray ndArray2) {
         return ndArray1.getManager()
-                .create(PyTorchLibrary.LIB.torchDiv(ndArray1.getHandle(), ndArray2.getHandle()));
+                .create(
+                        PyTorchLibrary.LIB.torchTrueDivide(
+                                ndArray1.getHandle(), ndArray2.getHandle()));
     }
 
     public static void divi(PtNDArray ndArray1, PtNDArray ndArray2) {
-        PyTorchLibrary.LIB.torchDivi(ndArray1.getHandle(), ndArray2.getHandle());
+        PyTorchLibrary.LIB.torchTrueDividei(ndArray1.getHandle(), ndArray2.getHandle());
     }
 
     public static PtNDArray remainder(PtNDArray ndArray1, PtNDArray ndArray2) {
@@ -387,6 +397,20 @@ public final class JniUtils {
 
     public static void powi(PtNDArray ndArray1, PtNDArray ndArray2) {
         PyTorchLibrary.LIB.torchPowi(ndArray1.getHandle(), ndArray2.getHandle());
+    }
+
+    public static PtNDArray logicalAnd(PtNDArray ndArray1, PtNDArray ndArray2) {
+        return ndArray1.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchLogicalAnd(
+                                ndArray1.getHandle(), ndArray2.getHandle()));
+    }
+
+    public static PtNDArray logicalOr(PtNDArray ndArray1, PtNDArray ndArray2) {
+        return ndArray1.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchLogicalOr(
+                                ndArray1.getHandle(), ndArray2.getHandle()));
     }
 
     public static PtNDArray logicalXor(PtNDArray ndArray1, PtNDArray ndArray2) {
@@ -490,6 +514,10 @@ public final class JniUtils {
 
     public static PtNDArray abs(PtNDArray ndArray) {
         return ndArray.getManager().create(PyTorchLibrary.LIB.torchAbs(ndArray.getHandle()));
+    }
+
+    public static PtNDArray square(PtNDArray ndArray) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchSquare(ndArray.getHandle()));
     }
 
     public static PtNDArray floor(PtNDArray ndArray) {

@@ -56,16 +56,6 @@ public final class IValueUtils {
     }
 
     /**
-     * Check IValue is a container of IValue Array.
-     *
-     * @param iValueHandle IValue {@link Pointer}
-     * @return result
-     */
-    public static boolean isArray(Pointer iValueHandle) {
-        return PyTorchLibrary.LIB.iValueIsList(iValueHandle);
-    }
-
-    /**
      * Check IValue is a container of IValue Tuple.
      *
      * @param iValueHandle IValue {@link Pointer}
@@ -167,12 +157,6 @@ public final class IValueUtils {
             list.add(toNDArray(iValueHandle, manager));
         } else if (isNDList(iValueHandle)) {
             list.addAll(toNDList(iValueHandle, manager));
-        } else if (isTuple(iValueHandle) || isArray(iValueHandle)) {
-            // Try to extract from Tuple/List
-            Pointer[] results = toIValueArray(iValueHandle);
-            for (Pointer ptr : results) {
-                list.addAll(forwardHelper(ptr, manager));
-            }
         } else if (isMap(iValueHandle)) {
             // Only allows <String, NDArray> type of map
             Map<Pointer, Pointer> map = toIValueMap(iValueHandle);

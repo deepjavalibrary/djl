@@ -86,6 +86,24 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_tensorClone(
   API_END();
 }
 
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndex(
+  JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {
+  API_BEGIN();
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  const auto min_indices = utils::GetVecFromJLongArray(env, jmin_indices);
+  const auto max_indices = utils::GetVecFromJLongArray(env, jmax_indices);
+  const auto step_indices = utils::GetVecFromJLongArray(env, jstep_indices);
+  std::vector<at::indexing::TensorIndex> indices;
+  indices.reserve(min_indices.size());
+  for (size_t i = 0; i < min_indices.size(); ++i) {
+    indices.emplace_back(
+      at::indexing::TensorIndex(torch::indexing::Slice(min_indices[i], max_indices[i], step_indices[i])));
+  }
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->index(c10::ArrayRef<at::indexing::TensorIndex>(indices)));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSlice(
     JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim, jlong jstart, jlong jend, jlong jstep) {
   API_BEGIN();
@@ -108,14 +126,10 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMaskedSele
 JNIEXPORT jbyteArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDataPtr(
     JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
-  jclass jexception = env->FindClass("java/lang/IllegalStateException");
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-  // Currently data_ptr() only support contiguous
-  if (!tensor_ptr->is_contiguous()) {
-    env->ThrowNew(jexception, "Currently data_ptr() only supports contiguous tensors");
-  }
-  jbyteArray result = env->NewByteArray(tensor_ptr->nbytes());
-  env->SetByteArrayRegion(result, 0, tensor_ptr->nbytes(), static_cast<const jbyte*>(tensor_ptr->data_ptr()));
+  auto tensor = (tensor_ptr->is_contiguous()) ? *tensor_ptr : tensor_ptr->contiguous();
+  jbyteArray result = env->NewByteArray(tensor.nbytes());
+  env->SetByteArrayRegion(result, 0, tensor.nbytes(), static_cast<const jbyte*>(tensor.data_ptr()));
   return result;
   API_END();
 }
@@ -124,23 +138,4 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDeleteTensor(
     JNIEnv* env, jobject jthis, jobject jhandle) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   delete tensor_ptr;
-}
-
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLogicalXor(
-    JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
-  API_BEGIN();
-  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
-  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
-  const auto* result_ptr = new torch::Tensor(torch::logical_xor(*self_ptr, *other_ptr));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
-  API_END();
-}
-
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLogicalNot(
-    JNIEnv* env, jobject jthis, jobject jhandle) {
-  API_BEGIN();
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  const auto* result_ptr = new torch::Tensor(tensor_ptr->logical_not());
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
-  API_END();
 }

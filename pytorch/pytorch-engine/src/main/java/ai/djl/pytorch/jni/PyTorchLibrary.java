@@ -91,9 +91,9 @@ final class PyTorchLibrary {
 
     native void torchMuli(Pointer self, Pointer other);
 
-    native Pointer torchDiv(Pointer self, Pointer other);
+    native Pointer torchTrueDivide(Pointer self, Pointer other);
 
-    native void torchDivi(Pointer self, Pointer other);
+    native void torchTrueDividei(Pointer self, Pointer other);
 
     native Pointer torchRemainder(Pointer self, Pointer other);
 
@@ -104,6 +104,10 @@ final class PyTorchLibrary {
     native void torchPowi(Pointer self, Pointer exponent);
 
     native Pointer torchMatmul(Pointer self, Pointer other);
+
+    native Pointer torchLogicalAnd(Pointer self, Pointer other);
+
+    native Pointer torchLogicalOr(Pointer self, Pointer other);
 
     native Pointer torchLogicalXor(Pointer self, Pointer other);
 
@@ -140,6 +144,9 @@ final class PyTorchLibrary {
             int layout,
             int[] device,
             boolean requiredGrad);
+
+    native Pointer torchIndex(
+            Pointer handle, long[] minIndices, long[] maxIndices, long[] stepIndices);
 
     native Pointer torchSlice(Pointer handle, long dim, long start, long end, long step);
 
@@ -188,6 +195,8 @@ final class PyTorchLibrary {
     native Pointer torchCat(Pointer[] handles, long dim);
 
     native Pointer torchAbs(Pointer handle);
+
+    native Pointer torchSquare(Pointer self);
 
     native Pointer torchFloor(Pointer handle);
 
@@ -323,8 +332,6 @@ final class PyTorchLibrary {
     native boolean iValueIsTensor(Pointer iValueHandle);
 
     native boolean iValueIsTensorList(Pointer iValueHandle);
-
-    native boolean iValueIsList(Pointer iValueHandle);
 
     native boolean iValueIsMap(Pointer iValueHandle);
 

@@ -215,19 +215,9 @@ public class PtNDArray extends NativeResource implements NDArray {
         }
 
         NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
-        PtNDArray afterSlice = this;
         if (fullSlice != null) {
-            long[] min = fullSlice.getMin();
-            long[] max = fullSlice.getMax();
-            long[] step = fullSlice.getStep();
-            for (int dim = 0; dim < min.length; dim++) {
-                // Skip the dimension no need for slice
-                if (step[dim] == 1 && getShape().get(dim) == max[dim] - min[dim]) {
-                    continue;
-                }
-                afterSlice = JniUtils.slice(afterSlice, dim, min[dim], max[dim], step[dim]);
-            }
-            return afterSlice.squeeze(fullSlice.getToSqueeze().stream().mapToInt(i -> i).toArray());
+            return JniUtils.index(this, fullSlice.getMin(), fullSlice.getMax(), fullSlice.getStep())
+                    .squeeze(fullSlice.getToSqueeze().stream().mapToInt(i -> i).toArray());
         } else {
             throw new UnsupportedOperationException(
                     "get() currently supports all, fixed, and slices indices");
@@ -613,7 +603,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray square() {
-        return pow(2);
+        return JniUtils.square(this);
     }
 
     /** {@inheritDoc} */
@@ -925,13 +915,13 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray logicalAnd(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.logicalAnd(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray logicalOr(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.logicalOr(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
@@ -1131,6 +1121,10 @@ public class PtNDArray extends NativeResource implements NDArray {
             Shape newShape = NDUtils.getShapeFromEmptyNDArrayForReductionOp(getShape(), axis);
             return (PtNDArray) manager.create(newShape, DataType.INT64);
         }
+        // TODO pytorch bug: https://github.com/pytorch/pytorch/issues/37084
+        if (isScalar()) {
+            return (PtNDArray) manager.create(0L);
+        }
         return JniUtils.argMax(this, axis, false);
     }
 
@@ -1149,6 +1143,10 @@ public class PtNDArray extends NativeResource implements NDArray {
         if (isEmpty()) {
             Shape newShape = NDUtils.getShapeFromEmptyNDArrayForReductionOp(getShape(), axis);
             return (PtNDArray) manager.create(newShape, DataType.INT64);
+        }
+        // TODO pytorch bug: https://github.com/pytorch/pytorch/issues/37084
+        if (isScalar()) {
+            return (PtNDArray) manager.create(0L);
         }
         return JniUtils.argMin(this, axis, false);
     }
