@@ -10,5 +10,4 @@ This folder contains documentation and guides for contributors and those working
 - [Troubleshooting](troubleshooting.md)
 
 ## Model Zoo Guides
-- [How to add a new model to the main model zoo](add_model_to_model-zoo.md)
-- [How to add a new model to the MXNet model zoo](add_model_to_mxnet-model-zoo.md)
+- [How to add a new model to the model zoos](add_model_to_model-zoo.md)

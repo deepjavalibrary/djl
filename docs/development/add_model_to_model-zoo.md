@@ -4,7 +4,12 @@ This document outlines the procedure to add new models into the model zoo.
 
 ## Step 1: Prepare the model files
 
-Your imperative model always requires a parameters file as an artifact.
+The model files you will have or need depend on what type of model you have:
+- Model built and trained in DJL:
+  - <MODEL_NAME>-0000.params
+- Model import from MXNet:
+  - <MODEL_NAME>-symbol.json
+  - <MODEL_NAME>-0000.params
 
 **Note:** To save space, compress the parameter file to .gz using the following command:
 ```shell script
@@ -26,7 +31,7 @@ For example, `image_classification/ai/djl/resnet`.
 ### Step 3: Create a `metadata.json` file
 You need to create a `metadata.json` file for the model zoo to load the model. You can refer to the format in the `metadata.json` files for existing models to create your own.
 
-As part of your `metadata.json` file, you must use the `arguments` property to specify the arguments required for the model loader to create a `Block` that matches the one used to train the model.
+For a model built as a DJL block, you must recreate the block before loading the parameters. As part of your `metadata.json` file, you should use the `arguments` property to specify the arguments required for the model loader to create another `Block` matching the one used to train the model.
 
 **Note:** You need to update the sha1 hash of each file in your `metadata.json` file. Use the following command to get the sha1Hash value:
 
@@ -36,18 +41,22 @@ $ shasum -a 1 <file_name>
 
 ### Step 4: Upload your model
 
-Verify that your folder has the following files:
+Verify that your folder has the following files (see Step 1 for additional files)
 
 - <version>/<model_name>-00xx.params.gz
 - metadata.json
 - ...
 
-Then, run the following command to upload your model to the S3 bucket:
+The official DJL ML repository is located on an S3 bucket managed by the AWS DJL team.
+
+For non-team members, coordinate with a team member in your pull request to coordinate adding the necessary files.
+
+For AWS team members, run the following command to upload your model to the S3 bucket:
 ```shell script
 $ ./gradlew syncS3
 ```
 
-### Step 5: Check in your ModelLoader and metadata files to the git repository
+### Step 5: Open a PR to add your ModelLoader and metadata files to the git repository
 
 You need to register your new model in the main model zoo interface. Be sure to include all the necessary information to load and use your model.
 
@@ -55,5 +64,5 @@ You need to register your new model in the main model zoo interface. Be sure to 
 
 ### Step 6: Update the README file
 
-Update the model-zoo/README.md file to keep the list of models up to date.
+Update the model zoo's README.md file for the appropriate model zoo to keep the list of models up to date.
 
