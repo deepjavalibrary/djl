@@ -85,7 +85,15 @@ public final class Exporter {
     public static MetadataBuilder kerasImport(ExporterArguments arguments)
             throws IOException, InterruptedException {
         KerasArgs args = new KerasArgs();
-        args.setArtifactPath(arguments.getArtifactDir());
+        String artifactDir;
+        try {
+            artifactDir = arguments.getArtifactDir();
+        } catch (IOException e) {
+            // case load by name
+            artifactDir = arguments.getBaseDir();
+        }
+        args.setArtifactPath(artifactDir);
+        args.setModelName(arguments.getArtifactName());
         KerasMetaBuilder exporter =
                 new KerasMetaBuilder()
                         .setApplication(arguments.getApplication())

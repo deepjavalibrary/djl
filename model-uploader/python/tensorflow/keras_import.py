@@ -18,22 +18,28 @@ import shutil
 
 parser = argparse.ArgumentParser(description='This is the keras model export portal')
 parser.add_argument("--input_path", required=True, type=str, help="The input directory of the keras model")
+parser.add_argument("--model_name", required=True, type=str, help="The name of the model to import")
 
-def export(input_path):
+def export(input_path, model_name):
     files = os.listdir(input_path)
+    loaded_model = None
     for file in files:
         if file.endswith(".h5"):
-            model_name = os.path.splitext(os.path.basename(file))[0]
             loaded_model = keras.models.load_model(os.path.join(input_path, file))
-            saved_dir = input_path + "/" + model_name + "/"
-            tf.saved_model.save(loaded_model, saved_dir)
-            saved_zip = zipdir(saved_dir)
-            os.remove(file)
-            shutil.rmtree(saved_dir)
-            dest_path = os.path.join(input_path, "keras")
-            os.mkdir(dest_path)
-            shutil.move(saved_zip, os.path.join(dest_path, model_name + ".zip"))
+    if loaded_model is None:
+        loaded_model = getattr(keras.applications, model_name)()
+    save_and_compress(loaded_model, input_path, model_name)
 
+
+def save_and_compress(model, input_path, model_name):
+    saved_dir = input_path + "/" + model_name + "/"
+    tf.saved_model.save(model, saved_dir)
+    saved_zip = zipdir(saved_dir)
+    os.remove(file)
+    shutil.rmtree(saved_dir)
+    dest_path = os.path.join(input_path, "keras")
+    os.mkdir(dest_path)
+    shutil.move(saved_zip, os.path.join(dest_path, model_name + ".zip"))
 
 def zipdir(path):
     file_name = os.path.dirname(path) + '.zip'
@@ -46,4 +52,4 @@ def zipdir(path):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    export(args.input_path)
+    export(args.input_path, args.model_name)
