@@ -20,9 +20,14 @@ import java.util.List;
 public class KerasArgs implements Arguments {
 
     private String artifactPath;
+    private String modelName;
 
     public void setArtifactPath(String artifactPath) {
         this.artifactPath = artifactPath;
+    }
+
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
     }
 
     public String getArtifactPath() {
@@ -31,6 +36,6 @@ public class KerasArgs implements Arguments {
 
     @Override
     public List<String> getArgs() {
-        return Arrays.asList("--input_path", artifactPath);
+        return Arrays.asList("--input_path", artifactPath, "--model_name", modelName);
     }
 }
