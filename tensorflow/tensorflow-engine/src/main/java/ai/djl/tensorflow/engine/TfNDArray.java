@@ -635,26 +635,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray subi(NDArray other) {
-        if (getShape().isScalar()) {
-            throw new UnsupportedOperationException(
-                    "TensorFlow engine does not support inplace operations on scalars yet");
-        }
-        tensor =
-                tf.inplaceSub(
-                                asOperand(),
-                                ((TfNDArray)
-                                                manager.arange(
-                                                        0,
-                                                        getShape().getShape()[0],
-                                                        1,
-                                                        DataType.INT32,
-                                                        getDevice()))
-                                        .asOperand(),
-                                ((TfNDArray) other).asOperand())
-                        .asOutput()
-                        .tensor();
-        operand = null;
-        return this;
+        return inPlaceHelper(sub(other), this);
     }
 
     /** {@inheritDoc} */
@@ -666,28 +647,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray muli(NDArray other) {
-        try (NDArray result = mul(other)) {
-            if (getShape().isScalar()) {
-                throw new UnsupportedOperationException(
-                        "TensorFlow engine does not support inplace operations on scalars yet");
-            }
-            tensor =
-                    tf.inplaceUpdate(
-                                    asOperand(),
-                                    ((TfNDArray)
-                                                    manager.arange(
-                                                            0,
-                                                            getShape().getShape()[0],
-                                                            1,
-                                                            DataType.INT32,
-                                                            getDevice()))
-                                            .asOperand(),
-                                    ((TfNDArray) result).asOperand())
-                            .asOutput()
-                            .tensor();
-            operand = null;
-        }
-        return this;
+        return inPlaceHelper(mul(other), this);
     }
 
     /** {@inheritDoc} */
@@ -699,28 +659,38 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray divi(NDArray other) {
-        try (NDArray result = div(other)) {
-            if (getShape().isScalar()) {
-                throw new UnsupportedOperationException(
-                        "TensorFlow engine does not support inplace operations on scalars yet");
-            }
-            tensor =
-                    tf.inplaceUpdate(
-                                    asOperand(),
-                                    ((TfNDArray)
-                                                    manager.arange(
-                                                            0,
-                                                            getShape().getShape()[0],
-                                                            1,
-                                                            DataType.INT32,
-                                                            getDevice()))
-                                            .asOperand(),
-                                    ((TfNDArray) result).asOperand())
-                            .asOutput()
-                            .tensor();
-            operand = null;
+        return inPlaceHelper(div(other), this);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    NDArray inPlaceHelper(NDArray source, NDArray destination) {
+        if (getShape().isScalar()) {
+            throw new UnsupportedOperationException(
+                    "TensorFlow engine does not support inplace operations on scalars yet");
         }
-        return this;
+        // select all indices for inplace update
+        Operand indices =
+                ((TfNDArray)
+                                manager.arange(
+                                        0,
+                                        getShape().getShape()[0],
+                                        1,
+                                        DataType.INT32,
+                                        getDevice()))
+                        .asOperand();
+
+        // inplace update destination tensor and operand
+        ((TfNDArray) destination)
+                .setTensor(
+                        tf.inplaceUpdate(
+                                        ((TfNDArray) destination).asOperand(),
+                                        indices,
+                                        ((TfNDArray) source).asOperand())
+                                .asOutput()
+                                .tensor());
+        ((TfNDArray) destination).clearOperand();
+
+        return destination;
     }
 
     /** {@inheritDoc} */
@@ -738,28 +708,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray modi(NDArray other) {
-        try (NDArray result = mod(other)) {
-            if (getShape().isScalar()) {
-                throw new UnsupportedOperationException(
-                        "TensorFlow engine does not support inplace operations on scalars yet");
-            }
-            tensor =
-                    tf.inplaceUpdate(
-                                    asOperand(),
-                                    ((TfNDArray)
-                                                    manager.arange(
-                                                            0,
-                                                            getShape().getShape()[0],
-                                                            1,
-                                                            DataType.INT32,
-                                                            getDevice()))
-                                            .asOperand(),
-                                    ((TfNDArray) result).asOperand())
-                            .asOutput()
-                            .tensor();
-            operand = null;
-        }
-        return this;
+        return inPlaceHelper(mod(other), this);
     }
 
     /** {@inheritDoc} */
@@ -771,28 +720,11 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray powi(NDArray other) {
-        try (NDArray result = pow(other)) {
-            if (getShape().isScalar()) {
-                throw new UnsupportedOperationException(
-                        "TensorFlow engine does not support inplace operations on scalars yet");
-            }
-            tensor =
-                    tf.inplaceUpdate(
-                                    asOperand(),
-                                    ((TfNDArray)
-                                                    manager.arange(
-                                                            0,
-                                                            getShape().getShape()[0],
-                                                            1,
-                                                            DataType.INT32,
-                                                            getDevice()))
-                                            .asOperand(),
-                                    ((TfNDArray) result).asOperand())
-                            .asOutput()
-                            .tensor();
-            operand = null;
-        }
-        return this;
+        return inPlaceHelper(pow(other), this);
+    }
+
+    NDArray rpowi(NDArray other) {
+        return inPlaceHelper(other.pow(this), this);
     }
 
     /** {@inheritDoc} */
@@ -804,28 +736,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray negi() {
-        try (NDArray result = neg()) {
-            if (getShape().isScalar()) {
-                throw new UnsupportedOperationException(
-                        "TensorFlow engine does not support inplace operations on scalars yet");
-            }
-            tensor =
-                    tf.inplaceUpdate(
-                                    asOperand(),
-                                    ((TfNDArray)
-                                                    manager.arange(
-                                                            0,
-                                                            getShape().getShape()[0],
-                                                            1,
-                                                            DataType.INT32,
-                                                            getDevice()))
-                                            .asOperand(),
-                                    ((TfNDArray) result).asOperand())
-                            .asOutput()
-                            .tensor();
-            operand = null;
-        }
-        return this;
+        return inPlaceHelper(neg(), this);
     }
 
     /** {@inheritDoc} */
@@ -1511,6 +1422,14 @@ public class TfNDArray implements NDArray {
 
     public Tensor<?> getTensor() {
         return tensor;
+    }
+
+    void setTensor(Tensor<?> tensor) {
+        this.tensor = tensor;
+    }
+
+    void clearOperand() {
+        this.operand = null;
     }
 
     int getRank() {

@@ -34,6 +34,8 @@ import org.tensorflow.Operand;
 import org.tensorflow.Tensor;
 import org.tensorflow.op.Ops;
 import org.tensorflow.op.core.Constant;
+import org.tensorflow.op.random.ParameterizedTruncatedNormal;
+import org.tensorflow.op.random.RandomUniform;
 import org.tensorflow.tools.buffer.ByteDataBuffer;
 import org.tensorflow.tools.buffer.DataBuffers;
 import org.tensorflow.types.TBool;
@@ -49,6 +51,7 @@ public class TfNDManager extends BaseNDManager {
     private static int nameAssignment = 1;
     EagerSession eagerSession;
     Ops tf;
+    private static Integer seed;
 
     private TfNDManager(NDManager parent, Device device) {
         super(parent, device);
@@ -76,6 +79,14 @@ public class TfNDManager extends BaseNDManager {
             tf = Ops.create(eagerSession);
         }
         return tf;
+    }
+
+    public static void setRandomSeed(Integer seed) {
+        TfNDManager.seed = seed;
+    }
+
+    public static Integer getRandomSeed() {
+        return seed;
     }
 
     static int nextNameAssignment() {
@@ -308,16 +319,57 @@ public class TfNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public NDArray randomUniform(
             float low, float high, Shape shape, DataType dataType, Device device) {
-        return null;
+        Operand shapeOp = tf.constant(shape.getShape());
+        org.tensorflow.DataType dType;
+        if (dataType == DataType.UNKNOWN) {
+            dType = TFloat32.DTYPE;
+        } else {
+            dType = TfDataType.toTf(dataType);
+        }
+        Operand minVal = tf.dtypes.cast(tf.constant(low), dType);
+        Operand maxVal = tf.dtypes.cast(tf.constant(high), dType);
+        Operand result;
+        if (seed != null) {
+            result = tf.random.randomUniform(shapeOp, dType, RandomUniform.seed((long) seed));
+        } else {
+            result = tf.random.randomUniform(shapeOp, dType);
+        }
+        return new TfNDArray(
+                this, tf.math.add(tf.math.mul(result, tf.math.sub(maxVal, minVal)), minVal));
     }
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public NDArray randomNormal(
             float loc, float scale, Shape shape, DataType dataType, Device device) {
-        return null;
+        Operand shapeOp = tf.constant(shape.getShape());
+        org.tensorflow.DataType dType;
+        if (dataType == DataType.UNKNOWN) {
+            dType = TFloat32.DTYPE;
+        } else {
+            dType = TfDataType.toTf(dataType);
+        }
+        Operand mean = tf.dtypes.cast(tf.constant(loc), dType);
+        Operand std = tf.dtypes.cast(tf.constant(scale), dType);
+        Operand minVal = tf.dtypes.cast(tf.constant(Float.NEGATIVE_INFINITY), dType);
+        Operand maxVal = tf.dtypes.cast(tf.constant(Float.POSITIVE_INFINITY), dType);
+        if (seed != null) {
+            return new TfNDArray(
+                    this,
+                    tf.random.parameterizedTruncatedNormal(
+                            shapeOp,
+                            mean,
+                            std,
+                            minVal,
+                            maxVal,
+                            ParameterizedTruncatedNormal.seed((long) seed)));
+        }
+        return new TfNDArray(
+                this, tf.random.parameterizedTruncatedNormal(shapeOp, mean, std, minVal, maxVal));
     }
 
     /** {@inheritDoc} */

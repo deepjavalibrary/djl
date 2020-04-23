@@ -51,7 +51,7 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rdiv(Number n) {
-        return rdiv(manager.create(n));
+        return rdiv(manager.create(n).toType(array.getDataType(), false));
     }
 
     /** {@inheritDoc} */
@@ -63,19 +63,19 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rdivi(Number n) {
-        return rdivi(manager.create(n));
+        return rdivi(manager.create(n).toType(array.getDataType(), false));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rdivi(NDArray b) {
-        return b.divi(array);
+        return array.inPlaceHelper(b.div(array), array);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rsub(Number n) {
-        return rsub(manager.create(n));
+        return rsub(manager.create(n).toType(array.getDataType(), false));
     }
 
     /** {@inheritDoc} */
@@ -87,19 +87,19 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rsubi(Number n) {
-        return rsubi(manager.create(n));
+        return rsubi(manager.create(n).toType(array.getDataType(), false));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rsubi(NDArray b) {
-        return b.subi(array);
+        return array.inPlaceHelper(b.sub(array), array);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rmod(Number n) {
-        return rmod(manager.create(n));
+        return rmod(manager.create(n).toType(array.getDataType(), false));
     }
 
     /** {@inheritDoc} */
@@ -111,25 +111,25 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rmodi(Number n) {
-        return rmodi(manager.create(n));
+        return rmodi(manager.create(n).toType(array.getDataType(), false));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rmodi(NDArray b) {
-        return b.modi(array);
+        return array.inPlaceHelper(b.mod(array), array);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rpow(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return array.pow(1f / n.floatValue());
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rpowi(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
+        return array.powi(1f / n.floatValue());
     }
 
     /** {@inheritDoc} */

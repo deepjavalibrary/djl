@@ -9,6 +9,7 @@ repositories {
 
 dependencies {
     api project(":tensorflow:tensorflow-engine")
+    runtimeOnly project(":tensorflow:tensorflow-native-auto")
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
