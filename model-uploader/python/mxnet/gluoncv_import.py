@@ -23,7 +23,9 @@ def export(model_name, input, export_path):
     net = get_model(model_name, pretrained=True)
     net.hybridize(static_alloc = True, static_shape = True)
     net(input)
-    os.mkdir(export_path)
+    export_path = export_path + "/" + model_name
+    if not os.path.exists(export_path):
+        os.makedirs(export_path)
     net.export(export_path + "/" + model_name)
 
 if __name__ == "__main__":

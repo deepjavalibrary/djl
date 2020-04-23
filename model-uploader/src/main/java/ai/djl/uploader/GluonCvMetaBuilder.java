@@ -15,8 +15,11 @@ package ai.djl.uploader;
 import ai.djl.Application;
 import ai.djl.uploader.arguments.GluonCvArgs;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Map;
 
 public final class GluonCvMetaBuilder {
+
     private String filePath = "python/mxnet/gluoncv_import.py";
     private String pythonPath = "python";
     private GluonCvArgs args;
@@ -25,6 +28,8 @@ public final class GluonCvMetaBuilder {
     private String artifactId;
     private String baseDir;
     private Application application;
+    private Map<String, String> properties;
+    private Map<String, Object> arguments;
 
     public GluonCvMetaBuilder optFilePath(String filePath) {
         this.filePath = filePath;
@@ -66,17 +71,28 @@ public final class GluonCvMetaBuilder {
         return this;
     }
 
+    public GluonCvMetaBuilder setProperties(Map<String, String> properties) {
+        this.properties = properties;
+        return this;
+    }
+
+    public GluonCvMetaBuilder setArguments(Map<String, Object> arguments) {
+        this.arguments = arguments;
+        return this;
+    }
+
     public MetadataBuilder prepareBuild() throws IOException, InterruptedException {
         Exporter.processSpawner(filePath, pythonPath, args);
         return MetadataBuilder.builder()
                 .setGroupId("ai.djl.mxnet")
                 .setApplication(application)
-                .setArtifactDir(args.getOutputPath())
+                .setArtifactDir(Paths.get(args.getOutputPath()))
                 .setArtifactName(args.getName())
                 .setName(name)
                 .setDescription(description)
                 .setArtifactId(artifactId)
                 .setBaseDir(baseDir)
-                .addArgument("shape", args.getShape());
+                .addProperties(properties)
+                .addArguments(arguments);
     }
 }

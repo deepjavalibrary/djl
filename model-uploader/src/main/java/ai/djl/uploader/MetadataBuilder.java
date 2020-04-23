@@ -47,9 +47,12 @@ import org.slf4j.LoggerFactory;
 
 /** The {@code MetadataBuilder} is designed to help build up metadata for model or dataset. */
 public final class MetadataBuilder {
-    private static final Logger logger = LoggerFactory.getLogger(MetadataBuilder.class);
+
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    private static final Logger logger = LoggerFactory.getLogger(MetadataBuilder.class);
     private static final String METADATA_VERSION = "0.1";
+
     private String artifactVersion = "0.0.1";
     private License license = License.apache();
     private Boolean isSnapshot;
@@ -115,8 +118,8 @@ public final class MetadataBuilder {
      *
      * <p>example: Application.CV.IMAGE_CLASSIFICATION for image classification task
      *
-     * @param application
-     * @return
+     * @param application model's application
+     * @return this builder
      */
     public MetadataBuilder setApplication(Application application) {
         this.application = application;
@@ -156,10 +159,9 @@ public final class MetadataBuilder {
      * @param artifactDir full path to the directory
      * @return builder
      */
-    public MetadataBuilder setArtifactDir(String artifactDir) {
-        Path path = Paths.get(artifactDir);
-        if (Files.isDirectory(path)) {
-            this.artifactDir = path;
+    public MetadataBuilder setArtifactDir(Path artifactDir) {
+        if (Files.isDirectory(artifactDir)) {
+            this.artifactDir = artifactDir;
         } else {
             throw new IllegalArgumentException("File path is not a directory " + artifactDir);
         }
@@ -414,9 +416,10 @@ public final class MetadataBuilder {
     }
 
     private Map<String, Artifact.Item> constructFiles(Path destination) throws IOException {
-        File[] listFiles = artifactDir.toFile().listFiles();
+        File dir = artifactDir.resolve(artifactName).toFile();
+        File[] listFiles = dir.listFiles();
         if (listFiles == null) {
-            throw new FileNotFoundException("File not found");
+            throw new FileNotFoundException("File not found in dir: " + dir);
         }
         while (existCollideFile(listFiles, destination)) {
             String[] digits = artifactVersion.split("\\.");
@@ -450,6 +453,16 @@ public final class MetadataBuilder {
             item.setSize(copiedFile.length());
             item.setUri(uri);
             files.put(names[0], item);
+        }
+        if (application == Application.CV.IMAGE_CLASSIFICATION
+                && !files.containsKey("synset")
+                && "imagenet".equals(properties.get("dataset"))) {
+            Artifact.Item item = new Artifact.Item();
+            item.setSha1Hash("e03a09a8336d75b7bb008748eadee253a30cb2c2");
+            item.setSize(31675);
+            item.setUri(
+                    "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt");
+            files.put("synset", item);
         }
         return files;
     }
