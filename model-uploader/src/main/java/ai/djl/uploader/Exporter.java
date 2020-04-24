@@ -15,6 +15,7 @@ package ai.djl.uploader;
 
 import ai.djl.uploader.arguments.Arguments;
 import ai.djl.uploader.arguments.GluonCvArgs;
+import ai.djl.uploader.arguments.HuggingFaceArgs;
 import ai.djl.uploader.arguments.KerasArgs;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,6 +48,8 @@ public final class Exporter {
                 metadataBuilder = gluonCvImport(arguments);
             } else if ("keras".equals(category)) {
                 metadataBuilder = kerasImport(arguments);
+            } else if ("huggingface".equals(category)) {
+                metadataBuilder = huggingfaceImport(arguments);
             } else {
                 metadataBuilder = readyToGoModel(arguments);
             }
@@ -76,8 +79,32 @@ public final class Exporter {
                         .setBaseDir(arguments.getBaseDir())
                         .setArtifactId(arguments.getArtifactId())
                         .setName(arguments.getName())
-                        .setProperties(arguments.getProperties())
-                        .setArguments(arguments.getArguments())
+                        .optProperties(arguments.getProperties())
+                        .optArguments(arguments.getArguments())
+                        .setDescription(arguments.getDescription());
+        String pythonPath = arguments.getPythonPath();
+        if (pythonPath != null) {
+            exporter.optPythonPath(pythonPath);
+        }
+        return exporter.prepareBuild();
+    }
+
+    public static MetadataBuilder huggingfaceImport(ExporterArguments arguments)
+            throws IOException, InterruptedException {
+        HuggingFaceArgs args = new HuggingFaceArgs();
+        args.setName(arguments.getArtifactName());
+        args.setApplicationName(arguments.getApplicationType());
+        args.setOutputPath(arguments.getBaseDir());
+        args.setShape(arguments.getShape());
+        HuggingFaceMetaBuilder exporter =
+                new HuggingFaceMetaBuilder()
+                        .setApplication(arguments.getApplication())
+                        .setArgs(args)
+                        .setBaseDir(arguments.getBaseDir())
+                        .setArtifactId(arguments.getArtifactId())
+                        .setName(arguments.getName())
+                        .optProperties(arguments.getProperties())
+                        .optArguments(arguments.getArguments())
                         .setDescription(arguments.getDescription());
         String pythonPath = arguments.getPythonPath();
         if (pythonPath != null) {
