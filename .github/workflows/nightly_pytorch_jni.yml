@@ -31,15 +31,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Workaround for startup run
-        # gradle :pytorch:pytorch-engine:jar will delete build folder for the first time
-        # in certain case, which lead to download jnilib from S3 and fail.
-        # run gradle clean to avoid gradle deleting build folder.
-        run: ./gradlew clean
       - name: Release JNI prep
         run: ./gradlew :pytorch:pytorch-native:compileJNI
-      - name: Test with Gradle
-        run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Upload compiled jni library
         uses: actions/upload-artifact@v1
         if: always()
@@ -159,3 +152,5 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.4.0/jnilib
+      - name: Test with Gradle
+        run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
