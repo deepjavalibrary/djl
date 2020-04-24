@@ -24,9 +24,13 @@ import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.nlp.EncoderDecoder;
 import ai.djl.modality.nlp.embedding.TrainableTextEmbedding;
+import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
+import ai.djl.modality.nlp.preprocess.PunctuationSeparator;
+import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
+import ai.djl.modality.nlp.preprocess.TextTerminator;
+import ai.djl.modality.nlp.preprocess.TextTruncator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -37,6 +41,7 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.MaskedSoftmaxCrossEntropyLoss;
@@ -46,6 +51,10 @@ import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.PaddingStackBatchifier;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.apache.commons.cli.ParseException;
 
 public final class TrainSeq2Seq {
@@ -57,15 +66,26 @@ public final class TrainSeq2Seq {
 
     public static TrainingResult runExample(String[] args) throws IOException, ParseException {
         Arguments arguments = Arguments.parseArgs(args);
-
+        ExecutorService executorService = Executors.newFixedThreadPool(8);
         try (Model model = Model.newInstance()) {
             // get training and validation dataset
-            TextDataset trainingSet =
-                    getDataset(Dataset.Usage.TRAIN, arguments, model.getNDManager());
-            TextDataset validateSet =
-                    getDataset(Dataset.Usage.TEST, arguments, model.getNDManager());
+            TextDataset trainingSet = getDataset(Dataset.Usage.TRAIN, arguments, executorService);
+            TextDataset validateDataset =
+                    getDataset(Dataset.Usage.TEST, arguments, executorService);
 
-            model.setBlock(getSeq2SeqModel(trainingSet));
+            // Fetch TextEmbedding from dataset
+            TrainableTextEmbedding sourceTextEmbedding =
+                    (TrainableTextEmbedding) trainingSet.getTextEmbedding(true);
+            TrainableTextEmbedding targetTextEmbedding =
+                    (TrainableTextEmbedding) trainingSet.getTextEmbedding(false);
+
+            // Build the model with the TextEmbedding so that embeddings can be trained
+            Block block =
+                    getSeq2SeqModel(
+                            sourceTextEmbedding,
+                            targetTextEmbedding,
+                            trainingSet.getVocabulary(false).getAllTokens().size());
+            model.setBlock(block);
 
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
@@ -74,7 +94,6 @@ public final class TrainSeq2Seq {
 
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
-
                 /*
                 In Sequence-Sequence model for MT, the decoder input must be staggered by one wrt
                 the label during training.
@@ -89,24 +108,27 @@ public final class TrainSeq2Seq {
                         trainer,
                         arguments.getEpoch(),
                         trainingSet,
-                        validateSet,
+                        validateDataset,
                         arguments.getOutputDir(),
-                        "seq2seqEn2Fr");
-
+                        "seq2seqMTEn-Fr");
                 TrainingResult result = trainer.getTrainingResult();
                 model.setProperty("Epoch", String.valueOf(result.getEpoch()));
                 model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
-
-                model.save(Paths.get(arguments.getOutputDir()), "seq2seqEn2Fr");
+                model.save(Paths.get(arguments.getOutputDir()), "seq2seqMTEn-Fr");
                 return result;
+            } finally {
+                executorService.shutdownNow();
             }
         }
     }
 
-    private static Block getSeq2SeqModel(TextDataset dataset) {
+    private static Block getSeq2SeqModel(
+            TrainableTextEmbedding sourceEmbedding,
+            TrainableTextEmbedding targetEmbedding,
+            int vocabSize) {
         SimpleSequenceEncoder simpleSequenceEncoder =
                 new SimpleSequenceEncoder(
-                        (TrainableTextEmbedding) dataset.getTextEmbedding(true),
+                        sourceEmbedding,
                         new LSTM.Builder()
                                 .setStateSize(32)
                                 .setNumStackedLayers(2)
@@ -114,18 +136,19 @@ public final class TrainSeq2Seq {
                                 .build());
         SimpleSequenceDecoder simpleSequenceDecoder =
                 new SimpleSequenceDecoder(
-                        (TrainableTextEmbedding) dataset.getTextEmbedding(false),
+                        targetEmbedding,
                         new LSTM.Builder()
                                 .setStateSize(32)
                                 .setNumStackedLayers(2)
                                 .optDropRate(0)
                                 .build(),
-                        dataset.getVocabulary(false).size());
+                        vocabSize);
         return new EncoderDecoder(simpleSequenceEncoder, simpleSequenceDecoder);
     }
 
     public static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         return new DefaultTrainingConfig(new MaskedSoftmaxCrossEntropyLoss())
+                .addEvaluator(new Accuracy("Accuracy", 0, 2))
                 .optInitializer(new XavierInitializer())
                 .optOptimizer(
                         Adam.builder()
@@ -137,19 +160,34 @@ public final class TrainSeq2Seq {
     }
 
     public static TextDataset getDataset(
-            Dataset.Usage usage, Arguments arguments, NDManager manager) throws IOException {
+            Dataset.Usage usage, Arguments arguments, ExecutorService executorService)
+            throws IOException {
+        long limit =
+                usage == Dataset.Usage.TRAIN ? arguments.getLimit() : arguments.getLimit() / 10;
         TatoebaEnglishFrenchDataset tatoebaEnglishFrenchDataset =
                 TatoebaEnglishFrenchDataset.builder()
-                        .setSampling(arguments.getBatchSize(), true, true)
+                        .setSampling(arguments.getBatchSize(), true, false)
                         .optBatchier(
                                 PaddingStackBatchifier.builder()
                                         .optIncludeValidLengths(true)
-                                        .addPad(0, 0, (m) -> m.zeros(new Shape(1)))
+                                        .addPad(0, 0, (m) -> m.zeros(new Shape(1)), 10)
                                         .build())
-                        .setSourceConfiguration(new Configuration().setEmbeddingSize(32))
-                        .setTargetConfiguration(new Configuration().setEmbeddingSize(32))
+                        .setSourceConfiguration(
+                                new Configuration().setEmbeddingSize(32).setTrainEmbedding(true))
+                        .setTargetConfiguration(
+                                new Configuration()
+                                        .setEmbeddingSize(32)
+                                        .setTrainEmbedding(true)
+                                        .setTextProcessors(
+                                                Arrays.asList(
+                                                        new SimpleTokenizer(),
+                                                        new LowerCaseConvertor(Locale.FRENCH),
+                                                        new PunctuationSeparator(),
+                                                        new TextTruncator(8),
+                                                        new TextTerminator())))
                         .optUsage(usage)
-                        .optLimit(arguments.getLimit())
+                        .optExecutor(executorService, 8)
+                        .optLimit(limit)
                         .build();
         tatoebaEnglishFrenchDataset.prepare(new ProgressBar());
         return tatoebaEnglishFrenchDataset;
@@ -168,7 +206,7 @@ public final class TrainSeq2Seq {
         @Override
         public NDList getLabels(Batch batch) {
             NDList labels = batch.getLabels();
-            return new NDList(labels.head().get(new NDIndex(":, 1:")), labels.get(1));
+            return new NDList(labels.head().get(new NDIndex(":, 1:")), labels.get(1).sub(1));
         }
     }
 }

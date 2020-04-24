@@ -29,7 +29,7 @@ import ai.djl.util.PairList;
  * to decode text input.
  */
 public class SimpleSequenceDecoder extends Decoder {
-    RecurrentBlock recurrentBlock;
+    private RecurrentBlock recurrentBlock;
 
     /**
      * Contructs a new instance of {@code SimpleSequenceDecoder} with the given {@link
