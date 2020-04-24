@@ -32,5 +32,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     tensors = []
     for shape in eval(args.shape):
-        tensors.append(torch.ones(shape))
+        tensors.append(torch.ones(shape, dtype=torch.int64))
     export(args.name, args.model_application, tuple(tensors), args.output_path)
