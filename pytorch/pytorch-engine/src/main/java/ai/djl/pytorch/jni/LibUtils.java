@@ -84,14 +84,20 @@ public final class LibUtils {
                                 String name = path.getFileName().toString();
                                 return !"c10_cuda.dll".equals(name)
                                         && !"torch.dll".equals(name)
+                                        && !"torch_cpu.dll".equals(name)
+                                        && !"torch_cuda.dll".equals(name)
+                                        && !"fbgemm.dll".equals(name)
                                         && Files.isRegularFile(path)
                                         && !name.endsWith("djl_torch.dll");
                             })
                     .map(path -> path.toAbsolutePath().toString())
                     .forEach(System::load);
+            System.load(libDir.resolve("fbgemm.dll").toAbsolutePath().toString());
+            System.load(libDir.resolve("torch_cpu.dll").toAbsolutePath().toString());
             if (Files.exists(libDir.resolve("c10_cuda.dll"))) {
                 // Windows System.load is global load
                 System.load(libDir.resolve("c10_cuda.dll").toAbsolutePath().toString());
+                System.load(libDir.resolve("torch_cuda.dll").toAbsolutePath().toString());
             }
             System.load(libDir.resolve("torch.dll").toAbsolutePath().toString());
         } catch (IOException e) {
