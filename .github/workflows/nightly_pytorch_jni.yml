@@ -31,6 +31,11 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: Workaround for startup run
+        # gradle :pytorch:pytorch-engine:jar will delete build folder for the first time
+        # in certain case, which lead to download jnilib from S3 and fail.
+        # run gradle clean to avoid gradle deleting build folder.
+        run: ./gradlew clean
       - name: Release JNI prep
         run: ./gradlew :pytorch:pytorch-native:compileJNI
       - name: Test with Gradle
