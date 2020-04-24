@@ -77,4 +77,32 @@ public abstract class MetaBuilder<T> {
         this.artifactId = artifactId;
         return self();
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getArtifactId() {
+        return artifactId;
+    }
+
+    public String getBaseDir() {
+        return baseDir;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public Map<String, Object> getArguments() {
+        return arguments;
+    }
 }
