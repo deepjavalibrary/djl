@@ -36,10 +36,8 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Stack;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -106,23 +104,6 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     MxNDArray(MxNDManager manager, Pointer handle, SparseFormat fmt) {
         this(manager, handle);
         this.sparseFormat = fmt;
-    }
-
-    private NumberFormat getNumberFormat() {
-        String numericLocale = System.getenv("LC_NUMERIC");
-        if (numericLocale == null) {
-            return NumberFormat.getInstance();
-        }
-        String[] locale = numericLocale.split("[_|.]");
-        switch (locale.length) {
-            case 1:
-                return NumberFormat.getInstance(new Locale(locale[0]));
-            case 2:
-            case 3:
-                return NumberFormat.getInstance(new Locale(locale[0], locale[1]));
-            default:
-                throw new IllegalArgumentException("Invalid locale format");
-        }
     }
 
     /** {@inheritDoc} */
@@ -572,7 +553,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray eq(Number other) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(other));
+        params.add("scalar", other.toString());
         return manager.invoke("_npi_equal_scalar", this, params);
     }
 
@@ -586,7 +567,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray neq(Number other) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(other));
+        params.add("scalar", other.toString());
         return manager.invoke("_npi_not_equal_scalar", this, params);
     }
 
@@ -600,7 +581,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray gt(Number other) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(other));
+        params.add("scalar", other.toString());
         return manager.invoke("_npi_greater_scalar", this, params);
     }
 
@@ -614,7 +595,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray gte(Number other) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(other));
+        params.add("scalar", other.toString());
         return manager.invoke("_npi_greater_equal_scalar", this, params);
     }
 
@@ -628,7 +609,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray lt(Number other) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(other));
+        params.add("scalar", other.toString());
         return manager.invoke("_npi_less_scalar", this, params);
     }
 
@@ -642,7 +623,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray lte(Number other) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(other));
+        params.add("scalar", other.toString());
         return manager.invoke("_npi_less_equal_scalar", this, params);
     }
 
@@ -656,7 +637,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray add(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         return manager.invoke("_npi_add_scalar", this, params);
     }
 
@@ -670,7 +651,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray sub(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         return manager.invoke("_npi_subtract_scalar", this, params);
     }
 
@@ -684,7 +665,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray mul(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         return manager.invoke("_npi_multiply_scalar", this, params);
     }
 
@@ -716,7 +697,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray div(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         return manager.invoke("_npi_true_divide_scalar", this, params);
     }
 
@@ -730,7 +711,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray mod(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         return manager.invoke("_npi_mod_scalar", this, params);
     }
 
@@ -744,7 +725,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray pow(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         return manager.invoke("_npi_power_scalar", this, params);
     }
 
@@ -758,7 +739,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray addi(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         manager.invoke("_npi_add_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
         return this;
     }
@@ -774,7 +755,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray subi(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         manager.invoke("_npi_subtract_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
         return this;
     }
@@ -790,7 +771,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray muli(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         manager.invoke("_npi_multiply_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
         return this;
     }
@@ -806,7 +787,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray divi(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         manager.invoke(
                 "_npi_true_divide_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
         return this;
@@ -823,7 +804,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray modi(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         manager.invoke("_npi_mod_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
         return this;
     }
@@ -839,7 +820,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray powi(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         manager.invoke("_npi_power_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
         return this;
     }
@@ -1024,7 +1005,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray maximum(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         return manager.invoke("_npi_maximum_scalar", this, params);
     }
 
@@ -1038,7 +1019,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public NDArray minimum(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", getNumberFormat().format(n));
+        params.add("scalar", n.toString());
         return manager.invoke("_npi_minimum_scalar", this, params);
     }
 
