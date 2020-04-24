@@ -42,6 +42,7 @@ public class ExporterArguments {
     private String artifactDir;
     private String pythonPath;
     private String shape;
+    private String applicationType;
 
     public ExporterArguments(CommandLine cmd) {
         if (cmd.hasOption("dataset")) {
@@ -52,6 +53,9 @@ public class ExporterArguments {
         }
         if (cmd.hasOption("keras")) {
             category = "keras";
+        }
+        if (cmd.hasOption("huggingface")) {
+            category = "huggingface";
         }
         if (cmd.hasOption("model")) {
             category = "model";
@@ -80,13 +84,14 @@ public class ExporterArguments {
         } else if (Application.UNDEFINED.getPath().equalsIgnoreCase(applicationName)) {
             application = Application.UNDEFINED;
             if (description == null) {
-                description = name + " CV model";
+                description = name + " model";
             }
         } else {
             throw new IllegalArgumentException("Unsupported application name " + applicationName);
         }
         properties = valueParser(cmd.getOptionValue("property"));
         arguments = parseArguments(cmd.getOptionValue("argument"));
+        // TODO: this is not always true, totally relying on model config
         if (arguments.isEmpty() && "imagenet".equals(properties.get("dataset"))) {
             arguments.put("width", 224);
             arguments.put("height", 224);
@@ -95,6 +100,7 @@ public class ExporterArguments {
         isRemote = cmd.hasOption("remote");
         pythonPath = cmd.getOptionValue("python-path");
         shape = cmd.getOptionValue("shape");
+        applicationType = cmd.getOptionValue("application-type");
     }
 
     public static Options getOptions() {
@@ -104,6 +110,7 @@ public class ExporterArguments {
                         .addOption(new Option("dataset", false, "create dataset metadata"))
                         .addOption(new Option("gluoncv", false, "import gluoncv model"))
                         .addOption(new Option("keras", false, "import keras model"))
+                        .addOption(new Option("huggingface", false, "import huggingface model"))
                         .addOption(new Option("model", false, "import general model"));
         og.setRequired(true);
         options.addOptionGroup(og);
@@ -141,7 +148,15 @@ public class ExporterArguments {
         options.addOption(
                 "py", "python-path", true, "the python path you would like to use for import");
         options.addOption(
-                "s", "shape", true, "the input shape of the model, example: (1,3,224,224)");
+                "s",
+                "shape",
+                true,
+                "the input shape of the model, example: (1,3,224,224) or [(1, 3), [(2, 4)]");
+        options.addOption(
+                "at",
+                "application-type",
+                true,
+                "The application type of the model, example: 'BertForQuestionAnswering' in huggingface");
         return options;
     }
 
@@ -197,6 +212,13 @@ public class ExporterArguments {
             throw new IOException("Please specify --shape");
         }
         return shape;
+    }
+
+    public String getApplicationType() throws IOException {
+        if (applicationType == null) {
+            throw new IOException("Please specify --application-type");
+        }
+        return applicationType;
     }
 
     public String getPythonPath() {

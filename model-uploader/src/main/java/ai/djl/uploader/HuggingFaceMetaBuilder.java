@@ -13,40 +13,34 @@
 
 package ai.djl.uploader;
 
-import ai.djl.uploader.arguments.KerasArgs;
+import ai.djl.uploader.arguments.HuggingFaceArgs;
 import java.io.IOException;
+import java.nio.file.Paths;
 
-public class KerasMetaBuilder extends MetaBuilder<KerasMetaBuilder> {
-
-    private String filePath = "python/tensorflow/keras_import.py";
+public class HuggingFaceMetaBuilder extends MetaBuilder<HuggingFaceMetaBuilder> {
+    private String filePath = "python/pytorch/huggingface_import.py";
     private String pythonPath = "python";
-    private KerasArgs args;
-    private String artifactName;
+    private HuggingFaceArgs args;
 
     @Override
-    public KerasMetaBuilder self() {
+    public HuggingFaceMetaBuilder self() {
         return this;
     }
 
     @Override
-    public KerasMetaBuilder optFilePath(String filePath) {
+    public HuggingFaceMetaBuilder optFilePath(String filePath) {
         this.filePath = filePath;
         return this;
     }
 
     @Override
-    public KerasMetaBuilder optPythonPath(String pythonPath) {
+    public HuggingFaceMetaBuilder optPythonPath(String pythonPath) {
         this.pythonPath = pythonPath;
         return this;
     }
 
-    public KerasMetaBuilder setArgs(KerasArgs args) {
+    public HuggingFaceMetaBuilder setArgs(HuggingFaceArgs args) {
         this.args = args;
-        return this;
-    }
-
-    public KerasMetaBuilder setArtifactName(String artifactName) {
-        this.artifactName = artifactName;
         return this;
     }
 
@@ -54,8 +48,9 @@ public class KerasMetaBuilder extends MetaBuilder<KerasMetaBuilder> {
     public MetadataBuilder prepareBuild() throws IOException, InterruptedException {
         Exporter.processSpawner(filePath, pythonPath, args);
         MetadataBuilder builder = super.prepareBuild();
-        return builder.setGroupId("ai.djl.tensorflow")
-                .setArtifactDir(args.getArtifactPath())
-                .setArtifactName(artifactName);
+        return builder.setGroupId("ai.djl.pytorch")
+                .setArtifactDir(Paths.get(args.getOutputPath(), args.getName()))
+                .setArtifactName(args.getName())
+                .addArgument("shape", args.getShape());
     }
 }
