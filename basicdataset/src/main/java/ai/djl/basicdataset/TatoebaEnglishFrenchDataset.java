@@ -14,6 +14,7 @@ package ai.djl.basicdataset;
 
 import ai.djl.Application;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
@@ -134,15 +135,22 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
                 targetTextData.add(text[1]);
             }
         }
-
-        preprocess(sourceTextData, true);
-        preprocess(targetTextData, false);
+        try {
+            preprocess(sourceTextData, true);
+            preprocess(targetTextData, false);
+        } catch (EmbeddingException e) {
+            throw new IOException(e.getMessage(), e);
+        }
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Record get(NDManager manager, long index) throws EmbeddingException {
-        return new Record(embedText(index, manager, true), embedText(index, manager, false));
+    public Record get(NDManager manager, long index) {
+        NDList data = new NDList();
+        NDList labels = new NDList();
+        data.add(sourceTextData.getEmbedding(manager, index));
+        labels.add(targetTextData.getEmbedding(manager, index));
+
+        return new Record(data, labels);
     }
 
     /** {@inheritDoc} */

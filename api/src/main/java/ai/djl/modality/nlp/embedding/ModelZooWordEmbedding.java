@@ -54,18 +54,18 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray preprocessWordToEmbed(NDManager manager, String word) {
+    public int preprocessWordToEmbed(String word) {
         if (embedding.hasItem(word)) {
-            return embedding.embed(manager, word);
+            return embedding.embed(word);
         }
-        return embedding.embed(manager, unknownToken);
+        return embedding.embed(unknownToken);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray embedWord(NDArray word) throws EmbeddingException {
+    public NDArray embedWord(NDManager manager, int word) throws EmbeddingException {
         try {
-            return predictor.predict(new NDList(word)).singletonOrThrow();
+            return predictor.predict(new NDList(manager.create(word))).singletonOrThrow();
         } catch (TranslateException e) {
             throw new EmbeddingException("Could not embed word", e);
         }

@@ -112,6 +112,11 @@ public class Predictor<I, O> implements AutoCloseable {
         return batchPredict(Collections.singletonList(input)).get(0);
     }
 
+    private NDList predict(NDList ndList) {
+        logger.trace("Predictor input data: {}", ndList);
+        return block.predict(parameterStore, ndList);
+    }
+
     /**
      * Predicts a batch for inference.
      *
@@ -136,8 +141,8 @@ public class Predictor<I, O> implements AutoCloseable {
                     NDList ndList = translator.processInput(context, input);
                     preprocessEnd(ndList);
 
-                    NDList result = forward(ndList);
-                    forwardEnd(result);
+                    NDList result = predict(ndList);
+                    predictEnd(result);
 
                     ret.add(translator.processOutput(context, result));
                     postProcessEnd(begin);
@@ -149,8 +154,8 @@ public class Predictor<I, O> implements AutoCloseable {
             NDList inputBatch = processInputs(context, inputs);
             preprocessEnd(inputBatch);
 
-            NDList result = forward(inputBatch);
-            forwardEnd(result);
+            NDList result = predict(inputBatch);
+            predictEnd(result);
 
             List<O> ret = processOutputs(context, result);
             postProcessEnd(begin);
@@ -177,11 +182,6 @@ public class Predictor<I, O> implements AutoCloseable {
                 ((LazyNDArray) array).waitToRead();
             }
         }
-    }
-
-    private NDList forward(NDList ndList) {
-        logger.trace("Predictor input data: {}", ndList);
-        return block.forward(parameterStore, ndList);
     }
 
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
@@ -214,7 +214,7 @@ public class Predictor<I, O> implements AutoCloseable {
         }
     }
 
-    private void forwardEnd(NDList list) {
+    private void predictEnd(NDList list) {
         if (metrics != null) {
             waitToRead(list);
             long tmp = System.nanoTime();

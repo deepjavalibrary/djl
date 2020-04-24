@@ -13,7 +13,6 @@
 package ai.djl.modality.nlp.embedding;
 
 import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -25,7 +24,7 @@ public class TrainableWordEmbeddingTest {
     private static final String UNKNOWN_TOKEN = "UNKNOWN_TOKEN";
 
     @Test
-    public void testWordEmbedding() throws EmbeddingException {
+    public void testWordEmbedding() {
         TrainableWordEmbedding trainableWordEmbedding =
                 TrainableWordEmbedding.builder()
                         .setItems(new SimpleTokenizer().tokenize(TEST_STRING))
@@ -33,14 +32,12 @@ public class TrainableWordEmbeddingTest {
                         .optUseDefault(true)
                         .build();
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray index = trainableWordEmbedding.preprocessWordToEmbed(manager, "Java");
-            Assert.assertTrue(index.isScalar());
-            String word = trainableWordEmbedding.unembedWord(index);
+            int index = trainableWordEmbedding.preprocessWordToEmbed("Java");
+            String word = trainableWordEmbedding.unembedWord(manager.create(index));
             Assert.assertEquals(word, "Java");
 
-            index = trainableWordEmbedding.preprocessWordToEmbed(manager, UNKNOWN_TOKEN);
-            Assert.assertTrue(index.isScalar());
-            word = trainableWordEmbedding.unembedWord(index);
+            index = trainableWordEmbedding.preprocessWordToEmbed(UNKNOWN_TOKEN);
+            word = trainableWordEmbedding.unembedWord(manager.create(index));
             Assert.assertEquals(word, "<unk>");
         }
     }

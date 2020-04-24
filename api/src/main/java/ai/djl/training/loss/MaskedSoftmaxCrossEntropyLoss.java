@@ -14,7 +14,6 @@ package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.types.Shape;
 
 /**
  * {@code MaskedSoftmaxCrossEntropyLoss} is an implementation of {@link Loss} that only considers a
@@ -22,16 +21,18 @@ import ai.djl.ndarray.types.Shape;
  * sequence.
  */
 public class MaskedSoftmaxCrossEntropyLoss extends Loss {
-    SoftmaxCrossEntropyLoss softmaxCrossEntropyLoss;
+    private float weight;
+    private int classAxis;
+    private boolean sparseLabel;
+    private boolean fromLogit;
 
-    /** Creates a new instance of {@code MaskedSoftmaxCrossEntropyLoss} with default parameters. */
+    /** Creates a new instance of {@code SoftmaxCrossEntropyLoss} with default parameters. */
     public MaskedSoftmaxCrossEntropyLoss() {
         this("MaskedSoftmaxCrossEntropyLoss");
-        softmaxCrossEntropyLoss = new SoftmaxCrossEntropyLoss();
     }
 
     /**
-     * Creates a new instance of {@code MaskedSoftmaxCrossEntropyLoss} with default parameters.
+     * Creates a new instance of {@code SoftmaxCrossEntropyLoss} with default parameters.
      *
      * @param name the name of the loss
      */
@@ -52,8 +53,10 @@ public class MaskedSoftmaxCrossEntropyLoss extends Loss {
     public MaskedSoftmaxCrossEntropyLoss(
             String name, float weight, int classAxis, boolean sparseLabel, boolean fromLogit) {
         super(name);
-        softmaxCrossEntropyLoss =
-                new SoftmaxCrossEntropyLoss(name, weight, classAxis, sparseLabel, fromLogit);
+        this.weight = weight;
+        this.classAxis = classAxis;
+        this.sparseLabel = sparseLabel;
+        this.fromLogit = fromLogit;
     }
 
     /**
@@ -66,12 +69,23 @@ public class MaskedSoftmaxCrossEntropyLoss extends Loss {
      */
     @Override
     public NDArray evaluate(NDList labels, NDList predictions) {
-        NDList label =
-                new NDList(
-                        labels.head()
-                                .reshape(labels.head().getShape().addAll(new Shape(1)))
-                                .sequenceMask(labels.get(1)));
-        NDList pred = new NDList(predictions.head().sequenceMask(labels.get(1)));
-        return softmaxCrossEntropyLoss.evaluate(label, pred);
+        NDArray weights = labels.head().onesLike().expandDims(-1).sequenceMask(labels.get(1));
+        NDArray pred = predictions.singletonOrThrow();
+        if (!fromLogit) {
+            pred = pred.logSoftmax(classAxis);
+        }
+        NDArray loss;
+        NDArray lab = labels.head();
+        if (sparseLabel) {
+            loss = pred.getNDArrayInternal().pick(lab, classAxis, true).neg();
+        } else {
+            lab = lab.reshapeLike(pred);
+            loss = pred.mul(lab).neg().sum(new int[] {classAxis}, true);
+        }
+        loss = loss.mul(weights);
+        if (weight != 1) {
+            loss = loss.mul(weight);
+        }
+        return loss.mean(new int[] {1});
     }
 }

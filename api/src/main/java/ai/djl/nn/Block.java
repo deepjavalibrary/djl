@@ -129,6 +129,38 @@ public interface Block {
     NDList forward(ParameterStore parameterStore, NDList inputs, PairList<String, Object> params);
 
     /**
+     * Predicts the output based on the input.
+     *
+     * <p>In most {@code Block} implementations, prediction is the same calling the {@link
+     * Block#forward(ParameterStore, NDList)} method. However, in some cases it can be different. In
+     * most {@code Block} implementation where predict is different from forward, this default
+     * method must be overriden.
+     *
+     * @param parameterStore the parameter store
+     * @param inputs the input NDList
+     * @param params optional parameters
+     * @return the output of the model
+     */
+    public NDList predict(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params);
+
+    /**
+     * Predicts the output based on the input.
+     *
+     * <p>In most {@code Block} implementations, prediction is the same calling the {@link
+     * Block#forward(ParameterStore, NDList)} method. However, in some cases it can be different. In
+     * most {@code Block} implementation where predict is different from forward, this default
+     * method must be overriden.
+     *
+     * @param parameterStore the parameter store
+     * @param inputs the input NDList
+     * @return the output of the model
+     */
+    default NDList predict(ParameterStore parameterStore, NDList inputs) {
+        return predict(parameterStore, inputs, null);
+    }
+
+    /**
      * Sets an {@link Initializer} to the block.
      *
      * @param initializer the initializer to set

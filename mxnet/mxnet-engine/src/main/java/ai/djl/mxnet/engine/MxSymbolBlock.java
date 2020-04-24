@@ -150,6 +150,13 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
 
     /** {@inheritDoc} */
     @Override
+    public NDList predict(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        return forward(parameterStore, inputs, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         if (outputShapes == null) {
             String[] outputNames = symbol.getOutputNames();

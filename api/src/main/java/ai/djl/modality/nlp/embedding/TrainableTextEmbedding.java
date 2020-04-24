@@ -14,7 +14,6 @@ package ai.djl.modality.nlp.embedding;
 
 import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -51,23 +50,23 @@ public class TrainableTextEmbedding extends AbstractBlock implements TextEmbeddi
 
     /** {@inheritDoc} */
     @Override
-    public NDArray preprocessTextToEmbed(NDManager manager, List<String> text) {
-        NDList result = new NDList(text.size());
-        for (String token : text) {
-            result.add(trainableWordEmbedding.preprocessWordToEmbed(manager, token));
+    public int[] preprocessTextToEmbed(List<String> text) {
+        int[] result = new int[text.size()];
+        for (int i = 0; i < text.size(); i++) {
+            result[i] = trainableWordEmbedding.preprocessWordToEmbed(text.get(i));
         }
-        return NDArrays.stack(result);
+        return result;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray embedText(NDArray text) {
+    public NDArray embedText(NDManager manager, int[] textIndices) {
         throw new UnsupportedOperationException("This operation is not supported by this class.");
     }
 
     /** {@inheritDoc} */
     @Override
-    public List<String> unembedText(NDArray textEmbedding) throws EmbeddingException {
+    public List<String> unembedText(NDArray textEmbedding) {
         NDList split = textEmbedding.split(textEmbedding.getShape().get(0));
         List<String> result = new ArrayList<>(split.size());
         for (NDArray token : split) {
@@ -80,6 +79,13 @@ public class TrainableTextEmbedding extends AbstractBlock implements TextEmbeddi
     public NDList forward(
             ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
         return trainableWordEmbedding.forward(parameterStore, inputs, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList predict(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        return forward(parameterStore, inputs, params);
     }
 
     @Override

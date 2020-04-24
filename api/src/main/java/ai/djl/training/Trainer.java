@@ -192,6 +192,16 @@ public class Trainer implements AutoCloseable {
     }
 
     /**
+     * Applies the predict function of the model once on the given input {@link NDList}.
+     *
+     * @param input the input {@link NDList}
+     * @return the output of the predict function
+     */
+    public NDList predict(NDList input) {
+        return model.getBlock().predict(parameterStore, input);
+    }
+
+    /**
      * Validates the given batch of data.
      *
      * <p>During validation, the evaluators and losses are computed, but gradients aren't computed,

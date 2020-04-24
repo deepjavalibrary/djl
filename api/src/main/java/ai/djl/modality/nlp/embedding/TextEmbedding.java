@@ -32,21 +32,20 @@ import java.util.List;
  *
  * <p>In the second option, the embedding can be trained using the standard deep learning techniques
  * to better handle the current dataset. For this case, you need two methods. First, call {@link
- * #preprocessTextToEmbed(NDManager, List)} within your dataset. Then, the first step in your model
- * should be to call {@link #embedText(NDArray)}.
+ * #preprocessTextToEmbed(List)} within your dataset. Then, the first step in your model should be
+ * to call {@link #embedText(NDManager, int[])}.
  */
 public interface TextEmbedding {
 
     /**
-     * Preprocesses the text to embed into an {@link NDArray} to pass into the model.
+     * Preprocesses the text to embed into an array to pass into the model.
      *
-     * <p>Make sure to call {@link #embedText(NDArray)} after this.
+     * <p>Make sure to call {@link #embedText(NDManager, int[])} after this.
      *
-     * @param manager the manager for the new array
      * @param text the text to embed
-     * @return the text that is ready to embed
+     * @return the indices of text that is ready to embed
      */
-    NDArray preprocessTextToEmbed(NDManager manager, List<String> text);
+    int[] preprocessTextToEmbed(List<String> text);
 
     /**
      * Embeds a text.
@@ -57,17 +56,18 @@ public interface TextEmbedding {
      * @throws EmbeddingException if there is an error while trying to embed
      */
     default NDArray embedText(NDManager manager, List<String> text) throws EmbeddingException {
-        return embedText(preprocessTextToEmbed(manager, text));
+        return embedText(manager, preprocessTextToEmbed(text));
     }
 
     /**
-     * Embeds the text after preprocessed using {@link #preprocessTextToEmbed(NDManager, List)}.
+     * Embeds the text after preprocessed using {@link #preprocessTextToEmbed(List)}.
      *
-     * @param text the text to embed
+     * @param manager the manager to create the embedding array
+     * @param textIndices the text to embed
      * @return the embedded text
      * @throws EmbeddingException if there is an error while trying to embed
      */
-    NDArray embedText(NDArray text) throws EmbeddingException;
+    NDArray embedText(NDManager manager, int[] textIndices) throws EmbeddingException;
 
     /**
      * Returns the closest matching text for a given embedding.

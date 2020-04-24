@@ -62,6 +62,13 @@ public class Prelu extends ParameterBlock {
 
     /** {@inheritDoc} */
     @Override
+    public NDList predict(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        return forward(parameterStore, inputs, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         return new Shape[] {inputs[0]};
     }

@@ -103,6 +103,13 @@ public class BatchNorm extends ParameterBlock {
 
     /** {@inheritDoc} */
     @Override
+    public NDList predict(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        return forward(parameterStore, inputs, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return new Shape[] {inputShapes[0]};
     }

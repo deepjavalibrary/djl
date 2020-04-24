@@ -57,6 +57,13 @@ public class LambdaBlock extends ParameterBlock {
 
     /** {@inheritDoc} */
     @Override
+    public NDList predict(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        return forward(parameterStore, inputs, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         try (NDManager subManager = manager.newSubManager()) {
             NDList input = new NDList(inputShapes.length);

@@ -14,12 +14,12 @@ package ai.djl.basicdataset;
 
 import ai.djl.basicdataset.utils.TextData;
 import ai.djl.basicdataset.utils.TextData.Configuration;
+import ai.djl.engine.Engine;
 import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.RandomAccessDataset;
 import java.util.List;
@@ -38,6 +38,7 @@ public abstract class TextDataset extends RandomAccessDataset {
 
     protected TextData sourceTextData;
     protected TextData targetTextData;
+    protected NDManager manager;
 
     /**
      * Creates a new instance of {@link RandomAccessDataset} with the given necessary
@@ -53,12 +54,7 @@ public abstract class TextDataset extends RandomAccessDataset {
         targetTextData =
                 new TextData(
                         TextData.getDefaultConfiguration().update(builder.targetConfiguration));
-    }
-
-    protected NDList embedText(long index, NDManager manager, boolean source)
-            throws EmbeddingException {
-        TextData textData = source ? sourceTextData : targetTextData;
-        return textData.embedText(index, manager);
+        manager = builder.manager;
     }
 
     /**
@@ -85,22 +81,36 @@ public abstract class TextDataset extends RandomAccessDataset {
     }
 
     /**
+     * Gets the raw textual input.
+     *
+     * @param index the index of the text input
+     * @param source whether to get text from source or target
+     * @return the raw text
+     */
+    public String getRawText(long index, boolean source) {
+        TextData textData = source ? sourceTextData : targetTextData;
+        return textData.getRawText(index);
+    }
+
+    /**
      * Performs pre-processing steps on text data such as tokenising, applying {@link
      * ai.djl.modality.nlp.preprocess.TextProcessor}s, creating vocabulary, and word embeddings.
      *
      * @param newTextData list of all unprocessed sentences in the dataset
      * @param source whether the text data provided is source or target
+     * @throws EmbeddingException if there is an error while embedding
      */
-    protected void preprocess(List<String> newTextData, boolean source) {
+    protected void preprocess(List<String> newTextData, boolean source) throws EmbeddingException {
         TextData textData = source ? sourceTextData : targetTextData;
-        textData.preprocess(newTextData);
+        textData.preprocess(
+                manager, newTextData.subList(0, (int) Math.min(limit, newTextData.size())));
     }
 
     /** Abstract Builder that helps build a {@link TextDataset}. */
     public abstract static class Builder<T extends Builder<T>> extends BaseBuilder<T> {
-
         private TextData.Configuration sourceConfiguration;
         private TextData.Configuration targetConfiguration;
+        private NDManager manager = Engine.getInstance().newBaseManager();
 
         /**
          * Sets the {@link TextData.Configuration} to use for the source text data.
@@ -121,6 +131,17 @@ public abstract class TextDataset extends RandomAccessDataset {
          */
         public T setTargetConfiguration(Configuration targetConfiguration) {
             this.targetConfiguration = targetConfiguration;
+            return self();
+        }
+
+        /**
+         * Sets the optional manager for the dataset (default follows engine default).
+         *
+         * @param manager the manager
+         * @return this builder
+         */
+        public T optManager(NDManager manager) {
+            this.manager = manager.newSubManager();
             return self();
         }
     }

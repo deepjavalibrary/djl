@@ -245,7 +245,8 @@ public class BlockCoreTest {
                 NDManager manager = trainer.getManager();
 
                 Assert.assertEquals(
-                        trainer.forward(new NDList(block.embed(manager, "x"))).singletonOrThrow(),
+                        trainer.forward(new NDList(manager.create(block.embed("x"))))
+                                .singletonOrThrow(),
                         manager.create(new int[] {1, 1}));
 
                 Assert.assertEquals(
@@ -465,7 +466,7 @@ public class BlockCoreTest {
                                 },
                                 new Shape(1, 2, 4));
                 Assertions.assertAlmostEquals(result.head(), expected);
-                Assertions.assertAlmostEquals(result.size(), 2);
+                Assertions.assertAlmostEquals(result.size(), 3);
                 NDArray lossValue = loss.evaluate(new NDList(labels), new NDList(result.head()));
                 Assertions.assertAlmostEquals(lossValue.getFloat(), -16.340019);
                 testEncode(manager, block);

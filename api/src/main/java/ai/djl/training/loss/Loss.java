@@ -175,6 +175,40 @@ public abstract class Loss extends Evaluator {
     }
 
     /**
+     * Returns a new instance of {@link MaskedSoftmaxCrossEntropyLoss} with default arguments.
+     *
+     * @return a new instance of {@link MaskedSoftmaxCrossEntropyLoss}
+     */
+    public static MaskedSoftmaxCrossEntropyLoss maskedSoftmaxCrossEntropyLoss() {
+        return new MaskedSoftmaxCrossEntropyLoss();
+    }
+
+    /**
+     * Returns a new instance of {@link MaskedSoftmaxCrossEntropyLoss} with default arguments.
+     *
+     * @param name the name of the loss
+     * @return a new instance of {@link MaskedSoftmaxCrossEntropyLoss}
+     */
+    public static MaskedSoftmaxCrossEntropyLoss maskedSoftmaxCrossEntropyLoss(String name) {
+        return new MaskedSoftmaxCrossEntropyLoss(name);
+    }
+
+    /**
+     * Returns a new instance of {@link MaskedSoftmaxCrossEntropyLoss} with the given arguments.
+     *
+     * @param name the name of the loss
+     * @param weight the weight to apply on the loss value, default 1
+     * @param classAxis the axis that represents the class probabilities, default -1
+     * @param sparseLabel whether labels are integer array or probabilities, default true
+     * @param fromLogit whether labels are log probabilities or un-normalized numbers
+     * @return a new instance of {@link MaskedSoftmaxCrossEntropyLoss}
+     */
+    public static MaskedSoftmaxCrossEntropyLoss maskedSoftmaxCrossEntropyLoss(
+            String name, float weight, int classAxis, boolean sparseLabel, boolean fromLogit) {
+        return new MaskedSoftmaxCrossEntropyLoss(name, weight, classAxis, sparseLabel, fromLogit);
+    }
+
+    /**
      * Returns a new instance of {@link HingeLoss} with default arguments.
      *
      * @return a new instance of {@link HingeLoss}

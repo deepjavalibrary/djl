@@ -118,6 +118,13 @@ public class SequentialBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
+    public NDList predict(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        return forward(parameterStore, inputs, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
         beforeInitialize(inputShapes);
         Shape[] shapes = inputShapes;

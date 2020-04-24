@@ -83,6 +83,13 @@ public class TfSymbolBlock implements SymbolBlock {
 
     /** {@inheritDoc} */
     @Override
+    public NDList predict(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        return forward(parameterStore, inputs, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void setInitializer(Initializer initializer) {
         throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }

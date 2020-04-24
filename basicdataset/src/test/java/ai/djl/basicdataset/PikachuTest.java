@@ -37,7 +37,8 @@ public class PikachuTest {
                 new PikachuDetectionUnitTest(
                         PikachuDetection.builder()
                                 .optUsage(Dataset.Usage.TEST)
-                                .setSampling(1, true));
+                                .setSampling(1, true)
+                                .optLimit(10));
         pikachu.prepare();
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())

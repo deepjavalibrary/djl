@@ -141,7 +141,12 @@ public class StanfordMovieReview extends TextDataset implements ZooDataset {
 
         prepareDataSentiment(usagePath.resolve("pos"), true, reviewTexts);
         prepareDataSentiment(usagePath.resolve("neg"), false, reviewTexts);
-        preprocess(reviewTexts, true);
+
+        try {
+            preprocess(reviewTexts, true);
+        } catch (EmbeddingException e) {
+            throw new IOException(e.getMessage(), e);
+        }
     }
 
     private void prepareDataSentiment(Path path, boolean sentiment, List<String> reviewTexts)
@@ -167,8 +172,9 @@ public class StanfordMovieReview extends TextDataset implements ZooDataset {
 
     /** {@inheritDoc} */
     @Override
-    public Record get(NDManager manager, long index) throws EmbeddingException {
-        NDList data = embedText(index, manager, true);
+    public Record get(NDManager manager, long index) {
+        NDList data = new NDList();
+        data.add(sourceTextData.getEmbedding(manager, index));
         NDList label = new NDList(manager.create(reviewSentiments.get(Math.toIntExact(index))));
         return new Record(data, label);
     }
