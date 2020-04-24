@@ -151,6 +151,6 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.4.0/jnilib
+          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.5.0/jnilib
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
