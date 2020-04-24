@@ -12,8 +12,13 @@
  */
 package ai.djl.uploader;
 
+import ai.djl.Application;
 import ai.djl.uploader.arguments.GluonCvArgs;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public final class GluonCvMetaBuilder extends MetaBuilder<GluonCvMetaBuilder> {
@@ -47,6 +52,18 @@ public final class GluonCvMetaBuilder extends MetaBuilder<GluonCvMetaBuilder> {
     public MetadataBuilder prepareBuild() throws IOException, InterruptedException {
         Exporter.processSpawner(filePath, pythonPath, args);
         MetadataBuilder builder = super.prepareBuild();
+        if (getApplication() == Application.CV.IMAGE_CLASSIFICATION
+                && "imagenet".equals(getProperties().get("dataset"))) {
+            Path synset = Paths.get(args.getOutputPath(), args.getName(), "synset.txt");
+            if (!Files.exists(synset)) {
+                URL url =
+                        new URL(
+                                "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt");
+                try (InputStream is = url.openStream()) {
+                    Files.copy(is, synset);
+                }
+            }
+        }
         return builder.setGroupId("ai.djl.mxnet")
                 .setArtifactDir(Paths.get(args.getOutputPath(), args.getName()))
                 .setArtifactName(args.getName())
