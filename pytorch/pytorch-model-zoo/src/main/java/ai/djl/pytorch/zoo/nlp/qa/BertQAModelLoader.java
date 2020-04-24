@@ -52,7 +52,7 @@ public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
      * @param repository the repository to load the model from
      */
     public BertQAModelLoader(Repository repository) {
-        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION, new PtModelZoo());
         factories.put(new Pair<>(QAInput.class, String.class), new FactoryImpl());
     }
 

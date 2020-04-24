@@ -92,6 +92,7 @@ public class MxModel extends BaseModel {
         if (block == null) {
             // load MxSymbolBlock
             Path symbolFile = modelDir.resolve(modelName + "-symbol.json");
+            logger.debug("Finding Symbol File: {}", symbolFile.toString());
             if (Files.notExists(symbolFile)) {
                 throw new FileNotFoundException(
                         "Symbol file not found in: " + modelPath + ", please set block manually.");

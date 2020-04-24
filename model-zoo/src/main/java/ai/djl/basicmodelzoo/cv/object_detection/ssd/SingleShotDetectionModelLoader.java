@@ -62,7 +62,11 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
      * @param repository the repository to load the model from
      */
     public SingleShotDetectionModelLoader(Repository repository) {
-        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        super(
+                repository,
+                MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID),
+                VERSION,
+                new BasicModelZoo());
         FactoryImpl factory = new FactoryImpl();
 
         factories.put(new Pair<>(Image.class, DetectedObjects.class), factory);
@@ -107,10 +111,8 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
         return loadModel(criteria);
     }
 
-    /** {@inheritDoc} */
-    @Override
     @SuppressWarnings("unchecked")
-    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments) {
+    private Block customSSDBlock(Map<String, Object> arguments) {
         int numClasses = ((Double) arguments.get("outSize")).intValue();
         int numFeatures = ((Double) arguments.get("numFeatures")).intValue();
         boolean globalPool = (boolean) arguments.get("globalPool");
@@ -142,18 +144,30 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
             baseBlock.add(SingleShotDetection.getDownSamplingBlock(numFilter));
         }
 
-        Block ssdBlock =
-                SingleShotDetection.builder()
-                        .setNumClasses(numClasses)
-                        .setNumFeatures(numFeatures)
-                        .optGlobalPool(globalPool)
-                        .setRatios(ratios)
-                        .setSizes(sizes)
-                        .setBaseNetwork(baseBlock)
-                        .build();
+        return SingleShotDetection.builder()
+                .setNumClasses(numClasses)
+                .setNumFeatures(numFeatures)
+                .optGlobalPool(globalPool)
+                .setRatios(ratios)
+                .setSizes(sizes)
+                .setBaseNetwork(baseBlock)
+                .build();
+    }
 
+    /** {@inheritDoc} */
+    @Override
+    protected Model createModel(
+            Device device, Artifact artifact, Map<String, Object> arguments, String engine) {
+        Model model = Model.newInstance(device, engine);
+        model.setBlock(customSSDBlock(arguments));
+        return model;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments) {
         Model model = Model.newInstance(device);
-        model.setBlock(ssdBlock);
+        model.setBlock(customSSDBlock(arguments));
         return model;
     }
 

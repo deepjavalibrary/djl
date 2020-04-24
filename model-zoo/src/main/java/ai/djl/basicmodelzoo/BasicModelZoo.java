@@ -43,8 +43,9 @@ public class BasicModelZoo implements ModelZoo {
     public Set<String> getSupportedEngines() {
         Set<String> set = new HashSet<>();
         set.add("MXNet");
-        set.add("PyTorch");
-        set.add("TensorFlow");
+        // TODO Currently WIP in supporting these two engines in the basic model zoo
+        //        set.add("PyTorch");
+        //        set.add("TensorFlow");
         return set;
     }
 }

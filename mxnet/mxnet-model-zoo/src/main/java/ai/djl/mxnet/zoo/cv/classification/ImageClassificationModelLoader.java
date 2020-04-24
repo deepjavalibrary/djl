@@ -58,7 +58,7 @@ public abstract class ImageClassificationModelLoader
      */
     public ImageClassificationModelLoader(
             Repository repository, String artifactId, String version) {
-        super(repository, MRL.model(APPLICATION, GROUP_ID, artifactId), version);
+        super(repository, MRL.model(APPLICATION, GROUP_ID, artifactId), version, new MxModelZoo());
         FactoryImpl factory = new FactoryImpl();
 
         factories.put(new Pair<>(Image.class, Classifications.class), factory);

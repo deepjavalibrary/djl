@@ -62,7 +62,11 @@ public class ResNetModelLoader extends BaseModelLoader<Image, Classifications> {
      * @param repository the repository to load the model from
      */
     public ResNetModelLoader(Repository repository) {
-        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        super(
+                repository,
+                MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID),
+                VERSION,
+                new BasicModelZoo());
         FactoryImpl factory = new FactoryImpl();
 
         factories.put(new Pair<>(Image.class, Classifications.class), factory);
@@ -107,9 +111,7 @@ public class ResNetModelLoader extends BaseModelLoader<Image, Classifications> {
         return loadModel(criteria);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments) {
+    private Block resnetBlock(Map<String, Object> arguments) {
         @SuppressWarnings("unchecked")
         Shape shape =
                 new Shape(
@@ -126,10 +128,22 @@ public class ResNetModelLoader extends BaseModelLoader<Image, Classifications> {
             float batchNormMomentum = (float) ((double) arguments.get("batchNormMomentum"));
             blockBuilder.optBatchNormMomentum(batchNormMomentum);
         }
-        Block block = blockBuilder.build();
+        return blockBuilder.build();
+    }
 
+    @Override
+    protected Model createModel(
+            Device device, Artifact artifact, Map<String, Object> arguments, String engine) {
+        Model model = Model.newInstance(device, engine);
+        model.setBlock(resnetBlock(arguments));
+        return model;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments) {
         Model model = Model.newInstance(device);
-        model.setBlock(block);
+        model.setBlock(resnetBlock(arguments));
         return model;
     }
 

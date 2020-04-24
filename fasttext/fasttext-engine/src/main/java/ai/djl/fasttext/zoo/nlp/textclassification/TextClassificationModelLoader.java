@@ -45,7 +45,7 @@ public class TextClassificationModelLoader extends BaseModelLoader<String, Class
      * @param repository the repository to load the model from
      */
     public TextClassificationModelLoader(Repository repository) {
-        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION, new FtModelZoo());
         factories.put(new Pair<>(String.class, Classifications.class), new FactoryImpl());
     }
 

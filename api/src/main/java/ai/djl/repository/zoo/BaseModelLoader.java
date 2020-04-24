@@ -41,6 +41,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
     protected MRL mrl;
     protected String version;
     protected Map<Pair<Type, Type>, TranslatorFactory<?, ?>> factories;
+    protected ModelZoo modelZoo;
 
     private Metadata metadata;
 
@@ -50,8 +51,9 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
      * @param repository the repository to load the model from
      * @param mrl the mrl of the model to load
      * @param version the version of the model to load
+     * @param modelZoo the modelZoo type that is being used to get supported engine types
      */
-    protected BaseModelLoader(Repository repository, MRL mrl, String version) {
+    protected BaseModelLoader(Repository repository, MRL mrl, String version, ModelZoo modelZoo) {
         this.repository = repository;
         this.mrl = mrl;
         this.version = version;
@@ -59,6 +61,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         factories.put(
                 new Pair<>(NDList.class, NDList.class),
                 (TranslatorFactory<NDList, NDList>) arguments -> new NoopTranslator());
+        this.modelZoo = modelZoo;
     }
 
     /** {@inheritDoc} */
@@ -79,6 +82,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         Map<String, Object> override = criteria.getArguments();
         Progress progress = criteria.getProgress();
         Map<String, Object> arguments = artifact.getArguments(override);
+
         try {
             Translator<S, T> translator = criteria.getTranslator();
             if (translator == null) {
@@ -98,9 +102,19 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
 
             Path modelPath = repository.getResourceDirectory(artifact);
 
-            Model model = createModel(criteria.getDevice(), artifact, arguments);
-            model.load(modelPath, artifact.getName(), criteria.getOptions());
+            // Check if the engine is specified in Criteria, use it if it is.
+            // Otherwise check the modelzoo supported engine and grab the first engine in the list.
+            // Otherwise if none of them is specified or model zoo is null, go to default engine.
 
+            String engine = criteria.getEngine();
+            if (engine == null || engine.isEmpty()) {
+                if (modelZoo != null) {
+                    engine = modelZoo.getSupportedEngines().iterator().next();
+                }
+            }
+
+            Model model = createModel(Device.defaultDevice(), artifact, arguments, engine);
+            model.load(modelPath, artifact.getName(), criteria.getOptions());
             return new ZooModel<>(model, translator);
         } finally {
             if (progress != null) {
@@ -116,6 +130,12 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         return list.stream()
                 .filter(a -> version == null || version.equals(a.getVersion()))
                 .collect(Collectors.toList());
+    }
+
+    protected Model createModel(
+            Device device, Artifact artifact, Map<String, Object> arguments, String engine)
+            throws IOException {
+        return Model.newInstance(device, engine);
     }
 
     protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments)

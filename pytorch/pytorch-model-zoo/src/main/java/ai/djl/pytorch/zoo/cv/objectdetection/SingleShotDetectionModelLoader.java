@@ -63,7 +63,7 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
      * @param repository the repository to load the model from
      */
     public SingleShotDetectionModelLoader(Repository repository) {
-        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION, new PtModelZoo());
         FactoryImpl factory = new FactoryImpl();
 
         factories.put(new Pair<>(Image.class, DetectedObjects.class), factory);

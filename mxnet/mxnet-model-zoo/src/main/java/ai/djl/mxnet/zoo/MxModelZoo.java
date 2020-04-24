@@ -47,7 +47,7 @@ import java.util.Set;
 public class MxModelZoo implements ModelZoo {
 
     private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
-    private static final Repository REPOSITORY = Repository.newInstance("MxNet", DJL_REPO_URL);
+    private static final Repository REPOSITORY = Repository.newInstance("MXNet", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.mxnet";
 
     public static final SingleShotDetectionModelLoader SSD =

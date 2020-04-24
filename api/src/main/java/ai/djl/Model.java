@@ -87,6 +87,9 @@ public interface Model extends AutoCloseable {
      * @return a new model instance
      */
     static Model newInstance(Device device, String engineName) {
+        if (engineName == null || engineName.isEmpty()) {
+            return newInstance(device);
+        }
         return Engine.getEngine(engineName).newModel(device);
     }
 

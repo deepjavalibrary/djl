@@ -32,7 +32,7 @@ public class DefaultModelLoader extends BaseModelLoader<NDList, NDList> {
      * @param mrl the mrl of the model to load
      */
     public DefaultModelLoader(Repository repository, MRL mrl) {
-        super(repository, mrl, null);
+        super(repository, mrl, null, null);
     }
 
     /** {@inheritDoc} */

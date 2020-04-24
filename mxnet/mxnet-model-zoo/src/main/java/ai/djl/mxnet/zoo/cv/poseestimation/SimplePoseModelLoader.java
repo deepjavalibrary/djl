@@ -63,7 +63,7 @@ public class SimplePoseModelLoader extends BaseModelLoader<Image, Joints> {
      * @param repository the repository to load the model from
      */
     public SimplePoseModelLoader(Repository repository) {
-        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION, new MxModelZoo());
         FactoryImpl factory = new FactoryImpl();
 
         factories.put(new Pair<>(Image.class, Joints.class), factory);

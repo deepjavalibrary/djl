@@ -14,7 +14,6 @@ package ai.djl.repository.zoo;
 
 import ai.djl.Application;
 import ai.djl.Device;
-import ai.djl.engine.Engine;
 import ai.djl.translate.Translator;
 import ai.djl.util.Progress;
 import java.util.HashMap;
@@ -189,9 +188,7 @@ public class Criteria<I, O> {
         Translator<I, O> translator;
         Progress progress;
 
-        Builder() {
-            engine = Engine.getInstance().getEngineName();
-        }
+        Builder() {}
 
         private Builder(Class<I> inputClass, Class<O> outputClass, Builder<?, ?> parent) {
             this.inputClass = inputClass;

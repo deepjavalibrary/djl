@@ -57,7 +57,7 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDLis
      * @param repository the repository to load the model from
      */
     public GloveWordEmbeddingModelLoader(Repository repository) {
-        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION);
+        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION, new MxModelZoo());
         factories.put(new Pair<>(String.class, NDList.class), new FactoryImpl());
     }
 
@@ -67,11 +67,8 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDLis
         return APPLICATION;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments)
+    private Model customGloveBlock(Model model, Artifact artifact, Map<String, Object> arguments)
             throws IOException {
-        Model model = Model.newInstance(device);
         List<String> idxToToken =
                 Utils.readLines(
                         repository.openStream(artifact.getFiles().get("idx_to_token"), null));
@@ -87,6 +84,23 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDLis
         model.setBlock(wordEmbedding);
         model.setProperty("unknownToken", (String) arguments.get("unknownToken"));
         return model;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected Model createModel(
+            Device device, Artifact artifact, Map<String, Object> arguments, String engine)
+            throws IOException {
+        Model model = Model.newInstance(device, engine);
+        return customGloveBlock(model, artifact, arguments);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments)
+            throws IOException {
+        Model model = Model.newInstance(device);
+        return customGloveBlock(model, artifact, arguments);
     }
 
     /** {@inheritDoc} */
