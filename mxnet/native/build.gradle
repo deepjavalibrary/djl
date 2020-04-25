@@ -177,15 +177,7 @@ task downloadMxnetNativeLib() {
                 "linux/cu92mkl/libmxnet.so.gz"    : "cu92mkl/linux/native/lib/libmxnet.so",
                 "linux/cu101mkl/libmxnet.so.gz"   : "cu101mkl/linux/native/lib/libmxnet.so",
                 "linux/cu102mkl/libmxnet.so.gz"   : "cu102mkl/linux/native/lib/libmxnet.so",
-                "osx/mkl/libmxnet.dylib.gz"       : "mkl/osx/native/lib/libmxnet.dylib",
-                "win/common/libgcc_s_seh-1.dll.gz": "mkl/win/native/lib/libgcc_s_seh-1.dll",
-                "win/common/libgfortran-3.dll.gz" : "mkl/win/native/lib/libgfortran-3.dll",
-                "win/common/libopenblas.dll.gz"   : "mkl/win/native/lib/libopenblas.dll",
-                "win/common/libquadmath-0.dll.gz" : "mkl/win/native/lib/libquadmath-0.dll",
-                "win/mkl/libmxnet.dll.gz"         : "mkl/win/native/lib/mxnet.dll",
-                "win/cu92mkl/libmxnet.dll.gz"     : "cu92mkl/win/native/lib/mxnet.dll",
-                "win/cu101mkl/libmxnet.dll.gz"    : "cu101mkl/win/native/lib/mxnet.dll",
-                "win/cu102mkl/libmxnet.dll.gz"    : "cu102mkl/win/native/lib/mxnet.dll"
+                "osx/mkl/libmxnet.dylib.gz"       : "mkl/osx/native/lib/libmxnet.dylib"
         ]
 
         files.each { entry ->
@@ -212,25 +204,6 @@ task downloadMxnetNativeLib() {
                 exclude '**/libmxnet.so'
             }
             into("${BINARY_ROOT}/cu102mkl/linux/native/lib")
-        }
-
-        copy {
-            from("${BINARY_ROOT}/mkl/win/native/lib") {
-                exclude '**/mxnet.dll'
-            }
-            into("${BINARY_ROOT}/cu92mkl/win/native/lib")
-        }
-        copy {
-            from("${BINARY_ROOT}/mkl/win/native/lib") {
-                exclude '**/mxnet.dll'
-            }
-            into("${BINARY_ROOT}/cu101mkl/win/native/lib")
-        }
-        copy {
-            from("${BINARY_ROOT}/mkl/win/native/lib") {
-                exclude '**/mxnet.dll'
-            }
-            into("${BINARY_ROOT}/cu102mkl/win/native/lib")
         }
 
         new File("${BINARY_ROOT}/auto").mkdirs()
