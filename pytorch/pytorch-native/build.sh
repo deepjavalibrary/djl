@@ -18,7 +18,7 @@ if [[ ! -d "libtorch" ]]; then
       echo "$1 is not supported."
       exit 1
     else
-      curl -s https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2B${$1}.zip | jar xv
+      curl -s https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2B${1}.zip | jar xv
     fi
   elif [[ $PLATFORM == 'darwin' ]]; then
     curl -s https://download.pytorch.org/libtorch/cpu/libtorch-macos-${VERSION}.zip | jar xv
