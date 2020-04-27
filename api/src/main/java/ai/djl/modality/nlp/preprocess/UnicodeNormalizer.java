@@ -17,9 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Applies unicode normalization to input strings.
- * This is particularly important if you are dealing with non-English input or with text originating from OCR
- * applications.
+ * Applies unicode normalization to input strings. This is particularly important if you are dealing
+ * with non-English input or with text originating from OCR applications.
  */
 public class UnicodeNormalizer implements TextProcessor {
 
@@ -29,6 +28,7 @@ public class UnicodeNormalizer implements TextProcessor {
 
     /**
      * Unicode normalizer with a configurable normal form.
+     *
      * @param normalForm The normal form to use.
      */
     public UnicodeNormalizer(final Normalizer.Form normalForm) {
@@ -36,26 +36,28 @@ public class UnicodeNormalizer implements TextProcessor {
     }
 
     /**
-     * Default version of the Unicode Normalizer using NFKC normal form.
-     * If you do not know what normal form you need, this is the normal form you need.
+     * Default version of the Unicode Normalizer using NFKC normal form. If you do not know what
+     * normal form you need, this is the normal form you need.
      */
     public UnicodeNormalizer() {
         this(DEFAULT_FORM);
     }
 
     /**
-     * Normalizes a String using a sensible default normal form.
-     * Use this if you do not want to think about unicode preprocessing.
-     * @param  s Any non-null string
+     * Normalizes a String using a sensible default normal form. Use this if you do not want to
+     * think about unicode preprocessing.
+     *
+     * @param s Any non-null string
      * @return The given string with default unicode normalization applied.
      */
     public static String normalizeDefault(final String s) {
         return Normalizer.normalize(s, DEFAULT_FORM);
     }
 
-
     @Override
     public List<String> preprocess(final List<String> tokens) {
-        return tokens.stream().map((s) -> Normalizer.normalize(s, normalForm)).collect(Collectors.toList());
+        return tokens.stream()
+                .map((s) -> Normalizer.normalize(s, normalForm))
+                .collect(Collectors.toList());
     }
 }
