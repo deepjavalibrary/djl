@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Unicode normalization does not take care of „exotic“ hyphens that we normally do not want in NLP
+ * Unicode normalization does not take care of "exotic“ hyphens that we normally do not want in NLP
  * input. This preprocessor turns all Hyphens into „normal“ ASCII minus-hyphen characters (U+002D).
  * Invisible soft hyphens are dropped from the input.
  */
