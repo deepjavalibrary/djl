@@ -62,9 +62,9 @@ It's part of the optimization algorithm that controls how fast to move towards r
 During the training process, you should usually reduce the learning rate periodically to prevent the model from plateauing. 
 You will also need different learning rate strategies based on whether you are using a pre-trained model or training from scratch.
 DJL provides several built-in `LearningRateTracker`s to suit your needs. For more information, see the
-[documentation](https://javadoc.djl.ai/api/0.4.0/ai/djl/training/optimizer/learningrate/LearningRateTracker.html).
+[documentation](https://javadoc.io/static/ai.djl/api/0.4.0/index.html?ai/djl/training/optimizer/learningrate/LearningRateTracker.html).
 
-Here, you use a [`MultiFactorTracker`](https://javadoc.djl.ai/api/0.4.0/ai/djl/training/optimizer/learningrate/MultiFactorTracker.html),
+Here, you use a [`MultiFactorTracker`](https://javadoc.io/static/ai.djl/api/0.4.0/index.html?ai/djl/training/optimizer/learningrate/MultiFactorTracker.html),
 which allows you to reduce the learning rate after a specified number of periods.
 We use a base learning rate of `0.001`, and reduce it by `sqrt(0.1)` every specified number of epochs. 
 For a pre-trained model, you reduce the learning rate at the 2nd, 5th, and 8th epoch because it take less time to train and converge. 

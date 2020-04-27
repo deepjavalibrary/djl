@@ -7,7 +7,7 @@ can be used for inference out of the box.
 
 ## Documentation
 
-The latest javadocs can be found on the [djl.ai website](https://javadoc.djl.ai/model-zoo/0.4.0/index.html).
+The latest javadocs can be found on the [djl.ai website](https://javadoc.io/doc/ai.djl/model-zoo/latest/index.html).
 
 You can also build the latest javadocs locally using the following command:
 

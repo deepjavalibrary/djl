@@ -18,7 +18,7 @@ This is a shallow wrapper around [JFastText](https://github.com/vinhkhuc/JFastTe
 
 ## Documentation
 
-The latest javadocs can be found on the [djl.ai website](https://javadoc.djl.ai/fasttext-engine/0.4.0/index.html).
+The latest javadocs can be found on the [djl.ai website](https://javadoc.io/doc/ai.djl.fasttext/fasttext-engine/latest/index.html).
 
 You can also build the latest javadocs locally using the following command:
 

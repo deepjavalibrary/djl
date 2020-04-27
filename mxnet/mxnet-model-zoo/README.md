@@ -6,7 +6,7 @@ The MXNet model zoo contains symbolic models that can be used for inference and 
 
 ## Documentation
 
-The latest javadocs can be found on the [djl.ai website](https://javadoc.djl.ai/mxnet-model-zoo/0.4.0/index.html).
+The latest javadocs can be found on the [djl.ai website](https://javadoc.io/doc/ai.djl.mxnet/mxnet-model-zoo/latest/index.html).
 
 You can also build the latest javadocs locally using the following command:
 

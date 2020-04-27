@@ -17,7 +17,7 @@ This module contains the following datasets:
 
 ## Documentation
 
-The latest javadocs can be found on the [djl.ai website](https://javadoc.djl.ai/basicdataset/0.4.0/index.html).
+The latest javadocs can be found on the [djl.ai website](https://javadoc.io/doc/ai.djl/basicdataset/latest/index.html).
 
 You can also build the latest javadocs locally using the following command:
 

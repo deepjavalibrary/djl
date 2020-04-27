@@ -29,7 +29,7 @@ More examples and demos of applications featuring DJL are located in our [demo r
 ## Prerequisites
 
 * You need to have Java Development Kit version 8 or later installed on your system. For more information, see [Setup](../docs/development/setup.md).
-* You should be familiar with the API documentation in the DJL [Javadoc](https://javadoc.djl.ai/api/0.4.0/index.html).
+* You should be familiar with the API documentation in the DJL [Javadoc](https://javadoc.io/doc/ai.djl/api/latest/index.html).
 
 
 # Getting started: 30 seconds to run an example
