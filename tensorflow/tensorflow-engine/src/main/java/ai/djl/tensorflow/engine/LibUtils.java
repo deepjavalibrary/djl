@@ -150,6 +150,7 @@ public final class LibUtils {
                 found = true;
                 URL url = new URL(link + '/' + line.replace("+", "%2B"));
                 String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
+                logger.info("Downloading {} ...", fileName);
                 try (InputStream fis = new GZIPInputStream(url.openStream())) {
                     Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
                 }
