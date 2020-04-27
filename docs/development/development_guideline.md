@@ -28,8 +28,9 @@ Script '/Volumes/Unix/projects/Joule/tools/gradle/formatter.gradle' line: 57
 * What went wrong:
 Execution failed for task ':api:verifyJava'.
 > File not formatted: /Volumes/Unix/projects/Joule/api/src/main/java/ai/djl/nn/convolutional/Conv2D.java
+  See https://github.com/awslabs/djl/blob/master/docs/development/development_guideline.md#coding-conventions for formatting instructions
 ```
-If you do fail the format check, the easiest way to resolve it is to run the gradle `formatJava` target to reformat your code.
+If you do fail the format check, the easiest way to resolve it is to run the gradle `formatJava` target to reformat your code. It may be helpful to just run the formatter before you build the project rather than waiting for the formatting verification to fail.
 
 ## Documentation Conventions
 
