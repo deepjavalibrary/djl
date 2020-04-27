@@ -199,20 +199,20 @@ public class TfNDManager extends BaseNDManager {
     @Override
     public NDArray createCSR(
             Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray createRowSparse(
             Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList load(Path path, Device device) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -223,7 +223,7 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -314,7 +314,8 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray linspace(float start, float stop, int num, boolean endpoint, Device device) {
-        return null;
+        return new TfNDArray(
+                this, tf.linSpace(tf.constant(start), tf.constant(stop), tf.constant(num)));
     }
 
     /** {@inheritDoc} */

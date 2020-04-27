@@ -46,6 +46,7 @@ import org.tensorflow.op.core.Max;
 import org.tensorflow.op.core.Min;
 import org.tensorflow.op.core.Prod;
 import org.tensorflow.op.core.Squeeze;
+import org.tensorflow.op.core.Sum;
 import org.tensorflow.op.math.Mean;
 import org.tensorflow.op.nn.TopK;
 import org.tensorflow.tools.buffer.ByteDataBuffer;
@@ -481,7 +482,8 @@ public class TfNDArray implements NDArray {
         return new TfNDArray(
                 manager,
                 tf.reduceAll(
-                        asOperand(), ((TfNDArray) manager.arange(0, getRank(), 1)).asOperand()));
+                        tf.dtypes.cast(asOperand(), TBool.DTYPE),
+                        ((TfNDArray) manager.arange(0, getRank(), 1)).asOperand()));
     }
 
     /** {@inheritDoc} */
@@ -490,7 +492,8 @@ public class TfNDArray implements NDArray {
         return new TfNDArray(
                 manager,
                 tf.reduceAny(
-                        asOperand(), ((TfNDArray) manager.arange(0, getRank(), 1)).asOperand()));
+                        tf.dtypes.cast(asOperand(), TBool.DTYPE),
+                        ((TfNDArray) manager.arange(0, getRank(), 1)).asOperand()));
     }
 
     /** {@inheritDoc} */
@@ -931,18 +934,29 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public NDArray sum() {
         // sum on all axis
+        Operand op;
+        // tf can't sum boolean values
+        if (getDataType() == DataType.BOOLEAN) {
+            op = tf.dtypes.cast(asOperand(), TInt64.DTYPE);
+        } else {
+            op = asOperand();
+        }
         return new TfNDArray(
-                manager,
-                tf.sum(asOperand(), ((TfNDArray) manager.arange(0, getRank(), 1)).asOperand()));
+                manager, tf.sum(op, ((TfNDArray) manager.arange(0, getRank(), 1)).asOperand()));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sum(int[] axes, boolean keepDims) {
         return new TfNDArray(
-                manager, tf.sum(asOperand(), ((TfNDArray) manager.create(axes)).asOperand()));
+                manager,
+                tf.sum(
+                        asOperand(),
+                        ((TfNDArray) manager.create(axes)).asOperand(),
+                        Sum.keepDims(keepDims)));
     }
 
     /** {@inheritDoc} */
@@ -1154,6 +1168,10 @@ public class TfNDArray implements NDArray {
         if (transposition != null) {
             result = tf.linalg.transpose(result, ((TfNDArray) transposition).asOperand());
         }
+        // re-apply neg after sort if ascending
+        if (ascending && !returnIndices) {
+            result = tf.math.neg(result);
+        }
         // always return long as indices type
         return new TfNDArray(manager, tf.dtypes.cast(result, TInt64.DTYPE));
     }
@@ -1161,18 +1179,78 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray softmax(int[] axes, float temperature) {
-        return new TfNDArray(manager, tf.nn.softmax(asOperand()));
+        if (temperature != 1.0) {
+            throw new UnsupportedOperationException(
+                    "TensorFlow softmax didn't suuport temperature");
+        }
+        return new TfNDArray(manager, softmaxHelper(axes, false));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray logSoftmax(int[] axes, float temperature) {
-        return new TfNDArray(manager, tf.nn.logSoftmax(asOperand()));
+        if (temperature != 1.0) {
+            throw new UnsupportedOperationException(
+                    "TensorFlow softmax didn't suuport temperature");
+        }
+        return new TfNDArray(manager, softmaxHelper(axes, true));
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private Operand softmaxHelper(int[] axes, boolean logSoftmax) {
+        long dim = getShape().dimension();
+        // if axis is -1 or last dim, directly apply softmax
+        if (axes.length > 1) {
+            throw new UnsupportedOperationException(
+                    "TensorFlow softmax does not support multiple axes");
+        }
+        // return itself if zero dim
+        if (dim == 0) {
+            return asOperand();
+        }
+        if (axes[0] == -1 || axes[0] == dim - 1) {
+            return logSoftmax ? tf.nn.logSoftmax(asOperand()) : tf.nn.softmax(asOperand());
+        }
+        if (axes[0] < -dim || axes[0] >= dim) {
+            throw new IllegalArgumentException(
+                    "Invalid axes value: "
+                            + axes[0]
+                            + ", must be in range ["
+                            + -dim
+                            + ", "
+                            + dim
+                            + ") where "
+                            + dim
+                            + " is the number of dimensions in the input.");
+        }
+
+        // tf.softmax always apply on last dimension, transpose input to make axes[0] last dimension
+        ArrayList<Operand<TInt64>> concatList = new ArrayList<>();
+        concatList.add(tf.range(tf.constant(0L), tf.constant(axes[0] % dim), tf.constant(1L)));
+        concatList.add(tf.expandDims(tf.constant(dim - 1), tf.constant(0)));
+        concatList.add(
+                tf.range(tf.constant((long) axes[0] + 1), tf.constant(dim - 1), tf.constant(1L)));
+        concatList.add(tf.expandDims(tf.constant((long) axes[0]), tf.constant(0)));
+
+        Operand transposed =
+                tf.linalg.transpose(asOperand(), tf.concat(concatList, tf.constant(0)));
+        // apply softmax
+        Operand output = logSoftmax ? tf.nn.logSoftmax(transposed) : tf.nn.softmax(transposed);
+        // transfer back to original shape
+        return tf.linalg.transpose(output, tf.concat(concatList, tf.constant(0)));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray cumSum(int axis) {
+        // just expand dim for scalar
+        if (isScalar()) {
+            return expandDims(0);
+        }
+        // return 0 shape if any of the dim is 0
+        if (Arrays.stream(getShape().getShape()).anyMatch(dim -> dim == 0L)) {
+            return manager.create(new Shape(0));
+        }
         return new TfNDArray(manager, tf.math.cumsum(asOperand(), tf.constant(axis)));
     }
 
@@ -1318,7 +1396,10 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray argMin() {
-        return argMin(0);
+        if (isEmpty()) {
+            throw new IllegalArgumentException("attempt to get argMin of an empty NDArray");
+        }
+        return flatten().argMin(0);
     }
 
     /** {@inheritDoc} */

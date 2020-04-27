@@ -123,13 +123,14 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rpow(Number n) {
-        return array.pow(1f / n.floatValue());
+
+        return manager.create(n).toType(array.getDataType(), false).pow(array);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rpowi(Number n) {
-        return array.powi(1f / n.floatValue());
+        return manager.create(n).toType(array.getDataType(), false).powi(array);
     }
 
     /** {@inheritDoc} */
@@ -398,13 +399,13 @@ public class TfNDArrayEx implements NDArrayEx {
                     tf.squeeze(
                             tf.image.resizeBilinear(
                                     ((TfNDArray) array.expandDims(0)).asOperand(),
-                                    tf.constant(new int[] {width, height}))));
+                                    tf.constant(new int[] {height, width}))));
         }
         return new TfNDArray(
                 manager,
                 tf.image.resizeBilinear(
                         (Operand<? extends TNumber>) operand,
-                        tf.constant(new int[] {width, height})));
+                        tf.constant(new int[] {height, width})));
     }
 
     /** {@inheritDoc} */
