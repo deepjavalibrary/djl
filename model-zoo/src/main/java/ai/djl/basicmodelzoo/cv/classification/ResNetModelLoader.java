@@ -124,7 +124,7 @@ public class ResNetModelLoader extends BaseModelLoader<BufferedImage, Classifica
                         .setImageShape(shape);
         if (arguments.containsKey("batchNormMomentum")) {
             float batchNormMomentum = (float) ((double) arguments.get("batchNormMomentum"));
-            blockBuilder.optBatchNormMomemtum(batchNormMomentum);
+            blockBuilder.optBatchNormMomentum(batchNormMomentum);
         }
         Block block = blockBuilder.build();
 

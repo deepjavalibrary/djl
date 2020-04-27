@@ -815,9 +815,7 @@ class MxNDArrayEx implements NDArrayEx {
         return array.getManager();
     }
 
-    private Shape getGlobalPoolingShapes(long fillValue) {
-        // determine pooling dimension according to input
-        // input dimension minus 2 (batch and channel dim)
+    private int getGlobalPoolingDim() {
         int poolDim = getArray().getShape().dimension() - 2;
         if (poolDim < 1 || poolDim > 3) {
             throw new IllegalStateException(
@@ -826,6 +824,13 @@ class MxNDArrayEx implements NDArrayEx {
                             + poolDim
                             + "D is not supported.");
         }
+        return poolDim;
+    }
+
+    private Shape getGlobalPoolingShapes(long fillValue) {
+        // determine pooling dimension according to input
+        // input dimension minus 2 (batch and channel dim)
+        int poolDim = getGlobalPoolingDim();
         long[] shape = new long[poolDim];
         Arrays.fill(shape, fillValue);
         return new Shape(shape);

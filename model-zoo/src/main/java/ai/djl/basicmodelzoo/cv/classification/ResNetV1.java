@@ -261,7 +261,7 @@ public final class ResNetV1 {
         /**
          * Sets the size of the output.
          *
-         * @param outSize the number of layers
+         * @param outSize the output size
          * @return this {@code Builder}
          */
         public Builder setOutSize(long outSize) {
@@ -270,13 +270,13 @@ public final class ResNetV1 {
         }
 
         /**
-         * Sets the size of the output.
+         * Sets the momentum of batchNorm layer.
          *
-         * @param batchNormMomemtum the number of layers
+         * @param batchNormMomentum the momentum
          * @return this {@code Builder}
          */
-        public Builder optBatchNormMomemtum(float batchNormMomemtum) {
-            this.batchNormMomentum = batchNormMomemtum;
+        public Builder optBatchNormMomentum(float batchNormMomentum) {
+            this.batchNormMomentum = batchNormMomentum;
             return this;
         }
 
