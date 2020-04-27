@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
+import ai.djl.engine.StandardCapabilities;
 import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.ndarray.NDArray;
@@ -611,7 +612,8 @@ public class BlockCoreTest {
     }
 
     private static Device[] getDevices() {
-        if (TestUtils.isWindows() && TestUtils.isMxnet()) {
+        if (!Engine.getInstance().hasCapability(StandardCapabilities.CUDNN)
+                && TestUtils.isMxnet()) {
             return new Device[] {
                 Device.cpu()
             }; // TODO: RNN is not implemented on MXNet without cuDNN
