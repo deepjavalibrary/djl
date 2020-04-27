@@ -97,13 +97,15 @@ public final class DebugEnvironment {
             logger.info("GPU {} memory used: {} bytes", i, mem.getCommitted());
         }
 
-        logger.info("GCC: ");
-        Process process = rt.exec("gcc --version");
-        try (Scanner gccOut =
-                new Scanner(process.getInputStream(), StandardCharsets.UTF_8.name())) {
-            gccOut.useDelimiter(System.lineSeparator());
-            while (gccOut.hasNext()) {
-                logger.info(gccOut.next());
+        if (!TestUtils.isWindows()) {
+            logger.info("GCC: ");
+            Process process = rt.exec("gcc --version");
+            try (Scanner gccOut =
+                    new Scanner(process.getInputStream(), StandardCharsets.UTF_8.name())) {
+                gccOut.useDelimiter(System.lineSeparator());
+                while (gccOut.hasNext()) {
+                    logger.info(gccOut.next());
+                }
             }
         }
     }

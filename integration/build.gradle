@@ -73,6 +73,9 @@ jacocoTestReport {
 
 task debugEnv(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    systemProperties System.getProperties()
+    systemProperties.remove("user.dir")
+    systemProperties.put("ai.djl.logging.level", "debug")
     main = "ai.djl.integration.util.DebugEnvironment"
 }
 
