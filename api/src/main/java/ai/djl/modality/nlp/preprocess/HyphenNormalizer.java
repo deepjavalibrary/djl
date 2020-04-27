@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -19,8 +19,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Unicode normalization does not take care of "exotic“ hyphens that we normally do not want in NLP
- * input. This preprocessor turns all Hyphens into "normal“ ASCII minus-hyphen characters (U+002D).
+ * Unicode normalization does not take care of "exotic" hyphens that we normally do not want in NLP
+ * input. This preprocessor turns all Hyphens into "normal" ASCII minus-hyphen characters (U+002D).
  * Invisible soft hyphens are dropped from the input.
  */
 public class HyphenNormalizer implements TextProcessor {
