@@ -1498,6 +1498,12 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray batchDot(NDArray other) {
+        return manager.invoke("_npx_batch_dot", new NDArray[] {this, other}, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray clip(Number min, Number max) {
         MxOpParams params = new MxOpParams();
         params.addParam("a_min", min);
