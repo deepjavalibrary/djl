@@ -179,13 +179,18 @@ public class PtNDArrayEx implements NDArrayEx {
     @Override
     public PtNDArray maxPool(
             Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.maxPool(
+                array,
+                kernel,
+                stride,
+                pad,
+                poolingConvention == null ? PoolingConvention.VALID : poolingConvention);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray globalMaxPool() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.globalMaxPool(array, getGlobalPoolingDim());
     }
 
     /** {@inheritDoc} */
@@ -209,13 +214,19 @@ public class PtNDArrayEx implements NDArrayEx {
             Shape pad,
             PoolingConvention poolingConvention,
             boolean countIncludePad) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.avgPool(
+                array,
+                kernel,
+                stride,
+                pad,
+                poolingConvention == null ? PoolingConvention.VALID : poolingConvention,
+                countIncludePad);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray globalAvgPool() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.globalAvgPool(array, getGlobalPoolingDim());
     }
 
     /** {@inheritDoc} */
@@ -504,5 +515,19 @@ public class PtNDArrayEx implements NDArrayEx {
     @Override
     public PtNDArray getArray() {
         return array;
+    }
+
+    private int getGlobalPoolingDim() {
+        // determine pooling dimension according to input
+        // input dimension minus 2 (batch and channel dim)
+        int poolDim = getArray().getShape().dimension() - 2;
+        if (poolDim < 1 || poolDim > 3) {
+            throw new IllegalStateException(
+                    "GlobalPooling only support"
+                            + "1 to 3 Dimensions, "
+                            + poolDim
+                            + "D is not supported.");
+        }
+        return poolDim;
     }
 }
