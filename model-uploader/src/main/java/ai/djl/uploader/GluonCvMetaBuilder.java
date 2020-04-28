@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public final class GluonCvMetaBuilder extends MetaBuilder<GluonCvMetaBuilder> {
+
     private String filePath = "python/mxnet/gluoncv_import.py";
     private String pythonPath = "python";
     private GluonCvArgs args;
@@ -66,7 +67,6 @@ public final class GluonCvMetaBuilder extends MetaBuilder<GluonCvMetaBuilder> {
         }
         return builder.setGroupId("ai.djl.mxnet")
                 .setArtifactDir(Paths.get(args.getOutputPath(), args.getName()))
-                .setArtifactName(args.getName())
-                .addArgument("shape", args.getShape());
+                .setArtifactName(args.getName());
     }
 }

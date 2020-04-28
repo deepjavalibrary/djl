@@ -21,6 +21,9 @@ import ai.djl.util.Hex;
 import ai.djl.util.ZipUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -48,7 +51,23 @@ import org.slf4j.LoggerFactory;
 /** The {@code MetadataBuilder} is designed to help build up metadata for model or dataset. */
 public final class MetadataBuilder {
 
-    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    @SuppressWarnings("rawtypes")
+    public static final Gson GSON =
+            new GsonBuilder()
+                    .setPrettyPrinting()
+                    .registerTypeAdapter(
+                            LinkedHashMap.class,
+                            (JsonDeserializer)
+                                    (json, typeOfT, context) -> {
+                                        // avoid Gson converting integer type to double
+                                        LinkedHashMap<String, Object> m = new LinkedHashMap<>();
+                                        JsonObject jo = json.getAsJsonObject();
+                                        for (Map.Entry<String, JsonElement> mx : jo.entrySet()) {
+                                            m.put(mx.getKey(), mx.getValue());
+                                        }
+                                        return m;
+                                    })
+                    .create();
 
     private static final Logger logger = LoggerFactory.getLogger(MetadataBuilder.class);
     private static final String METADATA_VERSION = "0.1";
@@ -65,8 +84,8 @@ public final class MetadataBuilder {
     private String artifactId;
     private String artifactName;
     private Path artifactDir;
-    private Map<String, String> properties;
-    private Map<String, Object> arguments;
+    private LinkedHashMap<String, String> properties;
+    private LinkedHashMap<String, Object> arguments;
 
     private MetadataBuilder() {}
 
@@ -300,7 +319,7 @@ public final class MetadataBuilder {
      * @throws IOException failed to create or copy files
      */
     public Metadata buildLocal() throws IOException {
-        String fileName = "metadata.json";
+        String metadataFileName = "metadata.json";
         Path targetDir =
                 Paths.get(
                         baseDir,
@@ -309,9 +328,10 @@ public final class MetadataBuilder {
                         application.getPath(),
                         groupId.replace('.', '/'),
                         artifactId);
-        Files.createDirectories(targetDir);
-        Artifact artifact = constructArtifact(targetDir);
-        Path metadataPath = targetDir.resolve(fileName);
+        Path artifactDir = targetDir.resolve(artifactName);
+        Files.createDirectories(artifactDir);
+        Artifact artifact = constructArtifact(artifactDir);
+        Path metadataPath = targetDir.resolve(metadataFileName);
         Metadata metadata;
         if (Files.exists(metadataPath)) {
             logger.info("Found exsisting metadata, try to add new artifact");
@@ -406,9 +426,9 @@ public final class MetadataBuilder {
 
     private Artifact constructArtifact(Path destination) throws IOException {
         Artifact artifact = new Artifact();
-        artifact.setArguments((LinkedHashMap<String, Object>) arguments);
+        artifact.setArguments(arguments);
         artifact.setName(artifactName);
-        artifact.setProperties((LinkedHashMap<String, String>) properties);
+        artifact.setProperties(properties);
         if (isSnapshot != null) {
             artifact.setSnapshot(isSnapshot);
         }
@@ -456,7 +476,7 @@ public final class MetadataBuilder {
             Artifact.Item item = new Artifact.Item();
             item.setSha1Hash(getSha1Sum(copiedFile));
             item.setSize(copiedFile.length());
-            item.setUri(uri);
+            item.setUri(artifactName + '/' + uri);
             files.put(names[0], item);
         }
         return files;
