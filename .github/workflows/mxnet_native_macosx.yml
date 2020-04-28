@@ -32,4 +32,4 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: libmxnet.dylib
-          path: build
+          path: build/libmxnet.dylib
