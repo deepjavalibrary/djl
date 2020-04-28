@@ -1125,6 +1125,9 @@ public class TfNDArray implements NDArray {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private NDArray sortHelper(int axis, boolean ascending, boolean returnIndices) {
+        if (isScalar()) {
+            return this;
+        }
         // using topK to implement argSort
         int k;
         int rank = getRank();
@@ -1161,7 +1164,8 @@ public class TfNDArray implements NDArray {
             topK = tf.nn.topK(input, tf.constant(k));
         }
         if (returnIndices) {
-            result = topK.indices();
+            // always return long as indices type
+            result = tf.dtypes.cast(topK.indices(), TInt64.DTYPE);
         } else {
             result = topK.values();
         }
@@ -1172,8 +1176,7 @@ public class TfNDArray implements NDArray {
         if (ascending && !returnIndices) {
             result = tf.math.neg(result);
         }
-        // always return long as indices type
-        return new TfNDArray(manager, tf.dtypes.cast(result, TInt64.DTYPE));
+        return new TfNDArray(manager, result);
     }
 
     /** {@inheritDoc} */

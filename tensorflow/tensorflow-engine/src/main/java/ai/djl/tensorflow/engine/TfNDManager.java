@@ -18,6 +18,7 @@ import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
@@ -281,6 +282,9 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray arange(float start, float stop, float step, DataType dataType, Device device) {
+        if (stop <= start) {
+            return create(new Shape(0));
+        }
         return new TfNDArray(
                 this,
                 tf.range(
@@ -314,8 +318,23 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray linspace(float start, float stop, int num, boolean endpoint, Device device) {
-        return new TfNDArray(
-                this, tf.linSpace(tf.constant(start), tf.constant(stop), tf.constant(num)));
+        if (num < 0) {
+            throw new IllegalArgumentException("number of samples must be non-negative.");
+        }
+        if (num == 0) {
+            return create(new Shape(0));
+        }
+        if (!endpoint) {
+            num++;
+        }
+        NDArray result =
+                new TfNDArray(
+                        this, tf.linSpace(tf.constant(start), tf.constant(stop), tf.constant(num)));
+        if (!endpoint) {
+            return result.get(new NDIndex(":-1"));
+        } else {
+            return result;
+        }
     }
 
     /** {@inheritDoc} */
