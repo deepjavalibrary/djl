@@ -13,6 +13,7 @@
 package ai.djl.integration.tests.modality.nlp;
 
 import ai.djl.basicmodelzoo.nlp.SimpleSequenceEncoder;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.nlp.embedding.TrainableTextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.ndarray.NDList;
@@ -27,6 +28,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class SimpleSequenceEncoderTest {
+
     @Test
     public void testEncoder() {
         TrainableTextEmbedding trainableTextEmbedding =
@@ -43,7 +45,7 @@ public class SimpleSequenceEncoderTest {
                                 .setSequenceLength(false)
                                 .setStateSize(16)
                                 .build());
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getDevices()[0])) {
             encoder.setInitializer(new XavierInitializer());
             encoder.initialize(manager, DataType.FLOAT32, new Shape(4, 7));
             NDList output =

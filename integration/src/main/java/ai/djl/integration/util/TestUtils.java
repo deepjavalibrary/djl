@@ -12,8 +12,10 @@
  */
 package ai.djl.integration.util;
 
+import ai.djl.Device;
 import ai.djl.TrainingDivergedException;
 import ai.djl.engine.Engine;
+import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
@@ -42,5 +44,15 @@ public final class TestUtils {
         Assertions.assertAlmostEquals(array.mean().getFloat(), mean);
         Assertions.assertAlmostEquals(array.max().getFloat(), max);
         Assertions.assertAlmostEquals(array.min().getFloat(), min);
+    }
+
+    public static Device[] getDevices() {
+        if (!Engine.getInstance().hasCapability(StandardCapabilities.CUDNN)
+                && TestUtils.isMxnet()) {
+            return new Device[] {
+                Device.cpu()
+            }; // TODO: RNN is not implemented on MXNet without cuDNN
+        }
+        return Device.getDevices(1);
     }
 }

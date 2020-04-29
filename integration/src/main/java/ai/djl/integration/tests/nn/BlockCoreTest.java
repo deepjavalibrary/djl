@@ -12,11 +12,9 @@
  */
 package ai.djl.integration.tests.nn;
 
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
-import ai.djl.engine.StandardCapabilities;
 import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.ndarray.NDArray;
@@ -365,7 +363,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(loss)
                         .optInitializer(Initializer.ONES)
-                        .optDevices(getDevices());
+                        .optDevices(TestUtils.getDevices());
         Block block =
                 RNN.builder()
                         .setStateSize(4)
@@ -403,7 +401,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(loss)
                         .optInitializer(Initializer.ONES)
-                        .optDevices(getDevices());
+                        .optDevices(TestUtils.getDevices());
         Block block =
                 RNN.builder()
                         .setStateSize(4)
@@ -442,7 +440,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(loss)
                         .optInitializer(Initializer.ONES)
-                        .optDevices(getDevices());
+                        .optDevices(TestUtils.getDevices());
         Block block =
                 LSTM.builder().setStateSize(4).setNumStackedLayers(1).optStateOutput(true).build();
         try (Model model = Model.newInstance(config.getDevices()[0])) {
@@ -481,7 +479,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(loss)
                         .optInitializer(Initializer.ONES)
-                        .optDevices(getDevices());
+                        .optDevices(TestUtils.getDevices());
         GRU block = GRU.builder().setStateSize(4).setNumStackedLayers(1).build();
         try (Model model = Model.newInstance(config.getDevices()[0])) {
             model.setBlock(block);
@@ -610,15 +608,5 @@ public class BlockCoreTest {
         for (int idx = 0; idx < bound; idx++) {
             Assert.assertEquals(original.valueAt(idx), loaded.valueAt(idx));
         }
-    }
-
-    private static Device[] getDevices() {
-        if (!Engine.getInstance().hasCapability(StandardCapabilities.CUDNN)
-                && TestUtils.isMxnet()) {
-            return new Device[] {
-                Device.cpu()
-            }; // TODO: RNN is not implemented on MXNet without cuDNN
-        }
-        return Device.getDevices(1);
     }
 }

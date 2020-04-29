@@ -31,12 +31,17 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Paths;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class MobileNetTest {
 
     @Test
     public void testMobileNetV2() throws IOException, ModelException, TranslateException {
+        if (System.getProperty("os.name").startsWith("Win")) {
+            throw new SkipException("Tensorflow doesn't support Windows yet.");
+        }
+
         Criteria<BufferedImage, Classifications> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)

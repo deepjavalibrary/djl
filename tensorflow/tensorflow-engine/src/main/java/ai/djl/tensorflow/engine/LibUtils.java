@@ -13,7 +13,6 @@
 
 package ai.djl.tensorflow.engine;
 
-import ai.djl.engine.EngineException;
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
 import java.io.File;
@@ -126,7 +125,7 @@ public final class LibUtils {
             }
 
             if (!found) {
-                throw new EngineException(
+                throw new UnsupportedOperationException(
                         "TensorFlow engine does not support this platform: " + os);
             }
 
