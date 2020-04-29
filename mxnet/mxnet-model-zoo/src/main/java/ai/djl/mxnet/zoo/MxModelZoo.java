@@ -14,6 +14,11 @@ package ai.djl.mxnet.zoo;
 
 import ai.djl.mxnet.engine.MxEngine;
 import ai.djl.mxnet.zoo.cv.actionrecognition.ActionRecognitionModelLoader;
+import ai.djl.mxnet.zoo.cv.classification.Alexnet;
+import ai.djl.mxnet.zoo.cv.classification.Darknet;
+import ai.djl.mxnet.zoo.cv.classification.Densenet;
+import ai.djl.mxnet.zoo.cv.classification.Googlenet;
+import ai.djl.mxnet.zoo.cv.classification.InceptionV3;
 import ai.djl.mxnet.zoo.cv.classification.MlpModelLoader;
 import ai.djl.mxnet.zoo.cv.classification.Mobilenet;
 import ai.djl.mxnet.zoo.cv.classification.Resnest;
@@ -22,6 +27,8 @@ import ai.djl.mxnet.zoo.cv.classification.Resnext;
 import ai.djl.mxnet.zoo.cv.classification.SeResnext;
 import ai.djl.mxnet.zoo.cv.classification.Senet;
 import ai.djl.mxnet.zoo.cv.classification.Squeezenet;
+import ai.djl.mxnet.zoo.cv.classification.Vgg;
+import ai.djl.mxnet.zoo.cv.classification.Xception;
 import ai.djl.mxnet.zoo.cv.objectdetection.SingleShotDetectionModelLoader;
 import ai.djl.mxnet.zoo.cv.objectdetection.YoloModelLoader;
 import ai.djl.mxnet.zoo.cv.poseestimation.SimplePoseModelLoader;
@@ -43,17 +50,26 @@ public class MxModelZoo implements ModelZoo {
     private static final Repository REPOSITORY = Repository.newInstance("MxNet", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.mxnet";
 
-    public static final MlpModelLoader MLP = new MlpModelLoader(REPOSITORY);
     public static final SingleShotDetectionModelLoader SSD =
             new SingleShotDetectionModelLoader(REPOSITORY);
     public static final YoloModelLoader YOLO = new YoloModelLoader(REPOSITORY);
+
+    public static final Alexnet ALEXNET = new Alexnet(REPOSITORY);
+    public static final Darknet DARKNET = new Darknet(REPOSITORY);
+    public static final Densenet DENSENET = new Densenet(REPOSITORY);
+    public static final Googlenet GOOGLENET = new Googlenet(REPOSITORY);
+    public static final InceptionV3 INCEPTIONV3 = new InceptionV3(REPOSITORY);
+    public static final MlpModelLoader MLP = new MlpModelLoader(REPOSITORY);
     public static final Mobilenet MOBILENET = new Mobilenet(REPOSITORY);
-    public static final Resnet RESNET = new Resnet(REPOSITORY);
     public static final Resnest RESNEST = new Resnest(REPOSITORY);
+    public static final Resnet RESNET = new Resnet(REPOSITORY);
     public static final Resnext RESNEXT = new Resnext(REPOSITORY);
     public static final Senet SENET = new Senet(REPOSITORY);
     public static final SeResnext SE_RESNEXT = new SeResnext(REPOSITORY);
     public static final Squeezenet SQUEEZENET = new Squeezenet(REPOSITORY);
+    public static final Vgg VGG = new Vgg(REPOSITORY);
+    public static final Xception XCEPTION = new Xception(REPOSITORY);
+
     public static final SimplePoseModelLoader SIMPLE_POSE = new SimplePoseModelLoader(REPOSITORY);
     public static final InstanceSegmentationModelLoader MASK_RCNN =
             new InstanceSegmentationModelLoader(REPOSITORY);
