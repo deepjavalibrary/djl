@@ -23,7 +23,6 @@ import ai.djl.nn.BlockList;
 import ai.djl.nn.Parameter;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -206,6 +205,7 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
 
     /**
      * Default implementation of predict that calls forward.
+     *
      * @param parameterStore the parameter store
      * @param inputs the input NDList
      * @param params optional parameters
