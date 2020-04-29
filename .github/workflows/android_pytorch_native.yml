@@ -50,4 +50,4 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync android_pytorch_tmp/${{ matrix.format }}_native.zip s3://djl-ai/publish/pytorch-1.5.0/android_native
+          aws s3 cp android_pytorch_tmp/${{ matrix.format }}_native.zip s3://djl-ai/publish/pytorch-1.5.0/android_native/
