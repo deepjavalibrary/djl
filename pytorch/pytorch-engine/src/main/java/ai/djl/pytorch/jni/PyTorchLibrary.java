@@ -307,6 +307,27 @@ final class PyTorchLibrary {
             double momentum,
             double eps);
 
+    native Pointer torchNNAvgPool(
+            Pointer inputHandle,
+            int dim,
+            long[] kernel,
+            long[] stride,
+            long[] pad,
+            boolean useCeil,
+            boolean countIncludePad);
+
+    native Pointer torchNNMaxPool(
+            Pointer inputHandle,
+            int dim,
+            long[] kernel,
+            long[] stride,
+            long[] pad,
+            boolean useCeil);
+
+    native Pointer torchNNAdaptiveAvgPool(Pointer inputHandle, int dim, long[] outSize);
+
+    native Pointer torchNNAdaptiveMaxPool(Pointer inputHandle, int dim, long[] outSize);
+
     native Pointer moduleLoad(String path, int[] device);
 
     native void moduleEval(Pointer handle);

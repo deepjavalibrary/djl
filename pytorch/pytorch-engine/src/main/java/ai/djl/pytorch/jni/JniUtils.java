@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.nn.pooling.PoolingConvention;
 import ai.djl.pytorch.engine.PtDeviceType;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
@@ -775,6 +776,76 @@ public final class JniUtils {
                                 isTraining,
                                 momentum,
                                 eps));
+    }
+
+    public static PtNDArray avgPool(
+            PtNDArray ndArray,
+            Shape kernel,
+            Shape stride,
+            Shape pad,
+            PoolingConvention convention,
+            boolean countIncludePad) {
+        boolean useCeil = PoolingConvention.FULL.equals(convention);
+        int dim = kernel.dimension();
+        return ndArray.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchNNAvgPool(
+                                ndArray.getHandle(),
+                                dim,
+                                kernel.getShape(),
+                                stride.getShape(),
+                                pad.getShape(),
+                                useCeil,
+                                countIncludePad));
+    }
+
+    public static PtNDArray maxPool(
+            PtNDArray ndArray,
+            Shape kernel,
+            Shape stride,
+            Shape pad,
+            PoolingConvention convention) {
+        boolean useCeil = PoolingConvention.FULL.equals(convention);
+        int dim = kernel.dimension();
+        return ndArray.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchNNMaxPool(
+                                ndArray.getHandle(),
+                                dim,
+                                kernel.getShape(),
+                                stride.getShape(),
+                                pad.getShape(),
+                                useCeil));
+    }
+
+    public static PtNDArray globalMaxPool(PtNDArray ndArray, int dim) {
+        Shape outShape;
+        if (dim == 1) {
+            outShape = new Shape(1);
+        } else if (dim == 2) {
+            outShape = new Shape(1, 1);
+        } else {
+            outShape = new Shape(1, 1, 1);
+        }
+        return ndArray.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchNNAdaptiveMaxPool(
+                                ndArray.getHandle(), dim, outShape.getShape()));
+    }
+
+    public static PtNDArray globalAvgPool(PtNDArray ndArray, int dim) {
+        Shape outShape;
+        if (dim == 1) {
+            outShape = new Shape(1);
+        } else if (dim == 2) {
+            outShape = new Shape(1, 1);
+        } else {
+            outShape = new Shape(1, 1, 1);
+        }
+        return ndArray.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchNNAdaptiveAvgPool(
+                                ndArray.getHandle(), dim, outShape.getShape()));
     }
 
     public static DataType getDataType(PtNDArray ndArray) {

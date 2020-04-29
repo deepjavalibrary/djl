@@ -74,6 +74,7 @@ public final class LoadModel {
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(BufferedImage.class, Classifications.class)
                         .optArtifactId(artifactId)
+                        .optFilters(arguments.getCriteria())
                         .optProgress(new ProgressBar());
         if (artifactId.startsWith("ai.djl.localmodelzoo")) {
             // load model from local folder

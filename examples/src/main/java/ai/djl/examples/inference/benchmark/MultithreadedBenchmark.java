@@ -113,7 +113,11 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
             this.collectMemory = collectMemory;
             predictor.setMetrics(metrics);
             total = counter.get();
-            steps = (int) Math.pow(10, Math.log10(total) - 1);
+            if (total < 10) {
+                steps = 1;
+            } else {
+                steps = (int) Math.pow(10, (int) (Math.log10(total)) - 1);
+            }
         }
 
         /** {@inheritDoc} */
