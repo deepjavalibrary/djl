@@ -15,6 +15,7 @@ package ai.djl.mxnet.zoo;
 import ai.djl.mxnet.engine.MxEngine;
 import ai.djl.mxnet.zoo.cv.actionrecognition.ActionRecognitionModelLoader;
 import ai.djl.mxnet.zoo.cv.classification.MlpModelLoader;
+import ai.djl.mxnet.zoo.cv.classification.Resnest;
 import ai.djl.mxnet.zoo.cv.classification.Resnet;
 import ai.djl.mxnet.zoo.cv.classification.Resnext;
 import ai.djl.mxnet.zoo.cv.classification.SeResnext;
@@ -46,6 +47,7 @@ public class MxModelZoo implements ModelZoo {
             new SingleShotDetectionModelLoader(REPOSITORY);
     public static final YoloModelLoader YOLO = new YoloModelLoader(REPOSITORY);
     public static final Resnet RESNET = new Resnet(REPOSITORY);
+    public static final Resnest RESNEST = new Resnest(REPOSITORY);
     public static final Resnext RESNEXT = new Resnext(REPOSITORY);
     public static final Senet SENET = new Senet(REPOSITORY);
     public static final SeResnext SE_RESNEXT = new SeResnext(REPOSITORY);
