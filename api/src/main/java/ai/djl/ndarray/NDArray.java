@@ -3907,14 +3907,6 @@ public interface NDArray extends AutoCloseable {
     NDArray matMul(NDArray other);
 
     /**
-     * Batchwise dot product.
-     *
-     * @param other the other {@code NDArray} to perform a batch dot product with
-     * @return the result {@code NDArray}
-     */
-    NDArray batchDot(NDArray other);
-
-    /**
      * Clips (limit) the values in this {@code NDArray}.
      *
      * <p>Given an interval, values outside the interval are clipped to the interval edges. For
