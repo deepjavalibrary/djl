@@ -53,9 +53,6 @@ public class Accuracy extends AbstractAccuracy {
     /** {@inheritDoc} */
     @Override
     protected Pair<Long, NDArray> accuracyHelper(NDList labels, NDList predictions) {
-        if (labels.size() != predictions.size()) {
-            throw new IllegalArgumentException("labels and prediction length does not match.");
-        }
         NDArray label = labels.get(index);
         NDArray prediction = predictions.get(index);
         checkLabelShapes(label, prediction);

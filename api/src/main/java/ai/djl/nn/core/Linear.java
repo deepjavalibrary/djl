@@ -38,7 +38,7 @@ import java.util.List;
  *
  * <p>It has the following shapes:
  *
- * <p>If {@code flatten} is false:
+ * <p>If {@code flatten} is true:
  *
  * <ul>
  *   <li>input X: [batchSize, x1, x2, …, xn]
@@ -60,7 +60,7 @@ import java.util.List;
  */
 public class Linear extends ParameterBlock {
 
-    private static final byte VERSION = 2;
+    private static final byte VERSION = 3;
 
     private long outChannels;
     private long inputDimension;
@@ -87,6 +87,13 @@ public class Linear extends ParameterBlock {
         inputs = opInputs(parameterStore, inputs);
         NDArrayEx ex = inputs.head().getNDArrayInternal();
         return ex.fullyConnected(inputs, outChannels, flatten, bias == null, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList predict(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        return forward(parameterStore, inputs, params);
     }
 
     /** {@inheritDoc} */
@@ -164,6 +171,7 @@ public class Linear extends ParameterBlock {
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
+        os.writeLong(outChannels);
         os.writeBoolean(flatten);
         os.writeLong(inputDimension);
         os.write(inputShape.getEncoded());
@@ -178,14 +186,19 @@ public class Linear extends ParameterBlock {
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
         byte version = is.readByte();
+        if (version < 1 || version > VERSION) {
+            throw new MalformedModelException("Unsupported encoding version: " + version);
+        }
         if (version == VERSION) {
+            outChannels = is.readLong();
             flatten = is.readBoolean();
             inputDimension = is.readLong();
-        } else if (version == 1) {
+        } else if (version == 2) {
+            flatten = is.readBoolean();
+            inputDimension = is.readLong();
+        } else {
             flatten = false;
             inputDimension = Shape.decode(is).size();
-        } else {
-            throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         inputShape = Shape.decode(is);
         weight.load(manager, is);

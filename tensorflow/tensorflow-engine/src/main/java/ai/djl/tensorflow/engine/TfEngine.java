@@ -90,5 +90,7 @@ public final class TfEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public void setRandomSeed(int seed) {}
+    public void setRandomSeed(int seed) {
+        TfNDManager.setRandomSeed(seed);
+    }
 }

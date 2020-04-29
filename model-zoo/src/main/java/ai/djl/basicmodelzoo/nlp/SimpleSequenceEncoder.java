@@ -14,10 +14,11 @@ package ai.djl.basicmodelzoo.nlp;
 
 import ai.djl.modality.nlp.Encoder;
 import ai.djl.modality.nlp.embedding.TrainableTextEmbedding;
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.recurrent.RecurrentBlock;
+import ai.djl.training.ParameterStore;
+import ai.djl.util.PairList;
 
 /**
  * {@code SimpleSequenceEncoder} implements a {@link Encoder} that employs a {@link RecurrentBlock}
@@ -52,7 +53,18 @@ public class SimpleSequenceEncoder extends Encoder {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray getState(NDList encoderOutput) {
-        return encoderOutput.get(1);
+    public NDList getStates(NDList encoderOutput) {
+        NDList ret = new NDList(encoderOutput.get(1));
+        if (encoderOutput.size() == 3) {
+            ret.add(encoderOutput.get(2));
+        }
+        return ret;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList predict(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        return forward(parameterStore, inputs, params);
     }
 }

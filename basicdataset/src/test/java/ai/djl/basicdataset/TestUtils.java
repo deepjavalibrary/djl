@@ -12,7 +12,6 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
@@ -26,13 +25,13 @@ public final class TestUtils {
     public static TextEmbedding getTextEmbedding(NDManager manager, int embeddingSize) {
         return new TextEmbedding() {
             @Override
-            public NDArray preprocessTextToEmbed(NDManager manager, List<String> text) {
-                return manager.zeros(new Shape(text.size()));
+            public int[] preprocessTextToEmbed(List<String> text) {
+                return new int[text.size()];
             }
 
             @Override
-            public NDArray embedText(NDArray text) throws EmbeddingException {
-                return manager.zeros(text.getShape().addAll(new Shape(embeddingSize)));
+            public NDArray embedText(NDManager manager, int[] textIndices) {
+                return manager.zeros(new Shape(textIndices.length, embeddingSize));
             }
 
             @Override

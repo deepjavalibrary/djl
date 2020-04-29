@@ -336,6 +336,7 @@ public final class LibUtils {
                             continue;
                         }
                     }
+                    logger.info("Downloading {} ...", fileName);
                     try (InputStream fis = new GZIPInputStream(url.openStream())) {
                         Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
                     }

@@ -126,7 +126,7 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDLis
         /** {@inheritDoc} */
         @Override
         @SuppressWarnings("unchecked")
-        public void prepare(NDManager manager, Model model) throws IOException {
+        public void prepare(NDManager manager, Model model) {
             try {
                 embedding = (Embedding<String>) model.getBlock();
             } catch (ClassCastException e) {
@@ -136,17 +136,17 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDLis
 
         /** {@inheritDoc} */
         @Override
-        public NDList processOutput(TranslatorContext ctx, NDList list) throws Exception {
+        public NDList processOutput(TranslatorContext ctx, NDList list) {
             return list;
         }
 
         /** {@inheritDoc} */
         @Override
-        public NDList processInput(TranslatorContext ctx, String input) throws Exception {
+        public NDList processInput(TranslatorContext ctx, String input) {
             if (embedding.hasItem(input)) {
-                return new NDList(embedding.embed(ctx.getNDManager(), input));
+                return new NDList(ctx.getNDManager().create(embedding.embed(input)));
             } else {
-                return new NDList(embedding.embed(ctx.getNDManager(), unknownToken));
+                return new NDList(ctx.getNDManager().create(embedding.embed(unknownToken)));
             }
         }
     }

@@ -30,6 +30,7 @@ import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -70,8 +71,8 @@ public abstract class Embedding<T> extends ParameterBlock {
                         ParameterType.WEIGHT,
                         true,
                         sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE);
-        embedder = new ConcurrentHashMap<>(baseBuilder.items.size());
-        unembedder = new ConcurrentHashMap<>(baseBuilder.items.size());
+        embedder = new ConcurrentHashMap<>();
+        unembedder = new ConcurrentHashMap<>();
         if (useDefault) {
             numItems++;
         }
@@ -120,6 +121,13 @@ public abstract class Embedding<T> extends ParameterBlock {
             unembedder.put(i, items.get(i));
         }
         inputShapes = new Shape[] {new Shape(-1)};
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList predict(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        return forward(parameterStore, inputs, params);
     }
 
     /**
@@ -225,6 +233,8 @@ public abstract class Embedding<T> extends ParameterBlock {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         embedding.load(manager, is);
+        numItems = (int) embedding.getArray().getShape().get(0);
+        embeddingSize = (int) embedding.getArray().getShape().get(1);
     }
 
     /**
@@ -265,12 +275,11 @@ public abstract class Embedding<T> extends ParameterBlock {
     /**
      * Embeds an item.
      *
-     * @param manager the manager for the new embedding
      * @param item the item to embed
      * @return the embedding {@link NDArray} of Shape()
      */
-    public NDArray embed(NDManager manager, T item) {
-        return manager.create(embedHelper(item));
+    public int embed(T item) {
+        return embedHelper(item);
     }
 
     /**
@@ -303,7 +312,7 @@ public abstract class Embedding<T> extends ParameterBlock {
     public abstract static class BaseBuilder<T, B extends BaseBuilder<T, B>> {
 
         protected Class<T> embeddingType;
-        protected List<T> items;
+        protected List<T> items = new ArrayList<>();
         protected int embeddingSize;
         protected boolean useDefault = true;
         protected boolean sparseGrad = true;

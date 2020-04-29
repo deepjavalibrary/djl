@@ -14,15 +14,11 @@ PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 VERSION=1.5.0
 if [[ ! -d "libtorch" ]]; then
   if [[ $PLATFORM == 'linux' ]]; then
-    if [[ $1 == "cpu" ]]; then
-      curl -s https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcpu.zip | jar xv
-    elif [[ $1 == "cu92" ]]; then
-      curl -s https://download.pytorch.org/libtorch/cu92/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu92.zip | jar xv
-    elif [[ $1 == "cu101" ]]; then
-      curl -s https://download.pytorch.org/libtorch/cu101/libtorch-cxx11-abi-shared-with-deps-${VERSION}.zip | jar xv
-    else
+    if [[ $1 != "cpu" ]] && [[ $1 != "cu92" ]] && [[ $1 != "cu101" ]] && [[ $1 != "cu102" ]]; then
       echo "$1 is not supported."
       exit 1
+    else
+      curl -s https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2B${1}.zip | jar xv
     fi
   elif [[ $PLATFORM == 'darwin' ]]; then
     curl -s https://download.pytorch.org/libtorch/cpu/libtorch-macos-${VERSION}.zip | jar xv

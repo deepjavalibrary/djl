@@ -148,6 +148,13 @@ public abstract class Convolution extends ParameterBlock {
 
     /** {@inheritDoc} */
     @Override
+    public NDList predict(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        return forward(parameterStore, inputs, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     protected void beforeInitialize(Shape[] inputs) {
         this.inputShapes = inputs;
         Shape inputShape = inputs[0];

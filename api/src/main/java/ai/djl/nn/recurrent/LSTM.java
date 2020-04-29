@@ -50,6 +50,7 @@ public class LSTM extends RecurrentBlock {
     private boolean clipLstmState;
     private double lstmStateClipMin;
     private double lstmStateClipMax;
+    private NDArray beginStateCell;
 
     /**
      * Creates an LSTM block.
@@ -103,9 +104,23 @@ public class LSTM extends RecurrentBlock {
         NDList result = new NDList(output.head().transpose(1, 0, 2));
         if (stateOutputs) {
             result.add(output.get(1));
+            result.add(output.get(2));
         }
-        resetBeginState();
+        resetBeginStates();
         return result;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setBeginStates(NDList beginStates) {
+        this.beginState = beginStates.get(0);
+        this.beginStateCell = beginStates.get(1);
+    }
+
+    @Override
+    protected void resetBeginStates() {
+        beginState = null;
+        beginStateCell = null;
     }
 
     /** {@inheritDoc} */
@@ -130,10 +145,11 @@ public class LSTM extends RecurrentBlock {
         Shape stateShape = new Shape(numStackedLayers * numDirections, batchSize, stateSize);
         if (beginState != null) {
             result.add(beginState);
+            result.add(beginStateCell);
         } else {
             result.add(inputs.head().getManager().zeros(stateShape));
+            result.add(inputs.head().getManager().zeros(stateShape));
         }
-        result.add(inputs.head().getManager().zeros(stateShape));
         if (useSequenceLength) {
             result.add(inputs.get(1));
         }

@@ -40,6 +40,7 @@ public class TatoebaEnglishFrenchDatasetTest {
                                                     TestUtils.getTextEmbedding(
                                                             manager, EMBEDDING_SIZE)))
                             .setSampling(32, true)
+                            .optLimit(1000)
                             .build();
             tatoebaEnglishFrenchDataset.prepare();
             Record record = tatoebaEnglishFrenchDataset.get(manager, 0);
@@ -70,6 +71,7 @@ public class TatoebaEnglishFrenchDatasetTest {
                                             .setEmbeddingSize(EMBEDDING_SIZE)
                                             .setTrainEmbedding(true))
                             .setSampling(32, true)
+                            .optLimit(1000)
                             .build();
             tatoebaEnglishFrenchDataset.prepare();
 

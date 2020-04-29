@@ -24,12 +24,13 @@ import ai.djl.ndarray.NDManager;
  *
  * <p>These word embeddings can be used in two different ways in models. First, they can be used
  * purely for preprocessing the model. In this case, it is a requirement for most models that use
- * text as an input. The model is not trained. For this use case, use {@link #embedWord}.
+ * text as an input. The model is not trained. For this use case, use {@link #embedWord(NDManager,
+ * String)}.
  *
  * <p>In the second option, the embedding can be trained using the standard deep learning techniques
  * to better handle the current dataset. For this case, you need two methods. First, call {@link
- * #preprocessWordToEmbed(NDManager, String)} within your dataset. Then, the first step in your
- * model should be to call {@link #embedWord(NDArray)}.
+ * #preprocessWordToEmbed(String)} within your dataset. Then, the first step in your model should be
+ * to call {@link #embedWord(NDManager, int)}.
  */
 public interface WordEmbedding {
 
@@ -42,15 +43,14 @@ public interface WordEmbedding {
     boolean vocabularyContains(String word);
 
     /**
-     * Preprocesses the word to embed into an {@link NDArray} to pass into the model.
+     * Pre-processes the word to embed into an array to pass into the model.
      *
-     * <p>Make sure to call {@link #embedWord(NDArray)} after this.
+     * <p>Make sure to call {@link #embedWord(NDManager, int)} after this.
      *
-     * @param manager the manager for the new array
      * @param word the word to embed
      * @return the word that is ready to embed
      */
-    NDArray preprocessWordToEmbed(NDManager manager, String word);
+    int preprocessWordToEmbed(String word);
 
     /**
      * Embeds a word.
@@ -58,30 +58,27 @@ public interface WordEmbedding {
      * @param manager the manager for the embedding array
      * @param word the word to embed
      * @return the embedded word
-     * @throws ai.djl.modality.nlp.embedding.EmbeddingException if there is an error while trying to
-     *     embed
+     * @throws EmbeddingException if there is an error while trying to embed
      */
     default NDArray embedWord(NDManager manager, String word) throws EmbeddingException {
-        return embedWord(preprocessWordToEmbed(manager, word));
+        return embedWord(manager, preprocessWordToEmbed(word));
     }
 
     /**
-     * Embeds the word after preprocessed using {@link #preprocessWordToEmbed(NDManager, String)}.
-     * This method must only be used for pre-trained word embeddings.
+     * Embeds the word after preprocessed using {@link #preprocessWordToEmbed(String)}.
      *
-     * @param word the word to embed
+     * @param manager the manager for the embedding array
+     * @param index the index of the word to embed
      * @return the embedded word
-     * @throws ai.djl.modality.nlp.embedding.EmbeddingException if there is an error while trying to
-     *     embed
+     * @throws EmbeddingException if there is an error while trying to embed
      */
-    NDArray embedWord(NDArray word) throws EmbeddingException;
+    NDArray embedWord(NDManager manager, int index) throws EmbeddingException;
 
     /**
      * Returns the closest matching word for the given index.
      *
      * @param word the word embedding to find the matching string word for.
      * @return a word similar to the passed in embedding
-     * @throws EmbeddingException if the input is not an unembeddable index
      */
-    String unembedWord(NDArray word) throws EmbeddingException;
+    String unembedWord(NDArray word);
 }

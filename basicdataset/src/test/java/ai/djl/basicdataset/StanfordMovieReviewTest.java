@@ -70,6 +70,7 @@ public class StanfordMovieReviewTest {
                                             .setEmbeddingSize(EMBEDDING_SIZE)
                                             .setTrainEmbedding(true))
                             .setSampling(32, true)
+                            .optLimit(100)
                             .build();
             dataset.prepare();
 

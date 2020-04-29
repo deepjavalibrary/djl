@@ -17,7 +17,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.core.Embedding;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +26,6 @@ import java.util.List;
  */
 public class TrainableWordEmbedding extends Embedding<String> implements WordEmbedding {
     private static final String DEFAULT_UNKNOWN_TOKEN = "<unk>";
-
     private String unknownToken;
 
     /**
@@ -51,7 +49,9 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
         super(
                 builder()
                         .setEmbeddingSize(embeddingSize)
-                        .setItems(new ArrayList<>(simpleVocabulary.getAllTokens())));
+                        .setItems(simpleVocabulary.getAllTokens())
+                        .optSparseGrad(false)
+                        .optUseDefault(false));
         this.unknownToken = simpleVocabulary.getUnknownToken();
     }
 
@@ -86,24 +86,28 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
 
     /** {@inheritDoc} */
     @Override
-    public NDArray preprocessWordToEmbed(NDManager manager, String word) {
+    public int preprocessWordToEmbed(String word) {
         if (hasItem(word)) {
-            return embed(manager, word);
+            try {
+                return embed(word);
+            } catch (IllegalArgumentException e) {
+                return embed(unknownToken);
+            }
         }
-        return embed(manager, unknownToken);
+        return embed(unknownToken);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray embedWord(NDArray word) {
+    public NDArray embedWord(NDManager manager, int index) {
         throw new UnsupportedOperationException("This operation is not supported by this class.");
     }
 
     /** {@inheritDoc} */
     @Override
-    public String unembedWord(NDArray word) throws EmbeddingException {
+    public String unembedWord(NDArray word) {
         if (!word.isScalar()) {
-            throw new EmbeddingException("NDArray word must be scalar index");
+            throw new IllegalArgumentException("NDArray word must be scalar index");
         }
         return unembed(word.toIntArray()[0]).orElseGet(() -> unknownToken);
     }

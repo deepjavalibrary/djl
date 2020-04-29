@@ -1,0 +1,35 @@
+name: MXNet Native OSX
+
+on:
+  # To trigger this workflow manually, you can use the following curl command:
+  # curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "mxnet-osx-build"}'
+
+  # Make sure you create your personal token with repo access. Follow steps in
+  # https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
+  # to create your personal token.
+  repository_dispatch:
+    types: [mxnet-osx-build]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Apache MXNet repository
+        uses: actions/checkout@v2
+        with:
+          repository: apache/incubator-mxnet
+          ref: v1.7.x
+      - name: Install Dependencies
+        run: |
+          brew install nasm automake ninja libtool
+      - name: Build
+        run: |
+          git --version
+          clang --version
+          CMAKE_STATICBUILD=1 ./tools/staticbuild/build.sh cpu
+      - name: Upload libmxnet.dylib
+        uses: actions/upload-artifact@v1
+        with:
+          name: libmxnet.dylib
+          path: build/libmxnet.dylib

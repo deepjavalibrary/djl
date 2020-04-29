@@ -54,7 +54,9 @@ class JavaFormatterPlugin implements Plugin<Project> {
                         formatted = RemoveUnusedImports.removeUnusedImports(formatted, RemoveUnusedImports.JavadocOnlyImports.KEEP)
                         formatted = ImportOrderer.reorderImports(formatted);
                         if (!src.equals(formatted)) {
-                            throw new GradleException("File not formatted: " + file.getAbsolutePath())
+                            throw new GradleException("File not formatted: " + file.getAbsolutePath()
+                                    + System.lineSeparator()
+                                    + "See https://github.com/awslabs/djl/blob/master/docs/development/development_guideline.md#coding-conventions for formatting instructions")
                         }
                     }
                 }

@@ -13,7 +13,6 @@
 package ai.djl.modality.nlp;
 
 import ai.djl.MalformedModelException;
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -51,9 +50,9 @@ public abstract class Decoder extends AbstractBlock {
     /**
      * Sets the state of the encoder as the initial state of the decoder.
      *
-     * @param encoderState the state of the encoder
+     * @param encoderStates the states of the encoder
      */
-    public abstract void initState(NDArray encoderState);
+    public abstract void initState(NDList encoderStates);
 
     /** {@inheritDoc} */
     @Override
@@ -72,7 +71,7 @@ public abstract class Decoder extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public BlockList getChildren() {
-        return block.getChildren();
+        return new BlockList(Collections.singletonList("Block"), Collections.singletonList(block));
     }
 
     /** {@inheritDoc} */

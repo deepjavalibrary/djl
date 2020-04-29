@@ -35,21 +35,20 @@ public class SimpleTextEmbedding implements TextEmbedding {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray preprocessTextToEmbed(NDManager manager, List<String> text) {
-        NDList result = new NDList(text.size());
-        for (String token : text) {
-            result.add(wordEmbedding.preprocessWordToEmbed(manager, token));
+    public int[] preprocessTextToEmbed(List<String> text) {
+        int[] result = new int[text.size()];
+        for (int i = 0; i < text.size(); i++) {
+            result[i] = wordEmbedding.preprocessWordToEmbed(text.get(i));
         }
-        return NDArrays.stack(result);
+        return result;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray embedText(NDArray text) throws EmbeddingException {
-        NDList split = text.split(text.getShape().get(0));
+    public NDArray embedText(NDManager manager, int[] textIndices) throws EmbeddingException {
         NDList result = new NDList();
-        for (NDArray token : split) {
-            result.add(wordEmbedding.embedWord(token.get(0)));
+        for (int index : textIndices) {
+            result.add(wordEmbedding.embedWord(manager, index));
         }
         return NDArrays.stack(result);
     }

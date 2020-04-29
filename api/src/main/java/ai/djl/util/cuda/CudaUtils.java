@@ -15,7 +15,9 @@ package ai.djl.util.cuda;
 import ai.djl.Device;
 import ai.djl.engine.EngineException;
 import com.sun.jna.Native;
+import java.io.File;
 import java.lang.management.MemoryUsage;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,6 +152,26 @@ public final class CudaUtils {
 
     private static CudaLibrary loadLibrary() {
         try {
+            if (System.getProperty("os.name").startsWith("Win")) {
+                String path = System.getenv("PATH");
+                if (path == null) {
+                    return null;
+                }
+                Pattern p = Pattern.compile("cudart64_\\d+\\.dll");
+                String[] searchPath = path.split(";");
+                for (String item : searchPath) {
+                    File dir = new File(item);
+                    File[] files = dir.listFiles(n -> p.matcher(n.getName()).matches());
+                    if (files != null && files.length > 0) {
+                        String fileName = files[0].getName();
+                        String cudaRt = fileName.substring(0, fileName.length() - 4);
+                        logger.debug("Found cudart: {}", files[0].getAbsolutePath());
+                        return Native.load(cudaRt, CudaLibrary.class);
+                    }
+                }
+                logger.debug("No cudart library found in path.");
+                return null;
+            }
             return Native.load("cudart", CudaLibrary.class);
         } catch (UnsatisfiedLinkError e) {
             logger.debug("cudart library not found.");

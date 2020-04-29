@@ -14,18 +14,22 @@ package ai.djl.basicmodelzoo.nlp;
 
 import ai.djl.modality.nlp.Decoder;
 import ai.djl.modality.nlp.embedding.TrainableTextEmbedding;
-import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrays;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.recurrent.RecurrentBlock;
+import ai.djl.training.ParameterStore;
+import ai.djl.util.PairList;
 
 /**
  * {@code SimpleSequenceDecoder} implements a {@link Decoder} that employs a {@link RecurrentBlock}
  * to decode text input.
  */
 public class SimpleSequenceDecoder extends Decoder {
-    RecurrentBlock recurrentBlock;
+    private RecurrentBlock recurrentBlock;
 
     /**
      * Contructs a new instance of {@code SimpleSequenceDecoder} with the given {@link
@@ -70,7 +74,24 @@ public class SimpleSequenceDecoder extends Decoder {
 
     /** {@inheritDoc} */
     @Override
-    public void initState(NDArray encoderState) {
-        recurrentBlock.setBeginState(encoderState);
+    public void initState(NDList encoderStates) {
+        recurrentBlock.setBeginStates(encoderStates);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList predict(
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+        Shape inputShape = inputs.get(0).getShape();
+        if (inputShape.get(1) != 1) {
+            throw new IllegalArgumentException("Input sequence length must be 1 during prediction");
+        }
+        NDList output = new NDList();
+        for (int i = 0; i < 10; i++) {
+            inputs = block.predict(parameterStore, inputs);
+            inputs = new NDList(inputs.head().argMax(2));
+            output.add(inputs.head().transpose(1, 0));
+        }
+        return new NDList(NDArrays.stack(output).transpose(2, 1, 0));
     }
 }
