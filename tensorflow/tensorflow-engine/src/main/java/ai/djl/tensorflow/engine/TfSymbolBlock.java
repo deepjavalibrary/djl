@@ -61,7 +61,10 @@ public class TfSymbolBlock implements SymbolBlock {
     /** {@inheritDoc} */
     @Override
     public NDList forward(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
         Session.Runner runner = session.runner();
         PairList<String, Shape> inputDescriptions = describeInput();
         PairList<String, Shape> outputDescriptions = describeOutput();
@@ -79,13 +82,6 @@ public class TfSymbolBlock implements SymbolBlock {
             resultNDList.add(((TfNDManager) manager).create(tensor));
         }
         return resultNDList;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList predict(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        return forward(parameterStore, inputs, params);
     }
 
     /** {@inheritDoc} */

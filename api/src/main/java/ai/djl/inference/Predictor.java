@@ -114,7 +114,7 @@ public class Predictor<I, O> implements AutoCloseable {
 
     private NDList predict(NDList ndList) {
         logger.trace("Predictor input data: {}", ndList);
-        return block.predict(parameterStore, ndList);
+        return block.forward(parameterStore, ndList, false);
     }
 
     /**

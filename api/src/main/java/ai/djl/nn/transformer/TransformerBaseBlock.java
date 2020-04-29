@@ -13,7 +13,6 @@
 package ai.djl.nn.transformer;
 
 import ai.djl.MalformedModelException;
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -21,8 +20,6 @@ import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.BlockList;
 import ai.djl.nn.Parameter;
-import ai.djl.training.ParameterStore;
-import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -201,20 +198,6 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
      */
     public abstract void initializeChildBlocks(
             NDManager manager, DataType dataType, Shape... inputShapes);
-
-    /**
-     * Default implementation of predict that calls forward.
-     *
-     * @param parameterStore the parameter store
-     * @param inputs the input NDList
-     * @param params optional parameters
-     * @return the prediction result, same as from forward pass
-     */
-    @Override
-    public NDList predict(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        return forward(parameterStore, inputs, params);
-    }
 
     @Override
     public List<Parameter> getDirectParameters() {

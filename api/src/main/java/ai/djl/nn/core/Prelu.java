@@ -52,19 +52,15 @@ public class Prelu extends ParameterBlock {
     /** {@inheritDoc} */
     @Override
     public NDList forward(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
         NDArray data = inputs.singletonOrThrow();
 
         NDList list = new NDList(data, parameterStore.getValue(alpha, data.getDevice()));
         NDArrayEx ex = data.getNDArrayInternal();
         return ex.prelu(list, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList predict(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        return forward(parameterStore, inputs, params);
     }
 
     /** {@inheritDoc} */

@@ -761,7 +761,7 @@ public class ScaledDotProductAttentionBlockTest {
                                 ps,
                                 new NDList(
                                         keySequence, querySequence, valueSequence, attentionMask),
-                                null)
+                                true)
                         .head();
         boolean allClose = NDArrays.allClose(result, expectedResult, 1e-04, 1e-07, true);
         Assert.assertTrue(allClose);

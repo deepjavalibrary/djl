@@ -80,15 +80,22 @@ public class SimpleSequenceDecoder extends Decoder {
 
     /** {@inheritDoc} */
     @Override
-    public NDList predict(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+    public NDList forward(
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
+        if (training) {
+            return block.forward(parameterStore, inputs, true, params);
+        }
+
         Shape inputShape = inputs.get(0).getShape();
         if (inputShape.get(1) != 1) {
             throw new IllegalArgumentException("Input sequence length must be 1 during prediction");
         }
         NDList output = new NDList();
         for (int i = 0; i < 10; i++) {
-            inputs = block.predict(parameterStore, inputs);
+            inputs = block.forward(parameterStore, inputs, false);
             inputs = new NDList(inputs.head().argMax(2));
             output.add(inputs.head().transpose(1, 0));
         }

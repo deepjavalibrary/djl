@@ -43,9 +43,9 @@ import java.util.List;
  * </ul>
  *
  * <p>The core purpose of a {@code Block} is to perform an operation on the inputs, and return an
- * output. It is defined in the {@link #forward(ParameterStore, NDList) forward} method. The forward
- * function could be defined explicitly in terms of parameters or implicitly and could be a
- * combination of the functions of the child blocks.
+ * output. It is defined in the {@link #forward(ParameterStore, NDList, boolean) forward} method.
+ * The forward function could be defined explicitly in terms of parameters or implicitly and could
+ * be a combination of the functions of the child blocks.
  *
  * <p>The parameters of a {@code Block} are instances of {@link Parameter} which are required for
  * the operation in the forward function. For example, in a {@link ai.djl.nn.convolutional.Conv2D}
@@ -67,7 +67,7 @@ import java.util.List;
  * recommend extending {@link ParameterBlock} to create blocks that don't have children. There can
  * be special cases where blocks have neither parameters nor children. One such example is {@link
  * LambdaBlock}. {@link LambdaBlock} takes in a function, and applies that function to its input in
- * the {@link #forward(ParameterStore, NDList) forward} method.
+ * the {@link #forward(ParameterStore, NDList, boolean) forward} method.
  *
  * <p>Now that we understand the components of the block, we can explore what the block really
  * represents. A block combined with the recursive, hierarchical structure of its children forms a
@@ -111,10 +111,11 @@ public interface Block {
      *
      * @param parameterStore the parameter store
      * @param inputs the input NDList
+     * @param training true for a training forward pass
      * @return the output of the forward pass
      */
-    default NDList forward(ParameterStore parameterStore, NDList inputs) {
-        return forward(parameterStore, inputs, null);
+    default NDList forward(ParameterStore parameterStore, NDList inputs, boolean training) {
+        return forward(parameterStore, inputs, training, null);
     }
 
     /**
@@ -123,42 +124,15 @@ public interface Block {
      *
      * @param parameterStore the parameter store
      * @param inputs the input NDList
+     * @param training true for a training forward pass
      * @param params optional parameters
      * @return the output of the forward pass
      */
-    NDList forward(ParameterStore parameterStore, NDList inputs, PairList<String, Object> params);
-
-    /**
-     * Predicts the output based on the input.
-     *
-     * <p>In most {@code Block} implementations, prediction is the same calling the {@link
-     * Block#forward(ParameterStore, NDList)} method. However, in some cases it can be different. In
-     * most {@code Block} implementation where predict is different from forward, this default
-     * method must be overriden.
-     *
-     * @param parameterStore the parameter store
-     * @param inputs the input NDList
-     * @param params optional parameters
-     * @return the output of the model
-     */
-    public NDList predict(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params);
-
-    /**
-     * Predicts the output based on the input.
-     *
-     * <p>In most {@code Block} implementations, prediction is the same calling the {@link
-     * Block#forward(ParameterStore, NDList)} method. However, in some cases it can be different. In
-     * most {@code Block} implementation where predict is different from forward, this default
-     * method must be overriden.
-     *
-     * @param parameterStore the parameter store
-     * @param inputs the input NDList
-     * @return the output of the model
-     */
-    default NDList predict(ParameterStore parameterStore, NDList inputs) {
-        return predict(parameterStore, inputs, null);
-    }
+    NDList forward(
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params);
 
     /**
      * Sets an {@link Initializer} to the block.

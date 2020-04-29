@@ -52,7 +52,9 @@ public class MxSymbolBlockTest {
             Block block = model.getBlock();
             NDArray arr = manager.ones(new Shape(1, 28, 28));
             Shape shape =
-                    block.forward(parameterStore, new NDList(arr)).singletonOrThrow().getShape();
+                    block.forward(parameterStore, new NDList(arr), true)
+                            .singletonOrThrow()
+                            .getShape();
             Assert.assertEquals(shape, new Shape(1, 10));
         }
     }

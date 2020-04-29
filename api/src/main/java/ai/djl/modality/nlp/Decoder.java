@@ -57,8 +57,11 @@ public abstract class Decoder extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public NDList forward(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        return block.forward(parameterStore, inputs, params);
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
+        return block.forward(parameterStore, inputs, training, params);
     }
 
     /** {@inheritDoc} */

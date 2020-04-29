@@ -51,7 +51,8 @@ public class SimpleSequenceEncoderTest {
             NDList output =
                     encoder.forward(
                             new ParameterStore(manager, false),
-                            new NDList(manager.zeros(new Shape(4, 7))));
+                            new NDList(manager.zeros(new Shape(4, 7))),
+                            true);
             Assert.assertEquals(output.head().getShape(), new Shape(4, 7, 16));
             Assert.assertEquals(output.size(), 3);
             Assert.assertEquals(output.get(1).getShape(), new Shape(2, 4, 16));

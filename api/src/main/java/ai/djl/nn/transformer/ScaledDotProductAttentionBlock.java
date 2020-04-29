@@ -193,7 +193,10 @@ public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
 
     @Override
     public NDList forward(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
         // E=embedding size
         long E = embeddingSize;
         // B=batch size
@@ -230,9 +233,11 @@ public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
             attentionMask = null;
         }
         // apply projection for key, query and value: (B * S, E)
-        NDList keys = keyProjection.forward(parameterStore, flattenedKeyInput, params);
-        NDList queries = queryProjection.forward(parameterStore, flattenedQueryInput, params);
-        NDList values = valueProjection.forward(parameterStore, flattenedValueInput, params);
+        NDList keys = keyProjection.forward(parameterStore, flattenedKeyInput, training, params);
+        NDList queries =
+                queryProjection.forward(parameterStore, flattenedQueryInput, training, params);
+        NDList values =
+                valueProjection.forward(parameterStore, flattenedValueInput, training, params);
         // reshape to (B, N, S, H)
         NDArray keyHeads = createAttentionHeadsFromEmbeddings(keys.head(), B, F, N, H);
         NDArray queryHeads = createAttentionHeadsFromEmbeddings(queries.head(), B, T, N, H);
@@ -269,7 +274,7 @@ public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
         // result of a position, as their probability will be set to 0
         NDArray attentionProbsAfterDropout =
                 attentionProbsDropout
-                        .forward(parameterStore, new NDList(attentionProbs))
+                        .forward(parameterStore, new NDList(attentionProbs), training)
                         .singletonOrThrow();
         // The result of the attention mechanism is created by a weighted sum using the attention
         // probs. The new head is the weighted sum of the value heads. (B, N, T, H)
@@ -282,7 +287,7 @@ public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
                         .reshape(B * T, E); // -> (B * T, E)
         // As a last step, we add another linear projection for each token to the embedding size
         NDList projectedEmbeddings =
-                resultProjection.forward(parameterStore, new NDList(resultEmbeddings));
+                resultProjection.forward(parameterStore, new NDList(resultEmbeddings), training);
         // and finally we reshape back so we have Batches, sequences and embeddings again
         NDArray reshapedResult = projectedEmbeddings.head().reshape(B, T, E);
         // done!

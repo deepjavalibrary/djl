@@ -130,7 +130,10 @@ public abstract class Convolution extends ParameterBlock {
     /** {@inheritDoc} */
     @Override
     public NDList forward(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
         inputs = opInputs(parameterStore, inputs);
         NDArrayEx ex = inputs.head().getNDArrayInternal();
         return ex.convolution(
@@ -144,13 +147,6 @@ public abstract class Convolution extends ParameterBlock {
                 getStringLayout(),
                 !includeBias,
                 params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList predict(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        return forward(parameterStore, inputs, params);
     }
 
     /** {@inheritDoc} */

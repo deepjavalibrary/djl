@@ -115,18 +115,14 @@ public class ParallelBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public NDList forward(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
         return function.apply(
                 blocks.stream()
-                        .map(block -> block.forward(parameterStore, inputs, params))
+                        .map(block -> block.forward(parameterStore, inputs, training, params))
                         .collect(Collectors.toList()));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList predict(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        return forward(parameterStore, inputs, params);
     }
 
     /** {@inheritDoc} */

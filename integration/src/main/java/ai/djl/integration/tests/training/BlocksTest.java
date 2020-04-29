@@ -43,7 +43,8 @@ public class BlocksTest {
 
                 NDArray data = manager.randomUniform(0, 255, new Shape(10, 28, 28));
                 NDArray expected = data.reshape(10, 28 * 28);
-                NDArray result = model.getBlock().forward(parameterStore, new NDList(data)).head();
+                NDArray result =
+                        model.getBlock().forward(parameterStore, new NDList(data), true).head();
                 Assertions.assertAlmostEquals(result, expected);
             }
         }

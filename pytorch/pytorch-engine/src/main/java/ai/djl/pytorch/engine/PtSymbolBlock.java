@@ -80,16 +80,12 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
     /** {@inheritDoc} */
     @Override
     public NDList forward(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
         // TODO refactor the forward to not take ParameterStore
         return IValueUtils.forward(this, inputs);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList predict(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        return forward(parameterStore, inputs, params);
     }
 
     /** {@inheritDoc} */

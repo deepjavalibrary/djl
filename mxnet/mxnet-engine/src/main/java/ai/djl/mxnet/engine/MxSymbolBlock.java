@@ -141,18 +141,14 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
     /** {@inheritDoc} */
     @Override
     public NDList forward(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
         if (op == null) {
             op = JnaUtils.createCachedOp(this, (MxNDManager) manager);
         }
         return op.forward(parameterStore, inputs);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList predict(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        return forward(parameterStore, inputs, params);
     }
 
     /** {@inheritDoc} */

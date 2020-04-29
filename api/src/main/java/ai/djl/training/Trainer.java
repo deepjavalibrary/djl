@@ -185,7 +185,7 @@ public class Trainer implements AutoCloseable {
     public NDList forward(NDList input) {
         long begin = System.nanoTime();
         try {
-            return model.getBlock().forward(parameterStore, input);
+            return model.getBlock().forward(parameterStore, input, true);
         } finally {
             addMetric("forward", begin);
         }
@@ -198,7 +198,7 @@ public class Trainer implements AutoCloseable {
      * @return the output of the predict function
      */
     public NDList predict(NDList input) {
-        return model.getBlock().predict(parameterStore, input);
+        return model.getBlock().forward(parameterStore, input, false);
     }
 
     /**

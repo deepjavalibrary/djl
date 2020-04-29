@@ -108,19 +108,15 @@ public class SequentialBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public NDList forward(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
         NDList current = inputs;
         for (Block block : blocks) {
-            current = block.forward(parameterStore, current);
+            current = block.forward(parameterStore, current, training);
         }
         return current;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList predict(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        return forward(parameterStore, inputs, params);
     }
 
     /** {@inheritDoc} */

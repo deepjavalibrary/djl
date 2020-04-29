@@ -123,13 +123,6 @@ public abstract class Embedding<T> extends ParameterBlock {
         inputShapes = new Shape[] {new Shape(-1)};
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public NDList predict(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        return forward(parameterStore, inputs, params);
-    }
-
     /**
      * Encodes an object of input type into a byte array. This is used in saving and loading the
      * {@link Embedding} objects.
@@ -173,7 +166,10 @@ public abstract class Embedding<T> extends ParameterBlock {
     /** {@inheritDoc} */
     @Override
     public NDList forward(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
         NDList opInputs = opInputs(parameterStore, inputs);
 
         NDArrayEx ex = opInputs.head().getNDArrayInternal();

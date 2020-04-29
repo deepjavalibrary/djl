@@ -13,7 +13,6 @@
 package ai.djl.basicmodelzoo.cv.object_detection.ssd;
 
 import ai.djl.MalformedModelException;
-import ai.djl.modality.cv.MultiBoxDetection;
 import ai.djl.modality.cv.MultiBoxPrior;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -65,13 +64,16 @@ public final class SingleShotDetection extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public NDList forward(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
         NDList networkOutput = inputs;
         NDArray[] anchorsOutputs = new NDArray[features.size()];
         NDArray[] classOutputs = new NDArray[features.size()];
         NDArray[] boundingBoxOutputs = new NDArray[features.size()];
         for (int i = 0; i < features.size(); i++) {
-            networkOutput = features.get(i).forward(parameterStore, networkOutput);
+            networkOutput = features.get(i).forward(parameterStore, networkOutput, training);
 
             MultiBoxPrior multiBoxPrior = multiBoxPriors.get(i);
 
@@ -79,36 +81,20 @@ public final class SingleShotDetection extends AbstractBlock {
             classOutputs[i] =
                     classPredictionBlocks
                             .get(i)
-                            .forward(parameterStore, networkOutput)
+                            .forward(parameterStore, networkOutput, training)
                             .singletonOrThrow();
             boundingBoxOutputs[i] =
                     anchorPredictionBlocks
                             .get(i)
-                            .forward(parameterStore, networkOutput)
+                            .forward(parameterStore, networkOutput, training)
                             .singletonOrThrow();
         }
         NDArray anchors = NDArrays.concat(new NDList(anchorsOutputs), 1);
         NDArray classPredictions = concatPredictions(new NDList(classOutputs));
         NDArray boundingBoxPredictions = concatPredictions(new NDList(boundingBoxOutputs));
-        return new NDList(
-                anchors,
-                classPredictions.reshape(classPredictions.size(0), -1, numClasses + 1),
-                boundingBoxPredictions);
-    }
+        classPredictions = classPredictions.reshape(classPredictions.size(0), -1, numClasses + 1);
 
-    /** {@inheritDoc} */
-    @Override
-    public NDList predict(
-            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
-        NDList output = forward(parameterStore, inputs, params);
-        NDArray anchors = output.get(0);
-        NDArray classPredictions = output.get(1).softmax(-1).transpose(0, 2, 1);
-        NDArray boundingBoxPredictions = output.get(2);
-        MultiBoxDetection multiBoxDetection = MultiBoxDetection.builder().build();
-        NDList detections =
-                multiBoxDetection.detection(
-                        new NDList(classPredictions, boundingBoxPredictions, anchors));
-        return detections.singletonOrThrow().split(new long[] {1, 2}, 2);
+        return new NDList(anchors, classPredictions, boundingBoxPredictions);
     }
 
     private NDArray concatPredictions(NDList output) {

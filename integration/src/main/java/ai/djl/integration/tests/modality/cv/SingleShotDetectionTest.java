@@ -99,7 +99,8 @@ public class SingleShotDetectionTest {
             ssd.setInitializer(new XavierInitializer());
             ssd.initialize(manager, DataType.FLOAT32, new Shape(32, 3, 256, 256));
             ParameterStore ps = new ParameterStore(manager, false);
-            NDList output = ssd.forward(ps, new NDList(manager.ones(new Shape(32, 3, 256, 256))));
+            NDList output =
+                    ssd.forward(ps, new NDList(manager.ones(new Shape(32, 3, 256, 256))), true);
             Assert.assertEquals(output.get(0).getShape(), new Shape(1, 5444, 4));
             Assert.assertEquals(output.get(1).getShape(), new Shape(32, 5444, 2));
             Assert.assertEquals(output.get(2).getShape(), new Shape(32, 21776));
