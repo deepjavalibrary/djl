@@ -116,3 +116,17 @@ Update the environment variable value with the following command:
 export MXNET_LIBRARY_PATH=//anaconda3/lib/python3.7/site-packages/mxnet/
 ```
 Now DJL will automatically use the MXNet library from this location.
+
+## Gradle issue
+
+Sometimes gradle may fail or stuck. For example, you may see the following error:
+```shell script
+* What went wrong:
+Execution failed for task ':api:formatJava'.
+> unable to create new native thread
+```
+You need kill gradle daemon process:
+```shell script
+./gradlew --stop
+``` 
+
