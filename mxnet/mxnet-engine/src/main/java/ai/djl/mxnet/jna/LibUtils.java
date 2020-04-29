@@ -329,11 +329,11 @@ public final class LibUtils {
                     if ("win".equals(os)) {
                         if ("libmxnet.dll".equals(fileName)) {
                             fileName = "mxnet.dll";
-                        } else if ("libcumxnet.dll".equals(fileName)) {
-                            fileName = "mxnet.dll";
-                        } else if (fileName.startsWith("mxnet_")
-                                && !("mxnet_" + cudaArch + ".dll").equals(fileName)) {
-                            continue;
+                        } else if (fileName.startsWith("mxnet_")) {
+                            if (!("mxnet_" + cudaArch + ".dll").equals(fileName)) {
+                                continue;
+                            }
+                            fileName = "mxnet.dll"; // split CUDA build
                         }
                     }
                     logger.info("Downloading {} ...", fileName);
