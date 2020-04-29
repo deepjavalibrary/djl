@@ -57,26 +57,34 @@ import ai.djl.util.PairList;
  *
  * <p>Attention masks must contain a 1 for positions to keep and a 0 for positions to mask.
  */
+// We name local variables for tensor dimensions as in the paper and the reference code.
+// While against the general code style, it makes things much easier readable here.
+@SuppressWarnings({
+    "LocalVariableName",
+    "PMD.LocalVariableNamingConventions",
+    "ParameterName",
+    "PMD.FormalParameterNamingConventions"
+})
 public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
 
     private static final int VERSION = 1;
 
     /** Size of the Word-/Token-embeddings we use the attention on. */
-    private final int embeddingSize;
+    private int embeddingSize;
     /** Number of attention heads. */
-    private final int headCount;
+    private int headCount;
     /** Pointwise Linear projection of the keys. */
-    private final Linear keyProjection;
+    private Linear keyProjection;
     /** Pointwise Linear projection of the queries. */
-    private final Linear queryProjection;
+    private Linear queryProjection;
     /** Pointwise Linear projection of the values. */
-    private final Linear valueProjection;
+    private Linear valueProjection;
     /** Pointwise Linear projection of the results. */
-    private final Linear resultProjection;
+    private Linear resultProjection;
     /** Dropout operation to be applied after probability calculation. */
-    private final Dropout attentionProbsDropout;
+    private Dropout attentionProbsDropout;
 
-    private ScaledDotProductAttentionBlock(final Builder builder) {
+    private ScaledDotProductAttentionBlock(Builder builder) {
         super(VERSION);
 
         this.embeddingSize = builder.embeddingSize;
@@ -138,7 +146,7 @@ public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
     }
 
     @Override
-    public Shape[] getOutputShapes(final NDManager manager, final Shape[] inputShapes) {
+    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         // Return shape is the shape of the query. For 2 or less inputs we have self-attention, i.e.
         // the shape of the output is the shape of the input
         if (inputShapes.length == 1 || inputShapes.length == 2) {
@@ -153,8 +161,7 @@ public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
     }
 
     @Override
-    public void initializeChildBlocks(
-            final NDManager manager, final DataType dataType, final Shape... inputShapes) {
+    public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         // The lookups are fed reshaped input where the batch size is combined with the sequence
         // length.
         // The linear layers only care about the 2nd dimension, so we set the first to -1.
@@ -176,42 +183,34 @@ public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
      * @param H size of attention heads
      * @return the reshaped input
      */
-    // We name parameters for tensor dimensions as in the paper and the reference code.
-    // While against the general code style, it makes things much easier readable here.
-    @SuppressWarnings({"ParameterName", "PMD.FormalParameterNamingConventions"})
     private NDArray createAttentionHeadsFromEmbeddings(
-            final NDArray projection, final long B, final long S, final long N, final long H) {
+            NDArray projection, long B, long S, long N, long H) {
         // Reshape projection to sequence & heads: (B * S, E) -> (B, S, N, H)
-        final NDArray sequenceAndHeads = projection.reshape(B, S, N, H);
+        NDArray sequenceAndHeads = projection.reshape(B, S, N, H);
         // Switch sequence idx & head index, so we have sequences of heads at the end
         return sequenceAndHeads.transpose(0, 2, 1, 3);
     }
 
     @Override
-    // We name local variables for tensor dimensions as in the paper and the reference code.
-    // While against the general code style, it makes things much easier readable here.
-    @SuppressWarnings({"LocalFinalVariableName", "PMD.LocalVariableNamingConventions"})
     public NDList forward(
-            final ParameterStore parameterStore,
-            final NDList inputs,
-            final PairList<String, Object> params) {
+            ParameterStore parameterStore, NDList inputs, PairList<String, Object> params) {
         // E=embedding size
-        final long E = embeddingSize;
+        long E = embeddingSize;
         // B=batch size
-        final long B = inputs.head().getShape().get(0);
+        long B = inputs.head().getShape().get(0);
         // N=number of attention heads
-        final long N = headCount;
+        long N = headCount;
         // F=from sequence length
-        final long F;
+        long F;
         // T=to sequence length
-        final long T;
+        long T;
         // H=Attention head size (= E / N)
-        final long H = E / N;
+        long H = E / N;
         // reshape input to flatten batch & sequence: (B * S, E)
-        final NDList flattenedKeyInput;
-        final NDList flattenedQueryInput;
-        final NDList flattenedValueInput;
-        final NDArray attentionMask;
+        NDList flattenedKeyInput;
+        NDList flattenedQueryInput;
+        NDList flattenedValueInput;
+        NDArray attentionMask;
         if (inputs.size() < 3) { // self attention, either masked or unmasked
             F = inputs.head().getShape().get(1);
             T = F;
@@ -231,27 +230,27 @@ public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
             attentionMask = null;
         }
         // apply projection for key, query and value: (B * S, E)
-        final NDList keys = keyProjection.forward(parameterStore, flattenedKeyInput, params);
-        final NDList queries = queryProjection.forward(parameterStore, flattenedQueryInput, params);
-        final NDList values = valueProjection.forward(parameterStore, flattenedValueInput, params);
+        NDList keys = keyProjection.forward(parameterStore, flattenedKeyInput, params);
+        NDList queries = queryProjection.forward(parameterStore, flattenedQueryInput, params);
+        NDList values = valueProjection.forward(parameterStore, flattenedValueInput, params);
         // reshape to (B, N, S, H)
-        final NDArray keyHeads = createAttentionHeadsFromEmbeddings(keys.head(), B, F, N, H);
-        final NDArray queryHeads = createAttentionHeadsFromEmbeddings(queries.head(), B, T, N, H);
-        final NDArray valueHeads = createAttentionHeadsFromEmbeddings(values.head(), B, F, N, H);
+        NDArray keyHeads = createAttentionHeadsFromEmbeddings(keys.head(), B, F, N, H);
+        NDArray queryHeads = createAttentionHeadsFromEmbeddings(queries.head(), B, T, N, H);
+        NDArray valueHeads = createAttentionHeadsFromEmbeddings(values.head(), B, F, N, H);
         // Apply attention by multiplying the key and query vectors: (B, N, T, F)
         // (For each entry in the sequence there is a weight for each other head in the sequence)
-        final NDArray attentionScores = queryHeads.matMul(keyHeads.transpose(0, 1, 3, 2));
+        NDArray attentionScores = queryHeads.matMul(keyHeads.transpose(0, 1, 3, 2));
         // Normalize the scores with 1/sqrt(H)
         NDArray normalizedAttentionScores =
                 attentionScores.mul(attentionScores.getManager().create(1f / (float) Math.sqrt(H)));
         // Apply masking if requested, mask has shape (B, T, F)
         if (attentionMask != null) {
             // expand mask to be used on all heads at once
-            final NDArray expandedMask = attentionMask.reshape(B, 1, T, F);
+            NDArray expandedMask = attentionMask.reshape(B, 1, T, F);
             // we turn the mask from ints into floats and turn all 1s into 0s and all
             // 0s int o a value of -10000. Adding this to the scores will push all unwanted
             // values towards -inf and keep the unmasked values unchanged
-            final NDArray maskOffset =
+            NDArray maskOffset =
                     expandedMask
                             .toType(DataType.FLOAT32, false)
                             .mul(expandedMask.getManager().create(-1f)) // turn 1 into -1
@@ -265,27 +264,27 @@ public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
             normalizedAttentionScores = normalizedAttentionScores.add(maskOffset);
         }
         // Then apply softmax to get a probability distribution, shape (B, N, T, F)
-        final NDArray attentionProbs = normalizedAttentionScores.softmax(3);
+        NDArray attentionProbs = normalizedAttentionScores.softmax(3);
         // We apply dropout to the attention probabilities - this will remove entire tokens from the
         // result of a position, as their probability will be set to 0
-        final NDArray attentionProbsAfterDropout =
+        NDArray attentionProbsAfterDropout =
                 attentionProbsDropout
                         .forward(parameterStore, new NDList(attentionProbs))
                         .singletonOrThrow();
         // The result of the attention mechanism is created by a weighted sum using the attention
         // probs. The new head is the weighted sum of the value heads. (B, N, T, H)
-        final NDArray attentionResult = attentionProbsAfterDropout.matMul(valueHeads);
+        NDArray attentionResult = attentionProbsAfterDropout.matMul(valueHeads);
         // Finally, the heads are reshaped and concatenated into an embedding again
         // (we directly flatten the batch and shape dimension to apply the output projection)
-        final NDArray resultEmbeddings =
+        NDArray resultEmbeddings =
                 attentionResult // (B, N, T, H)
                         .transpose(0, 2, 1, 3) // -> (B, T, N, H)
                         .reshape(B * T, E); // -> (B * T, E)
         // As a last step, we add another linear projection for each token to the embedding size
-        final NDList projectedEmbeddings =
+        NDList projectedEmbeddings =
                 resultProjection.forward(parameterStore, new NDList(resultEmbeddings));
         // and finally we reshape back so we have Batches, sequences and embeddings again
-        final NDArray reshapedResult = projectedEmbeddings.head().reshape(B, T, E);
+        NDArray reshapedResult = projectedEmbeddings.head().reshape(B, T, E);
         // done!
         return new NDList(reshapedResult);
     }
@@ -316,7 +315,7 @@ public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
          * @param embeddingSize the embedding Size to be used for the internal token representation.
          * @return this builder
          */
-        public Builder setEmbeddingSize(final int embeddingSize) {
+        public Builder setEmbeddingSize(int embeddingSize) {
             this.embeddingSize = embeddingSize;
             return this;
         }
@@ -329,7 +328,7 @@ public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
          * @param headCount the number of attention Heads
          * @return this builder
          */
-        public Builder setHeadCount(final int headCount) {
+        public Builder setHeadCount(int headCount) {
             this.headCount = headCount;
             return this;
         }
@@ -342,7 +341,7 @@ public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
          *     probability distribution
          * @return this builder
          */
-        public Builder optAttentionProbsDropoutProb(final float attentionProbsDropoutProb) {
+        public Builder optAttentionProbsDropoutProb(float attentionProbsDropoutProb) {
             this.attentionProbsDropoutProb = attentionProbsDropoutProb;
             return this;
         }

@@ -41,7 +41,7 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
      * The model version of this block, used for checking if parameters are still valid during
      * parameter loading.
      */
-    protected final int version;
+    protected int version;
 
     /**
      * All direct children of this Block. Keys are names of the blocks. Use the {@link
@@ -52,7 +52,7 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
     // of this API know the children are always iterated over in insertion order. LinkedHashMap
     // provides this guarantee, Map does not.
     @SuppressWarnings("PMD.LooseCoupling")
-    protected final LinkedHashMap<String, Block> children = new LinkedHashMap<>();
+    protected LinkedHashMap<String, Block> children = new LinkedHashMap<>();
 
     /**
      * All direct parameters of this Block. Keys are name of the parameters. Use the {@link
@@ -63,7 +63,7 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
     // of this API know the parameters are always iterated over in insertion order. LinkedHashMap
     // provides this guarantee, Map does not.
     @SuppressWarnings("PMD.LooseCoupling")
-    protected final LinkedHashMap<String, Parameter> parameters = new LinkedHashMap<>();
+    protected LinkedHashMap<String, Parameter> parameters = new LinkedHashMap<>();
 
     /**
      * Callbacks to determine the shape of a parameter. Values may be null in which case extending
@@ -74,7 +74,7 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
     // of this API know the callbacks are always iterated over in insertion order. LinkedHashMap
     // provides this guarantee, Map does not.
     @SuppressWarnings("PMD.LooseCoupling")
-    protected final LinkedHashMap<String, Function<Shape[], Shape>> parameterShapeCallbacks =
+    protected LinkedHashMap<String, Function<Shape[], Shape>> parameterShapeCallbacks =
             new LinkedHashMap<>();
 
     /**
@@ -82,7 +82,7 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
      *
      * @param version the version to use for parameter serialization.
      */
-    public TransformerBaseBlock(final int version) {
+    public TransformerBaseBlock(int version) {
         this.version = version;
     }
 
@@ -105,7 +105,7 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
      * @return the block given as a parameter - that way the block can be created and reassigned to
      *     a member variable more easily.
      */
-    protected <B extends Block> B addChildBlock(final String name, final B block) {
+    protected <B extends Block> B addChildBlock(String name, B block) {
         children.put(name, block);
         return block;
     }
@@ -120,7 +120,7 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
      * @return the parameter passed as arguments to make it easier to create and assign paramters in
      *     one line
      */
-    protected <P extends Parameter> P addParameter(final P parameter) {
+    protected <P extends Parameter> P addParameter(P parameter) {
         return addParameter(parameter, (Function<Shape[], Shape>) null);
     }
 
@@ -134,7 +134,7 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
      * @return the parameter passed as arguments to make it easier to create and assign paramters in
      *     one line
      */
-    protected <P extends Parameter> P addParameter(final P parameter, final Shape shape) {
+    protected <P extends Parameter> P addParameter(P parameter, Shape shape) {
         return addParameter(parameter, (inputShapes) -> shape);
     }
 
@@ -150,17 +150,17 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
      *     in one line
      */
     protected <P extends Parameter> P addParameter(
-            final P parameter, final Function<Shape[], Shape> shapeCallback) {
+            P parameter, Function<Shape[], Shape> shapeCallback) {
         parameters.put(parameter.getName(), parameter);
         parameterShapeCallbacks.put(parameter.getName(), shapeCallback);
         return parameter;
     }
 
     @Override
-    public Shape getParameterShape(final String name, final Shape[] inputShapes) {
-        final Function<Shape[], Shape> callback = parameterShapeCallbacks.get(name);
+    public Shape getParameterShape(String name, Shape[] inputShapes) {
+        Function<Shape[], Shape> callback = parameterShapeCallbacks.get(name);
         if (callback == null) {
-            final Parameter parameter = parameters.get(name);
+            Parameter parameter = parameters.get(name);
             if (parameter == null) {
                 throw new IllegalArgumentException(
                         "No parameter named " + name + " found in this block.");
@@ -183,10 +183,9 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public final Shape[] initialize(
-            final NDManager manager, final DataType dataType, final Shape... inputShapes) {
+    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
         beforeInitialize(inputShapes);
-        for (final Parameter parameter : getDirectParameters()) {
+        for (Parameter parameter : getDirectParameters()) {
             parameter.initialize(manager, dataType, inputShapes);
         }
         initializeChildBlocks(manager, dataType, inputShapes);
@@ -201,7 +200,7 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
      * @param inputShapes the expected input shapes
      */
     public abstract void initializeChildBlocks(
-            final NDManager manager, final DataType dataType, final Shape... inputShapes);
+            NDManager manager, DataType dataType, Shape... inputShapes);
 
     /**
      * Default implementation of predict that calls forward.
@@ -223,20 +222,20 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
     }
 
     @Override
-    public void saveParameters(final DataOutputStream os) throws IOException {
+    public void saveParameters(DataOutputStream os) throws IOException {
         os.write(version);
-        for (final Parameter parameter : parameters.values()) {
+        for (Parameter parameter : parameters.values()) {
             parameter.save(os);
         }
-        for (final Block child : children.values()) {
+        for (Block child : children.values()) {
             child.saveParameters(os);
         }
     }
 
     @Override
-    public void loadParameters(final NDManager manager, final DataInputStream is)
+    public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
-        final int loadVersion = is.readInt();
+        int loadVersion = is.readInt();
         if (loadVersion != getVersion()) {
             throw new MalformedModelException(
                     "Cannot load parameters for "
@@ -247,10 +246,10 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
                             + loadVersion
                             + ".");
         }
-        for (final Parameter parameter : parameters.values()) {
+        for (Parameter parameter : parameters.values()) {
             parameter.load(manager, is);
         }
-        for (final Block child : children.values()) {
+        for (Block child : children.values()) {
             child.loadParameters(manager, is);
         }
     }
