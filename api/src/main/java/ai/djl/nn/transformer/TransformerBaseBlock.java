@@ -205,11 +205,11 @@ public abstract class TransformerBaseBlock extends AbstractBlock {
             final NDManager manager, final DataType dataType, final Shape... inputShapes);
 
     /**
-     * Default implementation of predict that calls formward.
+     * Default implementation of predict that calls forward.
      * @param parameterStore the parameter store
      * @param inputs the input NDList
      * @param params optional parameters
-     * @return
+     * @return the prediction result, same as from forward pass
      */
     @Override
     public NDList predict(
