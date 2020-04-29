@@ -148,9 +148,18 @@ final class PyTorchLibrary {
     native Pointer torchIndex(
             Pointer handle, long[] minIndices, long[] maxIndices, long[] stepIndices);
 
+    native void torchIndexPut(
+            Pointer handle,
+            Pointer valueHandle,
+            long[] minIndices,
+            long[] maxIndices,
+            long[] stepIndices);
+
     native Pointer torchSlice(Pointer handle, long dim, long start, long end, long step);
 
     native Pointer torchMaskedSelect(Pointer handle, Pointer maskHandle);
+
+    native void torchMaskedPut(Pointer handle, Pointer valueHandle, Pointer maskHandle);
 
     native void torchDeleteTensor(Pointer handle);
 

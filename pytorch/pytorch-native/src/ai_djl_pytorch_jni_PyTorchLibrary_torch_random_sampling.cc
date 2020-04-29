@@ -24,7 +24,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_atNormal(JNIEnv
   API_BEGIN();
   const std::vector<int64_t> size_vec = utils::GetVecFromJLongArray(env, jsizes);
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequire_grad);
-  const auto* result_ptr = new torch::Tensor(at::normal(jmean, jstd, size_vec, nullptr, options));
+  const auto* result_ptr = new torch::Tensor(torch::normal(jmean, jstd, size_vec, nullptr, options));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }

@@ -261,11 +261,26 @@ public final class JniUtils {
                                 ndArray.getHandle(), minIndices, maxIndices, stepIndices));
     }
 
+    public static void indexSet(
+            PtNDArray ndArray,
+            PtNDArray value,
+            long[] minIndices,
+            long[] maxIndices,
+            long[] stepIndices) {
+        PyTorchLibrary.LIB.torchIndexPut(
+                ndArray.getHandle(), value.getHandle(), minIndices, maxIndices, stepIndices);
+    }
+
     public static PtNDArray booleanMask(PtNDArray ndArray, PtNDArray indicesNd) {
         return ndArray.getManager()
                 .create(
                         PyTorchLibrary.LIB.torchMaskedSelect(
                                 ndArray.getHandle(), indicesNd.getHandle()));
+    }
+
+    public static void booleanMaskSet(PtNDArray ndArray, PtNDArray value, PtNDArray indicesNd) {
+        PyTorchLibrary.LIB.torchMaskedPut(
+                ndArray.getHandle(), value.getHandle(), indicesNd.getHandle());
     }
 
     public static PtNDArray clone(PtNDArray ndArray) {

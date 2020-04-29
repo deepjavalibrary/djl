@@ -162,6 +162,19 @@ inline c10::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
   return c10_device;
 }
 
+inline std::vector<torch::indexing::TensorIndex> CreateTensorIndex(JNIEnv* env, jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {
+  const auto min_indices = GetVecFromJLongArray(env, jmin_indices);
+  const auto max_indices = GetVecFromJLongArray(env, jmax_indices);
+  const auto step_indices = GetVecFromJLongArray(env, jstep_indices);
+  std::vector<torch::indexing::TensorIndex> indices;
+  indices.reserve(min_indices.size());
+  for (size_t i = 0; i < min_indices.size(); ++i) {
+    indices.emplace_back(
+      torch::indexing::TensorIndex(torch::indexing::Slice(min_indices[i], max_indices[i], step_indices[i])));
+  }
+  return indices;
+}
+
 inline torch::TensorOptions CreateTensorOptions(
     JNIEnv* env, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
   // it gets the device and collect jdevice memory

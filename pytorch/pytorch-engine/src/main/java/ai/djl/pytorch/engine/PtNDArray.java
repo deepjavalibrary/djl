@@ -182,19 +182,41 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(NDIndex index, NDArray value) {
-        throw new UnsupportedOperationException("Not implemented");
+        // use booleanMask for NDIndexBooleans case
+        List<NDIndexElement> indices = index.getIndices();
+        if (!indices.isEmpty() && indices.get(0) instanceof NDIndexBooleans) {
+            if (indices.size() != 1) {
+                throw new IllegalArgumentException(
+                        "get() currently didn't support more that one boolean NDArray");
+            }
+            NDArray mask = ((NDIndexBooleans) indices.get(0)).getIndex();
+            JniUtils.booleanMaskSet(this, (PtNDArray) value, (PtNDArray) mask);
+        } else {
+            NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
+            if (fullSlice != null) {
+                JniUtils.indexSet(
+                        this,
+                        (PtNDArray) value,
+                        fullSlice.getMin(),
+                        fullSlice.getMax(),
+                        fullSlice.getStep());
+            } else {
+                throw new UnsupportedOperationException(
+                        "set() currently supports all, fixed, and slices indices");
+            }
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public void set(NDIndex index, Number value) {
-        throw new UnsupportedOperationException("Not implemented");
+        set(index, getManager().create(value));
     }
 
     /** {@inheritDoc} */
     @Override
     public void setScalar(NDIndex index, Number value) {
-        throw new UnsupportedOperationException("Not implemented");
+        set(index, value);
     }
 
     /** {@inheritDoc} */

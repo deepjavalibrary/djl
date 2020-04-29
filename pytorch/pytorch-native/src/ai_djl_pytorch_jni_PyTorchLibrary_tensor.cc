@@ -90,19 +90,20 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndex(JNIE
     jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {
   API_BEGIN();
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-  const auto min_indices = utils::GetVecFromJLongArray(env, jmin_indices);
-  const auto max_indices = utils::GetVecFromJLongArray(env, jmax_indices);
-  const auto step_indices = utils::GetVecFromJLongArray(env, jstep_indices);
-  std::vector<at::indexing::TensorIndex> indices;
-  indices.reserve(min_indices.size());
-  for (size_t i = 0; i < min_indices.size(); ++i) {
-    indices.emplace_back(
-        at::indexing::TensorIndex(torch::indexing::Slice(min_indices[i], max_indices[i], step_indices[i])));
-  }
-  const auto* result_ptr = new torch::Tensor(tensor_ptr->index(c10::ArrayRef<at::indexing::TensorIndex>(indices)));
+  auto indices = utils::CreateTensorIndex(env, jmin_indices, jmax_indices, jstep_indices);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->index(indices));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexPut(
+  JNIEnv* env, jobject jthis, jobject jhandle, jobject jvalue_handle, jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {
+    auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+    const auto* value_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jvalue_handle);
+    auto indices = utils::CreateTensorIndex(env, jmin_indices, jmax_indices, jstep_indices);
+    tensor_ptr->index_put_(indices, *value_ptr);
+}
+
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSlice(
     JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim, jlong jstart, jlong jend, jlong jstep) {
@@ -121,6 +122,14 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMaskedSele
   const auto* result_ptr = new torch::Tensor(tensor_ptr->masked_select(*index_ptr));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMaskedPut(
+  JNIEnv* env, jobject jthis, jobject jhandle, jobject jvalue_handle, jobject jmasked_handle) {
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+    const auto* index_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jmasked_handle);
+    const auto* value_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jvalue_handle);
+    tensor_ptr->masked_fill_(*index_ptr, *value_ptr);
 }
 
 JNIEXPORT jbyteArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDataPtr(
