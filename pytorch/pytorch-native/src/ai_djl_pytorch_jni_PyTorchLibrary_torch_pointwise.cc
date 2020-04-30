@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-#include "../build/include/ai_djl_pytorch_jni_PyTorchLibrary.h"
+#include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_error.h"
 #include "djl_pytorch_jni_utils.h"
 
@@ -169,11 +169,12 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchAbs(JNIEnv
   API_END();
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSquare(JNIEnv* env, jobject jthis, jobject jhandle) {
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSquare(
+    JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-    const auto* result_ptr = new torch::Tensor(tensor_ptr->square());
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->square());
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
 
@@ -373,41 +374,40 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNegi(JNIEnv* 
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLogicalAnd(
-  JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+    JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
   API_BEGIN();
-    const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
-    const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
-    const auto* result_ptr = new torch::Tensor(torch::logical_and(*self_ptr, *other_ptr));
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(torch::logical_and(*self_ptr, *other_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLogicalOr(
-  JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+    JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
   API_BEGIN();
-    const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
-    const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
-    const auto* result_ptr = new torch::Tensor(torch::logical_or(*self_ptr, *other_ptr));
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(torch::logical_or(*self_ptr, *other_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLogicalXor(
-  JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+    JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
   API_BEGIN();
-    const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
-    const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
-    const auto* result_ptr = new torch::Tensor(torch::logical_xor(*self_ptr, *other_ptr));
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(torch::logical_xor(*self_ptr, *other_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLogicalNot(
-  JNIEnv* env, jobject jthis, jobject jhandle) {
+    JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-    const auto* result_ptr = new torch::Tensor(tensor_ptr->logical_not());
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->logical_not());
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
-

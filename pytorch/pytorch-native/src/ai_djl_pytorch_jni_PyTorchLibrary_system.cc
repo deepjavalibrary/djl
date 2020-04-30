@@ -10,24 +10,38 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+#include <caffe2/utils/threadpool/ThreadPoolMobile.h>
 #include <torch/torch.h>
 
-#include "../build/include/ai_djl_pytorch_jni_PyTorchLibrary.h"
+#include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_utils.h"
+
+#if defined(__ANDROID__)
+#include <caffe2/utils/threadpool/ThreadPool.h>
+#include <caffe2/utils/threadpool/ThreadPoolMobile.h>
+#endif
 
 // The file is the implementation for PyTorch system-wide operations
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetNumInteropThreads(
     JNIEnv* env, jobject jthis, jint jthreads) {
   Log log(env);
+#if !defined(__ANDROID__)
+  log.info("Android didn't support this interop config, please use intra-op instead");
+#else
   torch::set_num_interop_threads(jthreads);
+#endif
   log.info("Number of inter-op threads is set to " + std::to_string(jthreads));
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetNumThreads(
     JNIEnv* env, jobject jthis, jint jthreads) {
   Log log(env);
+#if defined(__ANDROID__)
+  caffe2::mobile_threadpool()->setNumThreads(jthreads);
+#else
   torch::set_num_threads(jthreads);
+#endif
   log.info("Number of intra-op threads is set to " + std::to_string(jthreads));
 }
 
@@ -48,6 +62,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchShowConfig(
   }
   std::string feature;
   jstring jfeature;
+#if !defined(__ANDROID__)
   if (torch::cuda::is_available()) {
     feature = "CUDA";
     jfeature = env->NewStringUTF(feature.c_str());
@@ -60,6 +75,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchShowConfig(
     env->CallBooleanMethod(jset, add_method_id, jfeature);
     env->DeleteLocalRef(jfeature);
   }
+#endif
   if (torch::hasMKL()) {
     feature = "MKL";
     jfeature = env->NewStringUTF(feature.c_str());

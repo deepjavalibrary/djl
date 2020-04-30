@@ -13,7 +13,7 @@
 #include <torch/script.h>
 #include <torch/torch.h>
 
-#include "../build/include/ai_djl_pytorch_jni_PyTorchLibrary.h"
+#include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_error.h"
 #include "djl_pytorch_jni_utils.h"
 
@@ -45,7 +45,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
     JNIEnv* env, jobject jthis, jobject module_handle, jobjectArray tensor_ptrs) {
   API_BEGIN();
   auto ivalue_vec = std::vector<c10::IValue>();
-  size_t len = env->GetArrayLength(tensor_ptrs);
+  size_t len = static_cast<size_t>(env->GetArrayLength(tensor_ptrs));
   ivalue_vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     auto* tensor_ptr =

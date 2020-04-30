@@ -41,7 +41,8 @@ jobs:
           export ANDROID_ABI=${{ matrix.format }}
           cd android_pytorch_tmp
           bash ./scripts/build_android.sh
-          zip -r ${{ matrix.format }}_native.zip build_android/install
+          cd build_android/install
+          zip -r ${{ matrix.format }}_native.zip include lib
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -50,4 +51,4 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 cp android_pytorch_tmp/${{ matrix.format }}_native.zip s3://djl-ai/publish/pytorch-1.5.0/android_native/
+          aws s3 cp android_pytorch_tmp/build_android/install/${{ matrix.format }}_native.zip s3://djl-ai/publish/pytorch-1.5.0/android_native/

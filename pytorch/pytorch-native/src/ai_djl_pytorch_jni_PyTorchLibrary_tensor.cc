@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-#include "../build/include/ai_djl_pytorch_jni_PyTorchLibrary.h"
+#include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_error.h"
 #include "djl_pytorch_jni_utils.h"
 
@@ -86,8 +86,8 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_tensorClone(
   API_END();
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndex(
-  JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndex(JNIEnv* env, jobject jthis, jobject jhandle,
+    jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {
   API_BEGIN();
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   const auto min_indices = utils::GetVecFromJLongArray(env, jmin_indices);
@@ -97,7 +97,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndex(
   indices.reserve(min_indices.size());
   for (size_t i = 0; i < min_indices.size(); ++i) {
     indices.emplace_back(
-      at::indexing::TensorIndex(torch::indexing::Slice(min_indices[i], max_indices[i], step_indices[i])));
+        at::indexing::TensorIndex(torch::indexing::Slice(min_indices[i], max_indices[i], step_indices[i])));
   }
   const auto* result_ptr = new torch::Tensor(tensor_ptr->index(c10::ArrayRef<at::indexing::TensorIndex>(indices)));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);

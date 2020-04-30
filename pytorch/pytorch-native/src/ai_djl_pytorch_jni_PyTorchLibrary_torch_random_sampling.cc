@@ -13,7 +13,7 @@
 #include <torch/script.h>
 #include <torch/torch.h>
 
-#include "../build/include/ai_djl_pytorch_jni_PyTorchLibrary.h"
+#include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_error.h"
 #include "djl_pytorch_jni_utils.h"
 
