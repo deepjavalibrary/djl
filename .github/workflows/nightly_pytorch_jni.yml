@@ -90,18 +90,22 @@ jobs:
         run: |
           curl.exe -L http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_426.00_windows.exe -o cuda.exe
           curl.exe -L http://developer.nvidia.com/compute/cuda/9.2/Prod2/local_installers2/cuda_9.2.148_windows -o cuda92.exe
+          curl.exe -L http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_441.22_windows.exe -o cuda102.exe
           curl.exe -L https://developer.download.nvidia.com/compute/redist/cudnn/v7.6.4/cudnn-10.1-windows7-x64-v7.6.4.38.zip -o cudnn.zip
+          cuda102.exe -s
           cuda.exe -s
           cuda92.exe -s
           mkdir cuda
           unzip.exe cudnn.zip
           cp.exe -a cuda/include cuda/lib cuda/bin "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.1/"
           cp.exe -a cuda/include cuda/lib cuda/bin "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v9.2/"
+          cp.exe -a cuda/include cuda/lib cuda/bin "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.2/"
       - name: Release JNI
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64
-          set "CUDA_PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.1"
+          set "CUDA_PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.2"
+          set "CUDA_PATH_V10_2=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.2"
           set "CUDA_PATH_V10_1=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.1"
           set "CUDA_PATH_V9_2=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.2"
           set "PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.1\bin;%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.1\libnvvp;%PATH%"
