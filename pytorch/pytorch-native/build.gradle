@@ -47,13 +47,13 @@ def downloadBuildAndroid() {
                 commandLine 'bash', 'build_android.sh', "${abi}"
             }
             def ciDir = "${project.projectDir}/jnilib/android/${abi}"
-            def versionName = String.format("${project.parent.version}-%s", new Date().format('yyyyMMdd'))
-            def propFile = file("${ciDir}/pytorch.properties")
-            propFile.text = "version=${versionName}\n"
             copy {
                 from "${project.buildDir}/libdjl_torch.so"
                 into ciDir
             }
+            def versionName = String.format("${project.parent.version}-%s", new Date().format('yyyyMMdd'))
+            def propFile = file("${ciDir}/pytorch.properties")
+            propFile.text = "version=${versionName}\n"
             cleanBuild()
     }
 }
