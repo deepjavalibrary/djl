@@ -26,8 +26,14 @@ public class NDArrayShapesManipulationOpTest {
     public void testSplit() {
         // TODO add more test cases once MXNet split op bug is fixed
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f});
-            NDList result = array.split(2);
+            NDArray array = manager.arange(18f);
+            NDList result = array.split(18);
+            Assert.assertEquals(result.get(0), manager.create(new float[] {0f}));
+            Assert.assertEquals(result.get(8), manager.create(new float[] {8f}));
+            Assert.assertEquals(result.get(17), manager.create(new float[] {17f}));
+
+            array = manager.create(new float[] {1f, 2f, 3f, 4f});
+            result = array.split(2);
             Assert.assertEquals(result.get(0), manager.create(new float[] {1f, 2f}));
             Assert.assertEquals(result.get(1), manager.create(new float[] {3f, 4f}));
             result = array.split(new long[] {2});

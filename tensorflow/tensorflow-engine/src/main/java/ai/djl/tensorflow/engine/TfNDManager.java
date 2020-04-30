@@ -35,7 +35,7 @@ import org.tensorflow.Operand;
 import org.tensorflow.Tensor;
 import org.tensorflow.op.Ops;
 import org.tensorflow.op.core.Constant;
-import org.tensorflow.op.random.ParameterizedTruncatedNormal;
+import org.tensorflow.op.random.RandomStandardNormal;
 import org.tensorflow.op.random.RandomUniform;
 import org.tensorflow.tools.buffer.ByteDataBuffer;
 import org.tensorflow.tools.buffer.DataBuffers;
@@ -282,8 +282,8 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray arange(float start, float stop, float step, DataType dataType, Device device) {
-        if (stop <= start) {
-            return create(new Shape(0));
+        if (stop <= start && step > 0) {
+            return create(new Shape(0), dataType);
         }
         return new TfNDArray(
                 this,
@@ -324,17 +324,17 @@ public class TfNDManager extends BaseNDManager {
         if (num == 0) {
             return create(new Shape(0));
         }
-        if (!endpoint) {
-            num++;
+        if (endpoint) {
+            return new TfNDArray(
+                    this, tf.linSpace(tf.constant(start), tf.constant(stop), tf.constant(num)));
         }
+
         NDArray result =
                 new TfNDArray(
-                        this, tf.linSpace(tf.constant(start), tf.constant(stop), tf.constant(num)));
-        if (!endpoint) {
-            return result.get(new NDIndex(":-1"));
-        } else {
-            return result;
-        }
+                        this,
+                        tf.linSpace(tf.constant(start), tf.constant(stop), tf.constant(num + 1)));
+
+        return result.get(new NDIndex(":-1"));
     }
 
     /** {@inheritDoc} */
@@ -353,7 +353,12 @@ public class TfNDManager extends BaseNDManager {
         Operand maxVal = tf.dtypes.cast(tf.constant(high), dType);
         Operand result;
         if (seed != null) {
-            result = tf.random.randomUniform(shapeOp, dType, RandomUniform.seed((long) seed));
+            result =
+                    tf.random.randomUniform(
+                            shapeOp,
+                            dType,
+                            RandomUniform.seed((long) 1234),
+                            RandomUniform.seed2((long) 2234));
         } else {
             result = tf.random.randomUniform(shapeOp, dType);
         }
@@ -366,7 +371,7 @@ public class TfNDManager extends BaseNDManager {
     @SuppressWarnings({"rawtypes", "unchecked"})
     public NDArray randomNormal(
             float loc, float scale, Shape shape, DataType dataType, Device device) {
-        Operand shapeOp = tf.constant(shape.getShape());
+        Operand shapeOp = tf.dtypes.cast(tf.constant(shape.getShape()), TInt32.DTYPE);
         org.tensorflow.DataType dType;
         if (dataType == DataType.UNKNOWN) {
             dType = TFloat32.DTYPE;
@@ -375,21 +380,18 @@ public class TfNDManager extends BaseNDManager {
         }
         Operand mean = tf.dtypes.cast(tf.constant(loc), dType);
         Operand std = tf.dtypes.cast(tf.constant(scale), dType);
-        Operand minVal = tf.dtypes.cast(tf.constant(Float.NEGATIVE_INFINITY), dType);
-        Operand maxVal = tf.dtypes.cast(tf.constant(Float.POSITIVE_INFINITY), dType);
+        Operand result;
         if (seed != null) {
-            return new TfNDArray(
-                    this,
-                    tf.random.parameterizedTruncatedNormal(
+            result =
+                    tf.random.randomStandardNormal(
                             shapeOp,
-                            mean,
-                            std,
-                            minVal,
-                            maxVal,
-                            ParameterizedTruncatedNormal.seed((long) seed)));
+                            dType,
+                            RandomStandardNormal.seed((long) 1234),
+                            RandomStandardNormal.seed2((long) 2234));
+        } else {
+            result = tf.random.randomStandardNormal(shapeOp, dType);
         }
-        return new TfNDArray(
-                this, tf.random.parameterizedTruncatedNormal(shapeOp, mean, std, minVal, maxVal));
+        return new TfNDArray(this, tf.math.add(tf.math.mul(result, std), mean));
     }
 
     /** {@inheritDoc} */

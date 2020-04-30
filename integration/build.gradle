@@ -25,6 +25,7 @@ dependencies {
         runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}-SNAPSHOT"
     } else if (System.getProperty("ai.djl.default_engine") == "TensorFlow") {
         runtimeOnly project(":tensorflow:tensorflow-engine")
+        runtimeOnly project(":tensorflow:tensorflow-native-auto")
     } else {
         runtimeOnly project(":mxnet:mxnet-engine")
         runtimeOnly project(":mxnet:mxnet-model-zoo")

@@ -38,6 +38,7 @@ public final class TfDataType {
         map.put(DataType.INT32, TInt32.DTYPE);
         map.put(DataType.INT64, TInt64.DTYPE);
         map.put(DataType.UINT8, TUint8.DTYPE);
+        map.put(DataType.INT8, TUint8.DTYPE);
         map.put(DataType.BOOLEAN, TBool.DTYPE);
         return map;
     }

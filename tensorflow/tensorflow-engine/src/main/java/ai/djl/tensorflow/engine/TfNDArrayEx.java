@@ -393,6 +393,9 @@ public class TfNDArrayEx implements NDArrayEx {
     @SuppressWarnings("unchecked")
     @Override
     public NDArray resize(int width, int height) {
+        if (manager.create(array.getShape().getShape()).prod().toLongArray()[0] == 0L) {
+            throw new IllegalArgumentException("Can't resize image with 0 dims.");
+        }
         if (array.getShape().dimension() == 3) {
             return new TfNDArray(
                     manager,

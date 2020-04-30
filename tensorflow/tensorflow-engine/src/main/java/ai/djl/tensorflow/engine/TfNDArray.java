@@ -63,6 +63,7 @@ public class TfNDArray implements NDArray {
     private static final int MAX_DEPTH = 10;
     private static final int MAX_ROWS = 10;
     private static final int MAX_COLUMNS = 20;
+    private static final int MAX_OUTPUTS_PER_OP = 8;
 
     private String uid = UUID.randomUUID().toString();
     private Tensor<?> tensor;
@@ -338,6 +339,17 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray booleanMask(NDArray index, int axis) {
+        // handle scalar case manually to behave like numpy
+        if (isScalar()) {
+            if (!index.isScalar()) {
+                throw new IllegalArgumentException("Input is scalar, index must also be scalar.");
+            }
+            if (index.toBooleanArray()[0]) {
+                return expandDims(0);
+            } else {
+                return manager.create(new Shape());
+            }
+        }
         return new TfNDArray(
                 manager,
                 tf.gather(
@@ -479,21 +491,23 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray all() {
+        // TF takes bool for reduce and INT64 for indices
         return new TfNDArray(
                 manager,
                 tf.reduceAll(
                         tf.dtypes.cast(asOperand(), TBool.DTYPE),
-                        ((TfNDArray) manager.arange(0, getRank(), 1)).asOperand()));
+                        tf.range(tf.constant(0L), tf.constant((long) getRank()), tf.constant(1L))));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray any() {
+        // TF takes bool for reduce and INT64 for indices
         return new TfNDArray(
                 manager,
                 tf.reduceAny(
                         tf.dtypes.cast(asOperand(), TBool.DTYPE),
-                        ((TfNDArray) manager.arange(0, getRank(), 1)).asOperand()));
+                        tf.range(tf.constant(0L), tf.constant((long) getRank()), tf.constant(1L))));
     }
 
     /** {@inheritDoc} */
@@ -945,7 +959,10 @@ public class TfNDArray implements NDArray {
             op = asOperand();
         }
         return new TfNDArray(
-                manager, tf.sum(op, ((TfNDArray) manager.arange(0, getRank(), 1)).asOperand()));
+                manager,
+                tf.sum(
+                        op,
+                        tf.range(tf.constant(0L), tf.constant((long) getRank()), tf.constant(1L))));
     }
 
     /** {@inheritDoc} */
@@ -964,7 +981,9 @@ public class TfNDArray implements NDArray {
     public NDArray prod() {
         return new TfNDArray(
                 manager,
-                tf.prod(asOperand(), ((TfNDArray) manager.arange(0, getRank(), 1)).asOperand()));
+                tf.prod(
+                        asOperand(),
+                        tf.range(tf.constant(0L), tf.constant((long) getRank()), tf.constant(1L))));
     }
 
     /** {@inheritDoc} */
@@ -1001,6 +1020,49 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDList split(long[] indices, int axis) {
+        if (indices.length > MAX_OUTPUTS_PER_OP) {
+            // split MAX_OUTPUTS_PER_OP -1 slices multiple times
+            NDList result = new NDList();
+            long totalSize = getShape().get(axis);
+            int start = 0;
+
+            while (start < indices.length - MAX_OUTPUTS_PER_OP + 2) {
+                long[] partialIndices = new long[MAX_OUTPUTS_PER_OP];
+                for (int i = 0; i < MAX_OUTPUTS_PER_OP - 1; i++) {
+                    partialIndices[i] = indices[start + i];
+                }
+                partialIndices[MAX_OUTPUTS_PER_OP - 1] = totalSize;
+                NDList splitted = splitHelper(partialIndices, axis);
+                // remove last chunk from result
+                splitted.remove(splitted.get(splitted.size() - 1));
+                // remove first chunk from result
+                if (start > 0) {
+                    splitted.remove(splitted.get(0));
+                }
+                result.addAll(splitted);
+                start += MAX_OUTPUTS_PER_OP - 2;
+            }
+
+            long[] partialIndices = new long[indices.length - start];
+            for (int i = 0; i < partialIndices.length; i++) {
+                partialIndices[i] = indices[start + i];
+            }
+            NDList splitted = splitHelper(partialIndices, axis);
+            // remove the first chunk from result
+            splitted.remove(splitted.get(0));
+
+            result.addAll(splitted);
+
+            return result;
+        } else {
+            return splitHelper(indices, axis);
+        }
+    }
+
+    // workaround for split output must be less than MAX_OUTPUTS_PER_OP
+    // TODO: remove helper once this issue is fixed:
+    // https://github.com/tensorflow/java/issues/45
+    private NDList splitHelper(long[] indices, int axis) {
         NDList result = new NDList();
 
         List<Long> sizes = new ArrayList<>();
@@ -1017,20 +1079,23 @@ public class TfNDArray implements NDArray {
         if (indices[lastIndex] < dimSize) {
             sizes.add(dimSize - indices[lastIndex]);
         }
+        long totalSize = sizes.stream().mapToLong(Long::longValue).sum();
+
+        if (totalSize != getShape().get(axis)) {
+            throw new IllegalArgumentException(
+                    "split sizes :"
+                            + totalSize
+                            + " must sum to dimension on axis "
+                            + axis
+                            + ": "
+                            + getShape().get(axis));
+        }
+
         tf.splitV(
                         asOperand(),
-                        tf.constant(sizes.stream().mapToLong(n -> n).toArray()),
+                        tf.constant(sizes.stream().mapToInt(Long::intValue).toArray()),
                         tf.constant(axis),
                         (long) sizes.size())
-                .forEach(output -> result.add(new TfNDArray(manager, output)));
-        return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList split(long sections, int axis) {
-        NDList result = new NDList();
-        tf.split(tf.constant(axis), operand, sections)
                 .forEach(output -> result.add(new TfNDArray(manager, output)));
         return result;
     }
@@ -1062,6 +1127,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray squeeze(int[] axes) {
+        if (isScalar()) {
+            axes = new int[0];
+        }
         return new TfNDArray(
                 manager,
                 tf.squeeze(
@@ -1142,18 +1210,14 @@ public class TfNDArray implements NDArray {
             k = (int) arrayShape[arrayShape.length - 1];
         } else {
             k = (int) getShape().getShape()[axis];
-            // do transpose
-            if (axis < 0) {
-                // FIXME: This is dead code, why is here?
-                axis = axis + rank;
-            }
 
             transposition =
                     NDArrays.concat(
                             new NDList(
-                                    manager.arange(axis),
+                                    manager.arange(0, axis, 1, DataType.INT32, getDevice()),
                                     manager.create(new int[] {rank - 1}),
-                                    manager.arange(axis + 1, rank - 1),
+                                    manager.arange(
+                                            axis + 1, rank - 1, 1, DataType.INT32, getDevice()),
                                     manager.create(new int[] {axis})));
             input = tf.linalg.transpose(asOperand(), ((TfNDArray) transposition).asOperand());
         }
@@ -1348,9 +1412,35 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public NDArray matMul(NDArray other) {
-        return new TfNDArray(
-                manager, tf.linalg.matMul(asOperand(), ((TfNDArray) other).asOperand()));
+        if (isScalar() || other.isScalar()) {
+            throw new IllegalArgumentException("scalar is not allowed for matMul()");
+        }
+        if (getShape().dimension() > 2 || other.getShape().dimension() > 2) {
+            return new TfNDArray(
+                    manager, tf.train.batchMatMul(asOperand(), ((TfNDArray) other).asOperand()));
+        }
+        Operand lhs = asOperand();
+        Operand rhs = ((TfNDArray) other).asOperand();
+        boolean broadcast = false;
+        if (getShape().dimension() == 1) {
+            lhs = tf.broadcastTo(asOperand(), tf.constant(new long[] {1L, getShape().get(0)}));
+            broadcast = true;
+        }
+
+        if (other.getShape().dimension() == 1) {
+            rhs =
+                    tf.broadcastTo(
+                            ((TfNDArray) other).asOperand(),
+                            tf.constant(new long[] {1L, getShape().get(0)}));
+            broadcast = true;
+        }
+        if (broadcast) {
+            return new TfNDArray(manager, tf.linalg.matMul(lhs, rhs)).squeeze();
+        } else {
+            return new TfNDArray(manager, tf.linalg.matMul(lhs, rhs));
+        }
     }
 
     /** {@inheritDoc} */
@@ -1375,6 +1465,17 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray transpose(int... dimensions) {
+        if (Arrays.stream(dimensions).anyMatch(d -> d < 0)) {
+            throw new UnsupportedOperationException(
+                    "Passing -1 for broadcasting the dimension is not currently supported");
+        }
+        if (!Arrays.equals(
+                Arrays.stream(dimensions).sorted().toArray(),
+                IntStream.range(0, getShape().dimension()).toArray())) {
+            throw new IllegalArgumentException(
+                    "You must include each of the dimensions from 0 until "
+                            + getShape().dimension());
+        }
         return new TfNDArray(manager, tf.linalg.transpose(asOperand(), tf.constant(dimensions)));
     }
 
@@ -1387,12 +1488,18 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray argMax() {
+        if (isEmpty()) {
+            throw new IllegalArgumentException("attempt to get argMin of an empty NDArray");
+        }
         return flatten().argMax(0);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray argMax(int axis) {
+        if (isScalar()) {
+            return manager.create(0L);
+        }
         return new TfNDArray(manager, tf.math.argMax(asOperand(), tf.constant(axis)));
     }
 
@@ -1408,6 +1515,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray argMin(int axis) {
+        if (isScalar()) {
+            return manager.create(0L);
+        }
         return new TfNDArray(manager, tf.math.argMin(asOperand(), tf.constant(axis)));
     }
 

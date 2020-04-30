@@ -24,6 +24,7 @@ import ai.djl.testing.Assertions;
 import java.nio.FloatBuffer;
 import java.util.stream.IntStream;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class NDArrayCreationOpTest {
@@ -322,6 +323,9 @@ public class NDArrayCreationOpTest {
     @Test
     public void testFixedSeed() {
         try (NDManager manager = NDManager.newBaseManager()) {
+            if (Engine.getInstance().getEngineName().equals("TensorFlow")) {
+                throw new SkipException("TensorFlow fixed random seed require restart process.");
+            }
             int fixedSeed = 1234;
             Engine.getInstance().setRandomSeed(fixedSeed);
             NDArray expectedUniform = manager.randomUniform(-10, 10, new Shape(10, 10));

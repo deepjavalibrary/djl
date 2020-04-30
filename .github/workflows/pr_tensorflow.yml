@@ -1,0 +1,32 @@
+name: tensorflow engine integration tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-18.04, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      # Enable gradle cache: https://github.com/actions/cache/blob/master/examples.md#java---gradle
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Test with Gradle
+        run: ./gradlew :integration:test "-Dai.djl.default_engine=TensorFlow"
+      - name: Integration test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: integration
+          path: integration/build/reports
