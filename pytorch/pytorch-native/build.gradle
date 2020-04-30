@@ -39,11 +39,36 @@ def downloadBuild(String os, String flavor) {
     }
 }
 
+def downloadBuildAndroid() {
+    def LIST_ABI = ["armeabi-v7a", "arm64-v8a", "x86", "x86_64"]
+    LIST_ABI.each {
+        abi ->
+            exec {
+                commandLine 'bash', 'build_android.sh', "${abi}"
+            }
+            def ciDir = "${project.projectDir}/jnilib/android/${abi}"
+            def versionName = String.format("${project.parent.version}-%s", new Date().format('yyyyMMdd'))
+            def propFile = file("${ciDir}/pytorch.properties")
+            propFile.text = "version=${versionName}\n"
+            copy {
+                from "${project.buildDir}/libdjl_torch.so"
+                into ciDir
+            }
+            cleanBuild()
+    }
+}
+
 def cleanBuild() {
     delete "${project.projectDir}/build"
     delete "${project.projectDir}/libtorch"
+    delete "${project.projectDir}/libtorch_android"
 }
 
+task compileAndroidJNI {
+    doFirst {
+        downloadBuildAndroid()
+    }
+}
 
 task releaseJNI {
     doFirst {
