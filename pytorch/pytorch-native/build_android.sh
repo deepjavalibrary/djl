@@ -29,6 +29,6 @@ rm -rf build
 mkdir build && cd build
 mkdir classes
 javac -sourcepath ../../pytorch-engine/src/main/java/ ../../pytorch-engine/src/main/java/ai/djl/pytorch/jni/PyTorchLibrary.java -h include -d classes
-cmake -DCMAKE_TOOLCHAIN_FILE="{$ANDROID_NDK}"/build/cmake/android.toolchain.cmake -DANDROID_ABI="$1" -DANDROID_NATIVE_API_LEVEL=21 -DBUILD_ANDROID=ON  ..
+cmake -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK"/build/cmake/android.toolchain.cmake -DANDROID_ABI="$1" -DANDROID_NATIVE_API_LEVEL=21 -DBUILD_ANDROID=ON  ..
 cmake --build . --config Release -- -j "${NUM_PROC}"
 popd
