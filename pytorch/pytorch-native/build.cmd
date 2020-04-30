@@ -12,6 +12,8 @@ if "%1" == "cpu" (
     set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu92/libtorch-win-shared-with-deps-%VERSION%.zip"
 ) else if "%1" == "cu101" (
     set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu101/libtorch-win-shared-with-deps-%VERSION%.zip"
+) else if "%1" == "cu102" (
+      set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu102/libtorch-win-shared-with-deps-%VERSION%.zip"
 )
 
 

@@ -15,6 +15,7 @@ processResources {
         def url = "https://djl-ai.s3.amazonaws.com/publish/pytorch-${pytorch_version}/jnilib"
         def files = ["linux-cpu": ["pytorch.properties", "libdjl_torch.so"],
                      "win-cu92" : ["pytorch.properties", "djl_torch.dll"],
+                // TODO: Add cu102 after merge the cu102 build pr
                      "win-cu101" : ["pytorch.properties", "djl_torch.dll"],
                      "linux-cu92" : ["pytorch.properties", "libdjl_torch.so"],
                      "linux-cu101" : ["pytorch.properties", "libdjl_torch.so"],

@@ -55,6 +55,8 @@ task releaseJNI {
             cleanBuild()
             downloadBuild("win", "cu101")
             cleanBuild()
+            downloadBuild("win", "cu102")
+            cleanBuild()
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
             downloadBuild("osx", "cpu")
             cleanBuild()
@@ -64,6 +66,8 @@ task releaseJNI {
             downloadBuild("linux", "cu92")
             cleanBuild()
             downloadBuild("linux", "cu101")
+            cleanBuild()
+            downloadBuild("linux", "cu102")
             cleanBuild()
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
@@ -88,9 +92,9 @@ task compileJNI {
 task compileJNIGPU {
     doFirst {
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
-            downloadBuild("win", "cu101")
+            downloadBuild("win", "cu102")
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
-            downloadBuild("linux", "cu101")
+            downloadBuild("linux", "cu102")
         } else {
             throw new IllegalStateException("Architecture not supported: " + System.properties['os.name'])
         }
