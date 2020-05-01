@@ -57,6 +57,12 @@ public final class LibUtils {
     private LibUtils() {}
 
     public static void loadLibrary() {
+        // TODO workaround to make it work on Android Studio
+        // It should search for several places to find the native library
+        if (System.getProperty("java.vendor.url").equals("http://www.android.com/")) {
+            System.loadLibrary(LIB_NAME); // NOPMD
+            return;
+        }
         String libName = findOverrideLibrary();
         if (libName == null) {
             String nativeLibDir = findNativeLibrary();

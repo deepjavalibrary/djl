@@ -55,9 +55,12 @@ public class PtModel extends BaseModel {
     public void load(Path modelPath, String modelName, Map<String, Object> options)
             throws IOException, MalformedModelException {
         modelDir = modelPath.toAbsolutePath();
-        this.modelName = modelName;
+        this.modelName = (modelName.endsWith(".pt")) ? modelName : modelName + ".pt";
         if (block == null) {
-            Path modelFile = modelDir.resolve(modelName + ".pt");
+            Path modelFile =
+                    (modelDir.toString().endsWith(modelName))
+                            ? modelDir
+                            : modelDir.resolve(modelName);
             if (Files.notExists(modelFile)) {
                 throw new FileNotFoundException(".pt file not found in: " + modelPath);
             }
