@@ -1,6 +1,9 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 def pytorch_version = "1.5.0"
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -17,17 +20,87 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
 
     sourceSets {
         main {
-            jniLibs.srcDirs = ['jnilib/']
+            jniLibs.srcDirs = ["jnilib/"]
         }
     }
-
 }
+
+signing {
+    required(project.hasProperty("staging") || project.hasProperty("snapshot"))
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                pom {
+                    name = "PyTorch Android native library"
+                    description = "PyTorch Android native library binary distribution"
+                    url = "http://www.djl.ai/android"
+                    packaging = "aar"
+
+                    licenses {
+                        license {
+                            name = "The Apache License, Version 2.0"
+                            url = "https://www.apache.org/licenses/LICENSE-2.0"
+                        }
+                    }
+
+                    scm {
+                        connection = "scm:git:git@github.com:awslabs/djl.git"
+                        developerConnection = "scm:git:git@github.com:awslabs/djl.git"
+                        url = "https://github.com/awslabs/djl"
+                        tag = "HEAD"
+                    }
+
+                    developers {
+                        developer {
+                            name = "DJL.AI Team"
+                            email = "djl-dev@amazon.com"
+                            organization = "Amazon AI"
+                            organizationUrl = "https://amazon.com"
+                        }
+                    }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                if (project.hasProperty("snapshot")) {
+                    name = "snapshot"
+                    url = "https://oss.sonatype.org/content/repositories/snapshots/"
+                    credentials {
+                        username = findProperty("ossrhUsername")
+                        password = findProperty("ossrhPassword")
+                    }
+                } else if (project.hasProperty("staging")) {
+                    name = "staging"
+                    url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    credentials {
+                        username = findProperty("ossrhUsername")
+                        password = findProperty("ossrhPassword")
+                    }
+                } else {
+                    name = "local"
+                    url = "build/repo"
+                }
+            }
+        }
+    }
+}
+
 
 task processResources {
     doLast {
