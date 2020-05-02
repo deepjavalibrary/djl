@@ -172,13 +172,21 @@ public final class LibUtils {
         if (Files.exists(path)) {
             return path.toAbsolutePath().toString();
         }
+
+        Path tmp = null;
         try (InputStream stream =
                 LibUtils.class.getResourceAsStream(
                         "/jnilib/" + classifier + "/" + flavor + "/" + name)) {
-            Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
+            tmp = Files.createTempFile(nativeDir, "jni", "tmp");
+            Files.copy(stream, tmp, StandardCopyOption.REPLACE_EXISTING);
+            Utils.moveQuietly(tmp, path);
             return path.toAbsolutePath().toString();
         } catch (IOException e) {
             throw new IllegalStateException("Cannot copy jni files", e);
+        } finally {
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
         }
     }
 
@@ -239,13 +247,15 @@ public final class LibUtils {
         try {
             String userHome = System.getProperty("user.home");
             String libName = System.mapLibraryName(NATIVE_LIB_NAME);
-            Path dir = Paths.get(userHome, ".pytorch/cache/" + version + flavor + '-' + classifier);
+            Path cacheDir = Paths.get(userHome, ".pytorch/cache");
+            Path dir = cacheDir.resolve(version + flavor + '-' + classifier);
             Path path = dir.resolve(libName);
             if (Files.exists(path)) {
                 return dir.toAbsolutePath().toString();
             }
-            tmp = Paths.get(userHome, ".pytorch/cache/tmp");
-            Files.createDirectories(tmp);
+
+            Files.createDirectories(cacheDir);
+            tmp = Files.createTempDirectory(cacheDir, "tmp");
             for (String file : platform.getLibraries()) {
                 String libPath = "/native/lib/" + file;
                 try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
@@ -253,9 +263,7 @@ public final class LibUtils {
                 }
             }
 
-            Utils.deleteQuietly(dir);
-            Files.move(tmp, dir);
-            tmp = null;
+            Utils.moveQuietly(tmp, dir);
             return dir.toAbsolutePath().toString();
         } catch (IOException e) {
             throw new IllegalStateException("Failed to extract PyTorch native library", e);
@@ -277,14 +285,15 @@ public final class LibUtils {
 
         String userHome = System.getProperty("user.home");
         String libName = System.mapLibraryName(NATIVE_LIB_NAME);
-        Path dir = Paths.get(userHome, ".pytorch/cache/" + version + flavor + '-' + classifier);
+        Path cacheDir = Paths.get(userHome, ".pytorch/cache");
+        Path dir = cacheDir.resolve(version + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {
             return dir.toAbsolutePath().toString();
         }
         // if files not found
-        Path tmp = Paths.get(userHome, ".pytorch/cache/tmp");
-        Files.createDirectories(tmp);
+        Files.createDirectories(cacheDir);
+        Path tmp = Files.createTempDirectory(cacheDir, "tmp");
 
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
@@ -303,9 +312,8 @@ public final class LibUtils {
                     }
                 }
             }
-            Utils.deleteQuietly(dir);
-            Files.move(tmp, dir);
-            tmp = null;
+
+            Utils.moveQuietly(tmp, dir);
             return dir.toAbsolutePath().toString();
         } finally {
             if (tmp != null) {

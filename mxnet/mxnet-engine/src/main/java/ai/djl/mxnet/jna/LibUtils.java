@@ -157,16 +157,14 @@ public final class LibUtils {
         try {
             String userHome = System.getProperty("user.home");
             String libName = System.mapLibraryName(LIB_NAME);
-            Path dir =
-                    Paths.get(
-                            userHome,
-                            ".mxnet/cache/" + platform.getVersion() + platform.getClassifier());
+            Path cacheFolder = Paths.get(userHome, ".mxnet/cache");
+            Path dir = cacheFolder.resolve(platform.getVersion() + platform.getClassifier());
             Path path = dir.resolve(libName);
             if (Files.exists(path)) {
                 return path.toAbsolutePath().toString();
             }
-            tmp = Paths.get(userHome, ".mxnet/cache/tmp");
-            Files.createDirectories(tmp);
+            Files.createDirectories(cacheFolder);
+            tmp = Files.createTempDirectory(cacheFolder, "tmp");
             for (String file : platform.getLibraries()) {
                 String libPath = "/native/lib/" + file;
                 try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
@@ -174,9 +172,7 @@ public final class LibUtils {
                 }
             }
 
-            Utils.deleteQuietly(dir);
-            Files.move(tmp, dir);
-            tmp = null;
+            Utils.moveQuietly(tmp, dir);
             return path.toAbsolutePath().toString();
         } catch (IOException e) {
             throw new IllegalStateException("Failed to extract MXNet native library", e);
@@ -267,14 +263,15 @@ public final class LibUtils {
 
         String userHome = System.getProperty("user.home");
         String libName = System.mapLibraryName(LIB_NAME);
-        Path dir = Paths.get(userHome, ".mxnet/cache/" + version + flavor + '-' + classifier);
+        Path cacheFolder = Paths.get(userHome, ".mxnet/cache");
+        Path dir = cacheFolder.resolve(version + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {
             return path.toAbsolutePath().toString();
         }
 
-        Path tmp = Paths.get(userHome, ".mxnet/cache/tmp");
-        Files.createDirectories(tmp);
+        Files.createDirectories(cacheFolder);
+        Path tmp = Files.createTempDirectory(cacheFolder, "tmp");
 
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
@@ -343,9 +340,7 @@ public final class LibUtils {
                 }
             }
 
-            Utils.deleteQuietly(dir);
-            Files.move(tmp, dir);
-            tmp = null;
+            Utils.moveQuietly(tmp, dir);
             return path.toAbsolutePath().toString();
         } finally {
             if (tmp != null) {

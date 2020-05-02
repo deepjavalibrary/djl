@@ -88,15 +88,15 @@ public final class LibUtils {
 
         Path userHome = Paths.get(System.getProperty("user.home"));
         String libName = System.mapLibraryName(LIB_NAME);
-        Path dir =
-                userHome.resolve(".tensorflow/cache/" + version + '-' + flavor + '-' + classifier);
+        Path cacheDir = userHome.resolve(".tensorflow/cache/");
+        Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {
             return path.toAbsolutePath().toString();
         }
 
-        Path tmp = userHome.resolve(".tensorflow/cache/tmp");
-        Files.createDirectories(tmp);
+        Files.createDirectories(cacheDir);
+        Path tmp = Files.createTempDirectory(cacheDir, "tmp");
 
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
@@ -129,9 +129,7 @@ public final class LibUtils {
                         "TensorFlow engine does not support this platform: " + os);
             }
 
-            Utils.deleteQuietly(dir);
-            Files.move(tmp, dir);
-            tmp = null;
+            Utils.moveQuietly(tmp, dir);
             return path.toAbsolutePath().toString();
         } finally {
             if (tmp != null) {

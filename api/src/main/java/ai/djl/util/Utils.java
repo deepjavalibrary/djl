@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -102,6 +103,23 @@ public final class Utils {
                             });
         } catch (IOException ignore) {
             // ignore
+        }
+    }
+
+    /**
+     * Renames a file to a target file and ignore error if target already exists.
+     *
+     * @param source the path to the file to move
+     * @param target the path to the target file
+     * @throws IOException if move file failed
+     */
+    public static void moveQuietly(Path source, Path target) throws IOException {
+        try {
+            Files.move(source, target, StandardCopyOption.ATOMIC_MOVE);
+        } catch (IOException e) {
+            if (!Files.exists(target)) {
+                throw e;
+            }
         }
     }
 
