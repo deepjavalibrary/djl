@@ -130,3 +130,22 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTranspose(
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRepeat(
+  JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jrepeats) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    const std::vector<int64_t> repeats = utils::GetVecFromJLongArray(env, jrepeats);
+    const torch::Tensor* result_ptr = new torch::Tensor(tensor_ptr->repeat(repeats));
+    return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRepeatInterleave(
+  JNIEnv* env, jobject jthis, jobject jhandle, jlong jrepeats, jlong jdim) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    const torch::Tensor* result_ptr = new torch::Tensor(tensor_ptr->repeat_interleave(jrepeats, jdim));
+    return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
+  API_END();
+}

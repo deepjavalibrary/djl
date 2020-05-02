@@ -983,7 +983,11 @@ public class PtNDArray extends NativeResource implements NDArray {
     @Override
     public PtNDArray softmax(int[] axes, float temperature) {
         if (temperature != 1.0) {
-            throw new UnsupportedOperationException("PyTorch softmax didn't suuport temperature");
+            throw new UnsupportedOperationException("PyTorch softmax didn't support temperature");
+        }
+        if (axes.length > 1) {
+            throw new UnsupportedOperationException(
+                    "PyTorch softmax didn't support multiple dimension");
         }
         return JniUtils.softmax(this, axes[0], getDataType());
     }
@@ -991,31 +995,45 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray logSoftmax(int[] axes, float temperature) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (temperature != 1.0) {
+            throw new UnsupportedOperationException("PyTorch softmax didn't support temperature");
+        }
+        if (axes.length > 1) {
+            throw new UnsupportedOperationException(
+                    "PyTorch softmax didn't support multiple dimension");
+        }
+        return JniUtils.logSoftmax(this, axes[0], getDataType());
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray cumSum() {
-        throw new UnsupportedOperationException("Not implemented");
+        // TODO: change default behavior on cumSum
+        if (isScalar()) {
+            return (PtNDArray) reshape(1);
+        }
+        if (isEmpty()) {
+            return (PtNDArray) reshape(0);
+        }
+        return cumSum(0);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray cumSum(int axis) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.cumSum(this, axis);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray isInfinite() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.isInf(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray isNaN() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.isNaN(this);
     }
 
     /** {@inheritDoc} */
@@ -1033,7 +1051,15 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray tile(long repeats) {
-        throw new UnsupportedOperationException("Not implemented");
+        // zero-dim
+        if (isEmpty()) {
+            return (PtNDArray) duplicate();
+        }
+        // scalar
+        int dim = (isScalar()) ? 1 : getShape().dimension();
+        long[] repeatsArray = new long[dim];
+        Arrays.fill(repeatsArray, repeats);
+        return tile(repeatsArray);
     }
 
     /** {@inheritDoc} */
@@ -1045,7 +1071,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray tile(long[] repeats) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.tile(this, repeats);
     }
 
     /** {@inheritDoc} */
@@ -1057,19 +1083,31 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray repeat(long repeats) {
-        throw new UnsupportedOperationException("Not implemented");
+        // zero-dim
+        if (isEmpty()) {
+            return (PtNDArray) duplicate();
+        }
+        // scalar
+        int dim = (isScalar()) ? 1 : getShape().dimension();
+        long[] repeatsArray = new long[dim];
+        Arrays.fill(repeatsArray, repeats);
+        return repeat(repeatsArray);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray repeat(int axis, long repeats) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.repeat(this, repeats, axis);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray repeat(long[] repeats) {
-        throw new UnsupportedOperationException("Not implemented");
+        PtNDArray temp = this;
+        for (int dim = 0; dim < repeats.length; dim++) {
+            temp = JniUtils.repeat(temp, repeats[dim], dim);
+        }
+        return temp;
     }
 
     /** {@inheritDoc} */
@@ -1081,7 +1119,13 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray dot(NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        int selfDim = this.getShape().dimension();
+        int otherDim = other.getShape().dimension();
+        if (selfDim != otherDim || selfDim > 2) {
+            throw new UnsupportedOperationException(
+                    "Dimension mismatch or high dimensional dot operation is not supported. Please use .matMul instead.");
+        }
+        return JniUtils.dot(this, (PtNDArray) other);
     }
 
     @Override

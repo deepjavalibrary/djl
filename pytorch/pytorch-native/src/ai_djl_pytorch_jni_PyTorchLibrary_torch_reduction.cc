@@ -142,3 +142,12 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSum__Lai_d
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchCumSum(
+  JNIEnv* env, jobject jthis, jobject jhandle, jlong dim) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    const auto* result_ptr = new torch::Tensor(tensor_ptr->cumsum(dim));
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}

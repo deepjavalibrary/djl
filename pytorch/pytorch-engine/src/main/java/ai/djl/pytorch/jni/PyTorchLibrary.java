@@ -105,6 +105,10 @@ final class PyTorchLibrary {
 
     native Pointer torchMatmul(Pointer self, Pointer other);
 
+    native Pointer torchDot(Pointer self, Pointer other);
+
+    native Pointer torchMM(Pointer self, Pointer other);
+
     native Pointer torchLogicalAnd(Pointer self, Pointer other);
 
     native Pointer torchLogicalOr(Pointer self, Pointer other);
@@ -116,6 +120,8 @@ final class PyTorchLibrary {
     native Pointer torchReshape(Pointer handle, long[] shape);
 
     native Pointer torchSoftmax(Pointer handle, long dim, int dType);
+
+    native Pointer torchLogSoftmax(Pointer handle, long dim, int dType);
 
     native Pointer torchArgMax(Pointer handle);
 
@@ -187,6 +193,8 @@ final class PyTorchLibrary {
 
     native Pointer torchSum(Pointer handle, long[] dim, boolean keepDim);
 
+    native Pointer torchCumSum(Pointer handle, long dim);
+
     native Pointer torchFlatten(Pointer handle, long startDim, long endDim);
 
     native Pointer[] torchSplit(Pointer handle, long size, long dim);
@@ -202,6 +210,10 @@ final class PyTorchLibrary {
     native Pointer torchStack(Pointer[] handles, long dim);
 
     native Pointer torchCat(Pointer[] handles, long dim);
+
+    native Pointer torchRepeat(Pointer handle, long[] repeats);
+
+    native Pointer torchRepeatInterleave(Pointer handle, long repeat, long axis);
 
     native Pointer torchAbs(Pointer handle);
 
@@ -266,6 +278,10 @@ final class PyTorchLibrary {
     native Pointer torchNeg(Pointer self);
 
     native void torchNegi(Pointer self);
+
+    native Pointer torchIsNaN(Pointer self);
+
+    native Pointer torchIsInf(Pointer self);
 
     native Pointer atNormal(
             double mean,

@@ -139,6 +139,26 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMatmul(
   API_END();
 }
 
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDot(
+  JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+  API_BEGIN();
+    const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+    const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+    const auto* result_ptr = new torch::Tensor(self_ptr->dot(*other_ptr));
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMM(
+  JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+  API_BEGIN();
+    const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+    const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+    const auto* result_ptr = new torch::Tensor(self_ptr->mm(*other_ptr));
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
 JNIEXPORT jobject JNICALL
 Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMax__Lai_djl_pytorch_jni_Pointer_2Lai_djl_pytorch_jni_Pointer_2(
     JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
