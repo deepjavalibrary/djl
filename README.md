@@ -27,7 +27,7 @@ The following pseudocode demonstrates running inference:
     Criteria<BufferedImage, Classifications> criteria =
             Criteria.builder()
                     .optApplication(Application.CV.OBJECT_DETECTION) // find object dection model
-                    .setTypes(BufferedImage.class, Classifications.class) // define input and putput
+                    .setTypes(BufferedImage.class, Classifications.class) // define input and output
                     .optFilter("backbone", "resnet50") // choose network architecture
                     .build();
 
