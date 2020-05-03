@@ -18,7 +18,9 @@ import ai.djl.repository.Artifact;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooProvider;
+import ai.djl.util.Utils;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.ServiceLoader;
 import org.testng.annotations.AfterClass;
@@ -56,6 +58,7 @@ public class ModelZooTest {
                     }
                 }
             }
+            Utils.deleteQuietly(Paths.get("build/cache"));
         }
     }
 }
