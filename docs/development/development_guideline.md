@@ -13,6 +13,7 @@ When writing code for DJL, we usually try to follow standard Java coding convent
 
 - For builders, use setXXX for required values and optXXX for optional ones
 - Follow the example in `Convolution` and `Conv2D` when making extendable builders
+- The usage of `final` for members and parameters is generally discouraged in favor of readability.  
 
 Alongside these conventions, we have a number of checks that are run including PMD, SpotBugs, and Checkstyle. These can all be verified by running the gradle `build` target. Instructions for fixing any problems will be given by the relevant tool.
 
@@ -83,9 +84,13 @@ From the command line, you can run the following command to run a test:
 ```
 ./gradlew :<module>:run -Dmain=<class_name> --args ""
 ```
-For example, if you would like to run the integration test, you can use the following command:
+For example, if you would like to run the complete integration test, you can use the following command:
 ```
 ./gradlew :integration:run -Dmain=ai.djl.integration.IntegrationTest
+```
+To run an individual integration test from the command line, use the following: 
+```
+./gradlew :integration:run --args="-c <class_name> -m <method_name>"
 ```
 
 ## Logging
