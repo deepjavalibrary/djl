@@ -34,6 +34,6 @@ You can pull the module from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl</groupId>
     <artifactId>basicdataset</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
 </dependency>
 ```
