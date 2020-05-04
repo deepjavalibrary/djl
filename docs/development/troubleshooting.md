@@ -117,7 +117,7 @@ export MXNET_LIBRARY_PATH=//anaconda3/lib/python3.7/site-packages/mxnet/
 ```
 Now DJL will automatically use the MXNet library from this location.
 
-## Gradle issue
+## 5. Gradle issue
 
 Sometimes gradle may fail or stuck. For example, you may see the following error:
 ```shell script
@@ -130,3 +130,13 @@ You need kill gradle daemon process:
 ./gradlew --stop
 ``` 
 
+## 6. Cannot run tests from IntelliJ
+Running unit or integration tests manually from IntelliJ sometimes fails with the message "No tasks available". 
+If that happens, the following can help: Go to `File > Settings > Build, Execution, Deployment > Build Tools > Gradle` and change the option "Run tests using" from "Gradle" to "IntelliJ Idea".
+  
+## 7. Running an integration test hangs for a long time
+Often, the test itself does not actually hangt. To run the integration tests, the `integration` subproject 
+has a `-SNAPSHOT` dependency on the mxnet native binaries, `ai.djl.mxnet:mxnet-native-auto`. As it 
+is a snapshot depency, it is updated by the build system regularly. If your integration tests hang, 
+it is most likely just the automatic binary dependency being updated. As the total size is roughly
+1.7GB the download may take a while. Once this download is over, all further tests will run instantly.

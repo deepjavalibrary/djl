@@ -31,6 +31,19 @@ You can pull the DJL API from the central Maven repository by including the foll
 <dependency>
     <groupId>ai.djl</groupId>
     <artifactId>api</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
 </dependency>
 ```
+
+For testing the current nightly build, use the following: 
+
+```xml
+<dependency>
+    <groupId>ai.djl</groupId>
+    <artifactId>api</artifactId>
+    <version>0.5.0-SNAPSHOT</version>
+</dependency>
+```
+
+Note that the nightly build is under active development and might contain a number of bugs and 
+instabilities. 
