@@ -56,9 +56,9 @@ public class ModelZooTest {
                         Model model = modelLoader.loadModel(artifact.getProperties());
                         model.close();
                     }
+                    Utils.deleteQuietly(Paths.get("build/cache"));
                 }
             }
-            Utils.deleteQuietly(Paths.get("build/cache"));
         }
     }
 }
