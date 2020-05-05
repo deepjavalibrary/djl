@@ -14,7 +14,10 @@ package ai.djl.modality.cv;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * {@code ImageFactory} contains image creation mechanism on top of different platforms like PC and
@@ -53,11 +56,26 @@ public interface ImageFactory {
     /**
      * Gets {@link Image} from URL.
      *
+     * @param url the URL to load from
+     * @return {@link Image}
+     * @throws IOException URL is not valid.
+     */
+    Image fromUrl(URL url) throws IOException;
+
+    /**
+     * Gets {@link Image} from URL.
+     *
      * @param url the String represent URL to load from
      * @return {@link Image}
      * @throws IOException URL is not valid.
      */
-    Image fromUrl(String url) throws IOException;
+    default Image fromUrl(String url) throws IOException {
+        URI uri = URI.create(url);
+        if (uri.isAbsolute()) {
+            return fromUrl(uri.toURL());
+        }
+        return fromFile(Paths.get(url));
+    }
 
     /**
      * Gets {@link Image} from {@link InputStream}.

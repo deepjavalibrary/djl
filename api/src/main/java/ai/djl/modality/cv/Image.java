@@ -13,6 +13,7 @@
 package ai.djl.modality.cv;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDManager;
 import java.io.OutputStream;
 
 /**
@@ -33,14 +34,26 @@ public interface Image {
      *
      * @return pixels representing height
      */
-    int getHeigth();
+    int getHeight();
 
     /**
-     * Converts image to {@link NDArray}.
+     * Converts image to a RGB {@link NDArray}.
      *
+     * @param manager a {@link NDManager} to create the new NDArray with
      * @return {@link NDArray}
      */
-    NDArray toNDArray();
+    default NDArray toNDArray(NDManager manager) {
+        return toNDArray(manager, null);
+    }
+
+    /**
+     * Converts image to a {@link NDArray}.
+     *
+     * @param manager a {@link NDManager} to create the new NDArray with
+     * @param flag the color mode
+     * @return {@link NDArray}
+     */
+    NDArray toNDArray(NDManager manager, Flag flag);
 
     /**
      * Save the image to file.
@@ -49,4 +62,10 @@ public interface Image {
      * @param type type of the image, such as "png", "jpeg"
      */
     void save(OutputStream os, String type);
+
+    /** Flag indicates the color channel options for images. */
+    public enum Flag {
+        GRAYSCALE,
+        COLOR
+    }
 }
