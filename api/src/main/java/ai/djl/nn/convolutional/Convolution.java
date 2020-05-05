@@ -20,17 +20,14 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A convolution layer does a dot product calculation on each channel of \(k\)-channel input data by
@@ -71,7 +68,7 @@ import java.util.List;
  * number of input dimension each operates on as denoted by {@code ConvXD} for {@code X}
  * dimension(s).
  */
-public abstract class Convolution extends ParameterBlock {
+public abstract class Convolution extends AbstractBlock {
 
     private static final byte VERSION = 2;
 
@@ -92,6 +89,7 @@ public abstract class Convolution extends ParameterBlock {
      * @param builder the {@code Builder} that has the necessary configurations
      */
     public Convolution(ConvolutionBuilder<?> builder) {
+        super(VERSION);
         kernel = builder.kernel;
         stride = builder.stride;
         pad = builder.pad;
@@ -100,9 +98,15 @@ public abstract class Convolution extends ParameterBlock {
         numGroups = builder.numGroups;
         includeBias = builder.includeBias;
 
-        weight = new Parameter("weight", this, ParameterType.WEIGHT);
+        weight =
+                addParameter(
+                        new Parameter("weight", this, ParameterType.WEIGHT),
+                        (inputShapes) ->
+                                new Shape(numFilters, inputShapes[0].get(1)).addAll(kernel));
         if (includeBias) {
-            bias = new Parameter("bias", this, ParameterType.BIAS);
+            bias =
+                    addParameter(
+                            new Parameter("bias", this, ParameterType.BIAS), new Shape(numFilters));
         }
     }
 
@@ -177,53 +181,12 @@ public abstract class Convolution extends ParameterBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        Shape shape = inputShapes[0];
-        switch (name) {
-            case "weight":
-                return new Shape(numFilters, shape.get(1)).addAll(kernel);
-            case "bias":
-                return new Shape(numFilters);
-            default:
-                throw new IllegalArgumentException("Invalid parameter name");
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<Parameter> getDirectParameters() {
-        List<Parameter> parameters = new ArrayList<>();
-        parameters.add(weight);
-        if (includeBias) {
-            parameters.add(bias);
-        }
-        return parameters;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(VERSION);
-        saveInputShapes(os);
-        weight.save(os);
-        if (bias != null) {
-            bias.save(os);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void loadParameters(NDManager manager, DataInputStream is)
+    public void loadMetadata(byte version, DataInputStream is)
             throws IOException, MalformedModelException {
-        byte version = is.readByte();
         if (version == VERSION) {
             readInputShapes(is);
         } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
-        }
-        weight.load(manager, is);
-        if (bias != null) {
-            bias.load(manager, is);
         }
     }
 

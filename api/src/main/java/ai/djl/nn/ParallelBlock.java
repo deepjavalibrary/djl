@@ -20,7 +20,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +39,6 @@ public class ParallelBlock extends AbstractBlock {
 
     private static final byte VERSION = 2;
 
-    private List<Block> blocks;
     private Function<List<NDList>, NDList> function;
 
     /**
@@ -51,8 +49,7 @@ public class ParallelBlock extends AbstractBlock {
      *     single output
      */
     public ParallelBlock(Function<List<NDList>, NDList> function) {
-        this.function = function;
-        blocks = new ArrayList<>();
+        this(function, Collections.emptyList());
     }
 
     /**
@@ -63,8 +60,9 @@ public class ParallelBlock extends AbstractBlock {
      * @param blocks the blocks that form each of the parallel branches
      */
     public ParallelBlock(Function<List<NDList>, NDList> function, List<Block> blocks) {
+        super(VERSION);
         this.function = function;
-        this.blocks = blocks;
+        addAll(blocks);
     }
 
     /**
@@ -74,8 +72,7 @@ public class ParallelBlock extends AbstractBlock {
      * @return this block
      */
     public final ParallelBlock addAll(Block... blocks) {
-        this.blocks.addAll(Arrays.asList(blocks));
-        return this;
+        return addAll(Arrays.asList(blocks));
     }
 
     /**
@@ -85,7 +82,7 @@ public class ParallelBlock extends AbstractBlock {
      * @return this block
      */
     public final ParallelBlock addAll(Collection<Block> blocks) {
-        this.blocks.addAll(blocks);
+        blocks.forEach(this::add);
         return this;
     }
 
@@ -96,7 +93,9 @@ public class ParallelBlock extends AbstractBlock {
      * @return this block
      */
     public final ParallelBlock add(Block block) {
-        blocks.add(block);
+        if (block != null) {
+            addChildBlock(block.getClass().getSimpleName(), block);
+        }
         return this;
     }
 
@@ -108,8 +107,7 @@ public class ParallelBlock extends AbstractBlock {
      * @return this block
      */
     public final ParallelBlock add(Function<NDList, NDList> f) {
-        blocks.add(new LambdaBlock(f));
-        return this;
+        return add(new LambdaBlock(f));
     }
 
     /** {@inheritDoc} */
@@ -120,31 +118,30 @@ public class ParallelBlock extends AbstractBlock {
             boolean training,
             PairList<String, Object> params) {
         return function.apply(
-                blocks.stream()
+                children.values()
+                        .stream()
                         .map(block -> block.forward(parameterStore, inputs, training, params))
                         .collect(Collectors.toList()));
     }
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        beforeInitialize(inputShapes);
+    public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         for (Block child : getChildren().values()) {
             child.initialize(manager, dataType, inputShapes);
         }
-        return getOutputShapes(manager, inputShapes);
     }
 
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
-        if (blocks.isEmpty()) {
-            throw new IllegalArgumentException("The sequential block is empty");
+        if (children.isEmpty()) {
+            throw new IllegalArgumentException("The parallel block is empty");
         }
 
         try (NDManager subManager = manager.newSubManager()) {
             List<NDList> inputs = new ArrayList<>();
-            for (Block block : blocks) {
+            for (Block block : children.values()) {
                 Shape[] shapes = block.getOutputShapes(manager, inputShapes);
                 NDList output = new NDList(shapes.length);
                 for (Shape shape : shapes) {
@@ -163,53 +160,12 @@ public class ParallelBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public List<Parameter> getDirectParameters() {
-        return Collections.emptyList();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        throw new IllegalArgumentException("ParallelBlock have no parameters");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BlockList getChildren() {
-        int size = blocks.size();
-        BlockList children = new BlockList(size);
-        int precision = (int) Math.log10(size) + 1;
-        String format = "%0" + precision + "d:%s";
-        for (int i = 0; i < size; ++i) {
-            Block block = blocks.get(i);
-            String name = String.format(format, i, block.getClass().getSimpleName());
-            children.add(name, block);
-        }
-        return children;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(VERSION);
-        saveInputShapes(os);
-        for (Block block : blocks) {
-            block.saveParameters(os);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void loadParameters(NDManager manager, DataInputStream is)
+    public void loadMetadata(byte version, DataInputStream is)
             throws IOException, MalformedModelException {
-        byte version = is.readByte();
         if (version == VERSION) {
             readInputShapes(is);
         } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
-        }
-        for (Block block : blocks) {
-            block.loadParameters(manager, is);
         }
     }
 
@@ -218,7 +174,7 @@ public class ParallelBlock extends AbstractBlock {
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
         sb.append("Parallel(\n");
-        for (Block block : blocks) {
+        for (Block block : children.values()) {
             String blockString = block.toString().replaceAll("(?m)^", "\t");
             sb.append(blockString).append('\n');
         }

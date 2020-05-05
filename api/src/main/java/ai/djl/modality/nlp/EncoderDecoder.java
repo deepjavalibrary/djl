@@ -18,16 +18,12 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
-import ai.djl.nn.BlockList;
-import ai.djl.nn.Parameter;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * {@code EncoderDecoder} is a general implementation of the very popular encoder-decoder
@@ -36,6 +32,8 @@ import java.util.List;
  * translation(text-text), image captioning(image-text) etc.
  */
 public class EncoderDecoder extends AbstractBlock {
+    private static final byte VERSION = 1;
+
     protected Encoder encoder;
     protected Decoder decoder;
 
@@ -47,8 +45,9 @@ public class EncoderDecoder extends AbstractBlock {
      * @param decoder the {@link Decoder}
      */
     public EncoderDecoder(Encoder encoder, Decoder decoder) {
-        this.encoder = encoder;
-        this.decoder = decoder;
+        super(VERSION);
+        this.encoder = addChildBlock("Encoder", encoder);
+        this.decoder = addChildBlock("Decoder", decoder);
     }
 
     /** {@inheritDoc} */
@@ -154,24 +153,6 @@ public class EncoderDecoder extends AbstractBlock {
         beforeInitialize(inputShapes);
         encoder.initialize(manager, dataType, inputShapes[0]);
         return decoder.initialize(manager, dataType, inputShapes[1]);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BlockList getChildren() {
-        return new BlockList(Arrays.asList("Encoder", "Decoder"), Arrays.asList(encoder, decoder));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<Parameter> getDirectParameters() {
-        return Collections.emptyList();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        throw new IllegalArgumentException("EncodeDecoder blocks have no direct parameters");
     }
 
     /** {@inheritDoc} */

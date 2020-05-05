@@ -21,17 +21,14 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * {@code RecurrentBlock} is an abstract implementation of recurrent neural networks.
@@ -45,7 +42,7 @@ import java.util.List;
  * <p>Currently, vanilla RNN, LSTM and GRU are implemented, with both multi-layer and bidirectional
  * support.
  */
-public abstract class RecurrentBlock extends ParameterBlock {
+public abstract class RecurrentBlock extends AbstractBlock {
 
     private static final byte VERSION = 2;
 
@@ -62,7 +59,6 @@ public abstract class RecurrentBlock extends ParameterBlock {
     protected int gates;
     protected boolean stateOutputs;
     protected NDArray beginState;
-    protected List<Parameter> parameters = new ArrayList<>();
 
     /**
      * Creates a {@code RecurrentBlock} object.
@@ -70,6 +66,7 @@ public abstract class RecurrentBlock extends ParameterBlock {
      * @param builder the {@code Builder} that has the necessary configurations
      */
     public RecurrentBlock(BaseBuilder<?> builder) {
+        super(VERSION);
         stateSize = builder.stateSize;
         dropRate = builder.dropRate;
         numStackedLayers = builder.numStackedLayers;
@@ -90,7 +87,7 @@ public abstract class RecurrentBlock extends ParameterBlock {
             for (int i = 0; i < numStackedLayers; i++) {
                 for (String direction : directions) {
                     for (String gateString : gateStrings) {
-                        parameters.add(
+                        addParameter(
                                 new Parameter(
                                         String.format(
                                                 "%s_%s_%s_%s",
@@ -186,12 +183,6 @@ public abstract class RecurrentBlock extends ParameterBlock {
 
     /** {@inheritDoc} */
     @Override
-    public List<Parameter> getDirectParameters() {
-        return parameters;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void beforeInitialize(Shape[] inputs) {
         this.inputShapes = inputs;
         Shape inputShape = inputs[0];
@@ -222,26 +213,12 @@ public abstract class RecurrentBlock extends ParameterBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(VERSION);
-        saveInputShapes(os);
-        for (Parameter parameter : parameters) {
-            parameter.save(os);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void loadParameters(NDManager manager, DataInputStream is)
+    public void loadMetadata(byte version, DataInputStream is)
             throws IOException, MalformedModelException {
-        byte version = is.readByte();
         if (version == VERSION) {
             readInputShapes(is);
         } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
-        }
-        for (Parameter parameter : parameters) {
-            parameter.load(manager, is);
         }
     }
 
@@ -258,7 +235,7 @@ public abstract class RecurrentBlock extends ParameterBlock {
 
         NDList result = new NDList(head);
         try (NDList parameterList = new NDList()) {
-            for (Parameter parameter : parameters) {
+            for (Parameter parameter : parameters.values()) {
                 NDArray array = parameterStore.getValue(parameter, device);
                 parameterList.add(array.flatten());
             }

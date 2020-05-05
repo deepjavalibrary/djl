@@ -22,9 +22,9 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
@@ -33,7 +33,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -46,7 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @param <T> the type of item that should be embedded and map to the array
  */
-public abstract class Embedding<T> extends ParameterBlock implements AbstractIndexedEmbedding<T> {
+public abstract class Embedding<T> extends AbstractBlock implements AbstractIndexedEmbedding<T> {
 
     private static final byte VERSION = 4;
 
@@ -62,16 +61,19 @@ public abstract class Embedding<T> extends ParameterBlock implements AbstractInd
     protected Parameter embedding;
 
     protected Embedding(BaseBuilder<T, ?> baseBuilder) {
+        super(VERSION);
         embeddingSize = baseBuilder.embeddingSize;
         sparseGrad = baseBuilder.sparseGrad;
         dataType = baseBuilder.dataType;
         embedding =
-                new Parameter(
-                        "embedding",
-                        this,
-                        ParameterType.WEIGHT,
-                        true,
-                        sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE);
+                addParameter(
+                        new Parameter(
+                                "embedding",
+                                this,
+                                ParameterType.WEIGHT,
+                                true,
+                                sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE),
+                        (inputShapes) -> new Shape(numItems, embeddingSize));
         embedder = new ConcurrentHashMap<>();
         unembedder = new ConcurrentHashMap<>();
         if (baseBuilder.fallthrough != null && baseBuilder.defaultItem != null) {
@@ -110,16 +112,19 @@ public abstract class Embedding<T> extends ParameterBlock implements AbstractInd
      * @param sparseGrad whether to compute row sparse gradient in the backward calculation
      */
     public Embedding(NDArray embedding, List<T> items, boolean sparseGrad) {
+        super(VERSION);
         embeddingSize = Math.toIntExact(embedding.getShape().get(1));
         this.sparseGrad = sparseGrad;
         dataType = embedding.getDataType();
         this.embedding =
-                new Parameter(
-                        "embedding",
-                        this,
-                        ParameterType.WEIGHT,
-                        true,
-                        sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE);
+                addParameter(
+                        new Parameter(
+                                "embedding",
+                                this,
+                                ParameterType.WEIGHT,
+                                true,
+                                sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE),
+                        (inputShapes) -> new Shape(numItems, embeddingSize));
         this.embedding.setArray(embedding);
         numItems = Math.toIntExact(embedding.getShape().size(0));
         embedder = new ConcurrentHashMap<>(numItems);
@@ -135,21 +140,6 @@ public abstract class Embedding<T> extends ParameterBlock implements AbstractInd
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return new Shape[] {inputShapes[0].addAll(new Shape(embeddingSize))};
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<Parameter> getDirectParameters() {
-        return Collections.singletonList(embedding);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        if ("embedding".equals(name)) {
-            return new Shape(numItems, embeddingSize);
-        }
-        throw new IllegalArgumentException("Invalid parameter name");
     }
 
     /** {@inheritDoc} */

@@ -29,6 +29,9 @@ import ai.djl.util.PairList;
  * decode text input.
  */
 public class SimpleTextDecoder extends Decoder {
+
+    private static final byte VERSION = 1;
+
     private RecurrentBlock recurrentBlock;
 
     /**
@@ -56,7 +59,7 @@ public class SimpleTextDecoder extends Decoder {
             TrainableTextEmbedding trainableTextEmbedding,
             RecurrentBlock recurrentBlock,
             int vocabSize) {
-        super(getBlock(trainableTextEmbedding, recurrentBlock, vocabSize));
+        super(VERSION, getBlock(trainableTextEmbedding, recurrentBlock, vocabSize));
         this.recurrentBlock = recurrentBlock;
     }
 

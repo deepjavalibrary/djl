@@ -24,7 +24,6 @@ import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * A {@code Block} is a composable function that forms a neural network.
@@ -63,11 +62,10 @@ import java.util.List;
  *
  * <p>A block does not necessarily have to have children and parameters. For example, {@link
  * SequentialBlock}, and {@link ParallelBlock} don't have any parameters, but do have child blocks.
- * Similarly, {@link ai.djl.nn.convolutional.Conv2D} does not have children, but has parameters. We
- * recommend extending {@link ParameterBlock} to create blocks that don't have children. There can
- * be special cases where blocks have neither parameters nor children. One such example is {@link
- * LambdaBlock}. {@link LambdaBlock} takes in a function, and applies that function to its input in
- * the {@link #forward(ParameterStore, NDList, boolean) forward} method.
+ * Similarly, {@link ai.djl.nn.convolutional.Conv2D} does not have children, but has parameters.
+ * There can be special cases where blocks have neither parameters nor children. One such example is
+ * {@link LambdaBlock}. {@link LambdaBlock} takes in a function, and applies that function to its
+ * input in the {@link #forward(ParameterStore, NDList, boolean) forward} method.
  *
  * <p>Now that we understand the components of the block, we can explore what the block really
  * represents. A block combined with the recursive, hierarchical structure of its children forms a
@@ -199,7 +197,7 @@ public interface Block {
      *
      * @return the list of {@link Parameter}
      */
-    List<Parameter> getDirectParameters();
+    ParameterList getDirectParameters();
 
     /**
      * Returns a list of all the parameters of the block, including the parameters of its children

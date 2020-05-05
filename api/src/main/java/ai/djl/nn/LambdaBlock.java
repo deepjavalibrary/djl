@@ -19,10 +19,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -33,7 +30,7 @@ import java.util.function.Function;
  * in converting activation functions, identity blocks, and more. For example, identity block can be
  * created as {@code new LambdaBlock(x -> x)}.
  */
-public class LambdaBlock extends ParameterBlock {
+public class LambdaBlock extends AbstractBlock {
 
     private static final byte VERSION = 2;
 
@@ -45,6 +42,7 @@ public class LambdaBlock extends ParameterBlock {
      * @param lambda the function to apply
      */
     public LambdaBlock(Function<NDList, NDList> lambda) {
+        super(VERSION);
         this.lambda = lambda;
     }
 
@@ -73,25 +71,6 @@ public class LambdaBlock extends ParameterBlock {
             }
             return outputShapes;
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<Parameter> getDirectParameters() {
-        return Collections.emptyList();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        throw new IllegalArgumentException("LambdaBlocks have no parameters");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(VERSION);
-        saveInputShapes(os);
     }
 
     /** {@inheritDoc} */

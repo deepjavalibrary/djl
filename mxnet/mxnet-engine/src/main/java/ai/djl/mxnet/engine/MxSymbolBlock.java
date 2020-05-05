@@ -17,10 +17,9 @@ import ai.djl.MalformedModelException;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
@@ -34,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * {@code MxSymbolBlock} is the MXNet implementation of {@link SymbolBlock}.
@@ -42,14 +40,14 @@ import java.util.stream.Collectors;
  * <p>You can create a {@code MxSymbolBlock} using {@link ai.djl.Model#load(java.nio.file.Path,
  * String)}.
  */
-public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
+public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     private static final byte VERSION = 2;
 
     private NDManager manager;
     private CachedOp op;
     private Symbol symbol;
-    private List<Parameter> params; // includes input data
+    private List<Parameter> mxNetParams; // includes input data
     private Map<String, Shape> paramShapes;
     private Shape[] outputShapes;
 
@@ -63,19 +61,19 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
      * @param symbol the symbol containing the block's symbolic graph
      */
     public MxSymbolBlock(NDManager manager, Symbol symbol) {
+        super(VERSION);
         this.manager = manager;
         this.symbol = symbol;
         inputNames = new ArrayList<>();
 
         String[] allNames = symbol.getAllNames();
-        params = new ArrayList<>(allNames.length);
+        mxNetParams = new ArrayList<>(allNames.length);
 
         Set<String> auxNameSet = new HashSet<>(Arrays.asList(symbol.getAuxNames()));
         for (String name : allNames) {
             ParameterType type = inferType(name);
             boolean requireGrad = !auxNameSet.contains(name);
-
-            params.add(new Parameter(name, this, type, requireGrad));
+            mxNetParams.add(new Parameter(name, this, type, requireGrad));
         }
     }
 
@@ -86,6 +84,14 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
      */
     public void setInputNames(List<String> inputNames) {
         this.inputNames = inputNames;
+        // now that we know which of the parameters are just input placeholders and which
+        // are trainable, add them properly so they are correctly handled
+        Set<String> nameLookup = new HashSet<>(inputNames);
+        for (Parameter mxNetParameter : mxNetParams) {
+            if (!nameLookup.contains(mxNetParameter.getName())) {
+                addParameter(mxNetParameter);
+            }
+        }
     }
 
     /**
@@ -94,19 +100,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
      * @return the list of inputs and parameter NDArrays
      */
     public List<Parameter> getAllParameters() {
-        return params;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        beforeInitialize(inputShapes);
-        for (Parameter parameter : params) {
-            if (!inputNames.contains(parameter.getName())) {
-                parameter.initialize(manager, dataType, inputShapes);
-            }
-        }
-        return getOutputShapes(manager, inputShapes);
+        return mxNetParams;
     }
 
     /**
@@ -166,14 +160,6 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
 
     /** {@inheritDoc} */
     @Override
-    public List<Parameter> getDirectParameters() {
-        return params.stream()
-                .filter(p -> !inputNames.contains(p.getName()))
-                .collect(Collectors.toList());
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void removeLastBlock() {
         List<String> layerNames = getLayerNames();
         String layerName = layerNames.get(layerNames.size() - 2);
@@ -183,10 +169,11 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         symbol = sliced;
 
         HashSet<String> set = new HashSet<>(Arrays.asList(symbol.getAllNames()));
-        for (int i = params.size() - 1; i >= 0; --i) {
-            Parameter parameter = params.get(i);
+        for (int i = mxNetParams.size() - 1; i >= 0; --i) {
+            Parameter parameter = mxNetParams.get(i);
             if (!set.contains(parameter.getName())) {
-                params.remove(i).close();
+                mxNetParams.remove(i).close();
+                parameters.remove(parameter.getName(), parameter);
             }
         }
     }
@@ -217,7 +204,7 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
         for (String name : inputNames) {
             os.writeUTF(name);
         }
-        for (Parameter parameter : params) {
+        for (Parameter parameter : parameters.values()) {
             if (!inputNames.contains(parameter.getName())) {
                 parameter.save(os);
             }
@@ -237,10 +224,8 @@ public class MxSymbolBlock extends ParameterBlock implements SymbolBlock {
             inputNames.add(is.readUTF());
         }
 
-        for (Parameter parameter : params) {
-            if (!inputNames.contains(parameter.getName())) {
-                parameter.load(this.manager, is);
-            }
+        for (Parameter parameter : parameters.values()) {
+            parameter.load(this.manager, is);
         }
     }
 

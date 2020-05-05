@@ -19,15 +19,11 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
-import ai.djl.nn.BlockList;
-import ai.djl.nn.Parameter;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * {@code Decoder} is an abstract block that be can used as decoder in encoder-decoder architecture.
@@ -42,9 +38,11 @@ public abstract class Decoder extends AbstractBlock {
      * you are planning to use pre-trained embeddings that don't need further training.
      *
      * @param block the block to be used to decode
+     * @param version the version to use for parameter and metadata serialization
      */
-    public Decoder(Block block) {
-        this.block = block;
+    public Decoder(byte version, Block block) {
+        super(version);
+        this.block = addChildBlock("Block", block);
     }
 
     /**
@@ -64,29 +62,9 @@ public abstract class Decoder extends AbstractBlock {
         return block.forward(parameterStore, inputs, training, params);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        beforeInitialize(inputShapes);
-        return block.initialize(manager, dataType, inputShapes);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BlockList getChildren() {
-        return new BlockList(Collections.singletonList("Block"), Collections.singletonList(block));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<Parameter> getDirectParameters() {
-        return Collections.emptyList();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        throw new IllegalArgumentException("Decoder has no parameters");
+    public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
+        block.initialize(manager, dataType, inputShapes);
     }
 
     /** {@inheritDoc} */
