@@ -178,8 +178,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
     }
 
     /**
-     * Utility function to reshape and transpose an input of the shape (B, S, E) into (B,
-     * N, S, H).
+     * Utility function to reshape and transpose an input of the shape (B, S, E) into (B, N, S, H).
      *
      * @param projection projected embeddings
      * @param B batch size
