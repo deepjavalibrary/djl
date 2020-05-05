@@ -15,6 +15,7 @@ package ai.djl.nn.core;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
@@ -45,23 +46,23 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @param <T> the type of item that should be embedded and map to the array
  */
-public abstract class Embedding<T> extends ParameterBlock {
+public abstract class Embedding<T> extends ParameterBlock implements AbstractIndexedEmbedding<T> {
 
-    private static final byte VERSION = 3;
+    private static final byte VERSION = 4;
 
     protected int embeddingSize;
-    protected boolean useDefault;
     protected boolean sparseGrad;
     protected DataType dataType;
     protected Map<T, Integer> embedder;
     protected Map<Integer, T> unembedder;
     protected int numItems;
 
+    protected AbstractIndexedEmbedding<T> fallthroughEmbedding;
+
     protected Parameter embedding;
 
     protected Embedding(BaseBuilder<T, ?> baseBuilder) {
         embeddingSize = baseBuilder.embeddingSize;
-        useDefault = baseBuilder.useDefault;
         sparseGrad = baseBuilder.sparseGrad;
         dataType = baseBuilder.dataType;
         embedding =
@@ -73,9 +74,17 @@ public abstract class Embedding<T> extends ParameterBlock {
                         sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE);
         embedder = new ConcurrentHashMap<>();
         unembedder = new ConcurrentHashMap<>();
-        if (useDefault) {
-            numItems++;
+        if (baseBuilder.fallthrough != null && baseBuilder.defaultItem != null) {
+            throw new IllegalArgumentException(
+                    "You can not specify both a fallthrough and a defaultItem");
+        } else if (baseBuilder.fallthrough != null) {
+            fallthroughEmbedding = baseBuilder.fallthrough;
+        } else if (baseBuilder.defaultItem != null) {
+            fallthroughEmbedding = new DefaultItem(baseBuilder.defaultItem);
+        } else if (baseBuilder.useDefault) {
+            fallthroughEmbedding = new DefaultEmbedding();
         }
+        numItems = 1; // numItems includes a zero element for use by fallthroughEmbeddings
         for (T item : baseBuilder.items) {
             embedder.put(item, numItems);
             unembedder.put(numItems++, item);
@@ -102,7 +111,6 @@ public abstract class Embedding<T> extends ParameterBlock {
      */
     public Embedding(NDArray embedding, List<T> items, boolean sparseGrad) {
         embeddingSize = Math.toIntExact(embedding.getShape().get(1));
-        useDefault = false;
         this.sparseGrad = sparseGrad;
         dataType = embedding.getDataType();
         this.embedding =
@@ -113,7 +121,7 @@ public abstract class Embedding<T> extends ParameterBlock {
                         true,
                         sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE);
         this.embedding.setArray(embedding);
-        numItems = items.size();
+        numItems = Math.toIntExact(embedding.getShape().size(0));
         embedder = new ConcurrentHashMap<>(numItems);
         unembedder = new ConcurrentHashMap<>(numItems);
         for (int i = 1; i <= items.size(); i++) {
@@ -122,25 +130,6 @@ public abstract class Embedding<T> extends ParameterBlock {
         }
         inputShapes = new Shape[] {new Shape(-1)};
     }
-
-    /**
-     * Encodes an object of input type into a byte array. This is used in saving and loading the
-     * {@link Embedding} objects.
-     *
-     * @param input the input object to be encoded
-     * @return the encoded byte array.
-     * @throws IOException if there is an error while encoding
-     */
-    public abstract byte[] encode(T input) throws IOException;
-
-    /**
-     * Decodes the given byte array into an object of input parameter type.
-     *
-     * @param byteArray the byte array to be decoded
-     * @return the decode object of input parameter type
-     * @throws IOException if there was an error while decoding
-     */
-    public abstract T decode(byte[] byteArray) throws IOException;
 
     /** {@inheritDoc} */
     @Override
@@ -186,7 +175,6 @@ public abstract class Embedding<T> extends ParameterBlock {
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
         saveInputShapes(os);
-        os.writeBoolean(useDefault);
         os.writeBoolean(sparseGrad);
         os.writeUTF(dataType.toString());
         Set<Map.Entry<T, Integer>> embedderEntrySet = embedder.entrySet();
@@ -205,15 +193,23 @@ public abstract class Embedding<T> extends ParameterBlock {
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
         byte version = is.readByte();
-        if (version == VERSION) {
+
+        // True to prepend an empty zero index to embedding table
+        // For compatibility with versions that did not always have
+        // the zero index reserved for the fallthrough embedding
+        boolean addMissingZero = false;
+
+        if (version == VERSION || version == 3) {
             readInputShapes(is);
-            useDefault = is.readBoolean();
+            if (version == 3) {
+                addMissingZero = !is.readBoolean();
+            }
             sparseGrad = is.readBoolean();
             dataType = DataType.valueOf(is.readUTF().toUpperCase(Locale.ENGLISH));
             embedder = new ConcurrentHashMap<>();
             unembedder = new ConcurrentHashMap<>();
             int embedderSize = is.readInt();
-            for (int i = 0; i < embedderSize; i++) {
+            for (int i = 1; i <= embedderSize; i++) {
                 int encodedKeySize = is.readInt();
                 byte[] encodedKey = new byte[encodedKeySize];
                 if (is.read(encodedKey) != encodedKey.length) {
@@ -225,20 +221,25 @@ public abstract class Embedding<T> extends ParameterBlock {
             }
         } else if (version == 2) {
             readInputShapes(is);
+            addMissingZero = true;
         } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         embedding.load(manager, is);
         numItems = (int) embedding.getArray().getShape().get(0);
         embeddingSize = (int) embedding.getArray().getShape().get(1);
+        if (addMissingZero) {
+            numItems++;
+            embedding.setArray(
+                    NDArrays.concat(
+                            new NDList(
+                                    manager.zeros(new Shape(1, embeddingSize)),
+                                    embedding.getArray())));
+        }
     }
 
-    /**
-     * Returns whether an item is in the embedding.
-     *
-     * @param item the item to test
-     * @return true if the item is in the embedding
-     */
+    /** {@inheritDoc} */
+    @Override
     public boolean hasItem(T item) {
         return embedder.containsKey(item);
     }
@@ -257,47 +258,37 @@ public abstract class Embedding<T> extends ParameterBlock {
         return ret;
     }
 
-    /**
-     * Embeds an array of items.
-     *
-     * @param manager the manager for the new embeddings
-     * @param items the items to embed
-     * @return the embedding {@link NDArray} of Shape(items.length)
-     */
+    /** {@inheritDoc} */
+    @Override
     public NDArray embed(NDManager manager, T[] items) {
-        return manager.create(Arrays.stream(items).mapToInt(this::embedHelper).toArray());
+        return manager.create(Arrays.stream(items).mapToInt(this::embed).toArray());
     }
 
-    /**
-     * Embeds an item.
-     *
-     * @param item the item to embed
-     * @return the embedding {@link NDArray} of Shape()
-     */
+    /** {@inheritDoc} */
+    @Override
     public int embed(T item) {
-        return embedHelper(item);
-    }
-
-    /**
-     * Returns the item corresponding to the given index.
-     *
-     * @param index the index
-     * @return the item corresponding to the given index
-     */
-    public Optional<T> unembed(int index) {
-        return Optional.ofNullable(unembedder.get(index));
-    }
-
-    private Integer embedHelper(T value) {
-        if (embedder.containsKey(value)) {
-            return embedder.get(value);
+        if (embedder.containsKey(item)) {
+            return embedder.get(item);
         } else {
-            if (useDefault) {
-                return 0;
+            if (fallthroughEmbedding != null) {
+                return fallthroughEmbedding.embed(item);
             } else {
                 throw new IllegalArgumentException("The provided item was not found");
             }
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Optional<T> unembed(int index) {
+        if (index == 0) {
+            if (fallthroughEmbedding == null) {
+                throw new IllegalArgumentException(
+                        "Index 0 is reserved for the fallThrough but no fallThrough is found");
+            }
+            return fallthroughEmbedding.unembed(index);
+        }
+        return Optional.ofNullable(unembedder.get(index));
     }
 
     /**
@@ -311,6 +302,8 @@ public abstract class Embedding<T> extends ParameterBlock {
         protected List<T> items = new ArrayList<>();
         protected int embeddingSize;
         protected boolean useDefault = true;
+        protected T defaultItem;
+        protected AbstractIndexedEmbedding<T> fallthrough;
         protected boolean sparseGrad = true;
         protected DataType dataType = DataType.FLOAT32;
 
@@ -369,6 +362,31 @@ public abstract class Embedding<T> extends ParameterBlock {
         }
 
         /**
+         * Sets whether to use a default item's embedding for undefined items.
+         *
+         * @param defaultItem the item to use as a default.
+         * @return this Builder
+         */
+        public B optDefaultItem(T defaultItem) {
+            this.defaultItem = defaultItem;
+            return self();
+        }
+
+        /**
+         * Sets a custom handler for items not found in the embedding.
+         *
+         * <p>See the standard fallthrough handlers {@link #optUseDefault(boolean)} and {@link
+         * #optDefaultItem(Object)}.
+         *
+         * @param fallthrough the embedding to handle default cases.
+         * @return this Builder
+         */
+        public B optFallthrough(AbstractIndexedEmbedding<T> fallthrough) {
+            this.fallthrough = fallthrough;
+            return self();
+        }
+
+        /**
          * Sets the optional parameter whether to compute row sparse gradient in the backward
          * calculation. If set to True, the grad’s storage type is row_sparse.
          *
@@ -397,5 +415,95 @@ public abstract class Embedding<T> extends ParameterBlock {
          * @return this {@code BaseBuilder}
          */
         protected abstract B self();
+    }
+
+    protected class DefaultEmbedding implements AbstractIndexedEmbedding<T> {
+
+        /** {@inheritDoc} */
+        @Override
+        public byte[] encode(T input) throws IOException {
+            return Embedding.this.encode(input);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public T decode(byte[] byteArray) throws IOException {
+            return Embedding.this.decode(byteArray);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean hasItem(T item) {
+            return true;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public NDArray embed(NDManager manager, T[] items) {
+            int length = items.length;
+            NDArray base = embedding.getArray().get(0);
+            base.attach(manager);
+            return base.repeat(new Shape(length, embeddingSize));
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public int embed(T item) {
+            return 0;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Optional<T> unembed(int index) {
+            return Optional.empty();
+        }
+    }
+
+    protected class DefaultItem implements AbstractIndexedEmbedding<T> {
+
+        private T defaultItem;
+
+        public DefaultItem(T defaultItem) {
+            this.defaultItem = defaultItem;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public byte[] encode(T input) throws IOException {
+            return Embedding.this.encode(input);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public T decode(byte[] byteArray) throws IOException {
+            return Embedding.this.decode(byteArray);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean hasItem(T item) {
+            return true;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        @SuppressWarnings("unchecked")
+        public NDArray embed(NDManager manager, T[] items) {
+            Object[] defaults = new Object[items.length];
+            Arrays.fill(defaults, defaultItem);
+            return Embedding.this.embed(manager, (T[]) defaults);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public int embed(T item) {
+            return 0;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Optional<T> unembed(int index) {
+            return Optional.of(defaultItem);
+        }
     }
 }

@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.nn.core.Embedding;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * {@code TrainableWordEmbedding} is an implementation of {@link WordEmbedding} and {@link
@@ -26,7 +27,6 @@ import java.util.List;
  */
 public class TrainableWordEmbedding extends Embedding<String> implements WordEmbedding {
     private static final String DEFAULT_UNKNOWN_TOKEN = "<unk>";
-    private String unknownToken;
 
     /**
      * Constructs a new instance of {@code TrainableWordEmbedding} from the {@link Builder}.
@@ -35,7 +35,6 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
      */
     public TrainableWordEmbedding(Builder builder) {
         super(builder);
-        this.unknownToken = builder.unknownToken;
     }
 
     /**
@@ -51,8 +50,8 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
                         .setEmbeddingSize(embeddingSize)
                         .setItems(simpleVocabulary.getAllTokens())
                         .optSparseGrad(false)
+                        .optDefaultItem(simpleVocabulary.getUnknownToken())
                         .optUseDefault(false));
-        this.unknownToken = simpleVocabulary.getUnknownToken();
     }
 
     /**
@@ -63,7 +62,7 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
      */
     public TrainableWordEmbedding(NDArray embedding, List<String> items) {
         super(embedding, items);
-        this.unknownToken = DEFAULT_UNKNOWN_TOKEN;
+        this.fallthroughEmbedding = new DefaultItem(DEFAULT_UNKNOWN_TOKEN);
     }
 
     /**
@@ -75,7 +74,7 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
      */
     public TrainableWordEmbedding(NDArray embedding, List<String> items, boolean sparseGrad) {
         super(embedding, items, sparseGrad);
-        this.unknownToken = DEFAULT_UNKNOWN_TOKEN;
+        this.fallthroughEmbedding = new DefaultItem(DEFAULT_UNKNOWN_TOKEN);
     }
 
     /** {@inheritDoc} */
@@ -87,14 +86,7 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
     /** {@inheritDoc} */
     @Override
     public int preprocessWordToEmbed(String word) {
-        if (hasItem(word)) {
-            try {
-                return embed(word);
-            } catch (IllegalArgumentException e) {
-                return embed(unknownToken);
-            }
-        }
-        return embed(unknownToken);
+        return embed(word);
     }
 
     /** {@inheritDoc} */
@@ -109,7 +101,19 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
         if (!word.isScalar()) {
             throw new IllegalArgumentException("NDArray word must be scalar index");
         }
-        return unembed(word.toIntArray()[0]).orElseGet(() -> unknownToken);
+        int wordIndex = word.toIntArray()[0];
+
+        Optional<String> result = unembed(wordIndex);
+        if (result.isPresent()) {
+            return result.get();
+        }
+
+        result = fallthroughEmbedding.unembed(wordIndex);
+        if (result.isPresent()) {
+            return result.get();
+        }
+
+        throw new IllegalArgumentException("Failed to unembed word");
     }
 
     /** {@inheritDoc} */
@@ -137,11 +141,11 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
 
     /** A builder for a {@link TrainableWordEmbedding}. */
     public static class Builder extends Embedding.BaseBuilder<String, Builder> {
-        private String unknownToken = DEFAULT_UNKNOWN_TOKEN;
 
         Builder() {
             super();
             this.embeddingType = String.class;
+            this.defaultItem = DEFAULT_UNKNOWN_TOKEN;
         }
 
         /** {@inheritDoc} */
@@ -163,8 +167,7 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
          * @return this Builder
          */
         public Builder optUnknownToken(String unknownToken) {
-            this.unknownToken = unknownToken;
-            return self();
+            return optDefaultItem(unknownToken);
         }
 
         /**
