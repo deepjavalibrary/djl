@@ -110,7 +110,11 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
      * @return a linear projection with bias and an output size equal to the embedding size.
      */
     private Linear buildProjection() {
-        return Linear.builder().optBias(true).setOutChannels(embeddingSize).build();
+        return Linear.builder()
+                .setOutChannels(embeddingSize)
+                .optBias(true)
+                .optFlatten(false)
+                .build();
     }
 
     /**
@@ -174,7 +178,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
     }
 
     /**
-     * Utility function to reshape and transpose a flattened input of the shape (B * S, E) into (B,
+     * Utility function to reshape and transpose an input of the shape (B, S, E) into (B,
      * N, S, H).
      *
      * @param projection projected embeddings
@@ -186,7 +190,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
      */
     private NDArray createAttentionHeadsFromEmbeddings(
             NDArray projection, long B, long S, long N, long H) {
-        // Reshape projection to sequence & heads: (B * S, E) -> (B, S, N, H)
+        // Reshape projection to sequence & heads: (B, S, E) -> (B, S, N, H)
         NDArray sequenceAndHeads = projection.reshape(B, S, N, H);
         // Switch sequence idx & head index, so we have sequences of heads at the end
         return sequenceAndHeads.transpose(0, 2, 1, 3);
@@ -210,7 +214,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
         long T;
         // H=Attention head size (= E / N)
         long H = E / N;
-        // reshape input to flatten batch & sequence: (B * S, E)
+        // Create key, query & value input based on input size
         NDList flattenedKeyInput;
         NDList flattenedQueryInput;
         NDList flattenedValueInput;
@@ -218,28 +222,28 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
         if (inputs.size() < 3) { // self attention, either masked or unmasked
             F = inputs.head().getShape().get(1);
             T = F;
-            flattenedKeyInput = new NDList(inputs.head().reshape(B * F, embeddingSize));
+            flattenedKeyInput = new NDList(inputs.head());
             flattenedQueryInput = flattenedKeyInput;
             flattenedValueInput = flattenedKeyInput;
         } else { // attention with separate key, query & value
             F = inputs.get(0).getShape().get(1);
             T = inputs.get(1).getShape().get(1);
-            flattenedKeyInput = new NDList(inputs.get(0).reshape(B * F, embeddingSize));
-            flattenedQueryInput = new NDList(inputs.get(1).reshape(B * T, embeddingSize));
-            flattenedValueInput = new NDList(inputs.get(2).reshape(B * F, embeddingSize));
+            flattenedKeyInput = new NDList(inputs.get(0));
+            flattenedQueryInput = new NDList(inputs.get(1));
+            flattenedValueInput = new NDList(inputs.get(2));
         }
         if (inputs.size() == 2 || inputs.size() == 4) { // we have an additional attention mask
             attentionMask = inputs.get(inputs.size() - 1);
         } else {
             attentionMask = null;
         }
-        // apply projection for key, query and value: (B * S, E)
+        // apply projection for key, query and value, preserves shape: (B, S, E)
         NDList keys = keyProjection.forward(parameterStore, flattenedKeyInput, training, params);
         NDList queries =
                 queryProjection.forward(parameterStore, flattenedQueryInput, training, params);
         NDList values =
                 valueProjection.forward(parameterStore, flattenedValueInput, training, params);
-        // reshape to (B, N, S, H)
+        // reshape to (B, N, S, H) to create separate attention heads
         NDArray keyHeads = createAttentionHeadsFromEmbeddings(keys.head(), B, F, N, H);
         NDArray queryHeads = createAttentionHeadsFromEmbeddings(queries.head(), B, T, N, H);
         NDArray valueHeads = createAttentionHeadsFromEmbeddings(values.head(), B, F, N, H);
@@ -281,18 +285,15 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
         // probs. The new head is the weighted sum of the value heads. (B, N, T, H)
         NDArray attentionResult = attentionProbsAfterDropout.matMul(valueHeads);
         // Finally, the heads are reshaped and concatenated into an embedding again
-        // (we directly flatten the batch and shape dimension to apply the output projection)
         NDArray resultEmbeddings =
                 attentionResult // (B, N, T, H)
                         .transpose(0, 2, 1, 3) // -> (B, T, N, H)
-                        .reshape(B * T, E); // -> (B * T, E)
+                        .reshape(B, T, E); // -> (B, T, E)
         // As a last step, we add another linear projection for each token to the embedding size
         NDList projectedEmbeddings =
                 resultProjection.forward(parameterStore, new NDList(resultEmbeddings), training);
-        // and finally we reshape back so we have Batches, sequences and embeddings again
-        NDArray reshapedResult = projectedEmbeddings.head().reshape(B, T, E);
         // done!
-        return new NDList(reshapedResult);
+        return new NDList(projectedEmbeddings);
     }
 
     /**
