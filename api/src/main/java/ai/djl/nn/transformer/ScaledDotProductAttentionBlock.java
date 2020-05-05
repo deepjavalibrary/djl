@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.Dropout;
@@ -65,9 +66,9 @@ import ai.djl.util.PairList;
     "ParameterName",
     "PMD.FormalParameterNamingConventions"
 })
-public final class ScaledDotProductAttentionBlock extends TransformerBaseBlock {
+public final class ScaledDotProductAttentionBlock extends AbstractBlock {
 
-    private static final int VERSION = 1;
+    private static final byte VERSION = 1;
 
     /** Size of the Word-/Token-embeddings we use the attention on. */
     private int embeddingSize;

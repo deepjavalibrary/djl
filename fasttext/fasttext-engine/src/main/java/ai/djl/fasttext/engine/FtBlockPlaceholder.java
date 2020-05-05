@@ -18,14 +18,12 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.BlockList;
-import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterList;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.util.List;
 
 /** A placeholder {@link Block} to comply with the API. */
 public final class FtBlockPlaceholder implements Block {
@@ -94,7 +92,7 @@ public final class FtBlockPlaceholder implements Block {
 
     /** {@inheritDoc} */
     @Override
-    public List<Parameter> getDirectParameters() {
+    public ParameterList getDirectParameters() {
         throw new UnsupportedOperationException("Not support by FtEngine");
     }
 

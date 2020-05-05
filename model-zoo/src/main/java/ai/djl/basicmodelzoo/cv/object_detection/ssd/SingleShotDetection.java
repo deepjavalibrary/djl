@@ -23,8 +23,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Block;
-import ai.djl.nn.BlockList;
-import ai.djl.nn.Parameter;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv2D;
 import ai.djl.nn.norm.BatchNorm;
@@ -32,10 +30,8 @@ import ai.djl.nn.pooling.Pool;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -54,10 +50,16 @@ public final class SingleShotDetection extends AbstractBlock {
     private int numClasses;
 
     private SingleShotDetection(Builder builder) {
+        super(VERSION);
         features = builder.features;
+        features.forEach((block) -> addChildBlock(block.getClass().getSimpleName(), block));
         numClasses = builder.numClasses;
         classPredictionBlocks = builder.classPredictionBlocks;
+        classPredictionBlocks.forEach(
+                (block) -> addChildBlock(block.getClass().getSimpleName(), block));
         anchorPredictionBlocks = builder.anchorPredictionBlocks;
+        anchorPredictionBlocks.forEach(
+                (block) -> addChildBlock(block.getClass().getSimpleName(), block));
         multiBoxPriors = builder.multiBoxPriors;
     }
 
@@ -104,18 +106,6 @@ public final class SingleShotDetection extends AbstractBlock {
                         .map(array -> array.transpose(0, 2, 3, 1).reshape(array.size(0), -1))
                         .toArray(NDArray[]::new);
         return NDArrays.concat(new NDList(flattenOutput), 1);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<Parameter> getDirectParameters() {
-        return Collections.emptyList();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        throw new IllegalArgumentException("SSDBlock has no parameters");
     }
 
     /** {@inheritDoc} */
@@ -199,64 +189,12 @@ public final class SingleShotDetection extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public BlockList getChildren() {
-        int size = features.size() + classPredictionBlocks.size() + anchorPredictionBlocks.size();
-        BlockList children = new BlockList(size);
-        int precision = (int) Math.log10(size) + 1;
-        String format = "%0" + precision + "d:%s";
-        int i = 0;
-        for (Block block : features) {
-            String name = String.format(format, i, block.getClass().getSimpleName());
-            children.add(name, block);
-            i++;
-        }
-        for (Block block : classPredictionBlocks) {
-            String name = String.format(format, i, block.getClass().getSimpleName());
-            children.add(name, block);
-            i++;
-        }
-        for (Block block : anchorPredictionBlocks) {
-            String name = String.format(format, i, block.getClass().getSimpleName());
-            children.add(name, block);
-            i++;
-        }
-        return children;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(VERSION);
-        saveInputShapes(os);
-        for (Block block : features) {
-            block.saveParameters(os);
-        }
-        for (Block block : classPredictionBlocks) {
-            block.saveParameters(os);
-        }
-        for (Block block : anchorPredictionBlocks) {
-            block.saveParameters(os);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void loadParameters(NDManager manager, DataInputStream is)
+    public void loadMetadata(byte version, DataInputStream is)
             throws IOException, MalformedModelException {
-        byte version = is.readByte();
         if (version == VERSION) {
             readInputShapes(is);
         } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
-        }
-        for (Block block : features) {
-            block.loadParameters(manager, is);
-        }
-        for (Block block : classPredictionBlocks) {
-            block.loadParameters(manager, is);
-        }
-        for (Block block : anchorPredictionBlocks) {
-            block.loadParameters(manager, is);
         }
     }
 

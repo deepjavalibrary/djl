@@ -20,13 +20,9 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -40,7 +36,13 @@ public class SequentialBlock extends AbstractBlock {
 
     private static final byte VERSION = 2;
 
-    private List<Block> blocks = new ArrayList<>();
+    /**
+     * Creates an empty sequential block. Use {@code add} and {@code addAll} to add blocks to be
+     * executed in sequence.
+     */
+    public SequentialBlock() {
+        super(VERSION);
+    }
 
     /**
      * Adds an array of blocks to be executed in sequence, in order.
@@ -49,7 +51,7 @@ public class SequentialBlock extends AbstractBlock {
      * @return this block
      */
     public SequentialBlock addAll(Block... blocks) {
-        this.blocks.addAll(Arrays.asList(blocks));
+        this.addAll(Arrays.asList(blocks));
         return this;
     }
 
@@ -60,7 +62,7 @@ public class SequentialBlock extends AbstractBlock {
      * @return this block
      */
     public SequentialBlock addAll(Collection<Block> blocks) {
-        this.blocks.addAll(blocks);
+        blocks.forEach(this::add);
         return this;
     }
 
@@ -72,7 +74,7 @@ public class SequentialBlock extends AbstractBlock {
      */
     public SequentialBlock add(Block block) {
         if (block != null) {
-            blocks.add(block);
+            addChildBlock(block.getClass().getSimpleName(), block);
         }
         return this;
     }
@@ -84,13 +86,13 @@ public class SequentialBlock extends AbstractBlock {
      * @return this block
      */
     public SequentialBlock add(Function<NDList, NDList> f) {
-        blocks.add(new LambdaBlock(f));
+        add(new LambdaBlock(f));
         return this;
     }
 
     /** Removes the {@link Block} added last from the sequence of blocks. */
     public void removeLastBlock() {
-        blocks.remove(blocks.size() - 1);
+        children.remove(children.size() - 1);
     }
 
     /**
@@ -101,7 +103,7 @@ public class SequentialBlock extends AbstractBlock {
     public void replaceLastBlock(Block block) {
         removeLastBlock();
         if (block != null) {
-            blocks.add(block);
+            add(block);
         }
     }
 
@@ -113,7 +115,7 @@ public class SequentialBlock extends AbstractBlock {
             boolean training,
             PairList<String, Object> params) {
         NDList current = inputs;
-        for (Block block : blocks) {
+        for (Block block : children.values()) {
             current = block.forward(parameterStore, current, training);
         }
         return current;
@@ -121,23 +123,21 @@ public class SequentialBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        beforeInitialize(inputShapes);
+    public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         Shape[] shapes = inputShapes;
         for (Block child : getChildren().values()) {
             shapes = child.initialize(manager, dataType, shapes);
         }
-        return getOutputShapes(manager, inputShapes);
     }
 
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
-        if (blocks.isEmpty()) {
+        if (children.isEmpty()) {
             throw new IllegalArgumentException("The sequential block is empty");
         }
         Shape[] current = inputs;
-        for (Block block : blocks) {
+        for (Block block : children.values()) {
             current = block.getOutputShapes(manager, current);
         }
         return current;
@@ -145,53 +145,12 @@ public class SequentialBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public List<Parameter> getDirectParameters() {
-        return Collections.emptyList();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        throw new IllegalArgumentException("SequentialBlocks have no parameters");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BlockList getChildren() {
-        int size = blocks.size();
-        BlockList children = new BlockList(size);
-        int precision = (int) Math.log10(size) + 1;
-        String format = "%0" + precision + "d:%s";
-        for (int i = 0; i < size; ++i) {
-            Block block = blocks.get(i);
-            String name = String.format(format, i, block.getClass().getSimpleName());
-            children.add(name, block);
-        }
-        return children;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(VERSION);
-        saveInputShapes(os);
-        for (Block block : blocks) {
-            block.saveParameters(os);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void loadParameters(NDManager manager, DataInputStream is)
+    public void loadMetadata(byte version, DataInputStream is)
             throws IOException, MalformedModelException {
-        byte version = is.readByte();
         if (version == VERSION) {
             readInputShapes(is);
         } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
-        }
-        for (Block block : blocks) {
-            block.loadParameters(manager, is);
         }
     }
 
@@ -200,7 +159,7 @@ public class SequentialBlock extends AbstractBlock {
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
         sb.append("Sequential(\n");
-        for (Block block : blocks) {
+        for (Block block : children.values()) {
             String blockString = block.toString().replaceAll("(?m)^", "\t");
             sb.append(blockString).append('\n');
         }

@@ -19,9 +19,9 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.Pair;
@@ -29,9 +29,7 @@ import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * A Linear block applies a linear transformation \(Y = XW^T + b\).
@@ -58,7 +56,7 @@ import java.util.List;
  *
  * <p>The Linear block should be constructed using {@link Linear.Builder}.
  */
-public class Linear extends ParameterBlock {
+public class Linear extends AbstractBlock {
 
     private static final byte VERSION = 3;
 
@@ -72,11 +70,20 @@ public class Linear extends ParameterBlock {
     private Parameter bias;
 
     Linear(Builder builder) {
+        super(VERSION);
         outChannels = builder.outChannels;
         flatten = builder.flatten;
-        weight = new Parameter("weight", this, ParameterType.WEIGHT);
+        // "inputDimension" is only known after "beforeInitialize" is called, hence we need
+        // a callback, even if we do not used the callback parameter
+        weight =
+                addParameter(
+                        new Parameter("weight", this, ParameterType.WEIGHT),
+                        inputShapes -> new Shape(outChannels, inputDimension));
         if (builder.bias) {
-            bias = new Parameter("bias", this, ParameterType.BIAS);
+            bias =
+                    addParameter(
+                            new Parameter("bias", this, ParameterType.BIAS),
+                            new Shape(outChannels));
         }
     }
 
@@ -99,15 +106,6 @@ public class Linear extends ParameterBlock {
             return new Shape[] {new Shape(inputs[0].get(0), outChannels)};
         }
         return new Shape[] {inputShape.addAll(new Shape(outChannels))};
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<Parameter> getDirectParameters() {
-        if (bias != null) {
-            return Arrays.asList(weight, bias);
-        }
-        return Collections.singletonList(weight);
     }
 
     /** {@inheritDoc} */
@@ -152,36 +150,17 @@ public class Linear extends ParameterBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        switch (name) {
-            case "weight":
-                return new Shape(outChannels, inputDimension);
-            case "bias":
-                return new Shape(outChannels);
-            default:
-                throw new IllegalArgumentException("Invalid parameter name");
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(VERSION);
+    public void saveMetadata(DataOutputStream os) throws IOException {
         os.writeLong(outChannels);
         os.writeBoolean(flatten);
         os.writeLong(inputDimension);
         os.write(inputShape.getEncoded());
-        weight.save(os);
-        if (bias != null) {
-            bias.save(os);
-        }
     }
 
     /** {@inheritDoc} */
     @Override
-    public void loadParameters(NDManager manager, DataInputStream is)
+    public void loadMetadata(byte version, DataInputStream is)
             throws IOException, MalformedModelException {
-        byte version = is.readByte();
         if (version < 1 || version > VERSION) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
@@ -197,10 +176,6 @@ public class Linear extends ParameterBlock {
             inputDimension = Shape.decode(is).size();
         }
         inputShape = Shape.decode(is);
-        weight.load(manager, is);
-        if (bias != null) {
-            bias.load(manager, is);
-        }
     }
 
     private NDList opInputs(ParameterStore parameterStore, NDList inputs) {

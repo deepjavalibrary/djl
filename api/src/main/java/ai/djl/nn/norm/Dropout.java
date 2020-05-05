@@ -17,15 +17,11 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterBlock;
+import ai.djl.nn.AbstractBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * A dropout layer benefits a network by allowing some units (neurons), and hence their respective
@@ -53,7 +49,7 @@ import java.util.List;
  * 2-3 times since different simulated multiple networks are trained for each iteration, thus
  * resulting in noisy parameter updates.
  */
-public class Dropout extends ParameterBlock {
+public class Dropout extends AbstractBlock {
 
     private static final byte VERSION = 2;
 
@@ -61,6 +57,7 @@ public class Dropout extends ParameterBlock {
     private int[] sharedAxes;
 
     Dropout(Builder builder) {
+        super(VERSION);
         probability = builder.probability;
         sharedAxes = builder.sharedAxes;
     }
@@ -84,28 +81,8 @@ public class Dropout extends ParameterBlock {
 
     /** {@inheritDoc} */
     @Override
-    public List<Parameter> getDirectParameters() {
-        return Collections.emptyList();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        throw new IllegalArgumentException("Dropout has no parameters");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(VERSION);
-        saveInputShapes(os);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void loadParameters(NDManager manager, DataInputStream is)
+    public void loadMetadata(byte version, DataInputStream is)
             throws IOException, MalformedModelException {
-        byte version = is.readByte();
         if (version == VERSION) {
             readInputShapes(is);
         } else if (version != 1) {

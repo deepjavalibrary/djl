@@ -18,7 +18,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.BlockList;
-import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
@@ -175,7 +174,7 @@ public class TfSymbolBlock implements SymbolBlock {
 
     /** {@inheritDoc} */
     @Override
-    public List<Parameter> getDirectParameters() {
+    public ParameterList getDirectParameters() {
         throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 

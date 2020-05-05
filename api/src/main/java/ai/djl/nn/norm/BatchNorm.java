@@ -19,16 +19,14 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * In batch training (training with more than one samples per iteration), a batch normalization
@@ -62,7 +60,7 @@ import java.util.List;
  * \(y \:=\: \gamma\hat{x} \:+\: \beta\), <br>
  * where \(\gamma\) is the scale factor and \(\beta\) is the shift factor.
  */
-public class BatchNorm extends ParameterBlock {
+public class BatchNorm extends AbstractBlock {
 
     private static final byte VERSION = 2;
 
@@ -79,17 +77,32 @@ public class BatchNorm extends ParameterBlock {
     private Parameter runningVar;
 
     BatchNorm(Builder builder) {
+        super(VERSION);
         axis = builder.axis;
         epsilon = builder.epsilon;
         momentum = builder.momentum;
         center = builder.center;
         scale = builder.scale;
+        // When creating parameters we use a callback as "inChannels" is set before initialization,
+        // it is not known yet.
         // make gamma trainable if scale
-        gamma = new Parameter("gamma", this, ParameterType.GAMMA, scale);
+        gamma =
+                addParameter(
+                        new Parameter("gamma", this, ParameterType.GAMMA, scale),
+                        (inputShapes) -> new Shape(inChannels));
         // make beta trainable if center
-        beta = new Parameter("beta", this, ParameterType.BETA, center);
-        runningMean = new Parameter("runningMean", this, ParameterType.RUNNING_MEAN, false);
-        runningVar = new Parameter("runningVar", this, ParameterType.RUNNING_VAR, false);
+        beta =
+                addParameter(
+                        new Parameter("beta", this, ParameterType.BETA, center),
+                        (inputShapes) -> new Shape(inChannels));
+        runningMean =
+                addParameter(
+                        new Parameter("runningMean", this, ParameterType.RUNNING_MEAN, false),
+                        (inputShapes) -> new Shape(inChannels));
+        runningVar =
+                addParameter(
+                        new Parameter("runningVar", this, ParameterType.RUNNING_VAR, false),
+                        (inputShapes) -> new Shape(inChannels));
     }
 
     /** {@inheritDoc} */
@@ -112,29 +125,9 @@ public class BatchNorm extends ParameterBlock {
 
     /** {@inheritDoc} */
     @Override
-    public List<Parameter> getDirectParameters() {
-        return Arrays.asList(gamma, beta, runningMean, runningVar);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void beforeInitialize(Shape[] inputShapes) {
         this.inputShapes = inputShapes;
         inChannels = inputShapes[0].size(axis);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        switch (name) {
-            case "gamma":
-            case "beta":
-            case "runningMean":
-            case "runningVar":
-                return new Shape(inChannels);
-            default:
-                throw new IllegalArgumentException("Invalid parameter name");
-        }
     }
 
     private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
@@ -152,31 +145,21 @@ public class BatchNorm extends ParameterBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(VERSION);
+    public void saveMetadata(DataOutputStream os) throws IOException {
         saveInputShapes(os);
         os.writeLong(inChannels);
-        gamma.save(os);
-        beta.save(os);
-        runningMean.save(os);
-        runningVar.save(os);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void loadParameters(NDManager manager, DataInputStream is)
+    public void loadMetadata(byte version, DataInputStream is)
             throws IOException, MalformedModelException {
-        byte version = is.readByte();
         if (version == VERSION) {
             readInputShapes(is);
         } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         inChannels = is.readLong();
-        gamma.load(manager, is);
-        beta.load(manager, is);
-        runningMean.load(manager, is);
-        runningVar.load(manager, is);
     }
 
     /**

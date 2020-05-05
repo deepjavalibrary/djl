@@ -23,6 +23,9 @@ import ai.djl.nn.recurrent.RecurrentBlock;
  * encode text input.
  */
 public class SimpleTextEncoder extends Encoder {
+
+    private static final byte VERSION = 1;
+
     /**
      * Contructs a new instance of {@code SimpleTextEncoder} with the given {@link RecurrentBlock}.
      * Use this constructor if you are planning to use pre-trained embeddings that don't need
@@ -31,7 +34,7 @@ public class SimpleTextEncoder extends Encoder {
      * @param recurrentBlock the recurrent block to be used to encode
      */
     public SimpleTextEncoder(RecurrentBlock recurrentBlock) {
-        super(recurrentBlock);
+        super(VERSION, recurrentBlock);
         recurrentBlock.setStateOutputs(true);
     }
 
@@ -45,7 +48,7 @@ public class SimpleTextEncoder extends Encoder {
      */
     public SimpleTextEncoder(
             TrainableTextEmbedding trainableTextEmbedding, RecurrentBlock recurrentBlock) {
-        super(new SequentialBlock().add(trainableTextEmbedding).add(recurrentBlock));
+        super(VERSION, new SequentialBlock().add(trainableTextEmbedding).add(recurrentBlock));
         recurrentBlock.setStateOutputs(true);
     }
 

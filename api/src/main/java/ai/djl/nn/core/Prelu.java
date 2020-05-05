@@ -18,16 +18,14 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterBlock;
 import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Applies Leaky Parametric ReLU activation element-wise to the input.
@@ -38,7 +36,7 @@ import java.util.List;
  *
  * <p>Parametric ReLU is a Leaky ReLU in which the slope is learnt during training.
  */
-public class Prelu extends ParameterBlock {
+public class Prelu extends AbstractBlock {
 
     private static final byte VERSION = 2;
 
@@ -46,7 +44,8 @@ public class Prelu extends ParameterBlock {
 
     /** Creates a Parametric ReLU Block. */
     public Prelu() {
-        alpha = new Parameter("alpha", this, ParameterType.OTHER);
+        super(VERSION);
+        alpha = addParameter(new Parameter("alpha", this, ParameterType.OTHER), new Shape());
     }
 
     /** {@inheritDoc} */
@@ -71,37 +70,18 @@ public class Prelu extends ParameterBlock {
 
     /** {@inheritDoc} */
     @Override
-    public List<Parameter> getDirectParameters() {
-        return Collections.singletonList(alpha);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        if ("alpha".equals(name)) {
-            return new Shape();
-        }
-        throw new IllegalArgumentException("Invalid parameter name");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(VERSION);
+    public void saveMetadata(DataOutputStream os) throws IOException {
         saveInputShapes(os);
-        alpha.save(os);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void loadParameters(NDManager manager, DataInputStream is)
+    public void loadMetadata(byte version, DataInputStream is)
             throws IOException, MalformedModelException {
-        byte version = is.readByte();
         if (version == VERSION) {
             readInputShapes(is);
         } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
-        alpha.load(manager, is);
     }
 }
