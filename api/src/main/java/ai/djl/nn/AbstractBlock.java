@@ -31,6 +31,27 @@ import java.util.function.Function;
 /**
  * {@code AbstractBlock} is an abstract implementation of {@link Block}. It is recommended that all
  * {@code Block} classes that have children extend the {@code AbstractBlock}.
+ *
+ * <p>To create your own blocks, you need to do the following: - Define a version for serializing
+ * parameter- and metadata and pass it to the parent constructor - Use {@link
+ * AbstractBlock#addParameter(Parameter, Shape)} or {@link AbstractBlock#addParameter(Parameter,
+ * Function)} to add parameters to your block in the constructor if necessary. - Use {@link
+ * AbstractBlock#addChildBlock(String, Block)} to add child blocks if necessary - Override {@link
+ * AbstractBlock#getOutputShapes(NDManager, Shape[])} to determine the shape of your custom block's
+ * output based on the input it will receive - Override {@link
+ * AbstractBlock#initializeChildBlocks(NDManager, DataType, Shape...)} if you added child blocks to
+ * initialize them based on the input shape your block will receive. You can skip this if your block
+ * does not contain child blocks - Override {@link AbstractBlock#forward(ParameterStore, NDList,
+ * boolean, PairList)} to implement the computation of your block - Iff you need to save data aport
+ * from the parameter values of your block, you need to override {@link
+ * AbstractBlock#saveMetadata(DataOutputStream)} and {@link AbstractBlock#loadMetadata(byte,
+ * DataInputStream)}. If you do not need to save or load any state other than parameters in your
+ * block, you can skip this.
+ *
+ * <p>If you use {@link AbstractBlock#addParameter(Parameter)} to add parameters, you have to take
+ * care of parameter initialization yourself. In this case, you need to override {@link
+ * AbstractBlock#getParameterShape(String, Shape[])} to determine the shape of your parameters. If
+ * you use the other variants of {@code addParameter} this is done for you.
  */
 // Using LinkedHashMap instead of Map is intentional: we want to make sure that consumers
 // of this API know the children and parameters are always iterated over in insertion order.
