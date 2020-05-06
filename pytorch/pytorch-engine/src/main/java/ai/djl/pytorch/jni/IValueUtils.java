@@ -56,6 +56,16 @@ public final class IValueUtils {
     }
 
     /**
+     * Check IValue is a container of IValue List.
+     *
+     * @param iValueHandle IValue {@link Pointer}
+     * @return result
+     */
+    public static boolean isList(Pointer iValueHandle) {
+        return PyTorchLibrary.LIB.iValueIsList(iValueHandle);
+    }
+
+    /**
      * Check IValue is a container of IValue Tuple.
      *
      * @param iValueHandle IValue {@link Pointer}
@@ -169,6 +179,10 @@ public final class IValueUtils {
                 PyTorchLibrary.LIB.torchDeleteIValue(entry.getValue());
                 value.setName(name);
                 list.add(value);
+            }
+        } else if (isList(iValueHandle)) {
+            for (Pointer handle : toIValueArray(iValueHandle)) {
+                list.addAll(forwardHelper(handle, manager));
             }
         } else {
             // free the IValue handle

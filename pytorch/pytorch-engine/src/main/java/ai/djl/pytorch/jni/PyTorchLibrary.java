@@ -379,6 +379,8 @@ final class PyTorchLibrary {
 
     native boolean iValueIsTensorList(Pointer iValueHandle);
 
+    native boolean iValueIsList(Pointer iValueHandle);
+
     native boolean iValueIsMap(Pointer iValueHandle);
 
     native boolean iValueIsTuple(Pointer iValueHandle);
