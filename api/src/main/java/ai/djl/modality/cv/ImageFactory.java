@@ -33,7 +33,7 @@ public interface ImageFactory {
     static ImageFactory newInstance() {
         String className = "ai.djl.api.cv.BufferedImageFactory";
         if (System.getProperty("java.vendor.url").equals("http://www.android.com/")) {
-            className = "ai.djl.android.cv.BitMapFactory";
+            className = "ai.djl.android.cv.BitmapImageFactory";
         }
         try {
             Class<? extends ImageFactory> clazz =
