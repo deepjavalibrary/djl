@@ -147,6 +147,8 @@ public class TfModel extends BaseModel {
     @Override
     public void close() {
         manager.close();
-        block.clear();
+        if (block != null) {
+            block.clear();
+        }
     }
 }

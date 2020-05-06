@@ -617,30 +617,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray addi(NDArray other) {
-        if (getShape().isScalar()) {
-            throw new UnsupportedOperationException(
-                    "TensorFlow engine does not support inplace operations on scalars yet");
-        }
-        // from TensorFlow inplaceAdd documentation:
-        // Adds v into specified rows of x., computes y = x; y[i, :] += v; return y.
-        // i: A vector. Indices into the left-most dimension of x.
-        // To apply full inplaceAdd here in DJL, specify i to be all the rows.
-        tensor =
-                tf.inplaceAdd(
-                                asOperand(),
-                                ((TfNDArray)
-                                                manager.arange(
-                                                        0,
-                                                        getShape().getShape()[0],
-                                                        1,
-                                                        DataType.INT32,
-                                                        getDevice()))
-                                        .asOperand(),
-                                ((TfNDArray) other).asOperand())
-                        .asOutput()
-                        .tensor();
-        operand = null;
-        return this;
+        return inPlaceHelper(add(other), this);
     }
 
     /** {@inheritDoc} */
@@ -687,14 +664,10 @@ public class TfNDArray implements NDArray {
         }
         // select all indices for inplace update
         Operand indices =
-                ((TfNDArray)
-                                manager.arange(
-                                        0,
-                                        getShape().getShape()[0],
-                                        1,
-                                        DataType.INT32,
-                                        getDevice()))
-                        .asOperand();
+                tf.range(
+                        tf.constant(0),
+                        tf.constant((int) getShape().getShape()[0]),
+                        tf.constant(1));
 
         // inplace update destination tensor and operand
         ((TfNDArray) destination)
@@ -1235,6 +1208,7 @@ public class TfNDArray implements NDArray {
         }
         if (transposition != null) {
             result = tf.linalg.transpose(result, ((TfNDArray) transposition).asOperand());
+            transposition.close();
         }
         // re-apply neg after sort if ascending
         if (ascending && !returnIndices) {

@@ -15,8 +15,10 @@ package ai.djl.tensorflow.engine;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
+import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.GradientCollector;
+import ai.djl.util.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tensorflow.TensorFlow;
@@ -67,6 +69,11 @@ public final class TfEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public boolean hasCapability(String capability) {
+        if (StandardCapabilities.MKL.equals(capability)) {
+            return true;
+        } else if (StandardCapabilities.CUDA.equals(capability)) {
+            return Platform.fromSystem().getCudaArch() != null;
+        }
         return false;
     }
 

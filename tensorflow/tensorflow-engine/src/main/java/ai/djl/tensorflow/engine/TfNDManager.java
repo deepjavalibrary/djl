@@ -451,7 +451,9 @@ public class TfNDManager extends BaseNDManager {
     @Override
     public void close() {
         super.close();
-        eagerSession.close();
+        if (eagerSession != null) {
+            eagerSession.close();
+        }
     }
 
     private static final class SystemManager extends TfNDManager {

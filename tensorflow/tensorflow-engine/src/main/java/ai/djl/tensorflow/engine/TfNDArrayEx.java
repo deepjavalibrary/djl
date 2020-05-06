@@ -389,6 +389,39 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    @Override
+    public NDArray normalize(float[] mean, float[] std) {
+        // TODO: TensorFlow does not support channels first on CPU for conv2d
+        // https://github.com/tensorflow/tensorflow/issues/32691
+        // https://github.com/tensorflow/tensorflow/issues/26411
+        int dim = getArray().getShape().dimension();
+        Shape shape = (dim == 3) ? new Shape(1, 1, 3) : new Shape(1, 1, 1, 3);
+        try (NDArray meanArr = manager.create(mean, shape);
+                NDArray stdArr = manager.create(std, shape)) {
+            return getArray().sub(meanArr).divi(stdArr);
+        }
+    }
+
+    @Override
+    public NDArray toTensor() {
+        // TODO: TensorFlow does not support channels first on CPU for conv2d
+        // https://github.com/tensorflow/tensorflow/issues/32691
+        // https://github.com/tensorflow/tensorflow/issues/26411
+        NDArray input = array;
+        int dim = input.getShape().dimension();
+        if (dim == 3) {
+            input = input.expandDims(0);
+        }
+        input = input.div(255.0);
+        if (dim == 3) {
+            input = input.squeeze(0);
+        }
+        // The network by default takes float32
+        return (!input.getDataType().equals(DataType.FLOAT32))
+                ? input.toType(DataType.FLOAT32, false)
+                : input;
+    }
+
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override

@@ -40,14 +40,12 @@ public class TfSymbolBlock implements SymbolBlock {
 
     private NDManager manager;
     private SavedModelBundle bundle;
-    // private Graph graph;
     private MetaGraphDef metaGraphDef;
     private Session session;
 
     public TfSymbolBlock(NDManager manager, SavedModelBundle bundle) {
         this.manager = manager;
         this.bundle = bundle;
-        // graph = bundle.graph();
         session = bundle.session();
         metaGraphDef = bundle.metaGraphDef();
     }
@@ -117,7 +115,12 @@ public class TfSymbolBlock implements SymbolBlock {
     /** {@inheritDoc} */
     @Override
     public void clear() {
-        bundle.close();
+        if (session != null) {
+            session.close();
+        }
+        if (bundle != null) {
+            bundle.close();
+        }
     }
 
     /** {@inheritDoc} */
