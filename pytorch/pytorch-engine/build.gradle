@@ -23,7 +23,7 @@ processResources {
                      "osx-cpu"  : ["pytorch.properties", "libdjl_torch.dylib"],
                      "win-cpu"  : ["pytorch.properties", "djl_torch.dll"],
         ]
-        def classesDir = "${project.buildDir}/classes/java/main/jnilib"
+        def classesDir = "${project.buildDir}/jnilib"
         files.each { entry ->
             def nameList = entry.key.split("-")
             def flavor = nameList[1]
@@ -37,6 +37,11 @@ processResources {
                     downloadPath.withInputStream { i -> file.withOutputStream { it << i } }
                 }
             }
+        }
+
+        copy {
+            from classesDir
+            into "${project.buildDir}/classes/java/main/jnilib"
         }
     }
 }

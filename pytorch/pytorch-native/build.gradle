@@ -21,7 +21,7 @@ def downloadBuild(String os, String flavor) {
     }
     def engineDir = "${project.parent.projectDir}/pytorch-engine"
     def classifier = "${os}-x86_64"
-    def publishDir = "${engineDir}/build/classes/java/main/jnilib/${classifier}/${flavor}"
+    def publishDir = "${engineDir}/build/jnilib/${classifier}/${flavor}"
     copy {
         def tree = fileTree(project.buildDir)
         tree.include("**/libdjl_torch.*", "**/djl_torch.dll")
