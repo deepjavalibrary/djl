@@ -23,14 +23,11 @@ import java.nio.file.Paths;
  * {@code ImageFactory} contains image creation mechanism on top of different platforms like PC and
  * Android. System will choose appropriate Factory based on the supported image type.
  */
-public interface ImageFactory {
+public abstract class ImageFactory {
 
-    /**
-     * Get new instance of Image factory from the provided factory implementation.
-     *
-     * @return {@link ImageFactory}
-     */
-    static ImageFactory newInstance() {
+    private static final ImageFactory FACTORY = newInstance();
+
+    private static ImageFactory newInstance() {
         String className = "ai.djl.modality.cv.BufferedImageFactory";
         if (System.getProperty("java.vendor.url").equals("http://www.android.com/")) {
             className = "ai.djl.android.cv.BitmapImageFactory";
@@ -45,13 +42,22 @@ public interface ImageFactory {
     }
 
     /**
+     * Gets new instance of Image factory from the provided factory implementation.
+     *
+     * @return {@link ImageFactory}
+     */
+    public static ImageFactory getInstance() {
+        return FACTORY;
+    }
+
+    /**
      * Gets {@link Image} from file.
      *
      * @param path the path to the image
      * @return {@link Image}
      * @throws IOException Image not found or not readable
      */
-    Image fromFile(Path path) throws IOException;
+    public abstract Image fromFile(Path path) throws IOException;
 
     /**
      * Gets {@link Image} from URL.
@@ -60,7 +66,7 @@ public interface ImageFactory {
      * @return {@link Image}
      * @throws IOException URL is not valid.
      */
-    Image fromUrl(URL url) throws IOException;
+    public abstract Image fromUrl(URL url) throws IOException;
 
     /**
      * Gets {@link Image} from URL.
@@ -69,7 +75,7 @@ public interface ImageFactory {
      * @return {@link Image}
      * @throws IOException URL is not valid.
      */
-    default Image fromUrl(String url) throws IOException {
+    public Image fromUrl(String url) throws IOException {
         URI uri = URI.create(url);
         if (uri.isAbsolute()) {
             return fromUrl(uri.toURL());
@@ -84,7 +90,7 @@ public interface ImageFactory {
      * @return {@link Image}
      * @throws IOException image cannot be read from input stream.
      */
-    Image fromInputStream(InputStream is) throws IOException;
+    public abstract Image fromInputStream(InputStream is) throws IOException;
 
     /**
      * Gets {@link Image} from varies Java image types.
@@ -94,5 +100,5 @@ public interface ImageFactory {
      * @param image the image object.
      * @return {@link Image}
      */
-    Image fromImage(Object image);
+    public abstract Image fromImage(Object image);
 }

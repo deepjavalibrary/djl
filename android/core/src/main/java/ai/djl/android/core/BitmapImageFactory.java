@@ -32,7 +32,7 @@ import ai.djl.ndarray.types.Shape;
 /**
  * {@code BitmapImageFactory} is the Android implementation of {@link ImageFactory}.
  */
-public class BitmapImageFactory implements ImageFactory {
+public class BitmapImageFactory extends ImageFactory {
 
     /** {@inheritDoc} */
     @Override
@@ -86,6 +86,12 @@ public class BitmapImageFactory implements ImageFactory {
         @Override
         public int getHeight() {
             return bitmap.getHeight();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Object getWrappedImage() {
+            return bitmap;
         }
 
         /** {@inheritDoc} */

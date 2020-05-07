@@ -27,7 +27,7 @@ import java.nio.file.Path;
 import javax.imageio.ImageIO;
 
 /** {@code BufferedImageFactory} is the default implementation of {@link ImageFactory}. */
-public class BufferedImageFactory implements ImageFactory {
+public class BufferedImageFactory extends ImageFactory {
 
     static {
         if (System.getProperty("apple.awt.UIElement") == null) {
@@ -92,6 +92,12 @@ public class BufferedImageFactory implements ImageFactory {
         @Override
         public int getHeight() {
             return image.getHeight();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Object getWrappedImage() {
+            return image;
         }
 
         /** {@inheritDoc} */

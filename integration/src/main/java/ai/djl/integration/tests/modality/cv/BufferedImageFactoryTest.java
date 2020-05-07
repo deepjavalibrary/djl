@@ -25,7 +25,7 @@ public class BufferedImageFactoryTest {
     @Test
     public void testLoadImage() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            ImageFactory factory = ImageFactory.newInstance();
+            ImageFactory factory = ImageFactory.getInstance();
             Image img =
                     factory.fromUrl(
                             "https://github.com/awslabs/djl/raw/master/examples/src/test/resources/dog_bike_car.jpg");

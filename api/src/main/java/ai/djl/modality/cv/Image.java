@@ -38,6 +38,13 @@ public interface Image {
     int getHeight();
 
     /**
+     * Gets the wrapped image.
+     *
+     * @return the wrapped image object
+     */
+    Object getWrappedImage();
+
+    /**
      * Converts image to a RGB {@link NDArray}.
      *
      * @param manager a {@link NDManager} to create the new NDArray with
