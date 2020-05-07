@@ -38,8 +38,8 @@ public interface ImageFactory {
         try {
             Class<? extends ImageFactory> clazz =
                     Class.forName(className).asSubclass(ImageFactory.class);
-            return clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            return clazz.getConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
             throw new IllegalStateException("Create new ImageFactory failed!", e);
         }
     }
