@@ -56,6 +56,7 @@ public class SqueezenetTest {
                                 new NDList(input),
                                 new NDList(label),
                                 batchSize,
+                                Batchifier.STACK,
                                 Batchifier.STACK);
                 PairList<String, Parameter> parameters = squeezeNet.getParameters();
                 trainer.trainBatch(batch);

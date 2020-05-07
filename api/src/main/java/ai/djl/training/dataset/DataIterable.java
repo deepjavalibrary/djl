@@ -45,7 +45,8 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
 
     private RandomAccessDataset dataset;
     private NDManager manager;
-    private Batchifier batchifier;
+    private Batchifier dataBatchifier;
+    private Batchifier labelBatchifier;
     private Pipeline pipeline;
     private Pipeline targetPipeline;
     private ExecutorService executor;
@@ -62,7 +63,8 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
      * @param dataset the dataset to iterate on
      * @param manager the manager to create the arrays
      * @param sampler a sampler to sample data with
-     * @param batchifier a batchifier
+     * @param dataBatchifier a batchifier for data
+     * @param labelBatchifier a batchifier for labels
      * @param pipeline the pipeline of transforms to apply on the data
      * @param targetPipeline the pipeline of transforms to apply on the labels
      * @param executor an {@link ExecutorService}
@@ -73,7 +75,8 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
             RandomAccessDataset dataset,
             NDManager manager,
             Sampler sampler,
-            Batchifier batchifier,
+            Batchifier dataBatchifier,
+            Batchifier labelBatchifier,
             Pipeline pipeline,
             Pipeline targetPipeline,
             ExecutorService executor,
@@ -81,7 +84,8 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
             Device device) {
         this.dataset = dataset;
         this.manager = manager.newSubManager();
-        this.batchifier = batchifier;
+        this.dataBatchifier = dataBatchifier;
+        this.labelBatchifier = labelBatchifier;
         this.pipeline = pipeline;
         this.targetPipeline = targetPipeline;
         this.executor = executor;
@@ -168,8 +172,8 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
 
             labels[i] = record.getLabels();
         }
-        NDList batchData = batchifier.batchify(data);
-        NDList batchLabels = batchifier.batchify(labels);
+        NDList batchData = dataBatchifier.batchify(data);
+        NDList batchLabels = labelBatchifier.batchify(labels);
 
         Arrays.stream(data).forEach(NDList::close);
         Arrays.stream(labels).forEach(NDList::close);
@@ -188,7 +192,8 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
                 batchData,
                 batchLabels,
                 batchSize,
-                batchifier,
+                dataBatchifier,
+                labelBatchifier,
                 progress,
                 dataset.size());
     }

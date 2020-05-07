@@ -42,7 +42,8 @@ public class Batch implements AutoCloseable {
     private NDManager manager;
     private NDList data;
     private NDList labels;
-    private Batchifier batchifier;
+    private Batchifier dataBatchifier;
+    private Batchifier labelBatchifier;
     private int size;
     private long progress;
     private long progressTotal;
@@ -53,34 +54,25 @@ public class Batch implements AutoCloseable {
      * @param manager the {@link NDManager} to be attached to data and labels
      * @param data the {@link NDList} containing the data
      * @param labels the {@link NDList} containing the labels
-     * @param size (batchSize) the number of {@link Record}s in the batch
-     */
-    public Batch(NDManager manager, NDList data, NDList labels, int size) {
-        this.manager = manager;
-        data.attach(manager);
-        labels.attach(manager);
-        this.data = data;
-        this.labels = labels;
-        this.size = size;
-    }
-
-    /**
-     * Creates a new instance of {@code Batch} with the given manager, data and labels.
-     *
-     * @param manager the {@link NDManager} to be attached to data and labels
-     * @param data the {@link NDList} containing the data
-     * @param labels the {@link NDList} containing the labels
      * @param size the number of {@link Record}s in the batch
-     * @param batchifier (batchSize) the {@link Batchifier} that is used for split
+     * @param dataBatchifier the {@link Batchifier} that is used to split data
+     * @param labelBatchifier the {@link Batchifier} that is used to split labels
      */
-    public Batch(NDManager manager, NDList data, NDList labels, int size, Batchifier batchifier) {
+    public Batch(
+            NDManager manager,
+            NDList data,
+            NDList labels,
+            int size,
+            Batchifier dataBatchifier,
+            Batchifier labelBatchifier) {
         this.manager = manager;
         data.attach(manager);
         labels.attach(manager);
         this.data = data;
         this.labels = labels;
         this.size = size;
-        this.batchifier = batchifier;
+        this.dataBatchifier = dataBatchifier;
+        this.labelBatchifier = labelBatchifier;
     }
 
     /**
@@ -90,7 +82,8 @@ public class Batch implements AutoCloseable {
      * @param data the {@link NDList} containing the data
      * @param labels the {@link NDList} containing the labels
      * @param size (batchSize) the number of {@link Record}s in the batch
-     * @param batchifier the {@link Batchifier} that is used for split
+     * @param dataBatchifier the {@link Batchifier} that is used to split data
+     * @param labelBatchifier the {@link Batchifier} that is used for split labels
      * @param progress the progress of the batch if it is part of some kind of iteration like a
      *     dataset iteration. Returns 0 if there is no iteration.
      * @param progressTotal the total or end value for the progress of the batch if it is part of
@@ -101,7 +94,8 @@ public class Batch implements AutoCloseable {
             NDList data,
             NDList labels,
             int size,
-            Batchifier batchifier,
+            Batchifier dataBatchifier,
+            Batchifier labelBatchifier,
             long progress,
             long progressTotal) {
         this.manager = manager;
@@ -110,7 +104,8 @@ public class Batch implements AutoCloseable {
         this.data = data;
         this.labels = labels;
         this.size = size;
-        this.batchifier = batchifier;
+        this.dataBatchifier = dataBatchifier;
+        this.labelBatchifier = labelBatchifier;
         this.progress = progress;
         this.progressTotal = progressTotal;
     }
@@ -198,19 +193,35 @@ public class Batch implements AutoCloseable {
             // avoid copy if data already in device
             if (data.head().getDevice().equals(devices[0])) {
                 return new Batch[] {
-                    new Batch(manager, data, labels, size, batchifier, progress, progressTotal)
+                    new Batch(
+                            manager,
+                            data,
+                            labels,
+                            size,
+                            dataBatchifier,
+                            labelBatchifier,
+                            progress,
+                            progressTotal)
                 };
             } else {
                 NDList d = data.asInDevice(devices[0], true);
                 NDList l = labels.asInDevice(devices[0], true);
                 return new Batch[] {
-                    new Batch(manager, d, l, size, batchifier, progress, progressTotal)
+                    new Batch(
+                            manager,
+                            d,
+                            l,
+                            size,
+                            dataBatchifier,
+                            labelBatchifier,
+                            progress,
+                            progressTotal)
                 };
             }
         }
 
-        NDList[] splittedData = split(data, deviceCount, evenSplit);
-        NDList[] splittedLabels = split(labels, deviceCount, evenSplit);
+        NDList[] splittedData = split(data, dataBatchifier, deviceCount, evenSplit);
+        NDList[] splittedLabels = split(labels, labelBatchifier, deviceCount, evenSplit);
 
         Batch[] splitted = new Batch[splittedData.length];
         int baseSplitSize = size / deviceCount;
@@ -219,12 +230,21 @@ public class Batch implements AutoCloseable {
             NDList l = splittedLabels[i].asInDevice(devices[i], true);
             int subSize =
                     (i == splittedData.length - 1) ? (size - i * baseSplitSize) : baseSplitSize;
-            splitted[i] = new Batch(manager, d, l, subSize, batchifier, progress, progressTotal);
+            splitted[i] =
+                    new Batch(
+                            manager,
+                            d,
+                            l,
+                            subSize,
+                            dataBatchifier,
+                            labelBatchifier,
+                            progress,
+                            progressTotal);
         }
         return splitted;
     }
 
-    private NDList[] split(NDList list, int numOfSlices, boolean evenSplit) {
+    private NDList[] split(NDList list, Batchifier batchifier, int numOfSlices, boolean evenSplit) {
         if (batchifier == null) {
             throw new IllegalStateException(
                     "Split can only be called on a batch containing a batchifier");

@@ -31,7 +31,8 @@ import java.util.stream.IntStream;
 public abstract class RandomAccessDataset implements Dataset, RandomAccess {
 
     protected Sampler sampler;
-    protected Batchifier batchifier;
+    protected Batchifier dataBatchifier;
+    protected Batchifier labelBatchifier;
     protected Pipeline pipeline;
     protected Pipeline targetPipeline;
     protected ExecutorService executor;
@@ -49,7 +50,8 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
      */
     public RandomAccessDataset(BaseBuilder<?> builder) {
         this.sampler = builder.getSampler();
-        this.batchifier = builder.batchifier;
+        this.dataBatchifier = builder.dataBatchifier;
+        this.labelBatchifier = builder.labelBatchifier;
         this.pipeline = builder.pipeline;
         this.targetPipeline = builder.targetPipeline;
         this.executor = builder.executor;
@@ -77,7 +79,8 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
                 this,
                 manager,
                 sampler,
-                batchifier,
+                dataBatchifier,
+                labelBatchifier,
                 pipeline,
                 targetPipeline,
                 executor,
@@ -97,7 +100,8 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
                 this,
                 manager,
                 sampler,
-                batchifier,
+                dataBatchifier,
+                labelBatchifier,
                 pipeline,
                 targetPipeline,
                 executor,
@@ -160,7 +164,8 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
         protected Sampler sampler;
-        protected Batchifier batchifier = Batchifier.STACK;
+        protected Batchifier dataBatchifier = Batchifier.STACK;
+        protected Batchifier labelBatchifier = Batchifier.STACK;
         protected Pipeline pipeline;
         protected Pipeline targetPipeline;
         protected ExecutorService executor;
@@ -220,13 +225,24 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
         }
 
         /**
-         * Sets the {@link Batchifier} for the dataset.
+         * Sets the {@link Batchifier} for the data.
          *
-         * @param batchier the {@link Batchifier} to be set
+         * @param dataBatchifier the {@link Batchifier} to be set
          * @return this {@code BaseBuilder}
          */
-        public T optBatchier(Batchifier batchier) {
-            this.batchifier = batchier;
+        public T optDataBatchifier(Batchifier dataBatchifier) {
+            this.dataBatchifier = dataBatchifier;
+            return self();
+        }
+
+        /**
+         * Sets the {@link Batchifier} for the labels.
+         *
+         * @param labelBatchifier the {@link Batchifier} to be set
+         * @return this {@code BaseBuilder}
+         */
+        public T optLabelBatchifier(Batchifier labelBatchifier) {
+            this.labelBatchifier = labelBatchifier;
             return self();
         }
 

@@ -79,6 +79,7 @@ public class ResnetTest {
                                 new NDList(input),
                                 new NDList(label),
                                 batchSize,
+                                Batchifier.STACK,
                                 Batchifier.STACK);
                 PairList<String, Parameter> parameters = resNet50.getParameters();
                 trainer.trainBatch(batch);
@@ -133,6 +134,7 @@ public class ResnetTest {
                                 new NDList(data),
                                 new NDList(label),
                                 batchSize,
+                                Batchifier.STACK,
                                 Batchifier.STACK);
                 trainer.trainBatch(batch);
             }

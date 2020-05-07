@@ -56,7 +56,8 @@ public final class PaddingStackBatchifier implements Batchifier {
                 maxSize = Math.max(maxSize, array.getShape().get(dimIndex));
             }
             if (paddingSize != -1 && maxSize > paddingSize) {
-                throw new IllegalArgumentException("The batchifier padding size is too small");
+                throw new IllegalArgumentException(
+                        "The batchifier padding size is too small " + maxSize + " " + paddingSize);
             }
             maxSize = Math.max(maxSize, paddingSize);
             for (int j = 0; j < inputs.length; j++) {

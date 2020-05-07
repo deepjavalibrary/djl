@@ -167,13 +167,26 @@ public final class TrainSeq2Seq {
         TatoebaEnglishFrenchDataset tatoebaEnglishFrenchDataset =
                 TatoebaEnglishFrenchDataset.builder()
                         .setSampling(arguments.getBatchSize(), true, false)
-                        .optBatchier(
+                        .optDataBatchifier(
+                                PaddingStackBatchifier.builder()
+                                        .optIncludeValidLengths(true)
+                                        .addPad(0, 0, (m) -> m.zeros(new Shape(1)), 10)
+                                        .build())
+                        .optLabelBatchifier(
                                 PaddingStackBatchifier.builder()
                                         .optIncludeValidLengths(true)
                                         .addPad(0, 0, (m) -> m.zeros(new Shape(1)), 10)
                                         .build())
                         .setSourceConfiguration(
-                                new Configuration().setEmbeddingSize(32).setTrainEmbedding(true))
+                                new Configuration()
+                                        .setEmbeddingSize(32)
+                                        .setTrainEmbedding(true)
+                                        .setTextProcessors(
+                                                Arrays.asList(
+                                                        new SimpleTokenizer(),
+                                                        new LowerCaseConvertor(Locale.ENGLISH),
+                                                        new PunctuationSeparator(),
+                                                        new TextTruncator(10))))
                         .setTargetConfiguration(
                                 new Configuration()
                                         .setEmbeddingSize(32)

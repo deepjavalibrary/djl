@@ -179,7 +179,12 @@ public class OptimizerTest {
         NDArray label = data.mul(2);
         Batch batch =
                 new Batch(
-                        manager, new NDList(data), new NDList(label), batchSize, Batchifier.STACK);
+                        manager,
+                        new NDList(data),
+                        new NDList(label),
+                        batchSize,
+                        Batchifier.STACK,
+                        Batchifier.STACK);
         trainer.trainBatch(batch);
         trainer.step();
         return NDArrays.stack(
