@@ -36,20 +36,28 @@ public class BitmapImageFactory implements ImageFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Image fromFile(Path path) {
-        return new BitMapWrapper(BitmapFactory.decodeFile(path.toString()));
+    public Image fromFile(Path path) throws IOException {
+        Bitmap bitmap = BitmapFactory.decodeFile(path.toString());
+        if (bitmap == null) {
+            throw new IOException("Failed to read image from: " + path);
+        }
+        return new BitMapWrapper(bitmap);
     }
 
     /** {@inheritDoc} */
     @Override
     public Image fromUrl(URL url) throws IOException {
-        return fromInputStream(url.openStream());
+            return fromInputStream(url.openStream());
     }
 
     /** {@inheritDoc} */
     @Override
-    public Image fromInputStream(InputStream is) {
-        return new BitMapWrapper(BitmapFactory.decodeStream(is));
+    public Image fromInputStream(InputStream is) throws IOException {
+        Bitmap bitmap = BitmapFactory.decodeStream(is);
+        if (bitmap == null) {
+            throw new IOException("Failed to read image from input stream");
+        }
+        return new BitMapWrapper(bitmap);
     }
 
     /** {@inheritDoc} */
@@ -112,8 +120,10 @@ public class BitmapImageFactory implements ImageFactory {
 
         /** {@inheritDoc} */
         @Override
-        public void save(OutputStream os, String type) {
-            bitmap.compress(Bitmap.CompressFormat.valueOf(type.toUpperCase()), 100, os);
+        public void save(OutputStream os, String type) throws IOException {
+            if (!bitmap.compress(Bitmap.CompressFormat.valueOf(type.toUpperCase()), 100, os)) {
+                throw new IOException("Cannot save image file to output stream File type " +  type);
+            }
         }
     }
 }

@@ -48,7 +48,7 @@ public class ExampleInstrumentedTest {
 
     @Test
     public void testBitmapImageFactory() throws IOException {
-        try (NDManager manager = Engine.getInstance().newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager()) {
             ImageFactory factory = ImageFactory.newInstance();
             Image img = factory.fromUrl("https://github.com/awslabs/djl/raw/master/examples/src/test/resources/dog_bike_car.jpg");
             NDArray array = img.toNDArray(manager);

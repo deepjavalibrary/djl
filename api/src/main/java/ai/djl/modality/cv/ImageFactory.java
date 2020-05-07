@@ -31,7 +31,7 @@ public interface ImageFactory {
      * @return {@link ImageFactory}
      */
     static ImageFactory newInstance() {
-        String className = "ai.djl.api.cv.BufferedImageFactory";
+        String className = "ai.djl.modality.cv.BufferedImageFactory";
         if (System.getProperty("java.vendor.url").equals("http://www.android.com/")) {
             className = "ai.djl.android.cv.BitmapImageFactory";
         }
@@ -82,8 +82,9 @@ public interface ImageFactory {
      *
      * @param is {@link InputStream}
      * @return {@link Image}
+     * @throws IOException image cannot be read from input stream.
      */
-    Image fromInputStream(InputStream is);
+    Image fromInputStream(InputStream is) throws IOException;
 
     /**
      * Gets {@link Image} from varies Java image types.

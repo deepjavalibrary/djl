@@ -14,6 +14,7 @@ package ai.djl.modality.cv;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -60,8 +61,9 @@ public interface Image {
      *
      * @param os {@link OutputStream} to save the image.
      * @param type type of the image, such as "png", "jpeg"
+     * @throws IOException image cannot be saved through output stream
      */
-    void save(OutputStream os, String type);
+    void save(OutputStream os, String type) throws IOException;
 
     /** Flag indicates the color channel options for images. */
     public enum Flag {
