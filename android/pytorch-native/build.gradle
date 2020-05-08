@@ -31,6 +31,7 @@ android {
     }
 }
 
+// TODO: Making publish as an individual gradle file
 signing {
     required(project.hasProperty("staging") || project.hasProperty("snapshot"))
     def signingKey = findProperty("signingKey")
