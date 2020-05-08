@@ -943,8 +943,8 @@ public final class JniUtils {
         PyTorchLibrary.LIB.torchDeleteTensor(handle);
     }
 
-    public static void deleteModule(PtSymbolBlock block) {
-        PyTorchLibrary.LIB.torchDeleteModule(block.getHandle());
+    public static void deleteModule(Pointer pointer) {
+        PyTorchLibrary.LIB.torchDeleteModule(pointer);
     }
 
     public static PtSymbolBlock loadModule(PtNDManager manager, Path path, Device device) {
