@@ -24,6 +24,7 @@ import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.Pointer;
 import ai.djl.util.PairList;
+import java.lang.ref.WeakReference;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -50,6 +51,20 @@ public class PtNDManager extends BaseNDManager {
     @Override
     public ByteBuffer allocateDirect(int capacity) {
         return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public synchronized void attach(String resourceId, AutoCloseable resource) {
+        if (!Boolean.getBoolean("ai.djl.pytorch.disable_close_resource_on_finalize")) {
+            super.attach(resourceId, resource);
+            return;
+        }
+        if (closed.get()) {
+            throw new IllegalStateException("NDManager has been closed already.");
+        }
+        HardReference ref = new HardReference(resource);
+        resources.put(resourceId, ref);
     }
 
     /**
@@ -251,5 +266,20 @@ public class PtNDManager extends BaseNDManager {
         /** {@inheritDoc} */
         @Override
         public void close() {}
+    }
+
+    /** The workaround custom Reference class to avoid GC to close NDArray. */
+    private static final class HardReference extends WeakReference<AutoCloseable> {
+
+        private AutoCloseable obj;
+
+        HardReference(AutoCloseable obj) {
+            super(obj);
+            this.obj = obj;
+        }
+
+        private AutoCloseable getReference() {
+            return obj;
+        }
     }
 }

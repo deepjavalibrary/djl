@@ -1,4 +1,14 @@
 ## Optimize the PyTorch inference performance
+
+### Multithreading Inference
+To use multithreading inference feature, we have to disable GC to close the NDArray by
+```
+-Dai.djl.pytorch.disable_close_resource_on_finalize=true
+```
+Please make sure all the NDArrays are attached to the NDManager.
+It is expected to be fixed in the future.
+
+###
 There are two configurations you can set to optimize the inference performance.
 
 ```
