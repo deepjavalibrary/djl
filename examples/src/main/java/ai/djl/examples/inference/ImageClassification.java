@@ -17,15 +17,14 @@ import ai.djl.ModelException;
 import ai.djl.basicmodelzoo.basic.Mlp;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.util.BufferedImageUtils;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.util.NDImageUtils;
-import ai.djl.modality.cv.util.NDImageUtils.Flag;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -55,7 +54,7 @@ public final class ImageClassification {
 
     public static Classifications predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/0.png");
-        BufferedImage img = BufferedImageUtils.fromFile(imageFile);
+        Image img = ImageFactory.getInstance().fromFile(imageFile);
 
         try (Model model = Model.newInstance()) {
             model.setBlock(new Mlp(28 * 28, 10, new int[] {128, 64}));
@@ -64,16 +63,15 @@ public final class ImageClassification {
             Path modelDir = Paths.get("build/model");
             model.load(modelDir, "mlp");
 
-            Translator<BufferedImage, Classifications> translator = new MyTranslator();
+            Translator<Image, Classifications> translator = new MyTranslator();
 
-            try (Predictor<BufferedImage, Classifications> predictor =
-                    model.newPredictor(translator)) {
+            try (Predictor<Image, Classifications> predictor = model.newPredictor(translator)) {
                 return predictor.predict(img);
             }
         }
     }
 
-    private static final class MyTranslator implements Translator<BufferedImage, Classifications> {
+    private static final class MyTranslator implements Translator<Image, Classifications> {
 
         private List<String> classes;
 
@@ -83,8 +81,8 @@ public final class ImageClassification {
 
         /** {@inheritDoc} */
         @Override
-        public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-            NDArray array = BufferedImageUtils.toNDArray(ctx.getNDManager(), input, Flag.COLOR);
+        public NDList processInput(TranslatorContext ctx, Image input) {
+            NDArray array = input.toNDArray(ctx.getNDManager(), Image.Flag.COLOR);
             return new NDList(NDImageUtils.toTensor(array));
         }
 

@@ -24,24 +24,20 @@ import java.io.IOException;
  * is an example of processing an image and creating classification output:
  *
  * <pre>
- * private static final class MyTranslator implements Translator&lt;BufferedImage, Classification&gt; {
+ * private static final class MyTranslator implements Translator&lt;Image, Classification&gt; {
  *
  *     private int imageWidth;
  *     private int imageHeight;
- *     private Shape shape;
  *
  *     public MyTranslator(int imageWidth, int imageHeight) {
  *         this.imageWidth = imageWidth;
  *         this.imageHeight = imageHeight;
- *         shape = new Shape(1, 3, imageWidth, imageHeight);
  *     }
  *
  *     &#064;Override
- *     public NDList processInput(TranslatorContext ctx, BufferedImage input) {
- *         BufferedImage image = Images.resize(input, imageWidth, imageHeight);
- *         FloatBuffer buffer = Images.toFloatBuffer(image);
- *
- *         return new NDList(ctx.getNDManager().create(buffer, shape));
+ *     public NDList processInput(TranslatorContext ctx, Image input) {
+ *         NDArray imageND = input.toNDArray(ctx.getNDManager());
+ *         return new NDList(NDImageUtils.resize(imageND, imageWidth, imageHeight);
  *     }
  *
  *     &#064;Override

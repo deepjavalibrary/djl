@@ -159,10 +159,4 @@ public final class NDImageUtils {
     public static NDArray crop(NDArray image, int x, int y, int width, int height) {
         return image.getNDArrayInternal().crop(x, y, width, height);
     }
-
-    /** Flag indicates the color channel options for images. */
-    public enum Flag {
-        GRAYSCALE,
-        COLOR
-    }
 }

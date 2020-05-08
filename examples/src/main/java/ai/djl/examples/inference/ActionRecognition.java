@@ -16,13 +16,13 @@ import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.util.BufferedImageUtils;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,19 +49,19 @@ public final class ActionRecognition {
 
     public static Classifications predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/action_discus_throw.png");
-        BufferedImage img = BufferedImageUtils.fromFile(imageFile);
+        Image img = ImageFactory.getInstance().fromFile(imageFile);
 
-        Criteria<BufferedImage, Classifications> criteria =
+        Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.ACTION_RECOGNITION)
-                        .setTypes(BufferedImage.class, Classifications.class)
+                        .setTypes(Image.class, Classifications.class)
                         .optFilter("backbone", "inceptionv3")
                         .optFilter("dataset", "ucf101")
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<BufferedImage, Classifications> inception = ModelZoo.loadModel(criteria)) {
-            try (Predictor<BufferedImage, Classifications> action = inception.newPredictor()) {
+        try (ZooModel<Image, Classifications> inception = ModelZoo.loadModel(criteria)) {
+            try (Predictor<Image, Classifications> action = inception.newPredictor()) {
                 return action.predict(img);
             }
         }

@@ -15,9 +15,10 @@ package ai.djl.examples.inference;
 import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
@@ -53,20 +54,20 @@ public final class ObjectDetection {
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
-        BufferedImage img = BufferedImageUtils.fromFile(imageFile);
+        Image img = ImageFactory.getInstance().fromFile(imageFile);
 
-        Criteria<BufferedImage, DetectedObjects> criteria =
+        Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
-                        .setTypes(BufferedImage.class, DetectedObjects.class)
+                        .setTypes(Image.class, DetectedObjects.class)
                         .optFilter("backbone", "resnet50")
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<BufferedImage, DetectedObjects> model = ModelZoo.loadModel(criteria)) {
-            try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
+        try (ZooModel<Image, DetectedObjects> model = ModelZoo.loadModel(criteria)) {
+            try (Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
                 DetectedObjects detection = predictor.predict(img);
-                saveBoundingBoxImage(img, detection);
+                saveBoundingBoxImage((BufferedImage) img.getWrappedImage(), detection);
                 return detection;
             }
         }

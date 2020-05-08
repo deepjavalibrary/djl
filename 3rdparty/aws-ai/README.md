@@ -28,15 +28,15 @@ The following pseudocode demonstrates how to load model from S3:
     // group "ai.djl.localmodelzoo" is optional. With explicity group id,
     // you limit the search scope in your search locations only. Otherwise, it
     // will search from all model zoo for the artificat "resnet" 
-    Criteria<BufferedImage, Classifications> criteria =
+    Criteria<Image, Classifications> criteria =
         Criteria.builder()
                 .optApplication(Application.CV.IMAGE_CLASSIFICATION)
-                .setTypes(BufferedImage.class, Classifications.class)
+                .setTypes(Image.class, Classifications.class)
                 .optArtifactId("ai.djl.localmodelzoo:resnet")
                 .optProgress(new ProgressBar())
                 .build();
 
-    ZooModel<BufferedImage, Classifications> model = ModelZoo.loadModel(criteria);
+    ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
 ```
 
 If you want to customize your AWS credentials and region, you can manually register a customized

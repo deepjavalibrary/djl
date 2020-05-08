@@ -13,11 +13,10 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Application.CV;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.modality.cv.util.NDImageUtils;
-import ai.djl.modality.cv.util.NDImageUtils.Flag;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
@@ -46,7 +45,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     private Artifact artifact;
     private Usage usage;
     private boolean prepared;
-    private Flag flag;
+    private Image.Flag flag;
 
     private CocoUtils coco;
     private List<Path> imagePaths;
@@ -118,7 +117,10 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     public Record get(NDManager manager, long index) throws IOException {
         int idx = Math.toIntExact(index);
         NDList d =
-                new NDList(BufferedImageUtils.readFileToArray(manager, imagePaths.get(idx), flag));
+                new NDList(
+                        ImageFactory.getInstance()
+                                .fromFile(imagePaths.get(idx))
+                                .toNDArray(manager, flag));
         NDList l = new NDList(manager.create(labels.get(idx)));
         return new Record(d, l);
     }
@@ -192,7 +194,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
     /** A builder to construct a {@link CocoDetection}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
-        Flag flag;
+        Image.Flag flag;
         Repository repository;
         Artifact artifact;
         Usage usage;
@@ -202,7 +204,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
             pipeline = new Pipeline(new ToTensor());
-            flag = NDImageUtils.Flag.COLOR;
+            flag = Image.Flag.COLOR;
         }
 
         /** {@inheritDoc} */
@@ -250,7 +252,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
          * @param flag the color mode flag
          * @return this builder
          */
-        public Builder optFlag(Flag flag) {
+        public Builder optFlag(Image.Flag flag) {
             this.flag = flag;
             return self();
         }

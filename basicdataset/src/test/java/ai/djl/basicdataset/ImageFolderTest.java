@@ -13,9 +13,9 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Model;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
@@ -64,18 +64,22 @@ public class ImageFolderTest {
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
                 NDArray cat =
-                        BufferedImageUtils.readFileToArray(
-                                manager,
-                                Paths.get("src/test/resources/imagefolder/cat/kitten.jpg"));
+                        ImageFactory.getInstance()
+                                .fromFile(
+                                        Paths.get("src/test/resources/imagefolder/cat/kitten.jpg"))
+                                .toNDArray(manager);
                 NDArray dog =
-                        BufferedImageUtils.readFileToArray(
-                                manager,
-                                Paths.get("src/test/resources/imagefolder/dog/dog_bike_car.jpg"));
-
+                        ImageFactory.getInstance()
+                                .fromFile(
+                                        Paths.get(
+                                                "src/test/resources/imagefolder/dog/dog_bike_car.jpg"))
+                                .toNDArray(manager);
                 NDArray pikachu =
-                        BufferedImageUtils.readFileToArray(
-                                manager,
-                                Paths.get("src/test/resources/imagefolder/misc/pikachu.png"));
+                        ImageFactory.getInstance()
+                                .fromFile(
+                                        Paths.get(
+                                                "src/test/resources/imagefolder/misc/pikachu.png"))
+                                .toNDArray(manager);
 
                 Iterator<Batch> ds = trainer.iterateDataset(dataset).iterator();
 

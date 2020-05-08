@@ -13,9 +13,9 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Application.CV;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.modality.cv.util.NDImageUtils.Flag;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -82,7 +82,10 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
 
         Path imagePath =
                 repository.getFile(getArtifactItem(), getUsagePath() + "/" + item + ".jpeg");
-        NDArray imageArray = BufferedImageUtils.readFileToArray(manager, imagePath, Flag.GRAYSCALE);
+        NDArray imageArray =
+                ImageFactory.getInstance()
+                        .fromFile(imagePath)
+                        .toNDArray(manager, Image.Flag.GRAYSCALE);
         NDList data = new NDList(imageArray);
 
         NDList labels = new NDList(CAPTCHA_LENGTH);

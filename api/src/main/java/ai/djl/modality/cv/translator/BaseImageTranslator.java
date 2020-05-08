@@ -12,23 +12,21 @@
  */
 package ai.djl.modality.cv.translator;
 
-import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.modality.cv.util.NDImageUtils;
+import ai.djl.modality.cv.Image;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
-import java.awt.image.BufferedImage;
 
 /**
  * Built-in {@code Translator} that provides default image pre-processing.
  *
  * @param <T> the output object type
  */
-public abstract class BaseImageTranslator<T> implements Translator<BufferedImage, T> {
+public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
 
-    private NDImageUtils.Flag flag;
+    private Image.Flag flag;
     private Pipeline pipeline;
 
     /**
@@ -48,15 +46,15 @@ public abstract class BaseImageTranslator<T> implements Translator<BufferedImage
     }
 
     /**
-     * Processes the {@code BufferedImage} input and converts it to NDList.
+     * Processes the {@link Image} input and converts it to NDList.
      *
      * @param ctx the toolkit that helps create the input NDArray
-     * @param input the {@code BufferedImage} input
+     * @param input the {@link Image} input
      * @return a {@link NDList}
      */
     @Override
-    public NDList processInput(TranslatorContext ctx, BufferedImage input) {
-        NDArray array = BufferedImageUtils.toNDArray(ctx.getNDManager(), input, flag);
+    public NDList processInput(TranslatorContext ctx, Image input) {
+        NDArray array = input.toNDArray(ctx.getNDManager(), flag);
         return pipeline.transform(new NDList(array));
     }
 
@@ -68,17 +66,17 @@ public abstract class BaseImageTranslator<T> implements Translator<BufferedImage
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
-        protected NDImageUtils.Flag flag = NDImageUtils.Flag.COLOR;
+        protected Image.Flag flag = Image.Flag.COLOR;
         protected Pipeline pipeline;
 
         /**
-         * Sets the optional {@link ai.djl.modality.cv.util.NDImageUtils.Flag} (default is {@link
-         * NDImageUtils.Flag#COLOR}).
+         * Sets the optional {@link ai.djl.modality.cv.Image.Flag} (default is {@link
+         * Image.Flag#COLOR}).
          *
          * @param flag the color mode for the images
          * @return this builder
          */
-        public T optFlag(NDImageUtils.Flag flag) {
+        public T optFlag(Image.Flag flag) {
             this.flag = flag;
             return self();
         }

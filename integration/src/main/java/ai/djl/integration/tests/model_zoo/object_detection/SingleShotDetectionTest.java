@@ -19,10 +19,11 @@ import ai.djl.MalformedModelException;
 import ai.djl.basicdataset.PikachuDetection;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.inference.Predictor;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.MultiBoxDetection;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
@@ -44,7 +45,6 @@ import ai.djl.training.loss.SingleShotDetectionLoss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -57,11 +57,11 @@ public class SingleShotDetectionTest {
     public void testLoadPredict()
             throws IOException, ModelNotFoundException, TranslateException,
                     MalformedModelException {
-        try (ZooModel<BufferedImage, DetectedObjects> model = getModel()) {
+        try (ZooModel<Image, DetectedObjects> model = getModel()) {
             model.setBlock(getPredictBlock(model.getBlock()));
-            try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
+            try (Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
                 Path imagePath = Paths.get("../examples/src/test/resources/pikachu.jpg");
-                BufferedImage image = BufferedImageUtils.fromFile(imagePath);
+                Image image = ImageFactory.getInstance().fromFile(imagePath);
                 DetectedObjects detectedObjects = predictor.predict(image);
                 int numPikachus = detectedObjects.getNumberOfObjects();
                 Assert.assertTrue(numPikachus >= 6);
@@ -73,7 +73,7 @@ public class SingleShotDetectionTest {
     @Test
     public void testLoadTrain()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        try (ZooModel<BufferedImage, DetectedObjects> model = getModel()) {
+        try (ZooModel<Image, DetectedObjects> model = getModel()) {
             TrainingConfig config = setupTrainingConfig();
             try (Trainer trainer = model.newTrainer(config)) {
                 Dataset dataset = getDataset();
@@ -127,13 +127,13 @@ public class SingleShotDetectionTest {
                 .optDevices(Device.getDevices(1));
     }
 
-    private ZooModel<BufferedImage, DetectedObjects> getModel()
+    private ZooModel<Image, DetectedObjects> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
 
-        Criteria<BufferedImage, DetectedObjects> criteria =
+        Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
-                        .setTypes(BufferedImage.class, DetectedObjects.class)
+                        .setTypes(Image.class, DetectedObjects.class)
                         .optGroupId(BasicModelZoo.GROUP_ID)
                         .optArtifactId("ssd")
                         .optFilter("flavor", "tiny")

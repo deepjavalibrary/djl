@@ -16,6 +16,8 @@ import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
@@ -40,12 +42,14 @@ import org.testng.annotations.Test;
 
 public class InferenceTest {
 
-    private BufferedImage image;
+    private Image image;
 
     @BeforeClass
     public void setup() throws IOException {
         Files.createDirectories(Paths.get("build/model"));
-        image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+        image =
+                ImageFactory.getInstance()
+                        .fromImage(new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB));
     }
 
     @Test
@@ -58,7 +62,7 @@ public class InferenceTest {
         MockImageTranslator translator = new MockImageTranslator("cat");
 
         Metrics metrics = new Metrics();
-        try (Predictor<BufferedImage, DetectedObjects> ssd = model.newPredictor(translator)) {
+        try (Predictor<Image, DetectedObjects> ssd = model.newPredictor(translator)) {
             ssd.setMetrics(metrics);
             DetectedObjects result = ssd.predict(image);
 

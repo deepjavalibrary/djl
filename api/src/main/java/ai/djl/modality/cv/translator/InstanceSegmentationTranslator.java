@@ -13,6 +13,7 @@
 package ai.djl.modality.cv.translator;
 
 import ai.djl.Model;
+import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Mask;
@@ -25,7 +26,6 @@ import ai.djl.translate.Pipeline;
 import ai.djl.translate.Transform;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Utils;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +74,7 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
 
     /** {@inheritDoc} */
     @Override
-    public NDList processInput(TranslatorContext ctx, BufferedImage image) {
+    public NDList processInput(TranslatorContext ctx, Image image) {
         Pipeline pipeline = getPipeline();
         pipeline.insert(0, null, this);
         ctx.setAttachment("originalHeight", image.getHeight());

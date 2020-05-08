@@ -14,8 +14,8 @@ package ai.djl.examples.inference.benchmark.util;
 
 import ai.djl.engine.Engine;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import com.google.gson.Gson;
@@ -247,7 +247,7 @@ public class Arguments {
     public Object getInputData() throws IOException, ClassNotFoundException {
         Class<?> klass = getInputClass();
         if (klass == BufferedImage.class) {
-            return BufferedImageUtils.fromFile(getImageFile());
+            return ImageFactory.getInstance().fromFile(getImageFile());
         } else if (klass == float[].class || klass == NDList.class) {
             // TODO: load data from input file
             // Create empty NDArray from shape for now

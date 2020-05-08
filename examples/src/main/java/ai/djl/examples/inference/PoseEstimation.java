@@ -16,11 +16,12 @@ import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Joints;
 import ai.djl.modality.cv.output.Rectangle;
-import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
@@ -33,7 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,9 +57,9 @@ public final class PoseEstimation {
 
     public static Joints predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/pose_soccer.png");
-        BufferedImage img = BufferedImageUtils.fromFile(imageFile);
+        Image img = ImageFactory.getInstance().fromFile(imageFile);
 
-        BufferedImage person = predictPersonInImage(img);
+        Image person = predictPersonInImage(img);
 
         if (person == null) {
             logger.warn("No person found in image.");
@@ -69,14 +69,14 @@ public final class PoseEstimation {
         return predictJointsInPerson(person);
     }
 
-    private static BufferedImage predictPersonInImage(BufferedImage img)
+    private static Image predictPersonInImage(Image img)
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
 
-        Criteria<BufferedImage, DetectedObjects> criteria =
+        Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
-                        .setTypes(BufferedImage.class, DetectedObjects.class)
+                        .setTypes(Image.class, DetectedObjects.class)
                         .optFilter("size", "512")
                         .optFilter("backbone", "resnet50")
                         .optFilter("flavor", "v1")
@@ -85,8 +85,8 @@ public final class PoseEstimation {
                         .build();
 
         DetectedObjects detectedObjects;
-        try (ZooModel<BufferedImage, DetectedObjects> ssd = ModelZoo.loadModel(criteria)) {
-            try (Predictor<BufferedImage, DetectedObjects> predictor = ssd.newPredictor()) {
+        try (ZooModel<Image, DetectedObjects> ssd = ModelZoo.loadModel(criteria)) {
+            try (Predictor<Image, DetectedObjects> predictor = ssd.newPredictor()) {
                 detectedObjects = predictor.predict(img);
             }
         }
@@ -97,31 +97,34 @@ public final class PoseEstimation {
                 Rectangle rect = item.getBoundingBox().getBounds();
                 int width = img.getWidth();
                 int height = img.getHeight();
-                return img.getSubimage(
-                        (int) (rect.getX() * width),
-                        (int) (rect.getY() * height),
-                        (int) (rect.getWidth() * width),
-                        (int) (rect.getHeight() * height));
+                return ImageFactory.getInstance()
+                        .fromImage(
+                                ((BufferedImage) img.getWrappedImage())
+                                        .getSubimage(
+                                                (int) (rect.getX() * width),
+                                                (int) (rect.getY() * height),
+                                                (int) (rect.getWidth() * width),
+                                                (int) (rect.getHeight() * height)));
             }
         }
         return null;
     }
 
-    private static Joints predictJointsInPerson(BufferedImage person)
+    private static Joints predictJointsInPerson(Image person)
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
 
-        Criteria<BufferedImage, Joints> criteria =
+        Criteria<Image, Joints> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.POSE_ESTIMATION)
-                        .setTypes(BufferedImage.class, Joints.class)
+                        .setTypes(Image.class, Joints.class)
                         .optFilter("backbone", "resnet18")
                         .optFilter("flavor", "v1b")
                         .optFilter("dataset", "imagenet")
                         .build();
 
-        try (ZooModel<BufferedImage, Joints> pose = ModelZoo.loadModel(criteria)) {
-            try (Predictor<BufferedImage, Joints> predictor = pose.newPredictor()) {
+        try (ZooModel<Image, Joints> pose = ModelZoo.loadModel(criteria)) {
+            try (Predictor<Image, Joints> predictor = pose.newPredictor()) {
                 Joints joints = predictor.predict(person);
                 saveJointsImage(person, joints);
                 return joints;
@@ -129,15 +132,15 @@ public final class PoseEstimation {
         }
     }
 
-    private static void saveJointsImage(BufferedImage img, Joints joints) throws IOException {
+    private static void saveJointsImage(Image img, Joints joints) throws IOException {
         Path outputDir = Paths.get("build/output");
         Files.createDirectories(outputDir);
 
-        ImageVisualization.drawJoints(img, joints);
+        ImageVisualization.drawJoints((BufferedImage) img.getWrappedImage(), joints);
 
         Path imagePath = outputDir.resolve("joints.png");
         // Must use png format because you can't save as jpg with an alpha channel
-        ImageIO.write(img, "png", imagePath.toFile());
+        img.save(Files.newOutputStream(imagePath), "png");
         logger.info("Pose image has been saved in: {}", imagePath);
     }
 }

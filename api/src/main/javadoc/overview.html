@@ -36,7 +36,7 @@
     // Next user need create a <b>Predictor</b>, and use <a
     href="ai/djl/inference/Predictor.html#predict-I-"><b>Predictor.predict()</b></a>
     // to get prediction.
-    try (Predictor&lt;BufferedImage, DetectedObjects&gt; predictor = <b>model.newPredictor</b>(translator)) {
+    try (Predictor&lt;Image, DetectedObjects&gt; predictor = <b>model.newPredictor</b>(translator)) {
         DetectedObjects result = predictor.<b>predict</b>(img);
     }
 </pre>

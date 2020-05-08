@@ -42,7 +42,7 @@ model found is returned. A *ModelNotFoundException* will be thrown if no matchin
 The following is an example of the criteria to find a Resnet50-v1 model that has been trained on the imagenet dataset:
 
 ```java
-    Criteria<BufferedImage, Classification> criteria =
+    Criteria<Image, Classification> criteria =
             Criteria.builder()
                     .optApplication(Application.CV.OBJECT_DETECTION)
                     .setTypes(BufferedImage.class, Classification.class)
@@ -51,7 +51,7 @@ The following is an example of the criteria to find a Resnet50-v1 model that has
                     .optFilter("dataset", "cifar10")
                     .build();
 
-    ZooModel<BufferedImage, Classification> ssd = ModelZoo.loadModel(criteria));
+    ZooModel<Image, Classification> ssd = ModelZoo.loadModel(criteria));
 ```
 
 If you already known which `ModelLoader` to use, you can simply do the following:
@@ -61,7 +61,7 @@ If you already known which `ModelLoader` to use, you can simply do the following
     filter.put("flavor", "v1");
     filter.put("dataset", "cifar10");
 
-    ZooModel<BufferedImage, Classification> model = BasicModelZoo.RESNET.loadModel(filter);
+    ZooModel<Image, Classification> model = BasicModelZoo.RESNET.loadModel(filter);
 ```
 
 ### List available models

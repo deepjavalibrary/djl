@@ -18,7 +18,6 @@ import ai.djl.modality.cv.output.Joints;
 import ai.djl.modality.cv.output.Joints.Joint;
 import ai.djl.modality.cv.output.Mask;
 import ai.djl.modality.cv.output.Point;
-import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.util.RandomUtils;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -52,7 +51,7 @@ public final class ImageVisualization {
         for (DetectedObjects.DetectedObject result : list) {
             String className = result.getClassName();
             BoundingBox box = result.getBoundingBox();
-            g.setPaint(BufferedImageUtils.randomColor().darker());
+            g.setPaint(randomColor().darker());
 
             box.draw(g, imageWidth, imageHeight);
             Point p = box.getPoint();
@@ -123,6 +122,10 @@ public final class ImageVisualization {
         g.drawString(text, x + padding, y + ascent);
     }
 
+    private static Color randomColor() {
+        return new Color(RandomUtils.nextInt(255));
+    }
+
     /**
      * Draws all joints of a body on an image.
      *
@@ -138,7 +141,7 @@ public final class ImageVisualization {
         int imageHeight = image.getHeight();
 
         for (Joint joint : joints.getJoints()) {
-            g.setPaint(BufferedImageUtils.randomColor().darker());
+            g.setPaint(randomColor().darker());
             int x = (int) (joint.getX() * imageWidth);
             int y = (int) (joint.getY() * imageHeight);
             g.fillOval(x, y, 10, 10);

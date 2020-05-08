@@ -13,9 +13,9 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Application.CV;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.modality.cv.util.NDImageUtils.Flag;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -54,7 +54,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     private Artifact artifact;
     private Usage usage;
     private boolean prepared;
-    private Flag flag;
+    private Image.Flag flag;
 
     private List<Path> imagePaths;
     private List<float[]> labels;
@@ -167,7 +167,10 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
     public Record get(NDManager manager, long index) throws IOException {
         int idx = Math.toIntExact(index);
         NDList d =
-                new NDList(BufferedImageUtils.readFileToArray(manager, imagePaths.get(idx), flag));
+                new NDList(
+                        ImageFactory.getInstance()
+                                .fromFile(imagePaths.get(idx))
+                                .toNDArray(manager, flag));
         NDArray label = manager.create(labels.get(idx));
         NDList l = new NDList(label.reshape(new Shape(1).addAll(label.getShape())));
         return new Record(d, l);
@@ -185,13 +188,13 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
         Repository repository;
         Artifact artifact;
         Usage usage;
-        Flag flag;
+        Image.Flag flag;
 
         /** Constructs a new builder. */
         Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
-            flag = Flag.COLOR;
+            flag = Image.Flag.COLOR;
             pipeline = new Pipeline(new ToTensor());
         }
 
@@ -240,7 +243,7 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
          * @param flag the color mode flag
          * @return this builder
          */
-        public Builder optFlag(Flag flag) {
+        public Builder optFlag(Image.Flag flag) {
             this.flag = flag;
             return self();
         }

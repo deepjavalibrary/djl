@@ -12,9 +12,9 @@
  */
 package ai.djl.modality.cv.translator.wrapper;
 
+import ai.djl.modality.cv.Image;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
-import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.Map;
 
@@ -25,14 +25,14 @@ import java.util.Map;
  */
 public class UrlTranslatorFactory<T> implements TranslatorFactory<URL, T> {
 
-    private TranslatorFactory<BufferedImage, T> factory;
+    private TranslatorFactory<Image, T> factory;
 
     /**
      * Creates a {@code FileTranslatorFactory} instance.
      *
      * @param factory a factory that can process image
      */
-    public UrlTranslatorFactory(TranslatorFactory<BufferedImage, T> factory) {
+    public UrlTranslatorFactory(TranslatorFactory<Image, T> factory) {
         this.factory = factory;
     }
 

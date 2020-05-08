@@ -22,6 +22,7 @@ import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDList;
@@ -47,7 +48,6 @@ import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.training.optimizer.learningrate.MultiFactorTracker;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -119,9 +119,9 @@ public final class TrainWithOptimizers {
         boolean isSymbolic = arguments.isSymbolic();
         boolean preTrained = arguments.isPreTrained();
         Map<String, String> options = arguments.getCriteria();
-        Criteria.Builder<BufferedImage, Classifications> builder =
+        Criteria.Builder<Image, Classifications> builder =
                 Criteria.builder()
-                        .setTypes(BufferedImage.class, Classifications.class)
+                        .setTypes(Image.class, Classifications.class)
                         .optProgress(new ProgressBar())
                         .optArtifactId("resnet");
         if (isSymbolic) {

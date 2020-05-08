@@ -21,12 +21,13 @@ import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.MultiBoxDetection;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
-import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
@@ -47,12 +48,12 @@ import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.imageio.ImageIO;
 import org.apache.commons.cli.ParseException;
 
 /**
@@ -126,13 +127,13 @@ public final class TrainPikachu {
                             .setClasses(classes)
                             .optThreshold(detectionThreshold)
                             .build();
-            try (Predictor<BufferedImage, DetectedObjects> predictor =
-                    model.newPredictor(translator)) {
-                BufferedImage image = BufferedImageUtils.fromFile(imagePath);
+            try (Predictor<Image, DetectedObjects> predictor = model.newPredictor(translator)) {
+                Image image = ImageFactory.getInstance().fromFile(imagePath);
                 DetectedObjects detectedObjects = predictor.predict(image);
-                ImageVisualization.drawBoundingBoxes(image, detectedObjects);
+                ImageVisualization.drawBoundingBoxes(
+                        (BufferedImage) image.getWrappedImage(), detectedObjects);
                 Path out = Paths.get(outputDir).resolve("pikachu_output.png");
-                ImageIO.write(image, "png", out.toFile());
+                image.save(Files.newOutputStream(out), "png");
                 // return number of pikachu detected
                 return detectedObjects.getNumberOfObjects();
             }

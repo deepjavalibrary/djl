@@ -12,11 +12,11 @@
  */
 package ai.djl.modality.cv.translator.wrapper;
 
-import ai.djl.modality.cv.util.BufferedImageUtils;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
-import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 
 /**
@@ -26,21 +26,21 @@ import java.nio.file.Path;
  */
 public class FileTranslator<T> implements Translator<Path, T> {
 
-    private Translator<BufferedImage, T> translator;
+    private Translator<Image, T> translator;
 
     /**
      * Creates a {@code FileTranslator} instance.
      *
      * @param translator a {@code Translator} that can process image
      */
-    public FileTranslator(Translator<BufferedImage, T> translator) {
+    public FileTranslator(Translator<Image, T> translator) {
         this.translator = translator;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, Path input) throws Exception {
-        BufferedImage image = BufferedImageUtils.fromFile(input);
+        Image image = ImageFactory.getInstance().fromFile(input);
         return translator.processInput(ctx, image);
     }
 

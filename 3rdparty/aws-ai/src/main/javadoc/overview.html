@@ -23,15 +23,15 @@
     System.setProperty("ai.djl.repository.zoo.location",
             "s3://djl-misc/test/models/<b>resnet18</b>?model_name=<i>resent18_v1</i>");
 
-    Criteria&lt;BufferedImage, Classifications&gt; criteria =
+    Criteria&lt;Image, Classifications&gt; criteria =
         Criteria.builder()
                 .optApplication(Application.CV.IMAGE_CLASSIFICATION)
-                .setTypes(BufferedImage.class, Classifications.class)
+                .setTypes(Image.class, Classifications.class)
                 .optArtifactId("ai.djl.localmodelzoo:<b>resnet18</b>")
                 .optProgress(new ProgressBar())
                 .build();
 
-    ZooModel&lt;BufferedImage, Classifications&gt; model = ModelZoo.loadModel(criteria);
+    ZooModel&lt;Image, Classifications&gt; model = ModelZoo.loadModel(criteria);
 </pre>
 
 </body>

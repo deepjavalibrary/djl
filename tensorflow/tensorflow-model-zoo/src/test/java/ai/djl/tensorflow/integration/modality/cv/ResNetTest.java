@@ -16,17 +16,17 @@ import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
-import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Paths;
 import org.testng.Assert;
@@ -41,10 +41,10 @@ public class ResNetTest {
             throw new SkipException("Tensorflow doesn't support Windows yet.");
         }
 
-        Criteria<BufferedImage, Classifications> criteria =
+        Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
-                        .setTypes(BufferedImage.class, Classifications.class)
+                        .setTypes(Image.class, Classifications.class)
                         .optArtifactId("resnet")
                         .optFilter("layers", "50")
                         .optFilter("flavor", "v1")
@@ -64,15 +64,16 @@ public class ResNetTest {
                         .setSynsetArtifactName("synset.txt")
                         .optApplySoftmax(false)
                         .build();
-        try (ZooModel<BufferedImage, Classifications> model = ModelZoo.loadModel(criteria)) {
-            try (Predictor<BufferedImage, Classifications> predictor =
-                    model.newPredictor(myTranslator)) {
+        try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria)) {
+            try (Predictor<Image, Classifications> predictor = model.newPredictor(myTranslator)) {
                 Classifications result =
                         predictor.predict(
-                                BufferedImageUtils.fromFile(
-                                        Paths.get("../../examples/src/test/resources/kitten.jpg")));
+                                ImageFactory.getInstance()
+                                        .fromFile(
+                                                Paths.get(
+                                                        "../../examples/src/test/resources/kitten.jpg")));
                 System.out.println(result.best().getClassName());
-                Assert.assertTrue(result.best().getClassName().equals("n02124075 Egyptian cat"));
+                Assert.assertEquals(result.best().getClassName(), "n02124075 Egyptian cat");
             }
         }
     }

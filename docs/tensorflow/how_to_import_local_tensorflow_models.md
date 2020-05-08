@@ -26,11 +26,11 @@ Then you just need to pass the directory using `model.load()`, here is an exampl
 try (Model model = Model.newInstance()) {
     model.load(Paths.get("resnet50/1/"));
     // create new predictor
-    try (Predictor<BufferedImage, Classifications> predictor =
+    try (Predictor<Image, Classifications> predictor =
                     model.newPredictor(myTranslator)) {
         // run prediction on image file
         Classifications result =
-            predictor.predict(BufferedImageUtils.fromFile(Paths.get("cat.jpg")));
+            predictor.predict(ImageFactory.getinstance().fromFile(Paths.get("cat.jpg")));
         // show result
         // ...
     }

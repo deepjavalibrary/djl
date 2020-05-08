@@ -12,12 +12,12 @@
  */
 package ai.djl.modality.cv.translator.wrapper;
 
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
-import java.awt.image.BufferedImage;
 import java.io.InputStream;
-import javax.imageio.ImageIO;
 
 /**
  * Built-in {@code Translator} that provides image pre-processing from {@code InputStream}.
@@ -26,21 +26,21 @@ import javax.imageio.ImageIO;
  */
 public class InputStreamTranslator<T> implements Translator<InputStream, T> {
 
-    private Translator<BufferedImage, T> translator;
+    private Translator<Image, T> translator;
 
     /**
      * Creates a {@code UrlTranslator} instance.
      *
      * @param translator a {@code Translator} that can process image
      */
-    public InputStreamTranslator(Translator<BufferedImage, T> translator) {
+    public InputStreamTranslator(Translator<Image, T> translator) {
         this.translator = translator;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, InputStream input) throws Exception {
-        BufferedImage image = ImageIO.read(input);
+        Image image = ImageFactory.getInstance().fromInputStream(input);
         return translator.processInput(ctx, image);
     }
 

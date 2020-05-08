@@ -19,6 +19,7 @@ import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.Image;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -41,7 +42,6 @@ import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.PairList;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -101,7 +101,7 @@ public class ResnetTest {
     public void testLoadPredict()
             throws IOException, ModelNotFoundException, TranslateException,
                     MalformedModelException {
-        try (ZooModel<BufferedImage, Classifications> model = getModel()) {
+        try (ZooModel<Image, Classifications> model = getModel()) {
             try (Predictor<NDList, NDList> predictor = model.newPredictor(new TestTranslator())) {
                 NDList input = new NDList(model.getNDManager().ones(new Shape(3, 32, 32)));
                 List<NDList> inputs = Collections.nCopies(16, input);
@@ -113,7 +113,7 @@ public class ResnetTest {
     @Test
     public void testLoadTrain()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        try (ZooModel<BufferedImage, Classifications> model = getModel()) {
+        try (ZooModel<Image, Classifications> model = getModel()) {
             TrainingConfig config =
                     new DefaultTrainingConfig(Loss.l1Loss()).optInitializer(Initializer.ONES);
             try (Trainer trainer = model.newTrainer(config)) {
@@ -141,13 +141,13 @@ public class ResnetTest {
         }
     }
 
-    private ZooModel<BufferedImage, Classifications> getModel()
+    private ZooModel<Image, Classifications> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
 
-        Criteria<BufferedImage, Classifications> criteria =
+        Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
-                        .setTypes(BufferedImage.class, Classifications.class)
+                        .setTypes(Image.class, Classifications.class)
                         .optGroupId(BasicModelZoo.GROUP_ID)
                         .optArtifactId("resnet")
                         .optFilter("layers", "50")

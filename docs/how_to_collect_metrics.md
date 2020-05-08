@@ -16,15 +16,15 @@ For example, if there is an application that uses Predictor to serve inference r
 ```java
 // load the image in which objects need to be detected
 URL url = new URL("https://s3.amazonaws.com/images.pdpics.com/preview/3033-bicycle-rider.jpg");
-BufferedImage img = ImageIO.read(url);
+Image img = ImageFactory.getInstance().fromURL(url);
 
 // load the model for SingleShotDetector
 Map<String, String> criteria = new HashMap<>();
 criteria.put("size", "512");
 criteria.put("backbone", "resnet50");
 criteria.put("dataset", "voc");
-ZooModel<BufferedImage, DetectedObjects> model = MxModelZoo.SSD.loadModel(criteria);
-Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor();
+ZooModel<Image, DetectedObjects> model = MxModelZoo.SSD.loadModel(criteria);
+Predictor<Image, DetectedObjects> predictor = model.newPredictor();
 
 // instantiate metrics so that Predictor can record its performance
 Metrics metrics = new Metrics();

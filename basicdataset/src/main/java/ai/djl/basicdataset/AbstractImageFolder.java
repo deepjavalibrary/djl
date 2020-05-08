@@ -12,10 +12,9 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.util.BufferedImageUtils;
-import ai.djl.modality.cv.util.NDImageUtils;
-import ai.djl.modality.cv.util.NDImageUtils.Flag;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -42,7 +41,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
             new HashSet<>(Arrays.asList(".jpg", ".jpeg", ".png", ".bmp", ".wbmp", ".gif"));
 
     protected Repository repository;
-    protected Flag flag;
+    protected Image.Flag flag;
     protected List<String> synset;
     protected PairList<String, Integer> items;
 
@@ -60,7 +59,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         Pair<String, Integer> item = items.get(Math.toIntExact(index));
 
         Path imagePath = getImagePath(item.getKey());
-        NDArray array = BufferedImageUtils.readFileToArray(manager, imagePath, flag);
+        NDArray array = ImageFactory.getInstance().fromFile(imagePath).toNDArray(manager, flag);
         NDList d = new NDList(array);
         NDList l = new NDList(manager.create(item.getValue()));
         return new Record(d, l);
@@ -126,10 +125,10 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
             extends BaseBuilder<T> {
 
         Repository repository;
-        Flag flag;
+        Image.Flag flag;
 
         protected ImageFolderBuilder() {
-            flag = NDImageUtils.Flag.COLOR;
+            flag = Image.Flag.COLOR;
             pipeline = new Pipeline(new ToTensor());
         }
 
@@ -139,7 +138,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
          * @param flag the color mode flag
          * @return this builder
          */
-        public T optFlag(Flag flag) {
+        public T optFlag(Image.Flag flag) {
             this.flag = flag;
             return self();
         }
