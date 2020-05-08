@@ -38,7 +38,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.tensorflow.Operand;
-import org.tensorflow.Operation;
 import org.tensorflow.Tensor;
 import org.tensorflow.op.Ops;
 import org.tensorflow.op.core.Constant;
@@ -1577,13 +1576,7 @@ public class TfNDArray implements NDArray {
     @SuppressWarnings("unchecked")
     <T extends TType> Operand<T> asOperand() {
         if (operand == null) {
-            Operation op =
-                    manager.getEagerSession()
-                            .opBuilder("Const", "Const_" + TfNDManager.nextNameAssignment())
-                            .setAttr("dtype", tensor.dataType())
-                            .setAttr("value", tensor)
-                            .build();
-            operand = op.output(0);
+            operand = tf.constant(tensor);
         }
         return (Operand<T>) operand;
     }
