@@ -26,6 +26,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -456,6 +457,17 @@ public interface NDArray extends AutoCloseable {
      * @param value the value to replace with
      */
     void set(NDIndex index, Number value);
+
+    /**
+     * Sets the specific index by a function.
+     *
+     * @param index the locations to update
+     * @param function the function to change the value
+     */
+    default void set(NDIndex index, Function<NDArray, NDArray> function) {
+        NDArray array = get(index);
+        set(index, function.apply(array));
+    }
 
     /**
      * Sets the specified index in this {@code NDArray} with the given value.

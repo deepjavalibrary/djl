@@ -95,6 +95,17 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
+    public void testSetByFunction() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.arange(1, 10).reshape(3, 3);
+            NDArray expected = manager.create(new int[] {4, 10, 16});
+            NDIndex index = new NDIndex(":, 1");
+            original.set(index, nd -> nd.mul(2));
+            Assert.assertEquals(original.get(index), expected);
+        }
+    }
+
+    @Test
     public void testCopyTo() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.create(new float[] {1f, 2f, 3f, 4f});

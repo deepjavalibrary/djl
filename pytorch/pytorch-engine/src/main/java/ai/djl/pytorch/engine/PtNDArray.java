@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -194,12 +195,28 @@ public class PtNDArray extends NativeResource implements NDArray {
         } else {
             NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
             if (fullSlice != null) {
+                Stack<NDArray> prepareValue = new Stack<>();
+                prepareValue.add(value);
+                prepareValue.add(prepareValue.peek().toDevice(getDevice(), false));
+                // Deal with the case target: (1, 10, 1), original (10)
+                // try to find (10, 1) and reshape (10) to that
+                Shape targetShape = fullSlice.getShape();
+                while (targetShape.size() > value.size()) {
+                    targetShape = targetShape.slice(1);
+                }
+                prepareValue.add(prepareValue.peek().reshape(targetShape));
+                prepareValue.add(prepareValue.peek().broadcast(fullSlice.getShape()));
                 JniUtils.indexSet(
                         this,
-                        (PtNDArray) value,
+                        (PtNDArray) prepareValue.peek(),
                         fullSlice.getMin(),
                         fullSlice.getMax(),
                         fullSlice.getStep());
+                for (NDArray toClean : prepareValue) {
+                    if (toClean != value) {
+                        toClean.close();
+                    }
+                }
             } else {
                 throw new UnsupportedOperationException(
                         "set() currently supports all, fixed, and slices indices");
