@@ -33,6 +33,8 @@ public class ModelZooTest {
     public void setUp() {
         // force downloading without cache in .djl.ai folder.
         System.setProperty("DJL_CACHE_DIR", "build/cache");
+        String userHome = System.getProperty("user.home");
+        System.setProperty("ENGINE_CACHE_DIR", userHome);
     }
 
     @AfterClass

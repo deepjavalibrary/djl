@@ -155,9 +155,8 @@ public final class LibUtils {
     private static String loadLibraryFromClasspath(Platform platform) {
         Path tmp = null;
         try {
-            String userHome = System.getProperty("user.home");
             String libName = System.mapLibraryName(LIB_NAME);
-            Path cacheFolder = Paths.get(userHome, ".mxnet/cache");
+            Path cacheFolder = getCacheDir();
             Path dir = cacheFolder.resolve(platform.getVersion() + platform.getClassifier());
             Path path = dir.resolve(libName);
             if (Files.exists(path)) {
@@ -261,9 +260,8 @@ public final class LibUtils {
         String cudaArch = platform.getCudaArch();
         String os = platform.getOsPrefix();
 
-        String userHome = System.getProperty("user.home");
         String libName = System.mapLibraryName(LIB_NAME);
-        Path cacheFolder = Paths.get(userHome, ".mxnet/cache");
+        Path cacheFolder = getCacheDir();
         Path dir = cacheFolder.resolve(version + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {
@@ -308,10 +306,7 @@ public final class LibUtils {
 
                 // check again in case fallback to cpu
                 if ("mkl".equals(flavor)) {
-                    dir =
-                            Paths.get(
-                                    userHome,
-                                    ".mxnet/cache/" + version + flavor + '-' + classifier);
+                    dir = cacheFolder.resolve(version + flavor + '-' + classifier);
                     path = dir.resolve(libName);
                     if (Files.exists(path)) {
                         return path.toAbsolutePath().toString();
@@ -347,5 +342,24 @@ public final class LibUtils {
                 Utils.deleteQuietly(tmp);
             }
         }
+    }
+
+    private static Path getCacheDir() {
+        String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
+        if (cacheDir == null || cacheDir.isEmpty()) {
+            cacheDir = System.getenv("ENGINE_CACHE_DIR");
+            if (cacheDir == null || cacheDir.isEmpty()) {
+                cacheDir = System.getProperty("DJL_CACHE_DIR");
+                if (cacheDir == null || cacheDir.isEmpty()) {
+                    cacheDir = System.getenv("DJL_CACHE_DIR");
+                    if (cacheDir == null || cacheDir.isEmpty()) {
+                        String userHome = System.getProperty("user.home");
+                        return Paths.get(userHome, ".mxnet/cache");
+                    }
+                }
+                return Paths.get(cacheDir, "mxnet");
+            }
+        }
+        return Paths.get(cacheDir, ".mxnet/cache");
     }
 }

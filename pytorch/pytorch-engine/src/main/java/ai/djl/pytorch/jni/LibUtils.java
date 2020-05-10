@@ -245,9 +245,8 @@ public final class LibUtils {
         String flavor = platform.getFlavor();
         String classifier = platform.getClassifier();
         try {
-            String userHome = System.getProperty("user.home");
             String libName = System.mapLibraryName(NATIVE_LIB_NAME);
-            Path cacheDir = Paths.get(userHome, ".pytorch/cache");
+            Path cacheDir = getCacheDir();
             Path dir = cacheDir.resolve(version + flavor + '-' + classifier);
             Path path = dir.resolve(libName);
             if (Files.exists(path)) {
@@ -283,9 +282,8 @@ public final class LibUtils {
         String classifier = platform.getClassifier();
         String os = platform.getOsPrefix();
 
-        String userHome = System.getProperty("user.home");
         String libName = System.mapLibraryName(NATIVE_LIB_NAME);
-        Path cacheDir = Paths.get(userHome, ".pytorch/cache");
+        Path cacheDir = getCacheDir();
         Path dir = cacheDir.resolve(version + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {
@@ -320,5 +318,24 @@ public final class LibUtils {
                 Utils.deleteQuietly(tmp);
             }
         }
+    }
+
+    private static Path getCacheDir() {
+        String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
+        if (cacheDir == null || cacheDir.isEmpty()) {
+            cacheDir = System.getenv("ENGINE_CACHE_DIR");
+            if (cacheDir == null || cacheDir.isEmpty()) {
+                cacheDir = System.getProperty("DJL_CACHE_DIR");
+                if (cacheDir == null || cacheDir.isEmpty()) {
+                    cacheDir = System.getenv("DJL_CACHE_DIR");
+                    if (cacheDir == null || cacheDir.isEmpty()) {
+                        String userHome = System.getProperty("user.home");
+                        return Paths.get(userHome, ".pytorch/cache");
+                    }
+                }
+                return Paths.get(cacheDir, "pytorch");
+            }
+        }
+        return Paths.get(cacheDir, ".pytorch/cache");
     }
 }
