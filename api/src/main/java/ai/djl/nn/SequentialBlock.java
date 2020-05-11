@@ -201,7 +201,8 @@ public class SequentialBlock extends AbstractBlock {
         StringBuilder sb = new StringBuilder(200);
         sb.append("Sequential(\n");
         for (Block block : blocks) {
-            sb.append('\t').append(block).append('\n');
+            String blockString = block.toString().replaceAll("(?m)^", "\t");
+            sb.append(blockString).append('\n');
         }
         sb.append(')');
         return sb.toString();
