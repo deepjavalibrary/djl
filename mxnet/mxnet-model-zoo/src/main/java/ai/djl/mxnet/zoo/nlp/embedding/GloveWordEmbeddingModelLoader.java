@@ -81,7 +81,8 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDLis
                                 Integer.parseInt(artifact.getProperties().get("dimensions")))
                         .setItems(idxToToken)
                         .optUnknownToken((String) arguments.get("unknownToken"))
-                        .optUseDefault(false)
+                        .optUseDefault(true)
+                        .optSparseGrad(false)
                         .build();
         model.setBlock(wordEmbedding);
         model.setProperty("unknownToken", (String) arguments.get("unknownToken"));

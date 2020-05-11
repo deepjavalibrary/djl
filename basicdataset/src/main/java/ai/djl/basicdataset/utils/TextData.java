@@ -13,7 +13,6 @@
 package ai.djl.basicdataset.utils;
 
 import ai.djl.modality.nlp.SimpleVocabulary;
-import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableTextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
@@ -44,7 +43,6 @@ public class TextData {
     private TextEmbedding textEmbedding;
     private SimpleVocabulary vocabulary;
     private String unknownToken;
-    private boolean trainEmbedding;
     private int embeddingSize;
     private int size;
 
@@ -56,7 +54,6 @@ public class TextData {
     public TextData(Configuration config) {
         this.textProcessors = config.textProcessors;
         this.textEmbedding = config.textEmbedding;
-        this.trainEmbedding = config.trainEmbedding;
         this.embeddingSize = config.embeddingSize;
         this.unknownToken = config.unknownToken;
         this.reservedTokens = config.reservedTokens;
@@ -76,7 +73,6 @@ public class TextData {
 
         return new TextData.Configuration()
                 .setEmbeddingSize(15)
-                .setTrainEmbedding(false)
                 .setTextProcessors(defaultTextProcessors)
                 .setUnknownToken("<unk>")
                 .setReservedTokens(Arrays.asList("<bos>", "<eos>", "<pad>"));
@@ -87,9 +83,8 @@ public class TextData {
      *
      * @param manager the
      * @param newTextData the data from the dataset
-     * @throws EmbeddingException if there was an error while fetching the embedding
      */
-    public void preprocess(NDManager manager, List<String> newTextData) throws EmbeddingException {
+    public void preprocess(NDManager manager, List<String> newTextData) {
         rawText = newTextData;
         SimpleVocabulary.VocabularyBuilder vocabularyBuilder =
                 new SimpleVocabulary.VocabularyBuilder();
@@ -122,12 +117,8 @@ public class TextData {
                 }
             }
             textData.set(i, tokenizedTextDatum);
-            if (trainEmbedding) {
-                textEmbeddingList.add(
-                        manager.create(textEmbedding.preprocessTextToEmbed(tokenizedTextDatum)));
-            } else {
-                textEmbeddingList.add(textEmbedding.embedText(manager, tokenizedTextDatum));
-            }
+            textEmbeddingList.add(
+                    manager.create(textEmbedding.preprocessTextToEmbed(tokenizedTextDatum)));
         }
     }
 
@@ -204,15 +195,6 @@ public class TextData {
     }
 
     /**
-     * Gets the boolean that indicates whether the embeddings need to be trained.
-     *
-     * @return whether the embeddings need to be trained
-     */
-    public boolean getTrainEmbedding() {
-        return trainEmbedding;
-    }
-
-    /**
      * Returns the size of the data.
      *
      * @return the size of the data
@@ -229,7 +211,6 @@ public class TextData {
 
         private List<TextProcessor> textProcessors;
         private TextEmbedding textEmbedding;
-        private Boolean trainEmbedding;
         private Integer embeddingSize;
         private String unknownToken;
         private List<String> reservedTokens;
@@ -253,17 +234,6 @@ public class TextData {
          */
         public Configuration setTextEmbedding(TextEmbedding textEmbedding) {
             this.textEmbedding = textEmbedding;
-            return this;
-        }
-
-        /**
-         * Sets whether to train the {@link TextEmbedding}.
-         *
-         * @param trainEmbedding true to train the {@link TextEmbedding}
-         * @return this configuration
-         */
-        public Configuration setTrainEmbedding(boolean trainEmbedding) {
-            this.trainEmbedding = trainEmbedding;
             return this;
         }
 
@@ -309,7 +279,6 @@ public class TextData {
         public Configuration update(Configuration other) {
             textProcessors = other.textProcessors != null ? other.textProcessors : textProcessors;
             textEmbedding = other.textEmbedding != null ? other.textEmbedding : textEmbedding;
-            trainEmbedding = other.trainEmbedding != null ? other.trainEmbedding : trainEmbedding;
             embeddingSize = other.embeddingSize != null ? other.embeddingSize : embeddingSize;
             unknownToken = other.unknownToken != null ? other.unknownToken : unknownToken;
             reservedTokens = other.reservedTokens != null ? other.reservedTokens : reservedTokens;

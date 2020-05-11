@@ -72,6 +72,16 @@ public interface Model extends AutoCloseable {
     /**
      * Creates an empty model instance on the specified {@link Device} and engine.
      *
+     * @param engineName the name of the engine
+     * @return a new model instance
+     */
+    static Model newInstance(String engineName) {
+        return Engine.getEngine(engineName).newModel(Device.defaultDevice());
+    }
+
+    /**
+     * Creates an empty model instance on the specified {@link Device} and engine.
+     *
      * @param device the device to load the model onto
      * @param engineName the name of the engine
      * @return a new model instance

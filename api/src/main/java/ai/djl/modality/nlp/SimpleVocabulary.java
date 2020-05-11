@@ -50,7 +50,7 @@ public class SimpleVocabulary implements Vocabulary {
             return;
         }
         TokenInfo tokenInfo = tokens.getOrDefault(token, new TokenInfo());
-        if (++tokenInfo.frequency >= minFrequency) {
+        if (++tokenInfo.frequency == minFrequency) {
             tokenInfo.index = indexToToken.size();
             indexToToken.add(token);
         }

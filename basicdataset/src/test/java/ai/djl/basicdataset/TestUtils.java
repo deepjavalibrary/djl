@@ -35,6 +35,11 @@ public final class TestUtils {
             }
 
             @Override
+            public NDArray embedText(NDArray textIndices) {
+                return null;
+            }
+
+            @Override
             public List<String> unembedText(NDArray textEmbedding) {
                 return null;
             }

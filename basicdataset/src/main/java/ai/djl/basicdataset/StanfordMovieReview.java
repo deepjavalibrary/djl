@@ -16,6 +16,7 @@ import ai.djl.Application.NLP;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
@@ -175,7 +176,10 @@ public class StanfordMovieReview extends TextDataset implements ZooDataset {
     public Record get(NDManager manager, long index) {
         NDList data = new NDList();
         data.add(sourceTextData.getEmbedding(manager, index));
-        NDList label = new NDList(manager.create(reviewSentiments.get(Math.toIntExact(index))));
+        NDList label =
+                new NDList(
+                        manager.create(reviewSentiments.get(Math.toIntExact(index)))
+                                .toType(DataType.INT32, false));
         return new Record(data, label);
     }
 

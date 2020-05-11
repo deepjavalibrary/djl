@@ -58,10 +58,10 @@ public class TrainableTextEmbedding extends AbstractBlock implements TextEmbeddi
         return result;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public NDArray embedText(NDManager manager, int[] textIndices) {
-        throw new UnsupportedOperationException("This operation is not supported by this class.");
+    public NDArray embedText(NDArray textIndices) throws EmbeddingException {
+        throw new UnsupportedOperationException(
+                "EmbedText operation is not supported by this class.");
     }
 
     /** {@inheritDoc} */

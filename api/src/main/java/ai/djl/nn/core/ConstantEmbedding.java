@@ -12,7 +12,6 @@
  */
 package ai.djl.nn.core;
 
-import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -23,7 +22,6 @@ import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -72,13 +70,12 @@ public class ConstantEmbedding extends ParameterBlock implements AbstractIndexed
     }
 
     @Override
-    public void saveParameters(DataOutputStream os) throws IOException {
+    public void saveParameters(DataOutputStream os) {
         // Nothing to save
     }
 
     @Override
-    public void loadParameters(NDManager manager, DataInputStream is)
-            throws IOException, MalformedModelException {
+    public void loadParameters(NDManager manager, DataInputStream is) {
         // Nothing to load
     }
 
@@ -88,12 +85,12 @@ public class ConstantEmbedding extends ParameterBlock implements AbstractIndexed
     }
 
     @Override
-    public byte[] encode(Object input) throws IOException {
+    public byte[] encode(Object input) {
         return new byte[0];
     }
 
     @Override
-    public Object decode(byte[] byteArray) throws IOException {
+    public Object decode(byte[] byteArray) {
         return null;
     }
 

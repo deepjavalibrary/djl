@@ -72,7 +72,18 @@ public interface WordEmbedding {
      * @return the embedded word
      * @throws EmbeddingException if there is an error while trying to embed
      */
-    NDArray embedWord(NDManager manager, int index) throws EmbeddingException;
+    default NDArray embedWord(NDManager manager, int index) throws EmbeddingException {
+        return embedWord(manager.create(index));
+    }
+
+    /**
+     * Embeds the word after preprocessed using {@link #preprocessWordToEmbed(String)}.
+     *
+     * @param index the index of the word to embed
+     * @return the embedded word
+     * @throws EmbeddingException if there is an error while trying to embed
+     */
+    NDArray embedWord(NDArray index) throws EmbeddingException;
 
     /**
      * Returns the closest matching word for the given index.

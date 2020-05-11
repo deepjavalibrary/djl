@@ -70,7 +70,7 @@ final class NDSerializer {
             dos.flush();
             return baos.toByteArray();
         } catch (IOException e) {
-            throw new AssertionError("this should never happened", e);
+            throw new AssertionError("This should never happen", e);
         }
     }
 

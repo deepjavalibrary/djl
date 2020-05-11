@@ -25,7 +25,7 @@ public class TatoebaEnglishFrenchDatasetTest {
     private static final int EMBEDDING_SIZE = 15;
 
     @Test
-    public void testGetDataWithPreTrainedEmbedding() throws IOException, EmbeddingException {
+    public void testGetDataWithPreTrainedEmbedding() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             TatoebaEnglishFrenchDataset tatoebaEnglishFrenchDataset =
                     TatoebaEnglishFrenchDataset.builder()
@@ -44,10 +44,8 @@ public class TatoebaEnglishFrenchDatasetTest {
                             .build();
             tatoebaEnglishFrenchDataset.prepare();
             Record record = tatoebaEnglishFrenchDataset.get(manager, 0);
-            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
-            Assert.assertEquals(record.getData().get(0).getShape().get(1), EMBEDDING_SIZE);
-            Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 2);
-            Assert.assertEquals(record.getLabels().get(0).getShape().get(1), EMBEDDING_SIZE);
+            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
+            Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
         }
     }
 
@@ -61,15 +59,13 @@ public class TatoebaEnglishFrenchDatasetTest {
                                             .setTextEmbedding(
                                                     TestUtils.getTextEmbedding(
                                                             manager, EMBEDDING_SIZE))
-                                            .setEmbeddingSize(EMBEDDING_SIZE)
-                                            .setTrainEmbedding(true))
+                                            .setEmbeddingSize(EMBEDDING_SIZE))
                             .setTargetConfiguration(
                                     new Configuration()
                                             .setTextEmbedding(
                                                     TestUtils.getTextEmbedding(
                                                             manager, EMBEDDING_SIZE))
-                                            .setEmbeddingSize(EMBEDDING_SIZE)
-                                            .setTrainEmbedding(true))
+                                            .setEmbeddingSize(EMBEDDING_SIZE))
                             .setSampling(32, true)
                             .optLimit(1000)
                             .build();

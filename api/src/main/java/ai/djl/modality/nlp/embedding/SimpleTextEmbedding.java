@@ -15,7 +15,6 @@ package ai.djl.modality.nlp.embedding;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,17 +44,17 @@ public class SimpleTextEmbedding implements TextEmbedding {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray embedText(NDManager manager, int[] textIndices) throws EmbeddingException {
+    public NDArray embedText(NDArray textIndices) throws EmbeddingException {
         NDList result = new NDList();
-        for (int index : textIndices) {
-            result.add(wordEmbedding.embedWord(manager, index));
+        for (int i = 0; i < textIndices.size(); i++) {
+            result.add(wordEmbedding.embedWord(textIndices.get(i)));
         }
         return NDArrays.stack(result);
     }
 
     /** {@inheritDoc} */
     @Override
-    public List<String> unembedText(NDArray textEmbedding) throws EmbeddingException {
+    public List<String> unembedText(NDArray textEmbedding) {
         NDList split = textEmbedding.split(textEmbedding.getShape().get(0));
         List<String> result = new ArrayList<>(split.size());
         for (NDArray token : split) {

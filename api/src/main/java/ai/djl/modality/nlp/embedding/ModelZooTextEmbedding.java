@@ -16,28 +16,26 @@ import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.nn.core.Embedding;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
+import java.util.List;
 
 /** A {@link WordEmbedding} using a {@link ZooModel}. */
-public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
+public class ModelZooTextEmbedding implements TextEmbedding, AutoCloseable {
 
     private Predictor<NDList, NDList> predictor;
     private Embedding<String> embedding;
-    private String unknownToken;
 
     /**
-     * Constructs a {@link ModelZooWordEmbedding}.
+     * Constructs a {@link ModelZooTextEmbedding}.
      *
      * @param model the model for the embedding. The model's block must consist of only an {@link
      *     Embedding}&lt;{@link String}&gt;.
      */
     @SuppressWarnings("unchecked")
-    public ModelZooWordEmbedding(Model model) {
-        this.unknownToken = model.getProperty("unknownToken");
+    public ModelZooTextEmbedding(Model model) {
         predictor = model.newPredictor(new NoopTranslator());
         try {
             embedding = (Embedding<String>) model.getBlock();
@@ -48,24 +46,15 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public boolean vocabularyContains(String word) {
-        return embedding.hasItem(word);
+    public int[] preprocessTextToEmbed(List<String> tokens) {
+        return tokens.stream().mapToInt(token -> embedding.embed(token)).toArray();
     }
 
     /** {@inheritDoc} */
     @Override
-    public int preprocessWordToEmbed(String word) {
-        if (embedding.hasItem(word)) {
-            return embedding.embed(word);
-        }
-        return embedding.embed(unknownToken);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray embedWord(NDManager manager, int word) throws EmbeddingException {
+    public NDArray embedText(NDArray indices) throws EmbeddingException {
         try {
-            return predictor.predict(new NDList(manager.create(word))).singletonOrThrow();
+            return predictor.predict(new NDList(indices)).singletonOrThrow();
         } catch (TranslateException e) {
             throw new EmbeddingException("Could not embed word", e);
         }
@@ -73,7 +62,7 @@ public class ModelZooWordEmbedding implements WordEmbedding, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public String unembedWord(NDArray word) {
+    public List<String> unembedText(NDArray word) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

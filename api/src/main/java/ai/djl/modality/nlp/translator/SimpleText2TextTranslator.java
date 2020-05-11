@@ -41,7 +41,7 @@ import java.util.Locale;
  * A {@link Translator} that performs pre-process and post-processing for a sequence-to-sequence
  * text model.
  */
-public class Seq2SeqTranslator implements Translator<String, String> {
+public class SimpleText2TextTranslator implements Translator<String, String> {
     private SimpleTokenizer tokenizer = new SimpleTokenizer();
     private TrainableTextEmbedding sourceEmbedding;
     private TrainableTextEmbedding targetEmbedding;

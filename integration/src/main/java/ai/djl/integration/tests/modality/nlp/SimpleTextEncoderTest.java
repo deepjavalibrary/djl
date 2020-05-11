@@ -12,7 +12,7 @@
  */
 package ai.djl.integration.tests.modality.nlp;
 
-import ai.djl.basicmodelzoo.nlp.SimpleSequenceEncoder;
+import ai.djl.basicmodelzoo.nlp.SimpleTextEncoder;
 import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.nlp.embedding.TrainableTextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
@@ -27,7 +27,7 @@ import java.util.Arrays;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class SimpleSequenceEncoderTest {
+public class SimpleTextEncoderTest {
 
     @Test
     public void testEncoder() {
@@ -37,8 +37,8 @@ public class SimpleSequenceEncoderTest {
                                 .setEmbeddingSize(8)
                                 .setItems(Arrays.asList("1 2 3 4 5 6 7 8 9 10".split(" ")))
                                 .build());
-        SimpleSequenceEncoder encoder =
-                new SimpleSequenceEncoder(
+        SimpleTextEncoder encoder =
+                new SimpleTextEncoder(
                         trainableTextEmbedding,
                         LSTM.builder()
                                 .setNumStackedLayers(2)

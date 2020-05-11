@@ -19,31 +19,31 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.recurrent.RecurrentBlock;
 
 /**
- * {@code SimpleSequenceEncoder} implements a {@link Encoder} that employs a {@link RecurrentBlock}
- * to encode text input.
+ * {@code SimpleTextEncoder} implements a {@link Encoder} that employs a {@link RecurrentBlock} to
+ * encode text input.
  */
-public class SimpleSequenceEncoder extends Encoder {
+public class SimpleTextEncoder extends Encoder {
     /**
-     * Contructs a new instance of {@code SimpleSequenceEncoder} with the given {@link
-     * RecurrentBlock}. Use this constructor if you are planning to use pre-trained embeddings that
-     * don't need further training.
+     * Contructs a new instance of {@code SimpleTextEncoder} with the given {@link RecurrentBlock}.
+     * Use this constructor if you are planning to use pre-trained embeddings that don't need
+     * further training.
      *
      * @param recurrentBlock the recurrent block to be used to encode
      */
-    public SimpleSequenceEncoder(RecurrentBlock recurrentBlock) {
+    public SimpleTextEncoder(RecurrentBlock recurrentBlock) {
         super(recurrentBlock);
         recurrentBlock.setStateOutputs(true);
     }
 
     /**
-     * Contructs a new instance of {@code SimpleSequenceEncoder} with the given {@link
-     * RecurrentBlock} and {@link TrainableTextEmbedding}. Use this constructor if you are planning
-     * to use pre-trained or fresh embeddings that need further training.
+     * Contructs a new instance of {@code SimpleTextEncoder} with the given {@link RecurrentBlock}
+     * and {@link TrainableTextEmbedding}. Use this constructor if you are planning to use
+     * pre-trained or fresh embeddings that need further training.
      *
      * @param trainableTextEmbedding the {@link TrainableTextEmbedding} to train embeddings with
      * @param recurrentBlock the recurrent block to be used to encode
      */
-    public SimpleSequenceEncoder(
+    public SimpleTextEncoder(
             TrainableTextEmbedding trainableTextEmbedding, RecurrentBlock recurrentBlock) {
         super(new SequentialBlock().add(trainableTextEmbedding).add(recurrentBlock));
         recurrentBlock.setStateOutputs(true);

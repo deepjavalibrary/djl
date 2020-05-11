@@ -108,8 +108,8 @@ public abstract class TextDataset extends RandomAccessDataset {
 
     /** Abstract Builder that helps build a {@link TextDataset}. */
     public abstract static class Builder<T extends Builder<T>> extends BaseBuilder<T> {
-        private TextData.Configuration sourceConfiguration;
-        private TextData.Configuration targetConfiguration;
+        private TextData.Configuration sourceConfiguration = new Configuration();
+        private TextData.Configuration targetConfiguration = new Configuration();
         private NDManager manager = Engine.getInstance().newBaseManager();
 
         /**

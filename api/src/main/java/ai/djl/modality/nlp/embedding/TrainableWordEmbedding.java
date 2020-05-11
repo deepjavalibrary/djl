@@ -14,7 +14,6 @@ package ai.djl.modality.nlp.embedding;
 
 import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDManager;
 import ai.djl.nn.core.Embedding;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -89,10 +88,10 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
         return embed(word);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public NDArray embedWord(NDManager manager, int index) {
-        throw new UnsupportedOperationException("This operation is not supported by this class.");
+    public NDArray embedWord(NDArray index) throws EmbeddingException {
+        throw new UnsupportedOperationException(
+                "EmbedWord operation is not supported by this class.");
     }
 
     /** {@inheritDoc} */

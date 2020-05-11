@@ -25,34 +25,34 @@ import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 
 /**
- * {@code SimpleSequenceDecoder} implements a {@link Decoder} that employs a {@link RecurrentBlock}
- * to decode text input.
+ * {@code SimpleTextDecoder} implements a {@link Decoder} that employs a {@link RecurrentBlock} to
+ * decode text input.
  */
-public class SimpleSequenceDecoder extends Decoder {
+public class SimpleTextDecoder extends Decoder {
     private RecurrentBlock recurrentBlock;
 
     /**
-     * Contructs a new instance of {@code SimpleSequenceDecoder} with the given {@link
-     * RecurrentBlock}. Use this constructor if you are planning to use pre-trained embeddings that
-     * don't need further training.
+     * Contructs a new instance of {@code SimpleTextDecoder} with the given {@link RecurrentBlock}.
+     * Use this constructor if you are planning to use pre-trained embeddings that don't need
+     * further training.
      *
      * @param recurrentBlock the recurrent block to be used to decode
      * @param vocabSize the size of the {@link ai.djl.modality.nlp.Vocabulary}
      */
-    public SimpleSequenceDecoder(RecurrentBlock recurrentBlock, int vocabSize) {
+    public SimpleTextDecoder(RecurrentBlock recurrentBlock, int vocabSize) {
         this(null, recurrentBlock, vocabSize);
     }
 
     /**
-     * Contructs a new instance of {@code SimpleSequenceDecoder} with the given {@link
-     * RecurrentBlock}. Use this constructor if you are planning to use pre-trained embeddings that
-     * don't need further training.
+     * Contructs a new instance of {@code SimpleTextDecoder} with the given {@link RecurrentBlock}.
+     * Use this constructor if you are planning to use pre-trained embeddings that don't need
+     * further training.
      *
      * @param trainableTextEmbedding the {@link TrainableTextEmbedding} to train embeddings with
      * @param recurrentBlock the recurrent block to be used to decode
      * @param vocabSize the size of the {@link ai.djl.modality.nlp.Vocabulary}
      */
-    public SimpleSequenceDecoder(
+    public SimpleTextDecoder(
             TrainableTextEmbedding trainableTextEmbedding,
             RecurrentBlock recurrentBlock,
             int vocabSize) {

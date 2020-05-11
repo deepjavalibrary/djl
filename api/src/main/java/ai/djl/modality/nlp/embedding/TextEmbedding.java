@@ -63,11 +63,22 @@ public interface TextEmbedding {
      * Embeds the text after preprocessed using {@link #preprocessTextToEmbed(List)}.
      *
      * @param manager the manager to create the embedding array
-     * @param textIndices the text to embed
+     * @param textIndices the indices of text to embed
      * @return the embedded text
      * @throws EmbeddingException if there is an error while trying to embed
      */
-    NDArray embedText(NDManager manager, int[] textIndices) throws EmbeddingException;
+    default NDArray embedText(NDManager manager, int[] textIndices) throws EmbeddingException {
+        return embedText(manager.create(textIndices));
+    }
+
+    /**
+     * Embeds the text after preprocessed using {@link #preprocessTextToEmbed(List)}.
+     *
+     * @param textIndices the indices of text to embed
+     * @return the embedded text
+     * @throws EmbeddingException if there is an error while trying to embed
+     */
+    NDArray embedText(NDArray textIndices) throws EmbeddingException;
 
     /**
      * Returns the closest matching text for a given embedding.

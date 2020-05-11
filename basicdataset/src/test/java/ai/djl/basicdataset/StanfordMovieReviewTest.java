@@ -15,7 +15,6 @@ package ai.djl.basicdataset;
 import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.Record;
-import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -25,7 +24,7 @@ public class StanfordMovieReviewTest {
     private static final int EMBEDDING_SIZE = 15;
 
     @Test
-    public void testGetDataWithPreTrainedEmbedding() throws IOException, TranslateException {
+    public void testGetDataWithPreTrainedEmbedding() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             StanfordMovieReview dataset =
                     StanfordMovieReview.builder()
@@ -44,14 +43,13 @@ public class StanfordMovieReviewTest {
             dataset.prepare();
 
             Record record = dataset.get(manager, 0);
-            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
-            Assert.assertEquals(record.getData().get(0).getShape().get(1), EMBEDDING_SIZE);
+            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
             Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 0);
         }
     }
 
     @Test
-    public void testGetDataWithTrainableEmbedding() throws IOException, TranslateException {
+    public void testGetDataWithTrainableEmbedding() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             StanfordMovieReview dataset =
                     StanfordMovieReview.builder()
@@ -60,15 +58,13 @@ public class StanfordMovieReviewTest {
                                             .setTextEmbedding(
                                                     TestUtils.getTextEmbedding(
                                                             manager, EMBEDDING_SIZE))
-                                            .setEmbeddingSize(EMBEDDING_SIZE)
-                                            .setTrainEmbedding(true))
+                                            .setEmbeddingSize(EMBEDDING_SIZE))
                             .setTargetConfiguration(
                                     new Configuration()
                                             .setTextEmbedding(
                                                     TestUtils.getTextEmbedding(
                                                             manager, EMBEDDING_SIZE))
-                                            .setEmbeddingSize(EMBEDDING_SIZE)
-                                            .setTrainEmbedding(true))
+                                            .setEmbeddingSize(EMBEDDING_SIZE))
                             .setSampling(32, true)
                             .optLimit(100)
                             .build();

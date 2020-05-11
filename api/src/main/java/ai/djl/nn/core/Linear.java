@@ -281,7 +281,7 @@ public class Linear extends ParameterBlock {
          *     set
          */
         public Linear build() {
-            if (outChannels == 0) {
+            if (outChannels <= 0) {
                 throw new IllegalArgumentException("You must specify outChannels");
             }
             return new Linear(this);

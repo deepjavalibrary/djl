@@ -150,8 +150,6 @@ public class PikachuDetection extends RandomAccessDataset implements ZooDataset 
                 labelArray[0] = label.get(4);
 
                 // Bounding box labels
-                // Labels contain in format (Xmin, Ymin, Xmax, Ymax). We need it in (Xmin, Ymax,
-                // Xmax, Ymin)
                 labelArray[1] = label.get(5);
                 labelArray[2] = label.get(6);
                 labelArray[3] = label.get(7);

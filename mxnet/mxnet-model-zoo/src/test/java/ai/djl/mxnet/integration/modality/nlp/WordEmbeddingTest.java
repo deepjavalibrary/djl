@@ -14,13 +14,14 @@ package ai.djl.mxnet.integration.modality.nlp;
 
 import ai.djl.MalformedModelException;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
-import ai.djl.modality.nlp.embedding.ModelZooWordEmbedding;
+import ai.djl.modality.nlp.embedding.ModelZooTextEmbedding;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import java.io.IOException;
+import java.util.Collections;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -31,9 +32,11 @@ public class WordEmbeddingTest {
             throws IOException, ModelNotFoundException, MalformedModelException,
                     EmbeddingException {
         try (ZooModel<NDList, NDList> model = MxModelZoo.GLOVE.loadModel()) {
-            try (ModelZooWordEmbedding wordEmbedding = new ModelZooWordEmbedding(model)) {
+            try (ModelZooTextEmbedding wordEmbedding = new ModelZooTextEmbedding(model)) {
                 NDManager manager = model.getNDManager();
-                NDList result = new NDList(wordEmbedding.embedWord(manager, "the"));
+                NDList result =
+                        new NDList(
+                                wordEmbedding.embedText(manager, Collections.singletonList("the")));
                 Assert.assertEquals(result.singletonOrThrow().sum().getFloat(), -5.24, .01);
             }
         }
