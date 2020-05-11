@@ -28,7 +28,7 @@ dependencies {
     implementation "ai.djl.tensorflow:tensorflow-api:0.5.0"
     implementation "ai.djl.tensorflow:tensorflow-engine:0.5.0"
     implementation "ai.djl.tensorflow:tensorflow-model-zoo:0.5.0"
-    implementation "ai.djl.tensorflow:tensorflow-native-auto:2.1.0-a"
+    implementation "ai.djl.tensorflow:tensorflow-native-auto:2.1.0"
 }
 ```
 
@@ -55,7 +55,7 @@ Same as gradle, just include the 4 modules:
     <dependency>
       <groupId>ai.djl.tensorflow</groupId>
       <artifactId>tensorflow-native-auto</artifactId>
-      <version>2.1.0-a</version>
+      <version>2.1.0</version>
     </dependency>
 </dependencies>
 ```
