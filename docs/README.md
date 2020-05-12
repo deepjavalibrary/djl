@@ -7,7 +7,6 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - [Core API](../api/README.md) - Engine-agnostic API
 - [Basic Dataset](../basicdataset/README.md) - Built-in datasets
 - [Model Zoo](../model-zoo/README.md) - Built-in engine-agnostic model zoo
-- [Repository API](../repository/README.md) - Repository utilities to build the model zoo and dataset
 #### MXNet
 - [MXNet Engine](../mxnet/mxnet-engine/README.md) - MXNet Engine implementation
 - [MXNet Model Zoo](../mxnet/mxnet-model-zoo/README.md) - MXNet symbolic model zoo
@@ -17,8 +16,8 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - [TensorFlow Model Zoo](../tensorflow/tensorflow-model-zoo/README.md) - TensorFlow SavedModel model zoo
 
 #### PyTorch
-- [PyTorch Engine](../pytorc/pytorch-engine/README.md) - PyTorch Engine implementation
-- [PyTorch Model Zoo](../pytorc/pytorch-model-zoo/README.md) - PyTorch TorchScript model zoo
+- [PyTorch Engine](../pytorch/pytorch-engine/README.md) - PyTorch Engine implementation
+- [PyTorch Model Zoo](../pytorch/pytorch-model-zoo/README.md) - PyTorch TorchScript model zoo
 
 ## [JavaDoc API Reference](https://javadoc.djl.ai/)
 

@@ -17,10 +17,3 @@ done
 VERSION=0.3.0
 # check broken link in website and java doc site
 blc https://djl.ai/ -ro
-blc https://javadoc.djl.ai/ -ro
-blc https://javadoc.djl.ai/api/${VERSION}/index.html -ro
-blc https://javadoc.djl.ai/basicdataset/${VERSION}/index.html -ro
-blc https://javadoc.djl.ai/model-zoo/${VERSION}/index.html -ro
-blc https://javadoc.djl.ai/mxnet-engine/${VERSION}/index.html -ro
-blc https://javadoc.djl.ai/mxnet-model-zoo/${VERSION}/index.html -ro
-blc https://javadoc.djl.ai/repository/${VERSION}/index.html -ro

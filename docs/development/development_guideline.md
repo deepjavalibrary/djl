@@ -126,7 +126,7 @@ value to: $MODULE_WORKING_DIR$ to fix the issue.
 When debugging a DJL application in IntelliJ, it is often helpful to inspect your NDArray variables. Because NDArrays may contain
 a large number of elements, rendering them can be resource-heavy and cause the debugger to hang.
 
-IntelliJ allows you to [customize the data view in the Debug Tools](https://www.jetbrains.com/help/idea/customize-data-views.html).
+IntelliJ allows you to [customize the data view in the Debug Tools](https://www.jetbrains.com/help/idea/customizing-views.html#customize-data-view).
 You can create your own NDArray renderer as follows:
 ![](img/custom_debug_view.png)
 

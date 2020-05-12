@@ -6,16 +6,8 @@ This document outlines the procedure to release Deep Java Library (DJL) project 
 
 ## Step 1: Preparing the Release Candidate
 
-### Step 1.1 Publish javadoc to S3 bucket
 
-Make sure you are using correct aws credential and run the following command:
-
-```shell script
-cd djl
-./gradlew -Prelease uploadJavadoc
-```
-
-### Step 1.2: Bump up versions in documents to point to new url
+### Step 1.1: Bump up versions in documents to point to new url
 
 Edit [README Release Notes section](../../README.md#release-notes) to add link to new release. 
 
@@ -29,13 +21,7 @@ cd djl
 ```
 Make a commit, get reviewed, and then merge it into github.
 
-### Step 1.3: Upload javadoc-index.html to S3 bucket
-
-```shell script
-aws s3 cp website/javadoc-index.html s3://javadoc-djl-ai/index.html
-```
-
-### Step 1.4: Publish Native library to sonatype staging server
+### Step 1.2: Publish Native library to sonatype staging server
 
 This step depends on if there is a new release for different engines.
 If nothing changes between previous and current version, you don't need to do this step.
@@ -54,14 +40,14 @@ Run the following command to trigger pytorch-native publishing job:
 curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "pytorch-staging-pub"}'
 ```
 
-### Step 1.5: Publish DJL library to sonatype staging server
+### Step 1.3: Publish DJL library to sonatype staging server
 
 Run the following command to trigger DJL publishing job:
 ```shell script
 curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "release-build"}'
 ```
 
-### Step 1.6: Remove -SNAPSHOT in examples and jupyter notebooks
+### Step 1.4: Remove -SNAPSHOT in examples and jupyter notebooks
 
 Run the following command with correct version value:
 ```shell script
@@ -148,3 +134,23 @@ Manually trigger a nightly build with the following command:
 ```shell script
 curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "nightly-build"}'
 ```
+
+### Step 6.3: Update Java Doc on [javadoc.io]
+
+After verifying packages are available in maven central, click the following links to trigger javadoc.io to fetch latest DJL libraries.
+Verify the following link works, and update the website for java doc links accordingly.
+
+* [api](https://javadoc.io/doc/ai.djl/api/0.5.0/index.html)
+* [basicdataset](https://javadoc.io/doc/ai.djl/basicdataset/0.5.0/index.html)
+* [model-zoo](https://javadoc.io/doc/ai.djl/model-zoo/0.5.0/index.html)
+* [mxnet-model-zoo](https://javadoc.io/doc/ai.djl.mxnet/mxnet-model-zoo/0.5.0/index.html)
+* [mxnet-engine](https://javadoc.io/doc/ai.djl.mxnet/mxnet-engine/0.5.0/index.html)
+* [pytorch-model-zoo](https://javadoc.io/doc/ai.djl.pytorch/pytorch-model-zoo/0.5.0/index.html)
+* [pytorch-engine](https://javadoc.io/doc/ai.djl.pytorch/pytorch-engine/0.5.0/index.html)
+* [tensorflow-model-zoo](https://javadoc.io/doc/ai.djl.tensorflow/tensorflow-model-zoo/0.5.0/index.html)
+* [tensorflow-engine](https://javadoc.io/doc/ai.djl.tensorflow/tensorflow-engine/0.5.0/index.html)
+* [fasttext-engine](https://javadoc.io/doc/ai.djl.fasttext/fasttext-engine/0.5.0/index.html)
+
+### Step 6.4: Check broken links
+
+Manually run the [broken link checker](../../tools/scripts/broken_link_checker.sh) and fix any broken link found.
