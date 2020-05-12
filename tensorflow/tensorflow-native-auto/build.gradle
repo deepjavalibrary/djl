@@ -106,13 +106,11 @@ task uploadTensorflowNativeLibs() {
 
 jar {
     doFirst {
-        def dir = file("${project.buildDir}/placeholder/native/lib")
+        def dir = file("${project.buildDir}/classes/java/main/native/lib")
         dir.mkdirs();
         def propFile = new File(dir, "tensorflow.properties")
         propFile.text = "placeholder=true\nversion=${project.version}\n"
     }
-
-    from "${project.buildDir}/placeholder"
 }
 
 publishing {
@@ -126,3 +124,5 @@ publishing {
         }
     }
 }
+
+tasks.getByName("spotbugsMain").enabled = false
