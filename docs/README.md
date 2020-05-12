@@ -48,6 +48,8 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - [How to collect metrics](how_to_collect_metrics.md)
 - [How to use a dataset](development/how_to_use_dataset.md)
 
+## [Memory Management](development/memory_management.md)
+
 ## [Contributor Documentation](development/README.md)
 
 ## [FAQ](faq.md)

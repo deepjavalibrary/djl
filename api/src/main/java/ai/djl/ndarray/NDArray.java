@@ -36,7 +36,10 @@ import java.util.stream.LongStream;
  *
  * <p>NDArray is the core data structure for all mathematical computations. An NDArray represents a
  * multidimensional, fixed-size homogeneous array. It has very similar behaviour to the Numpy python
- * package with the addition of efficient computing.
+ * package with the addition of efficient computing. To understand how to manage NDArray lifecycle,
+ * please refer to <a
+ * href="https://github.com/awslabs/djl/blob/master/docs/development/memory_management.md">NDArray
+ * Memory Management Guide</a>
  */
 public interface NDArray extends AutoCloseable {
 
