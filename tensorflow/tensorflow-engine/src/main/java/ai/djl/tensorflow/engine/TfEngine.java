@@ -21,6 +21,7 @@ import ai.djl.training.GradientCollector;
 import ai.djl.util.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tensorflow.EagerSession;
 import org.tensorflow.TensorFlow;
 
 /**
@@ -41,6 +42,7 @@ public final class TfEngine extends Engine {
     static TfEngine newInstance() {
         try {
             LibUtils.loadLibrary();
+            EagerSession.getDefault();
             return new TfEngine();
         } catch (Throwable e) {
             logger.warn("Failed load TensorFlow native library.", e);
