@@ -167,6 +167,10 @@ public final class IValueUtils {
             list.add(toNDArray(iValueHandle, manager));
         } else if (isNDList(iValueHandle)) {
             list.addAll(toNDList(iValueHandle, manager));
+        } else if (isList(iValueHandle) || isTuple(iValueHandle)) {
+            for (Pointer handle : toIValueArray(iValueHandle)) {
+                list.addAll(forwardHelper(handle, manager));
+            }
         } else if (isMap(iValueHandle)) {
             // Only allows <String, NDArray> type of map
             Map<Pointer, Pointer> map = toIValueMap(iValueHandle);
@@ -179,10 +183,6 @@ public final class IValueUtils {
                 PyTorchLibrary.LIB.torchDeleteIValue(entry.getValue());
                 value.setName(name);
                 list.add(value);
-            }
-        } else if (isList(iValueHandle)) {
-            for (Pointer handle : toIValueArray(iValueHandle)) {
-                list.addAll(forwardHelper(handle, manager));
             }
         } else {
             // free the IValue handle
