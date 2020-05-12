@@ -1,8 +1,8 @@
 group "ai.djl.tensorflow"
 
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-version = "2.1.0-a" + (isRelease ? "" : "-SNAPSHOT")
-def tf_versoin = "2.1.0-a"
+version = "2.1.0" + (isRelease ? "" : "-SNAPSHOT")
+def tf_versoin = "2.1.0"
 def mkl_dnn_version = "0.21.2-1.5.2"
 
 repositories {
