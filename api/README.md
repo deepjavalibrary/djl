@@ -31,7 +31,7 @@ You can pull the DJL API from the central Maven repository by including the foll
 <dependency>
     <groupId>ai.djl</groupId>
     <artifactId>api</artifactId>
-    <version>0.4.1</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
