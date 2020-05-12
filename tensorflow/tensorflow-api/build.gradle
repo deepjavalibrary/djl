@@ -11,11 +11,11 @@ configurations {
 }
 
 dependencies {
-    api "org.bytedeco:javacpp:1.5.2"
+    api "org.bytedeco:javacpp:1.5.3"
     api "org.tensorflow:tensorflow-core-api:0.1.0-SNAPSHOT"
     api "org.tensorflow:tensorflow-tools:0.1.0-SNAPSHOT"
 
-    exclusion "org.bytedeco:javacpp:1.5.2"
+    exclusion "org.bytedeco:javacpp:1.5.3"
 }
 
 jar {
