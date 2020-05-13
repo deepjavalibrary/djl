@@ -18,7 +18,6 @@ import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Joints;
 import ai.djl.modality.cv.output.Rectangle;
@@ -28,7 +27,6 @@ import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -97,14 +95,11 @@ public final class PoseEstimation {
                 Rectangle rect = item.getBoundingBox().getBounds();
                 int width = img.getWidth();
                 int height = img.getHeight();
-                return ImageFactory.getInstance()
-                        .fromImage(
-                                ((BufferedImage) img.getWrappedImage())
-                                        .getSubimage(
-                                                (int) (rect.getX() * width),
-                                                (int) (rect.getY() * height),
-                                                (int) (rect.getWidth() * width),
-                                                (int) (rect.getHeight() * height)));
+                return img.getSubimage(
+                        (int) (rect.getX() * width),
+                        (int) (rect.getY() * height),
+                        (int) (rect.getWidth() * width),
+                        (int) (rect.getHeight() * height));
             }
         }
         return null;
@@ -136,7 +131,7 @@ public final class PoseEstimation {
         Path outputDir = Paths.get("build/output");
         Files.createDirectories(outputDir);
 
-        ImageVisualization.drawJoints((BufferedImage) img.getWrappedImage(), joints);
+        img.drawJoints(joints);
 
         Path imagePath = outputDir.resolve("joints.png");
         // Must use png format because you can't save as jpg with an alpha channel

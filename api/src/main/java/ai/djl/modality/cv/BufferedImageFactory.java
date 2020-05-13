@@ -12,10 +12,21 @@
  */
 package ai.djl.modality.cv;
 
+import ai.djl.modality.cv.output.BoundingBox;
+import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.output.Joints;
+import ai.djl.modality.cv.output.Mask;
+import ai.djl.modality.cv.output.Point;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.util.RandomUtils;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.IOException;
@@ -24,6 +35,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
+import java.util.List;
 import javax.imageio.ImageIO;
 
 /** {@code BufferedImageFactory} is the default implementation of {@link ImageFactory}. */
@@ -102,6 +114,23 @@ public class BufferedImageFactory extends ImageFactory {
 
         /** {@inheritDoc} */
         @Override
+        public Image getSubimage(int x, int y, int w, int h) {
+            return new BufferedImageWrapper(image.getSubimage(x, y, w, h));
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Image duplicate(Type type) {
+            BufferedImage newImage =
+                    new BufferedImage(image.getWidth(), image.getHeight(), getType(type));
+            Graphics2D g = newImage.createGraphics();
+            g.drawImage(image, 0, 0, null);
+            g.dispose();
+            return new BufferedImageWrapper(newImage);
+        }
+
+        /** {@inheritDoc} */
+        @Override
         public NDArray toNDArray(NDManager manager, Flag flag) {
             int width = image.getWidth();
             int height = image.getHeight();
@@ -148,6 +177,117 @@ public class BufferedImageFactory extends ImageFactory {
         @Override
         public void save(OutputStream os, String type) throws IOException {
             ImageIO.write(image, type, os);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void drawBoundingBoxes(DetectedObjects detections) {
+            Graphics2D g = (Graphics2D) image.getGraphics();
+            int stroke = 2;
+            g.setStroke(new BasicStroke(stroke));
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int imageWidth = image.getWidth();
+            int imageHeight = image.getHeight();
+
+            List<DetectedObjects.DetectedObject> list = detections.items();
+            for (DetectedObjects.DetectedObject result : list) {
+                String className = result.getClassName();
+                BoundingBox box = result.getBoundingBox();
+                g.setPaint(randomColor().darker());
+
+                box.draw(g, imageWidth, imageHeight);
+                Point p = box.getPoint();
+                int x = (int) (p.getX() * imageWidth);
+                int y = (int) (p.getY() * imageHeight);
+                drawText(g, className, x, y, stroke, 4);
+                // If we have a mask instead of a plain rectangle, draw tha mask
+                if (box instanceof Mask) {
+                    Mask mask = (Mask) box;
+                    drawMask(image, mask);
+                }
+            }
+            g.dispose();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void drawJoints(Joints joints) {
+            Graphics2D g = (Graphics2D) image.getGraphics();
+            int stroke = 2;
+            g.setStroke(new BasicStroke(stroke));
+
+            int imageWidth = image.getWidth();
+            int imageHeight = image.getHeight();
+
+            for (Joints.Joint joint : joints.getJoints()) {
+                g.setPaint(randomColor().darker());
+                int x = (int) (joint.getX() * imageWidth);
+                int y = (int) (joint.getY() * imageHeight);
+                g.fillOval(x, y, 10, 10);
+            }
+            g.dispose();
+        }
+
+        private int getType(Type type) {
+            if (type == Type.TYPE_INT_ARGB) {
+                return BufferedImage.TYPE_INT_ARGB;
+            }
+            throw new IllegalArgumentException("the type is not supported!");
+        }
+
+        private Color randomColor() {
+            return new Color(RandomUtils.nextInt(255));
+        }
+
+        private void drawText(Graphics2D g, String text, int x, int y, int stroke, int padding) {
+            FontMetrics metrics = g.getFontMetrics();
+            x += stroke / 2;
+            y += stroke / 2;
+            int width = metrics.stringWidth(text) + padding * 2 - stroke / 2;
+            int height = metrics.getHeight() + metrics.getDescent();
+            int ascent = metrics.getAscent();
+            java.awt.Rectangle background = new java.awt.Rectangle(x, y, width, height);
+            g.fill(background);
+            g.setPaint(Color.WHITE);
+            g.drawString(text, x + padding, y + ascent);
+        }
+
+        private void drawMask(BufferedImage image, Mask mask) {
+            float r = RandomUtils.nextFloat();
+            float g = RandomUtils.nextFloat();
+            float b = RandomUtils.nextFloat();
+            int imageWidth = image.getWidth();
+            int imageHeight = image.getHeight();
+            int x = (int) (mask.getX() * imageWidth);
+            int y = (int) (mask.getY() * imageHeight);
+            float[][] probDist = mask.getProbDist();
+            // Correct some coordinates of box when going out of image
+            if (x < 0) {
+                x = 0;
+            }
+            if (y < 0) {
+                y = 0;
+            }
+
+            BufferedImage maskImage =
+                    new BufferedImage(
+                            probDist.length, probDist[0].length, BufferedImage.TYPE_INT_ARGB);
+            for (int xCor = 0; xCor < probDist.length; xCor++) {
+                for (int yCor = 0; yCor < probDist[xCor].length; yCor++) {
+                    float opacity = probDist[xCor][yCor];
+                    if (opacity < 0.1) {
+                        opacity = 0f;
+                    }
+                    if (opacity > 0.8) {
+                        opacity = 0.8f;
+                    }
+                    maskImage.setRGB(xCor, yCor, new Color(r, g, b, opacity).darker().getRGB());
+                }
+            }
+            Graphics2D gR = (Graphics2D) image.getGraphics();
+            gR.drawImage(maskImage, x, y, null);
+            gR.dispose();
         }
     }
 }

@@ -23,7 +23,6 @@ import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.MultiBoxDetection;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -46,7 +45,6 @@ import ai.djl.training.loss.SingleShotDetectionLoss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -130,8 +128,7 @@ public final class TrainPikachu {
             try (Predictor<Image, DetectedObjects> predictor = model.newPredictor(translator)) {
                 Image image = ImageFactory.getInstance().fromFile(imagePath);
                 DetectedObjects detectedObjects = predictor.predict(image);
-                ImageVisualization.drawBoundingBoxes(
-                        (BufferedImage) image.getWrappedImage(), detectedObjects);
+                image.drawBoundingBoxes(detectedObjects);
                 Path out = Paths.get(outputDir).resolve("pikachu_output.png");
                 image.save(Files.newOutputStream(out), "png");
                 // return number of pikachu detected

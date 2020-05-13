@@ -17,20 +17,16 @@ import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,27 +65,23 @@ public final class InstanceSegmentation {
         try (ZooModel<Image, DetectedObjects> model = ModelZoo.loadModel(criteria)) {
             try (Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
                 DetectedObjects detection = predictor.predict(img);
-                saveBoundingBoxImage((BufferedImage) img.getWrappedImage(), detection);
+                saveBoundingBoxImage(img, detection);
                 return detection;
             }
         }
     }
 
-    private static void saveBoundingBoxImage(BufferedImage img, DetectedObjects detection)
+    private static void saveBoundingBoxImage(Image img, DetectedObjects detection)
             throws IOException {
         Path outputDir = Paths.get("build/output");
         Files.createDirectories(outputDir);
 
         // Make image copy with alpha channel because original image was jpg
-        BufferedImage newImage =
-                new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = newImage.createGraphics();
-        g.drawImage(img, 0, 0, null);
-        g.dispose();
-        ImageVisualization.drawBoundingBoxes(newImage, detection);
+        Image newImage = img.duplicate(Image.Type.TYPE_INT_ARGB);
+        newImage.drawBoundingBoxes(detection);
 
         Path imagePath = outputDir.resolve("instances.png");
-        ImageIO.write(newImage, "png", imagePath.toFile());
+        newImage.save(Files.newOutputStream(imagePath), "png");
         logger.info("Segmentation result image has been saved in: {}", imagePath);
     }
 }

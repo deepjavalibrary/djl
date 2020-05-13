@@ -12,6 +12,8 @@
  */
 package ai.djl.modality.cv;
 
+import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.output.Joints;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import java.io.IOException;
@@ -45,6 +47,25 @@ public interface Image {
     Object getWrappedImage();
 
     /**
+     * Gets the subimage defined by a specified rectangular region.
+     *
+     * @param x the X coordinate of the upper-left corner of the specified rectangular region
+     * @param y the Y coordinate of the upper-left corner of the specified rectangular region
+     * @param w the width of the specified rectangular region
+     * @param h the height of the specified rectangular region
+     * @return subimage of this image
+     */
+    Image getSubimage(int x, int y, int w, int h);
+
+    /**
+     * Gets a deep copy of the original image given the type.
+     *
+     * @param type the type of the copied image
+     * @return the copy of the original image.
+     */
+    Image duplicate(Type type);
+
+    /**
      * Converts image to a RGB {@link NDArray}.
      *
      * @param manager a {@link NDManager} to create the new NDArray with
@@ -72,9 +93,28 @@ public interface Image {
      */
     void save(OutputStream os, String type) throws IOException;
 
+    /**
+     * Draws the bounding boxes on the image.
+     *
+     * @param detections the object detection results
+     */
+    void drawBoundingBoxes(DetectedObjects detections);
+
+    /**
+     * Draws all joints of a body on an image.
+     *
+     * @param joints the joints of the body
+     */
+    void drawJoints(Joints joints);
+
     /** Flag indicates the color channel options for images. */
-    public enum Flag {
+    enum Flag {
         GRAYSCALE,
         COLOR
+    }
+
+    /** Type indicates the type options for images. */
+    enum Type {
+        TYPE_INT_ARGB
     }
 }
