@@ -14,13 +14,13 @@ package ai.djl.examples.inference.benchmark.util;
 
 import ai.djl.engine.Engine;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -229,7 +229,7 @@ public class Arguments {
 
     public Class<?> getInputClass() throws ClassNotFoundException {
         if (inputClass == null) {
-            return BufferedImage.class;
+            return Image.class;
         }
         return Class.forName(inputClass);
     }
@@ -246,7 +246,7 @@ public class Arguments {
 
     public Object getInputData() throws IOException, ClassNotFoundException {
         Class<?> klass = getInputClass();
-        if (klass == BufferedImage.class) {
+        if (klass == Image.class) {
             return ImageFactory.getInstance().fromFile(getImageFile());
         } else if (klass == float[].class || klass == NDList.class) {
             // TODO: load data from input file
