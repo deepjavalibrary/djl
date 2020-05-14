@@ -1,6 +1,7 @@
 group "ai.djl.tensorflow"
 
 repositories {
+    jcenter()
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots/"
     }
@@ -8,7 +9,7 @@ repositories {
 
 dependencies {
     api project(":api")
-    api project(":tensorflow:tensorflow-api")
+    api "ai.djl.tensorflow:tensorflow-api:0.5.0"
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
