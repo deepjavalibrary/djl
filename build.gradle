@@ -33,6 +33,9 @@ configure(javaProjects()) {
     targetCompatibility = 1.8
     compileJava.options.encoding = "UTF-8"
     compileTestJava.options.encoding = "UTF-8"
+    if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+        compileJava.options.compilerArgs.addAll(["--release", "8"])
+    }
 
     apply from: file("${rootProject.projectDir}/tools/gradle/java-formatter.gradle")
     apply from: file("${rootProject.projectDir}/tools/gradle/check.gradle")
