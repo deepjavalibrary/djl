@@ -12,7 +12,6 @@
  */
 package ai.djl.modality.cv.output;
 
-import java.awt.Graphics2D;
 import java.io.Serializable;
 
 /** An interface representing a bounding box for the detected object. */
@@ -50,13 +49,4 @@ public interface BoundingBox extends Serializable {
      * @return the IoU value
      */
     double getIoU(BoundingBox box);
-
-    /**
-     * Draws the bounding box using the {@link Graphics2D}.
-     *
-     * @param g the Graphics2D object of the image
-     * @param imageWidth the width of the image
-     * @param imageHeight the height of the image
-     */
-    void draw(Graphics2D g, int imageWidth, int imageHeight);
 }

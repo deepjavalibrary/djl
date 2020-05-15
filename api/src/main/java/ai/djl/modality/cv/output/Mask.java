@@ -12,8 +12,6 @@
  */
 package ai.djl.modality.cv.output;
 
-import java.awt.Graphics2D;
-
 /**
  * A mask with a probability for each pixel within a bounding rectangle.
  *
@@ -45,11 +43,5 @@ public class Mask extends Rectangle {
      */
     public float[][] getProbDist() {
         return probDist;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void draw(Graphics2D g, int imageWidth, int imageHeight) {
-        super.draw(g, imageWidth, imageHeight);
     }
 }

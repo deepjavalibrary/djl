@@ -16,7 +16,7 @@ import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Joints;
 import ai.djl.modality.cv.output.Mask;
-import ai.djl.modality.cv.output.Point;
+import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -196,10 +196,14 @@ public class BufferedImageFactory extends ImageFactory {
                 BoundingBox box = result.getBoundingBox();
                 g.setPaint(randomColor().darker());
 
-                box.draw(g, imageWidth, imageHeight);
-                Point p = box.getPoint();
-                int x = (int) (p.getX() * imageWidth);
-                int y = (int) (p.getY() * imageHeight);
+                Rectangle rectangle = box.getBounds();
+                int x = (int) (rectangle.getX() * imageWidth);
+                int y = (int) (rectangle.getY() * imageHeight);
+                g.drawRect(
+                        x,
+                        y,
+                        (int) (rectangle.getWidth() * imageWidth),
+                        (int) (rectangle.getHeight() * imageHeight));
                 drawText(g, className, x, y, stroke, 4);
                 // If we have a mask instead of a plain rectangle, draw tha mask
                 if (box instanceof Mask) {
