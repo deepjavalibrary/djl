@@ -49,5 +49,6 @@ public class Application {
         Application SENTIMENT_ANALYSIS = new Application("nlp/sentiment_analysis");
         Application WORD_EMBEDDING = new Application("nlp/word_embedding");
         Application MACHINE_TRANSLATION = new Application("nlp/machine_translation");
+        Application MULTIPLE_CHOICE = new Application("nlp/multiple_choice");
     }
 }
