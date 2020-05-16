@@ -78,7 +78,12 @@ public abstract class BaseNDManager implements NDManager {
         if (closed.get()) {
             throw new IllegalStateException("NDManager has been closed already.");
         }
-        WeakReference<AutoCloseable> ref = new WeakReference<>(resource);
+        WeakReference<AutoCloseable> ref;
+        if (Boolean.getBoolean("ai.djl.disable_close_resource_on_finalize")) {
+            ref = new HardReference(resource);
+        } else {
+            ref = new WeakReference<>(resource);
+        }
         resources.put(resourceId, ref);
     }
 
@@ -132,6 +137,21 @@ public abstract class BaseNDManager implements NDManager {
             if (c instanceof BaseNDManager) {
                 ((BaseNDManager) c).debugDump(level + 1);
             }
+        }
+    }
+
+    /** The workaround custom Reference class to avoid GC to close NDArray. */
+    private static final class HardReference extends WeakReference<AutoCloseable> {
+
+        private AutoCloseable obj;
+
+        HardReference(AutoCloseable obj) {
+            super(obj);
+            this.obj = obj;
+        }
+
+        private AutoCloseable getReference() {
+            return obj;
         }
     }
 }
