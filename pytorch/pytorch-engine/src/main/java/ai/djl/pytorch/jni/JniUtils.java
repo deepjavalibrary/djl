@@ -243,6 +243,14 @@ public final class JniUtils {
                                 copy));
     }
 
+    public static PtNDArray toSparse(PtNDArray ndArray) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchToSparse(ndArray.getHandle()));
+    }
+
+    public static PtNDArray toDense(PtNDArray ndArray) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchToDense(ndArray.getHandle()));
+    }
+
     public static PtNDArray broadcast(PtNDArray ndArray, Shape shape) {
         return ndArray.getManager()
                 .create(PyTorchLibrary.LIB.torchExpand(ndArray.getHandle(), shape.getShape()));

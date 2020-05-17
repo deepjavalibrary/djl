@@ -1261,13 +1261,25 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray toDense() {
-        throw new UnsupportedOperationException("Not implemented");
+        if (!isSparse()) {
+            return (PtNDArray) duplicate();
+        }
+        return JniUtils.toDense(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray toSparse(SparseFormat fmt) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (fmt == SparseFormat.DENSE) {
+            throw new IllegalArgumentException("Default type is not allowed");
+        }
+        if (fmt != SparseFormat.COO) {
+            throw new UnsupportedOperationException("Only COO sparse type supported for PyTorch");
+        }
+        if (fmt == getSparseFormat()) {
+            return (PtNDArray) duplicate();
+        }
+        return JniUtils.toSparse(this);
     }
 
     /** {@inheritDoc} */

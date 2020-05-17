@@ -42,6 +42,10 @@ final class PyTorchLibrary {
 
     native Pointer torchTo(Pointer handle, int dType, int[] device, boolean copy);
 
+    native Pointer torchToSparse(Pointer handle);
+
+    native Pointer torchToDense(Pointer handle);
+
     native Pointer tensorClone(Pointer handle);
 
     native Pointer torchEmpty(
