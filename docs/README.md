@@ -7,17 +7,24 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - [Core API](../api/README.md) - Engine-agnostic API
 - [Basic Dataset](../basicdataset/README.md) - Built-in datasets
 - [Model Zoo](../model-zoo/README.md) - Built-in engine-agnostic model zoo
+
 #### MXNet
 - [MXNet Engine](../mxnet/mxnet-engine/README.md) - MXNet Engine implementation
 - [MXNet Model Zoo](../mxnet/mxnet-model-zoo/README.md) - MXNet symbolic model zoo
-- [Pytorch Engine](../pytorch/pytorch-engine/README.md) - Pytorch Engine implementation
-- [Pytorch Model Zoo](../pytorch/pytorch-model-zoo/README.md) - PyTorch TorchScript model zoo
-- [TensorFlow Engine](../tensorflow/tensorflow-engine/README.md) - TensorFlow Engine implementation
-- [TensorFlow Model Zoo](../tensorflow/tensorflow-model-zoo/README.md) - TensorFlow SavedModel model zoo
+- [MXNet Gluon Importing](mxnet/how_to_convert_your_model_to_symbol.md) - MXNet Gluon Importing
 
 #### PyTorch
 - [PyTorch Engine](../pytorch/pytorch-engine/README.md) - PyTorch Engine implementation
 - [PyTorch Model Zoo](../pytorch/pytorch-model-zoo/README.md) - PyTorch TorchScript model zoo
+- [PyTorch Importing](pytorch/how_to_convert_your_model_to_torchscript.md) - Import TorchScript model
+- [Pytorch Inference Optimization](pytorch/how_to_optimize_inference_performance.md) - Improve inference performance
+
+
+#### Tensorflow
+- [TensorFlow Engine](../tensorflow/tensorflow-engine/README.md) - TensorFlow Engine implementation
+- [TensorFlow Model Zoo](../tensorflow/tensorflow-model-zoo/README.md) - TensorFlow SavedModel model zoo
+- [Keras Imporint](tensorflow/how_to_import_keras_models_in_DJL.md)
+- [Tensorflow Local Importing](tensorflow/how_to_import_local_tensorflow_models.md)
 
 ## [JavaDoc API Reference](https://javadoc.djl.ai/)
 
