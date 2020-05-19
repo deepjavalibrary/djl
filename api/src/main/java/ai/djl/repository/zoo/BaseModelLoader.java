@@ -15,6 +15,7 @@ package ai.djl.repository.zoo;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDList;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
@@ -109,13 +110,41 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
             String engine = criteria.getEngine();
             if (engine == null || engine.isEmpty()) {
                 if (modelZoo != null) {
-                    engine = modelZoo.getSupportedEngines().iterator().next();
+                    engine = Engine.getInstance().getEngineName();
+                    if (!modelZoo.getSupportedEngines().contains(engine)) {
+                        engine = modelZoo.getSupportedEngines().iterator().next();
+                    }
                 }
             }
 
-            Model model = createModel(Device.defaultDevice(), artifact, arguments, engine);
-            model.load(modelPath, artifact.getName(), criteria.getOptions());
-            return new ZooModel<>(model, translator);
+            try {
+                Model model = createModel(Device.defaultDevice(), artifact, arguments, engine);
+                model.load(modelPath, artifact.getName(), criteria.getOptions());
+                return new ZooModel<>(model, translator);
+            } catch (IllegalArgumentException e) {
+
+                if (e.getMessage().contains("Deep learning engine not found:")) {
+                    StringBuilder errorMsg = new StringBuilder(200);
+
+                    errorMsg.append("Your Criteria Filters: ");
+                    errorMsg.append(criteria.getFilters().toString());
+
+                    errorMsg.append(", Under Model Zoo: ");
+                    errorMsg.append((modelZoo == null) ? "null" : modelZoo.getClass().toString());
+
+                    errorMsg.append(", Is using Engine: ");
+                    errorMsg.append(
+                            (engine == null || engine.isEmpty())
+                                    ? Engine.getInstance().getEngineName()
+                                    : engine);
+                    errorMsg.append(
+                            ", But the engine could not be found, "
+                                    + "please try adding the dependency engine to the gradle file");
+
+                    throw new UnsupportedOperationException(errorMsg.toString(), e);
+                }
+                throw e;
+            }
         } finally {
             if (progress != null) {
                 progress.end();
