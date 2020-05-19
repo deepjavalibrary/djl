@@ -42,8 +42,9 @@ Then, right click the resources folder and select `Rebuild<default>`.
 ![FAQ1](https://djl-ai.s3.amazonaws.com/resources/images/FAQ_engine_not_found.png)
 
 #### 3. UnsatisfiedLinkError issue
-You might see the error when DJL try to load the native library for engines, some shared libraries are missing.
-Let's take PyTorch engine for example, DJL loads libtorch.dylib when creating the Engine instance.
+You might see the error when DJL tries to load the native library for the engines, but some shared libraries are missing.
+Let's take the PyTorch engine as an example.
+DJL loads libtorch.dylib when creating the Engine instance.
 You can check library files on which libtorch.dylib depends by typing `otool -L libtorch.dylib` on mac `ldd libtorch.so` on ubuntu.
 ```
 # in macos environment
@@ -54,8 +55,13 @@ libtorch.dylib:
 	@rpath/libc10.dylib (compatibility version 0.0.0, current version 0.0.0)
 	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 400.9.0)
 ```
-It shows the `libtorch.dylib` depends on `libiomp5.dylib` and `libc10.dylib`. If one of them is missing, it throws `UnsatisfiedLinkError` exception.
-If you are using `ai.djl.{engine}:{engine}-native-auto`, please create an issue on the `https://github.com/awslabs/djl`.
+It shows the `libtorch.dylib` depends on `libiomp5.dylib` and `libc10.dylib`. If one of them is missing, it throws an `UnsatisfiedLinkError` exception.
+If you are using `ai.djl.{engine}:{engine}-native-auto`, please create an issue at `https://github.com/awslabs/djl`.
+
+#### 4. Failed to extract native file issue
+Sometimes you may only have read-only access on the machine.
+It will cause a failure during engine loading because the cache attempts to write to the home directory.
+For more information, please refer to [DJL Cache Management](cache_management.md).
 
 ## 2. IntelliJ throws the `No Log4j 2 configuration file found.` exception.
 The following exception may appear after running the `./gradlew clean` command:
@@ -63,7 +69,7 @@ The following exception may appear after running the `./gradlew clean` command:
 ERROR StatusLogger No Log4j 2 configuration file found. Using default configuration (logging only errors to the console), or user programmatically provided configurations. Set system property 'log4j2.debug' to show Log4j 2 internal initialization logging. See https://logging.apache.org/log4j/2.x/manual/configuration.html for instructions on how to configure Log4j 2
 ```
 This issue has the same root cause as issue #1. You can follow the steps outlined previously to change `Build and running using:` to `Gradle`.
-If you prefer to continue using `IntelliJ IDEA` as your runner, navigate to the package of the program you are running using the project view and recompile the log configuration file.
+If you prefer to continue using `IntelliJ IDEA` as your runner, navigate to the project view for the program and recompile the log configuration file.
 
 For example, if you are running a DJL example, navigate to:
 ```
@@ -74,7 +80,7 @@ Then, right click the `log4j2.xml` file and select `Recompile log4j2.xml`.
 ![FAQ2](https://djl-ai.s3.amazonaws.com/resources/images/FAQ_log_recompile.png)
 
 ## 3. Build fails on Windows caused by "UnsatisfiedLinkError"
-DJL requires Visual C++ Redistributable Packages. If you encounter UnsatisfiedLinkError while building
+DJL requires Visual C++ Redistributable Packages. If you encounter an UnsatisfiedLinkError while building
 DJL on Windows, please download and install
 [Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) and reboot. 
 If the issue continues to persist, you can use the [docker file](../../docker/windows/Dockerfile) provided by us.
@@ -85,16 +91,16 @@ docker build --build-arg version=<YOUR_VERSION>
 ``` 
 
 ## 4. How to run DJL using other versions of MXNet?
-**Note:** this is not officially supported by DJL, some functions may not work. 
+**Note:** this is not officially supported by DJL, and some functions may not work. 
 If you require features in MXNet not provided by DJL, please submit an [issue](https://github.com/awslabs/djl/issues).
 
-By default DJL is running on the [MXNet engine](https://github.com/awslabs/djl/tree/master/mxnet/mxnet-engine).
+By default, DJL is running on the [MXNet engine](https://github.com/awslabs/djl/tree/master/mxnet/mxnet-engine).
 We use `mxnet-mkl` on CPU machines and `mxnet-cu102mkl` on GPU machines.
 `mkl` means [Intel-MKLDNN](https://github.com/intel/mkl-dnn) is enabled.
 `cu102` means [Nvidia CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit) version 10.2 is enabled.
 
 You don't need to download and install MXNet separately. It's automatically done when you
-build the DJL project by running the `./gradlew build` command. However, you still have the option to use other versions of MXNet or built your own customized version.
+build the DJL project by running the `./gradlew build` command. However, you still have the option to use other versions of MXNet and to build your own customized version.
 
 Follow the [MXNet Installation guide](https://mxnet.apache.org/get_started/?version=master&platform=linux&language=python&environ=pip&processor=cpu#) to install other versions of MXNet.
 You need the latest MXNet to work with DJL, so remember to add `--pre` at the end of your `pip install` command.
@@ -119,23 +125,26 @@ Now DJL will automatically use the MXNet library from this location.
 
 ## 5. Gradle issue
 
-Sometimes gradle may fail or stuck. For example, you may see the following error:
+Sometimes gradle may fail or get stuck. For example, you may see the following error:
 ```shell script
 * What went wrong:
 Execution failed for task ':api:formatJava'.
 > unable to create new native thread
 ```
-You need kill gradle daemon process:
+
+You need kill the gradle daemon process:
 ```shell script
 ./gradlew --stop
 ``` 
+
+After this, it should work when you re-run your command.
 
 ## 6. Cannot run tests from IntelliJ
 Running unit or integration tests manually from IntelliJ sometimes fails with the message "No tasks available". 
 If that happens, the following can help: Go to `File > Settings > Build, Execution, Deployment > Build Tools > Gradle` and change the option "Run tests using" from "Gradle" to "IntelliJ Idea".
   
 ## 7. Running an integration test hangs for a long time
-Often, the test itself does not actually hangt. To run the integration tests, the `integration` subproject 
+Often, the test itself does not actually hang. To run the integration tests, the `integration` subproject 
 has a `-SNAPSHOT` dependency on the mxnet native binaries, `ai.djl.mxnet:mxnet-native-auto`. As it 
 is a snapshot depency, it is updated by the build system regularly. If your integration tests hang, 
 it is most likely just the automatic binary dependency being updated. As the total size is roughly
