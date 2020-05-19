@@ -33,6 +33,18 @@ Execution failed for task ':api:verifyJava'.
 ```
 If you do fail the format check, the easiest way to resolve it is to run the gradle `formatJava` target to reformat your code. It may be helpful to just run the formatter before you build the project rather than waiting for the formatting verification to fail.
 
+## Commit message conventions
+
+We don't have rule to enforce git commit message format. However, we encourage developers and reviewers to follow
+the good practice:
+- Limit the subject line to 72 characters
+- Separate subject from body with a blank line
+- Adding a prefix if possible, for example `[api]` or `docs:`
+- Do not end the subject line with a period
+- Wrap the body line if possible
+- Make subject line more specific, avoid using some like: **Updated document**
+    
+
 ## Documentation Conventions
 
 DJL should have good and clear documentation for the sake of users learning about it and about deep learning.
