@@ -32,6 +32,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: check disk space
+        run: df -h
       - name: Build with Gradle
         run: ./gradlew -Dnightly=true build jRR
       - name: API test results
@@ -123,7 +125,7 @@ jobs:
 
   publish:
     runs-on: ubuntu-18.04
-    needs: [build, test-pytorch]
+    needs: [build, test-pytorch, test-tensorflow]
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK 1.8
