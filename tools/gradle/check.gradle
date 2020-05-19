@@ -1,11 +1,11 @@
 if (JavaVersion.current() < JavaVersion.VERSION_11) {
-   apply plugin: "com.github.spotbugs"
+    apply plugin: "com.github.spotbugs"
     spotbugs {
         excludeFilter = file("${rootProject.projectDir}/tools/conf/findbugs-exclude.xml")
         ignoreFailures = false
         spotbugsTest.enabled = true
     }
-    tasks.withType(SpotBugsTask) {
+    spotbugsMain {
         reports {
             xml.enabled false
             html.enabled true
