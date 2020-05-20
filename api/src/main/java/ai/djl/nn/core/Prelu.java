@@ -24,7 +24,6 @@ import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
@@ -66,12 +65,6 @@ public class Prelu extends AbstractBlock {
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         return new Shape[] {inputs[0]};
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void saveMetadata(DataOutputStream os) throws IOException {
-        saveInputShapes(os);
     }
 
     /** {@inheritDoc} */

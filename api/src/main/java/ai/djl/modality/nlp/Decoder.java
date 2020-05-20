@@ -31,6 +31,7 @@ import java.io.IOException;
  * class, and facilitate implementing encoder-decoder models for different tasks and inputs.
  */
 public abstract class Decoder extends AbstractBlock {
+
     protected Block block;
 
     /**

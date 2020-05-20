@@ -16,19 +16,18 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterBlock;
+import ai.djl.nn.AbstractBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 /** An {@link AbstractIndexedEmbedding} that always returns a constant value. */
 @SuppressWarnings("rawtypes")
-public class ConstantEmbedding extends ParameterBlock implements AbstractIndexedEmbedding {
+public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedEmbedding {
+
+    private static final byte VERSION = 1;
 
     protected NDArray embedding;
 
@@ -38,6 +37,7 @@ public class ConstantEmbedding extends ParameterBlock implements AbstractIndexed
      * @param embedding the value to return for all embeddings
      */
     public ConstantEmbedding(NDArray embedding) {
+        super(VERSION);
         this.embedding = embedding;
     }
 
@@ -52,16 +52,6 @@ public class ConstantEmbedding extends ParameterBlock implements AbstractIndexed
         embedding.copyTo(base);
         Shape shape = inputs.get(0).getShape().addAll(embedding.getShape());
         return new NDList(base.repeat(shape));
-    }
-
-    @Override
-    public List<Parameter> getDirectParameters() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        throw new IllegalArgumentException("Invalid parameter name");
     }
 
     @Override
