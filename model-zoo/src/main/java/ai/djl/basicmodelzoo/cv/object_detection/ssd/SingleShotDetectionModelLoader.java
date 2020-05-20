@@ -163,14 +163,6 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
         return model;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments) {
-        Model model = Model.newInstance(device);
-        model.setBlock(customSSDBlock(arguments));
-        return model;
-    }
-
     private static final class FactoryImpl implements TranslatorFactory<Image, DetectedObjects> {
 
         /** {@inheritDoc} */

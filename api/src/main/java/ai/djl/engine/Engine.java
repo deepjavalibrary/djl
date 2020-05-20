@@ -94,6 +94,17 @@ public abstract class Engine {
     }
 
     /**
+     * Returns if the specified engine is available.
+     *
+     * @param engineName the name of Engine to check
+     * @return {@code true} if the specified engine is available
+     * @see EngineProvider
+     */
+    public static boolean hasEngine(String engineName) {
+        return ALL_ENGINES.containsKey(engineName);
+    }
+
+    /**
      * Returns the {@code Engine} with the given name.
      *
      * @param engineName the name of Engine to retrieve

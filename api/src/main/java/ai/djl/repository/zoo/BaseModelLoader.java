@@ -104,47 +104,32 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
             Path modelPath = repository.getResourceDirectory(artifact);
 
             // Check if the engine is specified in Criteria, use it if it is.
-            // Otherwise check the modelzoo supported engine and grab the first engine in the list.
+            // Otherwise check the modelzoo supported engine and grab a random engine in the list.
             // Otherwise if none of them is specified or model zoo is null, go to default engine.
-
             String engine = criteria.getEngine();
-            if (engine == null || engine.isEmpty()) {
-                if (modelZoo != null) {
-                    engine = Engine.getInstance().getEngineName();
-                    if (!modelZoo.getSupportedEngines().contains(engine)) {
-                        engine = modelZoo.getSupportedEngines().iterator().next();
+            if (engine == null && modelZoo != null) {
+                String defaultEngine = Engine.getInstance().getEngineName();
+                for (String supportedEngine : modelZoo.getSupportedEngines()) {
+                    if (supportedEngine.equals(defaultEngine)) {
+                        engine = supportedEngine;
+                        break;
+                    } else if (Engine.hasEngine(supportedEngine)) {
+                        engine = supportedEngine;
                     }
                 }
-            }
-
-            try {
-                Model model = createModel(Device.defaultDevice(), artifact, arguments, engine);
-                model.load(modelPath, artifact.getName(), criteria.getOptions());
-                return new ZooModel<>(model, translator);
-            } catch (IllegalArgumentException e) {
-
-                if (e.getMessage().contains("Deep learning engine not found:")) {
-                    StringBuilder errorMsg = new StringBuilder(200);
-
-                    errorMsg.append("Your Criteria Filters: ");
-                    errorMsg.append(criteria.getFilters().toString());
-
-                    errorMsg.append(", Under Model Zoo: ");
-                    errorMsg.append((modelZoo == null) ? "null" : modelZoo.getClass().toString());
-
-                    errorMsg.append(", Is using Engine: ");
-                    errorMsg.append(
-                            (engine == null || engine.isEmpty())
-                                    ? Engine.getInstance().getEngineName()
-                                    : engine);
-                    errorMsg.append(
-                            ", But the engine could not be found, "
-                                    + "please try adding the dependency engine to the gradle file");
-
-                    throw new UnsupportedOperationException(errorMsg.toString(), e);
+                if (engine == null) {
+                    throw new ModelNotFoundException(
+                            "No supported engine available for model zoo: "
+                                    + modelZoo.getGroupId());
                 }
-                throw e;
             }
+            if (engine != null && !Engine.hasEngine(engine)) {
+                throw new ModelNotFoundException(engine + " is not supported.");
+            }
+
+            Model model = createModel(Device.defaultDevice(), artifact, arguments, engine);
+            model.load(modelPath, artifact.getName(), criteria.getOptions());
+            return new ZooModel<>(model, translator);
         } finally {
             if (progress != null) {
                 progress.end();
@@ -165,11 +150,6 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
             Device device, Artifact artifact, Map<String, Object> arguments, String engine)
             throws IOException {
         return Model.newInstance(device, engine);
-    }
-
-    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments)
-            throws IOException {
-        return Model.newInstance(device);
     }
 
     /**

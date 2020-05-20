@@ -131,18 +131,11 @@ public class ResNetModelLoader extends BaseModelLoader<Image, Classifications> {
         return blockBuilder.build();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Model createModel(
             Device device, Artifact artifact, Map<String, Object> arguments, String engine) {
         Model model = Model.newInstance(device, engine);
-        model.setBlock(resnetBlock(arguments));
-        return model;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments) {
-        Model model = Model.newInstance(device);
         model.setBlock(resnetBlock(arguments));
         return model;
     }

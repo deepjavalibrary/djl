@@ -19,6 +19,7 @@ import ai.djl.MalformedModelException;
 import ai.djl.basicdataset.PikachuDetection;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.inference.Predictor;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.MultiBoxDetection;
@@ -49,6 +50,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class SingleShotDetectionTest {
@@ -129,6 +131,9 @@ public class SingleShotDetectionTest {
 
     private ZooModel<Image, DetectedObjects> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
+        if (!TestUtils.isMxnet()) {
+            throw new SkipException("SSD-pikachu model only available in MXNet");
+        }
 
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()

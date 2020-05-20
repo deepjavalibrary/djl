@@ -107,8 +107,7 @@ public interface ModelZoo {
 
             Set<String> supportedEngine = zoo.getSupportedEngines();
             String engine = criteria.getEngine();
-
-            if (engine != null && !engine.isEmpty() && !supportedEngine.contains(engine)) {
+            if (engine != null && !supportedEngine.contains(engine)) {
                 continue;
             }
 

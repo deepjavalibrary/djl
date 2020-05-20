@@ -97,14 +97,6 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDLis
 
     /** {@inheritDoc} */
     @Override
-    protected Model createModel(Device device, Artifact artifact, Map<String, Object> arguments)
-            throws IOException {
-        Model model = Model.newInstance(device);
-        return customGloveBlock(model, artifact, arguments);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public ZooModel<NDList, NDList> loadModel(
             Map<String, String> filters, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException {

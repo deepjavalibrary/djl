@@ -18,6 +18,7 @@ import ai.djl.Model;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.inference.Predictor;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.ndarray.NDArray;
@@ -45,6 +46,7 @@ import ai.djl.util.PairList;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class ResnetTest {
@@ -143,6 +145,9 @@ public class ResnetTest {
 
     private ZooModel<Image, Classifications> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
+        if (!TestUtils.isMxnet()) {
+            throw new SkipException("Resnet50-cifar10 model only available in MXNet");
+        }
 
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
