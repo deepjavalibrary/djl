@@ -145,7 +145,7 @@ public class BatchNorm extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void saveMetadata(DataOutputStream os) throws IOException {
+    protected void saveMetadata(DataOutputStream os) throws IOException {
         saveInputShapes(os);
         os.writeLong(inChannels);
     }

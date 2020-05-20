@@ -119,7 +119,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
      *
      * @param stateOutputs whether the output must include the hidden states.
      */
-    public void setStateOutputs(boolean stateOutputs) {
+    public final void setStateOutputs(boolean stateOutputs) {
         this.stateOutputs = stateOutputs;
     }
 

@@ -150,7 +150,7 @@ public class Linear extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void saveMetadata(DataOutputStream os) throws IOException {
+    protected void saveMetadata(DataOutputStream os) throws IOException {
         os.writeLong(outChannels);
         os.writeBoolean(flatten);
         os.writeLong(inputDimension);

@@ -32,6 +32,7 @@ import java.util.Arrays;
  * translation(text-text), image captioning(image-text) etc.
  */
 public class EncoderDecoder extends AbstractBlock {
+
     private static final byte VERSION = 1;
 
     protected Encoder encoder;
