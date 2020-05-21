@@ -20,7 +20,7 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - [Pytorch Inference Optimization](pytorch/how_to_optimize_inference_performance.md) - Improve inference performance
 
 
-#### Tensorflow
+#### TensorFlow
 - [TensorFlow Engine](../tensorflow/tensorflow-engine/README.md) - TensorFlow Engine implementation
 - [TensorFlow Model Zoo](../tensorflow/tensorflow-model-zoo/README.md) - TensorFlow SavedModel model zoo
 - [Keras Imporint](tensorflow/how_to_import_keras_models_in_DJL.md)
@@ -52,6 +52,7 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 
 ## Cheat sheet
 
+- [How to load a model](load_model.md)
 - [How to collect metrics](how_to_collect_metrics.md)
 - [How to use a dataset](development/how_to_use_dataset.md)
 
