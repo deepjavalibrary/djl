@@ -93,26 +93,43 @@ public interface ModelZoo {
      */
     static <I, O> ZooModel<I, O> loadModel(Criteria<I, O> criteria)
             throws IOException, ModelNotFoundException, MalformedModelException {
+        String artifactId = criteria.getArtifactId();
+        ModelZoo modelZoo = criteria.getModelZoo();
         String groupId = criteria.getGroupId();
-        ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
-        for (ZooProvider provider : providers) {
-            ModelZoo zoo = provider.getModelZoo();
-            if (zoo == null) {
-                continue;
-            }
-            if (groupId != null && !zoo.getGroupId().equals(groupId)) {
-                // filter out ModelZoo by groupId
-                continue;
-            }
+        String engine = criteria.getEngine();
+        Application application = criteria.getApplication();
 
-            Set<String> supportedEngine = zoo.getSupportedEngines();
-            String engine = criteria.getEngine();
+        List<ModelZoo> list = new ArrayList<>();
+        if (modelZoo != null) {
+            if (groupId != null && !modelZoo.getGroupId().equals(groupId)) {
+                throw new ModelNotFoundException("groupId conflict with ModelZoo criteria.");
+            }
+            Set<String> supportedEngine = modelZoo.getSupportedEngines();
             if (engine != null && !supportedEngine.contains(engine)) {
-                continue;
+                throw new ModelNotFoundException(
+                        "ModelZoo doesn't support specified with engine: " + engine);
             }
+            list.add(modelZoo);
+        } else {
+            ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
+            for (ZooProvider provider : providers) {
+                ModelZoo zoo = provider.getModelZoo();
+                if (zoo == null) {
+                    continue;
+                }
+                if (groupId != null && !zoo.getGroupId().equals(groupId)) {
+                    // filter out ModelZoo by groupId
+                    continue;
+                }
+                Set<String> supportedEngine = zoo.getSupportedEngines();
+                if (engine != null && !supportedEngine.contains(engine)) {
+                    continue;
+                }
+                list.add(zoo);
+            }
+        }
 
-            Application application = criteria.getApplication();
-            String artifactId = criteria.getArtifactId();
+        for (ModelZoo zoo : list) {
             for (ModelLoader<?, ?> loader : zoo.getModelLoaders()) {
                 if (artifactId != null && !artifactId.equals(loader.getArtifactId())) {
                     // filter out by model loader artifactId

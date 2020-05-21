@@ -34,6 +34,7 @@ public class Criteria<I, O> {
     private Device device;
     private String groupId;
     private String artifactId;
+    private ModelZoo modelZoo;
     private Map<String, String> filters;
     private Map<String, Object> arguments;
     private Map<String, Object> options;
@@ -48,6 +49,7 @@ public class Criteria<I, O> {
         this.device = builder.device;
         this.groupId = builder.groupId;
         this.artifactId = builder.artifactId;
+        this.modelZoo = builder.modelZoo;
         this.filters = builder.filters;
         this.arguments = builder.arguments;
         this.options = builder.options;
@@ -119,6 +121,15 @@ public class Criteria<I, O> {
     }
 
     /**
+     * Returns the {@link ModelZoo} to be searched.
+     *
+     * @return the {@link ModelZoo} to be searched
+     */
+    public ModelZoo getModelZoo() {
+        return modelZoo;
+    }
+
+    /**
      * Returns the search filters that must match the properties of the model.
      *
      * @return the search filters that must match the properties of the model.
@@ -182,6 +193,7 @@ public class Criteria<I, O> {
         Device device;
         String groupId;
         String artifactId;
+        ModelZoo modelZoo;
         Map<String, String> filters;
         Map<String, Object> arguments;
         Map<String, Object> options;
@@ -274,6 +286,28 @@ public class Criteria<I, O> {
             } else {
                 this.artifactId = artifactId;
             }
+            return this;
+        }
+
+        /**
+         * Sets optional model urls of the {@link ModelLoader} for this criteria.
+         *
+         * @param modelUrls the comma delimited url string
+         * @return this {@code Builder}
+         */
+        public Builder<I, O> optModelUrls(String modelUrls) {
+            this.modelZoo = new DefaultModelZoo(modelUrls);
+            return this;
+        }
+
+        /**
+         * Sets optional {@link ModelZoo} of the {@link ModelLoader} for this criteria.
+         *
+         * @param modelZoo ModelZoo} of the {@link ModelLoader} for this criteria
+         * @return this {@code Builder}
+         */
+        public Builder<I, O> optModelZoo(ModelZoo modelZoo) {
+            this.modelZoo = modelZoo;
             return this;
         }
 
