@@ -11,7 +11,15 @@ To use multithreading inference feature, we have to disable GC to close the NDAr
 Please make sure all the NDArrays are attached to the NDManager.
 It is expected to be fixed in the future.
 
-###
+### oneDNN(MKLDNN) acceleration
+Unlike TensorFlow and MXNet, PyTorch by default doesn't enable MKLDNN which is treated as a device type like CPU and GPU.
+You can enable it by
+```
+-Dai.djl.pytorch.use_mkldnn=true
+```
+You might see the exception if certain data type or operator is not supported with the oneDNN device.
+
+### Thread configuration
 There are two configurations you can set to optimize the inference performance.
 
 ```
