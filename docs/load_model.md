@@ -2,14 +2,14 @@
 
 A model is a collection of artifacts that is created by the training process.
 In Deep Learning, running inference on a Model usually involves pre-processing and post-processing.
-DJL provides a `[ZooModel](https://javadoc.io/static/ai.djl/api/0.5.0/index.html?ai/djl/repository/zoo/ZooModel.html)` 
+DJL provides a [ZooModel](https://javadoc.io/static/ai.djl/api/0.5.0/index.html?ai/djl/repository/zoo/ZooModel.html) 
 class, which makes it easy to combine data processing with the model.
 
 This document will show you how to load a pre-trained model in various scenarios.
 
 ## Using ModelZoo API to load a Model
 
-We recommend to use the [ModelZoo](https://javadoc.io/static/ai.djl/api/0.5.0/index.html?ai/djl/repository/zoo/ModelZoo.html)
+We recommend you to use the [ModelZoo](https://javadoc.io/static/ai.djl/api/0.5.0/index.html?ai/djl/repository/zoo/ModelZoo.html)
 API to load models.
 
 The ModelZoo API provides a unified way to load models. The declarative nature of this API allows you to store model
@@ -33,6 +33,8 @@ to narrow down your search condition and locate the model you want to load.
 - filters: defines search filters that must match the properties of the model
 - options: defines engine/model specific options to load the model
 - arguments: defines model specific arguments to load the model
+
+*Note:* If multiple model matches the criteria you specified, the first one will be returned. The result is not deterministic.
 
 ### Load model from local file system
 
@@ -70,12 +72,14 @@ ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
 By default, DJL will use the file name of the URL as the model's `artifactId` and `modelName` and assumes there
 is no nested folder structure in the archive file.
 You can use URL query string to tell DJL how to load model from the archive file:
-- model_name: the file name (or prefix) of the model
+- model_name: the file name (or prefix) of the model.
+
+    You need to include the relative path to the model file if it's in a sub folder of the archive file. 
 - artifact_id: define a `artifactId` other than the file name
 
 For example:
 ```
-https://djl-ai.s3.amazonaws.com/resnet.zip?artifact_id=tf_resenet&model_name=resnet-18
+https://djl-ai.s3.amazonaws.com/resnet.zip?artifact_id=tf_resenet&model_name=saved_model/resnet-18
 ```
 
 ### Load model from AWS S3 bucket

@@ -24,6 +24,7 @@ import ai.djl.translate.Translator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,17 @@ public class TfModel extends BaseModel {
     @Override
     public void load(Path modelPath, String modelName, Map<String, Object> options) {
         modelDir = modelPath.toAbsolutePath();
+        Path path = modelDir.resolve(modelName);
+        Path file = path.resolve("saved_model.pb");
+        if (Files.exists(file) && Files.isRegularFile(file)) {
+            modelDir = path;
+        } else {
+            path = Paths.get(modelName);
+            if (path.getNameCount() > 1) {
+                path = path.subpath(0, path.getNameCount() - 1);
+                modelDir = modelDir.resolve(path);
+            }
+        }
         String[] tags = null;
         ConfigProto proto = null;
         RunOptions runOptions = null;
