@@ -22,6 +22,7 @@ import ai.djl.nn.Blocks;
 import ai.djl.nn.core.Linear;
 import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -39,7 +40,7 @@ public class GradientCollectorIntegrationTest {
 
     @Test
     public void testAutograd() {
-        try (Model model = Model.newInstance();
+        try (Model model = Model.newInstance("model");
                 NDManager manager = model.getNDManager()) {
             model.setBlock(Blocks.identityBlock());
             try (Trainer trainer =
@@ -85,7 +86,7 @@ public class GradientCollectorIntegrationTest {
                         .optInitializer(Initializer.ONES)
                         .optOptimizer(optimizer);
 
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("linear")) {
             Linear block = Linear.builder().setOutChannels(1).build();
             model.setBlock(block);
 
@@ -114,9 +115,9 @@ public class GradientCollectorIntegrationTest {
                 trainer.initialize(inputShape);
 
                 for (int epoch = 0; epoch < epochs; epoch++) {
-                    trainer.endEpoch();
+                    trainer.notifyListeners(listener -> listener.onEpoch(trainer));
                     for (Batch batch : trainer.iterateDataset(dataset)) {
-                        trainer.trainBatch(batch);
+                        EasyTrain.trainBatch(trainer, batch);
                         trainer.step();
                         batch.close();
                     }

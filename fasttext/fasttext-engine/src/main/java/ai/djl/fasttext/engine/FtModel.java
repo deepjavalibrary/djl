@@ -51,8 +51,13 @@ public class FtModel implements Model {
     private String modelName;
     private Map<String, String> properties;
 
-    /** Constructs a new Model. */
-    FtModel() {
+    /**
+     * Constructs a new Model.
+     *
+     * @param name the model name
+     */
+    FtModel(String name) {
+        this.modelName = name;
         fta = new FastTextWrapper.FastTextApi();
         properties = new ConcurrentHashMap<>();
     }

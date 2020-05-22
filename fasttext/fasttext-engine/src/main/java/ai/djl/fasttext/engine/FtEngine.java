@@ -52,8 +52,8 @@ public class FtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model newModel(Device device) {
-        return new FtModel();
+    public Model newModel(String name, Device device) {
+        return new FtModel(name);
     }
 
     /** {@inheritDoc} */

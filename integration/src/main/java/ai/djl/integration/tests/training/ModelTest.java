@@ -34,8 +34,8 @@ public class ModelTest {
         SequentialBlock block = new SequentialBlock();
         block.add(Conv2D.builder().setKernel(new Shape(1, 1)).setNumFilters(10).build());
         block.add(BatchNorm.builder().build());
-        try (Model saveModel = Model.newInstance();
-                Model loadModel = Model.newInstance()) {
+        try (Model saveModel = Model.newInstance("saveModel");
+                Model loadModel = Model.newInstance("loadModel")) {
             block.setInitializer(new XavierInitializer());
             block.initialize(saveModel.getNDManager(), DataType.FLOAT32, new Shape(1, 3, 32, 32));
             ParameterList savedParameters = block.getParameters();

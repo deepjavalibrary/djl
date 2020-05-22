@@ -20,7 +20,6 @@ import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.basicmodelzoo.nlp.SimpleTextDecoder;
 import ai.djl.basicmodelzoo.nlp.SimpleTextEncoder;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.nlp.EncoderDecoder;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
@@ -38,6 +37,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.recurrent.LSTM;
 import ai.djl.training.DataManager;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Batch;
@@ -70,7 +70,7 @@ public final class TrainSeq2Seq {
             throws IOException, ParseException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
         ExecutorService executorService = Executors.newFixedThreadPool(8);
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("seq2seqMTEn-Fr")) {
             // get training and validation dataset
             TextDataset trainingSet =
                     getDataset(Dataset.Usage.TRAIN, arguments, executorService, null, null);
@@ -114,13 +114,8 @@ public final class TrainSeq2Seq {
                 // initialize trainer with proper input shape
                 trainer.initialize(encoderInputShape, decoderInputShape);
 
-                TrainingUtils.fit(
-                        trainer,
-                        arguments.getEpoch(),
-                        trainingSet,
-                        validateDataset,
-                        arguments.getOutputDir(),
-                        "seq2seqMTEn-Fr");
+                EasyTrain.fit(trainer, arguments.getEpoch(), trainingSet, validateDataset);
+
                 TrainingResult result = trainer.getTrainingResult();
                 model.setProperty("Epoch", String.valueOf(result.getEpoch()));
                 model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));

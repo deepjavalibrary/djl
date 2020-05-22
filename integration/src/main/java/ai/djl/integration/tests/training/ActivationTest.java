@@ -34,7 +34,7 @@ public class ActivationTest {
 
     @Test
     public void testRelu() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Activation.reluBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -53,7 +53,7 @@ public class ActivationTest {
 
     @Test
     public void testSigmoid() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Activation.sigmoidBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -70,7 +70,7 @@ public class ActivationTest {
 
     @Test
     public void testTanh() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Activation.tanhBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -87,7 +87,7 @@ public class ActivationTest {
 
     @Test
     public void testSoftrelu() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Activation.softreluBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -104,7 +104,7 @@ public class ActivationTest {
 
     @Test
     public void testLeakyrelu() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             float alpha = 1.0f;
             model.setBlock(Activation.leakyReluBlock(alpha));
 
@@ -122,7 +122,7 @@ public class ActivationTest {
 
     @Test
     public void testElu() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             float alpha = 1.0f;
             model.setBlock(Activation.eluBlock(alpha));
 
@@ -139,7 +139,7 @@ public class ActivationTest {
 
     @Test
     public void testSelu() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Activation.seluBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -156,7 +156,7 @@ public class ActivationTest {
 
     @Test
     public void testGelu() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Activation.geluBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -173,7 +173,7 @@ public class ActivationTest {
 
     @Test
     public void testSwish() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             float beta = 1.0f;
             model.setBlock(Activation.swishBlock(beta));
 
@@ -191,7 +191,7 @@ public class ActivationTest {
 
     @Test
     public void testMish() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Activation.mishBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -208,7 +208,7 @@ public class ActivationTest {
 
     @Test
     public void testPrelu() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Activation.preluBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {

@@ -41,7 +41,7 @@ public class ImageNetTest {
                         .build();
         imagenet.prepare();
 
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             TrainingConfig config =
                     new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                             .optInitializer(Initializer.ONES);

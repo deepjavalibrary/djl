@@ -166,10 +166,6 @@ public abstract class BaseModel implements Model {
         this.modelDir = modelDir;
     }
 
-    protected void setModelName(String modelName) {
-        this.modelName = modelName;
-    }
-
     /** {@inheritDoc} */
     @Override
     public void save(Path modelPath, String modelName) throws IOException {

@@ -108,7 +108,11 @@ public class MlpModelLoader extends BaseModelLoader<Image, Classifications> {
     /** {@inheritDoc} */
     @Override
     protected Model createModel(
-            Device device, Artifact artifact, Map<String, Object> arguments, String engine) {
+            String name,
+            Device device,
+            Artifact artifact,
+            Map<String, Object> arguments,
+            String engine) {
         int width = ((Double) arguments.getOrDefault("width", 28d)).intValue();
         int height = ((Double) arguments.getOrDefault("height", 28d)).intValue();
         int input = width * height;
@@ -120,7 +124,7 @@ public class MlpModelLoader extends BaseModelLoader<Image, Classifications> {
                         .mapToInt(Double::intValue)
                         .toArray();
 
-        Model model = Model.newInstance(device, engine);
+        Model model = Model.newInstance(name, device, engine);
         model.setBlock(new Mlp(input, output, hidden));
         return model;
     }

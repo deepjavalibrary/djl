@@ -28,13 +28,16 @@ import org.slf4j.LoggerFactory;
 /**
  * {@link TrainingListener} that outputs the training time metrics after training is done.
  *
- * <p>The training time data is placed in the file "$outputDir/training.log".
+ * <p>The training time data is placed in the file "$outputDir/training.log" and the validation data
+ * is placed in "$outputDir/validate.log".
  */
 public class TimeMeasureTrainingListener implements TrainingListener {
 
     private static final Logger logger = LoggerFactory.getLogger(TimeMeasureTrainingListener.class);
 
     private String outputDir;
+    private long trainBatchBeginTime;
+    private long validateBatchBeginTime;
 
     /**
      * Constructs a {@link TimeMeasureTrainingListener}.
@@ -43,19 +46,34 @@ public class TimeMeasureTrainingListener implements TrainingListener {
      */
     public TimeMeasureTrainingListener(String outputDir) {
         this.outputDir = outputDir;
+        trainBatchBeginTime = -1;
+        validateBatchBeginTime = -1;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void onEpoch(Trainer trainer) {}
+    public void onEpoch(Trainer trainer) {
+        trainBatchBeginTime = -1;
+        validateBatchBeginTime = -1;
+    }
 
     /** {@inheritDoc} */
     @Override
-    public void onTrainingBatch(Trainer trainer, BatchData batchData) {}
+    public void onTrainingBatch(Trainer trainer, BatchData batchData) {
+        if (trainBatchBeginTime != -1) {
+            trainer.addMetric("train", trainBatchBeginTime);
+        }
+        trainBatchBeginTime = System.nanoTime();
+    }
 
     /** {@inheritDoc} */
     @Override
-    public void onValidationBatch(Trainer trainer, BatchData batchData) {}
+    public void onValidationBatch(Trainer trainer, BatchData batchData) {
+        if (validateBatchBeginTime != -1) {
+            trainer.addMetric("validate", validateBatchBeginTime);
+        }
+        validateBatchBeginTime = System.nanoTime();
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -75,18 +93,23 @@ public class TimeMeasureTrainingListener implements TrainingListener {
         try {
             Path dir = Paths.get(logDir);
             Files.createDirectories(dir);
-            Path file = dir.resolve("training.log");
-            try (BufferedWriter writer =
-                    Files.newBufferedWriter(
-                            file, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
-                List<Metric> list = metrics.getMetric("train");
-                for (Metric metric : list) {
-                    writer.append(metric.toString());
-                    writer.newLine();
-                }
+            dumpMetricToFile(dir.resolve("training.log"), metrics.getMetric("train"));
+            if (metrics.hasMetric("validate")) {
+                dumpMetricToFile(dir.resolve("validate.log"), metrics.getMetric("validate"));
             }
         } catch (IOException e) {
             logger.error("Failed dump training log", e);
+        }
+    }
+
+    private static void dumpMetricToFile(Path path, List<Metric> metrics) throws IOException {
+        try (BufferedWriter writer =
+                Files.newBufferedWriter(
+                        path, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+            for (Metric metric : metrics) {
+                writer.append(metric.toString());
+                writer.newLine();
+            }
         }
     }
 }

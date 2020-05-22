@@ -42,9 +42,11 @@ public class PtModel extends BaseModel {
     /**
      * Constructs a new Model on a given device.
      *
+     * @param name the model name
      * @param device the device the model should be located on
      */
-    PtModel(Device device) {
+    PtModel(String name, Device device) {
+        this.modelName = name;
         device = Device.defaultIfNull(device);
         manager = PtNDManager.getSystemManager().newSubManager(device);
         dataType = DataType.FLOAT32;

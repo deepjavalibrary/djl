@@ -74,8 +74,8 @@ public final class PtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model newModel(Device device) {
-        return new PtModel(device);
+    public Model newModel(String name, Device device) {
+        return new PtModel(name, device);
     }
 
     /** {@inheritDoc} */

@@ -19,7 +19,6 @@ import ai.djl.Model;
 import ai.djl.basicdataset.StanfordMovieReview;
 import ai.djl.basicdataset.utils.TextData;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
@@ -46,6 +45,7 @@ import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DataManager;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Batch;
@@ -99,7 +99,7 @@ public final class TrainSentimentAnalysis {
                         .optFilter("dimensions", "50")
                         .build();
 
-        try (Model model = Model.newInstance();
+        try (Model model = Model.newInstance("stanfordSentimentAnalysis");
                 ZooModel<String, NDList> embedding = ModelZoo.loadModel(criteria)) {
             ModelZooTextEmbedding modelZooTextEmbedding = new ModelZooTextEmbedding(embedding);
             // get training and validation dataset
@@ -121,13 +121,7 @@ public final class TrainSentimentAnalysis {
                 // initialize trainer with proper input shape
                 trainer.initialize(encoderInputShape);
 
-                TrainingUtils.fit(
-                        trainer,
-                        arguments.getEpoch(),
-                        trainingSet,
-                        validateSet,
-                        null,
-                        "stanfordSentimentAnalysis");
+                EasyTrain.fit(trainer, arguments.getEpoch(), trainingSet, validateSet);
 
                 TrainingResult result = trainer.getTrainingResult();
                 model.setProperty("Epoch", String.valueOf(result.getEpoch()));

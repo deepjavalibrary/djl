@@ -89,9 +89,13 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDLis
     /** {@inheritDoc} */
     @Override
     protected Model createModel(
-            Device device, Artifact artifact, Map<String, Object> arguments, String engine)
+            String name,
+            Device device,
+            Artifact artifact,
+            Map<String, Object> arguments,
+            String engine)
             throws IOException {
-        Model model = Model.newInstance(device, engine);
+        Model model = Model.newInstance(name, device, engine);
         return customGloveBlock(model, artifact, arguments);
     }
 

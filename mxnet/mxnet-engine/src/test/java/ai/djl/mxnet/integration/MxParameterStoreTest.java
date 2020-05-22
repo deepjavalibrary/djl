@@ -30,7 +30,7 @@ public class MxParameterStoreTest {
 
     @Test
     public void testParameterStore() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             NDManager manager = model.getNDManager();
             int numGpus = Device.getGpuCount();
             int numDevices;

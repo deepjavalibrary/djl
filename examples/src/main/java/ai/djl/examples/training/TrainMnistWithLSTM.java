@@ -16,7 +16,6 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicdataset.Mnist;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
@@ -27,6 +26,7 @@ import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.recurrent.LSTM;
 import ai.djl.training.DataManager;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Batch;
@@ -52,7 +52,7 @@ public final class TrainMnistWithLSTM {
     public static TrainingResult runExample(String[] args) throws IOException, ParseException {
         Arguments arguments = Arguments.parseArgs(args);
 
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("lstm")) {
             model.setBlock(getLSTMModel());
 
             // get training and validation dataset
@@ -76,13 +76,7 @@ public final class TrainMnistWithLSTM {
                 // initialize trainer with proper input shape
                 trainer.initialize(inputShape);
 
-                TrainingUtils.fit(
-                        trainer,
-                        arguments.getEpoch(),
-                        trainingSet,
-                        validateSet,
-                        arguments.getOutputDir(),
-                        "lstm");
+                EasyTrain.fit(trainer, arguments.getEpoch(), trainingSet, validateSet);
 
                 TrainingResult result = trainer.getTrainingResult();
                 float accuracy = result.getValidateEvaluation("Accuracy");

@@ -33,7 +33,7 @@ public class CaptchaTest {
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES);
 
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("captcha")) {
             model.setBlock(Blocks.identityBlock());
 
             CaptchaDataset captchaDataset =

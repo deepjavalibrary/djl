@@ -56,9 +56,11 @@ public class MxModel extends BaseModel {
     /**
      * Constructs a new Model on a given device.
      *
+     * @param name the model name
      * @param device the device the model should be located on
      */
-    MxModel(Device device) {
+    MxModel(String name, Device device) {
+        this.modelName = name;
         device = Device.defaultIfNull(device);
         dataType = DataType.FLOAT32;
         properties = new ConcurrentHashMap<>();

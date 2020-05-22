@@ -56,12 +56,13 @@ public final class ImageClassification {
         Path imageFile = Paths.get("src/test/resources/0.png");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
-        try (Model model = Model.newInstance()) {
+        String modelName = "mlp";
+        try (Model model = Model.newInstance(modelName)) {
             model.setBlock(new Mlp(28 * 28, 10, new int[] {128, 64}));
 
             // Assume you have run TrainMnist.java example, and saved model in build/model folder.
             Path modelDir = Paths.get("build/model");
-            model.load(modelDir, "mlp");
+            model.load(modelDir, modelName);
 
             Translator<Image, Classifications> translator = new MyTranslator();
 

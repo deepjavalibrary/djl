@@ -46,7 +46,7 @@ public class TrainCookingStackExchange {
 
     @Test
     public void testTrainTextClassification() throws IOException {
-        try (FtModel model = (FtModel) Model.newInstance()) {
+        try (FtModel model = (FtModel) Model.newInstance("ftModel")) {
             CookingStackExchange trainingSet = getDataset(Dataset.Usage.TRAIN);
             CookingStackExchange validateSet = getDataset(Dataset.Usage.TEST);
 
@@ -112,7 +112,7 @@ public class TrainCookingStackExchange {
         }
 
         TextClassificationTranslator translator = new TextClassificationTranslator();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("classifier")) {
             model.load(path, "text_classification.bin");
             try (Predictor<String, Classifications> predictor = model.newPredictor(translator)) {
                 Classifications result =

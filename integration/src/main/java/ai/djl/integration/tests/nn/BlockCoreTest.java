@@ -63,7 +63,7 @@ public class BlockCoreTest {
 
         long outSize = 3;
         Block block = Linear.builder().setOutChannels(outSize).build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -83,7 +83,7 @@ public class BlockCoreTest {
         }
 
         block = Linear.builder().setOutChannels(outSize).optBias(false).build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -108,7 +108,7 @@ public class BlockCoreTest {
 
         long outSize = 10;
         Block block = Linear.builder().setOutChannels(outSize).optFlatten(false).build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -131,7 +131,7 @@ public class BlockCoreTest {
 
         long outSize = 3;
         Block block = Linear.builder().setOutChannels(outSize).build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -154,7 +154,7 @@ public class BlockCoreTest {
         }
 
         block = Linear.builder().setOutChannels(outSize).optBias(false).build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -181,7 +181,7 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
         Block block = BatchNorm.builder().optAxis(1).build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -205,7 +205,7 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
         Block block = Dropout.builder().optProbability(.5f).build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -232,7 +232,7 @@ public class BlockCoreTest {
                         .setItems(Arrays.asList("a", "b", "c"))
                         .setEmbeddingSize(2)
                         .build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
             model.setDataType(DataType.INT32);
 
@@ -264,7 +264,7 @@ public class BlockCoreTest {
         Block block =
                 Conv1D.builder().setKernel(new Shape(2)).setNumFilters(1).optBias(false).build();
 
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -294,7 +294,7 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
         Block block = Conv2D.builder().setKernel(new Shape(2, 2)).setNumFilters(1).build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -325,7 +325,7 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
         Block block = Conv3D.builder().setKernel(new Shape(2, 2, 2)).setNumFilters(1).build();
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -371,7 +371,7 @@ public class BlockCoreTest {
                         .setActivation(RNN.Activation.TANH)
                         .optStateOutput(true)
                         .build();
-        try (Model model = Model.newInstance(config.getDevices()[0])) {
+        try (Model model = Model.newInstance("model", config.getDevices()[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -409,7 +409,7 @@ public class BlockCoreTest {
                         .setActivation(RNN.Activation.RELU)
                         .optStateOutput(true)
                         .build();
-        try (Model model = Model.newInstance(config.getDevices()[0])) {
+        try (Model model = Model.newInstance("model", config.getDevices()[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -443,7 +443,7 @@ public class BlockCoreTest {
                         .optDevices(TestUtils.getDevices());
         Block block =
                 LSTM.builder().setStateSize(4).setNumStackedLayers(1).optStateOutput(true).build();
-        try (Model model = Model.newInstance(config.getDevices()[0])) {
+        try (Model model = Model.newInstance("model", config.getDevices()[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -481,7 +481,7 @@ public class BlockCoreTest {
                         .optInitializer(Initializer.ONES)
                         .optDevices(TestUtils.getDevices());
         GRU block = GRU.builder().setStateSize(4).setNumStackedLayers(1).build();
-        try (Model model = Model.newInstance(config.getDevices()[0])) {
+        try (Model model = Model.newInstance("model", config.getDevices()[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -539,7 +539,7 @@ public class BlockCoreTest {
         block.removeLastBlock();
         Assert.assertEquals(block.getChildren().size(), 4);
 
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -575,7 +575,7 @@ public class BlockCoreTest {
         Assert.assertEquals(block.getDirectParameters().size(), 0);
         Assert.assertEquals(block.getParameters().size(), 4);
 
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {

@@ -34,7 +34,7 @@ public class Cifar10Test {
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES);
 
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
             int batchSize = config.getDevices().length * 32;
 
@@ -64,7 +64,7 @@ public class Cifar10Test {
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES);
 
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
 
             Cifar10 cifar10 =

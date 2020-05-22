@@ -43,9 +43,11 @@ public class TfModel extends BaseModel {
     /**
      * Constructs a new Model on a given device.
      *
+     * @param name the model name
      * @param device the device the model should be located on
      */
-    TfModel(Device device) {
+    TfModel(String name, Device device) {
+        modelName = name;
         device = Device.defaultIfNull(device);
         properties = new ConcurrentHashMap<>();
         manager = TfNDManager.getSystemManager().newSubManager(device);

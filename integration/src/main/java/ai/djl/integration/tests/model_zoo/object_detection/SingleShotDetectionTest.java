@@ -36,6 +36,7 @@ import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
@@ -83,7 +84,7 @@ public class SingleShotDetectionTest {
                 Shape inputShape = new Shape(32, 3, 256, 256);
                 trainer.initialize(inputShape);
                 Iterable<Batch> iterator = dataset.getData(model.getNDManager());
-                trainer.trainBatch(iterator.iterator().next());
+                EasyTrain.trainBatch(trainer, iterator.iterator().next());
             }
         }
     }

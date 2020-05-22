@@ -23,6 +23,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
@@ -39,7 +40,7 @@ public class SqueezenetTest {
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES);
         Block squeezeNet = SqueezeNet.squeezenet(10);
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("squeezenet")) {
             model.setBlock(squeezeNet);
             try (Trainer trainer = model.newTrainer(config)) {
                 int batchSize = config.getDevices().length * 16;
@@ -59,7 +60,7 @@ public class SqueezenetTest {
                                 Batchifier.STACK,
                                 Batchifier.STACK);
                 PairList<String, Parameter> parameters = squeezeNet.getParameters();
-                trainer.trainBatch(batch);
+                EasyTrain.trainBatch(trainer, batch);
                 trainer.step();
                 NDArray expectedAtIndex0 = manager.ones(new Shape(64, 1, 3, 3));
                 NDArray expectedAtIndex1 = manager.zeros(new Shape(64));

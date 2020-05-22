@@ -23,6 +23,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.core.Linear;
 import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
@@ -52,7 +53,7 @@ public class OptimizerTest {
                         .optOptimizer(sgd)
                         .optDevices(devices);
         Block block = Linear.builder().setOutChannels(CHANNELS).build();
-        try (Model model = Model.newInstance(devices[0])) {
+        try (Model model = Model.newInstance("model", devices[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -84,7 +85,7 @@ public class OptimizerTest {
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setOutChannels(CHANNELS).build();
-        try (Model model = Model.newInstance(devices[0])) {
+        try (Model model = Model.newInstance("model", devices[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -124,7 +125,7 @@ public class OptimizerTest {
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setOutChannels(CHANNELS).build();
-        try (Model model = Model.newInstance(devices[0])) {
+        try (Model model = Model.newInstance("model", devices[0])) {
             model.setBlock(block);
 
             int batchSize = config.getDevices().length * BATCH_SIZE;
@@ -156,7 +157,7 @@ public class OptimizerTest {
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setOutChannels(CHANNELS).build();
-        try (Model model = Model.newInstance(devices[0])) {
+        try (Model model = Model.newInstance("model", devices[0])) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -185,7 +186,7 @@ public class OptimizerTest {
                         batchSize,
                         Batchifier.STACK,
                         Batchifier.STACK);
-        trainer.trainBatch(batch);
+        EasyTrain.trainBatch(trainer, batch);
         trainer.step();
         return NDArrays.stack(
                 new NDList(

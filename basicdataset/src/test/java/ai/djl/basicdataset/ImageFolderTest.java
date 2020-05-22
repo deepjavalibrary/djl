@@ -46,7 +46,7 @@ public class ImageFolderTest {
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES);
 
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
 
             ImageFolder dataset =

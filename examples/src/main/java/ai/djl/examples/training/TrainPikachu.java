@@ -18,7 +18,6 @@ import ai.djl.Model;
 import ai.djl.basicdataset.PikachuDetection;
 import ai.djl.basicmodelzoo.cv.object_detection.ssd.SingleShotDetection;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.cv.Image;
@@ -34,6 +33,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
@@ -72,7 +72,7 @@ public final class TrainPikachu {
     public static TrainingResult runExample(String[] args) throws IOException, ParseException {
         Arguments arguments = Arguments.parseArgs(args);
 
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("ssd")) {
             model.setBlock(getSsdTrainBlock());
 
             RandomAccessDataset pikachuDetectionTrain = getDataset(Dataset.Usage.TRAIN, arguments);
@@ -85,13 +85,8 @@ public final class TrainPikachu {
 
                 Shape inputShape = new Shape(arguments.getBatchSize(), 3, 256, 256);
                 trainer.initialize(inputShape);
-                TrainingUtils.fit(
-                        trainer,
-                        arguments.getEpoch(),
-                        pikachuDetectionTrain,
-                        pikachuDetectionTest,
-                        arguments.getOutputDir(),
-                        "ssd");
+                EasyTrain.fit(
+                        trainer, arguments.getEpoch(), pikachuDetectionTrain, pikachuDetectionTest);
 
                 TrainingResult result = trainer.getTrainingResult();
                 float accuracy = result.getValidateEvaluation("classAccuracy");
@@ -107,7 +102,7 @@ public final class TrainPikachu {
 
     public static int predict(String outputDir, String imageFile)
             throws IOException, MalformedModelException, TranslateException {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("predModel")) {
             float detectionThreshold = 0.6f;
             // load parameters back to original training block
             model.setBlock(getSsdTrainBlock());

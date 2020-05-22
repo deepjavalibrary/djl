@@ -32,7 +32,7 @@ public class MxGradientCollectorIntegrationTest {
 
     @Test
     public void testMxAutograd() {
-        try (Model model = Model.newInstance();
+        try (Model model = Model.newInstance("model");
                 NDManager manager = model.getNDManager()) {
             model.setBlock(Blocks.identityBlock());
             try (Trainer trainer =

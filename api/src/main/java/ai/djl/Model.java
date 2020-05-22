@@ -53,44 +53,48 @@ public interface Model extends AutoCloseable {
     /**
      * Creates an empty model instance.
      *
+     * @param name the model name
      * @return a new Model instance
      */
-    static Model newInstance() {
-        return newInstance(Device.defaultDevice());
+    static Model newInstance(String name) {
+        return newInstance(name, Device.defaultDevice());
     }
 
     /**
      * Creates an empty model instance on the specified {@link Device}.
      *
+     * @param name the model name
      * @param device the device to load the model onto
      * @return a new model instance
      */
-    static Model newInstance(Device device) {
-        return Engine.getInstance().newModel(device);
+    static Model newInstance(String name, Device device) {
+        return Engine.getInstance().newModel(name, device);
     }
 
     /**
      * Creates an empty model instance on the specified {@link Device} and engine.
      *
+     * @param name the model name
      * @param engineName the name of the engine
      * @return a new model instance
      */
-    static Model newInstance(String engineName) {
-        return Engine.getEngine(engineName).newModel(Device.defaultDevice());
+    static Model newInstance(String name, String engineName) {
+        return Engine.getEngine(engineName).newModel(name, Device.defaultDevice());
     }
 
     /**
      * Creates an empty model instance on the specified {@link Device} and engine.
      *
+     * @param name the model name
      * @param device the device to load the model onto
      * @param engineName the name of the engine
      * @return a new model instance
      */
-    static Model newInstance(Device device, String engineName) {
+    static Model newInstance(String name, Device device, String engineName) {
         if (engineName == null || engineName.isEmpty()) {
-            return newInstance(device);
+            return newInstance(name, device);
         }
-        return Engine.getEngine(engineName).newModel(device);
+        return Engine.getEngine(engineName).newModel(name, device);
     }
 
     /**

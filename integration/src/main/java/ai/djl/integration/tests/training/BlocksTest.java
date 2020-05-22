@@ -34,7 +34,7 @@ public class BlocksTest {
 
     @Test
     public void testFlattenBlock() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.batchFlattenBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {

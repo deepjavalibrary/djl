@@ -49,7 +49,7 @@ public class DatasetTest {
 
     @Test
     public void testSequenceSampler() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
@@ -78,7 +78,7 @@ public class DatasetTest {
 
     @Test
     public void testRandomSampler() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
@@ -105,7 +105,7 @@ public class DatasetTest {
 
     @Test
     public void testBatchSampler() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
@@ -188,7 +188,7 @@ public class DatasetTest {
 
     @Test
     public void testArrayDataset() {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
@@ -266,7 +266,7 @@ public class DatasetTest {
 
     @Test
     public void testMultithreading() throws IOException, InterruptedException {
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
             NDManager manager = model.getNDManager();
 

@@ -24,7 +24,7 @@ public class MockEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model newModel(Device device) {
+    public Model newModel(String name, Device device) {
         return new MockModel();
     }
 

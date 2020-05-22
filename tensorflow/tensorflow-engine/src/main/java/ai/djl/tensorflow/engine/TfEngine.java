@@ -52,8 +52,8 @@ public final class TfEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model newModel(Device device) {
-        return new TfModel(device);
+    public Model newModel(String name, Device device) {
+        return new TfModel(name, device);
     }
 
     /** {@inheritDoc} */

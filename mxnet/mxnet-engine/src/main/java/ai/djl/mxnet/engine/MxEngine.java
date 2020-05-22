@@ -81,8 +81,8 @@ public final class MxEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model newModel(Device device) {
-        return new MxModel(device);
+    public Model newModel(String name, Device device) {
+        return new MxModel(name, device);
     }
 
     /** {@inheritDoc} */

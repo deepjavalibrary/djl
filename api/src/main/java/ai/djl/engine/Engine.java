@@ -137,10 +137,11 @@ public abstract class Engine {
     /**
      * Constructs a new model.
      *
+     * @param name the model name
      * @param device the device that the model will be loaded onto
      * @return a new Model instance using the network defined in block
      */
-    public abstract Model newModel(Device device);
+    public abstract Model newModel(String name, Device device);
 
     /**
      * Creates a new top-level {@link NDManager}.

@@ -19,7 +19,6 @@ import ai.djl.basicdataset.Cifar10;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
@@ -36,6 +35,7 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
@@ -76,6 +76,7 @@ public final class TrainWithOptimizers {
         OptimizerArguments arguments = new OptimizerArguments(cmd);
 
         try (Model model = getModel(arguments)) {
+
             // get training dataset
             RandomAccessDataset trainDataset = getDataset(Dataset.Usage.TRAIN, arguments);
             RandomAccessDataset validationDataset = getDataset(Dataset.Usage.TEST, arguments);
@@ -94,13 +95,7 @@ public final class TrainWithOptimizers {
 
                 // initialize trainer with proper input shape
                 trainer.initialize(inputShape);
-                TrainingUtils.fit(
-                        trainer,
-                        arguments.getEpoch(),
-                        trainDataset,
-                        validationDataset,
-                        arguments.getOutputDir(),
-                        "resnetv1");
+                EasyTrain.fit(trainer, arguments.getEpoch(), trainDataset, validationDataset);
 
                 TrainingResult result = trainer.getTrainingResult();
                 float accuracy = result.getValidateEvaluation("Accuracy");
@@ -162,7 +157,7 @@ public final class TrainWithOptimizers {
             return ModelZoo.loadModel(builder.build());
         } else {
             // construct new ResNet50 without pre-trained weights
-            Model model = Model.newInstance();
+            Model model = Model.newInstance("resnetv1");
             Block resNet50 =
                     ResNetV1.builder()
                             .setImageShape(new Shape(3, Cifar10.IMAGE_HEIGHT, Cifar10.IMAGE_WIDTH))

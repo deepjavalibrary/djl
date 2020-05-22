@@ -33,6 +33,7 @@ import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
@@ -64,7 +65,7 @@ public class ResnetTest {
                         .setOutSize(10)
                         .build();
 
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("resnet")) {
             model.setBlock(resNet50);
             try (Trainer trainer = model.newTrainer(config)) {
                 int batchSize = config.getDevices().length * 16;
@@ -84,7 +85,7 @@ public class ResnetTest {
                                 Batchifier.STACK,
                                 Batchifier.STACK);
                 PairList<String, Parameter> parameters = resNet50.getParameters();
-                trainer.trainBatch(batch);
+                EasyTrain.trainBatch(trainer, batch);
                 trainer.step();
                 NDArray expectedAtIndex0 = manager.ones(new Shape(16, 1, 3, 3));
                 NDArray expectedAtIndex1 = manager.ones(new Shape(16, 16, 3, 3));
@@ -138,7 +139,7 @@ public class ResnetTest {
                                 batchSize,
                                 Batchifier.STACK,
                                 Batchifier.STACK);
-                trainer.trainBatch(batch);
+                EasyTrain.trainBatch(trainer, batch);
             }
         }
     }

@@ -17,7 +17,6 @@ import ai.djl.Model;
 import ai.djl.basicdataset.CaptchaDataset;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.TrainingUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -25,6 +24,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
@@ -57,7 +57,7 @@ public final class TrainCaptcha {
     public static TrainingResult runExample(String[] args) throws ParseException, IOException {
         Arguments arguments = Arguments.parseArgs(args);
 
-        try (Model model = Model.newInstance()) {
+        try (Model model = Model.newInstance("captcha")) {
             model.setBlock(getBlock());
 
             // get training and validation dataset
@@ -76,13 +76,7 @@ public final class TrainCaptcha {
                 // initialize trainer with proper input shape
                 trainer.initialize(inputShape);
 
-                TrainingUtils.fit(
-                        trainer,
-                        arguments.getEpoch(),
-                        trainingSet,
-                        validateSet,
-                        arguments.getOutputDir(),
-                        "captcha");
+                EasyTrain.fit(trainer, arguments.getEpoch(), trainingSet, validateSet);
 
                 TrainingResult result = trainer.getTrainingResult();
                 float accuracy = result.getValidateEvaluation("acc_digit_0");

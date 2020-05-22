@@ -127,7 +127,13 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
                 throw new ModelNotFoundException(engine + " is not supported.");
             }
 
-            Model model = createModel(Device.defaultDevice(), artifact, arguments, engine);
+            Model model =
+                    createModel(
+                            artifact.getName(),
+                            Device.defaultDevice(),
+                            artifact,
+                            arguments,
+                            engine);
             model.load(modelPath, artifact.getName(), criteria.getOptions());
             return new ZooModel<>(model, translator);
         } finally {
@@ -147,9 +153,13 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
     }
 
     protected Model createModel(
-            Device device, Artifact artifact, Map<String, Object> arguments, String engine)
+            String name,
+            Device device,
+            Artifact artifact,
+            Map<String, Object> arguments,
+            String engine)
             throws IOException {
-        return Model.newInstance(device, engine);
+        return Model.newInstance(name, device, engine);
     }
 
     /**
