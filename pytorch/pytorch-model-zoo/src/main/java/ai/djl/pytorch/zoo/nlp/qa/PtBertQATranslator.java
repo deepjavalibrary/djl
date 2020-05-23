@@ -21,7 +21,6 @@ import ai.djl.modality.nlp.translator.QATranslator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.util.List;
@@ -57,10 +56,9 @@ public class PtBertQATranslator extends QATranslator {
         long[] indices = tokens.stream().mapToLong(vocabulary::getIndex).toArray();
         long[] attentionMask = token.getAttentionMask().stream().mapToLong(i -> i).toArray();
         long[] tokenType = token.getTokenTypes().stream().mapToLong(i -> i).toArray();
-        NDArray indicesArray = manager.create(indices, new Shape(1, indices.length));
-        NDArray attentionMaskArray =
-                manager.create(attentionMask, new Shape(1, attentionMask.length));
-        NDArray tokenTypeArray = manager.create(tokenType, new Shape(1, tokenType.length));
+        NDArray indicesArray = manager.create(indices);
+        NDArray attentionMaskArray = manager.create(attentionMask);
+        NDArray tokenTypeArray = manager.create(tokenType);
         return new NDList(indicesArray, attentionMaskArray, tokenTypeArray);
     }
 

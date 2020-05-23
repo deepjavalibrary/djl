@@ -66,10 +66,12 @@ public class MxBertQATranslator extends QATranslator {
         int validLength = token.getValidLength();
 
         NDManager manager = ctx.getNDManager();
-        NDArray data0 = manager.create(indexesFloat, new Shape(1, seqLength));
+        NDArray data0 = manager.create(indexesFloat);
         data0.setName("data0");
-        NDArray data1 = manager.create(types, new Shape(1, seqLength));
+        NDArray data1 = manager.create(types);
         data1.setName("data1");
+        // avoid to use scalar as MXNet Bert model was trained with 1.5.0
+        // which is not compatible with MXNet NumPy
         NDArray data2 = manager.create(new float[] {validLength});
         data2.setName("data2");
 

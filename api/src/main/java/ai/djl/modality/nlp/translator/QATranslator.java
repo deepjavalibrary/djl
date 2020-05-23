@@ -14,17 +14,10 @@
 package ai.djl.modality.nlp.translator;
 
 import ai.djl.modality.nlp.qa.QAInput;
-import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 
 /** An abstract class to define the question answering translator. */
 public abstract class QATranslator implements Translator<QAInput, String> {
-
-    /** {@inheritDoc} */
-    @Override
-    public Batchifier getBatchifier() {
-        return null;
-    }
 
     /** The builder for question answering translator. */
     @SuppressWarnings("rawtypes")
