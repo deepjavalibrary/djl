@@ -12,12 +12,17 @@ fi
 
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 VERSION=1.5.0
+CXX11ABI="-cxx11-abi"
+if [[ $2 == "centos" ]]; then
+  CXX11ABI=""
+fi
+
 if [[ ! -d "libtorch" ]]; then
   if [[ $PLATFORM == 'linux' ]]; then
     if [[ $1 == "cpu" ]] || [[ $1 == "cu92" ]] || [[ $1 == "cu101" ]]; then
-      curl -s https://download.pytorch.org/libtorch/${1}/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2B${1}.zip | jar xv
+      curl -s https://download.pytorch.org/libtorch/${1}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${1}.zip | jar xv
     elif [[ $1 == "cu102" ]]; then
-      curl -s https://download.pytorch.org/libtorch/${1}/libtorch-cxx11-abi-shared-with-deps-${VERSION}.zip | jar xv
+      curl -s https://download.pytorch.org/libtorch/${1}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}.zip | jar xv
     else
       echo "$1 is not supported."
       exit 1

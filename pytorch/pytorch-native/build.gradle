@@ -8,15 +8,20 @@ apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
 def VERSION = "1.5.0"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-version = VERSION + (isRelease ? "" : "-SNAPSHOT")
+boolean isCentOS = project.hasProperty("centos")
+version = VERSION + (isCentOS ? "-precxx11" : "") + (isRelease ? "" : "-SNAPSHOT")
 def BINARY_ROOT = "${project.buildDir}/download"
 
-def downloadBuild(String os, String flavor) {
+def downloadBuild(String os, String flavor, Boolean isCentOs = false) {
     exec {
         if (os == "win") {
             commandLine "${project.projectDir}/build.cmd", "${flavor}"
         } else {
-            commandLine 'bash', 'build.sh', "${flavor}"
+            if (isCentOs) {
+                commandLine 'bash', 'build.sh', "${flavor}", "centos"
+            } else {
+                commandLine 'bash', 'build.sh', "${flavor}"
+            }
         }
     }
     def engineDir = "${project.parent.projectDir}/pytorch-engine"
@@ -86,13 +91,13 @@ task releaseJNI {
             downloadBuild("osx", "cpu")
             cleanBuild()
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
-            downloadBuild("linux", "cpu")
+            downloadBuild("linux", "cpu", isCentOS)
             cleanBuild()
-            downloadBuild("linux", "cu92")
+            downloadBuild("linux", "cu92", isCentOS)
             cleanBuild()
-            downloadBuild("linux", "cu101")
+            downloadBuild("linux", "cu101", isCentOS)
             cleanBuild()
-            downloadBuild("linux", "cu102")
+            downloadBuild("linux", "cu102", isCentOS)
             cleanBuild()
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
@@ -197,6 +202,14 @@ task downloadPyTorchNativeLib() {
                 "cu101/libtorch-win-shared-with-deps-${VERSION}.zip"              : "cu101/win",
                 "cu102/libtorch-win-shared-with-deps-${VERSION}.zip"              : "cu102/win"
         ]
+        if (isCentOS) {
+            files = [
+                    "cpu/libtorch-shared-with-deps-${VERSION}%2Bcpu.zip"    : "cpu/linux",
+                    "cu92/libtorch-shared-with-deps-${VERSION}%2Bcu92.zip"  : "cu92/linux",
+                    "cu101/libtorch-shared-with-deps-${VERSION}%2Bcu101.zip": "cu101/linux",
+                    "cu102/libtorch-shared-with-deps-${VERSION}.zip"        : "cu102/linux",
+            ]
+        }
         files.each { entry ->
             project.logger.lifecycle("Downloading ${url}/${entry.key}")
             def outputDir = new File("${BINARY_ROOT}/${entry.value}")
@@ -224,8 +237,9 @@ task downloadPyTorchNativeLib() {
             delete(file)
             delete("${outputDir}/libtorch")
         }
-
-        new File("${BINARY_ROOT}/auto").mkdirs()
+        if (!isCentOS) {
+            new File("${BINARY_ROOT}/auto").mkdirs()
+        }
     }
 }
 
