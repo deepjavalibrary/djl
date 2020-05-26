@@ -9,7 +9,7 @@ apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 def VERSION = "1.5.0"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 boolean isCentOS = project.hasProperty("centos")
-version = VERSION + (isCentOS ? "-precxx11" : "") + (isRelease ? "" : "-SNAPSHOT")
+version = VERSION + (isRelease ? "" : "-SNAPSHOT")
 def BINARY_ROOT = "${project.buildDir}/download"
 
 def downloadBuild(String os, String flavor, Boolean isCentOs = false) {
@@ -291,7 +291,7 @@ flavorNames.each { flavor ->
     // and the native jars have to be published separately
     if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
         publishing.publications.create("${flavor}", MavenPublication) {
-            artifactId "pytorch-native-${flavor}"
+            artifactId "pytorch-native-${flavor}" + (isCentOS ? "-precxx11" : "")
             from components.java
             artifacts = artifactsNames
             artifact jar
