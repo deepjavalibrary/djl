@@ -87,7 +87,8 @@ jobs:
         run: |
           yum -y update
           yum -y install centos-release-scl-rh epel-release
-          yum -y install java-1.8.0-openjdk-devel devtoolset-7 rh-git218 patch
+          yum -y install java-1.8.0-openjdk-devel devtoolset-7 rh-git218 patch cmake3
+          ln -s /usr/bin/cmake3 /usr/bin/cmake
       - name: Release JNI prep
         run: |
           source scl_source enable devtoolset-7 rh-git218 || true
