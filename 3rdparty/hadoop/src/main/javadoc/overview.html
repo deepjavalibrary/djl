@@ -1,0 +1,24 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<p>This document is the API specification for the Hadoop integration for DJL.
+
+<p>You can use this library to load models from Hadoop HDFS file system:
+
+<pre>
+    Criteria&lt;Image, Classifications&gt; criteria =
+        Criteria.builder()
+                .optApplication(Application.CV.IMAGE_CLASSIFICATION)
+                .setTypes(Image.class, Classifications.class)
+                .<b>optModelUrl("hdfs://localhost/var/resnet/resnet18.zip")</b>
+                .optArtifactId("ai.djl.localmodelzoo:<b>resnet18</b>")
+                .optProgress(new ProgressBar())
+                .build();
+
+    ZooModel&lt;Image, Classifications&gt; model = ModelZoo.loadModel(criteria);
+</pre>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+}
+
+group "ai.djl.hadoop"
+
+dependencies {
+    api project(":api")
+    api "org.apache.hadoop:hadoop-core:1.2.1"
+
+    testImplementation project(":mxnet:mxnet-engine")
+    testImplementation "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}-SNAPSHOT"
+    testImplementation "org.apache.hadoop:hadoop-test:1.2.1"
+
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "Hadoop hdfs integration for DJL"
+                description = "Hadoop hdfs integration for DJL"
+                url = "http://www.djl.ai/3rdparty/${project.name}"
+            }
+        }
+    }
+}

@@ -14,10 +14,17 @@ package ai.djl.repository;
 
 import java.util.Locale;
 
-final class FilenameUtils {
+/** A class containing utility methods. */
+public final class FilenameUtils {
 
     private FilenameUtils() {}
 
+    /**
+     * Returns the type of the file.
+     *
+     * @param fileName the file name
+     * @return the type of the file
+     */
     public static String getFileType(String fileName) {
         fileName = fileName.toLowerCase(Locale.ROOT);
         if (fileName.endsWith(".zip")) {
@@ -35,6 +42,12 @@ final class FilenameUtils {
         }
     }
 
+    /**
+     * Returns the name of the file without file extension.
+     *
+     * @param name the file name
+     * @return the name of the file without file extension
+     */
     public static String getNamePart(String name) {
         String lowerCase = name.toLowerCase(Locale.ROOT);
         if (lowerCase.endsWith(".tar.gz")) {
