@@ -26,6 +26,11 @@
           "uri": "1.0/fra-eng-test.txt.gz",
           "sha1Hash": "84e33033961ec890e41dcad523911859ea9076e9",
           "size": 828726
+        },
+        "_about": {
+          "uri": "1.0/_about.txt.gz",
+          "sha1Hash": "2865253c08c30297134e6348a3fb62ef5b7a9e13",
+          "size": 730
         }
       }
     }
