@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+
+<html lang="en" class="gr__materializecss_com">
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-159559852-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-159559852-2');
+
+    </script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DJL Demo</title>
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.css"/>
+    <link href="https://djl.ai/website/css/style.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link rel="shortcut icon" type="image/x-icon" href="https://djl.ai/website/img/favicon.png"/>
+    <link rel="shortcut icon" sizes="96x96" href="https://djl.ai/website/img/favicon.png">
+    <link rel="apple-touch-icon" href="https://djl.ai/website/img/favicon.png">
+</head>
+<body data-gr-c-s-loaded="true">
+<nav class="white" role="navigation">
+    <div class="container">
+        <div class="nav-wrapper container">
+            <a href="https://djl.ai" class="logo" id="logo-container">
+                <img src="https://djl.ai/website/img/djl-middle.png">
+            </a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="https://javadoc.djl.ai">JavaDoc</a></li>
+                <li><a href="https://github.com/awslabs/djl">GitHub</a></li>
+                <li><a href="https://github.com/aws-samples/djl-demo">Demos</a></li>
+                <li><a href="https://github.com/awslabs/djl/tree/master/jupyter/tutorial">Tutorial</a></li>
+                <li><a href="https://github.com/awslabs/djl/tree/master/examples">Examples</a></li>
+                <li><a href="https://deepjavalibrary.slack.com">Slack</a></li>
+            </ul>
+            <ul id="nav-mobile" class="sidenav">
+                <li><a href="https://javadoc.djl.ai">JavaDoc</a></li>
+                <li><a href="https://github.com/awslabs/djl">GitHub</a></li>
+                <li><a href="https://github.com/aws-samples/djl-demo">Demos</a></li>
+                <li><a href="https://github.com/awslabs/djl/tree/master/jupyter/tutorial">Tutorial</a></li>
+                <li><a href="https://github.com/awslabs/djl/tree/master/examples">Examples</a></li>
+                <li><a href="https://deepjavalibrary.slack.com">Slack</a></li>
+            </ul>
+            <a href="https://materializecss.com/templates/parallax-template/preview.html#" data-target="nav-mobile"
+               class="sidenav-trigger"><i class="material-icons">menu</i></a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <br><br>
+    <h1 class="header center light-blue-text text-accent-2">DJL Demos</h1>
+    <div class="row center">
+        <h5 class="header col s12 light">Experience Java to solve your DL problem in a simple way.</h5>
+        <br><br>
+    </div>
+</div>
+
+<div class="container">
+    <div class="section">
+        <div class="row">
+            <h3 class="center">Use our JShell to try out NDArray</h3>
+            <div class="col s12">
+                <ul class="tabs">
+                    <li class="tab col s3"><a href="#creation">Creation</a></li>
+                    <li class="tab col s3"><a href="#math">Math Operation</a></li>
+                    <li class="tab col s3"><a href="#manipulation">Data Manipulation</a></li>
+                    <li class="tab col s3"><a href="#more">Learn More</a></li>
+                </ul>
+            </div>
+            <div id="creation" class="col s12">
+                <p><b>var array = manager.ones(new Shape(1,3,2))</b> to create a NDArray with shape 1,3,2</p>
+                <p><b>var array = manager.randomUniform(0, 1, new Shape(1, 1, 4))</b> to create a random uniform NDArray
+                </p>
+            </div>
+            <div id="math" class="col s12">
+                <p><b>NDArray nd = manager.arange(1, 10).reshape(3, 3)</b> to create a NDArray and reshape to 3x3</p>
+                <p><b>nd = nd.transpose()</b> to transpose the NDArray</p>
+                <p><b>nd = nd.add(10)</b> add 10 to final result</p>
+            </div>
+            <div id="manipulation" class="col s12">
+                <p><b>NDArray nd = manager.arange(5, 14)</b> to create a NDArray from 5 to 14</p>
+                <p><b>nd = nd.get(nd.gte(10))</b> filter the value that are >=10</p>
+                <p><b>NDArray nd = manager.arange(1, 10).reshape(3, 3)</b> to create a NDArray with shape 3x3</p>
+                <p><b>nd.set(new NDIndex(":, 1"), array -> array.mul(2));</b> Multiply the second column value by 2</p>
+                <p>type <b>nd</b> to show the result</p>
+            </div>
+            <div id="more" class="col s12">
+                To learn more about NDArray and its methods, please checkout our <a
+                    href="https://javadoc.io/doc/ai.djl/api/latest/ai/djl/ndarray/NDArray.html">NDArray javadoc</a>.
+            </div>
+        </div>
+        <div id="terminal"></div>
+    </div>
+</div>
+
+<footer class="page-footer grey darken-3">
+    <div class="container">
+        <div class="row">
+            <div class="col l6 s12">
+                <h5 class="white-text">About Us</h5>
+                <p class="grey-text text-lighten-4">Built with <span style="color: red;">&hearts;</span> for the Java
+                    community by your friends at AWS</p>
+            </div>
+        </div>
+    </div>
+    <div class="footer-copyright">
+        <div class="container">
+            Copyright 2020 <a class="brown-text text-lighten-3" href="http://aws.amazon.com/">Amazon.com, Inc.</a> or
+            its
+            affiliates. All Rights Reserved.
+        </div>
+    </div>
+</footer>
+
+<!--  Scripts-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="https://djl.ai/website/js/init.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.js"></script>
+<script src="https://djl.ai/website/js/terminal.js"></script>
+
+
+<div class="sidenav-overlay"></div>
+<div class="drag-target"></div>
+<div class="sidenav-overlay"></div>
+<div class="drag-target"></div>
+</body>
+</html>

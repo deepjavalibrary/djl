@@ -93,3 +93,8 @@ footer.page-footer {
   background-size: cover;
   background-position: 50% 50%;
 }
+
+#draw {
+  width: 100%;
+  overflow: hidden;
+}
