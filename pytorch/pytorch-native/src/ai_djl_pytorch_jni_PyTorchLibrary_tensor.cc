@@ -136,7 +136,9 @@ JNIEXPORT jbyteArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDataPtr
     JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-  auto tensor = (tensor_ptr->is_contiguous()) ? *tensor_ptr : tensor_ptr->contiguous();
+  // sparse and mkldnn are required to be converted to dense to access data ptr
+  auto tensor = (tensor_ptr->is_sparse() || tensor_ptr->is_mkldnn()) ? tensor_ptr->to_dense() : *tensor_ptr;
+  tensor = (tensor.is_contiguous()) ? tensor : tensor.contiguous();
   jbyteArray result = env->NewByteArray(tensor.nbytes());
   env->SetByteArrayRegion(result, 0, tensor.nbytes(), static_cast<const jbyte*>(tensor.data_ptr()));
   return result;

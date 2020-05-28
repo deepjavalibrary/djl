@@ -180,7 +180,9 @@ inline torch::TensorOptions CreateTensorOptions(
   // it gets the device and collect jdevice memory
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
   auto options = torch::TensorOptions()
-                     .layout((jlayout == 0) ? torch::kStrided : torch::kSparse)
+                      // for tensor creation API, MKLDNN layout is not supported
+                      // the workaround is to create with Strided then call to_mkldnn()
+                     .layout((jlayout != 1) ? torch::kStrided : torch::kSparse)
                      .device(device)
                      .requires_grad(JNI_TRUE == jrequired_grad);
   // DJL's UNKNOWN type
