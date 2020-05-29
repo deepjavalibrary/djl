@@ -57,7 +57,7 @@ task increaseFinalVersion {
 
         def collection = fileTree("jupyter").filter { it.name.endsWith(".ipynb") }
         collection += fileTree(".").filter {
-            it.name.endsWith(".md") || it.name.endsWith("overview.html") || it.name.endsWith("javadoc-index.html")
+            it.name.endsWith(".md") || it.name.endsWith("overview.html")
         }
 
         collection.each { File file ->
