@@ -39,71 +39,67 @@ public final class FtNDManagerPlaceholder implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray create(Shape shape, DataType dataType, Device device) {
+    public NDArray create(Shape shape, DataType dataType) {
         throw new UnsupportedOperationException("Not support by FtEngine");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray createCSR(
-            Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
+    public NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape) {
         throw new UnsupportedOperationException("Not support by FtEngine");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray createRowSparse(
-            Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
+    public NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
         throw new UnsupportedOperationException("Not support by FtEngine");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList load(Path path, Device device) {
+    public NDList load(Path path) {
         throw new UnsupportedOperationException("Not support by FtEngine");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zeros(Shape shape, DataType dataType, Device device) {
+    public NDArray zeros(Shape shape, DataType dataType) {
         throw new UnsupportedOperationException("Not support by FtEngine");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ones(Shape shape, DataType dataType, Device device) {
+    public NDArray ones(Shape shape, DataType dataType) {
         throw new UnsupportedOperationException("Not support by FtEngine");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray arange(float start, float stop, float step, DataType dataType, Device device) {
+    public NDArray arange(float start, float stop, float step, DataType dataType) {
         throw new UnsupportedOperationException("Not support by FtEngine");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eye(int rows, int cols, int k, DataType dataType, Device device) {
+    public NDArray eye(int rows, int cols, int k, DataType dataType) {
         throw new UnsupportedOperationException("Not support by FtEngine");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(float start, float stop, int num, boolean endpoint, Device device) {
+    public NDArray linspace(float start, float stop, int num, boolean endpoint) {
         throw new UnsupportedOperationException("Not support by FtEngine");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray randomUniform(
-            float low, float high, Shape shape, DataType dataType, Device device) {
+    public NDArray randomUniform(float low, float high, Shape shape, DataType dataType) {
         throw new UnsupportedOperationException("Not support by FtEngine");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray randomNormal(
-            float loc, float scale, Shape shape, DataType dataType, Device device) {
+    public NDArray randomNormal(float loc, float scale, Shape shape, DataType dataType) {
         throw new UnsupportedOperationException("Not support by FtEngine");
     }
 

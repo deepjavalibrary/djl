@@ -67,7 +67,7 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray create(Shape shape, DataType dataType, Device device) {
+    public PtNDArray create(Shape shape, DataType dataType) {
         return JniUtils.createEmptyNdArray(this, shape, dataType, device, SparseFormat.DENSE);
     }
 
@@ -109,45 +109,43 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray createCSR(
-            Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
+    public NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray createRowSparse(
-            Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
+    public NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList load(Path path, Device device) {
+    public NDList load(Path path) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zeros(Shape shape, DataType dataType, Device device) {
+    public NDArray zeros(Shape shape, DataType dataType) {
         return JniUtils.createZerosNdArray(this, shape, dataType, device, SparseFormat.DENSE);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ones(Shape shape, DataType dataType, Device device) {
+    public NDArray ones(Shape shape, DataType dataType) {
         return JniUtils.createOnesNdArray(this, shape, dataType, device, SparseFormat.DENSE);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray arange(int start, int stop, int step, DataType dataType, Device device) {
+    public NDArray arange(int start, int stop, int step, DataType dataType) {
         return arange((float) start, (float) stop, (float) step, dataType, device);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray arange(float start, float stop, float step, DataType dataType, Device device) {
+    public NDArray arange(float start, float stop, float step, DataType dataType) {
         if (Math.signum(stop - start) != Math.signum(step)) {
             return create(new Shape(0), dataType, device);
         }
@@ -156,7 +154,7 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eye(int rows, int cols, int k, DataType dataType, Device device) {
+    public NDArray eye(int rows, int cols, int k, DataType dataType) {
         if (k != 0) {
             throw new UnsupportedOperationException(
                     "index of the diagonal is not supported in PyTorch");
@@ -166,7 +164,7 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(float start, float stop, int num, boolean endpoint, Device device) {
+    public NDArray linspace(float start, float stop, int num, boolean endpoint) {
         if (!endpoint) {
             throw new UnsupportedOperationException("endpoint only support true");
         }
@@ -176,15 +174,13 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray randomUniform(
-            float low, float high, Shape shape, DataType dataType, Device device) {
+    public NDArray randomUniform(float low, float high, Shape shape, DataType dataType) {
         return JniUtils.uniform(this, low, high, shape, dataType, device);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray randomNormal(
-            float loc, float scale, Shape shape, DataType dataType, Device device) {
+    public NDArray randomNormal(float loc, float scale, Shape shape, DataType dataType) {
         return JniUtils.normal(this, loc, scale, shape, dataType, device);
     }
 

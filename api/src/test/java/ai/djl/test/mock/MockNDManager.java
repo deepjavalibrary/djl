@@ -34,71 +34,67 @@ public class MockNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray create(Shape shape, DataType dataType, Device device) {
-        return new MockNDArray(this, device, shape, dataType, null);
+    public NDArray create(Shape shape, DataType dataType) {
+        return new MockNDArray(this, getDevice(), shape, dataType, null);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray createCSR(
-            Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
+    public NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray createRowSparse(
-            Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
+    public NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList load(Path path, Device device) {
+    public NDList load(Path path) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zeros(Shape shape, DataType dataType, Device device) {
+    public NDArray zeros(Shape shape, DataType dataType) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ones(Shape shape, DataType dataType, Device device) {
+    public NDArray ones(Shape shape, DataType dataType) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray arange(float start, float stop, float step, DataType dataType, Device device) {
+    public NDArray arange(float start, float stop, float step, DataType dataType) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eye(int rows, int cols, int k, DataType dataType, Device device) {
+    public NDArray eye(int rows, int cols, int k, DataType dataType) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(float start, float stop, int num, boolean endPoint, Device device) {
+    public NDArray linspace(float start, float stop, int num, boolean endPoint) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray randomUniform(
-            float low, float high, Shape shape, DataType dataType, Device device) {
+    public NDArray randomUniform(float low, float high, Shape shape, DataType dataType) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray randomNormal(
-            float loc, float scale, Shape shape, DataType dataType, Device device) {
+    public NDArray randomNormal(float loc, float scale, Shape shape, DataType dataType) {
         return null;
     }
 

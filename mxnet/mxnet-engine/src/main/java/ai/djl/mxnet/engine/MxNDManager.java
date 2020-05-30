@@ -85,37 +85,33 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray create(Shape shape, DataType dataType, Device dev) {
-        dev = Device.defaultIfNull(dev, device);
-        Pointer handle = JnaUtils.createNdArray(dev, shape, dataType, shape.dimension(), false);
-        MxNDArray array = new MxNDArray(this, handle, dev, shape, dataType);
+    public MxNDArray create(Shape shape, DataType dataType) {
+        Pointer handle = JnaUtils.createNdArray(device, shape, dataType, shape.dimension(), false);
+        MxNDArray array = new MxNDArray(this, handle, device, shape, dataType);
         attach(array.getUid(), array);
         return array;
     }
 
     /** {@inheritDoc} */
     @Override
-    public MxSparseNDArray createCSR(
-            Buffer data, long[] indptr, long[] indices, Shape shape, Device dev) {
-        dev = Device.defaultIfNull(dev, device);
-
+    public MxSparseNDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape) {
         SparseFormat fmt = SparseFormat.CSR;
         DataType dataType = DataType.fromBuffer(data);
-        MxNDArray indptrNd = create(new Shape(indptr.length), DataType.INT64, dev);
+        MxNDArray indptrNd = create(new Shape(indptr.length), DataType.INT64);
         indptrNd.set(indptr);
-        MxNDArray indicesNd = create(new Shape(indices.length), DataType.INT64, dev);
+        MxNDArray indicesNd = create(new Shape(indices.length), DataType.INT64);
         indicesNd.set(indices);
         Pointer handle =
                 JnaUtils.createSparseNdArray(
                         fmt,
-                        dev,
+                        device,
                         shape,
                         dataType,
                         new DataType[] {indptrNd.getDataType(), indicesNd.getDataType()},
                         new Shape[] {indptrNd.getShape(), indicesNd.getShape()},
                         false);
         MxSparseNDArray sparse = create(handle, fmt);
-        MxNDArray dataNd = create(new Shape(data.remaining()), dataType, dev);
+        MxNDArray dataNd = create(new Shape(data.remaining()), dataType);
         dataNd.set(data);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, dataNd, -1);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, indptrNd, 0);
@@ -126,24 +122,22 @@ public class MxNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public MxSparseNDArray createRowSparse(
-            Buffer data, Shape dataShape, long[] indices, Shape shape, Device dev) {
-        dev = Device.defaultIfNull(dev, device);
-
+            Buffer data, Shape dataShape, long[] indices, Shape shape) {
         SparseFormat fmt = SparseFormat.ROW_SPARSE;
         DataType dataType = DataType.fromBuffer(data);
-        MxNDArray indicesNd = create(new Shape(indices.length), DataType.INT64, dev);
+        MxNDArray indicesNd = create(new Shape(indices.length), DataType.INT64);
         indicesNd.set(indices);
         Pointer handle =
                 JnaUtils.createSparseNdArray(
                         fmt,
-                        dev,
+                        device,
                         shape,
                         dataType,
                         new DataType[] {indicesNd.getDataType()},
                         new Shape[] {indicesNd.getShape()},
                         false);
         MxSparseNDArray sparse = create(handle, fmt);
-        MxNDArray dataNd = create(dataShape, dataType, dev);
+        MxNDArray dataNd = create(dataShape, dataType);
         dataNd.set(data);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, dataNd, -1);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, indicesNd, 0);
@@ -152,25 +146,25 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDList load(Path path, Device device) {
+    public NDList load(Path path) {
         return JnaUtils.loadNdArray(this, path, device);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zeros(Shape shape, DataType dataType, Device dev) {
-        return fill("_npi_zeros", dev, shape, dataType);
+    public NDArray zeros(Shape shape, DataType dataType) {
+        return fill("_npi_zeros", shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ones(Shape shape, DataType dataType, Device dev) {
-        return fill("_npi_ones", dev, shape, dataType);
+    public NDArray ones(Shape shape, DataType dataType) {
+        return fill("_npi_ones", shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray arange(float start, float stop, float step, DataType dataType, Device dev) {
+    public NDArray arange(float start, float stop, float step, DataType dataType) {
         MxOpParams params = new MxOpParams();
         params.addParam("start", start);
         params.addParam("stop", stop);
@@ -178,25 +172,25 @@ public class MxNDManager extends BaseNDManager {
         if (dataType != DataType.UNKNOWN) {
             params.setDataType(dataType);
         }
-        params.setDevice(Device.defaultIfNull(dev, device));
+        params.setDevice(device);
         return invoke("_npi_arange", params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eye(int rows, int cols, int k, DataType dataType, Device dev) {
+    public NDArray eye(int rows, int cols, int k, DataType dataType) {
         MxOpParams params = new MxOpParams();
         params.addParam("N", rows);
         params.addParam("M", cols);
         params.addParam("k", k);
         params.setDataType(dataType);
-        params.setDevice(Device.defaultIfNull(dev, device));
+        params.setDevice(device);
         return invoke("_npi_eye", params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray linspace(float start, float stop, int num, boolean endpoint, Device dev) {
+    public NDArray linspace(float start, float stop, int num, boolean endpoint) {
         if (num < 0) {
             throw new IllegalArgumentException("Num argument must be non-negative");
         }
@@ -205,19 +199,18 @@ public class MxNDManager extends BaseNDManager {
         params.addParam("stop", stop);
         params.addParam("num", num);
         params.addParam("endpoint", endpoint);
-        params.setDevice(Device.defaultIfNull(dev, device));
+        params.setDevice(device);
         return invoke("_npi_linspace", params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray randomUniform(
-            float low, float high, Shape shape, DataType dataType, Device dev) {
+    public NDArray randomUniform(float low, float high, Shape shape, DataType dataType) {
         MxOpParams params = new MxOpParams();
         params.addParam("low", low);
         params.addParam("high", high);
         params.addParam("size", shape);
-        params.setDevice(Device.defaultIfNull(dev, device));
+        params.setDevice(device);
         if (dataType != DataType.UNKNOWN) {
             params.setDataType(dataType);
         }
@@ -226,13 +219,12 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray randomNormal(
-            float loc, float scale, Shape shape, DataType dataType, Device dev) {
+    public NDArray randomNormal(float loc, float scale, Shape shape, DataType dataType) {
         MxOpParams params = new MxOpParams();
         params.addParam("loc", loc);
         params.addParam("scale", scale);
         params.addParam("size", shape);
-        params.setDevice(Device.defaultIfNull(dev, device));
+        params.setDevice(device);
         if (dataType != DataType.UNKNOWN) {
             params.setDataType(dataType);
         }
@@ -370,13 +362,13 @@ public class MxNDManager extends BaseNDManager {
         return Engine.getEngine(MxEngine.ENGINE_NAME);
     }
 
-    private NDArray fill(String opName, Device dev, Shape shape, DataType dataType) {
+    private NDArray fill(String opName, Shape shape, DataType dataType) {
         MxOpParams params = new MxOpParams();
         if (shape == null) {
             throw new IllegalArgumentException("Shape is required for " + opName.substring(1));
         }
         params.addParam("shape", shape);
-        params.setDevice(Device.defaultIfNull(dev, device));
+        params.setDevice(device);
         params.setDataType(dataType);
         return invoke(opName, params);
     }

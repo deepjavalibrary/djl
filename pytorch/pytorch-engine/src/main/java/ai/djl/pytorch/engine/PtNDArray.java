@@ -56,27 +56,6 @@ public class PtNDArray extends NativeResource implements NDArray {
     private PtNDArrayEx ptNDArrayEx;
 
     /**
-     * Constructs an PtTorch from a native handle and metadata (internal. Use {@link NDManager}
-     * instead).
-     *
-     * @param manager the manager to attach the new array to
-     * @param handle the pointer to the native PtTorch memory
-     * @param device the device the new array will be located on
-     * @param shape the shape of the new array
-     * @param dataType the dataType of the new array
-     */
-    PtNDArray(PtNDManager manager, Pointer handle, Device device, Shape shape, DataType dataType) {
-        this(manager, handle);
-        this.device = device;
-        // shape check
-        if (Arrays.stream(shape.getShape()).anyMatch(s -> s < 0)) {
-            throw new IllegalArgumentException("The shape must be >= 0");
-        }
-        this.shape = shape;
-        this.dataType = dataType;
-    }
-
-    /**
      * Constructs an PyTorch from a native handle (internal. Use {@link NDManager} instead).
      *
      * @param manager the manager to attach the new array to
@@ -1202,7 +1181,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     public PtNDArray argMax(int axis) {
         if (isEmpty()) {
             Shape newShape = NDUtils.getShapeFromEmptyNDArrayForReductionOp(getShape(), axis);
-            return (PtNDArray) manager.create(newShape, DataType.INT64);
+            return manager.create(newShape, DataType.INT64);
         }
         // TODO pytorch bug: https://github.com/pytorch/pytorch/issues/37084
         if (isScalar()) {
@@ -1225,7 +1204,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     public PtNDArray argMin(int axis) {
         if (isEmpty()) {
             Shape newShape = NDUtils.getShapeFromEmptyNDArrayForReductionOp(getShape(), axis);
-            return (PtNDArray) manager.create(newShape, DataType.INT64);
+            return manager.create(newShape, DataType.INT64);
         }
         // TODO pytorch bug: https://github.com/pytorch/pytorch/issues/37084
         if (isScalar()) {
