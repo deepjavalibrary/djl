@@ -168,3 +168,49 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchToDense(
     return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
+
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRequiresGrad(
+  JNIEnv* env, jobject jthis, jobject jhandle) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    return tensor_ptr->requires_grad();
+  API_END();
+}
+
+JNIEXPORT jstring JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGradFnName(
+  JNIEnv* env, jobject jthis, jobject jhandle) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    return env->NewStringUTF(tensor_ptr->grad_fn()->name().c_str());
+  API_END();
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchAttachGrad(
+  JNIEnv* env, jobject jthis, jobject jhandle) {
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    tensor_ptr->requires_grad_(true);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGrad(
+  JNIEnv* env, jobject jthis, jobject jhandle) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    const auto* result_ptr = new torch::Tensor(tensor_ptr->grad());
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDetachGrad(
+  JNIEnv* env, jobject jthis, jobject jhandle) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    const auto* result_ptr = new torch::Tensor(tensor_ptr->detach());
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchBackward(
+  JNIEnv* env, jobject jthis, jobject jhandle, jboolean keep_graph, jboolean create_graph) {
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    tensor_ptr->backward({}, keep_graph, create_graph);
+}

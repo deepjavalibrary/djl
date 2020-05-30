@@ -357,11 +357,25 @@ final class PyTorchLibrary {
 
     native Pointer torchNNAdaptiveMaxPool(Pointer inputHandle, int dim, long[] outSize);
 
+    native boolean torchRequiresGrad(Pointer inputHandle);
+
+    native String torchGradFnName(Pointer inputHandle);
+
+    native void torchAttachGrad(Pointer inputHandle);
+
+    native Pointer torchGrad(Pointer inputHandle);
+
+    native Pointer torchDetachGrad(Pointer inputHandle);
+
+    native void torchBackward(Pointer inputHandle, boolean keepGraph, boolean createGraph);
+
     native Pointer moduleLoad(String path, int[] device);
 
     native void moduleEval(Pointer handle);
 
-    native Pointer moduleForward(Pointer moduleHandle, Pointer[] arrayHandles);
+    native void moduleTrain(Pointer handle);
+
+    native Pointer moduleForward(Pointer moduleHandle, Pointer[] arrayHandles, boolean isTrain);
 
     native Pointer iValueCreateFromTensor(Pointer tensorHandle);
 

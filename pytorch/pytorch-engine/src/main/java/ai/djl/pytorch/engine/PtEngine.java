@@ -93,7 +93,7 @@ public final class PtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public GradientCollector newGradientCollector() {
-        throw new UnsupportedOperationException("PyTorch does not support training yet");
+        return new PtGradientCollector();
     }
 
     /** {@inheritDoc} */

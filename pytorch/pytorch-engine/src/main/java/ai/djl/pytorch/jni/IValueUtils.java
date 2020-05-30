@@ -197,17 +197,18 @@ public final class IValueUtils {
     /**
      * Run the forward of PyTorch module.
      *
-     * @param block the block that contains PyTorch module.
+     * @param block the block that contains PyTorch module
      * @param inputs input {@link NDList}
+     * @param isTrain is running on training mode
      * @return result {@link NDList}
      */
-    public static NDList forward(PtSymbolBlock block, NDList inputs) {
+    public static NDList forward(PtSymbolBlock block, NDList inputs, boolean isTrain) {
         Pointer[] arrayHandles =
                 inputs.stream()
                         .map(input -> ((PtNDArray) input).getHandle())
                         .toArray(Pointer[]::new);
 
-        Pointer result = PyTorchLibrary.LIB.moduleForward(block.getHandle(), arrayHandles);
+        Pointer result = PyTorchLibrary.LIB.moduleForward(block.getHandle(), arrayHandles, isTrain);
         PtNDManager manager = (PtNDManager) inputs.get(0).getManager();
         return forwardHelper(result, manager);
     }

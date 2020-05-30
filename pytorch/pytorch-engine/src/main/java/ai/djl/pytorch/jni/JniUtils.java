@@ -951,6 +951,31 @@ public final class JniUtils {
         PyTorchLibrary.LIB.torchDeleteTensor(handle);
     }
 
+    public static boolean checkGradient(PtNDArray ndArray) {
+        return PyTorchLibrary.LIB.torchRequiresGrad(ndArray.getHandle());
+    }
+
+    public static String getGradientFunctionNames(PtNDArray ndArray) {
+        return PyTorchLibrary.LIB.torchGradFnName(ndArray.getHandle());
+    }
+
+    public static void attachGradient(PtNDArray ndArray) {
+        PyTorchLibrary.LIB.torchAttachGrad(ndArray.getHandle());
+    }
+
+    public static PtNDArray detachGradient(PtNDArray ndArray) {
+        // TODO: detached ndarray may not use the same manager for the attached one
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchDetachGrad(ndArray.getHandle()));
+    }
+
+    public static PtNDArray getGradient(PtNDArray ndArray) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchGrad(ndArray.getHandle()));
+    }
+
+    public static void backward(PtNDArray ndArray, boolean keepGraph, boolean createGraph) {
+        PyTorchLibrary.LIB.torchBackward(ndArray.getHandle(), keepGraph, createGraph);
+    }
+
     public static void deleteModule(Pointer pointer) {
         PyTorchLibrary.LIB.torchDeleteModule(pointer);
     }
@@ -968,5 +993,9 @@ public final class JniUtils {
 
     public static void enableInferenceMode(PtSymbolBlock block) {
         PyTorchLibrary.LIB.moduleEval(block.getHandle());
+    }
+
+    public static void enableTrainingMode(PtSymbolBlock block) {
+        PyTorchLibrary.LIB.moduleTrain(block.getHandle());
     }
 }

@@ -41,8 +41,14 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleEval(
   module_ptr->eval();
 }
 
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleTrain(
+  JNIEnv* env, jobject jthis, jobject module_handle) {
+  auto* module_ptr = utils::GetPointerFromJHandle<torch::jit::script::Module>(env, module_handle);
+  module_ptr->train(true);
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
-    JNIEnv* env, jobject jthis, jobject module_handle, jobjectArray tensor_ptrs) {
+    JNIEnv* env, jobject jthis, jobject module_handle, jobjectArray tensor_ptrs, jboolean isTrain) {
   API_BEGIN();
   auto ivalue_vec = std::vector<c10::IValue>();
   size_t len = static_cast<size_t>(env->GetArrayLength(tensor_ptrs));
@@ -56,6 +62,9 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
   env->DeleteLocalRef(tensor_ptrs);
   auto* module_ptr = utils::GetPointerFromJHandle<torch::jit::script::Module>(env, module_handle);
   auto output = [&]() {
+    if (isTrain) {
+        return module_ptr->forward(ivalue_vec);
+    }
     // disable autograd
     JITCallGuard guard;
     return module_ptr->forward(ivalue_vec);
