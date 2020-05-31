@@ -26,6 +26,7 @@ set(SOURCE_FILES
     "src/ai_djl_pytorch_jni_PyTorchLibrary_system.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_nn_functional.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_inference.cc"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_training.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_comparison.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_tensor.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_creation.cc"

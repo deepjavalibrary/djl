@@ -23,20 +23,23 @@ public class PtGradientCollector implements GradientCollector {
     /** {@inheritDoc} */
     @Override
     public void backward(NDArray target) {
-        backward(target, false, false);
+        NDArray grad = target.getManager().ones(target.getShape(), target.getDataType());
+        backward(target, grad, false, false);
     }
 
     /**
      * Computes the gradients of the NDArray w.r.t variables.
      *
      * @param target the target/head array to run backward on
+     * @param grad The “vector” in the Jacobian-vector product, usually gradients w.r.t. each
+     *     element of corresponding tensors
      * @param keepGraph whether to retain the computation graph for another backward pass on the
      *     same graph. By default the computation history is cleared.
      * @param createGraph If true, graph of the derivative will be constructed, allowing to compute
      *     higher order derivative products. Defaults to false.
      */
-    private void backward(NDArray target, boolean keepGraph, boolean createGraph) {
-        JniUtils.backward((PtNDArray) target, keepGraph, createGraph);
+    private void backward(NDArray target, NDArray grad, boolean keepGraph, boolean createGraph) {
+        JniUtils.backward((PtNDArray) target, (PtNDArray) grad, keepGraph, createGraph);
     }
 
     /** {@inheritDoc} */

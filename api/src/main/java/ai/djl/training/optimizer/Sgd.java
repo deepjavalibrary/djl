@@ -21,14 +21,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * {@code Sgd} is a Stochastic Gradient Descent (SDG) optimizer.
+ * {@code Sgd} is a Stochastic Gradient Descent (SGD) optimizer.
  *
  * <p>If momentum is not set, it updates weights using the following update function:<br>
  * \( weight = weight - learning_rate * (gradient + wd * weight) \).
  *
  * <p>If momentum is set, it updates weights using the following update function:<br>
- * \( v = momentum * v - learning_rate * gradient \)<br>
- * \( weight += v \)<br>
+ * \( state = momentum * state + learning_rate * gradient \)<br>
+ * \( weight -= state \)<br>
  * Momentum update has better convergence rates on neural networks.
  */
 public class Sgd extends Optimizer {

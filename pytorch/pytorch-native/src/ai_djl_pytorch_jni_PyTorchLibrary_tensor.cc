@@ -227,7 +227,8 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDetachGrad
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchBackward(
-  JNIEnv* env, jobject jthis, jobject jhandle, jboolean keep_graph, jboolean create_graph) {
+  JNIEnv* env, jobject jthis, jobject jhandle, jobject jgrad_handle, jboolean keep_graph, jboolean create_graph) {
     const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-    tensor_ptr->backward({}, keep_graph, create_graph);
+    const auto* grad_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jgrad_handle);
+    tensor_ptr->backward(*grad_ptr, keep_graph, create_graph);
 }

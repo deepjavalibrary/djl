@@ -191,6 +191,7 @@ inline torch::TensorOptions CreateTensorOptions(
   }
   return options;
 }
+
 }  // namespace utils
 
 #endif  // DJL_TORCH_DJL_PYTORCH_JNI_UTILS_H

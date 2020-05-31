@@ -259,7 +259,19 @@ public class PtNDArrayEx implements NDArrayEx {
             float beta2,
             float epsilon,
             boolean lazyUpdate) {
-        throw new UnsupportedOperationException("Not implemented");
+        // TODO: Lazy update not used
+        JniUtils.adamUpdate(
+                (PtNDArray) inputs.get(0),
+                (PtNDArray) inputs.get(1),
+                (PtNDArray) inputs.get(2),
+                (PtNDArray) inputs.get(3),
+                learningRate,
+                weightDecay,
+                rescaleGrad,
+                clipGrad,
+                beta1,
+                beta2,
+                epsilon);
     }
 
     /** {@inheritDoc} */
@@ -286,7 +298,16 @@ public class PtNDArrayEx implements NDArrayEx {
             float clipGrad,
             float momentum,
             boolean lazyUpdate) {
-        throw new UnsupportedOperationException("Not implemented");
+        // TODO: Lazy update not used
+        JniUtils.sgdUpdate(
+                (PtNDArray) inputs.get(0),
+                (PtNDArray) inputs.get(1),
+                (momentum == 0f) ? null : (PtNDArray) inputs.get(2),
+                learningRate,
+                weightDecay,
+                rescaleGrad,
+                clipGrad,
+                momentum);
     }
 
     /** {@inheritDoc} */
