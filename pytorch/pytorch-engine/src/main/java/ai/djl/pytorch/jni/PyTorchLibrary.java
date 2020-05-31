@@ -261,6 +261,8 @@ final class PyTorchLibrary {
 
     native Pointer torchTanh(Pointer handle);
 
+    native Pointer torchSigmoid(Pointer handle);
+
     native Pointer torchAll(Pointer self);
 
     native Pointer torchAny(Pointer self);

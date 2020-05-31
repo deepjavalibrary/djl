@@ -658,6 +658,10 @@ public final class JniUtils {
         return ndArray.getManager().create(PyTorchLibrary.LIB.torchTanh(ndArray.getHandle()));
     }
 
+    public static PtNDArray sigmoid(PtNDArray ndArray) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchSigmoid(ndArray.getHandle()));
+    }
+
     public static PtNDArray all(PtNDArray ndArray) {
         return ndArray.getManager().create(PyTorchLibrary.LIB.torchAll(ndArray.getHandle()));
     }

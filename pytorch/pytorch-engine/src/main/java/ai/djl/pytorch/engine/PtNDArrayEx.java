@@ -130,13 +130,13 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public PtNDArray sigmoid() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.sigmoid(array);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray tanh() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.tanh(array);
     }
 
     /** {@inheritDoc} */
