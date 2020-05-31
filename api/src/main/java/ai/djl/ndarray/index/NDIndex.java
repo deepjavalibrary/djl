@@ -320,11 +320,7 @@ public class NDIndex {
                 long rawMax = Optional.ofNullable(slice.getMax()).orElse(target.size(i));
                 max[i] = rawMax < 0 ? Math.floorMod(rawMax, target.get(i)) : rawMax;
                 step[i] = Optional.ofNullable(slice.getStep()).orElse(1L);
-                if (step[i] > 0) {
-                    shape[i] = (max[i] - min[i] - 1) / (step[i] + 1);
-                } else {
-                    shape[i] = (min[i] - max[i]) / (-step[i] + 1);
-                }
+                shape[i] = (max[i] - min[i]) / step[i];
                 squeezedShape.add(shape[i]);
             } else if (ie instanceof NDIndexAll) {
                 min[i] = 0;

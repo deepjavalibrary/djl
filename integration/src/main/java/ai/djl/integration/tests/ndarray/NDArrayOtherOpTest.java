@@ -61,6 +61,10 @@ public class NDArrayOtherOpTest {
             NDArray value = manager.create(new float[] {9, 10});
             original.set(new NDIndex(0), value);
             Assert.assertEquals(original, expected);
+            original = manager.arange(0, 8).reshape(2, 4);
+            expected = manager.create(new int[] {0, 1, 9, 10, 4, 5, 11, 12}, new Shape(2, 4));
+            original.set(new NDIndex(":, 2:"), manager.arange(9, 13).reshape(2, 2));
+            Assert.assertEquals(original, expected);
         }
     }
 
