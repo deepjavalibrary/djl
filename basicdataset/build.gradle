@@ -7,6 +7,8 @@ repositories {
 dependencies {
     api project(":api")
 
+    // Add following dependency to your project for COCO dataset
+    // runtimeOnly "com.twelvemonkeys.imageio:imageio-jpeg:3.5"
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
