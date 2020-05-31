@@ -16,16 +16,33 @@ ai.djl.engine.EngineException: No deep learning engine found.
 
 #### 1. Engine dependency is missing
 DJL currently supports four engines: MXNet, PyTorch, TensorFlow(experimental) and FastText.
-Please includes at least one of those engines as dependencies.
-For example, add `ai.djl.mxnet:mxnet-engine:{version}` for gradle or 
+Please includes at least one of those engines and their native library as dependencies.
+For example, adding MXNet engine dependencies:
+
+Gradle:
+```
+implementation "ai.djl.mxnet:mxnet-engine:0.5.0"
+// See https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
+runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.7.0-a" 
+```
+
+Maven:
 ```
 <dependency>
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-engine</artifactId>
     <version>{version}</version>
 </dependency>
+<dependency>
+    <!--
+        See https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
+    -->
+    <groupId>ai.djl.mxnet</groupId>
+    <artifactId>mxnet-native-auto</artifactId>
+    <version>{mxnet.version}</version>
+    <scope>runtime</scope>
+</dependency>
 ```
-for maven.
 
 #### 2. Intellij Issue
 The error may appear after running the `./gradlew clean` command:
