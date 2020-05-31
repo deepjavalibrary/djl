@@ -94,15 +94,17 @@ public class TimeMeasureTrainingListener implements TrainingListener {
             Path dir = Paths.get(logDir);
             Files.createDirectories(dir);
             dumpMetricToFile(dir.resolve("training.log"), metrics.getMetric("train"));
-            if (metrics.hasMetric("validate")) {
-                dumpMetricToFile(dir.resolve("validate.log"), metrics.getMetric("validate"));
-            }
+            dumpMetricToFile(dir.resolve("validate.log"), metrics.getMetric("validate"));
         } catch (IOException e) {
             logger.error("Failed dump training log", e);
         }
     }
 
     private static void dumpMetricToFile(Path path, List<Metric> metrics) throws IOException {
+        if (metrics == null || metrics.isEmpty()) {
+            return;
+        }
+
         try (BufferedWriter writer =
                 Files.newBufferedWriter(
                         path, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
