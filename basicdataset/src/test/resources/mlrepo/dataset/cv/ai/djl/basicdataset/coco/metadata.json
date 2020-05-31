@@ -19,17 +19,19 @@
       "files": {
         "train2017": {
           "uri": "http://images.cocodataset.org/zips/train2017.zip",
+          "name": "",
           "sha1Hash": "10ad623668ab00c62c096f0ed636d6aff41faca5",
           "size": 19336861798
         },
         "val2017": {
           "uri": "http://images.cocodataset.org/zips/val2017.zip",
+          "name": "",
           "sha1Hash": "4950dc9d00dbe1c933ee0170f5797584351d2a41",
           "size": 815585330
         },
         "annotations": {
           "uri": "http://images.cocodataset.org/annotations/annotations_trainval2017.zip",
-          "name": "annotations",
+          "name": "",
           "sha1Hash": "8551ee4bb5860311e79dace7e79cb91e432e78b3",
           "size": 252907541
         }
