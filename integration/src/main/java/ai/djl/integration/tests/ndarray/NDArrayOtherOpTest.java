@@ -44,6 +44,23 @@ public class NDArrayOtherOpTest {
 
             NDArray getStepSlice = original.get("1::2");
             Assert.assertEquals(getStepSlice, expected);
+            original = manager.arange(120).reshape(2, 3, 4, 5);
+            NDArray getEllipsis = original.get("0,2, ...  ");
+            expected = manager.arange(40, 60).reshape(4, 5);
+            Assert.assertEquals(getEllipsis, expected);
+
+            getEllipsis = original.get("...,0:2,2");
+            expected =
+                    manager.create(new int[] {2, 7, 22, 27, 42, 47, 62, 67, 82, 87, 102, 107})
+                            .reshape(2, 3, 2);
+            Assert.assertEquals(getEllipsis, expected);
+
+            getEllipsis = original.get("1,...,2,3:5:2");
+            expected = manager.create(new int[] {73, 93, 113}).reshape(3, 1);
+            Assert.assertEquals(getEllipsis, expected);
+
+            getEllipsis = original.get("...");
+            Assert.assertEquals(getEllipsis, original);
 
             // get from boolean array
             original = manager.arange(10).reshape(2, 5);
@@ -86,6 +103,16 @@ public class NDArrayOtherOpTest {
             NDArray expected = manager.create(new float[] {9, 9, 3, 4}, new Shape(2, 2));
             original.set(new NDIndex(0), 9);
             Assert.assertEquals(original, expected);
+
+            original = manager.arange(4f).reshape(2, 2);
+            expected = manager.ones(new Shape(2, 2));
+            original.set(new NDIndex("..."), 1);
+            Assert.assertEquals(original, expected);
+
+            original = manager.arange(4f).reshape(2, 2);
+            expected = manager.create(new float[] {1, 1, 1, 3}).reshape(2, 2);
+            original.set(new NDIndex("..., 0"), 1);
+            Assert.assertEquals(original, expected);
         }
     }
 
@@ -105,6 +132,12 @@ public class NDArrayOtherOpTest {
             NDArray expected = manager.create(new int[] {4, 10, 16});
             NDIndex index = new NDIndex(":, 1");
             original.set(index, nd -> nd.mul(2));
+            Assert.assertEquals(original.get(index), expected);
+
+            original = manager.arange(6).reshape(3, 2);
+            expected = manager.create(new int[] {6, 8, 10});
+            index = new NDIndex("... , 1");
+            original.set(index, nd -> nd.add(5));
             Assert.assertEquals(original.get(index), expected);
         }
     }
