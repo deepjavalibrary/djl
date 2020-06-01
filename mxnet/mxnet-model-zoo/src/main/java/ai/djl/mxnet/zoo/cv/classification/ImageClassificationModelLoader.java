@@ -118,7 +118,6 @@ public abstract class ImageClassificationModelLoader
             return ImageClassificationTranslator.builder()
                     .optFlag(Image.Flag.valueOf(flag))
                     .setPipeline(pipeline)
-                    .setSynsetArtifactName("synset.txt")
                     .optApplySoftmax(true)
                     .build();
         }

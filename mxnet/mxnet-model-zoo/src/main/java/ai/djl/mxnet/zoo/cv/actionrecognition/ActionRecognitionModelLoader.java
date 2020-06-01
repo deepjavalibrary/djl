@@ -127,7 +127,7 @@ public class ActionRecognitionModelLoader extends BaseModelLoader<Image, Classif
 
             return ImageClassificationTranslator.builder()
                     .setPipeline(pipeline)
-                    .setSynsetArtifactName("classes.txt")
+                    .optSynsetArtifactName("classes.txt")
                     .build();
         }
     }

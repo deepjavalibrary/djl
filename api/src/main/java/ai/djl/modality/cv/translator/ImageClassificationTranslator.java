@@ -21,12 +21,14 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Utils;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 /** A generic {@link ai.djl.translate.Translator} for Image Classification tasks. */
 public class ImageClassificationTranslator extends BaseImageTranslator<Classifications> {
 
-    private String synsetArtifactName;
+    private SynsetLoader synsetLoader;
     private boolean applySoftmax;
 
     private List<String> synset;
@@ -38,19 +40,19 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
      */
     public ImageClassificationTranslator(Builder builder) {
         super(builder);
-        this.synsetArtifactName = builder.synsetArtifactName;
+        this.synsetLoader = builder.synsetLoader;
         this.applySoftmax = builder.applySoftmax;
     }
 
     /** {@inheritDoc} */
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
-        synset = model.getArtifact(synsetArtifactName, Utils::readLines);
+        synset = synsetLoader.load(model);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Classifications processOutput(TranslatorContext ctx, NDList list) throws IOException {
+    public Classifications processOutput(TranslatorContext ctx, NDList list) {
         NDArray probabilitiesNd = list.singletonOrThrow();
         if (applySoftmax) {
             probabilitiesNd = probabilitiesNd.softmax(0);
@@ -70,7 +72,7 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
     /** A Builder to construct a {@code ImageClassificationTranslator}. */
     public static class Builder extends BaseBuilder<Builder> {
 
-        private String synsetArtifactName;
+        private SynsetLoader synsetLoader;
         private boolean applySoftmax;
 
         Builder() {}
@@ -81,8 +83,30 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
          * @param synsetArtifactName a file listing the potential classes for an image
          * @return the builder
          */
-        public Builder setSynsetArtifactName(String synsetArtifactName) {
-            this.synsetArtifactName = synsetArtifactName;
+        public Builder optSynsetArtifactName(String synsetArtifactName) {
+            synsetLoader = new SynsetLoader(synsetArtifactName);
+            return this;
+        }
+
+        /**
+         * Sets the URL of the synset file.
+         *
+         * @param synsetUrl the URL of the synset file
+         * @return the builder
+         */
+        public Builder optSynsetUrl(URL synsetUrl) {
+            this.synsetLoader = new SynsetLoader(synsetUrl);
+            return this;
+        }
+
+        /**
+         * Sets the potential classes for an image.
+         *
+         * @param synset the potential classes for an image
+         * @return the builder
+         */
+        public Builder optSynset(List<String> synset) {
+            synsetLoader = new SynsetLoader(synset);
             return this;
         }
 
@@ -110,10 +134,40 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
          * @return an {@link ImageClassificationTranslator}
          */
         public ImageClassificationTranslator build() {
-            if (synsetArtifactName == null) {
-                throw new IllegalArgumentException("You must specify a synset artifact name");
+            if (synsetLoader == null) {
+                synsetLoader = new SynsetLoader("synset.txt");
             }
             return new ImageClassificationTranslator(this);
+        }
+    }
+
+    private static final class SynsetLoader {
+
+        private String synsetFileName;
+        private URL synsetUrl;
+        private List<String> synset;
+
+        public SynsetLoader(List<String> synset) {
+            this.synset = synset;
+        }
+
+        public SynsetLoader(URL synsetUrl) {
+            this.synsetUrl = synsetUrl;
+        }
+
+        public SynsetLoader(String synsetFileName) {
+            this.synsetFileName = synsetFileName;
+        }
+
+        public List<String> load(Model model) throws IOException {
+            if (synset != null) {
+                return synset;
+            } else if (synsetUrl != null) {
+                try (InputStream is = synsetUrl.openStream()) {
+                    return Utils.readLines(is);
+                }
+            }
+            return model.getArtifact(synsetFileName, Utils::readLines);
         }
     }
 }

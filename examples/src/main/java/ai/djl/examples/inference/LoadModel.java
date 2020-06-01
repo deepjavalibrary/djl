@@ -95,9 +95,6 @@ public final class LoadModel {
         // make proper changes to match your local model's behavior.
         Pipeline pipeline = new Pipeline();
         pipeline.add(new CenterCrop()).add(new Resize(224, 224)).add(new ToTensor());
-        return ImageClassificationTranslator.builder()
-                .setPipeline(pipeline)
-                .setSynsetArtifactName("synset.txt")
-                .build();
+        return ImageClassificationTranslator.builder().setPipeline(pipeline).build();
     }
 }

@@ -59,11 +59,7 @@ public class ResNetTest {
                                 new float[] {1f, 1f, 1f}));
 
         ImageClassificationTranslator myTranslator =
-                ImageClassificationTranslator.builder()
-                        .setPipeline(pipeline)
-                        .setSynsetArtifactName("synset.txt")
-                        .optApplySoftmax(false)
-                        .build();
+                ImageClassificationTranslator.builder().setPipeline(pipeline).build();
         try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria)) {
             try (Predictor<Image, Classifications> predictor = model.newPredictor(myTranslator)) {
                 Classifications result =

@@ -55,11 +55,7 @@ public class MobileNetTest {
         pipeline.add(new Resize(224, 224)).add(new CustomTransform());
 
         ImageClassificationTranslator myTranslator =
-                ImageClassificationTranslator.builder()
-                        .setPipeline(pipeline)
-                        .setSynsetArtifactName("synset.txt")
-                        .optApplySoftmax(false)
-                        .build();
+                ImageClassificationTranslator.builder().setPipeline(pipeline).build();
         try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria)) {
             try (Predictor<Image, Classifications> predictor = model.newPredictor(myTranslator)) {
                 Classifications result =

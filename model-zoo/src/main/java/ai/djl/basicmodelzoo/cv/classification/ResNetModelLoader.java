@@ -156,10 +156,7 @@ public class ResNetModelLoader extends BaseModelLoader<Image, Classifications> {
 
             Pipeline pipeline = new Pipeline();
             pipeline.add(new CenterCrop()).add(new Resize(width, height)).add(new ToTensor());
-            return ImageClassificationTranslator.builder()
-                    .setPipeline(pipeline)
-                    .setSynsetArtifactName("synset.txt")
-                    .build();
+            return ImageClassificationTranslator.builder().setPipeline(pipeline).build();
         }
     }
 }
