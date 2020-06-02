@@ -1,3 +1,5 @@
+// https://medium.com/codingtown/xterm-js-terminal-2b19ccd2a52
+// https://medium.com/swlh/local-echo-xterm-js-5210f062377e
 var term = new Terminal();
 const consoleId = (Math.random() + 1).toString(36).substring(7);
 
@@ -10,7 +12,7 @@ var cursor = 0;
 
 function init() {
   term.reset();
-  term.write("Welcome to the simulated jconsole for DJL.\r\nThis console is equipped with:\r\nNDManager manager, you can use 'clear' to clear screen\r\n");
+  term.write("Welcome to the simulated jconsole for DJL.\r\nThis console is equipped with:\r\nNDManager manager\r\n");
   term.write(prefix);
 }
 
@@ -71,7 +73,7 @@ function analyseResponse(data) {
     input = "";
   }
   else {
-    const Url = "https://noirbct7p5.execute-api.us-east-1.amazonaws.com/DJL-Console-Live";
+    const Url = "https://demo.djl.ai/addCommand";
     fetch(Url, {
     method: "POST",
     headers: {

@@ -18,7 +18,7 @@ function submitCode() {
     var value = editor.getValue();
     var select = document.getElementById("engine");
     var engine = select.options[select.selectedIndex].value;
-    const Url = "https://olzo20ie3f.execute-api.us-east-1.amazonaws.com/DJL-Block-Runner";
+    const Url = "https://demo.djl.ai/compute";
     result.setValue("Running in progress...");
     fetch(Url, {
         method: "POST",
@@ -37,3 +37,24 @@ function submitCode() {
         });
 }
 
+function getTemplate() {
+    var value = editor.getValue();
+    var select = document.getElementById("engine");
+    var engine = select.options[select.selectedIndex].value;
+    const Url = "https://demo.djl.ai/createzip";
+    fetch(Url, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify({ "engine" : engine, "commands" : value})
+        }).then(res => res.blob())
+        .then(blob => {
+            var file = window.URL.createObjectURL(blob);
+            window.location.assign(file);
+        })
+        .catch((error) => {
+          console.error("Error:", error)
+          result.setValue(error.toString());
+        });
+}
