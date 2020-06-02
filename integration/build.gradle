@@ -87,7 +87,7 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                if ("PyTorch" == System.getProperty("ai.djl.default_engine")) {
+                if (["PyTorch", "TensorFlow"].contains(System.getProperty("ai.djl.default_engine"))) {
                     minimum = 0.6
                 } else {
                     minimum = 0.7
