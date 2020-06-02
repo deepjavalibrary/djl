@@ -59,6 +59,7 @@ public class NDIndexTest {
 
             NDArray getStepSlice = original.get("1::2");
             Assert.assertEquals(getStepSlice, expected);
+
             original = manager.arange(120).reshape(2, 3, 4, 5);
             NDArray getEllipsis = original.get("0,2, ...  ");
             expected = manager.arange(40, 60).reshape(4, 5);

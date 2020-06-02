@@ -297,10 +297,10 @@ public class TfNDArray implements NDArray {
         if (fullSlice != null) {
             long[] begin = fullSlice.getMin();
             long[] end = fullSlice.getMax();
-
-            long[] size = new long[begin.length];
-            Arrays.setAll(size, i -> end[i] - begin[i]);
-            Operand<?> sliced = tf.slice(asOperand(), tf.constant(begin), tf.constant(size));
+            long[] step = fullSlice.getStep();
+            Operand<?> sliced =
+                    tf.stridedSlice(
+                            asOperand(), tf.constant(begin), tf.constant(end), tf.constant(step));
             if (!fullSlice.getToSqueeze().isEmpty()) {
                 sliced =
                         tf.squeeze(
