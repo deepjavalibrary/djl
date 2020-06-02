@@ -378,8 +378,10 @@ public class NDIndex {
             long[] shape,
             List<Long> squeezedShape) {
         if (ie instanceof NDIndexFixed) {
-            min[i] = ((NDIndexFixed) ie).getIndex();
-            max[i] = ((NDIndexFixed) ie).getIndex() + 1;
+            NDIndexFixed fixed = ((NDIndexFixed) ie);
+            long rawIndex = fixed.getIndex();
+            min[i] = rawIndex < 0 ? Math.floorMod(rawIndex, target.get(i)) : rawIndex;
+            max[i] = min[i] + 1;
             step[i] = 1;
             toSqueeze.add(i);
             shape[i] = 1;
