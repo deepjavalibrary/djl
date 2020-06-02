@@ -25,7 +25,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Transform;
 import ai.djl.translate.TranslatorContext;
-import ai.djl.util.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +36,7 @@ import java.util.List;
 public class InstanceSegmentationTranslator extends BaseImageTranslator<DetectedObjects>
         implements Transform {
 
-    private String synsetArtifactName;
+    private SynsetLoader synsetLoader;
     private float threshold;
     private int shortEdge;
     private int maxEdge;
@@ -54,7 +53,7 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
      */
     public InstanceSegmentationTranslator(Builder builder) {
         super(builder);
-        synsetArtifactName = builder.synsetArtifactName;
+        this.synsetLoader = builder.synsetLoader;
         this.threshold = builder.threshold;
         this.shortEdge = builder.shortEdge;
         this.maxEdge = builder.maxEdge;
@@ -69,7 +68,9 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
     /** {@inheritDoc} */
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
-        classes = model.getArtifact(synsetArtifactName, Utils::readLines);
+        if (classes == null) {
+            classes = synsetLoader.load(model);
+        }
     }
 
     /** {@inheritDoc} */
@@ -84,8 +85,7 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
 
     /** {@inheritDoc} */
     @Override
-    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws IOException {
-
+    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
         float[] ids = list.get(0).toFloatArray();
         float[] scores = list.get(1).toFloatArray();
         NDArray boundingBoxes = list.get(2);
@@ -164,27 +164,13 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
     }
 
     /** The builder for Instance Segmentation translator. */
-    public static class Builder extends BaseBuilder<Builder> {
+    public static class Builder extends ClassificationBuilder<Builder> {
 
-        String synsetArtifactName;
         float threshold = 0.3f;
         int shortEdge = 600;
         int maxEdge = 1000;
 
         Builder() {}
-
-        /**
-         * Sets the name for the synset.
-         *
-         * <p>synset is used to convert the prediction classes to their actual names.
-         *
-         * @param synsetArtifactName the name of synset
-         * @return the builder
-         */
-        public Builder setSynsetArtifactName(String synsetArtifactName) {
-            this.synsetArtifactName = synsetArtifactName;
-            return this;
-        }
 
         /**
          * Sets the threshold for prediction accuracy.
@@ -233,9 +219,7 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
          * @return the new translator
          */
         public InstanceSegmentationTranslator build() {
-            if (synsetArtifactName == null) {
-                throw new IllegalArgumentException("You must specify a synset artifact name");
-            }
+            validate();
             return new InstanceSegmentationTranslator(this);
         }
     }

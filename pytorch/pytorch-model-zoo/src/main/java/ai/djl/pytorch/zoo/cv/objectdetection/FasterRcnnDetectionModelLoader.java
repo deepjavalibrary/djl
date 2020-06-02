@@ -121,7 +121,7 @@ public class FasterRcnnDetectionModelLoader extends BaseModelLoader<Image, Detec
 
             return SingleShotDetectionTranslator.builder()
                     .setPipeline(pipeline)
-                    .setSynsetArtifactName("classes.txt")
+                    .optSynsetArtifactName("classes.txt")
                     .optThreshold((float) threshold)
                     .optRescaleSize(width, height)
                     .build();

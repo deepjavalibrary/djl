@@ -16,7 +16,6 @@ import ai.djl.Model;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
-import ai.djl.util.Utils;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,7 +26,7 @@ import java.util.List;
 public abstract class ObjectDetectionTranslator extends BaseImageTranslator<DetectedObjects> {
 
     protected float threshold;
-    protected String synsetArtifactName;
+    private SynsetLoader synsetLoader;
     protected List<String> classes;
     protected double imageWidth;
     protected double imageHeight;
@@ -37,11 +36,10 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
      *
      * @param builder the builder for the translator
      */
-    public ObjectDetectionTranslator(BaseBuilder<?> builder) {
+    protected ObjectDetectionTranslator(BaseBuilder<?> builder) {
         super(builder);
         this.threshold = builder.threshold;
-        this.synsetArtifactName = builder.synsetArtifactName;
-        this.classes = builder.classes;
+        this.synsetLoader = builder.synsetLoader;
         this.imageWidth = builder.imageWidth;
         this.imageHeight = builder.imageHeight;
     }
@@ -50,34 +48,22 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
         if (classes == null) {
-            classes = model.getArtifact(synsetArtifactName, Utils::readLines);
+            classes = synsetLoader.load(model);
         }
     }
 
     /** The base builder for the object detection translator. */
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder>
-            extends BaseImageTranslator.BaseBuilder<T> {
+            extends ClassificationBuilder<T> {
 
         protected float threshold = 0.2f;
-        protected String synsetArtifactName;
-        protected List<String> classes;
         protected double imageWidth;
         protected double imageHeight;
 
         /** {@inheritDoc} */
         @Override
         protected abstract T self();
-
-        protected void validate() {
-            if (synsetArtifactName == null && classes == null) {
-                throw new IllegalArgumentException(
-                        "You must specify a synset artifact name or classes");
-            } else if (synsetArtifactName != null && classes != null) {
-                throw new IllegalArgumentException(
-                        "You can only specify one of: synset artifact name or classes");
-            }
-        }
 
         /**
          * Sets the threshold for prediction accuracy.
@@ -89,34 +75,6 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
          */
         public T optThreshold(float threshold) {
             this.threshold = threshold;
-            return self();
-        }
-
-        /**
-         * Sets the name for the synset.
-         *
-         * <p>Synset is used to convert the prediction classes to their actual names.
-         *
-         * <p>Set either the synset or the classes.
-         *
-         * @param synsetArtifactName the name of synset
-         * @return this builder
-         */
-        public T setSynsetArtifactName(String synsetArtifactName) {
-            this.synsetArtifactName = synsetArtifactName;
-            return self();
-        }
-
-        /**
-         * Sets the class list.
-         *
-         * <p>Set either the synset or the classes.
-         *
-         * @param classes the list of classes
-         * @return this builder
-         */
-        public T setClasses(List<String> classes) {
-            this.classes = classes;
             return self();
         }
 
@@ -140,24 +98,6 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
          */
         public float getThreshold() {
             return threshold;
-        }
-
-        /**
-         * Get symset artifact name.
-         *
-         * @return name
-         */
-        public String getSynsetArtifactName() {
-            return synsetArtifactName;
-        }
-
-        /**
-         * Get classes.
-         *
-         * @return classes
-         */
-        public List<String> getClasses() {
-            return classes;
         }
 
         /**

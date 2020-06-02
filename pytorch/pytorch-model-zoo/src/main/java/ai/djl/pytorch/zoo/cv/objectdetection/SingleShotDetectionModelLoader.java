@@ -153,7 +153,7 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
             return PtSSDTranslator.builder()
                     .setBoxes(figSize, featSize, steps, scale, aspectRatio)
                     .setPipeline(pipeline)
-                    .setSynsetArtifactName("classes.txt")
+                    .optSynsetArtifactName("classes.txt")
                     .optThreshold((float) threshold)
                     .build();
         }

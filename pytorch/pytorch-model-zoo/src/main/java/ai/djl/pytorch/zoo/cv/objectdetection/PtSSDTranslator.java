@@ -23,7 +23,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.translate.TranslatorContext;
-import ai.djl.util.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +48,7 @@ public class PtSSDTranslator extends SingleShotDetectionTranslator {
      *
      * @param builder the builder for the translator
      */
-    public PtSSDTranslator(Builder builder) {
+    protected PtSSDTranslator(Builder builder) {
         super(builder);
         this.figSize = builder.figSize;
         this.featSize = builder.featSize;
@@ -61,13 +60,13 @@ public class PtSSDTranslator extends SingleShotDetectionTranslator {
     /** {@inheritDoc} */
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
-        classes = model.getArtifact(synsetArtifactName, Utils::readLines);
+        super.prepare(manager, model);
         boxRecover = boxRecover(model.getNDManager(), figSize, featSize, steps, scale, aspectRatio);
     }
 
     /** {@inheritDoc} */
     @Override
-    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws IOException {
+    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
         double scaleXY = 0.1;
         double scaleWH = 0.2;
 
@@ -222,13 +221,7 @@ public class PtSSDTranslator extends SingleShotDetectionTranslator {
          */
         @Override
         public PtSSDTranslator build() {
-            if (getSynsetArtifactName() == null && getClasses() == null) {
-                throw new IllegalArgumentException(
-                        "You must specify a synset artifact name or classes");
-            } else if (getSynsetArtifactName() != null && getClasses() != null) {
-                throw new IllegalArgumentException(
-                        "You can only specify one of: synset artifact name or classes");
-            }
+            validate();
             return new PtSSDTranslator(this);
         }
     }

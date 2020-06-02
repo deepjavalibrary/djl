@@ -36,7 +36,7 @@ public class YoloTranslator extends ObjectDetectionTranslator {
 
     /** {@inheritDoc} */
     @Override
-    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws Exception {
+    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
         int[] classIndices = list.get(0).toType(DataType.INT32, true).flatten().toIntArray();
         double[] probs = list.get(1).toType(DataType.FLOAT64, true).flatten().toDoubleArray();
         NDArray boundingBoxes = list.get(2);

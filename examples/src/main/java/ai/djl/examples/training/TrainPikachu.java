@@ -117,7 +117,7 @@ public final class TrainPikachu {
             SingleShotDetectionTranslator translator =
                     SingleShotDetectionTranslator.builder()
                             .setPipeline(pipeline)
-                            .setClasses(classes)
+                            .optSynset(classes)
                             .optThreshold(detectionThreshold)
                             .build();
             try (Predictor<Image, DetectedObjects> predictor = model.newPredictor(translator)) {

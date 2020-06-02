@@ -121,7 +121,7 @@ public class InstanceSegmentationModelLoader extends BaseModelLoader<Image, Dete
 
             return InstanceSegmentationTranslator.builder()
                     .setPipeline(pipeline)
-                    .setSynsetArtifactName("classes.txt")
+                    .optSynsetArtifactName("classes.txt")
                     .build();
         }
     }

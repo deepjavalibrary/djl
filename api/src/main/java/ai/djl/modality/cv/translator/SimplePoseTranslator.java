@@ -124,6 +124,7 @@ public class SimplePoseTranslator extends BaseImageTranslator<Joints> {
          * @return the new translator
          */
         public SimplePoseTranslator build() {
+            validate();
             return new SimplePoseTranslator(this);
         }
     }

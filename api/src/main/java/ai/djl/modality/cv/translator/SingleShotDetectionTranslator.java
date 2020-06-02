@@ -18,7 +18,6 @@ import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.TranslatorContext;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class SingleShotDetectionTranslator extends ObjectDetectionTranslator {
 
     /** {@inheritDoc} */
     @Override
-    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws IOException {
+    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
         float[] classIds = list.get(0).toFloatArray();
         float[] probabilities = list.get(1).toFloatArray();
         NDArray boundingBoxes = list.get(2);

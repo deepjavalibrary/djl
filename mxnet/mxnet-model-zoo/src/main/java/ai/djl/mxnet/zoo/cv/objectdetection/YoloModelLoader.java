@@ -117,7 +117,7 @@ public class YoloModelLoader extends BaseModelLoader<Image, DetectedObjects> {
 
             return YoloTranslator.builder()
                     .setPipeline(pipeline)
-                    .setSynsetArtifactName("classes.txt")
+                    .optSynsetArtifactName("classes.txt")
                     .optThreshold((float) threshold)
                     .optRescaleSize(width, height)
                     .build();

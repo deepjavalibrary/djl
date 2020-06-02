@@ -12,12 +12,18 @@
  */
 package ai.djl.modality.cv.translator;
 
+import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.Utils;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
 
 /**
  * Built-in {@code Translator} that provides default image pre-processing.
@@ -93,5 +99,91 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
         }
 
         protected abstract T self();
+
+        protected void validate() {
+            if (pipeline == null) {
+                throw new IllegalArgumentException("pipeline is required.");
+            }
+        }
+    }
+
+    /** A Builder to construct a {@code ImageClassificationTranslator}. */
+    @SuppressWarnings("rawtypes")
+    public abstract static class ClassificationBuilder<T extends BaseBuilder>
+            extends BaseBuilder<T> {
+
+        protected SynsetLoader synsetLoader;
+
+        /**
+         * Sets the name of the synset file listing the potential classes for an image.
+         *
+         * @param synsetArtifactName a file listing the potential classes for an image
+         * @return the builder
+         */
+        public T optSynsetArtifactName(String synsetArtifactName) {
+            synsetLoader = new SynsetLoader(synsetArtifactName);
+            return self();
+        }
+
+        /**
+         * Sets the URL of the synset file.
+         *
+         * @param synsetUrl the URL of the synset file
+         * @return the builder
+         */
+        public T optSynsetUrl(URL synsetUrl) {
+            this.synsetLoader = new SynsetLoader(synsetUrl);
+            return self();
+        }
+
+        /**
+         * Sets the potential classes for an image.
+         *
+         * @param synset the potential classes for an image
+         * @return the builder
+         */
+        public T optSynset(List<String> synset) {
+            synsetLoader = new SynsetLoader(synset);
+            return self();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected void validate() {
+            super.validate();
+            if (synsetLoader == null) {
+                synsetLoader = new SynsetLoader("synset.txt");
+            }
+        }
+    }
+
+    protected static final class SynsetLoader {
+
+        private String synsetFileName;
+        private URL synsetUrl;
+        private List<String> synset;
+
+        public SynsetLoader(List<String> synset) {
+            this.synset = synset;
+        }
+
+        public SynsetLoader(URL synsetUrl) {
+            this.synsetUrl = synsetUrl;
+        }
+
+        public SynsetLoader(String synsetFileName) {
+            this.synsetFileName = synsetFileName;
+        }
+
+        public List<String> load(Model model) throws IOException {
+            if (synset != null) {
+                return synset;
+            } else if (synsetUrl != null) {
+                try (InputStream is = synsetUrl.openStream()) {
+                    return Utils.readLines(is);
+                }
+            }
+            return model.getArtifact(synsetFileName, Utils::readLines);
+        }
     }
 }

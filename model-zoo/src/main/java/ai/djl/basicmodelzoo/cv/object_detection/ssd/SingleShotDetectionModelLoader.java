@@ -176,7 +176,7 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
             pipeline.add(new ToTensor());
             return SingleShotDetectionTranslator.builder()
                     .setPipeline(pipeline)
-                    .setSynsetArtifactName("synset.txt")
+                    .optSynsetArtifactName("synset.txt")
                     .optThreshold(((Double) arguments.get("threshold")).floatValue())
                     .build();
         }
