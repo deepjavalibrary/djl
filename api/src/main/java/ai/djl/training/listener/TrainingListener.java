@@ -114,7 +114,6 @@ public interface TrainingListener {
                 new EvaluatorTrainingListener(),
                 new DivergenceCheckTrainingListener(),
                 new LoggingTrainingListener(),
-                new CheckpointsTrainingListener(outputDir),
                 new TimeMeasureTrainingListener(outputDir)
             };
         }

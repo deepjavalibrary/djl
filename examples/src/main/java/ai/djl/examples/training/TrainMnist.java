@@ -27,11 +27,11 @@ import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
+import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
 import java.io.IOException;
-import java.nio.file.Paths;
 import org.apache.commons.cli.ParseException;
 
 /**
@@ -83,23 +83,27 @@ public final class TrainMnist {
 
                 EasyTrain.fit(trainer, arguments.getEpoch(), trainingSet, validateSet);
 
-                TrainingResult result = trainer.getTrainingResult();
-                float accuracy = result.getValidateEvaluation("Accuracy");
-                model.setProperty("Epoch", String.valueOf(result.getEpoch()));
-                model.setProperty("Accuracy", String.format("%.5f", accuracy));
-                model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
-
-                model.save(Paths.get(arguments.getOutputDir()), "mlp");
-                return result;
+                return trainer.getTrainingResult();
             }
         }
     }
 
     private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
+        String outputDir = arguments.getOutputDir();
+        CheckpointsTrainingListener listener = new CheckpointsTrainingListener(outputDir);
+        listener.setSaveModelCallback(
+                trainer -> {
+                    TrainingResult result = trainer.getTrainingResult();
+                    Model model = trainer.getModel();
+                    float accuracy = result.getValidateEvaluation("Accuracy");
+                    model.setProperty("Accuracy", String.format("%.5f", accuracy));
+                    model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
+                });
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
-                .addTrainingListeners(TrainingListener.Defaults.logging(arguments.getOutputDir()));
+                .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
+                .addTrainingListeners(listener);
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)

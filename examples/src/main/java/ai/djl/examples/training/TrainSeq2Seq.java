@@ -44,15 +44,14 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.initializer.XavierInitializer;
+import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.MaskedSoftmaxCrossEntropyLoss;
 import ai.djl.training.optimizer.Adam;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.PaddingStackBatchifier;
-import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -60,14 +59,14 @@ import java.util.concurrent.Executors;
 import org.apache.commons.cli.ParseException;
 
 public final class TrainSeq2Seq {
+
     private TrainSeq2Seq() {}
 
-    public static void main(String[] args) throws IOException, ParseException, TranslateException {
+    public static void main(String[] args) throws IOException, ParseException {
         TrainSeq2Seq.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args)
-            throws IOException, ParseException, TranslateException {
+    public static TrainingResult runExample(String[] args) throws IOException, ParseException {
         Arguments arguments = Arguments.parseArgs(args);
         ExecutorService executorService = Executors.newFixedThreadPool(8);
         try (Model model = Model.newInstance("seq2seqMTEn-Fr")) {
@@ -99,8 +98,6 @@ public final class TrainSeq2Seq {
 
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
-            config.addTrainingListeners(
-                    TrainingListener.Defaults.logging(arguments.getOutputDir()));
 
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
@@ -116,11 +113,7 @@ public final class TrainSeq2Seq {
 
                 EasyTrain.fit(trainer, arguments.getEpoch(), trainingSet, validateDataset);
 
-                TrainingResult result = trainer.getTrainingResult();
-                model.setProperty("Epoch", String.valueOf(result.getEpoch()));
-                model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
-                model.save(Paths.get(arguments.getOutputDir()), "seq2seqMTEn-Fr");
-                return result;
+                return trainer.getTrainingResult();
             } finally {
                 executorService.shutdownNow();
             }
@@ -152,6 +145,17 @@ public final class TrainSeq2Seq {
     }
 
     public static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
+        String outputDir = arguments.getOutputDir();
+        CheckpointsTrainingListener listener = new CheckpointsTrainingListener(outputDir);
+        listener.setSaveModelCallback(
+                trainer -> {
+                    TrainingResult result = trainer.getTrainingResult();
+                    Model model = trainer.getModel();
+                    float accuracy = result.getValidateEvaluation("Accuracy");
+                    model.setProperty("Accuracy", String.format("%.5f", accuracy));
+                    model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
+                });
+
         return new DefaultTrainingConfig(new MaskedSoftmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy("Accuracy", 0, 2))
                 .optInitializer(new XavierInitializer())
@@ -161,7 +165,9 @@ public final class TrainSeq2Seq {
                                         LearningRateTracker.fixedLearningRate(0.005f))
                                 .build())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
-                .optDataManager(new Seq2SeqDataManager());
+                .optDataManager(new Seq2SeqDataManager())
+                .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
+                .addTrainingListeners(listener);
     }
 
     public static TextDataset getDataset(

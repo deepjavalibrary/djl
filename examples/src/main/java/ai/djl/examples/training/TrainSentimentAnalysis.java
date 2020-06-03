@@ -50,16 +50,16 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.PaddingStackBatchifier;
 import ai.djl.translate.TranslateException;
+import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -69,6 +69,7 @@ import java.util.concurrent.Executors;
 import org.apache.commons.cli.ParseException;
 
 public final class TrainSentimentAnalysis {
+
     private static final int PADDING_SIZE = 500;
     private static final List<TextProcessor> TEXT_PROCESSORS =
             Arrays.asList(
@@ -124,14 +125,9 @@ public final class TrainSentimentAnalysis {
                 EasyTrain.fit(trainer, arguments.getEpoch(), trainingSet, validateSet);
 
                 TrainingResult result = trainer.getTrainingResult();
-                model.setProperty("Epoch", String.valueOf(result.getEpoch()));
-                model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
-
-                Path modelSavePath = Paths.get(arguments.getOutputDir());
-                model.save(modelSavePath, "stanfordSentimentAnalysis");
 
                 try (Predictor<String, Boolean> predictor =
-                        model.newPredictor(new Translator(embedding))) {
+                        model.newPredictor(new MyTranslator(embedding))) {
                     List<String> sentences =
                             Arrays.asList(
                                     "This movie was very good",
@@ -173,10 +169,20 @@ public final class TrainSentimentAnalysis {
 
     public static DefaultTrainingConfig setupTrainingConfig(
             Arguments arguments, ModelZooTextEmbedding embedding) {
+        String outputDir = arguments.getOutputDir();
+        CheckpointsTrainingListener listener = new CheckpointsTrainingListener(outputDir);
+        listener.setSaveModelCallback(
+                trainer -> {
+                    TrainingResult result = trainer.getTrainingResult();
+                    Model model = trainer.getModel();
+                    model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
+                });
+
         return new DefaultTrainingConfig(new SoftmaxCrossEntropyLoss())
                 .optDataManager(new EmbeddingDataManager(embedding))
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
-                .addTrainingListeners(TrainingListener.Defaults.logging(arguments.getOutputDir()));
+                .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
+                .addTrainingListeners(listener);
     }
 
     public static StanfordMovieReview getDataset(
@@ -209,17 +215,18 @@ public final class TrainSentimentAnalysis {
         return stanfordMovieReview;
     }
 
-    public static class Translator implements ai.djl.translate.Translator<String, Boolean> {
+    public static final class MyTranslator implements Translator<String, Boolean> {
+
         private TextEmbedding textEmbedding;
         private NDManager manager;
 
-        public Translator(ZooModel<String, NDList> embeddingModel) {
+        public MyTranslator(ZooModel<String, NDList> embeddingModel) {
             textEmbedding = new ModelZooTextEmbedding(embeddingModel);
             manager = embeddingModel.getNDManager();
         }
 
         @Override
-        public Boolean processOutput(TranslatorContext ctx, NDList list) throws Exception {
+        public Boolean processOutput(TranslatorContext ctx, NDList list) {
             long argmax = list.head().argMax().getLong();
             return argmax == 1;
         }
@@ -244,7 +251,8 @@ public final class TrainSentimentAnalysis {
         }
     }
 
-    private static class EmbeddingDataManager extends DataManager {
+    private static final class EmbeddingDataManager extends DataManager {
+
         private ModelZooTextEmbedding embedding;
 
         public EmbeddingDataManager(ModelZooTextEmbedding embedding) {

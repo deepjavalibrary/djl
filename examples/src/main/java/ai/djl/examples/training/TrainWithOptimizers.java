@@ -41,6 +41,7 @@ import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
+import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
@@ -49,7 +50,6 @@ import ai.djl.training.optimizer.learningrate.MultiFactorTracker;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 import org.apache.commons.cli.CommandLine;
@@ -76,7 +76,6 @@ public final class TrainWithOptimizers {
         OptimizerArguments arguments = new OptimizerArguments(cmd);
 
         try (Model model = getModel(arguments)) {
-
             // get training dataset
             RandomAccessDataset trainDataset = getDataset(Dataset.Usage.TRAIN, arguments);
             RandomAccessDataset validationDataset = getDataset(Dataset.Usage.TEST, arguments);
@@ -97,14 +96,7 @@ public final class TrainWithOptimizers {
                 trainer.initialize(inputShape);
                 EasyTrain.fit(trainer, arguments.getEpoch(), trainDataset, validationDataset);
 
-                TrainingResult result = trainer.getTrainingResult();
-                float accuracy = result.getValidateEvaluation("Accuracy");
-                model.setProperty("Epoch", String.valueOf(result.getEpoch()));
-                model.setProperty("Accuracy", String.format("%.5f", accuracy));
-                model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
-
-                model.save(Paths.get("build/model"), "resnetv1");
-                return result;
+                return trainer.getTrainingResult();
             }
         }
     }
@@ -170,11 +162,24 @@ public final class TrainWithOptimizers {
     }
 
     private static DefaultTrainingConfig setupTrainingConfig(OptimizerArguments arguments) {
+        String outputDir = arguments.getOutputDir();
+        CheckpointsTrainingListener listener =
+                new CheckpointsTrainingListener(outputDir, "resnetv1");
+        listener.setSaveModelCallback(
+                trainer -> {
+                    TrainingResult result = trainer.getTrainingResult();
+                    Model model = trainer.getModel();
+                    float accuracy = result.getValidateEvaluation("Accuracy");
+                    model.setProperty("Accuracy", String.format("%.5f", accuracy));
+                    model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
+                });
+
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
                 .optOptimizer(setupOptimizer(arguments))
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
-                .addTrainingListeners(TrainingListener.Defaults.logging(arguments.getOutputDir()));
+                .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
+                .addTrainingListeners(listener);
     }
 
     private static Optimizer setupOptimizer(OptimizerArguments arguments) {

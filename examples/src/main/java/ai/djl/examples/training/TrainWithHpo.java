@@ -31,6 +31,7 @@ import ai.djl.training.hyperparameter.optimizer.HpORandom;
 import ai.djl.training.hyperparameter.optimizer.HpOptimizer;
 import ai.djl.training.hyperparameter.param.HpInt;
 import ai.djl.training.hyperparameter.param.HpSet;
+import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
@@ -101,8 +102,7 @@ public final class TrainWithHpo {
             Arguments arguments,
             HpSet hpVals,
             RandomAccessDataset trainingSet,
-            RandomAccessDataset validateSet)
-            throws IOException {
+            RandomAccessDataset validateSet) {
         // Construct neural network
         int[] hidden = new int[(Integer) hpVals.getHParam("hiddenLayersCount").random()];
         Arrays.fill(hidden, (Integer) hpVals.getHParam("hiddenLayersSize").random());
@@ -133,10 +133,22 @@ public final class TrainWithHpo {
     }
 
     private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
+        String outputDir = arguments.getOutputDir();
+        CheckpointsTrainingListener listener = new CheckpointsTrainingListener(outputDir);
+        listener.setSaveModelCallback(
+                trainer -> {
+                    TrainingResult result = trainer.getTrainingResult();
+                    Model model = trainer.getModel();
+                    float accuracy = result.getValidateEvaluation("Accuracy");
+                    model.setProperty("Accuracy", String.format("%.5f", accuracy));
+                    model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
+                });
+
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
-                .addTrainingListeners(TrainingListener.Defaults.logging(arguments.getOutputDir()));
+                .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
+                .addTrainingListeners(listener);
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)

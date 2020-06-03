@@ -40,6 +40,7 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.BoundingBoxError;
 import ai.djl.training.evaluator.SingleShotDetectionAccuracy;
+import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.SingleShotDetectionLoss;
 import ai.djl.training.util.ProgressBar;
@@ -72,11 +73,11 @@ public final class TrainPikachu {
     public static TrainingResult runExample(String[] args) throws IOException, ParseException {
         Arguments arguments = Arguments.parseArgs(args);
 
-        try (Model model = Model.newInstance("ssd")) {
+        try (Model model = Model.newInstance("pikachu-ssd")) {
             model.setBlock(getSsdTrainBlock());
 
-            RandomAccessDataset pikachuDetectionTrain = getDataset(Dataset.Usage.TRAIN, arguments);
-            RandomAccessDataset pikachuDetectionTest = getDataset(Dataset.Usage.TEST, arguments);
+            RandomAccessDataset trainingSet = getDataset(Dataset.Usage.TRAIN, arguments);
+            RandomAccessDataset validateSet = getDataset(Dataset.Usage.TEST, arguments);
 
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
 
@@ -85,17 +86,10 @@ public final class TrainPikachu {
 
                 Shape inputShape = new Shape(arguments.getBatchSize(), 3, 256, 256);
                 trainer.initialize(inputShape);
-                EasyTrain.fit(
-                        trainer, arguments.getEpoch(), pikachuDetectionTrain, pikachuDetectionTest);
 
-                TrainingResult result = trainer.getTrainingResult();
-                float accuracy = result.getValidateEvaluation("classAccuracy");
-                model.setProperty("Epoch", String.valueOf(result.getEpoch()));
-                model.setProperty("ClassAccuracy", String.format("%.5f", accuracy));
-                model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
+                EasyTrain.fit(trainer, arguments.getEpoch(), trainingSet, validateSet);
 
-                model.save(Paths.get(arguments.getOutputDir()), "ssd");
-                return result;
+                return trainer.getTrainingResult();
             }
         }
     }
@@ -148,11 +142,23 @@ public final class TrainPikachu {
     }
 
     private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
+        String outputDir = arguments.getOutputDir();
+        CheckpointsTrainingListener listener = new CheckpointsTrainingListener(outputDir);
+        listener.setSaveModelCallback(
+                trainer -> {
+                    TrainingResult result = trainer.getTrainingResult();
+                    Model model = trainer.getModel();
+                    float accuracy = result.getValidateEvaluation("Accuracy");
+                    model.setProperty("ClassAccuracy", String.format("%.5f", accuracy));
+                    model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
+                });
+
         return new DefaultTrainingConfig(new SingleShotDetectionLoss())
                 .addEvaluator(new SingleShotDetectionAccuracy("classAccuracy"))
                 .addEvaluator(new BoundingBoxError("boundingBoxError"))
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
-                .addTrainingListeners(TrainingListener.Defaults.logging(arguments.getOutputDir()));
+                .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
+                .addTrainingListeners(listener);
     }
 
     public static Block getSsdTrainBlock() {
