@@ -15,8 +15,10 @@ package ai.djl.hadoop.hdfs;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
+import ai.djl.util.Utils;
 import ai.djl.util.ZipUtils;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -54,7 +56,11 @@ public class HdfsRepositoryTest {
             ZipUtils.zip(dir, zipFile);
         }
 
-        miniDfs = new MiniDFSCluster(new Configuration(), 1, true, null);
+        Configuration config = new Configuration();
+        if (!System.getProperty("os.name").startsWith("Win")) {
+            setFilePermission(config);
+        }
+        miniDfs = new MiniDFSCluster(config, 1, true, null);
         miniDfs.waitClusterUp();
         FileSystem fs = miniDfs.getFileSystem();
         fs.copyFromLocalFile(new Path(zipFile.toString()), new Path("/mlp.zip"));
@@ -89,5 +95,25 @@ public class HdfsRepositoryTest {
 
         Artifact artifact = repo.resolve(list.get(0), "1.0", null);
         repo.prepare(artifact);
+    }
+
+    private void setFilePermission(Configuration config) {
+        try {
+            Process process = Runtime.getRuntime().exec("/bin/sh -c umask");
+            int rc = process.waitFor();
+            if (rc != 0) {
+                return;
+            }
+
+            try (InputStream is = process.getInputStream()) {
+                String umask = Utils.toString(is).trim();
+                int umaskBits = Integer.parseInt(umask, 8);
+                int permBits = 0777 & ~umaskBits;
+                String perms = Integer.toString(permBits, 8);
+                config.set("dfs.datanode.data.dir.perm", perms);
+            }
+        } catch (IOException | InterruptedException ignore) {
+            // ignore
+        }
     }
 }

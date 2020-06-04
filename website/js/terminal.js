@@ -7,7 +7,7 @@ term.open(document.getElementById('terminal'));
 term.setOption('cursorBlink', true);
 
 const prefix = "djl.ai@jconsole> ";
-var input = "";
+var terminalInput = "";
 var cursor = 0;
 
 function init() {
@@ -21,18 +21,18 @@ init();
 term.on("data", (data) => {
   const code = data.charCodeAt(0);
   if (code == 13) { // Enter
-    analyseResponse(input);
+    analyseResponse(terminalInput);
     cursor = 0;
   } else if(code == 127) { // Backspace
-    if (input.length > 0 && cursor > 0) {
-      input = input.substr(0, cursor - 1) + input.substr(cursor);
+    if (terminalInput.length > 0 && cursor > 0) {
+      terminalInput = terminalInput.substr(0, cursor - 1) + terminalInput.substr(cursor);
       cursor -= 1;
-      rewriteInput(term, input, cursor);
+      rewriteInput(term, terminalInput, cursor);
     }
   } else if (code < 32) { // Control
         switch (data.substr(1)) {
           case '[C': // Right arrow
-            if (cursor < input.length) {
+            if (cursor < terminalInput.length) {
               cursor += 1;
               term.write(data);
             }
@@ -45,32 +45,32 @@ term.on("data", (data) => {
             break;
         }
   } else { // Visible
-    input = input.substr(0, cursor) +
+    terminalInput = terminalInput.substr(0, cursor) +
                 data +
-                input.substr(cursor);
+                terminalInput.substr(cursor);
     cursor += 1;
-    if (cursor != input.length) {
-        rewriteInput(term, input, cursor);
+    if (cursor != terminalInput.length) {
+        rewriteInput(term, terminalInput, cursor);
     } else {
         term.write(data);
     }
   }
 });
 
-function rewriteInput(term, input, cursor) {
+function rewriteInput(term, terminalInput, cursor) {
     // refer: http://www.climagic.org/mirrors/VT100_Escape_Codes.html
     term.write('\x1b[2K'); // clean entire line
     term.write('\r' + prefix); // rewrite prefix
-    term.write(input); // write content
-    if (input.length - cursor > 0) {
-        term.write('\x1b[' + (input.length - cursor) + 'D'); // move cursor back
+    term.write(terminalInput); // write content
+    if (terminalInput.length - cursor > 0) {
+        term.write('\x1b[' + (terminalInput.length - cursor) + 'D'); // move cursor back
     }
 }
 
 function analyseResponse(data) {
   if (data == "clear") {
     init();
-    input = "";
+    terminalInput = "";
   }
   else {
     const Url = "https://demo.djl.ai/addCommand";
@@ -89,13 +89,13 @@ function analyseResponse(data) {
       } else {
         term.write("\r\n" + prefix);
       }
-      input = "";
+      terminalInput = "";
     })
     .catch((error) => {
       console.error("Error:", error)
       term.write("\r\n" + error + "\r\n");
       term.write(prefix);
-      input = "";
+      terminalInput = "";
     });
   }
 }

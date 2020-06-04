@@ -11,6 +11,12 @@ if (JavaVersion.current() < JavaVersion.VERSION_11) {
             html.enabled true
         }
     }
+    spotbugsTest {
+        reports {
+            xml.enabled false
+            html.enabled true
+        }
+    }
 }
 
 apply plugin: "pmd"

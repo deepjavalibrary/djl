@@ -1,5 +1,5 @@
 
-var input = "import ai.djl.ndarray.NDArray;\nimport ai.djl.ndarray.NDManager;\nimport ai.djl.ndarray.types.Shape;\nimport ai.djl.ndarray.index.NDIndex;\n\nNDManager manager = NDManager.newBaseManager();\nNDArray array = manager.ones(new Shape(1,3,2));"
+var blockInput = "import ai.djl.ndarray.NDArray;\nimport ai.djl.ndarray.NDManager;\nimport ai.djl.ndarray.types.Shape;\nimport ai.djl.ndarray.index.NDIndex;\n\nNDManager manager = NDManager.newBaseManager();\nNDArray array = manager.ones(new Shape(1,3,2));"
 
 var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
   mode: "text/x-java",
@@ -12,7 +12,7 @@ var result = CodeMirror.fromTextArea(document.getElementById("result"), {
   theme: "dracula"
 });
 
-editor.setValue(input);
+editor.setValue(blockInput);
 
 function submitCode() {
     var value = editor.getValue();
