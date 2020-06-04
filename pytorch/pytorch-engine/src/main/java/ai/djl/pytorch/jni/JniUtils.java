@@ -279,6 +279,27 @@ public final class JniUtils {
                 ndArray.getHandle(), value.getHandle(), minIndices, maxIndices, stepIndices);
     }
 
+    public static void set(PtNDArray self, PtNDArray other) {
+        PyTorchLibrary.LIB.torchSet(self.getHandle(), other.getHandle());
+    }
+
+    public static PtNDArray pick(PtNDArray ndArray, PtNDArray index, long dim) {
+        if (index.getDataType() != DataType.INT64) {
+            index = index.toType(DataType.INT64, true);
+        }
+        return ndArray.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchIndexSelect(
+                                ndArray.getHandle(), index.getHandle(), dim));
+    }
+
+    public static PtNDArray where(PtNDArray condition, PtNDArray self, PtNDArray other) {
+        return self.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchWhere(
+                                condition.getHandle(), self.getHandle(), other.getHandle()));
+    }
+
     public static PtNDArray booleanMask(PtNDArray ndArray, PtNDArray indicesNd) {
         return ndArray.getManager()
                 .create(

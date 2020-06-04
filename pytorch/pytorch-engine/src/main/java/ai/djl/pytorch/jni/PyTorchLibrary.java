@@ -165,7 +165,11 @@ final class PyTorchLibrary {
             long[] maxIndices,
             long[] stepIndices);
 
+    native void torchSet(Pointer selfHandle, Pointer otherHandle);
+
     native Pointer torchSlice(Pointer handle, long dim, long start, long end, long step);
+
+    native Pointer torchIndexSelect(Pointer handle, Pointer indexHandle, long dim);
 
     native Pointer torchMaskedSelect(Pointer handle, Pointer maskHandle);
 
@@ -262,6 +266,8 @@ final class PyTorchLibrary {
     native Pointer torchTanh(Pointer handle);
 
     native Pointer torchSigmoid(Pointer handle);
+
+    native Pointer torchWhere(Pointer handle, Pointer x, Pointer y);
 
     native Pointer torchAll(Pointer self);
 

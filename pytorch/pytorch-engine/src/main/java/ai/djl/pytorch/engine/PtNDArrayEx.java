@@ -446,13 +446,23 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public PtNDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
-        throw new UnsupportedOperationException("Not implemented");
+        // TODO: support multiple modes
+        PtNDArray result = JniUtils.pick(array, (PtNDArray) index, axis);
+        if (!keepDims) {
+            result.flatten();
+        }
+        return result;
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray where(NDArray condition, NDArray other) {
-        throw new UnsupportedOperationException("Not implemented");
+        // Try to broadcast if shape mismatch
+        if (!condition.getShape().equals(array.getShape())) {
+            throw new UnsupportedOperationException(
+                    "condition and self shape mismatch, broadcast is not supported");
+        }
+        return JniUtils.where((PtNDArray) condition, array, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
