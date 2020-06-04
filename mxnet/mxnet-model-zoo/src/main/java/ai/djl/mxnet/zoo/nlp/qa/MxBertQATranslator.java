@@ -13,9 +13,9 @@
 package ai.djl.mxnet.zoo.nlp.qa;
 
 import ai.djl.Model;
+import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.bert.BertToken;
 import ai.djl.modality.nlp.bert.BertTokenizer;
-import ai.djl.modality.nlp.bert.BertVocabulary;
 import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.modality.nlp.translator.QATranslator;
 import ai.djl.ndarray.NDArray;
@@ -34,8 +34,9 @@ import java.util.stream.Collectors;
  * @see BertQAModelLoader
  */
 public class MxBertQATranslator extends QATranslator {
+
     private List<String> tokens;
-    private BertVocabulary vocabulary;
+    private Vocabulary vocabulary;
     private BertTokenizer tokenizer;
     private int seqLength;
 

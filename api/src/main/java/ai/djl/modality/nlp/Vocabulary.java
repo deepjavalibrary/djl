@@ -17,6 +17,7 @@ package ai.djl.modality.nlp;
  * token to an index.
  */
 public interface Vocabulary {
+
     /**
      * Returns the token corresponding to the given index.
      *
