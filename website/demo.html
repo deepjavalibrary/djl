@@ -135,7 +135,21 @@
                 <div class="row">
                     <h3 class="center">DJL Block Runner</h3>
                     <p class="center">Test the code, Download the template, Run it locally.</p>
-                    <div class="col s8 offset-s2 blue-grey darken-4">
+                    <ul class="col s10 offset-s1 collapsible">
+                        <li>
+                            <div class="collapsible-header"><i class="material-icons">filter_drama</i>Run Inference with DJL</div>
+                            <div class="collapsible-body">
+                                <script src="https://gist.github.com/lanking520/2eaaf3bba094b10aaffebd999bd4ae88.js"></script>
+                                <p>You can copy with the code snippet above to run inference with MXNet. You can also try to change the Model URL to run inference on PyTorch and TensorFlow:</p>
+                                <p>PyTorch: Please select <b>PyTorch</b> in the engine selection dropdown and uncomment the <b>second modelUrl</b>. </p>
+                                <p>TensorFlow: Please select <b>TensorFlow</b> in the engine selection dropdown and uncomment the <b>third modelUrl</b>. </p>
+                                <p>Use <b>Get Template</b> to test the code in your local machine.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="row">
+                    <div class="col s10 offset-s1 blue-grey darken-4">
                         <textarea id="editor"></textarea>
                     </div>
                 </div>
@@ -149,15 +163,15 @@
                     </div>
                     <div class="col s2">
                         <select class="browser-default" id="engine">
-                            <option value="mxnet" selected>MXNet</option>
-                            <option value="pytorch">PyTorch</option>
-                            <option value="tensorflow">TensorFlow</option>
+                            <option value="mxnet" selected>Engine: MXNet</option>
+                            <option value="pytorch">Engine: PyTorch</option>
+                            <option value="tensorflow">Engine: TensorFlow</option>
                         </select>
                     </div>
                 </div>
                 <div class="row">
-                    <p class="col s8 offset-s2">Output</p>
-                    <div class="col s8 offset-s2 blue-grey darken-4 z-depth-5">
+                    <p class="col s10 offset-s1">Output</p>
+                    <div class="col s10 offset-s1 blue-grey darken-4 z-depth-5">
                         <textarea id="result"></textarea>
                     </div>
                 </div>
