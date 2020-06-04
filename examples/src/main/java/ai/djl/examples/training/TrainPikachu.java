@@ -148,7 +148,7 @@ public final class TrainPikachu {
                 trainer -> {
                     TrainingResult result = trainer.getTrainingResult();
                     Model model = trainer.getModel();
-                    float accuracy = result.getValidateEvaluation("Accuracy");
+                    float accuracy = result.getValidateEvaluation("classAccuracy");
                     model.setProperty("ClassAccuracy", String.format("%.5f", accuracy));
                     model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
                 });
