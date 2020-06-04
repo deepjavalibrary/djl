@@ -12,7 +12,6 @@
  */
 package ai.djl.training;
 
-import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.training.dataset.Batch;
@@ -65,7 +64,7 @@ public final class EasyTrain {
             throw new IllegalArgumentException(
                     "The data must be on the same engine as the trainer. You may need to change one of your NDManagers.");
         }
-        Batch[] splits = batch.split(trainer.getDevices().stream().toArray(Device[]::new), false);
+        Batch[] splits = batch.split(trainer.getDevices(), false);
         BatchData batchData =
                 new BatchData(batch, new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
         try (GradientCollector collector = trainer.newGradientCollector()) {
@@ -102,7 +101,7 @@ public final class EasyTrain {
             throw new IllegalArgumentException(
                     "The data must be on the same engine as the trainer. You may need to change one of your NDManagers.");
         }
-        Batch[] splits = batch.split(trainer.getDevices().stream().toArray(Device[]::new), false);
+        Batch[] splits = batch.split(trainer.getDevices(), false);
         BatchData batchData =
                 new BatchData(batch, new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
         for (Batch split : splits) {

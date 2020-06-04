@@ -118,11 +118,11 @@ public class LoggingTrainingListener implements TrainingListener {
     @Override
     public void onTrainingBegin(Trainer trainer) {
         String devicesMsg;
-        List<Device> devices = trainer.getDevices();
-        if (devices.size() == 1 && Device.Type.CPU.equals(devices.get(0).getDeviceType())) {
+        Device[] devices = trainer.getDevices();
+        if (devices.length == 1 && Device.Type.CPU.equals(devices[0].getDeviceType())) {
             devicesMsg = Device.cpu().toString();
         } else {
-            devicesMsg = devices.size() + " GPUs";
+            devicesMsg = devices.length + " GPUs";
         }
         logger.info("Training on: {}.", devicesMsg);
 
