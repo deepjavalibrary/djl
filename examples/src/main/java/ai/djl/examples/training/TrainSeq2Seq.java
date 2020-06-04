@@ -43,12 +43,9 @@ import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.evaluator.Accuracy;
-import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.MaskedSoftmaxCrossEntropyLoss;
-import ai.djl.training.optimizer.Adam;
-import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.PaddingStackBatchifier;
 import java.io.IOException;
@@ -158,12 +155,6 @@ public final class TrainSeq2Seq {
 
         return new DefaultTrainingConfig(new MaskedSoftmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy("Accuracy", 0, 2))
-                .optInitializer(new XavierInitializer())
-                .optOptimizer(
-                        Adam.builder()
-                                .optLearningRateTracker(
-                                        LearningRateTracker.fixedLearningRate(0.005f))
-                                .build())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
                 .optDataManager(new Seq2SeqDataManager())
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))

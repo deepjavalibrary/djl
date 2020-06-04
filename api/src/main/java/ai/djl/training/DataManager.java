@@ -16,8 +16,8 @@ import ai.djl.ndarray.NDList;
 import ai.djl.training.dataset.Batch;
 
 /**
- * {@code DataManager} is an interface that is used primarily in the {@link Trainer} to manipulate
- * data from the dataset to be appropriate for the current model.
+ * {@code DataManager} is an class that is used primarily in the {@link Trainer} to manipulate data
+ * from the dataset to be appropriate for the current model.
  */
 public class DataManager {
     public static final DataManager DEFAULT_DATA_MANAGER = new DataManager();

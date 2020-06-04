@@ -17,6 +17,7 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicdataset.StanfordMovieReview;
+import ai.djl.basicdataset.utils.FixedBucketSampler;
 import ai.djl.basicdataset.utils.TextData;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.inference.Predictor;
@@ -28,7 +29,6 @@ import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
 import ai.djl.modality.nlp.preprocess.PunctuationSeparator;
 import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.modality.nlp.preprocess.TextProcessor;
-import ai.djl.modality.nlp.preprocess.TextTruncator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -69,14 +69,11 @@ import java.util.concurrent.Executors;
 import org.apache.commons.cli.ParseException;
 
 public final class TrainSentimentAnalysis {
-
-    private static final int PADDING_SIZE = 500;
     private static final List<TextProcessor> TEXT_PROCESSORS =
             Arrays.asList(
                     new SimpleTokenizer(),
                     new LowerCaseConvertor(Locale.ENGLISH),
-                    new PunctuationSeparator(),
-                    new TextTruncator(PADDING_SIZE));
+                    new PunctuationSeparator());
     private static int paddingTokenValue;
 
     private TrainSentimentAnalysis() {}
@@ -193,15 +190,14 @@ public final class TrainSentimentAnalysis {
             throws IOException {
         StanfordMovieReview stanfordMovieReview =
                 StanfordMovieReview.builder()
-                        .setSampling(arguments.getBatchSize(), true, false)
+                        .setSampling(new FixedBucketSampler(arguments.getBatchSize()))
                         .optDataBatchifier(
                                 PaddingStackBatchifier.builder()
                                         .optIncludeValidLengths(false)
                                         .addPad(
                                                 0,
                                                 0,
-                                                (m) -> m.ones(new Shape(1)).mul(paddingTokenValue),
-                                                PADDING_SIZE)
+                                                (m) -> m.ones(new Shape(1)).mul(paddingTokenValue))
                                         .build())
                         .setSourceConfiguration(
                                 new TextData.Configuration()

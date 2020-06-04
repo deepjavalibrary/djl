@@ -13,7 +13,6 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Application.NLP;
-import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -143,11 +142,7 @@ public class StanfordMovieReview extends TextDataset implements ZooDataset {
         prepareDataSentiment(usagePath.resolve("pos"), true, reviewTexts);
         prepareDataSentiment(usagePath.resolve("neg"), false, reviewTexts);
 
-        try {
-            preprocess(reviewTexts, true);
-        } catch (EmbeddingException e) {
-            throw new IOException(e.getMessage(), e);
-        }
+        preprocess(reviewTexts, true);
     }
 
     private void prepareDataSentiment(Path path, boolean sentiment, List<String> reviewTexts)

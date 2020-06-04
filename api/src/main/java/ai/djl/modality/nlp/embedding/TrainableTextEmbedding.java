@@ -33,7 +33,7 @@ public class TrainableTextEmbedding extends AbstractBlock implements TextEmbeddi
     private TrainableWordEmbedding trainableWordEmbedding;
 
     /**
-     * Constructs a {@link SimpleTextEmbedding}.
+     * Constructs a {@link TrainableTextEmbedding}.
      *
      * @param wordEmbedding the word embedding to embed each word
      */
