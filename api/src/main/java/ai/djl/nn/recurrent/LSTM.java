@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
@@ -125,7 +126,7 @@ public class LSTM extends RecurrentBlock {
         validateInputSize(inputs);
         long batchSize = inputs.head().getShape().get(0);
         inputs = updateInputLayoutToTNC(inputs);
-        NDArray head = inputs.head();
+        NDArray head = inputs.singletonOrThrow();
         Device device = head.getDevice();
 
         NDList result = new NDList(head);
@@ -143,8 +144,9 @@ public class LSTM extends RecurrentBlock {
             result.add(beginState);
             result.add(beginStateCell);
         } else {
-            result.add(inputs.head().getManager().zeros(stateShape));
-            result.add(inputs.head().getManager().zeros(stateShape));
+            // TODO manager creates the NDArray with the wrong device
+            result.add(head.getManager().zeros(stateShape, DataType.FLOAT32, device));
+            result.add(head.getManager().zeros(stateShape, DataType.FLOAT32, device));
         }
         if (useSequenceLength) {
             result.add(inputs.get(1));
