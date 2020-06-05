@@ -289,8 +289,8 @@ public final class JniUtils {
         }
         return ndArray.getManager()
                 .create(
-                        PyTorchLibrary.LIB.torchIndexSelect(
-                                ndArray.getHandle(), index.getHandle(), dim));
+                        PyTorchLibrary.LIB.torchGather(
+                                ndArray.getHandle(), index.getHandle(), dim, false));
     }
 
     public static PtNDArray where(PtNDArray condition, PtNDArray self, PtNDArray other) {

@@ -120,12 +120,12 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSlice(
   API_END();
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexSelect(
-  JNIEnv* env, jobject jthis, jobject jhandle, jobject jindex_handle, jlong dim) {
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGather(
+  JNIEnv* env, jobject jthis, jobject jhandle, jobject jindex_handle, jlong dim, jboolean sparse_grad) {
   API_BEGIN();
     const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
     const auto* index_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jindex_handle);
-    const auto* result_ptr = new torch::Tensor(tensor_ptr->index_select(dim, *index_ptr));
+    const auto* result_ptr = new torch::Tensor(tensor_ptr->gather(dim, *index_ptr, sparse_grad));
     return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }

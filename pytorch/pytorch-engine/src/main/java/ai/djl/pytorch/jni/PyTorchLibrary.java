@@ -169,7 +169,7 @@ final class PyTorchLibrary {
 
     native Pointer torchSlice(Pointer handle, long dim, long start, long end, long step);
 
-    native Pointer torchIndexSelect(Pointer handle, Pointer indexHandle, long dim);
+    native Pointer torchGather(Pointer handle, Pointer index, long dim, boolean sparseGrad);
 
     native Pointer torchMaskedSelect(Pointer handle, Pointer maskHandle);
 
