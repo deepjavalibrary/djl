@@ -279,6 +279,27 @@ public final class JniUtils {
                 ndArray.getHandle(), value.getHandle(), minIndices, maxIndices, stepIndices);
     }
 
+    public static void set(PtNDArray self, PtNDArray other) {
+        PyTorchLibrary.LIB.torchSet(self.getHandle(), other.getHandle());
+    }
+
+    public static PtNDArray pick(PtNDArray ndArray, PtNDArray index, long dim) {
+        if (index.getDataType() != DataType.INT64) {
+            index = index.toType(DataType.INT64, true);
+        }
+        return ndArray.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchGather(
+                                ndArray.getHandle(), index.getHandle(), dim, false));
+    }
+
+    public static PtNDArray where(PtNDArray condition, PtNDArray self, PtNDArray other) {
+        return self.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchWhere(
+                                condition.getHandle(), self.getHandle(), other.getHandle()));
+    }
+
     public static PtNDArray booleanMask(PtNDArray ndArray, PtNDArray indicesNd) {
         return ndArray.getManager()
                 .create(
@@ -976,8 +997,10 @@ public final class JniUtils {
         return ndArray.getManager().create(PyTorchLibrary.LIB.torchGrad(ndArray.getHandle()));
     }
 
-    public static void backward(PtNDArray ndArray, boolean keepGraph, boolean createGraph) {
-        PyTorchLibrary.LIB.torchBackward(ndArray.getHandle(), keepGraph, createGraph);
+    public static void backward(
+            PtNDArray ndArray, PtNDArray gradNd, boolean keepGraph, boolean createGraph) {
+        PyTorchLibrary.LIB.torchBackward(
+                ndArray.getHandle(), gradNd.getHandle(), keepGraph, createGraph);
     }
 
     public static void deleteModule(Pointer pointer) {
@@ -1001,5 +1024,51 @@ public final class JniUtils {
 
     public static void enableTrainingMode(PtSymbolBlock block) {
         PyTorchLibrary.LIB.moduleTrain(block.getHandle());
+    }
+
+    public static void adamUpdate(
+            PtNDArray weight,
+            PtNDArray grad,
+            PtNDArray mean,
+            PtNDArray variance,
+            float lr,
+            float wd,
+            float rescaleGrad,
+            float clipGrad,
+            float beta1,
+            float beta2,
+            float eps) {
+        PyTorchLibrary.LIB.adamUpdate(
+                weight.getHandle(),
+                grad.getHandle(),
+                mean.getHandle(),
+                variance.getHandle(),
+                lr,
+                wd,
+                rescaleGrad,
+                clipGrad,
+                beta1,
+                beta2,
+                eps);
+    }
+
+    public static void sgdUpdate(
+            PtNDArray weight,
+            PtNDArray grad,
+            PtNDArray state,
+            float lr,
+            float wd,
+            float rescaleGrad,
+            float clipGrad,
+            float momentum) {
+        PyTorchLibrary.LIB.sgdUpdate(
+                weight.getHandle(),
+                grad.getHandle(),
+                (state == null) ? null : state.getHandle(),
+                lr,
+                wd,
+                rescaleGrad,
+                clipGrad,
+                momentum);
     }
 }

@@ -39,6 +39,7 @@ import java.io.DataOutputStream;
 public class PtSymbolBlock extends NativeResource implements SymbolBlock {
 
     private PtNDManager manager;
+    private boolean isTrain;
 
     /**
      * Constructs a {@code PtSymbolBlock}.
@@ -53,8 +54,8 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
         super(handle);
         this.manager = manager;
         manager.attach(getUid(), this);
-        // Set for inference mode by default
-        JniUtils.enableInferenceMode(this);
+        // training mode is on by default
+        isTrain = true;
     }
 
     /** {@inheritDoc} */
@@ -82,6 +83,14 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
             boolean training,
             PairList<String, Object> params) {
         // TODO refactor the forward to not take ParameterStore
+        if (isTrain != training) {
+            isTrain = training;
+            if (isTrain) {
+                JniUtils.enableTrainingMode(this);
+            } else {
+                JniUtils.enableInferenceMode(this);
+            }
+        }
         return IValueUtils.forward(this, inputs, training);
     }
 
@@ -100,7 +109,7 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
     /** {@inheritDoc} */
     @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        return new Shape[0];
+        throw new UnsupportedOperationException("Not supported for PyTorch");
     }
 
     /** {@inheritDoc} */

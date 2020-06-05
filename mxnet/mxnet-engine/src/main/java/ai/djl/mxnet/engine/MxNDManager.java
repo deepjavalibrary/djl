@@ -308,16 +308,6 @@ public class MxNDManager extends BaseNDManager {
      * @throws EngineException if operation failed in native engine
      */
     public NDArray invoke(String operation, NDArray[] src, PairList<String, ?> params) {
-        // check if all the NDArrays are in the same device
-        if (src.length > 1) {
-            Device device = src[0].getDevice();
-            for (int i = 1; i < src.length; ++i) {
-                if (!device.equals(src[i].getDevice())) {
-                    throw new IllegalArgumentException(
-                            "Please make sure all the NDArrays are in the same device. You can call toDevice() to move the NDArray to the desired Device.");
-                }
-            }
-        }
         return JnaUtils.op(operation).invoke(this, src, params)[0];
     }
 

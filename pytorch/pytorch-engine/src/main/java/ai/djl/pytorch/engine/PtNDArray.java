@@ -136,13 +136,18 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void attachGradient() {
-        JniUtils.attachGradient(this);
+        attachGradient(null);
     }
 
     /** {@inheritDoc} */
     @Override
     public void attachGradient(SparseFormat sparseFormat) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (sparseFormat == null || sparseFormat.equals(SparseFormat.DENSE)) {
+            JniUtils.attachGradient(this);
+        } else {
+            throw new UnsupportedOperationException(
+                    "Sparse NDArray gradient atttach not supported");
+        }
     }
 
     /** {@inheritDoc} */
@@ -164,7 +169,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
-        throw new UnsupportedOperationException("Not implemented");
+        PtNDArray other = getManager().create(data, getShape(), getDataType());
+        JniUtils.set(this, other);
+        other.close();
     }
 
     /** {@inheritDoc} */

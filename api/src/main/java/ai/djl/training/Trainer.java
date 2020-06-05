@@ -29,7 +29,6 @@ import ai.djl.training.listener.EvaluatorTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
@@ -196,8 +195,8 @@ public class Trainer implements AutoCloseable {
      *
      * @return the devices used for training
      */
-    public List<Device> getDevices() {
-        return Arrays.asList(devices);
+    public Device[] getDevices() {
+        return devices;
     }
 
     /**

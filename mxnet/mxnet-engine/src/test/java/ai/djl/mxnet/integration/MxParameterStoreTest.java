@@ -114,7 +114,9 @@ public class MxParameterStoreTest {
         /** {@inheritDoc} */
         @Override
         public void update(String parameterId, NDArray weight, NDArray grad) {
-            weight.addi(grad.mul(learningRateTracker.getNewLearningRate(0)));
+            weight.addi(
+                    grad.mul(learningRateTracker.getNewLearningRate(0))
+                            .toDevice(weight.getDevice(), false));
             updateCount++;
         }
 

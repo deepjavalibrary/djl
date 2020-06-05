@@ -21,6 +21,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
+import ai.djl.training.initializer.Initializer;
 import ai.djl.translate.Translator;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -76,7 +77,14 @@ public class PtModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
-        throw new UnsupportedOperationException("Not implemented");
+        Initializer initializer = trainingConfig.getInitializer();
+        if (block == null) {
+            throw new IllegalStateException(
+                    "You must set a block for the model before creating a new trainer");
+        }
+        block.setInitializer(initializer);
+
+        return new Trainer(this, trainingConfig);
     }
 
     /** {@inheritDoc} */

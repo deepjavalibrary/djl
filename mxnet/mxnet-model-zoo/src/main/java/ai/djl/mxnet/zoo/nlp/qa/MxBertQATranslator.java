@@ -13,15 +13,16 @@
 package ai.djl.mxnet.zoo.nlp.qa;
 
 import ai.djl.Model;
+import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.bert.BertToken;
 import ai.djl.modality.nlp.bert.BertTokenizer;
-import ai.djl.modality.nlp.bert.BertVocabulary;
 import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.modality.nlp.translator.QATranslator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Utils;
 import java.io.IOException;
@@ -34,8 +35,9 @@ import java.util.stream.Collectors;
  * @see BertQAModelLoader
  */
 public class MxBertQATranslator extends QATranslator {
+
     private List<String> tokens;
-    private BertVocabulary vocabulary;
+    private Vocabulary vocabulary;
     private BertTokenizer tokenizer;
     private int seqLength;
 
@@ -48,6 +50,12 @@ public class MxBertQATranslator extends QATranslator {
     public void prepare(NDManager manager, Model model) throws IOException {
         vocabulary = model.getArtifact("vocab.json", MxBertVocabulary::parse);
         tokenizer = new BertTokenizer();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Batchifier getBatchifier() {
+        return null;
     }
 
     /** {@inheritDoc} */

@@ -95,6 +95,17 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTrueDividei(
   self_ptr->div_(*other_ptr);
 }
 
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchWhere(
+  JNIEnv* env, jobject jthis, jobject jcondition, jobject jself, jobject jother) {
+  API_BEGIN();
+  const auto* condition_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jcondition);
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(torch::where(*condition_ptr, *self_ptr, *other_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRemainder(
     JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
   API_BEGIN();

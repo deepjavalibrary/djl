@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <br>
  * \( m = beta1 * m + (1 - beta1) * grad\)<br>
  * \( v = beta2 * v + (1 - beta2) * grad^2 \)<br>
- * \( w += - learning_rate * m / (sqrt(v) + epsilon) \)<br>
+ * \( w -= learning_rate * m / (sqrt(v) + epsilon) \)<br>
  * <br>
  * where g represents the gradient, and m/v are 1st and 2nd order moment estimates (mean and
  * variance).

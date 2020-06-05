@@ -12,15 +12,19 @@
  */
 package ai.djl.mxnet.jna;
 
+import ai.djl.Device;
 import ai.djl.mxnet.engine.MxNDArray;
 import ai.djl.mxnet.engine.MxNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.training.Trainer;
 import ai.djl.util.PairList;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A FunctionInfo represents an operator (ie function) within the MXNet Engine. */
 public class FunctionInfo {
@@ -28,6 +32,8 @@ public class FunctionInfo {
     private Pointer handle;
     private String name;
     private PairList<String, String> arguments;
+
+    private static final Logger logger = LoggerFactory.getLogger(Trainer.class);
 
     FunctionInfo(Pointer pointer, String functionName, PairList<String, String> arguments) {
         this.handle = pointer;
@@ -47,6 +53,8 @@ public class FunctionInfo {
      */
     public int invoke(
             NDManager manager, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
+        checkDevices(src);
+        checkDevices(dest);
         PointerArray srcHandles = JnaUtils.toPointerArray(src);
         PointerByReference destRef = new PointerByReference(JnaUtils.toPointerArray(dest));
         return JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params).size();
@@ -62,6 +70,7 @@ public class FunctionInfo {
      * @return the error code or zero for no errors
      */
     public NDArray[] invoke(NDManager manager, NDArray[] src, PairList<String, ?> params) {
+        checkDevices(src);
         PointerArray srcHandles = JnaUtils.toPointerArray(src);
         return invoke((MxNDManager) manager, srcHandles, params);
     }
@@ -116,5 +125,18 @@ public class FunctionInfo {
      */
     public List<String> getArgumentTypes() {
         return arguments.values();
+    }
+
+    private void checkDevices(NDArray[] src) {
+        // check if all the NDArrays are in the same device
+        if (logger.isDebugEnabled() && src.length > 1) {
+            Device device = src[0].getDevice();
+            for (int i = 1; i < src.length; ++i) {
+                if (!device.equals(src[i].getDevice())) {
+                    logger.warn(
+                            "Please make sure all the NDArrays are in the same device. You can call toDevice() to move the NDArray to the desired Device.");
+                }
+            }
+        }
     }
 }
