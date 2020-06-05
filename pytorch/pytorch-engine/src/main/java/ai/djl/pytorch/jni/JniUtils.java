@@ -284,6 +284,28 @@ public final class JniUtils {
     }
 
     public static PtNDArray pick(PtNDArray ndArray, PtNDArray index, long dim) {
+        Shape indexShape = index.getShape();
+        Shape ndShape = ndArray.getShape();
+        int shapeDims = indexShape.dimension();
+        int ndDims = ndShape.dimension();
+        if (shapeDims != ndDims) {
+            for (int i = 0; i < ndDims - shapeDims; ++i) {
+                if (indexShape.equals(ndShape.slice(i, shapeDims))) {
+                    long[] shapes = indexShape.getShape();
+                    long[] newShape = new long[ndDims];
+                    Arrays.fill(newShape, 0, i, 1L);
+                    Arrays.fill(newShape, i, i + shapes.length, shapes[i]);
+                    Arrays.fill(newShape, i + shapes.length, ndDims, 1L);
+                    indexShape = new Shape(newShape);
+                    break;
+                }
+            }
+            if (indexShape.equals(index.getShape())) {
+                throw new IllegalArgumentException(
+                        "expand shape failed! Cannot expand from " + indexShape + "to " + ndShape);
+            }
+            index = index.reshape(indexShape);
+        }
         if (index.getDataType() != DataType.INT64) {
             index = index.toType(DataType.INT64, true);
         }
