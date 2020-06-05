@@ -96,11 +96,11 @@ public final class TrainPikachu {
 
     public static int predict(String outputDir, String imageFile)
             throws IOException, MalformedModelException, TranslateException {
-        try (Model model = Model.newInstance("predModel")) {
+        try (Model model = Model.newInstance("pikachu-ssd")) {
             float detectionThreshold = 0.6f;
             // load parameters back to original training block
             model.setBlock(getSsdTrainBlock());
-            model.load(Paths.get(outputDir), "ssd");
+            model.load(Paths.get(outputDir), "pikachu-ssd");
             // append prediction logic at end of training block with parameter loaded
             Block ssdTrain = model.getBlock();
             model.setBlock(getSsdPredictBlock(ssdTrain));
