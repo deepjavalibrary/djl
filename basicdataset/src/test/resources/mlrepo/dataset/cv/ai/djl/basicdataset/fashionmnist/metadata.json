@@ -5,11 +5,11 @@
   "type": "cv",
   "name": "FashMNIST",
   "description": "FashMNIST",
-  "website": "http://www.djl.ai/basicdataset",
+  "website": "https://github.com/zalandoresearch/fashion-mnist",
   "licenses": {
     "license": {
-      "name": "The Apache License, Version 2.0",
-      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+      "name": "MIT",
+      "url": "https://github.com/zalandoresearch/fashion-mnist/blob/master/LICENSE"
     }
   },
   "artifacts": [

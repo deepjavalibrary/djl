@@ -22,17 +22,16 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.dataset.PreparedDataset;
+import ai.djl.repository.dataset.ZooDataset;
 import ai.djl.training.dataset.ArrayDataset;
 import ai.djl.translate.Pipeline;
-import ai.djl.util.Progress;
 import ai.djl.util.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-public final class FashionMnist extends ArrayDataset implements PreparedDataset {
+public final class FashionMnist extends ArrayDataset implements ZooDataset {
 
     public static final int IMAGE_WIDTH = 28;
     public static final int IMAGE_HEIGHT = 28;
@@ -98,7 +97,7 @@ public final class FashionMnist extends ArrayDataset implements PreparedDataset 
     }
 
     @Override
-    public void prepare() throws IOException {
+    public void prepareData(Usage usage) throws IOException {
         Map<String, Artifact.Item> map = artifact.getFiles();
         Artifact.Item imageItem;
         Artifact.Item labelItem;
@@ -121,8 +120,26 @@ public final class FashionMnist extends ArrayDataset implements PreparedDataset 
     }
 
     @Override
-    public void prepare(Progress progress) throws IOException {
-
+    public void prepare() throws IOException {
+        Map<String, Artifact.Item> map = artifact.getFiles();
+        Artifact.Item imageItem;
+        Artifact.Item labelItem;
+        System.out.println(map);
+        switch (usage) {
+            case TRAIN:
+                imageItem = map.get("train_data");
+                labelItem = map.get("train_labels");
+                break;
+            case TEST:
+                imageItem = map.get("test_data");
+                labelItem = map.get("test_labels");
+                break;
+            case VALIDATION:
+            default:
+                throw new UnsupportedOperationException("Validation data not available.");
+        }
+        labels = new NDArray[]{readLabel(labelItem)};
+        data = new NDArray[]{readData(imageItem, labels[0].size())};
     }
 
     private NDArray readData(Artifact.Item item, long length) throws IOException {
