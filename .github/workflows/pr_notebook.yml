@@ -13,12 +13,12 @@ jobs:
           java-version: 11
       - uses: actions/checkout@v2
       - name: Set up Python3
-      - uses: actions/setup-python@v2
+        uses: actions/setup-python@v2
         with:
           python-version: 3.7
       - name: Install IJava kernel
         run: |
-          pip3 install -y jupyter
+          pip3 install jupyter
           git clone https://github.com/frankfliu/IJava.git
           cd IJava/
           ./gradlew installKernel
