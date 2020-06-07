@@ -313,6 +313,7 @@ public class MockNDArrayEx implements NDArrayEx {
             NDList inputs,
             float probability,
             int[] sharedAxes,
+            boolean training,
             PairList<String, Object> additional) {
         return null;
     }

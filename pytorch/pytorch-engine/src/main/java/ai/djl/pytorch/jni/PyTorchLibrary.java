@@ -334,6 +334,8 @@ final class PyTorchLibrary {
             int numGroup,
             boolean bias);
 
+    native Pointer torchNNDropout(Pointer inputHandle, double probability, boolean isTrain);
+
     native Pointer torchNNBatchNorm(
             Pointer inputHandle,
             Pointer weigthHandle,

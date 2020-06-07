@@ -531,6 +531,7 @@ class MxNDArrayEx implements NDArrayEx {
             NDList inputs,
             float probability,
             int[] sharedAxes,
+            boolean training,
             PairList<String, Object> additional) {
         MxOpParams params = new MxOpParams();
         params.addParam("p", probability);

@@ -159,3 +159,12 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAdaptive
     return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNDropout(
+  JNIEnv *env, jobject jthis, jobject jhandle, jdouble probability, jboolean isTraining) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    const auto* result_ptr = new torch::Tensor(torch::dropout(*tensor_ptr, probability, isTraining));
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}

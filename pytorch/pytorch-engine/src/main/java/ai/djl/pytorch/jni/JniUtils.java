@@ -889,6 +889,11 @@ public final class JniUtils {
                                 eps));
     }
 
+    public static PtNDArray dropout(PtNDArray ndArray, double prob, boolean isTraining) {
+        return ndArray.getManager()
+                .create(PyTorchLibrary.LIB.torchNNDropout(ndArray.getHandle(), prob, isTraining));
+    }
+
     public static PtNDArray avgPool(
             PtNDArray ndArray,
             Shape kernel,

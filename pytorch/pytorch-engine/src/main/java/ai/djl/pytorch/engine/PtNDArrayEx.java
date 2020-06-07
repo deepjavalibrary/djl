@@ -381,8 +381,13 @@ public class PtNDArrayEx implements NDArrayEx {
             NDList inputs,
             float probability,
             int[] sharedAxes,
+            boolean training,
             PairList<String, Object> additional) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (sharedAxes.length != 0) {
+            throw new UnsupportedOperationException("sharedAxes not supported");
+        }
+        return new NDList(
+                JniUtils.dropout((PtNDArray) inputs.singletonOrThrow(), probability, training));
     }
 
     /** {@inheritDoc} */
