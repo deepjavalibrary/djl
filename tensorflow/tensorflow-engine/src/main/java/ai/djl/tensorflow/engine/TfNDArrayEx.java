@@ -354,6 +354,7 @@ public class TfNDArrayEx implements NDArrayEx {
             int axis,
             boolean center,
             boolean scale,
+            boolean training,
             PairList<String, Object> additional) {
         throw new UnsupportedOperationException("Not implemented");
     }

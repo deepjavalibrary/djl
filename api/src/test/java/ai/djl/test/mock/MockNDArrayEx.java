@@ -326,6 +326,7 @@ public class MockNDArrayEx implements NDArrayEx {
             int axis,
             boolean center,
             boolean scale,
+            boolean training,
             PairList<String, Object> additional) {
         return null;
     }

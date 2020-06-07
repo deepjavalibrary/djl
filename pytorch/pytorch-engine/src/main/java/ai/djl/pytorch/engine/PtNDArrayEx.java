@@ -394,8 +394,8 @@ public class PtNDArrayEx implements NDArrayEx {
             int axis,
             boolean center,
             boolean scale,
+            boolean training,
             PairList<String, Object> additional) {
-        // TODO: modify for training model
         // TODO: axis center and scale are not used
         return new NDList(
                 JniUtils.batchNorm(
@@ -404,7 +404,7 @@ public class PtNDArrayEx implements NDArrayEx {
                         (PtNDArray) inputs.get(2),
                         (PtNDArray) inputs.get(3),
                         (PtNDArray) inputs.get(4),
-                        false,
+                        training,
                         momentum,
                         epsilon));
     }
