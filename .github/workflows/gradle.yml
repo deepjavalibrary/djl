@@ -1,6 +1,22 @@
 name: continuous build
 
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - "**.ipynb"
+      - "**.json"
+      - "**.html"
+      - "**.js"
+      - "**.css"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+      - "**.ipynb"
+      - "**.json"
+      - "**.html"
+      - "**.js"
+      - "**.css"
 
 jobs:
   build:
@@ -22,6 +38,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: check disk space
+        run: df -h
       - name: Build with Gradle
         run: ./gradlew build jRR
       - name: API test results

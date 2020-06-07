@@ -27,6 +27,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: check disk space
+        run: df -h
       - name: Build with Gradle
         run: ./gradlew build
       - name: Publish to staging repository

@@ -1,6 +1,12 @@
 name: D2L book Notebook integration tests
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - "jupyter/d2l-java/**"
+  pull_request:
+    paths:
+      - "jupyter/d2l-java/**"
 
 jobs:
   build:
