@@ -14,7 +14,7 @@ function run_test {
 mkdir test_output
 
 if [[ $# -eq 0 ]]; then
-    for f in {**,.}/*.ipynb
+    for f in **/*.ipynb
     do
         run_test "$f"
     done
