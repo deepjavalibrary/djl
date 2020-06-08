@@ -31,6 +31,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+/**
+ * FashMnist is a dataset from Zalando article images https://github.com/zalandoresearch/fashion-mnist.
+ *
+ * <p>Each sample is an image (in 3-D NDArray) with shape (28, 28, 1).
+ */
 public final class FashionMnist extends ArrayDataset implements ZooDataset {
 
     public static final int IMAGE_WIDTH = 28;
@@ -39,10 +44,10 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
 
     private static final String ARTIFACT_ID = "fashmnist";
 
-    private NDManager manager;
-    private Repository repository;
+    private final NDManager manager;
+    private final Repository repository;
+    private final Usage usage;
     private Artifact artifact;
-    private Usage usage;
     private boolean prepared;
 
     /**
@@ -50,7 +55,7 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
      *
      * @param builder a builder with the required arguments
      */
-    private FashionMnist(FashionMnist.Builder builder){
+    private FashionMnist(FashionMnist.Builder builder) {
         super(builder);
         this.manager = builder.manager;
         this.repository = builder.repository;
@@ -62,46 +67,11 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
         return new FashionMnist.Builder();
     }
 
-    public MRL getMrl() {
-        return MRL.dataset(Application.CV.IMAGE_CLASSIFICATION, BasicDatasets.GROUP_ID, ARTIFACT_ID);
-    }
-
-    /** {@inheritDoc} */
-    public Repository getRepository() {
-        return repository;
-    }
-
-    /** {@inheritDoc} */
-    public Artifact getArtifact() {
-        return artifact;
-    }
-
-    /** {@inheritDoc} */
-    public Usage getUsage() {
-        return usage;
-    }
-
-    /** {@inheritDoc} */
-    public boolean isPrepared() {
-        return prepared;
-    }
-
-    /** {@inheritDoc} */
-    public void setPrepared(boolean prepared) {
-        this.prepared = prepared;
-    }
-
-    /** {@inheritDoc} */
-    public void useDefaultArtifact() throws IOException {
-        artifact = repository.resolve(getMrl(), "1.0", null);
-    }
-
     @Override
     public void prepareData(Usage usage) throws IOException {
         Map<String, Artifact.Item> map = artifact.getFiles();
         Artifact.Item imageItem;
         Artifact.Item labelItem;
-        System.out.println(map);
         switch (usage) {
             case TRAIN:
                 imageItem = map.get("train_data");
@@ -115,29 +85,7 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
             default:
                 throw new UnsupportedOperationException("Validation data not available.");
         }
-        labels = new NDArray[]{readLabel(labelItem)};
-        data = new NDArray[]{readData(imageItem, labels[0].size())};
-    }
 
-    @Override
-    public void prepare() throws IOException {
-        Map<String, Artifact.Item> map = artifact.getFiles();
-        Artifact.Item imageItem;
-        Artifact.Item labelItem;
-        System.out.println(map);
-        switch (usage) {
-            case TRAIN:
-                imageItem = map.get("train_data");
-                labelItem = map.get("train_labels");
-                break;
-            case TEST:
-                imageItem = map.get("test_data");
-                labelItem = map.get("test_labels");
-                break;
-            case VALIDATION:
-            default:
-                throw new UnsupportedOperationException("Validation data not available.");
-        }
         labels = new NDArray[]{readLabel(labelItem)};
         data = new NDArray[]{readData(imageItem, labels[0].size())};
     }
@@ -149,7 +97,7 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
             }
 
             byte[] buf = Utils.toByteArray(is);
-            try (NDArray array = manager.create(new Shape(length, 28, 28, 1), DataType.UINT8)) {
+            try (NDArray array = manager.create(new Shape(length, IMAGE_WIDTH, IMAGE_HEIGHT, 1), DataType.UINT8)) {
                 array.set(buf);
                 return array.toType(DataType.FLOAT32, false);
             }
@@ -170,8 +118,54 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
         }
     }
 
+    public MRL getMrl() {
+        return MRL.dataset(Application.CV.IMAGE_CLASSIFICATION, BasicDatasets.GROUP_ID, ARTIFACT_ID);
+    }
+
     /**
-     * A builder for a {@link Mnist}.
+     * {@inheritDoc}
+     */
+    public Repository getRepository() {
+        return repository;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Artifact getArtifact() {
+        return artifact;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Usage getUsage() {
+        return usage;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isPrepared() {
+        return prepared;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setPrepared(boolean prepared) {
+        this.prepared = prepared;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void useDefaultArtifact() throws IOException {
+        artifact = repository.resolve(getMrl(), "1.0", null);
+    }
+
+    /**
+     * A builder for a {@link FashionMnist}.
      */
     public static final class Builder extends BaseBuilder<FashionMnist.Builder> {
 

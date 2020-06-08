@@ -3,9 +3,7 @@ package ai.djl.basicdataset;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.Repository;
-import ai.djl.repository.SimpleUrlRepository;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -43,6 +41,34 @@ public class FashionMnistTest {
             fashionMnist.prepare();
             try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(fashionMnist)) {
+                    Assert.assertEquals(batch.getData().size(), 1);
+                    Assert.assertEquals(batch.getLabels().size(), 1);
+                    batch.close();
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testFashMnistRemote() throws IOException {
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optInitializer(Initializer.ONES);
+
+        try (Model model = Model.newInstance("model")) {
+            model.setBlock(Blocks.identityBlock());
+
+            NDManager manager = model.getNDManager();
+            Mnist mnist =
+                    Mnist.builder()
+                            .optManager(manager)
+                            .optUsage(Dataset.Usage.TEST)
+                            .setSampling(32, true)
+                            .build();
+
+            mnist.prepare();
+            try (Trainer trainer = model.newTrainer(config)) {
+                for (Batch batch : trainer.iterateDataset(mnist)) {
                     Assert.assertEquals(batch.getData().size(), 1);
                     Assert.assertEquals(batch.getLabels().size(), 1);
                     batch.close();
