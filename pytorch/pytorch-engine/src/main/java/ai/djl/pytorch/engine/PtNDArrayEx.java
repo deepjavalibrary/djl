@@ -386,8 +386,9 @@ public class PtNDArrayEx implements NDArrayEx {
         if (sharedAxes.length != 0) {
             throw new UnsupportedOperationException("sharedAxes not supported");
         }
+        // FIXME: Hardcode training to false to workaround unexpected behavior in PyTorch
         return new NDList(
-                JniUtils.dropout((PtNDArray) inputs.singletonOrThrow(), probability, training));
+                JniUtils.dropout((PtNDArray) inputs.singletonOrThrow(), probability, false));
     }
 
     /** {@inheritDoc} */
@@ -402,6 +403,7 @@ public class PtNDArrayEx implements NDArrayEx {
             boolean training,
             PairList<String, Object> additional) {
         // TODO: axis center and scale are not used
+        // FIXME: Hardcode training to false to workaround unexpected behavior in PyTorch
         return new NDList(
                 JniUtils.batchNorm(
                         (PtNDArray) inputs.get(0),
@@ -409,7 +411,7 @@ public class PtNDArrayEx implements NDArrayEx {
                         (PtNDArray) inputs.get(2),
                         (PtNDArray) inputs.get(3),
                         (PtNDArray) inputs.get(4),
-                        training,
+                        false,
                         momentum,
                         epsilon));
     }
