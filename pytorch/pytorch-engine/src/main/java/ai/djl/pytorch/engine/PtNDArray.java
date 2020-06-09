@@ -16,7 +16,6 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.NDUtils;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.index.NDIndexBooleans;
 import ai.djl.ndarray.index.NDIndexElement;
@@ -35,7 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -1012,28 +1010,14 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray softmax(int[] axes, float temperature) {
-        if (temperature != 1.0) {
-            throw new UnsupportedOperationException("PyTorch softmax didn't support temperature");
-        }
-        if (axes.length > 1) {
-            throw new UnsupportedOperationException(
-                    "PyTorch softmax didn't support multiple dimension");
-        }
-        return JniUtils.softmax(this, axes[0], getDataType());
+    public PtNDArray softmax(int axis) {
+        return JniUtils.softmax(this, axis, getDataType());
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray logSoftmax(int[] axes, float temperature) {
-        if (temperature != 1.0) {
-            throw new UnsupportedOperationException("PyTorch softmax didn't support temperature");
-        }
-        if (axes.length > 1) {
-            throw new UnsupportedOperationException(
-                    "PyTorch softmax didn't support multiple dimension");
-        }
-        return JniUtils.logSoftmax(this, axes[0], getDataType());
+    public PtNDArray logSoftmax(int axis) {
+        return JniUtils.logSoftmax(this, axis, getDataType());
     }
 
     /** {@inheritDoc} */
@@ -1065,18 +1049,6 @@ public class PtNDArray extends NativeResource implements NDArray {
     @Override
     public PtNDArray isNaN() {
         return JniUtils.isNaN(this);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray createMask(NDIndex index) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray createMask(Predicate<Number> predicate) {
-        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -1218,10 +1190,6 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray argMax(int axis) {
-        if (isEmpty()) {
-            Shape newShape = NDUtils.getShapeFromEmptyNDArrayForReductionOp(getShape(), axis);
-            return manager.create(newShape, DataType.INT64);
-        }
         // TODO pytorch bug: https://github.com/pytorch/pytorch/issues/37084
         if (isScalar()) {
             return (PtNDArray) manager.create(0L);
@@ -1241,10 +1209,6 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray argMin(int axis) {
-        if (isEmpty()) {
-            Shape newShape = NDUtils.getShapeFromEmptyNDArrayForReductionOp(getShape(), axis);
-            return manager.create(newShape, DataType.INT64);
-        }
         // TODO pytorch bug: https://github.com/pytorch/pytorch/issues/37084
         if (isScalar()) {
             return (PtNDArray) manager.create(0L);

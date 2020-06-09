@@ -27,7 +27,6 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.Arrays;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
@@ -3456,48 +3455,9 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis along which to apply
      * @return the result {@code NDArray}
      * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
-     * @see NDArray#softmax(int[], float)
+     * @see NDArray#softmax(int)
      */
-    default NDArray softmax(int axis) {
-        return softmax(new int[] {axis}, 1);
-    }
-
-    /**
-     * Applies the softmax function along the given axis.
-     *
-     * @param axis the axis along which to apply
-     * @param temperature the exponent multiplier Beta in the softmax
-     * @return the result {@code NDArray}
-     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
-     * @see NDArray#softmax(int[], float)
-     */
-    default NDArray softmax(int axis, float temperature) {
-        return softmax(new int[] {axis}, temperature);
-    }
-
-    /**
-     * Applies the softmax function along the given axes.
-     *
-     * @param axes the axes along which to apply. An empty array indicates computing the softmax for
-     *     the whole array.
-     * @return the result {@code NDArray}
-     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
-     */
-    default NDArray softmax(int[] axes) {
-        return softmax(axes, 1f);
-    }
-
-    /**
-     * Applies the softmax function along the given axes.
-     *
-     * @param axes the axes to compute the softmax of. An empty array indicates computing the
-     *     softmax for the whole array.
-     * @param temperature the exponent multiplier Beta in the softmax
-     * @return the result {@code NDArray}
-     * @see <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>
-     * @see NDArray#softmax(int[], float)
-     */
-    NDArray softmax(int[] axes, float temperature);
+    NDArray softmax(int axis);
 
     /**
      * Applies the softmax function followed by a logarithm.
@@ -3508,50 +3468,7 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis along which to apply
      * @return the result {@code NDArray}
      */
-    default NDArray logSoftmax(int axis) {
-        return logSoftmax(new int[] {axis}, 1);
-    }
-
-    /**
-     * Applies the softmax function followed by a logarithm.
-     *
-     * <p>Mathematically equivalent to calling softmax and then log. This single operator is faster
-     * than calling two operators and numerically more stable when computing gradients.
-     *
-     * @param axis the axis along which to apply
-     * @param temperature the exponent multiplier Beta in the softmax
-     * @return the result {@code NDArray}
-     */
-    default NDArray logSoftmax(int axis, float temperature) {
-        return logSoftmax(new int[] {axis}, temperature);
-    }
-
-    /**
-     * Applies the softmax function followed by a logarithm.
-     *
-     * <p>Mathematically equivalent to calling softmax and then log. This single operator is faster
-     * than calling two operators and numerically more stable when computing gradients.
-     *
-     * @param axes the axes along which to apply. An empty array indicates computing the softmax for
-     *     the whole array.
-     * @return the result {@code NDArray}
-     */
-    default NDArray logSoftmax(int[] axes) {
-        return logSoftmax(axes, 1);
-    }
-
-    /**
-     * Applies the softmax function followed by a logarithm.
-     *
-     * <p>Mathematically equivalent to calling softmax and then log. This single operator is faster
-     * than calling two operators and numerically more stable when computing gradients.
-     *
-     * @param axes the axes along which to apply. An empty array indicates computing the softmax for
-     *     the whole array.
-     * @param temperature the exponent multiplier Beta in the softmax
-     * @return the result {@code NDArray}
-     */
-    NDArray logSoftmax(int[] axes, float temperature);
+    NDArray logSoftmax(int axis);
 
     /**
      * Returns the cumulative sum of the elements in the flattened {@code NDArray}.
@@ -3629,23 +3546,6 @@ public interface NDArray extends AutoCloseable {
      *     NDArray} are NaN
      */
     NDArray isNaN();
-
-    /**
-     * Returns a mask on whether each element matches the given index.
-     *
-     * @param index the index of values to set to true
-     * @return a new boolean NDArray where values are {@code true} if it matches the index
-     */
-    NDArray createMask(NDIndex index);
-
-    /**
-     * Returns a mask on whether each element matches the given condition.
-     *
-     * @param predicate a predicate to apply to each element of the array
-     * @return a new boolean {@code NDArray} where values are {@code true} if it matches the
-     *     predicate
-     */
-    NDArray createMask(Predicate<Number> predicate);
 
     /**
      * Constructs a {@code NDArray} by repeating this {@code NDArray} the number of times given

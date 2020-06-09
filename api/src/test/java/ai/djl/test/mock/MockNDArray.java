@@ -29,7 +29,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 public class MockNDArray implements NDArray {
 
@@ -869,13 +868,13 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes, float temperature) {
+    public NDArray softmax(int axis) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logSoftmax(int[] axes, float temperature) {
+    public NDArray logSoftmax(int axis) {
         return null;
     }
 
@@ -912,18 +911,6 @@ public class MockNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray isNaN() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray createMask(NDIndex index) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray createMask(Predicate<Number> predicate) {
         return null;
     }
 

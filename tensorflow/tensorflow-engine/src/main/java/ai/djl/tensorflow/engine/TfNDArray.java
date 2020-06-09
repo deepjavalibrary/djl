@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.tensorflow.Operand;
@@ -1220,43 +1219,31 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softmax(int[] axes, float temperature) {
-        if (temperature != 1.0) {
-            throw new UnsupportedOperationException(
-                    "TensorFlow softmax didn't suuport temperature");
-        }
-        return new TfNDArray(manager, softmaxHelper(axes, false));
+    public NDArray softmax(int axis) {
+        return new TfNDArray(manager, softmaxHelper(axis, false));
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray logSoftmax(int[] axes, float temperature) {
-        if (temperature != 1.0) {
-            throw new UnsupportedOperationException(
-                    "TensorFlow softmax didn't suuport temperature");
-        }
-        return new TfNDArray(manager, softmaxHelper(axes, true));
+    public NDArray logSoftmax(int axis) {
+        return new TfNDArray(manager, softmaxHelper(axis, true));
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private Operand softmaxHelper(int[] axes, boolean logSoftmax) {
+    private Operand softmaxHelper(int axis, boolean logSoftmax) {
         long dim = getShape().dimension();
         // if axis is -1 or last dim, directly apply softmax
-        if (axes.length > 1) {
-            throw new UnsupportedOperationException(
-                    "TensorFlow softmax does not support multiple axes");
-        }
         // return itself if zero dim
         if (dim == 0) {
             return asOperand();
         }
-        if (axes[0] == -1 || axes[0] == dim - 1) {
+        if (axis == -1 || axis == dim - 1) {
             return logSoftmax ? tf.nn.logSoftmax(asOperand()) : tf.nn.softmax(asOperand());
         }
-        if (axes[0] < -dim || axes[0] >= dim) {
+        if (axis < -dim || axis >= dim) {
             throw new IllegalArgumentException(
                     "Invalid axes value: "
-                            + axes[0]
+                            + axis
                             + ", must be in range ["
                             + -dim
                             + ", "
@@ -1268,11 +1255,11 @@ public class TfNDArray implements NDArray {
 
         // tf.softmax always apply on last dimension, transpose input to make axes[0] last dimension
         ArrayList<Operand<TInt64>> concatList = new ArrayList<>();
-        concatList.add(tf.range(tf.constant(0L), tf.constant(axes[0] % dim), tf.constant(1L)));
+        concatList.add(tf.range(tf.constant(0L), tf.constant(axis % dim), tf.constant(1L)));
         concatList.add(tf.expandDims(tf.constant(dim - 1), tf.constant(0)));
         concatList.add(
-                tf.range(tf.constant((long) axes[0] + 1), tf.constant(dim - 1), tf.constant(1L)));
-        concatList.add(tf.expandDims(tf.constant((long) axes[0]), tf.constant(0)));
+                tf.range(tf.constant((long) axis + 1), tf.constant(dim - 1), tf.constant(1L)));
+        concatList.add(tf.expandDims(tf.constant((long) axis), tf.constant(0)));
 
         Operand transposed =
                 tf.linalg.transpose(asOperand(), tf.concat(concatList, tf.constant(0)));
@@ -1312,18 +1299,6 @@ public class TfNDArray implements NDArray {
     @Override
     public NDArray isNaN() {
         return new TfNDArray(manager, tf.dtypes.cast(tf.math.isNan(asOperand()), TBool.DTYPE));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray createMask(NDIndex index) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray createMask(Predicate<Number> predicate) {
-        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -1464,7 +1439,7 @@ public class TfNDArray implements NDArray {
     @Override
     public NDArray argMax() {
         if (isEmpty()) {
-            throw new IllegalArgumentException("attempt to get argMin of an empty NDArray");
+            throw new IllegalArgumentException("attempt to get argMax of an empty NDArray");
         }
         return flatten().argMax(0);
     }
