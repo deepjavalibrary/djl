@@ -66,10 +66,9 @@ public class Accuracy extends AbstractAccuracy {
         }
         // result of sum is int64 now
         long total = label.size();
-        NDArray correct =
-                label.toType(DataType.INT64, false)
-                        .eq(predictionReduced.toType(DataType.INT64, false))
-                        .countNonzero();
-        return new Pair<>(total, correct);
+        try (NDArray nd = label.toType(DataType.INT64, false)) {
+            NDArray correct = predictionReduced.toType(DataType.INT64, false).eq(nd).countNonzero();
+            return new Pair<>(total, correct);
+        }
     }
 }

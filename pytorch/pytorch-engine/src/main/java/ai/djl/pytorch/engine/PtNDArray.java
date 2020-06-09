@@ -249,12 +249,15 @@ public class PtNDArray extends NativeResource implements NDArray {
 
         NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
         if (fullSlice != null) {
-            return JniUtils.index(this, fullSlice.getMin(), fullSlice.getMax(), fullSlice.getStep())
-                    .squeeze(fullSlice.getToSqueeze().stream().mapToInt(i -> i).toArray());
-        } else {
-            throw new UnsupportedOperationException(
-                    "get() currently supports all, fixed, and slices indices");
+            long[] min = fullSlice.getMin();
+            long[] max = fullSlice.getMax();
+            long[] step = fullSlice.getStep();
+            try (PtNDArray array = JniUtils.index(this, min, max, step)) {
+                return array.squeeze(fullSlice.getToSqueeze().stream().mapToInt(i -> i).toArray());
+            }
         }
+        throw new UnsupportedOperationException(
+                "get() currently supports all, fixed, and slices indices");
     }
 
     /** {@inheritDoc} */
