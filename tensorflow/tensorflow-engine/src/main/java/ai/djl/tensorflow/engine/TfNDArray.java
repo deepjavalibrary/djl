@@ -320,6 +320,21 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (TfNDManager) manager;
+        manager.attach(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void detach() {
+        manager.detach(getUid());
+        manager = TfNDManager.getSystemManager();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void copyTo(NDArray ndArray) {
         if (!(ndArray instanceof TfNDArray)) {
             throw new IllegalArgumentException("Only TfNDArray is supported.");
@@ -710,10 +725,6 @@ public class TfNDArray implements NDArray {
     @Override
     public NDArray powi(NDArray other) {
         return inPlaceHelper(pow(other), this);
-    }
-
-    NDArray rpowi(NDArray other) {
-        return inPlaceHelper(other.pow(this), this);
     }
 
     /** {@inheritDoc} */

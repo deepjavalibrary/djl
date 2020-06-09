@@ -265,6 +265,21 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (PtNDManager) manager;
+        manager.attach(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void detach() {
+        manager.detach(getUid());
+        manager = PtNDManager.getSystemManager();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray duplicate() {
         return JniUtils.clone(this);
     }
