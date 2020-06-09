@@ -1132,11 +1132,15 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray repeat(long[] repeats) {
-        PtNDArray temp = this;
+        PtNDArray result = this;
         for (int dim = 0; dim < repeats.length; dim++) {
-            temp = JniUtils.repeat(temp, repeats[dim], dim);
+            PtNDArray temp = result;
+            result = JniUtils.repeat(result, repeats[dim], dim);
+            if (temp != this) {
+                temp.close();
+            }
         }
-        return temp;
+        return result;
     }
 
     /** {@inheritDoc} */
