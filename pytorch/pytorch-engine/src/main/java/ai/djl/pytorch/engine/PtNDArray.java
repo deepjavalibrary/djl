@@ -184,8 +184,9 @@ public class PtNDArray extends NativeResource implements NDArray {
                 throw new IllegalArgumentException(
                         "get() currently didn't support more that one boolean NDArray");
             }
-            NDArray mask = ((NDIndexBooleans) indices.get(0)).getIndex();
-            JniUtils.booleanMaskSet(this, (PtNDArray) value, (PtNDArray) mask);
+            try (NDArray mask = ((NDIndexBooleans) indices.get(0)).getIndex()) {
+                JniUtils.booleanMaskSet(this, (PtNDArray) value, (PtNDArray) mask);
+            }
         } else {
             NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
             if (fullSlice != null) {
@@ -296,11 +297,12 @@ public class PtNDArray extends NativeResource implements NDArray {
             return JniUtils.booleanMask(this, (PtNDArray) index);
         } else if (indexShape.equals(getShape().slice(axis))) {
             // index will be broadcasted by default
-            PtNDArray flattedResult = JniUtils.booleanMask(this, (PtNDArray) index);
-            // Shape recovery
-            Shape remainder = getShape().slice(0, axis);
-            long selectedSize = flattedResult.getShape().size() / remainder.size();
-            return flattedResult.reshape(remainder.addAll(new Shape(selectedSize)));
+            try (PtNDArray flattedResult = JniUtils.booleanMask(this, (PtNDArray) index)) {
+                // Shape recovery
+                Shape remainder = getShape().slice(0, axis);
+                long selectedSize = flattedResult.getShape().size() / remainder.size();
+                return flattedResult.reshape(remainder.addAll(new Shape(selectedSize)));
+            }
         } else {
             throw new UnsupportedOperationException(
                     "Not supported for shape not broadcastable "
@@ -666,7 +668,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray cbrt() {
-        return JniUtils.pow(this, (PtNDArray) manager.create(1.0 / 3));
+        return JniUtils.pow(this, (PtNDArray) getManager().create(1.0 / 3));
     }
 
     /** {@inheritDoc} */

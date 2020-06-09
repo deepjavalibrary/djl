@@ -353,7 +353,9 @@ public class PtNDArrayEx implements NDArrayEx {
                         noBias);
         if (flatten) {
             long batchSize = result.getShape().get(0);
-            result = result.reshape(batchSize, outChannels);
+            NDArray reshaped = result.reshape(batchSize, outChannels);
+            result.close();
+            result = reshaped;
         }
         return new NDList(result);
     }
@@ -485,7 +487,9 @@ public class PtNDArrayEx implements NDArrayEx {
         // TODO: support multiple modes
         PtNDArray result = JniUtils.pick(array, (PtNDArray) index, axis);
         if (!keepDims) {
-            result.flatten();
+            PtNDArray flattened = result.flatten();
+            result.close();
+            result = flattened;
         }
         return result;
     }
