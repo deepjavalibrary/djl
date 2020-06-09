@@ -13,7 +13,6 @@
 package ai.djl.ndarray.index;
 
 import ai.djl.ndarray.types.Shape;
-import java.util.List;
 
 /**
  * An index as a slice on all dimensions where some dimensions can be squeezed.
@@ -24,7 +23,7 @@ public class NDIndexFullSlice {
     private long[] min;
     private long[] max;
     private long[] step;
-    private List<Integer> toSqueeze;
+    private int[] toSqueeze;
     private Shape shape;
     private Shape squeezedShape;
 
@@ -32,7 +31,7 @@ public class NDIndexFullSlice {
             long[] min,
             long[] max,
             long[] step,
-            List<Integer> toSqueeze,
+            int[] toSqueeze,
             Shape shape,
             Shape squeezedShape) {
         this.min = min;
@@ -71,11 +70,11 @@ public class NDIndexFullSlice {
     }
 
     /**
-     * Returns the list of axis to squeeze.
+     * Returns the squeeze array of axis.
      *
-     * @return the list of axis to squeeze
+     * @return the squeeze array of axis
      */
-    public List<Integer> getToSqueeze() {
+    public int[] getToSqueeze() {
         return toSqueeze;
     }
 

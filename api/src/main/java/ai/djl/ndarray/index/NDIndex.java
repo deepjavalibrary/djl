@@ -361,9 +361,10 @@ public class NDIndex {
                 addSliceInfo(ie, i, target, min, max, step, toSqueeze, shape, squeezedShape);
             }
         }
+        int[] squeeze = toSqueeze.stream().mapToInt(i -> i).toArray();
         NDIndexFullSlice fullSlice =
                 new NDIndexFullSlice(
-                        min, max, step, toSqueeze, new Shape(shape), new Shape(squeezedShape));
+                        min, max, step, squeeze, new Shape(shape), new Shape(squeezedShape));
         return Optional.of(fullSlice);
     }
 

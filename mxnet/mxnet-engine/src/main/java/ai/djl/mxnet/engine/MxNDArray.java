@@ -425,11 +425,10 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
             NDArray thisArr =
                     (getDataType() == DataType.BOOLEAN) ? toType(DataType.INT32, false) : this;
             NDArray result = manager.invoke("_npi_slice", thisArr, params);
-            if (!fullSlice.getToSqueeze().isEmpty()) {
+            int[] toSqueeze = fullSlice.getToSqueeze();
+            if (toSqueeze.length > 0) {
                 NDArray oldResult = result;
-                result =
-                        result.squeeze(
-                                fullSlice.getToSqueeze().stream().mapToInt(i -> i).toArray());
+                result = result.squeeze(toSqueeze);
                 oldResult.close();
             }
             // TODO cast the boolean NDArray back to int32 due to lack of support of slice op on

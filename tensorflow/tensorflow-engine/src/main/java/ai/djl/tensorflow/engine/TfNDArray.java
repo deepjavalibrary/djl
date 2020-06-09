@@ -295,22 +295,18 @@ public class TfNDArray implements NDArray {
 
         NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
         if (fullSlice != null) {
-            long[] begin = fullSlice.getMin();
-            long[] end = fullSlice.getMax();
-            long[] step = fullSlice.getStep();
-            Operand<?> sliced =
-                    tf.stridedSlice(
-                            asOperand(), tf.constant(begin), tf.constant(end), tf.constant(step));
-            if (!fullSlice.getToSqueeze().isEmpty()) {
-                sliced =
-                        tf.squeeze(
-                                sliced,
-                                Squeeze.axis(
-                                        fullSlice
-                                                .getToSqueeze()
-                                                .stream()
-                                                .map(Integer::longValue)
-                                                .collect(Collectors.toList())));
+            Constant<TInt64> begin = tf.constant(fullSlice.getMin());
+            Constant<TInt64> end = tf.constant(fullSlice.getMax());
+            Constant<TInt64> step = tf.constant(fullSlice.getStep());
+            int[] toSqueeze = fullSlice.getToSqueeze();
+            Operand<?> sliced = tf.stridedSlice(asOperand(), begin, end, step);
+            if (toSqueeze.length > 0) {
+                List<Long> squeeze =
+                        Arrays.stream(toSqueeze)
+                                .mapToLong(i -> i)
+                                .boxed()
+                                .collect(Collectors.toList());
+                sliced = tf.squeeze(sliced, Squeeze.axis(squeeze));
             }
             return new TfNDArray(manager, sliced);
         }
@@ -980,10 +976,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mean() {
-        return new TfNDArray(
-                manager,
-                tf.math.mean(
-                        asOperand(), ((TfNDArray) manager.arange(0, getRank(), 1)).asOperand()));
+        try (TfNDArray array = ((TfNDArray) manager.arange(0, getRank(), 1))) {
+            return new TfNDArray(manager, tf.math.mean(asOperand(), array.asOperand()));
+        }
     }
 
     /** {@inheritDoc} */
@@ -1011,9 +1006,7 @@ public class TfNDArray implements NDArray {
 
             while (start < indices.length - MAX_OUTPUTS_PER_OP + 2) {
                 long[] partialIndices = new long[MAX_OUTPUTS_PER_OP];
-                for (int i = 0; i < MAX_OUTPUTS_PER_OP - 1; i++) {
-                    partialIndices[i] = indices[start + i];
-                }
+                System.arraycopy(indices, start, partialIndices, 0, MAX_OUTPUTS_PER_OP - 1);
                 partialIndices[MAX_OUTPUTS_PER_OP - 1] = totalSize;
                 NDList splitted = splitHelper(partialIndices, axis);
                 // remove last chunk from result
@@ -1027,9 +1020,7 @@ public class TfNDArray implements NDArray {
             }
 
             long[] partialIndices = new long[indices.length - start];
-            for (int i = 0; i < partialIndices.length; i++) {
-                partialIndices[i] = indices[start + i];
-            }
+            System.arraycopy(indices, start, partialIndices, 0, partialIndices.length);
             NDList splitted = splitHelper(partialIndices, axis);
             // remove the first chunk from result
             splitted.remove(splitted.get(0));

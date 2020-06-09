@@ -254,7 +254,7 @@ public class PtNDArray extends NativeResource implements NDArray {
             long[] max = fullSlice.getMax();
             long[] step = fullSlice.getStep();
             try (PtNDArray array = JniUtils.index(this, min, max, step)) {
-                return array.squeeze(fullSlice.getToSqueeze().stream().mapToInt(i -> i).toArray());
+                return array.squeeze(fullSlice.getToSqueeze());
             }
         }
         throw new UnsupportedOperationException(
