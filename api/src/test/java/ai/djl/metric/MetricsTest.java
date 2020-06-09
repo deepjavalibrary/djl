@@ -13,6 +13,7 @@
 package ai.djl.metric;
 
 import java.util.List;
+import java.util.Set;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -44,6 +45,13 @@ public class MetricsTest {
 
         list = metrics.getMetric("m4");
         Assert.assertEquals(list.size(), 0);
+
+        Set<String> metricNames = metrics.getMetricNames();
+        Assert.assertEquals(metricNames.size(), 3);
+        Assert.assertEquals(metricNames.contains("m1"), true);
+        Assert.assertEquals(metricNames.contains("m2"), true);
+        Assert.assertEquals(metricNames.contains("m3"), true);
+        Assert.assertEquals(metricNames.contains("m4"), false);
     }
 
     @Test

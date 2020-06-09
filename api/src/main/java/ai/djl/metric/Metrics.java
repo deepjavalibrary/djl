@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -105,6 +106,15 @@ public class Metrics {
             return Collections.emptyList();
         }
         return list;
+    }
+
+    /**
+     * Returns a set of {@link String} metric names.
+     *
+     * @return a set of {@link String} metric names
+     */
+    public Set<String> getMetricNames() {
+        return metrics.keySet();
     }
 
     /**
