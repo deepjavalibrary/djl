@@ -27,6 +27,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -37,6 +38,10 @@ public class HdfsRepositoryTest {
 
     @BeforeClass
     public void setup() throws IOException {
+        if (System.getProperty("os.name").startsWith("Win")) {
+            throw new SkipException("MiniDFSCluster doesn't wupport windows.");
+        }
+
         System.setProperty("DJL_CACHE_DIR", "build/cache");
         String userHome = System.getProperty("user.home");
         System.setProperty("ENGINE_CACHE_DIR", userHome);
@@ -57,9 +62,7 @@ public class HdfsRepositoryTest {
         }
 
         Configuration config = new Configuration();
-        if (!System.getProperty("os.name").startsWith("Win")) {
-            setFilePermission(config);
-        }
+        setFilePermission(config);
         miniDfs = new MiniDFSCluster(config, 1, true, null);
         miniDfs.waitClusterUp();
         FileSystem fs = miniDfs.getFileSystem();
