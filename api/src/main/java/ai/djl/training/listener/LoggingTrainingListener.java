@@ -177,7 +177,7 @@ public class LoggingTrainingListener implements TrainingListener {
             logger.info(String.format("step P50: %.3f ms, P90: %.3f ms", p50, p90));
         }
 
-        if (metrics.hasMetric("step")) {
+        if (metrics.hasMetric("epoch")) {
             p50 = metrics.percentile("epoch", 50).getValue().longValue() / 1_000_000_000f;
             p90 = metrics.percentile("epoch", 90).getValue().longValue() / 1_000_000_000f;
             logger.info(String.format("epoch P50: %.3f s, P90: %.3f s", p50, p90));
