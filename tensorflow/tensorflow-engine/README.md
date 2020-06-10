@@ -6,7 +6,7 @@ This module contains the Tensorflow implementation of the Deep Java Library (DJL
 
 We don't recommend that developers use classes in this module directly. Use of these classes will couple your code with TensorFlow and make switching between frameworks difficult. Even so, developers are not restricted from using engine-specific features. For more information, see [NDManager#invoke()](https://javadoc.io/static/ai.djl/api/0.5.0/ai/djl/ndarray/NDManager.html#invoke-java.lang.String-ai.djl.ndarray.NDList-ai.djl.ndarray.NDList-ai.djl.util.PairList-).
 
-**Right now, the TensorFlow Engine is still experimental. Currently Windows platform and training is not supported. We do not recommend using TensorFlow Engine in production for now.**
+**Currently Windows platform and training is not supported.**
 
 ## Documentation
 
