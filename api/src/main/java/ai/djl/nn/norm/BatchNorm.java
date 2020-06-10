@@ -114,7 +114,7 @@ public class BatchNorm extends AbstractBlock {
             PairList<String, Object> params) {
         inputs = opInputs(parameterStore, inputs);
         NDArrayEx ex = inputs.head().getNDArrayInternal();
-        return ex.batchNorm(inputs, epsilon, momentum, axis, center, scale, params);
+        return ex.batchNorm(inputs, epsilon, momentum, axis, center, scale, training, params);
     }
 
     /** {@inheritDoc} */

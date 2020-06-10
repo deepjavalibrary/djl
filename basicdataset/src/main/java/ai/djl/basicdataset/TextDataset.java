@@ -17,7 +17,6 @@ import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.engine.Engine;
 import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
-import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.ndarray.NDManager;
@@ -93,14 +92,25 @@ public abstract class TextDataset extends RandomAccessDataset {
     }
 
     /**
+     * Gets the processed textual input.
+     *
+     * @param index the index of the text input
+     * @param source whether to get text from source or target
+     * @return the processed text
+     */
+    public List<String> getProcessedText(long index, boolean source) {
+        TextData textData = source ? sourceTextData : targetTextData;
+        return textData.getProcessedText(index);
+    }
+
+    /**
      * Performs pre-processing steps on text data such as tokenising, applying {@link
      * ai.djl.modality.nlp.preprocess.TextProcessor}s, creating vocabulary, and word embeddings.
      *
      * @param newTextData list of all unprocessed sentences in the dataset
      * @param source whether the text data provided is source or target
-     * @throws EmbeddingException if there is an error while embedding
      */
-    protected void preprocess(List<String> newTextData, boolean source) throws EmbeddingException {
+    protected void preprocess(List<String> newTextData, boolean source) {
         TextData textData = source ? sourceTextData : targetTextData;
         textData.preprocess(
                 manager, newTextData.subList(0, (int) Math.min(limit, newTextData.size())));

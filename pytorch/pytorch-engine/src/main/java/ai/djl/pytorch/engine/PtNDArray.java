@@ -184,8 +184,9 @@ public class PtNDArray extends NativeResource implements NDArray {
                 throw new IllegalArgumentException(
                         "get() currently didn't support more that one boolean NDArray");
             }
-            NDArray mask = ((NDIndexBooleans) indices.get(0)).getIndex();
-            JniUtils.booleanMaskSet(this, (PtNDArray) value, (PtNDArray) mask);
+            try (NDArray mask = ((NDIndexBooleans) indices.get(0)).getIndex()) {
+                JniUtils.booleanMaskSet(this, (PtNDArray) value, (PtNDArray) mask);
+            }
         } else {
             NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
             if (fullSlice != null) {
@@ -249,18 +250,36 @@ public class PtNDArray extends NativeResource implements NDArray {
 
         NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
         if (fullSlice != null) {
-            return JniUtils.index(this, fullSlice.getMin(), fullSlice.getMax(), fullSlice.getStep())
-                    .squeeze(fullSlice.getToSqueeze().stream().mapToInt(i -> i).toArray());
-        } else {
-            throw new UnsupportedOperationException(
-                    "get() currently supports all, fixed, and slices indices");
+            long[] min = fullSlice.getMin();
+            long[] max = fullSlice.getMax();
+            long[] step = fullSlice.getStep();
+            try (PtNDArray array = JniUtils.index(this, min, max, step)) {
+                return array.squeeze(fullSlice.getToSqueeze());
+            }
         }
+        throw new UnsupportedOperationException(
+                "get() currently supports all, fixed, and slices indices");
     }
 
     /** {@inheritDoc} */
     @Override
     public void copyTo(NDArray array) {
         throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (PtNDManager) manager;
+        manager.attach(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void detach() {
+        manager.detach(getUid());
+        manager = PtNDManager.getSystemManager();
     }
 
     /** {@inheritDoc} */
@@ -278,11 +297,12 @@ public class PtNDArray extends NativeResource implements NDArray {
             return JniUtils.booleanMask(this, (PtNDArray) index);
         } else if (indexShape.equals(getShape().slice(axis))) {
             // index will be broadcasted by default
-            PtNDArray flattedResult = JniUtils.booleanMask(this, (PtNDArray) index);
-            // Shape recovery
-            Shape remainder = getShape().slice(0, axis);
-            long selectedSize = flattedResult.getShape().size() / remainder.size();
-            return flattedResult.reshape(remainder.addAll(new Shape(selectedSize)));
+            try (PtNDArray flattedResult = JniUtils.booleanMask(this, (PtNDArray) index)) {
+                // Shape recovery
+                Shape remainder = getShape().slice(0, axis);
+                long selectedSize = flattedResult.getShape().size() / remainder.size();
+                return flattedResult.reshape(remainder.addAll(new Shape(selectedSize)));
+            }
         } else {
             throw new UnsupportedOperationException(
                     "Not supported for shape not broadcastable "
@@ -648,7 +668,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray cbrt() {
-        return JniUtils.pow(this, (PtNDArray) manager.create(1.0 / 3));
+        return JniUtils.pow(this, (PtNDArray) getManager().create(1.0 / 3));
     }
 
     /** {@inheritDoc} */
@@ -1114,11 +1134,15 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray repeat(long[] repeats) {
-        PtNDArray temp = this;
+        PtNDArray result = this;
         for (int dim = 0; dim < repeats.length; dim++) {
-            temp = JniUtils.repeat(temp, repeats[dim], dim);
+            PtNDArray temp = result;
+            result = JniUtils.repeat(result, repeats[dim], dim);
+            if (temp != this) {
+                temp.close();
+            }
         }
-        return temp;
+        return result;
     }
 
     /** {@inheritDoc} */

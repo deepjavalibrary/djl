@@ -56,6 +56,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
     // for multithreading
     private Queue<Future<Batch>> queue;
     private AtomicInteger progressCounter;
+    private boolean autoClose;
 
     /**
      * Creates a new instance of {@code DataIterable} with the given parameters.
@@ -91,6 +92,8 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
         this.executor = executor;
         this.device = device;
         progressCounter = new AtomicInteger(0);
+        String close = System.getProperty("ai.djl.dataiterator.autoclose", "true");
+        autoClose = Boolean.parseBoolean(close);
 
         sample = sampler.sample(dataset);
         if (executor != null) {
@@ -113,8 +116,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
     public boolean hasNext() {
         if (executor != null) {
             if (queue.isEmpty()) {
-                String close = System.getProperty("ai.djl.dataiterator.autoclose", "true");
-                if (Boolean.parseBoolean(close)) {
+                if (autoClose) {
                     manager.close();
                 }
                 return false;
@@ -122,8 +124,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
             return true;
         }
         if (!sample.hasNext()) {
-            String close = System.getProperty("ai.djl.dataiterator.autoclose", "true");
-            if (Boolean.parseBoolean(close)) {
+            if (autoClose) {
                 manager.close();
             }
             return false;

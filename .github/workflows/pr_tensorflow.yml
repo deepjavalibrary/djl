@@ -1,6 +1,14 @@
 name: tensorflow engine integration tests
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - "tensorflow/**"
+      - "integration/**"
+  pull_request:
+    paths:
+      - "tensorflow/**"
+      - "integration/**"
 
 jobs:
   build:

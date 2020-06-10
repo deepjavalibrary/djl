@@ -207,6 +207,21 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = manager;
+        manager.attach(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void detach() {
+        manager.detach(getUid());
+        manager = null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void copyTo(NDArray array) {}
 
     /** {@inheritDoc} */

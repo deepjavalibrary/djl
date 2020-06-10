@@ -1,6 +1,14 @@
 name: pytorch engine integration tests
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - "pytorch/**"
+      - "integration/**"
+  pull_request:
+    paths:
+      - "pytorch/**"
+      - "integration/**"
 
 jobs:
   build:

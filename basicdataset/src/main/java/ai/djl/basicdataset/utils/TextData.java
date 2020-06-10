@@ -195,6 +195,20 @@ public class TextData {
     }
 
     /**
+     * Gets the textual input after preprocessing.
+     *
+     * @param index the index of the text input
+     * @return the list of processed tokens
+     */
+    public List<String> getProcessedText(long index) {
+        List<String> tokens = Collections.singletonList(getRawText(index));
+        for (TextProcessor processor : textProcessors) {
+            tokens = processor.preprocess(tokens);
+        }
+        return tokens;
+    }
+
+    /**
      * Returns the size of the data.
      *
      * @return the size of the data

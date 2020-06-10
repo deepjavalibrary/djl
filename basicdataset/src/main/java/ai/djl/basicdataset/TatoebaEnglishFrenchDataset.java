@@ -13,7 +13,6 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Application;
-import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
@@ -135,12 +134,8 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
                 targetTextData.add(text[1]);
             }
         }
-        try {
-            preprocess(sourceTextData, true);
-            preprocess(targetTextData, false);
-        } catch (EmbeddingException e) {
-            throw new IOException(e.getMessage(), e);
-        }
+        preprocess(sourceTextData, true);
+        preprocess(targetTextData, false);
     }
 
     @Override

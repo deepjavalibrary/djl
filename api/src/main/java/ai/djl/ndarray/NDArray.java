@@ -155,10 +155,7 @@ public interface NDArray extends AutoCloseable {
      * @param manager the {@link NDManager} to be attached
      * @see NDManager
      */
-    default void attach(NDManager manager) {
-        detach();
-        getManager().attach(getUid(), manager);
-    }
+    void attach(NDManager manager);
 
     /**
      * Detaches the {@code NDArray} from current {@link NDManager}'s lifecycle.
@@ -169,9 +166,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @see NDManager
      */
-    default void detach() {
-        getManager().detach(getUid());
-    }
+    void detach();
 
     /**
      * Moves this {@code NDArray} to a different {@link Device}.

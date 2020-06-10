@@ -1,0 +1,40 @@
+name: D2L book Notebook integration tests
+
+on:
+  push:
+    paths:
+      - "jupyter/d2l-java/**"
+  pull_request:
+    paths:
+      - "jupyter/d2l-java/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - uses: actions/checkout@v2
+      - name: Set up Python3
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install IJava kernel
+        run: |
+          pip3 install jupyter
+          git clone https://github.com/frankfliu/IJava.git
+          cd IJava/
+          ./gradlew installKernel
+      - name: test Notebook
+        run: |
+          cd jupyter/d2l-java
+          bash test_notebook.sh
+      - name: generated Notebook in html
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: notebook
+          path: jupyter/d2l-java/test_output/

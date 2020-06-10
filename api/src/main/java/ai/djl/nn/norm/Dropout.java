@@ -70,7 +70,7 @@ public class Dropout extends AbstractBlock {
             boolean training,
             PairList<String, Object> params) {
         NDArrayEx ex = inputs.singletonOrThrow().getNDArrayInternal();
-        return ex.dropout(inputs, probability, sharedAxes, params);
+        return ex.dropout(inputs, probability, sharedAxes, training, params);
     }
 
     /** {@inheritDoc} */
