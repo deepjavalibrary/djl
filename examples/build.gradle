@@ -10,7 +10,7 @@ repositories {
     }
 }
 
-def DJL_VERSION = "0.5.0-SNAPSHOT"
+def DJL_VERSION = "0.6.0-SNAPSHOT"
 
 dependencies {
     implementation "commons-cli:commons-cli:1.4"
