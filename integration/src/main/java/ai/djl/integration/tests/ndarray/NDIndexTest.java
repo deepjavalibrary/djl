@@ -41,6 +41,18 @@ public class NDIndexTest {
     }
 
     @Test
+    public void testPick() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+            NDArray expected = manager.create(new float[] {1f, 4f});
+            NDArray actual =
+                    original.get(
+                            new NDIndex().addAllDim().addPickDim(manager.create(new int[] {0, 1})));
+            Assert.assertEquals(actual, expected);
+        }
+    }
+
+    @Test
     public void testGet() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));

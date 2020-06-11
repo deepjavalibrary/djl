@@ -22,6 +22,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.index.NDIndexBooleans;
 import ai.djl.ndarray.index.NDIndexElement;
+import ai.djl.ndarray.index.NDIndexFullPick;
 import ai.djl.ndarray.index.NDIndexFullSlice;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
@@ -410,6 +411,11 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
                         "get() currently didn't support more that one boolean NDArray");
             }
             return booleanMask(((NDIndexBooleans) indices.get(0)).getIndex());
+        }
+
+        NDIndexFullPick fullPick = index.getAsFullPick(getShape()).orElse(null);
+        if (fullPick != null) {
+            return getNDArrayInternal().pick(fullPick.getIndices(), fullPick.getAxis(), false);
         }
 
         NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);

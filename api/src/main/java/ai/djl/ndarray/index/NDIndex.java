@@ -257,6 +257,21 @@ public class NDIndex {
     }
 
     /**
+     * Appends a picking index that gets values by index in the axis.
+     *
+     * @param index the indices should be NDArray. For each element in the indices array, it acts
+     *     like a fixed index returning an element of that shape. So, the final shape would be
+     *     indices.getShape().addAll(target.getShape().slice(1)) (assuming it is the first index
+     *     element).
+     * @return the updated {@link NDIndex}
+     */
+    public NDIndex addPickDim(NDArray index) {
+        rank++;
+        indices.add(new NDIndexPick(index));
+        return this;
+    }
+
+    /**
      * Returns a stream of the NDIndexElements.
      *
      * @return a stream of the NDIndexElements
@@ -293,6 +308,34 @@ public class NDIndex {
         } else {
             indices.add(new NDIndexSlice(min, max, step));
         }
+    }
+
+    /**
+     * Returns thi index as a full pick if it can be represented as one.
+     *
+     * @param target the shape to index
+     * @return the full pick if it can be represented as one
+     */
+    public Optional<NDIndexFullPick> getAsFullPick(Shape target) {
+        int axis = 0;
+        NDIndexFullPick fullPick = null;
+        for (NDIndexElement el : indices) {
+            if (el instanceof NDIndexAll) {
+                axis++;
+            } else if (el instanceof NDIndexPick) {
+                if (fullPick == null) {
+                    fullPick = new NDIndexFullPick(((NDIndexPick) el).getIndices(), axis);
+                } else {
+                    // Don't support multiple picks
+                    throw new UnsupportedOperationException(
+                            "Only one pick per get is currently supported");
+                }
+            } else {
+                // Invalid dim for fullPick
+                return Optional.empty();
+            }
+        }
+        return Optional.ofNullable(fullPick);
     }
 
     /**
