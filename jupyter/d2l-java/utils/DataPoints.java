@@ -1,4 +1,7 @@
+import ai.djl.Device;
 import ai.djl.ndarray.*;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
 
 class DataPoints {
     private NDArray X, y;
