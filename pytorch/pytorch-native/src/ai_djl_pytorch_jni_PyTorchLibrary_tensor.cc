@@ -71,8 +71,13 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTo(
   API_BEGIN();
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
-  const auto* result_ptr =
-      new torch::Tensor(tensor_ptr->to(device, utils::GetScalarTypeFromDType(jdtype), false, jcopy == JNI_TRUE));
+  auto result = tensor_ptr->to(device, utils::GetScalarTypeFromDType(jdtype), false, jcopy == JNI_TRUE);
+  // disable "to" to calculate the gradient
+  // TODO "to" should also calculate the gradient
+  if (result.requires_grad()) {
+    result.detach_();
+  }
+  const auto* result_ptr = new torch::Tensor(result);
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }

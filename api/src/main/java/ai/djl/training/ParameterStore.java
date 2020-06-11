@@ -121,7 +121,11 @@ public class ParameterStore {
                     } else {
                         arrays[i] = array.toDevice(dev, true);
                         arrays[i].attach(manager);
-                        arrays[i].attachGradient();
+                        // some parameter doesn't require grad
+                        // for example running_mean in BatchNorm
+                        if (parameter.requireGradient()) {
+                            arrays[i].attachGradient();
+                        }
                     }
                     data.add(arrays[i]);
                 }
@@ -129,7 +133,11 @@ public class ParameterStore {
                 if (copy || !array.getDevice().equals(device)) {
                     array = array.toDevice(device, true);
                     array.attach(manager);
-                    array.attachGradient();
+                    // some parameter doesn't require grad
+                    // for example running_mean in BatchNorm
+                    if (parameter.requireGradient()) {
+                        array.attachGradient();
+                    }
                 }
                 data.add(array);
             }

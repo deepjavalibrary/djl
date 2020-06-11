@@ -23,7 +23,11 @@ public class PtGradientCollector implements GradientCollector {
     /** {@inheritDoc} */
     @Override
     public void backward(NDArray target) {
-        NDArray grad = target.getManager().ones(target.getShape(), target.getDataType());
+        // TODO manager should create the new NDArray on the same device
+        NDArray grad =
+                target.getManager()
+                        .ones(target.getShape(), target.getDataType())
+                        .toDevice(target.getDevice(), false);
         backward(target, grad, false, false);
     }
 
