@@ -10,8 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.ndarray.index;
+package ai.djl.ndarray.index.full;
 
+import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
 
 /**
@@ -27,7 +28,17 @@ public class NDIndexFullSlice {
     private Shape shape;
     private Shape squeezedShape;
 
-    NDIndexFullSlice(
+    /**
+     * Constructs a {@link NDIndexFullSlice}.
+     *
+     * @param min the min for each axis
+     * @param max the max for each axis
+     * @param step the step for each axis
+     * @param toSqueeze the axes to squeeze after slicing
+     * @param shape the result shape (without squeezing)
+     * @param squeezedShape the result shape (with squeezing)
+     */
+    public NDIndexFullSlice(
             long[] min,
             long[] max,
             long[] step,

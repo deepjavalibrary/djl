@@ -10,19 +10,28 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.ndarray.index;
+package ai.djl.ndarray.index.dim;
 
 import ai.djl.ndarray.NDArray;
 
-/** A simplified representation of a pick-based {@link NDIndex}. */
-public class NDIndexFullPick {
+/** An {@link NDIndexElement} that gets elements by index in the specified axis. */
+public class NDIndexPick implements NDIndexElement {
 
     private NDArray indices;
-    private int axis;
 
-    NDIndexFullPick(NDArray indices, int axis) {
+    /**
+     * Constructs a pick.
+     *
+     * @param indices the indices to pick
+     */
+    public NDIndexPick(NDArray indices) {
         this.indices = indices;
-        this.axis = axis;
+    }
+
+    @Override
+    /** {@inheritDoc} */
+    public int getRank() {
+        return 1;
     }
 
     /**
@@ -32,14 +41,5 @@ public class NDIndexFullPick {
      */
     public NDArray getIndices() {
         return indices;
-    }
-
-    /**
-     * Returns the axis to pick.
-     *
-     * @return the axis to pick
-     */
-    public int getAxis() {
-        return axis;
     }
 }

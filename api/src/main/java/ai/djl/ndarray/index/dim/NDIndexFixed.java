@@ -10,36 +10,34 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.ndarray.index;
+package ai.djl.ndarray.index.dim;
 
-import ai.djl.ndarray.NDArray;
+/** An NDIndexElement that returns only a specific value in the corresponding dimension. */
+public class NDIndexFixed implements NDIndexElement {
 
-/** An {@code NDIndexElement} to return values based on a mask binary NDArray. */
-public class NDIndexBooleans implements NDIndexElement {
-
-    private NDArray index;
+    private long index;
 
     /**
-     * Constructs a {@code NDIndexBooleans} instance with specified mask binary NDArray.
+     * Constructs a {@code NDIndexFixed} instance with specified dimension.
      *
-     * @param index the mask binary {@code NDArray}
+     * @param index the dimension of the NDArray
      */
-    public NDIndexBooleans(NDArray index) {
+    public NDIndexFixed(long index) {
         this.index = index;
     }
 
     /**
-     * Returns the mask binary {@code NDArray}.
+     * Returns the dimension of the index.
      *
-     * @return the mask binary {@code NDArray}
+     * @return the dimension of the index
      */
-    public NDArray getIndex() {
+    public long getIndex() {
         return index;
     }
 
     /** {@inheritDoc} */
     @Override
     public int getRank() {
-        return index.getShape().dimension();
+        return 1;
     }
 }
