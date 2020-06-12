@@ -48,4 +48,4 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 cp onnxruntime_tmp/java/build/libs s3://djl-ai/publish/onnxruntime-1.3.0/${{ runner.os }}/cpu
+          aws s3 sync onnxruntime_tmp/java/build/libs s3://djl-ai/publish/onnxruntime-1.3.0/${{ runner.os }}/cpu
