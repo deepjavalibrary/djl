@@ -18,10 +18,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.index.NDIndex;
-import ai.djl.ndarray.index.dim.NDIndexBooleans;
-import ai.djl.ndarray.index.dim.NDIndexElement;
-import ai.djl.ndarray.index.full.NDIndexFullSlice;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -256,61 +252,6 @@ public class TfNDArray implements NDArray {
     @Override
     public void set(Buffer data) {
         throw new UnsupportedOperationException("Tensor cannot be modified after creation");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(NDIndex index, NDArray value) {
-        throw new UnsupportedOperationException("Tensor cannot be modified after creation");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(NDIndex index, Number value) {
-        throw new UnsupportedOperationException("Tensor cannot be modified after creation");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setScalar(NDIndex index, Number value) {
-        throw new UnsupportedOperationException("Tensor cannot be modified after creation");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray get(NDIndex index) {
-        if (index.getRank() == 0 && getShape().isScalar()) {
-            return this;
-        }
-        // use booleanMask for NDIndexBooleans case
-        List<NDIndexElement> indices = index.getIndices();
-        if (!indices.isEmpty() && indices.get(0) instanceof NDIndexBooleans) {
-            if (indices.size() != 1) {
-                throw new IllegalArgumentException(
-                        "get() currently didn't support more that one boolean NDArray");
-            }
-            return booleanMask(((NDIndexBooleans) indices.get(0)).getIndex());
-        }
-
-        NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
-        if (fullSlice != null) {
-            Constant<TInt64> begin = tf.constant(fullSlice.getMin());
-            Constant<TInt64> end = tf.constant(fullSlice.getMax());
-            Constant<TInt64> step = tf.constant(fullSlice.getStep());
-            int[] toSqueeze = fullSlice.getToSqueeze();
-            Operand<?> sliced = tf.stridedSlice(asOperand(), begin, end, step);
-            if (toSqueeze.length > 0) {
-                List<Long> squeeze =
-                        Arrays.stream(toSqueeze)
-                                .mapToLong(i -> i)
-                                .boxed()
-                                .collect(Collectors.toList());
-                sliced = tf.squeeze(sliced, Squeeze.axis(squeeze));
-            }
-            return new TfNDArray(manager, sliced);
-        }
-        throw new UnsupportedOperationException(
-                "get() currently supports all, fixed, and slices indices");
     }
 
     /** {@inheritDoc} */

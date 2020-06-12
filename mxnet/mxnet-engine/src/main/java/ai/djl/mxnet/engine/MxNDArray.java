@@ -19,11 +19,6 @@ import ai.djl.ndarray.LazyNDArray;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.index.NDIndex;
-import ai.djl.ndarray.index.dim.NDIndexBooleans;
-import ai.djl.ndarray.index.dim.NDIndexElement;
-import ai.djl.ndarray.index.full.NDIndexFullPick;
-import ai.djl.ndarray.index.full.NDIndexFullSlice;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -37,8 +32,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
 import java.util.stream.IntStream;
 
 /** {@code MxNDArray} is the MXNet implementation of {@link NDArray}. */
@@ -322,119 +315,6 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
                 throw new AssertionError("Show never happen");
         }
         JnaUtils.syncCopyFromCPU(getHandle(), buf, size);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(NDIndex index, NDArray value) {
-        NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
-        if (fullSlice != null) {
-            MxOpParams params = new MxOpParams();
-            params.addTupleParam("begin", fullSlice.getMin());
-            params.addTupleParam("end", fullSlice.getMax());
-            params.addTupleParam("step", fullSlice.getStep());
-
-            Stack<NDArray> prepareValue = new Stack<>();
-            prepareValue.add(value);
-            prepareValue.add(prepareValue.peek().toDevice(getDevice(), false));
-            // prepareValue.add(prepareValue.peek().asType(getDataType(), false));
-            // Deal with the case target: (1, 10, 1), original (10)
-            // try to find (10, 1) and reshape (10) to that
-            Shape targetShape = fullSlice.getShape();
-            while (targetShape.size() > value.size()) {
-                targetShape = targetShape.slice(1);
-            }
-            prepareValue.add(prepareValue.peek().reshape(targetShape));
-            prepareValue.add(prepareValue.peek().broadcast(fullSlice.getShape()));
-
-            manager.invoke(
-                    "_npi_slice_assign",
-                    new NDArray[] {this, prepareValue.peek()},
-                    new NDArray[] {this},
-                    params);
-            for (NDArray toClean : prepareValue) {
-                if (toClean != value) {
-                    toClean.close();
-                }
-            }
-            return;
-        }
-        throw new UnsupportedOperationException(
-                "set() currently supports all, fixed, and slices indices");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(NDIndex index, Number value) {
-        NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
-        if (fullSlice != null) {
-            MxOpParams params = new MxOpParams();
-            params.addTupleParam("begin", fullSlice.getMin());
-            params.addTupleParam("end", fullSlice.getMax());
-            params.addTupleParam("step", fullSlice.getStep());
-            params.addParam("scalar", value);
-            manager.invoke(
-                    "_npi_slice_assign_scalar", new NDArray[] {this}, new NDArray[] {this}, params);
-            return;
-        }
-        throw new UnsupportedOperationException(
-                "set() currently supports all, fixed, and slices indices");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setScalar(NDIndex index, Number value) {
-        NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
-        if (fullSlice != null) {
-            if (fullSlice.getShape().size() != 1) {
-                throw new IllegalArgumentException("The provided index does not set a scalar");
-            }
-            set(index, value);
-            return;
-        }
-        throw new UnsupportedOperationException(
-                "set() currently supports all, fixed, and slices indices");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray get(NDIndex index) {
-        if (index.getRank() == 0 && getShape().isScalar()) {
-            // TODO: return a view once MXNet support it
-            return duplicate();
-        }
-        // use booleanMask for NDIndexBooleans case
-        List<NDIndexElement> indices = index.getIndices();
-        if (!indices.isEmpty() && indices.get(0) instanceof NDIndexBooleans) {
-            if (indices.size() != 1) {
-                throw new IllegalArgumentException(
-                        "get() currently didn't support more that one boolean NDArray");
-            }
-            return booleanMask(((NDIndexBooleans) indices.get(0)).getIndex());
-        }
-
-        NDIndexFullPick fullPick = index.getAsFullPick(getShape()).orElse(null);
-        if (fullPick != null) {
-            return getNDArrayInternal().pick(fullPick.getIndices(), fullPick.getAxis(), false);
-        }
-
-        NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
-        if (fullSlice != null) {
-            MxOpParams params = new MxOpParams();
-            params.addTupleParam("begin", fullSlice.getMin());
-            params.addTupleParam("end", fullSlice.getMax());
-            params.addTupleParam("step", fullSlice.getStep());
-            NDArray result = manager.invoke("_npi_slice", this, params);
-            int[] toSqueeze = fullSlice.getToSqueeze();
-            if (toSqueeze.length > 0) {
-                NDArray oldResult = result;
-                result = result.squeeze(toSqueeze);
-                oldResult.close();
-            }
-            return result;
-        }
-        throw new UnsupportedOperationException(
-                "get() currently supports all, fixed, and slices indices");
     }
 
     /** {@inheritDoc} */

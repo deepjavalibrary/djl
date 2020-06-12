@@ -14,6 +14,7 @@ package ai.djl.test.mock;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -378,6 +379,11 @@ public class MockNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray resize(int width, int height) {
+        return null;
+    }
+
+    @Override
+    public NDArrayIndexer getIndexer() {
         return null;
     }
 

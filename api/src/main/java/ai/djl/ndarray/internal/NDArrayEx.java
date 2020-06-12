@@ -15,6 +15,7 @@ package ai.djl.ndarray.internal;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Activation;
@@ -440,6 +441,13 @@ public interface NDArrayEx {
     ////////////////////////////////////////
     // Miscellaneous
     ////////////////////////////////////////
+
+    /**
+     * Returns an {@link NDArrayIndexer}.
+     *
+     * @return an {@link NDArrayIndexer}
+     */
+    NDArrayIndexer getIndexer();
 
     /**
      * Picks elements from an input array according to the input indices along the given axis.

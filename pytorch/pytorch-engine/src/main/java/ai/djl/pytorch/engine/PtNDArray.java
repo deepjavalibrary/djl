@@ -16,10 +16,6 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.index.NDIndex;
-import ai.djl.ndarray.index.dim.NDIndexBooleans;
-import ai.djl.ndarray.index.dim.NDIndexElement;
-import ai.djl.ndarray.index.full.NDIndexFullSlice;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -33,7 +29,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -170,93 +165,6 @@ public class PtNDArray extends NativeResource implements NDArray {
         PtNDArray other = getManager().create(data, getShape(), getDataType());
         JniUtils.set(this, other);
         other.close();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(NDIndex index, NDArray value) {
-        // use booleanMask for NDIndexBooleans case
-        List<NDIndexElement> indices = index.getIndices();
-        if (!indices.isEmpty() && indices.get(0) instanceof NDIndexBooleans) {
-            if (indices.size() != 1) {
-                throw new IllegalArgumentException(
-                        "get() currently didn't support more that one boolean NDArray");
-            }
-            try (NDArray mask = ((NDIndexBooleans) indices.get(0)).getIndex()) {
-                JniUtils.booleanMaskSet(this, (PtNDArray) value, (PtNDArray) mask);
-            }
-        } else {
-            NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
-            if (fullSlice != null) {
-                Stack<NDArray> prepareValue = new Stack<>();
-                prepareValue.add(value);
-                prepareValue.add(prepareValue.peek().toDevice(getDevice(), false));
-                // Deal with the case target: (1, 10, 1), original (10)
-                // try to find (10, 1) and reshape (10) to that
-                Shape targetShape = fullSlice.getShape();
-                while (targetShape.size() > value.size()) {
-                    targetShape = targetShape.slice(1);
-                }
-                prepareValue.add(prepareValue.peek().reshape(targetShape));
-                prepareValue.add(prepareValue.peek().broadcast(fullSlice.getShape()));
-                JniUtils.indexSet(
-                        this,
-                        (PtNDArray) prepareValue.peek(),
-                        fullSlice.getMin(),
-                        fullSlice.getMax(),
-                        fullSlice.getStep());
-                for (NDArray toClean : prepareValue) {
-                    if (toClean != value) {
-                        toClean.close();
-                    }
-                }
-            } else {
-                throw new UnsupportedOperationException(
-                        "set() currently supports all, fixed, and slices indices");
-            }
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(NDIndex index, Number value) {
-        set(index, getManager().create(value));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setScalar(NDIndex index, Number value) {
-        set(index, value);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray get(NDIndex index) {
-        // TODO find a better way to improve the speed
-        if (isScalar()) {
-            return (PtNDArray) duplicate();
-        }
-        // use booleanMask for NDIndexBooleans case
-        List<NDIndexElement> indices = index.getIndices();
-        if (!indices.isEmpty() && indices.get(0) instanceof NDIndexBooleans) {
-            if (indices.size() != 1) {
-                throw new IllegalArgumentException(
-                        "get() currently didn't support more that one boolean NDArray");
-            }
-            return booleanMask(((NDIndexBooleans) indices.get(0)).getIndex(), 0);
-        }
-
-        NDIndexFullSlice fullSlice = index.getAsFullSlice(getShape()).orElse(null);
-        if (fullSlice != null) {
-            long[] min = fullSlice.getMin();
-            long[] max = fullSlice.getMax();
-            long[] step = fullSlice.getStep();
-            try (PtNDArray array = JniUtils.index(this, min, max, step)) {
-                return array.squeeze(fullSlice.getToSqueeze());
-            }
-        }
-        throw new UnsupportedOperationException(
-                "get() currently supports all, fixed, and slices indices");
     }
 
     /** {@inheritDoc} */

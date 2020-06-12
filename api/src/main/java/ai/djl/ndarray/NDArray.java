@@ -445,7 +445,9 @@ public interface NDArray extends AutoCloseable {
      * @param value the value to replace with. Can broadcast if given smaller dimensions than the
      *     index
      */
-    void set(NDIndex index, NDArray value);
+    default void set(NDIndex index, NDArray value) {
+        getNDArrayInternal().getIndexer().set(this, index, value);
+    }
 
     /**
      * Sets the specified index in this {@code NDArray} with the given value.
@@ -453,7 +455,9 @@ public interface NDArray extends AutoCloseable {
      * @param index the locations to update
      * @param value the value to replace with
      */
-    void set(NDIndex index, Number value);
+    default void set(NDIndex index, Number value) {
+        getNDArrayInternal().getIndexer().set(this, index, value);
+    }
 
     /**
      * Sets the specific index by a function.
@@ -467,13 +471,15 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Sets the specified index in this {@code NDArray} with the given value.
+     * Sets the specified scalar in this {@code NDArray} with the given value.
      *
      * @param index the single index to update
      * @param value the value to replace with
      * @throws IllegalArgumentException thrown if the index does not correspond to a single element
      */
-    void setScalar(NDIndex index, Number value);
+    default void setScalar(NDIndex index, Number value) {
+        getNDArrayInternal().getIndexer().setScalar(this, index, value);
+    }
 
     /**
      * Returns a partial {@code NDArray}.
@@ -481,7 +487,9 @@ public interface NDArray extends AutoCloseable {
      * @param index the section of this {@code NDArray} to return
      * @return the partial {@code NDArray}
      */
-    NDArray get(NDIndex index);
+    default NDArray get(NDIndex index) {
+        return getNDArrayInternal().getIndexer().get(this, index);
+    }
 
     /**
      * Returns a partial {@code NDArray}.

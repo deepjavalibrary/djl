@@ -16,6 +16,7 @@ package ai.djl.tensorflow.engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDUtils;
+import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -30,6 +31,8 @@ import org.tensorflow.types.family.TNumber;
 import org.tensorflow.types.family.TType;
 
 public class TfNDArrayEx implements NDArrayEx {
+
+    private static final NDArrayIndexer INDEXER = new TfNDArrayIndexer();
 
     private TfNDArray array;
     private TfNDManager manager;
@@ -444,6 +447,12 @@ public class TfNDArrayEx implements NDArrayEx {
                 tf.image.resizeBilinear(
                         (Operand<? extends TNumber>) operand,
                         tf.constant(new int[] {height, width})));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArrayIndexer getIndexer() {
+        return INDEXER;
     }
 
     /** {@inheritDoc} */

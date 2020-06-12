@@ -15,6 +15,7 @@ package ai.djl.mxnet.engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDUtils;
+import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -25,6 +26,8 @@ import java.util.List;
 
 /** {@code MxNDArrayEx} is the MXNet implementation of the {@link NDArrayEx}. */
 class MxNDArrayEx implements NDArrayEx {
+
+    private static final NDArrayIndexer INDEXER = new MxNDArrayIndexer();
 
     private MxNDArray array;
 
@@ -654,6 +657,12 @@ class MxNDArrayEx implements NDArrayEx {
         params.add("width", width);
         params.add("height", height);
         return getManager().invoke("_npx__image_crop", array, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArrayIndexer getIndexer() {
+        return INDEXER;
     }
 
     ////////////////////////////////////////

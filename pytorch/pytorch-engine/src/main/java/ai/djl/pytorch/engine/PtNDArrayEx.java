@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.NDUtils;
+import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -26,6 +27,8 @@ import java.util.List;
 
 /** {@code PtNDArrayEx} is the PyTorch implementation of the {@link NDArrayEx}. */
 public class PtNDArrayEx implements NDArrayEx {
+
+    private static final NDArrayIndexer INDEXER = new PtNDArrayIndexer();
 
     private PtNDArray array;
 
@@ -483,6 +486,12 @@ public class PtNDArrayEx implements NDArrayEx {
             result.attach(subManager.getParentManager());
             return (PtNDArray) result;
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArrayIndexer getIndexer() {
+        return INDEXER;
     }
 
     /** {@inheritDoc} */
