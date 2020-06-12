@@ -1,0 +1,19 @@
+group "ai.djl.onnxruntime"
+
+task downloadOrt() {
+    def file = file("${project.buildDir}/onnxruntime-${onnxruntime_version}.jar")
+    outputs.file file
+    doFirst {
+        println "Downloading ${file} ..."
+        def url = "https://djl-ai.s3.amazonaws.com/publish/onnxruntime-${onnxruntime_version}/Linux/cpu/onnxruntime-${onnxruntime_version}.jar"
+        new URL(url).withInputStream { i -> file.withOutputStream { it << i } }
+    }
+}
+
+jar {
+    dependsOn downloadOrt
+    from(zipTree(new File("${project.buildDir}/onnxruntime-${onnxruntime_version}.jar"))) {
+        exclude "ai/onnxruntime/native/**"
+        exclude "META-INF/**"
+    }
+}
