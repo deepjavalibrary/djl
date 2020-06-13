@@ -16,7 +16,9 @@ import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.translate.Batchifier;
 import ai.djl.translate.Pipeline;
+import ai.djl.translate.Transform;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Utils;
@@ -34,6 +36,7 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
 
     private Image.Flag flag;
     private Pipeline pipeline;
+    private Batchifier batchifier;
 
     /**
      * Constructs an ImageTranslator with the provided builder.
@@ -43,6 +46,13 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
     public BaseImageTranslator(BaseBuilder<?> builder) {
         flag = builder.flag;
         pipeline = builder.pipeline;
+        batchifier = builder.batchifier;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Batchifier getBatchifier() {
+        return batchifier;
     }
 
     /** {@inheritDoc} */
@@ -74,6 +84,7 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
 
         protected Image.Flag flag = Image.Flag.COLOR;
         protected Pipeline pipeline;
+        protected Batchifier batchifier = Batchifier.STACK;
 
         /**
          * Sets the optional {@link ai.djl.modality.cv.Image.Flag} (default is {@link
@@ -95,6 +106,31 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
          */
         public T setPipeline(Pipeline pipeline) {
             this.pipeline = pipeline;
+            return self();
+        }
+
+        /**
+         * Adds the {@link Transform} to the {@link Pipeline} use for pre-processing the image.
+         *
+         * @param transform the {@link Transform} to be added
+         * @return this builder
+         */
+        public T addTransform(Transform transform) {
+            if (pipeline == null) {
+                pipeline = new Pipeline();
+            }
+            pipeline.add(transform);
+            return self();
+        }
+
+        /**
+         * Sets the {@link Batchifier} for the {@link Translator}.
+         *
+         * @param batchifier the {@link Batchifier} to be set
+         * @return this builder
+         */
+        public T optBatchifier(Batchifier batchifier) {
+            this.batchifier = batchifier;
             return self();
         }
 

@@ -75,9 +75,7 @@ public interface Translator<I, O> extends PreProcessor<I>, PostProcessor<O> {
      *
      * @return the {@link Batchifier}
      */
-    default Batchifier getBatchifier() {
-        return Batchifier.STACK;
-    }
+    Batchifier getBatchifier();
 
     /**
      * Prepares the translator with the manager and model to use.

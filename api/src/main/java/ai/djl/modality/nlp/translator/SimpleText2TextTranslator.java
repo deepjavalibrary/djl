@@ -22,7 +22,9 @@ import ai.djl.modality.nlp.preprocess.PunctuationSeparator;
 import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.modality.nlp.preprocess.TextProcessor;
 import ai.djl.modality.nlp.preprocess.TextTruncator;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.BlockList;
@@ -42,6 +44,7 @@ import java.util.Locale;
  * text model.
  */
 public class SimpleText2TextTranslator implements Translator<String, String> {
+
     private SimpleTokenizer tokenizer = new SimpleTokenizer();
     private TrainableTextEmbedding sourceEmbedding;
     private TrainableTextEmbedding targetEmbedding;
@@ -109,16 +112,12 @@ public class SimpleText2TextTranslator implements Translator<String, String> {
     public Batchifier getBatchifier() {
         return PaddingStackBatchifier.builder()
                 .optIncludeValidLengths(false)
-                .addPad(
-                        0,
-                        0,
-                        (m) ->
-                                m.ones(new Shape(1))
-                                        .mul(
-                                                sourceEmbedding
-                                                        .preprocessTextToEmbed(
-                                                                Arrays.asList("<pad>"))[0]),
-                        10)
+                .addPad(0, 0, this::get, 10)
                 .build();
+    }
+
+    private NDArray get(NDManager manager) {
+        return manager.ones(new Shape(1))
+                .mul(sourceEmbedding.preprocessTextToEmbed(Collections.singletonList("<pad>"))[0]);
     }
 }

@@ -36,7 +36,9 @@ public class PtBertQATranslator extends QATranslator {
     private Vocabulary vocabulary;
     private BertTokenizer tokenizer;
 
-    PtBertQATranslator() {}
+    PtBertQATranslator(Builder builder) {
+        super(builder);
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -72,6 +74,15 @@ public class PtBertQATranslator extends QATranslator {
         return tokens.subList(startIdx, endIdx + 1).toString();
     }
 
+    /**
+     * Creates a builder to build a {@code PtBertQATranslator}.
+     *
+     * @return a new builder
+     */
+    public static PtBertQATranslator.Builder builder() {
+        return new PtBertQATranslator.Builder();
+    }
+
     /** The builder for Bert QA translator. */
     public static class Builder extends BaseBuilder<Builder> {
 
@@ -91,7 +102,7 @@ public class PtBertQATranslator extends QATranslator {
          * @return the new translator
          */
         protected PtBertQATranslator build() {
-            return new PtBertQATranslator();
+            return new PtBertQATranslator(this);
         }
     }
 }

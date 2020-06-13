@@ -40,9 +40,8 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.Batchifier;
+import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
-import ai.djl.translate.Translator;
-import ai.djl.translate.TranslatorContext;
 import ai.djl.util.PairList;
 import java.io.IOException;
 import java.util.Collections;
@@ -105,7 +104,7 @@ public class ResnetTest {
             throws IOException, ModelNotFoundException, TranslateException,
                     MalformedModelException {
         try (ZooModel<Image, Classifications> model = getModel()) {
-            try (Predictor<NDList, NDList> predictor = model.newPredictor(new TestTranslator())) {
+            try (Predictor<NDList, NDList> predictor = model.newPredictor(new NoopTranslator())) {
                 NDList input = new NDList(model.getNDManager().ones(new Shape(3, 32, 32)));
                 List<NDList> inputs = Collections.nCopies(16, input);
                 predictor.batchPredict(inputs);
@@ -161,20 +160,5 @@ public class ResnetTest {
                         .build();
 
         return ModelZoo.loadModel(criteria);
-    }
-
-    private static class TestTranslator implements Translator<NDList, NDList> {
-
-        /** {@inheritDoc} */
-        @Override
-        public NDList processOutput(TranslatorContext ctx, NDList list) {
-            return list;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public NDList processInput(TranslatorContext ctx, NDList input) {
-            return input;
-        }
     }
 }

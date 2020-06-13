@@ -15,6 +15,7 @@ package ai.djl.modality.cv.translator.wrapper;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.ndarray.NDList;
+import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.io.InputStream;
@@ -48,5 +49,11 @@ public class InputStreamTranslator<T> implements Translator<InputStream, T> {
     @Override
     public T processOutput(TranslatorContext ctx, NDList list) throws Exception {
         return translator.processOutput(ctx, list);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Batchifier getBatchifier() {
+        return translator.getBatchifier();
     }
 }

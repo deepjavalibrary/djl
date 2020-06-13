@@ -42,6 +42,7 @@ public class MxBertQATranslator extends QATranslator {
     private int seqLength;
 
     MxBertQATranslator(Builder builder) {
+        super(builder);
         seqLength = builder.seqLength;
     }
 
@@ -55,6 +56,7 @@ public class MxBertQATranslator extends QATranslator {
     /** {@inheritDoc} */
     @Override
     public Batchifier getBatchifier() {
+        // MXNet BertQA model doesn't support batch
         return null;
     }
 

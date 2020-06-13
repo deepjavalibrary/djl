@@ -13,6 +13,7 @@
 package ai.djl.test.mock;
 
 import ai.djl.ndarray.NDList;
+import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
@@ -41,6 +42,12 @@ public class EchoTranslator<T> implements Translator<T, T> {
             throw outputException;
         }
         return output;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Batchifier getBatchifier() {
+        return null;
     }
 
     public void setPreprocessResult(NDList preprocessResult) {

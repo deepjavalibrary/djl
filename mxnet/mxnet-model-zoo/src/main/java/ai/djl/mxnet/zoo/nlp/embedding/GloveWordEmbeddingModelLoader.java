@@ -30,6 +30,7 @@ import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.translate.TranslatorFactory;
@@ -159,6 +160,12 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDLis
             } else {
                 return new NDList(ctx.getNDManager().create(embedding.embed(unknownToken)));
             }
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Batchifier getBatchifier() {
+            return Batchifier.STACK;
         }
     }
 }

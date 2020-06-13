@@ -19,12 +19,10 @@ import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.util.NDImageUtils;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
+import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
-import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -64,34 +62,17 @@ public final class ImageClassification {
             Path modelDir = Paths.get("build/model");
             model.load(modelDir);
 
-            Translator<Image, Classifications> translator = new MyTranslator();
+            List<String> classes =
+                    IntStream.range(0, 10).mapToObj(String::valueOf).collect(Collectors.toList());
+            Translator<Image, Classifications> translator =
+                    ImageClassificationTranslator.builder()
+                            .addTransform(new ToTensor())
+                            .optSynset(classes)
+                            .build();
 
             try (Predictor<Image, Classifications> predictor = model.newPredictor(translator)) {
                 return predictor.predict(img);
             }
-        }
-    }
-
-    private static final class MyTranslator implements Translator<Image, Classifications> {
-
-        private List<String> classes;
-
-        public MyTranslator() {
-            classes = IntStream.range(0, 10).mapToObj(String::valueOf).collect(Collectors.toList());
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public NDList processInput(TranslatorContext ctx, Image input) {
-            NDArray array = input.toNDArray(ctx.getNDManager(), Image.Flag.COLOR);
-            return new NDList(NDImageUtils.toTensor(array));
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Classifications processOutput(TranslatorContext ctx, NDList list) {
-            NDArray probabilities = list.singletonOrThrow().softmax(0);
-            return new Classifications(classes, probabilities);
         }
     }
 }

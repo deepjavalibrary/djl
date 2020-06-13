@@ -27,6 +27,7 @@ import ai.djl.test.mock.EchoTranslator;
 import ai.djl.test.mock.MockImageTranslator;
 import ai.djl.test.mock.MockModel;
 import ai.djl.test.mock.MockNDArray;
+import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
@@ -101,6 +102,12 @@ public class InferenceTest {
                         return new Classifications(
                                 Collections.singletonList(className),
                                 Collections.singletonList(0.9d));
+                    }
+
+                    /** {@inheritDoc} */
+                    @Override
+                    public Batchifier getBatchifier() {
+                        return null;
                     }
                 };
         Metrics metrics = new Metrics();
