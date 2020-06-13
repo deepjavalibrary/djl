@@ -105,42 +105,41 @@ public interface Model extends AutoCloseable {
      * @throws MalformedModelException if model file is corrupted
      */
     default void load(Path modelPath) throws IOException, MalformedModelException {
-        load(modelPath, modelPath.toFile().getName(), null);
+        load(modelPath, null, null);
     }
 
     /**
      * Loads the model from the {@code modelPath} and the given name.
      *
      * @param modelPath the directory or file path of the model location
-     * @param modelName the model file name
+     * @param prefix the model file name or path prefix
      * @throws IOException when IO operation fails in loading a resource
      * @throws MalformedModelException if model file is corrupted
      */
-    default void load(Path modelPath, String modelName)
-            throws IOException, MalformedModelException {
-        load(modelPath, modelName, null);
+    default void load(Path modelPath, String prefix) throws IOException, MalformedModelException {
+        load(modelPath, prefix, null);
     }
 
     /**
      * Loads the model from the {@code modelPath} with the name and options provided.
      *
      * @param modelPath the directory or file path of the model location
-     * @param modelName the model file name
+     * @param prefix the model file name or path prefix
      * @param options engine specific load model options, see documentation for each engine
      * @throws IOException when IO operation fails in loading a resource
      * @throws MalformedModelException if model file is corrupted
      */
-    void load(Path modelPath, String modelName, Map<String, Object> options)
+    void load(Path modelPath, String prefix, Map<String, Object> options)
             throws IOException, MalformedModelException;
 
     /**
      * Saves the model to the specified {@code modelPath} with the name provided.
      *
      * @param modelPath the directory or file path of the model location
-     * @param modelName the model file name
+     * @param newModelName the new model name to be saved, use null to keep original model name
      * @throws IOException when IO operation fails in loading a resource
      */
-    void save(Path modelPath, String modelName) throws IOException;
+    void save(Path modelPath, String newModelName) throws IOException;
 
     /**
      * Gets the block from the Model.

@@ -60,7 +60,7 @@ public class MxModel extends BaseModel {
      * @param device the device the model should be located on
      */
     MxModel(String name, Device device) {
-        this.modelName = name;
+        super(name);
         device = Device.defaultIfNull(device);
         dataType = DataType.FLOAT32;
         properties = new ConcurrentHashMap<>();
@@ -82,29 +82,41 @@ public class MxModel extends BaseModel {
      * </pre>
      *
      * @param modelPath the directory of the model
-     * @param modelName the name/prefix of the model
+     * @param prefix the model file name or path prefix
      * @param options load model options, see documentation for the specific engine
      * @throws IOException Exception for file loading
      */
     @Override
-    public void load(Path modelPath, String modelName, Map<String, Object> options)
+    public void load(Path modelPath, String prefix, Map<String, Object> options)
             throws IOException, MalformedModelException {
         modelDir = modelPath.toAbsolutePath();
-        this.modelName = modelName;
+        if (prefix == null) {
+            prefix = modelName;
+        }
+        Path paramFile = paramPathResolver(prefix, options);
+        if (paramFile == null) {
+            prefix = modelPath.toFile().getName();
+            paramFile = paramPathResolver(prefix, options);
+            if (paramFile == null) {
+                throw new IOException("Parameter file not found in: " + modelDir);
+            }
+        }
+
         if (block == null) {
             // load MxSymbolBlock
-            Path symbolFile = modelDir.resolve(modelName + "-symbol.json");
-            logger.debug("Finding Symbol File: {}", symbolFile.toString());
+            Path symbolFile = modelDir.resolve(prefix + "-symbol.json");
             if (Files.notExists(symbolFile)) {
                 throw new FileNotFoundException(
-                        "Symbol file not found in: " + modelPath + ", please set block manually.");
+                        "Symbol file not found: "
+                                + symbolFile
+                                + ", please set block manually for imperative model.");
             }
             Symbol symbol =
                     Symbol.load((MxNDManager) manager, symbolFile.toAbsolutePath().toString());
             // TODO: change default name "data" to model-specific one
             block = new MxSymbolBlock(manager, symbol);
         }
-        loadParameters(modelName, options);
+        loadParameters(paramFile, options);
         // TODO: Check if Symbol has all names that params file have
     }
 
@@ -166,13 +178,12 @@ public class MxModel extends BaseModel {
     }
 
     @SuppressWarnings("PMD.UseConcurrentHashMap")
-    private void loadParameters(String modelName, Map<String, Object> options)
+    private void loadParameters(Path paramFile, Map<String, Object> options)
             throws IOException, MalformedModelException {
-        if (readParameters(options)) {
+        if (readParameters(paramFile, options)) {
             return;
         }
         logger.debug("DJL formatted model not found, try to find MXNet model");
-        Path paramFile = paramPathResolver(options);
         NDList paramNDlist = manager.load(paramFile);
 
         MxSymbolBlock symbolBlock = (MxSymbolBlock) block;
@@ -195,7 +206,7 @@ public class MxModel extends BaseModel {
 
         // TODO: Find a better to infer model DataType from SymbolBlock.
         dataType = paramNDlist.head().getDataType();
-        logger.debug("MXNet Model {} ({}) loaded successfully.", modelName, dataType);
+        logger.debug("MXNet Model {} ({}) loaded successfully.", paramFile, dataType);
     }
 
     /** {@inheritDoc} */

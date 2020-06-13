@@ -54,7 +54,7 @@ public class ZooModel<I, O> implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public void load(Path modelPath, String modelName, Map<String, Object> options) {
+    public void load(Path modelPath, String prefix, Map<String, Object> options) {
         throw new IllegalArgumentException("ZooModel should not be re-loaded.");
     }
 

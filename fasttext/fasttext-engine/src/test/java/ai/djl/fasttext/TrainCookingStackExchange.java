@@ -112,8 +112,8 @@ public class TrainCookingStackExchange {
         }
 
         TextClassificationTranslator translator = new TextClassificationTranslator();
-        try (Model model = Model.newInstance("classifier")) {
-            model.load(path, "text_classification.bin");
+        try (Model model = Model.newInstance("text_classification")) {
+            model.load(path);
             try (Predictor<String, Classifications> predictor = model.newPredictor(translator)) {
                 Classifications result =
                         predictor.predict(

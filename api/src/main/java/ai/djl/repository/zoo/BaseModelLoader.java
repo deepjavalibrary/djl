@@ -134,7 +134,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
                             artifact,
                             arguments,
                             engine);
-            model.load(modelPath, artifact.getName(), criteria.getOptions());
+            model.load(modelPath, null, criteria.getOptions());
             return new ZooModel<>(model, translator);
         } finally {
             if (progress != null) {

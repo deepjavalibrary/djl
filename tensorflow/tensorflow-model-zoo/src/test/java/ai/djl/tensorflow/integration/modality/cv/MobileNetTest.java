@@ -20,15 +20,14 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
-import ai.djl.ndarray.NDArray;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
-import ai.djl.translate.Transform;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -42,39 +41,26 @@ public class MobileNetTest {
             throw new SkipException("Tensorflow doesn't support Windows yet.");
         }
 
+        Pipeline pipeline = new Pipeline(new Resize(224, 224));
+        pipeline.add(array -> array.div(127.5f).sub(1f));
+        ImageClassificationTranslator myTranslator =
+                ImageClassificationTranslator.builder().setPipeline(pipeline).build();
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(Image.class, Classifications.class)
+                        .optTranslator(myTranslator)
                         .optArtifactId("mobilenet")
                         .optFilter("flavor", "v2")
                         .optProgress(new ProgressBar())
                         .build();
 
-        Pipeline pipeline = new Pipeline();
-        pipeline.add(new Resize(224, 224)).add(new CustomTransform());
-
-        ImageClassificationTranslator myTranslator =
-                ImageClassificationTranslator.builder().setPipeline(pipeline).build();
-        try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria)) {
-            try (Predictor<Image, Classifications> predictor = model.newPredictor(myTranslator)) {
-                Classifications result =
-                        predictor.predict(
-                                ImageFactory.getInstance()
-                                        .fromFile(
-                                                Paths.get(
-                                                        "../../examples/src/test/resources/kitten.jpg")));
-                Assert.assertEquals(result.best().getClassName(), "n02124075 Egyptian cat");
-            }
-        }
-    }
-
-    private static final class CustomTransform implements Transform {
-
-        /** {@inheritDoc} */
-        @Override
-        public NDArray transform(NDArray array) {
-            return array.div(127.5f).sub(1f);
+        Path file = Paths.get("../../examples/src/test/resources/kitten.jpg");
+        Image img = ImageFactory.getInstance().fromFile(file);
+        try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
+                Predictor<Image, Classifications> predictor = model.newPredictor()) {
+            Classifications result = predictor.predict(img);
+            Assert.assertEquals(result.best().getClassName(), "n02124075 Egyptian cat");
         }
     }
 }

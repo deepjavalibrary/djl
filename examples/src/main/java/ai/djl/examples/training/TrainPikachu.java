@@ -100,7 +100,7 @@ public final class TrainPikachu {
             float detectionThreshold = 0.6f;
             // load parameters back to original training block
             model.setBlock(getSsdTrainBlock());
-            model.load(Paths.get(outputDir), "pikachu-ssd");
+            model.load(Paths.get(outputDir));
             // append prediction logic at end of training block with parameter loaded
             Block ssdTrain = model.getBlock();
             model.setBlock(getSsdPredictBlock(ssdTrain));

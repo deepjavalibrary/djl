@@ -47,7 +47,7 @@ public class PtModel extends BaseModel {
      * @param device the device the model should be located on
      */
     PtModel(String name, Device device) {
-        this.modelName = name;
+        super(name);
         device = Device.defaultIfNull(device);
         manager = PtNDManager.getSystemManager().newSubManager(device);
         dataType = DataType.FLOAT32;
@@ -55,23 +55,46 @@ public class PtModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public void load(Path modelPath, String modelName, Map<String, Object> options)
+    public void load(Path modelPath, String prefix, Map<String, Object> options)
             throws IOException, MalformedModelException {
         modelDir = modelPath.toAbsolutePath();
-        this.modelName = modelName;
+        if (prefix == null) {
+            prefix = modelName;
+        }
         if (block == null) {
-            String modelFullName = (modelName.endsWith(".pt")) ? modelName : modelName + ".pt";
-            Path modelFile =
-                    (modelDir.toString().endsWith(modelFullName))
-                            ? modelDir
-                            : modelDir.resolve(modelFullName);
-            if (Files.notExists(modelFile)) {
-                throw new FileNotFoundException(".pt file not found in: " + modelPath);
+            Path modelFile = findModelFile(prefix);
+            if (modelFile == null) {
+                modelFile = findModelFile(modelPath.toFile().getName());
+                if (modelFile == null) {
+                    throw new FileNotFoundException(".pt file not found in: " + modelPath);
+                }
             }
             block = JniUtils.loadModule((PtNDManager) manager, modelFile, manager.getDevice());
         } else {
-            readParameters(options);
+            Path paramFile = paramPathResolver(prefix, options);
+            if (paramFile == null) {
+                throw new IOException(
+                        "Parameter file not found in: "
+                                + modelDir
+                                + ". If you only specified model path, make sure path name match"
+                                + "your saved model file name.");
+            }
+            readParameters(paramFile, options);
         }
+    }
+
+    private Path findModelFile(String prefix) {
+        Path modelFile = modelDir.resolve(prefix);
+        if (Files.notExists(modelFile)) {
+            if (prefix.endsWith(".pt")) {
+                return null;
+            }
+            modelFile = modelDir.resolve(prefix + ".pt");
+            if (Files.notExists(modelFile)) {
+                return null;
+            }
+        }
+        return modelFile;
     }
 
     /** {@inheritDoc} */

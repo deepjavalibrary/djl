@@ -50,6 +50,10 @@ public abstract class BaseModel implements Model {
     protected Map<String, Object> artifacts = new ConcurrentHashMap<>();
     protected Map<String, String> properties = new ConcurrentHashMap<>();
 
+    protected BaseModel(String modelName) {
+        this.modelName = modelName;
+    }
+
     /** {@inheritDoc} */
     @Override
     public Block getBlock() {
@@ -168,7 +172,7 @@ public abstract class BaseModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public void save(Path modelPath, String modelName) throws IOException {
+    public void save(Path modelPath, String newModelName) throws IOException {
         if (Files.notExists(modelPath)) {
             Files.createDirectories(modelPath);
         }
@@ -180,14 +184,14 @@ public abstract class BaseModel implements Model {
         String epochValue = getProperty("Epoch");
         int epoch =
                 epochValue == null
-                        ? Utils.getCurrentEpoch(modelPath, modelName) + 1
+                        ? Utils.getCurrentEpoch(modelPath, newModelName) + 1
                         : Integer.parseInt(epochValue);
 
-        Path paramFile = modelPath.resolve(String.format("%s-%04d.params", modelName, epoch));
+        Path paramFile = modelPath.resolve(String.format("%s-%04d.params", newModelName, epoch));
         try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(paramFile))) {
             dos.writeBytes("DJL@");
             dos.writeInt(MODEL_VERSION);
-            dos.writeUTF(modelName);
+            dos.writeUTF(newModelName);
             dos.writeUTF(dataType.name());
             inputData = block.describeInput();
             dos.writeInt(inputData.size());
@@ -209,7 +213,6 @@ public abstract class BaseModel implements Model {
 
             block.saveParameters(dos);
         }
-        this.modelName = modelName;
         modelDir = modelPath.toAbsolutePath();
     }
 
@@ -224,37 +227,27 @@ public abstract class BaseModel implements Model {
         super.finalize();
     }
 
-    protected Path paramPathResolver(Map<String, Object> options) throws IOException {
-        Path paramFile;
-        if (Files.isRegularFile(modelDir)) {
-            paramFile = modelDir;
-        } else {
-            Object epochOption = null;
-            if (options != null) {
-                epochOption = options.get("epoch");
-            }
-            int epoch;
-            if (epochOption == null) {
-                epoch = Utils.getCurrentEpoch(modelDir, modelName);
-                if (epoch == -1) {
-                    throw new IOException(
-                            "Parameter file not found in: "
-                                    + modelDir
-                                    + ". If you only specified model path, make sure path name match"
-                                    + "your saved model file name.");
-                }
-            } else {
-                epoch = Integer.parseInt(epochOption.toString());
-            }
-
-            paramFile = modelDir.resolve(String.format("%s-%04d.params", modelName, epoch));
+    protected Path paramPathResolver(String prefix, Map<String, Object> options)
+            throws IOException {
+        Object epochOption = null;
+        if (options != null) {
+            epochOption = options.get("epoch");
         }
-        return paramFile;
+        int epoch;
+        if (epochOption == null) {
+            epoch = Utils.getCurrentEpoch(modelDir, prefix);
+            if (epoch == -1) {
+                return null;
+            }
+        } else {
+            epoch = Integer.parseInt(epochOption.toString());
+        }
+
+        return modelDir.resolve(String.format("%s-%04d.params", prefix, epoch));
     }
 
-    protected boolean readParameters(Map<String, Object> options)
+    protected boolean readParameters(Path paramFile, Map<String, Object> options)
             throws IOException, MalformedModelException {
-        Path paramFile = paramPathResolver(options);
         logger.debug("Try to load model from {}", paramFile);
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(paramFile))) {
             byte[] buf = new byte[4];
@@ -268,8 +261,8 @@ public abstract class BaseModel implements Model {
                 throw new IOException("Unsupported model version: " + version);
             }
 
-            modelName = dis.readUTF();
-            logger.debug("Loading model parameter: {}", modelName);
+            String savedModelName = dis.readUTF();
+            logger.debug("Loading saved model: {} parameter", savedModelName);
 
             dataType = DataType.valueOf(dis.readUTF());
 

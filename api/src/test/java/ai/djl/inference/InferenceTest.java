@@ -58,7 +58,7 @@ public class InferenceTest {
         String modelName = "mockModel";
 
         Model model = Model.newInstance(modelName);
-        model.load(modelDir, modelName);
+        model.load(modelDir);
         MockImageTranslator translator = new MockImageTranslator("cat");
 
         Metrics metrics = new Metrics();
@@ -128,7 +128,7 @@ public class InferenceTest {
         String modelName = "mockModel";
 
         try (Model model = Model.newInstance(modelName)) {
-            model.load(modelDir, modelName);
+            model.load(modelDir);
         }
     }
 }

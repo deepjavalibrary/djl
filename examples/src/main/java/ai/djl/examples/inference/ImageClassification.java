@@ -62,7 +62,7 @@ public final class ImageClassification {
 
             // Assume you have run TrainMnist.java example, and saved model in build/model folder.
             Path modelDir = Paths.get("build/model");
-            model.load(modelDir, modelName);
+            model.load(modelDir);
 
             Translator<Image, Classifications> translator = new MyTranslator();
 

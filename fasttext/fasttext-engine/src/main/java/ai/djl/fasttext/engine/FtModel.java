@@ -66,33 +66,26 @@ public class FtModel implements Model {
      * Loads the fastText model from a specified location.
      *
      * @param modelPath the directory of the model
-     * @param modelName the name of the model
+     * @param prefix the model file name or path prefix
      * @param options load model options, see documentation for the specific engine
      * @throws IOException Exception for file loading
      */
     @Override
-    public void load(Path modelPath, String modelName, Map<String, Object> options)
+    public void load(Path modelPath, String prefix, Map<String, Object> options)
             throws IOException, MalformedModelException {
         if (Files.notExists(modelPath)) {
             throw new FileNotFoundException(
                     "Model directory doesn't exist: " + modelPath.toAbsolutePath());
         }
         modelDir = modelPath.toAbsolutePath();
-        this.modelName = modelName;
-
-        Path modelFile = modelDir.resolve(modelName);
-        if (Files.notExists(modelFile)) {
-            if (modelName.endsWith(".ftz") || modelName.endsWith(".bin")) {
-                throw new FileNotFoundException(
-                        "Model file doesn't exist: " + modelFile.toAbsolutePath());
-            }
-            modelFile = modelDir.resolve(modelName + ".ftz");
-            if (Files.notExists(modelFile)) {
-                modelFile = modelDir.resolve(modelName + ".ftz");
-                if (Files.notExists(modelFile)) {
-                    throw new FileNotFoundException(
-                            "Model " + modelName + " not found in directory " + modelDir);
-                }
+        if (prefix == null) {
+            prefix = modelName;
+        }
+        Path modelFile = findModelFile(prefix);
+        if (modelFile == null) {
+            modelFile = findModelFile(modelPath.toFile().getName());
+            if (modelFile == null) {
+                throw new FileNotFoundException("No .ftz or .bin file found in : " + modelPath);
             }
         }
 
@@ -103,6 +96,23 @@ public class FtModel implements Model {
         fta.loadModel(modelFilePath);
 
         properties.put("model-type", fta.getModelName().getString());
+    }
+
+    private Path findModelFile(String prefix) {
+        Path modelFile = modelDir.resolve(prefix);
+        if (Files.notExists(modelFile)) {
+            if (prefix.endsWith(".ftz") || prefix.endsWith(".bin")) {
+                return null;
+            }
+            modelFile = modelDir.resolve(prefix + ".ftz");
+            if (Files.notExists(modelFile)) {
+                modelFile = modelDir.resolve(prefix + ".bin");
+                if (Files.notExists(modelFile)) {
+                    return null;
+                }
+            }
+        }
+        return modelFile;
     }
 
     /**
@@ -139,7 +149,7 @@ public class FtModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public void save(Path modelDir, String modelName) {}
+    public void save(Path modelDir, String newModelName) {}
 
     /** {@inheritDoc} */
     @Override
