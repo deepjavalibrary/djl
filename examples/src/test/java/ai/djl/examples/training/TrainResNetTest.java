@@ -14,11 +14,11 @@
 package ai.djl.examples.training;
 
 import ai.djl.Device;
-import ai.djl.MalformedModelException;
+import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.transferlearning.TrainResnetWithCifar10;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.TrainingResult;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
@@ -30,7 +30,7 @@ public class TrainResNetTest {
 
     @Test
     public void testTrainResNet()
-            throws ParseException, ModelNotFoundException, IOException, MalformedModelException {
+            throws ParseException, ModelException, IOException, TranslateException {
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
         String[] args = {"-e", "2", "-g", "4", "-m", "10", "-s", "-p"};
@@ -40,7 +40,7 @@ public class TrainResNetTest {
 
     @Test
     public void testTrainResNetSymbolicNightly()
-            throws ParseException, ModelNotFoundException, IOException, MalformedModelException {
+            throws ParseException, ModelException, IOException, TranslateException {
         // this is nightly test
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");
@@ -60,7 +60,7 @@ public class TrainResNetTest {
 
     @Test
     public void testTrainResNetImperativeNightly()
-            throws ParseException, ModelNotFoundException, IOException, MalformedModelException {
+            throws ParseException, ModelException, IOException, TranslateException {
         // this is nightly test
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");

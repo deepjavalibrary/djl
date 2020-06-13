@@ -127,13 +127,16 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
                 throw new ModelNotFoundException(engine + " is not supported.");
             }
 
+            String modelName = criteria.getModelName();
+            if (modelName == null) {
+                modelName = artifact.getName();
+            }
+
             Model model =
-                    createModel(
-                            artifact.getName(),
-                            Device.defaultDevice(),
-                            artifact,
-                            arguments,
-                            engine);
+                    createModel(modelName, Device.defaultDevice(), artifact, arguments, engine);
+            if (criteria.getBlock() != null) {
+                model.setBlock(criteria.getBlock());
+            }
             model.load(modelPath, null, criteria.getOptions());
             return new ZooModel<>(model, translator);
         } finally {

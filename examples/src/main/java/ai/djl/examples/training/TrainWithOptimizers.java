@@ -128,7 +128,7 @@ public final class TrainWithOptimizers {
             newBlock.add(block);
             newBlock.add(x -> new NDList(x.singletonOrThrow().squeeze()));
             newBlock.add(Linear.builder().setOutChannels(10).build());
-            newBlock.add(Blocks.batchFlattenBlock());
+            newBlock.add(Blocks.batchFlattenBlock(10));
             model.setBlock(newBlock);
             if (!preTrained) {
                 model.getBlock().clear();

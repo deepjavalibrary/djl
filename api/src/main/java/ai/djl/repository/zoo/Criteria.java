@@ -14,6 +14,7 @@ package ai.djl.repository.zoo;
 
 import ai.djl.Application;
 import ai.djl.Device;
+import ai.djl.nn.Block;
 import ai.djl.translate.Translator;
 import ai.djl.util.Progress;
 import java.util.HashMap;
@@ -39,6 +40,8 @@ public class Criteria<I, O> {
     private Map<String, Object> arguments;
     private Map<String, Object> options;
     private Translator<I, O> translator;
+    private Block block;
+    private String modelName;
     private Progress progress;
 
     Criteria(Builder<I, O> builder) {
@@ -54,6 +57,8 @@ public class Criteria<I, O> {
         this.arguments = builder.arguments;
         this.options = builder.options;
         this.translator = builder.translator;
+        this.block = builder.block;
+        this.modelName = builder.modelName;
         this.progress = builder.progress;
     }
 
@@ -166,6 +171,24 @@ public class Criteria<I, O> {
     }
 
     /**
+     * Returns the optional {@link Block} to be used for {@link ZooModel}.
+     *
+     * @return the optional {@link Block} to be used for {@link ZooModel}
+     */
+    public Block getBlock() {
+        return block;
+    }
+
+    /**
+     * Returns the optional model name to be used for {@link ZooModel}.
+     *
+     * @return the optional model name to be used for {@link ZooModel}
+     */
+    public String getModelName() {
+        return modelName;
+    }
+
+    /**
      * Returns the optional {@link Progress} for the model loading.
      *
      * @return the optional {@link Progress} for the model loading
@@ -198,6 +221,8 @@ public class Criteria<I, O> {
         Map<String, Object> arguments;
         Map<String, Object> options;
         Translator<I, O> translator;
+        Block block;
+        String modelName;
         Progress progress;
 
         Builder() {}
@@ -212,6 +237,8 @@ public class Criteria<I, O> {
             filters = parent.filters;
             arguments = parent.arguments;
             options = parent.options;
+            block = parent.block;
+            modelName = parent.modelName;
             progress = parent.progress;
         }
 
@@ -334,6 +361,28 @@ public class Criteria<I, O> {
                 filters = new HashMap<>();
             }
             filters.put(key, value);
+            return this;
+        }
+
+        /**
+         * Sets an optional model {@link Block} for this criteria.
+         *
+         * @param block optional model {@link Block} for this criteria
+         * @return this {@code Builder}
+         */
+        public Builder<I, O> optBlock(Block block) {
+            this.block = block;
+            return this;
+        }
+
+        /**
+         * Sets an optional model name for this criteria.
+         *
+         * @param modelName optional model name for this criteria
+         * @return this {@code Builder}
+         */
+        public Builder<I, O> optModelName(String modelName) {
+            this.modelName = modelName;
             return this;
         }
 
