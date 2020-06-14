@@ -25,7 +25,6 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -42,12 +41,13 @@ public class ResNetTest {
             throw new SkipException("Tensorflow doesn't support Windows yet.");
         }
 
-        Pipeline pipeline = new Pipeline(new Resize(224, 224));
-        pipeline.add(
-                new Normalize(new float[] {103.939f, 116.779f, 123.68f}, new float[] {1f, 1f, 1f}));
-
+        float[] mean = {103.939f, 116.779f, 123.68f};
+        float[] std = {1f, 1f, 1f};
         ImageClassificationTranslator myTranslator =
-                ImageClassificationTranslator.builder().setPipeline(pipeline).build();
+                ImageClassificationTranslator.builder()
+                        .addTransform(new Resize(224, 224))
+                        .addTransform(new Normalize(mean, std))
+                        .build();
 
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()

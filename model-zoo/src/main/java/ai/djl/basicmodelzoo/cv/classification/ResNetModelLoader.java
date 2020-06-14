@@ -36,7 +36,6 @@ import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -154,9 +153,11 @@ public class ResNetModelLoader extends BaseModelLoader<Image, Classifications> {
             int width = shape.get(2).intValue();
             int height = shape.get(1).intValue();
 
-            Pipeline pipeline = new Pipeline();
-            pipeline.add(new CenterCrop()).add(new Resize(width, height)).add(new ToTensor());
-            return ImageClassificationTranslator.builder().setPipeline(pipeline).build();
+            return ImageClassificationTranslator.builder()
+                    .addTransform(new CenterCrop())
+                    .addTransform(new Resize(width, height))
+                    .addTransform(new ToTensor())
+                    .build();
         }
     }
 }

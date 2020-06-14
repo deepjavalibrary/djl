@@ -29,7 +29,6 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.tensorflow.zoo.TfModelZoo;
-import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -110,12 +109,9 @@ public abstract class ImageClassificationModelLoader
             int height = ((Double) arguments.getOrDefault("height", 224d)).intValue();
             String flag = (String) arguments.getOrDefault("flag", Image.Flag.COLOR.name());
 
-            Pipeline pipeline = new Pipeline();
-            pipeline.add(new Resize(width, height));
-
             return ImageClassificationTranslator.builder()
                     .optFlag(Image.Flag.valueOf(flag))
-                    .setPipeline(pipeline)
+                    .addTransform(new Resize(width, height))
                     .build();
         }
     }

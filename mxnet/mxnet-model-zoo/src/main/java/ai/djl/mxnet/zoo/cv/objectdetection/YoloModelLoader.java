@@ -30,7 +30,6 @@ import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -112,11 +111,9 @@ public class YoloModelLoader extends BaseModelLoader<Image, DetectedObjects> {
             int height = ((Double) arguments.getOrDefault("height", 512d)).intValue();
             double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
 
-            Pipeline pipeline = new Pipeline();
-            pipeline.add(new Resize(width, height)).add(new ToTensor());
-
             return YoloTranslator.builder()
-                    .setPipeline(pipeline)
+                    .addTransform(new Resize(width, height))
+                    .addTransform(new ToTensor())
                     .optSynsetArtifactName("classes.txt")
                     .optThreshold((float) threshold)
                     .optRescaleSize(width, height)

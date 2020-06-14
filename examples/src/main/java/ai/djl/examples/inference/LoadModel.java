@@ -27,7 +27,6 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import java.io.IOException;
@@ -93,8 +92,10 @@ public final class LoadModel {
     private static Translator<Image, Classifications> getTranslator() {
         // This ImageClassificationTranslator is just a default, you need to
         // make proper changes to match your local model's behavior.
-        Pipeline pipeline = new Pipeline();
-        pipeline.add(new CenterCrop()).add(new Resize(224, 224)).add(new ToTensor());
-        return ImageClassificationTranslator.builder().setPipeline(pipeline).build();
+        return ImageClassificationTranslator.builder()
+                .addTransform(new CenterCrop())
+                .addTransform(new Resize(224, 224))
+                .addTransform(new ToTensor())
+                .build();
     }
 }

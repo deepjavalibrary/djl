@@ -17,7 +17,6 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.transform.CenterCrop;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -32,7 +31,6 @@ import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -49,6 +47,9 @@ public abstract class ImageClassificationModelLoader
 
     private static final Application APPLICATION = Application.CV.IMAGE_CLASSIFICATION;
     private static final String GROUP_ID = PtModelZoo.GROUP_ID;
+
+    private static final float[] MEAN = {0.485f, 0.456f, 0.406f};
+    private static final float[] STD = {0.229f, 0.224f, 0.225f};
 
     /**
      * Creates the Model loader from the given repository.
@@ -109,22 +110,15 @@ public abstract class ImageClassificationModelLoader
         /** {@inheritDoc} */
         @Override
         public Translator<Image, Classifications> newInstance(Map<String, Object> arguments) {
-            int width = ((Double) arguments.getOrDefault("width", 224d)).intValue();
-            int height = ((Double) arguments.getOrDefault("height", 224d)).intValue();
+            int width = ((Double) arguments.getOrDefault("width", 256d)).intValue();
+            int height = ((Double) arguments.getOrDefault("height", 256d)).intValue();
             String flag = (String) arguments.getOrDefault("flag", Image.Flag.COLOR.name());
-
-            Pipeline pipeline = new Pipeline();
-            pipeline.add(new Resize(256, 256))
-                    .add(new CenterCrop(width, height))
-                    .add(new ToTensor())
-                    .add(
-                            new Normalize(
-                                    new float[] {0.485f, 0.456f, 0.406f},
-                                    new float[] {0.229f, 0.224f, 0.225f}));
 
             return ImageClassificationTranslator.builder()
                     .optFlag(Image.Flag.valueOf(flag))
-                    .setPipeline(pipeline)
+                    .addTransform(new Resize(width, height))
+                    .addTransform(new ToTensor())
+                    .addTransform(new Normalize(MEAN, STD))
                     .optApplySoftmax(true)
                     .build();
         }

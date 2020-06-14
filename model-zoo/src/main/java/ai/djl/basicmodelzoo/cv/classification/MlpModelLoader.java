@@ -34,7 +34,6 @@ import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -138,11 +137,11 @@ public class MlpModelLoader extends BaseModelLoader<Image, Classifications> {
             int height = ((Double) arguments.getOrDefault("height", 28d)).intValue();
             String flag = (String) arguments.getOrDefault("flag", Image.Flag.COLOR.name());
 
-            Pipeline pipeline = new Pipeline();
-            pipeline.add(new CenterCrop()).add(new Resize(width, height)).add(new ToTensor());
             return ImageClassificationTranslator.builder()
                     .optFlag(Image.Flag.valueOf(flag))
-                    .setPipeline(pipeline)
+                    .addTransform(new CenterCrop())
+                    .addTransform(new Resize(width, height))
+                    .addTransform(new ToTensor())
                     .build();
         }
     }

@@ -52,6 +52,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.apache.commons.cli.ParseException;
 
@@ -105,13 +106,10 @@ public final class TrainPikachu {
             Block ssdTrain = model.getBlock();
             model.setBlock(getSsdPredictBlock(ssdTrain));
             Path imagePath = Paths.get(imageFile);
-            Pipeline pipeline = new Pipeline(new ToTensor());
-            List<String> classes = new ArrayList<>();
-            classes.add("pikachu");
             SingleShotDetectionTranslator translator =
                     SingleShotDetectionTranslator.builder()
-                            .setPipeline(pipeline)
-                            .optSynset(classes)
+                            .addTransform(new ToTensor())
+                            .optSynset(Collections.singletonList("pikachu"))
                             .optThreshold(detectionThreshold)
                             .build();
             try (Predictor<Image, DetectedObjects> predictor = model.newPredictor(translator)) {

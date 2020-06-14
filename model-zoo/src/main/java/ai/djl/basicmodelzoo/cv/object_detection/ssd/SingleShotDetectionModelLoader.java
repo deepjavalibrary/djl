@@ -34,7 +34,6 @@ import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -172,11 +171,8 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
         /** {@inheritDoc} */
         @Override
         public Translator<Image, DetectedObjects> newInstance(Map<String, Object> arguments) {
-            Pipeline pipeline = new Pipeline();
-            pipeline.add(new ToTensor());
             return SingleShotDetectionTranslator.builder()
-                    .setPipeline(pipeline)
-                    .optSynsetArtifactName("synset.txt")
+                    .addTransform(new ToTensor())
                     .optThreshold(((Double) arguments.get("threshold")).floatValue())
                     .build();
         }

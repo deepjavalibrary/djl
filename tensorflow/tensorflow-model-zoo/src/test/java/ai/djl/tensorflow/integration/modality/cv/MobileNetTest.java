@@ -24,7 +24,6 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,10 +40,11 @@ public class MobileNetTest {
             throw new SkipException("Tensorflow doesn't support Windows yet.");
         }
 
-        Pipeline pipeline = new Pipeline(new Resize(224, 224));
-        pipeline.add(array -> array.div(127.5f).sub(1f));
         ImageClassificationTranslator myTranslator =
-                ImageClassificationTranslator.builder().setPipeline(pipeline).build();
+                ImageClassificationTranslator.builder()
+                        .addTransform(new Resize(224, 224))
+                        .addTransform(array -> array.div(127.5f).sub(1f))
+                        .build();
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)

@@ -31,7 +31,6 @@ import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -56,6 +55,9 @@ public class SimplePoseModelLoader extends BaseModelLoader<Image, Joints> {
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "simple_pose";
     private static final String VERSION = "0.0.1";
+
+    private static final float[] MEAN = {0.485f, 0.456f, 0.406f};
+    private static final float[] STD = {0.229f, 0.224f, 0.225f};
 
     /**
      * Creates the Model loader from the given repository.
@@ -114,16 +116,10 @@ public class SimplePoseModelLoader extends BaseModelLoader<Image, Joints> {
             int height = ((Double) arguments.getOrDefault("height", 256d)).intValue();
             double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
 
-            Pipeline pipeline = new Pipeline();
-            pipeline.add(new Resize(width, height))
-                    .add(new ToTensor())
-                    .add(
-                            new Normalize(
-                                    new float[] {0.485f, 0.456f, 0.406f},
-                                    new float[] {0.229f, 0.224f, 0.225f}));
-
             return SimplePoseTranslator.builder()
-                    .setPipeline(pipeline)
+                    .addTransform(new Resize(width, height))
+                    .addTransform(new ToTensor())
+                    .addTransform(new Normalize(MEAN, STD))
                     .optThreshold((float) threshold)
                     .build();
         }
