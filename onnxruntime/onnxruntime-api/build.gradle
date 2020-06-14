@@ -4,10 +4,17 @@ task downloadOrt() {
     def file = file("${project.buildDir}/onnxruntime-${onnxruntime_version}.jar")
     outputs.file file
     doFirst {
-        println "Downloading ${file} ..."
-        def url = "https://djl-ai.s3.amazonaws.com/publish/onnxruntime-${onnxruntime_version}/Linux/cpu/onnxruntime-${onnxruntime_version}.jar"
-        new URL(url).withInputStream { i -> file.withOutputStream { it << i } }
+        if (!file.exists()) {
+            println "Downloading ${file} ..."
+            def url = "https://djl-ai.s3.amazonaws.com/publish/onnxruntime-${onnxruntime_version}/Linux/cpu/onnxruntime-${onnxruntime_version}.jar"
+            new URL(url).withInputStream { i -> file.withOutputStream { it << i } }
+        }
     }
+}
+
+task copyJar(type: Copy) {
+    from jar.outputs.files.singleFile
+    into "../onnxruntime-engine/libs/"
 }
 
 jar {
@@ -17,3 +24,4 @@ jar {
         exclude "META-INF/**"
     }
 }
+jar.finalizedBy(copyJar)

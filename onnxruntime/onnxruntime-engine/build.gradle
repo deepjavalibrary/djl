@@ -3,6 +3,7 @@ group "ai.djl.onnxruntime"
 dependencies {
     api project(":api")
     api project(":onnxruntime:onnxruntime-api")
+    implementation fileTree(dir: "libs", include: "*.jar")
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
