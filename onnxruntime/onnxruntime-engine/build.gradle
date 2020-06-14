@@ -11,3 +11,5 @@ dependencies {
 
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
+
+compileJava.dependsOn ":onnxruntime:onnxruntime-api:jar"

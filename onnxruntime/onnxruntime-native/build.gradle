@@ -16,7 +16,8 @@ task downloadOrtNativeLib() {
         def url = "https://djl-ai.s3.amazonaws.com/publish/onnxruntime-${onnxruntime_version}"
         def files = [
                 "Linux/cpu"    : "cpu/linux",
-                "macOS/cpu"    : "cpu/osx"
+                "macOS/cpu"    : "cpu/osx",
+                "Windows/cpu"    : "cpu/win"
         ]
         def downloadedJar = "onnxruntime-${onnxruntime_version}.jar"
         files.each { entry ->

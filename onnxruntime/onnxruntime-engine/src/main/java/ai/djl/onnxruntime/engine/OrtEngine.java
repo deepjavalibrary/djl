@@ -18,6 +18,8 @@ import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.GradientCollector;
+import ai.onnxruntime.OrtEnvironment;
+import ai.onnxruntime.OrtException;
 
 /**
  * The {@code OrtEngine} is an implementation of the {@link Engine} based on the <a
@@ -26,18 +28,32 @@ import ai.djl.training.GradientCollector;
  * <p>To get an instance of the {@code OrtEngine} when it is not the default Engine, call {@link
  * Engine#getEngine(String)} with the Engine name "OnnxRuntime".
  */
-public class OrtEngine extends Engine {
+public final class OrtEngine extends Engine implements AutoCloseable {
+
+    public static final String ENGINE_NAME = "OnnxRuntime";
+    private OrtEnvironment environment;
+
+    private OrtEngine(OrtEnvironment env) {
+        environment = env;
+    }
+
+    static Engine newInstance() {
+        LibUtils.prepareLibrary();
+        // init OrtRuntime
+        OrtEnvironment environment = OrtEnvironment.getEnvironment();
+        return new OrtEngine(environment);
+    }
 
     /** {@inheritDoc} */
     @Override
     public String getEngineName() {
-        return null;
+        return ENGINE_NAME;
     }
 
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return null;
+        return "1.3.0";
     }
 
     /** {@inheritDoc} */
@@ -73,4 +89,10 @@ public class OrtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public void setRandomSeed(int seed) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() throws OrtException {
+        environment.close();
+    }
 }
