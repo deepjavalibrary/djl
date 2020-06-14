@@ -1,4 +1,13 @@
+plugins {
+    id 'maven-publish'
+    id 'signing'
+}
+
 group "ai.djl.onnxruntime"
+def VERSION = "1.3.0"
+boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
+version = VERSION + (isRelease ? "" : "-SNAPSHOT")
+
 
 def BINARY_ROOT = "${project.buildDir}/download"
 
@@ -27,6 +36,64 @@ task downloadOrtNativeLib() {
                 into outputDir
             }
             delete(file)
+        }
+        new File("${BINARY_ROOT}/auto").mkdirs()
+    }
+}
+
+// Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
+jar {
+    def placeholder = "${project.buildDir}/placeholder"
+    doFirst {
+        def versionName = project.version
+        if (!isRelease) {
+            version += String.format("-%s", new Date().format('yyyyMMdd'))
+        }
+        def dir = file("${placeholder}/native/lib")
+        dir.mkdirs()
+        def propFile = file("${placeholder}/native/lib/onnxruntime.properties")
+        propFile.text = "placeholder=true\nversion=${versionName}\n"
+    }
+
+    from placeholder
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+project.tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+
+signing {
+    required(project.hasProperty("staging") || project.hasProperty("snapshot"))
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications
+}
+
+publishing.repositories {
+    maven {
+        if (project.hasProperty("snapshot")) {
+            name = "snapshot"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+            credentials {
+                username = findProperty("ossrhUsername")
+                password = findProperty("ossrhPassword")
+            }
+        } else if (project.hasProperty("staging")) {
+            name = "staging"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = findProperty("ossrhUsername")
+                password = findProperty("ossrhPassword")
+            }
+        } else {
+            name = "local"
+            url = "build/repo"
         }
     }
 }

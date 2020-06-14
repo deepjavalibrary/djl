@@ -1,22 +1,19 @@
-name: nightly android build
+name: ONNX Runtime snapshot publish
 
 on:
   # To trigger this workflow manually, you can use the following curl command:
-  # curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "nightly-android-build"}'
+  # curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "onnxruntime-snapshot-pub"}'
 
   # Make sure you create your personal token with repo access. Follow steps in
   # https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
   # to create your personal token.
   repository_dispatch:
-    types: [nightly-android-build]
-  schedule:
-    - cron:  '0 5 * * *'
+    types: [onnxruntime-snapshot-pub]
 
 jobs:
   build:
     runs-on: ubuntu-18.04
-    env:
-      NDK_VERSION: "20.0.5594570"
+
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK 1.8
@@ -30,14 +27,11 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Install NDK
-        run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${NDK_VERSION}" --sdk_root=${ANDROID_SDK_ROOT}
-      - name: publish android
-        run: |
-          export ANDROID_NDK=${ANDROID_HOME}/ndk-bundle
-          cd android
-          ./gradlew :pytorch-native:assemble
-          ./gradlew publish -Psnapshot
+      - name: Download native binaries
+        run: ./gradlew :onnxruntime:onnxruntime-native:dONL
+      - name: Publish to snapshot repository
+        working-directory: onnxruntime/onnxruntime-native
+        run: ./gradlew publish -Psnapshot
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
