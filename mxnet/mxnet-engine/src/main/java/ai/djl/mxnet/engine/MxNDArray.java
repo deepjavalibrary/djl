@@ -1268,6 +1268,10 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray softmax(int axis) {
+        // MXNet softmax op bug on GPU
+        if (isEmpty()) {
+            return manager.create(getShape());
+        }
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         return manager.invoke("_npx_softmax", this, params);
@@ -1276,6 +1280,10 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray logSoftmax(int axis) {
+        // MXNet logsoftmax op bug on GPU
+        if (isEmpty()) {
+            return manager.create(getShape());
+        }
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);
         return manager.invoke("_npx_log_softmax", this, params);
