@@ -55,9 +55,14 @@ public final class LibUtils {
 
     public static void prepareLibrary() {
         // get the directory of the file
-        Path libPath = findOverrideLibrary().getParent();
+        Path libPath = findOverrideLibrary();
         if (libPath == null) {
             libPath = findNativeLibrary();
+        } else {
+            libPath = libPath.getParent();
+        }
+        if (libPath == null) {
+            throw new IllegalStateException("ONNX Runtime Library now found!");
         }
         String nativeFileName = System.mapLibraryName(NATIVE_LIB_NAME);
         String jniName = System.mapLibraryName(LIB_NAME);
@@ -249,12 +254,12 @@ public final class LibUtils {
                     cacheDir = System.getenv("DJL_CACHE_DIR");
                     if (cacheDir == null || cacheDir.isEmpty()) {
                         String userHome = System.getProperty("user.home");
-                        return Paths.get(userHome, ".onnxruntime/cache");
+                        return Paths.get(userHome, ".djl-ai/onnxruntime");
                     }
                 }
                 return Paths.get(cacheDir, "onnxruntime");
             }
         }
-        return Paths.get(cacheDir, ".onnxruntime/cache");
+        return Paths.get(cacheDir, ".djl-ai/onnxruntime");
     }
 }
