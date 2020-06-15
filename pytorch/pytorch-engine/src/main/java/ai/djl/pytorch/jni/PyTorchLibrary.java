@@ -414,6 +414,8 @@ final class PyTorchLibrary {
 
     native boolean iValueIsTuple(Pointer iValueHandle);
 
+    native void zeroGrad(Pointer handle);
+
     native void adamUpdate(
             Pointer weight,
             Pointer grad,

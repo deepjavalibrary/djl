@@ -21,53 +21,54 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(
   jfloat rescale_grad, jfloat clip_grad, jfloat beta1, jfloat beta2, jfloat eps) {
   torch::autograd::AutoGradMode no_autograd_guard{false};
   const auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jweight);
-  auto* grad_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jgrad);
+  const auto grad = utils::GetPointerFromJHandle<torch::Tensor>(env, jgrad)->clone();
   const auto* mean_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jmean);
   const auto* variance_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jvariance);
   // following this formula: rescaled_grad = clip(rescale_grad * grad, clip_gradient)) + wd * weight
   if (rescale_grad != 1.0) {
-    grad_ptr->mul_(rescale_grad);
+    grad.mul_(rescale_grad);
   }
   if (clip_grad >= 0.0) {
     // Add clip grad option
-    clip_grad = abs(clip_grad);
-    grad_ptr->clamp_(-clip_grad, clip_grad);
+    grad.clamp_max_(clip_grad);
   }
-  grad_ptr->add_(*weight_ptr, weight_decay);
-  mean_ptr->mul_(beta1).add_(*grad_ptr, 1 - beta1);
-  variance_ptr->mul_(beta2).addcmul_(*grad_ptr, *grad_ptr, 1 - beta2);
+  grad.add_(*weight_ptr, weight_decay);
+  mean_ptr->mul_(beta1).add_(grad, 1 - beta1);
+  variance_ptr->mul_(beta2).addcmul_(grad, grad, 1 - beta2);
   weight_ptr->sub_(mean_ptr->mul(learning_rate).div(variance_ptr->sqrt().add(eps)));
-  // reset grad
-  weight_ptr->grad().detach_();
-  weight_ptr->grad().zero_();
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_sgdUpdate(
   JNIEnv* env, jobject jthis, jobject jweight, jobject jgrad, jobject jstate, jfloat learning_rate, jfloat weight_decay,
   jfloat rescale_grad, jfloat clip_grad, jfloat momentum) {
+  // disable gradient calculation
   torch::autograd::AutoGradMode no_autograd_guard{false};
   const auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jweight);
-  auto* grad_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jgrad);
+  // use clone to avoid input grad change
+  auto grad = utils::GetPointerFromJHandle<torch::Tensor>(env, jgrad)->clone();
   // following this formula: rescaled_grad = clip(rescale_grad * grad, clip_gradient)) + wd * weight
   if (rescale_grad != 1.0) {
-    grad_ptr->mul_(rescale_grad);
+    grad.mul_(rescale_grad);
   }
   // TODO: MXNet convension, if < 0, it won't clip
   if (clip_grad >= 0.0) {
     // Add clip grad option
-    clip_grad = abs(clip_grad);
-    grad_ptr->clamp_(-clip_grad, clip_grad);
+    grad.clamp_max_(clip_grad);
   }
-  grad_ptr->add_(*weight_ptr, weight_decay).mul_(learning_rate);
+  grad.add_(*weight_ptr, weight_decay).mul_(learning_rate);
   // TODO: implementation in DJL is different than PyTorch with missing dampening and nesterov
   if (momentum == 0.0) {
-    weight_ptr->sub_(*grad_ptr);
+    weight_ptr->sub_(grad);
   } else {
     const auto* state_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jstate);
-    state_ptr->mul_(momentum).add_(*grad_ptr);
+    state_ptr->mul_(momentum).add_(grad);
     weight_ptr->sub_(*state_ptr);
   }
-  // reset grad
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_zeroGrad
+  (JNIEnv* env, jobject jthis, jobject jhandle) {
+  const auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   weight_ptr->grad().detach_();
   weight_ptr->grad().zero_();
 }

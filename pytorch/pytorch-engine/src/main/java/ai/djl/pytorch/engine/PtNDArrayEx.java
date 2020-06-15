@@ -273,6 +273,8 @@ public class PtNDArrayEx implements NDArrayEx {
                 beta1,
                 beta2,
                 epsilon);
+        // call zero-grad
+        JniUtils.zeroGrad((PtNDArray) weights.singletonOrThrow());
     }
 
     /** {@inheritDoc} */
@@ -309,6 +311,8 @@ public class PtNDArrayEx implements NDArrayEx {
                 rescaleGrad,
                 clipGrad,
                 momentum);
+        // call zero-grad
+        JniUtils.zeroGrad((PtNDArray) weights.singletonOrThrow());
     }
 
     /** {@inheritDoc} */

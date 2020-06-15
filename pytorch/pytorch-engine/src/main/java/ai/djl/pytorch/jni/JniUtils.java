@@ -1053,6 +1053,10 @@ public final class JniUtils {
         PyTorchLibrary.LIB.moduleTrain(block.getHandle());
     }
 
+    public static void zeroGrad(PtNDArray weight) {
+        PyTorchLibrary.LIB.zeroGrad(weight.getHandle());
+    }
+
     public static void adamUpdate(
             PtNDArray weight,
             PtNDArray grad,

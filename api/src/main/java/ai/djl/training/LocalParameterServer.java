@@ -60,12 +60,17 @@ public class LocalParameterServer implements ParameterServer {
             }
         }
         // update weights on different devices with reduced gradient
-        for (NDArray weight : weights) {
-            if (weight.getDevice().equals(firstDevice)) {
-                optimizer.update(parameterId, weight, grads[0]);
-            } else {
-                try (NDArray gradSumCopy = grads[0].toDevice(weight.getDevice(), true)) {
-                    optimizer.update(parameterId, weight, gradSumCopy);
+        // use duplicate because after the first optimizer.update
+        // PyTorch optimizer will zero grads[0]
+        // the second copy is to move the grads[0] to the device the weight is on
+        try (NDArray aggregatedGrad = grads[0].duplicate()) {
+            for (NDArray weight : weights) {
+                if (weight.getDevice().equals(firstDevice)) {
+                    optimizer.update(parameterId, weight, aggregatedGrad);
+                } else {
+                    try (NDArray gradSumCopy = aggregatedGrad.toDevice(weight.getDevice(), true)) {
+                        optimizer.update(parameterId, weight, gradSumCopy);
+                    }
                 }
             }
         }
