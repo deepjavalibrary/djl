@@ -718,12 +718,6 @@ public class OrtNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray reshapeLike(NDArray array) {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray expandDims(int axis) {
         throw new UnsupportedOperationException("Not supported for ONNX Runtime");
     }
