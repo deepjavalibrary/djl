@@ -135,12 +135,11 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void attachGradient(SparseFormat sparseFormat) {
-        if (sparseFormat == null || sparseFormat.equals(SparseFormat.DENSE)) {
-            JniUtils.attachGradient(this);
-        } else {
+        if (sparseFormat != null && !sparseFormat.equals(SparseFormat.DENSE)) {
             throw new UnsupportedOperationException(
                     "Sparse NDArray gradient atttach not supported");
         }
+        JniUtils.attachGradient(this);
     }
 
     /** {@inheritDoc} */
@@ -262,8 +261,10 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray eq(Number other) {
-        return eq(manager.create(other));
+    public PtNDArray eq(Number n) {
+        try (NDArray number = manager.create(n)) {
+            return eq(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -274,8 +275,10 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray neq(Number other) {
-        return neq(manager.create(other));
+    public PtNDArray neq(Number n) {
+        try (NDArray number = manager.create(n)) {
+            return neq(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -286,8 +289,10 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray gt(Number other) {
-        return gt(manager.create(other));
+    public PtNDArray gt(Number n) {
+        try (NDArray number = manager.create(n)) {
+            return gt(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -298,8 +303,10 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray gte(Number other) {
-        return gte(manager.create(other));
+    public PtNDArray gte(Number n) {
+        try (NDArray number = manager.create(n)) {
+            return gte(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -310,8 +317,10 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray lt(Number other) {
-        return lt(manager.create(other));
+    public PtNDArray lt(Number n) {
+        try (NDArray number = manager.create(n)) {
+            return lt(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -322,8 +331,10 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray lte(Number other) {
-        return lte(manager.create(other));
+    public PtNDArray lte(Number n) {
+        try (NDArray number = manager.create(n)) {
+            return lte(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -335,7 +346,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray add(Number n) {
-        return add(manager.create(n));
+        try (NDArray number = manager.create(n)) {
+            return add(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -347,7 +360,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray sub(Number n) {
-        return sub(manager.create(n));
+        try (NDArray number = manager.create(n)) {
+            return sub(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -359,7 +374,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray mul(Number n) {
-        return mul(manager.create(n));
+        try (NDArray number = manager.create(n)) {
+            return mul(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -371,7 +388,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray div(Number n) {
-        return div(manager.create(n));
+        try (NDArray number = manager.create(n)) {
+            return div(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -383,9 +402,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray mod(Number n) {
-        // TODO PyTorch known issue https://github.com/pytorch/pytorch/issues/24753
-        // Current implementation only allow number have the same type fo tensor
-        throw new UnsupportedOperationException("Not implemented");
+        try (NDArray number = manager.create(n)) {
+            return mod(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -397,7 +416,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray pow(Number n) {
-        return pow(manager.create(n));
+        try (NDArray number = manager.create(n)) {
+            return pow(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -409,7 +430,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray addi(Number n) {
-        return addi(manager.create(n));
+        try (NDArray number = manager.create(n)) {
+            return addi(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -422,7 +445,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray subi(Number n) {
-        return subi(manager.create(n));
+        try (NDArray number = manager.create(n)) {
+            return subi(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -435,7 +460,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray muli(Number n) {
-        return muli(manager.create(n));
+        try (NDArray number = manager.create(n)) {
+            return muli(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -448,7 +475,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray divi(Number n) {
-        return divi(manager.create(n));
+        try (NDArray number = manager.create(n)) {
+            return divi(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -461,7 +490,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray modi(Number n) {
-        return modi(manager.create(n));
+        try (NDArray number = manager.create(n)) {
+            return modi(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -474,7 +505,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray powi(Number n) {
-        return powi(manager.create(n));
+        try (NDArray number = manager.create(n)) {
+            return powi(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -487,57 +520,53 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray maximum(Number n) {
-        return maximum(manager.create(n));
+        try (NDArray number = manager.create(n)) {
+            return maximum(number);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray maximum(NDArray other) {
-        if (!other.getDataType().equals(getDataType())) {
-            throw new IllegalArgumentException(
-                    "DataType mismatch, expected "
-                            + getDataType()
-                            + " Actual "
-                            + other.getDataType());
-        }
         return JniUtils.max(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray minimum(Number n) {
-        return minimum(manager.create(n));
+        try (NDArray number = manager.create(n)) {
+            return minimum(number);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray minimum(NDArray other) {
-        if (!other.getDataType().equals(getDataType())) {
-            throw new IllegalArgumentException(
-                    "DataType mismatch, expected "
-                            + getDataType()
-                            + " Actual "
-                            + other.getDataType());
-        }
         return JniUtils.min(this, (PtNDArray) other);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray all() {
-        return JniUtils.all(toType(DataType.BOOLEAN, true));
+        try (PtNDArray bool = toType(DataType.BOOLEAN, true)) {
+            return JniUtils.all(bool);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray any() {
-        return JniUtils.any(toType(DataType.BOOLEAN, true));
+        try (PtNDArray bool = toType(DataType.BOOLEAN, true)) {
+            return JniUtils.any(bool);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray none() {
-        return JniUtils.none(toType(DataType.BOOLEAN, true));
+        try (PtNDArray bool = toType(DataType.BOOLEAN, true)) {
+            return JniUtils.none(bool);
+        }
     }
 
     /** {@inheritDoc} */
@@ -706,7 +735,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray toRadians() {
-        return mul(Math.PI).div(manager.create(180.0));
+        return mul(Math.PI).div(180.0);
     }
 
     /** {@inheritDoc} */

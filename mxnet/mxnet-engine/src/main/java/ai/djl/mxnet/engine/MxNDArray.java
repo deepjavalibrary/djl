@@ -426,9 +426,9 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eq(Number other) {
+    public NDArray eq(Number n) {
         MxOpParams params = new MxOpParams();
-        params.add("scalar", other.toString());
+        params.add("scalar", n.toString());
         return manager.invoke("_npi_equal_scalar", this, params);
     }
 

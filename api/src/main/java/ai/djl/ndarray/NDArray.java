@@ -923,10 +923,10 @@ public interface NDArray extends AutoCloseable {
      * [ true]
      * </pre>
      *
-     * @param other the number to compare
+     * @param n the number to compare
      * @return the boolean {@code NDArray} for element-wise "Equals" comparison
      */
-    NDArray eq(Number other);
+    NDArray eq(Number n);
 
     /**
      * Returns the boolean {@code NDArray} for element-wise "Equals" comparison.
@@ -960,10 +960,10 @@ public interface NDArray extends AutoCloseable {
      * ]
      * </pre>
      *
-     * @param other the number to compare
+     * @param n the number to compare
      * @return the boolean {@code NDArray} for element-wise "Not equals" comparison
      */
-    NDArray neq(Number other);
+    NDArray neq(Number n);
 
     /**
      * Returns the boolean {@code NDArray} for element-wise "Not equals" comparison.
@@ -1002,10 +1002,10 @@ public interface NDArray extends AutoCloseable {
      * [ true, false]
      * </pre>
      *
-     * @param other the number to compare
+     * @param n the number to compare
      * @return the boolean {@code NDArray} for element-wise "Greater" comparison
      */
-    NDArray gt(Number other);
+    NDArray gt(Number n);
 
     /**
      * Returns the boolean {@code NDArray} for element-wise "Greater Than" comparison.
@@ -1035,10 +1035,10 @@ public interface NDArray extends AutoCloseable {
      * [ true, true]
      * </pre>
      *
-     * @param other the {@code NDArray} to compare
+     * @param n the number to compare
      * @return the boolean {@code NDArray} for element-wise "Greater or equals" comparison
      */
-    NDArray gte(Number other);
+    NDArray gte(Number n);
 
     /**
      * Returns the boolean {@code NDArray} for element-wise "Greater or equals" comparison.
@@ -1070,10 +1070,10 @@ public interface NDArray extends AutoCloseable {
      * [ true, false]
      * </pre>
      *
-     * @param other the number to compare
+     * @param n the number to compare
      * @return the boolean {@code NDArray} for element-wise "Less" comparison
      */
-    NDArray lt(Number other);
+    NDArray lt(Number n);
 
     /**
      * Returns the boolean {@code NDArray} for element-wise "Less" comparison.
@@ -1105,10 +1105,10 @@ public interface NDArray extends AutoCloseable {
      * [ true, true]
      * </pre>
      *
-     * @param other the number to compare
+     * @param n the number to compare
      * @return the boolean {@code NDArray} for element-wise "Less or equals" comparison
      */
-    NDArray lte(Number other);
+    NDArray lte(Number n);
 
     /**
      * Returns the boolean {@code NDArray} for element-wise "Less or equals" comparison.

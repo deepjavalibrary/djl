@@ -273,7 +273,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eq(Number other) {
+    public NDArray eq(Number n) {
         return null;
     }
 
@@ -285,7 +285,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray neq(Number other) {
+    public NDArray neq(Number n) {
         return null;
     }
 
@@ -297,7 +297,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray gt(Number other) {
+    public NDArray gt(Number n) {
         return null;
     }
 
@@ -309,7 +309,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray gte(Number other) {
+    public NDArray gte(Number n) {
         return null;
     }
 
@@ -321,7 +321,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray lt(Number other) {
+    public NDArray lt(Number n) {
         return null;
     }
 
@@ -333,7 +333,7 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray lte(Number other) {
+    public NDArray lte(Number n) {
         return null;
     }
 

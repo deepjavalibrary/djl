@@ -360,8 +360,10 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray eq(Number other) {
-        return eq(manager.create(other).toType(getDataType(), false));
+    public NDArray eq(Number n) {
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return eq(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -373,8 +375,10 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray neq(Number other) {
-        return neq(manager.create(other).toType(getDataType(), false));
+    public NDArray neq(Number n) {
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return neq(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -386,8 +390,10 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray gt(Number other) {
-        return gt(manager.create(other).toType(getDataType(), false));
+    public NDArray gt(Number n) {
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return gt(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -399,8 +405,10 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray gte(Number other) {
-        return gte(manager.create(other).toType(getDataType(), false));
+    public NDArray gte(Number n) {
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return gte(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -413,8 +421,10 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray lt(Number other) {
-        return lt(manager.create(other).toType(getDataType(), false));
+    public NDArray lt(Number n) {
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return lt(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -426,8 +436,10 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray lte(Number other) {
-        return lte(manager.create(other).toType(getDataType(), false));
+    public NDArray lte(Number n) {
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return lte(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -463,7 +475,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray add(Number n) {
-        return add(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return add(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -475,7 +489,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sub(Number n) {
-        return sub(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return sub(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -487,7 +503,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mul(Number n) {
-        return mul(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return mul(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -499,7 +517,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray div(Number n) {
-        return div(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return div(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -511,7 +531,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mod(Number n) {
-        return mod(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return mod(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -523,7 +545,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray pow(Number n) {
-        return pow(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return pow(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -535,7 +559,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray maximum(Number n) {
-        return maximum(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return maximum(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -548,7 +574,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray minimum(Number n) {
-        return minimum(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return minimum(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -561,7 +589,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray addi(Number n) {
-        return addi(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return addi(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -573,7 +603,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray subi(Number n) {
-        return subi(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return subi(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -585,7 +617,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray muli(Number n) {
-        return muli(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return muli(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -597,7 +631,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray divi(Number n) {
-        return divi(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return divi(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -642,7 +678,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray modi(Number n) {
-        return modi(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return modi(number);
+        }
     }
 
     /** {@inheritDoc} */
@@ -654,7 +692,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray powi(Number n) {
-        return powi(manager.create(n).toType(getDataType(), false));
+        try (NDArray number = manager.create(n).toType(getDataType(), false)) {
+            return powi(number);
+        }
     }
 
     /** {@inheritDoc} */
