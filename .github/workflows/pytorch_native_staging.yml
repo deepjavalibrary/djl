@@ -72,7 +72,7 @@ jobs:
           export ANDROID_NDK=${ANDROID_HOME}/ndk-bundle
           cd android
           ./gradlew :pytorch-native:assemble
-          ./gradlew :pytorch-native:publish -Pstaging
+          ./gradlew publish -Pstaging
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
