@@ -1044,14 +1044,6 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray reshapeLike(NDArray array) {
-        MxOpParams params = new MxOpParams();
-        return manager.invoke("_npx_reshape_like", new NDList(this, array), params)
-                .singletonOrThrow();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray expandDims(int axis) {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", axis);

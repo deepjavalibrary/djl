@@ -785,13 +785,16 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray prod() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.prod(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray prod(int[] axes, boolean keepDims) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (axes.length > 1) {
+            throw new UnsupportedOperationException("Only 1 axis is support!");
+        }
+        return JniUtils.prod(this, axes[0], keepDims);
     }
 
     /** {@inheritDoc} */
@@ -845,12 +848,6 @@ public class PtNDArray extends NativeResource implements NDArray {
     @Override
     public PtNDArray reshape(Shape shape) {
         return JniUtils.reshape(this, shape.getShape());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray reshapeLike(NDArray array) {
-        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */

@@ -76,7 +76,7 @@ public class SoftmaxCrossEntropyLoss extends Loss {
         if (sparseLabel) {
             loss = pred.getNDArrayInternal().pick(lab, classAxis, true).neg();
         } else {
-            lab = lab.reshapeLike(pred);
+            lab = lab.reshape(pred.getShape());
             loss = pred.mul(lab).neg().sum(new int[] {classAxis}, true);
         }
         if (weight != 1) {

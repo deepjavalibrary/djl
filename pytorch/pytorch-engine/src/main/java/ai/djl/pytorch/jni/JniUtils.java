@@ -570,6 +570,15 @@ public final class JniUtils {
                 .create(PyTorchLibrary.LIB.torchSum(ndArray.getHandle(), dims, keepDim));
     }
 
+    public static PtNDArray prod(PtNDArray ndArray) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchProd(ndArray.getHandle()));
+    }
+
+    public static PtNDArray prod(PtNDArray ndArray, long dim, boolean keepDim) {
+        return ndArray.getManager()
+                .create(PyTorchLibrary.LIB.torchProd(ndArray.getHandle(), dim, keepDim));
+    }
+
     public static PtNDArray cumSum(PtNDArray ndArray, long dim) {
         return ndArray.getManager()
                 .create(PyTorchLibrary.LIB.torchCumSum(ndArray.getHandle(), dim));

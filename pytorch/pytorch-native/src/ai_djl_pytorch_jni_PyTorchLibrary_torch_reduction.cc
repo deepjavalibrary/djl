@@ -143,6 +143,24 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSum__Lai_d
   API_END();
 }
 
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchProd__Lai_djl_pytorch_jni_Pointer_2(
+  JNIEnv* env, jobject jthis, jobject jhandle) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    const auto* result_ptr = new torch::Tensor(tensor_ptr->prod());
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchProd__Lai_djl_pytorch_jni_Pointer_2JZ
+  (JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim, jboolean jkeep_dim) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    const auto* result_ptr = new torch::Tensor(tensor_ptr->prod(jdim, jkeep_dim == JNI_TRUE));
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchCumSum(
   JNIEnv* env, jobject jthis, jobject jhandle, jlong dim) {
   API_BEGIN();

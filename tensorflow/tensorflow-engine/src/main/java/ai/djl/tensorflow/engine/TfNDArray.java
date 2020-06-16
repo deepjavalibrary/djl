@@ -1068,12 +1068,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray reshapeLike(NDArray array) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray expandDims(int axis) {
         return new TfNDArray(manager, tf.expandDims(asOperand(), tf.constant(axis)));
     }

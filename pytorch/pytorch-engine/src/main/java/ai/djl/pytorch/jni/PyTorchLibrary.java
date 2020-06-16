@@ -201,6 +201,10 @@ final class PyTorchLibrary {
 
     native Pointer torchSum(Pointer handle, long[] dim, boolean keepDim);
 
+    native Pointer torchProd(Pointer handle);
+
+    native Pointer torchProd(Pointer handle, long dim, boolean keepDim);
+
     native Pointer torchCumSum(Pointer handle, long dim);
 
     native Pointer torchFlatten(Pointer handle, long startDim, long endDim);
