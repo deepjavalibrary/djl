@@ -25,3 +25,16 @@ jar {
     }
 }
 jar.finalizedBy(copyJar)
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId "onnxruntime-api"
+            pom {
+                name = "ONNX Runtime API"
+                description = "ONNX Runtime Java API for DJL"
+                url = "http://www.djl.ai/onnxruntime/${project.name}"
+            }
+        }
+    }
+}

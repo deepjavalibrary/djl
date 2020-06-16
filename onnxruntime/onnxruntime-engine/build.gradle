@@ -13,3 +13,16 @@ dependencies {
 }
 
 compileJava.dependsOn ":onnxruntime:onnxruntime-api:jar"
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId "onnxruntime-engine"
+            pom {
+                name = "ONNX Runtime Engine Adapter"
+                description = "ONNX Runtime Engine Adapter for DJL"
+                url = "http://www.djl.ai/onnxruntime/${project.name}"
+            }
+        }
+    }
+}

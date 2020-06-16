@@ -85,37 +85,31 @@ public class OrtNDManager extends BaseNDManager {
     @Override
     public OrtNDArray create(Buffer data, Shape shape, DataType dataType) {
         try {
-            if (data instanceof ByteBuffer) {
-                return create(
-                        OnnxTensor.createTensor(
-                                env, (ByteBuffer) data, shape.getShape(), typeMapper(dataType)));
-            }
-            int size = data.remaining();
-            // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
-            DataType inputType = DataType.fromBuffer(data);
-
-            int numOfBytes = inputType.getNumOfBytes();
-            ByteBuffer buf = allocateDirect(size * numOfBytes);
-
-            switch (inputType) {
+            switch (dataType) {
                 case FLOAT32:
-                    buf.asFloatBuffer().put((FloatBuffer) data);
-                    break;
+                    return create(
+                            OnnxTensor.createTensor(env, (FloatBuffer) data, shape.getShape()));
                 case FLOAT64:
-                    buf.asDoubleBuffer().put((DoubleBuffer) data);
-                    break;
+                    return create(
+                            OnnxTensor.createTensor(env, (DoubleBuffer) data, shape.getShape()));
                 case INT32:
-                    buf.asIntBuffer().put((IntBuffer) data);
-                    break;
+                    return create(OnnxTensor.createTensor(env, (IntBuffer) data, shape.getShape()));
                 case INT64:
-                    buf.asLongBuffer().put((LongBuffer) data);
-                    break;
+                    return create(
+                            OnnxTensor.createTensor(env, (LongBuffer) data, shape.getShape()));
+                case INT8:
+                case UINT8:
+                    return create(
+                            OnnxTensor.createTensor(
+                                    env, (ByteBuffer) data, shape.getShape(), OnnxJavaType.INT8));
+                case BOOLEAN:
+                    return create(
+                            OnnxTensor.createTensor(
+                                    env, (ByteBuffer) data, shape.getShape(), OnnxJavaType.BOOL));
                 case FLOAT16:
                 default:
                     throw new AssertionError("Data type not supported!");
             }
-            return create(
-                    OnnxTensor.createTensor(env, buf, shape.getShape(), typeMapper(dataType)));
         } catch (OrtException e) {
             throw new EngineException(e);
         }

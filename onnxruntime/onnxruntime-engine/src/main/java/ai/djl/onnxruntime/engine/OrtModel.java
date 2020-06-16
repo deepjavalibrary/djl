@@ -71,9 +71,7 @@ public class OrtModel extends BaseModel {
         // TODO: Support SessionOption here for further optimization
         try {
             OrtEnvironment env = ((OrtNDManager) manager).getEnv();
-            block =
-                    new OrtSymbolBlock(
-                            (OrtNDManager) manager, env.createSession(modelFile.toString()));
+            block = new OrtSymbolBlock(env.createSession(modelFile.toString()));
         } catch (OrtException e) {
             throw new MalformedModelException("ONNX Model cannot be loaded", e);
         }

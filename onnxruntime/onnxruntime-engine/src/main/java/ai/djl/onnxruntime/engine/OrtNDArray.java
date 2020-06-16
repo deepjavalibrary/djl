@@ -21,15 +21,22 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.onnxruntime.OnnxJavaType;
 import ai.onnxruntime.OnnxTensor;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
 
 /** {@code OrtNDArray} is the ONNX Runtime implementation of {@link NDArray}. */
 public class OrtNDArray implements NDArray {
 
     private OrtNDManager manager;
     private OnnxTensor tensor;
+    private Shape shape;
+    private DataType dataType;
+    private String name;
+    private boolean isClosed;
 
     /**
      * Constructs an ONNX Runtime NDArray from a {@link OnnxTensor} (internal. Use {@link NDManager}
@@ -56,13 +63,13 @@ public class OrtNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public String getName() {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+        return name;
     }
 
     /** {@inheritDoc} */
     @Override
     public void setName(String name) {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+        this.name = name;
     }
 
     /** {@inheritDoc} */
@@ -74,19 +81,53 @@ public class OrtNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+        if (dataType != null) {
+            return dataType;
+        }
+        OnnxJavaType javaType = tensor.getInfo().type;
+        switch (javaType) {
+            case FLOAT:
+                dataType = DataType.FLOAT32;
+                break;
+            case DOUBLE:
+                dataType = DataType.FLOAT64;
+                break;
+            case INT8:
+                dataType = DataType.INT8;
+                break;
+            case INT32:
+                dataType = DataType.INT32;
+                break;
+            case INT64:
+                dataType = DataType.INT64;
+                break;
+            case BOOL:
+                dataType = DataType.BOOLEAN;
+                break;
+            case UNKNOWN:
+                dataType = DataType.UNKNOWN;
+                break;
+            default:
+                throw new UnsupportedOperationException("type is not supported: " + javaType);
+        }
+        return dataType;
     }
 
     /** {@inheritDoc} */
     @Override
     public Device getDevice() {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+        // TODO: Support on multiple devices
+        return Device.cpu();
     }
 
     /** {@inheritDoc} */
     @Override
     public Shape getShape() {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+        if (shape != null) {
+            return shape;
+        }
+        shape = new Shape(tensor.getInfo().getShape());
+        return shape;
     }
 
     /** {@inheritDoc} */
@@ -149,7 +190,9 @@ public class OrtNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
-        return getTensor().getByteBuffer();
+        ByteBuffer bb = getTensor().getByteBuffer();
+        bb.order(ByteOrder.nativeOrder());
+        return bb;
     }
 
     /** {@inheritDoc} */
@@ -970,7 +1013,26 @@ public class OrtNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public String toString() {
+        if (isClosed) {
+            return "This array is already closed";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("ND: ")
+                .append(getShape())
+                .append(' ')
+                .append(getDevice())
+                .append(' ')
+                .append(getDataType())
+                .append('\n')
+                .append(Arrays.toString(toArray()));
+        return sb.toString();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void close() {
         tensor.close();
+        isClosed = true;
     }
 }

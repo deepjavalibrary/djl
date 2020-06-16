@@ -12,6 +12,8 @@ configure([
         project(':tensorflow:tensorflow-model-zoo'),
         project(':tensorflow:tensorflow-native-auto'),
         project(':fasttext:fasttext-engine'),
+        project(':onnxruntime:onnxruntime-api'),
+        project(':onnxruntime:onnxruntime-engine'),
         project(':3rdparty:aws-ai'),
         project(':3rdparty:hadoop')]) {
     apply plugin: "maven-publish"

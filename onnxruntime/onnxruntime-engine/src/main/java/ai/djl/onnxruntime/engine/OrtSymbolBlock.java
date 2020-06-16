@@ -25,13 +25,17 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
+import ai.onnxruntime.OnnxJavaType;
+import ai.onnxruntime.OnnxSequence;
 import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OnnxValue;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
+import ai.onnxruntime.SequenceInfo;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +49,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class OrtSymbolBlock implements SymbolBlock, AutoCloseable {
 
-    private OrtNDManager manager;
     private OrtSession session;
 
     /**
@@ -54,11 +57,9 @@ public class OrtSymbolBlock implements SymbolBlock, AutoCloseable {
      * <p>You can create a {@code PtSymbolBlock} using {@link ai.djl.Model#load(java.nio.file.Path,
      * String)}.
      *
-     * @param manager the manager to use for the block
      * @param session the {@link OrtSession} contains the model information
      */
-    public OrtSymbolBlock(OrtNDManager manager, OrtSession session) {
-        this.manager = manager;
+    public OrtSymbolBlock(OrtSession session) {
         this.session = session;
     }
 
@@ -88,17 +89,70 @@ public class OrtSymbolBlock implements SymbolBlock, AutoCloseable {
         try {
             // forward
             OrtSession.Result results = session.run(container);
-            NDList output = new NDList();
-            for (Map.Entry<String, OnnxValue> r : results) {
-                OnnxValue value = r.getValue();
-                if (value instanceof OnnxTensor) {
-                    output.add(manager.create((OnnxTensor) value));
-                } else {
-                    throw new UnsupportedOperationException(
-                            "Unsupported output type! " + r.getKey());
-                }
+            return evaluateOutput(results, (OrtNDManager) inputs.get(0).getManager());
+        } catch (OrtException e) {
+            throw new EngineException(e);
+        }
+    }
+
+    private NDList evaluateOutput(OrtSession.Result results, OrtNDManager manager) {
+        NDList output = new NDList();
+        for (Map.Entry<String, OnnxValue> r : results) {
+            OnnxValue value = r.getValue();
+            if ((value instanceof OnnxTensor)) {
+                output.add(manager.create((OnnxTensor) value));
+            } else if (value instanceof OnnxSequence) {
+                // TODO: avoid memory copying to heap
+                output.add(seq2Nd((OnnxSequence) value, manager));
+            } else {
+                throw new UnsupportedOperationException("Unsupported output type! " + r.getKey());
             }
-            return output;
+        }
+        return output;
+    }
+
+    @SuppressWarnings("unchecked")
+    private OrtNDArray seq2Nd(OnnxSequence seq, OrtNDManager manager) {
+        try {
+            List<Object> values = seq.getValue();
+            OnnxJavaType type = seq.getInfo().sequenceType;
+            Shape shape = new Shape(values.size());
+            DataType dp;
+            SequenceInfo info = seq.getInfo();
+            if (info.sequenceOfMaps) {
+                type = info.mapInfo.valueType;
+                List<Object> valuesTmp = new ArrayList<>();
+                values.forEach(map -> valuesTmp.addAll(((Map<Object, Object>) map).values()));
+                shape = new Shape(values.size(), valuesTmp.size() / values.size());
+                values = valuesTmp;
+            }
+            ByteBuffer buffer = ByteBuffer.allocate(values.size() * type.size);
+            switch (type) {
+                case FLOAT:
+                    values.forEach(ele -> buffer.putFloat((Float) ele));
+                    buffer.rewind();
+                    return manager.create(buffer.asFloatBuffer(), shape, DataType.FLOAT32);
+                case DOUBLE:
+                    values.forEach(ele -> buffer.putDouble((Double) ele));
+                    buffer.rewind();
+                    return manager.create(buffer.asDoubleBuffer(), shape, DataType.FLOAT64);
+                case BOOL:
+                case INT8:
+                    dp = (type == OnnxJavaType.BOOL) ? DataType.BOOLEAN : DataType.INT8;
+                    values.forEach(ele -> buffer.put((Byte) ele));
+                    buffer.rewind();
+                    return manager.create(buffer, shape, dp);
+                case INT32:
+                    values.forEach(ele -> buffer.putInt((Integer) ele));
+                    buffer.rewind();
+                    return manager.create(buffer.asIntBuffer(), shape, DataType.INT32);
+                case INT64:
+                    values.forEach(ele -> buffer.putLong((Long) ele));
+                    buffer.rewind();
+                    return manager.create(buffer.asLongBuffer(), shape, DataType.INT64);
+                default:
+                    throw new UnsupportedOperationException("type is not supported: " + type);
+            }
         } catch (OrtException e) {
             throw new EngineException(e);
         }
@@ -192,10 +246,13 @@ public class OrtSymbolBlock implements SymbolBlock, AutoCloseable {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        try {
-            session.close();
-        } catch (OrtException e) {
-            throw new EngineException(e);
+        if (session != null) {
+            try {
+                session.close();
+                session = null;
+            } catch (OrtException e) {
+                throw new EngineException(e);
+            }
         }
     }
 }
