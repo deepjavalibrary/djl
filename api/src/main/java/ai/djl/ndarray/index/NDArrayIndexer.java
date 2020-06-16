@@ -18,6 +18,7 @@ import ai.djl.ndarray.index.dim.NDIndexElement;
 import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
 import java.util.List;
+import java.util.Optional;
 
 /** A helper class for {@link NDArray} implementations for operations with an {@link NDIndex}. */
 public abstract class NDArrayIndexer {
@@ -53,15 +54,15 @@ public abstract class NDArrayIndexer {
             return array.booleanMask(((NDIndexBooleans) indices.get(0)).getIndex());
         }
 
-        NDIndexFullPick fullPick = index.getAsFullPick(array.getShape()).orElse(null);
-        if (fullPick != null) {
+        Optional<NDIndexFullPick> fullPick = NDIndexFullPick.fromIndex(index, array.getShape());
+        if (fullPick.isPresent()) {
             return array.getNDArrayInternal()
-                    .pick(fullPick.getIndices(), fullPick.getAxis(), false);
+                    .pick(fullPick.get().getIndices(), fullPick.get().getAxis(), false);
         }
 
-        NDIndexFullSlice fullSlice = index.getAsFullSlice(array.getShape()).orElse(null);
-        if (fullSlice != null) {
-            return get(array, fullSlice);
+        Optional<NDIndexFullSlice> fullSlice = NDIndexFullSlice.fromIndex(index, array.getShape());
+        if (fullSlice.isPresent()) {
+            return get(array, fullSlice.get());
         }
         throw new UnsupportedOperationException(
                 "get() currently supports all, fixed, and slices indices");
@@ -102,7 +103,8 @@ public abstract class NDArrayIndexer {
             set(array, (NDIndexBooleans) indices.get(0), value);
         }
 
-        NDIndexFullSlice fullSlice = index.getAsFullSlice(array.getShape()).orElse(null);
+        NDIndexFullSlice fullSlice =
+                NDIndexFullSlice.fromIndex(index, array.getShape()).orElse(null);
         if (fullSlice != null) {
             set(array, fullSlice, value);
             return;
@@ -128,7 +130,8 @@ public abstract class NDArrayIndexer {
      * @param value the value to set with
      */
     public void set(NDArray array, NDIndex index, Number value) {
-        NDIndexFullSlice fullSlice = index.getAsFullSlice(array.getShape()).orElse(null);
+        NDIndexFullSlice fullSlice =
+                NDIndexFullSlice.fromIndex(index, array.getShape()).orElse(null);
         if (fullSlice != null) {
             set(array, fullSlice, value);
             return;
@@ -146,7 +149,8 @@ public abstract class NDArrayIndexer {
      * @throws IllegalArgumentException if the index does not point to a scalar value in the array
      */
     public void setScalar(NDArray array, NDIndex index, Number value) {
-        NDIndexFullSlice fullSlice = index.getAsFullSlice(array.getShape()).orElse(null);
+        NDIndexFullSlice fullSlice =
+                NDIndexFullSlice.fromIndex(index, array.getShape()).orElse(null);
         if (fullSlice != null) {
             if (fullSlice.getShape().size() != 1) {
                 throw new IllegalArgumentException("The provided index does not set a scalar");

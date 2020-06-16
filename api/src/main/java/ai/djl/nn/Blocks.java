@@ -47,7 +47,7 @@ public final class Blocks {
      *     batchFlatten} method
      */
     public static Block batchFlattenBlock() {
-        return new LambdaBlock(arrays -> batchFlatten(arrays));
+        return new LambdaBlock(Blocks::batchFlatten);
     }
 
     /**

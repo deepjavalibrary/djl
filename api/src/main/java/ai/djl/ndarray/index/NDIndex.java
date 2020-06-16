@@ -19,12 +19,8 @@ import ai.djl.ndarray.index.dim.NDIndexElement;
 import ai.djl.ndarray.index.dim.NDIndexFixed;
 import ai.djl.ndarray.index.dim.NDIndexPick;
 import ai.djl.ndarray.index.dim.NDIndexSlice;
-import ai.djl.ndarray.index.full.NDIndexFullPick;
-import ai.djl.ndarray.index.full.NDIndexFullSlice;
-import ai.djl.ndarray.types.Shape;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -147,6 +143,15 @@ public class NDIndex {
      */
     public int getRank() {
         return rank;
+    }
+
+    /**
+     * Returns the index of the ellipsis.
+     *
+     * @return the index of the ellipsis within this index or -1 for none.
+     */
+    public int getEllipsisIndex() {
+        return ellipsisIndex;
     }
 
     /**
@@ -316,153 +321,5 @@ public class NDIndex {
         } else {
             indices.add(new NDIndexSlice(min, max, step));
         }
-    }
-
-    /**
-     * Returns thi index as a full pick if it can be represented as one.
-     *
-     * @param target the shape to index
-     * @return the full pick if it can be represented as one
-     */
-    public Optional<NDIndexFullPick> getAsFullPick(Shape target) {
-        int axis = 0;
-        NDIndexFullPick fullPick = null;
-        for (NDIndexElement el : indices) {
-            if (el instanceof NDIndexAll) {
-                axis++;
-            } else if (el instanceof NDIndexPick) {
-                if (fullPick == null) {
-                    fullPick = new NDIndexFullPick(((NDIndexPick) el).getIndices(), axis);
-                } else {
-                    // Don't support multiple picks
-                    throw new UnsupportedOperationException(
-                            "Only one pick per get is currently supported");
-                }
-            } else {
-                // Invalid dim for fullPick
-                return Optional.empty();
-            }
-        }
-        return Optional.ofNullable(fullPick);
-    }
-
-    /**
-     * Returns this index as a full slice if it can be represented as one.
-     *
-     * @param target the shape to index
-     * @return the full slice if it can be represented as one
-     */
-    public Optional<NDIndexFullSlice> getAsFullSlice(Shape target) {
-        if (!stream().allMatch(
-                        ie ->
-                                ie instanceof NDIndexAll
-                                        || ie instanceof NDIndexFixed
-                                        || ie instanceof NDIndexSlice)) {
-            return Optional.empty();
-        }
-        int indDimensions = getRank();
-        int targetDimensions = target.dimension();
-        if (indDimensions > target.dimension()) {
-            throw new IllegalArgumentException(
-                    "The index has too many dimensions - "
-                            + indDimensions
-                            + " dimensions for array with "
-                            + targetDimensions
-                            + " dimensions");
-        }
-        long[] min = new long[targetDimensions];
-        long[] max = new long[targetDimensions];
-        long[] step = new long[targetDimensions];
-        List<Integer> toSqueeze = new ArrayList<>(targetDimensions);
-        long[] shape = new long[targetDimensions];
-        List<Long> squeezedShape = new ArrayList<>(targetDimensions);
-        if (ellipsisIndex == -1 || ellipsisIndex == rank) {
-            // ellipsis in the end and non ellipsis case
-            for (int i = 0; i < indDimensions; i++) {
-                NDIndexElement ie = get(i);
-                addSliceInfo(ie, i, target, min, max, step, toSqueeze, shape, squeezedShape);
-            }
-            for (int i = indDimensions; i < target.dimension(); i++) {
-                padIndexAll(i, target, min, max, step, shape, squeezedShape);
-            }
-        } else if (ellipsisIndex == 0) {
-            // ellipsis in the beginning
-            int paddingDim = targetDimensions - indDimensions;
-            int i;
-            for (i = 0; i < paddingDim; ++i) {
-                padIndexAll(i, target, min, max, step, shape, squeezedShape);
-            }
-            for (; i < targetDimensions; ++i) {
-                NDIndexElement ie = get(i - paddingDim);
-                addSliceInfo(ie, i, target, min, max, step, toSqueeze, shape, squeezedShape);
-            }
-        } else {
-            // ellipsis in the middle
-            int paddingDim = targetDimensions - indDimensions;
-            int i;
-            for (i = 0; i < ellipsisIndex; ++i) {
-                NDIndexElement ie = get(i);
-                addSliceInfo(ie, i, target, min, max, step, toSqueeze, shape, squeezedShape);
-            }
-            for (; i < paddingDim + ellipsisIndex; ++i) {
-                padIndexAll(i, target, min, max, step, shape, squeezedShape);
-            }
-            for (; i < targetDimensions; ++i) {
-                NDIndexElement ie = get(i - paddingDim);
-                addSliceInfo(ie, i, target, min, max, step, toSqueeze, shape, squeezedShape);
-            }
-        }
-        int[] squeeze = toSqueeze.stream().mapToInt(i -> i).toArray();
-        NDIndexFullSlice fullSlice =
-                new NDIndexFullSlice(
-                        min, max, step, squeeze, new Shape(shape), new Shape(squeezedShape));
-        return Optional.of(fullSlice);
-    }
-
-    private void addSliceInfo(
-            NDIndexElement ie,
-            int i,
-            Shape target,
-            long[] min,
-            long[] max,
-            long[] step,
-            List<Integer> toSqueeze,
-            long[] shape,
-            List<Long> squeezedShape) {
-        if (ie instanceof NDIndexFixed) {
-            NDIndexFixed fixed = ((NDIndexFixed) ie);
-            long rawIndex = fixed.getIndex();
-            min[i] = rawIndex < 0 ? Math.floorMod(rawIndex, target.get(i)) : rawIndex;
-            max[i] = min[i] + 1;
-            step[i] = 1;
-            toSqueeze.add(i);
-            shape[i] = 1;
-        } else if (ie instanceof NDIndexSlice) {
-            NDIndexSlice slice = (NDIndexSlice) ie;
-            long rawMin = Optional.ofNullable(slice.getMin()).orElse(0L);
-            min[i] = rawMin < 0 ? Math.floorMod(rawMin, target.get(i)) : rawMin;
-            long rawMax = Optional.ofNullable(slice.getMax()).orElse(target.size(i));
-            max[i] = rawMax < 0 ? Math.floorMod(rawMax, target.get(i)) : rawMax;
-            step[i] = Optional.ofNullable(slice.getStep()).orElse(1L);
-            shape[i] = (max[i] - min[i]) / step[i];
-            squeezedShape.add(shape[i]);
-        } else if (ie instanceof NDIndexAll) {
-            padIndexAll(i, target, min, max, step, shape, squeezedShape);
-        }
-    }
-
-    private void padIndexAll(
-            int i,
-            Shape target,
-            long[] min,
-            long[] max,
-            long[] step,
-            long[] shape,
-            List<Long> squeezedShape) {
-        min[i] = 0;
-        max[i] = target.size(i);
-        step[i] = 1;
-        shape[i] = target.size(i);
-        squeezedShape.add(target.size(i));
     }
 }

@@ -14,9 +14,14 @@ package ai.djl.ndarray.index.full;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.index.NDIndex;
+import ai.djl.ndarray.index.dim.NDIndexAll;
+import ai.djl.ndarray.index.dim.NDIndexElement;
+import ai.djl.ndarray.index.dim.NDIndexPick;
+import ai.djl.ndarray.types.Shape;
+import java.util.Optional;
 
 /** A simplified representation of a pick-based {@link NDIndex}. */
-public class NDIndexFullPick {
+public final class NDIndexFullPick {
 
     private NDArray indices;
     private int axis;
@@ -27,9 +32,38 @@ public class NDIndexFullPick {
      * @param indices the indices to pick
      * @param axis the axis to pick at
      */
-    public NDIndexFullPick(NDArray indices, int axis) {
+    private NDIndexFullPick(NDArray indices, int axis) {
         this.indices = indices;
         this.axis = axis;
+    }
+
+    /**
+     * Returns (if possible) the {@link NDIndexFullPick} representation of an {@link NDIndex}.
+     *
+     * @param index the index to represent
+     * @param target the shape of the array to index
+     * @return the full pick representation or nothing if it can't represent the index
+     */
+    public static Optional<NDIndexFullPick> fromIndex(NDIndex index, Shape target) {
+        int axis = 0;
+        NDIndexFullPick fullPick = null;
+        for (NDIndexElement el : index.getIndices()) {
+            if (el instanceof NDIndexAll) {
+                axis++;
+            } else if (el instanceof NDIndexPick) {
+                if (fullPick == null) {
+                    fullPick = new NDIndexFullPick(((NDIndexPick) el).getIndices(), axis);
+                } else {
+                    // Don't support multiple picks
+                    throw new UnsupportedOperationException(
+                            "Only one pick per get is currently supported");
+                }
+            } else {
+                // Invalid dim for fullPick
+                return Optional.empty();
+            }
+        }
+        return Optional.ofNullable(fullPick);
     }
 
     /**
