@@ -74,6 +74,10 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public PtNDArray create(Buffer data, Shape shape, DataType dataType) {
+        if (data.isDirect() && data instanceof ByteBuffer) {
+            return JniUtils.createNdFromByteBuffer(
+                    this, (ByteBuffer) data, shape, dataType, SparseFormat.DENSE, device);
+        }
         int size = data.remaining();
         // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
         DataType inputType = DataType.fromBuffer(data);
