@@ -91,7 +91,7 @@ public class TopKAccuracy extends AbstractAccuracy {
                                                 // get from last index as argSort is ascending
                                                 NDArray jPrediction =
                                                         topKPrediction.get(
-                                                                ":, " + (numClasses - j - 1));
+                                                                ":, {}", numClasses - j - 1);
                                                 return jPrediction
                                                         .flatten()
                                                         .eq(label.flatten())

@@ -19,6 +19,7 @@ import ai.djl.ndarray.index.dim.NDIndexElement;
 import ai.djl.ndarray.index.dim.NDIndexFixed;
 import ai.djl.ndarray.index.dim.NDIndexPick;
 import ai.djl.ndarray.index.dim.NDIndexSlice;
+import ai.djl.ndarray.types.DataType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -39,14 +40,14 @@ import java.util.stream.Stream;
  *   <li>A range of values - Use addSliceDim
  * </ul>
  *
- * <p>We recommend creating the NDIndex using {@link #NDIndex(String)}.
+ * <p>We recommend creating the NDIndex using {@link #NDIndex(String, Object...)}.
  *
- * @see #NDIndex(String)
+ * @see #NDIndex(String, Object...)
  */
 public class NDIndex {
 
     private static final Pattern ITEM_PATTERN =
-            Pattern.compile("(\\*)|((-?\\d+)?:(-?\\d+)?(:(-?\\d+))?)|(-?\\d+)");
+            Pattern.compile("(\\*)|((-?\\d+|\\{})?:(-?\\d+|\\{})?(:(-?\\d+|\\{}))?)|(-?\\d+|\\{})");
 
     private int rank;
     private List<NDIndexElement> indices;
@@ -91,6 +92,11 @@ public class NDIndex {
      *     // Uses a negative step to reverse along the dimension.
      *     assertEquals(a.get(new NDIndex("-1")).getShape(), new Shape(5, 4, 3));
      *
+     *     // Uses a variable argument to the index
+     *     // It can replace any number in any of these formats with {} and then the value of {}
+     *     // is specified in an argument following the indices string.
+     *     assertEquals(a.get(new NDIndex("{}, {}:{}", 0, 1, 3)).getShape(), new Shape(2, 3));
+     *
      *     // Uses ellipsis to insert many full slices
      *     assertEquals(a.get(new NDIndex("...")).getShape(), new Shape(5, 4, 3));
      *
@@ -100,12 +106,14 @@ public class NDIndex {
      *
      * @param indices a comma separated list of indices corresponding to either subsections,
      *     everything, or slices on a particular dimension
+     * @param args arguments to replace the varaible "{}" in the indices string. Can be an integer,
+     *     long, boolean {@link NDArray}, or integer {@link NDArray}.
      * @see <a href="https://docs.scipy.org/doc/numpy/reference/arrays.indexing.html">Numpy
      *     Indexing</a>
      */
-    public NDIndex(String indices) {
+    public NDIndex(String indices, Object... args) {
         this();
-        addIndices(indices);
+        addIndices(indices, args);
     }
 
     /**
@@ -176,13 +184,16 @@ public class NDIndex {
     /**
      * Updates the NDIndex by appending indices to the array.
      *
-     * @param indices the indices to add similar to {@link #NDIndex(String)}
+     * @param indices the indices to add similar to {@link #NDIndex(String, Object...)}
+     * @param args arguments to replace the varaible "{}" in the indices string. Can be an integer,
+     *     long, boolean {@link NDArray}, or integer {@link NDArray}.
      * @return the updated {@link NDIndex}
-     * @see #NDIndex(String)
+     * @see #NDIndex(String, Object...)
      */
-    public final NDIndex addIndices(String indices) {
+    public final NDIndex addIndices(String indices, Object... args) {
         String[] indexItems = indices.split(",");
         rank += indexItems.length;
+        int argIndex = 0;
         for (int i = 0; i < indexItems.length; ++i) {
             if (indexItems[i].trim().equals("...")) {
                 // make sure ellipsis appear only once
@@ -192,11 +203,14 @@ public class NDIndex {
                 }
                 ellipsisIndex = i;
             } else {
-                addIndexItem(indexItems[i]);
+                argIndex = addIndexItem(indexItems[i], argIndex, args);
             }
         }
         if (ellipsisIndex != -1) {
             rank--;
+        }
+        if (argIndex != args.length) {
+            throw new IllegalArgumentException("Incorrect number of index arguments");
         }
         return this;
     }
@@ -293,7 +307,7 @@ public class NDIndex {
         return indices.stream();
     }
 
-    private void addIndexItem(String indexItem) {
+    private int addIndexItem(String indexItem, int argIndex, Object[] args) {
         indexItem = indexItem.trim();
         Matcher m = ITEM_PATTERN.matcher(indexItem);
         if (!m.matches()) {
@@ -303,23 +317,77 @@ public class NDIndex {
         String star = m.group(1);
         if (star != null) {
             indices.add(new NDIndexAll());
-            return;
+            return argIndex;
         }
         // "number" number only case
         String digit = m.group(7);
         if (digit != null) {
-            indices.add(new NDIndexFixed(Long.parseLong(digit)));
-            return;
+            if ("{}".equals(digit)) {
+                Object arg = args[argIndex];
+                if (arg instanceof Integer) {
+                    indices.add(new NDIndexFixed((Integer) arg));
+                    return argIndex + 1;
+                } else if (arg instanceof Long) {
+                    indices.add(new NDIndexFixed((Long) arg));
+                    return argIndex + 1;
+                } else if (arg instanceof NDArray) {
+                    NDArray array = (NDArray) arg;
+                    if (array.getDataType() == DataType.BOOLEAN) {
+                        indices.add(new NDIndexBooleans(array));
+                        return argIndex + 1;
+                    } else if (array.getDataType().isInteger()) {
+                        indices.add(new NDIndexPick(array));
+                        return argIndex + 1;
+                    }
+                }
+                throw new IllegalArgumentException("Unknown argument: " + arg);
+            } else {
+                indices.add(new NDIndexFixed(Long.parseLong(digit)));
+                return argIndex;
+            }
         }
 
         // Slice
-        Long min = m.group(3) != null ? Long.parseLong(m.group(3)) : null;
-        Long max = m.group(4) != null ? Long.parseLong(m.group(4)) : null;
-        Long step = m.group(6) != null ? Long.parseLong(m.group(6)) : null;
+        Long min = null;
+        Long max = null;
+        Long step = null;
+        if (m.group(3) != null) {
+            min = parseSliceItem(m.group(3), argIndex, args);
+            if ("{}".equals(m.group(3))) {
+                argIndex++;
+            }
+        }
+        if (m.group(4) != null) {
+            max = parseSliceItem(m.group(4), argIndex, args);
+            if ("{}".equals(m.group(4))) {
+                argIndex++;
+            }
+        }
+        if (m.group(6) != null) {
+            step = parseSliceItem(m.group(6), argIndex, args);
+            if ("{}".equals(m.group(6))) {
+                argIndex++;
+            }
+        }
         if (min == null && max == null && step == null) {
             indices.add(new NDIndexAll());
         } else {
             indices.add(new NDIndexSlice(min, max, step));
+        }
+        return argIndex;
+    }
+
+    private Long parseSliceItem(String sliceItem, int argIndex, Object... args) {
+        if ("{}".equals(sliceItem)) {
+            Object arg = args[argIndex];
+            if (arg instanceof Integer) {
+                return ((Integer) arg).longValue();
+            } else if (arg instanceof Long) {
+                return (Long) arg;
+            }
+            throw new IllegalArgumentException("Unknown slice argument: " + arg);
+        } else {
+            return Long.parseLong(sliceItem);
         }
     }
 }

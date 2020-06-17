@@ -502,11 +502,13 @@ public interface NDArray extends AutoCloseable {
      * Returns a partial {@code NDArray}.
      *
      * @param indices the indices used to indicate what to get
+     * @param args arguments to replace the varaible "{}" in the indices string. Can be an integer,
+     *     long, boolean {@link NDArray}, or integer {@link NDArray}.
      * @return the partial {@code NDArray}
-     * @see NDIndex#NDIndex(String)
+     * @see NDIndex#NDIndex(String, Object...)
      */
-    default NDArray get(String indices) {
-        return get(new NDIndex(indices));
+    default NDArray get(String indices, Object... args) {
+        return get(new NDIndex(indices, args));
     }
 
     /**
