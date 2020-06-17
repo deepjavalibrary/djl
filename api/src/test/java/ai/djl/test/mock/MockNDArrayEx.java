@@ -389,12 +389,6 @@ public class MockNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray where(NDArray condition, NDArray other) {
         return null;
     }

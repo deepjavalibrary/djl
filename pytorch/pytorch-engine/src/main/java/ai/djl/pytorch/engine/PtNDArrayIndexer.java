@@ -15,6 +15,7 @@ package ai.djl.pytorch.engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.index.dim.NDIndexBooleans;
+import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.pytorch.jni.JniUtils;
@@ -22,6 +23,13 @@ import java.util.Stack;
 
 /** The {@link NDArrayIndexer} used by the {@link PtNDArray}. */
 public class PtNDArrayIndexer extends NDArrayIndexer {
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray get(NDArray array, NDIndexFullPick fullPick) {
+        return JniUtils.pick(
+                (PtNDArray) array, (PtNDArray) fullPick.getIndices(), fullPick.getAxis());
+    }
 
     /** {@inheritDoc} */
     @Override

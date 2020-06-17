@@ -457,12 +457,6 @@ public class TfNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray where(NDArray condition, NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
     }

@@ -450,37 +450,6 @@ public interface NDArrayEx {
     NDArrayIndexer getIndexer();
 
     /**
-     * Picks elements from an input array according to the input indices along the given axis.
-     *
-     * @param index the index array
-     * @param axis the axis used to pick the elements. Negative values means indexing happens from
-     *     right to left. If it is `None`, the elements in the index w.r.t the flattened input will
-     *     be picked.
-     * @param keepDims If true, the axis where we pick the elements is left in the result as
-     *     dimension with size one.
-     * @param mode Specify how out-of-bound indices behave. "clip" means clip to the range. So, if
-     *     all indices mentioned are too large, they are replaced by the index that addresses the
-     *     last element along an axis. "wrap" means to wrap around.
-     * @return a copy of the array
-     */
-    NDArray pick(NDArray index, int axis, boolean keepDims, String mode);
-
-    /**
-     * Picks elements from an input array according to the input indices along the given axis.
-     *
-     * @param index the index array
-     * @param axis the axis used to pick the elements. Negative values mean indexing happen from
-     *     right to left. If it is `None`, the elements in the index w.r.t the flattened input will
-     *     be picked.
-     * @param keepDims If true, the axis where we pick the elements is left in the result as
-     *     dimension with size one.
-     * @return a copy of the array
-     */
-    default NDArray pick(NDArray index, int axis, boolean keepDims) {
-        return pick(index, axis, keepDims, "clip");
-    }
-
-    /**
      * Returns elements chosen from the {@code NDArray} or the other {@code NDArray} depending on
      * condition.
      *

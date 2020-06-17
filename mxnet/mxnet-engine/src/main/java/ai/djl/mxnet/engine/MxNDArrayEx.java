@@ -671,16 +671,6 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("axis", axis);
-        params.addParam("keepdims", keepDims);
-        params.add("mode", mode);
-        return getManager().invoke("pick", new NDList(array, index), params).singletonOrThrow();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray where(NDArray condition, NDArray other) {
         NDArray array1;
         NDArray array2;

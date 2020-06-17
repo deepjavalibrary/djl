@@ -24,6 +24,15 @@ import java.util.Optional;
 public abstract class NDArrayIndexer {
 
     /**
+     * Returns a subarray by picking the elements.
+     *
+     * @param array the array to get from
+     * @param fullPick the elements to pick
+     * @return the subArray
+     */
+    public abstract NDArray get(NDArray array, NDIndexFullPick fullPick);
+
+    /**
      * Returns a subarray at the slice.
      *
      * @param array the array to get from
@@ -56,8 +65,7 @@ public abstract class NDArrayIndexer {
 
         Optional<NDIndexFullPick> fullPick = NDIndexFullPick.fromIndex(index, array.getShape());
         if (fullPick.isPresent()) {
-            return array.getNDArrayInternal()
-                    .pick(fullPick.get().getIndices(), fullPick.get().getAxis(), false);
+            return get(array, fullPick.get());
         }
 
         Optional<NDIndexFullSlice> fullSlice = NDIndexFullSlice.fromIndex(index, array.getShape());

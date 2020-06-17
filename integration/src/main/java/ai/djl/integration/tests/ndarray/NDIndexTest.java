@@ -44,7 +44,7 @@ public class NDIndexTest {
     public void testPick() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
-            NDArray expected = manager.create(new float[] {1f, 4f});
+            NDArray expected = manager.create(new float[] {1f, 4f}, new Shape(2, 1));
             NDArray actual =
                     original.get(
                             new NDIndex().addAllDim().addPickDim(manager.create(new int[] {0, 1})));

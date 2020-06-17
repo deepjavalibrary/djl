@@ -257,6 +257,25 @@ public class NDIndex {
     }
 
     /**
+     * Appends multiple new index to get all values in the dimension.
+     *
+     * @param count how many axes of {@link NDIndexAll} to add.
+     * @return the updated {@link NDIndex}
+     * @throws IllegalArgumentException if count is negative
+     */
+    public NDIndex addAllDim(int count) {
+        if (count < 0) {
+            throw new IllegalArgumentException(
+                    "The number of index dimensions to add can't be negative");
+        }
+        rank += count;
+        for (int i = 0; i < count; i++) {
+            indices.add(new NDIndexAll());
+        }
+        return this;
+    }
+
+    /**
      * Appends a new index to slice the dimension and returns a range of values.
      *
      * @param min the minimum of the range

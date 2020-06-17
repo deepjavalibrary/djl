@@ -13,14 +13,28 @@
 package ai.djl.mxnet.engine;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.index.dim.NDIndexBooleans;
+import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
 import ai.djl.ndarray.types.Shape;
 import java.util.Stack;
 
 /** The {@link NDArrayIndexer} used by the {@link MxNDArray}. */
 public class MxNDArrayIndexer extends NDArrayIndexer {
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray get(NDArray array, NDIndexFullPick fullPick) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", fullPick.getAxis());
+        params.addParam("keepdims", true);
+        params.add("mode", "wrap");
+        return array.getManager()
+                .invoke("pick", new NDList(array, fullPick.getIndices()), params)
+                .singletonOrThrow();
+    }
 
     /** {@inheritDoc} */
     @Override

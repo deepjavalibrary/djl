@@ -496,19 +496,6 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray pick(NDArray index, int axis, boolean keepDims, String mode) {
-        // TODO: support multiple modes
-        PtNDArray result = JniUtils.pick(array, (PtNDArray) index, axis);
-        if (!keepDims) {
-            PtNDArray flattened = result.flatten();
-            result.close();
-            result = flattened;
-        }
-        return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PtNDArray where(NDArray condition, NDArray other) {
         // Try to broadcast if shape mismatch
         if (!condition.getShape().equals(array.getShape())) {

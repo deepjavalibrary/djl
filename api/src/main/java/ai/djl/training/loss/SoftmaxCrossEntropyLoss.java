@@ -14,6 +14,7 @@ package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.index.NDIndex;
 
 /**
  * {@code SoftmaxCrossEntropyLoss} is a type of {@link Loss} that calculates the softmax cross
@@ -74,7 +75,11 @@ public class SoftmaxCrossEntropyLoss extends Loss {
         NDArray loss;
         NDArray lab = label.singletonOrThrow();
         if (sparseLabel) {
-            loss = pred.getNDArrayInternal().pick(lab, classAxis, true).neg();
+            NDIndex pickIndex =
+                    new NDIndex()
+                            .addAllDim(Math.floorMod(classAxis, pred.getShape().dimension()))
+                            .addPickDim(lab);
+            loss = pred.get(pickIndex).neg();
         } else {
             lab = lab.reshape(pred.getShape());
             loss = pred.mul(lab).neg().sum(new int[] {classAxis}, true);
