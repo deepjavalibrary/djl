@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -102,19 +103,20 @@ public final class LibUtils {
     }
 
     private static synchronized String findLibraryInClasspath() {
-        List<URL> urls;
+        Enumeration<URL> urls;
         try {
             urls =
-                    Collections.list(
-                            Thread.currentThread()
-                                    .getContextClassLoader()
-                                    .getResources("native/lib/mxnet.properties"));
+                    Thread.currentThread()
+                            .getContextClassLoader()
+                            .getResources("native/lib/mxnet.properties");
         } catch (IOException e) {
+            logger.warn("", e);
             return null;
         }
 
         // No native jars
-        if (urls.isEmpty()) {
+        if (!urls.hasMoreElements()) {
+            logger.debug("mxnet.properties not found in class path.");
             return null;
         }
 
@@ -122,7 +124,8 @@ public final class LibUtils {
         try {
             Platform matching = null;
             Platform placeholder = null;
-            for (URL url : urls) {
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
                 Platform platform = Platform.fromUrl(url);
                 if (platform.isPlaceholder()) {
                     placeholder = platform;
@@ -157,6 +160,8 @@ public final class LibUtils {
         try {
             String libName = System.mapLibraryName(LIB_NAME);
             Path cacheFolder = getCacheDir();
+            logger.debug("Using cache dir: {}", cacheFolder);
+
             Path dir = cacheFolder.resolve(platform.getVersion() + platform.getClassifier());
             Path path = dir.resolve(libName);
             if (Files.exists(path)) {
@@ -167,6 +172,7 @@ public final class LibUtils {
             for (String file : platform.getLibraries()) {
                 String libPath = "/native/lib/" + file;
                 try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
+                    logger.info("Extracting {} to cache ...", file);
                     Files.copy(is, tmp.resolve(file), StandardCopyOption.REPLACE_EXISTING);
                 }
             }
@@ -262,6 +268,7 @@ public final class LibUtils {
 
         String libName = System.mapLibraryName(LIB_NAME);
         Path cacheFolder = getCacheDir();
+        logger.debug("Using cache dir: {}", cacheFolder);
         Path dir = cacheFolder.resolve(version + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {

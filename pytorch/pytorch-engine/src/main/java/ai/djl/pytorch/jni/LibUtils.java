@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -191,18 +192,18 @@ public final class LibUtils {
     }
 
     private static synchronized String findNativeLibrary() {
-        List<URL> urls;
+        Enumeration<URL> urls;
         try {
             urls =
-                    Collections.list(
-                            Thread.currentThread()
-                                    .getContextClassLoader()
-                                    .getResources("native/lib/pytorch.properties"));
+                    Thread.currentThread()
+                            .getContextClassLoader()
+                            .getResources("native/lib/pytorch.properties");
         } catch (IOException e) {
+            logger.warn("", e);
             return null;
         }
         // No native jars
-        if (urls.isEmpty()) {
+        if (!urls.hasMoreElements()) {
             return null;
         }
 
@@ -210,7 +211,8 @@ public final class LibUtils {
         try {
             Platform matching = null;
             Platform placeholder = null;
-            for (URL url : urls) {
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
                 Platform platform = Platform.fromUrl(url);
                 if (platform.isPlaceholder()) {
                     placeholder = platform;
@@ -247,6 +249,7 @@ public final class LibUtils {
         try {
             String libName = System.mapLibraryName(NATIVE_LIB_NAME);
             Path cacheDir = getCacheDir();
+            logger.debug("Using cache dir: {}", cacheDir);
             Path dir = cacheDir.resolve(version + flavor + '-' + classifier);
             Path path = dir.resolve(libName);
             if (Files.exists(path)) {
@@ -284,6 +287,7 @@ public final class LibUtils {
 
         String libName = System.mapLibraryName(NATIVE_LIB_NAME);
         Path cacheDir = getCacheDir();
+        logger.debug("Using cache dir: {}", cacheDir);
         Path dir = cacheDir.resolve(version + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {

@@ -45,14 +45,18 @@ public abstract class Engine {
         for (EngineProvider provider : loaders) {
             Engine engine = provider.getEngine();
             if (engine != null) {
+                logger.debug("Engine loaded from provider: {}", engine.getEngineName());
                 if (firstEngine == null) {
                     firstEngine = engine;
                 }
                 ALL_ENGINES.put(engine.getEngineName(), engine);
+            } else {
+                logger.warn("Failed to load engine from: {}", provider.getClass().getName());
             }
         }
 
         if (firstEngine == null) {
+            logger.debug("No engine found from EngineProvider");
             return null;
         }
 

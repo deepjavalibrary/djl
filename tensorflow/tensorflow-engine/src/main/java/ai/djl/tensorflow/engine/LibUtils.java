@@ -59,6 +59,7 @@ public final class LibUtils {
                         .getResource("native/lib/tensorflow.properties");
         if (url == null) {
             // defer to tensorflow-core-api to handle loading native library.
+            logger.debug("tensorflow.properties not found in class path.");
             return null;
         }
 
@@ -88,6 +89,7 @@ public final class LibUtils {
 
         String libName = System.mapLibraryName(LIB_NAME);
         Path cacheDir = getCacheDir();
+        logger.debug("Using cache dir: {}", cacheDir);
         Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {

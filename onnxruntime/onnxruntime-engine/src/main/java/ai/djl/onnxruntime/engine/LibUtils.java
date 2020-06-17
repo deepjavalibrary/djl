@@ -23,7 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,13 +64,13 @@ public final class LibUtils {
         if (libPath == null) {
             throw new IllegalStateException("ONNX Runtime Library now found!");
         }
-        String nativeFileName = System.mapLibraryName(NATIVE_LIB_NAME);
-        String jniName = System.mapLibraryName(LIB_NAME);
-        System.setProperty(
-                "onnxruntime.native." + LIB_NAME + ".path", libPath.resolve(jniName).toString());
-        System.setProperty(
-                "onnxruntime.native." + NATIVE_LIB_NAME + ".path",
-                libPath.resolve(nativeFileName).toString());
+
+        String jniPath = libPath.resolve(System.mapLibraryName(LIB_NAME)).toString();
+        String nativePath = libPath.resolve(System.mapLibraryName(NATIVE_LIB_NAME)).toString();
+        System.setProperty("onnxruntime.native." + LIB_NAME + ".path", jniPath);
+        System.setProperty("onnxruntime.native." + NATIVE_LIB_NAME + ".path", nativePath);
+        logger.debug("Loading onnxruntime JNI from: {}", jniPath);
+        logger.debug("Loading onnxruntime native library from: {}", nativePath);
     }
 
     private static Path findOverrideLibrary() {
@@ -111,18 +111,19 @@ public final class LibUtils {
     }
 
     private static synchronized Path findNativeLibrary() {
-        List<URL> urls;
+        Enumeration<URL> urls;
         try {
             urls =
-                    Collections.list(
-                            Thread.currentThread()
-                                    .getContextClassLoader()
-                                    .getResources("native/lib/onnxruntime.properties"));
+                    Thread.currentThread()
+                            .getContextClassLoader()
+                            .getResources("native/lib/onnxruntime.properties");
         } catch (IOException e) {
+            logger.warn("", e);
             return null;
         }
         // No native jars
-        if (urls.isEmpty()) {
+        if (!urls.hasMoreElements()) {
+            logger.debug("onnxruntime.properties not found in class path.");
             return null;
         }
 
@@ -130,7 +131,8 @@ public final class LibUtils {
         try {
             Platform matching = null;
             Platform placeholder = null;
-            for (URL url : urls) {
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
                 Platform platform = Platform.fromUrl(url);
                 if (platform.isPlaceholder()) {
                     placeholder = platform;
@@ -168,6 +170,7 @@ public final class LibUtils {
         try {
             String libName = System.mapLibraryName(NATIVE_LIB_NAME);
             Path cacheDir = getCacheDir();
+            logger.debug("Using cache dir: {}", cacheDir);
             Path dir = cacheDir.resolve(version + flavor + '-' + classifier);
             Path path = dir.resolve(libName);
             if (Files.exists(path)) {
@@ -205,6 +208,7 @@ public final class LibUtils {
 
         String libName = System.mapLibraryName(NATIVE_LIB_NAME);
         Path cacheDir = getCacheDir();
+        logger.debug("Using cache dir: {}", cacheDir);
         Path dir = cacheDir.resolve(version + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {
