@@ -255,12 +255,12 @@ public final class LibUtils {
                     cacheDir = System.getenv("DJL_CACHE_DIR");
                     if (cacheDir == null || cacheDir.isEmpty()) {
                         String userHome = System.getProperty("user.home");
-                        return Paths.get(userHome, ".djl-ai/onnxruntime");
+                        return Paths.get(userHome, ".djl.ai/onnxruntime");
                     }
                 }
                 return Paths.get(cacheDir, "onnxruntime");
             }
         }
-        return Paths.get(cacheDir, ".djl-ai/onnxruntime");
+        return Paths.get(cacheDir, ".djl.ai/onnxruntime");
     }
 }
