@@ -67,8 +67,11 @@ public abstract class NDFormat {
                 .append(' ')
                 .append(array.getDevice())
                 .append(' ')
-                .append(array.getDataType())
-                .append(LF);
+                .append(array.getDataType());
+        if (array.hasGradient()) {
+            sb.append(" hasGradient");
+        }
+        sb.append(LF);
 
         long size = array.size();
         long dimension = array.getShape().dimension();

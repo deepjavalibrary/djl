@@ -198,6 +198,12 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public boolean hasGradient() {
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public double[] toDoubleArray() {
         double[] result = new double[(int) getShape().size()];
         tensor.rawData().asDoubles().read(result);

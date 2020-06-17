@@ -45,6 +45,8 @@ public class PtNDArray extends NativeResource implements NDArray {
     private DataType dataType;
     private Shape shape;
     private SparseFormat sparseFormat;
+    // use Boolean object to maintain three status: null, false, true
+    private Boolean isGradientRequired;
     private PtNDManager manager;
     private PtNDArrayEx ptNDArrayEx;
 
@@ -145,11 +147,21 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray getGradient() {
-        // TODO: remove the check when necessary
-        if (!JniUtils.checkGradient(this)) {
-            throw new IllegalStateException("NDArray not attached gradient");
+        if (!hasGradient()) {
+            throw new IllegalStateException(
+                    "No gradient attached to this NDArray, please call array.requiredGradient()"
+                            + "on your NDArray or block.setInitializer() on your Block");
         }
         return JniUtils.getGradient(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean hasGradient() {
+        if (isGradientRequired == null) {
+            isGradientRequired = JniUtils.requiresGrad(this);
+        }
+        return isGradientRequired;
     }
 
     /** {@inheritDoc} */

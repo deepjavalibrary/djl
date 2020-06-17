@@ -87,7 +87,7 @@ public class MxNDManager extends BaseNDManager {
     @Override
     public MxNDArray create(Shape shape, DataType dataType) {
         Pointer handle = JnaUtils.createNdArray(device, shape, dataType, shape.dimension(), false);
-        MxNDArray array = new MxNDArray(this, handle, device, shape, dataType);
+        MxNDArray array = new MxNDArray(this, handle, device, shape, dataType, false);
         attach(array.getUid(), array);
         return array;
     }

@@ -47,6 +47,9 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     private SparseFormat sparseFormat;
     private DataType dataType;
     private Shape shape;
+    // use Boolean object to maintain three status: false, true
+    // and null which means the flag is not set by the native engine yet
+    private Boolean hasGradient;
     private MxNDManager manager;
     private MxNDArrayEx mxNDArrayEx;
 
@@ -62,8 +65,15 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
      * @param device the device the new array will be located on
      * @param shape the shape of the new array
      * @param dataType the dataType of the new array
+     * @param hasGradient the gradient status of the new array
      */
-    MxNDArray(MxNDManager manager, Pointer handle, Device device, Shape shape, DataType dataType) {
+    MxNDArray(
+            MxNDManager manager,
+            Pointer handle,
+            Device device,
+            Shape shape,
+            DataType dataType,
+            boolean hasGradient) {
         this(manager, handle);
         this.device = device;
         // shape check
@@ -72,6 +82,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
         }
         this.shape = shape;
         this.dataType = dataType;
+        this.hasGradient = hasGradient;
     }
 
     /**
@@ -222,23 +233,20 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public void attachGradient() {
-        attachGradient(GradReq.WRITE, null);
+        attachGradient(null);
     }
 
     /** {@inheritDoc} */
     @Override
     public void attachGradient(SparseFormat sparseFormat) {
-        attachGradient(GradReq.WRITE, sparseFormat);
-    }
-
-    private void attachGradient(GradReq gradReq, SparseFormat format) {
-        // Does zerosLike support sparse?
-        try (MxNDArray grad = createGradient(format)) {
-            int gradReqValue = gradReq.getValue();
+        try (MxNDArray grad = createGradient(sparseFormat)) {
+            // DJL go with write as only MXNet support GradReq
+            int gradReqValue = GradReq.WRITE.getValue();
             IntBuffer gradReqBuffer = IntBuffer.allocate(1);
             gradReqBuffer.put(0, gradReqValue);
             JnaUtils.autogradMarkVariables(1, getHandle(), gradReqBuffer, grad.getHandle());
         }
+        hasGradient = true;
     }
 
     private MxNDArray createGradient(SparseFormat format) {
@@ -254,13 +262,23 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray getGradient() {
-        Pointer pointer = JnaUtils.getGradient(getHandle());
-        if (pointer == null) {
+        if (!hasGradient()) {
             throw new IllegalStateException(
-                    "No gradient attached to this NDArray, please call array.attachGradient()"
+                    "No gradient attached to this NDArray, please call array.requiredGradient()"
                             + "on your NDArray or block.setInitializer() on your Block");
         }
+        Pointer pointer = JnaUtils.getGradient(getHandle());
         return manager.create(pointer);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean hasGradient() {
+        if (hasGradient == null) {
+            Pointer pointer = JnaUtils.getGradient(getHandle());
+            hasGradient = pointer != null;
+        }
+        return hasGradient;
     }
 
     /** {@inheritDoc} */

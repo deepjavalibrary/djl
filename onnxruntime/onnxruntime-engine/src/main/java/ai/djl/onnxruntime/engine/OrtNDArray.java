@@ -142,6 +142,12 @@ public class OrtNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public boolean hasGradient() {
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public ByteBuffer toByteBuffer() {
         return getTensor().getByteBuffer();
     }

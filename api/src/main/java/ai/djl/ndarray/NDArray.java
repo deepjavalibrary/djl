@@ -210,6 +210,13 @@ public interface NDArray extends AutoCloseable {
     NDArray getGradient();
 
     /**
+     * Returns true if the gradient calculation is required for this {@code NDArray}.
+     *
+     * @return true if the gradient calculation is required for this {@code NDArray} else false
+     */
+    boolean hasGradient();
+
+    /**
      * Returns the size of this {@code NDArray} along a given axis.
      *
      * @param axis the axis to return the size for
@@ -3340,7 +3347,7 @@ public interface NDArray extends AutoCloseable {
      * </pre>
      *
      * @return a {@code NDArray} of indices corresponding to elements in this {@code NDArray} on the
-     *     axis, the output DataType is always {@link DataType#INT32}
+     *     axis, the output DataType is always {@link DataType#INT64}
      * @see NDArray#argSort(int, boolean)
      */
     default NDArray argSort() {
@@ -3371,7 +3378,7 @@ public interface NDArray extends AutoCloseable {
      *
      * @param axis the axis to sort along
      * @return a {@code NDArray} of indices corresponding to elements in this {@code NDArray} on the
-     *     axis, the output DataType is always {@link DataType#INT32}
+     *     axis, the output DataType is always {@link DataType#INT64}
      * @see NDArray#argSort(int, boolean)
      */
     default NDArray argSort(int axis) {
@@ -3398,7 +3405,7 @@ public interface NDArray extends AutoCloseable {
      * @param axis the axis to sort along
      * @param ascending whether to sort ascending
      * @return a {@code NDArray} of indices corresponding to elements in this {@code NDArray} on the
-     *     axis, the output DataType is always {@link DataType#INT32}
+     *     axis, the output DataType is always {@link DataType#INT64}
      */
     NDArray argSort(int axis, boolean ascending);
 

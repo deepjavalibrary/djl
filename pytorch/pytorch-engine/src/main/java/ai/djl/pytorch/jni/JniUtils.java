@@ -1012,7 +1012,7 @@ public final class JniUtils {
         PyTorchLibrary.LIB.torchDeleteTensor(handle);
     }
 
-    public static boolean checkGradient(PtNDArray ndArray) {
+    public static boolean requiresGrad(PtNDArray ndArray) {
         return PyTorchLibrary.LIB.torchRequiresGrad(ndArray.getHandle());
     }
 

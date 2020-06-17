@@ -136,6 +136,11 @@ public class MockNDArray implements NDArray {
         return null;
     }
 
+    @Override
+    public boolean hasGradient() {
+        return false;
+    }
+
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {

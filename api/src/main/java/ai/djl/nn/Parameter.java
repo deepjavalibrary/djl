@@ -44,7 +44,7 @@ public class Parameter implements AutoCloseable {
     private DataType mandatoryDataType;
     private Initializer initializer;
     private NDArray array;
-    private boolean requireGrad;
+    private boolean requiresGrad;
     private SparseFormat gradientFormat;
 
     /**
@@ -66,10 +66,10 @@ public class Parameter implements AutoCloseable {
      * @param name the name of the {@code Parameter}
      * @param block the block with which this {@code Parameter} is associated
      * @param type the type of this {@code Parameter}
-     * @param requireGrad whether this {@code Parameter} needs to compute gradients
+     * @param requiresGrad whether this {@code Parameter} needs to compute gradients
      */
-    public Parameter(String name, Block block, ParameterType type, boolean requireGrad) {
-        this(name, block, type, requireGrad, SparseFormat.DENSE);
+    public Parameter(String name, Block block, ParameterType type, boolean requiresGrad) {
+        this(name, block, type, requiresGrad, SparseFormat.DENSE);
     }
 
     /**
@@ -92,7 +92,7 @@ public class Parameter implements AutoCloseable {
         this.name = name;
         this.block = block;
         this.type = type;
-        this.requireGrad = requireGrad;
+        this.requiresGrad = requireGrad;
         this.initializer = type.getInitializer();
         this.gradientFormat = gradientFormat;
     }
@@ -152,7 +152,7 @@ public class Parameter implements AutoCloseable {
      * @return whether this parameter needs gradients to be computed
      */
     public boolean requireGradient() {
-        return requireGrad;
+        return requiresGrad;
     }
 
     /**
