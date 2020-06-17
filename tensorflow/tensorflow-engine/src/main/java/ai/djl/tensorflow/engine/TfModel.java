@@ -91,7 +91,7 @@ public class TfModel extends BaseModel {
         }
 
         SavedModelBundle bundle = loader.load();
-        block = new TfSymbolBlock(manager, bundle);
+        block = new TfSymbolBlock(bundle);
     }
 
     private Path findModleDir(String prefix) {

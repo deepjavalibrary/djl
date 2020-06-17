@@ -37,13 +37,11 @@ import org.tensorflow.proto.framework.TensorShapeProto;
 
 public class TfSymbolBlock implements SymbolBlock {
 
-    private NDManager manager;
     private SavedModelBundle bundle;
     private MetaGraphDef metaGraphDef;
     private Session session;
 
-    public TfSymbolBlock(NDManager manager, SavedModelBundle bundle) {
-        this.manager = manager;
+    public TfSymbolBlock(SavedModelBundle bundle) {
         this.bundle = bundle;
         session = bundle.session();
         metaGraphDef = bundle.metaGraphDef();
@@ -75,8 +73,9 @@ public class TfSymbolBlock implements SymbolBlock {
         List<Tensor<?>> result = runner.run();
 
         NDList resultNDList = new NDList();
+        TfNDManager tfNDManager = (TfNDManager) inputs.head().getManager();
         for (Tensor<?> tensor : result) {
-            resultNDList.add(((TfNDManager) manager).create(tensor));
+            resultNDList.add(tfNDManager.create(tensor));
         }
         return resultNDList;
     }
