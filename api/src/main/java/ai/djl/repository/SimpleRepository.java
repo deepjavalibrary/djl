@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@code SimpleRepository} is a {@link Repository} containing only a single artifact without
@@ -33,6 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see Repository
  */
 public class SimpleRepository extends AbstractRepository {
+
+    private static final Logger logger = LoggerFactory.getLogger(SimpleRepository.class);
 
     private String name;
     private Path path;
@@ -73,8 +77,10 @@ public class SimpleRepository extends AbstractRepository {
     public Metadata locate(MRL mrl) throws IOException {
         Path file = path.resolve("metadata.json");
         if (Files.isRegularFile(file)) {
+            logger.debug("Using metadata.json file: {}", file.toAbsolutePath());
             return metadataWithFile(file);
         }
+        logger.debug("No metadata.json file found in: {}", path.toAbsolutePath());
         return metadataWithoutFile();
     }
 
@@ -96,6 +102,7 @@ public class SimpleRepository extends AbstractRepository {
             metadata.setArtifactId(file.getName());
         }
         if (!Files.exists(path)) {
+            logger.debug("Specified path doesn't exists: {}", path.toAbsolutePath());
             return metadata;
         }
 
@@ -159,6 +166,7 @@ public class SimpleRepository extends AbstractRepository {
     @Override
     public List<MRL> getResources() {
         if (!Files.exists(path)) {
+            logger.debug("Specified path doesn't exists: {}", path.toAbsolutePath());
             return Collections.emptyList();
         }
 

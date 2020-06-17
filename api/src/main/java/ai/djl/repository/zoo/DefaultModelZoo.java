@@ -19,11 +19,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A {@link ModelZoo} that contains models in specified locations. */
 public class DefaultModelZoo implements ModelZoo {
 
     public static final String GROUP_ID = "ai.djl.localmodelzoo";
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultModelZoo.class);
 
     private List<ModelLoader<?, ?>> modelLoaders;
 
@@ -38,10 +42,13 @@ public class DefaultModelZoo implements ModelZoo {
         for (String url : urls) {
             if (!url.isEmpty()) {
                 Repository repo = Repository.newInstance(url, url);
+                logger.debug("Scanning models in repo: {}, {}", repo.getClass(), url);
                 List<MRL> mrls = repo.getResources();
                 for (MRL mrl : mrls) {
                     modelLoaders.add(new DefaultModelLoader(repo, mrl));
                 }
+            } else {
+                logger.warn("Model location is empty.");
             }
         }
     }
