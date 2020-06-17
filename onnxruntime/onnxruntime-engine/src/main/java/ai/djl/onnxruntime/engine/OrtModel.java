@@ -63,7 +63,7 @@ public class OrtModel extends BaseModel {
         }
         Path modelFile = findModelFile(prefix);
         if (modelFile == null) {
-            modelFile = findModelFile(modelPath.toFile().getName());
+            modelFile = findModelFile(modelDir.toFile().getName());
             if (modelFile == null) {
                 throw new FileNotFoundException(".onnx file not found in: " + modelPath);
             }
@@ -81,12 +81,12 @@ public class OrtModel extends BaseModel {
 
     private Path findModelFile(String prefix) {
         Path modelFile = modelDir.resolve(prefix);
-        if (Files.notExists(modelFile)) {
+        if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
             if (prefix.endsWith(".onnx")) {
                 return null;
             }
             modelFile = modelDir.resolve(prefix + ".onnx");
-            if (Files.notExists(modelFile)) {
+            if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
                 return null;
             }
         }

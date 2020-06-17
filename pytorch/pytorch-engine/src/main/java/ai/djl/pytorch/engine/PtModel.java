@@ -64,9 +64,9 @@ public class PtModel extends BaseModel {
         if (block == null) {
             Path modelFile = findModelFile(prefix);
             if (modelFile == null) {
-                modelFile = findModelFile(modelPath.toFile().getName());
+                modelFile = findModelFile(modelDir.toFile().getName());
                 if (modelFile == null) {
-                    throw new FileNotFoundException(".pt file not found in: " + modelPath);
+                    throw new FileNotFoundException(".pt file not found in: " + modelDir);
                 }
             }
             block = JniUtils.loadModule((PtNDManager) manager, modelFile, manager.getDevice());
@@ -85,12 +85,12 @@ public class PtModel extends BaseModel {
 
     private Path findModelFile(String prefix) {
         Path modelFile = modelDir.resolve(prefix);
-        if (Files.notExists(modelFile)) {
+        if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
             if (prefix.endsWith(".pt")) {
                 return null;
             }
             modelFile = modelDir.resolve(prefix + ".pt");
-            if (Files.notExists(modelFile)) {
+            if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
                 return null;
             }
         }

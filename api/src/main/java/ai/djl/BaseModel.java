@@ -167,7 +167,7 @@ public abstract class BaseModel implements Model {
     }
 
     protected void setModelDir(Path modelDir) {
-        this.modelDir = modelDir;
+        this.modelDir = modelDir.toAbsolutePath();
     }
 
     /** {@inheritDoc} */

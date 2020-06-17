@@ -91,23 +91,20 @@ public final class LibUtils {
 
     private static Path findLibraryInPath(String libPath) {
         String[] paths = libPath.split(File.pathSeparator);
-        List<String> mappedLibNames;
-        mappedLibNames = Collections.singletonList(System.mapLibraryName(LIB_NAME));
+        String mappedLibName = System.mapLibraryName(LIB_NAME);
 
         for (String path : paths) {
             File p = new File(path);
             if (!p.exists()) {
                 continue;
             }
-            for (String name : mappedLibNames) {
-                if (p.isFile() && p.getName().endsWith(name)) {
-                    return p.toPath();
-                }
+            if (p.isFile() && p.getName().endsWith(mappedLibName)) {
+                return p.toPath();
+            }
 
-                File file = new File(path, name);
-                if (file.exists() && file.isFile()) {
-                    return file.toPath();
-                }
+            File file = new File(path, mappedLibName);
+            if (file.exists() && file.isFile()) {
+                return file.toPath();
             }
         }
         return null;

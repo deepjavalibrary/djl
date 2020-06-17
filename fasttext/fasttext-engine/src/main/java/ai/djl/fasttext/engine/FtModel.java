@@ -83,7 +83,7 @@ public class FtModel implements Model {
         }
         Path modelFile = findModelFile(prefix);
         if (modelFile == null) {
-            modelFile = findModelFile(modelPath.toFile().getName());
+            modelFile = findModelFile(modelDir.toFile().getName());
             if (modelFile == null) {
                 throw new FileNotFoundException("No .ftz or .bin file found in : " + modelPath);
             }
@@ -100,14 +100,14 @@ public class FtModel implements Model {
 
     private Path findModelFile(String prefix) {
         Path modelFile = modelDir.resolve(prefix);
-        if (Files.notExists(modelFile)) {
+        if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
             if (prefix.endsWith(".ftz") || prefix.endsWith(".bin")) {
                 return null;
             }
             modelFile = modelDir.resolve(prefix + ".ftz");
-            if (Files.notExists(modelFile)) {
+            if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
                 modelFile = modelDir.resolve(prefix + ".bin");
-                if (Files.notExists(modelFile)) {
+                if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
                     return null;
                 }
             }

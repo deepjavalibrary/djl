@@ -95,7 +95,7 @@ public class MxModel extends BaseModel {
         }
         Path paramFile = paramPathResolver(prefix, options);
         if (paramFile == null) {
-            prefix = modelPath.toFile().getName();
+            prefix = modelDir.toFile().getName();
             paramFile = paramPathResolver(prefix, options);
             if (paramFile == null) {
                 throw new IOException("Parameter file not found in: " + modelDir);

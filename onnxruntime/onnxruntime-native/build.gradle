@@ -8,7 +8,6 @@ def VERSION = "1.3.0"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 version = VERSION + (isRelease ? "" : "-SNAPSHOT")
 
-
 def BINARY_ROOT = "${project.buildDir}/download"
 
 task downloadOrtNativeLib() {
@@ -44,19 +43,17 @@ task downloadOrtNativeLib() {
 
 // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
 jar {
-    def placeholder = "${project.buildDir}/placeholder"
     doFirst {
         def versionName = project.version
         if (!isRelease) {
-            version += String.format("-%s", new Date().format('yyyyMMdd'))
+            versionName += String.format("-%s", new Date().format('yyyyMMdd'))
         }
-        def dir = file("${placeholder}/native/lib")
-        dir.mkdirs()
-        def propFile = file("${placeholder}/native/lib/onnxruntime.properties")
+
+        def dir = file("${project.buildDir}/classes/java/main/native/lib")
+        dir.mkdirs();
+        def propFile = new File(dir, "onnxruntime.properties")
         propFile.text = "placeholder=true\nversion=${versionName}\n"
     }
-
-    from placeholder
 }
 
 java {
