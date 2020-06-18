@@ -36,6 +36,8 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@code AbstractRepository} is the shared base for implementers of the {@link Repository}
@@ -44,6 +46,8 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
  * @see Repository
  */
 public abstract class AbstractRepository implements Repository {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractRepository.class);
 
     /** {@inheritDoc} */
     @Override
@@ -167,6 +171,7 @@ public abstract class AbstractRepository implements Repository {
             fileUri = getBaseUri().resolve(baseUri).resolve(fileUri);
         }
 
+        logger.debug("Downloading artifact: {} ...", fileUri);
         try (InputStream is = fileUri.toURL().openStream()) {
             save(is, tmp, baseUri, item, progress);
         }

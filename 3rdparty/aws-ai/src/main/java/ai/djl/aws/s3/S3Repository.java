@@ -120,6 +120,7 @@ public class S3Repository extends AbstractRepository {
     protected void download(Path tmp, URI baseUri, Artifact.Item item, Progress progress)
             throws IOException {
         String key = item.getUri();
+        logger.debug("Downloading artifact from: s3://{}/{} ...", bucket, key);
         GetObjectRequest req = GetObjectRequest.builder().bucket(bucket).key(key).build();
         try (ResponseInputStream<GetObjectResponse> is = client.getObject(req)) {
             save(is, tmp, baseUri, item, progress);

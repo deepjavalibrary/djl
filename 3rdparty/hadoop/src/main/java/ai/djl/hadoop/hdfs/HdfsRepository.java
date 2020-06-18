@@ -117,6 +117,7 @@ public class HdfsRepository extends AbstractRepository {
             throws IOException {
         FileSystem fs = FileSystem.get(uri, config);
         org.apache.hadoop.fs.Path path = new org.apache.hadoop.fs.Path(item.getUri());
+        logger.debug("Downloading artifact: {} ...", path);
         try (InputStream is = fs.open(path)) {
             save(is, tmp, baseUri, item, progress);
         }

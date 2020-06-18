@@ -105,6 +105,7 @@ public class SimpleUrlRepository extends AbstractRepository {
     @Override
     protected void download(Path tmp, URI baseUri, Artifact.Item item, Progress progress)
             throws IOException {
+        logger.debug("Downloading artifact: {} ...", uri);
         try (InputStream is = uri.toURL().openStream()) {
             save(is, tmp, baseUri, item, progress);
         }

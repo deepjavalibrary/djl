@@ -138,10 +138,15 @@ public interface ModelZoo {
         }
 
         for (ModelZoo zoo : list) {
+            String loaderGroupId = zoo.getGroupId();
             for (ModelLoader<?, ?> loader : zoo.getModelLoaders()) {
                 Application app = loader.getApplication();
                 String loaderArtifactId = loader.getArtifactId();
-                logger.debug("Checking ModelLoader: {} {}:{}", app, groupId, loaderArtifactId);
+                logger.debug(
+                        "Checking ModelLoader: {} {}:{}",
+                        app.getPath(),
+                        loaderGroupId,
+                        loaderArtifactId);
                 if (artifactId != null && !artifactId.equals(loaderArtifactId)) {
                     // filter out by model loader artifactId
                     continue;
