@@ -1,8 +1,8 @@
 group "ai.djl.tensorflow"
 
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-version = "2.1.0" + (isRelease ? "" : "-SNAPSHOT")
-def tf_versoin = "2.1.0"
+version = "2.2.0" + (isRelease ? "" : "-SNAPSHOT")
+def tf_versoin = "2.2.0"
 def mkl_dnn_version = "0.21.2-1.5.2"
 
 repositories {
@@ -19,14 +19,16 @@ dependencies {
     download "org.tensorflow:tensorflow-core-api:0.1.0-SNAPSHOT:linux-x86_64-mkl-gpu"
     download "org.tensorflow:tensorflow-core-api:0.1.0-SNAPSHOT:linux-x86_64-mkl"
     download "org.tensorflow:tensorflow-core-api:0.1.0-SNAPSHOT:macosx-x86_64-mkl"
-    // download "org.tensorflow:tensorflow-core-api:0.1.0-SNAPSHOT:windows-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.1.0-SNAPSHOT:windows-x86_64"
     download("org.bytedeco:mkl-dnn:${mkl_dnn_version}:macosx-x86_64") {
         exclude group: "org.bytedeco", module: "javacpp"
     }
     download("org.bytedeco:mkl-dnn:${mkl_dnn_version}:linux-x86_64") {
         exclude group: "org.bytedeco", module: "javacpp"
     }
-    // download "org.bytedeco:mkl-dnn:${mkl_dnn_version}:windows-x86_64"
+    download("org.bytedeco:mkl-dnn:${mkl_dnn_version}:windows-x86_64") {
+        exclude group: "org.bytedeco", module: "javacpp"
+    }
 }
 
 task uploadTensorflowNativeLibs() {
@@ -64,29 +66,29 @@ task uploadTensorflowNativeLibs() {
         ant.move(file: "${tfUnzipDir}/linux-x86_64-mkl/", toFile: "${buildDir}/native/linux/cpu/")
         ant.move(file: "${tfUnzipDir}/linux-x86_64-mkl-gpu/", toFile: "${buildDir}/native/linux/gpu/")
         ant.move(file: "${tfUnzipDir}/macosx-x86_64-mkl/", toFile: "${buildDir}/native/osx/cpu/")
-        // ant.move(file: "${tfUnzipDir}/windows-x86_64-mkl/", toFile: "${buildDir}/native/windows/cpu/")
-        // ant.move(file: "${tfUnzipDir}/windows-x86_64-mkl-gpu/", toFile: "${buildDir}/native/windows/gpu/")
+        ant.move(file: "${tfUnzipDir}/windows-x86_64/", toFile: "${buildDir}/native/win/cpu/")
+        ant.move(file: "${tfUnzipDir}/windows-x86_64-gpu/", toFile: "${buildDir}/native/win/gpu/")
 
         copy {
             from "${mklUnzipDir}/linux-x86_64/"
             into "${buildDir}/native/linux/gpu/"
         }
-        //        copy {
-        //            from "${mklUnzipDir}/windows-x86_64/"
-        //            into "${buildDir}/native/windows/gpu/"
-        //        }
+        copy {
+            from "${mklUnzipDir}/windows-x86_64/lib/"
+            into "${buildDir}/native/win/gpu/"
+        }
 
         ant.move(file: "${mklUnzipDir}/linux-x86_64/", toFile: "${buildDir}/native/linux/cpu/")
         ant.move(file: "${mklUnzipDir}/macosx-x86_64/", toFile: "${buildDir}/native/osx/cpu/")
-        // ant.move(file: "${tfUnzipDir}/windows-x86_64-mkl-gpu", toFile: "${buildDir}/native/windows/gpu")
+        ant.move(file: "${mklUnzipDir}/windows-x86_64/lib", toFile: "${buildDir}/native/win/cpu")
 
         def f = new File("${buildDir}/native/files.txt")
         def uploadDirs = [
                 "${buildDir}/native/linux/cpu/",
                 "${buildDir}/native/linux/gpu/",
                 "${buildDir}/native/osx/cpu/",
-                //"${buildDir}/native/windows/cpu/",
-                //"${buildDir}/native/windows/gpu/"
+                "${buildDir}/native/win/cpu/",
+                "${buildDir}/native/win/gpu/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
@@ -117,8 +119,8 @@ publishing {
     publications {
         maven(MavenPublication) {
             pom {
-                name = "TensorFlow 2.1 native library"
-                description = "TensorFlow 2.1 native library"
+                name = "TensorFlow 2.2 native library"
+                description = "TensorFlow 2.2 native library"
                 url = "http://www.djl.ai/tensorflow/${project.name}"
             }
         }

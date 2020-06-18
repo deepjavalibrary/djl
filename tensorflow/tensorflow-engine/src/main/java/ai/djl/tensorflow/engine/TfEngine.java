@@ -35,6 +35,9 @@ public final class TfEngine extends Engine {
 
     private static final Logger logger = LoggerFactory.getLogger(TfEngine.class);
 
+    private boolean mklAvailable = true;
+    private boolean cudaAvailable = Platform.fromSystem().getCudaArch() != null;
+
     public static final String ENGINE_NAME = "TensorFlow";
 
     private TfEngine() {}
@@ -43,6 +46,7 @@ public final class TfEngine extends Engine {
         try {
             LibUtils.loadLibrary();
             EagerSession.getDefault();
+
             return new TfEngine();
         } catch (Throwable e) {
             logger.warn("Failed load TensorFlow native library.", e);
@@ -72,9 +76,9 @@ public final class TfEngine extends Engine {
     @Override
     public boolean hasCapability(String capability) {
         if (StandardCapabilities.MKL.equals(capability)) {
-            return true;
+            return mklAvailable;
         } else if (StandardCapabilities.CUDA.equals(capability)) {
-            return Platform.fromSystem().getCudaArch() != null;
+            return cudaAvailable;
         }
         return false;
     }

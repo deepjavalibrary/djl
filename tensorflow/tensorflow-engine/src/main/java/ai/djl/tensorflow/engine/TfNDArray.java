@@ -33,6 +33,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.tensorflow.Operand;
+import org.tensorflow.Operation;
 import org.tensorflow.Tensor;
 import org.tensorflow.op.Ops;
 import org.tensorflow.op.core.Constant;
@@ -1520,9 +1521,27 @@ public class TfNDArray implements NDArray {
     @SuppressWarnings("unchecked")
     <T extends TType> Operand<T> asOperand() {
         if (operand == null) {
-            operand = tf.constant(tensor);
+            Operation op =
+                    manager.getEagerSession()
+                            .opBuilder("Const", "Const_" + TfNDManager.nextNameAssignment())
+                            .setAttr("dtype", tensor.dataType())
+                            .setAttr("value", tensor)
+                            .setDevice(getTfDevice())
+                            .build();
+            operand = op.output(0);
         }
         return (Operand<T>) operand;
+    }
+
+    private String getTfDevice() {
+        if (getDevice().getDeviceType().equals(Device.Type.CPU)) {
+            return "/device:CPU:0";
+        } else if (getDevice().getDeviceType().equals(Device.Type.GPU)) {
+            return "/device:GPU:" + getDevice().getDeviceId();
+        } else {
+            throw new EngineException(
+                    "Unknown device type to TensorFlow Engine: " + getDevice().toString());
+        }
     }
 
     public Tensor<?> getTensor() {

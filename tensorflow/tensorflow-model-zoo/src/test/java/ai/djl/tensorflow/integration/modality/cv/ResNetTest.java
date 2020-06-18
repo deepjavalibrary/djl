@@ -30,16 +30,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class ResNetTest {
 
     @Test
     public void testResNet50V1() throws IOException, ModelException, TranslateException {
-        if (System.getProperty("os.name").startsWith("Win")) {
-            throw new SkipException("Tensorflow doesn't support Windows yet.");
-        }
 
         float[] mean = {103.939f, 116.779f, 123.68f};
         float[] std = {1f, 1f, 1f};
