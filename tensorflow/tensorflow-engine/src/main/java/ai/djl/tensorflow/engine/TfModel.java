@@ -82,7 +82,7 @@ public class TfModel extends BaseModel {
         }
 
         SavedModelBundle.Loader loader =
-                SavedModelBundle.loader(modelDir.toString()).withTags(tags);
+                SavedModelBundle.loader(exportDir.toString()).withTags(tags);
         if (proto != null) {
             loader.withConfigProto(proto);
         }
