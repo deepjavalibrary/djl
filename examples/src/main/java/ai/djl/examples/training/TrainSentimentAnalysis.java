@@ -163,7 +163,7 @@ public final class TrainSentimentAnalysis {
                                             new NDList(ntc.get(0), ntc.get(sequenceLength - 1)),
                                             1));
                         })
-                .add(Linear.builder().setOutChannels(2).build());
+                .add(Linear.builder().setUnits(2).build());
     }
 
     public static DefaultTrainingConfig setupTrainingConfig(

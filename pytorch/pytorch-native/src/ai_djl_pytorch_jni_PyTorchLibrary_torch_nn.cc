@@ -16,21 +16,6 @@
 #include "djl_pytorch_jni_error.h"
 #include "djl_pytorch_jni_utils.h"
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLinear(
-    JNIEnv* env, jobject jthis, jobject jhandle, jobject jweight, jobject jbias, jboolean bias) {
-  API_BEGIN();
-  auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-  auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jweight);
-  if (bias) {
-    auto* bias_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jbias);
-    const auto* result_ptr = new torch::Tensor(torch::nn::functional::linear(*tensor_ptr, *weight_ptr, *bias_ptr));
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
-  }
-  const auto* result_ptr = new torch::Tensor(torch::nn::functional::linear(*tensor_ptr, *weight_ptr));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
-  API_END();
-}
-
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRelu(
     JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();

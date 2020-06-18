@@ -21,6 +21,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.Blocks;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
@@ -94,7 +95,8 @@ public final class TrainMnistWithLSTM {
         block.add(
                 new LSTM.Builder().setStateSize(64).setNumStackedLayers(1).optDropRate(0).build());
         block.add(BatchNorm.builder().optEpsilon(1e-5f).optMomentum(0.9f).build());
-        block.add(Linear.builder().setOutChannels(10).optFlatten(true).build());
+        block.add(Blocks.batchFlattenBlock());
+        block.add(Linear.builder().setUnits(10).build());
         return block;
     }
 

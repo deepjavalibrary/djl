@@ -322,8 +322,7 @@ final class PyTorchLibrary {
 
     native Pointer torchUpsampleBilinear2d(Pointer handle, long[] shape, boolean alignCorners);
 
-    native Pointer torchNNLinear(
-            Pointer handle, Pointer weightHandle, Pointer biasHandle, boolean bias);
+    native Pointer torchNNLinear(Pointer handle, Pointer weightHandle, Pointer biasHandle);
 
     native Pointer torchNNRelu(Pointer handle);
 

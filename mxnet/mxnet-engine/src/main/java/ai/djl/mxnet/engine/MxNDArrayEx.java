@@ -484,19 +484,17 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDList fullyConnected(
-            NDList inputs,
-            long outChannels,
-            boolean flatten,
-            boolean noBias,
-            PairList<String, Object> additional) {
+    public NDList linear(NDArray input, NDArray weight, NDArray bias) {
         MxOpParams params = new MxOpParams();
-        params.addParam("num_hidden", outChannels);
-        params.addParam("flatten", flatten);
-        params.addParam("no_bias", noBias);
-        params.addAll(additional);
+        params.addParam("num_hidden", weight.size(0));
+        params.addParam("flatten", false);
+        params.addParam("no_bias", bias == null);
+        NDList inputs = new NDList(input, weight);
+        if (bias != null) {
+            inputs.add(bias);
+        }
 
-        return getManager().invoke("FullyConnected", inputs, params);
+        return getManager().invoke("_npx_fully_connected", inputs, params);
     }
 
     /** {@inheritDoc} */

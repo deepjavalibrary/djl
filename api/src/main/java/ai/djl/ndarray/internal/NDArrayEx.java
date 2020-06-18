@@ -274,12 +274,7 @@ public interface NDArrayEx {
             boolean noBias,
             PairList<String, Object> additional);
 
-    NDList fullyConnected(
-            NDList inputs,
-            long outChannels,
-            boolean flatten,
-            boolean noBias,
-            PairList<String, Object> additional);
+    NDList linear(NDArray input, NDArray weight, NDArray bias);
 
     NDList embedding(
             NDList inputs,

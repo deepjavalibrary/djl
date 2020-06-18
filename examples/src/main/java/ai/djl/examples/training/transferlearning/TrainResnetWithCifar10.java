@@ -148,7 +148,7 @@ public final class TrainResnetWithCifar10 {
             // the original model don't include the flatten
             // so apply the flatten here
             newBlock.add(Blocks.batchFlattenBlock());
-            newBlock.add(Linear.builder().setOutChannels(10).build());
+            newBlock.add(Linear.builder().setUnits(10).build());
             model.setBlock(newBlock);
             if (!preTrained) {
                 model.getBlock().clear();

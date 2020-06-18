@@ -71,7 +71,7 @@ public class SimpleTextDecoder extends Decoder {
         sequentialBlock
                 .add(trainableTextEmbedding)
                 .add(recurrentBlock)
-                .add(Linear.builder().setOutChannels(vocabSize).optFlatten(false).build());
+                .add(Linear.builder().setUnits(vocabSize).build());
         return sequentialBlock;
     }
 

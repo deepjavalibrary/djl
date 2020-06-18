@@ -63,7 +63,6 @@ public class ResnetTest {
                         .setNumLayers(50)
                         .setOutSize(10)
                         .build();
-
         try (Model model = Model.newInstance("resnet")) {
             model.setBlock(resNet50);
             try (Trainer trainer = model.newTrainer(config)) {

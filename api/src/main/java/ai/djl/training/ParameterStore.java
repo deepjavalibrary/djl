@@ -91,6 +91,10 @@ public class ParameterStore {
      * @return the value of the mirrored parameter on the device
      */
     public NDArray getValue(Parameter parameter, Device device) {
+        // for those optional parameters, they might not be in the ParameterStore
+        if (parameter == null) {
+            return null;
+        }
         String parameterId = parameter.getId();
         int index = deviceMap.get(device);
         ParameterData data =

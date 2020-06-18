@@ -87,7 +87,7 @@ public class GradientCollectorIntegrationTest {
                         .optOptimizer(optimizer);
 
         try (Model model = Model.newInstance("linear")) {
-            Linear block = Linear.builder().setOutChannels(1).build();
+            Linear block = Linear.builder().setUnits(1).build();
             model.setBlock(block);
 
             NDManager manager = model.getNDManager();

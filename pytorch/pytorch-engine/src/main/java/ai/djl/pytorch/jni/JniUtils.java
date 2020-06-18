@@ -837,15 +837,13 @@ public final class JniUtils {
                                 ndArray.getHandle(), size, alignCorners));
     }
 
-    public static PtNDArray fullyConnected(
-            PtNDArray ndArray, PtNDArray weight, PtNDArray bias, boolean noBias) {
-        return ndArray.getManager()
+    public static PtNDArray linear(PtNDArray input, PtNDArray weight, PtNDArray bias) {
+        return input.getManager()
                 .create(
                         PyTorchLibrary.LIB.torchNNLinear(
-                                ndArray.getHandle(),
+                                input.getHandle(),
                                 weight.getHandle(),
-                                noBias ? null : bias.getHandle(),
-                                !noBias));
+                                bias == null ? null : bias.getHandle()));
     }
 
     public static PtNDArray relu(PtNDArray ndArray) {

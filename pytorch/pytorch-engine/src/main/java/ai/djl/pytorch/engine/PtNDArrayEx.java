@@ -346,25 +346,8 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDList fullyConnected(
-            NDList inputs,
-            long outChannels,
-            boolean flatten,
-            boolean noBias,
-            PairList<String, Object> additional) {
-        NDArray result =
-                JniUtils.fullyConnected(
-                        (PtNDArray) inputs.get(0),
-                        (PtNDArray) inputs.get(1),
-                        noBias ? null : (PtNDArray) inputs.get(2),
-                        noBias);
-        if (flatten) {
-            long batchSize = result.getShape().get(0);
-            NDArray reshaped = result.reshape(batchSize, outChannels);
-            result.close();
-            result = reshaped;
-        }
-        return new NDList(result);
+    public NDList linear(NDArray input, NDArray weight, NDArray bias) {
+        return new NDList(JniUtils.linear((PtNDArray) input, (PtNDArray) weight, (PtNDArray) bias));
     }
 
     /** {@inheritDoc} */

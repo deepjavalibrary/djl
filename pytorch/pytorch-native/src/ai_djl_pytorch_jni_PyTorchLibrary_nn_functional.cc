@@ -10,6 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+#include <torch/torch.h>
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_error.h"
 #include "djl_pytorch_jni_utils.h"
@@ -42,5 +43,19 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUpsampleBi
   const auto* result_ptr =
       new torch::Tensor(torch::upsample_bilinear2d(*tensor_ptr, size_vec, jalign_corners == JNI_TRUE));
   return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLinear
+  (JNIEnv* env, jobject jthis, jobject jinput, jobject jweight, jobject jbias) {
+  API_BEGIN();
+    auto* input_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jinput);
+    auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jweight);
+    torch::Tensor bias = {};
+    if (!env->IsSameObject(jbias, nullptr)) {
+      bias = *utils::GetPointerFromJHandle<const torch::Tensor>(env, jbias);
+    }
+    const auto* result_ptr = new torch::Tensor(torch::nn::functional::linear(*input_ptr, *weight_ptr, bias));
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }

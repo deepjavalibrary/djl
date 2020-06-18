@@ -220,7 +220,7 @@ public final class ResNetV1 {
         }
         return resNet.add(Pool.globalAvgPool2DBlock())
                 .add(Blocks.batchFlattenBlock())
-                .add(Linear.builder().setOutChannels(builder.outSize).build())
+                .add(Linear.builder().setUnits(builder.outSize).build())
                 .add(Blocks.batchFlattenBlock());
     }
 

@@ -52,7 +52,7 @@ public class OptimizerTest {
                         .optInitializer(Initializer.ONES)
                         .optOptimizer(sgd)
                         .optDevices(devices);
-        Block block = Linear.builder().setOutChannels(CHANNELS).build();
+        Block block = Linear.builder().setUnits(CHANNELS).build();
         try (Model model = Model.newInstance("model", devices[0])) {
             model.setBlock(block);
 
@@ -84,7 +84,7 @@ public class OptimizerTest {
                         .optInitializer(Initializer.ONES)
                         .optOptimizer(optim)
                         .optDevices(devices);
-        Block block = Linear.builder().setOutChannels(CHANNELS).build();
+        Block block = Linear.builder().setUnits(CHANNELS).build();
         try (Model model = Model.newInstance("model", devices[0])) {
             model.setBlock(block);
 
@@ -124,7 +124,7 @@ public class OptimizerTest {
                         .optInitializer(Initializer.ONES)
                         .optOptimizer(optim)
                         .optDevices(devices);
-        Block block = Linear.builder().setOutChannels(CHANNELS).build();
+        Block block = Linear.builder().setUnits(CHANNELS).build();
         try (Model model = Model.newInstance("model", devices[0])) {
             model.setBlock(block);
 
@@ -156,7 +156,7 @@ public class OptimizerTest {
                         .optInitializer(Initializer.ONES)
                         .optOptimizer(optim)
                         .optDevices(devices);
-        Block block = Linear.builder().setOutChannels(CHANNELS).build();
+        Block block = Linear.builder().setUnits(CHANNELS).build();
         try (Model model = Model.newInstance("model", devices[0])) {
             model.setBlock(block);
 

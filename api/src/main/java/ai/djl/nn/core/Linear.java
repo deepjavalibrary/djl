@@ -14,17 +14,15 @@ package ai.djl.nn.core;
 
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
-import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -36,33 +34,21 @@ import java.util.Collections;
  *
  * <p>It has the following shapes:
  *
- * <p>If {@code flatten} is true:
- *
- * <ul>
- *   <li>input X: [batchSize, x1, x2, …, xn]
- *   <li>weight W: [outChannels, x1 * x2 * … * xn]
- *   <li>Bias b: [outChannels]
- *   <li>output Y: [batchSize, outChannels]
- * </ul>
- *
- * <p>If {@code flatten} is false:
- *
  * <ul>
  *   <li>input X: [x1, x2, …, xn, input_dim]
- *   <li>weight W: [outChannels, input_dim]
- *   <li>Bias b: [outChannels]
- *   <li>output Y: [x1, x2, …, xn, outChannels]
+ *   <li>weight W: [units, input_dim]
+ *   <li>Bias b: [units]
+ *   <li>output Y: [x1, x2, …, xn, units]
  * </ul>
  *
  * <p>The Linear block should be constructed using {@link Linear.Builder}.
  */
 public class Linear extends AbstractBlock {
 
-    private static final byte VERSION = 3;
+    private static final byte VERSION = 4;
 
-    private long outChannels;
-    private long inputDimension;
-    private boolean flatten;
+    private long units;
+    private long inputFeatures;
 
     private Shape inputShape;
 
@@ -71,19 +57,15 @@ public class Linear extends AbstractBlock {
 
     Linear(Builder builder) {
         super(VERSION);
-        outChannels = builder.outChannels;
-        flatten = builder.flatten;
-        // "inputDimension" is only known after "beforeInitialize" is called, hence we need
+        units = builder.units;
+        // "inputFeatures" is only known after "beforeInitialize" is called, hence we need
         // a callback, even if we do not used the callback parameter
         weight =
                 addParameter(
                         new Parameter("weight", this, ParameterType.WEIGHT),
-                        inputShapes -> new Shape(outChannels, inputDimension));
+                        inputShapes -> new Shape(units, inputFeatures));
         if (builder.bias) {
-            bias =
-                    addParameter(
-                            new Parameter("bias", this, ParameterType.BIAS),
-                            new Shape(outChannels));
+            bias = addParameter(new Parameter("bias", this, ParameterType.BIAS), new Shape(units));
         }
     }
 
@@ -94,18 +76,17 @@ public class Linear extends AbstractBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        inputs = opInputs(parameterStore, inputs);
-        NDArrayEx ex = inputs.head().getNDArrayInternal();
-        return ex.fullyConnected(inputs, outChannels, flatten, bias == null, params);
+        NDArray input = inputs.singletonOrThrow();
+        Device device = input.getDevice();
+        NDArray weightArr = parameterStore.getValue(weight, device);
+        NDArray biasArr = parameterStore.getValue(bias, device);
+        return linear(input, weightArr, biasArr);
     }
 
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
-        if (flatten) {
-            return new Shape[] {new Shape(inputs[0].get(0), outChannels)};
-        }
-        return new Shape[] {inputShape.addAll(new Shape(outChannels))};
+        return new Shape[] {inputShape.addAll(new Shape(units))};
     }
 
     /** {@inheritDoc} */
@@ -120,40 +101,15 @@ public class Linear extends AbstractBlock {
     public void beforeInitialize(Shape[] inputShapes) {
         this.inputShapes = inputShapes;
         Shape input = inputShapes[0];
-        if (flatten) {
-            Shape inChannels;
-            if (input.isLayoutKnown()) {
-                inChannels = input.filterByLayoutType(t -> !t.equals(LayoutType.BATCH));
-                inputShape =
-                        input.map(
-                                pair ->
-                                        new Pair<>(
-                                                pair.getValue().equals(LayoutType.BATCH)
-                                                        ? Long.valueOf(-1)
-                                                        : pair.getKey(),
-                                                pair.getValue()));
-            } else if (input.dimension() > 1) {
-                inChannels = input.slice(1);
-                inputShape =
-                        new Shape(new long[] {-1}, new LayoutType[] {LayoutType.BATCH})
-                                .addAll(input.slice(1));
-            } else {
-                inChannels = input;
-                inputShape = input;
-            }
-            inputDimension = inChannels.size();
-        } else {
-            inputDimension = input.get(input.dimension() - 1);
-            inputShape = input.slice(0, input.dimension() - 1);
-        }
+        inputFeatures = input.get(input.dimension() - 1);
+        inputShape = input.slice(0, input.dimension() - 1);
     }
 
     /** {@inheritDoc} */
     @Override
     protected void saveMetadata(DataOutputStream os) throws IOException {
-        os.writeLong(outChannels);
-        os.writeBoolean(flatten);
-        os.writeLong(inputDimension);
+        os.writeLong(units);
+        os.writeLong(inputFeatures);
         os.write(inputShape.getEncoded());
     }
 
@@ -165,31 +121,46 @@ public class Linear extends AbstractBlock {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         if (version == VERSION) {
-            outChannels = is.readLong();
-            flatten = is.readBoolean();
-            inputDimension = is.readLong();
+            units = is.readLong();
+            inputFeatures = is.readLong();
         } else if (version == 2) {
-            flatten = is.readBoolean();
-            inputDimension = is.readLong();
+            if (is.readBoolean()) {
+                throw new IllegalArgumentException("flatten is not supported!");
+            }
+            inputFeatures = is.readLong();
+        } else if (version == 3) {
+            units = is.readLong();
+            if (is.readBoolean()) {
+                throw new IllegalArgumentException("flatten is not supported!");
+            }
+            inputFeatures = is.readLong();
         } else {
-            flatten = false;
-            inputDimension = Shape.decode(is).size();
+            inputFeatures = Shape.decode(is).size();
         }
         inputShape = Shape.decode(is);
     }
 
-    private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
-        if (inputs.size() != 1) {
-            throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
-        }
-        Device device = inputs.head().getDevice();
+    /**
+     * Applies a linear transformation to the incoming data.
+     *
+     * @param input input X: [x1, x2, …, xn, input_dim]
+     * @param weight weight W: [units, input_dim]
+     * @return output Y: [x1, x2, …, xn, units]
+     */
+    public static NDList linear(NDArray input, NDArray weight) {
+        return linear(input, weight, null);
+    }
 
-        NDList result = new NDList(inputs);
-        result.add(parameterStore.getValue(weight, device));
-        if (bias != null) {
-            result.add(parameterStore.getValue(bias, device));
-        }
-        return result;
+    /**
+     * Applies a linear transformation to the incoming data.
+     *
+     * @param input input X: [x1, x2, …, xn, input_dim]
+     * @param weight weight W: [units, input_dim]
+     * @param bias bias b: [units]
+     * @return output Y: [x1, x2, …, xn, units]
+     */
+    public static NDList linear(NDArray input, NDArray weight, NDArray bias) {
+        return input.getNDArrayInternal().linear(input, weight, bias);
     }
 
     /**
@@ -204,20 +175,19 @@ public class Linear extends AbstractBlock {
     /** The Builder to construct a {@link Linear} type of {@link Block}. */
     public static final class Builder {
 
-        private long outChannels;
+        private long units;
         private boolean bias = true;
-        private boolean flatten;
 
         Builder() {}
 
         /**
          * Sets the number of output channels.
          *
-         * @param outChannels the number of desired output channels
+         * @param units the number of desired output channels
          * @return this Builder
          */
-        public Builder setOutChannels(long outChannels) {
-            this.outChannels = outChannels;
+        public Builder setUnits(long units) {
+            this.units = units;
             return this;
         }
 
@@ -234,21 +204,6 @@ public class Linear extends AbstractBlock {
         }
 
         /**
-         * Sets the optional parameter that indicates whether the input tensor should be flattened.
-         *
-         * <p>If flatten is set to true, all but the first axis of input data are collapsed
-         * together. If false, all but the last axis of input data are kept the same, and the
-         * transformation applies on the last axis.
-         *
-         * @param flatten whether the input tensor should be flattened.
-         * @return this Builder
-         */
-        public Builder optFlatten(boolean flatten) {
-            this.flatten = flatten;
-            return this;
-        }
-
-        /**
          * Returns the constructed {@code Linear}.
          *
          * @return the constructed {@code Linear}
@@ -256,8 +211,8 @@ public class Linear extends AbstractBlock {
          *     set
          */
         public Linear build() {
-            if (outChannels <= 0) {
-                throw new IllegalArgumentException("You must specify outChannels");
+            if (units <= 0) {
+                throw new IllegalArgumentException("You must specify unit");
             }
             return new Linear(this);
         }

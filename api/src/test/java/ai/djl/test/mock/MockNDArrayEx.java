@@ -280,16 +280,13 @@ public class MockNDArrayEx implements NDArrayEx {
             PairList<String, Object> additional) {
         return null;
     }
+
     /** {@inheritDoc} */
     @Override
-    public NDList fullyConnected(
-            NDList inputs,
-            long outChannels,
-            boolean flatten,
-            boolean noBias,
-            PairList<String, Object> additional) {
+    public NDList linear(NDArray input, NDArray weight, NDArray bias) {
         return null;
     }
+
     /** {@inheritDoc} */
     @Override
     public NDList embedding(

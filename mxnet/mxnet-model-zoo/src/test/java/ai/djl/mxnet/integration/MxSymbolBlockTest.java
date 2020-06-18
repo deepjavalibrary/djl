@@ -126,7 +126,7 @@ public class MxSymbolBlockTest {
             SequentialBlock newMlp = new SequentialBlock();
             mlp.removeLastBlock();
             newMlp.add(mlp);
-            Linear linear = Linear.builder().setOutChannels(10).build();
+            Linear linear = Linear.builder().setUnits(10).build();
 
             linear.setInitializer(Initializer.ONES);
             newMlp.add(linear);

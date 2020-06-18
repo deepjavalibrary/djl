@@ -110,11 +110,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
      * @return a linear projection with bias and an output size equal to the embedding size.
      */
     private Linear buildProjection() {
-        return Linear.builder()
-                .setOutChannels(embeddingSize)
-                .optBias(true)
-                .optFlatten(false)
-                .build();
+        return Linear.builder().setUnits(embeddingSize).optBias(true).build();
     }
 
     /**

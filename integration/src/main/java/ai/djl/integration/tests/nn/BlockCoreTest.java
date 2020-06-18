@@ -62,7 +62,7 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
         long outSize = 3;
-        Block block = Linear.builder().setOutChannels(outSize).build();
+        Block block = Linear.builder().setUnits(outSize).build();
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
@@ -82,7 +82,7 @@ public class BlockCoreTest {
             }
         }
 
-        block = Linear.builder().setOutChannels(outSize).optBias(false).build();
+        block = Linear.builder().setUnits(outSize).optBias(false).build();
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
@@ -99,15 +99,9 @@ public class BlockCoreTest {
                 testEncode(manager, block);
             }
         }
-    }
 
-    @Test
-    public void testLinearWithFlatten() throws IOException, MalformedModelException {
-        TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
-
-        long outSize = 10;
-        Block block = Linear.builder().setOutChannels(outSize).optFlatten(false).build();
+        outSize = 10;
+        block = Linear.builder().setUnits(outSize).build();
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
@@ -130,7 +124,7 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
         long outSize = 3;
-        Block block = Linear.builder().setOutChannels(outSize).build();
+        Block block = Linear.builder().setUnits(outSize).build();
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
@@ -153,7 +147,7 @@ public class BlockCoreTest {
             }
         }
 
-        block = Linear.builder().setOutChannels(outSize).optBias(false).build();
+        block = Linear.builder().setUnits(outSize).optBias(false).build();
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
@@ -522,8 +516,8 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
         SequentialBlock block = new SequentialBlock();
         block.add(x -> new NDList(x.singletonOrThrow().mul(6.5f)));
-        block.add(Linear.builder().setOutChannels(10).build());
-        block.add(Linear.builder().setOutChannels(5).build());
+        block.add(Linear.builder().setUnits(10).build());
+        block.add(Linear.builder().setUnits(5).build());
 
         Assert.assertEquals(block.getChildren().size(), 3);
         Assert.assertEquals(block.getDirectParameters().size(), 0);
@@ -531,7 +525,7 @@ public class BlockCoreTest {
 
         block.addAll(
                 Arrays.asList(
-                        Linear.builder().setOutChannels(3).build(),
+                        Linear.builder().setUnits(3).build(),
                         new LambdaBlock(x -> new NDList(x.singletonOrThrow().div(2f)))));
         Assert.assertEquals(block.getChildren().size(), 5);
         Assert.assertEquals(block.getParameters().size(), 6);
@@ -567,9 +561,9 @@ public class BlockCoreTest {
                                         list.get(0).singletonOrThrow(),
                                         list.get(1).singletonOrThrow(),
                                         list.get(2).singletonOrThrow()));
-        block.add(Linear.builder().setOutChannels(3).build());
+        block.add(Linear.builder().setUnits(3).build());
         block.add(x -> new NDList(x.singletonOrThrow().sum()));
-        block.add(Linear.builder().setOutChannels(2).build());
+        block.add(Linear.builder().setUnits(2).build());
 
         Assert.assertEquals(block.getChildren().size(), 3);
         Assert.assertEquals(block.getDirectParameters().size(), 0);

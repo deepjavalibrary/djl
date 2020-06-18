@@ -55,10 +55,10 @@ public class Mlp extends SequentialBlock {
     public Mlp(int input, int output, int[] hidden, Function<NDList, NDList> activation) {
         add(Blocks.batchFlattenBlock(input));
         for (int hiddenSize : hidden) {
-            add(Linear.builder().setOutChannels(hiddenSize).build());
+            add(Linear.builder().setUnits(hiddenSize).build());
             add(activation);
         }
 
-        add(Linear.builder().setOutChannels(output).build());
+        add(Linear.builder().setUnits(output).build());
     }
 }
