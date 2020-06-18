@@ -29,7 +29,6 @@ import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
@@ -146,9 +145,10 @@ public final class TrainResnetWithCifar10 {
             SymbolBlock block = (SymbolBlock) model.getBlock();
             block.removeLastBlock();
             newBlock.add(block);
-            newBlock.add(x -> new NDList(x.singletonOrThrow().squeeze()));
+            // the original model don't include the flatten
+            // so apply the flatten here
+            newBlock.add(Blocks.batchFlattenBlock());
             newBlock.add(Linear.builder().setOutChannels(10).build());
-            newBlock.add(Blocks.batchFlattenBlock(10));
             model.setBlock(newBlock);
             if (!preTrained) {
                 model.getBlock().clear();
