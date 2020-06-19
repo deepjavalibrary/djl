@@ -59,7 +59,7 @@ public class TfNDArray implements NDArray {
     private static final int MAX_COLUMNS = 20;
     private static final int MAX_OUTPUTS_PER_OP = 8;
 
-    private String uid = UUID.randomUUID().toString();
+    private String uid;
     private Tensor<?> tensor;
     private Shape shape;
     private TfNDManager manager;
@@ -70,38 +70,24 @@ public class TfNDArray implements NDArray {
 
     TfNDArray(NDManager manager, Tensor<?> tensor) {
         this.manager = (TfNDManager) manager;
-        this.manager.attach(getUid(), this);
         this.tensor = tensor;
         this.shape = new Shape(tensor.shape().asArray());
         this.tf = this.manager.getTf();
         tfNDArrayEx = new TfNDArrayEx(this);
+        uid = UUID.randomUUID().toString();
+        manager.attach(uid, this);
     }
 
     TfNDArray(NDManager manager, Operand<?> out) {
-        this.manager = (TfNDManager) manager;
-        this.manager.attach(getUid(), this);
-        this.tensor = out.asOutput().tensor();
-        this.shape = new Shape(tensor.shape().asArray());
-        this.tf = this.manager.getTf();
-        tfNDArrayEx = new TfNDArrayEx(this);
+        this(manager, out.asOutput().tensor());
     }
 
     public TfNDArray(NDManager manager, Shape shape, FloatBuffer data) {
-        this.manager = (TfNDManager) manager;
-        this.manager.attach(getUid(), this);
-        tensor = Tensor.of(TFloat32.DTYPE, toTfShape(shape), toDataBuffer(data));
-        this.shape = shape;
-        this.tf = this.manager.getTf();
-        tfNDArrayEx = new TfNDArrayEx(this);
+        this(manager, Tensor.of(TFloat32.DTYPE, toTfShape(shape), toDataBuffer(data)));
     }
 
     TfNDArray(NDManager manager, Shape shape, ByteBuffer data) {
-        this.manager = (TfNDManager) manager;
-        this.manager.attach(getUid(), this);
-        this.shape = shape;
-        this.tf = this.manager.getTf();
-        tensor = Tensor.of(TUint8.DTYPE, toTfShape(shape), DataBuffers.of(data));
-        tfNDArrayEx = new TfNDArrayEx(this);
+        this(manager, Tensor.of(TUint8.DTYPE, toTfShape(shape), DataBuffers.of(data)));
     }
 
     /** {@inheritDoc} */
@@ -265,7 +251,7 @@ public class TfNDArray implements NDArray {
     public void attach(NDManager manager) {
         detach();
         this.manager = (TfNDManager) manager;
-        manager.attach(getUid(), this);
+        manager.attach(uid, this);
     }
 
     /** {@inheritDoc} */

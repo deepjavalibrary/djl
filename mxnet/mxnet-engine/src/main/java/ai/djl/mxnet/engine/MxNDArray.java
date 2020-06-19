@@ -95,6 +95,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
         super(handle);
         this.manager = manager;
         mxNDArrayEx = new MxNDArrayEx(this);
+        manager.attach(getUid(), this);
     }
 
     /**

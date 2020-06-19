@@ -57,9 +57,7 @@ public class OrtNDManager extends BaseNDManager {
     }
 
     OrtNDArray create(OnnxTensor tensor) {
-        OrtNDArray array = new OrtNDArray(this, tensor);
-        array.attach(this);
-        return array;
+        return new OrtNDArray(this, tensor);
     }
 
     /** {@inheritDoc} */

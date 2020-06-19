@@ -60,9 +60,7 @@ public class PtNDManager extends BaseNDManager {
      * @return the created array
      */
     public PtNDArray create(Pointer handle) {
-        PtNDArray array = new PtNDArray(this, handle);
-        attach(array.getUid(), array);
-        return array;
+        return new PtNDArray(this, handle);
     }
 
     /** {@inheritDoc} */

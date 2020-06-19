@@ -51,6 +51,7 @@ public class OrtNDArray implements NDArray {
         this.manager = manager;
         this.tensor = tensor;
         uid = UUID.randomUUID().toString();
+        manager.attach(uid, this);
     }
 
     OnnxTensor getTensor() {

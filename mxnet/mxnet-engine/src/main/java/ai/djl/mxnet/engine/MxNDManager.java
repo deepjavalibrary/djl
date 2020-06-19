@@ -65,9 +65,7 @@ public class MxNDManager extends BaseNDManager {
      * @return the created array
      */
     public MxNDArray create(Pointer handle) {
-        MxNDArray array = new MxNDArray(this, handle);
-        attach(array.getUid(), array);
-        return array;
+        return new MxNDArray(this, handle);
     }
 
     /**
@@ -78,18 +76,14 @@ public class MxNDManager extends BaseNDManager {
      * @return the created array
      */
     public MxSparseNDArray create(Pointer handle, SparseFormat fmt) {
-        MxSparseNDArray array = new MxSparseNDArray(this, handle, fmt);
-        attach(array.getUid(), array);
-        return array;
+        return new MxSparseNDArray(this, handle, fmt);
     }
 
     /** {@inheritDoc} */
     @Override
     public MxNDArray create(Shape shape, DataType dataType) {
         Pointer handle = JnaUtils.createNdArray(device, shape, dataType, shape.dimension(), false);
-        MxNDArray array = new MxNDArray(this, handle, device, shape, dataType, false);
-        attach(array.getUid(), array);
-        return array;
+        return new MxNDArray(this, handle, device, shape, dataType, false);
     }
 
     /** {@inheritDoc} */

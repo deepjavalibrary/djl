@@ -60,6 +60,7 @@ public class PtNDArray extends NativeResource implements NDArray {
         super(handle);
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
+        manager.attach(getUid(), this);
     }
 
     /** {@inheritDoc} */
