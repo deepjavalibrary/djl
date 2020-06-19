@@ -21,7 +21,6 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
-import ai.onnxruntime.OnnxJavaType;
 import ai.onnxruntime.OnnxTensor;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -85,34 +84,8 @@ public class OrtNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
-        if (dataType != null) {
-            return dataType;
-        }
-        OnnxJavaType javaType = tensor.getInfo().type;
-        switch (javaType) {
-            case FLOAT:
-                dataType = DataType.FLOAT32;
-                break;
-            case DOUBLE:
-                dataType = DataType.FLOAT64;
-                break;
-            case INT8:
-                dataType = DataType.INT8;
-                break;
-            case INT32:
-                dataType = DataType.INT32;
-                break;
-            case INT64:
-                dataType = DataType.INT64;
-                break;
-            case BOOL:
-                dataType = DataType.BOOLEAN;
-                break;
-            case UNKNOWN:
-                dataType = DataType.UNKNOWN;
-                break;
-            default:
-                throw new UnsupportedOperationException("type is not supported: " + javaType);
+        if (dataType == null) {
+            dataType = OrtUtils.toDataType(tensor.getInfo().type);
         }
         return dataType;
     }
@@ -127,10 +100,9 @@ public class OrtNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public Shape getShape() {
-        if (shape != null) {
-            return shape;
+        if (shape == null) {
+            shape = new Shape(tensor.getInfo().getShape());
         }
-        shape = new Shape(tensor.getInfo().getShape());
         return shape;
     }
 
@@ -194,7 +166,7 @@ public class OrtNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
-        ByteBuffer bb = getTensor().getByteBuffer();
+        ByteBuffer bb = tensor.getByteBuffer();
         bb.order(ByteOrder.nativeOrder());
         return bb;
     }
@@ -1021,16 +993,14 @@ public class OrtNDArray implements NDArray {
         if (isClosed) {
             return "This array is already closed";
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("ND: ")
-                .append(getShape())
-                .append(' ')
-                .append(getDevice())
-                .append(' ')
-                .append(getDataType())
-                .append('\n')
-                .append(Arrays.toString(toArray()));
-        return sb.toString();
+        return "ND: "
+                + getShape()
+                + ' '
+                + getDevice()
+                + ' '
+                + getDataType()
+                + '\n'
+                + Arrays.toString(toArray());
     }
 
     /** {@inheritDoc} */

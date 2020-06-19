@@ -22,24 +22,20 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
-import ai.onnxruntime.OnnxJavaType;
 import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
 import java.nio.file.Path;
 
 /** {@code OrtNDManager} is the ONNX Runtime implementation of {@link NDManager}. */
 public class OrtNDManager extends BaseNDManager {
 
     private static final OrtNDManager SYSTEM_MANAGER = new SystemManager();
-    OrtEnvironment env;
+
+    private OrtEnvironment env;
 
     private OrtNDManager(NDManager parent, Device device, OrtEnvironment env) {
         super(parent, device);
@@ -64,31 +60,7 @@ public class OrtNDManager extends BaseNDManager {
     @Override
     public OrtNDArray create(Buffer data, Shape shape, DataType dataType) {
         try {
-            switch (dataType) {
-                case FLOAT32:
-                    return create(
-                            OnnxTensor.createTensor(env, (FloatBuffer) data, shape.getShape()));
-                case FLOAT64:
-                    return create(
-                            OnnxTensor.createTensor(env, (DoubleBuffer) data, shape.getShape()));
-                case INT32:
-                    return create(OnnxTensor.createTensor(env, (IntBuffer) data, shape.getShape()));
-                case INT64:
-                    return create(
-                            OnnxTensor.createTensor(env, (LongBuffer) data, shape.getShape()));
-                case INT8:
-                case UINT8:
-                    return create(
-                            OnnxTensor.createTensor(
-                                    env, (ByteBuffer) data, shape.getShape(), OnnxJavaType.INT8));
-                case BOOLEAN:
-                    return create(
-                            OnnxTensor.createTensor(
-                                    env, (ByteBuffer) data, shape.getShape(), OnnxJavaType.BOOL));
-                case FLOAT16:
-                default:
-                    throw new AssertionError("Data type not supported!");
-            }
+            return new OrtNDArray(this, OrtUtils.toTensor(env, data, shape, dataType));
         } catch (OrtException e) {
             throw new EngineException(e);
         }
@@ -207,7 +179,7 @@ public class OrtNDManager extends BaseNDManager {
     private static final class SystemManager extends OrtNDManager {
 
         SystemManager() {
-            super(null, Device.defaultDevice(), OrtEnvironment.getEnvironment());
+            super(null, null, OrtEnvironment.getEnvironment());
         }
 
         /** {@inheritDoc} */

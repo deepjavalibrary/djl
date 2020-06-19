@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * </ol>
  */
 @SuppressWarnings("MissingJavadocMethod")
-public final class LibUtils {
+final class LibUtils {
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
     private static final Pattern VERSION_PATTERN =
             Pattern.compile("(\\d+\\.\\d+\\.\\d+(-\\w)?)(-SNAPSHOT)?(-\\d+)?");

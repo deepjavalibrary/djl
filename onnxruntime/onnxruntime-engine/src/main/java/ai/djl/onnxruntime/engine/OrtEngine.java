@@ -30,18 +30,18 @@ import ai.onnxruntime.OrtEnvironment;
 public final class OrtEngine extends Engine {
 
     public static final String ENGINE_NAME = "OnnxRuntime";
+
     private Engine secondaryEngine;
     private OrtEnvironment env;
 
-    private OrtEngine(OrtEnvironment env) {
-        this.env = env;
+    private OrtEngine() {
+        // init OrtRuntime
+        this.env = OrtEnvironment.getEnvironment();
     }
 
     static Engine newInstance() {
         LibUtils.prepareLibrary();
-        // init OrtRuntime
-        OrtEnvironment environment = OrtEnvironment.getEnvironment();
-        return new OrtEngine(environment);
+        return new OrtEngine();
     }
 
     /** {@inheritDoc} */
@@ -84,10 +84,7 @@ public final class OrtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager() {
-        if (getSecondEngine() != null) {
-            return secondaryEngine.newBaseManager();
-        }
-        return OrtNDManager.getSystemManager().newSubManager();
+        return newBaseManager(null);
     }
 
     /** {@inheritDoc} */
