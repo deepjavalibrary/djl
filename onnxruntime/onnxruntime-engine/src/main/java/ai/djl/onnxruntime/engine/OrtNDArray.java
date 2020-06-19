@@ -27,6 +27,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.UUID;
 
 /** {@code OrtNDArray} is the ONNX Runtime implementation of {@link NDArray}. */
 public class OrtNDArray implements NDArray {
@@ -37,6 +38,7 @@ public class OrtNDArray implements NDArray {
     private DataType dataType;
     private String name;
     private boolean isClosed;
+    private String uid;
 
     /**
      * Constructs an ONNX Runtime NDArray from a {@link OnnxTensor} (internal. Use {@link NDManager}
@@ -48,6 +50,7 @@ public class OrtNDArray implements NDArray {
     OrtNDArray(OrtNDManager manager, OnnxTensor tensor) {
         this.manager = manager;
         this.tensor = tensor;
+        uid = UUID.randomUUID().toString();
     }
 
     OnnxTensor getTensor() {
@@ -75,7 +78,7 @@ public class OrtNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public String getUid() {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+        return uid;
     }
 
     /** {@inheritDoc} */

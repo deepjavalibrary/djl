@@ -13,10 +13,10 @@
 package ai.djl.onnxruntime.engine;
 
 import ai.djl.BaseModel;
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -37,16 +37,19 @@ import java.util.Map;
  */
 public class OrtModel extends BaseModel {
 
+    private OrtEnvironment env;
+
     /**
      * Constructs a new Model on a given device.
      *
      * @param name the model name
-     * @param device the device the model should be located on
+     * @param manager the {@link NDManager} to holds the NDArray
+     * @param env the {@link OrtEnvironment} ONNX Environment to create session
      */
-    OrtModel(String name, Device device) {
+    OrtModel(String name, NDManager manager, OrtEnvironment env) {
         super(name);
-        device = Device.defaultIfNull(device);
-        manager = OrtNDManager.getSystemManager().newSubManager(device);
+        this.manager = manager;
+        this.env = env;
         dataType = DataType.FLOAT32;
     }
 
@@ -70,7 +73,6 @@ public class OrtModel extends BaseModel {
         }
         // TODO: Support SessionOption here for further optimization
         try {
-            OrtEnvironment env = ((OrtNDManager) manager).getEnv();
             block = new OrtSymbolBlock(env.createSession(modelFile.toString()));
         } catch (OrtException e) {
             throw new MalformedModelException("ONNX Model cannot be loaded", e);

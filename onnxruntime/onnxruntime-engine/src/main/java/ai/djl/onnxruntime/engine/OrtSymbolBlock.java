@@ -15,6 +15,7 @@ package ai.djl.onnxruntime.engine;
 
 import ai.djl.MalformedModelException;
 import ai.djl.engine.EngineException;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -76,6 +77,11 @@ public class OrtSymbolBlock implements SymbolBlock, AutoCloseable {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
+        NDManager inputManager = inputs.get(0).getManager();
+        OrtNDManager manager =
+                (inputManager instanceof OrtNDManager)
+                        ? (OrtNDManager) inputManager
+                        : OrtNDManager.getSystemManager().newSubManager();
         List<String> inputNames = new ArrayList<>(session.getInputNames());
         if (inputs.size() != inputNames.size()) {
             throw new IllegalArgumentException("Input mismatch, looking for: " + inputNames);
@@ -83,36 +89,63 @@ public class OrtSymbolBlock implements SymbolBlock, AutoCloseable {
         Map<String, OnnxTensor> container = new ConcurrentHashMap<>();
         // feed data in to match names
         for (int i = 0; i < inputNames.size(); ++i) {
-            OnnxTensor tensor = ((OrtNDArray) inputs.get(i)).getTensor();
+            OnnxTensor tensor = getTensorFromNDArray(inputs.get(i), manager);
             container.put(inputNames.get(i), tensor);
         }
         try {
             // forward
             OrtSession.Result results = session.run(container);
-            return evaluateOutput(results, (OrtNDManager) inputs.get(0).getManager());
+            return evaluateOutput(results, inputManager, manager);
         } catch (OrtException e) {
             throw new EngineException(e);
         }
     }
 
-    private NDList evaluateOutput(OrtSession.Result results, OrtNDManager manager) {
+    private OnnxTensor getTensorFromNDArray(NDArray array, NDManager manager) {
+        if (!(array instanceof OrtNDArray)) {
+            ByteBuffer bb = array.toByteBuffer();
+            DataType dp = array.getDataType();
+            array = manager.create(dp.asDataType(bb), array.getShape(), dp);
+        }
+        return ((OrtNDArray) array).getTensor();
+    }
+
+    private NDList evaluateOutput(
+            OrtSession.Result results, NDManager inputManager, OrtNDManager manager) {
         NDList output = new NDList();
         for (Map.Entry<String, OnnxValue> r : results) {
             OnnxValue value = r.getValue();
             if ((value instanceof OnnxTensor)) {
-                output.add(manager.create((OnnxTensor) value));
+                output.add(getNDArrayFromTensor((OnnxTensor) value, inputManager, manager));
             } else if (value instanceof OnnxSequence) {
                 // TODO: avoid memory copying to heap
-                output.add(seq2Nd((OnnxSequence) value, manager));
+                output.add(seq2Nd((OnnxSequence) value, inputManager));
             } else {
                 throw new UnsupportedOperationException("Unsupported output type! " + r.getKey());
             }
         }
+        // destroy all local OrtNDArray if has 2nd engine
+        if (inputManager != manager) {
+            manager.close();
+        }
         return output;
     }
 
+    private NDArray getNDArrayFromTensor(
+            OnnxTensor tensor, NDManager inputManager, OrtNDManager manager) {
+        if (inputManager instanceof OrtNDManager) {
+            return manager.create(tensor);
+        } else {
+            // Store NDArray to second engine
+            NDArray array = manager.create(tensor);
+            ByteBuffer bb = array.toByteBuffer();
+            DataType dp = array.getDataType();
+            return inputManager.create(dp.asDataType(bb), array.getShape(), dp);
+        }
+    }
+
     @SuppressWarnings("unchecked")
-    private OrtNDArray seq2Nd(OnnxSequence seq, OrtNDManager manager) {
+    private NDArray seq2Nd(OnnxSequence seq, NDManager manager) {
         try {
             List<Object> values = seq.getValue();
             OnnxJavaType type = seq.getInfo().sequenceType;

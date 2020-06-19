@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.GradientCollector;
+import java.util.Collection;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
@@ -106,6 +107,15 @@ public abstract class Engine {
      */
     public static boolean hasEngine(String engineName) {
         return ALL_ENGINES.containsKey(engineName);
+    }
+
+    /**
+     * Returns a Collection of engines that are loaded.
+     *
+     * @return {@code Collection<Engine>} that are supported
+     */
+    public static Collection<Engine> getAllEngines() {
+        return ALL_ENGINES.values();
     }
 
     /**

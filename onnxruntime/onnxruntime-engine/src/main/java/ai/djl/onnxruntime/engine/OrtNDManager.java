@@ -50,27 +50,6 @@ public class OrtNDManager extends BaseNDManager {
         return SYSTEM_MANAGER;
     }
 
-    OrtEnvironment getEnv() {
-        return env;
-    }
-
-    private OnnxJavaType typeMapper(DataType dataType) {
-        if (dataType == DataType.FLOAT32) {
-            return OnnxJavaType.FLOAT;
-        } else if (dataType == DataType.FLOAT64) {
-            return OnnxJavaType.DOUBLE;
-        } else if (dataType == DataType.INT8) {
-            return OnnxJavaType.INT8;
-        } else if (dataType == DataType.INT32) {
-            return OnnxJavaType.INT32;
-        } else if (dataType == DataType.INT64) {
-            return OnnxJavaType.INT64;
-        } else if (dataType == DataType.BOOLEAN) {
-            return OnnxJavaType.BOOL;
-        }
-        throw new UnsupportedOperationException("Data type not supported! " + dataType);
-    }
-
     /** {@inheritDoc} */
     @Override
     public ByteBuffer allocateDirect(int capacity) {
@@ -78,7 +57,9 @@ public class OrtNDManager extends BaseNDManager {
     }
 
     OrtNDArray create(OnnxTensor tensor) {
-        return new OrtNDArray(this, tensor);
+        OrtNDArray array = new OrtNDArray(this, tensor);
+        array.attach(this);
+        return array;
     }
 
     /** {@inheritDoc} */
@@ -228,7 +209,7 @@ public class OrtNDManager extends BaseNDManager {
     private static final class SystemManager extends OrtNDManager {
 
         SystemManager() {
-            super(null, Device.defaultDevice(), OrtEnvironment.getEnvironment("DJL-Env"));
+            super(null, Device.defaultDevice(), OrtEnvironment.getEnvironment());
         }
 
         /** {@inheritDoc} */

@@ -16,10 +16,9 @@ package ai.djl.onnxruntime.engine;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
-import ai.djl.engine.EngineException;
+import ai.djl.ndarray.NDManager;
 import ai.djl.training.GradientCollector;
 import ai.onnxruntime.OrtEnvironment;
-import ai.onnxruntime.OrtException;
 
 /**
  * The {@code OrtEngine} is an implementation of the {@link Engine} based on the <a
@@ -31,25 +30,36 @@ import ai.onnxruntime.OrtException;
 public final class OrtEngine extends Engine {
 
     public static final String ENGINE_NAME = "OnnxRuntime";
+    private Engine secondaryEngine;
+    private OrtEnvironment env;
 
-    private OrtEngine() {}
+    private OrtEngine(OrtEnvironment env) {
+        this.env = env;
+    }
 
     static Engine newInstance() {
         LibUtils.prepareLibrary();
         // init OrtRuntime
         OrtEnvironment environment = OrtEnvironment.getEnvironment();
-        try {
-            environment.close();
-        } catch (OrtException e) {
-            throw new EngineException(e);
-        }
-        return new OrtEngine();
+        return new OrtEngine(environment);
     }
 
     /** {@inheritDoc} */
     @Override
     public String getEngineName() {
         return ENGINE_NAME;
+    }
+
+    Engine getSecondEngine() {
+        if (secondaryEngine == null) {
+            for (Engine availableEngine : Engine.getAllEngines()) {
+                if (!ENGINE_NAME.equals(availableEngine.getEngineName())) {
+                    secondaryEngine = availableEngine;
+                    break;
+                }
+            }
+        }
+        return secondaryEngine;
     }
 
     /** {@inheritDoc} */
@@ -61,24 +71,31 @@ public final class OrtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public boolean hasCapability(String capability) {
+        // TODO: Support GPU
         return false;
     }
 
     /** {@inheritDoc} */
     @Override
     public Model newModel(String name, Device device) {
-        return new OrtModel(name, device);
+        return new OrtModel(name, newBaseManager(device), env);
     }
 
     /** {@inheritDoc} */
     @Override
-    public OrtNDManager newBaseManager() {
+    public NDManager newBaseManager() {
+        if (getSecondEngine() != null) {
+            return secondaryEngine.newBaseManager();
+        }
         return OrtNDManager.getSystemManager().newSubManager();
     }
 
     /** {@inheritDoc} */
     @Override
-    public OrtNDManager newBaseManager(Device device) {
+    public NDManager newBaseManager(Device device) {
+        if (getSecondEngine() != null) {
+            return secondaryEngine.newBaseManager(device);
+        }
         return OrtNDManager.getSystemManager().newSubManager(device);
     }
 
