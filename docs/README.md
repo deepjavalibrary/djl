@@ -26,6 +26,10 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - [Keras Imporint](tensorflow/how_to_import_keras_models_in_DJL.md)
 - [Tensorflow Local Importing](tensorflow/how_to_import_local_tensorflow_models.md)
 
+
+#### ONNX Runtime
+- [Hybrid Engine Operations](onnxruntime/hybrid_engine.md) - Using a second Engine for supplemental API support
+
 ## [JavaDoc API Reference](https://javadoc.djl.ai/)
 
 ## [Jupyter notebook tutorials](../jupyter)

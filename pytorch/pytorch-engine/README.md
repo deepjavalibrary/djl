@@ -42,6 +42,8 @@ Choose a native library based on your platform and needs:
 We offer an automatic option that will download the jars the first time you run DJL.
 It will automatically determine the appropriate jars for your system based on the platform and GPU support.
 
+- ai.djl.pytorch:pytorch-native-auto:1.5.0
+
 ```xml
     <dependency>
       <groupId>ai.djl.pytorch</groupId>
