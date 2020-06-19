@@ -132,7 +132,7 @@ class FashionMnistUtils {
             }
             JPanel panel = new ImagePanel(SCALE, img);
             panel.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
-            JPanel container = new Container(getFashionMnistLabel(y), getFashionMnistLabel(predLabels[i]);
+            JPanel container = new Container(getFashionMnistLabel(y), getFashionMnistLabel(predLabels[record]));
             container.add(panel);
             frame.getContentPane().add(container);
         }
