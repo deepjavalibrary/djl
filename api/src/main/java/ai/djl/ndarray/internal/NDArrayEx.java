@@ -243,36 +243,14 @@ public interface NDArrayEx {
     // Neural network
     ////////////////////////////////////////
 
-    /**
-     * Computes N-D convolution on (N+2)-D input.
-     *
-     * @param inputs the inputs to the convolution operation. Msut include input data, weight
-     *     parameter matrix, and bias parameter
-     * @param kernel the convolution kernel size: (w,), (h, w) or (d, h, w)
-     * @param stride the convolution stride: (w,), (h, w) or (d, h, w). Defaults to 1 for each
-     *     dimension
-     * @param pad the zero pad for convolution: (w,), (h, w) or (d, h, w). Defaults to no padding
-     * @param dilate the convolution dilate: (w,), (h, w) or (d, h, w). Defaults to 1 for each
-     *     dimension
-     * @param numFilters the convolution filter(channel) number
-     * @param numGroups the number of group partitions. Defaults to 1
-     * @param layout the layout for input, output and weight. Empty for default layout: NCW for 1d,
-     *     NCHW for 2d and NCDHW for 3d. NHWC and NDHWC are only supported on GPU
-     * @param noBias whether to disable bias parameter. Defaults to false
-     * @param additional additional parameters
-     * @return the output of the convolution operation
-     */
     NDList convolution(
-            NDList inputs,
-            Shape kernel,
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
             Shape stride,
-            Shape pad,
-            Shape dilate,
-            int numFilters,
-            int numGroups,
-            String layout,
-            boolean noBias,
-            PairList<String, Object> additional);
+            Shape padding,
+            Shape dilation,
+            int groups);
 
     NDList linear(NDArray input, NDArray weight, NDArray bias);
 

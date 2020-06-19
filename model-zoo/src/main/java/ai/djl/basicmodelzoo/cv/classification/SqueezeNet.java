@@ -47,25 +47,25 @@ public final class SqueezeNet {
                 new SequentialBlock()
                         .add(
                                 Conv2D.builder()
-                                        .setNumFilters(squeezePlanes)
-                                        .setKernel(new Shape(1, 1))
+                                        .setFilters(squeezePlanes)
+                                        .setKernelSize(new Shape(1, 1))
                                         .build())
                         .add(Activation::relu);
         SequentialBlock expand1x1 =
                 new SequentialBlock()
                         .add(
                                 Conv2D.builder()
-                                        .setNumFilters(expand1x1Planes)
-                                        .setKernel(new Shape(1, 1))
+                                        .setFilters(expand1x1Planes)
+                                        .setKernelSize(new Shape(1, 1))
                                         .build())
                         .add(Activation::relu);
         SequentialBlock expand3x3 =
                 new SequentialBlock()
                         .add(
                                 Conv2D.builder()
-                                        .setNumFilters(expand3x3Planes)
-                                        .setKernel(new Shape(3, 3))
-                                        .optPad(new Shape(1, 1))
+                                        .setFilters(expand3x3Planes)
+                                        .setKernelSize(new Shape(3, 3))
+                                        .optPadding(new Shape(1, 1))
                                         .build())
                         .add(Activation::relu);
 
@@ -90,8 +90,8 @@ public final class SqueezeNet {
         return new SequentialBlock()
                 .add(
                         Conv2D.builder()
-                                .setNumFilters(64)
-                                .setKernel(new Shape(3, 3))
+                                .setFilters(64)
+                                .setKernelSize(new Shape(3, 3))
                                 .optStride(new Shape(2, 2))
                                 .build())
                 .add(Activation::relu)
@@ -123,7 +123,7 @@ public final class SqueezeNet {
                 .add(fire(64, 256, 256))
                 // Classifier
                 .add(Dropout.builder().optProbability(0.5f).build())
-                .add(Conv2D.builder().setNumFilters(outSize).setKernel(new Shape(1, 1)).build())
+                .add(Conv2D.builder().setFilters(outSize).setKernelSize(new Shape(1, 1)).build())
                 .add(Activation::relu)
                 .add(Pool.globalAvgPool2DBlock())
                 .add(Blocks.batchFlattenBlock());

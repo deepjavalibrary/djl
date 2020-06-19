@@ -268,16 +268,13 @@ public class MockNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDList convolution(
-            NDList inputs,
-            Shape kernel,
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
             Shape stride,
-            Shape pad,
-            Shape dilate,
-            int numFilters,
-            int numGroups,
-            String layout,
-            boolean noBias,
-            PairList<String, Object> additional) {
+            Shape padding,
+            Shape dilation,
+            int groups) {
         return null;
     }
 

@@ -12,6 +12,8 @@
  */
 package ai.djl.nn.convolutional;
 
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -78,6 +80,124 @@ public class Conv3D extends Convolution {
     }
 
     /**
+     * Applies 3D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, depth, height,
+     *     width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, depth,
+     *     height, width)
+     * @return the output of the conv3d operation
+     */
+    public static NDList conv3d(NDArray input, NDArray weight) {
+        return conv3d(
+                input, weight, null, new Shape(1, 1, 1), new Shape(0, 0, 0), new Shape(1, 1, 1));
+    }
+
+    /**
+     * Applies 3D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, depth, height,
+     *     width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, depth,
+     *     height, width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @return the output of the conv3d operation
+     */
+    public static NDList conv3d(NDArray input, NDArray weight, NDArray bias) {
+        return conv3d(
+                input, weight, bias, new Shape(1, 1, 1), new Shape(0, 0, 0), new Shape(1, 1, 1));
+    }
+
+    /**
+     * Applies 3D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, depth, height,
+     *     width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, depth,
+     *     height, width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(depth, height, width)
+     * @return the output of the conv3d operation
+     */
+    public static NDList conv3d(NDArray input, NDArray weight, NDArray bias, Shape stride) {
+        return conv3d(input, weight, bias, stride, new Shape(0, 0, 0), new Shape(1, 1, 1));
+    }
+
+    /**
+     * Applies 3D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, depth, height,
+     *     width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, depth,
+     *     height, width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(depth, height, width)
+     * @param padding implicit paddings on both sides of the input: Shape(depth, height, width)
+     * @return the output of the conv3d operation
+     */
+    public static NDList conv3d(
+            NDArray input, NDArray weight, NDArray bias, Shape stride, Shape padding) {
+        return conv3d(input, weight, bias, stride, padding, new Shape(1, 1, 1));
+    }
+
+    /**
+     * Applies 3D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, depth, height,
+     *     width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, depth,
+     *     height, width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(depth, height, width)
+     * @param padding implicit paddings on both sides of the input: Shape(depth, height, width)
+     * @param dilation the spacing between kernel elements: Shape(depth, height, width)
+     * @return the output of the conv3d operation
+     */
+    public static NDList conv3d(
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
+            Shape stride,
+            Shape padding,
+            Shape dilation) {
+        return conv3d(input, weight, bias, stride, padding, dilation, 1);
+    }
+
+    /**
+     * Applies 3D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, depth, height,
+     *     width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, depth,
+     *     height, width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(depth, height, width)
+     * @param padding implicit paddings on both sides of the input: Shape(depth, height, width)
+     * @param dilation the spacing between kernel elements: Shape(depth, height, width)
+     * @param groups split input into groups: input channel(input.size(1)) should be divisible by
+     *     the number of groups
+     * @return the output of the conv3d operation
+     */
+    public static NDList conv3d(
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
+            Shape stride,
+            Shape padding,
+            Shape dilation,
+            int groups) {
+        if (input.getShape().dimension() != 5 || weight.getShape().dimension() != 5) {
+            throw new IllegalArgumentException(
+                    "the shape of input or weight doesn't match the conv2d");
+        }
+        if (stride.dimension() > 3 || padding.dimension() > 3 || dilation.dimension() > 3) {
+            throw new IllegalArgumentException(
+                    "the shape of stride or padding or dilation doesn't match the conv2d");
+        }
+        return Convolution.convolution(input, weight, bias, stride, padding, dilation, groups);
+    }
+
+    /**
      * Creates a builder to build a {@code Conv3D}.
      *
      * @return a new builder
@@ -92,8 +212,8 @@ public class Conv3D extends Convolution {
         /** Creates a builder that can build a {@link Conv3D} block. */
         Builder() {
             stride = new Shape(1, 1, 1);
-            pad = new Shape(0, 0, 0);
-            dilate = new Shape(1, 1, 1);
+            padding = new Shape(0, 0, 0);
+            dilation = new Shape(1, 1, 1);
         }
 
         /** {@inheritDoc} */

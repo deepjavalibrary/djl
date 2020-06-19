@@ -167,6 +167,20 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
+     * Returns the value for the first key found in the list.
+     *
+     * @param key the key of the element to get
+     * @return the value for the first key found in the list
+     */
+    public V get(K key) {
+        int index = keys.indexOf(key);
+        if (index == -1) {
+            return null;
+        }
+        return values.get(index);
+    }
+
+    /**
      * Returns the key at the specified position in this list.
      *
      * @param index the index of the element to return

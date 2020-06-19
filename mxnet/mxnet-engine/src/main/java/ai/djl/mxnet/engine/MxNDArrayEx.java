@@ -458,28 +458,30 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDList convolution(
-            NDList inputs,
-            Shape kernel,
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
             Shape stride,
-            Shape pad,
-            Shape dilate,
-            int numFilters,
-            int numGroups,
-            String layout,
-            boolean noBias,
-            PairList<String, Object> additional) {
+            Shape padding,
+            Shape dilation,
+            int groups) {
         MxOpParams params = new MxOpParams();
-        params.addParam("kernel", kernel);
+        params.addParam("kernel", weight.getShape().slice(2));
         params.addParam("stride", stride);
-        params.addParam("pad", pad);
-        params.addParam("dilate", dilate);
-        params.addParam("num_filter", numFilters);
-        params.addParam("num_group", numGroups);
-        params.add("layout", layout);
-        params.add("no_bias", noBias);
-        params.addAll(additional);
+        params.addParam("pad", padding);
+        params.addParam("dilate", dilation);
+        params.addParam("num_group", groups);
+        params.addParam("num_filter", weight.getShape().get(0));
 
-        return getManager().invoke("Convolution", inputs, params);
+        NDList inputs = new NDList(input, weight);
+        if (bias != null) {
+            params.add("no_bias", false);
+            inputs.add(bias);
+        } else {
+            params.add("no_bias", true);
+        }
+
+        return getManager().invoke("_npx_convolution", inputs, params);
     }
 
     /** {@inheritDoc} */

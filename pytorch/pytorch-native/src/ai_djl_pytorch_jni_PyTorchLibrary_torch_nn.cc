@@ -25,37 +25,6 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRelu(
   API_END();
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNConvNd(JNIEnv* env, jobject jthis,
-    const jint dim, jobject jhandle, jobject jweight, jobject jbias, jlongArray stride, jlongArray pad,
-    jlongArray dilation, jint num_group, jboolean bias) {
-  API_BEGIN();
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  const auto* weigtht_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jweight);
-  torch::Tensor* bias_ptr;
-  if (bias) {
-    bias_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jbias);
-  } else {
-    bias_ptr = new torch::Tensor();
-  }
-  const std::vector<int64_t> padVec = utils::GetVecFromJLongArray(env, pad);
-  const std::vector<int64_t> strideVec = utils::GetVecFromJLongArray(env, stride);
-  const std::vector<int64_t> dilationVec = utils::GetVecFromJLongArray(env, dilation);
-
-  torch::Tensor* result_ptr = nullptr;
-  if (dim == 1) {
-    result_ptr = new torch::Tensor(
-        torch::conv1d(*tensor_ptr, *weigtht_ptr, *bias_ptr, strideVec, padVec, dilationVec, num_group));
-  } else if (dim == 2) {
-    result_ptr = new torch::Tensor(
-        torch::conv2d(*tensor_ptr, *weigtht_ptr, *bias_ptr, strideVec, padVec, dilationVec, num_group));
-  } else if (dim == 3) {
-    result_ptr = new torch::Tensor(
-        torch::conv3d(*tensor_ptr, *weigtht_ptr, *bias_ptr, strideVec, padVec, dilationVec, num_group));
-  }
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
-  API_END();
-}
-
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNBatchNorm(JNIEnv* env, jobject jthis,
     jobject jhandle, jobject jweight, jobject jbias, jobject running_mean, jobject running_var, jboolean is_training,
     jdouble momentum, jdouble eps) {

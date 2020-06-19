@@ -12,6 +12,8 @@
  */
 package ai.djl.nn.convolutional;
 
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -79,6 +81,116 @@ public class Conv2D extends Convolution {
     }
 
     /**
+     * Applies 2D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, height, width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, height,
+     *     width)
+     * @return the output of the conv2d operation
+     */
+    public static NDList conv2d(NDArray input, NDArray weight) {
+        return conv2d(input, weight, null, new Shape(1, 1), new Shape(0, 0), new Shape(1, 1));
+    }
+
+    /**
+     * Applies 2D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, height, width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, height,
+     *     width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @return the output of the conv2d operation
+     */
+    public static NDList conv2d(NDArray input, NDArray weight, NDArray bias) {
+        return conv2d(input, weight, bias, new Shape(1, 1), new Shape(0, 0), new Shape(1, 1));
+    }
+
+    /**
+     * Applies 2D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, height, width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, height,
+     *     width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(height, width)
+     * @return the output of the conv2d operation
+     */
+    public static NDList conv2d(NDArray input, NDArray weight, NDArray bias, Shape stride) {
+        return conv2d(input, weight, bias, stride, new Shape(0, 0), new Shape(1, 1));
+    }
+
+    /**
+     * Applies 2D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, height, width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, height,
+     *     width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(height, width)
+     * @param padding implicit paddings on both sides of the input: Shape(height, width)
+     * @return the output of the conv2d operation
+     */
+    public static NDList conv2d(
+            NDArray input, NDArray weight, NDArray bias, Shape stride, Shape padding) {
+        return conv2d(input, weight, bias, stride, padding, new Shape(1, 1));
+    }
+
+    /**
+     * Applies 2D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, height, width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, height,
+     *     width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(height, width)
+     * @param padding implicit paddings on both sides of the input: Shape(height, width)
+     * @param dilation the spacing between kernel elements: Shape(height, width)
+     * @return the output of the conv2d operation
+     */
+    public static NDList conv2d(
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
+            Shape stride,
+            Shape padding,
+            Shape dilation) {
+        return conv2d(input, weight, bias, stride, padding, dilation, 1);
+    }
+
+    /**
+     * Applies 2D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, height, width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, height,
+     *     width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(height, width)
+     * @param padding implicit paddings on both sides of the input: Shape(height, width)
+     * @param dilation the spacing between kernel elements: Shape(height, width)
+     * @param groups split input into groups: input channel(input.size(1)) should be divisible by
+     *     the number of groups
+     * @return the output of the conv2d operation
+     */
+    public static NDList conv2d(
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
+            Shape stride,
+            Shape padding,
+            Shape dilation,
+            int groups) {
+        if (input.getShape().dimension() != 4 || weight.getShape().dimension() != 3) {
+            throw new IllegalArgumentException(
+                    "the shape of input or weight doesn't match the conv2d");
+        }
+        if (stride.dimension() > 2 || padding.dimension() > 2 || dilation.dimension() > 2) {
+            throw new IllegalArgumentException(
+                    "the shape of stride or padding or dilation doesn't match the conv2d");
+        }
+        return Convolution.convolution(input, weight, bias, stride, padding, dilation, groups);
+    }
+
+    /**
      * Creates a builder to build a {@code Conv2D}.
      *
      * @return a new builder
@@ -93,8 +205,8 @@ public class Conv2D extends Convolution {
         /** Creates a builder that can build a {@link Conv2D} block. */
         Builder() {
             stride = new Shape(1, 1);
-            pad = new Shape(0, 0);
-            dilate = new Shape(1, 1);
+            padding = new Shape(0, 0);
+            dilation = new Shape(1, 1);
         }
 
         /** {@inheritDoc} */

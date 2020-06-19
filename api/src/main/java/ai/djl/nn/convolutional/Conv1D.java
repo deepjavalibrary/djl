@@ -12,6 +12,8 @@
  */
 package ai.djl.nn.convolutional;
 
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -75,6 +77,110 @@ public class Conv1D extends Convolution {
     }
 
     /**
+     * Applies 1D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, width)
+     * @return the output of the conv1d operation
+     */
+    public static NDList conv1d(NDArray input, NDArray weight) {
+        return conv1d(input, weight, null, new Shape(1), new Shape(0), new Shape(1));
+    }
+
+    /**
+     * Applies 1D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @return the output of the conv1d operation
+     */
+    public static NDList conv1d(NDArray input, NDArray weight, NDArray bias) {
+        return conv1d(input, weight, bias, new Shape(1), new Shape(0), new Shape(1));
+    }
+
+    /**
+     * Applies 1D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(width)
+     * @return the output of the conv1d operation
+     */
+    public static NDList conv1d(NDArray input, NDArray weight, NDArray bias, Shape stride) {
+        return conv1d(input, weight, bias, stride, new Shape(0), new Shape(1));
+    }
+
+    /**
+     * Applies 1D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(width)
+     * @param padding implicit paddings on both sides of the input: Shape(width)
+     * @return the output of the conv1d operation
+     */
+    public static NDList conv1d(
+            NDArray input, NDArray weight, NDArray bias, Shape stride, Shape padding) {
+        return conv1d(input, weight, bias, stride, padding, new Shape(1));
+    }
+
+    /**
+     * Applies 1D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(width)
+     * @param padding implicit paddings on both sides of the input: Shape(width)
+     * @param dilation the spacing between kernel elements: Shape(width)
+     * @return the output of the conv1d operation
+     */
+    public static NDList conv1d(
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
+            Shape stride,
+            Shape padding,
+            Shape dilation) {
+        return conv1d(input, weight, bias, stride, padding, dilation, 1);
+    }
+
+    /**
+     * Applies 1D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, width)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, width)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(width)
+     * @param padding implicit paddings on both sides of the input: Shape(width)
+     * @param dilation the spacing between kernel elements: Shape(width)
+     * @param groups split input into groups: input channel(input.size(1)) should be divisible by
+     *     the number of groups
+     * @return the output of the conv1d operation
+     */
+    public static NDList conv1d(
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
+            Shape stride,
+            Shape padding,
+            Shape dilation,
+            int groups) {
+        if (input.getShape().dimension() != 3 || weight.getShape().dimension() != 3) {
+            throw new IllegalArgumentException(
+                    "the shape of input or weight doesn't match the conv1d");
+        }
+        if (stride.dimension() > 1 || padding.dimension() > 1 || dilation.dimension() > 1) {
+            throw new IllegalArgumentException(
+                    "the shape of stride or padding or dilation doesn't match the conv1d");
+        }
+        return Convolution.convolution(input, weight, bias, stride, padding, dilation, groups);
+    }
+
+    /**
      * Creates a builder to build a {@code Conv1D}.
      *
      * @return a new builder
@@ -89,8 +195,8 @@ public class Conv1D extends Convolution {
         /** Creates a builder that can build a {@link Conv1D} block. */
         Builder() {
             stride = new Shape(1);
-            pad = new Shape(0);
-            dilate = new Shape(1);
+            padding = new Shape(0);
+            dilation = new Shape(1);
         }
 
         /** {@inheritDoc} */

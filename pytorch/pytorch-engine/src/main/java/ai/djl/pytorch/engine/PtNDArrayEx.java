@@ -321,27 +321,22 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDList convolution(
-            NDList inputs,
-            Shape kernel,
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
             Shape stride,
-            Shape pad,
-            Shape dilate,
-            int numFilters,
-            int numGroups,
-            String layout,
-            boolean noBias,
-            PairList<String, Object> additional) {
-        // TODO: numFilters and kernel not used
+            Shape padding,
+            Shape dilation,
+            int groups) {
         return new NDList(
                 JniUtils.convolution(
-                        (PtNDArray) inputs.get(0),
-                        (PtNDArray) inputs.get(1),
-                        noBias ? null : (PtNDArray) inputs.get(2),
+                        (PtNDArray) input,
+                        (PtNDArray) weight,
+                        (PtNDArray) bias,
                         stride,
-                        pad,
-                        dilate,
-                        numGroups,
-                        noBias));
+                        padding,
+                        dilation,
+                        groups));
     }
 
     /** {@inheritDoc} */

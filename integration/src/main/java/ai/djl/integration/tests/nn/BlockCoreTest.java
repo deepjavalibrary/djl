@@ -256,7 +256,7 @@ public class BlockCoreTest {
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
         Block block =
-                Conv1D.builder().setKernel(new Shape(2)).setNumFilters(1).optBias(false).build();
+                Conv1D.builder().setKernelSize(new Shape(2)).setFilters(1).optBias(false).build();
 
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
@@ -287,7 +287,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
-        Block block = Conv2D.builder().setKernel(new Shape(2, 2)).setNumFilters(1).build();
+        Block block = Conv2D.builder().setKernelSize(new Shape(2, 2)).setFilters(1).build();
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
@@ -318,7 +318,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
-        Block block = Conv3D.builder().setKernel(new Shape(2, 2, 2)).setNumFilters(1).build();
+        Block block = Conv3D.builder().setKernelSize(new Shape(2, 2, 2)).setFilters(1).build();
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 

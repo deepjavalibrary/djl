@@ -32,7 +32,7 @@ public class ModelTest {
     @Test
     public void testModelSaveAndLoad() throws IOException, MalformedModelException {
         SequentialBlock block = new SequentialBlock();
-        block.add(Conv2D.builder().setKernel(new Shape(1, 1)).setNumFilters(10).build());
+        block.add(Conv2D.builder().setKernelSize(new Shape(1, 1)).setFilters(10).build());
         block.add(BatchNorm.builder().build());
         try (Model saveModel = Model.newInstance("saveModel");
                 Model loadModel = Model.newInstance("loadModel")) {

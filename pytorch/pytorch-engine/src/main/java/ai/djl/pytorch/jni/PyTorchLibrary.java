@@ -327,15 +327,13 @@ final class PyTorchLibrary {
     native Pointer torchNNRelu(Pointer handle);
 
     native Pointer torchNNConvNd(
-            int dim,
             Pointer inputHandle,
             Pointer weightHandle,
             Pointer biasHandle,
             long[] stride,
-            long[] pad,
+            long[] padding,
             long[] dilation,
-            int numGroup,
-            boolean bias);
+            int groups);
 
     native Pointer torchNNDropout(Pointer inputHandle, double probability, boolean isTrain);
 

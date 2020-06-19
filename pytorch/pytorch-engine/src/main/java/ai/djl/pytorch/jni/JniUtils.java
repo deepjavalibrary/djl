@@ -855,23 +855,19 @@ public final class JniUtils {
             PtNDArray weight,
             PtNDArray bias,
             Shape stride,
-            Shape pad,
+            Shape padding,
             Shape dilation,
-            int numGroup,
-            boolean noBias) {
-        int dim = stride.dimension();
+            int groups) {
         return ndArray.getManager()
                 .create(
                         PyTorchLibrary.LIB.torchNNConvNd(
-                                dim,
                                 ndArray.getHandle(),
                                 weight.getHandle(),
-                                noBias ? null : bias.getHandle(),
+                                (bias != null) ? bias.getHandle() : null,
                                 stride.getShape(),
-                                pad.getShape(),
+                                padding.getShape(),
                                 dilation.getShape(),
-                                numGroup,
-                                !noBias));
+                                groups));
     }
 
     public static PtNDArray batchNorm(

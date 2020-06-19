@@ -17,7 +17,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
@@ -70,14 +69,14 @@ import java.io.IOException;
  */
 public abstract class Convolution extends AbstractBlock {
 
-    private static final byte VERSION = 2;
+    private static final byte VERSION = 3;
 
-    protected Shape kernel;
+    protected Shape kernelSize;
     protected Shape stride;
-    protected Shape pad;
-    protected Shape dilate;
-    protected int numFilters;
-    protected int numGroups;
+    protected Shape padding;
+    protected Shape dilation;
+    protected int filters;
+    protected int groups;
     protected boolean includeBias;
 
     protected Parameter weight;
@@ -90,23 +89,23 @@ public abstract class Convolution extends AbstractBlock {
      */
     public Convolution(ConvolutionBuilder<?> builder) {
         super(VERSION);
-        kernel = builder.kernel;
+        kernelSize = builder.kernelSize;
         stride = builder.stride;
-        pad = builder.pad;
-        dilate = builder.dilate;
-        numFilters = builder.numFilters;
-        numGroups = builder.numGroups;
+        padding = builder.padding;
+        dilation = builder.dilation;
+        filters = builder.filters;
+        groups = builder.groups;
         includeBias = builder.includeBias;
 
         weight =
                 addParameter(
                         new Parameter("weight", this, ParameterType.WEIGHT),
                         (inputShapes) ->
-                                new Shape(numFilters, inputShapes[0].get(1)).addAll(kernel));
+                                new Shape(filters, inputShapes[0].get(1)).addAll(kernelSize));
         if (includeBias) {
             bias =
                     addParameter(
-                            new Parameter("bias", this, ParameterType.BIAS), new Shape(numFilters));
+                            new Parameter("bias", this, ParameterType.BIAS), new Shape(filters));
         }
     }
 
@@ -138,19 +137,11 @@ public abstract class Convolution extends AbstractBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        inputs = opInputs(parameterStore, inputs);
-        NDArrayEx ex = inputs.head().getNDArrayInternal();
-        return ex.convolution(
-                inputs,
-                kernel,
-                stride,
-                pad,
-                dilate,
-                numFilters,
-                numGroups,
-                getStringLayout(),
-                !includeBias,
-                params);
+        NDArray input = inputs.singletonOrThrow();
+        Device device = input.getDevice();
+        NDArray weightArr = parameterStore.getValue(weight, device);
+        NDArray biasArr = parameterStore.getValue(bias, device);
+        return convolution(input, weightArr, biasArr, stride, padding, dilation, groups);
     }
 
     /** {@inheritDoc} */
@@ -166,12 +157,12 @@ public abstract class Convolution extends AbstractBlock {
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         long[] shape = new long[numDimensions()];
         shape[0] = inputs[0].get(0);
-        shape[1] = numFilters;
+        shape[1] = filters;
         for (int i = 0; i < numDimensions() - 2; i++) {
             shape[2 + i] =
                     (inputs[0].get(2 + i)
-                                            + 2 * pad.get(i)
-                                            - dilate.get(0) * (kernel.get(i) - 1)
+                                            + 2 * padding.get(i)
+                                            - dilation.get(0) * (kernelSize.get(i) - 1)
                                             - 1)
                                     / stride.get(0)
                             + 1;
@@ -190,16 +181,92 @@ public abstract class Convolution extends AbstractBlock {
         }
     }
 
-    private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
-        NDArray data = inputs.singletonOrThrow();
-        Device device = data.getDevice();
-        NDList ret = new NDList(3);
-        ret.add(data);
-        ret.add(parameterStore.getValue(weight, device));
-        if (bias != null) {
-            ret.add(parameterStore.getValue(bias, device));
-        }
-        return ret;
+    /**
+     * Applies N-D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, ...)
+     * @param weight filters of shape (outChannel, inputChannel/groups, ...)
+     * @return the output of the convolution operation
+     */
+    public static NDList convolution(NDArray input, NDArray weight) {
+        return convolution(input, weight, null, new Shape(1), new Shape(0), new Shape(1), 1);
+    }
+
+    /**
+     * Applies N-D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, ...)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, ...)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(w), Shape(h, w) or Shape(d, h, w)
+     * @return the output of the convolution operation
+     */
+    public static NDList convolution(NDArray input, NDArray weight, NDArray bias, Shape stride) {
+        return convolution(input, weight, bias, stride, new Shape(0), new Shape(1), 1);
+    }
+
+    /**
+     * Applies N-D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, ...)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, ...)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(w), Shape(h, w) or Shape(d, h, w)
+     * @param padding implicit paddings on both sides of the input: Shape(w), Shape(h, w) or
+     *     Shape(d, h, w)
+     * @return the output of the convolution operation
+     */
+    public static NDList convolution(
+            NDArray input, NDArray weight, NDArray bias, Shape stride, Shape padding) {
+        return convolution(input, weight, bias, stride, padding, new Shape(1), 1);
+    }
+
+    /**
+     * Applies N-D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, ...)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, ...)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(w), Shape(h, w) or Shape(d, h, w)
+     * @param padding implicit paddings on both sides of the input: Shape(w), Shape(h, w) or
+     *     Shape(d, h, w)
+     * @param dilation the spacing between kernel elements: Shape(w), Shape(h, w) or Shape(d, h, w)
+     * @return the output of the convolution operation
+     */
+    public static NDList convolution(
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
+            Shape stride,
+            Shape padding,
+            Shape dilation) {
+        return convolution(input, weight, bias, stride, padding, dilation, 1);
+    }
+
+    /**
+     * Applies N-D convolution over an input signal composed of several input planes.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, ...)
+     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, ...)
+     * @param bias bias {@code NDArray} of shape (outChannel)
+     * @param stride the stride of the convolving kernel: Shape(w), Shape(h, w) or Shape(d, h, w)
+     * @param padding implicit paddings on both sides of the input: Shape(w), Shape(h, w) or
+     *     Shape(d, h, w)
+     * @param dilation the spacing between kernel elements: Shape(w), Shape(h, w) or Shape(d, h, w)
+     * @param groups split input into groups: input channel(input.size(1)) should be divisible by
+     *     the number of groups
+     * @return the output of the convolution operation
+     */
+    public static NDList convolution(
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
+            Shape stride,
+            Shape padding,
+            Shape dilation,
+            int groups) {
+        return input.getNDArrayInternal()
+                .convolution(input, weight, bias, stride, padding, dilation, groups);
     }
 
     /**
@@ -210,22 +277,22 @@ public abstract class Convolution extends AbstractBlock {
     @SuppressWarnings("rawtypes")
     public abstract static class ConvolutionBuilder<T extends ConvolutionBuilder> {
 
-        protected Shape kernel;
+        protected Shape kernelSize;
         protected Shape stride;
-        protected Shape pad;
-        protected Shape dilate;
-        protected int numFilters;
-        protected int numGroups = 1;
+        protected Shape padding;
+        protected Shape dilation;
+        protected int filters;
+        protected int groups = 1;
         protected boolean includeBias = true;
 
         /**
          * Sets the shape of the kernel.
          *
-         * @param kernel the shape of the kernel
+         * @param kernelSize the shape of the kernel
          * @return this Builder
          */
-        public T setKernel(Shape kernel) {
-            this.kernel = kernel;
+        public T setKernelSize(Shape kernelSize) {
+            this.kernelSize = kernelSize;
             return self();
         }
 
@@ -243,11 +310,11 @@ public abstract class Convolution extends AbstractBlock {
         /**
          * Sets the padding along each dimension. Defaults to 0 along each dimension.
          *
-         * @param pad the shape of padding along each dimension
+         * @param padding the shape of padding along each dimension
          * @return this Builder
          */
-        public T optPad(Shape pad) {
-            this.pad = pad;
+        public T optPadding(Shape padding) {
+            this.padding = padding;
             return self();
         }
 
@@ -257,30 +324,30 @@ public abstract class Convolution extends AbstractBlock {
          * @param dilate the shape of dilation along each dimension
          * @return this Builder
          */
-        public T optDilate(Shape dilate) {
-            this.dilate = dilate;
+        public T optDilation(Shape dilate) {
+            this.dilation = dilate;
             return self();
         }
 
         /**
          * Sets the <b>Required</b> number of filters.
          *
-         * @param numFilters the number of convolution filters(channels)
+         * @param filters the number of convolution filters(channels)
          * @return this Builder
          */
-        public T setNumFilters(int numFilters) {
-            this.numFilters = numFilters;
+        public T setFilters(int filters) {
+            this.filters = filters;
             return self();
         }
 
         /**
          * Sets the number of group partitions.
          *
-         * @param numGroups the number of group partitions
+         * @param groups the number of group partitions
          * @return this Builder
          */
-        public T optNumGroups(int numGroups) {
-            this.numGroups = numGroups;
+        public T optGroups(int groups) {
+            this.groups = groups;
             return self();
         }
 
@@ -302,7 +369,7 @@ public abstract class Convolution extends AbstractBlock {
          * @throws IllegalArgumentException if the required arguments are not set
          */
         protected void validate() {
-            if (kernel == null || numFilters == 0) {
+            if (kernelSize == null || filters == 0) {
                 throw new IllegalArgumentException("Kernel and numFilters must be set");
             }
         }
