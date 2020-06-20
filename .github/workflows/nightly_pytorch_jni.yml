@@ -14,6 +14,7 @@ on:
 
 jobs:
   build-pytorch-jni-cpu:
+    if: github.repository == 'awslabs/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -41,6 +42,7 @@ jobs:
           path: pytorch/pytorch-native/jnilib
 
   build-pytorch-jni-linux-gpu:
+    if: github.repository == 'awslabs/djl'
     runs-on: ubuntu-latest
     container: nvidia/cuda:10.1-cudnn7-devel-ubuntu16.04
     steps:
@@ -69,6 +71,7 @@ jobs:
           path: pytorch/pytorch-native/jnilib
 
   build-pytorch-jni-centos:
+    if: github.repository == 'awslabs/djl'
     runs-on: ubuntu-latest
     container: nvidia/cuda:10.1-cudnn7-devel-centos7
     steps:
@@ -102,6 +105,7 @@ jobs:
 
 
   build-pytorch-jni-windows-gpu:
+    if: github.repository == 'awslabs/djl'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1
@@ -151,6 +155,7 @@ jobs:
           path: pytorch/pytorch-native/jnilib
 
   build-pytorch-jni-android:
+    if: github.repository == 'awslabs/djl'
     runs-on: ubuntu-18.04
     env:
       NDK_VERSION: "20.0.5594570"
@@ -180,6 +185,7 @@ jobs:
           path: pytorch/pytorch-native/jnilib
 
   publish:
+    if: github.repository == 'awslabs/djl'
     runs-on: ubuntu-18.04
     needs: [build-pytorch-jni-cpu, build-pytorch-jni-linux-gpu, build-pytorch-jni-windows-gpu, build-pytorch-jni-android, build-pytorch-jni-centos]
     steps:

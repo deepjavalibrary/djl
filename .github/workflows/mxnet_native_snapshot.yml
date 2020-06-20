@@ -16,6 +16,7 @@ on:
 
 jobs:
   build:
+    if: github.repository == 'awslabs/djl'
     runs-on: ubuntu-18.04
 
     steps:
