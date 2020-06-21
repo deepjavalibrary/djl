@@ -87,7 +87,12 @@ public class BufferedImageFactory extends ImageFactory {
         return new BufferedImageWrapper((BufferedImage) image);
     }
 
-    static class BufferedImageWrapper implements Image {
+    protected void save(BufferedImage image, OutputStream os, String type) throws IOException {
+        ImageIO.write(image, type, os);
+    }
+
+    private class BufferedImageWrapper implements Image {
+
         private final BufferedImage image;
 
         BufferedImageWrapper(BufferedImage image) {
@@ -176,7 +181,7 @@ public class BufferedImageFactory extends ImageFactory {
         /** {@inheritDoc} */
         @Override
         public void save(OutputStream os, String type) throws IOException {
-            ImageIO.write(image, type, os);
+            BufferedImageFactory.this.save(image, os, type);
         }
 
         /** {@inheritDoc} */

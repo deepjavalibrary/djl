@@ -25,7 +25,7 @@ import java.nio.file.Paths;
  */
 public abstract class ImageFactory {
 
-    private static final ImageFactory FACTORY = newInstance();
+    private static ImageFactory factory = newInstance();
 
     private static ImageFactory newInstance() {
         String className = "ai.djl.modality.cv.BufferedImageFactory";
@@ -47,7 +47,16 @@ public abstract class ImageFactory {
      * @return {@link ImageFactory}
      */
     public static ImageFactory getInstance() {
-        return FACTORY;
+        return factory;
+    }
+
+    /**
+     * Sets a custom instance of {@code ImageFactory}.
+     *
+     * @param factory a custom instance of {@code ImageFactory}
+     */
+    public static void setImageFactory(ImageFactory factory) {
+        ImageFactory.factory = factory;
     }
 
     /**
