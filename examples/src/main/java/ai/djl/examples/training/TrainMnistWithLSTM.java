@@ -17,6 +17,7 @@ import ai.djl.Model;
 import ai.djl.basicdataset.Mnist;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -24,12 +25,10 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.recurrent.LSTM;
-import ai.djl.training.DataManager;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
-import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
@@ -84,6 +83,15 @@ public final class TrainMnistWithLSTM {
     private static Block getLSTMModel() {
         SequentialBlock block = new SequentialBlock();
         block.add(
+                inputs -> {
+                    NDArray input = inputs.singletonOrThrow();
+                    Shape inputShape = input.getShape();
+                    long batchSize = inputShape.get(0);
+                    long channel = inputShape.get(3);
+                    long time = inputShape.size() / (batchSize * channel);
+                    return new NDList(input.reshape(new Shape(batchSize, time, channel)));
+                });
+        block.add(
                 new LSTM.Builder().setStateSize(64).setNumStackedLayers(1).optDropRate(0).build());
         block.add(BatchNorm.builder().optEpsilon(1e-5f).optMomentum(0.9f).build());
         block.add(Linear.builder().setOutChannels(10).optFlatten(true).build());
@@ -105,7 +113,6 @@ public final class TrainMnistWithLSTM {
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
                 .optInitializer(new XavierInitializer())
-                .optDataManager(new MnistWithLSTMDataManager())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
@@ -121,19 +128,5 @@ public final class TrainMnistWithLSTM {
                         .build();
         mnist.prepare(new ProgressBar());
         return mnist;
-    }
-
-    private static class MnistWithLSTMDataManager extends DataManager {
-        @Override
-        public NDList getData(Batch batch) {
-            NDList ret = new NDList();
-            NDList data = batch.getData();
-            Shape inputShape = data.singletonOrThrow().getShape();
-            long batchSize = inputShape.get(0);
-            long channel = inputShape.get(3);
-            long time = inputShape.size() / (batchSize * channel);
-            ret.add(data.singletonOrThrow().reshape(new Shape(batchSize, time, channel)));
-            return ret;
-        }
     }
 }

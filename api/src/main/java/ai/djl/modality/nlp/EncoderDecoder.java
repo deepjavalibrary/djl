@@ -62,47 +62,24 @@ public class EncoderDecoder extends AbstractBlock {
     }
 
     /**
-     * Applies the forward function of the encoder and the decoder. This method should be called
-     * only on blocks that are initialized.
-     *
-     * @param parameterStore the parameter store
-     * @param encoderInputs the input for the encoder
-     * @param decoderInputs the input for the decoder
-     * @param training true to run a training forward pass
-     * @param params optional parameters
-     * @return the output of the forward pass
-     */
-    public NDList forward(
-            ParameterStore parameterStore,
-            NDList encoderInputs,
-            NDList decoderInputs,
-            boolean training,
-            PairList<String, Object> params) {
-        if (training) {
-            NDList encoderOutputs = encoder.forward(parameterStore, encoderInputs, true, params);
-            decoder.initState(encoder.getStates(encoderOutputs));
-            return decoder.forward(parameterStore, decoderInputs, true, params);
-        }
-
-        NDList encoderOutputs =
-                encoder.forward(parameterStore, new NDList(encoderInputs), false, params);
-        decoder.initState(encoder.getStates(encoderOutputs));
-        return decoder.forward(parameterStore, new NDList(decoderInputs), false, params);
-    }
-
-    /**
-     * Applies the forward function of the encoder and the decoder. This method should be called
-     * only on blocks that are initialized.
-     *
-     * <p>This forward function in the {@code EncoderDecoder} class assumes the input {@link NDList}
-     * contains both the encoder and decoder inputs. Further, it assumes that the first index in the
-     * input {@link NDList} contains the encoder input and the second index contains the decoder
-     * input.
+     * Applies the forward function (prediction only) of the encoder and the decoder.
      *
      * @param parameterStore the parameter store
      * @param inputs the input NDList
-     * @param training true if running a forward pass for training
-     * @param params optional parameters
+     * @param training must be false
+     * @return the output of the forward pass
+     */
+    @Override
+    public NDList forward(ParameterStore parameterStore, NDList inputs, boolean training) {
+        return forward(parameterStore, inputs, training, null);
+    }
+
+    /**
+     * Applies the forward function (prediction only) of the encoder and the decoder.
+     *
+     * @param parameterStore the parameter store
+     * @param inputs the input NDList
+     * @param training must be false
      * @return the output of the forward pass
      */
     @Override
@@ -111,31 +88,26 @@ public class EncoderDecoder extends AbstractBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        return forward(
-                parameterStore,
-                new NDList(inputs.get(0)),
-                new NDList(inputs.get(1)),
-                training,
-                params);
+        if (training) {
+            throw new IllegalArgumentException("You must use forward with labels when training");
+        }
+        throw new UnsupportedOperationException(
+                "EncoderDecoder prediction has not been implemented yet");
     }
 
-    /**
-     * Applies the forward function of the encoder and the decoder. This method should be called
-     * only on blocks that are initialized.
-     *
-     * <p>This forward function in the {@code EncoderDecoder} class assumes the input {@link NDList}
-     * contains both the encoder and decoder inputs. Further, it assumes that the first index in the
-     * input {@link NDList} contains the encoder input and the second index contains the decoder
-     * input.
-     *
-     * @param parameterStore the parameter store
-     * @param inputs the input NDList
-     * @param training true if running a forward pass for training
-     * @return the output of the forward pass
-     */
+    /** {@inheritDoc} */
     @Override
-    public NDList forward(ParameterStore parameterStore, NDList inputs, boolean training) {
-        return forward(parameterStore, inputs, training, null);
+    public NDList forward(
+            ParameterStore parameterStore,
+            NDList data,
+            NDList labels,
+            PairList<String, Object> params) {
+        NDList encoderInput = new NDList(data.head().get(":, :-1"));
+        NDList decoderInput = new NDList(labels.head().get(":, 1:"), labels.get(1));
+
+        NDList encoderOutputs = encoder.forward(parameterStore, encoderInput, true, params);
+        decoder.initState(encoder.getStates(encoderOutputs));
+        return decoder.forward(parameterStore, decoderInput, true, params);
     }
 
     /**

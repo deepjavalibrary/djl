@@ -69,9 +69,9 @@ public final class EasyTrain {
                 new BatchData(batch, new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
         try (GradientCollector collector = trainer.newGradientCollector()) {
             for (Batch split : splits) {
-                NDList data = trainer.getDataManager().getData(split);
-                NDList labels = trainer.getDataManager().getLabels(split);
-                NDList preds = trainer.forward(data);
+                NDList data = split.getData();
+                NDList labels = split.getLabels();
+                NDList preds = trainer.forward(data, labels);
                 long time = System.nanoTime();
                 NDArray lossValue = trainer.getLoss().evaluate(labels, preds);
                 collector.backward(lossValue);
@@ -105,10 +105,9 @@ public final class EasyTrain {
         BatchData batchData =
                 new BatchData(batch, new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
         for (Batch split : splits) {
-            NDList data = trainer.getDataManager().getData(split);
-            NDList labels = trainer.getDataManager().getLabels(split);
-
-            NDList preds = trainer.forward(data);
+            NDList data = split.getData();
+            NDList labels = split.getLabels();
+            NDList preds = trainer.forward(data, labels);
             batchData.getLabels().put(labels.get(0).getDevice(), labels);
             batchData.getPredictions().put(preds.get(0).getDevice(), preds);
         }

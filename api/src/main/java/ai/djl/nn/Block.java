@@ -133,6 +133,26 @@ public interface Block {
             PairList<String, Object> params);
 
     /**
+     * A forward call using both training data and labels.
+     *
+     * <p>Within this forward call, it can be assumed that training is true.
+     *
+     * @param parameterStore the parameter store
+     * @param data the input data NDList
+     * @param labels the input labels NDList
+     * @param params optional parameters
+     * @return the output of the forward pass
+     * @see #forward(ParameterStore, NDList, boolean, PairList)
+     */
+    default NDList forward(
+            ParameterStore parameterStore,
+            NDList data,
+            NDList labels,
+            PairList<String, Object> params) {
+        return forward(parameterStore, data, true, params);
+    }
+
+    /**
      * Sets an {@link Initializer} to the block.
      *
      * @param initializer the initializer to set
