@@ -78,7 +78,7 @@ public class OrtSymbolBlock implements SymbolBlock, AutoCloseable {
             PairList<String, Object> params) {
         NDManager inputManager = inputs.head().getManager();
         boolean foreignEngine =
-                OrtEngine.ENGINE_NAME.equals(inputManager.getEngine().getEngineName());
+                !OrtEngine.ENGINE_NAME.equals(inputManager.getEngine().getEngineName());
         List<String> inputNames = new ArrayList<>(session.getInputNames());
         if (inputs.size() != inputNames.size()) {
             throw new IllegalArgumentException("Input mismatch, looking for: " + inputNames);

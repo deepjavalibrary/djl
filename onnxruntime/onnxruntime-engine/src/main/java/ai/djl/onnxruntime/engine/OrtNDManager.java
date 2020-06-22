@@ -172,7 +172,7 @@ public class OrtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+        return Engine.getEngine(OrtEngine.ENGINE_NAME);
     }
 
     /** The SystemManager is the root {@link OrtNDManager} of which all others are children. */
