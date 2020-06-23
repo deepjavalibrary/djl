@@ -9,11 +9,11 @@ repositories {
 
 dependencies {
     api project(":tensorflow:tensorflow-engine")
-    runtimeOnly project(":tensorflow:tensorflow-native-auto")
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
+    testRuntimeOnly project(":tensorflow:tensorflow-native-auto")
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 
