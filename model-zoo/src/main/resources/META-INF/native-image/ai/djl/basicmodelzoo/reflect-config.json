@@ -1,0 +1,13 @@
+[
+  {
+    "name": "ai.djl.basicmodelzoo.ZooProvider",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "ai.djl.basicmodelzoo.BasicModelZoo",
+    "allDeclaredFields": true
+  }
+]

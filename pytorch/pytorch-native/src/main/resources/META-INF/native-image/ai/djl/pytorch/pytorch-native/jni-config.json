@@ -1,0 +1,11 @@
+[
+  {
+    "name": "ai.djl.engine.EngineException"
+  },
+  {
+    "name": "java.lang.NullPointerException"
+  },
+  {
+    "name": "java.lang.IllegalStateException"
+  }
+]

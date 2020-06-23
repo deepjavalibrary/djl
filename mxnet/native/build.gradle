@@ -9,16 +9,6 @@ def VERSION = "1.7.0-a"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 version = VERSION + (isRelease ? "" : "-SNAPSHOT")
 
-sourceSets {
-    main {
-        // Don't include the resources folder with all the binaries in the placeholder jar,
-        // javadoc jar, or sources jar
-        resources {
-            srcDirs = []
-        }
-    }
-}
-
 // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
 jar {
     def placeholder = "${project.buildDir}/placeholder"

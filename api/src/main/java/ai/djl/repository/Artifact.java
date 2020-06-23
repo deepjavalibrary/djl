@@ -31,8 +31,8 @@ public class Artifact {
     private String version;
     private boolean snapshot;
     private String name;
-    private LinkedHashMap<String, String> properties;
-    private LinkedHashMap<String, Object> arguments;
+    private Map<String, String> properties;
+    private Map<String, Object> arguments;
     private Map<String, Item> files;
 
     private transient Metadata metadata;
@@ -133,7 +133,7 @@ public class Artifact {
      * @param properties the new properties
      * @see Repository
      */
-    public void setProperties(LinkedHashMap<String, String> properties) {
+    public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }
 
@@ -144,7 +144,7 @@ public class Artifact {
      * @return the artifact arguments
      * @see Repository
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("PMD.UseConcurrentHashMap")
     public Map<String, Object> getArguments(Map<String, Object> override) {
         if (arguments == null) {
             if (override != null) {
@@ -153,7 +153,10 @@ public class Artifact {
             return Collections.emptyMap();
         }
         if (override != null) {
-            ((Map<String, Object>) arguments.clone()).putAll(override);
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.putAll(arguments);
+            map.putAll(override);
+            return map;
         }
         return arguments;
     }

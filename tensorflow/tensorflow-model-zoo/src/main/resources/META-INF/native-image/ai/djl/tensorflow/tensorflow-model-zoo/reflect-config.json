@@ -1,0 +1,13 @@
+[
+  {
+    "name": "ai.djl.tensorflow.zoo.TfZooProvider",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "ai.djl.tensorflow.zoo.TfModelZoo",
+    "allDeclaredFields": true
+  }
+]

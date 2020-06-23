@@ -1,0 +1,10 @@
+{
+  "resources": [
+    {
+      "pattern": "ai.djl.engine.EngineProvider"
+    },
+    {
+      "pattern": "jnilib/.*"
+    }
+  ]
+}

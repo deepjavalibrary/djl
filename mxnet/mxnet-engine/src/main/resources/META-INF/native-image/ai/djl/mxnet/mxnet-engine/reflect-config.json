@@ -1,0 +1,9 @@
+[
+  {
+    "name": "ai.djl.mxnet.engine.MxEngineProvider",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  }
+]

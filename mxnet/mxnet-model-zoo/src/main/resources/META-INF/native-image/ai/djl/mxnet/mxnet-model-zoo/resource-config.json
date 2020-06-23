@@ -1,0 +1,7 @@
+{
+  "resources": [
+    {
+      "pattern": "ai.djl.repository.zoo.ZooProvider"
+    }
+  ]
+}
