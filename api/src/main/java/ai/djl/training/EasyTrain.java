@@ -107,7 +107,7 @@ public final class EasyTrain {
         for (Batch split : splits) {
             NDList data = split.getData();
             NDList labels = split.getLabels();
-            NDList preds = trainer.forward(data, labels);
+            NDList preds = trainer.evaluate(data);
             batchData.getLabels().put(labels.get(0).getDevice(), labels);
             batchData.getPredictions().put(preds.get(0).getDevice(), preds);
         }

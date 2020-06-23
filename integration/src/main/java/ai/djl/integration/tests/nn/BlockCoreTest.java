@@ -39,6 +39,7 @@ import ai.djl.nn.recurrent.LSTM;
 import ai.djl.nn.recurrent.RNN;
 import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
@@ -169,26 +170,29 @@ public class BlockCoreTest {
         }
     }
 
+    @SuppressWarnings("try")
     @Test
     public void testBatchNorm() throws IOException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
-        Block block = BatchNorm.builder().optAxis(1).build();
+        Block block = BatchNorm.builder().build();
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                Shape inputShape = new Shape(2, 2);
-                trainer.initialize(inputShape);
+                // the unused GradientCollector is for BatchNorm to know it is on training mode
+                try (GradientCollector collector = trainer.newGradientCollector()) {
+                    Shape inputShape = new Shape(2, 2);
+                    trainer.initialize(inputShape);
 
-                NDManager manager = trainer.getManager();
-                NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
-                NDArray expected = manager.create(new float[] {1, 2, 3, 4}, inputShape);
-                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
-                Assertions.assertAlmostEquals(result, expected);
-
-                testEncode(manager, block);
+                    NDManager manager = trainer.getManager();
+                    NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
+                    NDArray expected = manager.create(new float[] {-1, -1, 1, 1}, inputShape);
+                    NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                    Assertions.assertAlmostEquals(result, expected);
+                    testEncode(manager, block);
+                }
             }
         }
     }

@@ -382,26 +382,51 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDList batchNorm(
-            NDList inputs,
-            float epsilon,
-            float momentum,
+            NDArray input,
+            NDArray runningMean,
+            NDArray runningVar,
+            NDArray gamma,
+            NDArray beta,
             int axis,
-            boolean center,
-            boolean scale,
-            boolean training,
-            PairList<String, Object> additional) {
-        // TODO: axis center and scale are not used
-        // FIXME: Hardcode training to false to workaround unexpected behavior in PyTorch
-        return new NDList(
-                JniUtils.batchNorm(
-                        (PtNDArray) inputs.get(0),
-                        (PtNDArray) inputs.get(1),
-                        (PtNDArray) inputs.get(2),
-                        (PtNDArray) inputs.get(3),
-                        (PtNDArray) inputs.get(4),
-                        false,
-                        momentum,
-                        epsilon));
+            float momentum,
+            float eps,
+            boolean training) {
+        // TODO PyTorch will support axis argument
+        // https://github.com/pytorch/pytorch/issues/21856
+        if (axis == -1) {
+            return new NDList(
+                    JniUtils.batchNorm(
+                            (PtNDArray) input,
+                            (PtNDArray) runningMean,
+                            (PtNDArray) runningVar,
+                            (PtNDArray) gamma,
+                            (PtNDArray) beta,
+                            training,
+                            // momentum is defined differently in PyTorch
+                            1f - momentum,
+                            eps));
+        }
+        // apply the swapAxes to simulate BatchNorm with axis
+        try (NDManager subManager = input.getManager().newSubManager()) {
+            input.attach(subManager);
+            NDArray result = input;
+            result = result.swapAxes(1, axis);
+            result =
+                    JniUtils.batchNorm(
+                            (PtNDArray) result,
+                            (PtNDArray) runningMean,
+                            (PtNDArray) runningVar,
+                            (PtNDArray) gamma,
+                            (PtNDArray) beta,
+                            training,
+                            // momentum is defined differently in PyTorch
+                            1f - momentum,
+                            eps);
+            result = result.swapAxes(1, axis);
+            input.attach(subManager.getParentManager());
+            result.attach(subManager.getParentManager());
+            return new NDList(result);
+        }
     }
 
     /** {@inheritDoc} */

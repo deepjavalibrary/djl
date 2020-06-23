@@ -25,21 +25,6 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRelu(
   API_END();
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNBatchNorm(JNIEnv* env, jobject jthis,
-    jobject jhandle, jobject jweight, jobject jbias, jobject running_mean, jobject running_var, jboolean is_training,
-    jdouble momentum, jdouble eps) {
-  API_BEGIN();
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  const auto* weight_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jweight);
-  const auto* bias_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jbias);
-  const auto* running_mean_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, running_mean);
-  const auto* running_var_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, running_var);
-  const auto* result_ptr = new torch::Tensor(torch::nn::functional::detail::batch_norm(
-      *tensor_ptr, *running_mean_ptr, *running_var_ptr, *weight_ptr, *bias_ptr, is_training, momentum, eps));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
-  API_END();
-}
-
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAvgPool(
   JNIEnv *env, jobject jthis, jobject jhandle, jint dim, jlongArray kernel, jlongArray stride, jlongArray pad, jboolean use_ceil, jboolean count_include_pad) {
   API_BEGIN();

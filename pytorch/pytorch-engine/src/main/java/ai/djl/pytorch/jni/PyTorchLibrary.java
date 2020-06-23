@@ -339,11 +339,11 @@ final class PyTorchLibrary {
 
     native Pointer torchNNBatchNorm(
             Pointer inputHandle,
-            Pointer weigthHandle,
-            Pointer biasHandle,
             Pointer runningMeanHandle,
             Pointer runningVarHandle,
-            boolean isTraining,
+            Pointer weigthHandle,
+            Pointer biasHandle,
+            boolean training,
             double momentum,
             double eps);
 

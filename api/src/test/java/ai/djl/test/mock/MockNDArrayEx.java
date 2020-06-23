@@ -316,14 +316,15 @@ public class MockNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDList batchNorm(
-            NDList inputs,
-            float epsilon,
-            float momentum,
+            NDArray input,
+            NDArray runningMean,
+            NDArray runningVar,
+            NDArray gamma,
+            NDArray beta,
             int axis,
-            boolean center,
-            boolean scale,
-            boolean training,
-            PairList<String, Object> additional) {
+            float momentum,
+            float eps,
+            boolean training) {
         return null;
     }
 

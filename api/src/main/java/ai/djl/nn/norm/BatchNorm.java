@@ -112,9 +112,22 @@ public class BatchNorm extends AbstractBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        inputs = opInputs(parameterStore, inputs);
-        NDArrayEx ex = inputs.head().getNDArrayInternal();
-        return ex.batchNorm(inputs, epsilon, momentum, axis, center, scale, training, params);
+        NDArray input = inputs.singletonOrThrow();
+        Device device = input.getDevice();
+        NDArray gammaArr = parameterStore.getValue(gamma, device);
+        NDArray betaArr = parameterStore.getValue(beta, device);
+        NDArray runningMeanArr = parameterStore.getValue(runningMean, device);
+        NDArray runningVarArr = parameterStore.getValue(runningVar, device);
+        return batchNorm(
+                input,
+                runningMeanArr,
+                runningVarArr,
+                gammaArr,
+                betaArr,
+                axis,
+                momentum,
+                epsilon,
+                training);
     }
 
     /** {@inheritDoc} */
@@ -128,19 +141,6 @@ public class BatchNorm extends AbstractBlock {
     public void beforeInitialize(Shape[] inputShapes) {
         this.inputShapes = inputShapes;
         inChannels = inputShapes[0].size(axis);
-    }
-
-    private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
-        if (inputs.size() != 1) {
-            throw new IllegalArgumentException("Linear requires exactly 1 NDArray");
-        }
-        NDArray data = inputs.singletonOrThrow();
-        Device device = data.getDevice();
-        NDArray gammaValue = parameterStore.getValue(gamma, device);
-        NDArray betaValue = parameterStore.getValue(beta, device);
-        NDArray runningMeanValue = parameterStore.getValue(runningMean, device);
-        NDArray runningVarValue = parameterStore.getValue(runningVar, device);
-        return new NDList(data, gammaValue, betaValue, runningMeanValue, runningVarValue);
     }
 
     /** {@inheritDoc} */
@@ -160,6 +160,94 @@ public class BatchNorm extends AbstractBlock {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         inChannels = is.readLong();
+    }
+
+    /**
+     * Applies Batch Normalization for each channel across a batch of data.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, *), * could be
+     *     empty, width, (height, width), (depth, height, width)
+     * @param runningMean runningMean {@code NDArray}
+     * @param runningVar runningVar {@code NDArray}
+     * @return the output {@code NDArray} of shape (batchSize, inputChannel, *), * could be empty,
+     *     width, (height, width), (depth, height, width)
+     */
+    public static NDList batchNorm(NDArray input, NDArray runningMean, NDArray runningVar) {
+        NDArrayEx ex = input.getNDArrayInternal();
+        return ex.batchNorm(input, runningMean, runningVar, null, null, 1, 0.9f, 1E-5f, true);
+    }
+
+    /**
+     * Applies Batch Normalization for each channel across a batch of data.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, *), * could be
+     *     empty, width, (height, width), (depth, height, width)
+     * @param runningMean runningMean {@code NDArray}
+     * @param runningVar runningVar {@code NDArray}
+     * @param gamma gamma weight {@code NDArray}
+     * @param beta beta weight {@code NDArray}
+     * @return the output {@code NDArray} of shape (batchSize, inputChannel, *), * could be empty,
+     *     width, (height, width), (depth, height, width)
+     */
+    public static NDList batchNorm(
+            NDArray input, NDArray runningMean, NDArray runningVar, NDArray gamma, NDArray beta) {
+        NDArrayEx ex = input.getNDArrayInternal();
+        return ex.batchNorm(input, runningMean, runningVar, gamma, beta, 1, 0.9f, 1E-5f, true);
+    }
+
+    /**
+     * Applies Batch Normalization for each channel across a batch of data.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, *), * could be
+     *     empty, width, (height, width), (depth, height, width)
+     * @param runningMean runningMean {@code NDArray}
+     * @param runningVar runningVar {@code NDArray}
+     * @param gamma gamma weight {@code NDArray}
+     * @param beta beta weight {@code NDArray}
+     * @param axis the axis that should be normalized
+     * @return the output {@code NDArray} of shape (batchSize, inputChannel, *), * could be empty,
+     *     width, (height, width), (depth, height, width)
+     */
+    public static NDList batchNorm(
+            NDArray input,
+            NDArray runningMean,
+            NDArray runningVar,
+            NDArray gamma,
+            NDArray beta,
+            int axis) {
+        NDArrayEx ex = input.getNDArrayInternal();
+        return ex.batchNorm(input, runningMean, runningVar, gamma, beta, axis, 0.9f, 1E-5f, true);
+    }
+
+    /**
+     * Applies Batch Normalization for each channel across a batch of data.
+     *
+     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, *), * could be
+     *     empty, width, (height, width), (depth, height, width)
+     * @param runningMean runningMean {@code NDArray}
+     * @param runningVar runningVar {@code NDArray}
+     * @param gamma gamma weight {@code NDArray}
+     * @param beta beta weight {@code NDArray}
+     * @param axis the axis that should be normalized
+     * @param momentum the value used for the runningMean and runningVar computation.
+     * @param eps a value added to the denominator for numerical stability
+     * @param training indicate the training mode if true
+     * @return the output {@code NDArray} of shape (batchSize, inputChannel, *), * could be empty,
+     *     width, (height, width), (depth, height, width)
+     */
+    public static NDList batchNorm(
+            NDArray input,
+            NDArray runningMean,
+            NDArray runningVar,
+            NDArray gamma,
+            NDArray beta,
+            int axis,
+            float momentum,
+            float eps,
+            boolean training) {
+        NDArrayEx ex = input.getNDArrayInternal();
+        return ex.batchNorm(
+                input, runningMean, runningVar, gamma, beta, axis, momentum, eps, training);
     }
 
     /**
@@ -185,11 +273,11 @@ public class BatchNorm extends AbstractBlock {
         /**
          * Set the axis in which channel is specified. Defaults to 1.
          *
-         * @param val the axis in which channel is specified
+         * @param axis the axis in which channel is specified
          * @return this Builder
          */
-        public Builder optAxis(int val) {
-            axis = val;
+        public Builder optAxis(int axis) {
+            this.axis = axis;
             return this;
         }
 

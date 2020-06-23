@@ -88,3 +88,23 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNConvNd
     return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNBatchNorm
+  (JNIEnv* env, jobject jthis, jobject jinput, jobject jrunning_mean, jobject jrunning_var, jobject jweight, jobject jbias, jboolean jtraining, jdouble jmomentum, jdouble jeps) {
+  API_BEGIN();
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+  const auto* running_mean_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jrunning_mean);
+  const auto* running_var_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jrunning_var);
+  torch::Tensor weight = {};
+  torch::Tensor bias = {};
+  if (!env->IsSameObject(jweight, nullptr)) {
+    weight = *utils::GetPointerFromJHandle<const torch::Tensor>(env, jweight);
+  }
+  if (!env->IsSameObject(jbias, nullptr)) {
+      bias = *utils::GetPointerFromJHandle<const torch::Tensor>(env, jbias);
+  }
+  const auto* result_ptr = new torch::Tensor(torch::nn::functional::batch_norm(
+      *tensor_ptr, *running_mean_ptr, *running_var_ptr, torch::nn::functional::BatchNormFuncOptions().weight(weight).bias(bias).momentum(jmomentum).eps(jeps).training(jtraining)));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}

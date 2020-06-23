@@ -12,6 +12,7 @@
  */
 package ai.djl.mxnet.engine;
 
+import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDUtils;
@@ -547,22 +548,31 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDList batchNorm(
-            NDList inputs,
-            float epsilon,
-            float momentum,
+            NDArray input,
+            NDArray runningMean,
+            NDArray runningVar,
+            NDArray gamma,
+            NDArray beta,
             int axis,
-            boolean center,
-            boolean scale,
-            boolean training,
-            PairList<String, Object> additional) {
+            float momentum,
+            float eps,
+            boolean training) {
         MxOpParams params = new MxOpParams();
-        params.addParam("eps", epsilon);
-        params.addParam("momentum", momentum);
         params.addParam("axis", axis);
-        params.addParam("fix_gamma", scale ? 0 : 1);
-        params.addAll(additional);
+        params.addParam("fix_gamma", gamma == null);
+        params.addParam("eps", eps);
+        params.addParam("momentum", momentum);
 
-        return getManager().invoke("BatchNorm", inputs, params);
+        if (training != JnaUtils.autogradIsTraining()) {
+            throw new IllegalArgumentException(
+                    "the mode of batchNorm in MXNet should align with the mode of GradientCollector");
+        }
+
+        return getManager()
+                .invoke(
+                        "_npx_batch_norm",
+                        new NDList(input, gamma, beta, runningMean, runningVar),
+                        params);
     }
 
     /** {@inheritDoc} */
