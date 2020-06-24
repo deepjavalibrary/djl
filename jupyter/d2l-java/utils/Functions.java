@@ -10,4 +10,14 @@ public class Functions {
         }
         return y;
     }
+    
+    // ScatterTrace.builder() does not support float[],
+    // so we must convert to a double array first
+    public static double[] floatToDoubleArray(float[] x) {
+        double[] ret = new double[x.length];
+        for (int i = 0; i < x.length; i++) {
+            ret[i] = x[i];
+        }
+        return ret;
+    }
 }
