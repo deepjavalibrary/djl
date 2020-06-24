@@ -3099,8 +3099,8 @@ public class MockMxnetLibrary implements MxnetLibrary {
             String[] vkeys,
             int onum,
             String[] okeys,
-            PointerByReference vals,
-            PointerByReference outs,
+            PointerArray vals,
+            PointerArray outs,
             int priority) {
         if (functions.containsKey("MXKVStorePushPullEx")) {
             return functions

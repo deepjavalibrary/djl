@@ -718,6 +718,28 @@ public final class JnaUtils {
         checkCall(LIB.MXKVStorePullEx(handle, num, keys, toPointerArray(vals), priority));
     }
 
+    public static void parameterStorePushPull(
+            Pointer handle,
+            int inputNum,
+            String[] inputKeys,
+            int outputNum,
+            String[] outputKey,
+            NDList inputs,
+            NDList outputs,
+            int priority) {
+        checkNDArray(handle, "push from the parameter store with");
+        checkCall(
+                LIB.MXKVStorePushPullEx(
+                        handle,
+                        inputNum,
+                        inputKeys,
+                        outputNum,
+                        outputKey,
+                        toPointerArray(inputs),
+                        toPointerArray(outputs),
+                        priority));
+    }
+
     public static void parameterStoreSetUpdater(
             Pointer handle,
             MxnetLibrary.MXKVStoreUpdater updater,

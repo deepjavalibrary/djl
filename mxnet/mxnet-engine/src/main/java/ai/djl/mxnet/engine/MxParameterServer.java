@@ -64,6 +64,33 @@ public class MxParameterServer extends NativeResource implements ParameterServer
         JnaUtils.parameterStorePull(getHandle(), weights.length, keys, vals, priority);
     }
 
+    /**
+     * Pushes the value of a key from Parameter Server to NDArrays and Pulls right away.
+     *
+     * @param parameterId the key to pull
+     * @param inputs the NDArrays to store the value corresponding to the key, value will be copied
+     *     to the devices of the NDArrays
+     * @param outputs the NDArrays to get the value corresponding to the key, value will be copied
+     *     to the devices of the NDArrays
+     * @param priority the priority of the push operation. Higher priority push operations are
+     *     likely to be executed before other push actions
+     */
+    public void pushPull(String parameterId, NDArray[] inputs, NDArray[] outputs, int priority) {
+        String[] gradKeys = new String[inputs.length];
+        String[] weightKeys = new String[outputs.length];
+        Arrays.fill(gradKeys, parameterId);
+        Arrays.fill(weightKeys, parameterId);
+        JnaUtils.parameterStorePushPull(
+                getHandle(),
+                inputs.length,
+                gradKeys,
+                outputs.length,
+                weightKeys,
+                new NDList(inputs),
+                new NDList(outputs),
+                priority);
+    }
+
     private static Pointer createdKVStore() {
         return JnaUtils.parameterStoreCreate("device");
     }
