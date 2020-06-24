@@ -12,7 +12,7 @@
         Criteria.builder()
                 .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                 .setTypes(Image.class, Classifications.class)
-                .<b>optModelUrl("hdfs://localhost/var/resnet/resnet18.zip")</b>
+                .<b>optModelUrls("hdfs://localhost/var/resnet/resnet18.zip")</b>
                 .optArtifactId("ai.djl.localmodelzoo:<b>resnet18</b>")
                 .optProgress(new ProgressBar())
                 .build();

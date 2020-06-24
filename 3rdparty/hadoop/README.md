@@ -14,7 +14,7 @@ The following pseudocode demonstrates how to load model from HDFS url:
         Criteria.builder()
                 .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                 .setTypes(Image.class, Classifications.class)
-                .optModelUrl("hdfs://localhost:63049/resnet.tar.z")
+                .optModelUrls("hdfs://localhost:63049/resnet.tar.z")
                 .optArtifactId("ai.djl.localmodelzoo:resnet")
                 .build();
 
