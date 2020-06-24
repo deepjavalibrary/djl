@@ -1,4 +1,4 @@
-name: ONNX Runtime snapshot publish
+name: ONNX Runtime staging publish
 
 on:
   # To trigger this workflow manually, you can use the following curl command:
