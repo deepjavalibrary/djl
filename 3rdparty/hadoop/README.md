@@ -47,6 +47,6 @@ You can pull the module from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl.hadoop</groupId>
     <artifactId>hadoop</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
 </dependency>
 ```

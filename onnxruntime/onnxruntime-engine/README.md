@@ -6,7 +6,7 @@ This module contains the ONNX Runtime implementation of the Deep Java Library (D
 We don't recommend developers use classes within this module directly.
 Use of these classes will couple your code to the ONNX Runtime and make switching between frameworks difficult.
 Even so, developers are not restricted from using engine-specific features.
-For more information, see [NDManager#invoke()](https://javadoc.io/static/ai.djl/api/0.5.0/ai/djl/ndarray/NDManager.html#invoke-java.lang.String-ai.djl.ndarray.NDList-ai.djl.ndarray.NDList-ai.djl.util.PairList-).
+For more information, see [NDManager#invoke()](https://javadoc.io/static/ai.djl/api/0.6.0/ai/djl/ndarray/NDManager.html#invoke-java.lang.String-ai.djl.ndarray.NDList-ai.djl.ndarray.NDList-ai.djl.util.PairList-).
 
 ONNX Runtime is a DL library with limited support for NDArray operations.
 Currently, it only covers the basic NDArray creation methods. To better support the necessary preprocessing and postprocessing,

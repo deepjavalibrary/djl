@@ -140,16 +140,16 @@ curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.ever
 After verifying packages are available in maven central, click the following links to trigger javadoc.io to fetch latest DJL libraries.
 Verify the following link works, and update the website for java doc links accordingly.
 
-* [api](https://javadoc.io/doc/ai.djl/api/0.5.0/index.html)
-* [basicdataset](https://javadoc.io/doc/ai.djl/basicdataset/0.5.0/index.html)
-* [model-zoo](https://javadoc.io/doc/ai.djl/model-zoo/0.5.0/index.html)
-* [mxnet-model-zoo](https://javadoc.io/doc/ai.djl.mxnet/mxnet-model-zoo/0.5.0/index.html)
-* [mxnet-engine](https://javadoc.io/doc/ai.djl.mxnet/mxnet-engine/0.5.0/index.html)
-* [pytorch-model-zoo](https://javadoc.io/doc/ai.djl.pytorch/pytorch-model-zoo/0.5.0/index.html)
-* [pytorch-engine](https://javadoc.io/doc/ai.djl.pytorch/pytorch-engine/0.5.0/index.html)
-* [tensorflow-model-zoo](https://javadoc.io/doc/ai.djl.tensorflow/tensorflow-model-zoo/0.5.0/index.html)
-* [tensorflow-engine](https://javadoc.io/doc/ai.djl.tensorflow/tensorflow-engine/0.5.0/index.html)
-* [fasttext-engine](https://javadoc.io/doc/ai.djl.fasttext/fasttext-engine/0.5.0/index.html)
+* [api](https://javadoc.io/doc/ai.djl/api/0.6.0/index.html)
+* [basicdataset](https://javadoc.io/doc/ai.djl/basicdataset/0.6.0/index.html)
+* [model-zoo](https://javadoc.io/doc/ai.djl/model-zoo/0.6.0/index.html)
+* [mxnet-model-zoo](https://javadoc.io/doc/ai.djl.mxnet/mxnet-model-zoo/0.6.0/index.html)
+* [mxnet-engine](https://javadoc.io/doc/ai.djl.mxnet/mxnet-engine/0.6.0/index.html)
+* [pytorch-model-zoo](https://javadoc.io/doc/ai.djl.pytorch/pytorch-model-zoo/0.6.0/index.html)
+* [pytorch-engine](https://javadoc.io/doc/ai.djl.pytorch/pytorch-engine/0.6.0/index.html)
+* [tensorflow-model-zoo](https://javadoc.io/doc/ai.djl.tensorflow/tensorflow-model-zoo/0.6.0/index.html)
+* [tensorflow-engine](https://javadoc.io/doc/ai.djl.tensorflow/tensorflow-engine/0.6.0/index.html)
+* [fasttext-engine](https://javadoc.io/doc/ai.djl.fasttext/fasttext-engine/0.6.0/index.html)
 
 ### Step 6.4: Check broken links
 

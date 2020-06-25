@@ -24,10 +24,10 @@ repositories {
 }
 
 dependencies {
-    implementation "ai.djl:api:0.5.0"
-    implementation "ai.djl.tensorflow:tensorflow-api:0.5.0"
-    implementation "ai.djl.tensorflow:tensorflow-engine:0.5.0"
-    implementation "ai.djl.tensorflow:tensorflow-model-zoo:0.5.0"
+    implementation "ai.djl:api:0.6.0"
+    implementation "ai.djl.tensorflow:tensorflow-api:0.6.0"
+    implementation "ai.djl.tensorflow:tensorflow-engine:0.6.0"
+    implementation "ai.djl.tensorflow:tensorflow-model-zoo:0.6.0"
     implementation "ai.djl.tensorflow:tensorflow-native-auto:2.2.0"
 }
 ```
@@ -40,17 +40,17 @@ Same as gradle, just include the 4 modules:
     <dependency>
       <groupId>ai.djl.tensorflow</groupId>
       <artifactId>tensorflow-api</artifactId>
-      <version>0.5.0</version>
+      <version>0.6.0</version>
     </dependency>
     <dependency>
       <groupId>ai.djl.tensorflow</groupId>
       <artifactId>tensorflow-engine</artifactId>
-      <version>0.5.0</version>
+      <version>0.6.0</version>
     </dependency>
     <dependency>
       <groupId>ai.djl.tensorflow</groupId>
       <artifactId>tensorflow-model-zoo</artifactId>
-      <version>0.5.0</version>
+      <version>0.6.0</version>
     </dependency>
     <dependency>
       <groupId>ai.djl.tensorflow</groupId>

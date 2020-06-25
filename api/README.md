@@ -31,7 +31,7 @@ You can pull the DJL API from the central Maven repository by including the foll
 <dependency>
     <groupId>ai.djl</groupId>
     <artifactId>api</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
 </dependency>
 ```
 
@@ -41,7 +41,7 @@ For testing the current nightly build, use the following:
 <dependency>
     <groupId>ai.djl</groupId>
     <artifactId>api</artifactId>
-    <version>0.6.0-SNAPSHOT</version>
+    <version>0.7.0-SNAPSHOT</version>
 </dependency>
 ```
 
