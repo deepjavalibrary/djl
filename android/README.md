@@ -12,16 +12,10 @@ The minimum API level for DJL Android is 26.
 
 In gradle, you can include the snapshot repository and add the 4 modules in your dependencies:
 ```
-repositories {
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-}
-
 dependencies {
-    implementation "ai.djl:api:0.6.0-SNAPSHOT"
-    implementation "ai.djl.android:core:0.6.0-SNAPSHOT"
-    androidRuntimeOnly "ai.djl.pytorch:pytorch-engine:0.6.0-SNAPSHOT"
-    androidRuntimeOnly "ai.djl.android:pytorch-native:0.6.0-SNAPSHOT"
+    implementation "ai.djl:api:0.6.0"
+    implementation "ai.djl.android:core:0.6.0"
+    androidRuntimeOnly "ai.djl.pytorch:pytorch-engine:0.6.0"
+    androidRuntimeOnly "ai.djl.android:pytorch-native:0.6.0"
 }
 ```

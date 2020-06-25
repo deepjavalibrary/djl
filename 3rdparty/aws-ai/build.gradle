@@ -12,7 +12,7 @@ dependencies {
     api project(":api")
 
     testImplementation project(":mxnet:mxnet-engine")
-    testImplementation "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}-SNAPSHOT"
+    testImplementation "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"

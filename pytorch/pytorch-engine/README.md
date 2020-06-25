@@ -133,13 +133,13 @@ strings /<path-to-the-file>/libstdc++.so.6 | grep CXXABI
 
 User are required to use the corresponding `pytorch-engine` package along with the native package.
 
-- ai.djl.pytorch:pytorch-engine-precxx11:0.6.0-SNAPSHOT
+- ai.djl.pytorch:pytorch-engine-precxx11:0.6.0
 
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-engine-precxx11</artifactId>
-    <version>0.6.0-SNAPSHOT</version>
+    <version>0.6.0</version>
     <scope>runtime</scope>
 </dependency>
 ```

@@ -5,7 +5,7 @@ To use multithreading inference feature, we have to disable GC to close the NDAr
 ```
 # If you are using DJL 0.5.0
 -Dai.djl.pytorch.disable_close_resource_on_finalize=true
-# If you are using DJL 0.6.0-SNAPSHOT
+# If you are using DJL 0.6.0
 -Dai.djl.disable_close_resource_on_finalize=true
 ```
 Please make sure all the NDArrays are attached to the NDManager.

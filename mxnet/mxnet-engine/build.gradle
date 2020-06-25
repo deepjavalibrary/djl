@@ -9,7 +9,7 @@ repositories {
 dependencies {
     api project(":api")
 
-    testRuntimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}-SNAPSHOT"
+    testRuntimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
     testImplementation project(":basicdataset")
     testImplementation project(":model-zoo")
     testImplementation(project(":testing"))
