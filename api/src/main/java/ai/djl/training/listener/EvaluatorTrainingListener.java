@@ -79,13 +79,15 @@ public class EvaluatorTrainingListener implements TrainingListener {
         Metrics metrics = trainer.getMetrics();
         for (Evaluator evaluator : trainer.getEvaluators()) {
             float trainValue = evaluator.getAccumulator(TRAIN_EPOCH);
+            float validateValue = evaluator.getAccumulator(VALIDATE_EPOCH);
             if (metrics != null) {
                 String key = metricName(evaluator, TRAIN_EPOCH);
                 metrics.addMetric(key, trainValue);
+                String validateKey = metricName(evaluator, VALIDATE_EPOCH);
+                metrics.addMetric(validateKey, validateValue);
             }
 
             latestEvaluations.put("train_" + evaluator.getName(), trainValue);
-            float validateValue = evaluator.getAccumulator(VALIDATE_EPOCH);
             latestEvaluations.put("validate_" + evaluator.getName(), validateValue);
 
             if (evaluator == trainer.getLoss()) {
@@ -134,14 +136,6 @@ public class EvaluatorTrainingListener implements TrainingListener {
     @Override
     public void onValidationBatch(Trainer trainer, BatchData batchData) {
         updateEvaluators(trainer, batchData, new String[] {VALIDATE_EPOCH});
-        Metrics metrics = trainer.getMetrics();
-        if (metrics != null) {
-            for (Evaluator evaluator : trainer.getEvaluators()) {
-                String key = metricName(evaluator, VALIDATE_EPOCH);
-                float value = evaluator.getAccumulator(VALIDATE_EPOCH);
-                metrics.addMetric(key, value);
-            }
-        }
     }
 
     private void updateEvaluators(Trainer trainer, BatchData batchData, String[] accumulators) {
