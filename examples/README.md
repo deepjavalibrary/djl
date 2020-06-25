@@ -65,8 +65,8 @@ The following command executes an object detection example:
 * Maven
     ```sh
     cd examples
-    mvn package -DskipTests
-    mvn exec:java -Dexec.mainClass="ai.djl.examples.inference.ObjectDetection"
+    mvn clean package -DskipTests
+    mvn exec:java
     ```
 
 ## Engine selection

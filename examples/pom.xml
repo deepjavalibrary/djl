@@ -11,6 +11,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <djl.version>0.6.0-SNAPSHOT</djl.version>
+        <exec.mainClass>ai.djl.examples.inference.ObjectDetection</exec.mainClass>
     </properties>
 
     <repositories>
