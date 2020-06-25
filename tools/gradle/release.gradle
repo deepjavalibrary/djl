@@ -33,17 +33,16 @@ task increaseBuildVersion {
             throw new GradleException("targetVersion property is required.")
         }
         def targetVersion = project.property("targetVersion")
-        def releaseVersion = Pattern.quote(version.replaceAll("-SNAPSHOT", ""))
 
         def file = new File("examples/build.gradle")
-        file.text = file.text.replaceAll("\"${releaseVersion}\"", "\"${targetVersion}-SNAPSHOT\"")
+        file.text = file.text.replaceAll("def DJL_VERSION = \".+\"", "def DJL_VERSION = \"${targetVersion}-SNAPSHOT\"")
 
         file = new File("examples/pom.xml")
-        file.text = file.text.replaceAll("<djl.version>${releaseVersion}</djl.version>",
+        file.text = file.text.replaceAll("<djl.version>.+-SNAPSHOT</djl.version>",
                 "<djl.version>${targetVersion}-SNAPSHOT</djl.version>")
 
         file = new File("build.gradle")
-        file.text = file.text.replaceAll("\"${releaseVersion}\"", "\"${targetVersion}\"")
+        file.text = file.text.replaceAll("version = \"[0-9.]+\"", "version = \"${targetVersion}\"")
     }
 }
 
