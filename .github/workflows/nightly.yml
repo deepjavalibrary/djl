@@ -179,11 +179,12 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Install NDK
         run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${NDK_VERSION}" --sdk_root=${ANDROID_SDK_ROOT}
-      - name: publish android core package to Snapshot
+      - name: publish android package to Snapshot
         run: |
           export ANDROID_NDK=${ANDROID_HOME}/ndk-bundle
           cd android
-          ./gradlew :core:publish -Psnapshot
+          ./gradlew :pytorch-native:assemble
+          ./gradlew publish -Psnapshot
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
