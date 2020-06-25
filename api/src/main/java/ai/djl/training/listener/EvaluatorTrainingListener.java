@@ -88,7 +88,6 @@ public class EvaluatorTrainingListener implements TrainingListener {
             }
 
             latestEvaluations.put("train_" + evaluator.getName(), trainValue);
-            validateValue = evaluator.getAccumulator(VALIDATE_EPOCH);
             latestEvaluations.put("validate_" + evaluator.getName(), validateValue);
 
             if (evaluator == trainer.getLoss()) {
