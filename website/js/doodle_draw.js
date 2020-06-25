@@ -89,7 +89,7 @@ function clearMe() {
 
 // only used when startup
 function startUp() {
-  const Url = "https://e9qux4vd12.execute-api.us-east-1.amazonaws.com/Doodle";
+  const Url = "https://d2f27q6792.execute-api.us-east-1.amazonaws.com/DJL-Doodle-prod";
   fetch(Url, {
     method: "POST",
     headers: {
@@ -101,7 +101,7 @@ function startUp() {
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 function runInference(e) {
-  const Url = "https://e9qux4vd12.execute-api.us-east-1.amazonaws.com/Doodle";
+  const Url = "https://d2f27q6792.execute-api.us-east-1.amazonaws.com/DJL-Doodle-prod";
   var destCanvas = getCroppedCanvas();
   fetch(Url, {
     method: "POST",
