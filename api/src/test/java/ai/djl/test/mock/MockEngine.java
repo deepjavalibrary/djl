@@ -58,6 +58,7 @@ public class MockEngine extends Engine {
         return new MockNDManager();
     }
 
+    /** {@inheritDoc} */
     @Override
     public GradientCollector newGradientCollector() {
         return null;

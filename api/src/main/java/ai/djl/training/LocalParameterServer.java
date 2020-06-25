@@ -79,5 +79,12 @@ public class LocalParameterServer implements ParameterServer {
 
     /** {@inheritDoc} */
     @Override
+    public void update(String parameterId, NDArray[] inputs, NDArray[] outputs, int priority) {
+        push(parameterId, inputs, priority);
+        pull(parameterId, outputs, priority);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void close() {}
 }

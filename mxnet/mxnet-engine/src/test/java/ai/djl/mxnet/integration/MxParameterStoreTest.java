@@ -39,9 +39,8 @@ public class MxParameterStoreTest {
             } else {
                 numDevices = 4;
             }
-            int numWeights = 2;
-            // TODO: this test is currently flaky with large numUpdates and large numWeights
-            int numUpdates = 10;
+            int numWeights = Boolean.getBoolean("nightly") ? 100 : 2;
+            int numUpdates = Boolean.getBoolean("nightly") ? 1000 : 10;
             NDArray[][] weights = new NDArray[numWeights][numDevices];
             NDArray[][] grads = new NDArray[numWeights][numDevices];
             NDArray[] expected = new NDArray[numWeights];

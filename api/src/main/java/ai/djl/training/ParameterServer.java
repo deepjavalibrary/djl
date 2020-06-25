@@ -48,6 +48,19 @@ public interface ParameterServer extends AutoCloseable {
      */
     void pull(String parameterId, NDArray[] weights, int priority);
 
+    /**
+     * Updates the value of a key from Parameter Server to NDArrays and pull.
+     *
+     * @param parameterId the key to pushPull
+     * @param inputs the values corresponding to the key, values in array will be summed when key is
+     *     updated
+     * @param outputs the NDArrays to store the value corresponding to the key, value will be copied
+     *     to the devices of the NDArrays
+     * @param priority the priority of the push operation. Higher priority push operations are
+     *     likely to be executed before other push actions
+     */
+    void update(String parameterId, NDArray[] inputs, NDArray[] outputs, int priority);
+
     /** {@inheritDoc} */
     @Override
     void close();

@@ -16,6 +16,9 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.GradientCollector;
+import ai.djl.training.LocalParameterServer;
+import ai.djl.training.ParameterServer;
+import ai.djl.training.optimizer.Optimizer;
 import java.util.Collection;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -180,6 +183,16 @@ public abstract class Engine {
      * @return a new instance of {@link GradientCollector}
      */
     public abstract GradientCollector newGradientCollector();
+
+    /**
+     * Returns a new instance of {@link ParameterServer}.
+     *
+     * @param optimizer the optimizer to update
+     * @return a new instance of {@link ParameterServer}
+     */
+    public ParameterServer newParameterServer(Optimizer optimizer) {
+        return new LocalParameterServer(optimizer);
+    }
 
     /**
      * Seeds the random number generator in DJL Engine.

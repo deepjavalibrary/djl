@@ -87,8 +87,8 @@ public class Trainer implements AutoCloseable {
         evaluators = new ArrayList<>(trainingConfig.getEvaluators());
         evaluators.add(loss); // track loss as an evaluator by default
 
-        // ParameterServer parameterServer = new MxParameterServer(trainingConfig.getOptimizer());
-        ParameterServer parameterServer = new LocalParameterServer(trainingConfig.getOptimizer());
+        ParameterServer parameterServer =
+                manager.getEngine().newParameterServer(trainingConfig.getOptimizer());
 
         parameterStore = new ParameterStore(manager, false);
         parameterStore.setParameterServer(parameterServer, devices);

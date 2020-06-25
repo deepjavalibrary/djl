@@ -26,6 +26,10 @@ import java.util.Arrays;
 /** {@code MxParameterServer} is the MXNet implementation of {@link ParameterServer}. */
 public class MxParameterServer extends NativeResource implements ParameterServer {
 
+    @SuppressWarnings("PMD.SingularField")
+    // use class field to hold the OptimizerCallback which prevent it from being gc.
+    private OptimizerCallback callback;
+
     /**
      * Constructs a new {@code MxParameterServer}.
      *
@@ -33,8 +37,8 @@ public class MxParameterServer extends NativeResource implements ParameterServer
      */
     public MxParameterServer(Optimizer optimizer) {
         super(createdKVStore());
-        JnaUtils.parameterStoreSetUpdater(
-                getHandle(), null, new OptimizerCallback(optimizer), null);
+        callback = new OptimizerCallback(optimizer);
+        JnaUtils.parameterStoreSetUpdater(getHandle(), null, callback, null);
     }
 
     /** {@inheritDoc} */
@@ -64,18 +68,9 @@ public class MxParameterServer extends NativeResource implements ParameterServer
         JnaUtils.parameterStorePull(getHandle(), weights.length, keys, vals, priority);
     }
 
-    /**
-     * Pushes the value of a key from Parameter Server to NDArrays and Pulls right away.
-     *
-     * @param parameterId the key to pull
-     * @param inputs the NDArrays to store the value corresponding to the key, value will be copied
-     *     to the devices of the NDArrays
-     * @param outputs the NDArrays to get the value corresponding to the key, value will be copied
-     *     to the devices of the NDArrays
-     * @param priority the priority of the push operation. Higher priority push operations are
-     *     likely to be executed before other push actions
-     */
-    public void pushPull(String parameterId, NDArray[] inputs, NDArray[] outputs, int priority) {
+    /** {@inheritDoc} */
+    @Override
+    public void update(String parameterId, NDArray[] inputs, NDArray[] outputs, int priority) {
         String[] gradKeys = new String[inputs.length];
         String[] weightKeys = new String[outputs.length];
         Arrays.fill(gradKeys, parameterId);

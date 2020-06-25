@@ -51,11 +51,13 @@ public final class MxDeviceType implements DeviceType {
     public static String fromDeviceType(int deviceType) {
         switch (deviceType) {
             case 1:
+            case 3:
+                // hide the CPU_PINNED to frontend user
+                // but the advance user can still create CPU_PINNED
+                // to pass through engine
                 return Device.Type.CPU;
             case 2:
                 return Device.Type.GPU;
-            case 3:
-                return "cpu_pinned";
             default:
                 throw new IllegalArgumentException("Unsupported deviceType: " + deviceType);
         }

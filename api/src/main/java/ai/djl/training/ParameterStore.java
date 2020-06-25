@@ -76,18 +76,8 @@ public class ParameterStore {
                                 .stream()
                                 .map(NDArray::getGradient)
                                 .toArray(NDArray[]::new);
-                parameterServer.push(parameterId, grads, -priority);
-                ++priority;
-            }
-        }
-
-        priority = 0;
-        for (Map.Entry<String, ParameterData> entry : parameterMap.entrySet()) {
-            String parameterId = entry.getKey();
-            ParameterData data = entry.getValue();
-            if (data.requireGradient()) {
                 NDArray[] values = data.toArray();
-                parameterServer.pull(parameterId, values, -priority);
+                parameterServer.update(parameterId, grads, values, -priority);
                 ++priority;
             }
         }
