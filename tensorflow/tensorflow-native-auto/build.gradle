@@ -1,3 +1,8 @@
+plugins {
+    id 'maven-publish'
+    id 'signing'
+}
+
 group "ai.djl.tensorflow"
 
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
@@ -112,6 +117,46 @@ jar {
         dir.mkdirs();
         def propFile = new File(dir, "tensorflow.properties")
         propFile.text = "placeholder=true\nversion=${project.version}\n"
+    }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+project.tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+
+signing {
+    required(project.hasProperty("staging") || project.hasProperty("snapshot"))
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications
+}
+
+publishing.repositories {
+    maven {
+        if (project.hasProperty("snapshot")) {
+            name = "snapshot"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+            credentials {
+                username = findProperty("ossrhUsername")
+                password = findProperty("ossrhPassword")
+            }
+        } else if (project.hasProperty("staging")) {
+            name = "staging"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = findProperty("ossrhUsername")
+                password = findProperty("ossrhPassword")
+            }
+        } else {
+            name = "local"
+            url = "build/repo"
+        }
     }
 }
 

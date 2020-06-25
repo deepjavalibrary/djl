@@ -1,0 +1,37 @@
+name: Tensorflow staging publish
+
+on:
+  # To trigger this workflow manually, you can use the following curl command:
+  # curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "tensorflow-staging-pub"}'
+
+  # Make sure you create your personal token with repo access. Follow steps in
+  # https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
+  # to create your personal token.
+  repository_dispatch:
+    types: [tensorflow-staging-pub]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      # Enable gradle cache: https://github.com/actions/cache/blob/master/examples.md#java---gradle
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Publish to staging repository
+        working-directory: tensorflow/tensorflow-native-auto
+        run: ./gradlew publish -Pstaging
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
+          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
+          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}

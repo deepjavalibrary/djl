@@ -10,7 +10,6 @@ configure([
         project(':tensorflow:tensorflow-api'),
         project(':tensorflow:tensorflow-engine'),
         project(':tensorflow:tensorflow-model-zoo'),
-        project(':tensorflow:tensorflow-native-auto'),
         project(':fasttext:fasttext-engine'),
         project(':onnxruntime:onnxruntime-api'),
         project(':onnxruntime:onnxruntime-engine'),
