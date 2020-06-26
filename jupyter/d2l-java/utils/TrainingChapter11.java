@@ -59,7 +59,7 @@ public class TrainingChapter11 {
     /**
      * Gets the airfoil dataset 
      */
-    public AirfoilRandomAccess getDataCh11(int batchSize, int n) 
+    public static AirfoilRandomAccess getDataCh11(int batchSize, int n)
             throws IOException, TranslateException {
         // Load data
         AirfoilRandomAccess airfoil =
