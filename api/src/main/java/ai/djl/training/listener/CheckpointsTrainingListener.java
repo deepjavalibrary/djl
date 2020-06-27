@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A {@link TrainingListener} that saves a model checkpoint after each epoch. */
-public class CheckpointsTrainingListener implements TrainingListener {
+public class CheckpointsTrainingListener extends TrainingListenerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(CheckpointsTrainingListener.class);
 
@@ -29,7 +29,6 @@ public class CheckpointsTrainingListener implements TrainingListener {
     private String overrideModelName;
     private Consumer<Trainer> onSaveModel;
     private int step;
-
     private int epoch;
 
     /**
@@ -82,18 +81,6 @@ public class CheckpointsTrainingListener implements TrainingListener {
             saveModel(trainer);
         }
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public void onTrainingBatch(Trainer trainer, BatchData batchData) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void onValidationBatch(Trainer trainer, BatchData batchData) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void onTrainingBegin(Trainer trainer) {}
 
     /** {@inheritDoc} */
     @Override

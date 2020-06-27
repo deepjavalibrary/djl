@@ -20,7 +20,7 @@ import ai.djl.training.Trainer;
  *
  * <p>Adds "epoch" metric with epoch times and saves "epoch" model property with numEpochs
  */
-public class EpochTrainingListener implements TrainingListener {
+public class EpochTrainingListener extends TrainingListenerAdapter {
 
     private long epochTime;
     private int numEpochs;
@@ -35,15 +35,6 @@ public class EpochTrainingListener implements TrainingListener {
         epochTime = System.nanoTime();
         numEpochs++;
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public void onTrainingBatch(Trainer trainer, BatchData batchData) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void onValidationBatch(Trainer trainer, BatchData batchData) {}
-
     /** {@inheritDoc} */
     @Override
     public void onTrainingBegin(Trainer trainer) {

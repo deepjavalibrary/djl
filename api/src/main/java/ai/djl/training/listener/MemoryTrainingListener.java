@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * <p>If an outputDir is provided, the file "$outputDir/memory.log" will be created after training
  * with the memory usage results.
  */
-public class MemoryTrainingListener implements TrainingListener {
+public class MemoryTrainingListener extends TrainingListenerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(MemoryTrainingListener.class);
 
@@ -61,10 +61,6 @@ public class MemoryTrainingListener implements TrainingListener {
 
     /** {@inheritDoc} */
     @Override
-    public void onEpoch(Trainer trainer) {}
-
-    /** {@inheritDoc} */
-    @Override
     public void onTrainingBatch(Trainer trainer, BatchData batchData) {
         Metrics metrics = trainer.getMetrics();
         collectMemoryInfo(metrics);
@@ -76,10 +72,6 @@ public class MemoryTrainingListener implements TrainingListener {
         Metrics metrics = trainer.getMetrics();
         collectMemoryInfo(metrics);
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public void onTrainingBegin(Trainer trainer) {}
 
     /** {@inheritDoc} */
     @Override

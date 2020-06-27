@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@link EvaluatorTrainingListener#metricName(Evaluator, String)}. The validation evaluators are
  * also saved as model properties with the evaluator name.
  */
-public class EvaluatorTrainingListener implements TrainingListener {
+public class EvaluatorTrainingListener extends TrainingListenerAdapter {
 
     public static final String TRAIN_EPOCH = "train/epoch";
     public static final String TRAIN_PROGRESS = "train/progress";
@@ -160,10 +160,6 @@ public class EvaluatorTrainingListener implements TrainingListener {
             evaluator.addAccumulator(VALIDATE_EPOCH);
         }
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public void onTrainingEnd(Trainer trainer) {}
 
     /**
      * Returns the metric created with the evaluator for the given stage.
