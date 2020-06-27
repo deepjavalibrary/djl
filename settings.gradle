@@ -22,5 +22,3 @@ include ':onnxruntime:onnxruntime-native'
 include ':testing'
 include ':3rdparty:aws-ai'
 include ':3rdparty:hadoop'
-
-project(":examples").buildFileName = "djl.gradle"

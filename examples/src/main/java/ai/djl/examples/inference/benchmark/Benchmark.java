@@ -21,10 +21,15 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import java.util.Arrays;
 
 public final class Benchmark extends AbstractBenchmark {
 
     public static void main(String[] args) {
+        if (Arrays.asList(args).contains("-t")) {
+            MultithreadedBenchmark.main(args);
+            return;
+        }
         if (new Benchmark().runBenchmark(args)) {
             System.exit(0); // NOPMD
         }

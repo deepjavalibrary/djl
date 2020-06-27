@@ -1,34 +1,49 @@
 plugins {
-    id "java"
     id 'application'
 }
 
 repositories {
-    jcenter()
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots/"
     }
 }
 
-def DJL_VERSION = "0.7.0-SNAPSHOT"
-
 dependencies {
-    implementation "commons-cli:commons-cli:1.4"
-    implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
-    implementation "ai.djl:basicdataset:${DJL_VERSION}"
-    implementation "ai.djl:model-zoo:${DJL_VERSION}"
-    implementation "ai.djl.mxnet:mxnet-model-zoo:${DJL_VERSION}"
+    implementation "commons-cli:commons-cli:${commons_cli_version}"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
+    implementation project(":basicdataset")
+    implementation project(":model-zoo")
 
-    // See https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
-    runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.7.0-a"
+    if (System.getProperty("ai.djl.default_engine") == "PyTorch") {
+        runtimeOnly project(":pytorch:pytorch-model-zoo")
+        runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
+    } else if (System.getProperty("ai.djl.default_engine") == "TensorFlow") {
+        runtimeOnly project(":tensorflow:tensorflow-model-zoo")
+        runtimeOnly project(":tensorflow:tensorflow-native-auto")
+    } else {
+        runtimeOnly project(":mxnet:mxnet-model-zoo")
+        runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
+    }
 
-    testImplementation 'org.testng:testng:6.14.3'
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
 }
 
-test {
-    maxHeapSize = "1024m"
-
-    useTestNG()
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom.withXml {
+                // remove mxnet-native-XXX from pom file.
+                Node pomNode = asNode()
+                pomNode.dependencies.'*'.findAll() {
+                    it.artifactId.text().startsWith("mxnet-native-")
+                }.each() {
+                    it.parent().remove(it)
+                }
+            }
+        }
+    }
 }
 
 application {
@@ -36,9 +51,28 @@ application {
 }
 
 run {
+    environment("TF_CPP_MIN_LOG_LEVEL", "1") // turn off TensorFlow print out
     systemProperties System.getProperties()
     systemProperties.remove("user.dir")
     systemProperty("file.encoding", "UTF-8")
 }
 
+task listmodels(type: JavaExec) {
+    systemProperties System.getProperties()
+    systemProperties.remove("user.dir")
+    systemProperty("file.encoding", "UTF-8")
+    classpath = sourceSets.main.runtimeClasspath
+    main = "ai.djl.examples.inference.ListModels"
+}
+
+task benchmark(type: JavaExec) {
+    environment("TF_CPP_MIN_LOG_LEVEL", "1") // turn off TensorFlow print out
+    environment("MXNET_ENGINE_TYPE", "NaiveEngine")
+    environment("OMP_NUM_THREADS", "1")
+    systemProperties System.getProperties()
+    systemProperties.remove("user.dir")
+    systemProperty("file.encoding", "UTF-8")
+    classpath = sourceSets.main.runtimeClasspath
+    main = "ai.djl.examples.inference.benchmark.Benchmark"
+}
 tasks.distTar.enabled = false
