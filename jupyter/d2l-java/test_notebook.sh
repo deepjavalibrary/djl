@@ -7,7 +7,7 @@ set -e
 
 function run_test {
     base=$(basename $1)
-    jupyter nbconvert --to html --execute --output $base $1
+    jupyter nbconvert --to html --execute --ExecutePreprocessor.timeout=600 --output $base $1
     mv "${1}.html" test_output/
 }
 
@@ -21,3 +21,5 @@ if [[ $# -eq 0 ]]; then
 else
     run_test $1
 fi
+
+
