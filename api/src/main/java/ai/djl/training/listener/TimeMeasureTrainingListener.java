@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * <p>The training time data is placed in the file "$outputDir/training.log" and the validation data
  * is placed in "$outputDir/validate.log".
  */
-public class TimeMeasureTrainingListener implements TrainingListener {
+public class TimeMeasureTrainingListener extends TrainingListenerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(TimeMeasureTrainingListener.class);
 
@@ -74,10 +74,6 @@ public class TimeMeasureTrainingListener implements TrainingListener {
         }
         validateBatchBeginTime = System.nanoTime();
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public void onTrainingBegin(Trainer trainer) {}
 
     /** {@inheritDoc} */
     @Override

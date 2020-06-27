@@ -17,11 +17,7 @@ import ai.djl.training.Trainer;
 import ai.djl.training.loss.Loss;
 
 /** {@link TrainingListener} that gives early warning if your training has failed by divergence. */
-public class DivergenceCheckTrainingListener implements TrainingListener {
-
-    /** {@inheritDoc} */
-    @Override
-    public void onEpoch(Trainer trainer) {}
+public class DivergenceCheckTrainingListener extends TrainingListenerAdapter {
 
     /** {@inheritDoc} */
     @Override
@@ -33,16 +29,4 @@ public class DivergenceCheckTrainingListener implements TrainingListener {
                             + "add clipGradient option to your optimizer, check input data and loss calculation.");
         }
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public void onValidationBatch(Trainer trainer, BatchData batchData) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void onTrainingBegin(Trainer trainer) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void onTrainingEnd(Trainer trainer) {}
 }
