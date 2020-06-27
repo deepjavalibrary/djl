@@ -1534,8 +1534,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
         }
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
-            // TODO: remove after fixing multi-thread data loading issue
-            // JnaUtils.waitToRead(pointer);
+            JnaUtils.waitToRead(pointer);
             JnaUtils.freeNdArray(pointer);
             manager.detach(getUid());
             manager = null;
