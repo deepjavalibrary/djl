@@ -24,7 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -128,7 +127,7 @@ public abstract class AbstractRepository implements Repository {
             for (Artifact.Item item : files.values()) {
                 download(tmp, baseUri, item, progress);
             }
-            Files.move(tmp, resourceDir, StandardCopyOption.ATOMIC_MOVE);
+            Utils.moveQuietly(tmp, resourceDir);
         } finally {
             Utils.deleteQuietly(tmp);
             if (progress != null) {
