@@ -91,16 +91,20 @@ public class RemoteRepository extends AbstractRepository {
             }
         }
 
+        Path tmp = Files.createTempFile(cacheDir, "metadata", ".tmp");
         try (InputStream is = file.toURL().openStream()) {
             String json = Utils.toString(is);
             Metadata metadata = GSON.fromJson(json, Metadata.class);
             metadata.init();
             metadata.setLastUpdated(new Date());
-            try (Writer writer = Files.newBufferedWriter(cacheFile)) {
+            try (Writer writer = Files.newBufferedWriter(tmp)) {
                 writer.write(GSON.toJson(metadata));
             }
+            Utils.moveQuietly(tmp, cacheFile);
             metadata.setRepositoryUri(mrlUri);
             return metadata;
+        } finally {
+            Utils.deleteQuietly(tmp);
         }
     }
 
