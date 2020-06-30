@@ -7,11 +7,11 @@ set -e
 
 function run_test {
     base=$(basename $1)
+    dir=$(dirname $1)
     jupyter nbconvert --to html --execute --ExecutePreprocessor.timeout=600 --output $base $1
-    mv "${1}.html" test_output/
+    mkdir -p test_output/$dir
+    mv "${1}.html" test_output/$dir/
 }
-
-mkdir test_output
 
 if [[ $# -eq 0 ]]; then
     for f in **/*.ipynb
@@ -19,7 +19,16 @@ if [[ $# -eq 0 ]]; then
         run_test "$f"
     done
 else
-    run_test $1
+	for file in "$@"
+	do
+	    if [[ "$file" == *ipynb ]]; then
+            full_path=$(find . -name "$file")
+	 	    run_test "$full_path"
+	 	else
+            for f in ${file}/*.ipynb
+            do
+                run_test "$f"
+            done
+        fi
+   done
 fi
-
-

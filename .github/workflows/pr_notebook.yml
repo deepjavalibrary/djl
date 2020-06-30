@@ -11,6 +11,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        group: ["CH1_CH4_DROPOUT", "CH4_MID", "CH4_REST", "REST"]
+    env:
+      CH1_CH4_DROPOUT: "chapter_installation chapter_introduction chapter_preface chapter_preliminaries chapter_notation dropout.ipynb"
+      CH4_MID: "underfit-overfit.ipynb mlp-djl.ipynb"
+      CH4_REST: "mlp-scratch.ipynb backprop.ipynb environment.ipynb mlp.ipynb numerical-stability-and-init.ipynb weight-decay.ipynb"
+      REST: "chapter_convolutional-neural-networks chapter_linear-networks chapter_optimization utils"
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK 11
@@ -31,7 +39,7 @@ jobs:
       - name: test Notebook
         run: |
           cd jupyter/d2l-java
-          bash test_notebook.sh
+          bash test_notebook.sh $${{ matrix.group }}
       - name: generated Notebook in html
         uses: actions/upload-artifact@v1
         if: always()
