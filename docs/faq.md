@@ -12,7 +12,7 @@
 
 ##### 2. Which DL engines can I run with DJL?
 While DJL is designed to be engine-agnostic and to run with the any engine, we currently
-support the following frameworks:
+support the following engines:
 - Apache MXNet
 - PyTorch (Currently only support inference)
 - TensorFlow (Experimental - inference only)

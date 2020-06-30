@@ -12,7 +12,7 @@
  */
 
 /**
- * Contains top level, framework-agnostic classes for both inference and training.
+ * Contains top level, engine-agnostic classes for both inference and training.
  *
  * @see ai.djl.Model
  * @see ai.djl.Device

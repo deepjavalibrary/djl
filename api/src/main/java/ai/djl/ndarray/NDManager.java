@@ -35,9 +35,9 @@ import java.nio.file.Path;
 /**
  * NDArray managers are used to create <I>NDArrays</I> (n-dimensional array on native engine).
  *
- * <p>NDManager is implemented in each deep learning framework {@link Engine}. {@link NDArray}s are
- * resources that are allocated in each deep learning framework's native memory space. NDManager is
- * the key class that manages these native resources.
+ * <p>NDManager is implemented in each deep learning {@link Engine}. {@link NDArray}s are resources
+ * that are allocated in each deep learning engine's native memory space. NDManager is the key class
+ * that manages these native resources.
  *
  * <p>NDArray can only be created through NDManager. By default, NDArray's lifecycle is attached to
  * the creator NDManager. NDManager itself implements {@link AutoCloseable}. When NDManager is
@@ -64,7 +64,7 @@ import java.nio.file.Path;
  * <p>NDManager has a hierarchical structure; it has a single parent NDManager and has child
  * NDManagers. When the parent NDManager is closed, all children will be closed as well.
  *
- * <p>The DJL framework manages NDManager's lifecycle by default. You only need to manage the user
+ * <p>The DJL engine manages NDManager's lifecycle by default. You only need to manage the user
  * created child NDManager. The child NDManager becomes useful when you create a large number of
  * temporary NDArrays and want to free the resources earlier than the parent NDManager's lifecycle.
  *

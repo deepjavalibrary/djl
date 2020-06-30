@@ -4,7 +4,7 @@
 
 This module contains the core API of the Deep Java Library (DJL) project. It includes the following packages:
 
-- engine - Contains classes to load a deep learning framework
+- engine - Contains classes to load a deep learning engine
 - inference - Contains classes to implement inference tasks
 - metric - Contains classes to collect metrics information
 - modality - Contains utility classes for each of the predefined modalities

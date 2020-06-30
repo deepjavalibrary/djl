@@ -179,7 +179,7 @@ public final class Device {
     }
 
     /**
-     * Returns the number of GPUs available with specified framework.
+     * Returns the number of GPUs available with specified engine.
      *
      * @param engineName the name of engine to retrieve
      * @return the number of GPUs available in the system
@@ -194,7 +194,7 @@ public final class Device {
     /**
      * Returns the default context used in Engine.
      *
-     * <p>The default type is defined by whether the Deep Learning framework is recognizing GPUs
+     * <p>The default type is defined by whether the Deep Learning engine is recognizing GPUs
      * available on your machine. If there is no GPU available, CPU will be used.
      *
      * @return a {@link Device}

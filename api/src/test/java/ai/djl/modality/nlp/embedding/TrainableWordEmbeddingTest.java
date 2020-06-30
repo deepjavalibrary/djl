@@ -19,7 +19,7 @@ import org.testng.annotations.Test;
 
 public class TrainableWordEmbeddingTest {
     private static final String TEST_STRING =
-            "Deep Java Library (DJL) is an open-source, high-level, framework-agnostic Java API for deep learning. DJL is designed to be easy to get started with and simple to\n"
+            "Deep Java Library (DJL) is an open-source, high-level, engine-agnostic Java framework for deep learning. DJL is designed to be easy to get started with and simple to\n"
                     + "use for Java developers. DJL provides a native Java development experience and functions like any other regular Java library.\n";
     private static final String UNKNOWN_TOKEN = "UNKNOWN_TOKEN";
 

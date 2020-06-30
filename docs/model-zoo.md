@@ -12,7 +12,7 @@ allows the user to run inference with a plain java object.
 
 ## [DJL model zoo](../model-zoo/README.md)
 
-We provide framework agnostic `ZooModel`s in our model zoo. They can be used on any DJL backend engine.
+We provide engine agnostic `ZooModel`s in our model zoo. They can be used on any DJL backend engine.
 
 ## [MXNet symbolic model zoo](../mxnet/mxnet-model-zoo/README.md)
 

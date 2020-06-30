@@ -7,15 +7,15 @@
 
 ## Overview
 
-Deep Java Library (DJL) is an open-source, high-level, framework-agnostic Java API for deep learning. DJL is designed to be easy to get started with and simple to
+Deep Java Library (DJL) is an open-source, high-level, engine-agnostic Java framework for deep learning. DJL is designed to be easy to get started with and simple to
 use for Java developers. DJL provides a native Java development experience and functions like any other regular Java library.
 
 You don't have to be machine learning/deep learning expert to get started. You can use your existing Java expertise as an on-ramp to learn and use machine learning and deep learning. You can
 use your favorite IDE to build, train, and deploy your models. DJL makes it easy to integrate these models with your
 Java applications.
 
-Because DJL is deep learning framework agnostic, you don't have to make a choice
-between frameworks when creating your projects. You can switch frameworks at any
+Because DJL is deep learning engine agnostic, you don't have to make a choice
+between engines when creating your projects. You can switch engines at any
 point. To ensure the best performance, DJL also provides automatic CPU/GPU choice based on hardware configuration.
 
 DJL's ergonomic API interface is designed to guide you with best practices to accomplish

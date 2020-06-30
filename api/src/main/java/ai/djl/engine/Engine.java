@@ -29,9 +29,9 @@ import org.slf4j.LoggerFactory;
 /**
  * The {@code Engine} interface is the base of the provided implementation for DJL.
  *
- * <p>Any framework-specific functionality should be provided through this class. In general, it
- * should contain methods to detect information about the usable machine hardware and to create a
- * new {@link NDManager} and {@link Model}.
+ * <p>Any engine-specific functionality should be provided through this class. In general, it should
+ * contain methods to detect information about the usable machine hardware and to create a new
+ * {@link NDManager} and {@link Model}.
  *
  * @see EngineProvider
  */
@@ -137,9 +137,9 @@ public abstract class Engine {
     }
 
     /**
-     * Returns the version of the deep learning framework.
+     * Returns the version of the deep learning engine.
      *
-     * @return the version number of the deep learning framework
+     * @return the version number of the deep learning engine
      */
     public abstract String getVersion();
 

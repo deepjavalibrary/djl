@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Deep Java Library (DJL) model zoo contains framework-agnostic models. All the models have a built-in Translator and
+The Deep Java Library (DJL) model zoo contains engine-agnostic models. All the models have a built-in Translator and
 can be used for inference out of the box.
 
 ## Documentation
