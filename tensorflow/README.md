@@ -1,5 +1,8 @@
 # DJL TensorFlow Engine
 
+This directory contains the "TensorFlow" Engine implementation.
+It is based off the [Tensorflow Deep Learning Framework](https://www.tensorflow.org/).
+
 The DJL TensorFlow Engine allows you to run prediction with TensorFlow or Keras models using Java.
 It has the following 4 modules:
 

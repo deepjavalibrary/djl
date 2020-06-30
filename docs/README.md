@@ -2,35 +2,14 @@
 
 This folder contains examples and documentation for the Deep Java Library (DJL) project.
 
-## Modules
-
-- [Core API](../api/README.md) - Engine-agnostic API
-- [Basic Dataset](../basicdataset/README.md) - Built-in datasets
-- [Model Zoo](../model-zoo/README.md) - Built-in engine-agnostic model zoo
-
-#### MXNet
-- [MXNet Engine](../mxnet/mxnet-engine/README.md) - MXNet Engine implementation
-- [MXNet Model Zoo](../mxnet/mxnet-model-zoo/README.md) - MXNet symbolic model zoo
-- [MXNet Gluon Importing](mxnet/how_to_convert_your_model_to_symbol.md) - MXNet Gluon Importing
-
-#### PyTorch
-- [PyTorch Engine](../pytorch/pytorch-engine/README.md) - PyTorch Engine implementation
-- [PyTorch Model Zoo](../pytorch/pytorch-model-zoo/README.md) - PyTorch TorchScript model zoo
-- [PyTorch Importing](pytorch/how_to_convert_your_model_to_torchscript.md) - Import TorchScript model
-- [Pytorch Inference Optimization](pytorch/how_to_optimize_inference_performance.md) - Improve inference performance
-
-
-#### TensorFlow
-- [TensorFlow Engine](../tensorflow/tensorflow-engine/README.md) - TensorFlow Engine implementation
-- [TensorFlow Model Zoo](../tensorflow/tensorflow-model-zoo/README.md) - TensorFlow SavedModel model zoo
-- [Keras Imporint](tensorflow/how_to_import_keras_models_in_DJL.md)
-- [Tensorflow Local Importing](tensorflow/how_to_import_local_tensorflow_models.md)
-
-
-#### ONNX Runtime
-- [Hybrid Engine Operations](onnxruntime/hybrid_engine.md) - Using a second Engine for supplemental API support
-
 ## [JavaDoc API Reference](https://javadoc.djl.ai/)
+
+## Cheat sheet
+
+- [How to load a model](load_model.md)
+- [How to collect metrics](how_to_collect_metrics.md)
+- [How to use a dataset](development/how_to_use_dataset.md)
+- [Memory Management](development/memory_management.md)
 
 ## [Jupyter notebook tutorials](../jupyter)
 
@@ -54,13 +33,27 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - [Pose estimation example](../examples/docs/pose_estimation.md)
 - [Action recognition example](../examples/docs/action_recognition.md)
 
-## Cheat sheet
+## Engine Documentation
 
-- [How to load a model](load_model.md)
-- [How to collect metrics](how_to_collect_metrics.md)
-- [How to use a dataset](development/how_to_use_dataset.md)
+### [MXNet](../mxnet/README.md)
 
-## [Memory Management](development/memory_management.md)
+- [MXNet Gluon Importing](mxnet/how_to_convert_your_model_to_symbol.md) - MXNet Gluon Importing
+
+### [PyTorch](../pytorch/README.md)
+
+- [PyTorch Importing](pytorch/how_to_convert_your_model_to_torchscript.md) - Import TorchScript model
+- [Pytorch Inference Optimization](pytorch/how_to_optimize_inference_performance.md) - Improve inference performance
+
+
+### [TensorFlow](../tensorflow/README.md)
+
+- [Keras Imporint](tensorflow/how_to_import_keras_models_in_DJL.md)
+- [Tensorflow Local Importing](tensorflow/how_to_import_local_tensorflow_models.md)
+
+### [ONNX Runtime](../onnxruntime/README.md)
+
+- [Hybrid Engine Operations](onnxruntime/hybrid_engine.md) - Using a second Engine for supplemental API support
+
 
 ## [Contributor Documentation](development/README.md)
 
