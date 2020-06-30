@@ -1,0 +1,28 @@
+{
+  "metadataVersion": "0.1",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "ames",
+  "type": "tabular",
+  "name": "AMES",
+  "description": "AMES",
+  "website": "https://www.kaggle.com/c/house-prices-advanced-regression-techniques",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "1.0",
+      "snapshot": false,
+      "files": {
+        "data": {
+          "uri": "1.0/house-prices-advanced-regression-techniques.zip",
+          "sha1Hash": "bf6e77480b86b89d755be4daff129ad11da76354",
+          "size": 203809
+        }
+      }
+    }
+  ]
+}
