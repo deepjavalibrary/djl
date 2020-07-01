@@ -264,12 +264,7 @@ public interface NDArrayEx {
 
     NDList prelu(NDList inputs, PairList<String, Object> additional);
 
-    NDList dropout(
-            NDList inputs,
-            float probability,
-            int[] sharedAxes,
-            boolean training,
-            PairList<String, Object> additional);
+    NDList dropout(NDArray input, float rate, boolean training);
 
     NDList batchNorm(
             NDArray input,

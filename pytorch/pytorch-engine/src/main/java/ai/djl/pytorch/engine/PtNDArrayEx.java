@@ -365,18 +365,8 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDList dropout(
-            NDList inputs,
-            float probability,
-            int[] sharedAxes,
-            boolean training,
-            PairList<String, Object> additional) {
-        if (sharedAxes.length != 0) {
-            throw new UnsupportedOperationException("sharedAxes not supported");
-        }
-        // FIXME: Hardcode training to false to workaround unexpected behavior in PyTorch
-        return new NDList(
-                JniUtils.dropout((PtNDArray) inputs.singletonOrThrow(), probability, false));
+    public NDList dropout(NDArray input, float rate, boolean training) {
+        return new NDList(JniUtils.dropout((PtNDArray) input, rate, training));
     }
 
     /** {@inheritDoc} */

@@ -122,7 +122,7 @@ public final class SqueezeNet {
                 .add(fire(64, 256, 256))
                 .add(fire(64, 256, 256))
                 // Classifier
-                .add(Dropout.builder().optProbability(0.5f).build())
+                .add(Dropout.builder().optRate(0.5f).build())
                 .add(Conv2D.builder().setFilters(outSize).setKernelSize(new Shape(1, 1)).build())
                 .add(Activation::relu)
                 .add(Pool.globalAvgPool2DBlock())

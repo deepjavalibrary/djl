@@ -197,25 +197,29 @@ public class BlockCoreTest {
         }
     }
 
+    @SuppressWarnings("try")
     @Test
     public void testDropout() throws IOException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
-        Block block = Dropout.builder().optProbability(.5f).build();
+        Block block = Dropout.builder().optRate(.5f).build();
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                Shape inputShape = new Shape(2, 2);
-                trainer.initialize(inputShape);
+                // the unused GradientCollector is for Dropout to know it is on training mode
+                try (GradientCollector collector = trainer.newGradientCollector()) {
+                    Shape inputShape = new Shape(2, 2);
+                    trainer.initialize(inputShape);
 
-                NDManager manager = trainer.getManager();
-                NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
-                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
-                Assert.assertTrue(result.lte(result).all().getBoolean());
+                    NDManager manager = trainer.getManager();
+                    NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
+                    NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                    Assert.assertTrue(result.lte(result).all().getBoolean());
 
-                testEncode(manager, block);
+                    testEncode(manager, block);
+                }
             }
         }
     }

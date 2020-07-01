@@ -332,12 +332,7 @@ public class TfNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDList dropout(
-            NDList inputs,
-            float probability,
-            int[] sharedAxes,
-            boolean training,
-            PairList<String, Object> additional) {
+    public NDList dropout(NDArray input, float rate, boolean training) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

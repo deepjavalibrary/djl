@@ -13,6 +13,7 @@
 package ai.djl.nn.norm;
 
 import ai.djl.MalformedModelException;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
@@ -53,13 +54,11 @@ public class Dropout extends AbstractBlock {
 
     private static final byte VERSION = 2;
 
-    private float probability;
-    private int[] sharedAxes;
+    private float rate;
 
     Dropout(Builder builder) {
         super(VERSION);
-        probability = builder.probability;
-        sharedAxes = builder.sharedAxes;
+        rate = builder.rate;
     }
 
     /** {@inheritDoc} */
@@ -69,8 +68,7 @@ public class Dropout extends AbstractBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        NDArrayEx ex = inputs.singletonOrThrow().getNDArrayInternal();
-        return ex.dropout(inputs, probability, sharedAxes, training, params);
+        return dropout(inputs.singletonOrThrow(), rate, training);
     }
 
     /** {@inheritDoc} */
@@ -91,6 +89,42 @@ public class Dropout extends AbstractBlock {
     }
 
     /**
+     * Applies Dropout to the input.
+     *
+     * @param input input to apply dropout
+     * @return output
+     */
+    public static NDList dropout(NDArray input) {
+        NDArrayEx ex = input.getNDArrayInternal();
+        return ex.dropout(input, 0.5f, true);
+    }
+
+    /**
+     * Applies Dropout to the input.
+     *
+     * @param input input to apply dropout
+     * @param rate Fraction of the input units to drop
+     * @return output
+     */
+    public static NDList dropout(NDArray input, float rate) {
+        NDArrayEx ex = input.getNDArrayInternal();
+        return ex.dropout(input, rate, true);
+    }
+
+    /**
+     * Applies Dropout to the input.
+     *
+     * @param input input to apply dropout
+     * @param rate Fraction of the input units to drop
+     * @param training apply dropout if true
+     * @return output
+     */
+    public static NDList dropout(NDArray input, float rate, boolean training) {
+        NDArrayEx ex = input.getNDArrayInternal();
+        return ex.dropout(input, rate, training);
+    }
+
+    /**
      * Creates a builder to build a {@link Dropout}.
      *
      * @return a new builder
@@ -102,8 +136,7 @@ public class Dropout extends AbstractBlock {
     /** The Builder to construct a {@link Dropout} type of {@link ai.djl.nn.Block}. */
     public static final class Builder {
 
-        private float probability = 0.5f;
-        private int[] sharedAxes = {};
+        private float rate = 0.5f;
 
         Builder() {}
 
@@ -111,22 +144,11 @@ public class Dropout extends AbstractBlock {
          * Sets the probability or the fraction of the input that gets dropped out during training
          * time. Defaults to 0.5.
          *
-         * @param probability fraction of the input that gets dropped out during training
+         * @param rate fraction of the input that gets dropped out during training
          * @return this Builder
          */
-        public Builder optProbability(float probability) {
-            this.probability = probability;
-            return this;
-        }
-
-        /**
-         * Sets the axes for variational dropout kernel.
-         *
-         * @param sharedAxes the axes for variational dropout kernel
-         * @return this Builder
-         */
-        public Builder optSharedAxes(int[] sharedAxes) {
-            this.sharedAxes = sharedAxes;
+        public Builder optRate(float rate) {
+            this.rate = rate;
             return this;
         }
 

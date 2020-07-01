@@ -892,9 +892,9 @@ public final class JniUtils {
                                 eps));
     }
 
-    public static PtNDArray dropout(PtNDArray ndArray, double prob, boolean isTraining) {
+    public static PtNDArray dropout(PtNDArray ndArray, double prob, boolean training) {
         return ndArray.getManager()
-                .create(PyTorchLibrary.LIB.torchNNDropout(ndArray.getHandle(), prob, isTraining));
+                .create(PyTorchLibrary.LIB.torchNNDropout(ndArray.getHandle(), prob, training));
     }
 
     public static PtNDArray avgPool(

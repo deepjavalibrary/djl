@@ -99,9 +99,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
         this.attentionProbsDropout =
                 addChildBlock(
                         "probabilityDropout",
-                        Dropout.builder()
-                                .optProbability(builder.attentionProbsDropoutProb)
-                                .build());
+                        Dropout.builder().optRate(builder.attentionProbsDropoutProb).build());
     }
 
     /**

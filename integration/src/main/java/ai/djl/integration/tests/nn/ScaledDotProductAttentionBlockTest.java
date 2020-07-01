@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.nn;
 
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -19,6 +20,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.transformer.ScaledDotProductAttentionBlock;
+import ai.djl.training.GradientCollector;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.initializer.NormalInitializer;
@@ -700,6 +702,7 @@ public class ScaledDotProductAttentionBlockTest {
         0.2931098725215753
     };
 
+    @SuppressWarnings("try")
     @Test
     public void testMaskedAttention() {
         // The following test runs one forward pass of the block using hardcoded initializations.
@@ -756,13 +759,20 @@ public class ScaledDotProductAttentionBlockTest {
         block.getResultProjection().setInitializer(resultKernelInitializer, "weight");
         block.initialize(manager, DataType.FLOAT32, fromShape, toShape, fromShape);
         ParameterStore ps = new ParameterStore(manager, false);
-        NDArray result =
-                block.forward(
-                                ps,
-                                new NDList(
-                                        keySequence, querySequence, valueSequence, attentionMask),
-                                true)
-                        .head();
+        NDArray result;
+        // the unused GradientCollector is for Dropout to know it is on training mode
+        try (GradientCollector collector = Engine.getInstance().newGradientCollector()) {
+            result =
+                    block.forward(
+                                    ps,
+                                    new NDList(
+                                            keySequence,
+                                            querySequence,
+                                            valueSequence,
+                                            attentionMask),
+                                    true)
+                            .head();
+        }
         boolean allClose = NDArrays.allClose(result, expectedResult, 1e-04, 1e-07, true);
         Assert.assertTrue(allClose);
     }

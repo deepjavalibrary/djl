@@ -531,18 +531,16 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDList dropout(
-            NDList inputs,
-            float probability,
-            int[] sharedAxes,
-            boolean training,
-            PairList<String, Object> additional) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("p", probability);
-        params.addTupleParam("axes", sharedAxes);
-        params.addAll(additional);
+    public NDList dropout(NDArray input, float rate, boolean training) {
+        if (training != JnaUtils.autogradIsTraining()) {
+            throw new IllegalArgumentException(
+                    "the mode of dropout in MXNet should align with the mode of GradientCollector");
+        }
 
-        return getManager().invoke("Dropout", inputs, params);
+        MxOpParams params = new MxOpParams();
+        params.addParam("p", rate);
+
+        return getManager().invoke("_npx_dropout", new NDList(input), params);
     }
 
     /** {@inheritDoc} */
