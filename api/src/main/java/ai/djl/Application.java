@@ -57,4 +57,9 @@ public class Application {
         Application MACHINE_TRANSLATION = new Application("nlp/machine_translation");
         Application MULTIPLE_CHOICE = new Application("nlp/multiple_choice");
     }
+
+    /** The common set of applications for tabular data. */
+    public interface Tabular {
+        Application LINEAR_REGRESSION = new Application("tabular/linear_regression");
+    }
 }
