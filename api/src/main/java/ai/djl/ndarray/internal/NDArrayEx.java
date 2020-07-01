@@ -158,9 +158,9 @@ public interface NDArrayEx {
 
     NDArray tanh();
 
-    NDArray softrelu();
+    NDArray softPlus();
 
-    NDArray softsign();
+    NDArray softSign();
 
     NDArray leakyRelu(float alpha);
 
@@ -262,7 +262,7 @@ public interface NDArrayEx {
             DataType dataType,
             PairList<String, Object> additional);
 
-    NDList prelu(NDList inputs, PairList<String, Object> additional);
+    NDList prelu(NDArray input, NDArray alpha);
 
     NDList dropout(NDArray input, float rate, boolean training);
 

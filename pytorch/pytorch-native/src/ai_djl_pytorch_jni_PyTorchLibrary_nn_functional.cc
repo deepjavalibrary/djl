@@ -117,3 +117,66 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNDropout(
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRelu(
+  JNIEnv* env, jobject jthis, jobject jinput) {
+  API_BEGIN();
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+  const auto* result_ptr = new torch::Tensor(torch::nn::functional::relu(*tensor_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNSoftPlus(
+  JNIEnv* env, jobject jthis, jobject jinput) {
+  API_BEGIN();
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+  const auto* result_ptr = new torch::Tensor(torch::nn::functional::softplus(*tensor_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNSoftSign(
+  JNIEnv* env, jobject jthis, jobject jinput) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+    const auto* result_ptr = new torch::Tensor(torch::nn::functional::softsign(*tensor_ptr));
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLeakyRelu(
+  JNIEnv* env, jobject jthis, jobject jinput, jdouble jnegative_slope) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+    const auto* result_ptr = new torch::Tensor(torch::nn::functional::leaky_relu(*tensor_ptr, torch::nn::functional::LeakyReLUFuncOptions().negative_slope(jnegative_slope)));
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNElu(
+  JNIEnv* env, jobject jthis, jobject jinput, jdouble jalpha) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+    const auto* result_ptr = new torch::Tensor(torch::nn::functional::elu(*tensor_ptr, torch::nn::functional::ELUFuncOptions().alpha(jalpha)));
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNSelu(
+  JNIEnv* env, jobject jthis, jobject jinput) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+    const auto* result_ptr = new torch::Tensor(torch::nn::functional::selu(*tensor_ptr));
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNGelu(
+  JNIEnv* env, jobject jthis, jobject jinput) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+    const auto* result_ptr = new torch::Tensor(torch::nn::functional::gelu(*tensor_ptr));
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}

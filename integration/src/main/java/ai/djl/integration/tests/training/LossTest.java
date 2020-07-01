@@ -70,7 +70,7 @@ public class LossTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
-            Assert.assertEquals(
+            Assertions.assertAlmostEquals(
                     Loss.sigmoidBinaryCrossEntropyLoss()
                             .evaluate(new NDList(label), new NDList(pred))
                             .getFloat(),

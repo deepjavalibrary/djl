@@ -145,38 +145,38 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray softrelu() {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDArray softPlus() {
+        return JniUtils.softPlus(array);
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray softsign() {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDArray softSign() {
+        return JniUtils.softSign(array);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray leakyRelu(float alpha) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.leakyRelu(array, alpha);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray elu(float alpha) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.elu(array, alpha);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray selu() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.selu(array);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray gelu() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.gelu(array);
     }
 
     /** {@inheritDoc} */
@@ -359,7 +359,7 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDList prelu(NDList inputs, PairList<String, Object> additional) {
+    public NDList prelu(NDArray input, NDArray alpha) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

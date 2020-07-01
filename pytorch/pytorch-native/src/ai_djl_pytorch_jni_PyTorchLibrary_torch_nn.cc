@@ -16,15 +16,6 @@
 #include "djl_pytorch_jni_error.h"
 #include "djl_pytorch_jni_utils.h"
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRelu(
-    JNIEnv* env, jobject jthis, jobject jhandle) {
-  API_BEGIN();
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-  const auto* result_ptr = new torch::Tensor(tensor_ptr->relu());
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
-  API_END();
-}
-
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAvgPool(
   JNIEnv *env, jobject jthis, jobject jhandle, jint dim, jlongArray kernel, jlongArray stride, jlongArray pad, jboolean use_ceil, jboolean count_include_pad) {
   API_BEGIN();

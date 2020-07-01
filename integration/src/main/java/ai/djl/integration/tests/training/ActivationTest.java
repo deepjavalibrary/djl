@@ -88,13 +88,13 @@ public class ActivationTest {
     @Test
     public void testSoftrelu() {
         try (Model model = Model.newInstance("model")) {
-            model.setBlock(Activation.softreluBlock());
+            model.setBlock(Activation.softPlusBlock());
 
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.create(new float[] {0, 0, 2});
                 NDArray expected = manager.create(new float[] {.6931f, .6931f, 2.1269f});
-                Assertions.assertAlmostEquals(Activation.softrelu(data), expected);
+                Assertions.assertAlmostEquals(Activation.softPlus(data), expected);
 
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assertions.assertAlmostEquals(result, expected);

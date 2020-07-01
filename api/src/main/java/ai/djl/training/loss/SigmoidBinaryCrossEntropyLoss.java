@@ -67,7 +67,7 @@ public class SigmoidBinaryCrossEntropyLoss extends Loss {
             loss =
                     Activation.relu(pred)
                             .sub(pred.mul(lab))
-                            .add(Activation.softrelu(pred.abs().neg()));
+                            .add(Activation.softPlus(pred.abs().neg()));
         } else {
             double eps = 1e-12;
             loss =

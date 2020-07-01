@@ -156,13 +156,13 @@ public class TfNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softrelu() {
+    public NDArray softPlus() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softsign() {
+    public NDArray softSign() {
         return new TfNDArray(manager, tf.nn.softsign(array.asOperand()));
     }
 
@@ -326,7 +326,7 @@ public class TfNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDList prelu(NDList inputs, PairList<String, Object> additional) {
+    public NDList prelu(NDArray input, NDArray alpha) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

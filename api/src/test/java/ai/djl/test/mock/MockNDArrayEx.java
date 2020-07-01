@@ -134,13 +134,13 @@ public class MockNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softrelu() {
+    public NDArray softPlus() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softsign() {
+    public NDArray softSign() {
         return null;
     }
 
@@ -298,7 +298,7 @@ public class MockNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDList prelu(NDList inputs, PairList<String, Object> additional) {
+    public NDList prelu(NDArray input, NDArray alpha) {
         return null;
     }
 

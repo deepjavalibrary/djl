@@ -326,6 +326,18 @@ final class PyTorchLibrary {
 
     native Pointer torchNNRelu(Pointer handle);
 
+    native Pointer torchNNSoftPlus(Pointer handle);
+
+    native Pointer torchNNSoftSign(Pointer handle);
+
+    native Pointer torchNNLeakyRelu(Pointer handle, double negativeSlope);
+
+    native Pointer torchNNElu(Pointer handle, double alpha);
+
+    native Pointer torchNNSelu(Pointer handle);
+
+    native Pointer torchNNGelu(Pointer handle);
+
     native Pointer torchNNConvNd(
             Pointer inputHandle,
             Pointer weightHandle,

@@ -188,7 +188,7 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray relu() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "relu");
-        return getManager().invoke("Activation", array, params);
+        return getManager().invoke("_npx_activation", array, params);
     }
 
     /** {@inheritDoc} */
@@ -196,7 +196,7 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray sigmoid() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "sigmoid");
-        return getManager().invoke("Activation", array, params);
+        return getManager().invoke("_npx_activation", array, params);
     }
 
     /** {@inheritDoc} */
@@ -204,23 +204,23 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray tanh() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "tanh");
-        return getManager().invoke("Activation", array, params);
+        return getManager().invoke("_npx_activation", array, params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softrelu() {
+    public NDArray softPlus() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "softrelu");
-        return getManager().invoke("Activation", array, params);
+        return getManager().invoke("_npx_activation", array, params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray softsign() {
+    public NDArray softSign() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "softsign");
-        return getManager().invoke("Activation", array, params);
+        return getManager().invoke("_npx_activation", array, params);
     }
 
     /** {@inheritDoc} */
@@ -229,7 +229,7 @@ class MxNDArrayEx implements NDArrayEx {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "leaky");
         params.addParam("slope", alpha);
-        return getManager().invoke("LeakyReLU", array, params);
+        return getManager().invoke("_npx_leaky_relu", array, params);
     }
 
     /** {@inheritDoc} */
@@ -238,7 +238,7 @@ class MxNDArrayEx implements NDArrayEx {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "elu");
         params.addParam("slope", alpha);
-        return getManager().invoke("LeakyReLU", array, params);
+        return getManager().invoke("_npx_leaky_relu", array, params);
     }
 
     /** {@inheritDoc} */
@@ -246,7 +246,7 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray selu() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "selu");
-        return getManager().invoke("LeakyReLU", array, params);
+        return getManager().invoke("_npx_leaky_relu", array, params);
     }
 
     /** {@inheritDoc} */
@@ -254,7 +254,7 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray gelu() {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "gelu");
-        return getManager().invoke("LeakyReLU", array, params);
+        return getManager().invoke("_npx_leaky_relu", array, params);
     }
 
     ////////////////////////////////////////
@@ -521,12 +521,10 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDList prelu(NDList inputs, PairList<String, Object> additional) {
+    public NDList prelu(NDArray input, NDArray alpha) {
         MxOpParams params = new MxOpParams();
         params.addParam("act_type", "prelu");
-        params.addAll(additional);
-
-        return getManager().invoke("LeakyReLU", inputs, params);
+        return getManager().invoke("_npx_leaky_relu", new NDList(input, alpha), params);
     }
 
     /** {@inheritDoc} */

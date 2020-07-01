@@ -850,6 +850,32 @@ public final class JniUtils {
         return ndArray.getManager().create(PyTorchLibrary.LIB.torchNNRelu(ndArray.getHandle()));
     }
 
+    public static PtNDArray softPlus(PtNDArray ndArray) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchNNSoftPlus(ndArray.getHandle()));
+    }
+
+    public static PtNDArray softSign(PtNDArray ndArray) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchNNSoftSign(ndArray.getHandle()));
+    }
+
+    public static PtNDArray leakyRelu(PtNDArray ndArray, double negativeSlope) {
+        return ndArray.getManager()
+                .create(PyTorchLibrary.LIB.torchNNLeakyRelu(ndArray.getHandle(), negativeSlope));
+    }
+
+    public static PtNDArray elu(PtNDArray ndArray, double alpha) {
+        return ndArray.getManager()
+                .create(PyTorchLibrary.LIB.torchNNElu(ndArray.getHandle(), alpha));
+    }
+
+    public static PtNDArray selu(PtNDArray ndArray) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchNNSelu(ndArray.getHandle()));
+    }
+
+    public static PtNDArray gelu(PtNDArray ndArray) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchNNGelu(ndArray.getHandle()));
+    }
+
     public static PtNDArray convolution(
             PtNDArray ndArray,
             PtNDArray weight,

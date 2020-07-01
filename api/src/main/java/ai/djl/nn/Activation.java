@@ -106,27 +106,27 @@ public final class Activation {
     }
 
     /**
-     * Applies soft ReLU activation on the input {@link NDArray}.
+     * Applies softPlus activation on the input {@link NDArray}.
      *
-     * <p>Soft ReLU is defined by: \( y = log(1 + e^x) \)
+     * <p>softPlus is defined by: \( y = log(1 + e^x) \)
      *
      * @param array the input {@link NDArray}
      * @return the {@link NDArray} after applying soft ReLU activation
      */
-    public static NDArray softrelu(NDArray array) {
-        return array.getNDArrayInternal().softrelu();
+    public static NDArray softPlus(NDArray array) {
+        return array.getNDArrayInternal().softPlus();
     }
 
     /**
-     * Applies soft ReLU activation on the input singleton {@link NDList}.
+     * Applies softPlus activation on the input singleton {@link NDList}.
      *
-     * <p>Soft ReLU is defined by: \( y = log(1 + e^x) \)
+     * <p>softPlus is defined by: \( y = log(1 + e^x) \)
      *
      * @param arrays the input singleton {@link NDList}
      * @return the singleton {@link NDList} after applying soft ReLU activation
      */
-    public static NDList softrelu(NDList arrays) {
-        return new NDList(arrays.singletonOrThrow().getNDArrayInternal().softrelu());
+    public static NDList softPlus(NDList arrays) {
+        return new NDList(arrays.singletonOrThrow().getNDArrayInternal().softPlus());
     }
 
     /**
@@ -315,14 +315,14 @@ public final class Activation {
     }
 
     /**
-     * Creates a {@link LambdaBlock} that applies the {@link #softrelu(NDList) SoftReLU} activation
+     * Creates a {@link LambdaBlock} that applies the {@link #softPlus(NDList) SoftReLU} activation
      * function in its forward function.
      *
-     * @return the {@link LambdaBlock} that applies the {@link #softrelu(NDList) SoftReLU}
+     * @return the {@link LambdaBlock} that applies the {@link #softPlus(NDList) SoftReLU}
      *     activation function
      */
-    public static Block softreluBlock() {
-        return new LambdaBlock(Activation::softrelu);
+    public static Block softPlusBlock() {
+        return new LambdaBlock(Activation::softPlus);
     }
 
     /**

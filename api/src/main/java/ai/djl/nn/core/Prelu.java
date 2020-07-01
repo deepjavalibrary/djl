@@ -54,11 +54,9 @@ public class Prelu extends AbstractBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        NDArray data = inputs.singletonOrThrow();
-
-        NDList list = new NDList(data, parameterStore.getValue(alpha, data.getDevice()));
-        NDArrayEx ex = data.getNDArrayInternal();
-        return ex.prelu(list, params);
+        NDArray input = inputs.singletonOrThrow();
+        NDArray alphaArr = parameterStore.getValue(alpha, input.getDevice());
+        return prelu(input, alphaArr);
     }
 
     /** {@inheritDoc} */
@@ -76,5 +74,20 @@ public class Prelu extends AbstractBlock {
         } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
+    }
+
+    /**
+     * Applies a Prelu activation on the input {@link NDArray}.
+     *
+     * <p>Prelu is defined as \(y = max(0,x) + alpha * min(0, x) \) where alpha is learnable
+     * parameter
+     *
+     * @param input the input {@link NDArray}
+     * @param alpha learnable parameter
+     * @return the {@link NDArray} after applying Prelu activation
+     */
+    public static NDList prelu(NDArray input, NDArray alpha) {
+        NDArrayEx ex = input.getNDArrayInternal();
+        return ex.prelu(input, alpha);
     }
 }
