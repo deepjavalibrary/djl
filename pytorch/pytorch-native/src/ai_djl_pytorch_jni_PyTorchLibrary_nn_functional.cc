@@ -122,7 +122,9 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRelu(
   JNIEnv* env, jobject jthis, jobject jinput) {
   API_BEGIN();
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
-  const auto* result_ptr = new torch::Tensor(torch::nn::functional::relu(*tensor_ptr));
+  // FIIXME the compiled libtorch have reference error
+  // use torch::relu() for now until the fix
+  const auto* result_ptr = new torch::Tensor(torch::relu(*tensor_ptr));
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
@@ -167,7 +169,9 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNSelu(
   JNIEnv* env, jobject jthis, jobject jinput) {
   API_BEGIN();
     const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
-    const auto* result_ptr = new torch::Tensor(torch::nn::functional::selu(*tensor_ptr));
+    // FIIXME the compiled libtorch have reference error
+    // use torch::selu() for now until the fix
+    const auto* result_ptr = new torch::Tensor(torch::selu(*tensor_ptr));
     return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
