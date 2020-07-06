@@ -269,6 +269,16 @@ public class Shape {
     }
 
     /**
+     * Joins a this shape with axes.
+     *
+     * @param axes the axes to join
+     * @return the joined {@code Shape}
+     */
+    public Shape add(long... axes) {
+        return this.addAll(new Shape(axes));
+    }
+
+    /**
      * Joins a this shape with specified {@code other} shape.
      *
      * @param other the shape to join

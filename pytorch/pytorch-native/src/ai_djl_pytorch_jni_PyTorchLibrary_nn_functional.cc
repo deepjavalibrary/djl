@@ -184,3 +184,100 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNGelu(
     return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNMaxPool(
+  JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jkernel, jlongArray jstride, jlongArray jpadding, jboolean jceil_mode) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    const std::vector<int64_t> kernel_vec = utils::GetVecFromJLongArray(env, jkernel);
+    const std::vector<int64_t> stride_vec = utils::GetVecFromJLongArray(env, jstride);
+    const std::vector<int64_t> padding_vec = utils::GetVecFromJLongArray(env, jpadding);
+    torch::Tensor* result_ptr = nullptr;
+    long dim = tensor_ptr->dim() - 2;
+    if (dim == 1) {
+      result_ptr = new torch::Tensor(torch::nn::functional::max_pool1d(*tensor_ptr, torch::nn::functional::MaxPool1dFuncOptions(kernel_vec).stride(stride_vec).padding(padding_vec).ceil_mode(jceil_mode)));
+    } else if (dim == 2) {
+      result_ptr = new torch::Tensor(torch::nn::functional::max_pool2d(*tensor_ptr, torch::nn::functional::MaxPool2dFuncOptions(kernel_vec).stride(stride_vec).padding(padding_vec).ceil_mode(jceil_mode)));
+    } else if (dim == 3) {
+      result_ptr = new torch::Tensor(torch::nn::functional::max_pool3d(*tensor_ptr, torch::nn::functional::MaxPool3dFuncOptions(kernel_vec).stride(stride_vec).padding(padding_vec).ceil_mode(jceil_mode)));
+    }
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAvgPool(
+  JNIEnv* env, jobject jthis, jobject jinput, jlongArray jkernel_size, jlongArray jstride, jlongArray jpaddiing, jboolean jceil_mode, jboolean jcount_include_pad) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+    const std::vector<int64_t> kernel_vec = utils::GetVecFromJLongArray(env, jkernel_size);
+    const std::vector<int64_t> stride_vec = utils::GetVecFromJLongArray(env, jstride);
+    const std::vector<int64_t> padding_vec = utils::GetVecFromJLongArray(env, jpaddiing);
+
+    torch::Tensor* result_ptr = nullptr;
+    long dim = tensor_ptr->dim() - 2;
+    if (dim == 1) {
+      result_ptr = new torch::Tensor(torch::nn::functional::avg_pool1d(*tensor_ptr, torch::nn::functional::AvgPool1dFuncOptions(kernel_vec).stride(stride_vec).padding(padding_vec).ceil_mode(jceil_mode)));
+    } else if (dim == 2) {
+      result_ptr = new torch::Tensor(torch::nn::functional::avg_pool2d(*tensor_ptr, torch::nn::functional::AvgPool2dFuncOptions(kernel_vec).stride(stride_vec).padding(padding_vec).ceil_mode(jceil_mode)));
+    } else if (dim == 3) {
+      result_ptr = new torch::Tensor(torch::nn::functional::avg_pool3d(*tensor_ptr, torch::nn::functional::AvgPool3dFuncOptions(kernel_vec).stride(stride_vec).padding(padding_vec).ceil_mode(jceil_mode)));
+    }
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAdaptiveAvgPool(
+  JNIEnv* env, jobject jthis, jobject jhandle, jlongArray joutput_size) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    const std::vector<int64_t> output_vec = utils::GetVecFromJLongArray(env, joutput_size);
+
+    torch::Tensor* result_ptr = nullptr;
+    long dim = tensor_ptr->dim() - 2;
+    if (dim == 1) {
+      result_ptr = new torch::Tensor(torch::nn::functional::adaptive_avg_pool1d(*tensor_ptr, torch::nn::functional::AdaptiveAvgPool1dFuncOptions(output_vec)));
+    } else if (dim == 2) {
+      result_ptr = new torch::Tensor(torch::nn::functional::adaptive_avg_pool2d(*tensor_ptr, torch::nn::functional::AdaptiveAvgPool2dFuncOptions(output_vec)));
+    } else if (dim == 3) {
+      result_ptr = new torch::Tensor(torch::nn::functional::adaptive_avg_pool3d(*tensor_ptr, torch::nn::functional::AdaptiveAvgPool3dFuncOptions(output_vec)));
+    }
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAdaptiveMaxPool(
+  JNIEnv* env, jobject jthis, jobject jhandle, jlongArray joutput_size) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    const std::vector<int64_t> output_vec = utils::GetVecFromJLongArray(env, joutput_size);
+
+    torch::Tensor* result_ptr = nullptr;
+    long dim = tensor_ptr->dim() - 2;
+    if (dim == 1) {
+      result_ptr = new torch::Tensor(torch::nn::functional::adaptive_max_pool1d(*tensor_ptr, torch::nn::functional::AdaptiveMaxPool1dFuncOptions(output_vec)));
+    } else if (dim == 2) {
+      result_ptr = new torch::Tensor(torch::nn::functional::adaptive_max_pool2d(*tensor_ptr, torch::nn::functional::AdaptiveMaxPool2dFuncOptions(output_vec)));
+    } else if (dim == 3) {
+      result_ptr = new torch::Tensor(torch::nn::functional::adaptive_max_pool3d(*tensor_ptr, torch::nn::functional::AdaptiveMaxPool3dFuncOptions(output_vec)));
+    }
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLpPool
+  (JNIEnv* env, jobject jthis, jobject jinput, jdouble jnorm_type, jlongArray jkernel_size, jlongArray jstride, jboolean jceil_mode) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+    const std::vector<int64_t> kernel_vec = utils::GetVecFromJLongArray(env, jkernel_size);
+    const std::vector<int64_t> stride_vec = utils::GetVecFromJLongArray(env, jstride);
+
+    torch::Tensor* result_ptr = nullptr;
+    long dim = tensor_ptr->dim() - 2;
+    if (dim == 1) {
+      result_ptr = new torch::Tensor(torch::nn::functional::lp_pool1d(*tensor_ptr, torch::nn::functional::LPPool1dFuncOptions(jnorm_type, kernel_vec).stride(stride_vec).ceil_mode(jceil_mode)));
+    } else if (dim == 2) {
+      result_ptr = new torch::Tensor(torch::nn::functional::lp_pool2d(*tensor_ptr, torch::nn::functional::LPPool2dFuncOptions(jnorm_type, kernel_vec).stride(stride_vec).ceil_mode(jceil_mode)));
+    }
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}

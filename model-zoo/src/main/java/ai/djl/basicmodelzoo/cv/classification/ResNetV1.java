@@ -194,7 +194,7 @@ public final class ResNetV1 {
                                     .optMomentum(builder.batchNormMomentum)
                                     .build())
                     .add(Activation.reluBlock())
-                    .add(Pool.maxPool2DBlock(new Shape(3, 3), new Shape(2, 2), new Shape(1, 1)));
+                    .add(Pool.maxPool2dBlock(new Shape(3, 3), new Shape(2, 2), new Shape(1, 1)));
         }
         Shape resStride = new Shape(1, 1);
         for (int i = 0; i < numStages; i++) {
@@ -218,7 +218,7 @@ public final class ResNetV1 {
                 resStride = new Shape(2, 2);
             }
         }
-        return resNet.add(Pool.globalAvgPool2DBlock())
+        return resNet.add(Pool.globalAvgPool2dBlock())
                 .add(Blocks.batchFlattenBlock())
                 .add(Linear.builder().setUnits(builder.outSize).build())
                 .add(Blocks.batchFlattenBlock());

@@ -35,7 +35,6 @@ set(SOURCE_FILES
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_reduction.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_random_sampling.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_other.cc"
-    "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_nn.cc"
     "src/djl_pytorch_jni_log.cc"
     "src/djl_pytorch_jni_log.h"
     "src/djl_pytorch_jni_error.h")

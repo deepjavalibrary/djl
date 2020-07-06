@@ -24,7 +24,6 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.norm.Dropout;
 import ai.djl.nn.pooling.Pool;
-import ai.djl.nn.pooling.PoolingConvention;
 import java.util.Arrays;
 
 /**
@@ -95,28 +94,13 @@ public final class SqueezeNet {
                                 .optStride(new Shape(2, 2))
                                 .build())
                 .add(Activation::relu)
-                .add(
-                        Pool.maxPool2DBlock(
-                                new Shape(3, 3),
-                                new Shape(2, 2),
-                                new Shape(0, 0),
-                                PoolingConvention.FULL))
+                .add(Pool.maxPool2dBlock(new Shape(3, 3), new Shape(2, 2), new Shape(0, 0), true))
                 .add(fire(16, 64, 64))
                 .add(fire(16, 64, 64))
-                .add(
-                        Pool.maxPool2DBlock(
-                                new Shape(3, 3),
-                                new Shape(2, 2),
-                                new Shape(0, 0),
-                                PoolingConvention.FULL))
+                .add(Pool.maxPool2dBlock(new Shape(3, 3), new Shape(2, 2), new Shape(0, 0), true))
                 .add(fire(32, 128, 128))
                 .add(fire(32, 128, 128))
-                .add(
-                        Pool.maxPool2DBlock(
-                                new Shape(3, 3),
-                                new Shape(2, 2),
-                                new Shape(0, 0),
-                                PoolingConvention.FULL))
+                .add(Pool.maxPool2dBlock(new Shape(3, 3), new Shape(2, 2), new Shape(0, 0), true))
                 .add(fire(48, 192, 192))
                 .add(fire(48, 192, 192))
                 .add(fire(64, 256, 256))
@@ -125,7 +109,7 @@ public final class SqueezeNet {
                 .add(Dropout.builder().optRate(0.5f).build())
                 .add(Conv2d.builder().setFilters(outSize).setKernelShape(new Shape(1, 1)).build())
                 .add(Activation::relu)
-                .add(Pool.globalAvgPool2DBlock())
+                .add(Pool.globalAvgPool2dBlock())
                 .add(Blocks.batchFlattenBlock());
     }
 }

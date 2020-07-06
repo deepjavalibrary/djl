@@ -20,7 +20,6 @@ import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.pooling.PoolingConvention;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.util.PairList;
 import java.util.List;
@@ -181,73 +180,61 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray maxPool(
-            Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
-        return JniUtils.maxPool(
-                array,
-                kernel,
-                stride,
-                pad,
-                poolingConvention == null ? PoolingConvention.VALID : poolingConvention);
+    public PtNDArray maxPool(Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
+        return JniUtils.maxPool(array, kernelShape, stride, padding, ceilMode);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray globalMaxPool() {
-        return JniUtils.globalMaxPool(array, getGlobalPoolingDim());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray sumPool(
-            Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray globalSumPool() {
-        throw new UnsupportedOperationException("Not implemented");
+        Shape shape = getPoolShape(array);
+        try (NDArray temp = JniUtils.adaptiveMaxPool(array, shape)) {
+            return (PtNDArray) temp.reshape(array.getShape().slice(0, 2));
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray avgPool(
-            Shape kernel,
+            Shape kernelShape,
             Shape stride,
-            Shape pad,
-            PoolingConvention poolingConvention,
+            Shape padding,
+            boolean ceilMode,
             boolean countIncludePad) {
-        return JniUtils.avgPool(
-                array,
-                kernel,
-                stride,
-                pad,
-                poolingConvention == null ? PoolingConvention.VALID : poolingConvention,
-                countIncludePad);
+        return JniUtils.avgPool(array, kernelShape, stride, padding, ceilMode, countIncludePad);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray globalAvgPool() {
-        return JniUtils.globalAvgPool(array, getGlobalPoolingDim());
+        Shape shape = getPoolShape(array);
+        try (NDArray temp = JniUtils.adaptiveAvgPool(array, shape)) {
+            return (PtNDArray) temp.reshape(array.getShape().slice(0, 2));
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray lpPool(
-            Shape kernel,
-            Shape stride,
-            Shape pad,
-            PoolingConvention poolingConvention,
-            int pValue) {
-        throw new UnsupportedOperationException("Not implemented");
+            float normType, Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
+        if (padding.size() != 0) {
+            throw new IllegalArgumentException("padding is not supported for PyTorch engine");
+        }
+        if (array.getShape().dimension() - 2 == 3) {
+            throw new IllegalArgumentException("3D lpPool is not supported in PyTorch engine");
+        }
+        return JniUtils.lpPool(array, normType, kernelShape, stride, ceilMode);
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray globalLpPool(int pValue) {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDArray globalLpPool(float normType) {
+        try (NDArray temp =
+                JniUtils.lpPool(
+                        array, normType, array.getShape().slice(2), getPoolShape(array), false)) {
+            return (PtNDArray) temp.reshape(array.getShape().slice(0, 2));
+        }
+        //        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -560,17 +547,16 @@ public class PtNDArrayEx implements NDArrayEx {
         return array;
     }
 
-    private int getGlobalPoolingDim() {
-        // determine pooling dimension according to input
-        // input dimension minus 2 (batch and channel dim)
-        int poolDim = getArray().getShape().dimension() - 2;
-        if (poolDim < 1 || poolDim > 3) {
-            throw new IllegalStateException(
-                    "GlobalPooling only support"
-                            + "1 to 3 Dimensions, "
-                            + poolDim
-                            + "D is not supported.");
+    private Shape getPoolShape(NDArray array) {
+        switch (array.getShape().dimension() - 2) {
+            case 1:
+                return new Shape(1);
+            case 2:
+                return new Shape(1, 1);
+            case 3:
+                return new Shape(1, 1, 1);
+            default:
+                throw new IllegalArgumentException("the input dimension should be in [3, 5]");
         }
-        return poolDim;
     }
 }

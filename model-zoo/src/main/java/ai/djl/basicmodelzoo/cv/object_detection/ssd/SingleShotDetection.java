@@ -23,6 +23,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Block;
+import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.norm.BatchNorm;
@@ -217,7 +218,7 @@ public final class SingleShotDetection extends AbstractBlock {
                     .add(BatchNorm.builder().build())
                     .add(Activation::relu);
         }
-        sequentialBlock.add(Pool.maxPool2DBlock(new Shape(2, 2), new Shape(2, 2), new Shape(0, 0)));
+        sequentialBlock.add(Pool.maxPool2dBlock(new Shape(2, 2), new Shape(2, 2), new Shape(0, 0)));
         return sequentialBlock;
     }
 
@@ -372,7 +373,14 @@ public final class SingleShotDetection extends AbstractBlock {
                 }
             }
             if (globalPool) {
-                features.add(Pool.globalAvgPool2DBlock());
+                features.add(
+                        new LambdaBlock(
+                                arrays -> {
+                                    NDArray result =
+                                            Pool.globalAvgPool2d(arrays.singletonOrThrow());
+                                    // result shape: (N, C) MXNet multi-box takes (N, C, 1, 1)
+                                    return new NDList(result.reshape(result.getShape().add(1, 1)));
+                                }));
             }
             int numberOfFeatureMaps = features.size();
             if (sizes.size() != ratios.size() || sizes.size() != numberOfFeatureMaps) {

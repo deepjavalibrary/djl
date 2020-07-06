@@ -361,7 +361,6 @@ final class PyTorchLibrary {
 
     native Pointer torchNNAvgPool(
             Pointer inputHandle,
-            int dim,
             long[] kernel,
             long[] stride,
             long[] pad,
@@ -370,15 +369,21 @@ final class PyTorchLibrary {
 
     native Pointer torchNNMaxPool(
             Pointer inputHandle,
-            int dim,
-            long[] kernel,
+            long[] kernelSize,
             long[] stride,
-            long[] pad,
-            boolean useCeil);
+            long[] padding,
+            boolean ceilMode);
 
-    native Pointer torchNNAdaptiveAvgPool(Pointer inputHandle, int dim, long[] outSize);
+    native Pointer torchNNAdaptiveAvgPool(Pointer inputHandle, long[] outputSize);
 
-    native Pointer torchNNAdaptiveMaxPool(Pointer inputHandle, int dim, long[] outSize);
+    native Pointer torchNNAdaptiveMaxPool(Pointer inputHandle, long[] outputSize);
+
+    native Pointer torchNNLpPool(
+            Pointer inputHandle,
+            double normType,
+            long[] kernelSize,
+            long[] stride,
+            boolean ceilMode);
 
     native boolean torchRequiresGrad(Pointer inputHandle);
 

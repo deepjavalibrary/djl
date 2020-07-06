@@ -20,7 +20,6 @@ import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.pooling.PoolingConvention;
 import ai.djl.util.PairList;
 import java.util.Arrays;
 import java.util.List;
@@ -263,17 +262,14 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray maxPool(
-            Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
+    public NDArray maxPool(Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
         MxOpParams params = new MxOpParams();
-        params.addParam("kernel", kernel);
+        params.addParam("kernel", kernelShape);
         params.add("pool_type", "max");
         params.addParam("stride", stride);
-        params.addParam("pad", pad);
-        if (poolingConvention != null) {
-            params.add("pooling_convention", poolingConvention.name().toLowerCase());
-        }
-        return pool(params);
+        params.addParam("pad", padding);
+        params.add("pooling_convention", ceilMode ? "full" : "valid");
+        return getManager().invoke("_npx_pooling", getArray(), params);
     }
 
     /** {@inheritDoc} */
@@ -284,51 +280,27 @@ class MxNDArrayEx implements NDArrayEx {
         params.add("pad", getGlobalPoolingShapes(0));
         params.add("pool_type", "max");
         params.addParam("global_pool", true);
-        return pool(params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray sumPool(
-            Shape kernel, Shape stride, Shape pad, PoolingConvention poolingConvention) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("kernel", kernel);
-        params.add("pool_type", "sum");
-        params.addParam("stride", stride);
-        params.addParam("pad", pad);
-        if (poolingConvention != null) {
-            params.add("pooling_convention", poolingConvention.name().toLowerCase());
+        try (NDArray temp = getManager().invoke("_npx_pooling", getArray(), params)) {
+            return temp.reshape(temp.getShape().size(0), temp.getShape().size(1));
         }
-        return pool(params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray globalSumPool() {
-        MxOpParams params = new MxOpParams();
-        params.add("pool_type", "sum");
-        params.addParam("global_pool", true);
-        return pool(params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray avgPool(
-            Shape kernel,
+            Shape kernelShape,
             Shape stride,
-            Shape pad,
-            PoolingConvention poolingConvention,
+            Shape padding,
+            boolean ceilMode,
             boolean countIncludePad) {
         MxOpParams params = new MxOpParams();
-        params.addParam("kernel", kernel);
+        params.addParam("kernel", kernelShape);
         params.add("pool_type", "avg");
         params.addParam("stride", stride);
-        params.addParam("pad", pad);
+        params.addParam("pad", padding);
+        params.add("pooling_convention", ceilMode ? "full" : "valid");
         params.addParam("count_include_pad", countIncludePad);
-        if (poolingConvention != null) {
-            params.add("pooling_convention", poolingConvention.name().toLowerCase());
-        }
-        return pool(params);
+        return getManager().invoke("_npx_pooling", getArray(), params);
     }
 
     /** {@inheritDoc} */
@@ -339,41 +311,44 @@ class MxNDArrayEx implements NDArrayEx {
         params.add("pad", getGlobalPoolingShapes(0));
         params.add("pool_type", "avg");
         params.addParam("global_pool", true);
-        return pool(params);
+        try (NDArray temp = getManager().invoke("_npx_pooling", getArray(), params)) {
+            return temp.reshape(temp.getShape().size(0), temp.getShape().size(1));
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray lpPool(
-            Shape kernel,
-            Shape stride,
-            Shape pad,
-            PoolingConvention poolingConvention,
-            int pValue) {
+            float normType, Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
+        if (((int) normType) != normType) {
+            throw new IllegalArgumentException(
+                    "float type of normType is not supported in MXNet engine, please use integer instead");
+        }
         MxOpParams params = new MxOpParams();
-        params.addParam("kernel", kernel);
+        params.addParam("p_value", (int) normType);
+        params.addParam("kernel", kernelShape);
         params.add("pool_type", "lp");
         params.addParam("stride", stride);
-        params.addParam("pad", pad);
-        params.addParam("p_value", pValue);
-        if (poolingConvention != null) {
-            params.add("pooling_convention", poolingConvention.name().toLowerCase());
-        }
-        return pool(params);
+        params.addParam("pad", padding);
+        params.add("pooling_convention", ceilMode ? "full" : "valid");
+
+        return getManager().invoke("_npx_pooling", getArray(), params);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray globalLpPool(int pValue) {
+    public NDArray globalLpPool(float normType) {
+        if (((int) normType) != normType) {
+            throw new IllegalArgumentException(
+                    "float type of normType is not supported in MXNet engine, please use integer instead");
+        }
         MxOpParams params = new MxOpParams();
         params.add("pool_type", "lp");
-        params.addParam("p_value", pValue);
+        params.addParam("p_value", (int) normType);
         params.addParam("global_pool", true);
-        return pool(params);
-    }
-
-    private NDArray pool(MxOpParams params) {
-        return getManager().invoke("Pooling", getArray(), params);
+        try (NDArray temp = getManager().invoke("_npx_pooling", getArray(), params)) {
+            return temp.reshape(temp.getShape().size(0), temp.getShape().size(1));
+        }
     }
 
     ////////////////////////////////////////

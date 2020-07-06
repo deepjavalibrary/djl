@@ -34,7 +34,7 @@ public class PoolingOperationsTest {
     @Test
     public void testMaxPool1D() {
         try (Model model = Model.newInstance("model")) {
-            model.setBlock(Pool.maxPool1DBlock(new Shape(2)));
+            model.setBlock(Pool.maxPool1dBlock(new Shape(2)));
             // Look for a max pool value 5
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(2, 2, 2));
@@ -53,7 +53,7 @@ public class PoolingOperationsTest {
     @Test
     public void testMaxPool2D() {
         try (Model model = Model.newInstance("model")) {
-            model.setBlock(Pool.maxPool2DBlock(new Shape(2, 2)));
+            model.setBlock(Pool.maxPool2dBlock(new Shape(2, 2)));
             // Look for a max pool value 5
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(2, 2, 2, 2));
@@ -72,7 +72,7 @@ public class PoolingOperationsTest {
     @Test
     public void testMaxPool3D() {
         try (Model model = Model.newInstance("model")) {
-            model.setBlock(Pool.maxPool3DBlock(new Shape(2, 2, 2)));
+            model.setBlock(Pool.maxPool3dBlock(new Shape(2, 2, 2)));
             // Look for a max pool value 5
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(2, 2, 2, 2, 2));
@@ -91,7 +91,7 @@ public class PoolingOperationsTest {
     @Test
     public void testGlobalMaxPool() {
         try (Model model = Model.newInstance("model")) {
-            model.setBlock(Pool.globalMaxPool1DBlock());
+            model.setBlock(Pool.globalMaxPool1dBlock());
             // Look for a max pool value 5
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(2, 2, 2));
@@ -99,8 +99,8 @@ public class PoolingOperationsTest {
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.ones(new Shape(2, 2, 2));
                 data.set(new NDIndex(1, 1, 1), 5);
-                NDArray expected = manager.ones(new Shape(2, 2, 1));
-                expected.set(new NDIndex(1, 1, 0), 5);
+                NDArray expected = manager.ones(new Shape(2, 2));
+                expected.set(new NDIndex(1, 1), 5);
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assert.assertEquals(result, expected);
             }
@@ -110,7 +110,7 @@ public class PoolingOperationsTest {
     @Test
     public void testAvgPool1D() {
         try (Model model = Model.newInstance("model")) {
-            model.setBlock(Pool.avgPool1DBlock(new Shape(2)));
+            model.setBlock(Pool.avgPool1dBlock(new Shape(2)));
             // Look for a average pool value 1.5
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(2, 2, 2));
@@ -129,7 +129,7 @@ public class PoolingOperationsTest {
     @Test
     public void testAvgPool2D() {
         try (Model model = Model.newInstance("model")) {
-            model.setBlock(Pool.avgPool2DBlock(new Shape(2, 2)));
+            model.setBlock(Pool.avgPool2dBlock(new Shape(2, 2)));
             // Look for a average pool value 1.25
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(2, 2, 2, 2));
@@ -148,7 +148,7 @@ public class PoolingOperationsTest {
     @Test
     public void testAvgPool3D() {
         try (Model model = Model.newInstance("model")) {
-            model.setBlock(Pool.avgPool3DBlock(new Shape(2, 2, 2)));
+            model.setBlock(Pool.avgPool3dBlock(new Shape(2, 2, 2)));
             // Look for a average pool value 1.125
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(2, 2, 2, 2, 2));
@@ -167,7 +167,7 @@ public class PoolingOperationsTest {
     @Test
     public void testGlobalAvgPool() {
         try (Model model = Model.newInstance("model")) {
-            model.setBlock(Pool.globalAvgPool1DBlock());
+            model.setBlock(Pool.globalAvgPool1dBlock());
             // Look for a average pool value 1.5
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(2, 2, 2));
@@ -175,8 +175,8 @@ public class PoolingOperationsTest {
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.ones(new Shape(2, 2, 2));
                 data.set(new NDIndex(1, 1, 1), 2);
-                NDArray expected = manager.ones(new Shape(2, 2, 1));
-                expected.set(new NDIndex(1, 1, 0), 1.5);
+                NDArray expected = manager.ones(new Shape(2, 2));
+                expected.set(new NDIndex(1, 1), 1.5);
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assert.assertEquals(result, expected);
             }
@@ -186,7 +186,7 @@ public class PoolingOperationsTest {
     @Test
     public void testLpPool1D() {
         try (Model model = Model.newInstance("model")) {
-            model.setBlock(Pool.lpPool1DBlock(new Shape(2), 1));
+            model.setBlock(Pool.lpPool1dBlock(1, new Shape(2)));
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(2, 2, 2));
 
@@ -205,7 +205,7 @@ public class PoolingOperationsTest {
     @Test
     public void testLpPool2D() {
         try (Model model = Model.newInstance("model")) {
-            model.setBlock(Pool.lpPool2DBlock(new Shape(2, 2), 1));
+            model.setBlock(Pool.lpPool2dBlock(1, new Shape(2, 2)));
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(2, 2, 2, 2));
 
@@ -221,10 +221,11 @@ public class PoolingOperationsTest {
         }
     }
 
-    @Test
+    // lpPool3d is not supported in PyTorch engine
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testLpPool3D() {
         try (Model model = Model.newInstance("model")) {
-            model.setBlock(Pool.lpPool3DBlock(new Shape(2, 2, 2), 1));
+            model.setBlock(Pool.lpPool3dBlock(1, new Shape(2, 2, 2)));
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(2, 2, 2, 2, 2));
 
@@ -243,16 +244,16 @@ public class PoolingOperationsTest {
     @Test
     public void testGlobalLpPool() {
         try (Model model = Model.newInstance("model")) {
-            model.setBlock(Pool.globalLpPool1DBlock(1));
+            model.setBlock(Pool.globalLpPool1dBlock(1));
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(2, 2, 2));
 
                 NDManager manager = trainer.getManager();
                 NDArray data = manager.ones(new Shape(2, 2, 2));
                 data.set(new NDIndex(1, 1, 1), 2);
-                NDArray expected = manager.ones(new Shape(2, 2, 1));
+                NDArray expected = manager.ones(new Shape(2, 2));
                 expected.muli(2);
-                expected.set(new NDIndex(1, 1, 0), 3);
+                expected.set(new NDIndex(1, 1), 3);
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assert.assertEquals(result, expected);
             }

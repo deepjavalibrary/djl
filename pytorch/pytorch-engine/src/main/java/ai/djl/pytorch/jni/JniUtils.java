@@ -18,7 +18,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
-import ai.djl.nn.pooling.PoolingConvention;
 import ai.djl.pytorch.engine.PtDeviceType;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
@@ -925,72 +924,58 @@ public final class JniUtils {
 
     public static PtNDArray avgPool(
             PtNDArray ndArray,
-            Shape kernel,
+            Shape kernelSize,
             Shape stride,
-            Shape pad,
-            PoolingConvention convention,
+            Shape padding,
+            boolean ceilMode,
             boolean countIncludePad) {
-        boolean useCeil = PoolingConvention.FULL.equals(convention);
-        int dim = kernel.dimension();
         return ndArray.getManager()
                 .create(
                         PyTorchLibrary.LIB.torchNNAvgPool(
                                 ndArray.getHandle(),
-                                dim,
-                                kernel.getShape(),
+                                kernelSize.getShape(),
                                 stride.getShape(),
-                                pad.getShape(),
-                                useCeil,
+                                padding.getShape(),
+                                ceilMode,
                                 countIncludePad));
     }
 
     public static PtNDArray maxPool(
-            PtNDArray ndArray,
-            Shape kernel,
-            Shape stride,
-            Shape pad,
-            PoolingConvention convention) {
-        boolean useCeil = PoolingConvention.FULL.equals(convention);
-        int dim = kernel.dimension();
+            PtNDArray ndArray, Shape kernelSize, Shape stride, Shape padding, boolean ceilMode) {
         return ndArray.getManager()
                 .create(
                         PyTorchLibrary.LIB.torchNNMaxPool(
                                 ndArray.getHandle(),
-                                dim,
-                                kernel.getShape(),
+                                kernelSize.getShape(),
                                 stride.getShape(),
-                                pad.getShape(),
-                                useCeil));
+                                padding.getShape(),
+                                ceilMode));
     }
 
-    public static PtNDArray globalMaxPool(PtNDArray ndArray, int dim) {
-        Shape outShape;
-        if (dim == 1) {
-            outShape = new Shape(1);
-        } else if (dim == 2) {
-            outShape = new Shape(1, 1);
-        } else {
-            outShape = new Shape(1, 1, 1);
-        }
+    public static PtNDArray adaptiveMaxPool(PtNDArray ndArray, Shape outputSize) {
         return ndArray.getManager()
                 .create(
                         PyTorchLibrary.LIB.torchNNAdaptiveMaxPool(
-                                ndArray.getHandle(), dim, outShape.getShape()));
+                                ndArray.getHandle(), outputSize.getShape()));
     }
 
-    public static PtNDArray globalAvgPool(PtNDArray ndArray, int dim) {
-        Shape outShape;
-        if (dim == 1) {
-            outShape = new Shape(1);
-        } else if (dim == 2) {
-            outShape = new Shape(1, 1);
-        } else {
-            outShape = new Shape(1, 1, 1);
-        }
+    public static PtNDArray adaptiveAvgPool(PtNDArray ndArray, Shape outputSize) {
         return ndArray.getManager()
                 .create(
                         PyTorchLibrary.LIB.torchNNAdaptiveAvgPool(
-                                ndArray.getHandle(), dim, outShape.getShape()));
+                                ndArray.getHandle(), outputSize.getShape()));
+    }
+
+    public static PtNDArray lpPool(
+            PtNDArray ndArray, double normType, Shape kernelSize, Shape stride, boolean ceilMode) {
+        return ndArray.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchNNLpPool(
+                                ndArray.getHandle(),
+                                normType,
+                                kernelSize.getShape(),
+                                stride.getShape(),
+                                ceilMode));
     }
 
     public static DataType getDataType(PtNDArray ndArray) {
