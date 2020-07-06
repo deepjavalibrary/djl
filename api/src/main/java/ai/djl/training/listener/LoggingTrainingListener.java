@@ -62,7 +62,9 @@ public class LoggingTrainingListener implements TrainingListener {
                                 trainer.getEvaluators(),
                                 EvaluatorTrainingListener.VALIDATE_EPOCH,
                                 Short.MAX_VALUE);
-                if (!status.isEmpty()) logger.info("Validate: {}", status);
+                if (!status.isEmpty()) {
+                    logger.info("Validate: {}", status);
+                }
             } else {
                 logger.info("validation has not been run.");
             }
