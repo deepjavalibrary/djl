@@ -106,7 +106,7 @@ To increase build speed, you can use the following command to skip unit tests:
 
 ## Slack channel
 
-Join our [<img src='https://cdn3.iconfinder.com/data/icons/social-media-2169/24/social_media_social_media_logo_slack-512.png' width='20px' /> slack channel](https://deepjavalibrary.slack.com/join/shared_invite/enQtODQyOTYxNDExMTA3LWE5YjVlMWFmNTk3ZTJjNTE4NDIwNDc4NjA2MjZkM2VmM2M3MjI4MTFiMzFkOTVlZTM1NGVlZTI0OTlkNjhhNDI) to get in touch with the development team, for questions and discussions.
+Join our [<img src='https://cdn3.iconfinder.com/data/icons/social-media-2169/24/social_media_social_media_logo_slack-512.png' width='20px' /> slack channel](https://join.slack.com/t/deepjavalibrary/shared_invite/zt-ar91gjkz-qbXhr1l~LFGEIEeGBibT7w) to get in touch with the development team, for questions and discussions.
 
 ## License
 
