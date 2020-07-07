@@ -1,5 +1,6 @@
 ## Channel for questions ##
-Before or while filing an issue please feel free to join our [Slack channel](https://join.slack.com/t/deepjavalibrary/shared_invite/enQtODAwOTg0OTUzNDEwLTdlY2M4NmNlZTMzM2Q4MDUyZThkYzQwNmE2MDVhNTRiZDcxNTNlMWJhNTZkNWE1OGU2Nzg3MmY1OWQzN2Q5Mzk) to get in touch with development team, ask questions, find out what's cooking and more!
+Before or while filing an issue please feel free to join our [Slack channel](https://join.slack.com/t/deepjavalibrary/shared_invite/zt-ar91gjkz-qbXhr1l~LFGEIEeGBibT7w) to get in touch with development team, ask questions, find out what's cooking and more!
+
 
 ## Description ##
 (Brief description of what this PR is about)
