@@ -19,20 +19,20 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 
 /**
- * {@code Conv3D} layer behaves just as {@link Convolution} does, with the distinction being it
+ * {@code Conv3d} layer behaves just as {@link Convolution} does, with the distinction being it
  * operates of 3-dimensional data such as medical images or video data. The traversal of each filter
  * begins from {@link LayoutType#WIDTH} then to {@link LayoutType#HEIGHT}, and lastly across each
  * {@link LayoutType#DEPTH} in the specified {@code depth} size of the data.
  *
- * <p>The utilization of {@code Conv3D} layer allows deeper analysis of visual data such as those in
+ * <p>The utilization of {@code Conv3d} layer allows deeper analysis of visual data such as those in
  * medical images, or even analysis on temporal data such as video data as a whole instead of
- * processing each frame with a {@link Conv2D} layer, despite this being a common practice in
+ * processing each frame with a {@link Conv2d} layer, despite this being a common practice in
  * computer vision researches. The benefit of utilizing this kind of layer is the maintaining of
  * serial data across 2-dimensional data, hence could be beneficial for research focus on such as
  * object tracking. The drawback is that this kind of layer is more costly compared to other
  * convolution layer types since dot product operation is performed on all three dimensions.
  *
- * <p>The input to a {@code Conv3D} is an {@link ai.djl.ndarray.NDList} with a single 5-D {@link
+ * <p>The input to a {@code Conv3d} is an {@link ai.djl.ndarray.NDList} with a single 5-D {@link
  * ai.djl.ndarray.NDArray}. The layout of the {@link ai.djl.ndarray.NDArray} must be "NCDHW". The
  * shapes are
  *
@@ -49,7 +49,7 @@ import ai.djl.nn.Block;
  *
  * <p>Both {@code weight} and {@code bias} are learn-able parameters.
  */
-public class Conv3D extends Convolution {
+public class Conv3d extends Convolution {
 
     private static final LayoutType[] EXPECTED_LAYOUT = {
         LayoutType.BATCH, LayoutType.CHANNEL, LayoutType.DEPTH, LayoutType.HEIGHT, LayoutType.WIDTH
@@ -57,7 +57,7 @@ public class Conv3D extends Convolution {
     private static final String STRING_LAYOUT = "NCDHW";
     private static final int NUM_DIMENSIONS = 5;
 
-    Conv3D(Builder builder) {
+    Conv3d(Builder builder) {
         super(builder);
     }
 
@@ -198,7 +198,7 @@ public class Conv3D extends Convolution {
     }
 
     /**
-     * Creates a builder to build a {@code Conv3D}.
+     * Creates a builder to build a {@code Conv3d}.
      *
      * @return a new builder
      */
@@ -206,10 +206,10 @@ public class Conv3D extends Convolution {
         return new Builder();
     }
 
-    /** The Builder to construct a {@link Conv3D} type of {@link Block}. */
+    /** The Builder to construct a {@link Conv3d} type of {@link Block}. */
     public static final class Builder extends ConvolutionBuilder<Builder> {
 
-        /** Creates a builder that can build a {@link Conv3D} block. */
+        /** Creates a builder that can build a {@link Conv3d} block. */
         Builder() {
             stride = new Shape(1, 1, 1);
             padding = new Shape(0, 0, 0);
@@ -223,13 +223,13 @@ public class Conv3D extends Convolution {
         }
 
         /**
-         * Builds a {@link Conv3D} block.
+         * Builds a {@link Conv3d} block.
          *
-         * @return the {@link Conv3D} block
+         * @return the {@link Conv3d} block
          */
-        public Conv3D build() {
+        public Conv3d build() {
             validate();
-            return new Conv3D(this);
+            return new Conv3d(this);
         }
     }
 }

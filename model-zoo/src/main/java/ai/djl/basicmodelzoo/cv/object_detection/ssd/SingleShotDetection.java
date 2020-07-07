@@ -24,7 +24,7 @@ import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
-import ai.djl.nn.convolutional.Conv2D;
+import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.pooling.Pool;
 import ai.djl.training.ParameterStore;
@@ -209,7 +209,7 @@ public final class SingleShotDetection extends AbstractBlock {
         for (int i = 0; i < 2; i++) {
             sequentialBlock
                     .add(
-                            Conv2D.builder()
+                            Conv2d.builder()
                                     .setKernelShape(new Shape(3, 3))
                                     .setFilters(numFilters)
                                     .optPadding(new Shape(1, 1))
@@ -228,8 +228,8 @@ public final class SingleShotDetection extends AbstractBlock {
      * @param numClasses the number of classes
      * @return a class prediction block used in an SSD
      */
-    public static Conv2D getClassPredictionBlock(int numAnchors, int numClasses) {
-        return Conv2D.builder()
+    public static Conv2d getClassPredictionBlock(int numAnchors, int numClasses) {
+        return Conv2d.builder()
                 .setKernelShape(new Shape(3, 3))
                 .setFilters((numClasses + 1) * numAnchors)
                 .optPadding(new Shape(1, 1))
@@ -242,8 +242,8 @@ public final class SingleShotDetection extends AbstractBlock {
      * @param numAnchors the number of anchors
      * @return a anchor prediction block used in an SSD
      */
-    public static Conv2D getAnchorPredictionBlock(int numAnchors) {
-        return Conv2D.builder()
+    public static Conv2d getAnchorPredictionBlock(int numAnchors) {
+        return Conv2d.builder()
                 .setKernelShape(new Shape(3, 3))
                 .setFilters(4 * numAnchors)
                 .optPadding(new Shape(1, 1))
@@ -333,9 +333,9 @@ public final class SingleShotDetection extends AbstractBlock {
         }
 
         /**
-         * Sets the {@code Conv2D} blocks to be appended to the network to get multi-output network.
+         * Sets the {@code Conv2d} blocks to be appended to the network to get multi-output network.
          *
-         * @param features List of {@code Conv2D} blocks to be appended
+         * @param features List of {@code Conv2d} blocks to be appended
          * @return Returns this Builder
          */
         public Builder optFeatures(List<Block> features) {

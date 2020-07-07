@@ -19,7 +19,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.ParallelBlock;
 import ai.djl.nn.SequentialBlock;
-import ai.djl.nn.convolutional.Conv2D;
+import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.pooling.Pool;
@@ -58,7 +58,7 @@ public final class ResNetV1 {
         SequentialBlock resUnit = new SequentialBlock();
         if (bottleneck) {
             resUnit.add(
-                            Conv2D.builder()
+                            Conv2d.builder()
                                     .setKernelShape(new Shape(1, 1))
                                     .setFilters(numFilters / 4)
                                     .optStride(stride)
@@ -72,7 +72,7 @@ public final class ResNetV1 {
                                     .build())
                     .add(Activation::relu)
                     .add(
-                            Conv2D.builder()
+                            Conv2d.builder()
                                     .setKernelShape(new Shape(3, 3))
                                     .setFilters(numFilters / 4)
                                     .optStride(new Shape(1, 1))
@@ -86,7 +86,7 @@ public final class ResNetV1 {
                                     .build())
                     .add(Activation::relu)
                     .add(
-                            Conv2D.builder()
+                            Conv2d.builder()
                                     .setKernelShape(new Shape(1, 1))
                                     .setFilters(numFilters)
                                     .optStride(new Shape(1, 1))
@@ -101,7 +101,7 @@ public final class ResNetV1 {
 
         } else {
             resUnit.add(
-                            Conv2D.builder()
+                            Conv2d.builder()
                                     .setKernelShape(new Shape(3, 3))
                                     .setFilters(numFilters)
                                     .optStride(stride)
@@ -115,7 +115,7 @@ public final class ResNetV1 {
                                     .build())
                     .add(Activation::relu)
                     .add(
-                            Conv2D.builder()
+                            Conv2d.builder()
                                     .setKernelShape(new Shape(3, 3))
                                     .setFilters(numFilters)
                                     .optStride(new Shape(1, 1))
@@ -133,7 +133,7 @@ public final class ResNetV1 {
             shortcut.add(Blocks.identityBlock());
         } else {
             shortcut.add(
-                            Conv2D.builder()
+                            Conv2d.builder()
                                     .setKernelShape(new Shape(1, 1))
                                     .setFilters(numFilters)
                                     .optStride(stride)
@@ -172,7 +172,7 @@ public final class ResNetV1 {
         SequentialBlock resNet = new SequentialBlock();
         if (height <= 32) {
             resNet.add(
-                    Conv2D.builder()
+                    Conv2d.builder()
                             .setKernelShape(new Shape(3, 3))
                             .setFilters(builder.filters[0])
                             .optStride(new Shape(1, 1))
@@ -181,7 +181,7 @@ public final class ResNetV1 {
                             .build());
         } else {
             resNet.add(
-                            Conv2D.builder()
+                            Conv2d.builder()
                                     .setKernelShape(new Shape(7, 7))
                                     .setFilters(builder.filters[0])
                                     .optStride(new Shape(2, 2))

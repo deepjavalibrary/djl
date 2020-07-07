@@ -19,8 +19,8 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 
 /**
- * Being the pioneer of convolution layers, {@code Conv2D} layer works on two dimensions of input,
- * {@link LayoutType#WIDTH} and {@link LayoutType#HEIGHT} as usually a {@code Conv2D} layer is used
+ * Being the pioneer of convolution layers, {@code Conv2d} layer works on two dimensions of input,
+ * {@link LayoutType#WIDTH} and {@link LayoutType#HEIGHT} as usually a {@code Conv2d} layer is used
  * to process data with two spatial dimensions, namely image. The concept itself works just as how
  * {@link Convolution} does, and each filter slides through an input data by two directions, first
  * traversing the {@link LayoutType#WIDTH} then traverses each row of the data.
@@ -31,9 +31,9 @@ import ai.djl.nn.Block;
  * href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf">
  * paper</a> about AlexNet for image classification task. It is still commonly used in image-related
  * tasks and adapted in other tasks, including but not limited to 1-dimensional data which may be
- * transformed to 2-dimensional data, though {@link Conv1D} is now available for use.
+ * transformed to 2-dimensional data, though {@link Conv1d} is now available for use.
  *
- * <p>The input to a {@code Conv2D} is an {@link ai.djl.ndarray.NDList} with a single 4-D {@link
+ * <p>The input to a {@code Conv2d} is an {@link ai.djl.ndarray.NDList} with a single 4-D {@link
  * ai.djl.ndarray.NDArray}. The layout of the {@link ai.djl.ndarray.NDArray} must be "NCHW". The
  * shapes are
  *
@@ -49,7 +49,7 @@ import ai.djl.nn.Block;
  *
  * <p>Both {@code weight} and {@code bias} are learn-able parameters.
  */
-public class Conv2D extends Convolution {
+public class Conv2d extends Convolution {
 
     private static final LayoutType[] EXPECTED_LAYOUT = {
         LayoutType.BATCH, LayoutType.CHANNEL, LayoutType.HEIGHT, LayoutType.WIDTH
@@ -58,7 +58,7 @@ public class Conv2D extends Convolution {
     private static final String STRING_LAYOUT = "NCHW";
     private static final int NUM_DIMENSIONS = 4;
 
-    Conv2D(Builder builder) {
+    Conv2d(Builder builder) {
         super(builder);
     }
 
@@ -191,7 +191,7 @@ public class Conv2D extends Convolution {
     }
 
     /**
-     * Creates a builder to build a {@code Conv2D}.
+     * Creates a builder to build a {@code Conv2d}.
      *
      * @return a new builder
      */
@@ -199,10 +199,10 @@ public class Conv2D extends Convolution {
         return new Builder();
     }
 
-    /** The Builder to construct a {@link Conv2D} type of {@link Block}. */
+    /** The Builder to construct a {@link Conv2d} type of {@link Block}. */
     public static final class Builder extends ConvolutionBuilder<Builder> {
 
-        /** Creates a builder that can build a {@link Conv2D} block. */
+        /** Creates a builder that can build a {@link Conv2d} block. */
         Builder() {
             stride = new Shape(1, 1);
             padding = new Shape(0, 0);
@@ -216,13 +216,13 @@ public class Conv2D extends Convolution {
         }
 
         /**
-         * Builds a {@link Conv2D} block.
+         * Builds a {@link Conv2d} block.
          *
-         * @return the {@link Conv2D} block
+         * @return the {@link Conv2d} block
          */
-        public Conv2D build() {
+        public Conv2d build() {
             validate();
-            return new Conv2D(this);
+            return new Conv2d(this);
         }
     }
 }

@@ -18,7 +18,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.ParameterList;
 import ai.djl.nn.SequentialBlock;
-import ai.djl.nn.convolutional.Conv2D;
+import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.testing.Assertions;
 import ai.djl.training.initializer.XavierInitializer;
@@ -32,7 +32,7 @@ public class ModelTest {
     @Test
     public void testModelSaveAndLoad() throws IOException, MalformedModelException {
         SequentialBlock block = new SequentialBlock();
-        block.add(Conv2D.builder().setKernelShape(new Shape(1, 1)).setFilters(10).build());
+        block.add(Conv2d.builder().setKernelShape(new Shape(1, 1)).setFilters(10).build());
         block.add(BatchNorm.builder().build());
         try (Model saveModel = Model.newInstance("saveModel");
                 Model loadModel = Model.newInstance("loadModel")) {

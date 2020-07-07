@@ -21,7 +21,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.ParallelBlock;
 import ai.djl.nn.SequentialBlock;
-import ai.djl.nn.convolutional.Conv2D;
+import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.norm.Dropout;
 import ai.djl.nn.pooling.Pool;
 import ai.djl.nn.pooling.PoolingConvention;
@@ -46,7 +46,7 @@ public final class SqueezeNet {
         SequentialBlock squeezeWithActivation =
                 new SequentialBlock()
                         .add(
-                                Conv2D.builder()
+                                Conv2d.builder()
                                         .setFilters(squeezePlanes)
                                         .setKernelShape(new Shape(1, 1))
                                         .build())
@@ -54,7 +54,7 @@ public final class SqueezeNet {
         SequentialBlock expand1x1 =
                 new SequentialBlock()
                         .add(
-                                Conv2D.builder()
+                                Conv2d.builder()
                                         .setFilters(expand1x1Planes)
                                         .setKernelShape(new Shape(1, 1))
                                         .build())
@@ -62,7 +62,7 @@ public final class SqueezeNet {
         SequentialBlock expand3x3 =
                 new SequentialBlock()
                         .add(
-                                Conv2D.builder()
+                                Conv2d.builder()
                                         .setFilters(expand3x3Planes)
                                         .setKernelShape(new Shape(3, 3))
                                         .optPadding(new Shape(1, 1))
@@ -89,7 +89,7 @@ public final class SqueezeNet {
     public static Block squeezenet(int outSize) {
         return new SequentialBlock()
                 .add(
-                        Conv2D.builder()
+                        Conv2d.builder()
                                 .setFilters(64)
                                 .setKernelShape(new Shape(3, 3))
                                 .optStride(new Shape(2, 2))
@@ -123,7 +123,7 @@ public final class SqueezeNet {
                 .add(fire(64, 256, 256))
                 // Classifier
                 .add(Dropout.builder().optRate(0.5f).build())
-                .add(Conv2D.builder().setFilters(outSize).setKernelShape(new Shape(1, 1)).build())
+                .add(Conv2d.builder().setFilters(outSize).setKernelShape(new Shape(1, 1)).build())
                 .add(Activation::relu)
                 .add(Pool.globalAvgPool2DBlock())
                 .add(Blocks.batchFlattenBlock());

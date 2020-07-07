@@ -28,9 +28,9 @@ import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.ParallelBlock;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.SequentialBlock;
-import ai.djl.nn.convolutional.Conv1D;
-import ai.djl.nn.convolutional.Conv2D;
-import ai.djl.nn.convolutional.Conv3D;
+import ai.djl.nn.convolutional.Conv1d;
+import ai.djl.nn.convolutional.Conv2d;
+import ai.djl.nn.convolutional.Conv3d;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.norm.Dropout;
@@ -259,12 +259,12 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testConv1D() throws IOException, MalformedModelException {
+    public void testConv1d() throws IOException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
         Block block =
-                Conv1D.builder().setKernelShape(new Shape(2)).setFilters(1).optBias(false).build();
+                Conv1d.builder().setKernelShape(new Shape(2)).setFilters(1).optBias(false).build();
 
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
@@ -291,11 +291,11 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testConv2D() throws IOException, MalformedModelException {
+    public void testConv2d() throws IOException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
-        Block block = Conv2D.builder().setKernelShape(new Shape(2, 2)).setFilters(1).build();
+        Block block = Conv2d.builder().setKernelShape(new Shape(2, 2)).setFilters(1).build();
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
@@ -322,11 +322,11 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testConv3D() throws IOException, MalformedModelException {
+    public void testConv3d() throws IOException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
-        Block block = Conv3D.builder().setKernelShape(new Shape(2, 2, 2)).setFilters(1).build();
+        Block block = Conv3d.builder().setKernelShape(new Shape(2, 2, 2)).setFilters(1).build();
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 

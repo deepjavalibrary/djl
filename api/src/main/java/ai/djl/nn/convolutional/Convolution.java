@@ -59,9 +59,9 @@ import java.io.IOException;
  * it is also common to stack convolution layers with different output channels for more
  * representations of the input data.
  *
- * <p>Current implementations of {@code Convolution} are {@link Conv1D} with input dimension of
- * {@link LayoutType#WIDTH}, {@link Conv2D} with input dimension of {@link LayoutType#WIDTH} and
- * {@link LayoutType#HEIGHT}, and lastly {@link Conv3D} with input dimension of {@link
+ * <p>Current implementations of {@code Convolution} are {@link Conv1d} with input dimension of
+ * {@link LayoutType#WIDTH}, {@link Conv2d} with input dimension of {@link LayoutType#WIDTH} and
+ * {@link LayoutType#HEIGHT}, and lastly {@link Conv3d} with input dimension of {@link
  * LayoutType#WIDTH}, {@link LayoutType#HEIGHT}, and {@link LayoutType#DEPTH}. These implementations
  * share the same core principal as a {@code Convolution} layer does, with the difference being the
  * number of input dimension each operates on as denoted by {@code ConvXD} for {@code X}

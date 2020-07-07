@@ -19,7 +19,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 
 /**
- * A {@code Conv1D} layer works similar to {@link Convolution} layer with the exception of the
+ * A {@code Conv1d} layer works similar to {@link Convolution} layer with the exception of the
  * number of dimension it operates on being only one, which is {@link LayoutType#WIDTH}. The channel
  * of the input data may be more than one, depending on what data is processed. Each filter slides
  * through the data with only one direction of movement along the dimension itself.
@@ -28,9 +28,9 @@ import ai.djl.nn.Block;
  * href="https://ieeexplore.ieee.org/document/7318926/">paper</a> is used in tasks utilizing serial
  * data, enabling convolutional processing of 1-dimensional data such as time-series data (stock
  * price, weather, ECG) and text/speech data without the need of transforming it to 2-dimensional
- * data to be processed by {@link Conv2D}, though this is quite a common technique as well.
+ * data to be processed by {@link Conv2d}, though this is quite a common technique as well.
  *
- * <p>The input to a {@code Conv1D} is an {@link ai.djl.ndarray.NDList} with a single 3-D {@link
+ * <p>The input to a {@code Conv1d} is an {@link ai.djl.ndarray.NDList} with a single 3-D {@link
  * ai.djl.ndarray.NDArray}. The layout of the {@link ai.djl.ndarray.NDArray} must be "NCW". The
  * shapes are
  *
@@ -45,7 +45,7 @@ import ai.djl.nn.Block;
  *
  * <p>Both {@code weight} and {@code bias} are learn-able parameters.
  */
-public class Conv1D extends Convolution {
+public class Conv1d extends Convolution {
 
     private static final LayoutType[] EXPECTED_LAYOUT = {
         LayoutType.BATCH, LayoutType.CHANNEL, LayoutType.WIDTH
@@ -54,7 +54,7 @@ public class Conv1D extends Convolution {
     private static final String STRING_LAYOUT = "NCW";
     private static final int NUM_DIMENSIONS = 3;
 
-    Conv1D(Builder builder) {
+    Conv1d(Builder builder) {
         super(builder);
     }
 
@@ -181,7 +181,7 @@ public class Conv1D extends Convolution {
     }
 
     /**
-     * Creates a builder to build a {@code Conv1D}.
+     * Creates a builder to build a {@code Conv1d}.
      *
      * @return a new builder
      */
@@ -189,10 +189,10 @@ public class Conv1D extends Convolution {
         return new Builder();
     }
 
-    /** The Builder to construct a {@link Conv1D} type of {@link Block}. */
+    /** The Builder to construct a {@link Conv1d} type of {@link Block}. */
     public static final class Builder extends ConvolutionBuilder<Builder> {
 
-        /** Creates a builder that can build a {@link Conv1D} block. */
+        /** Creates a builder that can build a {@link Conv1d} block. */
         Builder() {
             stride = new Shape(1);
             padding = new Shape(0);
@@ -206,13 +206,13 @@ public class Conv1D extends Convolution {
         }
 
         /**
-         * Builds a {@link Conv1D} block.
+         * Builds a {@link Conv1d} block.
          *
-         * @return the {@link Conv1D} block
+         * @return the {@link Conv1d} block
          */
-        public Conv1D build() {
+        public Conv1d build() {
             validate();
-            return new Conv1D(this);
+            return new Conv1d(this);
         }
     }
 }

@@ -12,7 +12,7 @@ Many of us use the [IntelliJ IDEA IDE](https://www.jetbrains.com/idea/) to devel
 When writing code for DJL, we usually try to follow standard Java coding conventions. In addition, here are some other conventions we use:
 
 - For builders, use setXXX for required values and optXXX for optional ones
-- Follow the example in `Convolution` and `Conv2D` when making extendable builders
+- Follow the example in `Convolution` and `Conv2d` when making extendable builders
 - The usage of `final` for members and parameters is generally discouraged in favor of readability.  
 
 Alongside these conventions, we have a number of checks that are run including PMD, SpotBugs, and Checkstyle. These can all be verified by running the gradle `build` target. Instructions for fixing any problems will be given by the relevant tool.
@@ -28,7 +28,7 @@ Script '/Volumes/Unix/projects/Joule/tools/gradle/formatter.gradle' line: 57
 
 * What went wrong:
 Execution failed for task ':api:verifyJava'.
-> File not formatted: /Volumes/Unix/projects/Joule/api/src/main/java/ai/djl/nn/convolutional/Conv2D.java
+> File not formatted: /Volumes/Unix/projects/Joule/api/src/main/java/ai/djl/nn/convolutional/Conv2d.java
   See https://github.com/awslabs/djl/blob/master/docs/development/development_guideline.md#coding-conventions for formatting instructions
 ```
 If you do fail the format check, the easiest way to resolve it is to run the gradle `formatJava` target to reformat your code. It may be helpful to just run the formatter before you build the project rather than waiting for the formatting verification to fail.

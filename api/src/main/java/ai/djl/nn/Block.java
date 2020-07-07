@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
@@ -47,9 +48,9 @@ import java.io.IOException;
  * be a combination of the functions of the child blocks.
  *
  * <p>The parameters of a {@code Block} are instances of {@link Parameter} which are required for
- * the operation in the forward function. For example, in a {@link ai.djl.nn.convolutional.Conv2D}
- * block, the parameters are {@code weight} and {@code bias}. During training, these parameters are
- * updated to reflect the training data, and that forms the crux of learning.
+ * the operation in the forward function. For example, in a {@link Conv2d} block, the parameters are
+ * {@code weight} and {@code bias}. During training, these parameters are updated to reflect the
+ * training data, and that forms the crux of learning.
  *
  * <p>When building these block functions, the easiest way is to use composition. Similar to how
  * functions are built by calling other functions, blocks can be built by combining other blocks. We
@@ -62,10 +63,10 @@ import java.io.IOException;
  *
  * <p>A block does not necessarily have to have children and parameters. For example, {@link
  * SequentialBlock}, and {@link ParallelBlock} don't have any parameters, but do have child blocks.
- * Similarly, {@link ai.djl.nn.convolutional.Conv2D} does not have children, but has parameters.
- * There can be special cases where blocks have neither parameters nor children. One such example is
- * {@link LambdaBlock}. {@link LambdaBlock} takes in a function, and applies that function to its
- * input in the {@link #forward(ParameterStore, NDList, boolean) forward} method.
+ * Similarly, {@link Conv2d} does not have children, but has parameters. There can be special cases
+ * where blocks have neither parameters nor children. One such example is {@link LambdaBlock}.
+ * {@link LambdaBlock} takes in a function, and applies that function to its input in the {@link
+ * #forward(ParameterStore, NDList, boolean) forward} method.
  *
  * <p>Now that we understand the components of the block, we can explore what the block really
  * represents. A block combined with the recursive, hierarchical structure of its children forms a
