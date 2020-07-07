@@ -62,7 +62,9 @@ public class LoggingTrainingListener implements TrainingListener {
                                 trainer.getEvaluators(),
                                 EvaluatorTrainingListener.VALIDATE_EPOCH,
                                 Short.MAX_VALUE);
-                logger.info("Validate: {}", status);
+                if (!status.isEmpty()) {
+                    logger.info("Validate: {}", status);
+                }
             } else {
                 logger.info("validation has not been run.");
             }
@@ -197,7 +199,15 @@ public class LoggingTrainingListener implements TrainingListener {
             if (metrics.hasMetric(metricName)) {
                 float value = metrics.latestMetric(metricName).getValue().floatValue();
                 // use .2 precision to avoid new line in progress bar
-                metricOutputs.add(String.format("%s: %.2f", evaluator.getName(), value));
+                String output;
+                if (Math.abs(value) < .01 || Math.abs(value) > 9999) {
+                    output = String.format("%s: %.2E", evaluator.getName(), value);
+                } else if (metricName.startsWith("validate_") && Float.isNaN(value)) {
+                    continue;
+                } else {
+                    output = String.format("%s: %.2f", evaluator.getName(), value);
+                }
+                metricOutputs.add(output);
             } else {
                 metricOutputs.add(String.format("%s: _", evaluator.getName()));
             }
