@@ -1,8 +1,8 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: Enhancement
+about: Suggest an enhancement, feature request, or idea for this project
 title: ''
-labels: 'feature request'
+labels: 'enhancement'
 assignees: ''
 
 ---
@@ -12,7 +12,7 @@ assignees: ''
 
 ### Will this change the current api? How?
 
-### Who will benefit from this feature?
+### Who will benefit from this enhancement?
 
 ## References
 - list reference and related literature
