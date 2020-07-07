@@ -43,6 +43,7 @@ import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.MaskedSoftmaxCrossEntropyLoss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.PaddingStackBatchifier;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;
@@ -54,11 +55,12 @@ public final class TrainSeq2Seq {
 
     private TrainSeq2Seq() {}
 
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) throws IOException, ParseException, TranslateException {
         TrainSeq2Seq.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args) throws IOException, ParseException {
+    public static TrainingResult runExample(String[] args)
+            throws IOException, ParseException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
         ExecutorService executorService = Executors.newFixedThreadPool(8);
         try (Model model = Model.newInstance("seq2seqMTEn-Fr")) {
@@ -85,7 +87,7 @@ public final class TrainSeq2Seq {
                     getSeq2SeqModel(
                             sourceEmbedding,
                             targetEmbedding,
-                            trainingSet.getVocabulary(false).getAllTokens().size());
+                            trainingSet.getVocabulary(false).size());
             model.setBlock(block);
 
             // setup training configuration
@@ -115,7 +117,7 @@ public final class TrainSeq2Seq {
     private static Block getSeq2SeqModel(
             TrainableTextEmbedding sourceEmbedding,
             TrainableTextEmbedding targetEmbedding,
-            int vocabSize) {
+            long vocabSize) {
         SimpleTextEncoder simpleTextEncoder =
                 new SimpleTextEncoder(
                         sourceEmbedding,
@@ -161,7 +163,7 @@ public final class TrainSeq2Seq {
             ExecutorService executorService,
             TextEmbedding sourceEmbedding,
             TextEmbedding targetEmbedding)
-            throws IOException {
+            throws IOException, TranslateException {
         long limit =
                 usage == Dataset.Usage.TRAIN ? arguments.getLimit() : arguments.getLimit() / 10;
         TatoebaEnglishFrenchDataset.Builder datasetBuilder =

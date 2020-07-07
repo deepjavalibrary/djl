@@ -94,6 +94,11 @@ public final class PtBertVocabulary implements Vocabulary {
         return (indicesMap.containsKey(token)) ? indicesMap.get(token) : indicesMap.get("[UNK]");
     }
 
+    @Override
+    public long size() {
+        return indicesMap.size();
+    }
+
     /** {@inheritDoc} */
     @Override
     public String getToken(long index) {

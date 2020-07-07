@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.training;
 
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
 import org.testng.annotations.Test;
@@ -19,7 +20,7 @@ import org.testng.annotations.Test;
 public class TrainCaptchaTest {
 
     @Test
-    public void testTrainCaptcha() throws IOException, ParseException {
+    public void testTrainCaptcha() throws IOException, ParseException, TranslateException {
         String[] args = new String[] {"-g", "1", "-e", "1", "-m", "2"};
         TrainCaptcha.runExample(args);
     }

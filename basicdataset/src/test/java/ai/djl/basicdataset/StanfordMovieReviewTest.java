@@ -15,6 +15,7 @@ package ai.djl.basicdataset;
 import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.Record;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -24,7 +25,7 @@ public class StanfordMovieReviewTest {
     private static final int EMBEDDING_SIZE = 15;
 
     @Test
-    public void testGetDataWithPreTrainedEmbedding() throws IOException {
+    public void testGetDataWithPreTrainedEmbedding() throws IOException, TranslateException {
         try (NDManager manager = NDManager.newBaseManager()) {
             StanfordMovieReview dataset =
                     StanfordMovieReview.builder()
@@ -39,17 +40,18 @@ public class StanfordMovieReviewTest {
                                                     TestUtils.getTextEmbedding(
                                                             manager, EMBEDDING_SIZE)))
                             .setSampling(32, true)
+                            .optLimit(100)
                             .build();
             dataset.prepare();
 
             Record record = dataset.get(manager, 0);
-            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
+            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
             Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 0);
         }
     }
 
     @Test
-    public void testGetDataWithTrainableEmbedding() throws IOException {
+    public void testGetDataWithTrainableEmbedding() throws IOException, TranslateException {
         try (NDManager manager = NDManager.newBaseManager()) {
             StanfordMovieReview dataset =
                     StanfordMovieReview.builder()
@@ -71,7 +73,7 @@ public class StanfordMovieReviewTest {
             dataset.prepare();
 
             Record record = dataset.get(manager, 0);
-            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
+            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
             Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 0);
         }
     }

@@ -31,6 +31,7 @@ import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
 
@@ -45,11 +46,12 @@ public final class TrainMnist {
 
     private TrainMnist() {}
 
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) throws IOException, ParseException, TranslateException {
         TrainMnist.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args) throws IOException, ParseException {
+    public static TrainingResult runExample(String[] args)
+            throws IOException, ParseException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
 
         // Construct neural network
@@ -107,7 +109,7 @@ public final class TrainMnist {
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
-            throws IOException {
+            throws IOException, TranslateException {
         Mnist mnist =
                 Mnist.builder()
                         .optUsage(usage)

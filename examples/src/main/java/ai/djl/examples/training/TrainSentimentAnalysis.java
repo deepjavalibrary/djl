@@ -71,7 +71,7 @@ public final class TrainSentimentAnalysis {
                     new SimpleTokenizer(),
                     new LowerCaseConvertor(Locale.ENGLISH),
                     new PunctuationSeparator());
-    private static int paddingTokenValue;
+    private static long paddingTokenValue;
 
     private TrainSentimentAnalysis() {}
 
@@ -186,7 +186,7 @@ public final class TrainSentimentAnalysis {
             Dataset.Usage usage,
             ExecutorService executorService,
             Arguments arguments)
-            throws IOException {
+            throws IOException, TranslateException {
         StanfordMovieReview stanfordMovieReview =
                 StanfordMovieReview.builder()
                         .setSampling(new FixedBucketSampler(arguments.getBatchSize()))

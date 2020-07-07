@@ -24,6 +24,7 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.initializer.NormalInitializer;
 import ai.djl.training.loss.Loss;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.Iterator;
 import org.testng.Assert;
@@ -32,7 +33,7 @@ import org.testng.annotations.Test;
 public class PikachuTest {
 
     @Test
-    public void testPikachuRemote() throws IOException {
+    public void testPikachuRemote() throws IOException, TranslateException {
         PikachuDetection pikachu =
                 new PikachuDetectionUnitTest(
                         PikachuDetection.builder()

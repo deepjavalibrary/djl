@@ -16,6 +16,7 @@ import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
 import java.io.IOException;
 
@@ -87,12 +88,13 @@ public interface ZooDataset extends Dataset, PreparedDataset {
      *
      * @param usage the usage to prepare
      * @throws IOException for various exceptions depending on the specific dataset
+     * @throws TranslateException if there is an error while processing input
      */
-    void prepareData(Usage usage) throws IOException;
+    void prepareData(Usage usage) throws IOException, TranslateException;
 
     /** {@inheritDoc} */
     @Override
-    default void prepare(Progress progress) throws IOException {
+    default void prepare(Progress progress) throws IOException, TranslateException {
         if (!isPrepared()) {
             if (getArtifact() == null) {
                 useDefaultArtifact();

@@ -88,6 +88,12 @@ public class MxBertVocabulary implements Vocabulary {
 
     /** {@inheritDoc} */
     @Override
+    public long size() {
+        return idx2token.size();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getToken(long index) {
         return idx2token.get((int) index);
     }

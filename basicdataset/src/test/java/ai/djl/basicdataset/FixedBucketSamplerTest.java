@@ -15,6 +15,7 @@ package ai.djl.basicdataset;
 import ai.djl.basicdataset.utils.FixedBucketSampler;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.PaddingStackBatchifier;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,7 +26,7 @@ import org.testng.annotations.Test;
 
 public class FixedBucketSamplerTest {
     @Test
-    public void testFixedBucketSampler() throws IOException {
+    public void testFixedBucketSampler() throws IOException, TranslateException {
         FixedBucketSampler fixedBucketSampler = new FixedBucketSampler(10, 100, false, true);
         TatoebaEnglishFrenchDataset dataset =
                 TatoebaEnglishFrenchDataset.builder()

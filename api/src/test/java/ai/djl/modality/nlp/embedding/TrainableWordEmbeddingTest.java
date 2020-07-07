@@ -12,6 +12,7 @@
  */
 package ai.djl.modality.nlp.embedding;
 
+import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.ndarray.NDManager;
 import org.testng.Assert;
@@ -27,12 +28,13 @@ public class TrainableWordEmbeddingTest {
     public void testWordEmbedding() {
         TrainableWordEmbedding trainableWordEmbedding =
                 TrainableWordEmbedding.builder()
-                        .setItems(new SimpleTokenizer().tokenize(TEST_STRING))
+                        .setVocabulary(
+                                new SimpleVocabulary(new SimpleTokenizer().tokenize(TEST_STRING)))
                         .setEmbeddingSize(10)
                         .optUseDefault(true)
                         .build();
         try (NDManager manager = NDManager.newBaseManager()) {
-            int index = trainableWordEmbedding.preprocessWordToEmbed("Java");
+            long index = trainableWordEmbedding.preprocessWordToEmbed("Java");
             String word = trainableWordEmbedding.unembedWord(manager.create(index));
             Assert.assertEquals(word, "Java");
 

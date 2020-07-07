@@ -35,6 +35,7 @@ import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
+import ai.djl.translate.TranslateException;
 import ai.djl.util.Pair;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -49,11 +50,12 @@ public final class TrainWithHpo {
 
     private TrainWithHpo() {}
 
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) throws IOException, ParseException, TranslateException {
         TrainWithHpo.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args) throws IOException, ParseException {
+    public static TrainingResult runExample(String[] args)
+            throws IOException, ParseException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
 
         // get training and validation dataset
@@ -152,7 +154,7 @@ public final class TrainWithHpo {
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
-            throws IOException {
+            throws IOException, TranslateException {
         Mnist mnist =
                 Mnist.builder()
                         .optUsage(usage)

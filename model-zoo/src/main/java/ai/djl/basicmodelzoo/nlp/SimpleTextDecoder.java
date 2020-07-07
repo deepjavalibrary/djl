@@ -58,7 +58,7 @@ public class SimpleTextDecoder extends Decoder {
     public SimpleTextDecoder(
             TrainableTextEmbedding trainableTextEmbedding,
             RecurrentBlock recurrentBlock,
-            int vocabSize) {
+            long vocabSize) {
         super(VERSION, getBlock(trainableTextEmbedding, recurrentBlock, vocabSize));
         this.recurrentBlock = recurrentBlock;
     }
@@ -66,7 +66,7 @@ public class SimpleTextDecoder extends Decoder {
     private static Block getBlock(
             TrainableTextEmbedding trainableTextEmbedding,
             RecurrentBlock recurrentBlock,
-            int vocabSize) {
+            long vocabSize) {
         SequentialBlock sequentialBlock = new SequentialBlock();
         sequentialBlock
                 .add(trainableTextEmbedding)

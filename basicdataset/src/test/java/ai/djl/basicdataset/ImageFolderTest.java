@@ -29,6 +29,7 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.Pipeline;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -40,7 +41,7 @@ import org.testng.annotations.Test;
 public class ImageFolderTest {
 
     @Test
-    public void testImageFolder() throws IOException {
+    public void testImageFolder() throws IOException, TranslateException {
         Repository repository = Repository.newInstance("test", "src/test/resources/imagefolder");
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())

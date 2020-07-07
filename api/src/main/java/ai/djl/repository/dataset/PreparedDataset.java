@@ -12,6 +12,7 @@
  */
 package ai.djl.repository.dataset;
 
+import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
 import java.io.IOException;
 
@@ -27,8 +28,9 @@ public interface PreparedDataset {
      * Prepares the dataset for use.
      *
      * @throws IOException for various exceptions depending on the dataset
+     * @throws TranslateException if there is an error while processing input
      */
-    default void prepare() throws IOException {
+    default void prepare() throws IOException, TranslateException {
         prepare(null);
     }
 
@@ -37,6 +39,7 @@ public interface PreparedDataset {
      *
      * @param progress the progress tracker
      * @throws IOException for various exceptions depending on the dataset
+     * @throws TranslateException if there is an error while processing input
      */
-    void prepare(Progress progress) throws IOException;
+    void prepare(Progress progress) throws IOException, TranslateException;
 }

@@ -48,6 +48,7 @@ import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import ai.djl.training.optimizer.learningrate.MultiFactorTracker;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
@@ -63,12 +64,14 @@ public final class TrainWithOptimizers {
     private TrainWithOptimizers() {}
 
     public static void main(String[] args)
-            throws IOException, ParseException, ModelNotFoundException, MalformedModelException {
+            throws IOException, ParseException, ModelNotFoundException, MalformedModelException,
+                    TranslateException {
         TrainWithOptimizers.runExample(args);
     }
 
     public static TrainingResult runExample(String[] args)
-            throws IOException, ParseException, ModelNotFoundException, MalformedModelException {
+            throws IOException, ParseException, ModelNotFoundException, MalformedModelException,
+                    TranslateException {
         Options options = OptimizerArguments.getOptions();
         DefaultParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args, null, false);
@@ -216,7 +219,7 @@ public final class TrainWithOptimizers {
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
-            throws IOException {
+            throws IOException, TranslateException {
         Pipeline pipeline =
                 new Pipeline(
                         new ToTensor(),

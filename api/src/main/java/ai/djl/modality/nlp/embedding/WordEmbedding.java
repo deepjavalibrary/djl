@@ -30,7 +30,7 @@ import ai.djl.ndarray.NDManager;
  * <p>In the second option, the embedding can be trained using the standard deep learning techniques
  * to better handle the current dataset. For this case, you need two methods. First, call {@link
  * #preprocessWordToEmbed(String)} within your dataset. Then, the first step in your model should be
- * to call {@link #embedWord(NDManager, int)}.
+ * to call {@link #embedWord(NDManager, long)}.
  */
 public interface WordEmbedding {
 
@@ -45,12 +45,12 @@ public interface WordEmbedding {
     /**
      * Pre-processes the word to embed into an array to pass into the model.
      *
-     * <p>Make sure to call {@link #embedWord(NDManager, int)} after this.
+     * <p>Make sure to call {@link #embedWord(NDManager, long)} after this.
      *
      * @param word the word to embed
      * @return the word that is ready to embed
      */
-    int preprocessWordToEmbed(String word);
+    long preprocessWordToEmbed(String word);
 
     /**
      * Embeds a word.
@@ -72,7 +72,7 @@ public interface WordEmbedding {
      * @return the embedded word
      * @throws EmbeddingException if there is an error while trying to embed
      */
-    default NDArray embedWord(NDManager manager, int index) throws EmbeddingException {
+    default NDArray embedWord(NDManager manager, long index) throws EmbeddingException {
         return embedWord(manager.create(index));
     }
 

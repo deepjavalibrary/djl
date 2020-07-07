@@ -31,14 +31,9 @@ import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * An Embedding block map a collection of items to 1-Dimensional representative {@link NDArray}s.
@@ -47,13 +42,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class Embedding<T> extends AbstractBlock implements AbstractIndexedEmbedding<T> {
 
-    private static final byte VERSION = 4;
+    private static final byte VERSION = 5;
 
     protected int embeddingSize;
     protected boolean sparseGrad;
     protected DataType dataType;
-    protected Map<T, Integer> embedder;
-    protected Map<Integer, T> unembedder;
     protected int numItems;
 
     protected AbstractIndexedEmbedding<T> fallthroughEmbedding;
@@ -74,8 +67,6 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
                                 true,
                                 sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE),
                         (inputShapes) -> new Shape(numItems, embeddingSize));
-        embedder = new ConcurrentHashMap<>();
-        unembedder = new ConcurrentHashMap<>();
         if (baseBuilder.fallthrough != null && baseBuilder.defaultItem != null) {
             throw new IllegalArgumentException(
                     "You can not specify both a fallthrough and a defaultItem");
@@ -87,10 +78,6 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
             fallthroughEmbedding = new DefaultEmbedding();
         }
         numItems = 1; // numItems includes a zero element for use by fallthroughEmbeddings
-        for (T item : baseBuilder.items) {
-            embedder.put(item, numItems);
-            unembedder.put(numItems++, item);
-        }
         inputShapes = new Shape[] {new Shape(-1)};
     }
 
@@ -98,20 +85,18 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
      * Constructs a pretrained embedding.
      *
      * @param embedding the embedding array
-     * @param items the items in the embedding (in matching order to the embedding array)
      */
-    public Embedding(NDArray embedding, List<T> items) {
-        this(embedding, items, true);
+    public Embedding(NDArray embedding) {
+        this(embedding, true);
     }
 
     /**
      * Constructs a pretrained embedding.
      *
      * @param embedding the embedding array
-     * @param items the items in the embedding (in matching order to the embedding array)
      * @param sparseGrad whether to compute row sparse gradient in the backward calculation
      */
-    public Embedding(NDArray embedding, List<T> items, boolean sparseGrad) {
+    public Embedding(NDArray embedding, boolean sparseGrad) {
         super(VERSION);
         embeddingSize = Math.toIntExact(embedding.getShape().get(1));
         this.sparseGrad = sparseGrad;
@@ -127,12 +112,6 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
                         (inputShapes) -> new Shape(numItems, embeddingSize));
         this.embedding.setArray(embedding);
         numItems = Math.toIntExact(embedding.getShape().size(0));
-        embedder = new ConcurrentHashMap<>(numItems);
-        unembedder = new ConcurrentHashMap<>(numItems);
-        for (int i = 1; i <= items.size(); i++) {
-            embedder.put(items.get(i), i);
-            unembedder.put(i, items.get(i));
-        }
         inputShapes = new Shape[] {new Shape(-1)};
     }
 
@@ -167,14 +146,6 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
         saveInputShapes(os);
         os.writeBoolean(sparseGrad);
         os.writeUTF(dataType.toString());
-        Set<Map.Entry<T, Integer>> embedderEntrySet = embedder.entrySet();
-        os.writeInt(embedderEntrySet.size());
-        for (Map.Entry<T, Integer> entry : embedderEntrySet) {
-            byte[] encodedKey = encode(entry.getKey());
-            os.writeInt(encodedKey.length);
-            os.write(encodedKey);
-            os.writeInt(embedder.get(entry.getKey()));
-        }
         embedding.save(os);
     }
 
@@ -189,25 +160,23 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
         // the zero index reserved for the fallthrough embedding
         boolean addMissingZero = false;
 
-        if (version == VERSION || version == 3) {
+        if (version >= 3) {
             readInputShapes(is);
             if (version == 3) {
                 addMissingZero = !is.readBoolean();
             }
             sparseGrad = is.readBoolean();
             dataType = DataType.valueOf(is.readUTF().toUpperCase(Locale.ENGLISH));
-            embedder = new ConcurrentHashMap<>();
-            unembedder = new ConcurrentHashMap<>();
-            int embedderSize = is.readInt();
-            for (int i = 1; i <= embedderSize; i++) {
-                int encodedKeySize = is.readInt();
-                byte[] encodedKey = new byte[encodedKeySize];
-                if (is.read(encodedKey) != encodedKey.length) {
-                    throw new MalformedModelException("Model data is malformed");
+            if (version == 3 || version == 4) {
+                int embedderSize = is.readInt();
+                for (int i = 1; i <= embedderSize; i++) {
+                    int encodedKeySize = is.readInt();
+                    byte[] encodedKey = new byte[encodedKeySize];
+                    if (is.read(encodedKey) != encodedKey.length) {
+                        throw new MalformedModelException("Model data is malformed");
+                    }
+                    is.readInt();
                 }
-                int value = is.readInt();
-                embedder.put(decode(encodedKey), value);
-                unembedder.put(value, decode(encodedKey));
             }
         } else if (version == 2) {
             readInputShapes(is);
@@ -228,12 +197,6 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
         }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean hasItem(T item) {
-        return embedder.containsKey(item);
-    }
-
     private NDList opInputs(ParameterStore parameterStore, NDList inputs) {
         NDArray items = inputs.head();
         Device device = items.getDevice();
@@ -251,34 +214,7 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
     /** {@inheritDoc} */
     @Override
     public NDArray embed(NDManager manager, T[] items) {
-        return manager.create(Arrays.stream(items).mapToInt(this::embed).toArray());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int embed(T item) {
-        if (embedder.containsKey(item)) {
-            return embedder.get(item);
-        } else {
-            if (fallthroughEmbedding != null) {
-                return fallthroughEmbedding.embed(item);
-            } else {
-                throw new IllegalArgumentException("The provided item was not found");
-            }
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Optional<T> unembed(int index) {
-        if (index == 0) {
-            if (fallthroughEmbedding == null) {
-                throw new IllegalArgumentException(
-                        "Index 0 is reserved for the fallThrough but no fallThrough is found");
-            }
-            return fallthroughEmbedding.unembed(index);
-        }
-        return Optional.ofNullable(unembedder.get(index));
+        return manager.create(Arrays.stream(items).mapToLong(this::embed).toArray());
     }
 
     /**
@@ -289,7 +225,6 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
     public abstract static class BaseBuilder<T, B extends BaseBuilder<T, B>> {
 
         protected Class<T> embeddingType;
-        protected List<T> items = new ArrayList<>();
         protected int embeddingSize;
         protected boolean useDefault = true;
         protected T defaultItem;
@@ -315,18 +250,6 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
          * @return a new {@link BaseBuilder} class with the specified embedding type
          */
         protected abstract B setType(Class<T> embeddingType);
-
-        /**
-         * Sets the collection of items that should feature embeddings.
-         *
-         * @param items a {@link List} containing all the items that embeddings should be created
-         *     for
-         * @return this Builder
-         */
-        public B setItems(List<T> items) {
-            this.items = items;
-            return self();
-        }
 
         /**
          * Sets the size of the embeddings.
@@ -438,13 +361,13 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
 
         /** {@inheritDoc} */
         @Override
-        public int embed(T item) {
+        public long embed(T item) {
             return 0;
         }
 
         /** {@inheritDoc} */
         @Override
-        public Optional<T> unembed(int index) {
+        public Optional<T> unembed(long index) {
             return Optional.empty();
         }
     }
@@ -486,13 +409,13 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
 
         /** {@inheritDoc} */
         @Override
-        public int embed(T item) {
+        public long embed(T item) {
             return 0;
         }
 
         /** {@inheritDoc} */
         @Override
-        public Optional<T> unembed(int index) {
+        public Optional<T> unembed(long index) {
             return Optional.of(defaultItem);
         }
     }

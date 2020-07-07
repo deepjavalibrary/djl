@@ -17,7 +17,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Transform;
-import ai.djl.translate.TranslateException;
 import ai.djl.util.RandomUtils;
 import java.io.IOException;
 import java.util.Arrays;
@@ -69,10 +68,8 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
      * @param index the index of the requested data item
      * @return a {@link Record} that contains the data and label of the requested data item
      * @throws IOException if an I/O error occurs
-     * @throws TranslateException if there is an error while processing input
      */
-    public abstract Record get(NDManager manager, long index)
-            throws IOException, TranslateException;
+    public abstract Record get(NDManager manager, long index) throws IOException;
 
     /** {@inheritDoc} */
     @Override
@@ -362,7 +359,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
 
         /** {@inheritDoc} */
         @Override
-        public Record get(NDManager manager, long index) throws IOException, TranslateException {
+        public Record get(NDManager manager, long index) throws IOException {
             if (index >= size()) {
                 throw new IndexOutOfBoundsException("index(" + index + ") > size(" + size() + ").");
             }

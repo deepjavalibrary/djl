@@ -46,8 +46,8 @@ public class ModelZooTextEmbedding implements TextEmbedding, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
-    public int[] preprocessTextToEmbed(List<String> tokens) {
-        return tokens.stream().mapToInt(token -> embedding.embed(token)).toArray();
+    public long[] preprocessTextToEmbed(List<String> tokens) {
+        return tokens.stream().mapToLong(token -> embedding.embed(token)).toArray();
     }
 
     /** {@inheritDoc} */

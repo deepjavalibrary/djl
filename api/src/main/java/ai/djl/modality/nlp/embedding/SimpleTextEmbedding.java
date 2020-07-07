@@ -34,8 +34,8 @@ public class SimpleTextEmbedding implements TextEmbedding {
 
     /** {@inheritDoc} */
     @Override
-    public int[] preprocessTextToEmbed(List<String> text) {
-        int[] result = new int[text.size()];
+    public long[] preprocessTextToEmbed(List<String> text) {
+        long[] result = new long[text.size()];
         for (int i = 0; i < text.size(); i++) {
             result[i] = wordEmbedding.preprocessWordToEmbed(text.get(i));
         }

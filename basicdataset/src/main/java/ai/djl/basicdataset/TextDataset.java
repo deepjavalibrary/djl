@@ -17,9 +17,13 @@ import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.engine.Engine;
 import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
+import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.ndarray.NDManager;
+import ai.djl.repository.Artifact;
+import ai.djl.repository.Repository;
+import ai.djl.repository.dataset.ZooDataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import java.util.List;
 
@@ -33,11 +37,15 @@ import java.util.List;
  * are set, the dataset creates {@link TrainableWordEmbedding} based {@link TrainableWordEmbedding}
  * from the {@link Vocabulary} created within the dataset.
  */
-public abstract class TextDataset extends RandomAccessDataset {
+public abstract class TextDataset extends RandomAccessDataset implements ZooDataset {
 
     protected TextData sourceTextData;
     protected TextData targetTextData;
     protected NDManager manager;
+
+    protected Repository repository;
+    protected Artifact artifact;
+    protected Usage usage;
 
     /**
      * Creates a new instance of {@link RandomAccessDataset} with the given necessary
@@ -74,7 +82,7 @@ public abstract class TextDataset extends RandomAccessDataset {
      * @param source whether to get source or target vocabulary
      * @return the {@link SimpleVocabulary}
      */
-    public SimpleVocabulary getVocabulary(boolean source) {
+    public Vocabulary getVocabulary(boolean source) {
         TextData textData = source ? sourceTextData : targetTextData;
         return textData.getVocabulary();
     }
@@ -109,11 +117,30 @@ public abstract class TextDataset extends RandomAccessDataset {
      *
      * @param newTextData list of all unprocessed sentences in the dataset
      * @param source whether the text data provided is source or target
+     * @throws EmbeddingException if there is an error while embedding input
      */
-    protected void preprocess(List<String> newTextData, boolean source) {
+    protected void preprocess(List<String> newTextData, boolean source) throws EmbeddingException {
         TextData textData = source ? sourceTextData : targetTextData;
         textData.preprocess(
                 manager, newTextData.subList(0, (int) Math.min(limit, newTextData.size())));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Repository getRepository() {
+        return repository;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Artifact getArtifact() {
+        return artifact;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Usage getUsage() {
+        return usage;
     }
 
     /** Abstract Builder that helps build a {@link TextDataset}. */
@@ -121,6 +148,9 @@ public abstract class TextDataset extends RandomAccessDataset {
         private TextData.Configuration sourceConfiguration = new Configuration();
         private TextData.Configuration targetConfiguration = new Configuration();
         private NDManager manager = Engine.getInstance().newBaseManager();
+        protected Repository repository;
+        protected Artifact artifact;
+        protected Usage usage;
 
         /**
          * Sets the {@link TextData.Configuration} to use for the source text data.
@@ -152,6 +182,39 @@ public abstract class TextDataset extends RandomAccessDataset {
          */
         public T optManager(NDManager manager) {
             this.manager = manager.newSubManager();
+            return self();
+        }
+
+        /**
+         * Sets the optional usage.
+         *
+         * @param usage the usage
+         * @return this builder
+         */
+        public T optUsage(Usage usage) {
+            this.usage = usage;
+            return self();
+        }
+
+        /**
+         * Sets the optional repository.
+         *
+         * @param repository the repository
+         * @return this builder
+         */
+        public T optRepository(Repository repository) {
+            this.repository = repository;
+            return self();
+        }
+
+        /**
+         * Sets the optional artifact.
+         *
+         * @param artifact the artifact
+         * @return this builder
+         */
+        public T optArtifact(Artifact artifact) {
+            this.artifact = artifact;
             return self();
         }
     }

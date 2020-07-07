@@ -13,9 +13,9 @@
 package ai.djl.basicdataset;
 
 import ai.djl.basicdataset.utils.TextData.Configuration;
-import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.Record;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -25,7 +25,7 @@ public class TatoebaEnglishFrenchDatasetTest {
     private static final int EMBEDDING_SIZE = 15;
 
     @Test
-    public void testGetDataWithPreTrainedEmbedding() throws IOException {
+    public void testGetDataWithPreTrainedEmbedding() throws IOException, TranslateException {
         try (NDManager manager = NDManager.newBaseManager()) {
             TatoebaEnglishFrenchDataset tatoebaEnglishFrenchDataset =
                     TatoebaEnglishFrenchDataset.builder()
@@ -40,34 +40,26 @@ public class TatoebaEnglishFrenchDatasetTest {
                                                     TestUtils.getTextEmbedding(
                                                             manager, EMBEDDING_SIZE)))
                             .setSampling(32, true)
-                            .optLimit(1000)
+                            .optLimit(10)
                             .build();
             tatoebaEnglishFrenchDataset.prepare();
             Record record = tatoebaEnglishFrenchDataset.get(manager, 0);
-            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
-            Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
+            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
+            Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 2);
         }
     }
 
     @Test
-    public void testGetDataWithTrainableEmbedding() throws IOException, EmbeddingException {
+    public void testGetDataWithTrainableEmbedding() throws IOException, TranslateException {
         try (NDManager manager = NDManager.newBaseManager()) {
             TatoebaEnglishFrenchDataset tatoebaEnglishFrenchDataset =
                     TatoebaEnglishFrenchDataset.builder()
                             .setSourceConfiguration(
-                                    new Configuration()
-                                            .setTextEmbedding(
-                                                    TestUtils.getTextEmbedding(
-                                                            manager, EMBEDDING_SIZE))
-                                            .setEmbeddingSize(EMBEDDING_SIZE))
+                                    new Configuration().setEmbeddingSize(EMBEDDING_SIZE))
                             .setTargetConfiguration(
-                                    new Configuration()
-                                            .setTextEmbedding(
-                                                    TestUtils.getTextEmbedding(
-                                                            manager, EMBEDDING_SIZE))
-                                            .setEmbeddingSize(EMBEDDING_SIZE))
+                                    new Configuration().setEmbeddingSize(EMBEDDING_SIZE))
                             .setSampling(32, true)
-                            .optLimit(1000)
+                            .optLimit(10)
                             .build();
             tatoebaEnglishFrenchDataset.prepare();
 

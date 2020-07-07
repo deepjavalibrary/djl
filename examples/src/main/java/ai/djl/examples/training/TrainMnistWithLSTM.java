@@ -36,6 +36,7 @@ import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
 
@@ -43,11 +44,12 @@ public final class TrainMnistWithLSTM {
 
     private TrainMnistWithLSTM() {}
 
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) throws IOException, ParseException, TranslateException {
         TrainMnistWithLSTM.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args) throws IOException, ParseException {
+    public static TrainingResult runExample(String[] args)
+            throws IOException, ParseException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
 
         try (Model model = Model.newInstance("lstm")) {
@@ -118,7 +120,7 @@ public final class TrainMnistWithLSTM {
     }
 
     public static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
-            throws IOException {
+            throws IOException, TranslateException {
         Mnist mnist =
                 Mnist.builder()
                         .optUsage(usage)

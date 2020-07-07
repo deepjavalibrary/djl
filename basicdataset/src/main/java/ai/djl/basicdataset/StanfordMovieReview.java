@@ -13,6 +13,7 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Application.NLP;
+import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -116,7 +117,7 @@ public class StanfordMovieReview extends TextDataset implements ZooDataset {
 
     /** {@inheritDoc} */
     @Override
-    public void prepareData(Usage usage) throws IOException {
+    public void prepareData(Usage usage) throws IOException, EmbeddingException {
         Path cacheDir = repository.getCacheDirectory();
         URI resourceUri = artifact.getResourceUri();
         Path root = cacheDir.resolve(resourceUri.getPath()).resolve("aclImdb").resolve("aclImdb");

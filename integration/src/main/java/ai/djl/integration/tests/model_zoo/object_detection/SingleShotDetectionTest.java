@@ -75,7 +75,8 @@ public class SingleShotDetectionTest {
 
     @Test
     public void testLoadTrain()
-            throws IOException, ModelNotFoundException, MalformedModelException {
+            throws IOException, ModelNotFoundException, MalformedModelException,
+                    TranslateException {
         try (ZooModel<Image, DetectedObjects> model = getModel()) {
             TrainingConfig config = setupTrainingConfig();
             try (Trainer trainer = model.newTrainer(config)) {
@@ -111,7 +112,7 @@ public class SingleShotDetectionTest {
         return ssdPredict;
     }
 
-    private Dataset getDataset() throws IOException {
+    private Dataset getDataset() throws IOException, TranslateException {
         Pipeline pipeline = new Pipeline(new ToTensor());
         PikachuDetection pikachuDetection =
                 PikachuDetection.builder()

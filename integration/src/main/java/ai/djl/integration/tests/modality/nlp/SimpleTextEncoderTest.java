@@ -14,6 +14,7 @@ package ai.djl.integration.tests.modality.nlp;
 
 import ai.djl.basicmodelzoo.nlp.SimpleTextEncoder;
 import ai.djl.integration.util.TestUtils;
+import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.embedding.TrainableTextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.ndarray.NDList;
@@ -35,7 +36,9 @@ public class SimpleTextEncoderTest {
                 new TrainableTextEmbedding(
                         TrainableWordEmbedding.builder()
                                 .setEmbeddingSize(8)
-                                .setItems(Arrays.asList("1 2 3 4 5 6 7 8 9 10".split(" ")))
+                                .setVocabulary(
+                                        new SimpleVocabulary(
+                                                Arrays.asList("1 2 3 4 5 6 7 8 9 10".split(" "))))
                                 .build());
         SimpleTextEncoder encoder =
                 new SimpleTextEncoder(

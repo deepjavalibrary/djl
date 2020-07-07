@@ -13,6 +13,7 @@
 package ai.djl.modality.nlp.embedding;
 
 import ai.djl.modality.nlp.SimpleVocabulary;
+import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.ndarray.NDArray;
 import ai.djl.nn.core.Embedding;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +27,7 @@ import java.util.Optional;
  */
 public class TrainableWordEmbedding extends Embedding<String> implements WordEmbedding {
     private static final String DEFAULT_UNKNOWN_TOKEN = "<unk>";
+    private Vocabulary vocabulary;
 
     /**
      * Constructs a new instance of {@code TrainableWordEmbedding} from the {@link Builder}.
@@ -34,23 +36,24 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
      */
     public TrainableWordEmbedding(Builder builder) {
         super(builder);
+        this.vocabulary = builder.vocabulary;
     }
 
     /**
      * Constructs a new instance of {@code TrainableWordEmbedding} from a {@link SimpleVocabulary}
      * and a given embedding size.
      *
-     * @param simpleVocabulary a {@link SimpleVocabulary} to get tokens from
+     * @param vocabulary a {@link Vocabulary} to get tokens from
      * @param embeddingSize the required embedding size
      */
-    public TrainableWordEmbedding(SimpleVocabulary simpleVocabulary, int embeddingSize) {
+    public TrainableWordEmbedding(Vocabulary vocabulary, int embeddingSize) {
         super(
                 builder()
                         .setEmbeddingSize(embeddingSize)
-                        .setItems(simpleVocabulary.getAllTokens())
                         .optSparseGrad(false)
-                        .optDefaultItem(simpleVocabulary.getUnknownToken())
+                        .optDefaultItem(DEFAULT_UNKNOWN_TOKEN)
                         .optUseDefault(false));
+        this.vocabulary = vocabulary;
     }
 
     /**
@@ -60,8 +63,9 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
      * @param items the items in the embedding (in matching order to the embedding array)
      */
     public TrainableWordEmbedding(NDArray embedding, List<String> items) {
-        super(embedding, items);
+        super(embedding);
         this.fallthroughEmbedding = new DefaultItem(DEFAULT_UNKNOWN_TOKEN);
+        this.vocabulary = new SimpleVocabulary(items);
     }
 
     /**
@@ -72,19 +76,20 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
      * @param sparseGrad whether to compute row sparse gradient in the backward calculation
      */
     public TrainableWordEmbedding(NDArray embedding, List<String> items, boolean sparseGrad) {
-        super(embedding, items, sparseGrad);
+        super(embedding, sparseGrad);
         this.fallthroughEmbedding = new DefaultItem(DEFAULT_UNKNOWN_TOKEN);
+        this.vocabulary = new SimpleVocabulary(items);
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean vocabularyContains(String word) {
-        return embedder.containsKey(word);
+        return vocabulary.getIndex(word) >= 0;
     }
 
     /** {@inheritDoc} */
     @Override
-    public int preprocessWordToEmbed(String word) {
+    public long preprocessWordToEmbed(String word) {
         return embed(word);
     }
 
@@ -100,7 +105,7 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
         if (!word.isScalar()) {
             throw new IllegalArgumentException("NDArray word must be scalar index");
         }
-        int wordIndex = word.toIntArray()[0];
+        long wordIndex = word.toLongArray()[0];
 
         Optional<String> result = unembed(wordIndex);
         if (result.isPresent()) {
@@ -129,6 +134,31 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
         return new String(byteArray, StandardCharsets.UTF_8);
     }
 
+    @Override
+    public long embed(String item) {
+        if (vocabularyContains(item)) {
+            return vocabulary.getIndex(item);
+        } else {
+            if (fallthroughEmbedding != null) {
+                return fallthroughEmbedding.embed(item);
+            } else {
+                throw new IllegalArgumentException("The provided item was not found");
+            }
+        }
+    }
+
+    @Override
+    public Optional<String> unembed(long index) {
+        if (index == 0) {
+            if (fallthroughEmbedding == null) {
+                throw new IllegalArgumentException(
+                        "Index 0 is reserved for the fallThrough but no fallThrough is found");
+            }
+            return fallthroughEmbedding.unembed(index);
+        }
+        return Optional.ofNullable(vocabulary.getToken(index));
+    }
+
     /**
      * Creates a builder to build an {@link Embedding}.
      *
@@ -138,13 +168,30 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
         return new TrainableWordEmbedding.Builder();
     }
 
+    @Override
+    public boolean hasItem(String item) {
+        return false;
+    }
+
     /** A builder for a {@link TrainableWordEmbedding}. */
     public static class Builder extends Embedding.BaseBuilder<String, Builder> {
+        private Vocabulary vocabulary;
 
         Builder() {
             super();
             this.embeddingType = String.class;
             this.defaultItem = DEFAULT_UNKNOWN_TOKEN;
+        }
+
+        /**
+         * Sets the {@link Vocabulary} to be used.
+         *
+         * @param vocabulary the {@link Vocabulary} to be set
+         * @return this Builder
+         */
+        public Builder setVocabulary(Vocabulary vocabulary) {
+            this.vocabulary = vocabulary;
+            return self();
         }
 
         /** {@inheritDoc} */

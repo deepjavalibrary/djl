@@ -23,6 +23,7 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -30,7 +31,7 @@ import org.testng.annotations.Test;
 public class MnistTest {
 
     @Test
-    public void testMnistLocal() throws IOException {
+    public void testMnistLocal() throws IOException, TranslateException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES);
@@ -60,7 +61,7 @@ public class MnistTest {
     }
 
     @Test
-    public void testMnistRemote() throws IOException {
+    public void testMnistRemote() throws IOException, TranslateException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES);

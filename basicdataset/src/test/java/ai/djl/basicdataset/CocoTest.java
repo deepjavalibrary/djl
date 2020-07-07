@@ -21,6 +21,7 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -29,7 +30,7 @@ public class CocoTest {
 
     // CocoDetection dataset requires manual download so disable it
     @Test(enabled = false)
-    public void testCocoRemote() throws IOException {
+    public void testCocoRemote() throws IOException, TranslateException {
         CocoDetection coco =
                 CocoDetection.builder().optUsage(Dataset.Usage.TEST).setSampling(1, true).build();
         coco.prepare();

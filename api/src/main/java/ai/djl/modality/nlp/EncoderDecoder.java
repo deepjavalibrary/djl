@@ -102,8 +102,8 @@ public class EncoderDecoder extends AbstractBlock {
             NDList data,
             NDList labels,
             PairList<String, Object> params) {
-        NDList encoderInput = new NDList(data.head().get(":, :-1"));
-        NDList decoderInput = new NDList(labels.head().get(":, 1:"), labels.get(1));
+        NDList encoderInput = new NDList(data.head());
+        NDList decoderInput = new NDList(labels.head().get(":, :-1"), labels.get(1));
 
         NDList encoderOutputs = encoder.forward(parameterStore, encoderInput, true, params);
         decoder.initState(encoder.getStates(encoderOutputs));

@@ -45,7 +45,7 @@ public class TrainCookingStackExchange {
     private static final Logger logger = LoggerFactory.getLogger(TrainCookingStackExchange.class);
 
     @Test
-    public void testTrainTextClassification() throws IOException {
+    public void testTrainTextClassification() throws IOException, TranslateException {
         try (FtModel model = (FtModel) Model.newInstance("ftModel")) {
             CookingStackExchange trainingSet = getDataset(Dataset.Usage.TRAIN);
             CookingStackExchange validateSet = getDataset(Dataset.Usage.TEST);
@@ -125,7 +125,8 @@ public class TrainCookingStackExchange {
         }
     }
 
-    private static CookingStackExchange getDataset(Dataset.Usage usage) throws IOException {
+    private static CookingStackExchange getDataset(Dataset.Usage usage)
+            throws IOException, TranslateException {
         CookingStackExchange dataset = CookingStackExchange.builder().optUsage(usage).build();
         dataset.prepare(new ProgressBar());
         return dataset;

@@ -13,12 +13,10 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Application;
+import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
-import ai.djl.repository.Repository;
-import ai.djl.repository.dataset.ZooDataset;
 import ai.djl.training.dataset.Record;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,13 +30,9 @@ import java.util.List;
  * {@code TatoebaEnglishFrenchDataset} is a English-French machine translation dataset from The
  * Tatoeba Project (http://www.manythings.org/anki/).
  */
-public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDataset {
+public class TatoebaEnglishFrenchDataset extends TextDataset {
     private static final String VERSION = "1.0";
     private static final String ARTIFACT_ID = "tatoeba-en-fr";
-
-    private Repository repository;
-    private Artifact artifact;
-    private Usage usage;
     private boolean prepared;
 
     /**
@@ -71,24 +65,6 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
 
     /** {@inheritDoc} */
     @Override
-    public Repository getRepository() {
-        return repository;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Artifact getArtifact() {
-        return artifact;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Usage getUsage() {
-        return usage;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public boolean isPrepared() {
         return prepared;
     }
@@ -107,7 +83,7 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
 
     /** {@inheritDoc} */
     @Override
-    public void prepareData(Usage usage) throws IOException {
+    public void prepareData(Usage usage) throws IOException, EmbeddingException {
         Path root = repository.getResourceDirectory(artifact);
 
         Path usagePath;
@@ -156,9 +132,6 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
 
     /** A builder for a {@link TatoebaEnglishFrenchDataset}. */
     public static class Builder extends TextDataset.Builder<Builder> {
-        private Repository repository;
-        private Artifact artifact;
-        private Usage usage;
 
         /** Constructs a new builder. */
         Builder() {
@@ -170,39 +143,6 @@ public class TatoebaEnglishFrenchDataset extends TextDataset implements ZooDatas
         @Override
         public Builder self() {
             return this;
-        }
-
-        /**
-         * Sets the optional usage.
-         *
-         * @param usage the usage
-         * @return this builder
-         */
-        public Builder optUsage(Usage usage) {
-            this.usage = usage;
-            return self();
-        }
-
-        /**
-         * Sets the optional repository.
-         *
-         * @param repository the repository
-         * @return this builder
-         */
-        public Builder optRepository(Repository repository) {
-            this.repository = repository;
-            return self();
-        }
-
-        /**
-         * Sets the optional artifact.
-         *
-         * @param artifact the artifact
-         * @return this builder
-         */
-        public Builder optArtifact(Artifact artifact) {
-            this.artifact = artifact;
-            return self();
         }
 
         /**

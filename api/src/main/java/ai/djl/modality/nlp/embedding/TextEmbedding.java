@@ -33,19 +33,19 @@ import java.util.List;
  * <p>In the second option, the embedding can be trained using the standard deep learning techniques
  * to better handle the current dataset. For this case, you need two methods. First, call {@link
  * #preprocessTextToEmbed(List)} within your dataset. Then, the first step in your model should be
- * to call {@link #embedText(NDManager, int[])}.
+ * to call {@link #embedText(NDManager, long[])}.
  */
 public interface TextEmbedding {
 
     /**
      * Preprocesses the text to embed into an array to pass into the model.
      *
-     * <p>Make sure to call {@link #embedText(NDManager, int[])} after this.
+     * <p>Make sure to call {@link #embedText(NDManager, long[])} after this.
      *
      * @param text the text to embed
      * @return the indices of text that is ready to embed
      */
-    int[] preprocessTextToEmbed(List<String> text);
+    long[] preprocessTextToEmbed(List<String> text);
 
     /**
      * Embeds a text.
@@ -67,7 +67,7 @@ public interface TextEmbedding {
      * @return the embedded text
      * @throws EmbeddingException if there is an error while trying to embed
      */
-    default NDArray embedText(NDManager manager, int[] textIndices) throws EmbeddingException {
+    default NDArray embedText(NDManager manager, long[] textIndices) throws EmbeddingException {
         return embedText(manager.create(textIndices));
     }
 

@@ -70,7 +70,7 @@ public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedE
     }
 
     @Override
-    public Optional<?> unembed(int index) {
+    public Optional<?> unembed(long index) {
         return Optional.empty();
     }
 
@@ -85,7 +85,7 @@ public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedE
     }
 
     @Override
-    public int embed(Object item) {
+    public long embed(Object item) {
         return 0;
     }
 

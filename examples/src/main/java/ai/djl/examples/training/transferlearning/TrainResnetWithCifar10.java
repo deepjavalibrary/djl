@@ -219,7 +219,7 @@ public final class TrainResnetWithCifar10 {
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
-            throws IOException {
+            throws IOException, TranslateException {
         Pipeline pipeline =
                 new Pipeline(
                         new ToTensor(),

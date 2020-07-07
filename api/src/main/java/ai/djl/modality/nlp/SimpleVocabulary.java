@@ -31,7 +31,7 @@ public class SimpleVocabulary implements Vocabulary {
     private String unknownToken;
 
     /**
-     * Create a {@code SimpleVocabulary} object with ta {@link VocabularyBuilder}.
+     * Create a {@code SimpleVocabulary} object with a {@link VocabularyBuilder}.
      *
      * @param builder the {@link VocabularyBuilder} to build the vocabulary with
      */
@@ -40,60 +40,51 @@ public class SimpleVocabulary implements Vocabulary {
         minFrequency = builder.minFrequency;
         unknownToken = builder.unknownToken;
         reservedTokens.add(unknownToken);
+        addTokens(reservedTokens);
         for (List<String> sentence : builder.sentences) {
-            addAllTokens(sentence);
+            for (String word : sentence) {
+                addWord(word);
+            }
         }
     }
 
-    private void addToken(String token) {
+    /**
+     * Create a {@code SimpleVocabulary} object with the given list of tokens.
+     *
+     * @param tokens the {@link List} of tokens to build the vocabulary with
+     */
+    public SimpleVocabulary(List<String> tokens) {
+        reservedTokens = new HashSet<>();
+        minFrequency = 10;
+        unknownToken = "<unk>";
+        reservedTokens.add(unknownToken);
+        addTokens(reservedTokens);
+        addTokens(tokens);
+    }
+
+    private void addWord(String token) {
         if (reservedTokens.contains(token)) {
             return;
         }
         TokenInfo tokenInfo = tokens.getOrDefault(token, new TokenInfo());
         if (++tokenInfo.frequency == minFrequency) {
-            tokenInfo.index = indexToToken.size();
+            tokenInfo.index = tokens.size();
             indexToToken.add(token);
         }
         tokens.put(token, tokenInfo);
     }
 
-    private void addAllTokens(Collection<String> tokens) {
+    private void addTokens(Collection<String> tokens) {
         for (String token : tokens) {
-            addToken(token);
+            TokenInfo tokenInfo = new TokenInfo();
+            tokenInfo.frequency = Integer.MAX_VALUE;
+            tokenInfo.index = indexToToken.size();
+            indexToToken.add(token);
+            this.tokens.put(token, tokenInfo);
         }
     }
 
-    /**
-     * Returns whether the given token is a known word.
-     *
-     * @param token the token
-     * @return whether the given token is a known word
-     */
-    public boolean isKnownToken(String token) {
-        if (reservedTokens.contains(token)) {
-            return true;
-        }
-        if (!tokens.containsKey(token)) {
-            return false;
-        }
-        return tokens.get(token).frequency >= minFrequency;
-    }
-
-    /**
-     * Return a {@link String} used for unseen or rarely-seen tokens.
-     *
-     * @return the {@link String} used for unseen or rarely-seen tokens
-     */
-    public String getUnknownToken() {
-        return unknownToken;
-    }
-
-    /**
-     * Returns the token corresponding to the given index.
-     *
-     * @param index the index
-     * @return the token corresponding to the given index
-     */
+    /** {@inheritDoc} */
     @Override
     public String getToken(long index) {
         if (index < 0 || index >= indexToToken.size()) {
@@ -102,40 +93,21 @@ public class SimpleVocabulary implements Vocabulary {
         return indexToToken.get((int) index);
     }
 
-    /**
-     * Returns all the tokens in the vocabulary.
-     *
-     * @return the token corresponding to the given index
-     */
-    public List<String> getAllTokens() {
-        Set<String> tokenSet = new HashSet<>(indexToToken);
-        List<String> tokenList = new ArrayList<>();
-        tokenList.addAll(reservedTokens);
-        tokenSet.removeAll(reservedTokens);
-        tokenList.addAll(tokenSet);
-        return tokenList;
-    }
-
-    /**
-     * Returns the index of the given token.
-     *
-     * @param token the token
-     * @return the index of the given token
-     */
+    /** {@inheritDoc} */
     @Override
     public long getIndex(String token) {
         if (tokens.containsKey(token)) {
-            return tokens.get(token).index;
+            TokenInfo tokenInfo = tokens.get(token);
+            if (tokenInfo.frequency >= minFrequency) {
+                return tokenInfo.index;
+            }
         }
-        return 0;
+        return tokens.get(unknownToken).index;
     }
 
-    /**
-     * Returns the size of the {@code Vocabulary}.
-     *
-     * @return the size of the {@code Vocabulary}
-     */
-    public int size() {
+    /** {@inheritDoc} */
+    @Override
+    public long size() {
         return tokens.size();
     }
 

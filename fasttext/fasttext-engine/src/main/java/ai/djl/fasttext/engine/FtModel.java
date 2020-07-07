@@ -23,6 +23,7 @@ import ai.djl.nn.Block;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.TrainingResult;
+import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.util.PairList;
 import com.github.jfasttext.FastTextWrapper;
@@ -123,9 +124,10 @@ public class FtModel implements Model {
      * @param validateSet the validation dataset
      * @return the result of the training
      * @throws IOException when IO operation fails in loading a resource
+     * @throws TranslateException if there is an error while processing input
      */
     public TrainingResult fit(FtTrainingConfig config, FtDataset trainingSet, FtDataset validateSet)
-            throws IOException {
+            throws IOException, TranslateException {
         Path outputDir = config.getOutputDir();
         if (Files.notExists(outputDir)) {
             Files.createDirectory(outputDir);

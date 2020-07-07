@@ -18,6 +18,7 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.dataset.ZooDataset;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
@@ -35,8 +36,9 @@ public abstract class FtDataset implements Dataset, ZooDataset {
      *
      * @return cached fastText dataset file path
      * @throws IOException when IO operation fails in loading a resource
+     * @throws TranslateException if there is an error while processing input
      */
-    public Path getInputFile() throws IOException {
+    public Path getInputFile() throws IOException, TranslateException {
         prepare(null);
 
         Map<String, Artifact.Item> map = artifact.getFiles();

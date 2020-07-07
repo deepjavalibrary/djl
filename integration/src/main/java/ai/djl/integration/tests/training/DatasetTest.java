@@ -30,6 +30,7 @@ import ai.djl.training.dataset.RandomSampler;
 import ai.djl.training.dataset.SequenceSampler;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -265,7 +266,7 @@ public class DatasetTest {
     }
 
     @Test
-    public void testMultithreading() throws IOException, InterruptedException {
+    public void testMultithreading() throws IOException, InterruptedException, TranslateException {
         try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
             NDManager manager = model.getNDManager();

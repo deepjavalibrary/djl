@@ -12,7 +12,6 @@
  */
 package ai.djl.nn.core;
 
-import ai.djl.ndarray.NDArray;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -46,9 +45,9 @@ public interface AbstractIndexedEmbedding<T> extends AbstractEmbedding<T> {
      * Embeds an item.
      *
      * @param item the item to embed
-     * @return the embedding {@link NDArray} of Shape()
+     * @return the index of the item in the embedding
      */
-    int embed(T item);
+    long embed(T item);
 
     /**
      * Returns the item corresponding to the given index.
@@ -56,5 +55,5 @@ public interface AbstractIndexedEmbedding<T> extends AbstractEmbedding<T> {
      * @param index the index
      * @return the item corresponding to the given index
      */
-    Optional<T> unembed(int index);
+    Optional<T> unembed(long index);
 }

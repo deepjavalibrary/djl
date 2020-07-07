@@ -36,6 +36,7 @@ import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.SimpleCompositeLoss;
 import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
 import ai.djl.training.util.ProgressBar;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
 
@@ -50,11 +51,12 @@ public final class TrainCaptcha {
 
     private TrainCaptcha() {}
 
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) throws IOException, ParseException, TranslateException {
         TrainCaptcha.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args) throws ParseException, IOException {
+    public static TrainingResult runExample(String[] args)
+            throws ParseException, IOException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
 
         try (Model model = Model.newInstance("captcha")) {
@@ -113,7 +115,7 @@ public final class TrainCaptcha {
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
-            throws IOException {
+            throws IOException, TranslateException {
         CaptchaDataset dataset =
                 CaptchaDataset.builder()
                         .optUsage(usage)

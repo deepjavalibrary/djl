@@ -67,16 +67,16 @@ public final class TrainPikachu {
 
     private TrainPikachu() {}
 
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) throws IOException, ParseException, TranslateException {
         TrainPikachu.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args) throws IOException, ParseException {
+    public static TrainingResult runExample(String[] args)
+            throws IOException, ParseException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
 
         try (Model model = Model.newInstance("pikachu-ssd")) {
             model.setBlock(getSsdTrainBlock());
-
             RandomAccessDataset trainingSet = getDataset(Dataset.Usage.TRAIN, arguments);
             RandomAccessDataset validateSet = getDataset(Dataset.Usage.TEST, arguments);
 
@@ -125,7 +125,7 @@ public final class TrainPikachu {
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
-            throws IOException {
+            throws IOException, TranslateException {
         Pipeline pipeline = new Pipeline(new ToTensor());
         PikachuDetection pikachuDetection =
                 PikachuDetection.builder()

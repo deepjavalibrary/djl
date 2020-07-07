@@ -25,12 +25,12 @@ public final class TestUtils {
     public static TextEmbedding getTextEmbedding(NDManager manager, int embeddingSize) {
         return new TextEmbedding() {
             @Override
-            public int[] preprocessTextToEmbed(List<String> text) {
-                return new int[text.size()];
+            public long[] preprocessTextToEmbed(List<String> text) {
+                return new long[text.size()];
             }
 
             @Override
-            public NDArray embedText(NDManager manager, int[] textIndices) {
+            public NDArray embedText(NDManager manager, long[] textIndices) {
                 return manager.zeros(new Shape(textIndices.length, embeddingSize));
             }
 

@@ -21,6 +21,7 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset.Usage;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -29,7 +30,7 @@ public class ImageNetTest {
 
     // ImageNet requires running manual download so can't be automatically tested
     @Test(enabled = false)
-    public void testImageNetLocal() throws IOException {
+    public void testImageNetLocal() throws IOException, TranslateException {
         Repository repository =
                 Repository.newInstance(
                         "test", System.getProperty("user.home") + "/Desktop/testImagenet");

@@ -13,6 +13,8 @@
 package ai.djl.basicdataset.utils;
 
 import ai.djl.modality.nlp.SimpleVocabulary;
+import ai.djl.modality.nlp.Vocabulary;
+import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableTextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
@@ -22,6 +24,7 @@ import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.modality.nlp.preprocess.TextProcessor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.AbstractBlock;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,7 +44,7 @@ public class TextData {
     private List<TextProcessor> textProcessors;
     private List<String> reservedTokens;
     private TextEmbedding textEmbedding;
-    private SimpleVocabulary vocabulary;
+    private Vocabulary vocabulary;
     private String unknownToken;
     private int embeddingSize;
     private int size;
@@ -54,6 +57,7 @@ public class TextData {
     public TextData(Configuration config) {
         this.textProcessors = config.textProcessors;
         this.textEmbedding = config.textEmbedding;
+        this.vocabulary = config.vocabulary;
         this.embeddingSize = config.embeddingSize;
         this.unknownToken = config.unknownToken;
         this.reservedTokens = config.reservedTokens;
@@ -83,25 +87,32 @@ public class TextData {
      *
      * @param manager the
      * @param newTextData the data from the dataset
+     * @throws EmbeddingException if there is an error while embedding input
      */
-    public void preprocess(NDManager manager, List<String> newTextData) {
+    public void preprocess(NDManager manager, List<String> newTextData) throws EmbeddingException {
         rawText = newTextData;
-        SimpleVocabulary.VocabularyBuilder vocabularyBuilder =
-                new SimpleVocabulary.VocabularyBuilder();
-        vocabularyBuilder
-                .optMinFrequency(3)
-                .optReservedTokens(reservedTokens)
-                .optUnknownToken(unknownToken);
         List<List<String>> textData = new ArrayList<>();
         for (String textDatum : newTextData) {
             List<String> tokens = Collections.singletonList(textDatum);
             for (TextProcessor processor : textProcessors) {
                 tokens = processor.preprocess(tokens);
             }
-            vocabularyBuilder.add(tokens);
             textData.add(tokens);
         }
-        vocabulary = vocabularyBuilder.build();
+
+        if (vocabulary == null) {
+            SimpleVocabulary.VocabularyBuilder vocabularyBuilder =
+                    new SimpleVocabulary.VocabularyBuilder();
+            vocabularyBuilder
+                    .optMinFrequency(3)
+                    .optReservedTokens(reservedTokens)
+                    .optUnknownToken(unknownToken);
+            for (List<String> tokens : textData) {
+                vocabularyBuilder.add(tokens);
+            }
+            vocabulary = vocabularyBuilder.build();
+        }
+
         if (textEmbedding == null) {
             textEmbedding =
                     new TrainableTextEmbedding(
@@ -112,13 +123,16 @@ public class TextData {
         for (int i = 0; i < size; i++) {
             List<String> tokenizedTextDatum = textData.get(i);
             for (int j = 0; j < tokenizedTextDatum.size(); j++) {
-                if (!vocabulary.isKnownToken(tokenizedTextDatum.get(j))) {
-                    tokenizedTextDatum.set(j, vocabulary.getUnknownToken());
-                }
+                tokenizedTextDatum.set(
+                        j, vocabulary.getToken(vocabulary.getIndex(tokenizedTextDatum.get(j))));
             }
             textData.set(i, tokenizedTextDatum);
-            textEmbeddingList.add(
-                    manager.create(textEmbedding.preprocessTextToEmbed(tokenizedTextDatum)));
+            if (textEmbedding instanceof AbstractBlock) {
+                textEmbeddingList.add(
+                        manager.create(textEmbedding.preprocessTextToEmbed(tokenizedTextDatum)));
+            } else {
+                textEmbeddingList.add(textEmbedding.embedText(manager, tokenizedTextDatum));
+            }
         }
     }
 
@@ -163,7 +177,7 @@ public class TextData {
      *
      * @return the {@link SimpleVocabulary}
      */
-    public SimpleVocabulary getVocabulary() {
+    public Vocabulary getVocabulary() {
         if (vocabulary == null) {
             throw new IllegalStateException(
                     "This method must be called after preprocess is called on this object");
@@ -225,6 +239,7 @@ public class TextData {
 
         private List<TextProcessor> textProcessors;
         private TextEmbedding textEmbedding;
+        private Vocabulary vocabulary;
         private Integer embeddingSize;
         private String unknownToken;
         private List<String> reservedTokens;
@@ -248,6 +263,17 @@ public class TextData {
          */
         public Configuration setTextEmbedding(TextEmbedding textEmbedding) {
             this.textEmbedding = textEmbedding;
+            return this;
+        }
+
+        /**
+         * Sets the {@link Vocabulary} to use to hold the text data.
+         *
+         * @param vocabulary the {@link Vocabulary}
+         * @return this configuration
+         */
+        public Configuration setVocabulary(Vocabulary vocabulary) {
+            this.vocabulary = vocabulary;
             return this;
         }
 
@@ -293,6 +319,7 @@ public class TextData {
         public Configuration update(Configuration other) {
             textProcessors = other.textProcessors != null ? other.textProcessors : textProcessors;
             textEmbedding = other.textEmbedding != null ? other.textEmbedding : textEmbedding;
+            vocabulary = other.vocabulary != null ? other.vocabulary : vocabulary;
             embeddingSize = other.embeddingSize != null ? other.embeddingSize : embeddingSize;
             unknownToken = other.unknownToken != null ? other.unknownToken : unknownToken;
             reservedTokens = other.reservedTokens != null ? other.reservedTokens : reservedTokens;
