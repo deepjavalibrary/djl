@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Pipeline;
+import ai.djl.translate.Transform;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.RandomUtils;
 import java.io.IOException;
@@ -260,6 +261,20 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
         }
 
         /**
+         * Adds the {@link Transform} to the {@link Pipeline} to be applied on the data.
+         *
+         * @param transform the {@link Transform} to be added
+         * @return this builder
+         */
+        public T addTransform(Transform transform) {
+            if (pipeline == null) {
+                pipeline = new Pipeline();
+            }
+            pipeline.add(transform);
+            return self();
+        }
+
+        /**
          * Sets the {@link Pipeline} of {@link ai.djl.translate.Transform} to be applied on the
          * labels.
          *
@@ -269,6 +284,20 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
          */
         public T optTargetPipeline(Pipeline targetPipeline) {
             this.targetPipeline = targetPipeline;
+            return self();
+        }
+
+        /**
+         * Adds the {@link Transform} to the target {@link Pipeline} to be applied on the labels.
+         *
+         * @param transform the {@link Transform} to be added
+         * @return this builder
+         */
+        public T addTargetTransform(Transform transform) {
+            if (targetPipeline == null) {
+                targetPipeline = new Pipeline();
+            }
+            targetPipeline.add(transform);
             return self();
         }
 

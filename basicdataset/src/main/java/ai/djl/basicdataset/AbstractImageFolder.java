@@ -153,5 +153,27 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
             this.repository = repository;
             return self();
         }
+
+        /**
+         * Sets the repository file path containing the image folder.
+         *
+         * @param path the repository file path containing the image folder
+         * @return this builder
+         */
+        public T setRepositoryPath(String path) {
+            this.repository = Repository.newInstance("images", path);
+            return self();
+        }
+
+        /**
+         * Sets the repository file path containing the image folder.
+         *
+         * @param path the repository file path containing the image folder
+         * @return this builder
+         */
+        public T setRepositoryPath(Path path) {
+            this.repository = Repository.newInstance("images", path);
+            return self();
+        }
     }
 }
