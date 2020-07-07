@@ -59,7 +59,7 @@ public final class ResNetV1 {
         if (bottleneck) {
             resUnit.add(
                             Conv2D.builder()
-                                    .setKernelSize(new Shape(1, 1))
+                                    .setKernelShape(new Shape(1, 1))
                                     .setFilters(numFilters / 4)
                                     .optStride(stride)
                                     .optPadding(new Shape(0, 0))
@@ -73,7 +73,7 @@ public final class ResNetV1 {
                     .add(Activation::relu)
                     .add(
                             Conv2D.builder()
-                                    .setKernelSize(new Shape(3, 3))
+                                    .setKernelShape(new Shape(3, 3))
                                     .setFilters(numFilters / 4)
                                     .optStride(new Shape(1, 1))
                                     .optPadding(new Shape(1, 1))
@@ -87,7 +87,7 @@ public final class ResNetV1 {
                     .add(Activation::relu)
                     .add(
                             Conv2D.builder()
-                                    .setKernelSize(new Shape(1, 1))
+                                    .setKernelShape(new Shape(1, 1))
                                     .setFilters(numFilters)
                                     .optStride(new Shape(1, 1))
                                     .optPadding(new Shape(0, 0))
@@ -102,7 +102,7 @@ public final class ResNetV1 {
         } else {
             resUnit.add(
                             Conv2D.builder()
-                                    .setKernelSize(new Shape(3, 3))
+                                    .setKernelShape(new Shape(3, 3))
                                     .setFilters(numFilters)
                                     .optStride(stride)
                                     .optPadding(new Shape(1, 1))
@@ -116,7 +116,7 @@ public final class ResNetV1 {
                     .add(Activation::relu)
                     .add(
                             Conv2D.builder()
-                                    .setKernelSize(new Shape(3, 3))
+                                    .setKernelShape(new Shape(3, 3))
                                     .setFilters(numFilters)
                                     .optStride(new Shape(1, 1))
                                     .optPadding(new Shape(1, 1))
@@ -134,7 +134,7 @@ public final class ResNetV1 {
         } else {
             shortcut.add(
                             Conv2D.builder()
-                                    .setKernelSize(new Shape(1, 1))
+                                    .setKernelShape(new Shape(1, 1))
                                     .setFilters(numFilters)
                                     .optStride(stride)
                                     .optPadding(new Shape(0, 0))
@@ -173,7 +173,7 @@ public final class ResNetV1 {
         if (height <= 32) {
             resNet.add(
                     Conv2D.builder()
-                            .setKernelSize(new Shape(3, 3))
+                            .setKernelShape(new Shape(3, 3))
                             .setFilters(builder.filters[0])
                             .optStride(new Shape(1, 1))
                             .optPadding(new Shape(1, 1))
@@ -182,7 +182,7 @@ public final class ResNetV1 {
         } else {
             resNet.add(
                             Conv2D.builder()
-                                    .setKernelSize(new Shape(7, 7))
+                                    .setKernelShape(new Shape(7, 7))
                                     .setFilters(builder.filters[0])
                                     .optStride(new Shape(2, 2))
                                     .optPadding(new Shape(3, 3))

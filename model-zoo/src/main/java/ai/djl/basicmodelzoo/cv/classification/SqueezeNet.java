@@ -48,7 +48,7 @@ public final class SqueezeNet {
                         .add(
                                 Conv2D.builder()
                                         .setFilters(squeezePlanes)
-                                        .setKernelSize(new Shape(1, 1))
+                                        .setKernelShape(new Shape(1, 1))
                                         .build())
                         .add(Activation::relu);
         SequentialBlock expand1x1 =
@@ -56,7 +56,7 @@ public final class SqueezeNet {
                         .add(
                                 Conv2D.builder()
                                         .setFilters(expand1x1Planes)
-                                        .setKernelSize(new Shape(1, 1))
+                                        .setKernelShape(new Shape(1, 1))
                                         .build())
                         .add(Activation::relu);
         SequentialBlock expand3x3 =
@@ -64,7 +64,7 @@ public final class SqueezeNet {
                         .add(
                                 Conv2D.builder()
                                         .setFilters(expand3x3Planes)
-                                        .setKernelSize(new Shape(3, 3))
+                                        .setKernelShape(new Shape(3, 3))
                                         .optPadding(new Shape(1, 1))
                                         .build())
                         .add(Activation::relu);
@@ -91,7 +91,7 @@ public final class SqueezeNet {
                 .add(
                         Conv2D.builder()
                                 .setFilters(64)
-                                .setKernelSize(new Shape(3, 3))
+                                .setKernelShape(new Shape(3, 3))
                                 .optStride(new Shape(2, 2))
                                 .build())
                 .add(Activation::relu)
@@ -123,7 +123,7 @@ public final class SqueezeNet {
                 .add(fire(64, 256, 256))
                 // Classifier
                 .add(Dropout.builder().optRate(0.5f).build())
-                .add(Conv2D.builder().setFilters(outSize).setKernelSize(new Shape(1, 1)).build())
+                .add(Conv2D.builder().setFilters(outSize).setKernelShape(new Shape(1, 1)).build())
                 .add(Activation::relu)
                 .add(Pool.globalAvgPool2DBlock())
                 .add(Blocks.batchFlattenBlock());

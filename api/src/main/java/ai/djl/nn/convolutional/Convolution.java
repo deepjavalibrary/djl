@@ -71,7 +71,7 @@ public abstract class Convolution extends AbstractBlock {
 
     private static final byte VERSION = 3;
 
-    protected Shape kernelSize;
+    protected Shape kernelShape;
     protected Shape stride;
     protected Shape padding;
     protected Shape dilation;
@@ -89,7 +89,7 @@ public abstract class Convolution extends AbstractBlock {
      */
     public Convolution(ConvolutionBuilder<?> builder) {
         super(VERSION);
-        kernelSize = builder.kernelSize;
+        kernelShape = builder.kernelShape;
         stride = builder.stride;
         padding = builder.padding;
         dilation = builder.dilation;
@@ -101,7 +101,7 @@ public abstract class Convolution extends AbstractBlock {
                 addParameter(
                         new Parameter("weight", this, ParameterType.WEIGHT),
                         (inputShapes) ->
-                                new Shape(filters, inputShapes[0].get(1)).addAll(kernelSize));
+                                new Shape(filters, inputShapes[0].get(1)).addAll(kernelShape));
         if (includeBias) {
             bias =
                     addParameter(
@@ -162,7 +162,7 @@ public abstract class Convolution extends AbstractBlock {
             shape[2 + i] =
                     (inputs[0].get(2 + i)
                                             + 2 * padding.get(i)
-                                            - dilation.get(0) * (kernelSize.get(i) - 1)
+                                            - dilation.get(0) * (kernelShape.get(i) - 1)
                                             - 1)
                                     / stride.get(0)
                             + 1;
@@ -214,7 +214,7 @@ public abstract class Convolution extends AbstractBlock {
     @SuppressWarnings("rawtypes")
     public abstract static class ConvolutionBuilder<T extends ConvolutionBuilder> {
 
-        protected Shape kernelSize;
+        protected Shape kernelShape;
         protected Shape stride;
         protected Shape padding;
         protected Shape dilation;
@@ -225,11 +225,11 @@ public abstract class Convolution extends AbstractBlock {
         /**
          * Sets the shape of the kernel.
          *
-         * @param kernelSize the shape of the kernel
+         * @param kernelShape the shape of the kernel
          * @return this Builder
          */
-        public T setKernelSize(Shape kernelSize) {
-            this.kernelSize = kernelSize;
+        public T setKernelShape(Shape kernelShape) {
+            this.kernelShape = kernelShape;
             return self();
         }
 
@@ -306,7 +306,7 @@ public abstract class Convolution extends AbstractBlock {
          * @throws IllegalArgumentException if the required arguments are not set
          */
         protected void validate() {
-            if (kernelSize == null || filters == 0) {
+            if (kernelShape == null || filters == 0) {
                 throw new IllegalArgumentException("Kernel and numFilters must be set");
             }
         }

@@ -210,7 +210,7 @@ public final class SingleShotDetection extends AbstractBlock {
             sequentialBlock
                     .add(
                             Conv2D.builder()
-                                    .setKernelSize(new Shape(3, 3))
+                                    .setKernelShape(new Shape(3, 3))
                                     .setFilters(numFilters)
                                     .optPadding(new Shape(1, 1))
                                     .build())
@@ -230,7 +230,7 @@ public final class SingleShotDetection extends AbstractBlock {
      */
     public static Conv2D getClassPredictionBlock(int numAnchors, int numClasses) {
         return Conv2D.builder()
-                .setKernelSize(new Shape(3, 3))
+                .setKernelShape(new Shape(3, 3))
                 .setFilters((numClasses + 1) * numAnchors)
                 .optPadding(new Shape(1, 1))
                 .build();
@@ -244,7 +244,7 @@ public final class SingleShotDetection extends AbstractBlock {
      */
     public static Conv2D getAnchorPredictionBlock(int numAnchors) {
         return Conv2D.builder()
-                .setKernelSize(new Shape(3, 3))
+                .setKernelShape(new Shape(3, 3))
                 .setFilters(4 * numAnchors)
                 .optPadding(new Shape(1, 1))
                 .build();
