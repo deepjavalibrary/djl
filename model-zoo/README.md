@@ -45,7 +45,7 @@ The following is an example of the criteria to find a Resnet50-v1 model that has
     Criteria<Image, Classification> criteria =
             Criteria.builder()
                     .optApplication(Application.CV.OBJECT_DETECTION)
-                    .setTypes(BufferedImage.class, Classification.class)
+                    .setTypes(Image.class, Classification.class)
                     .optFilter("layer", "50")
                     .optFilter("flavor", "v1")
                     .optFilter("dataset", "cifar10")
