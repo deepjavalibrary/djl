@@ -185,68 +185,6 @@ public abstract class Convolution extends AbstractBlock {
      * Applies N-D convolution over an input signal composed of several input planes.
      *
      * @param input the input {@code NDArray} of shape (batchSize, inputChannel, ...)
-     * @param weight filters of shape (outChannel, inputChannel/groups, ...)
-     * @return the output of the convolution operation
-     */
-    public static NDList convolution(NDArray input, NDArray weight) {
-        return convolution(input, weight, null, new Shape(1), new Shape(0), new Shape(1), 1);
-    }
-
-    /**
-     * Applies N-D convolution over an input signal composed of several input planes.
-     *
-     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, ...)
-     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, ...)
-     * @param bias bias {@code NDArray} of shape (outChannel)
-     * @param stride the stride of the convolving kernel: Shape(w), Shape(h, w) or Shape(d, h, w)
-     * @return the output of the convolution operation
-     */
-    public static NDList convolution(NDArray input, NDArray weight, NDArray bias, Shape stride) {
-        return convolution(input, weight, bias, stride, new Shape(0), new Shape(1), 1);
-    }
-
-    /**
-     * Applies N-D convolution over an input signal composed of several input planes.
-     *
-     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, ...)
-     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, ...)
-     * @param bias bias {@code NDArray} of shape (outChannel)
-     * @param stride the stride of the convolving kernel: Shape(w), Shape(h, w) or Shape(d, h, w)
-     * @param padding implicit paddings on both sides of the input: Shape(w), Shape(h, w) or
-     *     Shape(d, h, w)
-     * @return the output of the convolution operation
-     */
-    public static NDList convolution(
-            NDArray input, NDArray weight, NDArray bias, Shape stride, Shape padding) {
-        return convolution(input, weight, bias, stride, padding, new Shape(1), 1);
-    }
-
-    /**
-     * Applies N-D convolution over an input signal composed of several input planes.
-     *
-     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, ...)
-     * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, ...)
-     * @param bias bias {@code NDArray} of shape (outChannel)
-     * @param stride the stride of the convolving kernel: Shape(w), Shape(h, w) or Shape(d, h, w)
-     * @param padding implicit paddings on both sides of the input: Shape(w), Shape(h, w) or
-     *     Shape(d, h, w)
-     * @param dilation the spacing between kernel elements: Shape(w), Shape(h, w) or Shape(d, h, w)
-     * @return the output of the convolution operation
-     */
-    public static NDList convolution(
-            NDArray input,
-            NDArray weight,
-            NDArray bias,
-            Shape stride,
-            Shape padding,
-            Shape dilation) {
-        return convolution(input, weight, bias, stride, padding, dilation, 1);
-    }
-
-    /**
-     * Applies N-D convolution over an input signal composed of several input planes.
-     *
-     * @param input the input {@code NDArray} of shape (batchSize, inputChannel, ...)
      * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, ...)
      * @param bias bias {@code NDArray} of shape (outChannel)
      * @param stride the stride of the convolving kernel: Shape(w), Shape(h, w) or Shape(d, h, w)
@@ -257,7 +195,7 @@ public abstract class Convolution extends AbstractBlock {
      *     the number of groups
      * @return the output of the convolution operation
      */
-    public static NDList convolution(
+    static NDList convolution(
             NDArray input,
             NDArray weight,
             NDArray bias,
@@ -268,7 +206,6 @@ public abstract class Convolution extends AbstractBlock {
         return input.getNDArrayInternal()
                 .convolution(input, weight, bias, stride, padding, dilation, groups);
     }
-
     /**
      * A builder that can build any {@code Convolution} block.
      *
