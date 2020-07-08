@@ -58,31 +58,36 @@ public final class ZipUtils {
      *
      * @param src the input directory to zip
      * @param dest the path to store the zipped files
+     * @param includeFolderName if include the source directory name in the zip entry
      * @throws IOException for failures to zip the input directory
      */
-    public static void zip(Path src, Path dest) throws IOException {
-        File srcFile = src.toFile();
-        int prefix = srcFile.getCanonicalPath().length() - srcFile.getName().length();
+    public static void zip(Path src, Path dest, boolean includeFolderName) throws IOException {
         try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(dest))) {
-            addToZip(prefix, srcFile, zos);
+            addToZip(src, src, zos);
         }
     }
 
-    private static void addToZip(int prefix, File file, ZipOutputStream zos) throws IOException {
-        String name = file.getCanonicalPath().substring(prefix);
-        if (file.isDirectory()) {
-            ZipEntry entry = new ZipEntry(name + '/');
-            zos.putNextEntry(entry);
-            File[] files = file.listFiles();
+    private static void addToZip(Path root, Path file, ZipOutputStream zos) throws IOException {
+        Path relative = root.relativize(file);
+        String name = relative.toString();
+        if (Files.isDirectory(file)) {
+            if (!name.isEmpty()) {
+                ZipEntry entry = new ZipEntry(name + '/');
+                zos.putNextEntry(entry);
+            }
+            File[] files = file.toFile().listFiles();
             if (files != null) {
                 for (File f : files) {
-                    addToZip(prefix, f, zos);
+                    addToZip(root, f.toPath(), zos);
                 }
             }
-        } else if (file.isFile()) {
+        } else if (Files.isRegularFile(file)) {
+            if (name.isEmpty()) {
+                name = file.toFile().getName();
+            }
             ZipEntry entry = new ZipEntry(name);
             zos.putNextEntry(entry);
-            Files.copy(file.toPath(), zos);
+            Files.copy(file, zos);
         }
     }
 }

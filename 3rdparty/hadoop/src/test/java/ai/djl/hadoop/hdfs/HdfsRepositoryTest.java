@@ -58,7 +58,7 @@ public class HdfsRepositoryTest {
             Files.createFile(paramFile);
         }
         if (Files.notExists(zipFile)) {
-            ZipUtils.zip(dir, zipFile);
+            ZipUtils.zip(dir, zipFile, true);
         }
 
         Configuration config = new Configuration();

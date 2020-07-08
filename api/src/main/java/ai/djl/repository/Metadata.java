@@ -186,7 +186,7 @@ public class Metadata {
      *
      * @return the {@link Application} name
      */
-    public String getApplicatrionName() {
+    public String getApplicationName() {
         return application;
     }
 

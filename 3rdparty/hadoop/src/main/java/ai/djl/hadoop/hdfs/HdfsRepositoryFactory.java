@@ -57,14 +57,9 @@ public class HdfsRepositoryFactory implements RepositoryFactory {
 
         String path = uri.getPath();
         String fileName = Paths.get(path).toFile().getName();
-        String fileType = FilenameUtils.getFileType(fileName);
-        boolean isDirectory;
-        if ("tgz".equals(fileType) || "zip".equals(fileType) || "tar".equals(fileType)) {
+        boolean isDirectory = FilenameUtils.isArchiveFile(fileName);
+        if (!isDirectory) {
             fileName = FilenameUtils.getNamePart(fileName);
-            isDirectory = false;
-        } else {
-            // assume this ia directory
-            isDirectory = true;
         }
         String modelName = null;
         String artifactId = null;

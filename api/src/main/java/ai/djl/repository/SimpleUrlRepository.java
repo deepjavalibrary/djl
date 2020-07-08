@@ -92,7 +92,7 @@ public class SimpleUrlRepository extends AbstractRepository {
         try {
             Metadata m = getMetadata();
             if (m != null && !m.getArtifacts().isEmpty()) {
-                MRL mrl = MRL.model(Application.UNDEFINED, m.getGroupId(), m.getArtifactId());
+                MRL mrl = MRL.undefined(m.getGroupId(), m.getArtifactId());
                 return Collections.singletonList(mrl);
             }
         } catch (IOException e) {
@@ -140,6 +140,7 @@ public class SimpleUrlRepository extends AbstractRepository {
             artifact.setName(modelName);
 
             metadata = new Metadata.MatchAllMetadata();
+            metadata.setApplication(Application.UNDEFINED);
             metadata.setGroupId(DefaultModelZoo.GROUP_ID);
             metadata.setArtifactId(artifactId);
             metadata.setArtifacts(Collections.singletonList(artifact));

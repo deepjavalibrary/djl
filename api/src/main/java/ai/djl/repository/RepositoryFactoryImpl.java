@@ -53,13 +53,10 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             return factory.newInstance(name, url);
         }
 
+        Path path = Paths.get(uri.getPath());
+        String fileName = path.toFile().getName();
+        String[] names = parseQueryString(uri, fileName);
         if ("file".equalsIgnoreCase(scheme)) {
-            Path path;
-            if (uri.isAbsolute()) {
-                path = Paths.get(uri);
-            } else {
-                path = Paths.get(uri.getPath());
-            }
             if (Files.exists(path) && Files.isDirectory(path)) {
                 try {
                     if (Files.walk(path)
@@ -74,33 +71,10 @@ class RepositoryFactoryImpl implements RepositoryFactory {
                     logger.warn("Failed locate metadata.json file, defaulting to simple", e);
                 }
             }
-            return new SimpleRepository(name, path);
+            return new SimpleRepository(name, path, names[0], names[1]);
         } else if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
-            Path path = Paths.get(uri.getPath());
-            String fileName = path.toFile().getName();
-            String fileType = FilenameUtils.getFileType(fileName);
-            if ("tgz".equals(fileType) || "zip".equals(fileType) || "tar".equals(fileType)) {
-                String modelName = null;
-                String artifactId = null;
-                String query = uri.getQuery();
-                if (query != null) {
-                    Matcher matcher = NAME_PATTERN.matcher(query);
-                    if (matcher.find()) {
-                        modelName = matcher.group(1);
-                    }
-                    matcher = ARTIFACT_PATTERN.matcher(query);
-                    if (matcher.find()) {
-                        artifactId = matcher.group(1);
-                    }
-                }
-
-                if (artifactId == null) {
-                    artifactId = FilenameUtils.getNamePart(fileName);
-                }
-                if (modelName == null) {
-                    modelName = artifactId;
-                }
-                return new SimpleUrlRepository(name, uri, artifactId, modelName);
+            if (FilenameUtils.isArchiveFile(fileName)) {
+                return new SimpleUrlRepository(name, uri, names[0], names[1]);
             }
         }
         return new RemoteRepository(name, uri);
@@ -127,5 +101,29 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             }
         }
         return registry;
+    }
+
+    private static String[] parseQueryString(URI uri, String fileName) {
+        String modelName = null;
+        String artifactId = null;
+        String query = uri.getQuery();
+        if (query != null) {
+            Matcher matcher = NAME_PATTERN.matcher(query);
+            if (matcher.find()) {
+                modelName = matcher.group(1);
+            }
+            matcher = ARTIFACT_PATTERN.matcher(query);
+            if (matcher.find()) {
+                artifactId = matcher.group(1);
+            }
+        }
+
+        if (artifactId == null) {
+            artifactId = FilenameUtils.getNamePart(fileName);
+        }
+        if (modelName == null) {
+            modelName = artifactId;
+        }
+        return new String[] {artifactId, modelName};
     }
 }

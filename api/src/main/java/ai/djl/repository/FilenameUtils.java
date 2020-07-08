@@ -43,6 +43,17 @@ public final class FilenameUtils {
     }
 
     /**
+     * Returns if the the file is an archive file.
+     *
+     * @param fileName the file name
+     * @return the type of the file
+     */
+    public static boolean isArchiveFile(String fileName) {
+        String fileType = getFileType(fileName);
+        return "tgz".equals(fileType) || "zip".equals(fileType) || "tar".equals(fileType);
+    }
+
+    /**
      * Returns the name of the file without file extension.
      *
      * @param name the file name

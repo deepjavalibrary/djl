@@ -12,12 +12,13 @@
  */
 package ai.djl.repository;
 
+import ai.djl.Application;
 import ai.djl.repository.Artifact.Item;
 import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Progress;
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,6 +41,12 @@ public class SimpleRepository extends AbstractRepository {
 
     private String name;
     private Path path;
+    private String artifactId;
+    private String modelName;
+    private boolean isRemote;
+
+    private Metadata metadata;
+    private boolean resolved;
 
     /**
      * (Internal) Constructs a SimpleRepository.
@@ -48,16 +55,21 @@ public class SimpleRepository extends AbstractRepository {
      *
      * @param name the name of the repository
      * @param path the path to the repository
+     * @param artifactId the artifatId of the repository
+     * @param modelName the modelName of the repository
      */
-    protected SimpleRepository(String name, Path path) {
+    protected SimpleRepository(String name, Path path, String artifactId, String modelName) {
         this.name = name;
         this.path = path;
+        this.artifactId = artifactId;
+        this.modelName = modelName;
+        isRemote = FilenameUtils.isArchiveFile(path.toString());
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean isRemote() {
-        return false;
+        return isRemote;
     }
 
     /** {@inheritDoc} */
@@ -75,56 +87,7 @@ public class SimpleRepository extends AbstractRepository {
     /** {@inheritDoc} */
     @Override
     public Metadata locate(MRL mrl) throws IOException {
-        Path file = path.resolve("metadata.json");
-        if (Files.isRegularFile(file)) {
-            logger.debug("Using metadata.json file: {}", file.toAbsolutePath());
-            return metadataWithFile(file);
-        }
-        logger.debug("No metadata.json file found in: {}", path.toAbsolutePath());
-        return metadataWithoutFile();
-    }
-
-    private Metadata metadataWithFile(Path file) throws IOException {
-        try (Reader reader = Files.newBufferedReader(file)) {
-            Metadata metadata = GSON.fromJson(reader, Metadata.class);
-            metadata.setRepositoryUri(URI.create(""));
-            return metadata;
-        }
-    }
-
-    private Metadata metadataWithoutFile() {
-        Metadata metadata = new Metadata.MatchAllMetadata();
-        metadata.setRepositoryUri(URI.create(""));
-        File file = path.toFile();
-        if (Files.isRegularFile(path)) {
-            metadata.setArtifactId(file.getParentFile().getName());
-        } else {
-            metadata.setArtifactId(file.getName());
-        }
-        if (!Files.exists(path)) {
-            logger.debug("Specified path doesn't exists: {}", path.toAbsolutePath());
-            return metadata;
-        }
-
-        Artifact artifact = new Artifact();
-        artifact.setName(file.getName());
-        Map<String, Item> files = new ConcurrentHashMap<>();
-        if (file.isDirectory()) {
-            File[] fileList = file.listFiles();
-            if (fileList != null) {
-                for (File f : fileList) {
-                    Item item = new Item();
-                    item.setName(f.getName());
-                    item.setSize(f.length());
-                    item.setArtifact(artifact);
-                    files.put(f.getName(), item);
-                }
-            }
-        }
-        artifact.setFiles(files);
-
-        metadata.setArtifacts(Collections.singletonList(artifact));
-        return metadata;
+        return getMetadata();
     }
 
     /** {@inheritDoc} */
@@ -140,25 +103,46 @@ public class SimpleRepository extends AbstractRepository {
 
     /** {@inheritDoc} */
     @Override
-    public Path getResourceDirectory(Artifact artifact) {
+    public Path getResourceDirectory(Artifact artifact) throws IOException {
+        if (isRemote) {
+            return super.getResourceDirectory(artifact);
+        }
         return path;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(Artifact artifact, Progress progress) {
-        // Do nothing
+    protected void download(Path tmp, URI baseUri, Artifact.Item item, Progress progress)
+            throws IOException {
+        logger.debug("Extracting artifact: {} ...", path);
+        try (InputStream is = Files.newInputStream(path)) {
+            save(is, tmp, baseUri, item, progress);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
-    public Path getCacheDirectory() {
+    public void prepare(Artifact artifact, Progress progress) throws IOException {
+        if (isRemote) {
+            super.prepare(artifact, progress);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Path getCacheDirectory() throws IOException {
+        if (isRemote) {
+            return super.getCacheDirectory();
+        }
         return path;
     }
 
     /** {@inheritDoc} */
     @Override
-    protected URI resolvePath(Item item, String path) {
+    protected URI resolvePath(Item item, String path) throws IOException {
+        if (isRemote) {
+            return super.resolvePath(item, path);
+        }
         return this.path.resolve(item.getName()).toUri();
     }
 
@@ -170,7 +154,61 @@ public class SimpleRepository extends AbstractRepository {
             return Collections.emptyList();
         }
 
-        MRL mrl = MRL.undefined(DefaultModelZoo.GROUP_ID, path.toFile().getName());
+        MRL mrl = MRL.undefined(DefaultModelZoo.GROUP_ID, artifactId);
         return Collections.singletonList(mrl);
+    }
+
+    private synchronized Metadata getMetadata() throws IOException {
+        if (resolved) {
+            return metadata;
+        }
+
+        resolved = true;
+        metadata = new Metadata.MatchAllMetadata();
+        metadata.setRepositoryUri(URI.create(""));
+        metadata.setApplication(Application.UNDEFINED);
+        metadata.setArtifactId(artifactId);
+        if (!Files.exists(path)) {
+            logger.debug("Specified path doesn't exists: {}", path.toAbsolutePath());
+            return metadata;
+        }
+
+        Artifact artifact = new Artifact();
+        artifact.setName(modelName);
+        Map<String, Item> files = new ConcurrentHashMap<>();
+        if (isRemote) {
+            Artifact.Item item = new Artifact.Item();
+            String uri = path.toAbsolutePath().toString();
+            item.setUri(uri);
+            item.setName(""); // avoid creating extra folder
+            item.setArtifact(artifact);
+            item.setSize(Files.size(path));
+            files.put(artifactId, item);
+            artifact.setFiles(files);
+            artifact.setName(modelName);
+
+            String hash = md5hash(uri + "artifact_id=" + artifactId + "&model_name=" + modelName);
+            MRL mrl = MRL.model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
+            metadata.setRepositoryUri(mrl.toURI());
+        } else {
+            if (Files.isDirectory(path)) {
+                File[] fileList = path.toFile().listFiles();
+                if (fileList != null) {
+                    for (File f : fileList) {
+                        Item item = new Item();
+                        item.setName(f.getName());
+                        item.setSize(f.length());
+                        item.setArtifact(artifact);
+                        files.put(f.getName(), item);
+                    }
+                }
+            } else {
+                logger.warn("Simple repository pointing to a non-archive file.");
+            }
+        }
+        artifact.setFiles(files);
+
+        metadata.setArtifacts(Collections.singletonList(artifact));
+        return metadata;
     }
 }
