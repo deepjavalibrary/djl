@@ -8,7 +8,7 @@ set -e
 function run_test {
     base=$(basename $1)
     dir=$(dirname $1)
-    jupyter nbconvert --to html --execute --ExecutePreprocessor.timeout=600 --output $base $1
+    jupyter nbconvert --to html --execute --ExecutePreprocessor.timeout=1000 --output $base $1
     mkdir -p test_output/$dir
     mv "${1}.html" test_output/$dir/
 }
