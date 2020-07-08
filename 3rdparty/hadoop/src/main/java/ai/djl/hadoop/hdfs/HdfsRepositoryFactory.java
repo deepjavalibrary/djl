@@ -57,7 +57,7 @@ public class HdfsRepositoryFactory implements RepositoryFactory {
 
         String path = uri.getPath();
         String fileName = Paths.get(path).toFile().getName();
-        boolean isDirectory = FilenameUtils.isArchiveFile(fileName);
+        boolean isDirectory = !FilenameUtils.isArchiveFile(fileName);
         if (!isDirectory) {
             fileName = FilenameUtils.getNamePart(fileName);
         }

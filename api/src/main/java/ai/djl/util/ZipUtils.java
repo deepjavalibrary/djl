@@ -63,7 +63,11 @@ public final class ZipUtils {
      */
     public static void zip(Path src, Path dest, boolean includeFolderName) throws IOException {
         try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(dest))) {
-            addToZip(src, src, zos);
+            Path root = includeFolderName ? src.getParent() : src;
+            if (root == null) {
+                throw new AssertionError("Parent folder should not be null.");
+            }
+            addToZip(root, src, zos);
         }
     }
 
