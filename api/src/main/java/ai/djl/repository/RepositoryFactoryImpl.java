@@ -53,7 +53,12 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             return factory.newInstance(name, url);
         }
 
-        Path path = Paths.get(uri.getPath());
+        String uriPath = uri.getPath();
+        if (uriPath.startsWith("/") && System.getProperty("os.name").startsWith("Win")) {
+            uriPath = uriPath.substring(1);
+        }
+        Path path = Paths.get(uriPath);
+
         String fileName = path.toFile().getName();
         String[] names = parseQueryString(uri, fileName);
         if ("file".equalsIgnoreCase(scheme)) {
