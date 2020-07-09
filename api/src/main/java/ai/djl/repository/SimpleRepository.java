@@ -178,7 +178,7 @@ public class SimpleRepository extends AbstractRepository {
         Map<String, Item> files = new ConcurrentHashMap<>();
         if (isRemote) {
             Artifact.Item item = new Artifact.Item();
-            String uri = path.toAbsolutePath().toString();
+            String uri = path.toAbsolutePath().toUri().toString();
             item.setUri(uri);
             item.setName(""); // avoid creating extra folder
             item.setArtifact(artifact);
