@@ -80,6 +80,32 @@ jobs:
           name: mxnet-model-zoo
           path: mxnet/mxnet-model-zoo/build/reports
 
+  documentation:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Set up Python3
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+      - name: install Python Dependencies
+        run: pip install mkdocs
+      - name: clone DJL repo to access the DJL parent dir
+        run: git clone https://github.com/awslabs/djl djl_tmp
+      - name: build docs
+        run: |
+          cd djl_tmp/docs
+          mkdocs build --site-dir ../../site
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Copy files to S3 with the AWS CLI
+        run: |
+          aws s3 sync site s3://djl-ai/documentation/nightly
+
+
   test-pytorch:
     if: github.repository == 'awslabs/djl'
     runs-on: ${{ matrix.operating-system }}

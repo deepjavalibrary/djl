@@ -2,6 +2,7 @@ site_name: Deep Java Library
 repo_name: GitHub
 repo_url: https://github.com/awslabs/djl/
 site_url: https://djl.ai
+use_directory_urls: false
 docs_dir: '../'
 theme: readthedocs
 nav:
