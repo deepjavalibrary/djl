@@ -1,0 +1,36 @@
+site_name: Deep Java Library
+repo_name: GitHub
+repo_url: https://github.com/awslabs/djl/
+site_url: https://djl.ai
+docs_dir: '../'
+theme: readthedocs
+nav:
+  - 'docs/README.md'
+  - 'docs/faq.md'
+  - 'docs/how_to_collect_metrics.md'
+  - 'docs/load_model.md'
+  - 'docs/model-zoo.md'
+  - 'docs/quick_start.md'
+  - Development:
+      - 'docs/development/README.md'
+      - 'docs/development/add_model_to_model-zoo.md'
+      - 'docs/development/cache_management.md'
+      - 'docs/development/development_guideline.md'
+      - 'docs/development/how_to_use_dataset.md'
+      - 'docs/development/memory_management.md'
+      - 'docs/development/release_process.md'
+      - 'docs/development/setup.md'
+      - 'docs/development/troubleshooting.md'
+  - MXNet:
+      - 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
+      - 'mxnet/README.md'
+  - ONNX Runtime:
+      - 'docs/onnxruntime/hybrid_engine.md'
+  - PyTorch:
+      - 'docs/pytorch/how_to_convert_your_model_to_torchscript.md'
+      - 'docs/pytorch/how_to_optimize_inference_performance.md'
+      - 'pytorch/README.md'
+  - TensorFlow:
+      - 'docs/tensorflow/how_to_import_keras_models_in_DJL.md'
+      - 'docs/tensorflow/how_to_import_local_tensorflow_models.md'
+      - 'tensorflow/README.md'

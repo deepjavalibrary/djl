@@ -12,7 +12,8 @@ The model files you will have or need depend on what type of model you have:
   - <MODEL_NAME>-0000.params
 
 **Note:** To save space, compress the parameter file to .gz using the following command:
-```shell script
+
+```shell
 $ gzip <MODEL_NAME>-0000.params
 ```
 
@@ -35,7 +36,7 @@ For a model built as a DJL block, you must recreate the block before loading the
 
 **Note:** You need to update the sha1 hash of each file in your `metadata.json` file. Use the following command to get the sha1Hash value:
 
-```shell script
+```shell
 $ shasum -a 1 <file_name>
 ```
 
@@ -52,7 +53,7 @@ The official DJL ML repository is located on an S3 bucket managed by the AWS DJL
 For non-team members, coordinate with a team member in your pull request to coordinate adding the necessary files.
 
 For AWS team members, run the following command to upload your model to the S3 bucket:
-```shell script
+```shell
 $ ./gradlew syncS3
 ```
 
