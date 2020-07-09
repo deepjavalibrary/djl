@@ -69,7 +69,7 @@ public final class TrainMnistWithLSTM {
                  * MNIST is 28x28 grayscale image and pre processed into 28 * 28 NDArray.
                  * 1st axis is batch axis, we can use 1 for initialization.
                  */
-                Shape inputShape = new Shape(32, 28, 28);
+                Shape inputShape = new Shape(32, 1, 28, 28);
 
                 // initialize trainer with proper input shape
                 trainer.initialize(inputShape);
