@@ -16,6 +16,7 @@ nav:
       - 'docs/development/README.md'
       - 'docs/development/add_model_to_model-zoo.md'
       - 'docs/development/cache_management.md'
+      - 'docs/development/configure_logging.md'
       - 'docs/development/development_guideline.md'
       - 'docs/development/how_to_use_dataset.md'
       - 'docs/development/memory_management.md'
