@@ -16,13 +16,56 @@ SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further detail
 
 You can resolve this issue by adding a popular logging framework to your project.
 
+### Use slf4j-simple
+
+For a quick prototyping, you can include [slf4j-simple](https://mvnrepository.com/artifact/org.slf4j/slf4j-simple)
+to your project to enable logging (slf4j-simple is not recommended for production deployment):
+
+For Maven:
+
+```
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-simple</artifactId>
+    <version>1.7.30</version>
+</dependency>
+```
+
+For Gradle:
+
+```
+    implementation "org.slf4j:slf4j-simple:1.7.30"
+```
+
+Then you can use system properties to configure slf4j-simple log level:
+```
+-Dorg.slf4j.simpleLogger.defaultLogLevel=debug
+```
+
+See [SimpleLogger](http://www.slf4j.org/api/org/slf4j/impl/SimpleLogger.html) for more detail.
+
+### Use log4j2
+
 In our examples module, we use [log4j2 binding](https://github.com/awslabs/djl/blob/master/examples/build.gradle#L13).
 While using log4j2 binding, you also need add a [log4j2.xml](../../examples/src/main/resources/log4j2.xml) file.
 
+### Use logback
+
 If you want to use other logging framework such as `logback`, you can just add the following dependency into your build.gradle:
 
-```shell
+```
     implementation "ch.qos.logback:logback-classic:1.2.3"
+```
+
+or for Maven:
+
+```
+<dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>1.2.3</version>
+    <scope>test</scope>
+</dependency>
 ```
 
 ## Configure logging level
