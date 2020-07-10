@@ -5,7 +5,7 @@ plugins {
 
 group = "ai.djl.mxnet"
 
-def VERSION = "1.7.0-a"
+def VERSION = "1.7.0-b"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 version = VERSION + (isRelease ? "" : "-SNAPSHOT")
 

@@ -17,7 +17,7 @@ runtimeOnly "ai.djl.onnxruntime:onnxruntime-native-auto:1.3.0"
 To use it along with MXNet for additional API support, add the following two dependencies:
 ```
 runtimeOnly "ai.djl.mxnet:mxnet-engine:0.6.0"
-runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.7.0-a"
+runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.7.0-b"
 ```
 You can also use PyTorch or TensorFlow Engine as the supplemental engine by adding their corresponding dependencies.
 
