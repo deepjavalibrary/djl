@@ -7,8 +7,6 @@ group "ai.djl.tensorflow"
 
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 version = "2.2.0" + (isRelease ? "" : "-SNAPSHOT")
-def tf_versoin = "2.2.0"
-def mkl_dnn_version = "0.21.2-1.5.2"
 
 repositories {
     maven {
@@ -106,7 +104,7 @@ task uploadTensorflowNativeLibs() {
         delete ("${buildDir}/native/org/")
 
         exec {
-            commandLine "aws", "s3", "sync", "${buildDir}/native/", "s3://djl-ai/publish/tensorflow-${tf_versoin}/"
+            commandLine "aws", "s3", "sync", "${buildDir}/native/", "s3://djl-ai/publish/tensorflow-${tensorflow_version}/"
         }
     }
 }
