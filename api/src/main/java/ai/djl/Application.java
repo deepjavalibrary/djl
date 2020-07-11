@@ -32,6 +32,12 @@ public class Application {
         return path;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return path.replace('/', '.').toUpperCase();
+    }
+
     /** The common set of applications for computer vision. */
     public interface CV {
         Application IMAGE_CLASSIFICATION = new Application("cv/image_classification");

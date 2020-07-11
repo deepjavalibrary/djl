@@ -32,7 +32,7 @@ public final class ListModels {
         Map<Application, List<Artifact>> models = ModelZoo.listModels();
         models.forEach(
                 (app, list) -> {
-                    String appName = app.getPath().replace('/', '.').toUpperCase();
+                    String appName = app.toString();
                     list.forEach(artifact -> logger.info("{} {}", appName, artifact));
                 });
     }
