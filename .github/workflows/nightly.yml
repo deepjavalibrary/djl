@@ -92,7 +92,7 @@ jobs:
         with:
           python-version: '3.x'
       - name: install Python Dependencies
-        run: pip3 install mkdocs mkdocs-exclude jupyter
+        run: pip3 install mkdocs mkdocs-exclude mknotebooks mkdocs-material jupyter Pygments
       - name: Install IJava kernel
         run: |
           git clone https://github.com/frankfliu/IJava.git
@@ -103,9 +103,8 @@ jobs:
       - name: run Notebooks
         run: |
           cd djl_tmp/jupyter
+          rm -rf d2l-java
           bash test_notebook.sh
-          cd ..
-          find . -name "*.md" | xargs sed -i 's/\.ipynb/\.md/g'
       - name: build docs
         run: |
           cd djl_tmp/docs

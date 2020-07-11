@@ -3,9 +3,24 @@ repo_name: GitHub
 repo_url: https://github.com/awslabs/djl/
 site_url: https://djl.ai
 use_directory_urls: false
+markdown_extensions:
+  - codehilite
+theme:
+  name: material
+  features:
+    - tabs
+  palette:
+    primary: light-blue
+    accent: light-blue
 docs_dir: '../'
-theme: readthedocs
+plugins:
+  - search
+  - mknotebooks
+  - exclude:
+      regex:
+        - '.*\.(symbol|params|pt|zip|gz|txt|sh)$'
 nav:
+  - HOME: 'README.md'
   - 'docs/README.md'
   - 'docs/faq.md'
   - 'docs/how_to_collect_metrics.md'
@@ -36,7 +51,4 @@ nav:
       - 'docs/tensorflow/how_to_import_keras_models_in_DJL.md'
       - 'docs/tensorflow/how_to_import_local_tensorflow_models.md'
       - 'tensorflow/README.md'
-plugins:
-  - exclude:
-      regex:
-        - '.*\.(symbol|params|pt|zip|gz|ipynb|txt|sh)$'
+

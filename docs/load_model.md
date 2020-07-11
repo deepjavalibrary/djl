@@ -20,6 +20,7 @@ See reference project: [DJL Spring Boot Starter](https://github.com/awslabs/djl-
 
 You can use [Criteria](https://javadoc.io/static/ai.djl/api/0.6.0/index.html?ai/djl/repository/zoo/Criteria.html) class 
 to narrow down your search condition and locate the model you want to load.
+
 - Engine: defines on which engine you want your model to be loaded
 - Device: defines on which device (GPU/CPU) you want your model to be loaded
 - Application: defines model application
