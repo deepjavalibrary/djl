@@ -11,9 +11,9 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - [How to use a dataset](development/how_to_use_dataset.md)
 - [Memory Management](development/memory_management.md)
 
-## [Jupyter notebook tutorials](../jupyter)
+## [Jupyter notebook tutorials](../jupyter/README.md)
 
-- **[Beginner Jupyter Tutorial](../jupyter/tutorial)**
+- **[Beginner Jupyter Tutorial](../jupyter/tutorial/README.md)**
 - [Run object detection with model zoo](../jupyter/object_detection_with_model_zoo.ipynb)
 - [Load pre-trained PyTorch model](../jupyter/load_pytorch_model.ipynb)
 - [Load pre-trained MXNet model](../jupyter/load_mxnet_model.ipynb)

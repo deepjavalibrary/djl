@@ -36,3 +36,7 @@ nav:
       - 'docs/tensorflow/how_to_import_keras_models_in_DJL.md'
       - 'docs/tensorflow/how_to_import_local_tensorflow_models.md'
       - 'tensorflow/README.md'
+plugins:
+  - exclude:
+      regex:
+        - '.*\.(symbol|params|pt|zip|gz|ipynb|txt|sh)$'

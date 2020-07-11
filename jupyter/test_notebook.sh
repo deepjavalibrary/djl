@@ -6,15 +6,27 @@
 set -e
 
 function run_test {
-    jupyter-nbconvert --to notebook --execute --output outFile $1
-    # grep "output_type" outFile.ipynb | grep "error"
-    rm outFile.ipynb
+    base=$(basename $1)
+    # Workaround on crashes
+    if [[ "$base" == transfer_learning_on_cifar10* ]]; then
+        jupyter nbconvert --to markdown --output $base $1
+    else
+        jupyter nbconvert --to markdown --execute --ExecutePreprocessor.timeout=600 --output $base $1
+    fi
+    output="${1}.md"
+    sed -i "1i\\
+     [download the notebook](${base})
+     " $output
+    mv $output `echo $output | sed 's/\.ipynb//'`
 }
 
 if [[ $# -eq 0 ]]; then
     for f in {**,.}/*.ipynb
     do
-        run_test "$f"
+        dir=$(dirname f)
+        if [[ "$dir" != d2l-java* ]]; then
+          run_test "$f"
+        fi
     done
 else
     run_test $1
