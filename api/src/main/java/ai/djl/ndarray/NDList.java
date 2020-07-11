@@ -179,7 +179,7 @@ public class NDList extends ArrayList<NDArray> implements AutoCloseable {
      * @param copy set {@code true} if you want to return a copy of the underlying NDArray
      * @return a new {@code NDList} with the NDArrays on specified {@link Device}
      */
-    public NDList asInDevice(Device device, boolean copy) {
+    public NDList toDevice(Device device, boolean copy) {
         if (!copy) {
             // if all arrays in NDList are already on device, return itself
             if (this.stream().allMatch(array -> array.getDevice() == device)) {

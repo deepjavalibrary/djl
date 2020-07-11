@@ -432,7 +432,7 @@ public final class JnaUtils {
             return ndList;
         }
 
-        NDList ret = ndList.asInDevice(device, true);
+        NDList ret = ndList.toDevice(device, true);
         ndList.close();
         return ret;
     }

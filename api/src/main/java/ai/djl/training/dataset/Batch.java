@@ -204,8 +204,8 @@ public class Batch implements AutoCloseable {
                             progressTotal)
                 };
             } else {
-                NDList d = data.asInDevice(devices[0], true);
-                NDList l = labels.asInDevice(devices[0], true);
+                NDList d = data.toDevice(devices[0], true);
+                NDList l = labels.toDevice(devices[0], true);
                 return new Batch[] {
                     new Batch(
                             manager,
@@ -226,8 +226,8 @@ public class Batch implements AutoCloseable {
         Batch[] splitted = new Batch[splittedData.length];
         int baseSplitSize = size / deviceCount;
         for (int i = 0; i < splittedData.length; ++i) {
-            NDList d = splittedData[i].asInDevice(devices[i], true);
-            NDList l = splittedLabels[i].asInDevice(devices[i], true);
+            NDList d = splittedData[i].toDevice(devices[i], true);
+            NDList l = splittedLabels[i].toDevice(devices[i], true);
             int subSize =
                     (i == splittedData.length - 1) ? (size - i * baseSplitSize) : baseSplitSize;
             splitted[i] =
