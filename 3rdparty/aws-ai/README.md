@@ -12,32 +12,19 @@ can load models from your s3 bucket.
 
 The following pseudocode demonstrates how to load model from S3:
 ```java
-    // Set model zoo search path system property. The value can be
-    // comma delimited url string. You can add multiple s3 url.
-    // The S3 url should point to a folder in your s3 bucket.
-    // In current implementation, DJL will only download files directly
-    // in that folder. The archive file like .zip, .tar.gz, .tgz, .tar.z
-    // files will be extracted automatically. This is useful for the models
-    // that are created by AWS SageMaker.
-    // The folder name will be interpreted as artifactId and modelName.
-    // If your model file has a different name then the folder name, you
-    // need use query string to tell DJL which model you want to load.
-    System.setProperty("ai.djl.repository.zoo.location",
-            "s3://djl-misc/test/models/resnet18?artifact_id=resnet&model_name=resent18_v1");
-
-    // group "ai.djl.localmodelzoo" is optional. With explicity group id,
-    // you limit the search scope in your search locations only. Otherwise, it
-    // will search from all model zoo for the artificat "resnet" 
     Criteria<Image, Classifications> criteria =
         Criteria.builder()
                 .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                 .setTypes(Image.class, Classifications.class)
-                .optArtifactId("ai.djl.localmodelzoo:resnet")
+                .optModleUrls("s3://djl-misc/test/models/resnet18?artifact_id=resnet&model_name=resent18_v1")
+                .optArtifactId("resnet")
                 .optProgress(new ProgressBar())
                 .build();
 
     ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
 ```
+
+See [How to load a model](../../docs/load_model.md) for more detail.
 
 If you want to customize your AWS credentials and region, you can manually register a customized
 `S3RepositoryFactory`:

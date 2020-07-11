@@ -15,11 +15,14 @@ The following pseudocode demonstrates how to load model from HDFS url:
                 .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                 .setTypes(Image.class, Classifications.class)
                 .optModelUrls("hdfs://localhost:63049/resnet.tar.z")
-                .optArtifactId("ai.djl.localmodelzoo:resnet")
+                .optArtifactId("resnet")
                 .build();
 
     ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
 ```
+
+See [How to load a model](../../docs/load_model.md) for more detail.
+
 `HdfsRepositoryFactory` will be registered automatically in DJL as long as you add this module in your class path.
 If you want to customize your Hadoop configuration, you can manually register a customized `HdfsRepositoryFactory`:
 

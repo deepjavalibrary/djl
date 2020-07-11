@@ -37,6 +37,21 @@ to narrow down your search condition and locate the model you want to load.
 
 *Note:* If multiple model matches the criteria you specified, the first one will be returned. The result is not deterministic.
 
+### Load model from ModelZoo repository
+
+The advantage os using ModelZoo repository is it provides a way to manage models versions. DJL allows you
+to update your model in the repository without conflict with existing models. Model consumer can pick up new model without code change.
+DJL searches classpath and locate available ModelZoo's in the system. 
+
+DJL provide several built-in ModelZoo:
+
+- [ai.djl:model-zoo](https://search.maven.org/search?q=g:ai.djl%20AND%20a:model-zoo) Engine-agnostic imperative model zoo
+- [ai.djl.mxnet:mxnet-model-zoo](https://search.maven.org/search?q=g:ai.djl.mxnet%20AND%20a:mxnet-model-zoo) MXNet symbolic model zoo
+- [ai.djl.pytorch:pytorch-model-zoo](https://search.maven.org/search?q=g:ai.djl.pytorch%20AND%20a:pytorch-model-zoo) PyTorch torch script model zoo
+- [ai.djl.tensorflow:tensorflow-model-zoo](https://search.maven.org/search?q=g:ai.djl.tensorflow%20AND%20a:tensorflow-model-zoo) TensorFlow saved bundle model zoo
+
+Users can create theirs own model zoo if needed, we are working on improving tools to help developer create their own model zoo repository.
+
 ### Load model from local file system
 
 The following shows how to load a pre-trained model from a file path:
@@ -44,21 +59,48 @@ The following shows how to load a pre-trained model from a file path:
 Criteria<Image, Classifications> criteria = Criteria.builder()
         .setTypes(Image.class, Classifications.class) // defines input and output data type
         .optTranslator(ImageClassificationTranslator.builder().setSynsetArtifactName("synset.txt").build())
-        .optModelUrls("/var/models/my_resnet50") // search models in specified path
+        .optModelUrls("file:///var/models/my_resnet50") // search models in specified path
         .optArtifactId("ai.djl.localmodelzoo:my_resnet50") // defines which model to load
         .build();
 
 ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
 ```
 
-### Load model from a URL
+DJL supports loading a pre-trained model from a local directory or an [archive file](#current-supported-archive-formats).
 
-DJL supports loading a model from a HTTP(s) URL. Since a model consists multiple files, the URL must be
-an archive file. Current supported archive formats are:
+#### Current supported archive formats
 
 - .zip
 - .tar
 - .tar.gz, .tgz, .tar.z
+
+#### Customize artifactId and modelName
+
+By default, DJL will use the directory/file name of the URL as the model's `artifactId` and `modelName`.
+Some engines (MXNet, PyTorch) are sensitive to the model name, you usually need name the directory or archive
+file to be the same as model. You can use URL query string to tell DJL how to load model if the model name are
+different from the directory or archive file:
+
+- model_name: the file name (or prefix) of the model.
+
+    You need to include the relative path to the model file if it's in a sub folder of the archive file. 
+- artifact_id: define a `artifactId` other than the file name
+
+For example:
+```
+files:///var/models/resnet.zip?artifact_id=resenet-18&model_name=resnet-18v1
+```
+
+If your the directory or archive file has nested folder, are include the folder name in url to let DJL know where
+to find model files:
+```
+files://var/models/resnet.zip?artifact_id=resenet-18&model_name=saved_model/resnet-18
+```
+
+### Load model from a URL
+
+DJL supports loading a model from a HTTP(s) URL. Since a model consists multiple files, the URL must be
+an [archive file](#current-supported-archive-formats).
 
 ```java
 Criteria<Image, Classifications> criteria = Criteria.builder()
@@ -71,27 +113,17 @@ Criteria<Image, Classifications> criteria = Criteria.builder()
 ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
 ```
 
-By default, DJL will use the file name of the URL as the model's `artifactId` and `modelName` and assumes there
-is no nested folder structure in the archive file.
-You can use URL query string to tell DJL how to load model from the archive file:
-
-- model_name: the file name (or prefix) of the model.
-
-    You need to include the relative path to the model file if it's in a sub folder of the archive file. 
-- artifact_id: define a `artifactId` other than the file name
-
-For example:
-```
-https://djl-ai.s3.amazonaws.com/resnet.zip?artifact_id=tf_resenet&model_name=saved_model/resnet-18
-```
+You can [customize artifactId and modelName](#customize-artifactid-and-modelname) the same way as loading model from local file system.
 
 ### Load model from AWS S3 bucket
 DJL supports loading a model from S3 bucket using `s3://` URL, see [here](../3rdparty/aws-ai/README.md) for detail.
 
+### Load model from Hadoop HDFS
+DJL supports loading a model from Hadoop HDFS file system using `hdfs://` URL, see [here](../3rdparty/hadoop/README.md) for detail.
+
 ### Implement your own Repository
 Users may want to access their model using varies protocol, such as:
 
-- hdfs://
 - ftp://
 - sftp://
 - tftp://
@@ -109,3 +141,14 @@ DJL is highly extensible, our API allows you to create your own URL protocol han
     See [java ServiceLoader](https://docs.oracle.com/javase/9/docs/api/java/util/ServiceLoader.html) for more detail.
 
 You can refer to [AWS S3 Repostory](../3rdparty/aws-ai/README.md) for an example.
+
+## Configure model zoo search path
+
+DJL provides a way for developers to configure a system wide model search path by setting a `ai.djl.repository.zoo.location`
+system properties:
+
+```
+-Dai.djl.repository.zoo.location=https://djl-ai.s3.amazonaws.com/resnet.zip,s3://djl-misc/test/models,file:///myModels
+```
+
+The value can be comma delimited url string.

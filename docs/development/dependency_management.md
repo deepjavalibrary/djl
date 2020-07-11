@@ -105,7 +105,7 @@ Gradle:
 | | [pytorch-native-cu92-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
 | | | |
 | [ai.djl.tensorflow](https://search.maven.org/search?q=g:ai.djl.tensorflow) | [tensorflow-engine](../../tensorflow/tensorflow-engine/README.md#installation) | TensorFlow engine adapter |
-| | [tensorflow-model-zoo](../../tensorflow/tensorflow-model-zoo/README.md#installation) | Contains state of the art TensorFlow symbolic models |
+| | [tensorflow-model-zoo](../../tensorflow/tensorflow-model-zoo/README.md#installation) | Contains state of the art TensorFlow saved bundle models |
 | | [tensorflow-native-auto](../../tensorflow/tensorflow-engine/README.md#install-tensorflow-native-library) | A placeholder package to automatically download native libraries for your platform |
 | | [tensorflow-api](../../tensorflow/tensorflow-api/README.md#installation) | A redistribution of tensorFlow core java API 2.x |
 | | | |
