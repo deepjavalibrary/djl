@@ -20,13 +20,29 @@ You can also build the latest javadocs locally using the following command:
 The javadocs output is built in the `build/doc/javadoc` folder.
 
 ## Installation
+You can pull the TensorFlow engine from the central Maven repository by including the following dependency:
 
-To use the experimental TensorFlow engine, you need to build from source. 
-Simply begin by checking out the code.
-Once you have checked out the code locally, you can build it as follows using Gradle:
-
-```sh
-./gradlew build
+```xml
+<dependency>
+    <groupId>ai.djl.tensorflow</groupId>
+    <artifactId>tensorflow-engine</artifactId>
+    <version>0.6.0</version>
+    <scope>runtime</scope>
+</dependency>
 ```
 
-Follow the main [README.md](../../README.md) and the [quick start guide](../../docs/quick_start.md)
+Besides the `tensorflow-engine` library, you may also need to include the TensorFlow native library in your project.
+
+### Install TensorFlow native library
+
+We offer an automatic option that will download the native libraries into [cache folder](../../docs/development/cache_management.md) the first time you run DJL.
+It will automatically determine the appropriate jars for your system based on the platform and GPU support.
+
+```xml
+<dependency>
+    <groupId>ai.djl.tensorflow</groupId>
+    <artifactId>tensorflow-native-auto</artifactId>
+    <version>2.2.0</version>
+    <scope>runtime</scope>
+</dependency>
+```
