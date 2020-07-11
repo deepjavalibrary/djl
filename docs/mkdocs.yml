@@ -1,17 +1,34 @@
 site_name: Deep Java Library
-repo_name: GitHub
+repo_name: awslabs/djl
 repo_url: https://github.com/awslabs/djl/
 site_url: https://djl.ai
 use_directory_urls: false
 markdown_extensions:
   - codehilite
+  - toc:
+      permalink: true
 theme:
   name: material
+  logo: website/img/DJL.svg
+  favicon: website/img/favicon.png
   features:
     - tabs
   palette:
     primary: light-blue
     accent: light-blue
+google_analytics:
+  - UA-159559852-2
+  - auto
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/awslabs/djl
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/deepjavalibrary
+    - icon: fontawesome/brands/slack
+      link: https://deepjavalibrary.slack.com/
+    - icon: fontawesome/brands/zhihu
+      link: https://zhuanlan.zhihu.com/c_1255493231133417472
 docs_dir: '../'
 plugins:
   - search
