@@ -5,6 +5,7 @@ This document outlines the procedure to add new models into the model zoo.
 ## Step 1: Prepare the model files
 
 The model files you will have or need depend on what type of model you have:
+
 - Model built and trained in DJL:
   - <MODEL_NAME>-0000.params
 - Model import from MXNet:

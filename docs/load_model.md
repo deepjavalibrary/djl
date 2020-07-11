@@ -55,6 +55,7 @@ ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
 
 DJL supports loading a model from a HTTP(s) URL. Since a model consists multiple files, the URL must be
 an archive file. Current supported archive formats are:
+
 - .zip
 - .tar
 - .tar.gz, .tgz, .tar.z
@@ -73,6 +74,7 @@ ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
 By default, DJL will use the file name of the URL as the model's `artifactId` and `modelName` and assumes there
 is no nested folder structure in the archive file.
 You can use URL query string to tell DJL how to load model from the archive file:
+
 - model_name: the file name (or prefix) of the model.
 
     You need to include the relative path to the model file if it's in a sub folder of the archive file. 
@@ -88,6 +90,7 @@ DJL supports loading a model from S3 bucket using `s3://` URL, see [here](../3rd
 
 ### Implement your own Repository
 Users may want to access their model using varies protocol, such as:
+
 - hdfs://
 - ftp://
 - sftp://
@@ -98,6 +101,7 @@ Users may want to access their model using varies protocol, such as:
 - jdbc://
 
 DJL is highly extensible, our API allows you to create your own URL protocol handling by extending `Repository` class:
+
 - Create a class that implements `RepositoryFactory` interface
     make sure `getSupportedScheme()` returns URI schemes that you what to handle
 - Create a class that implements `Repository` interface.

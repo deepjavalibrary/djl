@@ -11,4 +11,5 @@ This folder contains documentation and guides for contributors and those working
 - [Cache Management](cache_management.md)
 
 ## Model Zoo Guides
+
 - [How to add a new model to the model zoos](add_model_to_model-zoo.md)

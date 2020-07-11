@@ -14,6 +14,7 @@ We try our best to minimize the external dependencies. The core DJL library only
 ## Which DJL package do I need?
 
 Although DJL itself has many packages, but in a real production environment, the minimal dependencies can be:
+
 - ai.djl:api
 - one of the engine package (e.g. ai.djl.pytorch:pytorch-engine)
 - native library of selected engine (e.g. ai.djl.pytorch:pytorch-native-auto)

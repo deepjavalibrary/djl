@@ -70,6 +70,7 @@ metrics.addMetric("end_to_end_latency", (end-begin) / 1_000_000f, "ms");
 ## More information
 
 For more examples of metrics use, as well as convenient utilities provided by DJL, see:
+
 - [MemoryTrainingListener](../api/src/main/java/ai/djl/training/listener/MemoryTrainingListener.java) for memory consumption metrics
 - [Trainer](../api/src/main/java/ai/djl/training/Trainer.java) for metrics during training
 - [Predictor](../api/src/main/java/ai/djl/inference/Predictor.java) for metrics during inference

@@ -2,6 +2,7 @@
 
 DJL Android allows you to run inference with Android devices.
 It has the following two modules:
+
 - Core package: contains some Image processing toolkit for Android user using DJL
 - PyTorch Native: contains DJL PyTorch Android native package
 

@@ -70,6 +70,7 @@ For the Linux platform, you can choose between CPU, GPU. If you have Nvidia [CUD
 installed on your GPU machine, you can use one of the following library:
 
 #### Linux GPU
+
 - ai.djl.mxnet:mxnet-native-cu102mkl:1.7.0-a:linux-x86_64 - CUDA 10.2
 - ai.djl.mxnet:mxnet-native-cu101mkl:1.7.0-a:linux-x86_64 - CUDA 10.1
 - ai.djl.mxnet:mxnet-native-cu92mkl:1.7.0-a:linux-x86_64 - CUDA 9.2
@@ -105,6 +106,7 @@ installed on your GPU machine, you can use one of the following library:
 ```
 
 #### Linux CPU
+
 - ai.djl.mxnet:mxnet-native-mkl:1.7.0-a:linux-x86_64
 
 ```xml
@@ -124,11 +126,13 @@ library size are large, we no longer provide GPU package, instead you have to
 use [Automatic](#automatic-(recommended)) package.
 
 #### Windows GPU
+
 - ai.djl.mxnet:mxnet-native-auto:1.7.0-a
 
     This package supports CUDA 9.2, CUDA 10.1 and CUDA 10.2 for Windows.
 
 ### Windows CPU
+
 - ai.djl.mxnet:mxnet-native-mkl:1.7.0-a:win-x86_64
 
 ```xml

@@ -37,6 +37,7 @@ If you do fail the format check, the easiest way to resolve it is to run the gra
 
 We don't have rule to enforce git commit message format. However, we encourage developers and reviewers to follow
 the good practice:
+
 - Limit the subject line to 72 characters
 - Separate subject from body with a blank line
 - Adding a prefix if possible, for example `[api]` or `docs:`
@@ -56,6 +57,7 @@ The most basic element of our documentation is the javadoc. Javadoc is required 
 DJL documentation will also coincide with various deep learning concepts that users may or may not be familiar with. Some of these include the various operations and blocks, activation functions, loss functions, optimizers, datasets, and models.
 
 For all of the topics that are associated with a particular method or class (and can be defined in that javadoc), you should try to include the following information:
+
 - 1-3 sentence summary of what the topic is (note that other terms in the summary should link to their respective definitions) assuming that users don't have familiarity with the topic
 - A link to the paper indicated with an anchor tag with the text "paper", possibly some additional anchor tags to other sources that help explain it
 - 1-3 sentence summary of historical context(when it was created and why).
@@ -116,6 +118,7 @@ The values to set the log level to can be found [here](https://logging.apache.or
 
 ## Run examples in IntelliJ
 Before you run any examples in IntelliJ, configure your Application template as follows:
+
 1. Navigate to IntelliJ menu and select "Run". Select "Edit configurations...".
 2. Expand "Template" on the left side list, and select "Application".
 3. Change the "Working directory:" value to: "$MODULE_WORKING_DIR$".
@@ -123,6 +126,7 @@ Before you run any examples in IntelliJ, configure your Application template as 
 
 Navigate to the 'examples' module. Open the class that you want to execute (e.g. ai.djl.examples.inference.ObjectDetection).
 Select the triangle at the class declaration line. A popup menu appears with 3 items:
+
 - Run 'ObjectDetection.main()'
 - Debug 'ObjectDetection.main()'
 - Run 'ObjectDetection.main()' with coverage
@@ -143,6 +147,7 @@ You can create your own NDArray renderer as follows:
 ![](img/custom_debug_view.png)
 
 Please make sure to:
+
 - Check the "On-demand" option, which causes IntelliJ to only render the NDArray when you click on the variable.
 - Change the "Use following expression" field to something like [toDebugString(100, 10, 10, 20)](https://javadoc.io/static/ai.djl/api/0.6.0/ai/djl/ndarray/NDArray.html#toDebugString-ai.djl.ndarray.NDArray-int-int-int-int-)
 if you want to adjust the range of NDArray's debug output.

@@ -109,6 +109,7 @@ Navigate to DJL github site, select "Release" tab and click "Draft a new Release
 Select tag that created by previous step. Check "This is a pre-release" checkbox.
 
 Release notes content should include the following:
+
 - list of new features
 - list of bug fixes
 - limitations and known issues

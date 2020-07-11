@@ -73,6 +73,7 @@ For the Linux platform, you can choose between CPU, GPU. If you have NVIDIA [CUD
 installed on your GPU machine, you can use one of the following library:
 
 #### Linux GPU
+
 - ai.djl.pytorch:pytorch-native-cu102:1.5.0:linux-x86_64 - CUDA 10.2
 - ai.djl.pytorch:pytorch-native-cu101:1.5.0:linux-x86_64 - CUDA 10.1
 - ai.djl.pytorch:pytorch-native-cu92:1.5.0:linux-x86_64 - CUDA 9.2
@@ -108,6 +109,7 @@ installed on your GPU machine, you can use one of the following library:
 ```
 
 ### Linux CPU
+
 - ai.djl.pytorch:pytorch-native-cpu:1.5.0:linux-x86_64
 
 ```xml
@@ -142,9 +144,11 @@ Users are required to use the corresponding `pytorch-engine` package along with 
 For the native packages:
 
 #### centOS 7/Ubuntu 14.04 CPU
+
 - ai.djl.pytorch:pytorch-native-cpu-precxx11:1.5.0-post0:linux-x86_64
 
 #### centOS 7/Ubuntu 14.04 GPU
+
 - ai.djl.pytorch:pytorch-native-cu102-precxx11:1.5.0-post0:linux-x86_64 - CUDA 10.2
 - ai.djl.pytorch:pytorch-native-cu101-precxx11:1.5.0-post0:linux-x86_64 - CUDA 10.1
 - ai.djl.pytorch:pytorch-native-cu92-precxx11:1.5.0-post0:linux-x86_64 - CUDA 9.2
@@ -180,6 +184,7 @@ For the Windows platform, you can choose between CPU and GPU.
 ```
 
 ### Windows CPU
+
 - ai.djl.pytorch:pytorch-native-cpu:1.5.0:win-x86_64
 
 ```xml

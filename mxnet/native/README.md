@@ -18,9 +18,11 @@ dumpbin /dependents libmxnet.dll
 ```
 
 The example dependencies list for macOS mkl is:
+
 - libmxnet.dylib (Be sure to rename libmxnet.so to libmxnet.dylib for macOS)
 
 The example dependencies list for Windows mkl is:
+
 - libmxnet.dll
 - libopenblas.dll
 - libgfortran-3.dll
@@ -28,6 +30,7 @@ The example dependencies list for Windows mkl is:
 - libgcc_s_seh-1.dll
 
 The example dependencies list for Linux mkl is:
+
 - libquadmath.so.0
 - libgfortran.so.3
 - libmxnet.so
@@ -35,7 +38,8 @@ The example dependencies list for Linux mkl is:
 
 ### Step 2: Upload files to s3 bucket
 
-The example list for s3 files is: 
+The example list for s3 files is:
+
 - s3://djl-ai/publish/mxnet-1.6.0/linux/common/libgfortran.so.3
 - s3://djl-ai/publish/mxnet-1.6.0/linux/common/libquadmath.so.0
 - s3://djl-ai/publish/mxnet-1.6.0/linux/cu101mkl/libmxnet.so

@@ -4,6 +4,7 @@ Deep Java Library's (DJL) Model Zoo is more than a collection of pre-trained mod
 
 A ZooModel has the following
 characteristics:
+
 - Globally unique: similar to Java maven packages, a model has its own group ID and artifact ID that uniquely identify it.
 - Versioned: the model version scheme allows developers to continuously update their model without causing a backward compatibility issue.
 - Ready to use out of box: the model contains predefined pre-process and post-process functionality, which
