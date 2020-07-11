@@ -40,7 +40,6 @@ public final class OrtEngine extends Engine {
     }
 
     static Engine newInstance() {
-        LibUtils.prepareLibrary();
         return new OrtEngine();
     }
 

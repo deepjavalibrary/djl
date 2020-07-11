@@ -11,7 +11,6 @@ configure([
         project(':tensorflow:tensorflow-engine'),
         project(':tensorflow:tensorflow-model-zoo'),
         project(':fasttext:fasttext-engine'),
-        project(':onnxruntime:onnxruntime-api'),
         project(':onnxruntime:onnxruntime-engine'),
         project(':3rdparty:aws-ai'),
         project(':3rdparty:hadoop')]) {
