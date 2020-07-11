@@ -48,7 +48,7 @@ The following pseudocode demonstrates running training:
     // Construct your neural network with built-in blocks
     Block block = new Mlp(28, 28);
 
-    try (Model model = Model.newInstance()) { // Create an empty model
+    try (Model model = Model.newInstance("mlp")) { // Create an empty model
         model.setBlock(block); // set neural network to model
 
         // Get training and validation dataset (MNIST dataset)
@@ -66,7 +66,7 @@ The following pseudocode demonstrates running training:
             Shape inputShape = new Shape(1, 28 * 28);
             trainer.initialize(new Shape[] {inputShape});
 
-            TrainingUtils.fit(trainer, epoch, trainingSet, validateSet);
+            EasyTrain.fit(trainer, epoch, trainingSet, validateSet);
         }
 
         // Save the model
