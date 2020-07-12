@@ -3,8 +3,8 @@
 [Object detection](https://en.wikipedia.org/wiki/Object_detection) is a computer vision technique
 for locating instances of objects in images or videos. In this example, you can find an imperative implemention of an 
 SSD model, and the way to train it using the Pikachu Dataset. The code for the example can be found in 
-[TrainPikachu.java](../src/main/java/ai/djl/examples/training/TrainPikachu.java). 
-The code for the implementation of SSD can be found in [SingleShotDetection.java](../../model-zoo/src/main/java/ai/djl/basicmodelzoo/cv/object_detection/ssd/SingleShotDetection.java).
+[TrainPikachu.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/training/TrainPikachu.java). 
+The code for the implementation of SSD can be found in [SingleShotDetection.java](https://github.com/awslabs/djl/blob/master/zoo/src/main/java/ai/djl/basicmodelzoo/cv/object_detection/ssd/SingleShotDetection.java).
 
 There are no small datasets, like MNIST or Fashion-MNIST, in the object detection field. In order to quickly test models,
 you are using a small dataset of Pikachu images. It contains a series of background images on which a Pikachu image

@@ -154,4 +154,4 @@ Verify the following link works, and update the website for java doc links accor
 
 ### Step 6.4: Check broken links
 
-Manually run the [broken link checker](../../tools/scripts/broken_link_checker.sh) and fix any broken link found.
+Manually run the [broken link checker](https://github.com/awslabs/djl/tree/master/tools/scripts/broken_link_checker.sh) and fix any broken link found.

@@ -47,7 +47,7 @@ See [SimpleLogger](http://www.slf4j.org/api/org/slf4j/impl/SimpleLogger.html) fo
 ### Use log4j2
 
 In our examples module, we use [log4j2 binding](https://github.com/awslabs/djl/blob/master/examples/build.gradle#L13).
-While using log4j2 binding, you also need add a [log4j2.xml](../../examples/src/main/resources/log4j2.xml) file.
+While using log4j2 binding, you also need add a [log4j2.xml](https://github.com/awslabs/djl/blob/master/examples/src/main/resources/log4j2.xml) file.
 
 ### Use logback
 

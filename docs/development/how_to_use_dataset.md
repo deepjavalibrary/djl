@@ -194,5 +194,5 @@ for (Batch batch : dataset.getData(model.getNDManager())) {
     batch.close();
 }
 ```
-Full example code could be found in [CSVDataset.java](CSVDataset.java).
+Full example code could be found in [CSVDataset.java](https://github.com/awslabs/djl/blob/master/docs/development/CSVDataset.java).
 

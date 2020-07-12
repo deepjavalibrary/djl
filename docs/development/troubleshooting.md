@@ -100,7 +100,7 @@ Then, right click the `log4j2.xml` file and select `Recompile log4j2.xml`.
 DJL requires Visual C++ Redistributable Packages. If you encounter an UnsatisfiedLinkError while building
 DJL on Windows, please download and install
 [Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) and reboot. 
-If the issue continues to persist, you can use the [docker file](../../docker/windows/Dockerfile) provided by us.
+If the issue continues to persist, you can use the [docker file](https://github.com/awslabs/djl/blob/master/docker/windows/Dockerfile) provided by us.
 Please note that this docker will only work with Windows server 2019 by default. If you want it to work with other
 versions of Windows, you need to pass the version as an argument as follows:
 ```

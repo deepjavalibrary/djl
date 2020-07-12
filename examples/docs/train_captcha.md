@@ -2,7 +2,7 @@
 
 In this example, you learn how to train the dataset with multiple inputs and labels.
 
-The source code for this example can be found at [TrainCaptcha.java](../src/main/java/ai/djl/examples/training/TrainCaptcha.java).
+The source code for this example can be found at [TrainCaptcha.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/training/TrainCaptcha.java).
 
 ## Setup guide
 

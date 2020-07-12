@@ -39,7 +39,7 @@ to narrow down your search condition and locate the model you want to load.
 
 ### Load model from ModelZoo repository
 
-The advantage os using ModelZoo repository is it provides a way to manage models versions. DJL allows you
+The advantage of using ModelZoo repository is it provides a way to manage models versions. DJL allows you
 to update your model in the repository without conflict with existing models. Model consumer can pick up new model without code change.
 DJL searches classpath and locate available ModelZoo's in the system. 
 

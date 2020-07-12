@@ -38,4 +38,4 @@ try (Model model = Model.newInstance()) {
 ```
 
 Simple as that! You just need to specify the path. 
-For details and full code, please refer to [ImageClassification.java](../../examples/src/main/java/ai/djl/examples/inference/ImageClassification.java).
+For details and full code, please refer to [ImageClassification.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/ImageClassification.java).

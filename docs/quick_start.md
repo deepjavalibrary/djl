@@ -1,7 +1,7 @@
 # Quick start
 
 Deep Java Library (DJL) is designed to be easy to get started with and simple to use.
-The easiest way to learn DJL is to read the [beginner tutorial](../jupyter/tutorial) or our [examples](../examples).
+The easiest way to learn DJL is to read the [beginner tutorial](../jupyter/tutorial/README.md) or our [examples](https://github.com/awslabs/djl/tree/master/examples).
 
 ## Prerequisites
 
@@ -15,18 +15,18 @@ We try our best to maintain a stable master branch. If you experience issues wit
 
 ## Beginner tutorial
 
-To get started, we recommend that you follow our short [beginner tutorial](../jupyter/tutorial). It takes you through some of the basics of deep learning to create a model, train your model, and run inference using your trained model.
+To get started, we recommend that you follow our short [beginner tutorial](../jupyter/tutorial/README.md). It takes you through some of the basics of deep learning to create a model, train your model, and run inference using your trained model.
 
 ## Run examples
 
-DJL also provides examples for both training and performing inference with deep learning models. You can find the examples and their source code in the [examples](../examples) directory.
+DJL also provides examples for both training and performing inference with deep learning models. You can find the examples and their source code in the [examples](https://github.com/awslabs/djl/tree/master/examples) directory.
  
 All of our examples are executed by a simple command. For detailed command line instructions, see each example’s Readme.md file.
 
 - [Train your first model](../examples/docs/train_mnist_mlp.md)
 - [Single-shot Object Detection inference example](../examples/docs/object_detection.md)
-- [More examples](../examples)
-- [Jupyter examples](../jupyter)
+- [More examples](https://github.com/awslabs/djl/tree/master/examples)
+- [Jupyter examples](../jupyter/README.md)
 
 ## Other resources
 

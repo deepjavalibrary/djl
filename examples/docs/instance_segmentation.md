@@ -6,7 +6,7 @@ In this example, you learn how to implement inference code with Deep Java Librar
 
 The following is the instance segmentation example source code:
 
-[InstanceSegmentation.java](../src/main/java/ai/djl/examples/inference/InstanceSegmentation.java).
+[InstanceSegmentation.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/InstanceSegmentation.java).
 
 
 ## Setup guide

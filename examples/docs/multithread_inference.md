@@ -8,7 +8,7 @@ It can help to increase the throughput of your inference on multi-core CPUs and 
 DJL predictor is not thread-safe.
 You must create a new [Predictor](https://javadoc.io/static/ai.djl/api/0.6.0/index.html?ai/djl/inference/Predictor.html) for each thread.
 
-For a reference implementation, see [Multi-threaded Benchmark](../src/main/java/ai/djl/examples/inference/benchmark/MultithreadedBenchmark.java).
+For a reference implementation, see [Multi-threaded Benchmark](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/benchmark/MultithreadedBenchmark.java).
 
 you need to set corresponding configuration based on the engine you want to use.
 

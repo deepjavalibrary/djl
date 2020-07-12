@@ -2,7 +2,7 @@
 
 In this example, you learn how to use the BERT QA model trained by MXNet and PyTorch. 
 You can provide the model with a question and a paragraph containing an answer. The model is then able to find the best answer from the answer paragraph.
-You can find the source code in [BertQaInference.java](../src/main/java/ai/djl/examples/inference/BertQaInference.java).
+You can find the source code in [BertQaInference.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/BertQaInference.java).
 
 Note that MXNet BERT model has a limitation where the max size of the tokens including the question and the paragraph is 384.  
 

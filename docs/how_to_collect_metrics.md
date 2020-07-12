@@ -1,7 +1,7 @@
 # Metrics in DJL
 
 
-Deep Java Library (DJL) comes with utility classes to make it easy to capture performance metrics and other metrics during runtime. These metrics can be used to analyze and monitor inference, training performance, and stability. [Metrics](../api/src/main/java/ai/djl/metric/Metrics.java) is the class that enables collecting metrics information. It is built as a collection of individual [Metric](../api/src/main/java/ai/djl/metric/Metric.java) classes.
+Deep Java Library (DJL) comes with utility classes to make it easy to capture performance metrics and other metrics during runtime. These metrics can be used to analyze and monitor inference, training performance, and stability. [Metrics](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/metric/Metrics.java) is the class that enables collecting metrics information. It is built as a collection of individual [Metric](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/metric/Metric.java) classes.
 
 As a container for individual metrics classes, **Metrics** stores them as time series data so that metric-vs-timeline analysis could be performed. It also provides convenient statistical methods for getting aggregated information, such as _mean_ and _percentile_.
 
@@ -71,7 +71,7 @@ metrics.addMetric("end_to_end_latency", (end-begin) / 1_000_000f, "ms");
 
 For more examples of metrics use, as well as convenient utilities provided by DJL, see:
 
-- [MemoryTrainingListener](../api/src/main/java/ai/djl/training/listener/MemoryTrainingListener.java) for memory consumption metrics
-- [Trainer](../api/src/main/java/ai/djl/training/Trainer.java) for metrics during training
-- [Predictor](../api/src/main/java/ai/djl/inference/Predictor.java) for metrics during inference
+- [MemoryTrainingListener](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/training/listener/MemoryTrainingListener.java) for memory consumption metrics
+- [Trainer](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/training/Trainer.java) for metrics during training
+- [Predictor](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/inference/Predictor.java) for metrics during inference
 

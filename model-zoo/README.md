@@ -66,7 +66,7 @@ If you already known which `ModelLoader` to use, you can simply do the following
 
 ### List available models
 
-You can use [ModelZoo.listModels()](../api/src/main/java/ai/djl/repository/zoo/ModelZoo.java) API to query available models.
+You can use [ModelZoo.listModels()](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/repository/zoo/ModelZoo.java) API to query available models.
 
 Use the following command to list built-in models in examples module:
 ```shell script

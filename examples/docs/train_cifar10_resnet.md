@@ -3,7 +3,7 @@
 
 In this example, you learn how to train the [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) dataset with Deep Java Library (DJL) using [Transfer Learning](https://en.wikipedia.org/wiki/Transfer_learning).
 
-You can find the example source code in: [TrainResnetWithCifar10.java](../src/main/java/ai/djl/examples/training/transferlearning/TrainResnetWithCifar10.java).
+You can find the example source code in: [TrainResnetWithCifar10.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/training/transferlearning/TrainResnetWithCifar10.java).
 
 You can also find the Jupyter notebook tutorial [here](../../jupyter/transfer_learning_on_cifar10.ipynb).
 The Jupyter notebook explains the key concepts in detail.

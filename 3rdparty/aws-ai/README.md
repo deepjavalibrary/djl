@@ -7,7 +7,7 @@ The aws-ai module contains classes that make it easy for DJL to access AWS servi
 ### Load model from AWS S3 bucket
 
 With this module, you can easily load model from AWS S3 bucket. As long as you include
-this module in your project, [ModelZoo](../../api/src/main/java/ai/djl/repository/zoo/ModelZoo.java) class
+this module in your project, [ModelZoo](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/repository/zoo/ModelZoo.html) class
 can load models from your s3 bucket.
 
 The following pseudocode demonstrates how to load model from S3:

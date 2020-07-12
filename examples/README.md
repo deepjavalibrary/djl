@@ -20,9 +20,17 @@ The following examples are included for inference:
 - [Pose estimation example](docs/pose_estimation.md)
 - [Action recognition example](docs/action_recognition.md)
 
-These examples focus on the overall experience of training and inference. We keep components that are reusable within separate modules for other users to take advantage of in their own applications. For examples and references on creating datasets, look at the [basic dataset module](../basicdataset). For examples and references on building models and translators, look in our [main model zoo](../model-zoo).
+These examples focus on the overall experience of training and inference. We keep components
+that are reusable within separate modules for other users to take advantage of in their own
+applications. For examples and references on creating datasets, look at the
+[basic dataset module](https://github.com/awslabs/djl/tree/master/basicdataset).
+For examples and references on building models and translators, look in our
+[basic model zoo](https://github.com/awslabs/djl/tree/master/model-zoo).
 
-You may be able to find more translator examples in our engine specific model zoos: [mxnet](../mxnet/mxnet-model-zoo), [pytorch](../pytorch/pytorch-model-zoo), and [tensorflow](../tensorflow/tensorflow-model-zoo).
+You may be able to find more translator examples in our engine specific model zoos:
+[mxnet](https://github.com/awslabs/djl/tree/master/mxnet/mxnet-model-zoo),
+[pytorch](https://github.com/awslabs/djl/tree/master/pytorch/pytorch-model-zoo),
+and [tensorflow](https://github.com/awslabs/djl/tree/master/tensorflow/tensorflow-model-zoo).
 
 More examples and demos of applications featuring DJL are located in our [demo repository](https://github.com/aws-samples/djl-demo).
 
