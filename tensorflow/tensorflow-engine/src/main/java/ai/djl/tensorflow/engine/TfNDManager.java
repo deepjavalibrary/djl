@@ -154,7 +154,10 @@ public class TfNDManager extends BaseNDManager {
     }
 
     public TfNDArray create(ByteBuffer data, Shape shape) {
-        return new TfNDArray(this, shape, data);
+        try (Tensor<?> tensor =
+                Tensor.of(TUint8.DTYPE, TfNDArray.toTfShape(shape), DataBuffers.of(data))) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     /** {@inheritDoc} */
@@ -234,8 +237,10 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray zeros(Shape shape, DataType dataType) {
-        return new TfNDArray(
-                this, tf.zeros(tf.constant(shape.getShape()), TfDataType.toTf(dataType)));
+        try (Tensor<?> tensor =
+                tf.zeros(tf.constant(shape.getShape()), TfDataType.toTf(dataType)).asTensor()) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     /** {@inheritDoc} */
@@ -247,33 +252,43 @@ public class TfNDManager extends BaseNDManager {
     public NDArray fill(Shape shape, Number value, DataType dataType) {
         switch (dataType) {
             case INT32:
-                return new TfNDArray(
-                        this,
-                        tf.fill(tf.constant(shape.getShape()), tf.constant(value.intValue())));
+                try (Tensor<?> tensor =
+                        tf.fill(tf.constant(shape.getShape()), tf.constant(value.intValue()))
+                                .asTensor()) {
+                    return new TfNDArray(this, tensor);
+                }
             case INT64:
-                return new TfNDArray(
-                        this,
+                try (Tensor<?> tensor =
                         tf.fill(
-                                tf.constant(shape.getShape()).asOutput(),
-                                tf.constant(value.longValue())));
+                                        tf.constant(shape.getShape()).asOutput(),
+                                        tf.constant(value.longValue()))
+                                .asTensor()) {
+                    return new TfNDArray(this, tensor);
+                }
             case FLOAT16:
-                return new TfNDArray(
-                        this,
+                try (Tensor<?> tensor =
                         tf.fill(
-                                tf.constant(shape.getShape()).asOutput(),
-                                tf.constant(value.shortValue())));
+                                        tf.constant(shape.getShape()).asOutput(),
+                                        tf.constant(value.shortValue()))
+                                .asTensor()) {
+                    return new TfNDArray(this, tensor);
+                }
             case FLOAT64:
-                return new TfNDArray(
-                        this,
+                try (Tensor<?> tensor =
                         tf.fill(
-                                tf.constant(shape.getShape()).asOutput(),
-                                tf.constant(value.doubleValue())));
+                                        tf.constant(shape.getShape()).asOutput(),
+                                        tf.constant(value.doubleValue()))
+                                .asTensor()) {
+                    return new TfNDArray(this, tensor);
+                }
             default:
-                return new TfNDArray(
-                        this,
+                try (Tensor<?> tensor =
                         tf.fill(
-                                tf.constant(shape.getShape()).asOutput(),
-                                tf.constant(value.floatValue())));
+                                        tf.constant(shape.getShape()).asOutput(),
+                                        tf.constant(value.floatValue()))
+                                .asTensor()) {
+                    return new TfNDArray(this, tensor);
+                }
         }
     }
 
@@ -283,12 +298,14 @@ public class TfNDManager extends BaseNDManager {
         if (stop <= start && step > 0) {
             return create(new Shape(0), dataType);
         }
-        return new TfNDArray(
-                this,
+        try (Tensor<?> tensor =
                 tf.range(
-                        toConstant(start, dataType),
-                        toConstant(stop, dataType),
-                        toConstant(step, dataType)));
+                                toConstant(start, dataType),
+                                toConstant(stop, dataType),
+                                toConstant(step, dataType))
+                        .asTensor()) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     /** {@inheritDoc} */
@@ -299,13 +316,15 @@ public class TfNDManager extends BaseNDManager {
 
     private <T extends TType> NDArray eyeHelper(int rows, int cols, int k, DataType dataType) {
         Operand<T> diagonal =
-                ((TfNDArray) ones(new Shape(Math.min(rows, cols)), dataType)).asOperand();
+                ((TfNDArray) ones(new Shape(Math.min(rows, cols)), dataType)).getOperand();
 
-        Operand<T> value = ((TfNDArray) zeros(new Shape(1))).asOperand();
+        Operand<T> value = ((TfNDArray) zeros(new Shape(1))).getOperand();
         Operand<T> output =
                 tf.linalg.matrixDiag(
                         diagonal, tf.constant(k), tf.constant(rows), tf.constant(cols), value);
-        return new TfNDArray(this, output);
+        try (Tensor<?> tensor = output.asTensor()) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     <T extends TType> Constant<T> toConstant(Number n, DataType jType) {
@@ -322,16 +341,17 @@ public class TfNDManager extends BaseNDManager {
             return create(new Shape(0));
         }
         if (endpoint) {
-            return new TfNDArray(
-                    this, tf.linSpace(tf.constant(start), tf.constant(stop), tf.constant(num)));
+            try (Tensor<?> tensor =
+                    tf.linSpace(tf.constant(start), tf.constant(stop), tf.constant(num))
+                            .asTensor()) {
+                return new TfNDArray(this, tensor);
+            }
         }
-
-        NDArray result =
-                new TfNDArray(
-                        this,
-                        tf.linSpace(tf.constant(start), tf.constant(stop), tf.constant(num + 1)));
-
-        return result.get(new NDIndex(":-1"));
+        try (Tensor<?> tensor =
+                tf.linSpace(tf.constant(start), tf.constant(stop), tf.constant(num + 1))
+                        .asTensor()) {
+            return new TfNDArray(this, tensor).get(new NDIndex(":-1"));
+        }
     }
 
     /** {@inheritDoc} */
@@ -358,8 +378,10 @@ public class TfNDManager extends BaseNDManager {
         } else {
             result = tf.random.randomUniform(shapeOp, dType);
         }
-        return new TfNDArray(
-                this, tf.math.add(tf.math.mul(result, tf.math.sub(maxVal, minVal)), minVal));
+        try (Tensor<?> tensor =
+                tf.math.add(tf.math.mul(result, tf.math.sub(maxVal, minVal)), minVal).asTensor()) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     /** {@inheritDoc} */
@@ -386,7 +408,9 @@ public class TfNDManager extends BaseNDManager {
         } else {
             result = tf.random.randomStandardNormal(shapeOp, dType);
         }
-        return new TfNDArray(this, tf.math.add(tf.math.mul(result, std), mean));
+        try (Tensor<?> tensor = tf.math.add(tf.math.mul(result, std), mean).asTensor()) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     /** {@inheritDoc} */
