@@ -16,6 +16,8 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
+import ai.djl.util.Preconditions;
+import java.util.Objects;
 
 /** Utility class that provides {@code Block} and methods for different pooling functions. */
 public final class Pool {
@@ -35,13 +37,10 @@ public final class Pool {
      */
     public static NDArray maxPool1d(
             NDArray input, Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
-        if (kernelShape == null) {
-            throw new IllegalArgumentException("kernelShape cannot be null for maxPool1d");
-        }
-        if (kernelShape.dimension() != 1 || stride.dimension() != 1 || padding.dimension() != 1) {
-            throw new IllegalArgumentException(
-                    "kernelShape, Stride and Padding dimensions for maxPool1d layer should be 1");
-        }
+        Objects.requireNonNull(kernelShape, "kernelShape cannot be null for maxPool1d");
+        Preconditions.checkArgument(
+                kernelShape.dimension() == 1 && stride.dimension() == 1 && padding.dimension() == 1,
+                "kernelShape, Stride and Padding dimensions for maxPool1d layer should be 1");
         return input.getNDArrayInternal().maxPool(kernelShape, stride, padding, ceilMode);
     }
 
@@ -58,13 +57,10 @@ public final class Pool {
      */
     public static NDArray maxPool2d(
             NDArray input, Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
-        if (kernelShape == null) {
-            throw new IllegalArgumentException("kernelShape cannot be null for maxPool2d");
-        }
-        if (kernelShape.dimension() != 2 || stride.dimension() != 2 || padding.dimension() != 2) {
-            throw new IllegalArgumentException(
-                    "kernelShape, Stride and Padding dimensions for maxPool2d should be 2");
-        }
+        Objects.requireNonNull(kernelShape, "kernelShape cannot be null for maxPool2d");
+        Preconditions.checkArgument(
+                kernelShape.dimension() == 2 && stride.dimension() == 2 && padding.dimension() == 2,
+                "kernelShape, Stride and Padding dimensions for maxPool2d should be 2");
         return input.getNDArrayInternal().maxPool(kernelShape, stride, padding, ceilMode);
     }
 
@@ -81,13 +77,10 @@ public final class Pool {
      */
     public static NDArray maxPool3d(
             NDArray input, Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
-        if (kernelShape == null) {
-            throw new IllegalArgumentException("kernelShape cannot be null for maxPool3d");
-        }
-        if (kernelShape.dimension() != 3 || stride.dimension() != 3 || padding.dimension() != 3) {
-            throw new IllegalArgumentException(
-                    "kernelShape, Stride and Pad dimensions for maxPool3d should be 3");
-        }
+        Objects.requireNonNull(kernelShape, "kernelShape cannot be null for maxPool3d");
+        Preconditions.checkArgument(
+                kernelShape.dimension() == 3 && stride.dimension() == 3 && padding.dimension() == 3,
+                "kernelShape, Stride and Pad dimensions for maxPool3d should be 3");
         return input.getNDArrayInternal().maxPool(kernelShape, stride, padding, ceilMode);
     }
 
@@ -140,13 +133,10 @@ public final class Pool {
             Shape padding,
             boolean ceilMode,
             boolean countIncludePad) {
-        if (kernelShape == null) {
-            throw new IllegalArgumentException("kernelShape cannot be null for avgPool1d");
-        }
-        if (kernelShape.dimension() != 1 || stride.dimension() != 1 || padding.dimension() != 1) {
-            throw new IllegalArgumentException(
-                    "kernelShape, Stride and Padding dimensions for avgPool1d should be 1");
-        }
+        Objects.requireNonNull(kernelShape, "kernelShape cannot be null for avgPool1d");
+        Preconditions.checkArgument(
+                kernelShape.dimension() == 1 && stride.dimension() == 1 && padding.dimension() == 1,
+                "kernelShape, Stride and Padding dimensions for avgPool1d should be 1");
         return input.getNDArrayInternal()
                 .avgPool(kernelShape, stride, padding, ceilMode, countIncludePad);
     }
@@ -170,13 +160,10 @@ public final class Pool {
             Shape padding,
             boolean ceilMode,
             boolean countIncludePad) {
-        if (kernelShape == null) {
-            throw new IllegalArgumentException("kernelShape cannot be null for avgPool2d");
-        }
-        if (kernelShape.dimension() != 2 || stride.dimension() != 2 || padding.dimension() != 2) {
-            throw new IllegalArgumentException(
-                    "kernelShape, Stride and Padding dimensions for avgPool2d should be 2");
-        }
+        Objects.requireNonNull(kernelShape, "kernelShape cannot be null for avgPool2d");
+        Preconditions.checkArgument(
+                kernelShape.dimension() == 2 && stride.dimension() == 2 && padding.dimension() == 2,
+                "kernelShape, Stride and Padding dimensions for avgPool2d should be 2");
         return input.getNDArrayInternal()
                 .avgPool(kernelShape, stride, padding, ceilMode, countIncludePad);
     }
@@ -200,13 +187,10 @@ public final class Pool {
             Shape padding,
             boolean ceilMode,
             boolean countIncludePad) {
-        if (kernelShape == null) {
-            throw new IllegalArgumentException("kernelShape cannot be null for avgPool3d");
-        }
-        if (kernelShape.dimension() != 3 || stride.dimension() != 3 || padding.dimension() != 3) {
-            throw new IllegalArgumentException(
-                    "kernelShape, Stride and Padding dimensions for avgPool2d should be 3");
-        }
+        Objects.requireNonNull(kernelShape, "kernelShape cannot be null for avgPool3d");
+        Preconditions.checkArgument(
+                kernelShape.dimension() == 3 && stride.dimension() == 3 && padding.dimension() == 3,
+                "kernelShape, Stride and Padding dimensions for avgPool2d should be 3");
         return input.getNDArrayInternal()
                 .avgPool(kernelShape, stride, padding, ceilMode, countIncludePad);
     }
@@ -260,13 +244,10 @@ public final class Pool {
             Shape stride,
             Shape padding,
             boolean ceilMode) {
-        if (kernelShape == null) {
-            throw new IllegalArgumentException("kernelShape cannot be null for lpPool1d");
-        }
-        if (kernelShape.dimension() != 1 || stride.dimension() != 1 || padding.dimension() != 1) {
-            throw new IllegalArgumentException(
-                    "kernelShape, Stride and Padding dimensions for lpPool1d should be 1");
-        }
+        Objects.requireNonNull(kernelShape, "kernelShape cannot be null for lpPool1d");
+        Preconditions.checkArgument(
+                kernelShape.dimension() == 1 && stride.dimension() == 1 && padding.dimension() == 1,
+                "kernelShape, Stride and Padding dimensions for lpPool1d should be 1");
         return data.getNDArrayInternal().lpPool(normType, kernelShape, stride, padding, ceilMode);
     }
 
@@ -289,13 +270,10 @@ public final class Pool {
             Shape stride,
             Shape padding,
             boolean ceilMode) {
-        if (kernelShape == null) {
-            throw new IllegalArgumentException("kernelShape cannot be null for lpPool2d");
-        }
-        if (kernelShape.dimension() != 2 || stride.dimension() != 2) {
-            throw new IllegalArgumentException(
-                    "kernelShape, Stride and Padding dimensions for lpPool2d should be 2");
-        }
+        Objects.requireNonNull(kernelShape, "kernelShape cannot be null for lpPool2d");
+        Preconditions.checkArgument(
+                kernelShape.dimension() == 2 && stride.dimension() == 2,
+                "kernelShape, Stride and Padding dimensions for lpPool2d should be 2");
         return data.getNDArrayInternal().lpPool(normType, kernelShape, stride, padding, ceilMode);
     }
 
@@ -318,13 +296,10 @@ public final class Pool {
             Shape stride,
             Shape padding,
             boolean ceilMode) {
-        if (kernelShape == null) {
-            throw new IllegalArgumentException("kernelShape cannot be null for lpPool3d");
-        }
-        if (kernelShape.dimension() != 3 || stride.dimension() != 3 || padding.dimension() != 3) {
-            throw new IllegalArgumentException(
-                    "kernelShape, Stride and Padding dimensions for lpPool3d should be 1");
-        }
+        Objects.requireNonNull(kernelShape, "kernelShape cannot be null for lpPool3d");
+        Preconditions.checkArgument(
+                kernelShape.dimension() == 3 && stride.dimension() == 3 && padding.dimension() == 3,
+                "kernelShape, Stride and Padding dimensions for lpPool3d should be 1");
         return data.getNDArrayInternal().lpPool(normType, kernelShape, stride, padding, ceilMode);
     }
 

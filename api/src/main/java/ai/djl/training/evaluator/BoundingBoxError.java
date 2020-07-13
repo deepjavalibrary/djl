@@ -16,6 +16,7 @@ import ai.djl.modality.cv.MultiBoxTarget;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -78,9 +79,7 @@ public class BoundingBoxError extends Evaluator {
     @Override
     public float getAccumulator(String key) {
         Long total = totalInstances.get(key);
-        if (total == null) {
-            throw new IllegalArgumentException("No evaluator found at that path");
-        }
+        Objects.requireNonNull(total, "No evaluator found at that path");
 
         if (total == 0) {
             return Float.NaN;

@@ -23,6 +23,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+import ai.djl.util.Preconditions;
 
 /**
  * {@code LSTM} is an implementation of recurrent neural networks which applies Long Short-Term
@@ -192,9 +193,9 @@ public class LSTM extends RecurrentBlock {
          * @return the {@link LSTM} block
          */
         public LSTM build() {
-            if (stateSize == -1 || numStackedLayers == -1) {
-                throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
-            }
+            Preconditions.checkArgument(
+                    stateSize > 0 && numStackedLayers > 0,
+                    "Must set stateSize and numStackedLayers");
             return new LSTM(this);
         }
     }

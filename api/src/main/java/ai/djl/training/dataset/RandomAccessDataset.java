@@ -21,6 +21,7 @@ import ai.djl.translate.TranslateException;
 import ai.djl.util.RandomUtils;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.RandomAccess;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.IntStream;
@@ -180,9 +181,7 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
          * @return the {@code Sampler}
          */
         public Sampler getSampler() {
-            if (sampler == null) {
-                throw new IllegalArgumentException("The sampler must be set");
-            }
+            Objects.requireNonNull(sampler, "The sampler must be set");
             return sampler;
         }
 

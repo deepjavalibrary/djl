@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.util.Preconditions;
 
 /**
  * {@code Conv3d} layer behaves just as {@link Convolution} does, with the distinction being it
@@ -186,14 +187,12 @@ public class Conv3d extends Convolution {
             Shape padding,
             Shape dilation,
             int groups) {
-        if (input.getShape().dimension() != 5 || weight.getShape().dimension() != 5) {
-            throw new IllegalArgumentException(
-                    "the shape of input or weight doesn't match the conv2d");
-        }
-        if (stride.dimension() > 3 || padding.dimension() > 3 || dilation.dimension() > 3) {
-            throw new IllegalArgumentException(
-                    "the shape of stride or padding or dilation doesn't match the conv2d");
-        }
+        Preconditions.checkArgument(
+                input.getShape().dimension() == 5 && weight.getShape().dimension() == 5,
+                "the shape of input or weight doesn't match the conv2d");
+        Preconditions.checkArgument(
+                stride.dimension() == 3 && padding.dimension() == 3 && dilation.dimension() == 3,
+                "the shape of stride or padding or dilation doesn't match the conv2d");
         return Convolution.convolution(input, weight, bias, stride, padding, dilation, groups);
     }
 

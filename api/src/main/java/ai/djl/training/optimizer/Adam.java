@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import ai.djl.util.Preconditions;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -67,12 +68,12 @@ public class Adam extends Optimizer {
         float newLearningRate = (float) (lr * Math.sqrt(coef2) / coef1);
         float weightDecay = getWeightDecay();
 
-        if (Float.isNaN(newLearningRate)
-                || Float.isNaN(weightDecay)
-                || Float.isInfinite(newLearningRate)
-                || Float.isInfinite(weightDecay)) {
-            throw new IllegalStateException("learning rate or weight decay is nan or infinite");
-        }
+        Preconditions.checkArgument(
+                !Float.isNaN(newLearningRate)
+                        && !Float.isNaN(weightDecay)
+                        && !Float.isInfinite(newLearningRate)
+                        && !Float.isInfinite(weightDecay),
+                "learning rate or weight decay is nan or infinite");
         NDList inputs =
                 new NDList(
                         weight,

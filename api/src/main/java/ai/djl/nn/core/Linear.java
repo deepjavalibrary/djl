@@ -24,6 +24,7 @@ import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+import ai.djl.util.Preconditions;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -211,9 +212,7 @@ public class Linear extends AbstractBlock {
          *     set
          */
         public Linear build() {
-            if (units <= 0) {
-                throw new IllegalArgumentException("You must specify unit");
-            }
+            Preconditions.checkArgument(units > 0, "You must specify unit");
             return new Linear(this);
         }
     }

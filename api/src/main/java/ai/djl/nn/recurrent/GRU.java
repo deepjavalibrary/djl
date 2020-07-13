@@ -13,6 +13,7 @@
 package ai.djl.nn.recurrent;
 
 import ai.djl.nn.Block;
+import ai.djl.util.Preconditions;
 
 /**
  * {@code GRU} is an abstract implementation of recurrent neural networks which applies GRU (Gated
@@ -60,9 +61,9 @@ public class GRU extends RecurrentBlock {
          * @return the {@link GRU} block
          */
         public GRU build() {
-            if (stateSize == -1 || numStackedLayers == -1) {
-                throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
-            }
+            Preconditions.checkArgument(
+                    stateSize > 0 && numStackedLayers > 0,
+                    "Must set stateSize and numStackedLayers");
             return new GRU(this);
         }
     }

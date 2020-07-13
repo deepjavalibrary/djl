@@ -19,6 +19,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+import ai.djl.util.Preconditions;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -135,9 +136,7 @@ public class ParallelBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
-        if (children.isEmpty()) {
-            throw new IllegalArgumentException("The parallel block is empty");
-        }
+        Preconditions.checkArgument(!children.isEmpty(), "The parallel block is empty");
 
         try (NDManager subManager = manager.newSubManager()) {
             List<NDList> inputs = new ArrayList<>();

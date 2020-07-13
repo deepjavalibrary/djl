@@ -13,6 +13,7 @@
 package ai.djl.nn.recurrent;
 
 import ai.djl.nn.Block;
+import ai.djl.util.Preconditions;
 
 /**
  * {@code RNN} is an implementation of recurrent neural networks which applies a single-gate
@@ -77,9 +78,9 @@ public class RNN extends RecurrentBlock {
          * @return the {@link RNN} block
          */
         public RNN build() {
-            if (stateSize == -1 || numStackedLayers == -1) {
-                throw new IllegalArgumentException("Must set stateSize and numStackedLayers");
-            }
+            Preconditions.checkArgument(
+                    stateSize > 0 && numStackedLayers > 0,
+                    "Must set stateSize and numStackedLayers");
             return new RNN(this);
         }
     }

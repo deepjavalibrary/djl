@@ -263,8 +263,8 @@ public abstract class RecurrentBlock extends AbstractBlock {
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
         protected float dropRate;
-        protected long stateSize = -1;
-        protected int numStackedLayers = -1;
+        protected long stateSize;
+        protected int numStackedLayers;
         protected double lstmStateClipMin;
         protected double lstmStateClipMax;
         protected boolean clipLstmState;

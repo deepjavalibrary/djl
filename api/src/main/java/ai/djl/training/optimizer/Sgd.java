@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.training.optimizer.learningrate.LearningRateTracker;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -116,9 +117,7 @@ public class Sgd extends Optimizer {
          * @return the {@link Sgd} block
          */
         public Sgd build() {
-            if (learningRateTracker == null) {
-                throw new IllegalArgumentException("No lrTracker set");
-            }
+            Objects.requireNonNull(learningRateTracker, "No lrTracker set");
             return new Sgd(this);
         }
     }

@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.util.Pair;
+import ai.djl.util.Preconditions;
 
 /**
  * {@link BinaryAccuracy} is the {@link AbstractAccuracy} with two classes.
@@ -72,9 +73,9 @@ public class BinaryAccuracy extends AbstractAccuracy {
     /** {@inheritDoc} */
     @Override
     protected Pair<Long, NDArray> accuracyHelper(NDList labels, NDList predictions) {
-        if (labels.size() != predictions.size()) {
-            throw new IllegalArgumentException("labels and prediction length does not match.");
-        }
+        Preconditions.checkArgument(
+                labels.size() == predictions.size(),
+                "labels and prediction length does not match.");
         NDArray label = labels.get(index);
         NDArray prediction = predictions.get(index);
         checkLabelShapes(label, prediction, false);

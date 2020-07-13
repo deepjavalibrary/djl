@@ -12,6 +12,7 @@
  */
 package ai.djl.training.optimizer.learningrate;
 
+import ai.djl.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,10 +130,8 @@ public class FactorTracker extends LearningRateTracker {
          * @return the {@link FactorTracker} block
          */
         public FactorTracker build() {
-            if (step == 0) {
-                throw new IllegalArgumentException(
-                        "Step must be set to change learning rate every N steps");
-            }
+            Preconditions.checkArgument(
+                    step > 0, "Step must be set to change learning rate every N steps");
             return new FactorTracker(this);
         }
     }
