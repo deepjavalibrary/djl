@@ -12,11 +12,12 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.repository.dataset.PreparedDataset;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.translate.Pipeline;
 import ai.djl.util.Progress;
 import com.google.gson.Gson;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -84,7 +85,7 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
     @Override
     public void prepare(Progress progress) {
         if (!prepared) {
-            File root = Paths.get(repository.getBaseUri()).resolve(getUsagePath(usage)).toFile();
+            Path root = Paths.get(repository.getBaseUri()).resolve(getUsagePath(usage));
             if (progress != null) {
                 progress.reset("Preparing", 2);
                 progress.start(0);
@@ -174,6 +175,9 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
          * @return the {@link ImageNet}
          */
         public ImageNet build() {
+            if (pipeline == null) {
+                pipeline = new Pipeline(new ToTensor());
+            }
             return new ImageNet(this);
         }
     }

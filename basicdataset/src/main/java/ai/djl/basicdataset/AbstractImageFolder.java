@@ -14,7 +14,6 @@ package ai.djl.basicdataset;
 
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -22,20 +21,25 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.dataset.PreparedDataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
-import ai.djl.translate.Pipeline;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A dataset for loading image files stored in a folder structure. */
 public abstract class AbstractImageFolder extends RandomAccessDataset implements PreparedDataset {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractImageFolder.class);
 
     private static final Set<String> EXT =
             new HashSet<>(Arrays.asList(".jpg", ".jpeg", ".png", ".bmp", ".wbmp", ".gif"));
@@ -44,11 +48,13 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
     protected Image.Flag flag;
     protected List<String> synset;
     protected PairList<String, Integer> items;
+    private int maxDepth;
 
     protected AbstractImageFolder(ImageFolderBuilder<?> builder) {
         super(builder);
         this.flag = builder.flag;
         this.repository = builder.repository;
+        this.maxDepth = builder.maxDepth;
         this.synset = new ArrayList<>();
         this.items = new PairList<>();
     }
@@ -80,22 +86,26 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
         return synset;
     }
 
-    protected void listImages(File root, List<String> classes) {
+    protected void listImages(Path root, List<String> classes) {
         int label = 0;
         for (String className : classes) {
-            File classFolder = new File(root, className);
-            if (!classFolder.exists() || !classFolder.isDirectory()) {
+            Path classFolder = root.resolve(className);
+            if (!Files.isDirectory(classFolder)) {
                 continue;
             }
-            File[] files = classFolder.listFiles(this::isImage);
-            if (files == null) {
-                continue;
+            try (Stream<Path> stream = Files.walk(classFolder, maxDepth)) {
+                final int classLabel = label;
+                stream.forEach(
+                        p -> {
+                            if (isImage(p.toFile())) {
+                                String path = p.toAbsolutePath().toString();
+                                items.add(new Pair<>(path, classLabel));
+                            }
+                        });
+            } catch (IOException e) {
+                logger.warn("Failed to list images", e);
             }
-
-            for (File file : files) {
-                String path = file.getAbsolutePath();
-                items.add(new Pair<>(path, label));
-            }
+            logger.debug("Loaded {} images in {}, class: {}", items.size(), classFolder, label);
             ++label;
         }
     }
@@ -126,10 +136,11 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
 
         Repository repository;
         Image.Flag flag;
+        int maxDepth;
 
         protected ImageFolderBuilder() {
             flag = Image.Flag.COLOR;
-            pipeline = new Pipeline(new ToTensor());
+            maxDepth = 1;
         }
 
         /**
@@ -173,6 +184,17 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
          */
         public T setRepositoryPath(Path path) {
             this.repository = Repository.newInstance("images", path);
+            return self();
+        }
+
+        /**
+         * Sets the depth of the image folder.
+         *
+         * @param maxDepth the maximum number of directory levels to visit
+         * @return this builder
+         */
+        public T optMaxDepth(int maxDepth) {
+            this.maxDepth = maxDepth;
             return self();
         }
     }

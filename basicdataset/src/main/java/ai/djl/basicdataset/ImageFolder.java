@@ -12,6 +12,8 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.translate.Pipeline;
 import ai.djl.util.Progress;
 import java.io.File;
 import java.nio.file.Path;
@@ -63,7 +65,7 @@ public final class ImageFolder extends AbstractImageFolder {
     @Override
     public void prepare(Progress progress) {
         if (!prepared) {
-            File root = new File(repository.getBaseUri());
+            Path root = Paths.get(repository.getBaseUri());
             if (progress != null) {
                 progress.reset("Preparing", 2);
                 progress.start(0);
@@ -106,6 +108,9 @@ public final class ImageFolder extends AbstractImageFolder {
          * @return the {@link ImageFolder}
          */
         public ImageFolder build() {
+            if (pipeline == null) {
+                pipeline = new Pipeline(new ToTensor());
+            }
             return new ImageFolder(this);
         }
     }
