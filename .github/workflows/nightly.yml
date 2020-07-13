@@ -117,7 +117,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync site s3://djl-ai/documentation/nightly
+          aws s3 sync site s3://djl-ai/documentation/nightly --delete
 
 
   test-pytorch:
