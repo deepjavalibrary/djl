@@ -13,6 +13,7 @@
 package ai.djl.nn;
 
 import ai.djl.MalformedModelException;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -87,6 +88,19 @@ public class SequentialBlock extends AbstractBlock {
      */
     public SequentialBlock add(Function<NDList, NDList> f) {
         add(new LambdaBlock(f));
+        return this;
+    }
+
+    /**
+     * Adds a {@link LambdaBlock#singleton(Function)} that applies the given function to the
+     * sequence of blocks.
+     *
+     * @param f the function forms the {@link LambdaBlock}
+     * @return this block
+     * @see LambdaBlock#singleton(Function)
+     */
+    public SequentialBlock addSingleton(Function<NDArray, NDArray> f) {
+        add(LambdaBlock.singleton(f));
         return this;
     }
 

@@ -17,8 +17,6 @@ import ai.djl.Model;
 import ai.djl.basicdataset.Mnist;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
@@ -83,14 +81,13 @@ public final class TrainMnistWithLSTM {
 
     private static Block getLSTMModel() {
         SequentialBlock block = new SequentialBlock();
-        block.add(
-                inputs -> {
-                    NDArray input = inputs.singletonOrThrow();
+        block.addSingleton(
+                input -> {
                     Shape inputShape = input.getShape();
                     long batchSize = inputShape.get(0);
                     long channel = inputShape.get(3);
                     long time = inputShape.size() / (batchSize * channel);
-                    return new NDList(input.reshape(new Shape(batchSize, time, channel)));
+                    return input.reshape(new Shape(batchSize, time, channel));
                 });
         block.add(
                 new LSTM.Builder().setStateSize(64).setNumStackedLayers(1).optDropRate(0).build());

@@ -523,7 +523,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
         SequentialBlock block = new SequentialBlock();
-        block.add(x -> new NDList(x.singletonOrThrow().mul(6.5f)));
+        block.addSingleton(x -> x.mul(6.5f));
         block.add(Linear.builder().setUnits(10).build());
         block.add(Linear.builder().setUnits(5).build());
 
@@ -534,7 +534,7 @@ public class BlockCoreTest {
         block.addAll(
                 Arrays.asList(
                         Linear.builder().setUnits(3).build(),
-                        new LambdaBlock(x -> new NDList(x.singletonOrThrow().div(2f)))));
+                        LambdaBlock.singleton(x -> x.div(2f))));
         Assert.assertEquals(block.getChildren().size(), 5);
         Assert.assertEquals(block.getParameters().size(), 6);
 

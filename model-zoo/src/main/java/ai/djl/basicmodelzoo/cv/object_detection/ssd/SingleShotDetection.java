@@ -374,12 +374,11 @@ public final class SingleShotDetection extends AbstractBlock {
             }
             if (globalPool) {
                 features.add(
-                        new LambdaBlock(
-                                arrays -> {
-                                    NDArray result =
-                                            Pool.globalAvgPool2d(arrays.singletonOrThrow());
+                        LambdaBlock.singleton(
+                                array -> {
+                                    NDArray result = Pool.globalAvgPool2d(array);
                                     // result shape: (N, C) MXNet multi-box takes (N, C, 1, 1)
-                                    return new NDList(result.reshape(result.getShape().add(1, 1)));
+                                    return result.reshape(result.getShape().add(1, 1));
                                 }));
             }
             int numberOfFeatureMaps = features.size();

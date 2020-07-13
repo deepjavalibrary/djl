@@ -139,10 +139,10 @@ public final class TrainSentimentAnalysis {
 
     private static Block getModel(ModelZooTextEmbedding modelZooTextEmbedding) {
         return new SequentialBlock()
-                .add(
-                        inputs -> {
+                .addSingleton(
+                        input -> {
                             try {
-                                return new NDList(modelZooTextEmbedding.embedText(inputs.head()));
+                                return modelZooTextEmbedding.embedText(input);
                             } catch (EmbeddingException e) {
                                 throw new IllegalArgumentException(e.getMessage(), e);
                             }
@@ -154,14 +154,12 @@ public final class TrainSentimentAnalysis {
                                 .setSequenceLength(false)
                                 .optBidrectional(true)
                                 .build())
-                .add(
+                .addSingleton(
                         x -> {
-                            long sequenceLength = x.head().getShape().get(1);
-                            NDArray ntc = x.head().transpose(1, 0, 2);
-                            return new NDList(
-                                    NDArrays.concat(
-                                            new NDList(ntc.get(0), ntc.get(sequenceLength - 1)),
-                                            1));
+                            long sequenceLength = x.getShape().get(1);
+                            NDArray ntc = x.transpose(1, 0, 2);
+                            return NDArrays.concat(
+                                    new NDList(ntc.get(0), ntc.get(sequenceLength - 1)), 1);
                         })
                 .add(Linear.builder().setUnits(2).build());
     }

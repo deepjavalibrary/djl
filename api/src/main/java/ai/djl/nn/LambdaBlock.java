@@ -13,6 +13,7 @@
 package ai.djl.nn;
 
 import ai.djl.MalformedModelException;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
@@ -44,6 +45,17 @@ public class LambdaBlock extends AbstractBlock {
     public LambdaBlock(Function<NDList, NDList> lambda) {
         super(VERSION);
         this.lambda = lambda;
+    }
+
+    /**
+     * Creates a {@link LambdaBlock} for a singleton function.
+     *
+     * @param lambda a function accepting a singleton {@link NDList} and returning another sinleton
+     *     {@link NDList}
+     * @return a new {@link LambdaBlock} for the function
+     */
+    public static LambdaBlock singleton(Function<NDArray, NDArray> lambda) {
+        return new LambdaBlock(arrays -> new NDList(lambda.apply(arrays.singletonOrThrow())));
     }
 
     /** {@inheritDoc} */

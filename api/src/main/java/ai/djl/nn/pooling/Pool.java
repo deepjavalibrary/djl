@@ -13,7 +13,6 @@
 package ai.djl.nn.pooling;
 
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
@@ -376,15 +375,8 @@ public final class Pool {
      */
     public static Block maxPool1dBlock(
             Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
-        return new LambdaBlock(
-                ndList ->
-                        new NDList(
-                                maxPool1d(
-                                        ndList.singletonOrThrow(),
-                                        kernelShape,
-                                        stride,
-                                        padding,
-                                        ceilMode)));
+        return LambdaBlock.singleton(
+                array -> maxPool1d(array, kernelShape, stride, padding, ceilMode));
     }
 
     /**
@@ -440,15 +432,8 @@ public final class Pool {
      */
     public static Block maxPool2dBlock(
             Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
-        return new LambdaBlock(
-                ndList ->
-                        new NDList(
-                                maxPool2d(
-                                        ndList.singletonOrThrow(),
-                                        kernelShape,
-                                        stride,
-                                        padding,
-                                        ceilMode)));
+        return LambdaBlock.singleton(
+                array -> maxPool2d(array, kernelShape, stride, padding, ceilMode));
     }
 
     /**
@@ -504,15 +489,8 @@ public final class Pool {
      */
     public static Block maxPool3dBlock(
             Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
-        return new LambdaBlock(
-                ndList ->
-                        new NDList(
-                                maxPool3d(
-                                        ndList.singletonOrThrow(),
-                                        kernelShape,
-                                        stride,
-                                        padding,
-                                        ceilMode)));
+        return LambdaBlock.singleton(
+                array -> maxPool3d(array, kernelShape, stride, padding, ceilMode));
     }
 
     /**
@@ -562,7 +540,7 @@ public final class Pool {
      *     globalmaxPool1dBlock} pooling function
      */
     public static Block globalMaxPool1dBlock() {
-        return new LambdaBlock(ndList -> new NDList(globalMaxPool1d(ndList.singletonOrThrow())));
+        return LambdaBlock.singleton(Pool::globalMaxPool1d);
     }
 
     /**
@@ -573,7 +551,7 @@ public final class Pool {
      *     globalmaxPool2dBlock} pooling function
      */
     public static Block globalMaxPool2dBlock() {
-        return new LambdaBlock(ndList -> new NDList(globalMaxPool2d(ndList.singletonOrThrow())));
+        return LambdaBlock.singleton(Pool::globalMaxPool2d);
     }
 
     /**
@@ -584,7 +562,7 @@ public final class Pool {
      *     globalmaxPool3dBlock} pooling function
      */
     public static Block globalMaxPool3dBlock() {
-        return new LambdaBlock(ndList -> new NDList(globalMaxPool3d(ndList.singletonOrThrow())));
+        return LambdaBlock.singleton(Pool::globalMaxPool3d);
     }
 
     /**
@@ -606,16 +584,8 @@ public final class Pool {
             Shape padding,
             boolean ceilMode,
             boolean countIncludePad) {
-        return new LambdaBlock(
-                ndList ->
-                        new NDList(
-                                avgPool1d(
-                                        ndList.singletonOrThrow(),
-                                        kernelShape,
-                                        stride,
-                                        padding,
-                                        ceilMode,
-                                        countIncludePad)));
+        return LambdaBlock.singleton(
+                array -> avgPool1d(array, kernelShape, stride, padding, ceilMode, countIncludePad));
     }
 
     /**
@@ -693,16 +663,8 @@ public final class Pool {
             Shape padding,
             boolean ceilMode,
             boolean countIncludePad) {
-        return new LambdaBlock(
-                ndList ->
-                        new NDList(
-                                avgPool2d(
-                                        ndList.singletonOrThrow(),
-                                        kernelShape,
-                                        stride,
-                                        padding,
-                                        ceilMode,
-                                        countIncludePad)));
+        return LambdaBlock.singleton(
+                array -> avgPool2d(array, kernelShape, stride, padding, ceilMode, countIncludePad));
     }
 
     /**
@@ -780,16 +742,8 @@ public final class Pool {
             Shape padding,
             boolean ceilMode,
             boolean countIncludePad) {
-        return new LambdaBlock(
-                ndList ->
-                        new NDList(
-                                avgPool3d(
-                                        ndList.singletonOrThrow(),
-                                        kernelShape,
-                                        stride,
-                                        padding,
-                                        ceilMode,
-                                        countIncludePad)));
+        return LambdaBlock.singleton(
+                array -> avgPool3d(array, kernelShape, stride, padding, ceilMode, countIncludePad));
     }
 
     /**
@@ -856,7 +810,7 @@ public final class Pool {
      *     globalAvgPool1d} pooling function
      */
     public static Block globalAvgPool1dBlock() {
-        return new LambdaBlock(ndList -> new NDList(globalAvgPool1d(ndList.singletonOrThrow())));
+        return LambdaBlock.singleton(Pool::globalAvgPool1d);
     }
 
     /**
@@ -867,7 +821,7 @@ public final class Pool {
      *     globalAvgPool2d} pooling function
      */
     public static Block globalAvgPool2dBlock() {
-        return new LambdaBlock(ndList -> new NDList(globalAvgPool2d(ndList.singletonOrThrow())));
+        return LambdaBlock.singleton(Pool::globalAvgPool2d);
     }
 
     /**
@@ -878,7 +832,7 @@ public final class Pool {
      *     globalAvgPool3d} pooling function
      */
     public static Block globalAvgPool3dBlock() {
-        return new LambdaBlock(ndList -> new NDList(globalAvgPool3d(ndList.singletonOrThrow())));
+        return LambdaBlock.singleton(Pool::globalAvgPool3d);
     }
 
     /**
@@ -896,16 +850,8 @@ public final class Pool {
      */
     public static Block lpPool1dBlock(
             float normType, Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
-        return new LambdaBlock(
-                ndList ->
-                        new NDList(
-                                lpPool1d(
-                                        ndList.singletonOrThrow(),
-                                        normType,
-                                        kernelShape,
-                                        stride,
-                                        padding,
-                                        ceilMode)));
+        return LambdaBlock.singleton(
+                array -> lpPool1d(array, normType, kernelShape, stride, padding, ceilMode));
     }
 
     /**
@@ -952,16 +898,8 @@ public final class Pool {
      */
     public static Block lpPool2dBlock(
             float normType, Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
-        return new LambdaBlock(
-                ndList ->
-                        new NDList(
-                                lpPool2d(
-                                        ndList.singletonOrThrow(),
-                                        normType,
-                                        kernelShape,
-                                        stride,
-                                        padding,
-                                        ceilMode)));
+        return LambdaBlock.singleton(
+                array -> lpPool2d(array, normType, kernelShape, stride, padding, ceilMode));
     }
 
     /**
@@ -1022,16 +960,8 @@ public final class Pool {
      */
     public static Block lpPool3dBlock(
             float normType, Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
-        return new LambdaBlock(
-                ndList ->
-                        new NDList(
-                                lpPool3d(
-                                        ndList.singletonOrThrow(),
-                                        normType,
-                                        kernelShape,
-                                        stride,
-                                        padding,
-                                        ceilMode)));
+        return LambdaBlock.singleton(
+                array -> lpPool3d(array, normType, kernelShape, stride, padding, ceilMode));
     }
 
     /**
@@ -1086,8 +1016,7 @@ public final class Pool {
      *     globalLpPool1d} pooling function
      */
     public static Block globalLpPool1dBlock(float normType) {
-        return new LambdaBlock(
-                ndList -> new NDList(globalLpPool1d(ndList.singletonOrThrow(), normType)));
+        return LambdaBlock.singleton(array -> globalLpPool1d(array, normType));
     }
 
     /**
@@ -1099,8 +1028,7 @@ public final class Pool {
      *     globalLpPool2d} pooling function
      */
     public static Block globalLpPool2dBlock(float normType) {
-        return new LambdaBlock(
-                ndList -> new NDList(globalLpPool2d(ndList.singletonOrThrow(), normType)));
+        return LambdaBlock.singleton(array -> globalLpPool2d(array, normType));
     }
 
     /**
@@ -1112,7 +1040,6 @@ public final class Pool {
      *     globalLpPool3d} pooling function
      */
     public static Block globalLpPool3dBlock(float normType) {
-        return new LambdaBlock(
-                ndList -> new NDList(globalLpPool3d(ndList.singletonOrThrow(), normType)));
+        return LambdaBlock.singleton(array -> globalLpPool3d(array, normType));
     }
 }
