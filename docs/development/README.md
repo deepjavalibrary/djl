@@ -8,7 +8,6 @@ This folder contains documentation and guides for contributors and those working
 - **[Development guideline](development_guideline.md)**
 - [Release process](release_process.md)
 - [Troubleshooting](troubleshooting.md)
-- [Cache Management](cache_management.md)
 
 ## Model Zoo Guides
 

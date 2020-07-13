@@ -66,6 +66,5 @@ nav:
       - 'pytorch/README.md'
   - TensorFlow:
       - 'docs/tensorflow/how_to_import_keras_models_in_DJL.md'
-      - 'docs/tensorflow/how_to_import_local_tensorflow_models.md'
       - 'tensorflow/README.md'
 

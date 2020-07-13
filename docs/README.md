@@ -4,12 +4,18 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 
 ## [JavaDoc API Reference](https://javadoc.djl.ai/)
 
+## [Demos](https://djl.ai/website/demo.html)
+
 ## Cheat sheet
 
 - [How to load a model](load_model.md)
 - [How to collect metrics](how_to_collect_metrics.md)
 - [How to use a dataset](development/how_to_use_dataset.md)
+- [How to set log level](development/configure_logging.md)
+- [Dependency Management](development/dependency_management.md)
+- [Cache Management](development/cache_management.md)
 - [Memory Management](development/memory_management.md)
+- [Troubleshooting](development/troubleshooting.md)
 
 ## [Jupyter notebook tutorials](../jupyter/README.md)
 
@@ -48,13 +54,21 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 ### [TensorFlow](../tensorflow/README.md)
 
 - [Keras Imporint](tensorflow/how_to_import_keras_models_in_DJL.md)
-- [Tensorflow Local Importing](tensorflow/how_to_import_local_tensorflow_models.md)
 
 ### [ONNX Runtime](../onnxruntime/onnxruntime-engine/README.md)
 
 - [Hybrid Engine Operations](onnxruntime/hybrid_engine.md) - Using a second Engine for supplemental API support
 
+## Extensions and utilities
+
+- [Android support](../android/README.md)
+- [AWS S3 support](../3rdparty/aws-ai/README.md)
+- [Hadoop support](../3rdparty/hadoop/README.md)
 
 ## [Contributor Documentation](development/README.md)
+
+- [Setup development environment](development/setup.md)
+- [Development guideline](development/development_guideline.md)
+- [Release process](development/release_process.md)
 
 ## [FAQ](faq.md)

@@ -31,4 +31,4 @@ tf.saved_model.save(loaded_model, "resnet/1/")
 ```
 
 Once you have a SavedModel, you can load your Keras model using DJL TensorFlow engine.
-Refer to [How to import local TensorFlow models in DJL](how_to_import_local_tensorflow_models.md).
+Refer to [How to load models in DJL](../load_model.md).

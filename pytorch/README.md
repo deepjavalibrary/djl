@@ -7,4 +7,4 @@ It is based off the [PyTorch Deep Learning Framework](https://pytorch.org/).
 
 - [PyTorch Engine](pytorch-engine/README.md) - The PyTorch Engine implementation
 - [PyTorch Model Zoo](pytorch-model-zoo/README.md) - A ModelZoo containing models exported from PyTorch
-- [Pytorch](pytorch-native/README.md) - A utility module for building the pytorch-native jars containing the native binaries
+- [Pytorch native library](pytorch-native/README.md) - A utility module for building the pytorch-native jars containing the native binaries
