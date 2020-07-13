@@ -24,48 +24,11 @@ all engines into memory as long as they are in classpath, and those engines usua
 
 ## Using Bill of Materials module (BOM)
 
-BOM stands for Bill Of Materials. A BOM package is a POM only jar file that is used to control the versions
-of a project’s dependencies and provide a central place to define and update those versions.
+To automatically manage DJL packages' versions, we recommend you use the
+[Bill of Materials](https://search.maven.org/search?q=g:ai.djl%20AND%20a:bom).
+It can simplify your project's dependency management and make sure Maven picks the compatible versions of DJL modules.
 
-DJL's BOM package provides a flexibility way for developers to add DJL dependencies to their project
-without worrying about each modules' version that we should depend on.
-
-Maven:
-```xml
-<dependency>
-    <groupId>ai.djl</groupId>
-    <artifactId>bom</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
-    <type>pom</type>
-    <scope>import</scope>
-</dependency>
-<dependency>
-    <groupId>ai.djl</groupId>
-    <artifactId>api</artifactId>
-    <!-- You don't need specific DJL package's version -->
-</dependency>
-<dependency>
-    <groupId>ai.djl.mxnet</groupId>
-    <artifactId>mxnet-engine</artifactId>
-    <!-- You don't need specific DJL package's version -->
-</dependency>
-<dependency>
-    <groupId>ai.djl.mxnet</groupId>
-    <artifactId>mxnet-engine</artifactId>
-</dependency>
-<dependency>
-    <groupId>ai.djl.mxnet</groupId>
-    <artifactId>mxnet-native-auto</artifactId>
-    <scope>runtime</scope>
-</dependency>
-```
-
-Gradle:
-```
-    implementation platform("ai.djl:bom:0.7.0-SNAPSHOT")
-    implementation "ai.djl.pytorch:pytorch-model-zoo" // No version required
-    implementation "ai.djl.pytorch:pytorch-native-auto"  // No version required
-```
+See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 
 ## List of DJL packages published on Maven Central
 
