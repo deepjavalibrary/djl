@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 // Saved in the d2l-java package for later use
 class StopWatch {
 
@@ -18,6 +20,10 @@ class StopWatch {
         times.add(nanoToSec(System.nanoTime() - tik));
         return times.get(times.size() - 1);
     }
+    
+    public ArrayList<Double> getTimes() {
+        return times;
+    }
 
     // Return average time
     public double avg() {
@@ -34,14 +40,14 @@ class StopWatch {
     }
 
     // Return the accumulated times
-    public ArrayList cumsum() {
+    public ArrayList<Double> cumsum() {
         ArrayList<Double> cumsumList = new ArrayList();
         double currentSum = 0;
         for (Double d : times) {
             currentSum += d;
             cumsumList.add(currentSum);
         }
-        return times;
+        return cumsumList;
     }
 
     // Convert nano seconds to seconds
