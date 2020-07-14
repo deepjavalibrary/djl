@@ -35,7 +35,7 @@ plugins:
   - mknotebooks
   - exclude:
       regex:
-        - '.*\.(symbol|params|pt|jar|gz|zip|txt|json|sh|bat|cmd|puml|g4|java|py|cc|h|pro|properties|xml|html|js|css|gradlew|gradle|Dockerfile|RepositoryFactory|EngineProvider|ZooProvider)$|(docker|integration|testing|tools)/.*$'
+        - '.*\.(symbol|params|pt|jar|gz|zip|txt|json|sh|bat|cmd|puml|g4|java|py|cc|h|pro|properties|xml|gradlew|gradle|Dockerfile|RepositoryFactory|EngineProvider|ZooProvider)$|(docker|integration|testing|tools)/.*$'
 nav:
   - HOME: 'README.md'
   - 'docs/README.md'
