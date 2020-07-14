@@ -152,3 +152,39 @@ system properties:
 ```
 
 The value can be comma delimited url string.
+
+### Debug model loading issues
+
+You may run into `ModelNotFoundException` issue. In most cases, it's caused by the `Criteria` you specified
+doesn't match the desired model.
+
+Here is a few tips you can use to help you debug model loading issue:
+
+#### Enable debug log
+See [here](development/configure_logging.md#configure-logging-level) for how to enable debug log
+
+#### List models programmatically in your code
+You can use [ModelZoo.listModels()](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/repository/zoo/ModelZoo.java) API to query available models.
+
+#### List available models using DJL command line
+
+Use the following command to list models in examples module for MXNet engine:
+
+```shell
+./gradlew :examples:listmodels
+
+[INFO ] - CV.ACTION_RECOGNITION ai.djl.mxnet:action_recognition:0.0.1 {"backbone":"vgg16","dataset":"ucf101"}
+[INFO ] - CV.ACTION_RECOGNITION ai.djl.mxnet:action_recognition:0.0.1 {"backbone":"inceptionv3","dataset":"ucf101"}
+[INFO ] - CV.IMAGE_CLASSIFICATION ai.djl.zoo:resnet:0.0.1 {"layers":"50","flavor":"v1","dataset":"cifar10"}
+[INFO ] - CV.IMAGE_CLASSIFICATION ai.djl.zoo:mlp:0.0.2 {"dataset":"mnist"}
+[INFO ] - NLP.QUESTION_ANSWER ai.djl.mxnet:bertqa:0.0.1 {"backbone":"bert","dataset":"book_corpus_wiki_en_uncased"}
+
+...
+
+```
+
+You can list models from your model folder and only list models for specific Engine with debug log:
+
+```shell
+./gradlew :examples:listmodels -Dai.djl.default_engine=PyTorch -Dai.djl.logging.level=debug -Dai.djl.repository.zoo.location=file:///mymodels
+```

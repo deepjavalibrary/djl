@@ -5,6 +5,11 @@
 The Deep Java Library (DJL) model zoo contains engine-agnostic models. All the models have a built-in Translator and
 can be used for inference out of the box.
 
+You can find general ModelZoo and model loading document here:
+
+- [Model Zoo](../docs/model-zoo.md)
+- [How to load model](../docs/load_model.md)
+
 ## Documentation
 
 The latest javadocs can be found on the [djl.ai website](https://javadoc.io/doc/ai.djl/model-zoo/latest/index.html).
@@ -64,23 +69,6 @@ If you already known which `ModelLoader` to use, you can simply do the following
     ZooModel<Image, Classification> model = BasicModelZoo.RESNET.loadModel(filter);
 ```
 
-### List available models
-
-You can use [ModelZoo.listModels()](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/repository/zoo/ModelZoo.java) API to query available models.
-
-Use the following command to list built-in models in examples module:
-```shell script
-./gradlew :examples:run -Dmain=ai.djl.examples.inference.ListModels
-
-[INFO ] - CV.ACTION_RECOGNITION ai.djl.mxnet:action_recognition:0.0.1 {"backbone":"vgg16","dataset":"ucf101"}
-[INFO ] - CV.ACTION_RECOGNITION ai.djl.mxnet:action_recognition:0.0.1 {"backbone":"inceptionv3","dataset":"ucf101"}
-[INFO ] - CV.IMAGE_CLASSIFICATION ai.djl.zoo:resnet:0.0.1 {"layers":"50","flavor":"v1","dataset":"cifar10"}
-[INFO ] - CV.IMAGE_CLASSIFICATION ai.djl.zoo:mlp:0.0.2 {"dataset":"mnist"}
-[INFO ] - NLP.QUESTION_ANSWER ai.djl.mxnet:bertqa:0.0.1 {"backbone":"bert","dataset":"book_corpus_wiki_en_uncased"}
-
-...
-
-```
 
 ## Contributor Guides and Documentation
 
