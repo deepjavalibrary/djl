@@ -5,8 +5,6 @@ This module contains the PyTorch implementation of the Deep Java Library (DJL) E
 
 We don't recommend that developers use classes in this module directly.
 Use of these classes will couple your code with PyTorch and make switching between frameworks difficult.
-Even so, developers are not restricted from using engine-specific features.
-For more information, see [NDManager#invoke()](https://javadoc.io/static/ai.djl/api/0.6.0/ai/djl/ndarray/NDManager.html#invoke-java.lang.String-ai.djl.ndarray.NDList-ai.djl.ndarray.NDList-ai.djl.util.PairList-).
 
 ## Documentation
 
