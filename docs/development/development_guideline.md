@@ -18,6 +18,7 @@ When writing code for DJL, we usually try to follow standard Java coding convent
 Alongside these conventions, we have a number of checks that are run including PMD, SpotBugs, and Checkstyle. These can all be verified by running the gradle `build` target. Instructions for fixing any problems will be given by the relevant tool.
 
 We also follow the [AOSP Java Code Style](https://source.android.com/setup/contribute/code-style). See [here](https://github.com/google/google-java-format) for plugins that can help setup your IDE to use this style. The formatting is checked very strictly. Failing the formatting check will look like:
+
 ```
 > Task :api:verifyJava FAILED
 
@@ -31,6 +32,7 @@ Execution failed for task ':api:verifyJava'.
 > File not formatted: /Volumes/Unix/projects/Joule/api/src/main/java/ai/djl/nn/convolutional/Conv2d.java
   See https://github.com/awslabs/djl/blob/master/docs/development/development_guideline.md#coding-conventions for formatting instructions
 ```
+
 If you do fail the format check, the easiest way to resolve it is to run the gradle `formatJava` target to reformat your code. It may be helpful to just run the formatter before you build the project rather than waiting for the formatting verification to fail.
 
 ## Commit message conventions
@@ -71,6 +73,7 @@ For larger topics which do not have a corresponding javadoc section, they should
 ## Build
 
 This project uses a gradle wrapper, so you don't have to install gradle on your machine. You can just call the gradle wrapper using the following command:
+
 ```
 ./gradlew
 ```
@@ -85,6 +88,7 @@ There are several gradle build targets you can use. The following are the most c
 You can also run this from a subfolder to build for only the module within that folder.
 
 Run the following command to list all available tasks:
+
 ```sh
 ./gradlew tasks --all
 ```
@@ -95,14 +99,19 @@ Sometimes you may need to run individual tests or examples.
 If you are developing with an IDE, you can run a test by selecting the test and clicking the "Run" button.
 
 From the command line, you can run the following command to run a test:
+
 ```
 ./gradlew :<module>:run -Dmain=<class_name> --args ""
 ```
+
 For example, if you would like to run the complete integration test, you can use the following command:
+
 ```
 ./gradlew :integration:run -Dmain=ai.djl.integration.IntegrationTest
 ```
+
 To run an individual integration test from the command line, use the following: 
+
 ```
 ./gradlew :integration:run --args="-c <class_name> -m <method_name>"
 ```
@@ -110,6 +119,7 @@ To run an individual integration test from the command line, use the following:
 ## Logging
 
 To get a better understanding of your problems when developing, you can enable logging by adding the following parameter to your test command:
+
 ```
 -Dai.djl.logging.level=debug
 ```
@@ -149,7 +159,7 @@ You can create your own NDArray renderer as follows:
 Please make sure to:
 
 - Check the "On-demand" option, which causes IntelliJ to only render the NDArray when you click on the variable.
-- Change the "Use following expression" field to something like [toDebugString(100, 10, 10, 20)](https://javadoc.io/static/ai.djl/api/0.6.0/ai/djl/ndarray/NDArray.html#toDebugString-ai.djl.ndarray.NDArray-int-int-int-int-)
+- Change the "Use following expression" field to something like [toDebugString(100, 10, 10, 20)](https://javadoc.io/static/ai.djl/api/0.6.0/ai/djl/ndarray/NDArray.html#toDebugString-int-int-int-int-)
 if you want to adjust the range of NDArray's debug output.
 
 ## Common Problems

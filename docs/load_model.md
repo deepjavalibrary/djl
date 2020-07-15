@@ -2,14 +2,14 @@
 
 A model is a collection of artifacts that is created by the training process.
 In Deep Learning, running inference on a Model usually involves pre-processing and post-processing.
-DJL provides a [ZooModel](https://javadoc.io/static/ai.djl/api/0.6.0/index.html?ai/djl/repository/zoo/ZooModel.html) 
+DJL provides a [ZooModel](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/repository/zoo/ZooModel.html) 
 class, which makes it easy to combine data processing with the model.
 
 This document will show you how to load a pre-trained model in various scenarios.
 
 ## Using ModelZoo API to load a Model
 
-We recommend you to use the [ModelZoo](https://javadoc.io/static/ai.djl/api/0.6.0/index.html?ai/djl/repository/zoo/ModelZoo.html)
+We recommend you to use the [ModelZoo](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/repository/zoo/ModelZoo.html)
 API to load models.
 
 The ModelZoo API provides a unified way to load models. The declarative nature of this API allows you to store model
@@ -18,7 +18,7 @@ See reference project: [DJL Spring Boot Starter](https://github.com/awslabs/djl-
 
 ### Criteria class
 
-You can use [Criteria](https://javadoc.io/static/ai.djl/api/0.6.0/index.html?ai/djl/repository/zoo/Criteria.html) class 
+You can use [Criteria](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/repository/zoo/Criteria.html) class 
 to narrow down your search condition and locate the model you want to load.
 
 - Engine: defines on which engine you want your model to be loaded
@@ -55,6 +55,7 @@ Users can create theirs own model zoo if needed, we are working on improving too
 ### Load model from local file system
 
 The following shows how to load a pre-trained model from a file path:
+
 ```java
 Criteria<Image, Classifications> criteria = Criteria.builder()
         .setTypes(Image.class, Classifications.class) // defines input and output data type
@@ -87,12 +88,14 @@ different from the directory or archive file:
 - artifact_id: define a `artifactId` other than the file name
 
 For example:
+
 ```
 files:///var/models/resnet.zip?artifact_id=resenet-18&model_name=resnet-18v1
 ```
 
 If your the directory or archive file has nested folder, are include the folder name in url to let DJL know where
 to find model files:
+
 ```
 files://var/models/resnet.zip?artifact_id=resenet-18&model_name=saved_model/resnet-18
 ```
@@ -164,7 +167,7 @@ Here is a few tips you can use to help you debug model loading issue:
 See [here](development/configure_logging.md#configure-logging-level) for how to enable debug log
 
 #### List models programmatically in your code
-You can use [ModelZoo.listModels()](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/repository/zoo/ModelZoo.java) API to query available models.
+You can use [ModelZoo.listModels()](https://javadoc.io/static/ai.djl/api/0.6.0/ai/djl/repository/zoo/ModelZoo.html#listModels--) API to query available models.
 
 #### List available models using DJL command line
 

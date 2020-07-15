@@ -7,16 +7,20 @@ You can find the source code in [BertQaInference.java](https://github.com/awslab
 Note that MXNet BERT model has a limitation where the max size of the tokens including the question and the paragraph is 384.  
 
 Example:
+
 ```text
 Q: When did BBC Japan start broadcasting?
 ```
 
 Answer paragraph:
+
 ```text
 BBC Japan was a general entertainment channel, which operated between December 2004 and April 2006.
 It ceased operations after its Japanese distributor folded.
 ```
+
 And it picked the right answer:
+
 ```text
 A: December 2004
 ```

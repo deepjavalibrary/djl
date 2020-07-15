@@ -4,7 +4,7 @@
 
 This folder contains tutorials that illustrate how to accomplish basic AI tasks with Deep Java Library (DJL).
 
-## [Beginner Tutorial](tutorial)
+## [Beginner Tutorial](tutorial/README.md)
 
 ## More Tutorial Notebooks
 
@@ -63,7 +63,8 @@ You can open the `http://localhost:8888` to see the hosted instance on docker.
 
 ### Build docker image by yourself
 
-You can read [Dockerfile](Dockerfile) for detail. To build docker image:
+You can read [Dockerfile](https://github.com/awslabs/djl/blob/master/jupyter/Dockerfile) for detail. To build docker image:
+
 ```
 cd jupyter
 docker build -t deepjavalibrary/jupyter .

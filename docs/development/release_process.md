@@ -14,7 +14,8 @@ Edit [README Release Notes section](../../README.md#release-notes) to add link t
 Many of the documents are still pointing to the previous released version. We should update them the
 version we are going to release. For example, current version is 0.5.0-SNAPSHOT, but many of documents
 are using 0.4.0 (X.X.X), we should update build version with the following command:
-```shell script
+
+```shell
 cd djl
 # replace X.X.X with the previous released version number
 ./gradlew -PpreviousVersion=X.X.X iFV
@@ -29,28 +30,32 @@ If nothing changes between previous and current version, you don't need to do th
 #### MXNet
 
 Run the following command to trigger mxnet-native publishing job:
-```shell script
+
+```shell
 curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "mxnet-staging-pub"}'
 ```
 
 #### PyTorch
 
 Run the following command to trigger pytorch-native publishing job:
-```shell script
+
+```shell
 curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "pytorch-staging-pub"}'
 ```
 
 ### Step 1.3: Publish DJL library to sonatype staging server
 
 Run the following command to trigger DJL publishing job:
-```shell script
+
+```shell
 curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "release-build"}'
 ```
 
 ### Step 1.4: Remove -SNAPSHOT in examples and jupyter notebooks
 
 Run the following command with correct version value:
-```shell script
+
+```shell
 cd djl
 git clean -xdff
 ./gradlew release
@@ -64,7 +69,8 @@ git push origin vX.X.X
 Login to https://oss.sonatype.org/, and find out staging repo name.
 
 Run the following command to point maven repository to staging server:
-```shell script
+
+```shell
 cd djl
 git checkout vX.X.X
 ./gradlew -PstagingRepo=aidjl-XXXX staging
@@ -72,7 +78,7 @@ git checkout vX.X.X
 
 ### Step 2.1: Validate examples project are working fine
 
-```shell script
+```shell
 cd examples
 # By default it uses mxnet-engine
 # Please switch to pytorch, tensorflow engine to make sure all the engines pass the test 
@@ -84,7 +90,8 @@ mvn exec:java -Dexec.mainClass="ai.djl.examples.inference.ObjectDetection"
 ### Step 2.2: Validate jupyter notebooks
 
 Make sure jupyter notebook and running properly and all javadoc links are accessible.
-```shell script
+
+```shell
 cd jupyter
 jupyter notebook
 ```
@@ -122,7 +129,7 @@ will be published sonatype staging server.
 
 ### Step 6.1: Upgrade version for next release
 
-```shell script
+```shell
 cd djl
 ./gradlew -PtargetVersion=X.X.X iBV
 ```
@@ -132,7 +139,8 @@ Create a PR to get reviewed and merge into github.
 ### Step 6.2: Publish new snapshot to sonatype
 
 Manually trigger a nightly build with the following command:
-```shell script
+
+```shell
 curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/awslabs/djl/dispatches --data '{"event_type": "nightly-build"}'
 ```
 
@@ -141,16 +149,16 @@ curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.ever
 After verifying packages are available in maven central, click the following links to trigger javadoc.io to fetch latest DJL libraries.
 Verify the following link works, and update the website for java doc links accordingly.
 
-* [api](https://javadoc.io/doc/ai.djl/api/0.6.0/index.html)
-* [basicdataset](https://javadoc.io/doc/ai.djl/basicdataset/0.6.0/index.html)
-* [model-zoo](https://javadoc.io/doc/ai.djl/model-zoo/0.6.0/index.html)
-* [mxnet-model-zoo](https://javadoc.io/doc/ai.djl.mxnet/mxnet-model-zoo/0.6.0/index.html)
-* [mxnet-engine](https://javadoc.io/doc/ai.djl.mxnet/mxnet-engine/0.6.0/index.html)
-* [pytorch-model-zoo](https://javadoc.io/doc/ai.djl.pytorch/pytorch-model-zoo/0.6.0/index.html)
-* [pytorch-engine](https://javadoc.io/doc/ai.djl.pytorch/pytorch-engine/0.6.0/index.html)
-* [tensorflow-model-zoo](https://javadoc.io/doc/ai.djl.tensorflow/tensorflow-model-zoo/0.6.0/index.html)
-* [tensorflow-engine](https://javadoc.io/doc/ai.djl.tensorflow/tensorflow-engine/0.6.0/index.html)
-* [fasttext-engine](https://javadoc.io/doc/ai.djl.fasttext/fasttext-engine/0.6.0/index.html)
+* [api](https://javadoc.io/doc/ai.djl/api/latest/index.html)
+* [basicdataset](https://javadoc.io/doc/ai.djl/basicdataset/latest/index.html)
+* [model-zoo](https://javadoc.io/doc/ai.djl/model-zoo/latest/index.html)
+* [mxnet-model-zoo](https://javadoc.io/doc/ai.djl.mxnet/mxnet-model-zoo/latest/index.html)
+* [mxnet-engine](https://javadoc.io/doc/ai.djl.mxnet/mxnet-engine/latest/index.html)
+* [pytorch-model-zoo](https://javadoc.io/doc/ai.djl.pytorch/pytorch-model-zoo/latest/index.html)
+* [pytorch-engine](https://javadoc.io/doc/ai.djl.pytorch/pytorch-engine/latest/index.html)
+* [tensorflow-model-zoo](https://javadoc.io/doc/ai.djl.tensorflow/tensorflow-model-zoo/latest/index.html)
+* [tensorflow-engine](https://javadoc.io/doc/ai.djl.tensorflow/tensorflow-engine/latest/index.html)
+* [fasttext-engine](https://javadoc.io/doc/ai.djl.fasttext/fasttext-engine/latest/index.html)
 
 ### Step 6.4: Check broken links
 

@@ -1,17 +1,28 @@
 # Metrics in DJL
 
 
-Deep Java Library (DJL) comes with utility classes to make it easy to capture performance metrics and other metrics during runtime. These metrics can be used to analyze and monitor inference, training performance, and stability. [Metrics](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/metric/Metrics.java) is the class that enables collecting metrics information. It is built as a collection of individual [Metric](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/metric/Metric.java) classes.
+Deep Java Library (DJL) comes with utility classes to make it easy to capture performance metrics
+and other metrics during runtime. These metrics can be used to analyze and monitor inference,
+training performance, and stability. [Metrics](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/metric/Metrics.html)
+is the class that enables collecting metrics information. It is built as a collection of individual
+[Metric](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/metric/Metric.html) classes.
 
-As a container for individual metrics classes, **Metrics** stores them as time series data so that metric-vs-timeline analysis could be performed. It also provides convenient statistical methods for getting aggregated information, such as _mean_ and _percentile_.
+As a container for individual metrics classes, **Metrics** stores them as time series data so that
+metric-vs-timeline analysis could be performed. It also provides convenient statistical methods for
+getting aggregated information, such as _mean_ and _percentile_.
 
-DJL uses the Metrics collection to store key performance indicators (KPIs) during inference and training runs. These KPIs include various latencies, CPU and GPU memory consumption, losses, etc. They can be accessed if you utilize built-in DJL classes in your applications. For examples of these built-in classes, see [Metrics out of the box](#metrics-out-of-the-box). 
-DJL also provides an easy way to keep track of your own metrics. For more information, see [User defined metrics](#user-defined-metrics).
+DJL uses the Metrics collection to store key performance indicators (KPIs) during inference and
+training runs. These KPIs include various latencies, CPU and GPU memory consumption, losses, etc.
+They can be accessed if you utilize built-in DJL classes in your applications. For examples of
+these built-in classes, see [Use metrics with DJL](#use-metrics-with-djl). 
+DJL also provides an easy way to keep track of your own metrics. For more information,
+see [User defined metrics](#user-defined-metrics).
 
 ## Use metrics with DJL
 Many DJL classes keep track of relevant quantitative and qualitative metrics. DJL provides easy access to these metrics.
 
-For example, if there is an application that uses Predictor to serve inference requests, the following code can be used to access mean and p90 latency of individual requests:
+For example, if there is an application that uses Predictor to serve inference requests, the
+following code can be used to access mean and p90 latency of individual requests:
 
 ```java
 // load the image in which objects need to be detected

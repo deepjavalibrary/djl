@@ -6,6 +6,7 @@
 
 Extract the MXNet native library files from the MXNet python pip wheel or build them from source.
 Make sure to collect all the dependencies. Use the following commands to include all the libmxnet.so dependencies:
+
 ```bash
 # osx
 otool -L libmxnet.dylib

@@ -1,7 +1,7 @@
 # DJL TensorFlow Engine
 
 This directory contains the "TensorFlow" Engine implementation.
-It is based off the [Tensorflow Deep Learning Framework](https://www.tensorflow.org/).
+It is based off the [TensorFlow Deep Learning Framework](https://www.tensorflow.org/).
 
 The DJL TensorFlow Engine allows you to run prediction with TensorFlow or Keras models using Java.
 It has the following 4 modules:
@@ -17,18 +17,16 @@ Note:
 1. The TensorFlow native auto module only supports detecting Mac OSX, Linux CPU and Linux GPU with CUDA version from 9.2 to 10.2.
 2. For GPU usage, you need to install [Nvidia CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) and  [cuDNN Library](https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html).
 3. You can use `-Dai.djl.default_engine=TensorFlow` to switch between different Engines DJL support.
-4. Windows platform is currently not supported, we are still WIP on TensorFlow's windows build
 
 ### Gradle
 For gradle usage, include the snapshot repository and add the 4 modules in your dependencies:
+
 ```
 repositories {
     jcenter()
 }
 
 dependencies {
-    implementation "ai.djl:api:0.6.0"
-    implementation "ai.djl.tensorflow:tensorflow-api:0.6.0"
     implementation "ai.djl.tensorflow:tensorflow-engine:0.6.0"
     implementation "ai.djl.tensorflow:tensorflow-model-zoo:0.6.0"
     implementation "ai.djl.tensorflow:tensorflow-native-auto:2.2.0"
@@ -38,13 +36,9 @@ dependencies {
 ### Maven
 
 Same as gradle, just include the 4 modules:
+
 ```xml
 <dependencies>
-    <dependency>
-      <groupId>ai.djl.tensorflow</groupId>
-      <artifactId>tensorflow-api</artifactId>
-      <version>0.6.0</version>
-    </dependency>
     <dependency>
       <groupId>ai.djl.tensorflow</groupId>
       <artifactId>tensorflow-engine</artifactId>
@@ -62,9 +56,3 @@ Same as gradle, just include the 4 modules:
     </dependency>
 </dependencies>
 ```
-
-# Documentation
-
-For more TensorFlow Engine documentation please refer to our [docs folder](../docs/tensorflow)
-
-

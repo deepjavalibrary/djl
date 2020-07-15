@@ -100,6 +100,7 @@ Once you have checked out the code locally, you can build it as follows using Gr
 ```
 
 To increase build speed, you can use the following command to skip unit tests:
+
 ```sh
 ./gradlew build -x test
 ```

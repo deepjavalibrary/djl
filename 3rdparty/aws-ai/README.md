@@ -11,6 +11,7 @@ this module in your project, [ModelZoo](https://javadoc.io/doc/ai.djl/api/latest
 can load models from your s3 bucket.
 
 The following pseudocode demonstrates how to load model from S3:
+
 ```java
     Criteria<Image, Classifications> criteria =
         Criteria.builder()

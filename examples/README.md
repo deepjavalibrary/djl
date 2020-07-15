@@ -28,9 +28,9 @@ For examples and references on building models and translators, look in our
 [basic model zoo](https://github.com/awslabs/djl/tree/master/model-zoo).
 
 You may be able to find more translator examples in our engine specific model zoos:
-[mxnet](https://github.com/awslabs/djl/tree/master/mxnet/mxnet-model-zoo),
-[pytorch](https://github.com/awslabs/djl/tree/master/pytorch/pytorch-model-zoo),
-and [tensorflow](https://github.com/awslabs/djl/tree/master/tensorflow/tensorflow-model-zoo).
+[MXNet](https://github.com/awslabs/djl/tree/master/mxnet/mxnet-model-zoo),
+[PyTorch](https://github.com/awslabs/djl/tree/master/pytorch/pytorch-model-zoo),
+and [TensorFlow](https://github.com/awslabs/djl/tree/master/tensorflow/tensorflow-model-zoo).
 
 More examples and demos of applications featuring DJL are located in our [demo repository](https://github.com/aws-samples/djl-demo).
 
@@ -47,12 +47,14 @@ More examples and demos of applications featuring DJL are located in our [demo r
 This example supports building with both Gradle and Maven. To build, use either of the following commands:
 
 * Gradle build
+
     ```sh
     cd examples
     ./gradlew jar
     ```
 
 * Maven build
+
     ```sh
     cd examples
     mvn package -DskipTests
@@ -65,12 +67,14 @@ For more information on running each example, see the example's documentation.
 The following command executes an object detection example:
 
 * Gradle
+
     ```sh
     cd examples
     ./gradlew run
     ```
 
 * Maven
+
     ```sh
     cd examples
     mvn clean package -DskipTests
@@ -81,9 +85,12 @@ The following command executes an object detection example:
 
 DJL is engine agnostic, so it's capable of supporting different backends.
 
-With MXNet and PyTorch, you can choose different builds of the native library.
+With MXNet, PyTorch, TensorFlow and ONNX Runtime, you can choose different builds of the native library.
 We recommend the automatic engine selection which downloads the best engine for your platform and available hardware during the first runtime.
-Activate the automatic selection by adding `ai.djl.mxnet:mxnet-native-auto:1.7.0-b` for mxnet and `ai.djl.pytorch:pytorch-native-auto:1.5.0` as a dependency.
-You can also see [MXNet Engine](../mxnet/mxnet-engine/README.md) and [PyTorch Engine](../pytorch/pytorch-engine/README.md) for further options.
-
-
+Activate the automatic selection by adding `ai.djl.mxnet:mxnet-native-auto:1.7.0-b` for MXNet and `ai.djl.pytorch:pytorch-native-auto:1.5.0` for PyTorh as a dependency.
+You can also see:
+ 
+- [MXNet Engine](../mxnet/mxnet-engine/README.md)
+- [PyTorch Engine](../pytorch/pytorch-engine/README.md)
+- [TensorFlow Engine](../tensorflow/tensorflow-engine/README.md)
+- [ONNX Runtime Engine](../onnxruntime/onnxruntime-engine/README.md)

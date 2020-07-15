@@ -9,6 +9,7 @@ HDFS is widely used in Spark applications. We introduce HDFS integration for DJL
 With this module, you can directly load model from HDFS url.
 
 The following pseudocode demonstrates how to load model from HDFS url:
+
 ```java
     Criteria<Image, Classifications> criteria =
         Criteria.builder()
@@ -40,6 +41,7 @@ You can also build the latest javadocs locally using the following command:
 ```sh
 ./gradlew javadoc
 ```
+
 The javadocs output is built in the build/doc/javadoc folder.
 
 

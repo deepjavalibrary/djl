@@ -29,11 +29,14 @@ You can find the following image in your project test resource folder: `src/test
 ### Build the project and run
 
 Run the project by using the following command:
+
 ```
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.ImageClassification
 ```
+
 Your output should look like the following:
+
 ```text
 [INFO ] - [
         class: "0", probability: 0.99996

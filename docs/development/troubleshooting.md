@@ -5,6 +5,7 @@ Please review this list before submitting an issue.
 
 ## 1. `No deep learning engine found` exception.
 These could be due to several reasons.
+
 ```
 16:57:55.313 [main] ERROR ai.djl.examples.training.util.AbstractTraining - Unexpected error
 ai.djl.engine.EngineException: No deep learning engine found.
@@ -20,6 +21,7 @@ Please includes at least one of those engines and their native library as depend
 For example, adding MXNet engine dependencies:
 
 Gradle:
+
 ```
 implementation "ai.djl.mxnet:mxnet-engine:0.6.0"
 // See https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
@@ -27,6 +29,7 @@ runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.7.0-b"
 ```
 
 Maven:
+
 ```
 <dependency>
     <groupId>ai.djl.mxnet</groupId>
@@ -50,6 +53,7 @@ This issue is caused by a mismatch between IntelliJ and the Gradle runner.
 To fix this, navigate to: `Preferences-> Build Execution Deployment -> Build Tools -> Gradle`. Then, change the `Build and running using:` option to `Gradle`.
 
 If you prefer to continue using `IntelliJ IDEA` as your runner, you can navigate to the MXNet engine resources folder using the project view as follows:
+
 ```
 mxnet -> mxnet-engine -> src -> main -> resources
 ```
@@ -63,6 +67,7 @@ You might see the error when DJL tries to load the native library for the engine
 Let's take the PyTorch engine as an example.
 DJL loads libtorch.dylib when creating the Engine instance.
 You can check library files on which libtorch.dylib depends by typing `otool -L libtorch.dylib` on mac `ldd libtorch.so` on ubuntu.
+
 ```
 # in macos environment
 libtorch.dylib:
@@ -72,6 +77,7 @@ libtorch.dylib:
 	@rpath/libc10.dylib (compatibility version 0.0.0, current version 0.0.0)
 	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 400.9.0)
 ```
+
 It shows the `libtorch.dylib` depends on `libiomp5.dylib` and `libc10.dylib`. If one of them is missing, it throws an `UnsatisfiedLinkError` exception.
 If you are using `ai.djl.{engine}:{engine}-native-auto`, please create an issue at `https://github.com/awslabs/djl`.
 
@@ -82,16 +88,20 @@ For more information, please refer to [DJL Cache Management](cache_management.md
 
 ## 2. IntelliJ throws the `No Log4j 2 configuration file found.` exception.
 The following exception may appear after running the `./gradlew clean` command:
+
 ```bash
 ERROR StatusLogger No Log4j 2 configuration file found. Using default configuration (logging only errors to the console), or user programmatically provided configurations. Set system property 'log4j2.debug' to show Log4j 2 internal initialization logging. See https://logging.apache.org/log4j/2.x/manual/configuration.html for instructions on how to configure Log4j 2
 ```
+
 This issue has the same root cause as issue #1. You can follow the steps outlined previously to change `Build and running using:` to `Gradle`.
 If you prefer to continue using `IntelliJ IDEA` as your runner, navigate to the project view for the program and recompile the log configuration file.
 
 For example, if you are running a DJL example, navigate to:
+
 ```
 examples -> src -> main -> resources -> log4j2.xml
 ```
+
 Then, right click the `log4j2.xml` file and select `Recompile log4j2.xml`.
 
 ![FAQ2](https://djl-ai.s3.amazonaws.com/resources/images/FAQ_log_recompile.png)
@@ -103,6 +113,7 @@ DJL on Windows, please download and install
 If the issue continues to persist, you can use the [docker file](https://github.com/awslabs/djl/blob/master/docker/windows/Dockerfile) provided by us.
 Please note that this docker will only work with Windows server 2019 by default. If you want it to work with other
 versions of Windows, you need to pass the version as an argument as follows:
+
 ```
 docker build --build-arg version=<YOUR_VERSION>
 ``` 
@@ -124,33 +135,41 @@ You need the latest MXNet to work with DJL, so remember to add `--pre` at the en
 After installing MXNet, you need to update the `MXNET_LIBRARY_PATH` environment variable with your `libmxnet.so` file location.
  
 For example, if you are using an older version of CUDA(version 9.2), you can install MXNet with CUDA 9.2 by running the following command:
+
 ```bash
 pip install mxnet-cu92 --pre
 ```
+
 After installation, you can find the file location using the following commands in python:
+
 ```python
 python
 >>> import mxnet as mx
 >>> mx.__file__
 '//anaconda3/lib/python3.7/site-packages/mxnet/__init__.py'
 ```
+
 Update the environment variable value with the following command:
+
 ```bash
 export MXNET_LIBRARY_PATH=//anaconda3/lib/python3.7/site-packages/mxnet/
 ```
+
 Now DJL will automatically use the MXNet library from this location.
 
 ## 5. Gradle issue
 
 Sometimes gradle may fail or get stuck. For example, you may see the following error:
-```shell script
+
+```shell
 * What went wrong:
 Execution failed for task ':api:formatJava'.
 > unable to create new native thread
 ```
 
 You need kill the gradle daemon process:
-```shell script
+
+```shell
 ./gradlew --stop
 ``` 
 

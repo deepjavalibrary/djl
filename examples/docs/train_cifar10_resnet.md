@@ -24,6 +24,7 @@ Import the `ai.djl.basicmodelzoo.cv.classification.ResNetV1` class and use its b
 You can set the number of layers to create variants of [ResNet](https://en.wikipedia.org/wiki/Residual_neural_network) such as ResNet18, ResNet50, and ResNet152.
 
 For example, you can create ResNet50 using the following code:
+
 ```java
  Block resNet50 = new ResNetV1.Builder()
                         .setImageShape(new Shape(3, 32, 32))
@@ -31,12 +32,14 @@ For example, you can create ResNet50 using the following code:
                         .setOutSize(10)
                         .build();
 ```
+
 To run the example, use the following command: 
+
 ```
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.transferlearning.TrainResnetWithCifar10 --args="-e 10 -b 32 -g 1"
-
 ```
+
 You can use the option `-p` to specify pre-trained parameters. 
 
 ### Using a MXNet model from the MXNet Model Zoo
@@ -45,10 +48,10 @@ A MXNet model is pre-trained using the [Apache MXNet(incubating)](https://mxnet.
 Models are trained in Python and exported to `.symbol`(model architecture) and `.params`(trained parameter values) files. These models are also known as symbolic models.
 
 To run the example using MXNet model, use the option `-s` as shown in the following command: 
+
 ```
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.transferlearning.TrainResnetWithCifar10 --args="-e 10 -b 32 -g 1 -s -p"
-
 ```
 
 You can also remove the option `-p` to train from scratch.
@@ -62,9 +65,9 @@ It's part of the optimization algorithm that controls how fast to move towards r
 During the training process, you should usually reduce the learning rate periodically to prevent the model from plateauing. 
 You will also need different learning rate strategies based on whether you are using a pre-trained model or training from scratch.
 DJL provides several built-in `LearningRateTracker`s to suit your needs. For more information, see the
-[documentation](https://javadoc.io/static/ai.djl/api/0.6.0/index.html?ai/djl/training/optimizer/learningrate/LearningRateTracker.html).
+[documentation](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/training/optimizer/learningrate/LearningRateTracker.html).
 
-Here, you use a [`MultiFactorTracker`](https://javadoc.io/static/ai.djl/api/0.6.0/index.html?ai/djl/training/optimizer/learningrate/MultiFactorTracker.html),
+Here, you use a [`MultiFactorTracker`](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/training/optimizer/learningrate/MultiFactorTracker.html),
 which allows you to reduce the learning rate after a specified number of periods.
 We use a base learning rate of `0.001`, and reduce it by `sqrt(0.1)` every specified number of epochs. 
 For a pre-trained model, you reduce the learning rate at the 2nd, 5th, and 8th epoch because it take less time to train and converge. 
@@ -82,9 +85,11 @@ They come with powerful Nvidia GPUs, and include pre-installed drivers and all d
 
 For example, on an [p3.16xlarge](https://aws.amazon.com/ec2/instance-types/) instance with [Ubuntu Deep Learning Base AMI](https://aws.amazon.com/marketplace/pp/Amazon-Web-Services-Deep-Learning-Base-AMI-Amazon-/B077GFM7L7), 
 run the following command to check the GPU status, driver information, and CUDA version.
+
 ```
 nvidia-smi
 ```
+
 You should see the following output:
 
 ```aidl
@@ -134,12 +139,14 @@ Use the option `-g` to specify how many GPUs to use, and use `-b` to specify the
 Usually, you use `32*number_of_gpus`, so each GPU will get a data batch size of 32. For 4 GPUs, the total batch size is 128.
 
 Run the following command to train using 4 GPUs:
+
 ```
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.transferlearning.TrainResnetWithCifar10 --args="-e 10 -b 128 -g 4 -p"
-
 ```
+
 You should see the following output:
+
 ```bash
 > Task :examples:run
 [INFO ] - Running TrainResnetWithCifar10 on: 4 GPUs, epoch: 10.

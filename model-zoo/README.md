@@ -19,6 +19,7 @@ You can also build the latest javadocs locally using the following command:
 ```sh
 ./gradlew javadoc
 ```
+
 The javadocs output is built in the build/doc/javadoc folder.
 
 ## Installation
@@ -60,6 +61,7 @@ The following is an example of the criteria to find a Resnet50-v1 model that has
 ```
 
 If you already known which `ModelLoader` to use, you can simply do the following:
+
 ```java
     Map<String, String> filter = new HashMap<>();
     filter.put("layers", "50");

@@ -18,7 +18,9 @@ The following command trains the model for two epochs. The trained model is save
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.TrainCaptcha
 ```
+
 Your output should look like the following:
+
 ```text
 [INFO ] - Running TrainCaptcha on: cpu(0).
 [INFO ] - Load MXNet Engine Version 1.6.0 in 0.133 ms.

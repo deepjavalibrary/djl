@@ -8,16 +8,19 @@ Verify that Java is available in your $PATH environment variable by using the fo
 you can use the $JAVA_HOME environment variable to control which version of Java to use.
 
 For ubuntu:
+
 ```bash
 sudo apt-get install openjdk-8-jdk-headless
 ```
 
 For centos
+
 ```bash
 sudo yum install java-1.8.0-openjdk
 ```
 
 For Mac:
+
 ```bash
 brew tap homebrew/cask-versions
 brew update

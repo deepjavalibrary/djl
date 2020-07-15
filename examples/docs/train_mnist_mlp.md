@@ -23,7 +23,9 @@ The following command trains the model for two epochs. The trained model is save
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.TrainMnist
 ```
+
 Your output should look like the following:
+
 ```text
 [INFO ] - Running TrainMnist on: cpu(0), epoch: 2.
 [INFO ] - Load library 1.5.0 in 0.121 ms.

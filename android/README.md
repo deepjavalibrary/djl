@@ -12,6 +12,7 @@ You need to have Android SDK and Android NDK installed on your machine.
 The minimum API level for DJL Android is 26.
 
 In gradle, you can include the snapshot repository and add the 4 modules in your dependencies:
+
 ```
 dependencies {
     implementation "ai.djl:api:0.6.0"

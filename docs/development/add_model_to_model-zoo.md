@@ -54,6 +54,7 @@ The official DJL ML repository is located on an S3 bucket managed by the AWS DJL
 For non-team members, coordinate with a team member in your pull request to coordinate adding the necessary files.
 
 For AWS team members, run the following command to upload your model to the S3 bucket:
+
 ```shell
 $ ./gradlew syncS3
 ```

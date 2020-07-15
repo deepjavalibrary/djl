@@ -4,7 +4,7 @@
 for locating instances of objects in images or videos. In this example, you can find an imperative implemention of an 
 SSD model, and the way to train it using the Pikachu Dataset. The code for the example can be found in 
 [TrainPikachu.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/training/TrainPikachu.java). 
-The code for the implementation of SSD can be found in [SingleShotDetection.java](https://github.com/awslabs/djl/blob/master/zoo/src/main/java/ai/djl/basicmodelzoo/cv/object_detection/ssd/SingleShotDetection.java).
+The code for the implementation of SSD can be found in [SingleShotDetection.java](https://github.com/awslabs/djl/blob/master/model-zoo/src/main/java/ai/djl/basicmodelzoo/cv/object_detection/ssd/SingleShotDetection.java).
 
 There are no small datasets, like MNIST or Fashion-MNIST, in the object detection field. In order to quickly test models,
 you are using a small dataset of Pikachu images. It contains a series of background images on which a Pikachu image
@@ -18,11 +18,14 @@ Follow [setup](../../docs/development/setup.md) to configure your development en
 
 ### Build the project and run it
 The following command trains the model for 2 epochs. The trained model is saved in the following folder: `build/model`.
+
 ```
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.TrainPikachu
 ```
+
 Your output should look like the following:
+
 ```text
 [INFO ] - Running TrainPikachu on: cpu(0), epoch: 2.
 [INFO ] - Load library 1.5.0 in 0.183 ms.
@@ -45,11 +48,14 @@ Validating:  100% |████████████████████�
 [INFO ] - step P50: 4.436 ms, P90: 6.829 ms
 [INFO ] - epoch P50: 138.332 s, P90: 138.332 s
 ```
+
 You can also run the example with your own arguments, for example, to train 5 epochs using batch size 64, and save it to a specified folder `ssd_model`:
+
 ```
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.TrainPikachu --args="-e 5 -b 64 -o ssd_model"
 ```
+
 The following table shows the list of available arguments:
 
  | Argument   | Comments                                 |

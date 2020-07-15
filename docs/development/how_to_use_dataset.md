@@ -22,6 +22,7 @@ the RandomAccessDataset.
 
 The following code illustrates an implementation of ArrayDataset. 
 The ArrayDataset is recommended only if your dataset is small enough to fit in memory.
+
 ```
 // given you have data1, data2 and label1, label2, label3
 ArrayDataset dataset = new ArrayDataset.Builder()
@@ -31,6 +32,7 @@ ArrayDataset dataset = new ArrayDataset.Builder()
                               .build();
 
 ```
+
 When you get the `Batch` from `trainer.iterateDataset(dataset)`, 
 you can use ``batch.getData()`` to get a NDList with size 2. You can then use `NDList.get(0)` to get your first data and `NDList.get(1)` to get your second data.
 Similarly, you can use `batch.getLabels()` to get a NDList with size 3.
@@ -43,6 +45,7 @@ The ImageFolder dataset is recommended only if you want to iterate through your 
 
 ### Step 1: Prepare Images
 Arrange your image folder structure as follows:
+
 ```
 dataset_root/shoes/Aerobic Shoes1.png
 dataset_root/shoes/Aerobic Shose2.png
@@ -61,11 +64,13 @@ dataset_root/pumps/Red Pumps
 dataset_root/pumps/Pink Pumps
 ...
 ```
+
 The dataset will take the folder name e.g. `boots`, `pumps`, `shoes` in sorted order as your labels
 **Note:** Nested folder structures are not currently supported
 
 ### Step 2: Use the Dataset
 Add the following code snippet to your project to use the ImageFolder dataset.
+
 ```
 ImageFolder dataset = 
     new ImageFolder.Builder()
@@ -104,16 +109,19 @@ The CSV file has the following format.
 | sample.url.bad.com | 1  |
 
 We'll also use the 3rd party [Apache Commons](https://commons.apache.org/) library to read the CSV file. To use the library, include the following dependency:
+
 ```
 api group: 'org.apache.commons', name: 'commons-csv', version: '1.7'
 ```
 
 ### Step 2: Implementation
 In order to extend the dataset, the following dependencies are required:
+
 ```
 api "ai.djl:api:0.6.0"
 api "ai.djl:basicdataset:0.6.0"
 ```
+
 There are three parts we need to implement for CSVDataset.
 
 1. Constructor and Builder
@@ -121,6 +129,7 @@ First, we need a private field that holds the CSVRecord list from the csv file.
 We create a constructor and pass the CSVRecord list from builder to the class field.
 For builder, we have all we need in `BaseBuilder` so we only need to include the two minimal methods as shown.
 In the *build()* method, we take advantage of CSVParser to get the record of each CSV file and put them in CSVRecord list.
+
 ```
 public class CSVDataset extends RandomAccessDataset {
 
@@ -158,10 +167,12 @@ public class CSVDataset extends RandomAccessDataset {
 
 }
 ```
+
 2. Getter
 The getter returns a Record object which contains encoded inputs and labels.
 Here, we use simple encoding to transform the url String to an int array and create a NDArray on top of it.
 The reason why we use NDList here is that you might have multiple inputs and labels in different tasks.  
+
 ```
 @Override
 public Record get(NDManager manager, long index) {
@@ -172,17 +183,21 @@ public Record get(NDManager manager, long index) {
     return new Record(new NDList(datum), new NDList(label));
 }
 ```
+
 3. Size
 The size of the dataset
 Here, we can directly use the size of the List<CSVRecord>.
+
 ```
 @Override
 public long size() {
     return csvRecords.size();
 }
 ```
+
 Done!
 Now, you can use the CSVDataset with the following code snippet:
+
 ```
 CSVDataset dataset = new CSVDataset.Builder().setSampling(batchSize, false).build();
 for (Batch batch : dataset.getData(model.getNDManager())) {
@@ -194,5 +209,6 @@ for (Batch batch : dataset.getData(model.getNDManager())) {
     batch.close();
 }
 ```
+
 Full example code could be found in [CSVDataset.java](https://github.com/awslabs/djl/blob/master/docs/development/CSVDataset.java).
 

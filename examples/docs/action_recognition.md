@@ -19,12 +19,14 @@ You can find the image used in this example in the project test resource folder:
 
 ### Build the project and run
 Use the following command to run the project:
+
 ```
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.ActionRecognition
 ```
 
 Your output should look like the following:
+
 ```text
 [INFO ] - [
         class: "ThrowDiscus", probability: 0.99868

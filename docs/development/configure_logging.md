@@ -38,6 +38,7 @@ For Gradle:
 ```
 
 Then you can use system properties to configure slf4j-simple log level:
+
 ```
 -Dorg.slf4j.simpleLogger.defaultLogLevel=debug
 ```

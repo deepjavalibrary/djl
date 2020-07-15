@@ -15,15 +15,16 @@ You can also build the latest javadocs locally using the following command:
 The javadocs output is built in the build/doc/javadoc folder.
 
 ## Installation
-To use the experimental TensorFlow model zoo, you need to build from source. 
-Simply begin by checking out the code.
-Once you have checked out the code locally, you can build it as follows using Gradle:
+You can pull the [ai.djl.tensorflow:tensorFlow-model-zoo](https://search.maven.org/artifact/ai.djl.tensorflow/tensorflow-model-zoo)
+from the central Maven repository by including the following dependency:
 
-```sh
-./gradlew build
+```xml
+<dependency>
+    <groupId>ai.djl.tensorflow</groupId>
+    <artifactId>tensorflow-model-zoo</artifactId>
+    <version>0.6.0</version>
+</dependency>
 ```
-
-Follow the main [README.md](../../README.md) and the [quick start guide](../../docs/quick_start.md)
 
 ## Pre-trained models
 
