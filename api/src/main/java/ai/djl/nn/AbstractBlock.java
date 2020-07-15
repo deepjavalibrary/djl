@@ -125,7 +125,8 @@ public abstract class AbstractBlock implements Block {
      *     a member variable more easily.
      */
     protected final <B extends Block> B addChildBlock(String name, B block) {
-        children.add(name, block);
+        int childNumber = children.size() + 1;
+        children.add(String.format("%02d%s", childNumber, name), block);
         return block;
     }
 
