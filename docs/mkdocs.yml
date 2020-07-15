@@ -72,6 +72,8 @@ nav:
       - Inference performance tuning: 'docs/pytorch/how_to_optimize_inference_performance.md'
   - TensorFlow:
       - Overview: 'tensorflow/README.md'
+      - TensorFlow Engine: 'tensorflow/tensorflow-engine/README.md'
+      - TensorFlow Model Zoo: 'tensorflow/tensorflow-model-zoo/README.md'
       - Import Keras Model: 'docs/tensorflow/how_to_import_keras_models_in_DJL.md'
   - Utilities:
       - Android: 'android/README.md'
