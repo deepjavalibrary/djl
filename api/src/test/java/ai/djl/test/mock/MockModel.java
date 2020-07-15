@@ -58,6 +58,12 @@ public class MockModel implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public Path getModelPath() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Block getBlock() {
         return new SequentialBlock();
     }

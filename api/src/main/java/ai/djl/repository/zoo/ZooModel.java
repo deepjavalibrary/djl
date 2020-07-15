@@ -66,6 +66,12 @@ public class ZooModel<I, O> implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public Path getModelPath() {
+        return model.getModelPath();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Block getBlock() {
         return model.getBlock();
     }

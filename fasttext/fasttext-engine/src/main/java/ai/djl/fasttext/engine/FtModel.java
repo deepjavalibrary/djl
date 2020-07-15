@@ -153,6 +153,12 @@ public class FtModel implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public Path getModelPath() {
+        return modelDir;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Block getBlock() {
         return FtBlockPlaceholder.PLACEHOLDER;
     }

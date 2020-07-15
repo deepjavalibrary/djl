@@ -217,6 +217,12 @@ public abstract class BaseModel implements Model {
     }
 
     /** {@inheritDoc} */
+    @Override
+    public Path getModelPath() {
+        return modelDir;
+    }
+
+    /** {@inheritDoc} */
     @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {

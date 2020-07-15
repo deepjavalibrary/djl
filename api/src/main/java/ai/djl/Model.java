@@ -142,6 +142,13 @@ public interface Model extends AutoCloseable {
     void save(Path modelPath, String newModelName) throws IOException;
 
     /**
+     * Returns the directory from where the model is loaded.
+     *
+     * @return the directory of the model location
+     */
+    Path getModelPath();
+
+    /**
      * Gets the block from the Model.
      *
      * @return the {@link Block}
