@@ -74,6 +74,16 @@ public abstract class Optimizer {
     }
 
     /**
+     * Returns a new instance of {@link RmsProp.Builder} that can build an {@link RmsProp}
+     * optimizer.
+     *
+     * @return the {@link RmsProp} {@link RmsProp.Builder}
+     */
+    public static RmsProp.Builder rmsprop() {
+        return new RmsProp.Builder();
+    }
+
+    /**
      * Gets the value of weight decay.
      *
      * @return the value of weight decay

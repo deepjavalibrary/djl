@@ -224,6 +224,18 @@ public interface NDArrayEx {
             float clipGrad,
             float momentum);
 
+    void rmspropUpdate(
+            NDList inputs,
+            NDList weights,
+            float learningRate,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float rho,
+            float momentum,
+            float epsilon,
+            boolean centered);
+
     void sgdUpdate(
             NDList inputs,
             NDList weights,

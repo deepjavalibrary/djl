@@ -384,6 +384,37 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    public void rmspropUpdate(
+            NDList inputs,
+            NDList weights,
+            float learningRate,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float gamma1,
+            float gamma2,
+            float epsilon,
+            boolean centered) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("lr", learningRate);
+        params.addParam("wd", weightDecay);
+        params.addParam("rescale_grad", rescaleGrad);
+        params.addParam("clip_gradient", clipGrad);
+
+        params.addParam("gamma1", gamma1);
+        params.addParam("epsilon", epsilon);
+
+        if (!centered) {
+            getManager().invoke("rmsprop_update", inputs, weights, params);
+        } else {
+            params.addParam("gamma2", gamma2);
+
+            getManager().invoke("rmspropalex_update", inputs, weights, params);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void nagUpdate(
             NDList inputs,
             NDList weights,
