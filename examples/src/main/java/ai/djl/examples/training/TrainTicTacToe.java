@@ -64,7 +64,6 @@ public final class TrainTicTacToe {
 
         if (arguments.getLimit() != Long.MAX_VALUE) {
             gamesPerEpoch = Math.toIntExact(arguments.getLimit());
-            validationGamesPerEpoch = 0;
         }
 
         TicTacToe game = new TicTacToe(NDManager.newBaseManager(), batchSize, replayBufferSize);

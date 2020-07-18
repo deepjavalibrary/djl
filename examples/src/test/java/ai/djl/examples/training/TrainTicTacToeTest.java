@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.training;
 
+import ai.djl.engine.Engine;
 import ai.djl.training.TrainingResult;
 import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
@@ -23,6 +24,8 @@ public class TrainTicTacToeTest {
     public void testTrainTicTacToe() throws ParseException {
         if (Boolean.getBoolean("nightly")) {
             String[] args = new String[] {"-g", "1"};
+
+            Engine.getInstance().setRandomSeed(1234);
 
             TrainingResult result = TrainTicTacToe.runExample(args);
             float winRate = result.getValidateEvaluation("winRate");
