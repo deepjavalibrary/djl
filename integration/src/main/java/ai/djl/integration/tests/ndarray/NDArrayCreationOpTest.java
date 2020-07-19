@@ -185,6 +185,40 @@ public class NDArrayCreationOpTest {
     }
 
     @Test
+    public void testFull() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.full(new Shape(5), 3);
+            NDArray expected = manager.create(new int[] {3, 3, 3, 3, 3});
+            Assert.assertEquals(array, expected);
+            array = manager.full(new Shape(6), 5f);
+            expected = manager.create(new float[] {5f, 5f, 5f, 5f, 5f, 5f});
+            Assert.assertEquals(array, expected);
+
+            // test multi-dim
+            array = manager.full(new Shape(2, 3), -100);
+            expected =
+                    manager.create(new int[] {-100, -100, -100, -100, -100, -100}, new Shape(2, 3));
+            Assert.assertEquals(array, expected);
+            array = manager.full(new Shape(3, 2), 4f);
+            expected = manager.create(new float[] {4f, 4f, 4f, 4f, 4f, 4f}, new Shape(3, 2));
+            Assert.assertEquals(array, expected);
+
+            // test scalar
+            array = manager.full(new Shape(), 1f);
+            expected = manager.create(1f);
+            Assert.assertEquals(array, expected);
+            array = manager.full(new Shape(), 0);
+            expected = manager.create(0);
+            Assert.assertEquals(array, expected);
+
+            // test zero-dim
+            array = manager.ones(new Shape(0, 1));
+            expected = manager.create(new Shape(0, 1));
+            Assert.assertEquals(array, expected);
+        }
+    }
+
+    @Test
     public void testZerosLike() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new Shape(5));

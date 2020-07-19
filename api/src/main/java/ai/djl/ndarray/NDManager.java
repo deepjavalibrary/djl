@@ -695,6 +695,54 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Return a new {@code NDArray} of given shape, filled with value.
+     *
+     * @param shape shape of a new {@code NDArray}
+     * @param value fill value
+     * @return {@code NDArray} of fill value with the given shape
+     */
+    default NDArray full(Shape shape, int value) {
+        return full(shape, value, DataType.INT32);
+    }
+
+    /**
+     * Return a new {@code NDArray} of given shape, filled with value.
+     *
+     * @param shape shape of a new {@code NDArray}
+     * @param value fill value
+     * @return {@code NDArray} of fill value with the given shape
+     */
+    default NDArray full(Shape shape, float value) {
+        return full(shape, value, DataType.FLOAT32);
+    }
+
+    /**
+     * Return a new {@code NDArray} of given shape, filled with value.
+     *
+     * @param shape shape of a new {@code NDArray}
+     * @param value fill value
+     * @param dataType the desired data-type for the {@link NDArray}
+     * @return {@code NDArray} of fill value with the given shape
+     */
+    NDArray full(Shape shape, float value, DataType dataType);
+
+    /**
+     * Return a new {@code NDArray} of given shape, device, filled with value.
+     *
+     * @param shape shape of a new {@code NDArray}
+     * @param value fill value
+     * @param dataType the desired data-type for the {@link NDArray}
+     * @param device the {@link Device} of the {@link NDArray}
+     * @return {@code NDArray} of fill value with the given shape
+     */
+    default NDArray full(Shape shape, float value, DataType dataType, Device device) {
+        if (device == null || device.equals(getDevice())) {
+            return full(shape, value, dataType);
+        }
+        return newSubManager(device).full(shape, value, dataType);
+    }
+
+    /**
      * Returns evenly spaced values starting from 0.
      *
      * <p>Values are generated within the half-open interval [start, stop) (in other words, the

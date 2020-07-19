@@ -141,6 +141,12 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray full(Shape shape, float value, DataType dataType) {
+        return JniUtils.full(this, shape, value, dataType, device, SparseFormat.DENSE);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray arange(int start, int stop, int step, DataType dataType) {
         return arange((float) start, (float) stop, (float) step, dataType, device);
     }

@@ -104,6 +104,12 @@ public class OrtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray full(Shape shape, float value, DataType dataType) {
+        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray arange(float start, float stop, float step, DataType dataType) {
         throw new UnsupportedOperationException("Not supported for ONNX Runtime");
     }

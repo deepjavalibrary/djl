@@ -75,6 +75,12 @@ public final class FtNDManagerPlaceholder implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray full(Shape shape, float value, DataType dataType) {
+        throw new UnsupportedOperationException("Not support by FtEngine");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray arange(float start, float stop, float step, DataType dataType) {
         throw new UnsupportedOperationException("Not support by FtEngine");
     }

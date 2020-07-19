@@ -104,7 +104,6 @@ public final class JniUtils {
     public static PtNDArray createEmptyNdArray(
             PtNDManager manager, Shape shape, DataType dType, Device device, SparseFormat fmt) {
         int layoutVal = layoutMapper(fmt);
-        // TODO: set default type of require gradient
         return manager.create(
                 PyTorchLibrary.LIB.torchEmpty(
                         shape.getShape(),
@@ -120,7 +119,6 @@ public final class JniUtils {
     public static PtNDArray createZerosNdArray(
             PtNDManager manager, Shape shape, DataType dType, Device device, SparseFormat fmt) {
         int layoutVal = layoutMapper(fmt);
-        // TODO: set default type of require gradient
         return manager.create(
                 PyTorchLibrary.LIB.torchZeros(
                         shape.getShape(),
@@ -136,7 +134,6 @@ public final class JniUtils {
     public static PtNDArray createOnesNdArray(
             PtNDManager manager, Shape shape, DataType dType, Device device, SparseFormat fmt) {
         int layoutVal = layoutMapper(fmt);
-        // TODO: set default type of require gradient
         return manager.create(
                 PyTorchLibrary.LIB.torchOnes(
                         shape.getShape(),
@@ -149,10 +146,30 @@ public final class JniUtils {
                         false));
     }
 
+    public static PtNDArray full(
+            PtNDManager manager,
+            Shape shape,
+            double fillValue,
+            DataType dType,
+            Device device,
+            SparseFormat fmt) {
+        int layoutVal = layoutMapper(fmt);
+        return manager.create(
+                PyTorchLibrary.LIB.torchFull(
+                        shape.getShape(),
+                        fillValue,
+                        dType.ordinal(),
+                        layoutVal,
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
+                        false));
+    }
+
     public static PtNDArray zerosLike(
             PtNDArray array, DataType dType, Device device, SparseFormat fmt) {
         int layoutVal = layoutMapper(fmt);
-        // TODO: set default type of require gradient
         return array.getManager()
                 .create(
                         PyTorchLibrary.LIB.torchZerosLike(
@@ -169,7 +186,6 @@ public final class JniUtils {
     public static PtNDArray onesLike(
             PtNDArray array, DataType dType, Device device, SparseFormat fmt) {
         int layoutVal = layoutMapper(fmt);
-        // TODO: set default type of require gradient
         return array.getManager()
                 .create(
                         PyTorchLibrary.LIB.torchOnesLike(

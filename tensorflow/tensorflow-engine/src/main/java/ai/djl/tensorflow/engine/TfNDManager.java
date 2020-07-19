@@ -249,6 +249,12 @@ public class TfNDManager extends BaseNDManager {
         return fill(shape, 1, dataType);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public NDArray full(Shape shape, float value, DataType dataType) {
+        return fill(shape, value, dataType);
+    }
+
     public NDArray fill(Shape shape, Number value, DataType dataType) {
         switch (dataType) {
             case INT32:

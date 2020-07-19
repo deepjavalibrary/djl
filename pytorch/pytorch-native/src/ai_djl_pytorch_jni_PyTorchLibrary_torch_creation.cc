@@ -82,6 +82,19 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchOnes(JNIEn
   API_END();
 }
 
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFull(JNIEnv* env, jobject jthis,
+                                                                           jlongArray jshape, jdouble jfill_value, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
+  API_BEGIN();
+    const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
+    const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
+    const torch::Tensor* tensor_ptr =
+      new torch::Tensor((jlayout == 2)
+                        ? torch::full(shape_vec, jfill_value, options).to_mkldnn()
+                        : torch::full(shape_vec, jfill_value, options));
+    return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
+  API_END();
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchZerosLike(JNIEnv* env, jobject jthis,
     jobject jhandle, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
   API_BEGIN();

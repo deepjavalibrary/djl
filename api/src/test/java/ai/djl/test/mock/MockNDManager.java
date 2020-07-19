@@ -70,6 +70,12 @@ public class MockNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray full(Shape shape, float value, DataType dataType) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray arange(float start, float stop, float step, DataType dataType) {
         return null;
     }

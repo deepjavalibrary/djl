@@ -57,6 +57,14 @@ final class PyTorchLibrary {
     native Pointer torchOnes(
             long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 
+    native Pointer torchFull(
+            long[] shape,
+            double fillValue,
+            int dType,
+            int layout,
+            int[] device,
+            boolean requiredGrad);
+
     native Pointer torchZerosLike(
             Pointer handle, int dType, int layout, int[] device, boolean requiredGrad);
 
