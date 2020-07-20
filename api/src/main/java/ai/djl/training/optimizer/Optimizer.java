@@ -84,6 +84,16 @@ public abstract class Optimizer {
     }
 
     /**
+     * Returns a new instance of {@link ai.djl.training.optimizer.Adagrad.Builder} that can build an
+     * {@link Adagrad} optimizer.
+     *
+     * @return the {@link Adagrad} {@link ai.djl.training.optimizer.Adagrad.Builder}
+     */
+    public static Adagrad.Builder adagrad() {
+        return new Adagrad.Builder();
+    }
+
+    /**
      * Gets the value of weight decay.
      *
      * @return the value of weight decay

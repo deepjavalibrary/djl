@@ -203,6 +203,15 @@ public interface NDArrayEx {
     // Optimizer
     ////////////////////////////////////////
 
+    void adagradUpdate(
+            NDList inputs,
+            NDList weights,
+            float learningRate,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float epsilon);
+
     void adamUpdate(
             NDList inputs,
             NDList weights,

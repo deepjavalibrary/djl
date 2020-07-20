@@ -211,6 +211,17 @@ public class MockNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    public void adagradUpdate(
+            NDList inputs,
+            NDList weights,
+            float learningRate,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float epsilon) {}
+
+    /** {@inheritDoc} */
+    @Override
     public void adamUpdate(
             NDList inputs,
             NDList weights,

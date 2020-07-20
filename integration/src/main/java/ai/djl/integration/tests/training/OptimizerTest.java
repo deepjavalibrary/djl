@@ -176,6 +176,38 @@ public class OptimizerTest {
     }
 
     @Test
+    public void testAdagrad() {
+        Optimizer optim =
+                Optimizer.adagrad()
+                        .optLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
+                        .build();
+
+        Device[] devices = Device.getDevices(1);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES)
+                        .optOptimizer(optim)
+                        .optDevices(devices);
+        Block block = Linear.builder().setUnits(CHANNELS).build();
+        try (Model model = Model.newInstance("model", devices[0])) {
+            model.setBlock(block);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                int batchSize = config.getDevices().length * BATCH_SIZE;
+                trainer.initialize(new Shape(batchSize, CHANNELS));
+
+                NDManager manager = trainer.getManager();
+                NDArray result = runOptimizer(manager, trainer, block, batchSize);
+                NDArray result2 = runOptimizer(manager, trainer, block, batchSize);
+
+                Assertions.assertAlmostEquals(result, manager.create(new float[] {0.9f, -0.1f}));
+                Assertions.assertAlmostEquals(
+                        result2, manager.create(new float[] {0.834f, -0.1656f}));
+            }
+        }
+    }
+
+    @Test
     public void testRMSProp() {
         Optimizer optim =
                 Optimizer.rmsprop()

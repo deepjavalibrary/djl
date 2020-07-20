@@ -357,6 +357,27 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    public void adagradUpdate(
+            NDList inputs,
+            NDList weights,
+            float learningRate,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float epsilon) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("lr", learningRate);
+        params.addParam("wd", weightDecay);
+        params.addParam("rescale_grad", rescaleGrad);
+        params.addParam("clip_gradient", clipGrad);
+
+        params.addParam("epsilon", epsilon);
+
+        getManager().invoke("adagrad_update", inputs, weights, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void adamUpdate(
             NDList inputs,
             NDList weights,
