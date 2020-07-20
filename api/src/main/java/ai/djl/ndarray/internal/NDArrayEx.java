@@ -203,6 +203,44 @@ public interface NDArrayEx {
     // Optimizer
     ////////////////////////////////////////
 
+    default void adadeltaUpdate(
+            NDList inputs,
+            NDList weights,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float rho,
+            float epsilon) {
+        NDArray weight = inputs.get(0);
+        NDArray grad = inputs.get(1);
+        NDArray s = inputs.get(2);
+        NDArray delta = inputs.get(3);
+
+        NDManager manager = weight.getManager();
+        try (NDManager subManager = manager.newSubManager()) {
+            inputs.attach(subManager);
+            weights.attach(subManager);
+
+            // Preprocess Gradient
+            grad.muli(rescaleGrad);
+            if (clipGrad > 0) {
+                grad = grad.clip(-clipGrad, clipGrad);
+            }
+            grad.addi(weight.mul(weightDecay));
+
+            // Update s, g, and delta
+            s.muli(rho).addi(grad.square().mul(1 - rho));
+            NDArray g = delta.add(epsilon).sqrt().div(s.add(epsilon).sqrt()).mul(grad);
+            delta.muli(rho).addi(g.square().mul(1 - rho));
+
+            // Update weight
+            weight.subi(g);
+
+            inputs.attach(manager);
+            weights.attach(manager);
+        }
+    }
+
     void adagradUpdate(
             NDList inputs,
             NDList weights,
@@ -382,10 +420,12 @@ public interface NDArrayEx {
     }
 
     default NDArray toTensor() {
-        try (NDManager subManager = getArray().getManager().newSubManager()) {
+        NDManager manager = getArray().getManager();
+        try (NDManager subManager = manager.newSubManager()) {
             NDArray array = getArray();
+            array.attach(subManager);
+
             NDArray result = array;
-            result.attach(subManager);
             int dim = result.getShape().dimension();
             if (dim == 3) {
                 result = result.expandDims(0);
@@ -398,8 +438,8 @@ public interface NDArrayEx {
             if (!result.getDataType().equals(DataType.FLOAT32)) {
                 result = result.toType(DataType.FLOAT32, false);
             }
-            array.attach(subManager.getParentManager());
-            result.attach(subManager.getParentManager());
+            array.attach(manager);
+            result.attach(manager);
             return result;
         }
     }

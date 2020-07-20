@@ -266,6 +266,35 @@ public class OptimizerTest {
         }
     }
 
+    @Test
+    public void testAdadelta() {
+        Optimizer optim = Optimizer.adadelta().build();
+
+        Device[] devices = Device.getDevices(1);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES)
+                        .optOptimizer(optim)
+                        .optDevices(devices);
+
+        Block block = Linear.builder().setUnits(CHANNELS).build();
+        try (Model model = Model.newInstance("model", devices[0])) {
+            model.setBlock(block);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                int batchSize = config.getDevices().length * BATCH_SIZE;
+                trainer.initialize(new Shape(batchSize, CHANNELS));
+
+                NDManager manager = trainer.getManager();
+                NDArray result = runOptimizer(manager, trainer, block, batchSize);
+                NDArray result2 = runOptimizer(manager, trainer, block, batchSize);
+
+                Assertions.assertAlmostEquals(result, manager.create(new float[] {0.999f, 0f}));
+                Assertions.assertAlmostEquals(result2, manager.create(new float[] {0.999f, 0f}));
+            }
+        }
+    }
+
     private NDArray runOptimizer(NDManager manager, Trainer trainer, Block block, int batchSize) {
         NDArray data = manager.ones(new Shape(batchSize, CHANNELS)).mul(2);
         NDArray label = data.mul(2);

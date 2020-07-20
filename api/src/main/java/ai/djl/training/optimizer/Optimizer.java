@@ -94,6 +94,16 @@ public abstract class Optimizer {
     }
 
     /**
+     * Returns a new instance of {@link ai.djl.training.optimizer.Adadelta.Builder} that can build
+     * an {@link Adadelta} optimizer.
+     *
+     * @return the {@link Adadelta} {@link ai.djl.training.optimizer.Adadelta.Builder}
+     */
+    public static Adadelta.Builder adadelta() {
+        return new Adadelta.Builder();
+    }
+
+    /**
      * Gets the value of weight decay.
      *
      * @return the value of weight decay
