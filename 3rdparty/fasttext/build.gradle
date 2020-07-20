@@ -1,0 +1,18 @@
+group "ai.djl.fasttext"
+
+repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+}
+
+dependencies {
+    api "com.github.vinhkhuc:jfasttext:0.4"
+    api project(":api")
+    api project(":basicdataset")
+
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
+}
