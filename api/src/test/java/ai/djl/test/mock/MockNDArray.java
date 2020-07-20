@@ -515,6 +515,18 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sign() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray signi() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray neg() {
         return null;
     }

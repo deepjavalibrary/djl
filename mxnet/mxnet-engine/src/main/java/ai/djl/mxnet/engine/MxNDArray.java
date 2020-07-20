@@ -741,6 +741,19 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sign() {
+        return manager.invoke("_npi_sign", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray signi() {
+        manager.invoke("_npi_sign", new NDArray[] {this}, new NDArray[] {this}, null);
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray abs() {
         return manager.invoke("_npi_absolute", this, null);
     }

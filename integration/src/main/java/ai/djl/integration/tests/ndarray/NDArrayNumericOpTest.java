@@ -676,4 +676,38 @@ public class NDArrayNumericOpTest {
             Assert.assertEquals(array.atanh(), array);
         }
     }
+
+    @Test
+    public void testSign() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            double[] data = {-3, 5, -7};
+            NDArray array = manager.create(data);
+            data = new double[] {-1, 1, -1};
+            NDArray expected = manager.create(data);
+            Assert.assertEquals(array.sign(), expected);
+            Assert.assertNotEquals(array, expected);
+
+            array = manager.create(new double[] {0, -7, -8, 2, -9});
+            expected = manager.create(new double[] {0, -1, -1, 1, -1});
+            Assert.assertEquals(array.signi(), expected);
+            Assert.assertEquals(array, expected);
+
+            // test multi-dim
+            array = manager.create(new float[] {1f, -1f, 0f, 7f}, new Shape(2, 2));
+            expected = manager.create(new float[] {1f, -1f, 0f, 1f}, new Shape(2, 2));
+            Assertions.assertAlmostEquals(array.sign(), expected);
+
+            // test scalar
+            array = manager.create(0.5f);
+            expected = manager.create(1f);
+            Assertions.assertAlmostEquals(array.sign(), expected);
+
+            array = manager.create(0f);
+            Assertions.assertAlmostEquals(array.sign(), array);
+
+            // test zero-dim
+            array = manager.create(new Shape(0, 0));
+            Assert.assertEquals(array.sign(), array);
+        }
+    }
 }

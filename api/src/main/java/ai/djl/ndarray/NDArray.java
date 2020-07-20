@@ -1659,6 +1659,20 @@ public interface NDArray extends AutoCloseable {
     NDArray powi(NDArray other);
 
     /**
+     * Returns the element-wise sign.
+     *
+     * @return the result {@code NDArray}
+     */
+    NDArray sign();
+
+    /**
+     * Returns the element-wise sign in-place.
+     *
+     * @return the result {@code NDArray}
+     */
+    NDArray signi();
+
+    /**
      * Returns the maximum of this {@code NDArray} and a number element-wise.
      *
      * <p>Examples

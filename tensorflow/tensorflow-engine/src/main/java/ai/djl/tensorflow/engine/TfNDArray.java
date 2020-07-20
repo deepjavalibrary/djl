@@ -746,6 +746,18 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sign() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray signi() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray neg() {
         try (Tensor<?> tensor = tf.math.neg(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);

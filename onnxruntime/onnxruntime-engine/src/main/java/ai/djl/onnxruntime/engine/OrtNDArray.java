@@ -467,6 +467,18 @@ public class OrtNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sign() {
+        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray signi() {
+        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray maximum(Number n) {
         throw new UnsupportedOperationException("Not supported for ONNX Runtime");
     }
