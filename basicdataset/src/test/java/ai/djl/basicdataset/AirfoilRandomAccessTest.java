@@ -22,6 +22,7 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.apache.commons.csv.CSVRecord;
 import org.testng.Assert;
@@ -41,8 +42,8 @@ import org.testng.annotations.Test;
  */
 public class AirfoilRandomAccessTest {
 
-    @Test(enabled = true)
-    public void testAirfoilRemote() throws IOException {
+    @Test
+    public void testAirfoilRemote() throws IOException, TranslateException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES);
@@ -98,7 +99,7 @@ public class AirfoilRandomAccessTest {
     }
 
     @Test
-    public void testAirfoilRemotePreprocessing() throws IOException {
+    public void testAirfoilRemotePreprocessing() throws IOException, TranslateException {
         int batchSize = 10;
         int n = 1500;
 
