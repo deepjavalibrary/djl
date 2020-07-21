@@ -18,11 +18,14 @@ import ai.djl.engine.EngineProvider;
 /** {@code PtEngineProvider} is the PyTorch implementation of {@link EngineProvider}. */
 public class PtEngineProvider implements EngineProvider {
 
-    private static final Engine ENGINE = PtEngine.newInstance();
+    private static Engine engine;
 
     /** {@inheritDoc} */
     @Override
-    public Engine getEngine() {
-        return ENGINE;
+    public synchronized Engine getEngine() {
+        if (engine == null) {
+            engine = PtEngine.newInstance();
+        }
+        return engine;
     }
 }

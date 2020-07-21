@@ -1,7 +1,7 @@
 {
   "resources": [
     {
-      "pattern": "ai.djl.repository.zoo.ZooProvider"
+      "pattern": "META-INF/services/ai.djl.repository.zoo.ZooProvider"
     }
   ]
 }

@@ -17,11 +17,14 @@ import ai.djl.engine.EngineProvider;
 
 public class TfEngineProvider implements EngineProvider {
 
-    private static final Engine ENGINE = TfEngine.newInstance();
+    private static Engine engine;
 
     /** {@inheritDoc} */
     @Override
-    public Engine getEngine() {
-        return ENGINE;
+    public synchronized Engine getEngine() {
+        if (engine == null) {
+            engine = TfEngine.newInstance();
+        }
+        return engine;
     }
 }

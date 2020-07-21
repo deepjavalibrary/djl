@@ -18,11 +18,14 @@ import ai.djl.engine.EngineProvider;
 /** {@code MxEngineProvider} is the MXNet implementation of {@link EngineProvider}. */
 public class MxEngineProvider implements EngineProvider {
 
-    private static final Engine ENGINE = MxEngine.newInstance();
+    private static Engine engine;
 
     /** {@inheritDoc} */
     @Override
-    public Engine getEngine() {
-        return ENGINE;
+    public synchronized Engine getEngine() {
+        if (engine == null) {
+            engine = MxEngine.newInstance();
+        }
+        return engine;
     }
 }
