@@ -1,0 +1,164 @@
+/*
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ * with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+package ai.djl.integration.tests.model_zoo.classification;
+
+import ai.djl.Device;
+import ai.djl.Model;
+import ai.djl.basicmodelzoo.cv.classification.VGG;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Block;
+import ai.djl.nn.Parameter;
+import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
+import ai.djl.training.ParameterStore;
+import ai.djl.training.Trainer;
+import ai.djl.training.TrainingConfig;
+import ai.djl.training.dataset.Batch;
+import ai.djl.training.initializer.Initializer;
+import ai.djl.training.loss.Loss;
+import ai.djl.translate.Batchifier;
+import ai.djl.util.PairList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.testng.Assert;
+import org.testng.SkipException;
+import org.testng.annotations.Test;
+
+public class VGGTest {
+
+    @Test
+    public void testTrainWithDefaultChannels() {
+
+        if (!Boolean.getBoolean("nightly")) {
+            throw new SkipException("Nightly only");
+        }
+
+        if (Device.getGpuCount() > 0) {
+
+            TrainingConfig config =
+                    new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                            .optInitializer(Initializer.ONES);
+
+            Block vgg = VGG.builder().build();
+            try (Model model = Model.newInstance("vgg")) {
+                model.setBlock(vgg);
+                try (Trainer trainer = model.newTrainer(config)) {
+                    int batchSize = 256;
+                    Shape inputShape = new Shape(batchSize, 1, 224, 224);
+                    NDManager manager = trainer.getManager();
+                    trainer.initialize(inputShape);
+
+                    NDArray input = manager.ones(inputShape);
+                    NDArray label = manager.ones(new Shape(batchSize, 1));
+                    Batch batch =
+                            new Batch(
+                                    manager,
+                                    new NDList(input),
+                                    new NDList(label),
+                                    batchSize,
+                                    Batchifier.STACK,
+                                    Batchifier.STACK);
+                    PairList<String, Parameter> parameters = vgg.getParameters();
+                    EasyTrain.trainBatch(trainer, batch);
+                    trainer.step();
+
+                    Assert.assertEquals(
+                            parameters.get(0).getValue().getArray().getShape(),
+                            new Shape(64, 1, 3, 3));
+                    Assert.assertEquals(
+                            parameters.get(2).getValue().getArray().getShape(),
+                            new Shape(128, 64, 3, 3));
+                    Assert.assertEquals(
+                            parameters.get(4).getValue().getArray().getShape(),
+                            new Shape(256, 128, 3, 3));
+                    Assert.assertEquals(
+                            parameters.get(8).getValue().getArray().getShape(),
+                            new Shape(512, 256, 3, 3));
+                    Assert.assertEquals(
+                            parameters.get(12).getValue().getArray().getShape(),
+                            new Shape(512, 512, 3, 3));
+                    Assert.assertEquals(
+                            parameters.get(16).getValue().getArray().getShape(),
+                            new Shape(4096, 25088));
+                    Assert.assertEquals(
+                            parameters.get(18).getValue().getArray().getShape(),
+                            new Shape(4096, 4096));
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testOutputShapes() {
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optInitializer(Initializer.ONES);
+        Block vgg = VGG.builder().build();
+
+        Model model = Model.newInstance("vgg");
+        model.setBlock(vgg);
+
+        Trainer trainer = model.newTrainer(config);
+
+        NDArray x = trainer.getManager().ones(new Shape(256, 1, 224, 224));
+
+        trainer.initialize(x.getShape());
+
+        Shape currentShape = x.getShape();
+
+        Map<String, Shape> shapeMap = new ConcurrentHashMap<>();
+        for (int i = 0; i < vgg.getChildren().size(); i++) {
+
+            Shape[] newShape =
+                    vgg.getChildren()
+                            .get(i)
+                            .getValue()
+                            .getOutputShapes(trainer.getManager(), new Shape[] {currentShape});
+            currentShape = newShape[0];
+            shapeMap.put(vgg.getChildren().get(i).getKey(), currentShape);
+        }
+
+        Assert.assertEquals(shapeMap.get("01SequentialBlock"), new Shape(256, 64, 112, 112));
+        Assert.assertEquals(shapeMap.get("02SequentialBlock"), new Shape(256, 128, 56, 56));
+        Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(256, 256, 28, 28));
+        Assert.assertEquals(shapeMap.get("04SequentialBlock"), new Shape(256, 512, 14, 14));
+        Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(256, 512, 7, 7));
+        Assert.assertEquals(shapeMap.get("07Linear"), new Shape(256, 4096));
+    }
+
+    @Test
+    public void testForwardMethod() {
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optInitializer(Initializer.ONES);
+        Block vgg = VGG.builder().build();
+
+        Model model = Model.newInstance("vgg");
+        model.setBlock(vgg);
+
+        Trainer trainer = model.newTrainer(config);
+
+        NDArray x = trainer.getManager().ones(new Shape(256, 1, 224, 224));
+
+        trainer.initialize(x.getShape());
+
+        NDArray xHat =
+                vgg.forward(new ParameterStore(trainer.getManager(), true), new NDList(x), false)
+                        .singletonOrThrow();
+
+        Assert.assertEquals(xHat.getShape(), new Shape(256, 10));
+    }
+}
