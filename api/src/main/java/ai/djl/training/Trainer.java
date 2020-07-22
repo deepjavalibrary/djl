@@ -66,6 +66,7 @@ public class Trainer implements AutoCloseable {
     private ParameterStore parameterStore;
     private List<Evaluator> evaluators;
     private Loss loss;
+    private DataManager dataManager;
 
     private boolean gradientsChecked;
 
@@ -81,6 +82,7 @@ public class Trainer implements AutoCloseable {
         manager = model.getNDManager().newSubManager();
         devices = trainingConfig.getDevices();
         loss = trainingConfig.getLossFunction();
+        dataManager = trainingConfig.getDataManager();
         if (loss == null) {
             throw new IllegalArgumentException("You must specify a loss for the trainer");
         }
@@ -172,7 +174,7 @@ public class Trainer implements AutoCloseable {
      * @return the output of the predict function
      */
     public NDList evaluate(NDList input) {
-        return model.getBlock().forward(parameterStore, input, false);
+        return model.getBlock().forward(parameterStore, input, false, null);
     }
 
     /** Updates all of the parameters of the model once. */
@@ -229,6 +231,15 @@ public class Trainer implements AutoCloseable {
      */
     public Model getModel() {
         return model;
+    }
+
+    /**
+     * Returns the {@link DataManager}.
+     *
+     * @return the {@link DataManager}
+     */
+    public DataManager getDataManager() {
+        return dataManager;
     }
 
     /**

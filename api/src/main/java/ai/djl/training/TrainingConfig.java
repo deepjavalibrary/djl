@@ -63,6 +63,13 @@ public interface TrainingConfig {
     Loss getLossFunction();
 
     /**
+     * Gets the {@link DataManager} that computes data and labels from the output of dataset.
+     *
+     * @return a {@link DataManager}
+     */
+    DataManager getDataManager();
+
+    /**
      * Returns the list of {@link Evaluator}s that should be computed during training.
      *
      * @return a list of {@link Evaluator}s

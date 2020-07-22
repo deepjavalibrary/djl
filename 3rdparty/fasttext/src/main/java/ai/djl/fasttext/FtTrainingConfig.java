@@ -13,6 +13,7 @@
 package ai.djl.fasttext;
 
 import ai.djl.Device;
+import ai.djl.training.DataManager;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.initializer.Initializer;
@@ -260,6 +261,16 @@ public class FtTrainingConfig implements TrainingConfig {
     /** {@inheritDoc} */
     @Override
     public Loss getLossFunction() {
+        return null;
+    }
+
+    /**
+     * Gets the {@link DataManager} that computes data and labels from the output of dataset.
+     *
+     * @return a {@link DataManager}
+     */
+    @Override
+    public DataManager getDataManager() {
         return null;
     }
 

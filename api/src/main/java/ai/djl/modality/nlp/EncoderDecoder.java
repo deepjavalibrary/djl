@@ -61,27 +61,13 @@ public class EncoderDecoder extends AbstractBlock {
         return new PairList<>(inputNames, Arrays.asList(inputShapes));
     }
 
-    /**
-     * Applies the forward function (prediction only) of the encoder and the decoder.
-     *
-     * @param parameterStore the parameter store
-     * @param inputs the input NDList
-     * @param training must be false
-     * @return the output of the forward pass
-     */
+    /** {@inheritDoc} */
     @Override
     public NDList forward(ParameterStore parameterStore, NDList inputs, boolean training) {
         return forward(parameterStore, inputs, training, null);
     }
 
-    /**
-     * Applies the forward function (prediction only) of the encoder and the decoder.
-     *
-     * @param parameterStore the parameter store
-     * @param inputs the input NDList
-     * @param training must be false
-     * @return the output of the forward pass
-     */
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore,
@@ -102,12 +88,9 @@ public class EncoderDecoder extends AbstractBlock {
             NDList data,
             NDList labels,
             PairList<String, Object> params) {
-        NDList encoderInput = new NDList(data.head());
-        NDList decoderInput = new NDList(labels.head().get(":, :-1"), labels.get(1));
-
-        NDList encoderOutputs = encoder.forward(parameterStore, encoderInput, true, params);
+        NDList encoderOutputs = encoder.forward(parameterStore, data, true, params);
         decoder.initState(encoder.getStates(encoderOutputs));
-        return decoder.forward(parameterStore, decoderInput, true, params);
+        return decoder.forward(parameterStore, labels, true, params);
     }
 
     /**
