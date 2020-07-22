@@ -15,28 +15,34 @@ package ai.djl.modality.rl.agent;
 import ai.djl.modality.rl.env.RlEnv;
 import ai.djl.modality.rl.env.RlEnv.Step;
 import ai.djl.ndarray.NDList;
+import ai.djl.training.tracker.Tracker;
 import ai.djl.util.RandomUtils;
 
 /**
- * The exploration/excitation agent helps other agents explore their environments during training.
+ * The {@link EpsilonGreedy} is a simple exploration/excitation agent.
+ *
+ * <p>It helps other agents explore their environments during training by sometimes picking random
+ * actions.
  *
  * <p>If a model based agent is used, it will only explore paths through the environment that have
  * already been seen. While this is sometimes good, it is also important to sometimes explore new
  * paths as well. This agent exhibits a tradeoff that takes random paths a fixed percentage of the
  * time during training.
  */
-public class ExplorationExploitation implements RlAgent {
+public class EpsilonGreedy implements RlAgent {
 
     private RlAgent baseAgent;
-    private float exploreRate;
+    private Tracker exploreRate;
+
+    private int counter;
 
     /**
-     * Constructs an {@link ExplorationExploitation}.
+     * Constructs an {@link EpsilonGreedy}.
      *
      * @param baseAgent the (presumably model-based) agent to use for exploitation and to train
      * @param exploreRate the probability of taking a random action
      */
-    public ExplorationExploitation(RlAgent baseAgent, float exploreRate) {
+    public EpsilonGreedy(RlAgent baseAgent, Tracker exploreRate) {
         this.baseAgent = baseAgent;
         this.exploreRate = exploreRate;
     }
@@ -44,7 +50,7 @@ public class ExplorationExploitation implements RlAgent {
     /** {@inheritDoc} */
     @Override
     public NDList chooseAction(RlEnv env, boolean training) {
-        if (training && RandomUtils.random() < exploreRate) {
+        if (training && RandomUtils.random() < exploreRate.getNewValue(counter++)) {
             return env.getActionSpace().randomAction();
         }
         return baseAgent.chooseAction(env, training);

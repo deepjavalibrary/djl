@@ -43,7 +43,7 @@ import java.util.stream.Stream;
 public class QAgent implements RlAgent {
 
     private Trainer trainer;
-    private float rewardDecay;
+    private float rewardDiscount;
     private Batchifier batchifier;
 
     /**
@@ -52,22 +52,22 @@ public class QAgent implements RlAgent {
      * <p>It uses the {@link ai.djl.translate.StackBatchifier} as the default batchifier.
      *
      * @param trainer the trainer for the model to learn
-     * @param rewardDecay the reward decay to train with
+     * @param rewardDiscount the reward discount to apply to rewards from future states
      */
-    public QAgent(Trainer trainer, float rewardDecay) {
-        this(trainer, rewardDecay, Batchifier.STACK);
+    public QAgent(Trainer trainer, float rewardDiscount) {
+        this(trainer, rewardDiscount, Batchifier.STACK);
     }
 
     /**
      * Constructs a {@link QAgent} with a custom {@link Batchifier}.
      *
      * @param trainer the trainer for the model to learn
-     * @param rewardDecay the reward decay to train with
+     * @param rewardDiscount the reward discount to apply to rewards from future states
      * @param batchifier the batchifier to join inputs with
      */
-    public QAgent(Trainer trainer, float rewardDecay, Batchifier batchifier) {
+    public QAgent(Trainer trainer, float rewardDiscount, Batchifier batchifier) {
         this.trainer = trainer;
-        this.rewardDecay = rewardDecay;
+        this.rewardDiscount = rewardDiscount;
         this.batchifier = batchifier;
     }
 
@@ -109,7 +109,7 @@ public class QAgent implements RlAgent {
                 } else {
                     bestAction = results.getManager().create(0f);
                 }
-                NDList postQ = new NDList(bestAction.mul(rewardDecay).add(step.getReward()));
+                NDList postQ = new NDList(bestAction.mul(rewardDiscount).add(step.getReward()));
                 NDArray lossValue = trainer.getLoss().evaluate(preQ, postQ);
                 collector.backward(lossValue);
                 batchData.getLabels().put(postQ.get(0).getDevice(), postQ);

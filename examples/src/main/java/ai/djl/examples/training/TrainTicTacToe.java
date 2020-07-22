@@ -15,7 +15,7 @@ package ai.djl.examples.training;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.basic.Mlp;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.modality.rl.agent.ExplorationExploitation;
+import ai.djl.modality.rl.agent.EpsilonGreedy;
 import ai.djl.modality.rl.agent.QAgent;
 import ai.djl.modality.rl.agent.RlAgent;
 import ai.djl.modality.rl.env.RlEnv.Step;
@@ -32,6 +32,8 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
+import ai.djl.training.tracker.LinearTracker;
+import ai.djl.training.tracker.Tracker;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +62,7 @@ public final class TrainTicTacToe {
         int replayBufferSize = 1024;
         int gamesPerEpoch = 128;
         int validationGamesPerEpoch = 32;
-        float rewardDecay = 0.9f;
+        float rewardDiscount = 0.9f;
 
         if (arguments.getLimit() != Long.MAX_VALUE) {
             gamesPerEpoch = Math.toIntExact(arguments.getLimit());
@@ -81,8 +83,15 @@ public final class TrainTicTacToe {
                 trainer.notifyListeners(listener -> listener.onTrainingBegin(trainer));
 
                 // Constructs the agent to train and play with
-                RlAgent agent = new QAgent(trainer, rewardDecay);
-                agent = new ExplorationExploitation(agent, 0.5f);
+                RlAgent agent = new QAgent(trainer, rewardDiscount);
+                Tracker exploreRate =
+                        new LinearTracker.Builder()
+                                .optBaseValue(1f)
+                                .optSlope(-.9f / (epoch * gamesPerEpoch * 7))
+                                .optStopValue(.1f)
+                                .setStep(1)
+                                .build();
+                agent = new EpsilonGreedy(agent, exploreRate);
 
                 float validationWinRate = 0;
                 for (int i = 0; i < epoch; i++) {
