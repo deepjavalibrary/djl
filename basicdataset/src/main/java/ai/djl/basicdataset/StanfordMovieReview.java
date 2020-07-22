@@ -19,9 +19,9 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
-import ai.djl.repository.Repository;
-import ai.djl.repository.dataset.ZooDataset;
+import ai.djl.repository.Resource;
 import ai.djl.training.dataset.Record;
+import ai.djl.util.Progress;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -39,14 +39,10 @@ import java.util.List;
  * <p>The data is sourced from reviews located on IMDB (see <a
  * href="https://ai.stanford.edu/~amaas/data/sentiment/">here</a> for details).
  */
-public class StanfordMovieReview extends TextDataset implements ZooDataset {
+public class StanfordMovieReview extends TextDataset {
+
     private static final String VERSION = "1.0";
     private static final String ARTIFACT_ID = "stanford-movie-review";
-
-    private Repository repository;
-    private Artifact artifact;
-    private Usage usage;
-    private boolean prepared;
 
     private List<Boolean> reviewSentiments;
     private List<Integer> reviewImdbScore;
@@ -59,9 +55,9 @@ public class StanfordMovieReview extends TextDataset implements ZooDataset {
      */
     protected StanfordMovieReview(Builder builder) {
         super(builder);
-        this.repository = builder.repository;
-        this.artifact = builder.artifact;
         this.usage = builder.usage;
+        MRL mrl = MRL.dataset(NLP.SENTIMENT_ANALYSIS, builder.groupId, builder.artifactId);
+        resource = new Resource(builder.repository, mrl, VERSION);
     }
 
     /**
@@ -75,50 +71,13 @@ public class StanfordMovieReview extends TextDataset implements ZooDataset {
 
     /** {@inheritDoc} */
     @Override
-    public MRL getMrl() {
-        return MRL.dataset(NLP.SENTIMENT_ANALYSIS, BasicDatasets.GROUP_ID, ARTIFACT_ID);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Repository getRepository() {
-        return repository;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Artifact getArtifact() {
-        return artifact;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Usage getUsage() {
-        return usage;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isPrepared() {
-        return prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setPrepared(boolean prepared) {
-        this.prepared = prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void useDefaultArtifact() throws IOException {
-        artifact = repository.resolve(getMrl(), VERSION, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void prepareData(Usage usage) throws IOException, EmbeddingException {
-        Path cacheDir = repository.getCacheDirectory();
+    public void prepare(Progress progress) throws IOException, EmbeddingException {
+        if (prepared) {
+            return;
+        }
+        Artifact artifact = resource.getDefaultArtifact();
+        resource.prepare(artifact, progress);
+        Path cacheDir = resource.getRepository().getCacheDirectory();
         URI resourceUri = artifact.getResourceUri();
         Path root = cacheDir.resolve(resourceUri.getPath()).resolve("aclImdb").resolve("aclImdb");
 
@@ -144,6 +103,7 @@ public class StanfordMovieReview extends TextDataset implements ZooDataset {
         prepareDataSentiment(usagePath.resolve("neg"), false, reviewTexts);
 
         preprocess(reviewTexts, true);
+        prepared = true;
     }
 
     private void prepareDataSentiment(Path path, boolean sentiment, List<String> reviewTexts)
@@ -169,7 +129,7 @@ public class StanfordMovieReview extends TextDataset implements ZooDataset {
 
     /** {@inheritDoc} */
     @Override
-    public Record get(NDManager manager, long index) {
+    protected Record get(NDManager manager, long index) {
         NDList data = new NDList();
         data.add(sourceTextData.getEmbedding(manager, index));
         NDList label =
@@ -188,47 +148,9 @@ public class StanfordMovieReview extends TextDataset implements ZooDataset {
     /** A builder for a {@link StanfordMovieReview}. */
     public static class Builder extends TextDataset.Builder<Builder> {
 
-        private Repository repository;
-        private Artifact artifact;
-        private Usage usage;
-
         /** Constructs a new builder. */
         public Builder() {
-            repository = BasicDatasets.REPOSITORY;
-            usage = Usage.TRAIN;
-        }
-
-        /**
-         * Sets the optional repository.
-         *
-         * @param repository the repository
-         * @return this builder
-         */
-        public Builder setRepository(Repository repository) {
-            this.repository = repository;
-            return this;
-        }
-
-        /**
-         * Sets the optional artifact.
-         *
-         * @param artifact the artifact
-         * @return this builder
-         */
-        public Builder setArtifact(Artifact artifact) {
-            this.artifact = artifact;
-            return this;
-        }
-
-        /**
-         * Sets the optional usage.
-         *
-         * @param usage the usage
-         * @return this builder
-         */
-        public Builder setUsage(Usage usage) {
-            this.usage = usage;
-            return this;
+            artifactId = ARTIFACT_ID;
         }
 
         /** {@inheritDoc} */

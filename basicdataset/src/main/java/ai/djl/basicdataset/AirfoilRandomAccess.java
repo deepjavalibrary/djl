@@ -19,9 +19,11 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.dataset.ZooDataset;
+import ai.djl.repository.Resource;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
+import ai.djl.translate.TranslateException;
+import ai.djl.util.Progress;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -42,7 +44,7 @@ import org.apache.commons.csv.CSVRecord;
  *
  * <p>1503 instances 6 attributes
  */
-public final class AirfoilRandomAccess extends RandomAccessDataset implements ZooDataset {
+public final class AirfoilRandomAccess extends RandomAccessDataset {
 
     private static final String ARTIFACT_ID = "airfoil";
     private static final String[] FEATURE_ARRAY = {
@@ -58,15 +60,13 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
     // as common-csv only always reading(no modifying)
     private List<CSVRecord> csvRecords; // dataset
 
-    private Repository repository;
-    private Artifact artifact;
     private Usage usage;
-    private boolean prepared;
-
     private float[][] data;
     private float[] labelArray;
-
     private Map<String, Integer> stringToIndex;
+
+    private Resource resource;
+    private boolean prepared;
 
     /**
      * Creates an instance of {@code RandomAccessDataset} with the arguments in {@link
@@ -76,8 +76,10 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
      */
     private AirfoilRandomAccess(Builder builder) {
         super(builder);
-        repository = builder.repository;
-        artifact = builder.artifact;
+        MRL mrl =
+                MRL.dataset(
+                        Application.Tabular.LINEAR_REGRESSION, builder.groupId, builder.artifactId);
+        resource = new Resource(builder.repository, mrl, "1.0");
         usage = builder.usage;
 
         features = new HashSet<>();
@@ -91,8 +93,14 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
         stringToIndex.put(label, FEATURE_ARRAY.length);
     }
 
-    /** Remove mean and rescale variance to 1 for all features. */
-    public void whitenAll() {
+    /**
+     * Remove mean and rescale variance to 1 for all features.
+     *
+     * @throws IOException for various exceptions depending on the dataset
+     * @throws TranslateException if there is an error while processing input
+     */
+    public void whitenAll() throws IOException, TranslateException {
+        prepare();
         float[] meanArray = new float[FEATURE_ARRAY.length + 1];
         float[] sdArray = new float[FEATURE_ARRAY.length + 1];
 
@@ -170,8 +178,11 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
      * <p>TODO: make standalone without need for whiten() after to set data[] (speed penalty)
      *
      * @param n number of records to be used starting from the beginning
+     * @throws IOException for various exceptions depending on the dataset
+     * @throws TranslateException if there is an error while processing input
      */
-    public void selectFirstN(int n) {
+    public void selectFirstN(int n) throws IOException, TranslateException {
+        prepare();
         csvRecords.subList(n, csvRecords.size()).clear();
     }
 
@@ -182,49 +193,6 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
      */
     public static Builder builder() {
         return new Builder();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public MRL getMrl() {
-        return MRL.dataset(
-                Application.Tabular.LINEAR_REGRESSION, BasicDatasets.GROUP_ID, ARTIFACT_ID);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Repository getRepository() {
-        return repository;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Artifact getArtifact() {
-        return artifact;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Usage getUsage() {
-        return usage;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isPrepared() {
-        return prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setPrepared(boolean prepared) {
-        this.prepared = prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void useDefaultArtifact() throws IOException {
-        artifact = repository.resolve(getMrl(), "1.0", null);
     }
 
     /**
@@ -241,7 +209,7 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
 
     /** {@inheritDoc} */
     @Override
-    public Record get(NDManager manager, long index) {
+    protected Record get(NDManager manager, long index) {
         int idx = Math.toIntExact(index);
         NDList d = new NDList(getFeatureNDArray(manager, idx));
         NDList l = new NDList(manager.create(getLabel(idx)));
@@ -296,7 +264,7 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
         }
 
         return manager.create(newFeatureArray);
-    } /* getFeatureNDArray() */
+    }
 
     /** Move all currently set features to available. */
     public void removeAllFeatures() {
@@ -338,8 +306,15 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
 
     /** {@inheritDoc} */
     @Override
-    public void prepareData(Usage usage) throws IOException {
-        Path root = repository.getResourceDirectory(artifact);
+    public void prepare(Progress progress) throws IOException {
+        if (prepared) {
+            return;
+        }
+
+        Artifact artifact = resource.getDefaultArtifact();
+        resource.prepare(artifact);
+
+        Path root = resource.getRepository().getResourceDirectory(artifact);
         Path csvFile;
         switch (usage) {
             case TRAIN:
@@ -380,6 +355,7 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
             }
             labelArray[i] = getRecordFloat(getCSVRecord(i), label);
         }
+        prepared = true;
     }
 
     /** {@inheritDoc} */
@@ -392,12 +368,15 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
     public static final class Builder extends BaseBuilder<Builder> {
 
         Repository repository;
-        Artifact artifact;
+        String groupId;
+        String artifactId;
         Usage usage;
 
         /** Constructs a new builder. */
         Builder() {
             repository = BasicDatasets.REPOSITORY;
+            groupId = BasicDatasets.GROUP_ID;
+            artifactId = ARTIFACT_ID;
             usage = Usage.TRAIN;
         }
 
@@ -430,14 +409,31 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
         }
 
         /**
-         * Sets the optional artifact.
+         * Sets optional groupId.
          *
-         * @param artifact the artifact
+         * @param groupId the groupId}
          * @return this builder
          */
-        public Builder optArtifact(Artifact artifact) {
-            this.artifact = artifact;
-            return self();
+        public Builder optGroupId(String groupId) {
+            this.groupId = groupId;
+            return this;
+        }
+
+        /**
+         * Sets the optional artifactId.
+         *
+         * @param artifactId the artifactId
+         * @return this builder
+         */
+        public Builder optArtifactId(String artifactId) {
+            if (artifactId.contains(":")) {
+                String[] tokens = artifactId.split(":");
+                groupId = tokens[0];
+                this.artifactId = tokens[1];
+            } else {
+                this.artifactId = artifactId;
+            }
+            return this;
         }
 
         /**

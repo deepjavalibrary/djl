@@ -115,7 +115,7 @@ public final class TrainCaptcha {
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
-            throws IOException, TranslateException {
+            throws IOException {
         CaptchaDataset dataset =
                 CaptchaDataset.builder()
                         .optUsage(usage)

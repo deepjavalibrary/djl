@@ -125,6 +125,8 @@ public class SimpleRepository extends AbstractRepository {
     public void prepare(Artifact artifact, Progress progress) throws IOException {
         if (isRemote) {
             super.prepare(artifact, progress);
+        } else {
+            logger.debug("Skip prepare for local repository.");
         }
     }
 

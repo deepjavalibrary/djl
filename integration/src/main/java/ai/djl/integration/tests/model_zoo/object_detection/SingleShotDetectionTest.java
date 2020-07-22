@@ -44,7 +44,6 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.evaluator.BoundingBoxError;
 import ai.djl.training.evaluator.SingleShotDetectionAccuracy;
 import ai.djl.training.loss.SingleShotDetectionLoss;
-import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -112,16 +111,13 @@ public class SingleShotDetectionTest {
         return ssdPredict;
     }
 
-    private Dataset getDataset() throws IOException, TranslateException {
+    private Dataset getDataset() {
         Pipeline pipeline = new Pipeline(new ToTensor());
-        PikachuDetection pikachuDetection =
-                PikachuDetection.builder()
-                        .optUsage(Dataset.Usage.TEST)
-                        .optPipeline(pipeline)
-                        .setSampling(32, true)
-                        .build();
-        pikachuDetection.prepare(new ProgressBar());
-        return pikachuDetection;
+        return PikachuDetection.builder()
+                .optUsage(Dataset.Usage.TEST)
+                .optPipeline(pipeline)
+                .setSampling(32, true)
+                .build();
     }
 
     private TrainingConfig setupTrainingConfig() {

@@ -12,11 +12,9 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.Application.CV;
 import ai.djl.Model;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Blocks;
-import ai.djl.repository.MRL;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -35,12 +33,12 @@ public class PikachuTest {
     @Test
     public void testPikachuRemote() throws IOException, TranslateException {
         PikachuDetection pikachu =
-                new PikachuDetectionUnitTest(
-                        PikachuDetection.builder()
-                                .optUsage(Dataset.Usage.TEST)
-                                .setSampling(1, true)
-                                .optLimit(10));
-        pikachu.prepare();
+                PikachuDetection.builder()
+                        .optArtifactId("pikachu-unittest")
+                        .optUsage(Dataset.Usage.TEST)
+                        .setSampling(1, true)
+                        .optLimit(10)
+                        .build();
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(new NormalInitializer(0.01f));
@@ -54,19 +52,6 @@ public class PikachuTest {
                 Assert.assertEquals(
                         batch.getLabels().singletonOrThrow().getShape(), new Shape(1, 1, 5));
             }
-        }
-    }
-
-    private static final class PikachuDetectionUnitTest extends PikachuDetection {
-
-        PikachuDetectionUnitTest(PikachuDetection.Builder builder) {
-            super(builder);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public MRL getMrl() {
-            return MRL.dataset(CV.OBJECT_DETECTION, BasicDatasets.GROUP_ID, "pikachu-unittest");
         }
     }
 }

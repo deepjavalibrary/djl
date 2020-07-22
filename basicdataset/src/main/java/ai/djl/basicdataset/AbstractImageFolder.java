@@ -18,9 +18,10 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Repository;
-import ai.djl.repository.dataset.PreparedDataset;
+import ai.djl.repository.Resource;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
+import ai.djl.translate.TranslateException;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.io.File;
@@ -37,31 +38,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A dataset for loading image files stored in a folder structure. */
-public abstract class AbstractImageFolder extends RandomAccessDataset implements PreparedDataset {
+public abstract class AbstractImageFolder extends RandomAccessDataset {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractImageFolder.class);
 
     private static final Set<String> EXT =
             new HashSet<>(Arrays.asList(".jpg", ".jpeg", ".png", ".bmp", ".wbmp", ".gif"));
 
-    protected Repository repository;
     protected Image.Flag flag;
     protected List<String> synset;
     protected PairList<String, Integer> items;
+    protected Resource resource;
+    protected boolean prepared;
+
     private int maxDepth;
 
     protected AbstractImageFolder(ImageFolderBuilder<?> builder) {
         super(builder);
         this.flag = builder.flag;
-        this.repository = builder.repository;
         this.maxDepth = builder.maxDepth;
         this.synset = new ArrayList<>();
         this.items = new PairList<>();
+        this.resource = new Resource(builder.repository, null, "1.0");
     }
 
     /** {@inheritDoc} */
     @Override
-    public Record get(NDManager manager, long index) throws IOException {
+    protected Record get(NDManager manager, long index) throws IOException {
         Pair<String, Integer> item = items.get(Math.toIntExact(index));
 
         Path imagePath = getImagePath(item.getKey());
@@ -81,8 +84,11 @@ public abstract class AbstractImageFolder extends RandomAccessDataset implements
      * Returns the synsets of the ImageFolder dataset.
      *
      * @return a list that contains synsets
+     * @throws IOException for various exceptions depending on the dataset
+     * @throws TranslateException if there is an error while processing input
      */
-    public List<String> getSynset() {
+    public List<String> getSynset() throws IOException, TranslateException {
+        prepare();
         return synset;
     }
 

@@ -12,95 +12,18 @@
  */
 package ai.djl.fasttext.dataset;
 
-import ai.djl.ndarray.NDManager;
-import ai.djl.repository.Artifact;
-import ai.djl.repository.Repository;
-import ai.djl.repository.dataset.ZooDataset;
-import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
-import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Map;
 
-/** An abstract class loads fastText dataset. */
-public abstract class FtDataset implements Dataset, ZooDataset {
-
-    protected Repository repository;
-    protected Usage usage;
-    private Artifact artifact;
-    private boolean prepared;
+/** An interface loads fastText dataset. */
+public interface FtDataset extends Dataset {
 
     /**
      * Returns cached fastText dataset file path.
      *
      * @return cached fastText dataset file path
      * @throws IOException when IO operation fails in loading a resource
-     * @throws TranslateException if there is an error while processing input
      */
-    public Path getInputFile() throws IOException, TranslateException {
-        prepare(null);
-
-        Map<String, Artifact.Item> map = artifact.getFiles();
-        Artifact.Item item;
-        switch (usage) {
-            case TRAIN:
-                item = map.get("train");
-                break;
-            case TEST:
-                item = map.get("test");
-                break;
-            case VALIDATION:
-            default:
-                item = map.get("validation");
-                break;
-        }
-        return repository.getFile(item, "").toAbsolutePath();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Iterable<Batch> getData(NDManager manager) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Repository getRepository() {
-        return repository;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Artifact getArtifact() {
-        return artifact;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Usage getUsage() {
-        return usage;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isPrepared() {
-        return prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setPrepared(boolean prepared) {
-        this.prepared = prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void useDefaultArtifact() throws IOException {
-        artifact = repository.resolve(getMrl(), "1.0", null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void prepareData(Usage usage) {}
+    Path getInputFile() throws IOException;
 }

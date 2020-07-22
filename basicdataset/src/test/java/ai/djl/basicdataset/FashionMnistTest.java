@@ -46,7 +46,6 @@ public class FashionMnistTest {
                             .setSampling(32, true)
                             .build();
 
-            fashionMnist.prepare();
             try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(fashionMnist)) {
                     Assert.assertEquals(batch.getData().size(), 1);

@@ -21,9 +21,8 @@ import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.ndarray.NDManager;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.Repository;
-import ai.djl.repository.dataset.ZooDataset;
+import ai.djl.repository.Resource;
 import ai.djl.training.dataset.RandomAccessDataset;
 import java.util.List;
 
@@ -37,15 +36,15 @@ import java.util.List;
  * are set, the dataset creates {@link TrainableWordEmbedding} based {@link TrainableWordEmbedding}
  * from the {@link Vocabulary} created within the dataset.
  */
-public abstract class TextDataset extends RandomAccessDataset implements ZooDataset {
+public abstract class TextDataset extends RandomAccessDataset {
 
     protected TextData sourceTextData;
     protected TextData targetTextData;
     protected NDManager manager;
-
-    protected Repository repository;
-    protected Artifact artifact;
     protected Usage usage;
+
+    protected Resource resource;
+    protected boolean prepared;
 
     /**
      * Creates a new instance of {@link RandomAccessDataset} with the given necessary
@@ -62,6 +61,7 @@ public abstract class TextDataset extends RandomAccessDataset implements ZooData
                 new TextData(
                         TextData.getDefaultConfiguration().update(builder.targetConfiguration));
         manager = builder.manager;
+        usage = builder.usage;
     }
 
     /**
@@ -125,32 +125,24 @@ public abstract class TextDataset extends RandomAccessDataset implements ZooData
                 manager, newTextData.subList(0, (int) Math.min(limit, newTextData.size())));
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Repository getRepository() {
-        return repository;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Artifact getArtifact() {
-        return artifact;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Usage getUsage() {
-        return usage;
-    }
-
     /** Abstract Builder that helps build a {@link TextDataset}. */
     public abstract static class Builder<T extends Builder<T>> extends BaseBuilder<T> {
-        private TextData.Configuration sourceConfiguration = new Configuration();
-        private TextData.Configuration targetConfiguration = new Configuration();
-        private NDManager manager = Engine.getInstance().newBaseManager();
+
+        TextData.Configuration sourceConfiguration = new Configuration();
+        TextData.Configuration targetConfiguration = new Configuration();
+        NDManager manager = Engine.getInstance().newBaseManager();
+
         protected Repository repository;
-        protected Artifact artifact;
+        protected String groupId;
+        protected String artifactId;
         protected Usage usage;
+
+        /** Constructs a new builder. */
+        Builder() {
+            repository = BasicDatasets.REPOSITORY;
+            groupId = BasicDatasets.GROUP_ID;
+            usage = Usage.TRAIN;
+        }
 
         /**
          * Sets the {@link TextData.Configuration} to use for the source text data.
@@ -208,13 +200,30 @@ public abstract class TextDataset extends RandomAccessDataset implements ZooData
         }
 
         /**
-         * Sets the optional artifact.
+         * Sets optional groupId.
          *
-         * @param artifact the artifact
+         * @param groupId the groupId}
          * @return this builder
          */
-        public T optArtifact(Artifact artifact) {
-            this.artifact = artifact;
+        public T optGroupId(String groupId) {
+            this.groupId = groupId;
+            return self();
+        }
+
+        /**
+         * Sets the optional artifactId.
+         *
+         * @param artifactId the artifactId
+         * @return this builder
+         */
+        public T optArtifactId(String artifactId) {
+            if (artifactId.contains(":")) {
+                String[] tokens = artifactId.split(":");
+                groupId = tokens[0];
+                this.artifactId = tokens[1];
+            } else {
+                this.artifactId = artifactId;
+            }
             return self();
         }
     }

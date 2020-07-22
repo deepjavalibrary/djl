@@ -12,21 +12,74 @@
  */
 package ai.djl.fasttext.dataset;
 
-import ai.djl.Application;
+import ai.djl.Application.NLP;
+import ai.djl.ndarray.NDManager;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
+import ai.djl.repository.Resource;
+import ai.djl.training.dataset.Batch;
+import ai.djl.util.Progress;
+import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * A text classification dataset contains questions from cooking.stackexchange.com and their
  * associated tags on the site.
  */
-public class CookingStackExchange extends FtDataset {
+public class CookingStackExchange implements FtDataset {
 
     private static final String ARTIFACT_ID = "cooking_stackexchange";
 
+    private Usage usage;
+    private Path root;
+
+    private Resource resource;
+    private boolean prepared;
+
     CookingStackExchange(Builder builder) {
-        this.repository = builder.repository;
         this.usage = builder.usage;
+        MRL mrl = MRL.dataset(NLP.TEXT_CLASSIFICATION, FtDatasets.GROUP_ID, ARTIFACT_ID);
+        resource = new Resource(builder.repository, mrl, "1.0");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Path getInputFile() throws IOException {
+        prepare(null);
+        return root;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Iterable<Batch> getData(NDManager manager) {
+        return null;
+    }
+
+    @Override
+    public void prepare(Progress progress) throws IOException {
+        if (prepared) {
+            return;
+        }
+
+        Artifact artifact = resource.getDefaultArtifact();
+        resource.prepare(artifact, progress);
+
+        Artifact.Item item;
+        switch (usage) {
+            case TRAIN:
+                item = artifact.getFiles().get("train");
+                break;
+            case TEST:
+                item = artifact.getFiles().get("test");
+                break;
+            case VALIDATION:
+            default:
+                item = artifact.getFiles().get("validation");
+                break;
+        }
+        root = resource.getRepository().getFile(item, "").toAbsolutePath();
+        prepared = true;
     }
 
     /**
@@ -36,12 +89,6 @@ public class CookingStackExchange extends FtDataset {
      */
     public static Builder builder() {
         return new Builder();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public MRL getMrl() {
-        return MRL.dataset(Application.NLP.TEXT_CLASSIFICATION, FtDatasets.GROUP_ID, ARTIFACT_ID);
     }
 
     /** A builder to construct a {@link CookingStackExchange}. */

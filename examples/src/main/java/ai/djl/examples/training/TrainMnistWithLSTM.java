@@ -120,7 +120,7 @@ public final class TrainMnistWithLSTM {
     }
 
     public static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
-            throws IOException, TranslateException {
+            throws IOException {
         Mnist mnist =
                 Mnist.builder()
                         .optUsage(usage)

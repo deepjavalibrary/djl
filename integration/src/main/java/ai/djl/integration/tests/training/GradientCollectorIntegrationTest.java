@@ -33,6 +33,8 @@ import ai.djl.training.listener.EvaluatorTrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.tracker.Tracker;
+import ai.djl.translate.TranslateException;
+import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -70,7 +72,7 @@ public class GradientCollectorIntegrationTest {
     }
 
     @Test
-    public void testTrain() {
+    public void testTrain() throws IOException, TranslateException {
         int numOfData = 1000;
         int batchSize = 10;
         int epochs = 10;

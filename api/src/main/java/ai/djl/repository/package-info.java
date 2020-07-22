@@ -15,8 +15,7 @@
  * Contains a Maven-based Repository format for creating repositories of artifacts such as datasets
  * and model zoos.
  *
- * <p>There are also helper classes for Datasets ({@link ai.djl.repository.dataset}) and Model Zoos
- * ({@link ai.djl.repository.zoo}) as well.
+ * <p>There are also helper classes for Model Zoos ({@link ai.djl.repository.zoo}).
  *
  * @see ai.djl.repository.Repository
  */

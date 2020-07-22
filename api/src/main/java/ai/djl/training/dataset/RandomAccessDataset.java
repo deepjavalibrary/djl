@@ -17,11 +17,12 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Transform;
+import ai.djl.translate.TranslateException;
+import ai.djl.util.Progress;
 import ai.djl.util.RandomUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.RandomAccess;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.IntStream;
 
@@ -29,7 +30,7 @@ import java.util.stream.IntStream;
  * RandomAccessDataset represent the dataset that support random access reads. i.e. it could access
  * a specific data item given the index.
  */
-public abstract class RandomAccessDataset implements Dataset, RandomAccess {
+public abstract class RandomAccessDataset implements Dataset {
 
     protected Sampler sampler;
     protected Batchifier dataBatchifier;
@@ -69,11 +70,12 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
      * @return a {@link Record} that contains the data and label of the requested data item
      * @throws IOException if an I/O error occurs
      */
-    public abstract Record get(NDManager manager, long index) throws IOException;
+    protected abstract Record get(NDManager manager, long index) throws IOException;
 
     /** {@inheritDoc} */
     @Override
-    public Iterable<Batch> getData(NDManager manager) {
+    public Iterable<Batch> getData(NDManager manager) throws IOException, TranslateException {
+        prepare();
         return new DataIterable(
                 this,
                 manager,
@@ -93,8 +95,12 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
      * @param manager the dataset to iterate through
      * @param sampler the sampler to use to iterate through the dataset
      * @return an {@link Iterable} of {@link Batch} that contains batches of data from the dataset
+     * @throws IOException for various exceptions depending on the dataset
+     * @throws TranslateException if there is an error while processing input
      */
-    public Iterable<Batch> getData(NDManager manager, Sampler sampler) {
+    public Iterable<Batch> getData(NDManager manager, Sampler sampler)
+            throws IOException, TranslateException {
+        prepare();
         return new DataIterable(
                 this,
                 manager,
@@ -129,8 +135,11 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
      *
      * @param ratio the ratio of each sub dataset
      * @return an array of the sub dataset
+     * @throws IOException for various exceptions depending on the dataset
+     * @throws TranslateException if there is an error while processing input
      */
-    public RandomAccessDataset[] randomSplit(int... ratio) {
+    public RandomAccessDataset[] randomSplit(int... ratio) throws IOException, TranslateException {
+        prepare();
         if (ratio.length < 2) {
             throw new IllegalArgumentException("Requires at least two split portion.");
         }
@@ -374,8 +383,12 @@ public abstract class RandomAccessDataset implements Dataset, RandomAccess {
 
         /** {@inheritDoc} */
         @Override
-        public Iterable<Batch> getData(NDManager manager) {
+        public Iterable<Batch> getData(NDManager manager) throws IOException, TranslateException {
             return dataset.getData(manager);
         }
+
+        /** {@inheritDoc} */
+        @Override
+        public void prepare(Progress progress) {}
     }
 }

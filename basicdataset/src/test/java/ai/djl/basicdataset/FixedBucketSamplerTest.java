@@ -42,7 +42,6 @@ public class FixedBucketSamplerTest {
                                         .addPad(0, 0, (m) -> m.ones(new Shape(1)), 10)
                                         .build())
                         .build();
-        dataset.prepare();
 
         Iterator<List<Long>> iterator = fixedBucketSampler.sample(dataset);
         long count = 0;

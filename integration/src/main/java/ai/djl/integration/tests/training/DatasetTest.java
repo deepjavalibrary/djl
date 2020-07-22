@@ -49,7 +49,7 @@ public class DatasetTest {
             new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
 
     @Test
-    public void testSequenceSampler() {
+    public void testSequenceSampler() throws IOException, TranslateException {
         try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
 
@@ -78,7 +78,7 @@ public class DatasetTest {
     }
 
     @Test
-    public void testRandomSampler() {
+    public void testRandomSampler() throws IOException, TranslateException {
         try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
 
@@ -105,7 +105,7 @@ public class DatasetTest {
     }
 
     @Test
-    public void testBatchSampler() {
+    public void testBatchSampler() throws IOException, TranslateException {
         try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
 
@@ -188,7 +188,7 @@ public class DatasetTest {
     }
 
     @Test
-    public void testArrayDataset() {
+    public void testArrayDataset() throws IOException, TranslateException {
         try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
 
@@ -283,7 +283,6 @@ public class DatasetTest {
                             .optExecutor(executor, 4)
                             .build();
 
-            cifar10.prepare();
             try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
                     batch.close();

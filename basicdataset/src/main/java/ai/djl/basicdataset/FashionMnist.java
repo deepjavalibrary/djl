@@ -12,7 +12,7 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.Application;
+import ai.djl.Application.CV;
 import ai.djl.engine.Engine;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDArray;
@@ -22,9 +22,10 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.dataset.ZooDataset;
+import ai.djl.repository.Resource;
 import ai.djl.training.dataset.ArrayDataset;
 import ai.djl.translate.Pipeline;
+import ai.djl.util.Progress;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +37,7 @@ import java.util.Map;
  *
  * <p>Each sample is an image (in 3-D NDArray) with shape (28, 28, 1).
  */
-public final class FashionMnist extends ArrayDataset implements ZooDataset {
+public final class FashionMnist extends ArrayDataset {
 
     public static final int IMAGE_WIDTH = 28;
     public static final int IMAGE_HEIGHT = 28;
@@ -45,9 +46,9 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
     private static final String ARTIFACT_ID = "fashmnist";
 
     private final NDManager manager;
-    private final Repository repository;
     private final Usage usage;
-    private Artifact artifact;
+
+    private Resource resource;
     private boolean prepared;
 
     /**
@@ -58,9 +59,9 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
     private FashionMnist(FashionMnist.Builder builder) {
         super(builder);
         this.manager = builder.manager;
-        this.repository = builder.repository;
-        this.artifact = builder.artifact;
         this.usage = builder.usage;
+        MRL mrl = MRL.dataset(CV.IMAGE_CLASSIFICATION, builder.groupId, builder.artifactId);
+        resource = new Resource(builder.repository, mrl, "1.0");
     }
 
     /**
@@ -72,8 +73,16 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
         return new FashionMnist.Builder();
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void prepareData(Usage usage) throws IOException {
+    public void prepare(Progress progress) throws IOException {
+        if (prepared) {
+            return;
+        }
+
+        Artifact artifact = resource.getDefaultArtifact();
+        resource.prepare(artifact, progress);
+
         Map<String, Artifact.Item> map = artifact.getFiles();
         Artifact.Item imageItem;
         Artifact.Item labelItem;
@@ -93,10 +102,11 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
 
         labels = new NDArray[] {readLabel(labelItem)};
         data = new NDArray[] {readData(imageItem, labels[0].size())};
+        prepared = true;
     }
 
     private NDArray readData(Artifact.Item item, long length) throws IOException {
-        try (InputStream is = repository.openStream(item, null)) {
+        try (InputStream is = resource.getRepository().openStream(item, null)) {
             if (is.skip(16) != 16) {
                 throw new AssertionError("Failed skip data.");
             }
@@ -112,7 +122,7 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
     }
 
     private NDArray readLabel(Artifact.Item item) throws IOException {
-        try (InputStream is = repository.openStream(item, null)) {
+        try (InputStream is = resource.getRepository().openStream(item, null)) {
             if (is.skip(8) != 8) {
                 throw new AssertionError("Failed skip data.");
             }
@@ -125,68 +135,27 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
         }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public MRL getMrl() {
-        return MRL.dataset(
-                Application.CV.IMAGE_CLASSIFICATION, BasicDatasets.GROUP_ID, ARTIFACT_ID);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Repository getRepository() {
-        return repository;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Artifact getArtifact() {
-        return artifact;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Usage getUsage() {
-        return usage;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isPrepared() {
-        return prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setPrepared(boolean prepared) {
-        this.prepared = prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void useDefaultArtifact() throws IOException {
-        artifact = repository.resolve(getMrl(), "1.0", null);
-    }
-
     /** A builder for a {@link FashionMnist}. */
-    public static final class Builder extends BaseBuilder<FashionMnist.Builder> {
+    public static final class Builder extends BaseBuilder<Builder> {
 
-        private NDManager manager;
-        private Repository repository;
-        private Artifact artifact;
-        private Usage usage;
+        NDManager manager;
+        Repository repository;
+        String groupId;
+        String artifactId;
+        Usage usage;
 
         /** Constructs a new builder. */
         Builder() {
             repository = BasicDatasets.REPOSITORY;
+            groupId = BasicDatasets.GROUP_ID;
+            artifactId = ARTIFACT_ID;
             usage = Usage.TRAIN;
-            pipeline = new Pipeline(new ToTensor());
             manager = Engine.getInstance().newBaseManager();
         }
 
         /** {@inheritDoc} */
         @Override
-        protected FashionMnist.Builder self() {
+        protected Builder self() {
             return this;
         }
 
@@ -196,7 +165,8 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
          * @param manager the manager
          * @return this builder
          */
-        public FashionMnist.Builder optManager(NDManager manager) {
+        public Builder optManager(NDManager manager) {
+            this.manager.close();
             this.manager = manager.newSubManager();
             return this;
         }
@@ -207,19 +177,36 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
          * @param repository the repository
          * @return this builder
          */
-        public FashionMnist.Builder optRepository(Repository repository) {
+        public Builder optRepository(Repository repository) {
             this.repository = repository;
             return this;
         }
 
         /**
-         * Sets the optional artifact.
+         * Sets optional groupId.
          *
-         * @param artifact the artifact
+         * @param groupId the groupId}
          * @return this builder
          */
-        public FashionMnist.Builder optArtifact(Artifact artifact) {
-            this.artifact = artifact;
+        public Builder optGroupId(String groupId) {
+            this.groupId = groupId;
+            return this;
+        }
+
+        /**
+         * Sets the optional artifactId.
+         *
+         * @param artifactId the artifactId
+         * @return this builder
+         */
+        public Builder optArtifactId(String artifactId) {
+            if (artifactId.contains(":")) {
+                String[] tokens = artifactId.split(":");
+                groupId = tokens[0];
+                this.artifactId = tokens[1];
+            } else {
+                this.artifactId = artifactId;
+            }
             return this;
         }
 
@@ -229,7 +216,7 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
          * @param usage the usage
          * @return this builder
          */
-        public FashionMnist.Builder optUsage(Usage usage) {
+        public Builder optUsage(Usage usage) {
             this.usage = usage;
             return this;
         }
@@ -240,6 +227,9 @@ public final class FashionMnist extends ArrayDataset implements ZooDataset {
          * @return the {@link Mnist}
          */
         public FashionMnist build() {
+            if (pipeline == null) {
+                pipeline = new Pipeline(new ToTensor());
+            }
             return new FashionMnist(this);
         }
     }

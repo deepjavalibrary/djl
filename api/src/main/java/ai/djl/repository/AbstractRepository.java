@@ -100,7 +100,7 @@ public abstract class AbstractRepository implements Repository {
     public void prepare(Artifact artifact, Progress progress) throws IOException {
         Path resourceDir = getResourceDirectory(artifact);
         if (Files.exists(resourceDir)) {
-            // files have been downloaded already.
+            logger.debug("Files have been downloaded already: {}", resourceDir);
             return;
         }
 
@@ -124,6 +124,7 @@ public abstract class AbstractRepository implements Repository {
         }
 
         try {
+            logger.debug("Items to download: {}", files.size());
             for (Artifact.Item item : files.values()) {
                 download(tmp, baseUri, item, progress);
             }

@@ -110,9 +110,6 @@ public class AirfoilRandomAccessTest {
 
         // Select Features
         airfoil.addAllFeatures();
-
-        // Prepare Data
-        airfoil.prepare();
         airfoil.selectFirstN(n);
         airfoil.whitenAll();
 

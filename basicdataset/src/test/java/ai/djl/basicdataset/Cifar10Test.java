@@ -48,7 +48,6 @@ public class Cifar10Test {
                             .setSampling(batchSize, true)
                             .build();
 
-            cifar10.prepare();
             try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
                     Assert.assertEquals(batch.getData().size(), 1);
@@ -75,7 +74,6 @@ public class Cifar10Test {
                             .setSampling(32, true)
                             .build();
 
-            cifar10.prepare();
             try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
                     Assert.assertEquals(batch.getData().size(), 1);

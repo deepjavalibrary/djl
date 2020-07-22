@@ -12,12 +12,15 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.Application;
+import ai.djl.Application.NLP;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
+import ai.djl.repository.Resource;
 import ai.djl.training.dataset.Record;
+import ai.djl.util.Progress;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,9 +34,9 @@ import java.util.List;
  * Tatoeba Project (http://www.manythings.org/anki/).
  */
 public class TatoebaEnglishFrenchDataset extends TextDataset {
+
     private static final String VERSION = "1.0";
     private static final String ARTIFACT_ID = "tatoeba-en-fr";
-    private boolean prepared;
 
     /**
      * Creates a new instance of {@code TatoebaEnglishFrenchDataset}.
@@ -42,9 +45,9 @@ public class TatoebaEnglishFrenchDataset extends TextDataset {
      */
     protected TatoebaEnglishFrenchDataset(Builder builder) {
         super(builder);
-        this.repository = builder.repository;
-        this.artifact = builder.artifact;
         this.usage = builder.usage;
+        MRL mrl = MRL.dataset(NLP.MACHINE_TRANSLATION, builder.groupId, builder.artifactId);
+        resource = new Resource(builder.repository, mrl, VERSION);
     }
 
     /**
@@ -58,33 +61,14 @@ public class TatoebaEnglishFrenchDataset extends TextDataset {
 
     /** {@inheritDoc} */
     @Override
-    public MRL getMrl() {
-        return MRL.dataset(
-                Application.NLP.MACHINE_TRANSLATION, BasicDatasets.GROUP_ID, ARTIFACT_ID);
-    }
+    public void prepare(Progress progress) throws IOException, EmbeddingException {
+        if (prepared) {
+            return;
+        }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean isPrepared() {
-        return prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setPrepared(boolean prepared) {
-        this.prepared = prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void useDefaultArtifact() throws IOException {
-        artifact = repository.resolve(getMrl(), VERSION, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void prepareData(Usage usage) throws IOException, EmbeddingException {
-        Path root = repository.getResourceDirectory(artifact);
+        Artifact artifact = resource.getDefaultArtifact();
+        resource.prepare(artifact, progress);
+        Path root = resource.getRepository().getResourceDirectory(artifact);
 
         Path usagePath;
         switch (usage) {
@@ -112,10 +96,12 @@ public class TatoebaEnglishFrenchDataset extends TextDataset {
         }
         preprocess(sourceTextData, true);
         preprocess(targetTextData, false);
+
+        prepared = true;
     }
 
     @Override
-    public Record get(NDManager manager, long index) {
+    protected Record get(NDManager manager, long index) {
         NDList data = new NDList();
         NDList labels = new NDList();
         data.add(sourceTextData.getEmbedding(manager, index));
@@ -134,9 +120,8 @@ public class TatoebaEnglishFrenchDataset extends TextDataset {
     public static class Builder extends TextDataset.Builder<Builder> {
 
         /** Constructs a new builder. */
-        Builder() {
-            repository = BasicDatasets.REPOSITORY;
-            usage = Usage.TRAIN;
+        public Builder() {
+            artifactId = ARTIFACT_ID;
         }
 
         /** {@inheritDoc} */

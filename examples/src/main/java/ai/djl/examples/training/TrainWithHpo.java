@@ -104,7 +104,8 @@ public final class TrainWithHpo {
             Arguments arguments,
             HpSet hpVals,
             RandomAccessDataset trainingSet,
-            RandomAccessDataset validateSet) {
+            RandomAccessDataset validateSet)
+            throws IOException, TranslateException {
         // Construct neural network
         int[] hidden = new int[(Integer) hpVals.getHParam("hiddenLayersCount").random()];
         Arrays.fill(hidden, (Integer) hpVals.getHParam("hiddenLayersSize").random());
@@ -154,7 +155,7 @@ public final class TrainWithHpo {
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
-            throws IOException, TranslateException {
+            throws IOException {
         Mnist mnist =
                 Mnist.builder()
                         .optUsage(usage)

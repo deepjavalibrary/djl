@@ -57,7 +57,6 @@ public class ImageFolderTest {
                                     new Pipeline().add(new Resize(100, 100)).add(new ToTensor()))
                             .setSampling(1, false)
                             .build();
-            dataset.prepare();
 
             List<String> synsets = Arrays.asList("cat", "dog", "misc");
             Assert.assertEquals(synsets, dataset.getSynset());

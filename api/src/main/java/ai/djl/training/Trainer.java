@@ -28,6 +28,8 @@ import ai.djl.training.listener.EpochTrainingListener;
 import ai.djl.training.listener.EvaluatorTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
+import ai.djl.translate.TranslateException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -122,8 +124,10 @@ public class Trainer implements AutoCloseable {
      *
      * @param dataset the dataset to iterate through
      * @return an {@link Iterable} of {@link Batch} that contains batches of data from the dataset
+     * @throws IOException for various exceptions depending on the dataset
+     * @throws TranslateException if there is an error while processing input
      */
-    public Iterable<Batch> iterateDataset(Dataset dataset) {
+    public Iterable<Batch> iterateDataset(Dataset dataset) throws IOException, TranslateException {
         return dataset.getData(getManager());
     }
 

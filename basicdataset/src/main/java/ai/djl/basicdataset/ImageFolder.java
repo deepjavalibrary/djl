@@ -16,6 +16,7 @@ import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.translate.Pipeline;
 import ai.djl.util.Progress;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -39,11 +40,8 @@ import java.util.Arrays;
  */
 public final class ImageFolder extends AbstractImageFolder {
 
-    private boolean prepared;
-
     private ImageFolder(ImageFolderBuilder<?> builder) {
         super(builder);
-        loadSynset();
     }
 
     /**
@@ -63,9 +61,11 @@ public final class ImageFolder extends AbstractImageFolder {
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(Progress progress) {
+    public void prepare(Progress progress) throws IOException {
         if (!prepared) {
-            Path root = Paths.get(repository.getBaseUri());
+            resource.prepare(null, progress);
+            loadSynset();
+            Path root = Paths.get(resource.getRepository().getBaseUri());
             if (progress != null) {
                 progress.reset("Preparing", 2);
                 progress.start(0);
@@ -74,13 +74,12 @@ public final class ImageFolder extends AbstractImageFolder {
             } else {
                 listImages(root, synset);
             }
-
             prepared = true;
         }
     }
 
     private void loadSynset() {
-        File root = new File(repository.getBaseUri());
+        File root = new File(resource.getRepository().getBaseUri());
         File[] dir = root.listFiles(f -> f.isDirectory() && !f.getName().startsWith("."));
         if (dir == null || dir.length == 0) {
             throw new IllegalArgumentException(root + " not found or didn't have any file in it");

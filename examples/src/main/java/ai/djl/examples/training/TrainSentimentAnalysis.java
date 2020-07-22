@@ -199,7 +199,7 @@ public final class TrainSentimentAnalysis {
                                 new TextData.Configuration()
                                         .setTextEmbedding(new ModelZooTextEmbedding(embeddingModel))
                                         .setTextProcessors(TEXT_PROCESSORS))
-                        .setUsage(usage)
+                        .optUsage(usage)
                         .optExecutor(executorService, 8)
                         .optLimit(arguments.getLimit())
                         .build();

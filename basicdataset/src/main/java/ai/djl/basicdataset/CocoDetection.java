@@ -22,10 +22,11 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.dataset.ZooDataset;
+import ai.djl.repository.Resource;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.Pipeline;
+import ai.djl.util.Progress;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -37,28 +38,26 @@ import java.util.List;
  *
  * <p>Each image might have different {@link ai.djl.ndarray.types.Shape}s.
  */
-public class CocoDetection extends RandomAccessDataset implements ZooDataset {
+public class CocoDetection extends RandomAccessDataset {
 
     private static final String ARTIFACT_ID = "coco";
 
-    private Repository repository;
-    private Artifact artifact;
     private Usage usage;
-    private boolean prepared;
     private Image.Flag flag;
-
-    private CocoUtils coco;
     private List<Path> imagePaths;
     private List<double[][]> labels;
 
+    private Resource resource;
+    private boolean prepared;
+
     CocoDetection(Builder builder) {
         super(builder);
-        repository = builder.repository;
-        artifact = builder.artifact;
         usage = builder.usage;
         flag = builder.flag;
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
+        MRL mrl = MRL.dataset(CV.IMAGE_CLASSIFICATION, builder.groupId, builder.artifactId);
+        resource = new Resource(builder.repository, mrl, "1.0");
     }
 
     /**
@@ -72,49 +71,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
     /** {@inheritDoc} */
     @Override
-    public MRL getMrl() {
-        return MRL.dataset(CV.IMAGE_CLASSIFICATION, BasicDatasets.GROUP_ID, ARTIFACT_ID);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Repository getRepository() {
-        return repository;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Artifact getArtifact() {
-        return artifact;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Usage getUsage() {
-        return usage;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isPrepared() {
-        return prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setPrepared(boolean prepared) {
-        this.prepared = prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void useDefaultArtifact() throws IOException {
-        artifact = repository.resolve(getMrl(), "1.0", null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Record get(NDManager manager, long index) throws IOException {
+    protected Record get(NDManager manager, long index) throws IOException {
         int idx = Math.toIntExact(index);
         NDList d =
                 new NDList(
@@ -127,8 +84,14 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
     /** {@inheritDoc} */
     @Override
-    public void prepareData(Usage usage) throws IOException {
-        Path root = repository.getResourceDirectory(artifact);
+    public void prepare(Progress progress) throws IOException {
+        if (prepared) {
+            return;
+        }
+
+        Artifact artifact = resource.getDefaultArtifact();
+        resource.prepare(artifact, progress);
+        Path root = resource.getRepository().getResourceDirectory(artifact);
 
         Path jsonFile;
         switch (usage) {
@@ -142,17 +105,18 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
             default:
                 throw new UnsupportedOperationException("Validation data not available.");
         }
-        coco = new CocoUtils(jsonFile);
+        CocoUtils coco = new CocoUtils(jsonFile);
         coco.prepare();
         List<Long> imageIds = coco.getImageIds();
         for (long id : imageIds) {
             Path imagePath = root.resolve(coco.getRelativeImagePath(id));
-            List<double[]> labelOfImageId = getLabels(id);
+            List<double[]> labelOfImageId = getLabels(coco, id);
             if (!labelOfImageId.isEmpty()) {
                 imagePaths.add(imagePath);
                 labels.add(labelOfImageId.toArray(new double[0][]));
             }
         }
+        prepared = true;
     }
 
     /** {@inheritDoc} */
@@ -170,7 +134,7 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
         return list;
     }
 
-    private List<double[]> getLabels(long imageId) {
+    private List<double[]> getLabels(CocoUtils coco, long imageId) {
         List<Long> annotationIds = coco.getAnnotationIdByImageId(imageId);
         if (annotationIds == null) {
             return Collections.emptyList();
@@ -196,14 +160,16 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
 
         Image.Flag flag;
         Repository repository;
-        Artifact artifact;
+        String groupId;
+        String artifactId;
         Usage usage;
 
         /** Constructs a new builder. */
         Builder() {
             repository = BasicDatasets.REPOSITORY;
+            groupId = BasicDatasets.GROUP_ID;
+            artifactId = ARTIFACT_ID;
             usage = Usage.TRAIN;
-            pipeline = new Pipeline(new ToTensor());
             flag = Image.Flag.COLOR;
         }
 
@@ -236,14 +202,31 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
         }
 
         /**
-         * Sets the optional artifact.
+         * Sets optional groupId.
          *
-         * @param artifact the artifact
+         * @param groupId the groupId}
          * @return this builder
          */
-        public Builder optArtifact(Artifact artifact) {
-            this.artifact = artifact;
-            return self();
+        public Builder optGroupId(String groupId) {
+            this.groupId = groupId;
+            return this;
+        }
+
+        /**
+         * Sets the optional artifactId.
+         *
+         * @param artifactId the artifactId
+         * @return this builder
+         */
+        public Builder optArtifactId(String artifactId) {
+            if (artifactId.contains(":")) {
+                String[] tokens = artifactId.split(":");
+                groupId = tokens[0];
+                this.artifactId = tokens[1];
+            } else {
+                this.artifactId = artifactId;
+            }
+            return this;
         }
 
         /**
@@ -263,6 +246,9 @@ public class CocoDetection extends RandomAccessDataset implements ZooDataset {
          * @return the new {@link CocoDetection}
          */
         public CocoDetection build() {
+            if (pipeline == null) {
+                pipeline = new Pipeline(new ToTensor());
+            }
             return new CocoDetection(this);
         }
     }

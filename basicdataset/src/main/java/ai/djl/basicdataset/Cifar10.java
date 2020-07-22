@@ -22,9 +22,10 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.dataset.ZooDataset;
+import ai.djl.repository.Resource;
 import ai.djl.training.dataset.ArrayDataset;
 import ai.djl.translate.Pipeline;
+import ai.djl.util.Progress;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +36,7 @@ import java.util.Map;
  *
  * <p>Each sample is an image (in 3-D {@link NDArray}) with shape (32, 32, 3).
  */
-public final class Cifar10 extends ArrayDataset implements ZooDataset {
+public final class Cifar10 extends ArrayDataset {
 
     public static final int IMAGE_WIDTH = 32;
     public static final int IMAGE_HEIGHT = 32;
@@ -48,17 +49,17 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
     private static final int DATA_AND_LABEL_SIZE = IMAGE_HEIGHT * IMAGE_WIDTH * 3 + 1;
 
     private NDManager manager;
-    private Repository repository;
-    private Artifact artifact;
     private Usage usage;
+
+    private Resource resource;
     private boolean prepared;
 
     Cifar10(Builder builder) {
         super(builder);
         this.manager = builder.manager;
-        this.repository = builder.repository;
-        this.artifact = builder.artifact;
         this.usage = builder.usage;
+        MRL mrl = MRL.dataset(CV.IMAGE_CLASSIFICATION, builder.groupId, builder.artifactId);
+        resource = new Resource(builder.repository, mrl, "1.0");
     }
 
     /**
@@ -72,49 +73,14 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
 
     /** {@inheritDoc} */
     @Override
-    public MRL getMrl() {
-        return MRL.dataset(CV.IMAGE_CLASSIFICATION, BasicDatasets.GROUP_ID, ARTIFACT_ID);
-    }
+    public void prepare(Progress progress) throws IOException {
+        if (prepared) {
+            return;
+        }
 
-    /** {@inheritDoc} */
-    @Override
-    public Repository getRepository() {
-        return repository;
-    }
+        Artifact artifact = resource.getDefaultArtifact();
+        resource.prepare(artifact, progress);
 
-    /** {@inheritDoc} */
-    @Override
-    public Artifact getArtifact() {
-        return artifact;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Usage getUsage() {
-        return usage;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isPrepared() {
-        return prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setPrepared(boolean prepared) {
-        this.prepared = prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void useDefaultArtifact() throws IOException {
-        artifact = repository.resolve(getMrl(), "1.0", null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void prepareData(Usage usage) throws IOException {
         Map<String, Artifact.Item> map = artifact.getFiles();
         Artifact.Item item;
         switch (usage) {
@@ -145,10 +111,11 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
                             + " didn't match with the size of labels "
                             + labels[0].size(0));
         }
+        prepared = true;
     }
 
     private NDArray readData(Artifact.Item item) throws IOException {
-        try (InputStream is = repository.openStream(item, null)) {
+        try (InputStream is = resource.getRepository().openStream(item, null)) {
             byte[] buf = Utils.toByteArray(is);
             int length = buf.length / DATA_AND_LABEL_SIZE;
             try (NDArray array =
@@ -162,14 +129,17 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
     /** A builder to construct a {@link Cifar10}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
-        private NDManager manager;
-        private Repository repository;
-        private Artifact artifact;
-        private Usage usage;
+        NDManager manager;
+        Repository repository;
+        String groupId;
+        String artifactId;
+        Usage usage;
 
         /** Constructs a new builder. */
         Builder() {
             repository = BasicDatasets.REPOSITORY;
+            groupId = BasicDatasets.GROUP_ID;
+            artifactId = ARTIFACT_ID;
             usage = Usage.TRAIN;
             pipeline = new Pipeline(new ToTensor());
             manager = Engine.getInstance().newBaseManager();
@@ -188,7 +158,8 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
          * @return this builder
          */
         public Builder optManager(NDManager manager) {
-            this.manager = manager;
+            this.manager.close();
+            this.manager = manager.newSubManager();
             return this;
         }
 
@@ -204,13 +175,30 @@ public final class Cifar10 extends ArrayDataset implements ZooDataset {
         }
 
         /**
-         * Sets the optional artifact containing the data.
+         * Sets optional groupId.
          *
-         * @param artifact the artifact
+         * @param groupId the groupId}
          * @return this builder
          */
-        public Builder optArtifact(Artifact artifact) {
-            this.artifact = artifact;
+        public Builder optGroupId(String groupId) {
+            this.groupId = groupId;
+            return this;
+        }
+
+        /**
+         * Sets the optional artifactId.
+         *
+         * @param artifactId the artifactId
+         * @return this builder
+         */
+        public Builder optArtifactId(String artifactId) {
+            if (artifactId.contains(":")) {
+                String[] tokens = artifactId.split(":");
+                groupId = tokens[0];
+                this.artifactId = tokens[1];
+            } else {
+                this.artifactId = artifactId;
+            }
             return this;
         }
 

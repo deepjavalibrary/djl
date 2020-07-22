@@ -13,11 +13,11 @@
 package ai.djl.basicdataset;
 
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.repository.dataset.PreparedDataset;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.translate.Pipeline;
 import ai.djl.util.Progress;
 import com.google.gson.Gson;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -31,18 +31,18 @@ import java.util.Arrays;
  *
  * <p>Each image might have different {@link ai.djl.ndarray.types.Shape}s.
  */
-public class ImageNet extends AbstractImageFolder implements PreparedDataset {
+public class ImageNet extends AbstractImageFolder {
 
-    private Usage usage;
-    private boolean prepared;
     private String[] wordNetIds;
     private String[] classNames;
     private String[] classFull;
+    private Path root;
 
     ImageNet(Builder builder) {
         super(builder);
-        this.usage = builder.usage;
-        loadSynset();
+        root =
+                Paths.get(resource.getRepository().getBaseUri())
+                        .resolve(getUsagePath(builder.usage));
     }
 
     /**
@@ -83,9 +83,10 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(Progress progress) {
+    public void prepare(Progress progress) throws IOException {
         if (!prepared) {
-            Path root = Paths.get(repository.getBaseUri()).resolve(getUsagePath(usage));
+            resource.prepare(null, progress);
+
             if (progress != null) {
                 progress.reset("Preparing", 2);
                 progress.start(0);
@@ -94,7 +95,7 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
             } else {
                 listImages(root, Arrays.asList(wordNetIds));
             }
-
+            loadSynset();
             prepared = true;
         }
     }
@@ -142,7 +143,7 @@ public class ImageNet extends AbstractImageFolder implements PreparedDataset {
     /** {@inheritDoc} */
     @Override
     protected Path getImagePath(String key) {
-        return Paths.get(repository.getBaseUri()).resolve(getUsagePath(usage)).resolve(key);
+        return root.resolve(key);
     }
 
     /** A builder for a {@link ImageNet}. */

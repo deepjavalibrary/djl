@@ -49,7 +49,6 @@ public class MnistTest {
                             .setSampling(32, true)
                             .build();
 
-            mnist.prepare();
             try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(mnist)) {
                     Assert.assertEquals(batch.getData().size(), 1);
@@ -77,7 +76,6 @@ public class MnistTest {
                             .setSampling(32, true)
                             .build();
 
-            mnist.prepare();
             try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(mnist)) {
                     Assert.assertEquals(batch.getData().size(), 1);

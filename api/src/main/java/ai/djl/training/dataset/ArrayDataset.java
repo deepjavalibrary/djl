@@ -15,6 +15,8 @@ package ai.djl.training.dataset;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.util.Progress;
+import java.io.IOException;
 import java.util.stream.Stream;
 
 /**
@@ -85,6 +87,10 @@ public class ArrayDataset extends RandomAccessDataset {
         label.attach(manager);
         return new Record(datum, label);
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public void prepare(Progress progress) throws IOException {}
 
     /** The Builder to construct an {@link ArrayDataset}. */
     public static final class Builder extends BaseBuilder<Builder> {

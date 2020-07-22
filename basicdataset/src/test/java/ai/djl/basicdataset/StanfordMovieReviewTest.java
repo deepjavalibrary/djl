@@ -42,8 +42,8 @@ public class StanfordMovieReviewTest {
                             .setSampling(32, true)
                             .optLimit(100)
                             .build();
-            dataset.prepare();
 
+            dataset.prepare();
             Record record = dataset.get(manager, 0);
             Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
             Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 0);
@@ -70,8 +70,8 @@ public class StanfordMovieReviewTest {
                             .setSampling(32, true)
                             .optLimit(100)
                             .build();
-            dataset.prepare();
 
+            dataset.prepare();
             Record record = dataset.get(manager, 0);
             Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
             Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 0);

@@ -16,14 +16,17 @@ import ai.djl.util.Progress;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A class represents a resource in a {@link Repository}. */
 public class Resource {
 
+    private static final Logger logger = LoggerFactory.getLogger(Resource.class);
+
     private Repository repository;
     private MRL mrl;
     private String version;
-    private boolean prepared;
     private Metadata metadata;
 
     /**
@@ -64,15 +67,6 @@ public class Resource {
      */
     public String getVersion() {
         return version;
-    }
-
-    /**
-     * Returns the prepared state of the resource.
-     *
-     * @return true if the resource is prepared
-     */
-    public boolean isPrepared() {
-        return prepared;
     }
 
     /**
@@ -129,11 +123,9 @@ public class Resource {
      * @throws IOException if it failed to prepare
      */
     public void prepare(Artifact artifact, Progress progress) throws IOException {
-        if (!prepared) {
-            if (artifact != null) {
-                repository.prepare(artifact, progress);
-            }
-            prepared = true;
+        if (artifact != null) {
+            logger.debug("Preparing artifact: {}, {}", repository.getName(), artifact);
+            repository.prepare(artifact, progress);
         }
     }
 

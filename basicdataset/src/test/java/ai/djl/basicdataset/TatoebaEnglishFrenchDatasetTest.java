@@ -42,6 +42,7 @@ public class TatoebaEnglishFrenchDatasetTest {
                             .setSampling(32, true)
                             .optLimit(10)
                             .build();
+
             tatoebaEnglishFrenchDataset.prepare();
             Record record = tatoebaEnglishFrenchDataset.get(manager, 0);
             Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
@@ -61,8 +62,8 @@ public class TatoebaEnglishFrenchDatasetTest {
                             .setSampling(32, true)
                             .optLimit(10)
                             .build();
-            tatoebaEnglishFrenchDataset.prepare();
 
+            tatoebaEnglishFrenchDataset.prepare();
             Record record = tatoebaEnglishFrenchDataset.get(manager, 0);
             Assert.assertEquals(record.getData().size(), 1);
             Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);

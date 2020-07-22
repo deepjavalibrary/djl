@@ -26,7 +26,6 @@ import ai.djl.modality.Classifications;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.dataset.Dataset;
-import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -125,10 +124,7 @@ public class TrainCookingStackExchange {
         }
     }
 
-    private static CookingStackExchange getDataset(Dataset.Usage usage)
-            throws IOException, TranslateException {
-        CookingStackExchange dataset = CookingStackExchange.builder().optUsage(usage).build();
-        dataset.prepare(new ProgressBar());
-        return dataset;
+    private static CookingStackExchange getDataset(Dataset.Usage usage) {
+        return CookingStackExchange.builder().optUsage(usage).build();
     }
 }

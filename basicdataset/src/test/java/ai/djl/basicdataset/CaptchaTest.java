@@ -43,7 +43,6 @@ public class CaptchaTest {
                             .setSampling(32, true)
                             .build();
 
-            captchaDataset.prepare();
             try (Trainer trainer = model.newTrainer(config)) {
                 for (Batch batch : trainer.iterateDataset(captchaDataset)) {
                     Assert.assertEquals(batch.getData().size(), 1);

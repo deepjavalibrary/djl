@@ -22,10 +22,12 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.dataset.ZooDataset;
+import ai.djl.repository.Resource;
+import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.Pipeline;
+import ai.djl.util.Progress;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -38,7 +40,7 @@ import java.util.List;
  * 0-10. The dataset therefore features 6 labels. Each label ranges from 0-11 where 0-10 represent a
  * recognized digit and 11 indicates that the value is not a digit (size 5 and not 6).
  */
-public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
+public class CaptchaDataset extends RandomAccessDataset {
 
     public static final int IMAGE_WIDTH = 160;
     public static final int IMAGE_HEIGHT = 60;
@@ -47,12 +49,13 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
 
     private static final String ARTIFACT_ID = "captcha";
 
-    private Repository repository;
-    private Artifact artifact;
     private Usage usage;
-    private boolean prepared;
-
     private List<String> items;
+    private Artifact.Item dataItem;
+    private String pathPrefix;
+
+    private Resource resource;
+    private boolean prepared;
 
     /**
      * Creates a new instance of {@link CaptchaDataset}.
@@ -61,9 +64,9 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
      */
     public CaptchaDataset(Builder builder) {
         super(builder);
-        this.repository = builder.repository;
-        this.artifact = builder.artifact;
         this.usage = builder.usage;
+        MRL mrl = MRL.dataset(CV.IMAGE_CLASSIFICATION, builder.groupId, builder.artifactId);
+        resource = new Resource(builder.repository, mrl, "1.1");
     }
 
     /**
@@ -77,11 +80,10 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
 
     /** {@inheritDoc} */
     @Override
-    public Record get(NDManager manager, long index) throws IOException {
+    protected Record get(NDManager manager, long index) throws IOException {
         String item = items.get(Math.toIntExact(index));
-
         Path imagePath =
-                repository.getFile(getArtifactItem(), getUsagePath() + "/" + item + ".jpeg");
+                resource.getRepository().getFile(dataItem, pathPrefix + '/' + item + ".jpeg");
         NDArray imageArray =
                 ImageFactory.getInstance()
                         .fromFile(imagePath)
@@ -110,60 +112,24 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
 
     /** {@inheritDoc} */
     @Override
-    public MRL getMrl() {
-        return MRL.dataset(CV.IMAGE_CLASSIFICATION, BasicDatasets.GROUP_ID, ARTIFACT_ID);
-    }
+    public void prepare(Progress progress) throws IOException {
+        if (prepared) {
+            return;
+        }
 
-    /** {@inheritDoc} */
-    @Override
-    public Repository getRepository() {
-        return repository;
-    }
+        Artifact artifact = resource.getDefaultArtifact();
+        resource.prepare(artifact, progress);
 
-    /** {@inheritDoc} */
-    @Override
-    public Artifact getArtifact() {
-        return artifact;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Usage getUsage() {
-        return usage;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isPrepared() {
-        return prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setPrepared(boolean prepared) {
-        this.prepared = prepared;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void useDefaultArtifact() throws IOException {
-        artifact = repository.resolve(getMrl(), "1.1", null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void prepareData(Usage usage) throws IOException {
+        dataItem = artifact.getFiles().get("data");
+        pathPrefix = getUsagePath();
         items = new ArrayList<>();
         for (String filenameWithExtension :
-                repository.listDirectory(getArtifactItem(), getUsagePath())) {
+                resource.getRepository().listDirectory(dataItem, pathPrefix)) {
             String captchaFilename =
                     filenameWithExtension.substring(0, filenameWithExtension.lastIndexOf('.'));
             items.add(captchaFilename);
         }
-    }
-
-    private Artifact.Item getArtifactItem() {
-        return artifact.getFiles().get("data");
+        prepared = true;
     }
 
     private String getUsagePath() {
@@ -183,13 +149,16 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
     public static final class Builder extends BaseBuilder<Builder> {
 
         Repository repository;
-        Artifact artifact;
+        String groupId;
+        String artifactId;
         Usage usage;
 
         /** Constructs a new builder. */
         Builder() {
             repository = BasicDatasets.REPOSITORY;
-            usage = Usage.TRAIN;
+            groupId = BasicDatasets.GROUP_ID;
+            artifactId = ARTIFACT_ID;
+            usage = Dataset.Usage.TRAIN;
             pipeline = new Pipeline(new ToTensor());
         }
 
@@ -211,13 +180,30 @@ public class CaptchaDataset extends RandomAccessDataset implements ZooDataset {
         }
 
         /**
-         * Sets the optional artifact.
+         * Sets optional groupId.
          *
-         * @param artifact the artifact
+         * @param groupId the groupId}
          * @return this builder
          */
-        public Builder optArtifact(Artifact artifact) {
-            this.artifact = artifact;
+        public Builder optGroupId(String groupId) {
+            this.groupId = groupId;
+            return this;
+        }
+
+        /**
+         * Sets the optional artifactId.
+         *
+         * @param artifactId the artifactId
+         * @return this builder
+         */
+        public Builder optArtifactId(String artifactId) {
+            if (artifactId.contains(":")) {
+                String[] tokens = artifactId.split(":");
+                groupId = tokens[0];
+                this.artifactId = tokens[1];
+            } else {
+                this.artifactId = artifactId;
+            }
             return this;
         }
 

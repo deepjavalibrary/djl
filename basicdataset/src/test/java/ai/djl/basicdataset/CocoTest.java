@@ -33,7 +33,7 @@ public class CocoTest {
     public void testCocoRemote() throws IOException, TranslateException {
         CocoDetection coco =
                 CocoDetection.builder().optUsage(Dataset.Usage.TEST).setSampling(1, true).build();
-        coco.prepare();
+
         try (Model model = Model.newInstance("model")) {
             TrainingConfig config =
                     new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);

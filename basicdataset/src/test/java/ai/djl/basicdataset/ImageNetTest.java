@@ -40,7 +40,6 @@ public class ImageNetTest {
                         .setRepository(repository)
                         .setSampling(32, true)
                         .build();
-        imagenet.prepare();
 
         try (Model model = Model.newInstance("model")) {
             TrainingConfig config =

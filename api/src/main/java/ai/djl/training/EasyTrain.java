@@ -17,7 +17,9 @@ import ai.djl.ndarray.NDList;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.listener.TrainingListener.BatchData;
+import ai.djl.translate.TranslateException;
 import ai.djl.util.Preconditions;
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** Helper for easy training of a whole model, a trainining batch, or a validation batch. */
@@ -32,9 +34,12 @@ public final class EasyTrain {
      * @param numEpoch the number of epochs to train
      * @param trainingDataset the dataset to train on
      * @param validateDataset the dataset to validate against. Can be null for no validation
+     * @throws IOException for various exceptions depending on the dataset
+     * @throws TranslateException if there is an error while processing input
      */
     public static void fit(
-            Trainer trainer, int numEpoch, Dataset trainingDataset, Dataset validateDataset) {
+            Trainer trainer, int numEpoch, Dataset trainingDataset, Dataset validateDataset)
+            throws IOException, TranslateException {
         for (int epoch = 0; epoch < numEpoch; epoch++) {
             for (Batch batch : trainer.iterateDataset(trainingDataset)) {
                 trainBatch(trainer, batch);

@@ -219,7 +219,7 @@ public final class TrainWithOptimizers {
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
-            throws IOException, TranslateException {
+            throws IOException {
         Pipeline pipeline =
                 new Pipeline(
                         new ToTensor(),
