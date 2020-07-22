@@ -42,10 +42,12 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.DataManager;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
+import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
@@ -105,7 +107,7 @@ public final class TrainSentimentAnalysis {
                     getDataset(embedding, Dataset.Usage.TRAIN, executorService, arguments);
             StanfordMovieReview validateSet =
                     getDataset(embedding, Dataset.Usage.TEST, executorService, arguments);
-            model.setBlock(getModel(modelZooTextEmbedding));
+            model.setBlock(getModel());
 
             // setup training configuration
             DefaultTrainingConfig config = setupTrainingConfig(arguments, modelZooTextEmbedding);
@@ -137,16 +139,8 @@ public final class TrainSentimentAnalysis {
         }
     }
 
-    private static Block getModel(ModelZooTextEmbedding modelZooTextEmbedding) {
+    private static Block getModel() {
         return new SequentialBlock()
-                .addSingleton(
-                        input -> {
-                            try {
-                                return modelZooTextEmbedding.embedText(input);
-                            } catch (EmbeddingException e) {
-                                throw new IllegalArgumentException(e.getMessage(), e);
-                            }
-                        })
                 .add(
                         LSTM.builder()
                                 .setNumStackedLayers(2)
@@ -154,12 +148,14 @@ public final class TrainSentimentAnalysis {
                                 .setSequenceLength(false)
                                 .optBidrectional(true)
                                 .build())
-                .addSingleton(
+                .add(
                         x -> {
-                            long sequenceLength = x.getShape().get(1);
-                            NDArray ntc = x.transpose(1, 0, 2);
-                            return NDArrays.concat(
-                                    new NDList(ntc.get(0), ntc.get(sequenceLength - 1)), 1);
+                            long sequenceLength = x.head().getShape().get(1);
+                            NDArray ntc = x.head().transpose(1, 0, 2);
+                            return new NDList(
+                                    NDArrays.concat(
+                                            new NDList(ntc.get(0), ntc.get(sequenceLength - 1)),
+                                            1));
                         })
                 .add(Linear.builder().setUnits(2).build());
     }
@@ -176,6 +172,7 @@ public final class TrainSentimentAnalysis {
                 });
 
         return new DefaultTrainingConfig(new SoftmaxCrossEntropyLoss())
+                .optDataManager(new EmbeddingDataManager(embedding))
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
@@ -243,6 +240,24 @@ public final class TrainSentimentAnalysis {
                     .optIncludeValidLengths(false)
                     .addPad(0, 0, m -> m.ones(new Shape(1, 50)).mul(paddingTokenValue))
                     .build();
+        }
+    }
+
+    private static final class EmbeddingDataManager extends DataManager {
+
+        private ModelZooTextEmbedding embedding;
+
+        public EmbeddingDataManager(ModelZooTextEmbedding embedding) {
+            this.embedding = embedding;
+        }
+
+        @Override
+        public NDList getData(Batch batch) {
+            try {
+                return new NDList(embedding.embedText(batch.getData().head()));
+            } catch (EmbeddingException e) {
+                throw new IllegalArgumentException(e.getMessage(), e);
+            }
         }
     }
 }
