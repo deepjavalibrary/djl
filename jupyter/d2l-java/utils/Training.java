@@ -1,4 +1,10 @@
 import ai.djl.ndarray.*;
+import ai.djl.metric.Metrics;
+import ai.djl.training.EasyTrain;
+import ai.djl.training.Trainer;
+import ai.djl.training.dataset.ArrayDataset;
+
+import java.util.Map;
 
 class Training {
 
@@ -14,11 +20,43 @@ class Training {
     public static void sgd(NDList params, float lr, int batchSize) {
         for (int i = 0; i < params.size(); i++) {
             NDArray param = params.get(i);
-            // Update param
+            // Update param in place.
             // param = param - param.gradient * lr / batchSize
-            params.set(i, param.sub(param.getGradient().mul(lr).div(batchSize)));
-            // Close Gradient
-            param.getGradient().close();
+            param.subi(param.getGradient().mul(lr).div(batchSize));
         }
+    }
+
+    public static float accuracy(NDArray yHat, NDArray y) {
+        // Check size of 1st dimension greater than 1
+        // to see if we have multiple samples
+        if (yHat.getShape().size(1) > 1) {
+            // Argmax gets index of maximum args for given axis 1
+            // Convert yHat to same dataType as y (int32)
+            // Sum up number of true entries
+            return yHat.argMax(1).toType(DataType.INT32, false).eq(y.toType(DataType.INT32, false))
+                    .sum().toType(DataType.FLOAT32, false).getFloat();
+        }
+        return yHat.toType(DataType.INT32, false).eq(y.toType(DataType.INT32, false))
+                .sum().toType(DataType.FLOAT32, false).getFloat();
+    }
+
+    public static void trainingChapter6(ArrayDataset trainIter, ArrayDataset testIter,
+                                        int numEpochs, Trainer trainer, Map<String, double[]> evaluatorMetrics, double avgTrainTimePerEpoch) {
+
+        trainer.setMetrics(new Metrics());
+
+        EasyTrain.fit(trainer, numEpochs, trainIter, testIter);
+
+        Metrics metrics = trainer.getMetrics();
+
+        trainer.getEvaluators().stream()
+                .forEach(evaluator -> {
+                    evaluatorMetrics.put("train_epoch_" + evaluator.getName(), metrics.getMetric("train_epoch_" + evaluator.getName()).stream()
+                            .mapToDouble(x -> x.getValue().doubleValue()).toArray());
+                    evaluatorMetrics.put("validate_epoch_" + evaluator.getName(), metrics.getMetric("validate_epoch_" + evaluator.getName()).stream()
+                            .mapToDouble(x -> x.getValue().doubleValue()).toArray());
+                });
+
+        avgTrainTimePerEpoch = metrics.mean("epoch");
     }
 }
