@@ -10,9 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.training.optimizer.learningrate;
+package ai.djl.training.tracker;
 
-/** An enum that enumerates the types of warm-up modes for a {@link LearningRateTracker}. */
+/** An enum that enumerates the types of warm-up modes for a {@link Tracker}. */
 public enum WarmUpMode {
     LINEAR,
     CONSTANT

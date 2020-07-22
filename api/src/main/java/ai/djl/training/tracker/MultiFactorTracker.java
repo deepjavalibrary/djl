@@ -11,17 +11,16 @@
  * and limitations under the License.
  */
 
-package ai.djl.training.optimizer.learningrate;
+package ai.djl.training.tracker;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@code MultiFactorTracker} is an implementation of {@link LearningRateTracker} which is updated
- * by a multiplicative factor, at an uneven interval of steps, until it reaches a specified stop
- * value.
+ * {@code MultiFactorTracker} is an implementation of {@link Tracker} which is updated by a
+ * multiplicative factor, at an uneven interval of steps, until it reaches a specified stop value.
  */
-public class MultiFactorTracker extends LearningRateTracker {
+public class MultiFactorTracker extends Tracker {
     private static final Logger logger = LoggerFactory.getLogger(FactorTracker.class);
 
     private int[] steps;
@@ -41,29 +40,29 @@ public class MultiFactorTracker extends LearningRateTracker {
 
     /** {@inheritDoc} */
     @Override
-    public float getNewLearningRate(int numUpdate) {
+    public float getNewValue(int numUpdate) {
         if (numUpdate < warmUpSteps) {
-            return getWarmUpLearningRate(numUpdate);
+            return getWarmUpValue(numUpdate);
         }
         while (stepIndex <= steps.length - 1) {
             if (numUpdate > steps[stepIndex]) {
                 stepIndex++;
-                baseLearningRate *= factor;
+                baseValue *= factor;
                 logger.debug(
-                        "Update[{}]: Change learning rate to {}",
+                        "Update[{}]: Change tracker value to {}",
                         numUpdate,
-                        String.format("%.5e", baseLearningRate));
+                        String.format("%.5e", baseValue));
             } else {
-                checkLearningRate(baseLearningRate);
-                return baseLearningRate;
+                checkValue(baseValue);
+                return baseValue;
             }
         }
-        checkLearningRate(baseLearningRate);
-        return baseLearningRate;
+        checkValue(baseValue);
+        return baseValue;
     }
 
     /** The Builder to construct an {@link MultiFactorTracker} object. */
-    public static final class Builder extends LrBaseBuilder<Builder> {
+    public static final class Builder extends TrackerBaseBuilder<Builder> {
 
         int[] steps;
         float factor = 1;
@@ -77,18 +76,18 @@ public class MultiFactorTracker extends LearningRateTracker {
         }
 
         /**
-         * Sets an array of integers indicating when the learning rate should be changed, usually in
-         * an uneven interval of steps.
+         * Sets an array of integers indicating when the value should be changed, usually in an
+         * uneven interval of steps.
          *
-         * @param steps an array of integers indicating when the learning rate should be change
+         * @param steps an array of integers indicating when the value should be change
          * @return this {@code Builder}
          */
         public Builder setSteps(int[] steps) {
             if (steps.length <= 1) {
                 throw new IllegalArgumentException(
                         "Steps should be an array of integers indicating when the "
-                                + "learning rate should be changed, usually in an uneven interval of steps"
-                                + "use FactorTracker if you want learning rate to be changed at a constant interval of steps");
+                                + "value should be changed, usually in an uneven interval of steps"
+                                + "use FactorTracker if you want the value to be changed at a constant interval of steps");
             }
             for (int i = 0; i < steps.length; i++) {
                 if (i > 0 && steps[i] <= steps[i - 1]) {
@@ -123,7 +122,7 @@ public class MultiFactorTracker extends LearningRateTracker {
          */
         public MultiFactorTracker build() {
             if (steps == null) {
-                throw new IllegalArgumentException("Steps must be set to change learning rate");
+                throw new IllegalArgumentException("Steps must be set to change value");
             }
             return new MultiFactorTracker(this);
         }

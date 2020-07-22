@@ -17,7 +17,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.SparseFormat;
-import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import ai.djl.training.tracker.Tracker;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Adagrad extends Optimizer {
 
-    private LearningRateTracker learningRateTracker;
+    private Tracker learningRateTracker;
     private float epsilon;
 
     private Map<String, Map<Device, NDArray>> history;
@@ -57,7 +57,7 @@ public class Adagrad extends Optimizer {
     @Override
     public void update(String parameterId, NDArray weight, NDArray grad) {
         int t = updateCount(parameterId);
-        float newLearningRate = learningRateTracker.getNewLearningRate(t);
+        float newLearningRate = learningRateTracker.getNewValue(t);
         float weightDecay = getWeightDecay();
 
         if (Float.isNaN(newLearningRate)
@@ -94,8 +94,7 @@ public class Adagrad extends Optimizer {
     /** The Builder to construct an {@link Adagrad} object. */
     public static final class Builder extends OptimizerBuilder<Builder> {
 
-        private LearningRateTracker learningRateTracker =
-                LearningRateTracker.fixedLearningRate(0.001f);
+        private Tracker learningRateTracker = Tracker.fixed(0.001f);
         private float epsilon = 1e-8f;
 
         Builder() {}
@@ -107,12 +106,12 @@ public class Adagrad extends Optimizer {
         }
 
         /**
-         * Sets the {@link LearningRateTracker} for this optimizer.
+         * Sets the {@link Tracker} for this optimizer.
          *
-         * @param learningRateTracker the {@link LearningRateTracker} to be set
+         * @param learningRateTracker the {@link Tracker} to be set
          * @return this {@code Builder}
          */
-        public Builder optLearningRateTracker(LearningRateTracker learningRateTracker) {
+        public Builder optLearningRateTracker(Tracker learningRateTracker) {
             this.learningRateTracker = learningRateTracker;
             return this;
         }

@@ -16,7 +16,7 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import ai.djl.training.tracker.Tracker;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Sgd extends Optimizer {
 
-    private LearningRateTracker learningRateTracker;
+    private Tracker learningRateTracker;
     private float momentum;
     private Map<String, Map<Device, NDArray>> momentumStates;
 
@@ -55,7 +55,7 @@ public class Sgd extends Optimizer {
     public void update(String parameterId, NDArray weight, NDArray grad) {
         // TODO: Support Mixed precision Sparse
         float weightDecay = getWeightDecay();
-        float learningRate = learningRateTracker.getNewLearningRate(updateCount(parameterId));
+        float learningRate = learningRateTracker.getNewValue(updateCount(parameterId));
         NDList inputs;
         if (momentum != 0f) {
             NDArray state =
@@ -78,7 +78,7 @@ public class Sgd extends Optimizer {
     /** The Builder to construct an {@link Sgd} object. */
     public static final class Builder extends OptimizerBuilder<Builder> {
 
-        LearningRateTracker learningRateTracker;
+        Tracker learningRateTracker;
         float momentum;
 
         Builder() {}
@@ -90,12 +90,12 @@ public class Sgd extends Optimizer {
         }
 
         /**
-         * Sets the {@link LearningRateTracker} for this optimizer.
+         * Sets the {@link Tracker} for this optimizer.
          *
-         * @param learningRateTracker the {@link LearningRateTracker} to be set
+         * @param learningRateTracker the {@link Tracker} to be set
          * @return this {@code Builder}
          */
-        public Builder setLearningRateTracker(LearningRateTracker learningRateTracker) {
+        public Builder setLearningRateTracker(Tracker learningRateTracker) {
             this.learningRateTracker = learningRateTracker;
             return this;
         }

@@ -12,10 +12,9 @@
  */
 
 /**
- * Contains classes for having a gradually changing learning rate.
+ * Contains classes for having a gradually changing hyper-parameter.
  *
- * <p>It contains a main interface {@link
- * ai.djl.training.optimizer.learningrate.LearningRateTracker} and various learning rate options
- * that extend it.
+ * <p>It contains a main interface {@link ai.djl.training.tracker.Tracker} and various options that
+ * extend it.
  */
-package ai.djl.training.optimizer.learningrate;
+package ai.djl.training.tracker;

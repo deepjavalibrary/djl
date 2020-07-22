@@ -16,6 +16,6 @@
  *
  * <p>It contains a main interface {@link ai.djl.training.optimizer.Optimizer} and various
  * optimizers that extend it. There are also the helpers for learning rates in {@link
- * ai.djl.training.optimizer.learningrate}.
+ * ai.djl.training.tracker}.
  */
 package ai.djl.training.optimizer;

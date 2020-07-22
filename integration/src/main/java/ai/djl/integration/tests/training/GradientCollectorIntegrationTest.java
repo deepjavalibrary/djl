@@ -32,7 +32,7 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.training.listener.EvaluatorTrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
-import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import ai.djl.training.tracker.Tracker;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -75,10 +75,7 @@ public class GradientCollectorIntegrationTest {
         int batchSize = 10;
         int epochs = 10;
 
-        Optimizer optimizer =
-                Optimizer.sgd()
-                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(.03f))
-                        .build();
+        Optimizer optimizer = Optimizer.sgd().setLearningRateTracker(Tracker.fixed(.03f)).build();
 
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())

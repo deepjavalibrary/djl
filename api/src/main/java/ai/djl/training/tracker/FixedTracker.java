@@ -10,31 +10,28 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.training.optimizer.learningrate;
+package ai.djl.training.tracker;
 
-/**
- * {@code FixedLearningRate} is an implementation of {@link LearningRateTracker} which returns a
- * fixed value for the learning rate.
- */
-class FixedLearningRate extends LearningRateTracker {
+/** {@link FixedTracker} is an implementation of {@link Tracker} which returns a fixed value. */
+class FixedTracker extends Tracker {
 
     /**
-     * Creates a new instance of {@code FixedLearningRate}.
+     * Creates a new instance of {@link FixedTracker}.
      *
      * @param builder the builder used to build this object
      */
-    public FixedLearningRate(Builder builder) {
+    public FixedTracker(Builder builder) {
         super(builder);
     }
 
     /** {@inheritDoc} */
     @Override
-    public float getNewLearningRate(int numUpdate) {
-        return baseLearningRate;
+    public float getNewValue(int numUpdate) {
+        return baseValue;
     }
 
     /**
-     * Creates a builder to build a {@code FixedLearningRate}.
+     * Creates a builder to build a {@link FixedTracker}.
      *
      * @return a new builder
      */
@@ -42,8 +39,8 @@ class FixedLearningRate extends LearningRateTracker {
         return new Builder();
     }
 
-    /** The Builder to construct an {@link FixedLearningRate} object. */
-    public static final class Builder extends LrBaseBuilder<Builder> {
+    /** The Builder to construct an {@link FixedTracker} object. */
+    public static final class Builder extends TrackerBaseBuilder<Builder> {
 
         Builder() {}
 
@@ -54,12 +51,12 @@ class FixedLearningRate extends LearningRateTracker {
         }
 
         /**
-         * Builds a {@link FixedLearningRate} block.
+         * Builds a {@link FixedTracker} block.
          *
-         * @return the {@link FixedLearningRate} block
+         * @return the {@link FixedTracker} block
          */
-        public FixedLearningRate build() {
-            return new FixedLearningRate(this);
+        public FixedTracker build() {
+            return new FixedTracker(this);
         }
     }
 }

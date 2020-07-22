@@ -10,23 +10,23 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.training.optimizer.learningrate;
+package ai.djl.training.tracker;
 
 import ai.djl.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@code FactorTracker} is an implementation of {@link LearningRateTracker} which is updated by a
+ * {@code FactorTracker} is an implementation of {@link Tracker} which is updated by a
  * multiplicative factor, at a constant interval of steps, until it reaches a specified stop value.
  */
-public class FactorTracker extends LearningRateTracker {
+public class FactorTracker extends Tracker {
 
     private static final Logger logger = LoggerFactory.getLogger(FactorTracker.class);
 
     private int step;
     private float factor;
-    private float stopFactorLearningRate;
+    private float stopFactorValue;
     private int count;
 
     /**
@@ -38,42 +38,42 @@ public class FactorTracker extends LearningRateTracker {
         super(builder);
         this.step = builder.step;
         this.factor = builder.factor;
-        this.stopFactorLearningRate = builder.stopFactorLearningRate;
+        this.stopFactorValue = builder.stopFactorValue;
         this.count = 0;
     }
 
     /** {@inheritDoc} */
     @Override
-    public float getNewLearningRate(int numUpdate) {
+    public float getNewValue(int numUpdate) {
         if (numUpdate < warmUpSteps) {
-            return getWarmUpLearningRate(numUpdate);
+            return getWarmUpValue(numUpdate);
         }
         while (numUpdate > count + step) {
             count += step;
-            baseLearningRate *= factor;
-            if (baseLearningRate < stopFactorLearningRate) {
-                baseLearningRate = stopFactorLearningRate;
+            baseValue *= factor;
+            if (baseValue < stopFactorValue) {
+                baseValue = stopFactorValue;
                 logger.debug(
-                        "Update[{}]: now learning rate arrived at {}, will not change in the future",
+                        "Update[{}]: now tracker value arrived at {}, will not change in the future",
                         numUpdate,
-                        String.format("%.5e", baseLearningRate));
+                        String.format("%.5e", baseValue));
             } else {
                 logger.debug(
-                        "Update[{}]: Change learning rate to {}",
+                        "Update[{}]: Change tracker value to {}",
                         numUpdate,
-                        String.format("%.5e", baseLearningRate));
+                        String.format("%.5e", baseValue));
             }
         }
-        checkLearningRate(baseLearningRate);
-        return baseLearningRate;
+        checkValue(baseValue);
+        return baseValue;
     }
 
     /** The Builder to construct an {@link FactorTracker} object. */
-    public static final class Builder extends LrBaseBuilder<Builder> {
+    public static final class Builder extends TrackerBaseBuilder<Builder> {
 
         int step;
         float factor = 1;
-        float stopFactorLearningRate = 1e-8f;
+        float stopFactorValue = 1e-8f;
 
         Builder() {}
 
@@ -113,14 +113,13 @@ public class FactorTracker extends LearningRateTracker {
         }
 
         /**
-         * Sets the stop value after which the learning rate should remain constant.
+         * Sets the stop value after which the value should remain constant.
          *
-         * @param stopFactorLearningRate the stop value after which the learning rate should remain
-         *     constant
+         * @param stopFactorValue the stop value after which the value should remain constant
          * @return this {@code Builder}
          */
-        public Builder optStopFactorLearningRate(float stopFactorLearningRate) {
-            this.stopFactorLearningRate = stopFactorLearningRate;
+        public Builder optStopFactorValue(float stopFactorValue) {
+            this.stopFactorValue = stopFactorValue;
             return this;
         }
 
@@ -130,8 +129,7 @@ public class FactorTracker extends LearningRateTracker {
          * @return the {@link FactorTracker} block
          */
         public FactorTracker build() {
-            Preconditions.checkArgument(
-                    step > 0, "Step must be set to change learning rate every N steps");
+            Preconditions.checkArgument(step > 0, "Step must be set to change value every N steps");
             return new FactorTracker(this);
         }
     }

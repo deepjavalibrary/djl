@@ -13,9 +13,9 @@
 
 package ai.djl.training;
 
-import ai.djl.training.optimizer.learningrate.FactorTracker;
-import ai.djl.training.optimizer.learningrate.LearningRateTracker;
-import ai.djl.training.optimizer.learningrate.MultiFactorTracker;
+import ai.djl.training.tracker.FactorTracker;
+import ai.djl.training.tracker.MultiFactorTracker;
+import ai.djl.training.tracker.Tracker;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -25,33 +25,29 @@ public class LearningRateTest {
     public void testFactorTracker() {
 
         FactorTracker factorTracker =
-                LearningRateTracker.factorTracker()
-                        .setStep(250)
-                        .optFactor(0.5f)
-                        .optBaseLearningRate(1f)
-                        .build();
-        Assert.assertEquals(factorTracker.getNewLearningRate(1), 1f);
-        Assert.assertEquals(factorTracker.getNewLearningRate(250), 1f);
-        Assert.assertEquals(factorTracker.getNewLearningRate(251), .5f);
-        Assert.assertEquals(factorTracker.getNewLearningRate(500), .5f);
-        Assert.assertEquals(factorTracker.getNewLearningRate(501), .25f);
+                Tracker.factorTracker().setStep(250).optFactor(0.5f).optBaseValue(1f).build();
+        Assert.assertEquals(factorTracker.getNewValue(1), 1f);
+        Assert.assertEquals(factorTracker.getNewValue(250), 1f);
+        Assert.assertEquals(factorTracker.getNewValue(251), .5f);
+        Assert.assertEquals(factorTracker.getNewValue(500), .5f);
+        Assert.assertEquals(factorTracker.getNewValue(501), .25f);
     }
 
     @Test
     public void testMultiFactorTracker() {
 
         MultiFactorTracker factorTracker =
-                LearningRateTracker.multiFactorTracker()
+                Tracker.multiFactorTracker()
                         .setSteps(new int[] {100, 250, 500})
                         .optFactor(0.5f)
-                        .optBaseLearningRate(1f)
+                        .optBaseValue(1f)
                         .build();
-        Assert.assertEquals(factorTracker.getNewLearningRate(1), 1f);
-        Assert.assertEquals(factorTracker.getNewLearningRate(100), 1f);
-        Assert.assertEquals(factorTracker.getNewLearningRate(101), .5f);
-        Assert.assertEquals(factorTracker.getNewLearningRate(250), .5f);
-        Assert.assertEquals(factorTracker.getNewLearningRate(251), .25f);
-        Assert.assertEquals(factorTracker.getNewLearningRate(500), .25f);
-        Assert.assertEquals(factorTracker.getNewLearningRate(501), .125f);
+        Assert.assertEquals(factorTracker.getNewValue(1), 1f);
+        Assert.assertEquals(factorTracker.getNewValue(100), 1f);
+        Assert.assertEquals(factorTracker.getNewValue(101), .5f);
+        Assert.assertEquals(factorTracker.getNewValue(250), .5f);
+        Assert.assertEquals(factorTracker.getNewValue(251), .25f);
+        Assert.assertEquals(factorTracker.getNewValue(500), .25f);
+        Assert.assertEquals(factorTracker.getNewValue(501), .125f);
     }
 }

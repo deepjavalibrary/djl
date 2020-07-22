@@ -16,7 +16,7 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import ai.djl.training.tracker.Tracker;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -51,7 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RmsProp extends Optimizer {
 
-    private LearningRateTracker learningRateTracker;
+    private Tracker learningRateTracker;
     private float rho;
     private float momentum;
     private float epsilon;
@@ -81,7 +81,7 @@ public class RmsProp extends Optimizer {
     /** {@inheritDoc} */
     @Override
     public void update(String parameterId, NDArray weight, NDArray grad) {
-        float newLearningRate = learningRateTracker.getNewLearningRate(updateCount(parameterId));
+        float newLearningRate = learningRateTracker.getNewValue(updateCount(parameterId));
         float weightDecay = getWeightDecay();
 
         if (Float.isNaN(newLearningRate)
@@ -155,8 +155,7 @@ public class RmsProp extends Optimizer {
     /** The Builder to construct an {@link RmsProp} object. */
     public static final class Builder extends OptimizerBuilder<Builder> {
 
-        private LearningRateTracker learningRateTracker =
-                LearningRateTracker.fixedLearningRate(0.001f);
+        private Tracker learningRateTracker = Tracker.fixed(0.001f);
         private float rho = 0.9f;
         private float momentum = 0.9f;
         private float epsilon = 1e-8f;
@@ -171,12 +170,12 @@ public class RmsProp extends Optimizer {
         }
 
         /**
-         * Sets the {@link LearningRateTracker} for this optimizer.
+         * Sets the {@link Tracker} for this optimizer.
          *
-         * @param learningRateTracker the {@link LearningRateTracker} to be set
+         * @param learningRateTracker the {@link Tracker} to be set
          * @return this {@code Builder}
          */
-        public Builder optLearningRateTracker(LearningRateTracker learningRateTracker) {
+        public Builder optLearningRateTracker(Tracker learningRateTracker) {
             this.learningRateTracker = learningRateTracker;
             return this;
         }

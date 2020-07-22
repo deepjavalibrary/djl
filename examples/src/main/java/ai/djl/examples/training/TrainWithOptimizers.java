@@ -44,8 +44,8 @@ import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
-import ai.djl.training.optimizer.learningrate.LearningRateTracker;
-import ai.djl.training.optimizer.learningrate.MultiFactorTracker;
+import ai.djl.training.tracker.MultiFactorTracker;
+import ai.djl.training.tracker.Tracker;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
@@ -199,11 +199,11 @@ public final class TrainWithOptimizers {
                 }
                 int[] steps = Arrays.stream(epochs).map(k -> k * 60000 / batchSize).toArray();
                 MultiFactorTracker learningRateTracker =
-                        LearningRateTracker.multiFactorTracker()
+                        Tracker.multiFactorTracker()
                                 .setSteps(steps)
-                                .optBaseLearningRate(1e-3f)
+                                .optBaseValue(1e-3f)
                                 .optFactor((float) Math.sqrt(.1f))
-                                .optWarmUpBeginLearningRate(1e-4f)
+                                .optWarmUpBeginValue(1e-4f)
                                 .optWarmUpSteps(200)
                                 .build();
                 return Optimizer.sgd()

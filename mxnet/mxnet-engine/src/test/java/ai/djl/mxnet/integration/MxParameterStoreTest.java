@@ -22,7 +22,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
-import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import ai.djl.training.tracker.Tracker;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -67,9 +67,7 @@ public class MxParameterStoreTest {
             }
 
             TestOptimizer optimizer =
-                    TestOptimizer.builder()
-                            .setLearningRateTracker(LearningRateTracker.fixedLearningRate(lr))
-                            .build();
+                    TestOptimizer.builder().setLearningRateTracker(Tracker.fixed(lr)).build();
 
             try (ParameterServer ps = new MxParameterServer(optimizer)) {
 
@@ -102,7 +100,7 @@ public class MxParameterStoreTest {
 
     private static class TestOptimizer extends Optimizer {
 
-        private LearningRateTracker learningRateTracker;
+        private Tracker learningRateTracker;
         int updateCount;
 
         protected TestOptimizer(TestOptimizer.Builder builder) {
@@ -114,7 +112,7 @@ public class MxParameterStoreTest {
         @Override
         public void update(String parameterId, NDArray weight, NDArray grad) {
             weight.addi(
-                    grad.mul(learningRateTracker.getNewLearningRate(0))
+                    grad.mul(learningRateTracker.getNewValue(0))
                             .toDevice(weight.getDevice(), false));
             updateCount++;
         }
@@ -125,17 +123,17 @@ public class MxParameterStoreTest {
 
         public static final class Builder extends OptimizerBuilder<Builder> {
 
-            private LearningRateTracker learningRateTracker;
+            private Tracker learningRateTracker;
 
             Builder() {}
 
             public MxParameterStoreTest.TestOptimizer.Builder setLearningRateTracker(
-                    LearningRateTracker learningRateTracker) {
+                    Tracker learningRateTracker) {
                 this.learningRateTracker = learningRateTracker;
                 return this;
             }
 
-            public LearningRateTracker getLearningRateTracker() {
+            public Tracker getLearningRateTracker() {
                 return learningRateTracker;
             }
 

@@ -30,7 +30,7 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
-import ai.djl.training.optimizer.learningrate.LearningRateTracker;
+import ai.djl.training.tracker.Tracker;
 import ai.djl.translate.Batchifier;
 import org.testng.annotations.Test;
 
@@ -41,10 +41,7 @@ public class OptimizerTest {
 
     @Test
     public void testSgd() {
-        Optimizer sgd =
-                Optimizer.sgd()
-                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
-                        .build();
+        Optimizer sgd = Optimizer.sgd().setLearningRateTracker(Tracker.fixed(0.1f)).build();
 
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
@@ -74,7 +71,7 @@ public class OptimizerTest {
     public void testSgdWithMomentum() {
         Optimizer optim =
                 Optimizer.sgd()
-                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
+                        .setLearningRateTracker(Tracker.fixed(0.1f))
                         .optMomentum(0.9f)
                         .build();
 
@@ -113,7 +110,7 @@ public class OptimizerTest {
     public void testNag() {
         Optimizer optim =
                 Optimizer.nag()
-                        .setLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
+                        .setLearningRateTracker(Tracker.fixed(0.1f))
                         .setMomentum(0.9f)
                         .build();
 
@@ -145,10 +142,7 @@ public class OptimizerTest {
 
     @Test
     public void testAdam() {
-        Optimizer optim =
-                Optimizer.adam()
-                        .optLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
-                        .build();
+        Optimizer optim = Optimizer.adam().optLearningRateTracker(Tracker.fixed(0.1f)).build();
 
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
@@ -177,10 +171,7 @@ public class OptimizerTest {
 
     @Test
     public void testAdagrad() {
-        Optimizer optim =
-                Optimizer.adagrad()
-                        .optLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
-                        .build();
+        Optimizer optim = Optimizer.adagrad().optLearningRateTracker(Tracker.fixed(0.1f)).build();
 
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
@@ -211,7 +202,7 @@ public class OptimizerTest {
     public void testRMSProp() {
         Optimizer optim =
                 Optimizer.rmsprop()
-                        .optLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
+                        .optLearningRateTracker(Tracker.fixed(0.1f))
                         .optCentered(false)
                         .build();
 
@@ -245,7 +236,7 @@ public class OptimizerTest {
     public void testRMSPropAlex() {
         Optimizer optim =
                 Optimizer.rmsprop()
-                        .optLearningRateTracker(LearningRateTracker.fixedLearningRate(0.1f))
+                        .optLearningRateTracker(Tracker.fixed(0.1f))
                         .optCentered(true)
                         .build();
 
