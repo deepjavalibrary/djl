@@ -19,7 +19,7 @@ class FashionMnistUtils {
 
     public static RandomAccessDataset getDataset(Dataset.Usage usage,
                                                  int batchSize,
-                                                 boolean randomShuffle) throws IOException {
+                                                 boolean randomShuffle) throws IOException, TranslateException {
         FashionMnist fashionMnist = FashionMnist.builder().optUsage(usage)
                 .setSampling(batchSize, randomShuffle)
                 .build();
