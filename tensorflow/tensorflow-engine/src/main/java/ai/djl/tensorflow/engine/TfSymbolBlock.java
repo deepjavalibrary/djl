@@ -76,6 +76,7 @@ public class TfSymbolBlock implements SymbolBlock {
         TfNDManager tfNDManager = (TfNDManager) inputs.head().getManager();
         for (Tensor<?> tensor : result) {
             resultNDList.add(tfNDManager.create(tensor));
+            tensor.close();
         }
         return resultNDList;
     }
@@ -126,10 +127,7 @@ public class TfSymbolBlock implements SymbolBlock {
     public PairList<String, Shape> describeInput() {
         PairList<String, Shape> inputDescriptions = new PairList<>();
         Map<String, SignatureDef> signatureDefMap = metaGraphDef.getSignatureDefMap();
-        SignatureDef servingDefault =
-                metaGraphDef.getSignatureDefOrDefault(
-                        "serving_default",
-                        signatureDefMap.get(signatureDefMap.keySet().iterator().next()));
+        SignatureDef servingDefault = signatureDefMap.entrySet().iterator().next().getValue();
         for (Map.Entry<String, TensorInfo> entry : servingDefault.getInputsMap().entrySet()) {
             TensorShapeProto shapeProto = entry.getValue().getTensorShape();
             inputDescriptions.add(
@@ -147,12 +145,13 @@ public class TfSymbolBlock implements SymbolBlock {
     PairList<String, Shape> describeOutput() {
         PairList<String, Shape> outputDescription = new PairList<>();
         Map<String, SignatureDef> signatureDefMap = metaGraphDef.getSignatureDefMap();
-        SignatureDef servingDefault =
-                metaGraphDef.getSignatureDefOrDefault(
-                        "serving_default",
-                        signatureDefMap.get(signatureDefMap.keySet().iterator().next()));
+        SignatureDef servingDefault = signatureDefMap.entrySet().iterator().next().getValue();
         for (Map.Entry<String, TensorInfo> entry : servingDefault.getOutputsMap().entrySet()) {
             TensorShapeProto shapeProto = entry.getValue().getTensorShape();
+            // does not support string tensors
+            if (entry.getValue().getDtype() == org.tensorflow.proto.framework.DataType.DT_STRING) {
+                continue;
+            }
             outputDescription.add(
                     entry.getValue().getName(),
                     new Shape(

@@ -18,6 +18,7 @@ import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.tensorflow.engine.TfEngine;
 import ai.djl.tensorflow.zoo.cv.classification.MobileNet;
 import ai.djl.tensorflow.zoo.cv.classification.Resnet;
+import ai.djl.tensorflow.zoo.cv.objectdetction.SingleShotDetectionModelLoader;
 import java.util.Collections;
 import java.util.Set;
 
@@ -33,6 +34,8 @@ public class TfModelZoo implements ModelZoo {
 
     public static final Resnet RESNET = new Resnet(REPOSITORY);
     public static final MobileNet MOBILENET = new MobileNet(REPOSITORY);
+    public static final SingleShotDetectionModelLoader SSD =
+            new SingleShotDetectionModelLoader(REPOSITORY);
 
     /** {@inheritDoc} */
     @Override
