@@ -86,10 +86,9 @@ public final class TrainTicTacToe {
                 RlAgent agent = new QAgent(trainer, rewardDiscount);
                 Tracker exploreRate =
                         new LinearTracker.Builder()
-                                .optBaseValue(1f)
+                                .setBaseValue(1f)
                                 .optSlope(-.9f / (epoch * gamesPerEpoch * 7))
-                                .optStopValue(.1f)
-                                .setStep(1)
+                                .optMinValue(0.1f)
                                 .build();
                 agent = new EpsilonGreedy(agent, exploreRate);
 

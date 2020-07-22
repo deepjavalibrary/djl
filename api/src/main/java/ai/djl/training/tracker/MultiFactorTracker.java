@@ -13,16 +13,19 @@
 
 package ai.djl.training.tracker;
 
+import ai.djl.training.tracker.LinearTracker.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@code MultiFactorTracker} is an implementation of {@link Tracker} which is updated by a
- * multiplicative factor, at an uneven interval of steps, until it reaches a specified stop value.
+ * {@code MultiFactorTracker} is an implementation of {@link Tracker} which returns piecewise
+ * constant values for fixed numbers of steps. multiplicative factor, at an uneven interval of
+ * steps, until it reaches a specified stop value.
  */
-public class MultiFactorTracker extends Tracker {
+public class MultiFactorTracker implements Tracker {
     private static final Logger logger = LoggerFactory.getLogger(FactorTracker.class);
 
+    private float baseValue;
     private int[] steps;
     private float factor;
     private int stepIndex;
@@ -33,7 +36,7 @@ public class MultiFactorTracker extends Tracker {
      * @param builder the builder to create a new instance of {@code MultiFactorTracker}
      */
     public MultiFactorTracker(Builder builder) {
-        super(builder);
+        this.baseValue = builder.baseValue;
         this.steps = builder.steps;
         this.factor = builder.factor;
     }
@@ -41,9 +44,6 @@ public class MultiFactorTracker extends Tracker {
     /** {@inheritDoc} */
     @Override
     public float getNewValue(int numUpdate) {
-        if (numUpdate < warmUpSteps) {
-            return getWarmUpValue(numUpdate);
-        }
         while (stepIndex <= steps.length - 1) {
             if (numUpdate > steps[stepIndex]) {
                 stepIndex++;
@@ -53,25 +53,27 @@ public class MultiFactorTracker extends Tracker {
                         numUpdate,
                         String.format("%.5e", baseValue));
             } else {
-                checkValue(baseValue);
                 return baseValue;
             }
         }
-        checkValue(baseValue);
         return baseValue;
     }
 
     /** The Builder to construct an {@link MultiFactorTracker} object. */
-    public static final class Builder extends TrackerBaseBuilder<Builder> {
+    public static final class Builder {
 
+        float baseValue;
         int[] steps;
         float factor = 1;
 
-        Builder() {}
-
-        /** {@inheritDoc} */
-        @Override
-        protected Builder self() {
+        /**
+         * Sets the initial value after no steps.
+         *
+         * @param baseValue the initial value
+         * @return this {@code Builder}
+         */
+        public Builder setBaseValue(float baseValue) {
+            this.baseValue = baseValue;
             return this;
         }
 

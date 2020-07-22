@@ -24,23 +24,20 @@ public class LearningRateTest {
     @Test
     public void testFactorTracker() {
 
-        FactorTracker factorTracker =
-                Tracker.factorTracker().setStep(250).optFactor(0.5f).optBaseValue(1f).build();
-        Assert.assertEquals(factorTracker.getNewValue(1), 1f);
-        Assert.assertEquals(factorTracker.getNewValue(250), 1f);
-        Assert.assertEquals(factorTracker.getNewValue(251), .5f);
-        Assert.assertEquals(factorTracker.getNewValue(500), .5f);
-        Assert.assertEquals(factorTracker.getNewValue(501), .25f);
+        FactorTracker factorTracker = Tracker.factor().setFactor(0.5f).setBaseValue(1f).build();
+        Assert.assertEquals(factorTracker.getNewValue(0), 1f);
+        Assert.assertEquals(factorTracker.getNewValue(1), 0.5f);
+        Assert.assertEquals(factorTracker.getNewValue(3), 0.125f);
     }
 
     @Test
     public void testMultiFactorTracker() {
 
         MultiFactorTracker factorTracker =
-                Tracker.multiFactorTracker()
+                Tracker.multiFactor()
                         .setSteps(new int[] {100, 250, 500})
                         .optFactor(0.5f)
-                        .optBaseValue(1f)
+                        .setBaseValue(1f)
                         .build();
         Assert.assertEquals(factorTracker.getNewValue(1), 1f);
         Assert.assertEquals(factorTracker.getNewValue(100), 1f);

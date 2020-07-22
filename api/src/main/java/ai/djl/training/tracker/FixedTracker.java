@@ -13,7 +13,9 @@
 package ai.djl.training.tracker;
 
 /** {@link FixedTracker} is an implementation of {@link Tracker} which returns a fixed value. */
-class FixedTracker extends Tracker {
+class FixedTracker implements Tracker {
+
+    private float value;
 
     /**
      * Creates a new instance of {@link FixedTracker}.
@@ -21,13 +23,13 @@ class FixedTracker extends Tracker {
      * @param builder the builder used to build this object
      */
     public FixedTracker(Builder builder) {
-        super(builder);
+        this.value = builder.value;
     }
 
     /** {@inheritDoc} */
     @Override
     public float getNewValue(int numUpdate) {
-        return baseValue;
+        return value;
     }
 
     /**
@@ -40,13 +42,12 @@ class FixedTracker extends Tracker {
     }
 
     /** The Builder to construct an {@link FixedTracker} object. */
-    public static final class Builder extends TrackerBaseBuilder<Builder> {
+    public static final class Builder {
 
-        Builder() {}
+        private float value;
 
-        /** {@inheritDoc} */
-        @Override
-        protected Builder self() {
+        public Builder setValue(float value) {
+            this.value = value;
             return this;
         }
 

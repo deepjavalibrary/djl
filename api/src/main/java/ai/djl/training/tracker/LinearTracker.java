@@ -13,21 +13,16 @@
 package ai.djl.training.tracker;
 
 import ai.djl.util.Preconditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@code FactorTracker} is an implementation of {@link Tracker} which is updated by a constant
- * factor, at a constant interval of steps, until it reaches a specified stop value.
+ * factor.
  */
-public class LinearTracker extends Tracker {
+public class LinearTracker implements Tracker {
 
-    private static final Logger logger = LoggerFactory.getLogger(LinearTracker.class);
-
-    private int step;
+    private float baseValue;
     private float slope;
-    private float stopValue;
-    private int count;
+    private int maxUpdates;
 
     /**
      * Creates a new instance of {@code FactorTracker}.
@@ -35,68 +30,44 @@ public class LinearTracker extends Tracker {
      * @param builder the builder to create a new instance of {@code FactorTracker}
      */
     public LinearTracker(Builder builder) {
-        super(builder);
-        this.step = builder.step;
+        this.baseValue = builder.baseValue;
         this.slope = builder.slope;
-        this.stopValue = builder.stopValue;
-        this.count = 0;
+        this.maxUpdates = builder.maxUpdates;
     }
 
     /** {@inheritDoc} */
     @Override
     public float getNewValue(int numUpdate) {
-        if (numUpdate < warmUpSteps) {
-            return getWarmUpValue(numUpdate);
+        if (numUpdate > maxUpdates) {
+            numUpdate = maxUpdates;
         }
-        while (numUpdate > count + step) {
-            count += step;
-            baseValue += slope;
-            if (baseValue < stopValue) {
-                baseValue = stopValue;
-                logger.debug(
-                        "Update[{}]: now tracker value arrived at {}, will not change in the future",
-                        numUpdate,
-                        String.format("%.5e", baseValue));
-            } else {
-                logger.debug(
-                        "Update[{}]: Change tracker value to {}",
-                        numUpdate,
-                        String.format("%.5e", baseValue));
-            }
-        }
-        checkValue(baseValue);
-        return baseValue;
+        return baseValue + numUpdate * slope;
     }
 
     /** The Builder to construct an {@link LinearTracker} object. */
-    public static final class Builder extends TrackerBaseBuilder<Builder> {
+    public static final class Builder {
 
-        int step;
-        float slope = 1;
-        float stopValue = 1e-8f;
-
-        /** {@inheritDoc} */
-        @Override
-        protected Builder self() {
-            return this;
-        }
+        float baseValue;
+        float slope;
+        Float min;
+        Float max;
+        Integer maxUpdates;
 
         /**
-         * Sets the number of steps after which the linear change begins.
+         * Sets the initial value after no steps.
          *
-         * @param step the number of steps after which the linear change begins once
+         * @param baseValue the initial value
          * @return this {@code Builder}
          */
-        public Builder setStep(int step) {
-            if (step < 1) {
-                throw new IllegalArgumentException("step should be larger or equal to 1");
-            }
-            this.step = step;
+        public Builder setBaseValue(float baseValue) {
+            this.baseValue = baseValue;
             return this;
         }
 
         /**
          * Sets the value of the linear slope.
+         *
+         * <p>Use a positive number for an increasing value and negative for decreasing.
          *
          * @param slope the value of the linear slope
          * @return this {@code Builder}
@@ -107,13 +78,40 @@ public class LinearTracker extends Tracker {
         }
 
         /**
-         * Sets the stop value after which the value should remain constant.
+         * Sets the maximum value for a positive slope.
          *
-         * @param stopValue the stop value after which the value should remain constant
+         * <p>This is equivalent to the max updates. Only one can be set.
+         *
+         * @param max the max value
          * @return this {@code Builder}
          */
-        public Builder optStopValue(float stopValue) {
-            this.stopValue = stopValue;
+        public Builder optMaxValue(float max) {
+            this.max = max;
+            return this;
+        }
+
+        /**
+         * Sets the minimum value for a negative slope.
+         *
+         * <p>This is equivalent to the max updates. Only one can be set.
+         *
+         * @param min the minimum value
+         * @return this {@code Builder}
+         */
+        public Builder optMinValue(float min) {
+            this.min = min;
+            return this;
+        }
+
+        /**
+         * Sets the maximum number of updates after which the value should remain constant.
+         *
+         * @param maxUpdates the maximum number of updates after which the value should remain
+         *     constant
+         * @return this {@code Builder}
+         */
+        public Builder optMaxUpdates(int maxUpdates) {
+            this.maxUpdates = maxUpdates;
             return this;
         }
 
@@ -123,7 +121,31 @@ public class LinearTracker extends Tracker {
          * @return the {@link LinearTracker} block
          */
         public LinearTracker build() {
-            Preconditions.checkArgument(step > 0, "Step must be set to change value every N steps");
+            Preconditions.checkArgument(slope != 0, "You must set a slope");
+            Preconditions.checkArgument(
+                    min == null || max == null, "You can not set both a max value and a min value");
+
+            if (max != null) {
+                Preconditions.checkArgument(
+                        maxUpdates == null, "You can not set both maxUpdates and a max value");
+                Preconditions.checkArgument(
+                        slope > 0, "The slope must be positive for a max value");
+                Preconditions.checkArgument(
+                        max > baseValue, "The max must be greater than the base value");
+                maxUpdates = Math.round((max - baseValue) / slope);
+            } else if (min != null) {
+                Preconditions.checkArgument(
+                        maxUpdates == null, "You can not set both maxUpdates and a min value");
+                Preconditions.checkArgument(
+                        slope < 0, "The slope must be negative for a min value");
+                Preconditions.checkArgument(
+                        min < baseValue, "The min must be smaller than the base value");
+                maxUpdates = Math.round((baseValue - min) / slope);
+            } else if (maxUpdates == null) {
+                // Default to no max if none set
+                maxUpdates = Integer.MAX_VALUE;
+            }
+
             return new LinearTracker(this);
         }
     }
