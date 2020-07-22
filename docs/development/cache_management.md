@@ -1,4 +1,4 @@
-# DJL Cache Management
+# Cache Management
 
 DJL uses cache directories to store downloaded models and Engine specific native files.
 By default, cache directories are located at current user's home directory:

@@ -15,7 +15,7 @@ ai.djl.engine.EngineException: No deep learning engine found.
 	at ai.djl.examples.training.TrainPikachu.main(TrainPikachu.java:72) [main/:?]
 ```
 
-#### 1. Engine dependency is missing
+### 1. Engine dependency is missing
 DJL currently supports four engines: MXNet, PyTorch, TensorFlow(experimental) and FastText.
 Please includes at least one of those engines and their native library as dependencies.
 For example, adding MXNet engine dependencies:
@@ -47,7 +47,7 @@ Maven:
 </dependency>
 ```
 
-#### 2. Intellij Issue
+### 2. Intellij Issue
 The error may appear after running the `./gradlew clean` command:
 This issue is caused by a mismatch between IntelliJ and the Gradle runner.
 To fix this, navigate to: `Preferences-> Build Execution Deployment -> Build Tools -> Gradle`. Then, change the `Build and running using:` option to `Gradle`.
@@ -62,7 +62,7 @@ Then, right click the resources folder and select `Rebuild<default>`.
 
 ![FAQ1](https://djl-ai.s3.amazonaws.com/resources/images/FAQ_engine_not_found.png)
 
-#### 3. UnsatisfiedLinkError issue
+### 3. UnsatisfiedLinkError issue
 You might see the error when DJL tries to load the native library for the engines, but some shared libraries are missing.
 Let's take the PyTorch engine as an example.
 DJL loads libtorch.dylib when creating the Engine instance.
@@ -81,7 +81,7 @@ libtorch.dylib:
 It shows the `libtorch.dylib` depends on `libiomp5.dylib` and `libc10.dylib`. If one of them is missing, it throws an `UnsatisfiedLinkError` exception.
 If you are using `ai.djl.{engine}:{engine}-native-auto`, please create an issue at `https://github.com/awslabs/djl`.
 
-#### 4. Failed to extract native file issue
+### 4. Failed to extract native file issue
 Sometimes you may only have read-only access on the machine.
 It will cause a failure during engine loading because the cache attempts to write to the home directory.
 For more information, please refer to [DJL Cache Management](cache_management.md).

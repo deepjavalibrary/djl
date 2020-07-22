@@ -1,4 +1,4 @@
-# DJL - examples
+# Examples
 
 This module contains examples to demonstrate use of the Deep Java Library (DJL).
 

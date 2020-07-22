@@ -1,4 +1,4 @@
-# DJL logging configuration
+# Logging configuration
 
 DJL uses [slf4j-api](http://www.slf4j.org/) to print logs. DJL library itself does not define the
 logging framework. Instead, users have to choose their own logging framework at deployment time.

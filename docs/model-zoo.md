@@ -2,7 +2,7 @@
 
 Deep Java Library's (DJL) Model Zoo is more than a collection of pre-trained models. It's a bridge between a model vendor and a consumer. It provides a framework for developers to create and publish their own models. 
 
-A ZooModel has the following characteristics:
+A [ZooModel](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/repository/zoo/ZooModel.html) has the following characteristics:
 
 - Globally unique: similar to Java maven packages, a model has its own group ID and artifact ID that uniquely identify it.
 - Versioned: the model version scheme allows developers to continuously update their model without causing a backward compatibility issue.

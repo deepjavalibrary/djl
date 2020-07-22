@@ -1,6 +1,6 @@
 # FAQ
 
-##### 1.  Why Deep Java Library (DJL)?
+### 1.  Why Deep Java Library (DJL)?
 
 - Prioritizes the Java developer's experience
 - Makes it easy for new machine learning developers to get started
@@ -10,7 +10,7 @@
 - Allows developers to write code once and run it on any deep learning engine
 - Allows developers to use engine specific features
 
-##### 2. Which DL engines can I run with DJL?
+### 2. Which DL engines can I run with DJL?
 While DJL is designed to be engine-agnostic and to run with the any engine, we currently
 support the following engines:
 
@@ -19,10 +19,10 @@ support the following engines:
 - TensorFlow (Experimental - inference only)
 - fastText
 
-##### 3. Does DJL support inference on GPU?
+### 3. Does DJL support inference on GPU?
 Yes. DJL does support inference on GPU. If GPUs are available, DJL automatically detects the GPU, and runs inference on a single GPU by default. 
 
-##### 4. Does DJL support training on GPU?
+### 4. Does DJL support training on GPU?
 Yes. DJL offers multi-GPU support. DJL can automatically detect if GPUs are available. If GPUs are available, it will
 run on a single GPU by default, unless the user specifies otherwise.
 
@@ -39,19 +39,19 @@ setting the devices. For example, if you have 7 GPUs available, and you want the
 All of the examples in the example folder can be run on 
 multiple GPUs with the appropriate arguments. Follow the steps in the example to [train a ResNet50 model on CIFAR-10 dataset](https://github.com/awslabs/djl/blob/master/examples/docs/train_cifar10_resnet.md#train-using-multiple-gpus) on a GPU.
 
-##### 5. Does DJL support inference on multiple threads?
+### 5. Does DJL support inference on multiple threads?
 Yes. DJL offers multi-threaded inference. If using the MXNet engine for a multi-threaded inference case, you need to 
 specify the 'MXNET_ENGINE_TYPE' environment variable to 'NaiveEngine'. For more information, see the
-[Multi-threaded inference example](https://github.com/awslabs/djl/blob/master/examples/docs/multithread_inference.md).
+[Multi-threaded inference example](../examples/docs/multithread_inference.md).
 
-##### 6. Does DJL support distributed training?
+### 6. Does DJL support distributed training?
 DJL does not currently support distributed training.
 
-##### 7. Can I run DJL on other versions of MxNet?
-This is not officially supported by DJL, but you can follow the steps outlined in the [troubleshooting document](https://github.com/awslabs/djl/blob/master/docs/development/troubleshooting.md#3-how-to-run-djl-using-other-versions-of-mxnet)
+### 7. Can I run DJL on other versions of MxNet?
+This is not officially supported by DJL, but you can follow the steps outlined in the [troubleshooting document](development/troubleshooting.md#4-how-to-run-djl-using-other-versions-of-mxnet)
 to use other versions of MXNet or built your own customized version.
 
-##### 8. I have a model trained and saved by another DL engine. Can I load that model on to DJL?
+### 8. I have a model trained and saved by another DL engine. Can I load that model on to DJL?
 While DJL is designed to be engine-agnostic, here is a list of the DJL engines and the formats they support:
 
 - MXNet
@@ -62,6 +62,8 @@ While DJL is designed to be engine-agnostic, here is a list of the DJL engines a
 - TensorFlow
     - .pb format
     - Keras model - DJL only supports the [SavedModel API](https://www.tensorflow.org/guide/keras/save_and_serialize). The .h5 format is currently not supported
+- ONNX Model
+   - .onnx format
 - fastText
     - .bin format
     - .ftz format

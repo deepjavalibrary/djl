@@ -31,7 +31,7 @@ To send us a pull request, please:
 
 1. Fork the repository.
 2. Modify the source; please focus on the specific change you are contributing. If you also reformat all the code, it will be hard for us to focus on your change.
-3. Look at the [contributor documentation](https://github.com/awslabs/djl/tree/master/docs/development/README.md), especially the docs in bold, for help setting up your development environment and information about various conventions.
+3. Look at the [contributor documentation](docs/development/README.md), especially the docs in bold, for help setting up your development environment and information about various conventions.
 4. Ensure local tests pass.
 5. Commit to your fork using clear commit messages.
 6. Send us a pull request, answering any default questions in the pull request interface.

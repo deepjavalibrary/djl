@@ -1,4 +1,4 @@
-# DJL - model zoo
+# Model Zoo
 
 ## Introduction
 

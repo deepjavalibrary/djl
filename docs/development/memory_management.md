@@ -26,7 +26,6 @@ Here are the rule of thumb:
 ## Inference case
 For the majority of the inference cases, you would be working on the ProcessInput and ProcessOutput.
 Make sure all temporary NDArrays are attached to the NDManager in TranslatorContext.
-Here is the reference code [processInput](https://github.com/awslabs/djl/blob/72dbfa895329df77f980e3d59c98f27ff1c9b3a3/api/src/main/java/ai/djl/modality/cv/translator/BaseImageTranslator.java#L59).
 Note that if you don't specify NDManager in a NDArray operation, it uses the NDManger from the input NDArray.
 
 ## Training
@@ -37,7 +36,7 @@ The intermediate NDArrays involving in training case are usually
 
 In general, all the parameters in the model should be associated with Model level NDManager.
 All of the input and output NDArrays should be associated with one NDManager which is one level down to the model NDManager.
-Please check if you call [batch.close()](https://github.com/awslabs/djl/blob/468ce0d686758c46b3a62f6c18a084e80846bd8d/api/src/main/java/ai/djl/training/EasyTrain.java#L41)
+Please check if you call [batch.close()](https://javadoc.io/static/ai.djl/api/0.6.0/ai/djl/training/dataset/Batch.html#close--)
 to release one batch of the dataset at the end of each batch.
 If you still see the memory grows as the training process goes, it is most likely that intermediate NDArrays are attached to the Model(Block) parameter level.
 As a result, those NDArrays would not closed until the training is finished.
