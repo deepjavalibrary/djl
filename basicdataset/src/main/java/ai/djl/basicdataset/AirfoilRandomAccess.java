@@ -13,7 +13,6 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Application;
-import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -46,6 +45,9 @@ import org.apache.commons.csv.CSVRecord;
 public final class AirfoilRandomAccess extends RandomAccessDataset implements ZooDataset {
 
     private static final String ARTIFACT_ID = "airfoil";
+    private static final String[] FEATURE_ARRAY = {
+        "freq", "aoa", "chordlen", "freestreamvel", "ssdt"
+    };
 
     private Set<String> features; // features currently included
     private Set<String> availableFeatures; // features not included
@@ -56,16 +58,14 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
     // as common-csv only always reading(no modifying)
     private List<CSVRecord> csvRecords; // dataset
 
-    private final NDManager manager;
-    private final Repository repository;
+    private Repository repository;
     private Artifact artifact;
-    private final Usage usage;
+    private Usage usage;
     private boolean prepared;
 
     private float[][] data;
     private float[] labelArray;
 
-    String[] featureArray = {"freq", "aoa", "chordlen", "freestreamvel", "ssdt"};
     private Map<String, Integer> stringToIndex;
 
     /**
@@ -78,29 +78,27 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
         super(builder);
         repository = builder.repository;
         artifact = builder.artifact;
-
         usage = builder.usage;
-        manager = builder.manager;
 
         features = new HashSet<>();
-        availableFeatures = new HashSet<>(Arrays.asList(featureArray));
+        availableFeatures = new HashSet<>(Arrays.asList(FEATURE_ARRAY));
         label = "ssoundpres";
 
         stringToIndex = new HashMap<>();
-        for (int i = 0; i < featureArray.length; i++) {
-            stringToIndex.put(featureArray[i], i);
+        for (int i = 0; i < FEATURE_ARRAY.length; i++) {
+            stringToIndex.put(FEATURE_ARRAY[i], i);
         }
-        stringToIndex.put(label, featureArray.length);
+        stringToIndex.put(label, FEATURE_ARRAY.length);
     }
 
     /** Remove mean and rescale variance to 1 for all features. */
     public void whitenAll() {
-        float[] meanArray = new float[featureArray.length + 1];
-        float[] sdArray = new float[featureArray.length + 1];
+        float[] meanArray = new float[FEATURE_ARRAY.length + 1];
+        float[] sdArray = new float[FEATURE_ARRAY.length + 1];
 
         /* Mean Calculation */
         for (CSVRecord record : csvRecords) {
-            for (String feature : featureArray) {
+            for (String feature : FEATURE_ARRAY) {
                 int index = stringToIndex.get(feature);
                 meanArray[index] += getRecordFloat(record, feature);
             }
@@ -115,7 +113,7 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
 
         /* Standard Deviation Calculation */
         for (CSVRecord record : csvRecords) {
-            for (String feature : featureArray) {
+            for (String feature : FEATURE_ARRAY) {
                 int index = stringToIndex.get(feature);
                 sdArray[index] +=
                         (float) Math.pow(getRecordFloat(record, feature) - meanArray[index], 2);
@@ -135,16 +133,16 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
         /* Whiten Data */
         for (int i = 0; i < size(); i++) {
             CSVRecord record = csvRecords.get(i);
-            for (String feature : featureArray) {
+            for (String feature : FEATURE_ARRAY) {
                 int index = stringToIndex.get(feature);
                 data[i][index] =
                         (getRecordFloat(record, feature) - meanArray[index]) / sdArray[index];
             }
             labelArray[i] =
-                    (getRecordFloat(record, label) - meanArray[featureArray.length])
-                            / sdArray[featureArray.length];
+                    (getRecordFloat(record, label) - meanArray[FEATURE_ARRAY.length])
+                            / sdArray[FEATURE_ARRAY.length];
         }
-    } /* whitenAll() */
+    }
 
     /**
      * Gets the feature order of the columns.
@@ -152,11 +150,7 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
      * @return a list of the features in order shown in the FeatureNDArray
      */
     public List<String> getFeatureOrder() {
-        List<String> order = new ArrayList<>();
-        for (String feature : features) {
-            order.add(feature);
-        }
-        return order;
+        return new ArrayList<>(features);
     }
 
     /**
@@ -171,8 +165,9 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
     }
 
     /**
-     * Chooses the 1st N records to be used (not reversible). // TODO: make standalone without need
-     * for whiten() after to set data[] (speed penalty)
+     * Chooses the 1st N records to be used (not reversible).
+     *
+     * <p>TODO: make standalone without need for whiten() after to set data[] (speed penalty)
      *
      * @param n number of records to be used starting from the beginning
      */
@@ -246,7 +241,7 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
 
     /** {@inheritDoc} */
     @Override
-    public Record get(NDManager manager, long index) throws IOException {
+    public Record get(NDManager manager, long index) {
         int idx = Math.toIntExact(index);
         NDList d = new NDList(getFeatureNDArray(manager, idx));
         NDList l = new NDList(manager.create(getLabel(idx)));
@@ -374,12 +369,12 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
             csvRecords = csvParser.getRecords();
         }
 
-        data = new float[(int) size()][featureArray.length];
+        data = new float[(int) size()][FEATURE_ARRAY.length];
         labelArray = new float[(int) size()];
 
         // Set data array
         for (int i = 0; i < csvRecords.size(); i++) {
-            for (String feature : featureArray) {
+            for (String feature : FEATURE_ARRAY) {
                 int featureIndex = stringToIndex.get(feature);
                 data[i][featureIndex] = getRecordFloat(getCSVRecord(i), feature);
             }
@@ -399,13 +394,11 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
         Repository repository;
         Artifact artifact;
         Usage usage;
-        private NDManager manager;
 
         /** Constructs a new builder. */
         Builder() {
             repository = BasicDatasets.REPOSITORY;
             usage = Usage.TRAIN;
-            manager = Engine.getInstance().newBaseManager();
         }
 
         /** {@inheritDoc} */
@@ -445,17 +438,6 @@ public final class AirfoilRandomAccess extends RandomAccessDataset implements Zo
         public Builder optArtifact(Artifact artifact) {
             this.artifact = artifact;
             return self();
-        }
-
-        /**
-         * Sets the optional manager for the dataset (default follows engine default).
-         *
-         * @param manager the manager
-         * @return this builder
-         */
-        public AirfoilRandomAccess.Builder optManager(NDManager manager) {
-            this.manager = manager.newSubManager();
-            return this;
         }
 
         /**

@@ -54,7 +54,6 @@ public class AirfoilRandomAccessTest {
             NDManager manager = model.getNDManager();
             AirfoilRandomAccess airfoil =
                     AirfoilRandomAccess.builder()
-                            .optManager(manager)
                             .optUsage(Dataset.Usage.TRAIN)
                             .setSampling(32, true)
                             .build();
