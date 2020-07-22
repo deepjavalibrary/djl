@@ -73,7 +73,8 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDLis
             throws IOException {
         List<String> idxToToken =
                 Utils.readLines(
-                        repository.openStream(artifact.getFiles().get("idx_to_token"), null));
+                        resource.getRepository()
+                                .openStream(artifact.getFiles().get("idx_to_token"), null));
         TrainableWordEmbedding wordEmbedding =
                 TrainableWordEmbedding.builder()
                         .setEmbeddingSize(

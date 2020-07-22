@@ -19,9 +19,8 @@ import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDList;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
-import ai.djl.repository.Metadata;
 import ai.djl.repository.Repository;
-import ai.djl.repository.VersionRange;
+import ai.djl.repository.Resource;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
@@ -38,13 +37,9 @@ import java.util.stream.Collectors;
 /** Shared code for the {@link ModelLoader} implementations. */
 public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
 
-    protected Repository repository;
-    protected MRL mrl;
-    protected String version;
     protected Map<Pair<Type, Type>, TranslatorFactory<?, ?>> factories;
     protected ModelZoo modelZoo;
-
-    private Metadata metadata;
+    protected Resource resource;
 
     /**
      * Constructs a {@link ModelLoader} given the repository, mrl, and version.
@@ -55,9 +50,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
      * @param modelZoo the modelZoo type that is being used to get supported engine types
      */
     protected BaseModelLoader(Repository repository, MRL mrl, String version, ModelZoo modelZoo) {
-        this.repository = repository;
-        this.mrl = mrl;
-        this.version = version;
+        this.resource = new Resource(repository, mrl, version);
         factories = new ConcurrentHashMap<>();
         factories.put(
                 new Pair<>(NDList.class, NDList.class),
@@ -68,14 +61,14 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
     /** {@inheritDoc} */
     @Override
     public String getArtifactId() {
-        return mrl.getArtifactId();
+        return resource.getMrl().getArtifactId();
     }
 
     /** {@inheritDoc} */
     @Override
     public <S, T> ZooModel<S, T> loadModel(Criteria<S, T> criteria)
             throws IOException, ModelNotFoundException, MalformedModelException {
-        Artifact artifact = match(criteria.getFilters());
+        Artifact artifact = resource.match(criteria.getFilters());
         if (artifact == null) {
             throw new ModelNotFoundException("Model not found.");
         }
@@ -95,13 +88,13 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
                 translator = factory.newInstance(arguments);
             }
 
-            repository.prepare(artifact, progress);
+            resource.prepare(artifact, progress);
             if (progress != null) {
                 progress.reset("Loading", 2);
                 progress.update(1);
             }
 
-            Path modelPath = repository.getResourceDirectory(artifact);
+            Path modelPath = resource.getRepository().getResourceDirectory(artifact);
 
             // Check if the engine is specified in Criteria, use it if it is.
             // Otherwise check the modelzoo supported engine and grab a random engine in the list.
@@ -148,8 +141,9 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
 
     /** {@inheritDoc} */
     @Override
-    public List<Artifact> listModels() throws IOException, ModelNotFoundException {
-        List<Artifact> list = getMetadata().getArtifacts();
+    public List<Artifact> listModels() throws IOException {
+        List<Artifact> list = resource.listArtifacts();
+        String version = resource.getVersion();
         return list.stream()
                 .filter(a -> version == null || version.equals(a.getVersion()))
                 .collect(Collectors.toList());
@@ -165,62 +159,21 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         return Model.newInstance(name, device, engine);
     }
 
-    /**
-     * Returns the first artifact that matches a given criteria.
-     *
-     * @param criteria the criteria to match against
-     * @return the first artifact that matches the criteria. Null will be returned if no artifact
-     *     matches
-     * @throws IOException for errors while loading the model
-     * @throws ModelNotFoundException if the metadata to get artifacts from is not found
-     */
-    protected Artifact match(Map<String, String> criteria)
-            throws IOException, ModelNotFoundException {
-        List<Artifact> list = search(criteria);
-        if (list.isEmpty()) {
-            return null;
-        }
-        return list.get(0);
-    }
-
-    /**
-     * Returns all the artifacts that match a given criteria.
-     *
-     * @param criteria the criteria to match against
-     * @return all the artifacts that match a given criteria
-     * @throws IOException for errors while loading the model
-     * @throws ModelNotFoundException if the metadata to get artifacts from is not found
-     */
-    private List<Artifact> search(Map<String, String> criteria)
-            throws IOException, ModelNotFoundException {
-        return getMetadata().search(VersionRange.parse(version), criteria);
-    }
-
-    private Metadata getMetadata() throws IOException, ModelNotFoundException {
-        if (metadata == null) {
-            metadata = repository.locate(mrl);
-            if (metadata == null) {
-                throw new ModelNotFoundException(mrl.getArtifactId() + " Models not found.");
-            }
-        }
-        return metadata;
-    }
-
     /** {@inheritDoc} */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
-        sb.append(repository.getName())
+        sb.append(resource.getRepository().getName())
                 .append(':')
-                .append(mrl.getGroupId())
+                .append(resource.getMrl().getGroupId())
                 .append(':')
-                .append(mrl.getArtifactId())
+                .append(resource.getMrl().getArtifactId())
                 .append(" [\n");
         try {
             for (Artifact artifact : listModels()) {
                 sb.append('\t').append(artifact).append('\n');
             }
-        } catch (IOException | ModelNotFoundException e) {
+        } catch (IOException e) {
             sb.append("\tFailed load metadata.");
         }
         sb.append("\n]");
