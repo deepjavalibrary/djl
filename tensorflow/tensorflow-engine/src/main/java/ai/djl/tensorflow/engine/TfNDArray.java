@@ -747,13 +747,15 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sign() {
-        throw new UnsupportedOperationException("Not implemented");
+        try (Tensor<?> tensor = tf.math.sign(getOperand()).asTensor()) {
+            return new TfNDArray(manager, tensor);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray signi() {
-        throw new UnsupportedOperationException("Not implemented");
+        return inPlaceHelper(sign(), this);
     }
 
     /** {@inheritDoc} */

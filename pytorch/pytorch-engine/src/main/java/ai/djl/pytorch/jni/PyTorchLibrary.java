@@ -115,6 +115,10 @@ final class PyTorchLibrary {
 
     native void torchPowi(Pointer self, Pointer exponent);
 
+    native Pointer torchSign(Pointer self);
+
+    native void torchSigni(Pointer self);
+
     native Pointer torchMatmul(Pointer self, Pointer other);
 
     native Pointer torchDot(Pointer self, Pointer other);

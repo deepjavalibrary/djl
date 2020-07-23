@@ -498,6 +498,14 @@ public final class JniUtils {
         PyTorchLibrary.LIB.torchPowi(ndArray1.getHandle(), ndArray2.getHandle());
     }
 
+    public static PtNDArray sign(PtNDArray ndArray) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchSign(ndArray.getHandle()));
+    }
+
+    public static void signi(PtNDArray ndArray) {
+        PyTorchLibrary.LIB.torchSigni(ndArray.getHandle());
+    }
+
     public static PtNDArray logicalAnd(PtNDArray ndArray1, PtNDArray ndArray2) {
         return ndArray1.getManager()
                 .create(

@@ -532,14 +532,15 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray sign() {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDArray sign() {
+        return JniUtils.sign(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray signi() {
-        throw new UnsupportedOperationException("Not implemented");
+    public PtNDArray signi() {
+        JniUtils.signi(this);
+        return this;
     }
 
     /** {@inheritDoc} */

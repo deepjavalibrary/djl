@@ -451,3 +451,18 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLogicalNot
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSign
+  (JNIEnv* env, jobject jthis, jobject jhandle) {
+  API_BEGIN();
+    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+    const auto* result_ptr = new torch::Tensor(tensor_ptr->sign());
+    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END();
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSigni
+  (JNIEnv* env, jobject jthis, jobject jhandle) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  tensor_ptr->sign_();
+}
