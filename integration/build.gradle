@@ -15,7 +15,6 @@ dependencies {
     api project(":basicdataset")
     api project(":model-zoo")
     api project(":testing")
-    api project(":3rdparty:fasttext")
     api("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }

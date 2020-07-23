@@ -12,7 +12,7 @@
  */
 package ai.djl.fasttext.zoo;
 
-import ai.djl.fasttext.engine.FtEngine;
+import ai.djl.engine.Engine;
 import ai.djl.fasttext.zoo.nlp.textclassification.TextClassificationModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
@@ -38,6 +38,6 @@ public class FtModelZoo implements ModelZoo {
     /** {@inheritDoc} */
     @Override
     public Set<String> getSupportedEngines() {
-        return Collections.singleton(FtEngine.ENGINE_NAME);
+        return Collections.singleton(Engine.getInstance().getEngineName());
     }
 }

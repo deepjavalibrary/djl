@@ -9,9 +9,9 @@ configure([
         project(':tensorflow:tensorflow-api'),
         project(':tensorflow:tensorflow-engine'),
         project(':tensorflow:tensorflow-model-zoo'),
-        project(':fasttext:fasttext-engine'),
         project(':onnxruntime:onnxruntime-engine'),
         project(':3rdparty:aws-ai'),
+        project(':3rdparty:fasttext'),
         project(':3rdparty:hadoop')]) {
     apply plugin: "maven-publish"
     apply plugin: "signing"

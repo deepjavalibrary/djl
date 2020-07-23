@@ -15,9 +15,11 @@ package ai.djl.fasttext.zoo.nlp.textclassification;
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
-import ai.djl.fasttext.engine.TextClassificationTranslator;
+import ai.djl.Model;
+import ai.djl.fasttext.FtModel;
 import ai.djl.fasttext.zoo.FtModelZoo;
 import ai.djl.modality.Classifications;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
@@ -80,12 +82,22 @@ public class TextClassificationModelLoader extends BaseModelLoader<String, Class
         return loadModel(criteria);
     }
 
+    @Override
+    protected Model createModel(
+            String name,
+            Device device,
+            Artifact artifact,
+            Map<String, Object> arguments,
+            String engine) {
+        return new FtModel(name);
+    }
+
     private static final class FactoryImpl implements TranslatorFactory<String, Classifications> {
 
         /** {@inheritDoc} */
         @Override
         public Translator<String, Classifications> newInstance(Map<String, Object> arguments) {
-            return new TextClassificationTranslator();
+            return null;
         }
     }
 }

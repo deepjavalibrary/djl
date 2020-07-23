@@ -58,6 +58,15 @@ public class ZooModel<I, O> implements Model {
         throw new IllegalArgumentException("ZooModel should not be re-loaded.");
     }
 
+    /**
+     * Returns the wrapped model.
+     *
+     * @return the wrapped model
+     */
+    public Model getWrappedModel() {
+        return model;
+    }
+
     /** {@inheritDoc} */
     @Override
     public void save(Path modelPath, String modelName) throws IOException {

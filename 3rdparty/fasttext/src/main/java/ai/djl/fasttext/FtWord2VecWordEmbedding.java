@@ -19,6 +19,7 @@ import com.github.jfasttext.FastTextWrapper;
 
 /** An implementation of {@link WordEmbedding} for FastText word embeddings. */
 public class FtWord2VecWordEmbedding implements WordEmbedding {
+
     private FtModel model;
     private FtVocabulary vocabulary;
 

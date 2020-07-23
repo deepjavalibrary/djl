@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * FtWord2VecWordEmbedding}.
  */
 public class FtVocabulary implements Vocabulary {
+
     private Map<Long, String> tokenMap = new ConcurrentHashMap<>();
     private Map<String, Long> indicesMap = new ConcurrentHashMap<>();
     private long index;

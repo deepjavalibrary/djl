@@ -14,12 +14,30 @@ package ai.djl.fasttext;
 
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.basicdataset.RawDataset;
+import ai.djl.inference.Predictor;
+import ai.djl.modality.Classifications;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Block;
+import ai.djl.training.Trainer;
+import ai.djl.training.TrainingConfig;
 import ai.djl.training.TrainingResult;
+import ai.djl.translate.Translator;
+import ai.djl.util.PairList;
 import com.github.jfasttext.FastTextWrapper;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import org.bytedeco.javacpp.CharPointer;
 import org.bytedeco.javacpp.PointerPointer;
 
@@ -28,12 +46,13 @@ import org.bytedeco.javacpp.PointerPointer;
  *
  * <p>FtModel contains all the methods in Model to load and process a model.
  */
-public class FtModel implements AutoCloseable {
+public class FtModel implements Model {
 
     FastTextWrapper.FastTextApi fta;
 
     private Path modelDir;
     private String modelName;
+    private Map<String, String> properties;
 
     /**
      * Constructs a new Model.
@@ -43,17 +62,13 @@ public class FtModel implements AutoCloseable {
     public FtModel(String name) {
         this.modelName = name;
         fta = new FastTextWrapper.FastTextApi();
+        properties = new ConcurrentHashMap<>();
     }
 
-    /**
-     * Loads the fastText model from a specified location.
-     *
-     * @param modelPath the directory of the model
-     * @param prefix the model file name or path prefix
-     * @throws IOException Exception for file loading
-     * @throws MalformedModelException if model file is corrupted
-     */
-    public void load(Path modelPath, String prefix) throws IOException, MalformedModelException {
+    /** {@inheritDoc} */
+    @Override
+    public void load(Path modelPath, String prefix, Map<String, Object> options)
+            throws IOException, MalformedModelException {
         if (Files.notExists(modelPath)) {
             throw new FileNotFoundException(
                     "Model directory doesn't exist: " + modelPath.toAbsolutePath());
@@ -75,6 +90,8 @@ public class FtModel implements AutoCloseable {
             throw new MalformedModelException("Malformed FastText model file:" + modelFilePath);
         }
         fta.loadModel(modelFilePath);
+
+        properties.put("model-type", fta.getModelName().getString());
     }
 
     private Path findModelFile(String prefix) {
@@ -95,14 +112,35 @@ public class FtModel implements AutoCloseable {
     }
 
     /**
+     * Returns top K number of classifications of the input text.
+     *
+     * @param text the input text to be classified
+     * @param topK the value of K
+     * @return classifications of the input text
+     */
+    public Classifications classify(String text, int topK) {
+        FastTextWrapper.FloatStringPairVector fspv = fta.predictProba(text, topK);
+
+        int size = Math.min((int) fspv.size(), topK);
+        List<String> classNames = new ArrayList<>(size);
+        List<Double> probabilities = new ArrayList<>(size);
+        for (int i = 0; i < size; ++i) {
+            probabilities.add(Math.exp(fspv.first(i)));
+            classNames.add(fspv.second(i).getString().substring(9));
+        }
+        return new Classifications(classNames, probabilities);
+    }
+
+    /**
      * Train the fastText model.
      *
      * @param config the training configuration to use
-     * @param inputFilePath the training dataset file path
+     * @param dataset the training dataset
      * @return the result of the training
      * @throws IOException when IO operation fails in loading a resource
      */
-    public TrainingResult fit(FtTrainingConfig config, Path inputFilePath) throws IOException {
+    public TrainingResult fit(FtTrainingConfig config, RawDataset<Path> dataset)
+            throws IOException {
         Path outputDir = config.getOutputDir();
         if (Files.notExists(outputDir)) {
             Files.createDirectory(outputDir);
@@ -110,7 +148,7 @@ public class FtModel implements AutoCloseable {
         String fitModelName = config.getModelName();
         Path modelFile = outputDir.resolve(fitModelName).toAbsolutePath();
 
-        String[] args = config.toCommand(inputFilePath.toString());
+        String[] args = config.toCommand(dataset.getData().toString());
 
         fta.runCmd(args.length, new PointerPointer<CharPointer>(args));
         setModelFile(modelFile);
@@ -124,7 +162,118 @@ public class FtModel implements AutoCloseable {
         return result;
     }
 
-    private void setModelFile(Path modelFile) {
+    /** {@inheritDoc} */
+    @Override
+    public void save(Path modelDir, String newModelName) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public Path getModelPath() {
+        return modelDir;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Block getBlock() {
+        throw new UnsupportedOperationException("Fasttext doesn't support Block.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setBlock(Block block) {
+        throw new UnsupportedOperationException("Fasttext doesn't support setting the Block.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return modelName;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Trainer newTrainer(TrainingConfig trainingConfig) {
+        throw new UnsupportedOperationException(
+                "FastText only supports training using FtModel.fit");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
+        return new Predictor<>(this, translator, false);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setDataType(DataType dataType) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public DataType getDataType() {
+        return DataType.UNKNOWN;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void cast(DataType dataType) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PairList<String, Shape> describeInput() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PairList<String, Shape> describeOutput() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String[] getArtifactNames() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <T> T getArtifact(String name, Function<InputStream, T> function) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public URL getArtifact(String artifactName) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public InputStream getArtifactAsStream(String name) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDManager getNDManager() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setProperty(String key, String value) {
+        properties.put(key, value);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getProperty(String key) {
+        return properties.get(key);
+    }
+
+    void setModelFile(Path modelFile) {
         this.modelDir = modelFile;
     }
 
@@ -142,6 +291,9 @@ public class FtModel implements AutoCloseable {
         sb.append("Model (\n\tName: ").append(modelName);
         if (modelDir != null) {
             sb.append("\n\tModel location: ").append(modelDir.toAbsolutePath());
+        }
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
+            sb.append("\n\t").append(entry.getKey()).append(": ").append(entry.getValue());
         }
         sb.append("\n)");
         return sb.toString();

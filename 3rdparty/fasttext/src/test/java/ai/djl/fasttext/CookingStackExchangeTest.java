@@ -1,0 +1,119 @@
+/*
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ * with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+package ai.djl.fasttext;
+
+import ai.djl.MalformedModelException;
+import ai.djl.ModelException;
+import ai.djl.basicdataset.CookingStackExchange;
+import ai.djl.fasttext.zoo.FtModelZoo;
+import ai.djl.modality.Classifications;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.TrainingResult;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.Assert;
+import org.testng.SkipException;
+import org.testng.annotations.Test;
+
+public class CookingStackExchangeTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(CookingStackExchangeTest.class);
+
+    @Test
+    public void testTrainTextClassification() throws IOException {
+        try (FtModel model = new FtModel("cooking")) {
+            CookingStackExchange dataset = CookingStackExchange.builder().build();
+
+            // setup training configuration
+            FtTrainingConfig config =
+                    FtTrainingConfig.builder()
+                            .setOutputDir(Paths.get("build"))
+                            .setModelName("cooking")
+                            .optLoss(FtTrainingConfig.FtLoss.HS)
+                            .build();
+
+            TrainingResult result = model.fit(config, dataset);
+            Assert.assertEquals(result.getEpoch(), 5);
+            Assert.assertTrue(Files.exists(Paths.get("build/cooking.bin")));
+        }
+    }
+
+    @Test
+    public void testTextClassification()
+            throws IOException, MalformedModelException, ModelNotFoundException {
+        try (ZooModel<String, Classifications> model =
+                FtModelZoo.COOKING_STACKEXCHANGE.loadModel()) {
+            FtModel ftModel = (FtModel) model.getWrappedModel();
+            Classifications result =
+                    ftModel.classify("Which baking dish is best to bake a banana bread ?", 8);
+
+            Assert.assertEquals(result.item(0).getClassName(), "bread");
+        }
+    }
+
+    @Test
+    public void testWord2Vec() throws IOException, MalformedModelException, ModelNotFoundException {
+        try (ZooModel<String, Classifications> model =
+                        FtModelZoo.COOKING_STACKEXCHANGE.loadModel();
+                NDManager manager = NDManager.newBaseManager()) {
+
+            FtModel ftModel = (FtModel) model.getWrappedModel();
+            FtWord2VecWordEmbedding fasttextWord2VecWordEmbedding =
+                    new FtWord2VecWordEmbedding(ftModel, new FtVocabulary());
+            long index = fasttextWord2VecWordEmbedding.preprocessWordToEmbed("bread");
+            NDArray embedding = fasttextWord2VecWordEmbedding.embedWord(manager, index);
+            Assert.assertEquals(embedding.getShape(), new Shape(100));
+            Assert.assertEquals(embedding.toFloatArray()[0], 0.038162477, 0.001);
+        }
+    }
+
+    @Test(enabled = false)
+    public void testBlazingText() throws IOException, ModelException {
+        if (!Boolean.getBoolean("nightly")) {
+            throw new SkipException("Nightly only");
+        }
+
+        URL url =
+                new URL(
+                        "https://djl-ai.s3.amazonaws.com/resources/test-models/blazingtext_classification.bin");
+        Path path = Paths.get("build/tmp/model");
+        Path modelFile = path.resolve("text_classification.bin");
+        if (!Files.exists(modelFile)) {
+            Files.createDirectories(path);
+            try (InputStream is = url.openStream()) {
+                Files.copy(is, modelFile);
+            }
+        }
+
+        try (FtModel model = new FtModel("text_classification")) {
+            model.load(path);
+            Classifications result =
+                    model.classify(
+                            "Convair was an american aircraft manufacturing company which later expanded into rockets and spacecraft .",
+                            5);
+
+            logger.info("{}", result);
+            Assert.assertEquals(result.item(0).getClassName(), "Company");
+        }
+    }
+}
