@@ -13,6 +13,7 @@
 
 package ai.djl.training;
 
+import ai.djl.training.tracker.CosineTracker;
 import ai.djl.training.tracker.FactorTracker;
 import ai.djl.training.tracker.MultiFactorTracker;
 import ai.djl.training.tracker.Tracker;
@@ -46,5 +47,27 @@ public class LearningRateTest {
         Assert.assertEquals(factorTracker.getNewValue(251), .25f);
         Assert.assertEquals(factorTracker.getNewValue(500), .25f);
         Assert.assertEquals(factorTracker.getNewValue(501), .125f);
+    }
+
+    @Test
+    public void testCosineTracker() {
+        float baseValue = 0.5f;
+        float finalValue = 0.01f;
+        double epsilon = 1e-3;
+        CosineTracker cosineTracker =
+                Tracker.cosine()
+                        .setBaseValue(baseValue)
+                        .optFinalValue(finalValue)
+                        .setMaxUpdates(200)
+                        .build();
+
+        Assert.assertEquals(cosineTracker.getNewValue(0), baseValue);
+        Assert.assertEquals(cosineTracker.getNewValue(20), 0.488f, epsilon);
+        Assert.assertEquals(cosineTracker.getNewValue(50), 0.428f, epsilon);
+        Assert.assertEquals(cosineTracker.getNewValue(100), 0.255f, epsilon);
+        Assert.assertEquals(cosineTracker.getNewValue(150), 0.082f, epsilon);
+        Assert.assertEquals(cosineTracker.getNewValue(180), 0.022f, epsilon);
+        Assert.assertEquals(cosineTracker.getNewValue(200), finalValue);
+        Assert.assertEquals(cosineTracker.getNewValue(300), finalValue);
     }
 }

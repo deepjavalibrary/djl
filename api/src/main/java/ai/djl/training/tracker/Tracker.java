@@ -58,6 +58,16 @@ public interface Tracker {
     }
 
     /**
+     * Returns a new instance of {@link ai.djl.training.tracker.CosineTracker.Builder} that can
+     * build an {@link CosineTracker}.
+     *
+     * @return the {@link CosineTracker} {@link ai.djl.training.tracker.CosineTracker.Builder}
+     */
+    static CosineTracker.Builder cosine() {
+        return new CosineTracker.Builder();
+    }
+
+    /**
      * Returns a new instance of {@link Tracker} with a fixed value.
      *
      * @param value the fixed value
