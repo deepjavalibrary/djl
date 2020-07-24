@@ -461,6 +461,32 @@ public class TfNDArrayEx implements NDArrayEx {
         }
     }
 
+    @Override
+    public NDArray randomFlipLeftRight() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public NDArray randomFlipTopBottom() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public NDArray randomBrightness(float brightness) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public NDArray randomHue(float hue) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public NDArray randomColorJitter(
+            float brightness, float contrast, float saturation, float hue) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArrayIndexer getIndexer() {

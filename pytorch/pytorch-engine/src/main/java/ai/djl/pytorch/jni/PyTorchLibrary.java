@@ -155,6 +155,8 @@ final class PyTorchLibrary {
 
     native Pointer torchPermute(Pointer handle, long[] dims);
 
+    native Pointer torchFlip(Pointer handle, long[] dims);
+
     native Pointer torchTranspose(Pointer handle, long axis1, long axis2);
 
     native boolean contentEqual(Pointer handle1, Pointer handle2);

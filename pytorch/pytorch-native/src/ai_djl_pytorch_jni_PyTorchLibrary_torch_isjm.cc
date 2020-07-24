@@ -122,6 +122,16 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchPermute(
   API_END();
 }
 
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFlip(
+        JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jdims) {
+    API_BEGIN();
+        const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+        const std::vector<int64_t> dims = utils::GetVecFromJLongArray(env, jdims);
+        const auto* result_ptr = new torch::Tensor(tensor_ptr->flip(dims));
+        return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+    API_END();
+}
+
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTranspose(
     JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim1, jlong jdim2) {
   API_BEGIN();

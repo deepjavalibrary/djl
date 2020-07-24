@@ -576,6 +576,23 @@ public class NDArrayOtherOpTest {
         }
     }
 
+    @Test
+    public void testFlip() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            // test single dim
+            NDArray original = manager.create(new float[] {1, 2, 3, 4});
+            NDArray expected = manager.create(new float[] {4, 3, 2, 1});
+            Assert.assertEquals(original.flip(0), expected);
+            // test second dim
+            original = original.reshape(2, 2);
+            expected = manager.create(new float[] {2, 1, 4, 3}, new Shape(2, 2));
+            Assert.assertEquals(original.flip(1), expected);
+            // test two dims
+            expected = manager.create(new float[] {4, 3, 2, 1}, new Shape(2, 2));
+            Assert.assertEquals(original.flip(0, 1), expected);
+        }
+    }
+
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testTranspose() {
         try (NDManager manager = NDManager.newBaseManager()) {

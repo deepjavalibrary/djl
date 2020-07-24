@@ -1352,6 +1352,13 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
         return manager.invoke("_npi_swapaxes", this, params);
     }
 
+    @Override
+    public NDArray flip(int... axes) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axis", axes);
+        return manager.invoke("_npi_flip", this, params);
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray transpose() {

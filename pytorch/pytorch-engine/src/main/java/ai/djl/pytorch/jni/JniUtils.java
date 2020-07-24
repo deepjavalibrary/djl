@@ -431,6 +431,10 @@ public final class JniUtils {
                 .create(PyTorchLibrary.LIB.torchPermute(ndArray.getHandle(), dims));
     }
 
+    public static PtNDArray flip(PtNDArray ndArray, long[] dims) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchFlip(ndArray.getHandle(), dims));
+    }
+
     public static PtNDArray transpose(PtNDArray ndArray, long dim1, long dim2) {
         return ndArray.getManager()
                 .create(PyTorchLibrary.LIB.torchTranspose(ndArray.getHandle(), dim1, dim2));

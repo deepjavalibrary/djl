@@ -997,6 +997,11 @@ public class MockNDArray implements NDArray {
         return null;
     }
 
+    @Override
+    public NDArray flip(int... axes) {
+        return null;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray transpose() {

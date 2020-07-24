@@ -694,6 +694,50 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray randomFlipLeftRight() {
+        MxOpParams params = new MxOpParams();
+        return getManager().invoke("_npx__image_random_flip_left_right", array, params);
+    }
+
+    @Override
+    public NDArray randomFlipTopBottom() {
+        MxOpParams params = new MxOpParams();
+        return getManager().invoke("_npx__image_random_flip_top_bottom", array, params);
+    }
+
+    @Override
+    public NDArray randomBrightness(float brightness) {
+        MxOpParams params = new MxOpParams();
+        float min = Math.max(0, 1 - brightness);
+        float max = 1 + brightness;
+        params.addParam("min_factor", min);
+        params.addParam("max_factor", max);
+        return getManager().invoke("_npx__image_random_brightness", array, params);
+    }
+
+    @Override
+    public NDArray randomHue(float hue) {
+        MxOpParams params = new MxOpParams();
+        float min = Math.max(0, 1 - hue);
+        float max = 1 + hue;
+        params.addParam("min_factor", min);
+        params.addParam("max_factor", max);
+        return getManager().invoke("_npx__image_random_hue", array, params);
+    }
+
+    @Override
+    public NDArray randomColorJitter(
+            float brightness, float contrast, float saturation, float hue) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("brightness", brightness);
+        params.addParam("contrast", contrast);
+        params.addParam("saturation", saturation);
+        params.addParam("hue", hue);
+        return getManager().invoke("_npx__image_random_color_jitter", array, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArrayIndexer getIndexer() {
         return INDEXER;
     }

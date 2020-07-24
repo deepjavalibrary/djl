@@ -1556,6 +1556,13 @@ public class TfNDArray implements NDArray {
         }
     }
 
+    @Override
+    public NDArray flip(int... axes) {
+        try (Tensor<?> tensor = tf.reverse(getOperand(), tf.constant(axes)).asTensor()) {
+            return new TfNDArray(manager, tensor);
+        }
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray transpose() {

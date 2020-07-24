@@ -423,6 +423,21 @@ public interface NDArrayEx {
         return array.get(sb.toString());
     }
 
+    // TODO: default can be implemented by using np.flip
+    NDArray randomFlipLeftRight();
+
+    // TODO: default can be implemented by using np.flip
+    NDArray randomFlipTopBottom();
+
+    // TODO: add TorchVision support
+    NDArray randomBrightness(float brightness);
+
+    // TODO: add TorchVision support
+    NDArray randomHue(float hue);
+
+    // TODO: add TorchVision support
+    NDArray randomColorJitter(float brightness, float contrast, float saturation, float hue);
+
     ////////////////////////////////////////
     // Miscellaneous
     ////////////////////////////////////////

@@ -3894,6 +3894,16 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
+     * Returns the reverse order of elements in an array along the given axis.
+     *
+     * <p>The shape of the array is preserved, but the elements are reordered.
+     *
+     * @param axes the axes to flip on
+     * @return the newly flipped array
+     */
+    NDArray flip(int... axes);
+
+    /**
      * Returns this {@code NDArray} with axes transposed.
      *
      * <p>Examples

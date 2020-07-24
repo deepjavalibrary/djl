@@ -146,4 +146,38 @@ public class NDImageUtilsTest {
             Assert.assertEquals(result, expected);
         }
     }
+
+    @Test
+    public void testRandomCrop() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            // make sure runnable
+            NDArray image = manager.randomUniform(0, 255, new Shape(100, 50, 3));
+            NDImageUtils.randomResizedCrop(image, 10, 10, 0.3, 0.7, 0.5, 2);
+        }
+    }
+
+    @Test
+    public void testRandomFlip() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            manager.getEngine().setRandomSeed(1234);
+            // flip lr
+            NDArray image = manager.randomUniform(0, 255, new Shape(10, 10, 3));
+            NDArray result = NDImageUtils.randomFlipLeftRight(image);
+            Assert.assertEquals(result.get("0,:,0"), image.get("0,:,0").flip(0));
+            // fliptb
+            result = NDImageUtils.randomFlipTopBottom(image);
+            Assert.assertEquals(result.get(":,0,0"), image.get(":,0,0").flip(0));
+        }
+    }
+
+    @Test
+    public void testRandomColor() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            // make sure runnable
+            NDArray image = manager.randomUniform(0, 255, new Shape(10, 10, 3));
+            NDImageUtils.randomBrightness(image, 0.6f);
+            NDImageUtils.randomHue(image, 0.6f);
+            NDImageUtils.randomColorJitter(image, 0.6f, 0.8f, 0.7f, 0.6f);
+        }
+    }
 }

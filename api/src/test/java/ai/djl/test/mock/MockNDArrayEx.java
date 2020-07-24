@@ -379,6 +379,32 @@ public class MockNDArrayEx implements NDArrayEx {
     }
 
     @Override
+    public NDArray randomFlipLeftRight() {
+        return null;
+    }
+
+    @Override
+    public NDArray randomFlipTopBottom() {
+        return null;
+    }
+
+    @Override
+    public NDArray randomBrightness(float brightness) {
+        return null;
+    }
+
+    @Override
+    public NDArray randomHue(float hue) {
+        return null;
+    }
+
+    @Override
+    public NDArray randomColorJitter(
+            float brightness, float contrast, float saturation, float hue) {
+        return null;
+    }
+
+    @Override
     public NDArrayIndexer getIndexer() {
         return null;
     }

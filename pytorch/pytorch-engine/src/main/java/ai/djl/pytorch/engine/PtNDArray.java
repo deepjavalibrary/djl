@@ -1115,6 +1115,11 @@ public class PtNDArray extends NativeResource implements NDArray {
         return JniUtils.transpose(this, axis1, axis2);
     }
 
+    @Override
+    public NDArray flip(int... axes) {
+        return JniUtils.flip(this, Arrays.stream(axes).mapToLong(ele -> (long) ele).toArray());
+    }
+
     /** {@inheritDoc} */
     @Override
     public PtNDArray transpose() {

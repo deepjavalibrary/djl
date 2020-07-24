@@ -14,6 +14,7 @@ package ai.djl.modality.cv.util;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.util.RandomUtils;
 
 /**
  * {@code NDImageUtils} is an image processing utility to load, reshape, and convert images using
@@ -158,5 +159,110 @@ public final class NDImageUtils {
      */
     public static NDArray crop(NDArray image, int x, int y, int width, int height) {
         return image.getNDArrayInternal().crop(x, y, width, height);
+    }
+
+    /**
+     * Randomly flip the input image left to right with a probability of 0.5.
+     *
+     * @param image the image with HWC format
+     * @return the flipped image
+     */
+    public static NDArray randomFlipLeftRight(NDArray image) {
+        return image.getNDArrayInternal().randomFlipLeftRight();
+    }
+
+    /**
+     * Randomly flip the input image top to bottom with a probability of 0.5.
+     *
+     * @param image the image with HWC format
+     * @return the flipped image
+     */
+    public static NDArray randomFlipTopBottom(NDArray image) {
+        return image.getNDArrayInternal().randomFlipTopBottom();
+    }
+
+    /**
+     * Crop the input image with random scale and aspect ratio.
+     *
+     * @param image the image with HWC format
+     * @param width the output width of the image
+     * @param height the output height of the image
+     * @param minAreaScale minimum targetArea/srcArea value
+     * @param maxAreaScale maximum targetArea/srcArea value
+     * @param minAspectRatio minimum aspect ratio
+     * @param maxAspectRatio maximum aspect ratio
+     * @return the cropped image
+     */
+    public static NDArray randomResizedCrop(
+            NDArray image,
+            int width,
+            int height,
+            double minAreaScale,
+            double maxAreaScale,
+            double minAspectRatio,
+            double maxAspectRatio) {
+        Shape shape = image.getShape();
+        // assume HWC
+        int h = (int) shape.get(0);
+        int w = (int) shape.get(1);
+        int srcArea = h * w;
+        double targetArea =
+                minAreaScale * srcArea
+                        + (maxAreaScale - minAreaScale) * srcArea * RandomUtils.nextFloat();
+        // get ratio from maximum achievable h and w
+        double maxRatio = (targetArea / h) / h;
+        double minRatio = w / (targetArea / w);
+        double[] intersectRatio = {
+            Math.max(minRatio, minAspectRatio), Math.min(maxRatio, maxAspectRatio)
+        };
+        if (intersectRatio[1] < intersectRatio[0]) {
+            return centerCrop(image, width, height);
+        }
+        // compute final area to crop
+        float finalRatio =
+                RandomUtils.nextFloat((float) intersectRatio[0], (float) intersectRatio[1]);
+        int newWidth = (int) Math.round(Math.sqrt(targetArea * finalRatio));
+        int newHeight = (int) (newWidth / finalRatio);
+        int x = RandomUtils.nextInt(w - newWidth);
+        int y = RandomUtils.nextInt(h - newHeight);
+        return crop(image, x, y, newWidth, newHeight);
+    }
+
+    /**
+     * Randomly jitters image brightness with a factor chosen from [max(0, 1 - brightness), 1 +
+     * brightness].
+     *
+     * @param image the image with HWC format
+     * @param brightness the brightness factor from 0 to 1
+     * @return the transformed image
+     */
+    public static NDArray randomBrightness(NDArray image, float brightness) {
+        return image.getNDArrayInternal().randomBrightness(brightness);
+    }
+
+    /**
+     * Randomly jitters image hue with a factor chosen from [max(0, 1 - hue), 1 + hue].
+     *
+     * @param image the image with HWC format
+     * @param hue the hue factor from 0 to 1
+     * @return the transformed image
+     */
+    public static NDArray randomHue(NDArray image, float hue) {
+        return image.getNDArrayInternal().randomHue(hue);
+    }
+
+    /**
+     * Randomly jitters the brightness, contrast, saturation, and hue of an image.
+     *
+     * @param image the image with HWC format
+     * @param brightness the brightness factor from 0 to 1
+     * @param contrast the contrast factor from 0 to 1
+     * @param saturation the saturation factor from 0 to 1
+     * @param hue the hue factor from 0 to 1
+     * @return the transformed image
+     */
+    public static NDArray randomColorJitter(
+            NDArray image, float brightness, float contrast, float saturation, float hue) {
+        return image.getNDArrayInternal().randomColorJitter(brightness, contrast, saturation, hue);
     }
 }
