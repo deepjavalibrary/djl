@@ -162,6 +162,7 @@ public class MxNDManager extends BaseNDManager {
         params.addParam("shape", shape);
         params.addParam("value", value);
         params.setDataType(dataType);
+        params.setDevice(device);
         return invoke("_npi_full", params);
     }
 
