@@ -116,7 +116,22 @@ versions of Windows, you need to pass the version as an argument as follows:
 
 ```
 docker build --build-arg version=<YOUR_VERSION>
-``` 
+```
+
+CN: 如果您在中国，可以使用 [DirectX 修复工具](https://blog.csdn.net/VBcom/article/details/6962388) 来安装遗失依赖项。
+
+### Check dependencies
+
+You can run the following if you have Visual Studio tools CMD:
+
+```cmd
+dumpbin /dependents your_dll_file.dll
+```
+
+or install a [Dependency Walker](http://www.dependencywalker.com/).
+It's an application that can check the dependencies for a specific DLL by simply
+drag and drop.
+
 
 ## 4. How to run DJL using other versions of MXNet?
 **Note:** this is not officially supported by DJL, and some functions may not work. 
