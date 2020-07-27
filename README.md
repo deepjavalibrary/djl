@@ -113,4 +113,4 @@ Join our [<img src='https://cdn3.iconfinder.com/data/icons/social-media-2169/24/
 
 ## License
 
-This project is licensed under the Apache-2.0 License.
+This project is licensed under the [Apache-2.0 License](LICENSE).
