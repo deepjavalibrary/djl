@@ -12,6 +12,7 @@
  */
 package ai.djl.mxnet.engine;
 
+import ai.djl.Device;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -695,18 +696,25 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray randomFlipLeftRight() {
-        MxOpParams params = new MxOpParams();
-        return getManager().invoke("_npx__image_random_flip_left_right", array, params);
+        if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
+            throw new UnsupportedOperationException("randomFlipLeftRight is not supported on GPU");
+        }
+        return getManager().invoke("_npx__image_random_flip_left_right", array, null);
     }
 
     @Override
     public NDArray randomFlipTopBottom() {
-        MxOpParams params = new MxOpParams();
-        return getManager().invoke("_npx__image_random_flip_top_bottom", array, params);
+        if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
+            throw new UnsupportedOperationException("randomFlipTopBottom is not supported on GPU");
+        }
+        return getManager().invoke("_npx__image_random_flip_top_bottom", array, null);
     }
 
     @Override
     public NDArray randomBrightness(float brightness) {
+        if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
+            throw new UnsupportedOperationException("randomBrightness is not supported on GPU");
+        }
         MxOpParams params = new MxOpParams();
         float min = Math.max(0, 1 - brightness);
         float max = 1 + brightness;
@@ -717,6 +725,9 @@ class MxNDArrayEx implements NDArrayEx {
 
     @Override
     public NDArray randomHue(float hue) {
+        if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
+            throw new UnsupportedOperationException("randomHue is not supported on GPU");
+        }
         MxOpParams params = new MxOpParams();
         float min = Math.max(0, 1 - hue);
         float max = 1 + hue;
@@ -728,6 +739,9 @@ class MxNDArrayEx implements NDArrayEx {
     @Override
     public NDArray randomColorJitter(
             float brightness, float contrast, float saturation, float hue) {
+        if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
+            throw new UnsupportedOperationException("randomColorJitter is not supported on GPU");
+        }
         MxOpParams params = new MxOpParams();
         params.addParam("brightness", brightness);
         params.addParam("contrast", contrast);
