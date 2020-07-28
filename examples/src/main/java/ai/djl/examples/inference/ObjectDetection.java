@@ -14,6 +14,7 @@ package ai.djl.examples.inference;
 
 import ai.djl.Application;
 import ai.djl.ModelException;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
@@ -27,6 +28,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,12 +54,20 @@ public final class ObjectDetection {
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
+        String backbone = "resnet50";
+        Map<String, Object> options = null;
+        if ("TensorFlow".equals(Engine.getInstance().getEngineName())) {
+            backbone = "mobilenet_v2";
+            options = new ConcurrentHashMap<>();
+            options.put("Tags", new String[] {});
+        }
 
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(Image.class, DetectedObjects.class)
-                        .optFilter("backbone", "resnet50")
+                        .optFilter("backbone", backbone)
+                        .optOptions(options)
                         .optProgress(new ProgressBar())
                         .build();
 
