@@ -96,13 +96,21 @@ To build from source, begin by checking out the code.
 Once you have checked out the code locally, you can build it as follows using Gradle:
 
 ```sh
+# for Linux/macOS:
 ./gradlew build
+
+# for Windows:
+gradlew build
 ```
 
 To increase build speed, you can use the following command to skip unit tests:
 
 ```sh
+# for Linux/macOS:
 ./gradlew build -x test
+
+# for Windows:
+gradlew build -x test
 ```
 
 **Note:** SpotBugs is not compatible with JDK 11+. SpotBugs will not be executed if you are using JDK 11+.

@@ -50,7 +50,12 @@ This example supports building with both Gradle and Maven. To build, use either 
 
     ```sh
     cd examples
+
+    # for Linux/macOS:
     ./gradlew jar
+
+    # for Windows:
+    ..\gradlew jar
     ```
 
 * Maven build
@@ -70,7 +75,12 @@ The following command executes an object detection example:
 
     ```sh
     cd examples
+
+    # for Linux/macOS:
     ./gradlew run
+
+    # for Windows:
+    ..\gradlew run
     ```
 
 * Maven
