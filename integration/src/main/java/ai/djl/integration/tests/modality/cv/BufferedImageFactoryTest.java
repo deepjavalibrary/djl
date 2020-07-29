@@ -16,7 +16,9 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.Assertions;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -31,6 +33,18 @@ public class BufferedImageFactoryTest {
                             "https://github.com/awslabs/djl/raw/master/examples/src/test/resources/dog_bike_car.jpg");
             NDArray array = img.toNDArray(manager);
             Assert.assertEquals(new Shape(img.getHeight(), img.getWidth(), 3), array.getShape());
+        }
+    }
+
+    @Test
+    public void testFormNDArray() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.arange(0.0f, 12.0f).reshape(3, 2, 2);
+            ImageFactory factory = ImageFactory.getInstance();
+            Image image = factory.fromNDArray(array.toType(DataType.INT8, true));
+            NDArray converted =
+                    image.toNDArray(manager).transpose(2, 0, 1).toType(DataType.FLOAT32, true);
+            Assertions.assertAlmostEquals(array, converted);
         }
     }
 }

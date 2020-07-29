@@ -13,7 +13,7 @@ buildscript {
 allprojects {
     group 'ai.djl.android'
     boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-    version = "0.6.0" + (isRelease ? "" : "-SNAPSHOT")
+    version = "0.7.0" + (isRelease ? "" : "-SNAPSHOT")
 
     repositories {
         google()

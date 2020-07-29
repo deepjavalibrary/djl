@@ -13,6 +13,7 @@
 package ai.djl.android.core;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -34,6 +35,7 @@ import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
@@ -85,6 +87,19 @@ public class BitmapWrapperTest {
             NDArray array = img.toNDArray(manager);
             NDArray duplicate = img.duplicate(Image.Type.TYPE_INT_ARGB).toNDArray(manager);
             assertEquals(array, duplicate);
+        }
+    }
+
+    @Test
+    public void testImageFromNDArray() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.arange(0.0f, 12.0f).reshape(3, 2, 2);
+            ImageFactory factory = ImageFactory.getInstance();
+            Image image = factory.fromNDArray(array.toType(DataType.INT8, true));
+            NDArray converted = image.toNDArray(manager)
+                    .transpose(2, 0, 1)
+                    .toType(DataType.FLOAT32, true);
+            assertEquals(array, converted);
         }
     }
 }

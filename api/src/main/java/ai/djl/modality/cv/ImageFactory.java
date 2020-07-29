@@ -12,6 +12,7 @@
  */
 package ai.djl.modality.cv;
 
+import ai.djl.ndarray.NDArray;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -110,4 +111,12 @@ public abstract class ImageFactory {
      * @return {@link Image}
      */
     public abstract Image fromImage(Object image);
+
+    /**
+     * Gets {@link Image} from {@link NDArray}.
+     *
+     * @param array the NDArray with CHW format
+     * @return {@link Image}
+     */
+    public abstract Image fromNDArray(NDArray array);
 }

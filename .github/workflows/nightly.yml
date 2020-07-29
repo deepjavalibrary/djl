@@ -199,7 +199,7 @@ jobs:
   publish-android:
     if: github.repository == 'awslabs/djl'
     runs-on: ubuntu-18.04
-    needs: [build, test-pytorch, test-tensorflow]
+    needs: [publish]
     env:
       NDK_VERSION: "20.0.5594570"
     steps:
