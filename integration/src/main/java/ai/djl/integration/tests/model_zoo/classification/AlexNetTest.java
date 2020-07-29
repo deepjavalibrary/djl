@@ -47,7 +47,7 @@ public class AlexNetTest {
         try (Model model = Model.newInstance("alexnet")) {
             model.setBlock(alexNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 256;
+                int batchSize = 1;
                 Shape inputShape = new Shape(batchSize, 1, 224, 224);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -102,7 +102,7 @@ public class AlexNetTest {
         try (Model model = Model.newInstance("alexnet")) {
             model.setBlock(alexNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 256;
+                int batchSize = 1;
                 Shape inputShape = new Shape(batchSize, 1, 224, 224);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -156,7 +156,7 @@ public class AlexNetTest {
 
         Trainer trainer = model.newTrainer(config);
 
-        NDArray x = trainer.getManager().ones(new Shape(256, 1, 224, 224));
+        NDArray x = trainer.getManager().ones(new Shape(1, 1, 224, 224));
 
         trainer.initialize(x.getShape());
 
@@ -174,11 +174,11 @@ public class AlexNetTest {
             shapeMap.put(alexNet.getChildren().get(i).getKey(), currentShape);
         }
 
-        Assert.assertEquals(shapeMap.get("01Conv2d"), new Shape(256, 96, 54, 54));
-        Assert.assertEquals(shapeMap.get("04Conv2d"), new Shape(256, 256, 26, 26));
-        Assert.assertEquals(shapeMap.get("07Conv2d"), new Shape(256, 384, 12, 12));
-        Assert.assertEquals(shapeMap.get("13LambdaBlock"), new Shape(256, 256, 5, 5));
-        Assert.assertEquals(shapeMap.get("17Dropout"), new Shape(256, 4096));
+        Assert.assertEquals(shapeMap.get("01Conv2d"), new Shape(1, 96, 54, 54));
+        Assert.assertEquals(shapeMap.get("04Conv2d"), new Shape(1, 256, 26, 26));
+        Assert.assertEquals(shapeMap.get("07Conv2d"), new Shape(1, 384, 12, 12));
+        Assert.assertEquals(shapeMap.get("13LambdaBlock"), new Shape(1, 256, 5, 5));
+        Assert.assertEquals(shapeMap.get("17Dropout"), new Shape(1, 4096));
     }
 
     @Test
@@ -193,7 +193,7 @@ public class AlexNetTest {
 
         Trainer trainer = model.newTrainer(config);
 
-        NDArray x = trainer.getManager().ones(new Shape(256, 1, 224, 224));
+        NDArray x = trainer.getManager().ones(new Shape(1, 1, 224, 224));
 
         trainer.initialize(x.getShape());
 
@@ -204,6 +204,6 @@ public class AlexNetTest {
                                 false)
                         .singletonOrThrow();
 
-        Assert.assertEquals(xHat.getShape(), new Shape(256, 10));
+        Assert.assertEquals(xHat.getShape(), new Shape(1, 10));
     }
 }

@@ -46,7 +46,7 @@ public class GoogLeNetTest {
         try (Model model = Model.newInstance("googlenet")) {
             model.setBlock(googLeNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 256;
+                int batchSize = 1;
                 Shape inputShape = new Shape(batchSize, 1, 96, 96);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -100,7 +100,7 @@ public class GoogLeNetTest {
 
         Trainer trainer = model.newTrainer(config);
 
-        NDArray x = trainer.getManager().ones(new Shape(256, 1, 96, 96));
+        NDArray x = trainer.getManager().ones(new Shape(1, 1, 96, 96));
 
         trainer.initialize(x.getShape());
 
@@ -119,11 +119,11 @@ public class GoogLeNetTest {
             shapeMap.put(googLeNet.getChildren().get(i).getKey(), currentShape);
         }
 
-        Assert.assertEquals(shapeMap.get("01SequentialBlock"), new Shape(256, 64, 24, 24));
-        Assert.assertEquals(shapeMap.get("02SequentialBlock"), new Shape(256, 192, 12, 12));
-        Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(256, 480, 6, 6));
-        Assert.assertEquals(shapeMap.get("04SequentialBlock"), new Shape(256, 832, 3, 3));
-        Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(256, 1024));
+        Assert.assertEquals(shapeMap.get("01SequentialBlock"), new Shape(1, 64, 24, 24));
+        Assert.assertEquals(shapeMap.get("02SequentialBlock"), new Shape(1, 192, 12, 12));
+        Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(1, 480, 6, 6));
+        Assert.assertEquals(shapeMap.get("04SequentialBlock"), new Shape(1, 832, 3, 3));
+        Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(1, 1024));
     }
 
     @Test
@@ -138,7 +138,7 @@ public class GoogLeNetTest {
 
         Trainer trainer = model.newTrainer(config);
 
-        NDArray x = trainer.getManager().ones(new Shape(256, 1, 28, 28));
+        NDArray x = trainer.getManager().ones(new Shape(1, 1, 28, 28));
 
         trainer.initialize(x.getShape());
 
@@ -148,6 +148,6 @@ public class GoogLeNetTest {
                                 new ParameterStore(trainer.getManager(), true), new NDList(x), true)
                         .singletonOrThrow();
 
-        Assert.assertEquals(xHat.getShape(), new Shape(256, 10));
+        Assert.assertEquals(xHat.getShape(), new Shape(1, 10));
     }
 }

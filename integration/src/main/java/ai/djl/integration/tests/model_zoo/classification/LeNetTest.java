@@ -47,7 +47,7 @@ public class LeNetTest {
         try (Model model = Model.newInstance("lenet")) {
             model.setBlock(leNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 256;
+                int batchSize = 1;
                 Shape inputShape = new Shape(batchSize, 1, 28, 28);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -89,7 +89,7 @@ public class LeNetTest {
         try (Model model = Model.newInstance("lenet")) {
             model.setBlock(leNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 256;
+                int batchSize = 1;
                 Shape inputShape = new Shape(batchSize, 1, 28, 28);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -135,7 +135,7 @@ public class LeNetTest {
 
         Trainer trainer = model.newTrainer(config);
 
-        NDArray x = trainer.getManager().ones(new Shape(256, 1, 28, 28));
+        NDArray x = trainer.getManager().ones(new Shape(1, 1, 28, 28));
 
         trainer.initialize(x.getShape());
 
@@ -153,10 +153,10 @@ public class LeNetTest {
             shapeMap.put(leNet.getChildren().get(i).getKey(), currentShape);
         }
 
-        Assert.assertEquals(shapeMap.get("01Conv2d"), new Shape(256, 6, 28, 28));
-        Assert.assertEquals(shapeMap.get("04Conv2d"), new Shape(256, 16, 10, 10));
-        Assert.assertEquals(shapeMap.get("08Linear"), new Shape(256, 120));
-        Assert.assertEquals(shapeMap.get("12Linear"), new Shape(256, 10));
+        Assert.assertEquals(shapeMap.get("01Conv2d"), new Shape(1, 6, 28, 28));
+        Assert.assertEquals(shapeMap.get("04Conv2d"), new Shape(1, 16, 10, 10));
+        Assert.assertEquals(shapeMap.get("08Linear"), new Shape(1, 120));
+        Assert.assertEquals(shapeMap.get("12Linear"), new Shape(1, 10));
     }
 
     @Test
@@ -171,7 +171,7 @@ public class LeNetTest {
 
         Trainer trainer = model.newTrainer(config);
 
-        NDArray x = trainer.getManager().ones(new Shape(256, 1, 28, 28));
+        NDArray x = trainer.getManager().ones(new Shape(1, 1, 28, 28));
 
         trainer.initialize(x.getShape());
 
@@ -179,6 +179,6 @@ public class LeNetTest {
                 leNet.forward(new ParameterStore(trainer.getManager(), true), new NDList(x), true)
                         .singletonOrThrow();
 
-        Assert.assertEquals(xHat.getShape(), new Shape(256, 10));
+        Assert.assertEquals(xHat.getShape(), new Shape(1, 10));
     }
 }
