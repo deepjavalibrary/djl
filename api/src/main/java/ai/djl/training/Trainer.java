@@ -32,6 +32,7 @@ import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,9 +86,7 @@ public class Trainer implements AutoCloseable {
         devices = trainingConfig.getDevices();
         loss = trainingConfig.getLossFunction();
         dataManager = trainingConfig.getDataManager();
-        if (loss == null) {
-            throw new IllegalArgumentException("You must specify a loss for the trainer");
-        }
+        Objects.requireNonNull(loss, "You must specify a loss for the trainer");
         evaluators = new ArrayList<>(trainingConfig.getEvaluators());
         evaluators.add(loss); // track loss as an evaluator by default
 

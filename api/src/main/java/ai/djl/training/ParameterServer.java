@@ -14,6 +14,7 @@
 package ai.djl.training;
 
 import ai.djl.ndarray.NDArray;
+import java.util.Arrays;
 
 /** An interface for a key-value store to store parameters, and their corresponding gradients. */
 public interface ParameterServer extends AutoCloseable {
@@ -27,39 +28,23 @@ public interface ParameterServer extends AutoCloseable {
     void init(String parameterId, NDArray[] value);
 
     /**
-     * Updates values of a key in Parameter Server.
+     * Updates the parameter of a key from Parameter Server.
      *
-     * @param parameterId the key to update
-     * @param grads the values corresponding to the key, values in array will be summed when key is
-     *     updated
-     * @param priority the priority of the push operation. Higher priority push operations are
-     *     likely to be executed before other push actions
+     * @param parameterId the key to identify the parameter
+     * @param params the parameter NDArrays in different devices to be updated.
      */
-    void push(String parameterId, NDArray[] grads, int priority);
-
+    default void update(String parameterId, NDArray[] params) {
+        NDArray[] grads = Arrays.stream(params).map(NDArray::getGradient).toArray(NDArray[]::new);
+        update(parameterId, grads, params);
+    }
     /**
-     * Pulls the value of a key from Parameter Server to NDArrays.
+     * Updates the parameter of a key from Parameter Server.
      *
-     * @param parameterId the key to pull
-     * @param weights the NDArrays to store the value corresponding to the key, value will be copied
-     *     to the devices of the NDArrays
-     * @param priority the priority of the push operation. Higher priority push operations are
-     *     likely to be executed before other push actions
+     * @param parameterId the key to identify the parameter
+     * @param grads the gradient NDArrays in different devices to apply the update.
+     * @param params the parameter NDArrays in different devices to be updated.
      */
-    void pull(String parameterId, NDArray[] weights, int priority);
-
-    /**
-     * Updates the value of a key from Parameter Server to NDArrays and pull.
-     *
-     * @param parameterId the key to pushPull
-     * @param inputs the values corresponding to the key, values in array will be summed when key is
-     *     updated
-     * @param outputs the NDArrays to store the value corresponding to the key, value will be copied
-     *     to the devices of the NDArrays
-     * @param priority the priority of the push operation. Higher priority push operations are
-     *     likely to be executed before other push actions
-     */
-    void update(String parameterId, NDArray[] inputs, NDArray[] outputs, int priority);
+    void update(String parameterId, NDArray[] grads, NDArray[] params);
 
     /** {@inheritDoc} */
     @Override

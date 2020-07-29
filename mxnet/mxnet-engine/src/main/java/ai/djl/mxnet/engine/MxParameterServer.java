@@ -30,6 +30,8 @@ public class MxParameterServer extends NativeResource implements ParameterServer
     // use class field to hold the OptimizerCallback which prevent it from being gc.
     private OptimizerCallback callback;
 
+    private int priority;
+
     /**
      * Constructs a new {@code MxParameterServer}.
      *
@@ -39,6 +41,7 @@ public class MxParameterServer extends NativeResource implements ParameterServer
         super(createdKVStore());
         callback = new OptimizerCallback(optimizer);
         JnaUtils.parameterStoreSetUpdater(getHandle(), null, callback, null);
+        priority = 0;
     }
 
     /** {@inheritDoc} */
@@ -52,38 +55,21 @@ public class MxParameterServer extends NativeResource implements ParameterServer
 
     /** {@inheritDoc} */
     @Override
-    public void push(String parameterId, NDArray[] grads, int priority) {
-        String[] keys = new String[grads.length];
-        Arrays.fill(keys, parameterId);
-        NDList vals = new NDList(grads);
-        JnaUtils.parameterStorePush(getHandle(), grads.length, keys, vals, priority);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void pull(String parameterId, NDArray[] weights, int priority) {
-        String[] keys = new String[weights.length];
-        Arrays.fill(keys, parameterId);
-        NDList vals = new NDList(weights);
-        JnaUtils.parameterStorePull(getHandle(), weights.length, keys, vals, priority);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void update(String parameterId, NDArray[] inputs, NDArray[] outputs, int priority) {
-        String[] gradKeys = new String[inputs.length];
-        String[] weightKeys = new String[outputs.length];
+    public void update(String parameterId, NDArray[] grads, NDArray[] params) {
+        String[] gradKeys = new String[grads.length];
+        String[] paramKeys = new String[params.length];
         Arrays.fill(gradKeys, parameterId);
-        Arrays.fill(weightKeys, parameterId);
+        Arrays.fill(paramKeys, parameterId);
         JnaUtils.parameterStorePushPull(
                 getHandle(),
-                inputs.length,
+                grads.length,
                 gradKeys,
-                outputs.length,
-                weightKeys,
-                new NDList(inputs),
-                new NDList(outputs),
-                priority);
+                params.length,
+                paramKeys,
+                new NDList(grads),
+                new NDList(params),
+                -priority);
+        priority++;
     }
 
     private static Pointer createdKVStore() {

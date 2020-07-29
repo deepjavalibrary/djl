@@ -76,13 +76,8 @@ public class MxParameterStoreTest {
                     ps.init(String.valueOf(i), new NDArray[] {weights[i][0]});
                 }
                 for (int n = 0; n < numUpdates; n++) {
-                    // push
                     for (int i = 0; i < numWeights; i++) {
-                        ps.push(String.valueOf(i), grads[i], -i);
-                    }
-                    // pull
-                    for (int i = 0; i < numWeights; i++) {
-                        ps.pull(String.valueOf(i), weights[i], -i);
+                        ps.update(String.valueOf(i), grads[i], weights[i]);
                     }
                 }
                 for (int i = 0; i < numWeights; i++) {

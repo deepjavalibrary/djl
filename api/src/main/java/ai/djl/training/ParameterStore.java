@@ -66,19 +66,12 @@ public class ParameterStore {
 
     /** Updates all the mirrored parameters. */
     public void updateAllParameters() {
-        int priority = 0;
         for (Map.Entry<String, ParameterData> entry : parameterMap.entrySet()) {
             String parameterId = entry.getKey();
             ParameterData data = entry.getValue();
             if (data.requireGradient()) {
-                NDArray[] grads =
-                        data.getNDArrays()
-                                .stream()
-                                .map(NDArray::getGradient)
-                                .toArray(NDArray[]::new);
-                NDArray[] values = data.toArray();
-                parameterServer.update(parameterId, grads, values, -priority);
-                ++priority;
+                NDArray[] params = data.toArray();
+                parameterServer.update(parameterId, params);
             }
         }
     }
