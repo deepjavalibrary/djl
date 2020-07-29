@@ -107,8 +107,8 @@ public class YoloModelLoader extends BaseModelLoader<Image, DetectedObjects> {
 
         @Override
         public Translator<Image, DetectedObjects> newInstance(Map<String, Object> arguments) {
-            int width = ((Double) arguments.getOrDefault("width", 512d)).intValue();
-            int height = ((Double) arguments.getOrDefault("height", 512d)).intValue();
+            int width = ((Double) arguments.getOrDefault("width", 450d)).intValue();
+            int height = ((Double) arguments.getOrDefault("height", 450d)).intValue();
             double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
 
             return YoloTranslator.builder()
