@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -66,9 +67,10 @@ public final class LibUtils {
         }
         String libName = findOverrideLibrary();
         if (libName == null) {
-            String nativeLibDir = findNativeLibrary();
+            AtomicBoolean fallback = new AtomicBoolean(false);
+            String nativeLibDir = findNativeLibrary(fallback);
             if (nativeLibDir != null) {
-                libName = copyJniLibraryFromClasspath(Paths.get(nativeLibDir));
+                libName = copyJniLibraryFromClasspath(Paths.get(nativeLibDir), fallback.get());
             } else {
                 throw new IllegalStateException("Native library not found");
             }
@@ -152,12 +154,12 @@ public final class LibUtils {
         return null;
     }
 
-    private static String copyJniLibraryFromClasspath(Path nativeDir) {
+    private static String copyJniLibraryFromClasspath(Path nativeDir, boolean fallback) {
         String name = System.mapLibraryName(LIB_NAME);
         Platform platform = Platform.fromSystem();
         String classifier = platform.getClassifier();
         String flavor = platform.getFlavor();
-        if (flavor.isEmpty()) {
+        if (fallback || flavor.isEmpty()) {
             flavor = "cpu";
         }
         Properties prop = new Properties();
@@ -191,7 +193,7 @@ public final class LibUtils {
         }
     }
 
-    private static synchronized String findNativeLibrary() {
+    private static synchronized String findNativeLibrary(AtomicBoolean fallback) {
         Enumeration<URL> urls;
         try {
             urls =
@@ -228,7 +230,7 @@ public final class LibUtils {
 
             if (placeholder != null) {
                 try {
-                    return downloadPyTorch(placeholder);
+                    return downloadPyTorch(placeholder, fallback);
                 } catch (IOException e) {
                     throw new IllegalStateException("Failed to download PyTorch native library", e);
                 }
@@ -276,7 +278,8 @@ public final class LibUtils {
         }
     }
 
-    private static String downloadPyTorch(Platform platform) throws IOException {
+    private static String downloadPyTorch(Platform platform, AtomicBoolean fallback)
+            throws IOException {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
         if (flavor.isEmpty()) {
@@ -295,15 +298,31 @@ public final class LibUtils {
         }
         // if files not found
         Files.createDirectories(cacheDir);
-        Path tmp = Files.createTempDirectory(cacheDir, "tmp");
 
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Unexpected version: " + version);
         }
         String link = "https://djl-ai.s3.amazonaws.com/publish/pytorch-" + matcher.group(1);
+        Path tmp = null;
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
+            if (flavor.startsWith("cu")
+                    && !lines.contains(flavor + '/' + os + "/native/lib/libtorch.so.gz")) {
+                logger.warn("No matching cuda flavor for {} found: {}.", os, flavor);
+                // fallback to CPU
+                flavor = "cpu";
+                fallback.set(true);
+
+                // check again
+                dir = cacheDir.resolve(version + flavor + '-' + classifier);
+                path = dir.resolve(libName);
+                if (Files.exists(path)) {
+                    return dir.toAbsolutePath().toString();
+                }
+            }
+
+            tmp = Files.createTempDirectory(cacheDir, "tmp");
             for (String line : lines) {
                 if (line.startsWith(flavor + '/' + os + '/')) {
                     URL url = new URL(link + '/' + line);
