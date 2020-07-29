@@ -125,8 +125,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
                 modelName = artifact.getName();
             }
 
-            Model model =
-                    createModel(modelName, Device.defaultDevice(), artifact, arguments, engine);
+            Model model = createModel(modelName, criteria.getDevice(), artifact, arguments, engine);
             if (criteria.getBlock() != null) {
                 model.setBlock(criteria.getBlock());
             }
