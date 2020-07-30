@@ -39,6 +39,7 @@ plugins:
 nav:
   - HOME: 'README.md'
   - 'docs/quick_start.md'
+  - 'docs/interactive_tool.md'
   - 'docs/README.md'
   - 'examples/README.md'
   - 'docs/development/README.md'

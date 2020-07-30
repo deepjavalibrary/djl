@@ -9,10 +9,12 @@ our [examples](../examples/README.md).
 * You need a Java Development Kit (JDK) installed on your system. We recommend using JDK 8, but any later version also works. For more information, see [Setup](development/setup.md).
 * You need git installed on your system to clone the DJL repository.
 
-## Get source code
+## Try DJL
 
-We try our best to maintain a stable master branch. If you experience issues with the master branch, use the latest 
-[stable release](https://github.com/awslabs/djl/releases/latest).
+We developed several interactive toolkits for you to experience DJL.
+You can start from here to run inference online and download starter template with DJL.
+
+See [DJL Future Labs](interactive_tool.md)
 
 ## Beginner tutorial
 
