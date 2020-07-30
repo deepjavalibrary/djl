@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.model_zoo.classification;
 
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.cv.classification.GoogLeNet;
 import ai.djl.ndarray.NDArray;
@@ -41,12 +42,13 @@ public class GoogLeNetTest {
     public void testTrainWithDefaultChannels() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block googLeNet = GoogLeNet.builder().build();
         try (Model model = Model.newInstance("googlenet")) {
             model.setBlock(googLeNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 1;
+                int batchSize = 2;
                 Shape inputShape = new Shape(batchSize, 1, 96, 96);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -92,6 +94,7 @@ public class GoogLeNetTest {
     public void testOutputShapes() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block googLeNet = GoogLeNet.builder().build();
 
@@ -99,8 +102,8 @@ public class GoogLeNetTest {
         model.setBlock(googLeNet);
 
         Trainer trainer = model.newTrainer(config);
-
-        NDArray x = trainer.getManager().ones(new Shape(1, 1, 96, 96));
+        int batchSize = 2;
+        NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 96, 96));
 
         trainer.initialize(x.getShape());
 
@@ -119,17 +122,18 @@ public class GoogLeNetTest {
             shapeMap.put(googLeNet.getChildren().get(i).getKey(), currentShape);
         }
 
-        Assert.assertEquals(shapeMap.get("01SequentialBlock"), new Shape(1, 64, 24, 24));
-        Assert.assertEquals(shapeMap.get("02SequentialBlock"), new Shape(1, 192, 12, 12));
-        Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(1, 480, 6, 6));
-        Assert.assertEquals(shapeMap.get("04SequentialBlock"), new Shape(1, 832, 3, 3));
-        Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(1, 1024));
+        Assert.assertEquals(shapeMap.get("01SequentialBlock"), new Shape(batchSize, 64, 24, 24));
+        Assert.assertEquals(shapeMap.get("02SequentialBlock"), new Shape(batchSize, 192, 12, 12));
+        Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(batchSize, 480, 6, 6));
+        Assert.assertEquals(shapeMap.get("04SequentialBlock"), new Shape(batchSize, 832, 3, 3));
+        Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(batchSize, 1024));
     }
 
     @Test
     public void testForwardMethod() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block googLeNet = GoogLeNet.builder().build();
 
@@ -137,8 +141,8 @@ public class GoogLeNetTest {
         model.setBlock(googLeNet);
 
         Trainer trainer = model.newTrainer(config);
-
-        NDArray x = trainer.getManager().ones(new Shape(1, 1, 28, 28));
+        int batchSize = 2;
+        NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 28, 28));
 
         trainer.initialize(x.getShape());
 
@@ -148,6 +152,6 @@ public class GoogLeNetTest {
                                 new ParameterStore(trainer.getManager(), true), new NDList(x), true)
                         .singletonOrThrow();
 
-        Assert.assertEquals(xHat.getShape(), new Shape(1, 10));
+        Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
     }
 }

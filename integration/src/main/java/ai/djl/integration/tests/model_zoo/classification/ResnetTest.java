@@ -13,6 +13,7 @@
 package ai.djl.integration.tests.model_zoo.classification;
 
 import ai.djl.Application;
+import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.BasicModelZoo;
@@ -55,6 +56,7 @@ public class ResnetTest {
     public void testTrain() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
 
         Block resNet50 =
@@ -66,7 +68,7 @@ public class ResnetTest {
         try (Model model = Model.newInstance("resnet")) {
             model.setBlock(resNet50);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = config.getDevices().length * 16;
+                int batchSize = 2;
                 Shape inputShape = new Shape(batchSize, 1, 28, 28);
                 trainer.initialize(inputShape);
 
@@ -116,9 +118,11 @@ public class ResnetTest {
             throws IOException, ModelNotFoundException, MalformedModelException {
         try (ZooModel<Image, Classifications> model = getModel()) {
             TrainingConfig config =
-                    new DefaultTrainingConfig(Loss.l1Loss()).optInitializer(Initializer.ONES);
+                    new DefaultTrainingConfig(Loss.l1Loss())
+                            .optDevices(Device.getDevices(2))
+                            .optInitializer(Initializer.ONES);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = config.getDevices().length * 16;
+                int batchSize = 2;
                 Shape inputShape = new Shape(batchSize, 3, 32, 32);
 
                 trainer.initialize(inputShape);

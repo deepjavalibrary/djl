@@ -13,6 +13,7 @@
 
 package ai.djl.integration.tests.model_zoo.classification;
 
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.cv.classification.SqueezeNet;
 import ai.djl.ndarray.NDArray;
@@ -38,12 +39,13 @@ public class SqueezenetTest {
     public void testTrain() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block squeezeNet = SqueezeNet.squeezenet(10);
         try (Model model = Model.newInstance("squeezenet")) {
             model.setBlock(squeezeNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = config.getDevices().length * 16;
+                int batchSize = 2;
                 Shape inputShape = new Shape(batchSize, 1, 28, 28);
                 trainer.initialize(inputShape);
 

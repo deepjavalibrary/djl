@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.model_zoo.classification;
 
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.cv.classification.NiN;
 import ai.djl.ndarray.NDArray;
@@ -41,12 +42,13 @@ public class NiNTest {
     public void testTrainWithDefaultChannels() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block nin = NiN.builder().build();
         try (Model model = Model.newInstance("nin")) {
             model.setBlock(nin);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 1;
+                int batchSize = 2;
                 Shape inputShape = new Shape(batchSize, 1, 224, 224);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -91,6 +93,7 @@ public class NiNTest {
     public void testTrainWithCustomChannels() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block nin =
                 NiN.builder()
@@ -100,7 +103,7 @@ public class NiNTest {
         try (Model model = Model.newInstance("nin")) {
             model.setBlock(nin);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 1;
+                int batchSize = 2;
                 Shape inputShape = new Shape(batchSize, 1, 224, 224);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -142,6 +145,7 @@ public class NiNTest {
     public void testOutputShapes() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block nin = NiN.builder().build();
 
@@ -149,9 +153,8 @@ public class NiNTest {
         model.setBlock(nin);
 
         Trainer trainer = model.newTrainer(config);
-
-        NDArray x = trainer.getManager().ones(new Shape(1, 1, 224, 224));
-
+        int batchSize = 2;
+        NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 224, 224));
         trainer.initialize(x.getShape());
 
         Shape currentShape = x.getShape();
@@ -168,16 +171,17 @@ public class NiNTest {
             shapeMap.put(nin.getChildren().get(i).getKey(), currentShape);
         }
 
-        Assert.assertEquals(shapeMap.get("01SequentialBlock"), new Shape(1, 96, 54, 54));
-        Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(1, 256, 26, 26));
-        Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(1, 384, 12, 12));
-        Assert.assertEquals(shapeMap.get("08SequentialBlock"), new Shape(1, 10, 5, 5));
+        Assert.assertEquals(shapeMap.get("01SequentialBlock"), new Shape(batchSize, 96, 54, 54));
+        Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(batchSize, 256, 26, 26));
+        Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(batchSize, 384, 12, 12));
+        Assert.assertEquals(shapeMap.get("08SequentialBlock"), new Shape(batchSize, 10, 5, 5));
     }
 
     @Test
     public void testForwardMethod() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block nin = NiN.builder().build();
 
@@ -185,8 +189,8 @@ public class NiNTest {
         model.setBlock(nin);
 
         Trainer trainer = model.newTrainer(config);
-
-        NDArray x = trainer.getManager().ones(new Shape(1, 1, 224, 224));
+        int batchSize = 2;
+        NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 224, 224));
 
         trainer.initialize(x.getShape());
 
@@ -194,6 +198,6 @@ public class NiNTest {
                 nin.forward(new ParameterStore(trainer.getManager(), true), new NDList(x), false)
                         .singletonOrThrow();
 
-        Assert.assertEquals(xHat.getShape(), new Shape(1, 10));
+        Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
     }
 }

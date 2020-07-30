@@ -50,13 +50,14 @@ public class VGGTest {
 
             TrainingConfig config =
                     new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                            .optDevices(Device.getDevices(2))
                             .optInitializer(Initializer.ONES);
 
             Block vgg = VGG.builder().build();
             try (Model model = Model.newInstance("vgg")) {
                 model.setBlock(vgg);
                 try (Trainer trainer = model.newTrainer(config)) {
-                    int batchSize = 1;
+                    int batchSize = 2;
                     Shape inputShape = new Shape(batchSize, 1, 224, 224);
                     NDManager manager = trainer.getManager();
                     trainer.initialize(inputShape);
@@ -105,6 +106,7 @@ public class VGGTest {
     public void testOutputShapes() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block vgg = VGG.builder().build();
 
@@ -112,8 +114,8 @@ public class VGGTest {
         model.setBlock(vgg);
 
         Trainer trainer = model.newTrainer(config);
-
-        NDArray x = trainer.getManager().ones(new Shape(1, 1, 224, 224));
+        int batchSize = 2;
+        NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 224, 224));
 
         trainer.initialize(x.getShape());
 
@@ -131,18 +133,19 @@ public class VGGTest {
             shapeMap.put(vgg.getChildren().get(i).getKey(), currentShape);
         }
 
-        Assert.assertEquals(shapeMap.get("01SequentialBlock"), new Shape(1, 64, 112, 112));
-        Assert.assertEquals(shapeMap.get("02SequentialBlock"), new Shape(1, 128, 56, 56));
-        Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(1, 256, 28, 28));
-        Assert.assertEquals(shapeMap.get("04SequentialBlock"), new Shape(1, 512, 14, 14));
-        Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(1, 512, 7, 7));
-        Assert.assertEquals(shapeMap.get("07Linear"), new Shape(1, 4096));
+        Assert.assertEquals(shapeMap.get("01SequentialBlock"), new Shape(batchSize, 64, 112, 112));
+        Assert.assertEquals(shapeMap.get("02SequentialBlock"), new Shape(batchSize, 128, 56, 56));
+        Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(batchSize, 256, 28, 28));
+        Assert.assertEquals(shapeMap.get("04SequentialBlock"), new Shape(batchSize, 512, 14, 14));
+        Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(batchSize, 512, 7, 7));
+        Assert.assertEquals(shapeMap.get("07Linear"), new Shape(batchSize, 4096));
     }
 
     @Test
     public void testForwardMethod() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block vgg = VGG.builder().build();
 
@@ -150,8 +153,8 @@ public class VGGTest {
         model.setBlock(vgg);
 
         Trainer trainer = model.newTrainer(config);
-
-        NDArray x = trainer.getManager().ones(new Shape(1, 1, 224, 224));
+        int batchSize = 2;
+        NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 224, 224));
 
         trainer.initialize(x.getShape());
 
@@ -159,6 +162,6 @@ public class VGGTest {
                 vgg.forward(new ParameterStore(trainer.getManager(), true), new NDList(x), false)
                         .singletonOrThrow();
 
-        Assert.assertEquals(xHat.getShape(), new Shape(1, 10));
+        Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
     }
 }

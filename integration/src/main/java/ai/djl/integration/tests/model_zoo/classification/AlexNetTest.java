@@ -13,6 +13,7 @@
 
 package ai.djl.integration.tests.model_zoo.classification;
 
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.cv.classification.AlexNet;
 import ai.djl.ndarray.NDArray;
@@ -42,12 +43,13 @@ public class AlexNetTest {
     public void testTrainWithDefaultChannels() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block alexNet = AlexNet.builder().build();
         try (Model model = Model.newInstance("alexnet")) {
             model.setBlock(alexNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 1;
+                int batchSize = 2;
                 Shape inputShape = new Shape(batchSize, 1, 224, 224);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -93,6 +95,7 @@ public class AlexNetTest {
     public void testTrainWithCustomChannels() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block alexNet =
                 AlexNet.builder()
@@ -102,7 +105,7 @@ public class AlexNetTest {
         try (Model model = Model.newInstance("alexnet")) {
             model.setBlock(alexNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 1;
+                int batchSize = 2;
                 Shape inputShape = new Shape(batchSize, 1, 224, 224);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -148,6 +151,7 @@ public class AlexNetTest {
     public void testOutputShapes() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block alexNet = AlexNet.builder().build();
 
@@ -156,7 +160,9 @@ public class AlexNetTest {
 
         Trainer trainer = model.newTrainer(config);
 
-        NDArray x = trainer.getManager().ones(new Shape(1, 1, 224, 224));
+        int batchSize = 2;
+
+        NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 224, 224));
 
         trainer.initialize(x.getShape());
 
@@ -174,17 +180,18 @@ public class AlexNetTest {
             shapeMap.put(alexNet.getChildren().get(i).getKey(), currentShape);
         }
 
-        Assert.assertEquals(shapeMap.get("01Conv2d"), new Shape(1, 96, 54, 54));
-        Assert.assertEquals(shapeMap.get("04Conv2d"), new Shape(1, 256, 26, 26));
-        Assert.assertEquals(shapeMap.get("07Conv2d"), new Shape(1, 384, 12, 12));
-        Assert.assertEquals(shapeMap.get("13LambdaBlock"), new Shape(1, 256, 5, 5));
-        Assert.assertEquals(shapeMap.get("17Dropout"), new Shape(1, 4096));
+        Assert.assertEquals(shapeMap.get("01Conv2d"), new Shape(batchSize, 96, 54, 54));
+        Assert.assertEquals(shapeMap.get("04Conv2d"), new Shape(batchSize, 256, 26, 26));
+        Assert.assertEquals(shapeMap.get("07Conv2d"), new Shape(batchSize, 384, 12, 12));
+        Assert.assertEquals(shapeMap.get("13LambdaBlock"), new Shape(batchSize, 256, 5, 5));
+        Assert.assertEquals(shapeMap.get("17Dropout"), new Shape(batchSize, 4096));
     }
 
     @Test
     public void testForwardMethod() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
                         .optInitializer(Initializer.ONES);
         Block alexNet = AlexNet.builder().build();
 
@@ -192,8 +199,8 @@ public class AlexNetTest {
         model.setBlock(alexNet);
 
         Trainer trainer = model.newTrainer(config);
-
-        NDArray x = trainer.getManager().ones(new Shape(1, 1, 224, 224));
+        int batchSize = 2;
+        NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 224, 224));
 
         trainer.initialize(x.getShape());
 
@@ -204,6 +211,6 @@ public class AlexNetTest {
                                 false)
                         .singletonOrThrow();
 
-        Assert.assertEquals(xHat.getShape(), new Shape(1, 10));
+        Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
     }
 }
