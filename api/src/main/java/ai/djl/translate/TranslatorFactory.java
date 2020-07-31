@@ -12,6 +12,7 @@
  */
 package ai.djl.translate;
 
+import ai.djl.Model;
 import java.util.Map;
 
 /**
@@ -25,8 +26,11 @@ public interface TranslatorFactory<I, O> {
     /**
      * Returns a new instance of the {@link Translator} class.
      *
+     * @param model the {@link Model} that uses the {@link Translator}
      * @param arguments the configurations for a new {@code Translator} instance
      * @return a new instance of the {@code Translator} class
+     * @throws TranslateException if failed to create Translator instance
      */
-    Translator<I, O> newInstance(Map<String, Object> arguments);
+    Translator<I, O> newInstance(Model model, Map<String, Object> arguments)
+            throws TranslateException;
 }

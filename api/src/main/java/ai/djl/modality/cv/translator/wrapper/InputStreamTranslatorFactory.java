@@ -12,7 +12,9 @@
  */
 package ai.djl.modality.cv.translator.wrapper;
 
+import ai.djl.Model;
 import ai.djl.modality.cv.Image;
+import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import java.io.InputStream;
@@ -38,7 +40,8 @@ public class InputStreamTranslatorFactory<T> implements TranslatorFactory<InputS
 
     /** {@inheritDoc} */
     @Override
-    public Translator<InputStream, T> newInstance(Map<String, Object> arguments) {
-        return new InputStreamTranslator<>(factory.newInstance(arguments));
+    public Translator<InputStream, T> newInstance(Model model, Map<String, Object> arguments)
+            throws TranslateException {
+        return new InputStreamTranslator<>(factory.newInstance(model, arguments));
     }
 }

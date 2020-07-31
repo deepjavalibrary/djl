@@ -15,6 +15,7 @@ package ai.djl.tensorflow.zoo.cv.objectdetction;
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.transform.Resize;
@@ -104,7 +105,8 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
         /** {@inheritDoc} */
         @Override
         @SuppressWarnings("unchecked")
-        public Translator<Image, DetectedObjects> newInstance(Map<String, Object> arguments) {
+        public Translator<Image, DetectedObjects> newInstance(
+                Model model, Map<String, Object> arguments) {
             int width = ((Double) arguments.getOrDefault("width", 256)).intValue();
             int height = ((Double) arguments.getOrDefault("height", 256)).intValue();
             double threshold = (Double) arguments.getOrDefault("threshold", 0.4d);

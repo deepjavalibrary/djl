@@ -178,16 +178,10 @@ public class Metadata {
      * @return the {@link Application}
      */
     public Application getApplication() {
+        if (applicationClass == null && application != null) {
+            applicationClass = Application.of(application);
+        }
         return applicationClass;
-    }
-
-    /**
-     * Returns the {@link Application} name.
-     *
-     * @return the {@link Application} name
-     */
-    public String getApplicationName() {
-        return application;
     }
 
     /**
@@ -198,6 +192,15 @@ public class Metadata {
     public void setApplication(Application application) {
         this.applicationClass = application;
         this.application = application.getPath();
+    }
+
+    /**
+     * Returns the {@link Application} name.
+     *
+     * @return the {@link Application} name
+     */
+    public String getApplicationName() {
+        return application;
     }
 
     /**

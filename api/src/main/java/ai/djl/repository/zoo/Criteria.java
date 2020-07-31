@@ -14,8 +14,10 @@ package ai.djl.repository.zoo;
 
 import ai.djl.Application;
 import ai.djl.Device;
+import ai.djl.Model;
 import ai.djl.nn.Block;
 import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Progress;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +41,7 @@ public class Criteria<I, O> {
     private Map<String, String> filters;
     private Map<String, Object> arguments;
     private Map<String, Object> options;
-    private Translator<I, O> translator;
+    private TranslatorFactory<I, O> factory;
     private Block block;
     private String modelName;
     private Progress progress;
@@ -56,7 +58,7 @@ public class Criteria<I, O> {
         this.filters = builder.filters;
         this.arguments = builder.arguments;
         this.options = builder.options;
-        this.translator = builder.translator;
+        this.factory = builder.factory;
         this.block = builder.block;
         this.modelName = builder.modelName;
         this.progress = builder.progress;
@@ -162,12 +164,12 @@ public class Criteria<I, O> {
     }
 
     /**
-     * Returns the optional {@link Translator} to be used for {@link ZooModel}.
+     * Returns the optional {@link TranslatorFactory} to be used for {@link ZooModel}.
      *
-     * @return the optional {@link Translator} to be used for {@link ZooModel}
+     * @return the optional {@link TranslatorFactory} to be used for {@link ZooModel}
      */
-    public Translator<I, O> getTranslator() {
-        return translator;
+    public TranslatorFactory<I, O> getTranslatorFactory() {
+        return factory;
     }
 
     /**
@@ -220,7 +222,7 @@ public class Criteria<I, O> {
         Map<String, String> filters;
         Map<String, Object> arguments;
         Map<String, Object> options;
-        Translator<I, O> translator;
+        TranslatorFactory<I, O> factory;
         Block block;
         String modelName;
         Progress progress;
@@ -445,7 +447,18 @@ public class Criteria<I, O> {
          * @return this {@code Builder}
          */
         public Builder<I, O> optTranslator(Translator<I, O> translator) {
-            this.translator = translator;
+            this.factory = new TranslatorFactorImpl<>(translator);
+            return this;
+        }
+
+        /**
+         * Sets the optional {@link TranslatorFactory} to override default {@code Translator}.
+         *
+         * @param factory the override {@code TranslatorFactory}
+         * @return this {@code Builder}
+         */
+        public Builder<I, O> optTranslatorFactory(TranslatorFactory<I, O> factory) {
+            this.factory = factory;
             return this;
         }
 
@@ -471,6 +484,21 @@ public class Criteria<I, O> {
                         "Input and output type are required for a Criteria.");
             }
             return new Criteria<>(this);
+        }
+    }
+
+    private static final class TranslatorFactorImpl<I, O> implements TranslatorFactory<I, O> {
+
+        private Translator<I, O> translator;
+
+        public TranslatorFactorImpl(Translator<I, O> translator) {
+            this.translator = translator;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Translator<I, O> newInstance(Model model, Map<String, Object> arguments) {
+            return translator;
         }
     }
 }

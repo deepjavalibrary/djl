@@ -12,7 +12,9 @@
  */
 package ai.djl.modality.cv.translator.wrapper;
 
+import ai.djl.Model;
 import ai.djl.modality.cv.Image;
+import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import java.net.URL;
@@ -38,7 +40,8 @@ public class UrlTranslatorFactory<T> implements TranslatorFactory<URL, T> {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<URL, T> newInstance(Map<String, Object> arguments) {
-        return new UrlTranslator<>(factory.newInstance(arguments));
+    public Translator<URL, T> newInstance(Model model, Map<String, Object> arguments)
+            throws TranslateException {
+        return new UrlTranslator<>(factory.newInstance(model, arguments));
     }
 }

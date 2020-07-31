@@ -15,6 +15,7 @@ package ai.djl.mxnet.zoo.cv.classification;
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.Model;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.transform.CenterCrop;
@@ -106,7 +107,8 @@ public abstract class ImageClassificationModelLoader
 
         /** {@inheritDoc} */
         @Override
-        public Translator<Image, Classifications> newInstance(Map<String, Object> arguments) {
+        public Translator<Image, Classifications> newInstance(
+                Model model, Map<String, Object> arguments) {
             int width = ((Double) arguments.getOrDefault("width", 224d)).intValue();
             int height = ((Double) arguments.getOrDefault("height", 224d)).intValue();
             String flag = (String) arguments.getOrDefault("flag", Image.Flag.COLOR.name());

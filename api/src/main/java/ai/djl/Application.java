@@ -12,6 +12,8 @@
  */
 package ai.djl;
 
+import java.util.Objects;
+
 /** A class contains common deep learning applications. */
 public class Application {
 
@@ -32,10 +34,68 @@ public class Application {
         return path;
     }
 
+    /**
+     * Converts a path string to a {@code Application}.
+     *
+     * @param path the repository path of the application
+     * @return the {@code Application}
+     */
+    public static Application of(String path) {
+        switch (path) {
+            case "cv/image_classification":
+                return CV.IMAGE_CLASSIFICATION;
+            case "cv/object_detection":
+                return CV.OBJECT_DETECTION;
+            case "cv/semantic_segmentation":
+                return CV.SEMANTIC_SEGMENTATION;
+            case "cv/instance_segmentation":
+                return CV.INSTANCE_SEGMENTATION;
+            case "cv/pose_estimation":
+                return CV.POSE_ESTIMATION;
+            case "cv/action_recognition":
+                return CV.ACTION_RECOGNITION;
+            case "nlp/question_answer":
+                return NLP.QUESTION_ANSWER;
+            case "nlp/text_classification":
+                return NLP.TEXT_CLASSIFICATION;
+            case "nlp/sentiment_analysis":
+                return NLP.SENTIMENT_ANALYSIS;
+            case "nlp/word_embedding":
+                return NLP.WORD_EMBEDDING;
+            case "nlp/machine_translation":
+                return NLP.MACHINE_TRANSLATION;
+            case "nlp/multiple_choice":
+                return NLP.MULTIPLE_CHOICE;
+            case "tabular/linear_regression":
+                return Tabular.LINEAR_REGRESSION;
+            case "undefined":
+            default:
+                return UNDEFINED;
+        }
+    }
+
     /** {@inheritDoc} */
     @Override
     public String toString() {
         return path.replace('/', '.').toUpperCase();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Application)) {
+            return false;
+        }
+        return path.equals(((Application) o).path);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
     }
 
     /** The common set of applications for computer vision. */

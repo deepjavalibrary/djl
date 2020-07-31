@@ -170,7 +170,8 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
 
         /** {@inheritDoc} */
         @Override
-        public Translator<Image, DetectedObjects> newInstance(Map<String, Object> arguments) {
+        public Translator<Image, DetectedObjects> newInstance(
+                Model model, Map<String, Object> arguments) {
             return SingleShotDetectionTranslator.builder()
                     .addTransform(new ToTensor())
                     .optThreshold(((Double) arguments.get("threshold")).floatValue())

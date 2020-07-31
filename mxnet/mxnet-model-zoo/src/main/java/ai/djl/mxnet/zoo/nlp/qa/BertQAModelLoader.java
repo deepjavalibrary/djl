@@ -15,6 +15,7 @@ package ai.djl.mxnet.zoo.nlp.qa;
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.Model;
 import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.MRL;
@@ -93,7 +94,7 @@ public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
 
         /** {@inheritDoc} */
         @Override
-        public Translator<QAInput, String> newInstance(Map<String, Object> arguments) {
+        public Translator<QAInput, String> newInstance(Model model, Map<String, Object> arguments) {
             int seqLength = (int) arguments.getOrDefault("seqLength", 384);
             return MxBertQATranslator.builder().setSeqLength(seqLength).build();
         }

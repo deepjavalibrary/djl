@@ -96,7 +96,8 @@ public class TextClassificationModelLoader extends BaseModelLoader<String, Class
 
         /** {@inheritDoc} */
         @Override
-        public Translator<String, Classifications> newInstance(Map<String, Object> arguments) {
+        public Translator<String, Classifications> newInstance(
+                Model model, Map<String, Object> arguments) {
             return null;
         }
     }

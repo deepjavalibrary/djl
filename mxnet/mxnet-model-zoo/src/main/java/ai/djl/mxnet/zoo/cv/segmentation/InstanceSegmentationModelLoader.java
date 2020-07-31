@@ -15,6 +15,7 @@ package ai.djl.mxnet.zoo.cv.segmentation;
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.transform.Normalize;
@@ -113,7 +114,8 @@ public class InstanceSegmentationModelLoader extends BaseModelLoader<Image, Dete
 
         /** {@inheritDoc} */
         @Override
-        public Translator<Image, DetectedObjects> newInstance(Map<String, Object> arguments) {
+        public Translator<Image, DetectedObjects> newInstance(
+                Model model, Map<String, Object> arguments) {
             return InstanceSegmentationTranslator.builder()
                     .addTransform(new ToTensor())
                     .addTransform(new Normalize(MEAN, STD))

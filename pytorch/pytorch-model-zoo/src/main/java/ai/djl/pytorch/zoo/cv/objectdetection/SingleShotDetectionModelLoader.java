@@ -15,6 +15,7 @@ package ai.djl.pytorch.zoo.cv.objectdetection;
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.transform.Normalize;
@@ -105,7 +106,8 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
         /** {@inheritDoc} */
         @Override
         @SuppressWarnings("unchecked")
-        public Translator<Image, DetectedObjects> newInstance(Map<String, Object> arguments) {
+        public Translator<Image, DetectedObjects> newInstance(
+                Model model, Map<String, Object> arguments) {
             int width = ((Double) arguments.getOrDefault("width", 300)).intValue();
             int height = ((Double) arguments.getOrDefault("height", 300)).intValue();
             double threshold = (Double) arguments.getOrDefault("threshold", 0.4d);

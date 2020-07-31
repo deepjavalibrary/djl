@@ -12,7 +12,9 @@
  */
 package ai.djl.modality.cv.translator.wrapper;
 
+import ai.djl.Model;
 import ai.djl.modality.cv.Image;
+import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import java.nio.file.Path;
@@ -38,7 +40,8 @@ public class FileTranslatorFactory<T> implements TranslatorFactory<Path, T> {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<Path, T> newInstance(Map<String, Object> arguments) {
-        return new FileTranslator<>(factory.newInstance(arguments));
+    public Translator<Path, T> newInstance(Model model, Map<String, Object> arguments)
+            throws TranslateException {
+        return new FileTranslator<>(factory.newInstance(model, arguments));
     }
 }

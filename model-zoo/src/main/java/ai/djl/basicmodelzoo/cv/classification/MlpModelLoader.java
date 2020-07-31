@@ -132,7 +132,8 @@ public class MlpModelLoader extends BaseModelLoader<Image, Classifications> {
 
         /** {@inheritDoc} */
         @Override
-        public Translator<Image, Classifications> newInstance(Map<String, Object> arguments) {
+        public Translator<Image, Classifications> newInstance(
+                Model model, Map<String, Object> arguments) {
             int width = ((Double) arguments.getOrDefault("width", 28d)).intValue();
             int height = ((Double) arguments.getOrDefault("height", 28d)).intValue();
             String flag = (String) arguments.getOrDefault("flag", Image.Flag.COLOR.name());

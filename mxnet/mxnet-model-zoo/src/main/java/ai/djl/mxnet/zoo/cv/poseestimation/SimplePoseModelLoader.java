@@ -15,6 +15,7 @@ package ai.djl.mxnet.zoo.cv.poseestimation;
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.Joints;
 import ai.djl.modality.cv.transform.Normalize;
@@ -111,7 +112,7 @@ public class SimplePoseModelLoader extends BaseModelLoader<Image, Joints> {
 
         /** {@inheritDoc} */
         @Override
-        public Translator<Image, Joints> newInstance(Map<String, Object> arguments) {
+        public Translator<Image, Joints> newInstance(Model model, Map<String, Object> arguments) {
             int width = ((Double) arguments.getOrDefault("width", 192d)).intValue();
             int height = ((Double) arguments.getOrDefault("height", 256d)).intValue();
             double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));

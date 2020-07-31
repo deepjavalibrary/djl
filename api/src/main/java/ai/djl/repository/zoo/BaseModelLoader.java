@@ -16,12 +16,16 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
+import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.ndarray.NDList;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.Resource;
 import ai.djl.translate.NoopTranslator;
+import ai.djl.translate.ServingTranslatorFactory;
+import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -51,11 +55,12 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
      */
     protected BaseModelLoader(Repository repository, MRL mrl, String version, ModelZoo modelZoo) {
         this.resource = new Resource(repository, mrl, version);
+        this.modelZoo = modelZoo;
         factories = new ConcurrentHashMap<>();
         factories.put(
                 new Pair<>(NDList.class, NDList.class),
-                (TranslatorFactory<NDList, NDList>) arguments -> new NoopTranslator());
-        this.modelZoo = modelZoo;
+                (TranslatorFactory<NDList, NDList>) (m, c) -> new NoopTranslator());
+        factories.put(new Pair<>(Input.class, Output.class), new ServingTranslatorFactory());
     }
 
     /** {@inheritDoc} */
@@ -78,14 +83,12 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         Map<String, Object> arguments = artifact.getArguments(override);
 
         try {
-            Translator<S, T> translator = criteria.getTranslator();
-            if (translator == null) {
-                TranslatorFactory<S, T> factory = getTranslatorFactory(criteria);
+            TranslatorFactory<S, T> factory = criteria.getTranslatorFactory();
+            if (factory == null) {
+                factory = getTranslatorFactory(criteria);
                 if (factory == null) {
                     throw new ModelNotFoundException("No matching default translator found.");
                 }
-
-                translator = factory.newInstance(arguments);
             }
 
             resource.prepare(artifact, progress);
@@ -130,7 +133,11 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
                 model.setBlock(criteria.getBlock());
             }
             model.load(modelPath, null, criteria.getOptions());
+            model.setProperty("application", getApplication().getPath());
+            Translator<S, T> translator = factory.newInstance(model, arguments);
             return new ZooModel<>(model, translator);
+        } catch (TranslateException e) {
+            throw new ModelNotFoundException("No matching translator found.", e);
         } finally {
             if (progress != null) {
                 progress.end();
