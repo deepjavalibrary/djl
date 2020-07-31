@@ -27,7 +27,7 @@ Make a commit, get reviewed, and then merge it into github.
 This step depends on if there is a new release for different engines.
 If nothing changes between previous and current version, you don't need to do this step.
 
-#### MXNet
+#### Apache MXNet
 
 Run the following command to trigger mxnet-native publishing job:
 

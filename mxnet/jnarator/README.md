@@ -15,7 +15,7 @@ The jnarator module uses antlr to create a customized C language parser. This pa
 reads the C header file, and parses it into an AST tree. The module then
 walks through the tree to find C API calls and generates their corresponding Java methods.
 
-The following example demonstrates how to use this module in the MXNet module:
+The following example demonstrates how to use this module in the Apache MXNet module:
 
 ```
 task jnarator(dependsOn: ":jnarator:jar") {

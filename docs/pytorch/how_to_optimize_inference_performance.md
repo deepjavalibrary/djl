@@ -14,7 +14,7 @@ Please make sure all the NDArrays are attached to the NDManager.
 It is expected to be fixed in the future.
 
 ### oneDNN(MKLDNN) acceleration
-Unlike TensorFlow and MXNet, PyTorch by default doesn't enable MKLDNN which is treated as a device type like CPU and GPU.
+Unlike TensorFlow and Apache MXNet, PyTorch by default doesn't enable MKLDNN which is treated as a device type like CPU and GPU.
 You can enable it by
 
 ```

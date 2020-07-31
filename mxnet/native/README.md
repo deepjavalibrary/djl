@@ -1,10 +1,16 @@
-# DJL - MXNet native library
+# DJL - Apache MXNet native library
 
-## Publishing the MXNet native library
+This module contains DJL released Apache MXNet binary files.
+The source of binary can be traced from the following two ways:
+
+- The binaries are built from source from [Apache MXNet](https://github.com/apache/incubator-mxnet) without modification.
+- The binaries are obtained from the Apache MXNet python pip wheel.
+
+## Publishing the Apache MXNet native library
 
 ### Step 1: Prepare the MXNet native library
 
-Extract the MXNet native library files from the MXNet python pip wheel or build them from source.
+Extract the Apache MXNet native library files from the Apache MXNet python pip wheel or build them from source.
 Make sure to collect all the dependencies. Use the following commands to include all the libmxnet.so dependencies:
 
 ```bash
@@ -78,13 +84,13 @@ cd mxnet/native
 3. Publish to staging via the Github action
 curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/USERNAME/RESPOSITORY_NAME/dispatches --data '{"event_type": “mxnet-staging-pub"}'
 
-# Test with the SSD MXNet model
+# Test with the SSD Apache MXNet model
 ./gradlew :example:run
 
 # After testing all three platforms(osx, linux, win), you can publish the package through sonatype.
 ```
 
-### Optional: Use GitHub actions to publish the MXNet native library
+### Optional: Use GitHub actions to publish the Apache MXNet native library
 
 We have a weekly GitHub pipeline that publishes the snapshots automatically. The pipeline can also be manually triggered using the GitHub REST API:
 

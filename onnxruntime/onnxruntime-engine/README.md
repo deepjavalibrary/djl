@@ -1,7 +1,8 @@
 # DJL - ONNX Runtime engine implementation
 
 ## Overview
-This module contains the ONNX Runtime implementation of the Deep Java Library (DJL) EngineProvider.
+This module contains the Deep Java Library (DJL) EngineProvider for ONNX Runtime.
+
 It is based off the [ONNX Runtime Deep Learning Framework](https://microsoft.github.io/onnxruntime/).
 
 

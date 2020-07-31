@@ -133,23 +133,23 @@ It's an application that can check the dependencies for a specific DLL by simply
 drag and drop.
 
 
-## 4. How to run DJL using other versions of MXNet?
+## 4. How to run DJL using other versions of Apache MXNet?
 **Note:** this is not officially supported by DJL, and some functions may not work. 
-If you require features in MXNet not provided by DJL, please submit an [issue](https://github.com/awslabs/djl/issues).
+If you require features in Apache MXNet not provided by DJL, please submit an [issue](https://github.com/awslabs/djl/issues).
 
 By default, DJL is running on the [MXNet engine](https://github.com/awslabs/djl/tree/master/mxnet/mxnet-engine).
 We use `mxnet-mkl` on CPU machines and `mxnet-cu102mkl` on GPU machines.
 `mkl` means [Intel-MKLDNN](https://github.com/intel/mkl-dnn) is enabled.
 `cu102` means [Nvidia CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit) version 10.2 is enabled.
 
-You don't need to download and install MXNet separately. It's automatically done when you
+You don't need to download and install Apache MXNet separately. It's automatically done when you
 build the DJL project by running the `./gradlew build` command. However, you still have the option to use other versions of MXNet and to build your own customized version.
 
 Follow the [MXNet Installation guide](https://mxnet.apache.org/get_started/?version=master&platform=linux&language=python&environ=pip&processor=cpu#) to install other versions of MXNet.
-You need the latest MXNet to work with DJL, so remember to add `--pre` at the end of your `pip install` command.
-After installing MXNet, you need to update the `MXNET_LIBRARY_PATH` environment variable with your `libmxnet.so` file location.
+You need the latest Apache MXNet to work with DJL, so remember to add `--pre` at the end of your `pip install` command.
+After installing Apache MXNet, you need to update the `MXNET_LIBRARY_PATH` environment variable with your `libmxnet.so` file location.
  
-For example, if you are using an older version of CUDA(version 9.2), you can install MXNet with CUDA 9.2 by running the following command:
+For example, if you are using an older version of CUDA(version 9.2), you can install Apache MXNet with CUDA 9.2 by running the following command:
 
 ```bash
 pip install mxnet-cu92 --pre
@@ -170,7 +170,7 @@ Update the environment variable value with the following command:
 export MXNET_LIBRARY_PATH=//anaconda3/lib/python3.7/site-packages/mxnet/
 ```
 
-Now DJL will automatically use the MXNet library from this location.
+Now DJL will automatically use the Apache MXNet library from this location.
 
 ## 5. Gradle issue
 

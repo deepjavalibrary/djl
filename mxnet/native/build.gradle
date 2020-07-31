@@ -99,8 +99,8 @@ flavorNames.each { flavor ->
             artifact javadocJar
             artifact sourcesJar
             pom {
-                name = "MXNet native library"
-                description = "MXNet Engine native library binary distribution"
+                name = "DJL release for Apache MXNet native binaries"
+                description = "Deep Java Library (DJL) provided Apache MXNet native library binary distribution"
                 url = "http://www.djl.ai/mxnet/native"
                 packaging = "jar"
 

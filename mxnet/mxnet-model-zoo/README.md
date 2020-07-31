@@ -33,7 +33,8 @@ You can pull the MXNet engine from the central Maven repository by including the
 
 ## Pre-trained models
 
-The MXNet model zoo contains two major categories: Computer Vision (CV) and Natural Language Processing (NLP). All the models are grouped by task under these two categories as follows:
+The MXNet model zoo contains two major categories: Computer Vision (CV) and Natural Language Processing (NLP). 
+All the models are grouped by task under these two categories as follows:
 
 
 * CV

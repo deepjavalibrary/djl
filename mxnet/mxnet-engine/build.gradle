@@ -105,8 +105,8 @@ publishing {
     publications {
         maven(MavenPublication) {
             pom {
-                name = "MXNet Engine Adapter"
-                description = "MXNet Engine Adapter for DJL"
+                name = "DJL Engine Adapter for Apache MXNet"
+                description = "Deep Java Library (DJL) Engine Adapter for Apache MXNet"
                 url = "http://www.djl.ai/mxnet/${project.name}"
             }
         }

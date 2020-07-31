@@ -22,7 +22,7 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - **[Beginner Jupyter Tutorial](../jupyter/tutorial/README.md)**
 - [Run object detection with model zoo](../jupyter/object_detection_with_model_zoo.ipynb)
 - [Load pre-trained PyTorch model](../jupyter/load_pytorch_model.ipynb)
-- [Load pre-trained MXNet model](../jupyter/load_mxnet_model.ipynb)
+- [Load pre-trained Apache MXNet model](../jupyter/load_mxnet_model.ipynb)
 - [Transfer learning example](../jupyter/transfer_learning_on_cifar10.ipynb)
 - [Question answering example](../jupyter/BERTQA.ipynb)
 
@@ -41,9 +41,9 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 
 ## Engine Documentation
 
-### [MXNet](../mxnet/README.md)
+### [Apache MXNet](../mxnet/README.md)
 
-- [MXNet Gluon Importing](mxnet/how_to_convert_your_model_to_symbol.md) - MXNet Gluon Importing
+- [Apache MXNet Gluon Importing](mxnet/how_to_convert_your_model_to_symbol.md) - Apache MXNet Gluon Importing
 
 ### [PyTorch](../pytorch/README.md)
 

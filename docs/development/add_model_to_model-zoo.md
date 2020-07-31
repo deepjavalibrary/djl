@@ -8,7 +8,7 @@ The model files you will have or need depend on what type of model you have:
 
 - Model built and trained in DJL:
   - <MODEL_NAME>-0000.params
-- Model import from MXNet:
+- Model import from Apache MXNet:
   - <MODEL_NAME>-symbol.json
   - <MODEL_NAME>-0000.params
 

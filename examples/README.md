@@ -28,7 +28,7 @@ For examples and references on building models and translators, look in our
 [basic model zoo](https://github.com/awslabs/djl/tree/master/model-zoo).
 
 You may be able to find more translator examples in our engine specific model zoos:
-[MXNet](https://github.com/awslabs/djl/tree/master/mxnet/mxnet-model-zoo),
+[Apache MXNet](https://github.com/awslabs/djl/tree/master/mxnet/mxnet-model-zoo),
 [PyTorch](https://github.com/awslabs/djl/tree/master/pytorch/pytorch-model-zoo),
 and [TensorFlow](https://github.com/awslabs/djl/tree/master/tensorflow/tensorflow-model-zoo).
 
@@ -95,7 +95,7 @@ The following command executes an object detection example:
 
 DJL is engine agnostic, so it's capable of supporting different backends.
 
-With MXNet, PyTorch, TensorFlow and ONNX Runtime, you can choose different builds of the native library.
+With Apache MXNet, PyTorch, TensorFlow and ONNX Runtime, you can choose different builds of the native library.
 We recommend the automatic engine selection which downloads the best engine for your platform and available hardware during the first runtime.
 Activate the automatic selection by adding `ai.djl.mxnet:mxnet-native-auto:1.7.0-b` for MXNet and `ai.djl.pytorch:pytorch-native-auto:1.5.0` for PyTorh as a dependency.
 You can also see:

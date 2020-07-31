@@ -2,7 +2,7 @@
 
 ## Overview
 
-This module contains the TensorFlow implementation of the Deep Java Library (DJL) EngineProvider.
+This module contains the Deep Java Library (DJL) EngineProvider for TensorFlow.
 
 We don't recommend that developers use classes in this module directly. Use of these classes will
 couple your code with TensorFlow and make switching between frameworks difficult.

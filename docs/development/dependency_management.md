@@ -40,15 +40,15 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | examples (deprecated) | Contains DJL examples |
 | | repository (deprecated, use api instead) | Contain classes for DJL Repository API. The package is moved into api in newer releases |
 | | | |
-| [ai.djl.mxnet](https://search.maven.org/search?q=g:ai.djl.mxnet) | [mxnet-engine](../../mxnet/mxnet-engine/README.md#installation) | MXNet engine adapter |
-| | [mxnet-model-zoo](../../mxnet/mxnet-model-zoo/README.md#installation) | Contains state of the art MXNet symbolic models |
+| [ai.djl.mxnet](https://search.maven.org/search?q=g:ai.djl.mxnet) | [mxnet-engine](../../mxnet/mxnet-engine/README.md#installation) | Apache MXNet engine adapter |
+| | [mxnet-model-zoo](../../mxnet/mxnet-model-zoo/README.md#installation) | Contains state of the art Apache MXNet symbolic models |
 | | [mxnet-native-auto](../../mxnet/mxnet-engine/README.md#automatic-recommended) | A placeholder package to automatically download native libraries for your platform |
-| | [mxnet-native-mkl(osx-x86_64)](../../mxnet/mxnet-engine/README.md#macos) | Contains MXNet native library for macOS |
-| | [mxnet-native-mkl(win-x86_64)](../../mxnet/mxnet-engine/README.md#windows-cpu) | Contains MXNet native library for Windows |
-| | [mxnet-native-mkl(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-cpu) | Contains MXNet native library for Linux |
-| | [mxnet-native-cu102(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-gpu) | Contains MXNet native library for Linux with CUDA 10.2|
-| | [mxnet-native-cu101(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-gpu) | Contains MXNet native library for Linux with CUDA 10.1 |
-| | [mxnet-native-cu92(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-gpu) | Contains MXNet native library for Linux with CUDA 9.2 |
+| | [mxnet-native-mkl(osx-x86_64)](../../mxnet/mxnet-engine/README.md#macos) | Contains Apache MXNet native library for macOS |
+| | [mxnet-native-mkl(win-x86_64)](../../mxnet/mxnet-engine/README.md#windows-cpu) | Contains Apache MXNet native library for Windows |
+| | [mxnet-native-mkl(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-cpu) | Contains Apache MXNet native library for Linux |
+| | [mxnet-native-cu102(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-gpu) | Contains Apache MXNet native library for Linux with CUDA 10.2|
+| | [mxnet-native-cu101(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-gpu) | Contains Apache MXNet native library for Linux with CUDA 10.1 |
+| | [mxnet-native-cu92(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-gpu) | Contains Apache MXNet native library for Linux with CUDA 9.2 |
 | | | |
 | [ai.djl.pytorch](https://search.maven.org/search?q=g:ai.djl.pytorch) | [pytorch-engine](../../pytorch/pytorch-engine/README.md#installation) | PyTorch engine adapter |
 | | [pytorch-model-zoo](../../pytorch/pytorch-model-zoo/README.md#installation) | Contains state of the art PyTorch torch script models |

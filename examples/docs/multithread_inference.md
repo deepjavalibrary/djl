@@ -12,12 +12,12 @@ For a reference implementation, see [Multi-threaded Benchmark](https://github.co
 
 you need to set corresponding configuration based on the engine you want to use.
 
-## MXNet
+## Apache MXNet
 
 ## Engine configuration
-To use MXNet Engine to run multi-threading, complete the following steps.
+To use Apache MXNet Engine to run multi-threading, complete the following steps.
 
-## Enable NaiveEngine with MXNet
+## Enable NaiveEngine with Apache MXNet
 If using the MXNet engine for a multi-threaded inference case, you need to specify the 'MXNET_ENGINE_TYPE' environment variable using the following command:
 
 ```
@@ -32,7 +32,7 @@ export OMP_NUM_THREADS=1
 
 ## Save your inference memory with thread-safe mode (Experimental)
 
-This is an experimental feature used in MXNet to share the parameters' memory across all predictors.
+This is an experimental feature used in Apache MXNet to share the parameters' memory across all predictors.
 Memory consumption will not change if you change the number of threads.
 By default, the parameters for the model will be copied for each thread.
 
