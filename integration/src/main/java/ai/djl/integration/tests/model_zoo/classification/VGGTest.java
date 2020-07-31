@@ -34,13 +34,18 @@ import ai.djl.util.PairList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class VGGTest {
 
     @Test
     public void testTrainWithDefaultChannels() {
-
+        // Vgg is too large to be fit into the github action cpu main memory
+        // only run the test when we have GPU
+        if (Device.getGpuCount() == 0) {
+            throw new SkipException("GPU only");
+        }
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optDevices(Device.getDevices(2))
