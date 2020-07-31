@@ -1046,6 +1046,9 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDList split(long[] indices, int axis) {
+        if (indices.length == 0) {
+            return new NDList(this);
+        }
         MxOpParams params = new MxOpParams();
         // follow the numpy behavior
         if (indices[0] != 0) {

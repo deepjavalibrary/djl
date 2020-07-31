@@ -45,7 +45,7 @@ public class SqueezenetTest {
         try (Model model = Model.newInstance("squeezenet")) {
             model.setBlock(squeezeNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 2;
+                int batchSize = 1;
                 Shape inputShape = new Shape(batchSize, 1, 28, 28);
                 trainer.initialize(inputShape);
 

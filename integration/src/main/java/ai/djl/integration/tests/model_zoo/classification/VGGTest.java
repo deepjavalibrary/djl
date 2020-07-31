@@ -34,7 +34,6 @@ import ai.djl.util.PairList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class VGGTest {
@@ -42,62 +41,53 @@ public class VGGTest {
     @Test
     public void testTrainWithDefaultChannels() {
 
-        if (!Boolean.getBoolean("nightly")) {
-            throw new SkipException("Nightly only");
-        }
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Device.getDevices(2))
+                        .optInitializer(Initializer.ONES);
 
-        if (Device.getGpuCount() > 0) {
+        Block vgg = VGG.builder().build();
+        try (Model model = Model.newInstance("vgg")) {
+            model.setBlock(vgg);
+            try (Trainer trainer = model.newTrainer(config)) {
+                int batchSize = 1;
+                Shape inputShape = new Shape(batchSize, 1, 224, 224);
+                NDManager manager = trainer.getManager();
+                trainer.initialize(inputShape);
 
-            TrainingConfig config =
-                    new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                            .optDevices(Device.getDevices(2))
-                            .optInitializer(Initializer.ONES);
+                NDArray input = manager.ones(inputShape);
+                NDArray label = manager.ones(new Shape(batchSize, 1));
+                Batch batch =
+                        new Batch(
+                                manager,
+                                new NDList(input),
+                                new NDList(label),
+                                batchSize,
+                                Batchifier.STACK,
+                                Batchifier.STACK);
+                PairList<String, Parameter> parameters = vgg.getParameters();
+                EasyTrain.trainBatch(trainer, batch);
+                trainer.step();
 
-            Block vgg = VGG.builder().build();
-            try (Model model = Model.newInstance("vgg")) {
-                model.setBlock(vgg);
-                try (Trainer trainer = model.newTrainer(config)) {
-                    int batchSize = 2;
-                    Shape inputShape = new Shape(batchSize, 1, 224, 224);
-                    NDManager manager = trainer.getManager();
-                    trainer.initialize(inputShape);
-
-                    NDArray input = manager.ones(inputShape);
-                    NDArray label = manager.ones(new Shape(batchSize, 1));
-                    Batch batch =
-                            new Batch(
-                                    manager,
-                                    new NDList(input),
-                                    new NDList(label),
-                                    batchSize,
-                                    Batchifier.STACK,
-                                    Batchifier.STACK);
-                    PairList<String, Parameter> parameters = vgg.getParameters();
-                    EasyTrain.trainBatch(trainer, batch);
-                    trainer.step();
-
-                    Assert.assertEquals(
-                            parameters.get(0).getValue().getArray().getShape(),
-                            new Shape(64, 1, 3, 3));
-                    Assert.assertEquals(
-                            parameters.get(2).getValue().getArray().getShape(),
-                            new Shape(128, 64, 3, 3));
-                    Assert.assertEquals(
-                            parameters.get(4).getValue().getArray().getShape(),
-                            new Shape(256, 128, 3, 3));
-                    Assert.assertEquals(
-                            parameters.get(8).getValue().getArray().getShape(),
-                            new Shape(512, 256, 3, 3));
-                    Assert.assertEquals(
-                            parameters.get(12).getValue().getArray().getShape(),
-                            new Shape(512, 512, 3, 3));
-                    Assert.assertEquals(
-                            parameters.get(16).getValue().getArray().getShape(),
-                            new Shape(4096, 25088));
-                    Assert.assertEquals(
-                            parameters.get(18).getValue().getArray().getShape(),
-                            new Shape(4096, 4096));
-                }
+                Assert.assertEquals(
+                        parameters.get(0).getValue().getArray().getShape(), new Shape(64, 1, 3, 3));
+                Assert.assertEquals(
+                        parameters.get(2).getValue().getArray().getShape(),
+                        new Shape(128, 64, 3, 3));
+                Assert.assertEquals(
+                        parameters.get(4).getValue().getArray().getShape(),
+                        new Shape(256, 128, 3, 3));
+                Assert.assertEquals(
+                        parameters.get(8).getValue().getArray().getShape(),
+                        new Shape(512, 256, 3, 3));
+                Assert.assertEquals(
+                        parameters.get(12).getValue().getArray().getShape(),
+                        new Shape(512, 512, 3, 3));
+                Assert.assertEquals(
+                        parameters.get(16).getValue().getArray().getShape(),
+                        new Shape(4096, 25088));
+                Assert.assertEquals(
+                        parameters.get(18).getValue().getArray().getShape(), new Shape(4096, 4096));
             }
         }
     }
@@ -114,7 +104,7 @@ public class VGGTest {
         model.setBlock(vgg);
 
         Trainer trainer = model.newTrainer(config);
-        int batchSize = 2;
+        int batchSize = 1;
         NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 224, 224));
 
         trainer.initialize(x.getShape());
@@ -153,7 +143,7 @@ public class VGGTest {
         model.setBlock(vgg);
 
         Trainer trainer = model.newTrainer(config);
-        int batchSize = 2;
+        int batchSize = 1;
         NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 224, 224));
 
         trainer.initialize(x.getShape());

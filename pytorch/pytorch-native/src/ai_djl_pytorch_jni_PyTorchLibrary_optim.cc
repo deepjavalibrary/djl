@@ -68,7 +68,12 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_sgdUpdate(
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_zeroGrad
   (JNIEnv* env, jobject jthis, jobject jhandle) {
+  torch::NoGradGuard NoGradGuard;
   const auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-  weight_ptr->grad().detach_();
-  weight_ptr->grad().zero_();
+  // the check is only for batch_size < # of gpus
+  // where some required_grad weights never call backward
+  // TODO we should avoid the create parameter but not applying backward
+  if (weight_ptr->grad().defined()) {
+    weight_ptr->grad().zero_();
+  }
 }

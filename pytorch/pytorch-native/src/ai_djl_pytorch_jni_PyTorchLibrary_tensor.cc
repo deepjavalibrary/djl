@@ -69,14 +69,10 @@ JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLayout(JNIEnv
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTo(
     JNIEnv* env, jobject jthis, jobject jhandle, jint jdtype, jintArray jdevice, jboolean jcopy) {
   API_BEGIN();
+  torch::NoGradGuard NoGradGuard;
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
   auto result = tensor_ptr->to(device, utils::GetScalarTypeFromDType(jdtype), false, jcopy == JNI_TRUE);
-  // disable "to" to calculate the gradient
-  // TODO "to" should also calculate the gradient
-  if (result.requires_grad()) {
-    result.detach_();
-  }
   const auto* result_ptr = new torch::Tensor(result);
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
@@ -85,6 +81,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTo(
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_tensorClone(
     JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
+  torch::NoGradGuard NoGradGuard;
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->clone());
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
@@ -176,6 +173,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDeleteTensor(
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchToSparse(
   JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
+  torch::NoGradGuard NoGradGuard;
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->to_sparse());
   return utils::CreatePointer<torch::Tensor>(env, result_ptr);
@@ -185,9 +183,10 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchToSparse(
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchToDense(
   JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-    const auto* result_ptr = new torch::Tensor(tensor_ptr->to_dense());
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  torch::NoGradGuard NoGradGuard;
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->to_dense());
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
 
@@ -218,6 +217,9 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGrad(
   API_BEGIN();
     const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
     const auto* result_ptr = new torch::Tensor(tensor_ptr->grad());
+    if (!tensor_ptr->grad().defined()) {
+      return nullptr;
+    }
     return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }

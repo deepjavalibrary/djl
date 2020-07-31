@@ -49,7 +49,7 @@ public class LeNetTest {
         try (Model model = Model.newInstance("lenet")) {
             model.setBlock(leNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 2;
+                int batchSize = 1;
                 Shape inputShape = new Shape(batchSize, 1, 28, 28);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -92,7 +92,7 @@ public class LeNetTest {
         try (Model model = Model.newInstance("lenet")) {
             model.setBlock(leNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 2;
+                int batchSize = 1;
                 Shape inputShape = new Shape(batchSize, 1, 28, 28);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -138,7 +138,7 @@ public class LeNetTest {
         model.setBlock(leNet);
 
         Trainer trainer = model.newTrainer(config);
-        int batchSize = 2;
+        int batchSize = 1;
         NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 28, 28));
 
         trainer.initialize(x.getShape());
@@ -175,7 +175,7 @@ public class LeNetTest {
         model.setBlock(leNet);
 
         Trainer trainer = model.newTrainer(config);
-        int batchSize = 2;
+        int batchSize = 1;
         NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 28, 28));
 
         trainer.initialize(x.getShape());

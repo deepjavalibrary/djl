@@ -68,7 +68,7 @@ public class ResnetTest {
         try (Model model = Model.newInstance("resnet")) {
             model.setBlock(resNet50);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 2;
+                int batchSize = 1;
                 Shape inputShape = new Shape(batchSize, 1, 28, 28);
                 trainer.initialize(inputShape);
 

@@ -1063,7 +1063,11 @@ public final class JniUtils {
     }
 
     public static PtNDArray getGradient(PtNDArray ndArray) {
-        return ndArray.getManager().create(PyTorchLibrary.LIB.torchGrad(ndArray.getHandle()));
+        Pointer pointer = PyTorchLibrary.LIB.torchGrad(ndArray.getHandle());
+        if (pointer == null) {
+            return null;
+        }
+        return ndArray.getManager().create(pointer);
     }
 
     public static void backward(

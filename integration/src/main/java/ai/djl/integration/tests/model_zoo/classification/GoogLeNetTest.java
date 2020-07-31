@@ -48,7 +48,7 @@ public class GoogLeNetTest {
         try (Model model = Model.newInstance("googlenet")) {
             model.setBlock(googLeNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 2;
+                int batchSize = 1;
                 Shape inputShape = new Shape(batchSize, 1, 96, 96);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -102,7 +102,7 @@ public class GoogLeNetTest {
         model.setBlock(googLeNet);
 
         Trainer trainer = model.newTrainer(config);
-        int batchSize = 2;
+        int batchSize = 1;
         NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 96, 96));
 
         trainer.initialize(x.getShape());
@@ -141,7 +141,7 @@ public class GoogLeNetTest {
         model.setBlock(googLeNet);
 
         Trainer trainer = model.newTrainer(config);
-        int batchSize = 2;
+        int batchSize = 1;
         NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 28, 28));
 
         trainer.initialize(x.getShape());

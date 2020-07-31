@@ -46,7 +46,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     private Shape shape;
     private SparseFormat sparseFormat;
     // use Boolean object to maintain three status: null, false, true
-    private Boolean isGradientRequired;
+    private Boolean hasGradient;
     private PtNDManager manager;
     private PtNDArrayEx ptNDArrayEx;
 
@@ -143,6 +143,7 @@ public class PtNDArray extends NativeResource implements NDArray {
                     "Sparse NDArray gradient atttach not supported");
         }
         JniUtils.attachGradient(this);
+        hasGradient = true;
     }
 
     /** {@inheritDoc} */
@@ -153,16 +154,24 @@ public class PtNDArray extends NativeResource implements NDArray {
                     "No gradient attached to this NDArray, please call array.requiredGradient()"
                             + "on your NDArray or block.setInitializer() on your Block");
         }
-        return JniUtils.getGradient(this);
+        PtNDArray res = JniUtils.getGradient(this);
+        // If you call getGradient() before you run the backward,
+        // you will get nothing in PyTorch engine.
+        // To align with MXNet's behavior, we will create a zeros NDArray.
+        // TODO should we access the grad NDArray after we close the parameter NDArray?
+        if (res == null) {
+            res = (PtNDArray) getManager().zeros(getShape());
+        }
+        return res;
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean hasGradient() {
-        if (isGradientRequired == null) {
-            isGradientRequired = JniUtils.requiresGrad(this);
+        if (hasGradient == null) {
+            hasGradient = JniUtils.requiresGrad(this);
         }
-        return isGradientRequired;
+        return hasGradient;
     }
 
     /** {@inheritDoc} */
@@ -855,6 +864,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDList split(long[] indices, int axis) {
+        if (indices.length == 0) {
+            return new NDList(this);
+        }
         List<Long> ptIndex = new ArrayList<>();
         ptIndex.add(indices[0]);
         for (int i = 1; i < indices.length; i++) {

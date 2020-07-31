@@ -39,6 +39,11 @@ public class NDArrayShapesManipulationOpTest {
             result = array.split(new long[] {2});
             Assert.assertEquals(result.get(0), manager.create(new float[] {1f, 2f}));
             Assert.assertEquals(result.get(1), manager.create(new float[] {3f, 4f}));
+
+            // special case: indices = empty
+            array = manager.arange(6f).reshape(2, 3);
+            result = array.split(new long[0]);
+            Assert.assertEquals(result.singletonOrThrow(), array);
         }
     }
 

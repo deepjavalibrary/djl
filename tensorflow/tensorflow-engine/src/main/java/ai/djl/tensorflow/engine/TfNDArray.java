@@ -1148,6 +1148,9 @@ public class TfNDArray implements NDArray {
     // TODO: remove helper once this issue is fixed:
     // https://github.com/tensorflow/java/issues/45
     private NDList splitHelper(long[] indices, int axis) {
+        if (indices.length == 0) {
+            return new NDList(this);
+        }
         NDList result = new NDList();
 
         List<Long> sizes = new ArrayList<>();

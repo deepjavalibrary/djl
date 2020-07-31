@@ -48,7 +48,7 @@ public class NiNTest {
         try (Model model = Model.newInstance("nin")) {
             model.setBlock(nin);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 2;
+                int batchSize = 1;
                 Shape inputShape = new Shape(batchSize, 1, 224, 224);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -103,7 +103,7 @@ public class NiNTest {
         try (Model model = Model.newInstance("nin")) {
             model.setBlock(nin);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 2;
+                int batchSize = 1;
                 Shape inputShape = new Shape(batchSize, 1, 224, 224);
                 NDManager manager = trainer.getManager();
                 trainer.initialize(inputShape);
@@ -153,7 +153,7 @@ public class NiNTest {
         model.setBlock(nin);
 
         Trainer trainer = model.newTrainer(config);
-        int batchSize = 2;
+        int batchSize = 1;
         NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 224, 224));
         trainer.initialize(x.getShape());
 
@@ -189,7 +189,7 @@ public class NiNTest {
         model.setBlock(nin);
 
         Trainer trainer = model.newTrainer(config);
-        int batchSize = 2;
+        int batchSize = 1;
         NDArray x = trainer.getManager().ones(new Shape(batchSize, 1, 224, 224));
 
         trainer.initialize(x.getShape());
