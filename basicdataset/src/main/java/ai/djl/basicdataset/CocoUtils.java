@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.util.JsonUtils;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -52,7 +53,7 @@ public class CocoUtils {
         if (!prepared) {
             CocoMetadata metadata;
             try (Reader reader = Files.newBufferedReader(annotationPath)) {
-                metadata = CocoMetadata.GSON.fromJson(reader, CocoMetadata.class);
+                metadata = JsonUtils.GSON.fromJson(reader, CocoMetadata.class);
             }
             createIndex(metadata);
             prepared = true;

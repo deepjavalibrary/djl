@@ -13,8 +13,6 @@
 package ai.djl.repository;
 
 import ai.djl.util.Progress;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -67,12 +65,6 @@ import java.util.Map;
  * {@link Repository#newInstance(String, String)} with the location of the repository.
  */
 public interface Repository {
-
-    Gson GSON =
-            new GsonBuilder()
-                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                    .setPrettyPrinting()
-                    .create();
 
     /**
      * Creates a new instance of a repository with a name and url.

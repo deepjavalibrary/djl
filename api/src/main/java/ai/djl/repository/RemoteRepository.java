@@ -12,6 +12,7 @@
  */
 package ai.djl.repository;
 
+import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,7 +81,7 @@ public class RemoteRepository extends AbstractRepository {
         Path cacheFile = cacheDir.resolve("metadata.json");
         if (Files.exists(cacheFile)) {
             try (Reader reader = Files.newBufferedReader(cacheFile)) {
-                Metadata metadata = GSON.fromJson(reader, Metadata.class);
+                Metadata metadata = JsonUtils.GSON_PRETTY.fromJson(reader, Metadata.class);
                 metadata.init();
                 Date lastUpdated = metadata.getLastUpdated();
                 if (Boolean.getBoolean("offline")
@@ -94,11 +95,11 @@ public class RemoteRepository extends AbstractRepository {
         Path tmp = Files.createTempFile(cacheDir, "metadata", ".tmp");
         try (InputStream is = file.toURL().openStream()) {
             String json = Utils.toString(is);
-            Metadata metadata = GSON.fromJson(json, Metadata.class);
+            Metadata metadata = JsonUtils.GSON_PRETTY.fromJson(json, Metadata.class);
             metadata.init();
             metadata.setLastUpdated(new Date());
             try (Writer writer = Files.newBufferedWriter(tmp)) {
-                writer.write(GSON.toJson(metadata));
+                writer.write(JsonUtils.GSON_PRETTY.toJson(metadata));
             }
             Utils.moveQuietly(tmp, cacheFile);
             metadata.setRepositoryUri(mrlUri);

@@ -13,7 +13,7 @@
 package ai.djl.examples.training.util;
 
 import ai.djl.Device;
-import com.google.gson.Gson;
+import ai.djl.util.JsonUtils;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -70,7 +70,7 @@ public class Arguments {
         }
         if (cmd.hasOption("criteria")) {
             Type type = new TypeToken<Map<String, Object>>() {}.getType();
-            criteria = new Gson().fromJson(cmd.getOptionValue("criteria"), type);
+            criteria = JsonUtils.GSON.fromJson(cmd.getOptionValue("criteria"), type);
         }
     }
 

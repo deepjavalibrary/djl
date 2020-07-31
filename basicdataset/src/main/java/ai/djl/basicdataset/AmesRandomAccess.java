@@ -22,8 +22,8 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.Resource;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
+import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
-import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -59,8 +59,6 @@ public class AmesRandomAccess extends RandomAccessDataset {
     private static final Logger logger = LoggerFactory.getLogger(AmesRandomAccess.class);
 
     private static final String ARTIFACT_ID = "ames";
-
-    private static final Gson GSON = new Gson();
 
     private Set<String> enabledFeatures; // enabled features
     private Set<String> categoricalFeatures; // set of categorical features
@@ -483,7 +481,7 @@ public class AmesRandomAccess extends RandomAccessDataset {
                     new InputStreamReader(
                             AmesRandomAccess.class.getResourceAsStream("ames.json"),
                             StandardCharsets.UTF_8)) {
-                af = GSON.fromJson(reader, AmesFeatures.class);
+                af = JsonUtils.GSON.fromJson(reader, AmesFeatures.class);
             }
             return new AmesRandomAccess(this);
         }

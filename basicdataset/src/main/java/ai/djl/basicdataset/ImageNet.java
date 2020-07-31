@@ -15,11 +15,12 @@ package ai.djl.basicdataset;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.translate.Pipeline;
+import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
-import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,9 +41,8 @@ public class ImageNet extends AbstractImageFolder {
 
     ImageNet(Builder builder) {
         super(builder);
-        root =
-                Paths.get(resource.getRepository().getBaseUri())
-                        .resolve(getUsagePath(builder.usage));
+        String usagePath = getUsagePath(builder.usage);
+        root = Paths.get(resource.getRepository().getBaseUri()).resolve(usagePath);
     }
 
     /**
@@ -108,11 +108,8 @@ public class ImageNet extends AbstractImageFolder {
         if (classStream == null) {
             throw new AssertionError("Missing imagenet/classes.json in jar resource");
         }
-        String[][] classes =
-                new Gson()
-                        .fromJson(
-                                new InputStreamReader(classStream, StandardCharsets.UTF_8),
-                                String[][].class);
+        Reader reader = new InputStreamReader(classStream, StandardCharsets.UTF_8);
+        String[][] classes = JsonUtils.GSON.fromJson(reader, String[][].class);
         wordNetIds = new String[classes.length];
         classNames = new String[classes.length];
         classFull = new String[classes.length];

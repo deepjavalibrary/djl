@@ -13,8 +13,7 @@
 package ai.djl.mxnet.zoo.nlp.qa;
 
 import ai.djl.modality.nlp.Vocabulary;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import ai.djl.util.JsonUtils;
 import com.google.gson.annotations.SerializedName;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,8 +28,6 @@ import java.util.Map;
 
 /** A MXNet implementation of Vocabulary. */
 public class MxBertVocabulary implements Vocabulary {
-
-    private static final Gson GSON = new GsonBuilder().create();
 
     @SerializedName("token_to_idx")
     private Map<String, Long> token2idx;
@@ -74,7 +71,7 @@ public class MxBertVocabulary implements Vocabulary {
      */
     public static MxBertVocabulary parse(InputStream is) {
         try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-            return GSON.fromJson(reader, MxBertVocabulary.class);
+            return JsonUtils.GSON.fromJson(reader, MxBertVocabulary.class);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

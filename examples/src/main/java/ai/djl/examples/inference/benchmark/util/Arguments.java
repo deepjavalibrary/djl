@@ -19,7 +19,7 @@ import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
-import com.google.gson.Gson;
+import ai.djl.util.JsonUtils;
 import com.google.gson.reflect.TypeToken;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class Arguments {
         }
         if (cmd.hasOption("criteria")) {
             Type type = new TypeToken<Map<String, String>>() {}.getType();
-            criteria = new Gson().fromJson(cmd.getOptionValue("criteria"), type);
+            criteria = JsonUtils.GSON.fromJson(cmd.getOptionValue("criteria"), type);
         }
         if (cmd.hasOption("input-shape")) {
             String shape = cmd.getOptionValue("input-shape");

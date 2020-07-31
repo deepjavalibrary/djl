@@ -27,9 +27,8 @@ import ai.djl.repository.Resource;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.Pipeline;
+import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.Reader;
@@ -46,11 +45,6 @@ public class PikachuDetection extends RandomAccessDataset {
 
     private static final String VERSION = "1.0";
     private static final String ARTIFACT_ID = "pikachu";
-    private static final Gson GSON =
-            new GsonBuilder()
-                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                    .setPrettyPrinting()
-                    .create();
 
     private Usage usage;
     private Image.Flag flag;
@@ -106,7 +100,7 @@ public class PikachuDetection extends RandomAccessDataset {
         Path indexFile = usagePath.resolve("index.file");
         try (Reader reader = Files.newBufferedReader(indexFile)) {
             Type mapType = new TypeToken<Map<String, List<Float>>>() {}.getType();
-            Map<String, List<Float>> metadata = GSON.fromJson(reader, mapType);
+            Map<String, List<Float>> metadata = JsonUtils.GSON.fromJson(reader, mapType);
             for (Map.Entry<String, List<Float>> entry : metadata.entrySet()) {
                 float[] labelArray = new float[5];
                 String imgName = entry.getKey();

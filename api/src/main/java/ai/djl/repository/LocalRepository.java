@@ -12,6 +12,7 @@
  */
 package ai.djl.repository;
 
+import ai.djl.util.JsonUtils;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URI;
@@ -76,7 +77,7 @@ public class LocalRepository extends AbstractRepository {
             return null;
         }
         try (Reader reader = Files.newBufferedReader(file)) {
-            Metadata metadata = GSON.fromJson(reader, Metadata.class);
+            Metadata metadata = JsonUtils.GSON_PRETTY.fromJson(reader, Metadata.class);
             metadata.init();
             metadata.setRepositoryUri(uri);
             return metadata;

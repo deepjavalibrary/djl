@@ -13,8 +13,6 @@
 package ai.djl.basicdataset;
 
 import ai.djl.modality.cv.output.Rectangle;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -25,11 +23,6 @@ import java.util.List;
 
 /** A metadata class to represent the structure of annotations in Coco. */
 public class CocoMetadata {
-
-    public static final Gson GSON =
-            new GsonBuilder()
-                    .registerTypeAdapter(Rectangle.class, new RectangleDeserializer())
-                    .create();
 
     private List<Image> images;
     private List<Annotation> annotations;
