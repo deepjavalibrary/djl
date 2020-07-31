@@ -1,0 +1,44 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    implementation "io.netty:netty-all:${netty_version}"
+    implementation "com.google.code.gson:gson:${gson_version}"
+    implementation "commons-cli:commons-cli:${commons_cli_version}"
+    implementation "org.slf4j:slf4j-api:${slf4j_version}"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
+    implementation project(":api")
+    implementation project(":mxnet:mxnet-engine")
+
+    runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.7.0-b"
+
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'ai.djl.serving.ModelServer'
+    }
+    includeEmptyDirs = false
+    from configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
+
+    exclude "META-INF/maven/**"
+    exclude "META-INF/INDEX.LIST"
+    exclude "META-INF/MANIFEST*"
+}
+
+application {
+    mainClassName = System.getProperty("main", "ai.djl.serving.ModelServer")
+}
+
+run {
+    environment("TF_CPP_MIN_LOG_LEVEL", "1") // turn off TensorFlow print out
+    environment("MXNET_ENGINE_TYPE", "NaiveEngine")
+    environment("OMP_NUM_THREADS", "1")
+    systemProperties System.getProperties()
+    systemProperties.remove("user.dir")
+    systemProperty("file.encoding", "UTF-8")
+}

@@ -27,6 +27,7 @@ import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.util.JsonUtils;
+import ai.djl.util.PairList;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -287,7 +288,7 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
             Input input = (Input) ctx.getAttachment("input");
             Output output = new Output(input.getRequestId(), 200, "OK");
             Object obj = translator.processOutput(ctx, list);
-            output.setContent(JsonUtils.GSON_PRETTY.toJson(obj));
+            output.setContent(JsonUtils.GSON_PRETTY.toJson(obj) + '\n');
             return output;
         }
 
@@ -295,7 +296,14 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
         @Override
         public NDList processInput(TranslatorContext ctx, Input input) throws Exception {
             ctx.setAttachment("input", input);
-            byte[] data = input.getContent().valueAt(0);
+            PairList<String, byte[]> inputs = input.getContent();
+            byte[] data = inputs.get("data");
+            if (data == null) {
+                data = inputs.get("body");
+            }
+            if (data == null) {
+                data = input.getContent().valueAt(0);
+            }
             Image image = factory.fromInputStream(new ByteArrayInputStream(data));
             return translator.processInput(ctx, image);
         }

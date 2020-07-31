@@ -14,7 +14,7 @@ package ai.djl.repository.zoo;
 
 import ai.djl.ModelException;
 
-/** /** Thrown when an application tries to load a model from repository search path. */
+/** Thrown when an application tries to load a model from repository search path. */
 public class ModelNotFoundException extends ModelException {
 
     private static final long serialVersionUID = 1L;
