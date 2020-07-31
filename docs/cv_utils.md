@@ -45,7 +45,8 @@ Image imgLoaded = BufferedImageFactory.getInstance().fromFile(Path.of("bicycle.p
 
 ## Draw Bounding Boxes
 `Image` includes a useful function to draw bounding boxes given a `DetectedObjects` instance
-generated from a `ObjectDetection` model. We'll use the `SingleShotDetection` model to demonstrate below.
+generated from a `ObjectDetection` model. We'll use the pre-trained `SingleShotDetection` model from the model zoo 
+to demonstrate below.
 
 ```java
 // Load Object Detection Model
@@ -64,7 +65,8 @@ img.save(out1, "png");
 ```
 
 ## Draw Joints
-You can also draw joints if you have a `Joints` instance generated from a `SimplePose` model.
+You can also draw joints if you have a `Joints` instance generated from a `PoseEstimation` model.
+Here, we'll use the `SimplePose` model from the model zoo!
 
 ```java
 // Load Pose Detection Model
