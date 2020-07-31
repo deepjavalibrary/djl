@@ -115,9 +115,9 @@ public class BufferedImageFactory extends ImageFactory {
                         ele -> {
                             int x = ele % width;
                             int y = ele / width;
-                            int red = ((byte) raw[ele]) & 0xFF;
-                            int green = ((byte) raw[ele + imageArea]) & 0xFF;
-                            int blue = ((byte) raw[ele + imageArea * 2]) & 0xFF;
+                            int red = raw[ele] & 0xFF;
+                            int green = raw[ele + imageArea] & 0xFF;
+                            int blue = raw[ele + imageArea * 2] & 0xFF;
                             int rgb = (red << 16) | (green << 8) | blue;
                             image.setRGB(x, y, rgb);
                         });

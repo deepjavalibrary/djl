@@ -104,11 +104,10 @@ public class BitmapImageFactory extends ImageFactory {
         IntStream.range(0, imageArea).parallel().forEach(ele -> {
             int x = ele % width;
             int y = ele / width;
-            int red = Integer.valueOf(raw[ele]).byteValue() & 0xFF;
-            int green = Integer.valueOf(raw[ele + imageArea]).byteValue() & 0xFF;
-            int blue = Integer.valueOf(raw[ele + imageArea * 2]).byteValue() & 0xFF;
-            int rgb = (red << 16) | (green << 8) | blue;
-            bitmap.setPixel(x, y, rgb);
+            int red = raw[ele] & 0xFF;
+            int green = raw[ele + imageArea] & 0xFF;
+            int blue = raw[ele + imageArea * 2] & 0xFF;
+            bitmap.setPixel(x, y, Color.argb(255, red, green, blue));
         });
         return new BitMapWrapper(bitmap);
     }
