@@ -30,8 +30,8 @@ publishing {
     publications {
         maven(MavenPublication) {
             pom {
-                name = "TensorFlow model zoo"
-                description = "TensorFlow model zoo for DJL"
+                name = "DJL model zoo for TensorFlow"
+                description = "DJL model zoo for TensorFlow"
                 url = "http://www.djl.ai/tensorflow/${project.name}"
             }
         }

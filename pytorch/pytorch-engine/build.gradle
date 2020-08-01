@@ -66,8 +66,8 @@ publishing {
         maven(MavenPublication) {
             artifactId "pytorch-engine" + (isCentOS ? "-precxx11" : "")
             pom {
-                name = "PyTorch Engine Adapter"
-                description = "PyTorch Engine Adapter for DJL"
+                name = "DJL Engine Adapter for PyTorch"
+                description = "Deep Java Library (DJL) Engine Adapter for PyTorch"
                 url = "http://www.djl.ai/pytorch/${project.name}"
             }
         }

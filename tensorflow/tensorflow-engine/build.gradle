@@ -21,8 +21,8 @@ publishing {
     publications {
         maven(MavenPublication) {
             pom {
-                name = "TensorFlow Engine Adapter"
-                description = "TensorFlow Engine Adapter for DJL"
+                name = "DJL Engine Adapter for TensorFlow"
+                description = "Deep Java Library (DJL) Engine Adapter for TensorFlow"
                 url = "http://www.djl.ai/tensorflow/${project.name}"
             }
         }

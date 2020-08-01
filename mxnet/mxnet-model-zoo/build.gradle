@@ -34,8 +34,8 @@ publishing {
     publications {
         maven(MavenPublication) {
             pom {
-                name = "MXNet model zoo"
-                description = "MXNet model zoo for DJL"
+                name = "DJL model zoo for Apache MXNet"
+                description = "Deep Java Library (DJL) model zoo for Apache MXNet"
                 url = "http://www.djl.ai/mxnet/${project.name}"
             }
         }

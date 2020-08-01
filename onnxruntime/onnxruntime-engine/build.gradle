@@ -16,8 +16,8 @@ publishing {
         maven(MavenPublication) {
             artifactId "onnxruntime-engine"
             pom {
-                name = "ONNX Runtime Engine Adapter"
-                description = "ONNX Runtime Engine Adapter for DJL"
+                name = "DJL Engine Adapter for ONNX Runtime"
+                description = "Deep Java Library (DJL) Engine Adapter for ONNX Runtime"
                 url = "http://www.djl.ai/onnxruntime/${project.name}"
             }
         }

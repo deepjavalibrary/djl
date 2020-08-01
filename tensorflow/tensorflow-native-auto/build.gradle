@@ -162,8 +162,8 @@ publishing {
     publications {
         maven(MavenPublication) {
             pom {
-                name = "TensorFlow 2.2 native library"
-                description = "TensorFlow 2.2 native library"
+                name = "DJL release for TensorFlow native binaries"
+                description = "Deep Java Library (DJL) provided TensorFlow native library binary distribution"
                 url = "http://www.djl.ai/tensorflow/${project.name}"
             }
         }

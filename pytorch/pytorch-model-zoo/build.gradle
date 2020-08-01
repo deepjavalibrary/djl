@@ -22,8 +22,8 @@ publishing {
     publications {
         maven(MavenPublication) {
             pom {
-                name = "PyTorch model zoo"
-                description = "PyTorch model zoo for DJL"
+                name = "DJL model zoo for PyTorch"
+                description = "Deep Java Library (DJL) model zoo for PyTorch"
                 url = "http://www.djl.ai/pytorch/${project.name}"
             }
         }

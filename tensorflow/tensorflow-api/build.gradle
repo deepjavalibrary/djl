@@ -32,8 +32,8 @@ publishing {
     publications {
         maven(MavenPublication) {
             pom {
-                name = "TensorFlow 2.0 core api"
-                description = "TensorFlow 2.0 core api"
+                name = "DJL release for TensorFlow core api"
+                description = "Deep Java Library (DJL) release for TensorFlow core api"
                 url = "http://www.djl.ai/tensorflow/${project.name}"
 
                 withXml {
