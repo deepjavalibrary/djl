@@ -20,6 +20,7 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.zip.GZIPInputStream;
 
 /** A utility class downloads the file from specified url. */
@@ -77,9 +78,9 @@ public final class DownloadUtils {
             ProgressInputStream pis = new ProgressInputStream(is, progress);
             String fileName = url.getFile();
             if (fileName.endsWith(".gz")) {
-                Files.copy(new GZIPInputStream(pis), output);
+                Files.copy(new GZIPInputStream(pis), output, StandardCopyOption.REPLACE_EXISTING);
             } else {
-                Files.copy(pis, output);
+                Files.copy(pis, output, StandardCopyOption.REPLACE_EXISTING);
             }
         }
     }

@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -206,11 +207,11 @@ public abstract class AbstractRepository implements Repository {
             if ("zip".equals(extension)) {
                 ZipInputStream zis = new ZipInputStream(pis);
                 zis.getNextEntry();
-                Files.copy(zis, file);
+                Files.copy(zis, file, StandardCopyOption.REPLACE_EXISTING);
             } else if ("gzip".equals(extension)) {
-                Files.copy(new GZIPInputStream(pis), file);
+                Files.copy(new GZIPInputStream(pis), file, StandardCopyOption.REPLACE_EXISTING);
             } else {
-                Files.copy(pis, file);
+                Files.copy(pis, file, StandardCopyOption.REPLACE_EXISTING);
             }
         }
         pis.validateChecksum(item);
@@ -236,7 +237,7 @@ public abstract class AbstractRepository implements Repository {
                                 "Parent path should never be null: " + file.toString());
                     }
                     Files.createDirectories(parentFile);
-                    Files.copy(tis, file);
+                    Files.copy(tis, file, StandardCopyOption.REPLACE_EXISTING);
                 }
             }
         }

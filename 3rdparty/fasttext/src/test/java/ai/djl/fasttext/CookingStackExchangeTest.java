@@ -29,6 +29,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -101,7 +102,7 @@ public class CookingStackExchangeTest {
         if (!Files.exists(modelFile)) {
             Files.createDirectories(path);
             try (InputStream is = url.openStream()) {
-                Files.copy(is, modelFile);
+                Files.copy(is, modelFile, StandardCopyOption.REPLACE_EXISTING);
             }
         }
 
