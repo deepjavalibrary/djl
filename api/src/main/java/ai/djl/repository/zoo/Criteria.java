@@ -227,7 +227,9 @@ public class Criteria<I, O> {
         String modelName;
         Progress progress;
 
-        Builder() {}
+        Builder() {
+            application = Application.UNDEFINED;
+        }
 
         private Builder(Class<I> inputClass, Class<O> outputClass, Builder<?, ?> parent) {
             this.inputClass = inputClass;

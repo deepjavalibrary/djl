@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * An {@code Artifact} is a set of data files such as a model or dataset.
@@ -144,21 +145,15 @@ public class Artifact {
      * @return the artifact arguments
      * @see Repository
      */
-    @SuppressWarnings("PMD.UseConcurrentHashMap")
     public Map<String, Object> getArguments(Map<String, Object> override) {
-        if (arguments == null) {
-            if (override != null) {
-                return override;
-            }
-            return Collections.emptyMap();
+        Map<String, Object> map = new ConcurrentHashMap<>();
+        if (arguments != null) {
+            map.putAll(arguments);
         }
         if (override != null) {
-            Map<String, Object> map = new LinkedHashMap<>();
-            map.putAll(arguments);
             map.putAll(override);
-            return map;
         }
-        return arguments;
+        return map;
     }
 
     /**

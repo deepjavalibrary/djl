@@ -12,6 +12,7 @@
  */
 package ai.djl.repository.zoo;
 
+import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
@@ -133,7 +134,10 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
                 model.setBlock(criteria.getBlock());
             }
             model.load(modelPath, null, criteria.getOptions());
-            model.setProperty("application", getApplication().getPath());
+            Application application = criteria.getApplication();
+            if (application != Application.UNDEFINED) {
+                arguments.put("application", application.getPath());
+            }
             Translator<S, T> translator = factory.newInstance(model, arguments);
             return new ZooModel<>(model, translator);
         } catch (TranslateException e) {

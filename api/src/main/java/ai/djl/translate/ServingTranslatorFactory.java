@@ -25,6 +25,7 @@ import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.util.JsonUtils;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -44,6 +45,8 @@ import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,15 +60,8 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
     public Translator<Input, Output> newInstance(Model model, Map<String, Object> arguments)
             throws TranslateException {
         Path modelDir = model.getModelPath();
-        Path libPath = modelDir.resolve("libs");
-        if (!Files.isDirectory(libPath)) {
-            libPath = modelDir.resolve("lib");
-            if (!Files.isDirectory(libPath)) {
-                return loadDefaultTranslator(model, arguments);
-            }
-        }
         String className = null;
-        Path manifestFile = libPath.resolve("serving.properties");
+        Path manifestFile = modelDir.resolve("serving.properties");
         if (Files.isRegularFile(manifestFile)) {
             Properties prop = new Properties();
             try (Reader reader = Files.newBufferedReader(manifestFile)) {
@@ -73,24 +69,38 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
             } catch (IOException e) {
                 throw new TranslateException("Failed to load serving.properties file", e);
             }
+            for (String key : prop.stringPropertyNames()) {
+                arguments.putIfAbsent(key, prop.getProperty(key));
+            }
             className = prop.getProperty("translator");
+        }
+
+        Path libPath = modelDir.resolve("libs");
+        if (!Files.isDirectory(libPath)) {
+            libPath = modelDir.resolve("lib");
+            if (!Files.isDirectory(libPath)) {
+                return loadDefaultTranslator(arguments);
+            }
         }
         ServingTranslator translator = findTranslator(libPath, className);
         if (translator != null) {
             translator.setArguments(arguments);
             return translator;
         }
-        return loadDefaultTranslator(model, arguments);
+        return loadDefaultTranslator(arguments);
     }
 
     private ServingTranslator findTranslator(Path path, String className) {
         try {
+            Path classesDir = path.resolve("classes");
+            compileJavaClass(classesDir);
+
             List<Path> jarFiles =
                     Files.list(path)
                             .filter(p -> p.toString().endsWith(".jar"))
                             .collect(Collectors.toList());
             List<URL> urls = new ArrayList<>(jarFiles.size() + 1);
-            urls.add(path.toUri().toURL());
+            urls.add(classesDir.toUri().toURL());
             for (Path p : jarFiles) {
                 urls.add(p.toUri().toURL());
             }
@@ -101,7 +111,7 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
                 return initTranslator(cl, className);
             }
 
-            ServingTranslator translator = scanDirectory(cl, path);
+            ServingTranslator translator = scanDirectory(cl, classesDir);
             if (translator != null) {
                 return translator;
             }
@@ -119,6 +129,10 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
     }
 
     private ServingTranslator scanDirectory(ClassLoader cl, Path dir) throws IOException {
+        if (!Files.isDirectory(dir)) {
+            logger.debug("Directory not exists: {}", dir);
+            return null;
+        }
         Collection<Path> files =
                 Files.walk(dir)
                         .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".class"))
@@ -167,9 +181,9 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
         return null;
     }
 
-    private Translator<Input, Output> loadDefaultTranslator(
-            Model model, Map<String, Object> arguments) throws TranslateException {
-        String appName = model.getProperty("application");
+    private Translator<Input, Output> loadDefaultTranslator(Map<String, Object> arguments)
+            throws TranslateException {
+        String appName = (String) arguments.get("application");
         if (appName != null) {
             Application application = Application.of(appName);
             if (application == Application.CV.IMAGE_CLASSIFICATION) {
@@ -187,25 +201,28 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
 
     private Translator<Input, Output> getImageClassificationTranslator(
             Map<String, Object> arguments) {
-        int width = ((Double) arguments.getOrDefault("width", 224d)).intValue();
-        int height = ((Double) arguments.getOrDefault("height", 224d)).intValue();
-        String flag = (String) arguments.getOrDefault("flag", Image.Flag.COLOR.name());
+        int width = getOrDefault(arguments, "width", 224).intValue();
+        int height = getOrDefault(arguments, "height", 224).intValue();
+        String flag = arguments.getOrDefault("flag", Image.Flag.COLOR.name()).toString();
+        boolean softmax = Boolean.parseBoolean(arguments.getOrDefault("softmax", false).toString());
 
-        final Translator<Image, Classifications> translator =
+        Translator<Image, Classifications> translator =
                 ImageClassificationTranslator.builder()
                         .optFlag(Image.Flag.valueOf(flag))
                         .addTransform(new CenterCrop())
                         .addTransform(new Resize(width, height))
                         .addTransform(new ToTensor())
+                        .optApplySoftmax(softmax)
                         .build();
         return new ImageServingTranslator(translator);
     }
 
     private Translator<Input, Output> getSsdTranslator(Map<String, Object> arguments) {
-        int width = ((Double) arguments.getOrDefault("width", 512d)).intValue();
-        int height = ((Double) arguments.getOrDefault("height", 512d)).intValue();
-        double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
-        String flag = (String) arguments.getOrDefault("flag", Image.Flag.COLOR.name());
+        int width = getOrDefault(arguments, "width", 512).intValue();
+        int height = getOrDefault(arguments, "height", 512).intValue();
+        double threshold = getOrDefault(arguments, "threshold", 0.2d);
+        String flag = arguments.getOrDefault("flag", Image.Flag.COLOR.name()).toString();
+        String synset = arguments.getOrDefault("synset", "synset.txt").toString();
 
         SingleShotDetectionTranslator translator =
                 SingleShotDetectionTranslator.builder()
@@ -214,23 +231,57 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
                         .addTransform(new ToTensor())
                         .optThreshold((float) threshold)
                         .optRescaleSize(width, height)
+                        .optSynsetArtifactName(synset)
                         .build();
         return new ImageServingTranslator(translator);
+    }
+
+    private void compileJavaClass(Path dir) {
+        try {
+            if (!Files.isDirectory(dir)) {
+                logger.debug("Directory not exists: {}", dir);
+                return;
+            }
+            String[] files =
+                    Files.walk(dir)
+                            .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
+                            .map(p -> p.toAbsolutePath().toString())
+                            .toArray(String[]::new);
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            if (files.length > 0) {
+                compiler.run(null, null, null, files);
+            }
+        } catch (Throwable e) {
+            logger.warn("Failed to compile bundled java file", e);
+        }
+    }
+
+    private static Double getOrDefault(
+            Map<String, Object> arguments, String key, double defaultValue) {
+        Object value = arguments.get(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        return Double.valueOf(value.toString());
     }
 
     private static final class ImageServingTranslator implements Translator<Input, Output> {
 
         private Translator<Image, ?> translator;
+        private ImageFactory factory;
 
         public ImageServingTranslator(Translator<Image, ?> translator) {
             this.translator = translator;
+            factory = ImageFactory.getInstance();
         }
 
+        /** {@inheritDoc} */
         @Override
         public Batchifier getBatchifier() {
             return translator.getBatchifier();
         }
 
+        /** {@inheritDoc} */
         @Override
         public Output processOutput(TranslatorContext ctx, NDList list) throws Exception {
             Input input = (Input) ctx.getAttachment("input");
@@ -240,13 +291,19 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
             return output;
         }
 
+        /** {@inheritDoc} */
         @Override
         public NDList processInput(TranslatorContext ctx, Input input) throws Exception {
             ctx.setAttachment("input", input);
             byte[] data = input.getContent().valueAt(0);
-            Image image =
-                    ImageFactory.getInstance().fromInputStream(new ByteArrayInputStream(data));
+            Image image = factory.fromInputStream(new ByteArrayInputStream(data));
             return translator.processInput(ctx, image);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void prepare(NDManager manager, Model model) throws IOException {
+            translator.prepare(manager, model);
         }
     }
 }

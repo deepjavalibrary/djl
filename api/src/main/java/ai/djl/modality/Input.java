@@ -93,4 +93,17 @@ public class Input {
     public void setContent(PairList<String, byte[]> content) {
         this.content = content;
     }
+
+    /**
+     * Adds a key/value pair to the input content.
+     *
+     * @param key key with which the specified data is to be added
+     * @param data data to be added with the specified key
+     */
+    public void addData(String key, byte[] data) {
+        if (content == null) {
+            content = new PairList<>();
+        }
+        content.add(key, data);
+    }
 }

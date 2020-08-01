@@ -151,7 +151,7 @@ public interface ModelZoo {
                     // filter out by model loader artifactId
                     continue;
                 }
-                if (application != null
+                if (application != Application.UNDEFINED
                         && app != Application.UNDEFINED
                         && !app.equals(application)) {
                     // filter out ModelLoader by application
@@ -161,6 +161,7 @@ public interface ModelZoo {
                 try {
                     return loader.loadModel(criteria);
                 } catch (ModelNotFoundException e) {
+                    logger.trace("", e);
                     logger.debug(
                             "input/output type found for ModelLoader: {} {}:{}",
                             app,
