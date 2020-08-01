@@ -18,7 +18,7 @@ jar {
             versionName += String.format("-%s", new Date().format('yyyyMMdd'))
         }
         def dir = file("${placeholder}/native/lib")
-        dir.mkdirs();
+        dir.mkdirs()
         def propFile = file("${placeholder}/native/lib/mxnet.properties")
         propFile.text = "placeholder=true\nversion=${versionName}\n"
     }
@@ -80,6 +80,8 @@ flavorNames.each { flavor ->
 
                 def binaryLicenseFile = new File(metaInf, "LICENSE.binary.dependencies")
                 binaryLicenseFile.text = new URL("https://raw.githubusercontent.com/apache/incubator-mxnet/master/tools/dependencies/LICENSE.binary.dependencies").text
+
+                from file("src/main/resources")
             }
             from file("${BINARY_ROOT}/${flavor}/${osName}")
             archiveClassifier = "${osName}-x86_64"
