@@ -12,12 +12,15 @@
  */
 package ai.djl.modality.cv.translator.wrapper;
 
+import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -55,5 +58,11 @@ public class FileTranslator<T> implements Translator<Path, T> {
     @Override
     public Batchifier getBatchifier() {
         return translator.getBatchifier();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void prepare(NDManager manager, Model model) throws IOException {
+        translator.prepare(manager, model);
     }
 }
