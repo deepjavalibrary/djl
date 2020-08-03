@@ -210,8 +210,8 @@ public final class NDImageUtils {
                 minAreaScale * srcArea
                         + (maxAreaScale - minAreaScale) * srcArea * RandomUtils.nextFloat();
         // get ratio from maximum achievable h and w
-        double maxRatio = (targetArea / h) / h;
-        double minRatio = w / (targetArea / w);
+        double minRatio = (targetArea / h) / h;
+        double maxRatio = w / (targetArea / w);
         double[] intersectRatio = {
             Math.max(minRatio, minAspectRatio), Math.min(maxRatio, maxAspectRatio)
         };
@@ -225,7 +225,9 @@ public final class NDImageUtils {
         int newHeight = (int) (newWidth / finalRatio);
         int x = RandomUtils.nextInt(w - newWidth);
         int y = RandomUtils.nextInt(h - newHeight);
-        return crop(image, x, y, newWidth, newHeight);
+        try (NDArray cropped = crop(image, x, y, newWidth, newHeight)) {
+            return resize(cropped, width, height);
+        }
     }
 
     /**
