@@ -297,7 +297,7 @@ public class Trainer implements AutoCloseable {
     protected void finalize() throws Throwable {
         if (manager.isOpen()) {
             if (logger.isDebugEnabled()) {
-                logger.warn("Model was not closed explicitly: {}", getClass().getSimpleName());
+                logger.warn("Trainer for {} was not closed explicitly.", model.getName());
             }
             close();
         }

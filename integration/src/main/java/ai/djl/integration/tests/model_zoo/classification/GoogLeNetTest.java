@@ -127,6 +127,9 @@ public class GoogLeNetTest {
         Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(batchSize, 480, 6, 6));
         Assert.assertEquals(shapeMap.get("04SequentialBlock"), new Shape(batchSize, 832, 3, 3));
         Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(batchSize, 1024));
+
+        trainer.close();
+        model.close();
     }
 
     @Test
@@ -153,5 +156,7 @@ public class GoogLeNetTest {
                         .singletonOrThrow();
 
         Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
+        trainer.close();
+        model.close();
     }
 }

@@ -175,6 +175,9 @@ public class NiNTest {
         Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(batchSize, 256, 26, 26));
         Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(batchSize, 384, 12, 12));
         Assert.assertEquals(shapeMap.get("08SequentialBlock"), new Shape(batchSize, 10, 5, 5));
+
+        trainer.close();
+        model.close();
     }
 
     @Test
@@ -199,5 +202,8 @@ public class NiNTest {
                         .singletonOrThrow();
 
         Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
+
+        trainer.close();
+        model.close();
     }
 }

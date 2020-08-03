@@ -161,6 +161,9 @@ public class LeNetTest {
         Assert.assertEquals(shapeMap.get("04Conv2d"), new Shape(batchSize, 16, 10, 10));
         Assert.assertEquals(shapeMap.get("08Linear"), new Shape(batchSize, 120));
         Assert.assertEquals(shapeMap.get("12Linear"), new Shape(batchSize, 10));
+
+        trainer.close();
+        model.close();
     }
 
     @Test
@@ -185,5 +188,8 @@ public class LeNetTest {
                         .singletonOrThrow();
 
         Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
+
+        trainer.close();
+        model.close();
     }
 }

@@ -134,6 +134,9 @@ public class VGGTest {
         Assert.assertEquals(shapeMap.get("04SequentialBlock"), new Shape(batchSize, 512, 14, 14));
         Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(batchSize, 512, 7, 7));
         Assert.assertEquals(shapeMap.get("07Linear"), new Shape(batchSize, 4096));
+
+        trainer.close();
+        model.close();
     }
 
     @Test
@@ -158,5 +161,8 @@ public class VGGTest {
                         .singletonOrThrow();
 
         Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
+
+        trainer.close();
+        model.close();
     }
 }

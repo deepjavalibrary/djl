@@ -227,7 +227,7 @@ public abstract class BaseModel implements Model {
     @Override
     protected void finalize() throws Throwable {
         if (manager.isOpen()) {
-            logger.warn("Model was not closed explicitly.");
+            logger.warn("Model: {} was not closed explicitly.", modelName);
             manager.close();
         }
         super.finalize();

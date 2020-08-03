@@ -246,7 +246,7 @@ public class Predictor<I, O> implements AutoCloseable {
     protected void finalize() throws Throwable {
         if (manager.isOpen()) {
             if (logger.isDebugEnabled()) {
-                logger.warn("Predictor was not closed explicitly: {}", getClass().getSimpleName());
+                logger.warn("Predictor for {} was not closed explicitly.", model.getName());
             }
             close();
         }

@@ -185,6 +185,9 @@ public class AlexNetTest {
         Assert.assertEquals(shapeMap.get("07Conv2d"), new Shape(batchSize, 384, 12, 12));
         Assert.assertEquals(shapeMap.get("13LambdaBlock"), new Shape(batchSize, 256, 5, 5));
         Assert.assertEquals(shapeMap.get("17Dropout"), new Shape(batchSize, 4096));
+
+        trainer.close();
+        model.close();
     }
 
     @Test
@@ -212,5 +215,8 @@ public class AlexNetTest {
                         .singletonOrThrow();
 
         Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
+
+        trainer.close();
+        model.close();
     }
 }
