@@ -258,7 +258,7 @@ public abstract class AbstractBenchmark {
         String artifactId = arguments.getArtifactId();
         Class<?> input = arguments.getInputClass();
         Class<?> output = arguments.getOutputClass();
-        Shape shape = arguments.getInputShape();
+        Shape[] shapes = arguments.getInputShapes();
 
         Criteria.Builder<?, ?> builder =
                 Criteria.builder()
@@ -267,14 +267,18 @@ public abstract class AbstractBenchmark {
                         .optArtifactId(artifactId)
                         .optProgress(new ProgressBar());
 
-        if (shape != null) {
+        if (shapes != null) {
             builder.optTranslator(
                     new Translator() {
 
                         /** {@inheritDoc} */
                         @Override
                         public NDList processInput(TranslatorContext ctx, Object input) {
-                            return new NDList(ctx.getNDManager().ones(shape));
+                            NDList list = new NDList();
+                            for (Shape shape : shapes) {
+                                list.add(ctx.getNDManager().ones(shape));
+                            }
+                            return list;
                         }
 
                         /** {@inheritDoc} */

@@ -27,8 +27,12 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -43,7 +47,7 @@ public class Arguments {
     private int duration;
     private int iteration;
     private int threads;
-    private Shape inputShape;
+    private Shape[] inputShapes;
     private boolean help;
 
     public Arguments(CommandLine cmd) {
@@ -70,11 +74,23 @@ public class Arguments {
             Type type = new TypeToken<Map<String, String>>() {}.getType();
             criteria = JsonUtils.GSON.fromJson(cmd.getOptionValue("criteria"), type);
         }
-        if (cmd.hasOption("input-shape")) {
-            String shape = cmd.getOptionValue("input-shape");
-            String[] tokens = shape.split(",");
-            long[] shapes = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
-            inputShape = new Shape(shapes);
+        if (cmd.hasOption("input-shapes")) {
+            String shape = cmd.getOptionValue("input-shapes");
+            if (shape.contains("(")) {
+                Pattern pattern = Pattern.compile("\\((\\s*(\\d+)([,\\s]+\\d+)*\\s*)\\)");
+                Matcher matcher = pattern.matcher(shape);
+                List<Shape> shapes = new ArrayList<>();
+                while (matcher.find()) {
+                    String[] tokens = matcher.group(1).split(",");
+                    long[] array = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
+                    shapes.add(new Shape(array));
+                }
+                inputShapes = shapes.toArray(new Shape[0]);
+            } else {
+                String[] tokens = shape.split(",");
+                long[] shapes = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
+                inputShapes = new Shape[] {new Shape(shapes)};
+            }
         }
     }
 
@@ -91,10 +107,10 @@ public class Arguments {
                         .build());
         options.addOption(
                 Option.builder("s")
-                        .longOpt("input-shape")
+                        .longOpt("input-shapes")
                         .hasArg()
-                        .argName("INPUT-SHAPE")
-                        .desc("Input data shape for non-CV model.")
+                        .argName("INPUT-SHAPES")
+                        .desc("Input data shapes for non-CV model.")
                         .build());
         options.addOption(
                 Option.builder("i")
@@ -196,14 +212,14 @@ public class Arguments {
     }
 
     public Class<?> getInputClass() {
-        if (inputShape == null) {
+        if (inputShapes == null) {
             return Image.class;
         }
         return NDList.class;
     }
 
     public Class<?> getOutputClass() {
-        if (inputShape == null) {
+        if (inputShapes == null) {
             if (artifactId != null && artifactId.contains("ssd")) {
                 return DetectedObjects.class;
             }
@@ -213,14 +229,14 @@ public class Arguments {
     }
 
     public Object getInputData() throws IOException {
-        if (inputShape == null) {
+        if (inputShapes == null) {
             return ImageFactory.getInstance().fromFile(getImageFile());
         }
         return null;
     }
 
-    public Shape getInputShape() {
-        return inputShape;
+    public Shape[] getInputShapes() {
+        return inputShapes;
     }
 
     public boolean hasHelp() {
