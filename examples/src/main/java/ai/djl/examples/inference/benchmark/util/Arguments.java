@@ -60,6 +60,9 @@ public class Arguments {
         }
         if (cmd.hasOption("threads")) {
             threads = Integer.parseInt(cmd.getOptionValue("threads"));
+            if (threads <= 0) {
+                threads = Runtime.getRuntime().availableProcessors() * 2 - 1;
+            }
         } else {
             threads = Runtime.getRuntime().availableProcessors() * 2 - 1;
         }
