@@ -12,7 +12,7 @@
  */
 
 /**
- * Contains implementations of interfaces within the DJL API for the MXNet Engine.
+ * Contains implementations of interfaces within the DJL API for the Apache MXNet Engine.
  *
  * @see ai.djl.mxnet.engine.MxEngine
  */

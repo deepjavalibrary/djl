@@ -12,7 +12,7 @@
  */
 
 /**
- * Contains the main MXNet implementation of the DJL API.
+ * Contains the main DJL implementation of the API for Apache MXNet.
  *
  * @see ai.djl.mxnet.engine.MxEngine
  */

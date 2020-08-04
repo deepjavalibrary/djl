@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains classes to generate the MXNet native interface. */
+/** Contains classes to generate the Apache MXNet (incubating) native interface. */
 package ai.djl.mxnet.jnarator;

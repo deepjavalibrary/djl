@@ -1,6 +1,6 @@
 # Apache MXNet Engine
 
-This directory contains the Deep Java Library (DJL) EngineProvider for [Apache MXNet Deep Learning Framework](https://mxnet.apache.org/).
+This directory contains the Deep Java Library (DJL) EngineProvider for [Apache MXNet (incubating) Deep Learning Framework](https://mxnet.apache.org/).
 
 ## Modules
 

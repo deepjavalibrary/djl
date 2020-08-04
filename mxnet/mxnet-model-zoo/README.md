@@ -1,8 +1,8 @@
-# DJL - MXNet model zoo
+# DJL - Apache MXNet model zoo
 
 ## Introduction
 
-The MXNet model zoo contains symbolic models that can be used for inference and training. All the models in this model zoo contain pre-trained parameters for their specific datasets.
+The model zoo contains symbolic models from Apache MXNet (incubating) that can be used for inference and training. All the models in this model zoo contain pre-trained parameters for their specific datasets.
 
 ## Documentation
 
