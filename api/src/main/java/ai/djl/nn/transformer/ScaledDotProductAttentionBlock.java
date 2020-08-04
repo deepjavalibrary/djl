@@ -144,6 +144,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
         return resultProjection;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         // Return shape is the shape of the query. For 2 or less inputs we have self-attention, i.e.
@@ -159,6 +160,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         // The lookups are fed reshaped input where the batch size is combined with the sequence
@@ -189,6 +191,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
         return sequenceAndHeads.transpose(0, 2, 1, 3);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore,

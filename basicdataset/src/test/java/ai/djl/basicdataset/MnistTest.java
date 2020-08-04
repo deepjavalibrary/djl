@@ -21,7 +21,6 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
-import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -32,9 +31,7 @@ public class MnistTest {
 
     @Test
     public void testMnistLocal() throws IOException, TranslateException {
-        TrainingConfig config =
-                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optInitializer(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss());
 
         try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
@@ -61,9 +58,7 @@ public class MnistTest {
 
     @Test
     public void testMnistRemote() throws IOException, TranslateException {
-        TrainingConfig config =
-                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optInitializer(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss());
 
         try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());

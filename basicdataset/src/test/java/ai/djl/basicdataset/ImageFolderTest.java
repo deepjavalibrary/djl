@@ -26,7 +26,6 @@ import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
-import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
@@ -43,9 +42,7 @@ public class ImageFolderTest {
     @Test
     public void testImageFolder() throws IOException, TranslateException {
         Repository repository = Repository.newInstance("test", "src/test/resources/imagefolder");
-        TrainingConfig config =
-                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optInitializer(Initializer.ONES);
+        TrainingConfig config = new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss());
 
         try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
