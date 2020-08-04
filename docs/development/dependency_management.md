@@ -85,6 +85,6 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | [ai.djl.android](https://search.maven.org/search?q=g:ai.djl.android) | [core](../../android/README.md#installation) | Contains Android specific utilities (e.g. ImageFactory) for DJL |
 | | [pytorch-native](../../android/README.md#installation) | Contains DJL PyTorch Android native package |
 | | | |
-| [ai.djl.aws](https://search.maven.org/search?q=g:ai.djl.aws) | [aws-ai](../../3rdparty/aws-ai/README.md#installation) | Contains classes that make it easy for DJL to access AWS services |
+| [ai.djl.aws](https://search.maven.org/search?q=g:ai.djl.aws) | [aws-ai](../../extensions/aws-ai/README.md#installation) | Contains classes that make it easy for DJL to access AWS services |
 | | | |
-| [ai.djl.hadoop](https://search.maven.org/search?q=g:ai.djl.hadoop) | [hadoop](../../3rdparty/hadoop/README.md#installation) | Contains classes that make it easy for DJL access HDFS |
+| [ai.djl.hadoop](https://search.maven.org/search?q=g:ai.djl.hadoop) | [hadoop](../../extensions/hadoop/README.md#installation) | Contains classes that make it easy for DJL access HDFS |

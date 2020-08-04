@@ -62,8 +62,8 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 ## Extensions and utilities
 
 - [Android support](../android/README.md)
-- [AWS S3 support](../3rdparty/aws-ai/README.md)
-- [Hadoop support](../3rdparty/hadoop/README.md)
+- [AWS S3 support](../extensions/aws-ai/README.md)
+- [Hadoop support](../extensions/hadoop/README.md)
 
 ## [Contributor Documentation](development/README.md)
 

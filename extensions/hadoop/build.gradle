@@ -4,15 +4,15 @@ repositories {
     }
 }
 
-group "ai.djl.aws"
+group "ai.djl.hadoop"
 
 dependencies {
-    api platform("software.amazon.awssdk:bom:2.11.9")
-    api "software.amazon.awssdk:s3"
     api project(":api")
+    api "org.apache.hadoop:hadoop-core:1.2.1"
 
     testImplementation project(":mxnet:mxnet-engine")
     testImplementation "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
+    testImplementation "org.apache.hadoop:hadoop-test:1.2.1"
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
@@ -24,9 +24,9 @@ publishing {
     publications {
         maven(MavenPublication) {
             pom {
-                name = "AWS AI toolkit for DJL"
-                description = "AWS AI toolkit for DJL"
-                url = "http://www.djl.ai/3rdparty/${project.name}"
+                name = "Hadoop hdfs integration for DJL"
+                description = "Hadoop hdfs integration for DJL"
+                url = "http://www.djl.ai/extensions/${project.name}"
             }
         }
     }
