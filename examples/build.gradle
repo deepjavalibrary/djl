@@ -59,6 +59,8 @@ task benchmark(type: JavaExec) {
     systemProperties.remove("user.dir")
     systemProperty("file.encoding", "UTF-8")
     classpath = sourceSets.main.runtimeClasspath
+    // restrict the jvm heap size for better monitoring benchmark
+    applicationDefaultJvmArgs = ["-Xmx2g"]
     main = "ai.djl.examples.inference.benchmark.Benchmark"
 }
 tasks.distTar.enabled = false
