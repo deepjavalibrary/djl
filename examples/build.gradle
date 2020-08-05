@@ -51,8 +51,10 @@ task listmodels(type: JavaExec) {
 
 task benchmark(type: JavaExec) {
     environment("TF_CPP_MIN_LOG_LEVEL", "1") // turn off TensorFlow print out
-    environment("MXNET_ENGINE_TYPE", "NaiveEngine")
-    environment("OMP_NUM_THREADS", "1")
+    if (args.contains("-t")) {
+        environment("MXNET_ENGINE_TYPE", "NaiveEngine")
+        environment("OMP_NUM_THREADS", "1")
+    }
     systemProperties System.getProperties()
     systemProperties.remove("user.dir")
     systemProperty("file.encoding", "UTF-8")
