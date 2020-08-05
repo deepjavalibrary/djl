@@ -20,7 +20,17 @@ See our reference project: [DJL Spring Boot Starter](https://github.com/awslabs/
 
 You can use the [Criteria](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/repository/zoo/Criteria.html) class 
 to narrow down your search condition and locate the model you want to load.
-The criteria accepts the following information:
+[Criteria](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/repository/zoo/Criteria.html) class follows
+DJL Builder convention. The methods start with `set` are required fields, and `opt` for optional fields.
+You must call `setType()` method when creating a `Criteria` object:
+
+```
+Criteria<Image, Classifications> criteria = Criteria.builder()
+        .setTypes(Image.class, Classifications.class)
+        .build();
+```
+
+The criteria accept the following optional information:
 
 - Engine: defines on which engine you want your model to be loaded
 - Device: defines on which device (GPU/CPU) you want your model to be loaded
