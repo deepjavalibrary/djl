@@ -64,8 +64,6 @@ public final class JnaUtils {
         "_contrib_", "_linalg_", "_sparse_", "_image_", "_random_"
     };
 
-    public static final String MXNET_THREAD_SAFE_PREDICTOR = "MXNET_THREAD_SAFE_PREDICTOR";
-
     private static final MxnetLibrary LIB = LibUtils.loadLibrary();
 
     private static final Map<String, FunctionInfo> OPS = getNdArrayFunctions();
@@ -1741,23 +1739,11 @@ public final class JnaUtils {
         // Creating CachedOp
         Pointer symbolHandle = symbol.getHandle();
         PointerByReference ref = new PointerByReference();
-        if (useThreadSafePredictor()) {
-            String[] keys = {"data_indices", "param_indices"};
-            String[] values = {dataIndices.values().toString(), paramIndices.toString()};
-            checkCall(
-                    LIB.MXCreateCachedOpEX(
-                            symbolHandle,
-                            keys.length,
-                            keys,
-                            values,
-                            ref,
-                            useThreadSafePredictorByte()));
-        } else {
-            // static_alloc and static_shape are enabled by default
-            String[] keys = {"data_indices", "param_indices", "static_alloc", "static_shape"};
-            String[] values = {dataIndices.values().toString(), paramIndices.toString(), "1", "1"};
-            checkCall(LIB.MXCreateCachedOpEx(symbolHandle, keys.length, keys, values, ref));
-        }
+
+        // static_alloc and static_shape are enabled by default
+        String[] keys = {"data_indices", "param_indices", "static_alloc", "static_shape"};
+        String[] values = {dataIndices.values().toString(), paramIndices.toString(), "1", "1"};
+        checkCall(LIB.MXCreateCachedOpEx(symbolHandle, keys.length, keys, values, ref));
 
         return new CachedOp(ref.getValue(), manager, parameters, paramIndices, dataIndices);
     }
@@ -1791,18 +1777,6 @@ public final class JnaUtils {
             }
         }
         return output;
-    }
-
-    public static boolean useThreadSafePredictor() {
-        return Boolean.getBoolean(MXNET_THREAD_SAFE_PREDICTOR);
-    }
-
-    private static byte useThreadSafePredictorByte() {
-        byte use = (byte) (useThreadSafePredictor() ? 1 : 0);
-
-        ByteBuffer buf = ByteBuffer.allocate(1);
-        buf.put(0, use);
-        return buf.get(0);
     }
 
     public static void checkCall(int ret) {

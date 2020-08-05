@@ -35,7 +35,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +49,6 @@ import org.slf4j.LoggerFactory;
 public class MxModel extends BaseModel {
 
     private static final Logger logger = LoggerFactory.getLogger(MxModel.class);
-    // the variable is used to avoid ParameterStore copy for the first time
-    private AtomicBoolean first;
 
     /**
      * Constructs a new Model on a given device.
@@ -65,7 +62,6 @@ public class MxModel extends BaseModel {
         dataType = DataType.FLOAT32;
         properties = new ConcurrentHashMap<>();
         manager = MxNDManager.getSystemManager().newSubManager(device);
-        first = new AtomicBoolean(true);
     }
 
     /**
@@ -136,9 +132,7 @@ public class MxModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        boolean firstPredictor = first.getAndSet(false);
-        boolean shouldCopyParameters = !JnaUtils.useThreadSafePredictor() && !firstPredictor;
-        return new Predictor<>(this, translator, shouldCopyParameters);
+        return new Predictor<>(this, translator, false);
     }
 
     /** {@inheritDoc} */

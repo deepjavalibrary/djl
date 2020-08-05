@@ -30,18 +30,6 @@ To get the best throughput, you may also need to set 'OMP_NUM_THREADS' environme
 export OMP_NUM_THREADS=1
 ```
 
-## Save your inference memory with thread-safe mode (Experimental)
-
-This is an experimental feature used in Apache MXNet to share the parameters' memory across all predictors.
-Memory consumption will not change if you change the number of threads.
-By default, the parameters for the model will be copied for each thread.
-
-Please add the following parameter to your Java application:
-
-```
--DMXNET_THREAD_SAFE_INFERENCE=true
-```
-
 ## PyTorch
 
 Currently, PyTorch engine doesn't support multithreading inference. You may see random crash during the inference. 
