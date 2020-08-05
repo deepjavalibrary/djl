@@ -163,9 +163,9 @@ public class MemoryTrainingListener extends TrainingListenerAdapter {
                         return;
                     }
                     float cpu = Float.parseFloat(tokens[0]);
-                    long rss = Long.parseLong(tokens[1]);
+                    long rss = Long.parseLong(tokens[1]) * 1024;
                     metrics.addMetric("cpu", cpu, "%");
-                    metrics.addMetric("rss", rss, "KB");
+                    metrics.addMetric("rss", rss, "bytes");
                 }
             } catch (IOException e) {
                 logger.error("Failed execute cmd: " + cmd, e);
