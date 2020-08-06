@@ -6,7 +6,7 @@ plugins {
 group "ai.djl.tensorflow"
 
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-version = "2.2.0" + (isRelease ? "" : "-SNAPSHOT")
+version = "2.3.0" + (isRelease ? "" : "-SNAPSHOT")
 
 repositories {
     maven {
@@ -19,10 +19,10 @@ configurations {
 }
 
 dependencies {
-    download "org.tensorflow:tensorflow-core-api:0.1.0-SNAPSHOT:linux-x86_64-mkl-gpu"
-    download "org.tensorflow:tensorflow-core-api:0.1.0-SNAPSHOT:linux-x86_64-mkl"
-    download "org.tensorflow:tensorflow-core-api:0.1.0-SNAPSHOT:macosx-x86_64-mkl"
-    download "org.tensorflow:tensorflow-core-api:0.1.0-SNAPSHOT:windows-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT:linux-x86_64-mkl-gpu"
+    download "org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT:linux-x86_64-mkl"
+    download "org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT:macosx-x86_64-mkl"
+    download "org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT:windows-x86_64"
     download("org.bytedeco:mkl-dnn:${mkl_dnn_version}:macosx-x86_64") {
         exclude group: "org.bytedeco", module: "javacpp"
     }
@@ -70,16 +70,17 @@ task uploadTensorflowNativeLibs() {
         ant.move(file: "${tfUnzipDir}/linux-x86_64-mkl-gpu/", toFile: "${buildDir}/native/linux/gpu/")
         ant.move(file: "${tfUnzipDir}/macosx-x86_64-mkl/", toFile: "${buildDir}/native/osx/cpu/")
         ant.move(file: "${tfUnzipDir}/windows-x86_64/", toFile: "${buildDir}/native/win/cpu/")
-        ant.move(file: "${tfUnzipDir}/windows-x86_64-gpu/", toFile: "${buildDir}/native/win/gpu/")
+        //No windows gpu support for TF 2.3.0 yet
+        //ant.move(file: "${tfUnzipDir}/windows-x86_64-gpu/", toFile: "${buildDir}/native/win/gpu/")
 
         copy {
             from "${mklUnzipDir}/linux-x86_64/"
             into "${buildDir}/native/linux/gpu/"
         }
-        copy {
-            from "${mklUnzipDir}/windows-x86_64/lib/"
-            into "${buildDir}/native/win/gpu/"
-        }
+//        copy {
+//            from "${mklUnzipDir}/windows-x86_64/lib/"
+//            into "${buildDir}/native/win/gpu/"
+//        }
 
         ant.move(file: "${mklUnzipDir}/linux-x86_64/", toFile: "${buildDir}/native/linux/cpu/")
         ant.move(file: "${mklUnzipDir}/macosx-x86_64/", toFile: "${buildDir}/native/osx/cpu/")
@@ -91,7 +92,7 @@ task uploadTensorflowNativeLibs() {
                 "${buildDir}/native/linux/gpu/",
                 "${buildDir}/native/osx/cpu/",
                 "${buildDir}/native/win/cpu/",
-                "${buildDir}/native/win/gpu/"
+                //"${buildDir}/native/win/gpu/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
@@ -102,6 +103,9 @@ task uploadTensorflowNativeLibs() {
         }
 
         delete ("${buildDir}/native/org/")
+        delete ("${buildDir}/native/com/")
+        delete ("${buildDir}/native/google/")
+
 
         exec {
             commandLine "aws", "s3", "sync", "${buildDir}/native/", "s3://djl-ai/publish/tensorflow-${tensorflow_version}/"
