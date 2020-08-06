@@ -223,8 +223,10 @@ public final class NDImageUtils {
                 RandomUtils.nextFloat((float) intersectRatio[0], (float) intersectRatio[1]);
         int newWidth = (int) Math.round(Math.sqrt(targetArea * finalRatio));
         int newHeight = (int) (newWidth / finalRatio);
-        int x = RandomUtils.nextInt(w - newWidth);
-        int y = RandomUtils.nextInt(h - newHeight);
+        // num in nextInt(num) should be greater than 0
+        // otherwise it throws IllegalArgumentException: bound must be positive
+        int x = w == newWidth ? 0 : RandomUtils.nextInt(w - newWidth);
+        int y = h == newHeight ? 0 : RandomUtils.nextInt(h - newHeight);
         try (NDArray cropped = crop(image, x, y, newWidth, newHeight)) {
             return resize(cropped, width, height);
         }
