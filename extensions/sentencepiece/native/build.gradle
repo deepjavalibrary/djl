@@ -1,0 +1,53 @@
+plugins {
+    id 'maven-publish'
+    id 'signing'
+}
+
+group = "ai.djl.sentencepiece"
+apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
+def VERSION = "0.1.92"
+boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
+version = VERSION + (isRelease ? "" : "-SNAPSHOT")
+
+def downloadBuild(String os) {
+    exec {
+        if (os == "win") {
+            throw new IllegalStateException("Not supported for Windows")
+        } else {
+            commandLine 'cd', 'native', '&&', 'bash', 'build.sh'
+        }
+    }
+    def engineDir = "${project.parent.projectDir}/sentencepiece-engine"
+    def classifier = "${os}-x86_64"
+    def publishDir = "${engineDir}/build/jnilib/${classifier}"
+    copy {
+        def tree = fileTree(project.buildDir)
+        tree.include("**/libsentencepiece_native.*", "**/entencepiece_native.dll")
+        from tree.files
+        into publishDir
+    }
+    def versionName = String.format("${project.parent.version}-%s", new Date().format('yyyyMMdd'))
+    def propFile = file("${publishDir}/sentencepiece.properties")
+    propFile.text = "version=${versionName}\n"
+    // for nightly ci
+    def ciDir = "${project.projectDir}/jnilib/${classifier}"
+    copy {
+        from publishDir
+        into ciDir
+    }
+}
+
+task compileJNI {
+    doFirst {
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
+            downloadBuild("win")
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
+            downloadBuild("osx")
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            downloadBuild("linux")
+        } else {
+            throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
+        }
+    }
+}
+
