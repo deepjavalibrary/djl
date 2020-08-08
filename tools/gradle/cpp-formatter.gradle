@@ -34,8 +34,12 @@ class CppFormatterPlugin implements Plugin<Project> {
                 Project rootProject = project.getRootProject()
                 def clang = new File("${rootProject.projectDir}/.clang/clang-format")
                 checkClang(clang)
-                def files = new File("src").listFiles() ?: []
-                for (File f : (files as List<File>)) {
+                def files = project.fileTree("src").include("**/*.cc")
+                for (File f : files) {
+                    if (!f.isFile()) {
+                        continue
+                    }
+                    project.logger.info("formatting cpp file: " + f)
                     f.text = formatCpp(f, clang)
                 }
             }
@@ -49,8 +53,12 @@ class CppFormatterPlugin implements Plugin<Project> {
                 Project rootProject = project.getRootProject()
                 def clang = new File("${rootProject.projectDir}/.clang/clang-format")
                 checkClang(clang)
-                def files = new File("src").listFiles() ?: []
-                for (File f : (files as List<File>)) {
+                def files = project.fileTree("src").include("**/*.cc")
+                for (File f : files) {
+                    if (!f.isFile()) {
+                        continue
+                    }
+                    project.logger.info("checking cpp file: " + f)
                     if (f.text != formatCpp(f, clang)) {
                         throw new GradleException("File not formatted: " + f.getAbsolutePath())
                     }
