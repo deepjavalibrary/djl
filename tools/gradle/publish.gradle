@@ -12,7 +12,8 @@ configure([
         project(':onnxruntime:onnxruntime-engine'),
         project(':extensions:aws-ai'),
         project(':extensions:fasttext'),
-        project(':extensions:hadoop')]) {
+        project(':extensions:hadoop'),
+        project(':extensions:sentencepiece')]) {
     apply plugin: "maven-publish"
     apply plugin: "signing"
 

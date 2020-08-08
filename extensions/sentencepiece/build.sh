@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+set -e
+WORK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+NUM_PROC=1
+if [[ -n $(command -v nproc) ]]; then
+    NUM_PROC=$(nproc)
+elif [[ -n $(command -v sysctl) ]]; then
+    NUM_PROC=$(sysctl -n hw.ncpu)
+fi
+PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
+
+VERSION=v0.1.92
+
+pushd $WORK_DIR
+if [ ! -d "download" ];
+then
+  git clone https://github.com/google/sentencepiece.git -b $VERSION download
+fi
+
+mkdir -p build/sentencepiece
+cd build/sentencepiece
+cmake ../../download
+cmake --build . --config Release -- -j "${NUM_PROC}"
+cd ..
+
+rm -rf classes
+mkdir classes
+javac -sourcepath ../src/main/java/ ../src/main/java/ai/djl/sentencepiece/jni/SentencePieceLibrary.java -h include -d classes
+cmake ..
+cmake --build . --config Release -- -j "${NUM_PROC}"
+
+popd
+
+# for nightly ci
+if [[ $PLATFORM == 'darwin' ]]; then
+  mkdir -p build/jnilib/native/lib/osx-x86-64
+  cp -f build/libsentencepiece_native.dylib build/jnilib/native/lib/osx-x86-64/
+elif [[ $PLATFORM == 'linux' ]]; then
+  mkdir -p build/jnilib/native/lib/linux-x86-64
+  cp -f build/libsentencepiece_native.so build/jnilib/native/lib/linux-x86-64/
+fi

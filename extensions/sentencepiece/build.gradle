@@ -10,50 +10,66 @@ dependencies {
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 
-
-test {
-    environment "PATH", "src/test/bin:${environment.PATH}"
+processResources {
+    doLast {
+        def url = "https://djl-ai.s3.amazonaws.com/publish/sentencepiece-${sentencepiece_version}/jnilib"
+        def files = [
+                "linux-x86-64": "libsentencepiece_native.so",
+                "osx-x86-64"  : "libsentencepiece_native.dylib"
+        ]
+        def jniDir = "${project.buildDir}/jnilib/native/lib"
+        files.each { entry ->
+            def downloadPath = new URL("${url}/${entry.key}/${entry.value}")
+            def file = file("${jniDir}/${entry.key}/${entry.value}")
+            if (!file.exists()) {
+                project.logger.lifecycle("${downloadPath}")
+                file.getParentFile().mkdirs()
+                downloadPath.withInputStream { i -> file.withOutputStream { it << i } }
+            }
+        }
+    }
 }
 
+// Create a properties files that contains version information
+jar {
+    def jniDir = "${project.buildDir}/jnilib"
+    doFirst {
+        def versionName = "${sentencepiece_version}"
+        boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
+        if (!isRelease) {
+            version += String.format("-%s", new Date().format('yyyyMMdd'))
+        }
+        def dir = file("${jniDir}/native/lib")
+        dir.mkdirs()
+        def propFile = file("${jniDir}/native/lib/sentencepiece.properties")
+        propFile.text = "version=${versionName}\n"
+    }
+
+    from jniDir
+    from "jnilib"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "DJL NLP utilities for SentencePiece"
+                description = "Deep Java Library (DJL) NLP utilities for SentencePiece"
+                url = "http://www.djl.ai/sentencepiece/${project.name}"
+            }
+        }
+    }
+}
 
 apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
-def downloadBuild(String os) {
-    exec {
-        if (os == "win") {
-            throw new IllegalStateException("Not supported for Windows")
-        } else {
-            commandLine 'bash', 'native/build.sh'
-        }
-    }
-    def classifier = "${os}-x86_64"
-    def publishDir = "${project.projectDir}/build/jnilib/${classifier}"
-    copy {
-        def tree = fileTree("${project.projectDir}/native/build")
-        tree.include("**/libsentencepiece_native.*", "**/entencepiece_native.dll")
-        from tree.files
-        into publishDir
-    }
-    def VERSION = "0.1.92"
-    def versionName = String.format("${VERSION}-%s", new Date().format('yyyyMMdd'))
-    def propFile = file("${publishDir}/sentencepiece.properties")
-    propFile.text = "version=${versionName}\n"
-    // for nightly ci
-    def ciDir = "${project.projectDir}/jnilib/${classifier}"
-    copy {
-        from publishDir
-        into ciDir
-    }
-}
-
 task compileJNI {
     doFirst {
-        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
-            downloadBuild("win")
-        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
-            downloadBuild("osx")
-        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
-            downloadBuild("linux")
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")
+                || System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            exec {
+                commandLine 'bash', 'build.sh'
+            }
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
         }

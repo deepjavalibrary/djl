@@ -34,28 +34,6 @@ jobs:
         run: sudo apt-get install libgoogle-perftools-dev
       - name: Release JNI prep
         run: ./gradlew :extensions:sentencepiece:compileJNI
-      - name: Upload compiled jni library
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: jnilib-${{ runner.os }}
-          path: extensions/sentencepiece/jnilib
-
-  publish:
-    runs-on: ubuntu-18.04
-    needs: [build-sentencepiece-jni-cpu]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Download compiledJNI Mac
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-macOS
-          path: jnilib
-      - name: Download compiledJNI Linux CPU
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-Linux
-          path: jnilib
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -64,4 +42,4 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync jnilib s3://djl-ai/publish/sentencepiece-0.1.92/jnilib
+          aws s3 sync extensions/sentencepiece/build/jnilib/native/lib s3://djl-ai/publish/sentencepiece-0.1.92/jnilib
