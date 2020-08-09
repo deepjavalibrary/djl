@@ -51,10 +51,21 @@ task listmodels(type: JavaExec) {
 
 task benchmark(type: JavaExec) {
     environment("TF_CPP_MIN_LOG_LEVEL", "1") // turn off TensorFlow print out
-    if (args.contains("-t")) {
-        environment("MXNET_ENGINE_TYPE", "NaiveEngine")
-        environment("OMP_NUM_THREADS", "1")
+    List<String> arguments = gradle.startParameter["taskRequests"]["args"].getAt(0)
+    for (String argument : arguments) {
+        if (argument.trim().startsWith("--args")) {
+            String[] line = argument.split("=", 2)
+            if (line.length == 2) {
+                line = line[1].split(" ");
+                if (line.contains("-t")) {
+                    environment("MXNET_ENGINE_TYPE", "NaiveEngine")
+                    environment("OMP_NUM_THREADS", "1")
+                }
+                break;
+            }
+        }
     }
+
     systemProperties System.getProperties()
     systemProperties.remove("user.dir")
     systemProperty("file.encoding", "UTF-8")
