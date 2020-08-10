@@ -856,12 +856,12 @@ public final class JniUtils {
                         false));
     }
 
-    public static PtNDArray upsampleBilinear2d(
-            PtNDArray ndArray, long[] size, boolean alignCorners) {
+    public static PtNDArray interpolate(
+            PtNDArray ndArray, long[] size, int mode, boolean alignCorners) {
         return ndArray.getManager()
                 .create(
-                        PyTorchLibrary.LIB.torchUpsampleBilinear2d(
-                                ndArray.getHandle(), size, alignCorners));
+                        PyTorchLibrary.LIB.torchNNInterpolate(
+                                ndArray.getHandle(), size, mode, alignCorners));
     }
 
     public static PtNDArray linear(PtNDArray input, PtNDArray weight, PtNDArray bias) {

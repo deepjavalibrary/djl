@@ -404,7 +404,7 @@ public interface NDArrayEx {
         }
     }
 
-    NDArray resize(int width, int height);
+    NDArray resize(int width, int height, int interpolation);
 
     default NDArray crop(int x, int y, int width, int height) {
         NDArray array = getArray();

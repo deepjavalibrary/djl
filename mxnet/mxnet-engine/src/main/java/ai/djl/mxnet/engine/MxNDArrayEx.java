@@ -673,12 +673,13 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray resize(int width, int height) {
+    public NDArray resize(int width, int height, int interpolation) {
         if (array.isEmpty()) {
             throw new IllegalArgumentException("attempt to resize of an empty NDArray");
         }
         MxOpParams params = new MxOpParams();
         params.addTupleParam("size", width, height);
+        params.addParam("interp", interpolation);
         return getManager().invoke("_npx__image_resize", array, params);
     }
 

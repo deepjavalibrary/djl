@@ -14,6 +14,8 @@
 #define DJL_TORCH_DJL_PYTORCH_JNI_UTILS_H
 
 #include <c10/util/typeid.h>
+#include <c10/util/variant.h>
+#include <torch/csrc/api/include/torch/enum.h>
 #include <jni.h>
 #include <torch/script.h>
 
@@ -28,6 +30,15 @@ namespace utils {
 static constexpr const char* const POINTER_CLASS = "ai/djl/pytorch/jni/Pointer";
 
 static constexpr const jint RELEASE_MODE = JNI_ABORT;
+
+// for image interpolation
+typedef c10::variant<
+  torch::enumtype::kNearest,
+  torch::enumtype::kLinear,
+  torch::enumtype::kBilinear,
+  torch::enumtype::kBicubic,
+  torch::enumtype::kTrilinear,
+  torch::enumtype::kArea> mode_t;
 
 inline jint GetDTypeFromScalarType(const c10::ScalarType& type) {
   if (torch::kFloat32 == type) {
@@ -160,6 +171,19 @@ inline c10::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
   c10::Device c10_device(device_type, device_idx);
   env->ReleaseIntArrayElements(jdevice, device, RELEASE_MODE);
   return c10_device;
+}
+
+inline mode_t GetInterpolationMode(jint jmode) {
+  switch (jmode) {
+    case 0: return torch::kNearest;
+    case 1: return torch::kLinear;
+    case 2: return torch::kBilinear;
+    case 3: return torch::kBicubic;
+    case 4: return torch::kTrilinear;
+    case 5: return torch::kArea;
+    default:
+      throw;
+  }
 }
 
 inline std::vector<torch::indexing::TensorIndex> CreateTensorIndex(JNIEnv* env, jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {

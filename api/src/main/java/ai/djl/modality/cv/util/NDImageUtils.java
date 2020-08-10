@@ -12,6 +12,7 @@
  */
 package ai.djl.modality.cv.util;
 
+import ai.djl.modality.cv.Image;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.RandomUtils;
@@ -25,14 +26,14 @@ public final class NDImageUtils {
     private NDImageUtils() {}
 
     /**
-     * Resizes an image to the given size.
+     * Resizes an image to the given width and height.
      *
      * @param image the image to resize
-     * @param size the new size to use for both height and width
+     * @param size the desired size
      * @return the resized NDList
      */
     public static NDArray resize(NDArray image, int size) {
-        return image.getNDArrayInternal().resize(size, size);
+        return resize(image, size, size, Image.Interpolation.BILINEAR);
     }
 
     /**
@@ -44,7 +45,21 @@ public final class NDImageUtils {
      * @return the resized NDList
      */
     public static NDArray resize(NDArray image, int width, int height) {
-        return image.getNDArrayInternal().resize(width, height);
+        return resize(image, width, height, Image.Interpolation.BILINEAR);
+    }
+
+    /**
+     * Resizes an image to the given width and height with given interpolation.
+     *
+     * @param image the image to resize
+     * @param width the desired width
+     * @param height the desired height
+     * @param interpolation the desired interpolation
+     * @return the resized NDList
+     */
+    public static NDArray resize(
+            NDArray image, int width, int height, Image.Interpolation interpolation) {
+        return image.getNDArrayInternal().resize(width, height, interpolation.ordinal());
     }
 
     /**

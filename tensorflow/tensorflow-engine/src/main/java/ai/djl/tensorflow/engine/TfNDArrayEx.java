@@ -23,10 +23,12 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 import org.tensorflow.Operand;
 import org.tensorflow.Tensor;
 import org.tensorflow.op.Ops;
 import org.tensorflow.op.core.Stack;
+import org.tensorflow.types.TInt32;
 import org.tensorflow.types.family.TNumber;
 import org.tensorflow.types.family.TType;
 
@@ -437,14 +439,16 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
-    public NDArray resize(int width, int height) {
+    public NDArray resize(int width, int height, int interpolation) {
         if (manager.create(array.getShape().getShape()).prod().toLongArray()[0] == 0L) {
             throw new IllegalArgumentException("Can't resize image with 0 dims.");
         }
+        BiFunction<Operand<TNumber>, Operand<TInt32>, Operand<? extends TNumber>> function =
+                getResizeFunction(interpolation);
         if (array.getShape().dimension() == 3) {
             try (Tensor<?> tensor =
                     tf.squeeze(
-                                    tf.image.resizeBilinear(
+                                    function.apply(
                                             ((TfNDArray) array.expandDims(0)).getOperand(),
                                             tf.constant(new int[] {height, width})))
                             .asTensor()) {
@@ -452,10 +456,7 @@ public class TfNDArrayEx implements NDArrayEx {
             }
         }
         try (Tensor<?> tensor =
-                tf.image
-                        .resizeBilinear(
-                                (Operand<? extends TNumber>) operand,
-                                tf.constant(new int[] {height, width}))
+                function.apply((Operand<TNumber>) operand, tf.constant(new int[] {height, width}))
                         .asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -580,5 +581,22 @@ public class TfNDArrayEx implements NDArrayEx {
     @Override
     public NDArray getArray() {
         return array;
+    }
+
+    private BiFunction<Operand<TNumber>, Operand<TInt32>, Operand<? extends TNumber>>
+            getResizeFunction(int interpolate) {
+        switch (interpolate) {
+            case 0:
+                return tf.image::resizeNearestNeighbor;
+            case 1:
+                return tf.image::resizeBilinear;
+            case 2:
+                return tf.image::resizeArea;
+            case 3:
+                return tf.image::resizeBicubic;
+            default:
+                throw new UnsupportedOperationException(
+                        "The kind of interpolation is not supported.");
+        }
     }
 }

@@ -12,6 +12,7 @@
  */
 package ai.djl.modality.cv.transform;
 
+import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
@@ -21,6 +22,7 @@ public class Resize implements Transform {
 
     private int width;
     private int height;
+    private Image.Interpolation interpolation;
 
     /**
      * Creates a {@code Resize} {@link Transform} that resizes to the given size.
@@ -28,8 +30,7 @@ public class Resize implements Transform {
      * @param size the new size to use for both height and width
      */
     public Resize(int size) {
-        width = size;
-        height = size;
+        this(size, size, Image.Interpolation.BILINEAR);
     }
 
     /**
@@ -39,13 +40,26 @@ public class Resize implements Transform {
      * @param height the desired height
      */
     public Resize(int width, int height) {
+        this(width, height, Image.Interpolation.BILINEAR);
+    }
+
+    /**
+     * Creates a {@code Resize} {@link Transform} that resizes to the given width and height with
+     * given interpolation.
+     *
+     * @param width the desired width
+     * @param height the desired height
+     * @param interpolation the desired interpolation
+     */
+    public Resize(int width, int height, Image.Interpolation interpolation) {
         this.width = width;
         this.height = height;
+        this.interpolation = interpolation;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray transform(NDArray array) {
-        return NDImageUtils.resize(array, width, height);
+        return NDImageUtils.resize(array, width, height, interpolation);
     }
 }

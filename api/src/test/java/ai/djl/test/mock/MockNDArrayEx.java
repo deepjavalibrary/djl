@@ -374,7 +374,7 @@ public class MockNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray resize(int width, int height) {
+    public NDArray resize(int width, int height, int interpolation) {
         return null;
     }
 

@@ -117,4 +117,12 @@ public interface Image {
     enum Type {
         TYPE_INT_ARGB
     }
+
+    /** Interpolation indicates the Interpolation options for resizinig an image. */
+    enum Interpolation {
+        NEAREST,
+        BILINEAR,
+        AREA,
+        BICUBIC
+    }
 }

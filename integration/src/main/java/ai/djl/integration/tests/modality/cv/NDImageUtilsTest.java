@@ -13,12 +13,14 @@
 package ai.djl.integration.tests.modality.cv;
 
 import ai.djl.engine.Engine;
+import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
+import ai.djl.util.cuda.CudaUtils;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
@@ -96,31 +98,43 @@ public class NDImageUtilsTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testResize() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            // test 3D H, W, C
-            NDArray image = manager.ones(new Shape(100, 50, 3));
-            NDArray result = NDImageUtils.resize(image, 50);
-            NDArray expected = manager.ones(new Shape(50, 50, 3));
-            Assertions.assertAlmostEquals(result, expected);
-            result = NDImageUtils.resize(image, 25, 50);
-            expected = manager.ones(new Shape(50, 25, 3));
-            Assertions.assertAlmostEquals(result, expected);
+            Image.Interpolation[] interpolations = {
+                Image.Interpolation.NEAREST,
+                Image.Interpolation.BILINEAR,
+                Image.Interpolation.AREA,
+                Image.Interpolation.BICUBIC
+            };
+            for (Image.Interpolation interpolation : interpolations) {
+                // mxnet only support BILINEAR on GPU
+                if (CudaUtils.hasCuda() && !interpolation.equals(Image.Interpolation.BILINEAR)) {
+                    continue;
+                }
+                // test 3D H, W, C
+                NDArray image = manager.ones(new Shape(100, 50, 3));
+                NDArray result = NDImageUtils.resize(image, 50, 50);
+                NDArray expected = manager.ones(new Shape(50, 50, 3));
+                Assertions.assertAlmostEquals(result, expected);
+                result = NDImageUtils.resize(image, 25, 50, interpolation);
+                expected = manager.ones(new Shape(50, 25, 3));
+                Assertions.assertAlmostEquals(result, expected);
 
-            // test 4D N, H, W, C
-            NDArray batchImages = manager.ones(new Shape(5, 75, 40, 3));
-            result = NDImageUtils.resize(batchImages, 20);
-            expected = manager.ones(new Shape(5, 20, 20, 3));
-            Assertions.assertAlmostEquals(result, expected);
-            result = NDImageUtils.resize(batchImages, 25, 50);
-            expected = manager.ones(new Shape(5, 50, 25, 3));
-            Assertions.assertAlmostEquals(result, expected);
+                // test 4D N, H, W, C
+                NDArray batchImages = manager.ones(new Shape(5, 75, 40, 3));
+                result = NDImageUtils.resize(batchImages, 20);
+                expected = manager.ones(new Shape(5, 20, 20, 3));
+                Assertions.assertAlmostEquals(result, expected);
+                result = NDImageUtils.resize(batchImages, 25, 50, interpolation);
+                expected = manager.ones(new Shape(5, 50, 25, 3));
+                Assertions.assertAlmostEquals(result, expected);
 
-            // test zero-dim
-            image = manager.create(new Shape(0, 2, 3));
-            // throw IllegalArgumentException
-            result = NDImageUtils.resize(image, 20);
-            batchImages = manager.create(new Shape(5, 0, 1, 3));
-            // throw IllegalArgumentException
-            result = NDImageUtils.resize(batchImages, 20);
+                // test zero-dim
+                image = manager.create(new Shape(0, 2, 3));
+                // throw IllegalArgumentException
+                result = NDImageUtils.resize(image, 20);
+                batchImages = manager.create(new Shape(5, 0, 1, 3));
+                // throw IllegalArgumentException
+                result = NDImageUtils.resize(batchImages, 20);
+            }
         }
     }
 

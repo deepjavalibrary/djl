@@ -468,7 +468,7 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray resize(int width, int height) {
+    public PtNDArray resize(int width, int height, int interpolation) {
         // create subManager to help close intermediate NDArray
         try (NDManager subManager = array.getManager().newSubManager()) {
             array.attach(subManager);
@@ -485,8 +485,11 @@ public class PtNDArrayEx implements NDArrayEx {
             }
             result = result.transpose(0, 3, 1, 2);
             result =
-                    JniUtils.upsampleBilinear2d(
-                                    (PtNDArray) result, new long[] {height, width}, true)
+                    JniUtils.interpolate(
+                                    (PtNDArray) result,
+                                    new long[] {height, width},
+                                    getInterpolationMode(interpolation),
+                                    false)
                             .transpose(0, 2, 3, 1);
             if (dim == 3) {
                 result = result.squeeze(0);
@@ -612,6 +615,24 @@ public class PtNDArrayEx implements NDArrayEx {
                 return new Shape(1, 1, 1);
             default:
                 throw new IllegalArgumentException("the input dimension should be in [3, 5]");
+        }
+    }
+
+    // Here is the list of PyTorch C++ interpolation mapping: kNearest, kLinear, kBilinear,
+    // kBicubic, kTrilinear, kArea
+    private int getInterpolationMode(int interpolation) {
+        switch (interpolation) {
+            case 0:
+                return 0;
+            case 1:
+                return 2;
+            case 2:
+                return 5;
+            case 3:
+                return 3;
+            default:
+                throw new UnsupportedOperationException(
+                        "The kind of interpolation is not supported.");
         }
     }
 }

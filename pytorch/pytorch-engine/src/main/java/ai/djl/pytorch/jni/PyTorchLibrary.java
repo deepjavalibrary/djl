@@ -334,7 +334,7 @@ final class PyTorchLibrary {
     native Pointer torchEye(
             int n, int m, int dType, int layout, int[] device, boolean requiredGrad);
 
-    native Pointer torchUpsampleBilinear2d(Pointer handle, long[] shape, boolean alignCorners);
+    native Pointer torchNNInterpolate(Pointer handle, long[] size, int mode, boolean alignCorners);
 
     native Pointer torchNNLinear(Pointer handle, Pointer weightHandle, Pointer biasHandle);
 

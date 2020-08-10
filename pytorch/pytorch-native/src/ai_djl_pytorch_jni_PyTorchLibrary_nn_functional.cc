@@ -36,13 +36,18 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLogSoftmax
   API_END();
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUpsampleBilinear2d(
-    JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jsize, jboolean jalign_corners) {
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNInterpolate(
+    JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jsize, jint jmode, jboolean jalign_corners) {
   API_BEGIN();
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   const auto size_vec = utils::GetVecFromJLongArray(env, jsize);
-  const auto* result_ptr =
-      new torch::Tensor(torch::upsample_bilinear2d(*tensor_ptr, size_vec, jalign_corners == JNI_TRUE));
+  auto options =
+      torch::nn::functional::InterpolateFuncOptions().size(size_vec).mode(utils::GetInterpolationMode(jmode));
+  // kNearest, kArea interpolate can't set align_corners
+  if (jmode != 0 && jmode != 5) {
+    options = options.align_corners(jalign_corners);
+  }
+  const auto* result_ptr = new torch::Tensor(torch::nn::functional::interpolate(*tensor_ptr, options));
   return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
   API_END();
 }
