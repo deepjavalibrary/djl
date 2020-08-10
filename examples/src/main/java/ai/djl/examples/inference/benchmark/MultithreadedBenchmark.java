@@ -116,7 +116,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
             if (total < 10) {
                 steps = 1;
             } else {
-                steps = (int) Math.pow(10, (int) (Math.log10(total)) - 1);
+                steps = (int) Math.pow(10, (int) Math.log10(total));
             }
         }
 
@@ -132,9 +132,9 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
                 if (collectMemory) {
                     MemoryTrainingListener.collectMemoryInfo(metrics);
                 }
-                int processed = total - remaining;
+                int processed = total - remaining + 1;
                 logger.trace("Worker-{}: {} iteration finished.", workerId, ++count);
-                if (processed % steps == 0) {
+                if (processed % steps == 0 || processed == total) {
                     logger.info("Completed {} requests", processed);
                 }
             }
