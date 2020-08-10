@@ -16,9 +16,9 @@
 
 // The file is the implementation for PyTorch training operations
 
-JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(
-  JNIEnv* env, jobject jthis, jobject jweight, jobject jgrad, jobject jmean, jobject jvariance, jfloat learning_rate, jfloat weight_decay,
-  jfloat rescale_grad, jfloat clip_grad, jfloat beta1, jfloat beta2, jfloat eps) {
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(JNIEnv* env, jobject jthis, jobject jweight,
+    jobject jgrad, jobject jmean, jobject jvariance, jfloat learning_rate, jfloat weight_decay, jfloat rescale_grad,
+    jfloat clip_grad, jfloat beta1, jfloat beta2, jfloat eps) {
   torch::autograd::AutoGradMode no_autograd_guard{false};
   const auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jweight);
   const auto grad = utils::GetPointerFromJHandle<torch::Tensor>(env, jgrad)->clone();
@@ -38,9 +38,9 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(
   weight_ptr->sub_(mean_ptr->mul(learning_rate).div(variance_ptr->sqrt().add(eps)));
 }
 
-JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_sgdUpdate(
-  JNIEnv* env, jobject jthis, jobject jweight, jobject jgrad, jobject jstate, jfloat learning_rate, jfloat weight_decay,
-  jfloat rescale_grad, jfloat clip_grad, jfloat momentum) {
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_sgdUpdate(JNIEnv* env, jobject jthis, jobject jweight,
+    jobject jgrad, jobject jstate, jfloat learning_rate, jfloat weight_decay, jfloat rescale_grad, jfloat clip_grad,
+    jfloat momentum) {
   // disable gradient calculation
   torch::autograd::AutoGradMode no_autograd_guard{false};
   const auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jweight);
@@ -66,8 +66,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_sgdUpdate(
   }
 }
 
-JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_zeroGrad
-  (JNIEnv* env, jobject jthis, jobject jhandle) {
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_zeroGrad(JNIEnv* env, jobject jthis, jobject jhandle) {
   torch::NoGradGuard NoGradGuard;
   const auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   // the check is only for batch_size < # of gpus

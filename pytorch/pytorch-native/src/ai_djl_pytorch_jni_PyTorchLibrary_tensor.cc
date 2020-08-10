@@ -98,19 +98,19 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndex(JNIE
   API_END();
 }
 
-JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexPut(
-  JNIEnv* env, jobject jthis, jobject jhandle, jobject jvalue_handle, jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {
-    auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-    const auto* value_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jvalue_handle);
-    auto indices = utils::CreateTensorIndex(env, jmin_indices, jmax_indices, jstep_indices);
-    tensor_ptr->index_put_(indices, *value_ptr);
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexPut(JNIEnv* env, jobject jthis, jobject jhandle,
+    jobject jvalue_handle, jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {
+  auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  const auto* value_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jvalue_handle);
+  auto indices = utils::CreateTensorIndex(env, jmin_indices, jmax_indices, jstep_indices);
+  tensor_ptr->index_put_(indices, *value_ptr);
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSet(
-  JNIEnv* env, jobject jthis, jobject jself, jobject jreplace) {
-    const auto* self_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jself);
-    const auto* replace_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jreplace);
-    self_ptr->set_(*replace_ptr);
+    JNIEnv* env, jobject jthis, jobject jself, jobject jreplace) {
+  const auto* self_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jself);
+  const auto* replace_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jreplace);
+  self_ptr->set_(*replace_ptr);
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSlice(
@@ -123,15 +123,14 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSlice(
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGather(
-  JNIEnv* env, jobject jthis, jobject jhandle, jobject jindex_handle, jlong dim, jboolean sparse_grad) {
+    JNIEnv* env, jobject jthis, jobject jhandle, jobject jindex_handle, jlong dim, jboolean sparse_grad) {
   API_BEGIN();
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-    const auto* index_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jindex_handle);
-    const auto* result_ptr = new torch::Tensor(tensor_ptr->gather(dim, *index_ptr, sparse_grad));
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  const auto* index_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jindex_handle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->gather(dim, *index_ptr, sparse_grad));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
-
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMaskedSelect(
     JNIEnv* env, jobject jthis, jobject jhandle, jobject jmasked_handle) {
@@ -144,11 +143,11 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMaskedSele
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMaskedPut(
-  JNIEnv* env, jobject jthis, jobject jhandle, jobject jvalue_handle, jobject jmasked_handle) {
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
-    const auto* index_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jmasked_handle);
-    const auto* value_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jvalue_handle);
-    tensor_ptr->masked_fill_(*index_ptr, *value_ptr);
+    JNIEnv* env, jobject jthis, jobject jhandle, jobject jvalue_handle, jobject jmasked_handle) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  const auto* index_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jmasked_handle);
+  const auto* value_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jvalue_handle);
+  tensor_ptr->masked_fill_(*index_ptr, *value_ptr);
 }
 
 JNIEXPORT jbyteArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDataPtr(
@@ -171,7 +170,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDeleteTensor(
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchToSparse(
-  JNIEnv* env, jobject jthis, jobject jhandle) {
+    JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
   torch::NoGradGuard NoGradGuard;
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
@@ -181,7 +180,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchToSparse(
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchToDense(
-  JNIEnv* env, jobject jthis, jobject jhandle) {
+    JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
   torch::NoGradGuard NoGradGuard;
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
@@ -191,51 +190,51 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchToDense(
 }
 
 JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRequiresGrad(
-  JNIEnv* env, jobject jthis, jobject jhandle) {
+    JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-    return tensor_ptr->requires_grad();
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  return tensor_ptr->requires_grad();
   API_END();
 }
 
 JNIEXPORT jstring JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGradFnName(
-  JNIEnv* env, jobject jthis, jobject jhandle) {
+    JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-    return env->NewStringUTF(tensor_ptr->grad_fn()->name().c_str());
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  return env->NewStringUTF(tensor_ptr->grad_fn()->name().c_str());
   API_END();
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchAttachGrad(
-  JNIEnv* env, jobject jthis, jobject jhandle) {
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-    tensor_ptr->requires_grad_(true);
+    JNIEnv* env, jobject jthis, jobject jhandle) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  tensor_ptr->requires_grad_(true);
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGrad(
-  JNIEnv* env, jobject jthis, jobject jhandle) {
+    JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-    const auto* result_ptr = new torch::Tensor(tensor_ptr->grad());
-    if (!tensor_ptr->grad().defined()) {
-      return nullptr;
-    }
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->grad());
+  if (!tensor_ptr->grad().defined()) {
+    return nullptr;
+  }
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDetachGrad(
-  JNIEnv* env, jobject jthis, jobject jhandle) {
+    JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-    const auto* result_ptr = new torch::Tensor(tensor_ptr->detach());
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->detach());
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchBackward(
-  JNIEnv* env, jobject jthis, jobject jhandle, jobject jgrad_handle, jboolean keep_graph, jboolean create_graph) {
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-    const auto* grad_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jgrad_handle);
-    tensor_ptr->backward(*grad_ptr, keep_graph, create_graph);
+    JNIEnv* env, jobject jthis, jobject jhandle, jobject jgrad_handle, jboolean keep_graph, jboolean create_graph) {
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* grad_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jgrad_handle);
+  tensor_ptr->backward(*grad_ptr, keep_graph, create_graph);
 }

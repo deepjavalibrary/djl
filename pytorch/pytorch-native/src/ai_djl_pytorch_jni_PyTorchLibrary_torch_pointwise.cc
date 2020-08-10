@@ -96,7 +96,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTrueDividei(
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchWhere(
-  JNIEnv* env, jobject jthis, jobject jcondition, jobject jself, jobject jother) {
+    JNIEnv* env, jobject jthis, jobject jcondition, jobject jself, jobject jother) {
   API_BEGIN();
   const auto* condition_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jcondition);
   const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
@@ -151,22 +151,22 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMatmul(
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDot(
-  JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+    JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
   API_BEGIN();
-    const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
-    const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
-    const auto* result_ptr = new torch::Tensor(self_ptr->dot(*other_ptr));
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(self_ptr->dot(*other_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMM(
-  JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
+    JNIEnv* env, jobject jthis, jobject jself, jobject jother) {
   API_BEGIN();
-    const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
-    const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
-    const auto* result_ptr = new torch::Tensor(self_ptr->mm(*other_ptr));
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  const auto* self_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jself);
+  const auto* other_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jother);
+  const auto* result_ptr = new torch::Tensor(self_ptr->mm(*other_ptr));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
 
@@ -367,11 +367,11 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTanh(
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSigmoid(
-  JNIEnv* env, jobject jthis, jobject jhandle) {
+    JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-    const auto* result_ptr = new torch::Tensor(tensor_ptr->sigmoid());
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->sigmoid());
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
 
@@ -452,17 +452,16 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLogicalNot
   API_END();
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSign
-  (JNIEnv* env, jobject jthis, jobject jhandle) {
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSign(
+    JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN();
-    const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
-    const auto* result_ptr = new torch::Tensor(tensor_ptr->sign());
-    return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->sign());
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
   API_END();
 }
 
-JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSigni
-  (JNIEnv* env, jobject jthis, jobject jhandle) {
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSigni(JNIEnv* env, jobject jthis, jobject jhandle) {
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   tensor_ptr->sign_();
 }
