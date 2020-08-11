@@ -31,6 +31,7 @@ static constexpr const char* const POINTER_CLASS = "ai/djl/pytorch/jni/Pointer";
 
 static constexpr const jint RELEASE_MODE = JNI_ABORT;
 
+#if !defined(__ANDROID__)
 // for image interpolation
 typedef c10::variant<
   torch::enumtype::kNearest,
@@ -39,6 +40,7 @@ typedef c10::variant<
   torch::enumtype::kBicubic,
   torch::enumtype::kTrilinear,
   torch::enumtype::kArea> mode_t;
+#endif
 
 inline jint GetDTypeFromScalarType(const c10::ScalarType& type) {
   if (torch::kFloat32 == type) {
@@ -173,6 +175,7 @@ inline c10::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
   return c10_device;
 }
 
+#if !defined(__ANDROID__)
 inline mode_t GetInterpolationMode(jint jmode) {
   switch (jmode) {
     case 0: return torch::kNearest;
@@ -185,6 +188,7 @@ inline mode_t GetInterpolationMode(jint jmode) {
       throw;
   }
 }
+#endif
 
 inline std::vector<torch::indexing::TensorIndex> CreateTensorIndex(JNIEnv* env, jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {
   const auto min_indices = GetVecFromJLongArray(env, jmin_indices);

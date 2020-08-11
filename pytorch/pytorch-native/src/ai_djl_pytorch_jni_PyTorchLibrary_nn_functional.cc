@@ -41,6 +41,20 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNInterpol
   API_BEGIN();
   const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   const auto size_vec = utils::GetVecFromJLongArray(env, jsize);
+#if defined(__ANDROID__)
+  torch::Tensor result;
+  if (jmode == 0) {
+    result = torch::upsample_nearest2d(*tensor_ptr, size_vec);
+  } else if (jmode == 2) {
+    result = torch::upsample_bilinear2d(*tensor_ptr, size_vec, jalign_corners);
+  } else if (jmode == 3) {
+    result = torch::upsample_bicubic2d(*tensor_ptr, size_vec, jalign_corners);
+  } else {
+    jclass jexception = env->FindClass("ai/djl/engine/EngineException");
+    env->ThrowNew(jexception, "This kind of mode is not supported on Android");
+  }
+  const auto* result_ptr = new torch::Tensor(result);
+#else
   auto options =
       torch::nn::functional::InterpolateFuncOptions().size(size_vec).mode(utils::GetInterpolationMode(jmode));
   // kNearest, kArea interpolate can't set align_corners
@@ -48,6 +62,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNInterpol
     options = options.align_corners(jalign_corners);
   }
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::interpolate(*tensor_ptr, options));
+#endif
   return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
   API_END();
 }
