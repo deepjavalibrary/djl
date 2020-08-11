@@ -95,7 +95,7 @@ jobs:
       - name: Release JNI prep
         run: |
           source scl_source enable devtoolset-7 rh-git218 || true
-          ./gradlew :pytorch:pytorch-native:releaseJNI -Pcentos
+          ./gradlew :pytorch:pytorch-native:releaseJNI -Pprecxx11
       - name: Upload compiled jni library
         uses: actions/upload-artifact@v1
         if: always()
@@ -233,6 +233,6 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.5.0/jnilib
+          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.6.0/jnilib
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
