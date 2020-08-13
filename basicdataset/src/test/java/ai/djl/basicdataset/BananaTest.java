@@ -12,20 +12,14 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.Model;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.Blocks;
-import ai.djl.training.DefaultTrainingConfig;
-import ai.djl.training.Trainer;
-import ai.djl.training.TrainingConfig;
+import ai.djl.testing.Assertions;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
-import ai.djl.training.initializer.NormalInitializer;
-import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import java.util.Iterator;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class BananaTest {
@@ -34,25 +28,24 @@ public class BananaTest {
     public void testBananaRemote() throws IOException, TranslateException {
         BananaDetection bananaDetection =
                 BananaDetection.builder()
-                        .optUsage(Dataset.Usage.TEST)
-                        .setSampling(1, true)
-                        .optLimit(10)
+                        .setSampling(32, false)
+                        .optUsage(Dataset.Usage.TRAIN)
                         .build();
 
         bananaDetection.prepare();
-        TrainingConfig config =
-                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optInitializer(new NormalInitializer(0.01f));
-        try (Model model = Model.newInstance("model")) {
-            model.setBlock(Blocks.identityBlock());
-            try (Trainer trainer = model.newTrainer(config)) {
-                Iterator<Batch> ds = trainer.iterateDataset(bananaDetection).iterator();
-                Batch batch = ds.next();
-                Assert.assertEquals(
-                        batch.getData().singletonOrThrow().getShape(), new Shape(1, 3, 256, 256));
-                Assert.assertEquals(
-                        batch.getLabels().singletonOrThrow().getShape(), new Shape(1, 1, 5));
+        NDManager manager = NDManager.newBaseManager();
+
+        for (Batch batch : bananaDetection.getData(manager)) {
+
+            for (int i = 0; i < 1; i++) {
+                NDArray imgLabel = batch.getLabels().get(0).get(i);
+                Assertions.assertAlmostEquals(
+                        imgLabel,
+                        manager.create(
+                                new float[] {0f, 0.4063f, 0.0781f, 0.5586f, 0.2266f},
+                                new Shape(1, 5)));
             }
+            break;
         }
     }
 }

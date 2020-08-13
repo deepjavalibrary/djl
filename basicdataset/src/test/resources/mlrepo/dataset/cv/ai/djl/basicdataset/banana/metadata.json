@@ -19,13 +19,13 @@
       "files": {
         "train": {
           "uri": "1.0/train.zip",
-          "sha1Hash": "665a7e18bfa8dce80f666189730c31870ef1435e",
-          "size": 15142329
+          "sha1Hash": "93986b0b3ef507ec5158bb17a432df16ef8a62b6",
+          "size": 16934214
         },
         "test": {
           "uri": "1.0/test.zip",
-          "sha1Hash": "10e36c1825ea4f1d6381ac018dd6ce5d2dabb2cd",
-          "size": 1546006
+          "sha1Hash": "e09c3705b4d6f8d7b500c22d52b7bbccc32b64fe",
+          "size": 1728085
         }
       }
     }
