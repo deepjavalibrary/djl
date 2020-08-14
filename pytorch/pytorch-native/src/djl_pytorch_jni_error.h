@@ -19,9 +19,8 @@
  * every function starts with API_BEGIN()
  * and finishes with API_END()
  */
-#define API_BEGIN() \
-  try {             \
-  __func__
+#define API_BEGIN() try {
+
 #define API_END()                                                        \
   }                                                                      \
   catch (const c10::Error& e) {                                          \
@@ -35,7 +34,12 @@
   catch (const std::exception& e_) {                                     \
     jclass jexception = env->FindClass("ai/djl/engine/EngineException"); \
     env->ThrowNew(jexception, e_.what());                                \
-  }                                                                      \
+  }
+
+// TODO refactor all jni functions to c style function which mean
+//  return value should be unified to function execution status code
+#define API_END_RETURN() \
+  API_END()              \
   return 0;
 
 #endif  // DJL_TORCH_DJL_PYTORCH_JNI_ERROR_H

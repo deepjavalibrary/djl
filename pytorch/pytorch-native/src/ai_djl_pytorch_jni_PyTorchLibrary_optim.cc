@@ -12,6 +12,7 @@
  */
 
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
+#include "djl_pytorch_jni_error.h"
 #include "djl_pytorch_jni_utils.h"
 
 // The file is the implementation for PyTorch training operations
@@ -19,6 +20,7 @@
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(JNIEnv* env, jobject jthis, jobject jweight,
     jobject jgrad, jobject jmean, jobject jvariance, jfloat learning_rate, jfloat weight_decay, jfloat rescale_grad,
     jfloat clip_grad, jfloat beta1, jfloat beta2, jfloat eps) {
+  API_BEGIN()
   torch::autograd::AutoGradMode no_autograd_guard{false};
   const auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jweight);
   const auto grad = utils::GetPointerFromJHandle<torch::Tensor>(env, jgrad)->clone();
@@ -36,11 +38,13 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(JNIEnv*
   mean_ptr->mul_(beta1).add_(grad, 1 - beta1);
   variance_ptr->mul_(beta2).addcmul_(grad, grad, 1 - beta2);
   weight_ptr->sub_(mean_ptr->mul(learning_rate).div(variance_ptr->sqrt().add(eps)));
+  API_END()
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_sgdUpdate(JNIEnv* env, jobject jthis, jobject jweight,
     jobject jgrad, jobject jstate, jfloat learning_rate, jfloat weight_decay, jfloat rescale_grad, jfloat clip_grad,
     jfloat momentum) {
+  API_BEGIN()
   // disable gradient calculation
   torch::autograd::AutoGradMode no_autograd_guard{false};
   const auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jweight);
@@ -64,9 +68,11 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_sgdUpdate(JNIEnv* 
     state_ptr->mul_(momentum).add_(grad);
     weight_ptr->sub_(*state_ptr);
   }
+  API_END()
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_zeroGrad(JNIEnv* env, jobject jthis, jobject jhandle) {
+  API_BEGIN()
   torch::NoGradGuard NoGradGuard;
   const auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
   // the check is only for batch_size < # of gpus
@@ -75,4 +81,5 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_zeroGrad(JNIEnv* e
   if (weight_ptr->grad().defined()) {
     weight_ptr->grad().zero_();
   }
+  API_END()
 }

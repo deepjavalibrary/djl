@@ -14,6 +14,7 @@
 #include <torch/torch.h>
 
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
+#include "djl_pytorch_jni_error.h"
 #include "djl_pytorch_jni_utils.h"
 
 #if defined(__ANDROID__)
@@ -24,38 +25,49 @@
 // The file is the implementation for PyTorch system-wide operations
 
 JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGetNumInteropThreads(JNIEnv* env, jobject jthis) {
+  API_BEGIN()
   return torch::get_num_interop_threads();
+  API_END_RETURN()
 }
 
 JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGetNumThreads(JNIEnv* env, jobject jthis) {
+  API_BEGIN()
   return torch::get_num_threads();
+  API_END_RETURN()
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetNumInteropThreads(
     JNIEnv* env, jobject jthis, jint jthreads) {
+  API_BEGIN()
 #if defined(__ANDROID__)
   Log log(env);
   log.info("Android didn't support this interop config, please use intra-op instead");
 #else
   torch::set_num_interop_threads(jthreads);
 #endif
+  API_END()
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetNumThreads(
     JNIEnv* env, jobject jthis, jint jthreads) {
+  API_BEGIN()
 #if defined(__ANDROID__)
   caffe2::mobile_threadpool()->setNumThreads(jthreads);
 #else
   torch::set_num_threads(jthreads);
 #endif
+  API_END()
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchManualSeed(JNIEnv* env, jobject jthis, jlong jseed) {
+  API_BEGIN()
   torch::manual_seed(jseed);
+  API_END()
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchShowConfig(
     JNIEnv* env, jobject jthis, jobject jset) {
+  API_BEGIN()
   jclass jexception = env->FindClass("java/lang/NullPointerException");
   jclass set_class = env->GetObjectClass(jset);
   if (set_class == nullptr) {
@@ -99,4 +111,5 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchShowConfig(
     env->CallBooleanMethod(jset, add_method_id, jfeature);
     env->DeleteLocalRef(jfeature);
   }
+  API_END()
 }
