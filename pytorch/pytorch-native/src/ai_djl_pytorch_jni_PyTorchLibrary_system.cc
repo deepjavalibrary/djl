@@ -26,12 +26,12 @@
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetNumInteropThreads(
     JNIEnv* env, jobject jthis, jint jthreads) {
   Log log(env);
-#if !defined(__ANDROID__)
+#if defined(__ANDROID__)
   log.info("Android didn't support this interop config, please use intra-op instead");
 #else
   torch::set_num_interop_threads(jthreads);
-#endif
   log.info("Number of inter-op threads is set to " + std::to_string(jthreads));
+#endif
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetNumThreads(

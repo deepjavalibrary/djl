@@ -10,6 +10,7 @@ In DJL, we use tracing to create TorchScript for our ModelZoo models.
 Here is an example of tracing in actions:
 
 ```python
+import torch
 import torchvision
 
 # An instance of your model.
