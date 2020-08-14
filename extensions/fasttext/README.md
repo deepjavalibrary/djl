@@ -32,4 +32,4 @@ You can pull the fastText engine from the central Maven repository by including 
     <version>0.6.0</version>
 </dependency>
 ```
-ß
+

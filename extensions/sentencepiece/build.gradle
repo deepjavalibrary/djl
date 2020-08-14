@@ -14,10 +14,10 @@ processResources {
     doLast {
         def url = "https://djl-ai.s3.amazonaws.com/publish/sentencepiece-${sentencepiece_version}/jnilib"
         def files = [
-                "linux-x86-64": "libsentencepiece_native.so",
-                "osx-x86-64"  : "libsentencepiece_native.dylib"
+                "linux-x86_64": "libsentencepiece_native.so",
+                "osx-x86_64"  : "libsentencepiece_native.dylib"
         ]
-        def jniDir = "${project.buildDir}/jnilib/native/lib"
+        def jniDir = "${project.buildDir}/jnilib"
         files.each { entry ->
             def downloadPath = new URL("${url}/${entry.key}/${entry.value}")
             def file = file("${jniDir}/${entry.key}/${entry.value}")
@@ -27,26 +27,21 @@ processResources {
                 downloadPath.withInputStream { i -> file.withOutputStream { it << i } }
             }
         }
-    }
-}
-
-// Create a properties files that contains version information
-jar {
-    def jniDir = "${project.buildDir}/jnilib"
-    doFirst {
+        def classDir = "${project.buildDir}/classes/java/main/native/lib"
+        file(classDir).mkdirs()
+        copy {
+            from jniDir
+            into classDir
+        }
+        // write properties
         def versionName = "${sentencepiece_version}"
         boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
         if (!isRelease) {
-            version += String.format("-%s", new Date().format('yyyyMMdd'))
+            versionName += String.format("-%s", new Date().format('yyyyMMdd'))
         }
-        def dir = file("${jniDir}/native/lib")
-        dir.mkdirs()
-        def propFile = file("${jniDir}/native/lib/sentencepiece.properties")
+        def propFile = file("${classDir}/sentencepiece.properties")
         propFile.text = "version=${versionName}\n"
     }
-
-    from jniDir
-    from "jnilib"
 }
 
 publishing {

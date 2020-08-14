@@ -13,21 +13,28 @@
 package ai.djl.sentencepiece.jni;
 
 /** A class containing utilities to interact with the SentencePiece Engine's JNI layer. */
-final class SentencePieceLibrary {
+@SuppressWarnings("MissingJavadocMethod")
+public final class SentencePieceLibrary {
 
-    static final SentencePieceLibrary LIB = new SentencePieceLibrary();
+    public static final SentencePieceLibrary LIB = new SentencePieceLibrary();
 
     private SentencePieceLibrary() {}
 
-    native Pointer createSentencePieceProcessor(String filePath);
+    public native Pointer createSentencePieceProcessor();
 
-    native void deleteSentencePieceProcessor(Pointer handle);
+    public native void loadModel(Pointer handle, String filePath);
 
-    native String[] tokenize(Pointer handle, String text);
+    public native void deleteSentencePieceProcessor(Pointer handle);
 
-    native int[] encode(Pointer handle, String text);
+    public native String[] tokenize(Pointer handle, String text);
 
-    native String detokenize(Pointer handle, String[] tokens);
+    public native int[] encode(Pointer handle, String text);
 
-    native String decode(Pointer handle, int[] ids);
+    public native String detokenize(Pointer handle, String[] tokens);
+
+    public native String decode(Pointer handle, int[] ids);
+
+    public native String idToPiece(Pointer handle, int id);
+
+    public native int pieceToId(Pointer handle, String piece);
 }

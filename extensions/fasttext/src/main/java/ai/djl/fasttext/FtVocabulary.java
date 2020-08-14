@@ -26,11 +26,13 @@ public class FtVocabulary implements Vocabulary {
     private Map<String, Long> indicesMap = new ConcurrentHashMap<>();
     private long index;
 
+    /** {@inheritDoc} */
     @Override
     public String getToken(long index) {
         return tokenMap.get(index);
     }
 
+    /** {@inheritDoc} */
     @Override
     public long getIndex(String token) {
         if (!indicesMap.containsKey(token)) {
@@ -40,6 +42,7 @@ public class FtVocabulary implements Vocabulary {
         return indicesMap.get(token);
     }
 
+    /** {@inheritDoc} */
     @Override
     public long size() {
         return indicesMap.size();

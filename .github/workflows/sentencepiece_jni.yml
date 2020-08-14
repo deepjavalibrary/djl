@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [macos-latest, ubuntu-18.04]
+        operating-system: [macos-latest, ubuntu-16.04]
 
     steps:
       - uses: actions/checkout@v1
@@ -42,4 +42,4 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync extensions/sentencepiece/build/jnilib/native/lib s3://djl-ai/publish/sentencepiece-0.1.92/jnilib
+          aws s3 sync extensions/sentencepiece/build/jnilib s3://djl-ai/publish/sentencepiece-0.1.92/jnilib

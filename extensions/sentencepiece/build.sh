@@ -34,9 +34,9 @@ popd
 
 # for nightly ci
 if [[ $PLATFORM == 'darwin' ]]; then
-  mkdir -p build/jnilib/native/lib/osx-x86-64
-  cp -f build/libsentencepiece_native.dylib build/jnilib/native/lib/osx-x86-64/
+  mkdir -p build/jnilib/osx-x86_64
+  cp -f build/libsentencepiece_native.dylib build/jnilib/osx-x86_64/
 elif [[ $PLATFORM == 'linux' ]]; then
-  mkdir -p build/jnilib/native/lib/linux-x86-64
-  cp -f build/libsentencepiece_native.so build/jnilib/native/lib/linux-x86-64/
+  mkdir -p build/jnilib/linux-x86_64
+  cp -f build/libsentencepiece_native.so build/jnilib/linux-x86_64/
 fi

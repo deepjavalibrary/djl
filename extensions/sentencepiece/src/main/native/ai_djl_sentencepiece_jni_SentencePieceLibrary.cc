@@ -94,15 +94,20 @@ inline std::vector<int> GetVectorFromIntArray(JNIEnv *env, jintArray array) {
 }
 
 JNIEXPORT jobject JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_createSentencePieceProcessor
-        (JNIEnv* env, jobject jthis, jstring jpath) {
-    jclass jexception = env->FindClass("ai/djl/engine/EngineException");
+        (JNIEnv *env, jobject jthis) {
     auto* processor_ptr = new sentencepiece::SentencePieceProcessor();
+    return CreatePointer<sentencepiece::SentencePieceProcessor>(env, processor_ptr);
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_loadModel
+        (JNIEnv* env, jobject jthis, jobject jhandle, jstring jpath) {
+    jclass jexception = env->FindClass("ai/djl/engine/EngineException");
+    auto* processor_ptr = GetPointerFromJHandle<sentencepiece::SentencePieceProcessor>(env, jhandle);
     const std::string path_string = jstringToString(env, jpath);
     const auto status = processor_ptr->Load(path_string);
     if (!status.ok()) {
         env->ThrowNew(jexception, status.ToString().c_str());
     }
-    return CreatePointer<sentencepiece::SentencePieceProcessor>(env, processor_ptr);
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_deleteSentencePieceProcessor
@@ -162,4 +167,16 @@ JNIEXPORT jstring JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_dec
         env->ThrowNew(jexception, status.ToString().c_str());
     }
     return env->NewStringUTF(detokenized.c_str());
+}
+
+JNIEXPORT jstring JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_idToPiece
+        (JNIEnv *env, jobject jthis, jobject jhandle, jint jid) {
+    auto* processor_ptr = GetPointerFromJHandle<sentencepiece::SentencePieceProcessor>(env, jhandle);
+    return env->NewStringUTF(processor_ptr->IdToPiece(jid).c_str());
+}
+
+JNIEXPORT int JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_pieceToId
+        (JNIEnv *env, jobject jthis, jobject jhandle, jstring jpiece) {
+    auto* processor_ptr = GetPointerFromJHandle<sentencepiece::SentencePieceProcessor>(env, jhandle);
+    return processor_ptr->PieceToId(jstringToString(env, jpiece));
 }
