@@ -23,26 +23,31 @@
 
 // The file is the implementation for PyTorch system-wide operations
 
+JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGetNumInteropThreads(JNIEnv* env, jobject jthis) {
+  return torch::get_num_interop_threads();
+}
+
+JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGetNumThreads(JNIEnv* env, jobject jthis) {
+  return torch::get_num_threads();
+}
+
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetNumInteropThreads(
     JNIEnv* env, jobject jthis, jint jthreads) {
-  Log log(env);
 #if defined(__ANDROID__)
+  Log log(env);
   log.info("Android didn't support this interop config, please use intra-op instead");
 #else
   torch::set_num_interop_threads(jthreads);
-  log.info("Number of inter-op threads is set to " + std::to_string(jthreads));
 #endif
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetNumThreads(
     JNIEnv* env, jobject jthis, jint jthreads) {
-  Log log(env);
 #if defined(__ANDROID__)
   caffe2::mobile_threadpool()->setNumThreads(jthreads);
 #else
   torch::set_num_threads(jthreads);
 #endif
-  log.info("Number of intra-op threads is set to " + std::to_string(jthreads));
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchManualSeed(JNIEnv* env, jobject jthis, jlong jseed) {

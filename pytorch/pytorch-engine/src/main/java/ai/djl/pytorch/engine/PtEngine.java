@@ -47,6 +47,8 @@ public final class PtEngine extends Engine {
             if (Integer.getInteger("ai.djl.pytorch.num_threads") != null) {
                 JniUtils.setNumThreads(Integer.getInteger("ai.djl.pytorch.num_threads"));
             }
+            logger.info("Number of inter-op threads is " + JniUtils.getNumInteropThreads());
+            logger.info("Number of intra-op threads is " + JniUtils.getNumThreads());
             return new PtEngine();
         } catch (Throwable t) {
             logger.warn("Failed to load PyTorch native library", t);

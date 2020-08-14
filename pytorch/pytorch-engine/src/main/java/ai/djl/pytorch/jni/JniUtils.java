@@ -57,6 +57,14 @@ public final class JniUtils {
         }
     }
 
+    public static int getNumInteropThreads() {
+        return PyTorchLibrary.LIB.torchGetNumInteropThreads();
+    }
+
+    public static int getNumThreads() {
+        return PyTorchLibrary.LIB.torchGetNumThreads();
+    }
+
     public static void setNumInteropThreads(int threads) {
         PyTorchLibrary.LIB.torchSetNumInteropThreads(threads);
     }

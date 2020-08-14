@@ -22,6 +22,10 @@ final class PyTorchLibrary {
 
     private PyTorchLibrary() {}
 
+    native int torchGetNumInteropThreads();
+
+    native int torchGetNumThreads();
+
     native void torchSetNumInteropThreads(int threads);
 
     native void torchSetNumThreads(int threads);
