@@ -40,6 +40,7 @@ import ai.djl.training.optimizer.Optimizer;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("MissingJavadocMethod")
@@ -52,14 +53,13 @@ public class AdadeltaTempTest {
     public void testAdadelta() {
         Optimizer optim = Optimizer.adadelta().build();
 
-        Device[] devices = Device.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES)
                         .optOptimizer(optim)
-                        .optDevices(devices);
+                        .optDevices(Device.getDevices(1));
         Block block = Linear.builder().setUnits(CHANNELS).build();
-        try (Model model = Model.newInstance("model", devices[0])) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -70,15 +70,24 @@ public class AdadeltaTempTest {
                 NDArray result = runOptimizer(manager, trainer, block, batchSize);
                 NDArray result2 = runOptimizer(manager, trainer, block, batchSize);
 
-                //                System.out.println(result);
-                //                System.out.println(result2);
                 Assertions.assertAlmostEquals(result, manager.create(new float[] {0.999f, 0f}));
                 Assertions.assertAlmostEquals(result2, manager.create(new float[] {0.999f, 0f}));
             }
         }
     }
 
-    public static AirfoilRandomAccess getDataCh11(int batchSize, int n)
+    @Test
+    public void testAdadeltaNightly() throws IOException, TranslateException {
+        // this is nightly test
+        if (!Boolean.getBoolean("nightly")) {
+            throw new SkipException("Nightly only");
+        }
+        Optimizer optim = Optimizer.adadelta().build();
+        AirfoilRandomAccess airfoil = getData(32, 1500);
+        train(optim, airfoil, 20);
+    }
+
+    public static AirfoilRandomAccess getData(int batchSize, int n)
             throws IOException, TranslateException {
         // Load data
         AirfoilRandomAccess airfoil =
@@ -118,7 +127,7 @@ public class AdadeltaTempTest {
                                 .toArray(NDArray[]::new)));
     }
 
-    public static void trainConciseCh11(Optimizer sgd, AirfoilRandomAccess dataset, int numEpochs)
+    public static void train(Optimizer sgd, AirfoilRandomAccess dataset, int numEpochs)
             throws IOException, TranslateException {
         // Initialization
         SequentialBlock net = new SequentialBlock();
@@ -152,14 +161,5 @@ public class AdadeltaTempTest {
                 batch.close();
             }
         }
-    }
-    /* End Ch11 Optimization */
-
-    @Test
-    public void testAdadelta2() throws IOException, TranslateException {
-        Optimizer optim = Optimizer.adadelta().build();
-
-        AirfoilRandomAccess airfoil = getDataCh11(32, 1500);
-        trainConciseCh11(optim, airfoil, 20);
     }
 }
