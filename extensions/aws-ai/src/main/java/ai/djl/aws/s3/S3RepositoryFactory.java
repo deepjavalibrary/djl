@@ -12,6 +12,7 @@
  */
 package ai.djl.aws.s3;
 
+import ai.djl.repository.FilenameUtils;
 import ai.djl.repository.Repository;
 import ai.djl.repository.RepositoryFactory;
 import java.net.URI;
@@ -59,7 +60,8 @@ public class S3RepositoryFactory implements RepositoryFactory {
         if (!prefix.isEmpty()) {
             prefix = prefix.substring(1);
         }
-        if (!prefix.isEmpty() && !prefix.endsWith("/")) {
+        boolean isArchive = FilenameUtils.isArchiveFile(prefix);
+        if (!isArchive && !prefix.isEmpty() && !prefix.endsWith("/")) {
             prefix += '/'; // NOPMD
         }
 
@@ -78,10 +80,10 @@ public class S3RepositoryFactory implements RepositoryFactory {
         }
 
         if (artifactId == null) {
-            Path path = Paths.get(prefix);
-            if (path.getNameCount() == 0) {
+            if (prefix.isEmpty()) {
                 artifactId = bucket;
             } else {
+                Path path = Paths.get(prefix);
                 Path fileName = path.getFileName();
                 if (fileName == null) {
                     throw new AssertionError("This should never happen.");
@@ -89,6 +91,10 @@ public class S3RepositoryFactory implements RepositoryFactory {
                 artifactId = fileName.toString();
             }
         }
+        if (isArchive) {
+            artifactId = FilenameUtils.getNamePart(artifactId);
+        }
+
         if (modelName == null) {
             modelName = artifactId;
         }
