@@ -234,7 +234,21 @@ public class PtNDArrayEx implements NDArrayEx {
                         array, normType, array.getShape().slice(2), getPoolShape(array), false)) {
             return (PtNDArray) temp.reshape(array.getShape().slice(0, 2));
         }
-        //        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void adadeltaUpdate(
+            NDList inputs,
+            NDList weights,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float rho,
+            float epsilon) {
+        // TODO move the adadelta to each engine
+        throw new UnsupportedOperationException(
+                "AdaDelta optimzier is not supported for PyTorch engine!");
     }
 
     /** {@inheritDoc} */
