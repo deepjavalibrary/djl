@@ -64,6 +64,7 @@ configure(javaProjects()) {
             systemProperties System.getProperties()
             systemProperties.remove("user.dir")
             systemProperty "ai.djl.logging.level", "debug"
+            systemProperty "org.slf4j.simpleLogger.defaultLogLevel", "debug"
             systemProperty "disableProgressBar", "true"
             systemProperty "nightly", System.getProperty("nightly", "false")
             if (gradle.startParameter.offline) {
