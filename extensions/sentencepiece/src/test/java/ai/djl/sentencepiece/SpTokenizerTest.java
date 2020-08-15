@@ -15,6 +15,7 @@ package ai.djl.sentencepiece;
 
 import ai.djl.training.util.DownloadUtils;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -27,15 +28,18 @@ public class SpTokenizerTest {
 
     @BeforeTest
     public void downloadModel() throws IOException {
-        DownloadUtils.download(
-                "https://djl-ai.s3.amazonaws.com/resources/test-models/test_model.model",
-                "build/test/models/test_model.model");
+        Path modelFile = Paths.get("build/test/models/sententpiece_test_model.model");
+        if (Files.notExists(modelFile)) {
+            DownloadUtils.download(
+                    "https://djl-ai.s3.amazonaws.com/resources/test-models/sententpiece_test_model.model",
+                    "build/test/models/sententpiece_test_model.model");
+        }
     }
 
     @Test
     public void testLoadModel() throws IOException {
         Path modelPath = Paths.get("build/test/models");
-        String prefix = "test_model";
+        String prefix = "sententpiece_test_model";
         SpTokenizer tokenizer = new SpTokenizer(modelPath, prefix);
         tokenizer.getProcessor().close();
     }
@@ -43,7 +47,7 @@ public class SpTokenizerTest {
     @Test
     public void testTokenize() throws IOException {
         Path modelPath = Paths.get("build/test/models");
-        String prefix = "test_model";
+        String prefix = "sententpiece_test_model";
         SpTokenizer tokenizer = new SpTokenizer(modelPath, prefix);
         String original = "Hello World";
         List<String> tokens = tokenizer.tokenize(original);
