@@ -12,6 +12,7 @@
  */
 package ai.djl.hadoop.hdfs;
 
+import ai.djl.Application;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
@@ -98,6 +99,28 @@ public class HdfsRepositoryTest {
 
         Artifact artifact = repo.resolve(list.get(0), "1.0", null);
         repo.prepare(artifact);
+
+        Assert.assertTrue(repo.isRemote());
+        Assert.assertEquals(repo.getName(), "hdfs");
+        Assert.assertEquals(repo.getBaseUri().toString(), "hdfs://localhost:" + port);
+
+        repo = Repository.newInstance("hdfs", "hdfs://localhost:" + port);
+        list = repo.getResources();
+        Assert.assertFalse(list.isEmpty());
+    }
+
+    @Test
+    public void testAccessDeny() throws IOException {
+        int port = miniDfs.getNameNodePort();
+        Repository repo =
+                Repository.newInstance("hdfs", "hdfs://localhost:" + port + "/non-exists");
+
+        List<MRL> list = repo.getResources();
+        Assert.assertTrue(list.isEmpty());
+
+        MRL mrl = MRL.model(Application.UNDEFINED, "ai.djl.localmodelzoo", "mlp");
+        Artifact artifact = repo.resolve(mrl, "0.0.1", null);
+        Assert.assertNull(artifact);
     }
 
     private void setFilePermission(Configuration config) {
