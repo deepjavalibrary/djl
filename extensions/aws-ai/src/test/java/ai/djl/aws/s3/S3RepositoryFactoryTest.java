@@ -12,9 +12,15 @@
  */
 package ai.djl.aws.s3;
 
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class S3RepositoryFactoryTest {
+
+    @BeforeClass
+    public void setUp() {
+        System.setProperty("aws.region", "us-east-1");
+    }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testUnsupportedProtocol() {
