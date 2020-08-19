@@ -182,8 +182,7 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
         return null;
     }
 
-    private Translator<Input, Output> loadDefaultTranslator(Map<String, Object> arguments)
-            throws TranslateException {
+    private Translator<Input, Output> loadDefaultTranslator(Map<String, Object> arguments) {
         String appName = (String) arguments.get("application");
         if (appName != null) {
             Application application = Application.of(appName);
@@ -192,12 +191,9 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
             } else if (application == Application.CV.OBJECT_DETECTION) {
                 // TODO: check model name
                 return getSsdTranslator(arguments);
-            } else {
-                // TODO: Add more modalities
-                throw new TranslateException("Unsupported application: " + application);
             }
         }
-        throw new TranslateException("No ServingTranslator found.");
+        return new RawTranslator();
     }
 
     private Translator<Input, Output> getImageClassificationTranslator(
@@ -312,6 +308,40 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
         @Override
         public void prepare(NDManager manager, Model model) throws IOException {
             translator.prepare(manager, model);
+        }
+    }
+
+    private static final class RawTranslator implements Translator<Input, Output> {
+
+        /** {@inheritDoc} */
+        @Override
+        public Batchifier getBatchifier() {
+            return null;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public NDList processInput(TranslatorContext ctx, Input input) throws IOException {
+            ctx.setAttachment("input", input);
+            PairList<String, byte[]> inputs = input.getContent();
+            byte[] data = inputs.get("data");
+            if (data == null) {
+                data = inputs.get("body");
+            }
+            if (data == null) {
+                data = input.getContent().valueAt(0);
+            }
+            NDManager manager = ctx.getNDManager();
+            return NDList.decode(manager, data);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Output processOutput(TranslatorContext ctx, NDList list) {
+            Input input = (Input) ctx.getAttachment("input");
+            Output output = new Output(input.getRequestId(), 200, "OK");
+            output.setContent(list.encode());
+            return output;
         }
     }
 }

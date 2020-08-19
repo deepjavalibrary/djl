@@ -95,6 +95,15 @@ public class Input {
     }
 
     /**
+     * Appends an item at the end of the input.
+     *
+     * @param data data to be added
+     */
+    public void addData(byte[] data) {
+        addData(null, data);
+    }
+
+    /**
      * Adds a key/value pair to the input content.
      *
      * @param key key with which the specified data is to be added
@@ -105,5 +114,18 @@ public class Input {
             content = new PairList<>();
         }
         content.add(key, data);
+    }
+
+    /**
+     * Inserts the specified element at the specified position in the input.
+     *
+     * @param index the index at which the specified element is to be inserted
+     * @param data data to be added with the specified key
+     */
+    public void addData(int index, byte[] data) {
+        if (content == null) {
+            content = new PairList<>();
+        }
+        content.add(index, null, data);
     }
 }

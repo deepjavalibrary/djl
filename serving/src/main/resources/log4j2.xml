@@ -13,5 +13,8 @@
         <Logger name="ai.djl" level="${sys:ai.djl.logging.level:-info}" additivity="false">
             <AppenderRef ref="console"/>
         </Logger>
+        <Logger name="org.mortbay.log" level="warn" additivity="false">
+            <AppenderRef ref="console"/>
+        </Logger>
     </Loggers>
 </Configuration>

@@ -21,7 +21,12 @@ import ai.djl.modality.Classifications;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.util.NDImageUtils;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
@@ -30,6 +35,7 @@ import ai.djl.translate.TranslateException;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
 import ai.djl.util.ZipUtils;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
@@ -38,6 +44,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,6 +56,7 @@ import org.testng.annotations.Test;
 public class CustomTranslatorTest {
 
     private Path modelDir = Paths.get("build/models/mlp");
+    private byte[] data;
 
     @BeforeClass
     public void setup() throws IOException, ModelNotFoundException, MalformedModelException {
@@ -80,6 +88,11 @@ public class CustomTranslatorTest {
                 Files.copy(is, paramFile, StandardCopyOption.REPLACE_EXISTING);
             }
         }
+
+        Path imageFile = Paths.get("../examples/src/test/resources/0.png");
+        try (InputStream is = Files.newInputStream(imageFile)) {
+            data = Utils.toByteArray(is);
+        }
     }
 
     @AfterClass
@@ -93,6 +106,9 @@ public class CustomTranslatorTest {
         if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
             return;
         }
+
+        // load RawTranslator
+        runRawTranslator();
 
         // load default translator with criteria
         Map<String, Object> arguments = new ConcurrentHashMap<>();
@@ -116,7 +132,6 @@ public class CustomTranslatorTest {
         try (Writer writer = Files.newBufferedWriter(confFile)) {
             prop.store(writer, "");
         }
-        //
         runImageClassification(Application.UNDEFINED, null);
 
         Path libsDir = modelDir.resolve("libs");
@@ -163,15 +178,15 @@ public class CustomTranslatorTest {
                         .build();
 
         Path imageFile = Paths.get("../examples/src/test/resources/dog_bike_car.jpg");
-        byte[] data;
+        byte[] buf;
         try (InputStream is = Files.newInputStream(imageFile)) {
-            data = Utils.toByteArray(is);
+            buf = Utils.toByteArray(is);
         }
 
         try (ZooModel<Input, Output> model = ModelZoo.loadModel(criteria);
                 Predictor<Input, Output> predictor = model.newPredictor()) {
             Input input = new Input("1");
-            input.addData("data", data);
+            input.addData(buf);
             Output output = predictor.predict(input);
             Assert.assertEquals(output.getRequestId(), "1");
             String content = new String(output.getContent(), StandardCharsets.UTF_8);
@@ -190,20 +205,47 @@ public class CustomTranslatorTest {
                         .optModelUrls(modelDir.toString())
                         .build();
 
-        Path imageFile = Paths.get("../examples/src/test/resources/0.png");
-        byte[] data;
-        try (InputStream is = Files.newInputStream(imageFile)) {
-            data = Utils.toByteArray(is);
-        }
-
         try (ZooModel<Input, Output> model = ModelZoo.loadModel(criteria);
                 Predictor<Input, Output> predictor = model.newPredictor()) {
             Input input = new Input("1");
-            input.addData("data", data);
+            input.addData("body", data);
             Output output = predictor.predict(input);
             Assert.assertEquals(output.getRequestId(), "1");
             String content = new String(output.getContent(), StandardCharsets.UTF_8);
             Classifications result = JsonUtils.GSON.fromJson(content, Classifications.class);
+            Assert.assertEquals(result.best().getClassName(), "0");
+        }
+    }
+
+    public void runRawTranslator() throws IOException, ModelException, TranslateException {
+        Criteria<Input, Output> criteria =
+                Criteria.builder()
+                        .setTypes(Input.class, Output.class)
+                        .optModelUrls(modelDir.toString())
+                        .build();
+
+        try (ZooModel<Input, Output> model = ModelZoo.loadModel(criteria);
+                Predictor<Input, Output> predictor = model.newPredictor()) {
+            NDManager manager = model.getNDManager();
+
+            // manually pre process
+            ByteArrayInputStream is = new ByteArrayInputStream(data);
+            Image image = ImageFactory.getInstance().fromInputStream(is);
+            NDArray array = image.toNDArray(manager, Image.Flag.GRAYSCALE);
+            array = NDImageUtils.toTensor(array).expandDims(0);
+            NDList list = new NDList(array);
+
+            Input input = new Input("1");
+            input.addData(0, list.encode());
+            Output output = predictor.predict(input);
+            Assert.assertEquals(output.getRequestId(), "1");
+
+            // manually post process
+            list = NDList.decode(manager, output.getContent());
+            NDArray probabilities = list.singletonOrThrow().get(0).softmax(0);
+
+            List<String> classes = model.getArtifact("synset.txt", Utils::readLines);
+            Classifications result = new Classifications(classes, probabilities);
             Assert.assertEquals(result.best().getClassName(), "0");
         }
     }
