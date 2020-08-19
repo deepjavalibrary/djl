@@ -16,6 +16,7 @@ import ai.djl.pytorch.engine.PtEngine;
 import ai.djl.pytorch.zoo.cv.classification.Resnet;
 import ai.djl.pytorch.zoo.cv.objectdetection.SingleShotDetectionModelLoader;
 import ai.djl.pytorch.zoo.nlp.qa.BertQAModelLoader;
+import ai.djl.pytorch.zoo.nlp.sentimentanalysis.DistilBertSentimentAnalysisModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 import java.util.Collections;
@@ -35,6 +36,9 @@ public class PtModelZoo implements ModelZoo {
     public static final SingleShotDetectionModelLoader SSD =
             new SingleShotDetectionModelLoader(REPOSITORY);
     public static final BertQAModelLoader BERT_QA = new BertQAModelLoader(REPOSITORY);
+
+    public static final DistilBertSentimentAnalysisModelLoader DB_SENTIMENT_ANALYSIS =
+            new DistilBertSentimentAnalysisModelLoader(REPOSITORY);
 
     /** {@inheritDoc} */
     @Override

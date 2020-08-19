@@ -38,6 +38,7 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - [Instance segmentation example](../examples/docs/instance_segmentation.md)
 - [Pose estimation example](../examples/docs/pose_estimation.md)
 - [Action recognition example](../examples/docs/action_recognition.md)
+- [Sentiment Analysis example](../examples/docs/sentiment_analysis.md)
 
 ## Engine Documentation
 

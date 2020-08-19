@@ -21,12 +21,13 @@ import ai.djl.modality.nlp.translator.QATranslator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.pytorch.zoo.nlp.PtBertVocabulary;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.util.List;
 
 /**
- * The translator for {@link PtBertQATranslator}.
+ * The {@link ai.djl.translate.Translator} for PyTorch Question Answering model.
  *
  * @see BertQAModelLoader
  */

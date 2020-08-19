@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,13 +10,13 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.pytorch.zoo.nlp.qa;
+package ai.djl.pytorch.zoo.nlp.sentimentanalysis;
 
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.modality.nlp.qa.QAInput;
+import ai.djl.modality.Classifications;
 import ai.djl.pytorch.zoo.PtModelZoo;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
@@ -32,19 +32,19 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Model loader for PyTorch BERT QA models.
+ * Model loader for PyTorch DistilBERT Sentiment Analysis models.
  *
  * <p>The model was trained with PyTorch from https://github.com/huggingface/transformers.
  *
- * <p>See <a href="https://arxiv.org/pdf/1810.04805.pdf">the BERT paper</a>
+ * <p>See <a href="https://arxiv.org/abs/1910.01108">the BERT paper</a>
  *
  * @see ai.djl.pytorch.engine.PtSymbolBlock
  */
-public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
-
-    private static final Application APPLICATION = Application.NLP.QUESTION_ANSWER;
+public class DistilBertSentimentAnalysisModelLoader
+        extends BaseModelLoader<String, Classifications> {
+    private static final Application APPLICATION = Application.NLP.SENTIMENT_ANALYSIS;
     private static final String GROUP_ID = PtModelZoo.GROUP_ID;
-    private static final String ARTIFACT_ID = "bertqa";
+    private static final String ARTIFACT_ID = "distilbert";
     private static final String VERSION = "0.0.1";
 
     /**
@@ -52,19 +52,19 @@ public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
      *
      * @param repository the repository to load the model from
      */
-    public BertQAModelLoader(Repository repository) {
+    public DistilBertSentimentAnalysisModelLoader(Repository repository) {
         super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION, new PtModelZoo());
-        factories.put(new Pair<>(QAInput.class, String.class), new FactoryImpl());
+        factories.put(new Pair<>(String.class, Classifications.class), new FactoryImpl());
     }
 
     /** {@inheritDoc} */
     @Override
-    public ZooModel<QAInput, String> loadModel(
+    public ZooModel<String, Classifications> loadModel(
             Map<String, String> filters, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException {
-        Criteria<QAInput, String> criteria =
+        Criteria<String, Classifications> criteria =
                 Criteria.builder()
-                        .setTypes(QAInput.class, String.class)
+                        .setTypes(String.class, Classifications.class)
                         .optFilters(filters)
                         .optDevice(device)
                         .optProgress(progress)
@@ -78,12 +78,13 @@ public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
         return APPLICATION;
     }
 
-    private static final class FactoryImpl implements TranslatorFactory<QAInput, String> {
+    private static final class FactoryImpl implements TranslatorFactory<String, Classifications> {
 
         /** {@inheritDoc} */
         @Override
-        public Translator<QAInput, String> newInstance(Model model, Map<String, Object> arguments) {
-            return PtBertQATranslator.builder().build();
+        public Translator<String, Classifications> newInstance(
+                Model model, Map<String, Object> arguments) {
+            return new PtDistilBertTranslator();
         }
     }
 }

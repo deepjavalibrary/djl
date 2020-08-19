@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.pytorch.zoo.nlp.qa;
+package ai.djl.pytorch.zoo.nlp;
 
 import ai.djl.modality.nlp.Vocabulary;
 import java.io.BufferedReader;
@@ -37,7 +37,7 @@ public final class PtBertVocabulary implements Vocabulary {
     }
 
     /**
-     * Parses the vocabulary file and create {@code MxBertVocabulary}.
+     * Parses the vocabulary file and create {@code PtBertVocabulary}.
      *
      * @param path the input file path
      * @return an instance of {@code PtBertVocabulary}
