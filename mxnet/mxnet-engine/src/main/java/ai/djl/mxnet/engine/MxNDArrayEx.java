@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.NDUtils;
 import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
@@ -355,6 +356,46 @@ class MxNDArrayEx implements NDArrayEx {
     ////////////////////////////////////////
     // Optimizer
     ////////////////////////////////////////
+
+    /** {@inheritDoc} */
+    @Override
+    public void adadeltaUpdate(
+            NDList inputs,
+            NDList weights,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float rho,
+            float epsilon) {
+        NDArray weight = inputs.get(0);
+        NDArray grad = inputs.get(1);
+        NDArray s = inputs.get(2);
+        NDArray delta = inputs.get(3);
+
+        NDManager manager = weight.getManager();
+        try (NDManager subManager = manager.newSubManager()) {
+            inputs.attach(subManager);
+            weights.attach(subManager);
+
+            // Preprocess Gradient
+            grad.muli(rescaleGrad);
+            if (clipGrad > 0) {
+                grad = grad.clip(-clipGrad, clipGrad);
+            }
+            grad.addi(weight.mul(weightDecay));
+
+            // Update s, g, and delta
+            s.muli(rho).addi(grad.square().mul(1 - rho));
+            NDArray g = delta.add(epsilon).sqrt().div(s.add(epsilon).sqrt()).mul(grad);
+            delta.muli(rho).addi(g.square().mul(1 - rho));
+
+            // Update weight
+            weight.subi(g);
+
+            inputs.attach(manager);
+            weights.attach(manager);
+        }
+    }
 
     /** {@inheritDoc} */
     @Override
