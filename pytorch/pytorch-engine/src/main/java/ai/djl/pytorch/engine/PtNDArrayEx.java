@@ -246,7 +246,6 @@ public class PtNDArrayEx implements NDArrayEx {
             float clipGrad,
             float rho,
             float epsilon) {
-        // TODO move the adadelta to each engine
         throw new UnsupportedOperationException(
                 "AdaDelta optimzier is not supported for PyTorch engine!");
     }

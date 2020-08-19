@@ -244,6 +244,19 @@ public class TfNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    public void adadeltaUpdate(
+            NDList inputs,
+            NDList weights,
+            float weightDecay,
+            float rescaleGrad,
+            float clipGrad,
+            float rho,
+            float epsilon) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void adagradUpdate(
             NDList inputs,
             NDList weights,
