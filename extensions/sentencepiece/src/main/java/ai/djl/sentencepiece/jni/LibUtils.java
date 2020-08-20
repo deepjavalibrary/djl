@@ -70,6 +70,10 @@ public final class LibUtils {
         Path tmp = null;
         try (InputStream stream =
                 LibUtils.class.getResourceAsStream("/native/lib/" + classifier + "/" + name)) {
+            if (stream == null) {
+                throw new UnsupportedOperationException(
+                        "SentencePiece is not supported by this platform");
+            }
             Files.createDirectories(nativeDir.resolve(version));
             tmp = Files.createTempFile(nativeDir, "jni", "tmp");
             Files.copy(stream, tmp, StandardCopyOption.REPLACE_EXISTING);

@@ -17,14 +17,27 @@ import ai.djl.sentencepiece.jni.NativeResource;
 import ai.djl.sentencepiece.jni.SentencePieceLibrary;
 
 /** The processor holder for SentencePiece. */
-class SpProcessor extends NativeResource {
+final class SpProcessor extends NativeResource {
+
+    private static RuntimeException libraryStatus;
 
     static {
-        LibUtils.loadLibrary();
+        try {
+            LibUtils.loadLibrary();
+        } catch (RuntimeException e) {
+            libraryStatus = e;
+        }
     }
 
-    SpProcessor() {
+    private SpProcessor() {
         super(SentencePieceLibrary.LIB.createSentencePieceProcessor());
+    }
+
+    static SpProcessor newInstance() {
+        if (libraryStatus != null) {
+            throw libraryStatus;
+        }
+        return new SpProcessor();
     }
 
     void loadModel(String path) {

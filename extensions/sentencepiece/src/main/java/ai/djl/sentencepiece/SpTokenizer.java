@@ -37,7 +37,7 @@ public class SpTokenizer implements Tokenizer {
      * @throws IOException when IO operation fails in loading a resource
      */
     public SpTokenizer(Path modelPath, String prefix) throws IOException {
-        this.processor = new SpProcessor();
+        this.processor = SpProcessor.newInstance();
         loadModel(modelPath, prefix);
     }
 
