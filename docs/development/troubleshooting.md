@@ -22,7 +22,7 @@ CN: Windows 10 加载失败常常是因为缺少 Windows Visual C++ 相关扩展
 
 ### 1. Engine dependency is missing
 DJL currently supports four engines: MXNet, PyTorch, TensorFlow(experimental) and FastText.
-Please includes at least one of those engines and their native library as dependencies.
+Please include at least one of those engines and their native library as dependencies.
 For example, adding MXNet engine dependencies:
 
 Gradle:
@@ -30,7 +30,7 @@ Gradle:
 ```
 implementation "ai.djl.mxnet:mxnet-engine:0.6.0"
 // See https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
-runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.7.0-b" 
+runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.7.0-backport"
 ```
 
 Maven:

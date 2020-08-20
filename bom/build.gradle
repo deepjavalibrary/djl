@@ -18,7 +18,6 @@ dependencies {
         api "ai.djl.mxnet:mxnet-model-zoo:${version}"
         api "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
         api "ai.djl.mxnet:mxnet-native-mkl:${mxnet_version}"
-        api "ai.djl.mxnet:mxnet-native-cu92:${mxnet_version}"
         api "ai.djl.mxnet:mxnet-native-cu101:${mxnet_version}"
         api "ai.djl.mxnet:mxnet-native-cu102:${mxnet_version}"
         api "ai.djl.tensorflow:tensorflow-api:${version}"

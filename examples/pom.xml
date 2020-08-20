@@ -68,7 +68,7 @@
             -->
             <groupId>ai.djl.mxnet</groupId>
             <artifactId>mxnet-native-auto</artifactId>
-            <version>1.7.0-b</version>
+            <version>1.7.0-backport</version>
             <scope>runtime</scope>
         </dependency>
 
