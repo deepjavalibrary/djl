@@ -52,6 +52,11 @@ public class CustomTranslatorTest {
 
     @BeforeClass
     public void setup() throws IOException, ModelNotFoundException, MalformedModelException {
+        if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
+            return;
+        }
+
+        Utils.deleteQuietly(modelDir);
         Files.createDirectories(modelDir);
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
