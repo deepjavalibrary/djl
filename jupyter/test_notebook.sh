@@ -19,9 +19,7 @@ if [[ $# -eq 0 ]]; then
     for f in {**,.}/*.ipynb
     do
         dir=$(dirname f)
-        if [[ "$dir" != d2l-java* ]]; then
-          run_test "$f"
-        fi
+        run_test "$f"
     done
 else
     run_test $1
