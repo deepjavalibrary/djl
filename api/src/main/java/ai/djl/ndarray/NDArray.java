@@ -152,9 +152,9 @@ public interface NDArray extends AutoCloseable {
      * <p>Attached resource will be closed when the {@link NDManager} is closed.
      *
      * @param manager the {@link NDManager} to be attached
-     * @see NDManager
+     * @return the original {@link NDManager}
      */
-    void attach(NDManager manager);
+    NDManager attach(NDManager manager);
 
     /**
      * Detaches the {@code NDArray} from current {@link NDManager}'s lifecycle.

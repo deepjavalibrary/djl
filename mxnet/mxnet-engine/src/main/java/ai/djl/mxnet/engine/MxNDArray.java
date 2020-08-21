@@ -53,9 +53,6 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     private MxNDManager manager;
     private MxNDArrayEx mxNDArrayEx;
 
-    // Whether the NDArray should be freed on closing. Used for callbacks like kvstore update
-    private boolean shouldFree = true;
-
     /**
      * Constructs an MxNDArray from a native handle and metadata (internal. Use {@link NDManager}
      * instead).
@@ -166,10 +163,12 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void attach(NDManager manager) {
+    public NDManager attach(NDManager manager) {
         detach();
+        NDManager original = this.manager;
         this.manager = (MxNDManager) manager;
         manager.attach(getUid(), this);
+        return original;
     }
 
     /** {@inheritDoc} */
@@ -206,19 +205,6 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
         }
         // TODO support copy
         return duplicate(getManager(), getShape(), dataType, getDevice(), getName());
-    }
-
-    /**
-     * Sets whether to free the MxNDArray when it is closed (internal).
-     *
-     * <p>It should not be freed in cases such as MxParameterServer optimizer callback where the
-     * NDArray is merely intended to be read, not freed. Otherwise, leave it as the deafult (should
-     * free).
-     *
-     * @param shouldFree {@code true} if the MxNDArray should be freed on close
-     */
-    public void setShouldFree(boolean shouldFree) {
-        this.shouldFree = shouldFree;
     }
 
     /**
@@ -1552,9 +1538,6 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        if (!shouldFree) {
-            return;
-        }
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
             JnaUtils.waitToRead(pointer);

@@ -101,8 +101,6 @@ public class MxParameterServer extends NativeResource implements ParameterServer
             try (MxNDManager manager = MxNDManager.getSystemManager().newSubManager()) {
                 MxNDArray grad = manager.create(recv);
                 MxNDArray weight = manager.create(local);
-                grad.setShouldFree(false);
-                weight.setShouldFree(false);
                 optimizer.update(parameterId, weight, grad);
             }
         }

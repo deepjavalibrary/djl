@@ -114,10 +114,12 @@ public class OrtNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void attach(NDManager manager) {
+    public NDManager attach(NDManager manager) {
         detach();
+        NDManager original = this.manager;
         this.manager = (OrtNDManager) manager;
         manager.attach(getUid(), this);
+        return original;
     }
 
     /** {@inheritDoc} */

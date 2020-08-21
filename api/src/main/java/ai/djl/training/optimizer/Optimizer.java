@@ -141,6 +141,7 @@ public abstract class Optimizer {
                         k -> {
                             Map<Device, NDArray> map = new ConcurrentHashMap<>();
                             NDArray s = defaultFunction.apply(k);
+                            // TODO attach s to the NDManager of ParameterStore
                             s.detach(); // s is detached because it would be put into the optimizer
                             // callback manager and closed after the optimizer callback
                             // when using the MxParameterServer. For now, this will let it be closed
