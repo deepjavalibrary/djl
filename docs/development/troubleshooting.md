@@ -15,6 +15,11 @@ ai.djl.engine.EngineException: No deep learning engine found.
 	at ai.djl.examples.training.TrainPikachu.main(TrainPikachu.java:72) [main/:?]
 ```
 
+For Windows 10 specifically, DJL many fail due to missing [Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads).
+You can install this package and reboot again to see if the issue persist. You can also check the below instruction to do further investigation.
+
+CN: Windows 10 加载失败常常是因为缺少 Windows Visual C++ 相关扩展包而导致的。您可以通过下面Windows的步骤来修复系统缺失依赖项。
+
 ### 1. Engine dependency is missing
 DJL currently supports four engines: MXNet, PyTorch, TensorFlow(experimental) and FastText.
 Please includes at least one of those engines and their native library as dependencies.
@@ -81,6 +86,32 @@ libtorch.dylib:
 It shows the `libtorch.dylib` depends on `libiomp5.dylib` and `libc10.dylib`. If one of them is missing, it throws an `UnsatisfiedLinkError` exception.
 If you are using `ai.djl.{engine}:{engine}-native-auto`, please create an issue at `https://github.com/awslabs/djl`.
 
+**Windows**
+
+You can run the following if you have Visual Studio tools CMD:
+
+```cmd
+dumpbin /dependents your_dll_file.dll
+```
+
+or install a [Dependency Walker](http://www.dependencywalker.com/).
+It's an application that can check the dependencies for a specific DLL by simply
+drag and drop.
+
+DJL requires Visual C++ Redistributable Packages. If you encounter an UnsatisfiedLinkError while building
+DJL on Windows, please download and install
+[Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) and reboot. 
+
+CN: 如果您在中国，可以使用 [DirectX 修复工具](https://blog.csdn.net/VBcom/article/details/6962388) 来安装遗失依赖项。
+
+If the issue continues to persist, you can use the [docker file](https://github.com/awslabs/djl/blob/master/docker/windows/Dockerfile) provided by us.
+Please note that this docker will only work with Windows server 2019 by default. If you want it to work with other
+versions of Windows, you need to pass the version as an argument as follows:
+
+```
+docker build --build-arg version=<YOUR_VERSION>
+```
+
 ### 4. Failed to extract native file issue
 Sometimes you may only have read-only access on the machine.
 It will cause a failure during engine loading because the cache attempts to write to the home directory.
@@ -105,32 +136,6 @@ examples -> src -> main -> resources -> log4j2.xml
 Then, right click the `log4j2.xml` file and select `Recompile log4j2.xml`.
 
 ![FAQ2](https://djl-ai.s3.amazonaws.com/resources/images/FAQ_log_recompile.png)
-
-## 3. Build fails on Windows caused by "UnsatisfiedLinkError"
-DJL requires Visual C++ Redistributable Packages. If you encounter an UnsatisfiedLinkError while building
-DJL on Windows, please download and install
-[Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) and reboot. 
-If the issue continues to persist, you can use the [docker file](https://github.com/awslabs/djl/blob/master/docker/windows/Dockerfile) provided by us.
-Please note that this docker will only work with Windows server 2019 by default. If you want it to work with other
-versions of Windows, you need to pass the version as an argument as follows:
-
-```
-docker build --build-arg version=<YOUR_VERSION>
-```
-
-CN: 如果您在中国，可以使用 [DirectX 修复工具](https://blog.csdn.net/VBcom/article/details/6962388) 来安装遗失依赖项。
-
-### Check dependencies
-
-You can run the following if you have Visual Studio tools CMD:
-
-```cmd
-dumpbin /dependents your_dll_file.dll
-```
-
-or install a [Dependency Walker](http://www.dependencywalker.com/).
-It's an application that can check the dependencies for a specific DLL by simply
-drag and drop.
 
 
 ## 4. How to run DJL using other versions of Apache MXNet?
