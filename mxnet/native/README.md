@@ -82,7 +82,7 @@ cd mxnet/native
 ./gradlew publish -Pstaging
 
 3. Publish to staging via the Github action
-curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/USERNAME/RESPOSITORY_NAME/dispatches --data '{"event_type": “mxnet-staging-pub"}'
+# Run the workflow from the web portal
 
 # Test with the SSD Apache MXNet model
 ./gradlew :example:run
@@ -92,9 +92,4 @@ curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.ever
 
 ### Optional: Use GitHub actions to publish the Apache MXNet native library
 
-We have a weekly GitHub pipeline that publishes the snapshots automatically. The pipeline can also be manually triggered using the GitHub REST API:
-
-```bash
-# manually trigger publish a snapshot release
-curl -XPOST -u "USERNAME:PERSONAL_TOKEN" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/USERNAME/RESPOSITORY_NAME/dispatches --data '{"event_type": “mxnet-snapshot-pub"}'
-```
+We have a weekly GitHub pipeline that publishes the snapshots automatically. The pipeline can also be manually triggered using the GitHub Actions web portal
