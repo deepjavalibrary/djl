@@ -1004,6 +1004,9 @@ public final class JniUtils {
 
     public static PtNDArray lpPool(
             PtNDArray ndArray, double normType, Shape kernelSize, Shape stride, boolean ceilMode) {
+        if (ndArray.getShape().dimension() - 2 == 3) {
+            throw new UnsupportedOperationException("3D lpPool is not supported in PyTorch engine");
+        }
         return ndArray.getManager()
                 .create(
                         PyTorchLibrary.LIB.torchNNLpPool(

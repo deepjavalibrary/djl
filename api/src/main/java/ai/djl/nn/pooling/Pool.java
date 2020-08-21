@@ -39,6 +39,9 @@ public final class Pool {
             NDArray input, Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
         Objects.requireNonNull(kernelShape, "kernelShape cannot be null for maxPool1d");
         Preconditions.checkArgument(
+                input.getShape().dimension() == 3,
+                "Expect input dimension is 3 but got " + input.getShape().dimension());
+        Preconditions.checkArgument(
                 kernelShape.dimension() == 1 && stride.dimension() == 1 && padding.dimension() == 1,
                 "kernelShape, Stride and Padding dimensions for maxPool1d layer should be 1");
         return input.getNDArrayInternal().maxPool(kernelShape, stride, padding, ceilMode);
@@ -58,6 +61,9 @@ public final class Pool {
     public static NDArray maxPool2d(
             NDArray input, Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
         Objects.requireNonNull(kernelShape, "kernelShape cannot be null for maxPool2d");
+        Preconditions.checkArgument(
+                input.getShape().dimension() == 4,
+                "Expect input dimension is 4 but got " + input.getShape().dimension());
         Preconditions.checkArgument(
                 kernelShape.dimension() == 2 && stride.dimension() == 2 && padding.dimension() == 2,
                 "kernelShape, Stride and Padding dimensions for maxPool2d should be 2");
@@ -79,6 +85,9 @@ public final class Pool {
             NDArray input, Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
         Objects.requireNonNull(kernelShape, "kernelShape cannot be null for maxPool3d");
         Preconditions.checkArgument(
+                input.getShape().dimension() == 5,
+                "Expect input dimension is 5 but got " + input.getShape().dimension());
+        Preconditions.checkArgument(
                 kernelShape.dimension() == 3 && stride.dimension() == 3 && padding.dimension() == 3,
                 "kernelShape, Stride and Pad dimensions for maxPool3d should be 3");
         return input.getNDArrayInternal().maxPool(kernelShape, stride, padding, ceilMode);
@@ -87,31 +96,40 @@ public final class Pool {
     /**
      * Performs 1-D Global Max Pooling on the input.
      *
-     * @param data the NDArray on which max pooling is performed
+     * @param input the NDArray on which max pooling is performed
      * @return the NDArray after applying global max pooling
      */
-    public static NDArray globalMaxPool1d(NDArray data) {
-        return data.getNDArrayInternal().globalMaxPool();
+    public static NDArray globalMaxPool1d(NDArray input) {
+        Preconditions.checkArgument(
+                input.getShape().dimension() == 3,
+                "Expect input dimension is 3 but got " + input.getShape().dimension());
+        return input.getNDArrayInternal().globalMaxPool();
     }
 
     /**
      * Performs 2-D Global Max Pooling on the input.
      *
-     * @param data the NDArray on which max pooling is performed
+     * @param input the NDArray on which max pooling is performed
      * @return the NDArray after applying global max pooling
      */
-    public static NDArray globalMaxPool2d(NDArray data) {
-        return data.getNDArrayInternal().globalMaxPool();
+    public static NDArray globalMaxPool2d(NDArray input) {
+        Preconditions.checkArgument(
+                input.getShape().dimension() == 4,
+                "Expect input dimension is 4 but got " + input.getShape().dimension());
+        return input.getNDArrayInternal().globalMaxPool();
     }
 
     /**
      * Performs 3-D Global Max Pooling on the input.
      *
-     * @param data the NDArray on which max pooling is performed
+     * @param input the NDArray on which max pooling is performed
      * @return the NDArray after applying global max pooling
      */
-    public static NDArray globalMaxPool3d(NDArray data) {
-        return data.getNDArrayInternal().globalMaxPool();
+    public static NDArray globalMaxPool3d(NDArray input) {
+        Preconditions.checkArgument(
+                input.getShape().dimension() == 5,
+                "Expect input dimension is 5 but got " + input.getShape().dimension());
+        return input.getNDArrayInternal().globalMaxPool();
     }
 
     /**
@@ -134,6 +152,9 @@ public final class Pool {
             boolean ceilMode,
             boolean countIncludePad) {
         Objects.requireNonNull(kernelShape, "kernelShape cannot be null for avgPool1d");
+        Preconditions.checkArgument(
+                input.getShape().dimension() == 3,
+                "Expect input dimension is 3 but got " + input.getShape().dimension());
         Preconditions.checkArgument(
                 kernelShape.dimension() == 1 && stride.dimension() == 1 && padding.dimension() == 1,
                 "kernelShape, Stride and Padding dimensions for avgPool1d should be 1");
@@ -162,6 +183,9 @@ public final class Pool {
             boolean countIncludePad) {
         Objects.requireNonNull(kernelShape, "kernelShape cannot be null for avgPool2d");
         Preconditions.checkArgument(
+                input.getShape().dimension() == 4,
+                "Expect input dimension is 4 but got " + input.getShape().dimension());
+        Preconditions.checkArgument(
                 kernelShape.dimension() == 2 && stride.dimension() == 2 && padding.dimension() == 2,
                 "kernelShape, Stride and Padding dimensions for avgPool2d should be 2");
         return input.getNDArrayInternal()
@@ -189,6 +213,9 @@ public final class Pool {
             boolean countIncludePad) {
         Objects.requireNonNull(kernelShape, "kernelShape cannot be null for avgPool3d");
         Preconditions.checkArgument(
+                input.getShape().dimension() == 5,
+                "Expect input dimension is 5 but got " + input.getShape().dimension());
+        Preconditions.checkArgument(
                 kernelShape.dimension() == 3 && stride.dimension() == 3 && padding.dimension() == 3,
                 "kernelShape, Stride and Padding dimensions for avgPool2d should be 3");
         return input.getNDArrayInternal()
@@ -198,37 +225,46 @@ public final class Pool {
     /**
      * Performs 1-D Global Avg Pooling on the input.
      *
-     * @param data the NDArray on which average pooling is performed
+     * @param input the NDArray on which average pooling is performed
      * @return the NDArray after applying global avg pooling
      */
-    public static NDArray globalAvgPool1d(NDArray data) {
-        return data.getNDArrayInternal().globalAvgPool();
+    public static NDArray globalAvgPool1d(NDArray input) {
+        Preconditions.checkArgument(
+                input.getShape().dimension() == 3,
+                "Expect input dimension is 3 but got " + input.getShape().dimension());
+        return input.getNDArrayInternal().globalAvgPool();
     }
 
     /**
      * Performs 2-D Global Avg Pooling on the input.
      *
-     * @param data the NDArray on which average pooling is performed
+     * @param input the NDArray on which average pooling is performed
      * @return the NDArray after applying global avg pooling
      */
-    public static NDArray globalAvgPool2d(NDArray data) {
-        return data.getNDArrayInternal().globalAvgPool();
+    public static NDArray globalAvgPool2d(NDArray input) {
+        Preconditions.checkArgument(
+                input.getShape().dimension() == 4,
+                "Expect input dimension is 4 but got " + input.getShape().dimension());
+        return input.getNDArrayInternal().globalAvgPool();
     }
 
     /**
      * Performs 3-D Global Avg Pooling on the input.
      *
-     * @param data the NDArray on which average pooling is performed
+     * @param input the NDArray on which average pooling is performed
      * @return the NDArray after applying global avg pooling
      */
-    public static NDArray globalAvgPool3d(NDArray data) {
-        return data.getNDArrayInternal().globalAvgPool();
+    public static NDArray globalAvgPool3d(NDArray input) {
+        Preconditions.checkArgument(
+                input.getShape().dimension() == 5,
+                "Expect input dimension is 5 but got " + input.getShape().dimension());
+        return input.getNDArrayInternal().globalAvgPool();
     }
 
     /**
      * Performs 1-D LP Pooling on the input.
      *
-     * @param data the NDArray on which LP pooling is performed
+     * @param input the NDArray on which LP pooling is performed
      * @param normType float value indicating norm
      * @param kernelShape the shape of the kernel to be used
      * @param stride the stride to be used for each dimension
@@ -238,7 +274,7 @@ public final class Pool {
      * @return the NDArray after applying lp pooling
      */
     public static NDArray lpPool1d(
-            NDArray data,
+            NDArray input,
             float normType,
             Shape kernelShape,
             Shape stride,
@@ -246,15 +282,18 @@ public final class Pool {
             boolean ceilMode) {
         Objects.requireNonNull(kernelShape, "kernelShape cannot be null for lpPool1d");
         Preconditions.checkArgument(
+                input.getShape().dimension() == 3,
+                "Expect input dimension is 3 but got " + input.getShape().dimension());
+        Preconditions.checkArgument(
                 kernelShape.dimension() == 1 && stride.dimension() == 1 && padding.dimension() == 1,
                 "kernelShape, Stride and Padding dimensions for lpPool1d should be 1");
-        return data.getNDArrayInternal().lpPool(normType, kernelShape, stride, padding, ceilMode);
+        return input.getNDArrayInternal().lpPool(normType, kernelShape, stride, padding, ceilMode);
     }
 
     /**
      * Performs 2-D LP Pooling on the input.
      *
-     * @param data the NDArray on which LP pooling is performed
+     * @param input the NDArray on which LP pooling is performed
      * @param normType float value indicating norm
      * @param kernelShape the shape of the kernel to be used
      * @param stride the stride to be used for each dimension
@@ -264,7 +303,7 @@ public final class Pool {
      * @return the NDArray after applying lp pooling
      */
     public static NDArray lpPool2d(
-            NDArray data,
+            NDArray input,
             float normType,
             Shape kernelShape,
             Shape stride,
@@ -272,15 +311,18 @@ public final class Pool {
             boolean ceilMode) {
         Objects.requireNonNull(kernelShape, "kernelShape cannot be null for lpPool2d");
         Preconditions.checkArgument(
+                input.getShape().dimension() == 4,
+                "Expect input dimension is 4 but got " + input.getShape().dimension());
+        Preconditions.checkArgument(
                 kernelShape.dimension() == 2 && stride.dimension() == 2,
                 "kernelShape, Stride and Padding dimensions for lpPool2d should be 2");
-        return data.getNDArrayInternal().lpPool(normType, kernelShape, stride, padding, ceilMode);
+        return input.getNDArrayInternal().lpPool(normType, kernelShape, stride, padding, ceilMode);
     }
 
     /**
      * Performs 3-D LP Pooling on the input.
      *
-     * @param data the NDArray on which LP pooling is performed
+     * @param input the NDArray on which LP pooling is performed
      * @param normType float value indicating norm
      * @param kernelShape the shape of the kernel to be used
      * @param stride the stride to be used for each dimension
@@ -290,7 +332,7 @@ public final class Pool {
      * @return the NDArray after applying lp pooling
      */
     public static NDArray lpPool3d(
-            NDArray data,
+            NDArray input,
             float normType,
             Shape kernelShape,
             Shape stride,
@@ -298,42 +340,54 @@ public final class Pool {
             boolean ceilMode) {
         Objects.requireNonNull(kernelShape, "kernelShape cannot be null for lpPool3d");
         Preconditions.checkArgument(
+                input.getShape().dimension() == 5,
+                "Expect input dimension is 5 but got " + input.getShape().dimension());
+        Preconditions.checkArgument(
                 kernelShape.dimension() == 3 && stride.dimension() == 3 && padding.dimension() == 3,
                 "kernelShape, Stride and Padding dimensions for lpPool3d should be 1");
-        return data.getNDArrayInternal().lpPool(normType, kernelShape, stride, padding, ceilMode);
+        return input.getNDArrayInternal().lpPool(normType, kernelShape, stride, padding, ceilMode);
     }
 
     /**
      * Performs 1-D Global LP Pooling on the input.
      *
-     * @param data the NDArray on which LP pooling is performed
+     * @param input the NDArray on which LP pooling is performed
      * @param normType float value indicating norm
      * @return the NDArray after applying global lp pooling
      */
-    public static NDArray globalLpPool1d(NDArray data, float normType) {
-        return data.getNDArrayInternal().globalLpPool(normType);
+    public static NDArray globalLpPool1d(NDArray input, float normType) {
+        Preconditions.checkArgument(
+                input.getShape().dimension() == 3,
+                "Expect input dimension is 3 but got " + input.getShape().dimension());
+        return input.getNDArrayInternal().globalLpPool(normType);
     }
 
     /**
      * Performs 2-D Global LP Pooling on the input.
      *
-     * @param data the NDArray on which LP pooling is performed
+     * @param input the NDArray on which LP pooling is performed
      * @param normType float value indicating norm
      * @return the NDArray after applying global lp pooling
      */
-    public static NDArray globalLpPool2d(NDArray data, float normType) {
-        return data.getNDArrayInternal().globalLpPool(normType);
+    public static NDArray globalLpPool2d(NDArray input, float normType) {
+        Preconditions.checkArgument(
+                input.getShape().dimension() == 4,
+                "Expect input dimension is 4 but got " + input.getShape().dimension());
+        return input.getNDArrayInternal().globalLpPool(normType);
     }
 
     /**
      * Performs 3-D Global LP Pooling on the input.
      *
-     * @param data the NDArray on which LP pooling is performed
+     * @param input the NDArray on which LP pooling is performed
      * @param normType float value indicating norm
      * @return the NDArray after applying global lp pooling
      */
-    public static NDArray globalLpPool3d(NDArray data, float normType) {
-        return data.getNDArrayInternal().globalLpPool(normType);
+    public static NDArray globalLpPool3d(NDArray input, float normType) {
+        Preconditions.checkArgument(
+                input.getShape().dimension() == 5,
+                "Expect input dimension is 5 but got " + input.getShape().dimension());
+        return input.getNDArrayInternal().globalLpPool(normType);
     }
 
     /**

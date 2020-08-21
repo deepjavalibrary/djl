@@ -220,9 +220,6 @@ public class PtNDArrayEx implements NDArrayEx {
         if (padding.size() != 0) {
             throw new IllegalArgumentException("padding is not supported for PyTorch engine");
         }
-        if (array.getShape().dimension() - 2 == 3) {
-            throw new IllegalArgumentException("3D lpPool is not supported in PyTorch engine");
-        }
         return JniUtils.lpPool(array, normType, kernelShape, stride, ceilMode);
     }
 
