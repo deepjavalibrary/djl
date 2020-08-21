@@ -11,15 +11,15 @@ elif [[ -n $(command -v sysctl) ]]; then
 fi
 
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
-VERSION=1.6.0
+VERSION=1.5.0
 CXX11ABI="-cxx11-abi"
-if [[ $2 == "precxx11" ]]; then
+if [[ $2 == "centos" ]]; then
   CXX11ABI=""
 fi
 
 if [[ ! -d "libtorch" ]]; then
   if [[ $PLATFORM == 'linux' ]]; then
-    if [[ $1 == "cpu" ]] || [[ $1 == "cu101" ]]; then
+    if [[ $1 == "cpu" ]] || [[ $1 == "cu92" ]] || [[ $1 == "cu101" ]]; then
       curl -s https://download.pytorch.org/libtorch/${1}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${1}.zip | jar xv
     elif [[ $1 == "cu102" ]]; then
       curl -s https://download.pytorch.org/libtorch/${1}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}.zip | jar xv
