@@ -12,6 +12,7 @@
  */
 package ai.djl.repository;
 
+import ai.djl.Application;
 import ai.djl.util.Progress;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,8 +36,8 @@ import java.util.Map;
  * multiple artifacts. The metadata files are identified by an {@link MRL} which contains:
  *
  * <ul>
- *   <li>{@link Anchor} - The anchor is used to organize metadata and artifacts into multi-level
- *       categories (See {@link Anchor}).
+ *   <li>type - The resource type, e.g. model or dataset.
+ *   <li>Application - The resource application (See {@link Application}).
  *   <li>Group Id - The group id identifies the group publishing the artifacts using a reverse
  *       domain name system.
  *   <li>Artifact Id - The artifact id identifies the different artifacts published by a single

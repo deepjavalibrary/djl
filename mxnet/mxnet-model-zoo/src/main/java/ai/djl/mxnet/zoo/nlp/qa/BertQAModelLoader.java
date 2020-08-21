@@ -84,12 +84,6 @@ public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
         return loadModel(criteria);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Application getApplication() {
-        return APPLICATION;
-    }
-
     private static final class FactoryImpl implements TranslatorFactory<QAInput, String> {
 
         /** {@inheritDoc} */

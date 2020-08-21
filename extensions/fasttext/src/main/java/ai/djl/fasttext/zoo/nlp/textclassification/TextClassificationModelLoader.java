@@ -51,12 +51,6 @@ public class TextClassificationModelLoader extends BaseModelLoader<String, Class
         factories.put(new Pair<>(String.class, Classifications.class), new FactoryImpl());
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Application getApplication() {
-        return APPLICATION;
-    }
-
     /**
      * Loads the model with the given search filters.
      *

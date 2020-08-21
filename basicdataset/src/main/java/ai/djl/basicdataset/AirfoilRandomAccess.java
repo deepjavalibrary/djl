@@ -76,9 +76,7 @@ public final class AirfoilRandomAccess extends RandomAccessDataset {
      */
     private AirfoilRandomAccess(Builder builder) {
         super(builder);
-        MRL mrl =
-                MRL.dataset(
-                        Application.Tabular.LINEAR_REGRESSION, builder.groupId, builder.artifactId);
+        MRL mrl = MRL.dataset(Application.Tabular.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, "1.0");
         usage = builder.usage;
 

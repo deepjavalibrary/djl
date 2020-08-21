@@ -73,12 +73,6 @@ public class MlpModelLoader extends BaseModelLoader<Image, Classifications> {
                 new InputStreamTranslatorFactory<>(factory));
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Application getApplication() {
-        return APPLICATION;
-    }
-
     /**
      * Loads the model with the given search filters.
      *

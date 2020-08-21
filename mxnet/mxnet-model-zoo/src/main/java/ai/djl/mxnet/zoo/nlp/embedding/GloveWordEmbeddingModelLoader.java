@@ -63,12 +63,6 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDLis
         factories.put(new Pair<>(String.class, NDList.class), new FactoryImpl());
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Application getApplication() {
-        return APPLICATION;
-    }
-
     private Model customGloveBlock(Model model, Artifact artifact, Map<String, Object> arguments)
             throws IOException {
         List<String> idxToToken =

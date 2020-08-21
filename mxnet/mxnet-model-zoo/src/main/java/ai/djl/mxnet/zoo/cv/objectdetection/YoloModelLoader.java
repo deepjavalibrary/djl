@@ -86,11 +86,6 @@ public class YoloModelLoader extends BaseModelLoader<Image, DetectedObjects> {
     }
 
     @Override
-    public Application getApplication() {
-        return APPLICATION;
-    }
-
-    @Override
     public ZooModel<Image, DetectedObjects> loadModel(
             Map<String, String> filters, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException {

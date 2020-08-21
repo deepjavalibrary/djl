@@ -39,6 +39,6 @@ public class ListModelsTest {
         System.setProperty("ai.djl.repository.zoo.location", "src/test/resources," + repoUrl);
         Map<Application, List<Artifact>> models = ModelZoo.listModels();
         List<Artifact> artifacts = models.get(Application.UNDEFINED);
-        Assert.assertTrue(artifacts.size() > 1);
+        Assert.assertFalse(artifacts.isEmpty());
     }
 }

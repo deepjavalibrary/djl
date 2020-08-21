@@ -79,7 +79,7 @@ public class AmesRandomAccess extends RandomAccessDataset {
     AmesRandomAccess(Builder builder) {
         super(builder);
         usage = builder.usage;
-        MRL mrl = MRL.dataset(Tabular.LINEAR_REGRESSION, builder.groupId, builder.artifactId);
+        MRL mrl = MRL.dataset(Tabular.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, "1.0");
         label = "saleprice";
 

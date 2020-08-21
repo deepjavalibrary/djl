@@ -77,12 +77,6 @@ public class SimplePoseModelLoader extends BaseModelLoader<Image, Joints> {
                 new InputStreamTranslatorFactory<>(factory));
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Application getApplication() {
-        return APPLICATION;
-    }
-
     /**
      * Loads the model with the given search filters.
      *

@@ -12,7 +12,6 @@
  */
 package ai.djl.repository.zoo;
 
-import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDList;
@@ -33,12 +32,6 @@ public class DefaultModelLoader extends BaseModelLoader<NDList, NDList> {
      */
     public DefaultModelLoader(Repository repository, MRL mrl) {
         super(repository, mrl, null, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Application getApplication() {
-        return Application.UNDEFINED;
     }
 
     /** {@inheritDoc} */

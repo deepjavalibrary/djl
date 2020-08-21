@@ -12,6 +12,7 @@
  */
 package ai.djl.repository;
 
+import ai.djl.Application;
 import ai.djl.util.JsonUtils;
 import java.io.IOException;
 import java.io.Reader;
@@ -108,22 +109,21 @@ public class LocalRepository extends AbstractRepository {
                             f -> {
                                 if (f.endsWith("metadata.json") && Files.isRegularFile(f)) {
                                     Path relative = path.relativize(f);
-                                    List<String> tokens = new ArrayList<>();
-                                    for (Path p : relative) {
-                                        tokens.add(p.toString());
+                                    String type = relative.getName(0).toString();
+                                    try (Reader reader = Files.newBufferedReader(f)) {
+                                        Metadata metadata =
+                                                JsonUtils.GSON.fromJson(reader, Metadata.class);
+                                        Application application = metadata.getApplication();
+                                        String groupId = metadata.getGroupId();
+                                        String artifactId = metadata.getArtifactId();
+                                        if ("dataset".equals(type)) {
+                                            list.add(MRL.dataset(application, groupId, artifactId));
+                                        } else if ("model".equals(type)) {
+                                            list.add(MRL.model(application, groupId, artifactId));
+                                        }
+                                    } catch (IOException e) {
+                                        logger.warn("Failed to read metadata.json", e);
                                     }
-                                    int size = tokens.size();
-                                    if (size < 5) {
-                                        logger.warn(
-                                                "Invalid repository path: " + relative.toString());
-                                        return;
-                                    }
-
-                                    Anchor anchor =
-                                            new Anchor(tokens.get(0), tokens.get(1), tokens.get(2));
-                                    String groupId = String.join(".", tokens.subList(3, size - 2));
-                                    String artifactId = tokens.get(size - 2);
-                                    list.add(new MRL(anchor, groupId, artifactId));
                                 }
                             });
         } catch (IOException e) {

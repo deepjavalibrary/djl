@@ -79,12 +79,6 @@ public class InstanceSegmentationModelLoader extends BaseModelLoader<Image, Dete
                 new InputStreamTranslatorFactory<>(factory));
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Application getApplication() {
-        return APPLICATION;
-    }
-
     /**
      * Loads the model with the given search filters.
      *

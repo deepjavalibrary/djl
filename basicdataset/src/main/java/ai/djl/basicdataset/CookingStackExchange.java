@@ -40,7 +40,7 @@ public class CookingStackExchange implements RawDataset<Path> {
 
     CookingStackExchange(Builder builder) {
         this.usage = builder.usage;
-        MRL mrl = MRL.dataset(NLP.TEXT_CLASSIFICATION, builder.groupId, builder.artifactId);
+        MRL mrl = MRL.dataset(NLP.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, "1.0");
     }
 

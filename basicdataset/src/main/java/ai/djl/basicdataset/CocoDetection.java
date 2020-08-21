@@ -56,7 +56,7 @@ public class CocoDetection extends RandomAccessDataset {
         flag = builder.flag;
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
-        MRL mrl = MRL.dataset(CV.IMAGE_CLASSIFICATION, builder.groupId, builder.artifactId);
+        MRL mrl = MRL.dataset(CV.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, "1.0");
     }
 

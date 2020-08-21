@@ -42,6 +42,8 @@ public class Application {
      */
     public static Application of(String path) {
         switch (path) {
+            case "cv":
+                return CV.ANY;
             case "cv/image_classification":
                 return CV.IMAGE_CLASSIFICATION;
             case "cv/object_detection":
@@ -54,6 +56,8 @@ public class Application {
                 return CV.POSE_ESTIMATION;
             case "cv/action_recognition":
                 return CV.ACTION_RECOGNITION;
+            case "nlp":
+                return NLP.ANY;
             case "nlp/question_answer":
                 return NLP.QUESTION_ANSWER;
             case "nlp/text_classification":
@@ -66,6 +70,8 @@ public class Application {
                 return NLP.MACHINE_TRANSLATION;
             case "nlp/multiple_choice":
                 return NLP.MULTIPLE_CHOICE;
+            case "tabular":
+                return Tabular.ANY;
             case "tabular/linear_regression":
                 return Tabular.LINEAR_REGRESSION;
             case "undefined":
@@ -100,6 +106,7 @@ public class Application {
 
     /** The common set of applications for computer vision. */
     public interface CV {
+        Application ANY = new Application("cv");
         Application IMAGE_CLASSIFICATION = new Application("cv/image_classification");
         Application OBJECT_DETECTION = new Application("cv/object_detection");
         Application SEMANTIC_SEGMENTATION = new Application("cv/semantic_segmentation");
@@ -110,6 +117,7 @@ public class Application {
 
     /** The common set of applications for natural language processing. */
     public interface NLP {
+        Application ANY = new Application("nlp");
         Application QUESTION_ANSWER = new Application("nlp/question_answer");
         Application TEXT_CLASSIFICATION = new Application("nlp/text_classification");
         Application SENTIMENT_ANALYSIS = new Application("nlp/sentiment_analysis");
@@ -120,6 +128,7 @@ public class Application {
 
     /** The common set of applications for tabular data. */
     public interface Tabular {
+        Application ANY = new Application("tabular");
         Application LINEAR_REGRESSION = new Application("tabular/linear_regression");
     }
 }

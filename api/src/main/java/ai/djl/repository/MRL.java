@@ -26,29 +26,32 @@ import java.net.URI;
  * <p>The mrl consists of three different properties:
  *
  * <ul>
- *   <li>baseAnchor - The base anchor is used to organize metadata and artifacts into (multi-level)
- *       categories (See {@link Anchor}).
+ *   <li>type - The resource type, e.g. model or dataset.
+ *   <li>application - The resource application (See {@link Application}).
  *   <li>groupId - The group id identifies the group publishing the artifacts using a reverse domain
  *       name system.
  *   <li>artifactId - The artifact id identifies the different artifacts published by a single
  *       group.
  * </ul>
  */
-public class MRL {
+public final class MRL {
 
-    private Anchor baseAnchor;
+    private String type;
+    private Application application;
     private String groupId;
     private String artifactId;
 
     /**
      * Constructs an MRL.
      *
-     * @param baseAnchor the desired anchor
+     * @param type the resource type
+     * @param application the resource application
      * @param groupId the desired groupId
      * @param artifactId the desired artifactId
      */
-    MRL(Anchor baseAnchor, String groupId, String artifactId) {
-        this.baseAnchor = baseAnchor;
+    private MRL(String type, Application application, String groupId, String artifactId) {
+        this.type = type;
+        this.application = application;
         this.groupId = groupId;
         this.artifactId = artifactId;
     }
@@ -62,8 +65,7 @@ public class MRL {
      * @return a model {@code MRL}
      */
     public static MRL model(Application application, String groupId, String artifactId) {
-        Anchor baseAnchor = Anchor.MODEL.resolve(application.getPath());
-        return new MRL(baseAnchor, groupId, artifactId);
+        return new MRL("model", application, groupId, artifactId);
     }
 
     /**
@@ -75,8 +77,7 @@ public class MRL {
      * @return a dataset {@code MRL}
      */
     public static MRL dataset(Application application, String groupId, String artifactId) {
-        Anchor baseAnchor = Anchor.DATASET.resolve(application.getPath()).getParent();
-        return new MRL(baseAnchor, groupId, artifactId);
+        return new MRL("dataset", application, groupId, artifactId);
     }
 
     /**
@@ -87,7 +88,7 @@ public class MRL {
      * @return a dataset {@code MRL}
      */
     public static MRL undefined(String groupId, String artifactId) {
-        return new MRL(new Anchor(), groupId, artifactId);
+        return new MRL("", Application.UNDEFINED, groupId, artifactId);
     }
 
     /**
@@ -96,27 +97,27 @@ public class MRL {
      * @return the URI to the metadata location
      */
     public URI toURI() {
-        String groupIdPath = groupId.replace('.', '/');
-        Anchor anchor = baseAnchor.resolve(groupIdPath, artifactId);
-        return URI.create(anchor.getPath() + '/');
+        StringBuilder sb = new StringBuilder();
+        if (!type.isEmpty()) {
+            sb.append(type).append('/');
+        }
+        sb.append(application.getPath())
+                .append('/')
+                .append(groupId.replace('.', '/'))
+                .append('/')
+                .append(artifactId)
+                .append('/');
+
+        return URI.create(sb.toString());
     }
 
     /**
-     * Returns the base anchor.
+     * Returns the resource application.
      *
-     * @return the base anchor
+     * @return the resource application
      */
-    public Anchor getBaseAnchor() {
-        return baseAnchor;
-    }
-
-    /**
-     * Sets the base anchor.
-     *
-     * @param baseAnchor the new base anchor
-     */
-    public void setBaseAnchor(Anchor baseAnchor) {
-        this.baseAnchor = baseAnchor;
+    public Application getApplication() {
+        return application;
     }
 
     /**
@@ -129,30 +130,12 @@ public class MRL {
     }
 
     /**
-     * Sets the groupId.
-     *
-     * @param groupId the new groupId
-     */
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
-
-    /**
      * Returns the artifactId.
      *
      * @return the artifactId
      */
     public String getArtifactId() {
         return artifactId;
-    }
-
-    /**
-     * Sets the artifactId.
-     *
-     * @param artifactId the new artifactId
-     */
-    public void setArtifactId(String artifactId) {
-        this.artifactId = artifactId;
     }
 
     /** {@inheritDoc} */

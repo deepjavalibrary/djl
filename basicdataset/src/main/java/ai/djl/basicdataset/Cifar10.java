@@ -58,7 +58,7 @@ public final class Cifar10 extends ArrayDataset {
         super(builder);
         this.manager = builder.manager;
         this.usage = builder.usage;
-        MRL mrl = MRL.dataset(CV.IMAGE_CLASSIFICATION, builder.groupId, builder.artifactId);
+        MRL mrl = MRL.dataset(CV.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, "1.0");
     }
 

@@ -16,6 +16,7 @@ import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.repository.Artifact;
+import ai.djl.repository.Resource;
 import ai.djl.util.Progress;
 import java.io.IOException;
 import java.util.List;
@@ -30,18 +31,29 @@ import java.util.Map;
 public interface ModelLoader<I, O> {
 
     /**
+     * Returns the {@code Resource} of the {@code ModelLoader}.
+     *
+     * @return the {@code Resource} of the {@code ModelLoader}
+     */
+    Resource getResource();
+
+    /**
      * Returns the artifact ID of the {@code ModelLoader}.
      *
      * @return the artifact ID of the {@code ModelLoader}
      */
-    String getArtifactId();
+    default String getArtifactId() {
+        return getResource().getMrl().getArtifactId();
+    }
 
     /**
      * Returns the application of the {@code ModelLoader}.
      *
      * @return the application of the {@code ModelLoader}
      */
-    Application getApplication();
+    default Application getApplication() {
+        return getResource().getMrl().getApplication();
+    }
 
     /**
      * Loads the model with the given criteria.

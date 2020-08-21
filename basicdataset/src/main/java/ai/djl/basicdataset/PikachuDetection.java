@@ -60,7 +60,7 @@ public class PikachuDetection extends RandomAccessDataset {
         flag = builder.flag;
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
-        MRL mrl = MRL.dataset(CV.OBJECT_DETECTION, builder.groupId, builder.artifactId);
+        MRL mrl = MRL.dataset(CV.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, VERSION);
     }
 

@@ -81,12 +81,6 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
 
     /** {@inheritDoc} */
     @Override
-    public Application getApplication() {
-        return APPLICATION;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public ZooModel<Image, DetectedObjects> loadModel(
             Map<String, String> filters, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException {

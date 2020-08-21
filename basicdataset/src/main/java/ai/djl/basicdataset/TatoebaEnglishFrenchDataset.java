@@ -46,7 +46,7 @@ public class TatoebaEnglishFrenchDataset extends TextDataset {
     protected TatoebaEnglishFrenchDataset(Builder builder) {
         super(builder);
         this.usage = builder.usage;
-        MRL mrl = MRL.dataset(NLP.MACHINE_TRANSLATION, builder.groupId, builder.artifactId);
+        MRL mrl = MRL.dataset(NLP.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, VERSION);
     }
 

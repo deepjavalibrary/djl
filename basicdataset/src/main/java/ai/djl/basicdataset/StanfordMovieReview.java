@@ -56,7 +56,7 @@ public class StanfordMovieReview extends TextDataset {
     protected StanfordMovieReview(Builder builder) {
         super(builder);
         this.usage = builder.usage;
-        MRL mrl = MRL.dataset(NLP.SENTIMENT_ANALYSIS, builder.groupId, builder.artifactId);
+        MRL mrl = MRL.dataset(NLP.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, VERSION);
     }
 

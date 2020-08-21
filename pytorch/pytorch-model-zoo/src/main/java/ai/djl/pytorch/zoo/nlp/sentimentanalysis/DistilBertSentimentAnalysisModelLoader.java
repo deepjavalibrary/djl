@@ -72,12 +72,6 @@ public class DistilBertSentimentAnalysisModelLoader
         return loadModel(criteria);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Application getApplication() {
-        return APPLICATION;
-    }
-
     private static final class FactoryImpl implements TranslatorFactory<String, Classifications> {
 
         /** {@inheritDoc} */
