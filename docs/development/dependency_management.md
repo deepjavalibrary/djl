@@ -37,6 +37,7 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | [ai.djl](https://search.maven.org/search?q=g:ai.djl) | [api](../../api/README.md#installation) | DJL core API, contains top level, engine-agnostic classes for both inference and training |
 | | [basicdataset](../../basicdataset/README.md#installation) | Contains a collection of built-in datasets |
 | | [model-zoo](../../model-zoo/README.md#installation) | Contains a collection of built-in engine-agnostic models |
+| | [serving](../../serving/README.md#installation) | Contains an universal model server implementation |
 | | examples (deprecated) | Contains DJL examples |
 | | repository (deprecated, use api instead) | Contain classes for DJL Repository API. The package is moved into api in newer releases |
 | | | |
@@ -48,7 +49,7 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [mxnet-native-mkl(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-cpu) | Contains Apache MXNet native library for Linux |
 | | [mxnet-native-cu102(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-gpu) | Contains Apache MXNet native library for Linux with CUDA 10.2|
 | | [mxnet-native-cu101(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-gpu) | Contains Apache MXNet native library for Linux with CUDA 10.1 |
-| | [mxnet-native-cu92(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-gpu) | Contains Apache MXNet native library for Linux with CUDA 9.2 |
+| | mxnet-native-cu92(linux-x86_64) (deprecated) | Contains Apache MXNet native library for Linux with CUDA 9.2 |
 | | | |
 | [ai.djl.pytorch](https://search.maven.org/search?q=g:ai.djl.pytorch) | [pytorch-engine](../../pytorch/pytorch-engine/README.md#installation) | PyTorch engine adapter |
 | | [pytorch-model-zoo](../../pytorch/pytorch-model-zoo/README.md#installation) | Contains state of the art PyTorch torch script models |
@@ -59,13 +60,13 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [pytorch-native-cu102(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-gpu) | Contains PyTorch native library for Linux with CUDA 10.2 |
 | | [pytorch-native-cu101(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-gpu) | Contains PyTorch native library for Linux with CUDA 10.1 |
 | | [pytorch-native-cu101(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-gpu) | Contains PyTorch native library for Windows with CUDA 10.1 |
-| | [pytorch-native-cu92(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-gpu) | Contains PyTorch native library for Linux with CUDA 9.2 |
-| | [pytorch-native-cu92(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-gpu) | Contains PyTorch native library for Windows with CUDA 9.2 |
+| | pytorch-native-cu92(linux-x86_64) (deprecated) | Contains PyTorch native library for Linux with CUDA 9.2 |
+| | pytorch-native-cu92(win-x86_64) (deprecated) | Contains PyTorch native library for Windows with CUDA 9.2 |
 | | [pytorch-engine-precxx11](../../pytorch/pytorch-engine/README.md#for-pre-cxx11-build) | PyTorch engine adapter specific for centOS 7 and Ubuntu 14.04 |
 | | [pytorch-native-cpu-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#centos-7ubuntu-1404-cpu) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
 | | [pytorch-native-cu102-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04|
 | | [pytorch-native-cu101-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
-| | [pytorch-native-cu92-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
+| | pytorch-native-cu92-precxx11(linux-x86_64) (deprecated) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
 | | | |
 | [ai.djl.tensorflow](https://search.maven.org/search?q=g:ai.djl.tensorflow) | [tensorflow-engine](../../tensorflow/tensorflow-engine/README.md#installation) | TensorFlow engine adapter |
 | | [tensorflow-model-zoo](../../tensorflow/tensorflow-model-zoo/README.md#installation) | Contains state of the art TensorFlow saved bundle models |
@@ -87,4 +88,8 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | | |
 | [ai.djl.aws](https://search.maven.org/search?q=g:ai.djl.aws) | [aws-ai](../../extensions/aws-ai/README.md#installation) | Contains classes that make it easy for DJL to access AWS services |
 | | | |
+| [ai.djl.fasttext](https://search.maven.org/search?q=g:ai.djl.fasttext) | [fasttext](../../extensions/fasttext/README.md#installation) | Contains NLP utility classes NLP for fastText |
+| | | |
 | [ai.djl.hadoop](https://search.maven.org/search?q=g:ai.djl.hadoop) | [hadoop](../../extensions/hadoop/README.md#installation) | Contains classes that make it easy for DJL access HDFS |
+| | | |
+| [ai.djl.sentencepiece](https://search.maven.org/search?q=g:ai.djl.sentencepiece) | [sentencepiece](../../extensions/sentencepiece/README.md#installation) | Contains NLP utility classes NLP for SentencePiece |
