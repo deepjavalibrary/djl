@@ -1,4 +1,4 @@
-name: Tensorflow staging publish
+name: Native Release Tensorflow
 
 on:
   workflow_dispatch:

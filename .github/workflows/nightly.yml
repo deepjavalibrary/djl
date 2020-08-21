@@ -1,4 +1,4 @@
-name: nightly build
+name: Nightly
 
 on:
   schedule:

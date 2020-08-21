@@ -1,4 +1,4 @@
-name: PyTorch staging publish
+name: Native Release PyTorch
 
 on:
   workflow_dispatch:

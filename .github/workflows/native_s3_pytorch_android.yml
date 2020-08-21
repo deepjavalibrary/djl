@@ -1,4 +1,4 @@
-name: publish android native
+name: Native S3 PyTorch Android
 
 on:
   workflow_dispatch:

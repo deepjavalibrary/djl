@@ -1,13 +1,13 @@
-name: tensorflow engine integration tests
+name: Continous PyTorch
 
 on:
   push:
     paths:
-      - "tensorflow/**"
+      - "pytorch/**"
       - "integration/**"
   pull_request:
     paths:
-      - "tensorflow/**"
+      - "pytorch/**"
       - "integration/**"
 
 jobs:
@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ubuntu-18.04, macos-latest]
+        operating-system: [ubuntu-18.04, macos-latest, windows-latest]
 
     steps:
       - uses: actions/checkout@v1
@@ -30,8 +30,12 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: Workaround for startup run
+        run: ./gradlew jar clean
+      - name: Compile JNI
+        run: ./gradlew :pytorch:pytorch-native:compileJNI
       - name: Test with Gradle
-        run: ./gradlew :integration:test "-Dai.djl.default_engine=TensorFlow"
+        run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Integration test results
         uses: actions/upload-artifact@v1
         if: always()

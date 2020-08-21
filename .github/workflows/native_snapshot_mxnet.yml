@@ -1,13 +1,16 @@
-name: release-android
+name: Native Snapshot MXNet
 
 on:
+  # Publish snapshot build weekly
+  schedule:
+    - cron:  '0 10 * * 1'
   workflow_dispatch:
 
 jobs:
-  release-android:
+  build:
+    if: github.repository == 'awslabs/djl'
     runs-on: ubuntu-18.04
-    env:
-      NDK_VERSION: "20.0.5594570"
+
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK 1.8
@@ -21,14 +24,11 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Install NDK
-        run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${NDK_VERSION}" --sdk_root=${ANDROID_SDK_ROOT}
-      - name: publish android core to staging
-        run: |
-          export ANDROID_NDK=${ANDROID_HOME}/ndk-bundle
-          cd android
-          ./gradlew :pytorch-native:assemble
-          ./gradlew publish -Pstaging
+      - name: Download native binaries
+        run: ./gradlew :mxnet:native:dMNL
+      - name: Publish to snapshot repository
+        working-directory: mxnet/native
+        run: ./gradlew publish -Psnapshot
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}

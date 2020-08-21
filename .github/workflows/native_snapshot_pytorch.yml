@@ -1,14 +1,10 @@
-name: weekly MXNet snapshot publish
+name: Native Snapshot PyTorch
 
 on:
-  # Publish snapshot build weekly
-  schedule:
-    - cron:  '0 10 * * 1'
   workflow_dispatch:
 
 jobs:
   build:
-    if: github.repository == 'awslabs/djl'
     runs-on: ubuntu-18.04
 
     steps:
@@ -25,9 +21,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Download native binaries
-        run: ./gradlew :mxnet:native:dMNL
+        run: ./gradlew :pytorch:pytorch-native:dPTNL
       - name: Publish to snapshot repository
-        working-directory: mxnet/native
+        working-directory: pytorch/pytorch-native
         run: ./gradlew publish -Psnapshot
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}

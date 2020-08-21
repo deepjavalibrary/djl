@@ -1,4 +1,4 @@
-name: nightly pytorch jni release
+name: Native JNI S3 PyTorch
 
 on:
   workflow_dispatch:

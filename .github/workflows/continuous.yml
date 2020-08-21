@@ -1,4 +1,4 @@
-name: continuous build
+name: Continuous
 
 on:
   push:

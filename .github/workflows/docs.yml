@@ -1,4 +1,4 @@
-name: docs.djl.ai build
+name: Docs
 
 on:
   # Publish docs weekly

@@ -1,38 +1,29 @@
-name: sentencepiece jni release
+name: Native S3 Tensorflow
 
 on:
   workflow_dispatch:
 
 jobs:
-  build-sentencepiece-jni-cpu:
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      matrix:
-        operating-system: [macos-latest, ubuntu-16.04]
-
+  upload:
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+      # Enable gradle cache: https://github.com/actions/cache/blob/master/examples.md#java---gradle
       - uses: actions/cache@v1
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: install libgoogle-perftools-dev
-        if: runner.os == 'Linux'
-        run: sudo apt-get install libgoogle-perftools-dev
-      - name: Release JNI prep
-        run: ./gradlew :extensions:sentencepiece:compileJNI
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      - name: Copy files to S3 with the AWS CLI
-        run: |
-          aws s3 sync extensions/sentencepiece/build/jnilib s3://djl-ai/publish/sentencepiece-0.1.92/jnilib
+      - name: Upload tensorflow native binaries to s3
+        run: ./gradlew :tensorflow:tensorflow-native-auto:uTNL

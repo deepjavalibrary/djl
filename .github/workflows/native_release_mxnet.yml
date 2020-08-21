@@ -1,4 +1,4 @@
-name: MXNet staging publish
+name: Native Release MXNet
 
 on:
   workflow_dispatch:

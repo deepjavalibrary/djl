@@ -1,4 +1,4 @@
-name: MXNet Native OSX
+name: Native Build MXNet OSX
 
 on:
   workflow_dispatch:
