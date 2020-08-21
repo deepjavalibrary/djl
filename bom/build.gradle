@@ -13,6 +13,7 @@ dependencies {
         api "ai.djl:api:${version}"
         api "ai.djl:basicdataset:${version}"
         api "ai.djl:model-zoo:${version}"
+        api "ai.djl:serving:${version}"
         api "ai.djl.mxnet:mxnet-engine:${version}"
         api "ai.djl.mxnet:mxnet-model-zoo:${version}"
         api "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
@@ -39,6 +40,9 @@ dependencies {
         api "ai.djl.onnxruntime:onnxruntime-engine:${version}"
         api "ai.djl.aws:aws-ai:${version}"
         api "ai.djl.hadoop:hadoop:${version}"
+        api "ai.djl.fasttext:fasttext:${version}"
+        api "ai.djl.hadoop:hadoop:${version}"
+        api "ai.djl.sentencepiece:sentencepiece:${version}"
     }
 }
 
