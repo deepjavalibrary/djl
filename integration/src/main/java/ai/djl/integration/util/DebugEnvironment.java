@@ -88,6 +88,10 @@ public final class DebugEnvironment {
         int gpuCount = Device.getGpuCount();
         logger.info("GPU Count: {}", gpuCount);
         logger.info("Default Device: {}", Device.defaultDevice());
+        if (gpuCount > 0) {
+            logger.info("CUDA: {}", CudaUtils.getCudaVersionString());
+            logger.info("ARCH: {}", CudaUtils.getComputeCapability(0));
+        }
 
         // CudaUtils.getGpuMemory() will allocates memory on GPUs if CUDA runtime is not
         // initialized.
