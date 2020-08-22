@@ -32,10 +32,15 @@ Log::Log(JNIEnv* env)
     : env(env),
       logger(get_log_object(env)),
       info_method(get_log_method(env, logger, "info")),
+      debug_method(get_log_method(env, logger, "debug")),
       error_method(get_log_method(env, logger, "error")) {}
 
 void Log::info(const std::string& message) {
   env->CallVoidMethod(logger, info_method, env->NewStringUTF(message.c_str()));
+}
+
+void Log::debug(const std::string& message) {
+  env->CallVoidMethod(logger, debug_method, env->NewStringUTF(message.c_str()));
 }
 
 void Log::error(const std::string& message) {

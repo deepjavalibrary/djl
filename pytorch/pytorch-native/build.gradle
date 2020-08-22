@@ -6,20 +6,19 @@ plugins {
 group = "ai.djl.pytorch"
 apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
-def VERSION = "1.5.0"
+def VERSION = "1.6.0"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-boolean isCentOS = project.hasProperty("centos")
-// fixme: reomve isCentOS when new version comes
-version = VERSION + (isCentOS ? "-post0" : "") + (isRelease ? "" : "-SNAPSHOT")
+boolean isPrecxx11 = project.hasProperty("precxx11")
+version = VERSION + (isRelease ? "" : "-SNAPSHOT")
 def BINARY_ROOT = "${project.buildDir}/download"
 
-def downloadBuild(String os, String flavor, Boolean isCentOs = false) {
+def downloadBuild(String os, String flavor, Boolean isPrecxx11 = false) {
     exec {
         if (os == "win") {
             commandLine "${project.projectDir}/build.cmd", "${flavor}"
         } else {
-            if (isCentOs) {
-                commandLine 'bash', 'build.sh', "${flavor}", "centos"
+            if (isPrecxx11) {
+                commandLine 'bash', 'build.sh', "${flavor}", "precxx11"
             } else {
                 commandLine 'bash', 'build.sh', "${flavor}"
             }
@@ -82,8 +81,6 @@ task releaseJNI {
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
             downloadBuild("win", "cpu")
             cleanBuild()
-            downloadBuild("win", "cu92")
-            cleanBuild()
             downloadBuild("win", "cu101")
             cleanBuild()
             downloadBuild("win", "cu102")
@@ -92,13 +89,11 @@ task releaseJNI {
             downloadBuild("osx", "cpu")
             cleanBuild()
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
-            downloadBuild("linux", "cpu", isCentOS)
+            downloadBuild("linux", "cpu", isPrecxx11)
             cleanBuild()
-            downloadBuild("linux", "cu92", isCentOS)
+            downloadBuild("linux", "cu101", isPrecxx11)
             cleanBuild()
-            downloadBuild("linux", "cu101", isCentOS)
-            cleanBuild()
-            downloadBuild("linux", "cu102", isCentOS)
+            downloadBuild("linux", "cu102", isPrecxx11)
             cleanBuild()
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
@@ -196,17 +191,14 @@ task downloadPyTorchNativeLib() {
                 "cpu/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcpu.zip"    : "cpu/linux",
                 "cpu/libtorch-macos-${VERSION}.zip"                               : "cpu/osx",
                 "cpu/libtorch-win-shared-with-deps-${VERSION}.zip"                : "cpu/win",
-                "cu92/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu92.zip"  : "cu92/linux",
                 "cu101/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu101.zip": "cu101/linux",
                 "cu102/libtorch-cxx11-abi-shared-with-deps-${VERSION}.zip"        : "cu102/linux",
-                "cu92/libtorch-win-shared-with-deps-${VERSION}.zip"               : "cu92/win",
                 "cu101/libtorch-win-shared-with-deps-${VERSION}.zip"              : "cu101/win",
                 "cu102/libtorch-win-shared-with-deps-${VERSION}.zip"              : "cu102/win"
         ]
         if (isCentOS) {
             files = [
                     "cpu/libtorch-shared-with-deps-${VERSION}%2Bcpu.zip"    : "cpu/linux",
-                    "cu92/libtorch-shared-with-deps-${VERSION}%2Bcu92.zip"  : "cu92/linux",
                     "cu101/libtorch-shared-with-deps-${VERSION}%2Bcu101.zip": "cu101/linux",
                     "cu102/libtorch-shared-with-deps-${VERSION}.zip"        : "cu102/linux",
             ]
@@ -224,7 +216,7 @@ task downloadPyTorchNativeLib() {
             // CPU dependencies
             copy {
                 from("${outputDir}/libtorch/lib/") {
-                    include "libc10.*", "c10.dll", "libiomp5*.*", "libgomp*.*", "libtorch.*", "libtorch_cpu.*", "torch.dll", "torch_cpu.dll", "fbgemm.dll", "asmjit.dll"
+                    include "libc10.*", "c10.dll", "libiomp5*.*", "libgomp*.*", "libtorch.*", "libtorch_cpu.*", "torch.dll", "torch_cpu.dll", "fbgemm.dll", "asmjit.dll", "*tensorpipe.*"
                 }
                 into("${outputDir}/native/lib")
             }
@@ -235,7 +227,7 @@ task downloadPyTorchNativeLib() {
                 }
                 into("${outputDir}/native/lib")
             }
-            if (isCentOS) {
+            if (isPrecxx11) {
                 def libstd = new File("${outputDir}/native/lib/libstdc++.so.6")
                 new URL("https://djl-ai.s3.amazonaws.com/publish/extra/libstdc%2B%2B.so.6").withInputStream {
                     i -> libstd.withOutputStream { it << i}
@@ -244,7 +236,7 @@ task downloadPyTorchNativeLib() {
             delete(file)
             delete("${outputDir}/libtorch")
         }
-        if (!isCentOS) {
+        if (!isPrecxx11) {
             new File("${BINARY_ROOT}/auto").mkdirs()
         }
     }
@@ -287,7 +279,7 @@ flavorNames.each { flavor ->
                 def binaryLicenseFile = new File(metaInf, "NOTICE")
                 binaryLicenseFile.text = new URL("https://raw.githubusercontent.com/pytorch/pytorch/master/NOTICE").text
 
-                if (isCentOS) {
+                if (isPrecxx11) {
                     def libstd = new File(metaInf, "ATTRIBUTION")
                     libstd.text = new URL("https://djl-ai.s3.amazonaws.com/publish/extra/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt").text
                 }
@@ -304,7 +296,7 @@ flavorNames.each { flavor ->
     // and the native jars have to be published separately
     if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
         publishing.publications.create("${flavor}", MavenPublication) {
-            artifactId "pytorch-native-${flavor}" + (isCentOS ? "-precxx11" : "")
+            artifactId "pytorch-native-${flavor}" + (isPrecxx11 ? "-precxx11" : "")
             from components.java
             artifacts = artifactsNames
             artifact jar

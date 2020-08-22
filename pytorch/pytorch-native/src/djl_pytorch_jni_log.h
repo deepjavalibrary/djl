@@ -28,12 +28,14 @@ class Log {
  public:
   explicit Log(JNIEnv* env);
   void info(const std::string& message);
+  void debug(const std::string& message);
   void error(const std::string& message);
 
  private:
   JNIEnv* env;
   const jobject logger;
   const jmethodID info_method;
+  const jmethodID debug_method;
   const jmethodID error_method;
 };
 

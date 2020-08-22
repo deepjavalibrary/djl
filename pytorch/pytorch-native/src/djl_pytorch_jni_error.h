@@ -25,10 +25,8 @@
   }                                                                      \
   catch (const c10::Error& e) {                                          \
     jclass jexception = env->FindClass("ai/djl/engine/EngineException"); \
-    std::vector<std::string> stake_trace = e.msg_stack();                \
-    for (std::string & msg : stake_trace) {                              \
-      std::cerr << msg << std::endl;                                     \
-    }                                                                    \
+    Log log(env);                                                        \
+    log.debug(e.what());                                                 \
     env->ThrowNew(jexception, e.what_without_backtrace());               \
   }                                                                      \
   catch (const std::exception& e_) {                                     \
