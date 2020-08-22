@@ -1,5 +1,7 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "cv",
   "groupId": "ai.djl.basicdataset",
   "artifactId": "fashmnist",
   "name": "fashmnist",
@@ -38,6 +40,5 @@
         }
       }
     }
-  ],
-  "lastUpdated": "2020-06-11T21:04:12.386Z"
+  ]
 }

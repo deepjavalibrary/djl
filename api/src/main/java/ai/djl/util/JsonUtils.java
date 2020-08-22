@@ -14,6 +14,8 @@ package ai.djl.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 
 /** An interface containing Gson constants. */
 public interface JsonUtils {
@@ -22,6 +24,16 @@ public interface JsonUtils {
             new GsonBuilder()
                     .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
                     .setPrettyPrinting()
+                    .registerTypeAdapter(
+                            Double.class,
+                            (JsonSerializer<Double>)
+                                    (src, typeOfSrc, context) -> {
+                                        long v = src.longValue();
+                                        if (src.equals(Double.valueOf(String.valueOf(v)))) {
+                                            return new JsonPrimitive(v);
+                                        }
+                                        return new JsonPrimitive(src);
+                                    })
                     .create();
     Gson GSON = new GsonBuilder().create();
 }

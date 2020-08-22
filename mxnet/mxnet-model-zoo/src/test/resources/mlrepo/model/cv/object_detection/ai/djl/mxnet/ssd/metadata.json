@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/object_detection",
   "groupId": "ai.djl.mxnet",
   "artifactId": "ssd",
-  "type": "cv",
   "name": "SSD",
   "description": "Single-shot object detection",
   "website": "http://www.djl.ai/mxnet/model-zoo",
@@ -26,20 +27,23 @@
       "arguments": {
         "width": 512,
         "height": 512,
-        "threshold": 0.2
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
           "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/classes_voc.txt",
           "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
-          "size": 134,
-          "name": "classes.txt"
+          "name": "classes.txt",
+          "size": 134
         },
         "symbol": {
           "uri": "0.0.1/ssd_512_resnet50_v1-symbol.json",
           "sha1Hash": "470d2cce5abec637163daa50a4fd262943caf2c5",
-          "size": 255172,
-          "name": "ssd_512_resnet50_v1_voc-symbol.json"
+          "name": "ssd_512_resnet50_v1_voc-symbol.json",
+          "size": 255172
         },
         "parameters": {
           "uri": "0.0.1/ssd_512_resnet50_v1_voc-0000.params.gz",
@@ -61,20 +65,23 @@
       "arguments": {
         "width": 512,
         "height": 512,
-        "threshold": 0.2
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
           "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/classes_coco.txt",
           "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
-          "size": 620,
-          "name": "classes.txt"
+          "name": "classes.txt",
+          "size": 620
         },
         "symbol": {
           "uri": "0.0.1/ssd_512_vgg16_atrous-symbol.json",
           "sha1Hash": "e7b5f8f000fed56cbeb8d8d0f0d4a8d35094600a",
-          "size": 188979,
-          "name": "ssd_512_vgg16_atrous_coco-symbol.json"
+          "name": "ssd_512_vgg16_atrous_coco-symbol.json",
+          "size": 188979
         },
         "parameters": {
           "uri": "0.0.1/ssd_512_vgg16_atrous_coco-0000.params.gz",
@@ -95,20 +102,23 @@
       "arguments": {
         "width": 512,
         "height": 512,
-        "threshold": 0.2
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
           "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/classes_voc.txt",
           "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
-          "size": 134,
-          "name": "classes.txt"
+          "name": "classes.txt",
+          "size": 134
         },
         "symbol": {
           "uri": "0.0.1/ssd_512_mobilenet1.0-symbol.json",
           "sha1Hash": "42fc3b27bff6431a7107eef728f984acf3c1afad",
-          "size": 161649,
-          "name": "ssd_512_mobilenet1.0_voc-symbol.json"
+          "name": "ssd_512_mobilenet1.0_voc-symbol.json",
+          "size": 161649
         },
         "parameters": {
           "uri": "0.0.1/ssd_512_mobilenet1.0_voc-0000.params.gz",
@@ -130,20 +140,23 @@
       "arguments": {
         "width": 300,
         "height": 300,
-        "threshold": 0.2
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
           "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/classes_voc.txt",
           "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
-          "size": 134,
-          "name": "classes.txt"
+          "name": "classes.txt",
+          "size": 134
         },
         "symbol": {
           "uri": "0.0.1/ssd_300_vgg16_atrous-symbol.json",
           "sha1Hash": "2907f14ec41ff6d73f59ffd3f94c43a0d54c2db3",
-          "size": 106291,
-          "name": "ssd_300_vgg16_atrous_voc-symbol.json"
+          "name": "ssd_300_vgg16_atrous_voc-symbol.json",
+          "size": 106291
         },
         "parameters": {
           "uri": "0.0.1/ssd_300_vgg16_atrous_voc-0000.params.gz",

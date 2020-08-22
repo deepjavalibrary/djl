@@ -1,0 +1,29 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "tabular",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "airfoil",
+  "name": "Airfoil",
+  "description": "Airfoil Self-Noise Data Set",
+  "website": "https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise#",
+  "licenses": {
+    "license": {
+      "name": "UCI Citation Policy",
+      "url": "https://archive.ics.uci.edu/ml/citation_policy.html"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "1.0",
+      "snapshot": false,
+      "files": {
+        "data": {
+          "uri": "1.0/airfoil_self_noise.dat",
+          "sha1Hash": "76e5be1548fd8222e5074cf0faae75edff8cf93f",
+          "size": 59984
+        }
+      }
+    }
+  ]
+}

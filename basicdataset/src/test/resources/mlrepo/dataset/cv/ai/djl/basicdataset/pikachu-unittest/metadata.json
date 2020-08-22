@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "cv",
   "groupId": "ai.djl.basicdataset",
   "artifactId": "pikachu-unittest",
-  "type": "cv",
   "name": "PIKACHU",
   "description": "Pikachu detection dataset for unit test",
   "website": "http://www.djl.ai/basicdataset",

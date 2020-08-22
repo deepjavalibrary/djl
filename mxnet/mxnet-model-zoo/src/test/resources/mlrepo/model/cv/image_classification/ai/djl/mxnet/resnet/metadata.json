@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
   "groupId": "ai.djl.mxnet",
   "artifactId": "resnet",
-  "type": "cv",
   "name": "Resnet",
   "description": "Resnet image classification",
   "website": "http://www.djl.ai/mxnet/model-zoo",
@@ -24,7 +25,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -55,7 +59,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -86,7 +93,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -117,19 +127,22 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset_cifar10.txt",
           "sha1Hash": "107a31d7b87d44ff07d50cfceb176add6d8b9518",
-          "size": 60,
-          "name": "synset.txt"
+          "name": "synset.txt",
+          "size": 60
         },
         "symbol": {
           "uri": "0.0.1/resnet50_v1-symbol.json",
-          "name": "resnet50_v1_cifar10-symbol.json",
           "sha1Hash": "a326bd546630fa171398ea33d0136f8e43530748",
+          "name": "resnet50_v1_cifar10-symbol.json",
           "size": 31675
         },
         "parameters": {

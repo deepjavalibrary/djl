@@ -1,5 +1,7 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "nlp",
   "groupId": "ai.djl.basicdataset",
   "artifactId": "stanford-movie-review",
   "name": "stanford-movie-review",

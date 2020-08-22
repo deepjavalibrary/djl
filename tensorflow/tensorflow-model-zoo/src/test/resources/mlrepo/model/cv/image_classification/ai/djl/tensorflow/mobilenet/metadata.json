@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
   "groupId": "ai.djl.tensorflow",
   "artifactId": "mobilenet",
-  "type": "cv",
   "name": "MobileNet",
   "description": "MobileNet image classification",
   "website": "http://www.djl.ai/tensorflow/model-zoo",
@@ -23,7 +24,8 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "resize": true
       },
       "files": {
         "synset": {
@@ -33,8 +35,8 @@
         },
         "model": {
           "uri": "0.0.1/mobilenetv2.zip",
-          "name": "",
           "sha1Hash": "f3c563cb110eab25d5e2dcd23faeb715d1a026e5",
+          "name": "",
           "size": 15982749
         }
       }

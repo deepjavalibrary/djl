@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/instance_segmentation",
   "groupId": "ai.djl.mxnet",
   "artifactId": "mask_rcnn",
-  "type": "cv",
   "name": "Instance segmentation",
   "description": "Instance segmentation",
   "website": "http://www.djl.ai/mxnet/model-zoo",
@@ -21,6 +22,10 @@
         "backbone": "resnet18",
         "flavor": "v1b",
         "dataset": "coco"
+      },
+      "arguments": {
+        "normalize": true,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
@@ -48,6 +53,10 @@
         "backbone": "resnet101",
         "flavor": "v1d",
         "dataset": "coco"
+      },
+      "arguments": {
+        "normalize": true,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {

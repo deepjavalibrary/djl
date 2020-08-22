@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "nlp/question_answer",
   "groupId": "ai.djl.mxnet",
   "artifactId": "bertqa",
-  "type": "nlp",
   "name": "Question and Answer model",
   "description": "BERT QA model",
   "website": "http://www.djl.ai/mxnet/model-zoo",

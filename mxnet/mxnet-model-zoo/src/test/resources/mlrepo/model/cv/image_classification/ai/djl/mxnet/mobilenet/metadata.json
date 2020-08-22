@@ -1,11 +1,12 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
   "groupId": "ai.djl.mxnet",
   "artifactId": "mobilenet",
   "name": "MobileNet",
   "description": "MobileNet image classification model",
   "website": "http://www.djl.ai/mxnet/model-zoo",
-  "application": "cv/image_classification",
   "licenses": {
     "apache": {
       "name": "The Apache License, Version 2.0",
@@ -24,7 +25,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -55,7 +59,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -86,7 +93,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -117,7 +127,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -148,7 +161,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -179,7 +195,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -210,7 +229,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -241,7 +263,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -272,7 +297,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -303,7 +331,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {

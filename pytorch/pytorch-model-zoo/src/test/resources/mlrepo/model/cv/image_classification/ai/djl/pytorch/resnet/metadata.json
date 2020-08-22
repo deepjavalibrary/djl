@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
   "groupId": "ai.djl.pytorch",
   "artifactId": "resnet",
-  "type": "cv",
   "name": "Resnet",
   "description": "Resnet image classification",
   "website": "http://www.djl.ai/pytorch/model-zoo",
@@ -23,7 +24,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "resize": true,
+        "normalize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -48,7 +52,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "resize": true,
+        "normalize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {

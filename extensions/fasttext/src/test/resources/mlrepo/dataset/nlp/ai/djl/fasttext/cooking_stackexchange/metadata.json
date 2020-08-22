@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "nlp",
   "groupId": "ai.djl.fasttext",
   "artifactId": "cooking_stackexchange",
-  "type": "nlp",
   "name": "cooking_stackexchange",
   "description": "Contains questions from cooking.stackexchange.com and their associated tags on the site",
   "website": "http://www.djl.ai/fasttext/textclassification/cooking_stackexchange",

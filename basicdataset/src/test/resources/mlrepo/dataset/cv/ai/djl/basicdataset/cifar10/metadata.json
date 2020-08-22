@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "cv",
   "groupId": "ai.djl.basicdataset",
   "artifactId": "cifar10",
-  "type": "cv",
   "name": "CIFAR10",
   "description": "CIFAR10",
   "website": "http://www.djl.ai/basicdataset",

@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
   "groupId": "ai.djl.tensorflow",
   "artifactId": "resnet",
-  "type": "cv",
   "name": "Resnet",
   "description": "Resnet image classification",
   "website": "http://www.djl.ai/tensorflow/model-zoo",
@@ -24,7 +25,8 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "resize": true
       },
       "files": {
         "synset": {
@@ -34,8 +36,8 @@
         },
         "model": {
           "uri": "0.0.1/resnet50v1.zip",
-          "name": "",
           "sha1Hash": "d1912a3ee4a2d357d2d78f2e72394707950e82fe",
+          "name": "",
           "size": 95366354
         }
       }

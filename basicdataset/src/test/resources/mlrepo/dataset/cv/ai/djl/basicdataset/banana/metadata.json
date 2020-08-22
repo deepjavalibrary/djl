@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "cv",
   "groupId": "ai.djl.basicdataset",
   "artifactId": "banana",
-  "type": "cv",
   "name": "Banana",
   "description": "Banana detection dataset",
   "website": "http://www.djl.ai/basicdataset",

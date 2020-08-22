@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "nlp/text_classification",
   "groupId": "ai.djl.fasttext",
   "artifactId": "cooking_stackexchange",
-  "type": "nlp",
   "name": "Cooking stackexchange model",
   "description": "Cooking stackexchange model",
   "website": "http://www.djl.ai/fasttext/model-zoo",

@@ -1,5 +1,7 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "cv",
   "groupId": "ai.djl.basicdataset",
   "artifactId": "captcha",
   "name": "Captcha",
@@ -12,8 +14,8 @@
       "files": {
         "data": {
           "uri": "captchaImage.zip",
-          "name": "data",
           "sha1Hash": "575da8579b61de1b9d094f16cdfa0a8358394f45",
+          "name": "data",
           "size": 43210912
         }
       }

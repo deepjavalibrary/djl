@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/pose_estimation",
   "groupId": "ai.djl.mxnet",
   "artifactId": "simple_pose",
-  "type": "cv",
   "name": "Simple pose",
   "description": "Simple pose Pose Estimation",
   "website": "http://www.djl.ai/mxnet/model-zoo",
@@ -24,7 +25,10 @@
       },
       "arguments": {
         "width": 192,
-        "height": 256
+        "height": 256,
+        "resize": true,
+        "normalize": true,
+        "threshold": 0.2
       },
       "files": {
         "symbol": {
@@ -76,7 +80,10 @@
       },
       "arguments": {
         "width": 192,
-        "height": 256
+        "height": 256,
+        "resize": true,
+        "normalize": true,
+        "threshold": 0.2
       },
       "files": {
         "symbol": {
@@ -102,7 +109,10 @@
       },
       "arguments": {
         "width": 192,
-        "height": 256
+        "height": 256,
+        "resize": true,
+        "normalize": true,
+        "threshold": 0.2
       },
       "files": {
         "symbol": {
@@ -128,7 +138,10 @@
       },
       "arguments": {
         "width": 192,
-        "height": 256
+        "height": 256,
+        "resize": true,
+        "normalize": true,
+        "threshold": 0.2
       },
       "files": {
         "symbol": {

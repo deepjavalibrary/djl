@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
   "groupId": "ai.djl.mxnet",
   "artifactId": "mlp",
-  "type": "cv",
   "name": "MLP",
   "description": "MLP image classification",
   "website": "http://www.djl.ai/mxnet/model-zoo",
@@ -23,7 +24,10 @@
       "arguments": {
         "flag": "GRAYSCALE",
         "width": 28,
-        "height": 28
+        "height": 28,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {

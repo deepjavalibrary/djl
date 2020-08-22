@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
   "groupId": "ai.djl.zoo",
   "artifactId": "mlp",
-  "type": "cv",
   "name": "MLP",
   "description": "MLP image classification",
   "website": "http://www.djl.ai/model-zoo",
@@ -29,8 +30,8 @@
         "synset": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/synset_mnist.txt",
           "sha1Hash": "24637c71f916ff1abc46f7974cc317ff1de13ec1",
-          "size": 19,
-          "name": "synset.txt"
+          "name": "synset.txt",
+          "size": 19
         },
         "parameters": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/mlp/0.0.1/mlp-0000.params",
@@ -51,14 +52,17 @@
         "width": 28,
         "height": 28,
         "output": 10,
-        "hidden": [128, 64]
+        "hidden": [
+          128,
+          64
+        ]
       },
       "files": {
         "synset": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/synset_mnist.txt",
           "sha1Hash": "24637c71f916ff1abc46f7974cc317ff1de13ec1",
-          "size": 19,
-          "name": "synset.txt"
+          "name": "synset.txt",
+          "size": 19
         },
         "parameters": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/mlp/0.0.1/mlp-0000.params",

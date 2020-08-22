@@ -1,11 +1,12 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "nlp/sentiment_analysis",
   "groupId": "ai.djl.pytorch",
   "artifactId": "distilbert",
   "name": "traced_distilbert_sst_english",
   "description": "A distil BERT-based Sentiment Analysis model trained on SST",
   "website": "http://www.djl.ai/pytorch/model-zoo",
-  "application": "nlp/sentiment_analysis",
   "licenses": {
     "apache": {
       "name": "The Apache License, Version 2.0",

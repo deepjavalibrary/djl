@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/object_detection",
   "groupId": "ai.djl.pytorch",
   "artifactId": "ssd",
-  "type": "cv",
   "name": "Object detection",
   "description": "Faster RCNN object detection",
   "website": "http://www.djl.ai/pytorch/model-zoo",
@@ -25,7 +26,11 @@
       "arguments": {
         "width": 300,
         "height": 300,
+        "resize": true,
+        "normalize": true,
+        "rescale": true,
         "threshold": 0.4,
+        "synsetFileName": "classes.txt",
         "size": 300,
         "feat_size": [
           38,
@@ -80,8 +85,8 @@
         "classes": {
           "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/pytorch/classes_coco.txt",
           "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
-          "size": 620,
-          "name": "classes.txt"
+          "name": "classes.txt",
+          "size": 620
         },
         "model": {
           "uri": "0.0.1/ssd_300_resnet50.pt.gz",

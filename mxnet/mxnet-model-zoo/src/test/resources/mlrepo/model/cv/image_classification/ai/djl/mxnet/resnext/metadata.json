@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
   "groupId": "ai.djl.mxnet",
   "artifactId": "resnext",
-  "type": "cv",
   "name": "Resnext",
   "description": "Resnext image classification",
   "website": "http://www.djl.ai/mxnet/model-zoo",
@@ -24,7 +25,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {

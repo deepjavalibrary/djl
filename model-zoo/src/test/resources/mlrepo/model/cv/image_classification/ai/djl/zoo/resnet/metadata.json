@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
   "groupId": "ai.djl.zoo",
   "artifactId": "resnet",
-  "type": "cv",
   "name": "Resnet",
   "description": "Resnet image classification",
   "website": "http://www.djl.ai/model-zoo",
@@ -17,7 +18,16 @@
       "version": "0.0.1",
       "snapshot": false,
       "name": "resnetv1",
+      "properties": {
+        "layers": "50",
+        "flavor": "v1",
+        "dataset": "cifar10"
+      },
       "arguments": {
+        "width": 32,
+        "height": 32,
+        "centerCrop": true,
+        "resize": true,
         "numLayers": 50,
         "outSize": 10,
         "imageShape": [
@@ -26,17 +36,12 @@
           32
         ]
       },
-      "properties": {
-        "layers": "50",
-        "flavor": "v1",
-        "dataset": "cifar10"
-      },
       "files": {
         "synset": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/synset_cifar10.txt",
           "sha1Hash": "9e5321bb62ab5bb5ffb9c20fb8538c9466ce799e",
-          "size": 59,
-          "name": "synset.txt"
+          "name": "synset.txt",
+          "size": 59
         },
         "parameters": {
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/resnet/0.0.1/resnetv1-0000.params.gz",

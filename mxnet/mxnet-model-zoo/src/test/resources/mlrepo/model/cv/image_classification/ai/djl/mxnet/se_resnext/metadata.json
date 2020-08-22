@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
   "groupId": "ai.djl.mxnet",
   "artifactId": "se_resnext",
-  "type": "cv",
   "name": "Senet and Resnext",
   "description": "Senet and Resnext image classification",
   "website": "http://www.djl.ai/mxnet/model-zoo",
@@ -24,7 +25,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {
@@ -52,6 +56,13 @@
         "layers": "101",
         "flavor": "64x4d",
         "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {

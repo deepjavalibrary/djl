@@ -1,5 +1,7 @@
 {
-  "metadataVersion": 0.1,
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/object_detection",
   "groupId": "ai.djl.mxnet",
   "artifactId": "yolo",
   "name": "yolo",
@@ -20,10 +22,15 @@
         "dataset": "voc",
         "version": "3",
         "backbone": "darknet53",
-        "imageSize": 320
+        "imageSize": "320"
       },
       "arguments": {
-        "threshold": 0.2
+        "width": 450,
+        "height": 450,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
@@ -52,10 +59,15 @@
         "dataset": "voc",
         "version": "3",
         "backbone": "darknet53",
-        "imageSize": 416
+        "imageSize": "416"
       },
       "arguments": {
-        "threshold": 0.2
+        "width": 450,
+        "height": 450,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
@@ -84,10 +96,15 @@
         "dataset": "voc",
         "version": "3",
         "backbone": "mobilenet1.0",
-        "imageSize": 320
+        "imageSize": "320"
       },
       "arguments": {
-        "threshold": 0.2
+        "width": 450,
+        "height": 450,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
@@ -116,10 +133,15 @@
         "dataset": "voc",
         "version": "3",
         "backbone": "mobilenet1.0",
-        "imageSize": 416
+        "imageSize": "416"
       },
       "arguments": {
-        "threshold": 0.2
+        "width": 450,
+        "height": 450,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
@@ -148,10 +170,15 @@
         "dataset": "coco",
         "version": "3",
         "backbone": "darknet53",
-        "imageSize": 320
+        "imageSize": "320"
       },
       "arguments": {
-        "threshold": 0.2
+        "width": 450,
+        "height": 450,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
@@ -180,10 +207,15 @@
         "dataset": "coco",
         "version": "3",
         "backbone": "darknet53",
-        "imageSize": 416
+        "imageSize": "416"
       },
       "arguments": {
-        "threshold": 0.2
+        "width": 450,
+        "height": 450,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
@@ -212,10 +244,15 @@
         "dataset": "coco",
         "version": "3",
         "backbone": "darknet53",
-        "imageSize": 608
+        "imageSize": "608"
       },
       "arguments": {
-        "threshold": 0.2
+        "width": 450,
+        "height": 450,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
@@ -244,10 +281,15 @@
         "dataset": "coco",
         "version": "3",
         "backbone": "mobilenet1.0",
-        "imageSize": 320
+        "imageSize": "320"
       },
       "arguments": {
-        "threshold": 0.2
+        "width": 450,
+        "height": 450,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
@@ -276,10 +318,15 @@
         "dataset": "coco",
         "version": "3",
         "backbone": "mobilenet1.0",
-        "imageSize": 416
+        "imageSize": "416"
       },
       "arguments": {
-        "threshold": 0.2
+        "width": 450,
+        "height": 450,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
@@ -308,10 +355,15 @@
         "dataset": "coco",
         "version": "3",
         "backbone": "mobilenet1.0",
-        "imageSize": 608
+        "imageSize": "608"
       },
       "arguments": {
-        "threshold": 0.2
+        "width": 450,
+        "height": 450,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {

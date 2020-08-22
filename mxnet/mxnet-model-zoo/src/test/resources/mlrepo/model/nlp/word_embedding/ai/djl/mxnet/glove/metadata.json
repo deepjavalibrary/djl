@@ -1,0 +1,41 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "nlp/word_embedding",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "glove",
+  "name": "Glove word embeddings",
+  "description": "Word Embeddings produced using GloVe",
+  "website": "https://gluon-nlp.mxnet.io/model_zoo/word_embeddings/index.html",
+  "licenses": {
+    "license": {
+      "name": "ODC Public Domain Dedication and License",
+      "url": "https://www.opendatacommons.org/licenses/pddl/1.0/"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "glove",
+      "properties": {
+        "dimensions": "50"
+      },
+      "arguments": {
+        "unknownToken": "\u003cunk\u003e"
+      },
+      "files": {
+        "parameters": {
+          "uri": "0.0.1/glove-0000.params.gz",
+          "sha1Hash": "b7f806083cea89c36f371066b1df2f30781bf88f",
+          "size": 73333111
+        },
+        "idx_to_token": {
+          "uri": "0.0.1/idx_to_token.txt.gz",
+          "sha1Hash": "1d47c555791752866a4dcd8452f2eb6c28b62022",
+          "size": 1842598
+        }
+      }
+    }
+  ]
+}

@@ -1,11 +1,12 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
   "groupId": "ai.djl.mxnet",
   "artifactId": "inceptionv3",
   "name": "InceptionV3",
   "description": "InceptionV3 image classification model",
   "website": "http://www.djl.ai/mxnet/model-zoo",
-  "application": "cv/image_classification",
   "licenses": {
     "apache": {
       "name": "The Apache License, Version 2.0",
@@ -21,8 +22,11 @@
         "dataset": "imagenet"
       },
       "arguments": {
-        "width": 299.0,
-        "height": 299.0
+        "width": 299,
+        "height": 299,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
       },
       "files": {
         "synset": {

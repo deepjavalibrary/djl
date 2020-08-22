@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "nlp",
   "groupId": "ai.djl.basicdataset",
   "artifactId": "tatoeba_en_fr",
-  "type": "nlp",
   "name": "tatoeba_en_fr",
   "description": "English-French Translation Dataset - Tatoeba Project",
   "website": "http://www.djl.ai/basicdataset",

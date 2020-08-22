@@ -1,8 +1,9 @@
 {
-  "metadataVersion": "0.1",
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/action_recognition",
   "groupId": "ai.djl.mxnet",
   "artifactId": "action_recognition",
-  "type": "cv",
   "name": "Action Recognition",
   "description": "Action Recognition models",
   "website": "http://www.djl.ai/mxnet/model-zoo",
@@ -23,7 +24,10 @@
       },
       "arguments": {
         "width": 224,
-        "height": 224
+        "height": 224,
+        "resize": true,
+        "normalize": true,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
@@ -53,7 +57,10 @@
       },
       "arguments": {
         "width": 299,
-        "height": 299
+        "height": 299,
+        "resize": true,
+        "normalize": true,
+        "synsetFileName": "classes.txt"
       },
       "files": {
         "classes": {
