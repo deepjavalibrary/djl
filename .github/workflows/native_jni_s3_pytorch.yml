@@ -6,8 +6,6 @@ on:
     - cron:  '0 5 * * *'
 
 jobs:
-  env:
-    PYTROCH_VERSION=1.6.0
   build-pytorch-jni-cpu:
     if: github.repository == 'awslabs/djl'
     runs-on: ${{ matrix.operating-system }}
@@ -224,6 +222,6 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync jnilib s3://djl-ai/publish/pytorch-$PYTROCH_VERSION/jnilib
+          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.6.0/jnilib
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
