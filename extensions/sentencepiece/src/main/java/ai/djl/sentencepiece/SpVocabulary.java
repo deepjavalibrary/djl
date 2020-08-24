@@ -20,7 +20,6 @@ public final class SpVocabulary implements Vocabulary {
     private SpProcessor processor;
 
     // TODO: Support direct Vocabulary loading
-
     private SpVocabulary(SpProcessor processor) {
         this.processor = processor;
     }

@@ -56,4 +56,18 @@ public class SpTokenizerTest {
         String recovered = tokenizer.buildSentence(tokens);
         Assert.assertEquals(original, recovered);
     }
+
+    @Test
+    public void testEncodeDecode() throws IOException {
+        Path modelPath = Paths.get("build/test/models");
+        String prefix = "sententpiece_test_model";
+        SpTokenizer tokenizer = new SpTokenizer(modelPath, prefix);
+        String original = "Hello World";
+        SpProcessor processor = tokenizer.getProcessor();
+        int[] ids = processor.encode(original);
+        int[] expected = new int[] {151, 88, 21, 4, 321, 54, 31, 17};
+        Assert.assertEquals(ids, expected);
+        String recovered = processor.decode(ids);
+        Assert.assertEquals(recovered, original);
+    }
 }

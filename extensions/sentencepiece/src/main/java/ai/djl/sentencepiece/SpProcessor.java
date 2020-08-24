@@ -60,6 +60,14 @@ final class SpProcessor extends NativeResource {
         return SentencePieceLibrary.LIB.pieceToId(getHandle(), token);
     }
 
+    int[] encode(String sentence) {
+        return SentencePieceLibrary.LIB.encode(getHandle(), sentence);
+    }
+
+    String decode(int[] ids) {
+        return SentencePieceLibrary.LIB.decode(getHandle(), ids);
+    }
+
     @Override
     public void close() {
         SentencePieceLibrary.LIB.deleteSentencePieceProcessor(getHandle());
