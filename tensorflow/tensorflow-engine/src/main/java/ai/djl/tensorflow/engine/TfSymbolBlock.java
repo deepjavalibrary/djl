@@ -40,6 +40,8 @@ public class TfSymbolBlock implements SymbolBlock {
     private SavedModelBundle bundle;
     private MetaGraphDef metaGraphDef;
     private Session session;
+    private PairList<String, Shape> inputDescriptions;
+    private PairList<String, Shape> outputDescriptions;
 
     public TfSymbolBlock(SavedModelBundle bundle) {
         this.bundle = bundle;
@@ -61,8 +63,9 @@ public class TfSymbolBlock implements SymbolBlock {
             boolean training,
             PairList<String, Object> params) {
         Session.Runner runner = session.runner();
-        PairList<String, Shape> inputDescriptions = describeInput();
-        PairList<String, Shape> outputDescriptions = describeOutput();
+
+        describeInput();
+        describeOutput();
 
         for (int i = 0; i < inputDescriptions.size(); i++) {
             runner.feed(inputDescriptions.get(i).getKey(), ((TfNDArray) inputs.get(i)).getTensor());
@@ -125,43 +128,48 @@ public class TfSymbolBlock implements SymbolBlock {
     /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeInput() {
-        PairList<String, Shape> inputDescriptions = new PairList<>();
-        Map<String, SignatureDef> signatureDefMap = metaGraphDef.getSignatureDefMap();
-        SignatureDef servingDefault = signatureDefMap.entrySet().iterator().next().getValue();
-        for (Map.Entry<String, TensorInfo> entry : servingDefault.getInputsMap().entrySet()) {
-            TensorShapeProto shapeProto = entry.getValue().getTensorShape();
-            inputDescriptions.add(
-                    entry.getValue().getName(),
-                    new Shape(
-                            shapeProto
-                                    .getDimList()
-                                    .stream()
-                                    .mapToLong(TensorShapeProto.Dim::getSize)
-                                    .toArray()));
+        if (inputDescriptions == null) {
+            inputDescriptions = new PairList<>();
+            Map<String, SignatureDef> signatureDefMap = metaGraphDef.getSignatureDefMap();
+            SignatureDef servingDefault = signatureDefMap.entrySet().iterator().next().getValue();
+            for (Map.Entry<String, TensorInfo> entry : servingDefault.getInputsMap().entrySet()) {
+                TensorShapeProto shapeProto = entry.getValue().getTensorShape();
+                inputDescriptions.add(
+                        entry.getValue().getName(),
+                        new Shape(
+                                shapeProto
+                                        .getDimList()
+                                        .stream()
+                                        .mapToLong(TensorShapeProto.Dim::getSize)
+                                        .toArray()));
+            }
         }
         return inputDescriptions;
     }
 
     PairList<String, Shape> describeOutput() {
-        PairList<String, Shape> outputDescription = new PairList<>();
-        Map<String, SignatureDef> signatureDefMap = metaGraphDef.getSignatureDefMap();
-        SignatureDef servingDefault = signatureDefMap.entrySet().iterator().next().getValue();
-        for (Map.Entry<String, TensorInfo> entry : servingDefault.getOutputsMap().entrySet()) {
-            TensorShapeProto shapeProto = entry.getValue().getTensorShape();
-            // does not support string tensors
-            if (entry.getValue().getDtype() == org.tensorflow.proto.framework.DataType.DT_STRING) {
-                continue;
+        if (outputDescriptions == null) {
+            outputDescriptions = new PairList<>();
+            Map<String, SignatureDef> signatureDefMap = metaGraphDef.getSignatureDefMap();
+            SignatureDef servingDefault = signatureDefMap.entrySet().iterator().next().getValue();
+            for (Map.Entry<String, TensorInfo> entry : servingDefault.getOutputsMap().entrySet()) {
+                TensorShapeProto shapeProto = entry.getValue().getTensorShape();
+                // does not support string tensors
+                if (entry.getValue().getDtype()
+                        == org.tensorflow.proto.framework.DataType.DT_STRING) {
+                    continue;
+                }
+                outputDescriptions.add(
+                        entry.getValue().getName(),
+                        new Shape(
+                                shapeProto
+                                        .getDimList()
+                                        .stream()
+                                        .mapToLong(TensorShapeProto.Dim::getSize)
+                                        .toArray()));
             }
-            outputDescription.add(
-                    entry.getValue().getName(),
-                    new Shape(
-                            shapeProto
-                                    .getDimList()
-                                    .stream()
-                                    .mapToLong(TensorShapeProto.Dim::getSize)
-                                    .toArray()));
         }
-        return outputDescription;
+        return outputDescriptions;
     }
 
     /** {@inheritDoc} */
