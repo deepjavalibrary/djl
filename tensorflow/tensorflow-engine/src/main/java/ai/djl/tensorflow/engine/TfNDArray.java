@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.tensorflow.Operand;
 import org.tensorflow.Tensor;
+import org.tensorflow.ndarray.buffer.ByteDataBuffer;
+import org.tensorflow.ndarray.buffer.DataBuffers;
 import org.tensorflow.op.Ops;
 import org.tensorflow.op.core.Constant;
 import org.tensorflow.op.core.Max;
@@ -43,8 +45,6 @@ import org.tensorflow.op.core.Squeeze;
 import org.tensorflow.op.core.Sum;
 import org.tensorflow.op.math.Mean;
 import org.tensorflow.op.nn.TopK;
-import org.tensorflow.tools.buffer.ByteDataBuffer;
-import org.tensorflow.tools.buffer.DataBuffers;
 import org.tensorflow.types.TBool;
 import org.tensorflow.types.TInt64;
 import org.tensorflow.types.family.TType;
@@ -1754,8 +1754,8 @@ public class TfNDArray implements NDArray {
         return getConstant(n, jType, tf);
     }
 
-    public static org.tensorflow.tools.Shape toTfShape(Shape shape) {
-        return org.tensorflow.tools.Shape.of(shape.getShape());
+    public static org.tensorflow.ndarray.Shape toTfShape(Shape shape) {
+        return org.tensorflow.ndarray.Shape.of(shape.getShape());
     }
 
     public static ByteDataBuffer toDataBuffer(FloatBuffer buffer) {

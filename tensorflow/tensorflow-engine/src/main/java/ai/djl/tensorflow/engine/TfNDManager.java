@@ -33,12 +33,12 @@ import java.nio.file.Path;
 import org.tensorflow.EagerSession;
 import org.tensorflow.Operand;
 import org.tensorflow.Tensor;
+import org.tensorflow.ndarray.buffer.ByteDataBuffer;
+import org.tensorflow.ndarray.buffer.DataBuffers;
 import org.tensorflow.op.Ops;
 import org.tensorflow.op.core.Constant;
 import org.tensorflow.op.random.RandomStandardNormal;
 import org.tensorflow.op.random.RandomUniform;
-import org.tensorflow.tools.buffer.ByteDataBuffer;
-import org.tensorflow.tools.buffer.DataBuffers;
 import org.tensorflow.types.TBool;
 import org.tensorflow.types.TFloat32;
 import org.tensorflow.types.TInt32;
@@ -97,28 +97,28 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray create(byte[] data) {
-        org.tensorflow.tools.Shape shape = org.tensorflow.tools.Shape.of(data.length);
+        org.tensorflow.ndarray.Shape shape = org.tensorflow.ndarray.Shape.of(data.length);
         return new TfNDArray(this, TUint8.tensorOf(shape, DataBuffers.of(data)));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(float[] data) {
-        org.tensorflow.tools.Shape shape = org.tensorflow.tools.Shape.of(data.length);
+        org.tensorflow.ndarray.Shape shape = org.tensorflow.ndarray.Shape.of(data.length);
         return new TfNDArray(this, TFloat32.tensorOf(shape, DataBuffers.of(data)));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(int[] data) {
-        org.tensorflow.tools.Shape shape = org.tensorflow.tools.Shape.of(data.length);
+        org.tensorflow.ndarray.Shape shape = org.tensorflow.ndarray.Shape.of(data.length);
         return new TfNDArray(this, TInt32.tensorOf(shape, DataBuffers.of(data)));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(boolean[] data) {
-        org.tensorflow.tools.Shape shape = org.tensorflow.tools.Shape.of(data.length);
+        org.tensorflow.ndarray.Shape shape = org.tensorflow.ndarray.Shape.of(data.length);
         return new TfNDArray(this, TBool.tensorOf(shape, DataBuffers.of(data)));
     }
 
@@ -347,14 +347,23 @@ public class TfNDManager extends BaseNDManager {
             return create(new Shape(0));
         }
         if (endpoint) {
+
             try (Tensor<?> tensor =
-                    tf.linSpace(tf.constant(start), tf.constant(stop), tf.constant(num))
+                    org.tensorflow.op.core.LinSpace.create(
+                                    tf.scope(),
+                                    tf.constant(start),
+                                    tf.constant(stop),
+                                    tf.constant(num))
                             .asTensor()) {
                 return new TfNDArray(this, tensor);
             }
         }
         try (Tensor<?> tensor =
-                tf.linSpace(tf.constant(start), tf.constant(stop), tf.constant(num + 1))
+                org.tensorflow.op.core.LinSpace.create(
+                                tf.scope(),
+                                tf.constant(start),
+                                tf.constant(stop),
+                                tf.constant(num + 1))
                         .asTensor()) {
             return new TfNDArray(this, tensor).get(new NDIndex(":-1"));
         }
