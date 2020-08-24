@@ -70,6 +70,5 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 
 - [Setup development environment](development/setup.md)
 - [Development guideline](development/development_guideline.md)
-- [Release process](development/release_process.md)
 
 ## [FAQ](faq.md)

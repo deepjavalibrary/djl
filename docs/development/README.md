@@ -6,7 +6,6 @@ This folder contains documentation and guides for contributors and those working
 
 - **[Setup development environment](setup.md)**
 - **[Development guideline](development_guideline.md)**
-- [Release process](release_process.md)
 - [Troubleshooting](troubleshooting.md)
 
 ## Model Zoo Guides
