@@ -190,10 +190,10 @@ task downloadPyTorchNativeLib() {
         def files = [
                 "cpu/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcpu.zip"    : "cpu/linux",
                 "cpu/libtorch-macos-${VERSION}.zip"                               : "cpu/osx",
-                "cpu/libtorch-win-shared-with-deps-${VERSION}.zip"                : "cpu/win",
+                "cpu/libtorch-win-shared-with-deps-${VERSION}%2Bcpu.zip"          : "cpu/win",
                 "cu101/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu101.zip": "cu101/linux",
                 "cu102/libtorch-cxx11-abi-shared-with-deps-${VERSION}.zip"        : "cu102/linux",
-                "cu101/libtorch-win-shared-with-deps-${VERSION}.zip"              : "cu101/win",
+                "cu101/libtorch-win-shared-with-deps-${VERSION}%2Bcu101.zip"      : "cu101/win",
                 "cu102/libtorch-win-shared-with-deps-${VERSION}.zip"              : "cu102/win"
         ]
         if (isPrecxx11) {
