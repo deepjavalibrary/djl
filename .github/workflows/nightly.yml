@@ -139,8 +139,8 @@ jobs:
       - name: Publish to snapshot repository
         run: |
           ./gradlew publish -Psnapshot
-          # Publish PyTorch Engine CentOS to snapshot repository
-          ./gradlew :pytorch:pytorch-engine:publish -Psnapshot -Pcentos
+          # Publish PyTorch Engine Precxx11 to snapshot repository
+          ./gradlew :pytorch:pytorch-engine:publish -Psnapshot -Pprecxx11
           cd bom
           ./gradlew publish -Psnapshot
         env:

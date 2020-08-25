@@ -1,6 +1,6 @@
 group "ai.djl.pytorch"
 
-boolean isCentOS = project.hasProperty("centos")
+boolean isPrecxx11 = project.hasProperty("precxx11")
 dependencies {
     api project(":api")
 
@@ -24,8 +24,8 @@ processResources {
                      "osx-cpu"  : ["pytorch.properties", "libdjl_torch.dylib"],
                      "win-cpu"  : ["pytorch.properties", "djl_torch.dll"],
         ]
-        if (isCentOS) {
-            url = url + "/centos"
+        if (isPrecxx11) {
+            url = url + "/precxx11"
             files = [
                     "linux-cpu": ["pytorch.properties", "libdjl_torch.so"],
                     "linux-cu92" : ["pytorch.properties", "libdjl_torch.so"],
@@ -64,7 +64,7 @@ test {
 publishing {
     publications {
         maven(MavenPublication) {
-            artifactId "pytorch-engine" + (isCentOS ? "-precxx11" : "")
+            artifactId "pytorch-engine" + (isPrecxx11 ? "-precxx11" : "")
             pom {
                 name = "DJL Engine Adapter for PyTorch"
                 description = "Deep Java Library (DJL) Engine Adapter for PyTorch"

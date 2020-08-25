@@ -63,7 +63,7 @@ jobs:
           name: jnilib-${{ runner.os }}-GPU
           path: pytorch/pytorch-native/jnilib
 
-  build-pytorch-jni-centos:
+  build-pytorch-jni-precxx11:
     if: github.repository == 'awslabs/djl'
     runs-on: ubuntu-latest
     container: nvidia/cuda:10.1-cudnn7-devel-centos7
@@ -88,12 +88,12 @@ jobs:
       - name: Release JNI prep
         run: |
           source scl_source enable devtoolset-7 rh-git218 || true
-          ./gradlew :pytorch:pytorch-native:releaseJNI -Pcentos
+          ./gradlew :pytorch:pytorch-native:releaseJNI -Pprecxx11
       - name: Upload compiled jni library
         uses: actions/upload-artifact@v1
         if: always()
         with:
-          name: jnilib-${{ runner.os }}-centos
+          name: jnilib-${{ runner.os }}-precxx11
           path: pytorch/pytorch-native/jnilib
 
 
@@ -176,7 +176,7 @@ jobs:
   publish:
     if: github.repository == 'awslabs/djl'
     runs-on: ubuntu-18.04
-    needs: [build-pytorch-jni-cpu, build-pytorch-jni-linux-gpu, build-pytorch-jni-windows-gpu, build-pytorch-jni-android, build-pytorch-jni-centos]
+    needs: [build-pytorch-jni-cpu, build-pytorch-jni-linux-gpu, build-pytorch-jni-windows-gpu, build-pytorch-jni-android, build-pytorch-jni-precxx11]
     steps:
       - uses: actions/checkout@v2
       - name: Download compiledJNI Mac
@@ -204,11 +204,11 @@ jobs:
         with:
           name: jnilib-Linux
           path: jnilib
-      - name: Download compiledJNI CentOS CPU/GPU
+      - name: Download compiledJNI Precxx11 CPU/GPU
         uses: actions/download-artifact@v1
         with:
-          name: jnilib-Linux-centos
-          path: jnilib/centos
+          name: jnilib-Linux-precxx11
+          path: jnilib/precxx11
       - name: Download compiledJNI Android
         uses: actions/download-artifact@v1
         with:

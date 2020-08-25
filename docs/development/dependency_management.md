@@ -62,7 +62,7 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [pytorch-native-cu101(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-gpu) | Contains PyTorch native library for Windows with CUDA 10.1 |
 | | pytorch-native-cu92(linux-x86_64) (deprecated) | Contains PyTorch native library for Linux with CUDA 9.2 |
 | | pytorch-native-cu92(win-x86_64) (deprecated) | Contains PyTorch native library for Windows with CUDA 9.2 |
-| | [pytorch-engine-precxx11](../../pytorch/pytorch-engine/README.md#for-pre-cxx11-build) | PyTorch engine adapter specific for centOS 7 and Ubuntu 14.04 |
+| | [pytorch-engine-precxx11](../../pytorch/pytorch-engine/README.md#for-pre-cxx11-build) | PyTorch engine adapter specific for precxx11 environment like CentOs 7 and Ubuntu 14.04 |
 | | [pytorch-native-cpu-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#centos-7ubuntu-1404-cpu) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
 | | [pytorch-native-cu102-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04|
 | | [pytorch-native-cu101-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |

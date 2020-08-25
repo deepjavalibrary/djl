@@ -27,8 +27,8 @@ jobs:
       - name: Publish to staging repository
         run: |
           ./gradlew publish -Pstaging
-          # Publish PyTorch Engine CentOS to staging repository
-          ./gradlew :pytorch:pytorch-engine:publish -Pstaging -Pcentos
+          # Publish PyTorch Engine precxx11 to staging repository
+          ./gradlew :pytorch:pytorch-engine:publish -Pstaging -Pprecxx11
           cd bom
           ./gradlew publish -Pstaging
         env:
