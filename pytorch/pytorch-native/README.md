@@ -48,10 +48,10 @@ Use the following task to build pytorch JNI library for GPU:
 gradlew compileJNIGPU
 ```
 
-The task will build CUDA 10.1 by default, you can change the flavor in `compileJNIGPU` to `cu92` to use CUDA 9.2.
+The task will build CUDA 10.1 by default, you can change the flavor in `compileJNIGPU` to `cu102` to use CUDA 10.2.
 
 ```
-downloadBuild("win", "cu92")
+downloadBuild("win", "cu102")
 ```
 
 ### Format C++ code

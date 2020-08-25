@@ -327,7 +327,7 @@ public final class LibUtils {
                 if (line.startsWith(flavor + '/' + os + '/')) {
                     URL url = new URL(link + '/' + line);
                     String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
-                    logger.info("Downloading {} ...", fileName);
+                    logger.info("Downloading {} ...", url);
                     try (InputStream fis = new GZIPInputStream(url.openStream())) {
                         Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
                     }
