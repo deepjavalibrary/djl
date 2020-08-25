@@ -17,8 +17,10 @@
 #include "djl_pytorch_jni_utils.h"
 
 #if defined(__ANDROID__)
-#include <caffe2/utils/threadpool/ThreadPool.h>
-#include <caffe2/utils/threadpool/ThreadPoolMobile.h>
+#ifndef USE_PTHREADPOOL
+#define USE_PTHREADPOOL
+#endif /* USE_PTHREADPOOL */
+#include <caffe2/utils/threadpool/pthreadpool-cpp.h>
 #endif
 
 // The file is the implementation for PyTorch system-wide operations
@@ -51,7 +53,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetNumThreads
     JNIEnv* env, jobject jthis, jint jthreads) {
   API_BEGIN()
 #if defined(__ANDROID__)
-  caffe2::mobile_threadpool()->setNumThreads(jthreads);
+  caffe2::pthreadpool()->set_thread_count(jthreads);
 #else
   torch::set_num_threads(jthreads);
 #endif
