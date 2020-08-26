@@ -253,16 +253,21 @@ public final class JniUtils {
     }
 
     public static PtNDArray to(PtNDArray ndArray, DataType dataType, Device device, boolean copy) {
-        return ndArray.getManager()
-                .create(
-                        PyTorchLibrary.LIB.torchTo(
-                                ndArray.getHandle(),
-                                dataType.ordinal(),
-                                new int[] {
-                                    PtDeviceType.toDeviceType(device),
-                                    device.equals(Device.cpu()) ? -1 : device.getDeviceId()
-                                },
-                                copy));
+        PtNDManager manager = ndArray.getManager();
+        // the device of the manager should always match the one in NDArray which the manager attach
+        // to
+        if (!device.equals(manager.getDevice())) {
+            manager = manager.newSubManager(device);
+        }
+        return manager.create(
+                PyTorchLibrary.LIB.torchTo(
+                        ndArray.getHandle(),
+                        dataType.ordinal(),
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
+                        copy));
     }
 
     public static PtNDArray toSparse(PtNDArray ndArray) {
