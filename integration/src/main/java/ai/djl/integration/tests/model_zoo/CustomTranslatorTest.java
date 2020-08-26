@@ -202,7 +202,7 @@ public class CustomTranslatorTest {
                         .setTypes(Input.class, Output.class)
                         .optApplication(application)
                         .optArguments(arguments)
-                        .optModelUrls(modelDir.toString())
+                        .optModelUrls(modelDir.toUri().toURL().toString())
                         .build();
 
         try (ZooModel<Input, Output> model = ModelZoo.loadModel(criteria);
@@ -221,7 +221,7 @@ public class CustomTranslatorTest {
         Criteria<Input, Output> criteria =
                 Criteria.builder()
                         .setTypes(Input.class, Output.class)
-                        .optModelUrls(modelDir.toString())
+                        .optModelUrls(modelDir.toUri().toURL().toString())
                         .build();
 
         try (ZooModel<Input, Output> model = ModelZoo.loadModel(criteria);
