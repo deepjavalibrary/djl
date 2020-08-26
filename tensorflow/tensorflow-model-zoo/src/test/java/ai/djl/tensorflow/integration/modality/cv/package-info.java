@@ -13,6 +13,6 @@
 
 /**
  * Contains integration tests for {@link ai.djl.Application.NLP} models in the {@link
- * ai.djl.mxnet.zoo.MxModelZoo}.
+ * ai.djl.tensorflow.zoo.TfModelZoo}.
  */
 package ai.djl.tensorflow.integration.modality.cv;

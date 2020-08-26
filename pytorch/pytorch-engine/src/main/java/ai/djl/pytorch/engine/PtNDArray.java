@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.internal.NDFormat;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -1222,7 +1223,7 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray toDense() {
-        if (!isSparse()) {
+        if (!isSparse() && JniUtils.getLayout(this) != 2) {
             return (PtNDArray) duplicate();
         }
         return JniUtils.toDense(this);
@@ -1260,6 +1261,12 @@ public class PtNDArray extends NativeResource implements NDArray {
     public String toString() {
         if (isReleased()) {
             return "This array is already closed";
+        }
+        // index operator in toDebugString is not supported for MKLDNN & Sparse layout
+        if (JniUtils.getLayout(this) != 0) {
+            try (NDArray tmp = toDense()) {
+                return NDFormat.format(tmp, MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
+            }
         }
         return toDebugString(MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
     }

@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("MissingJavadocMethod")
 public final class JniUtils {
 
-    @SuppressWarnings("PMD.UnusedPrivateField")
     private static final Logger logger = LoggerFactory.getLogger(JniUtils.class);
 
     private static Set<String> configs;
@@ -1034,9 +1033,11 @@ public final class JniUtils {
             return SparseFormat.DENSE;
         } else if (layout == 1) {
             return SparseFormat.COO;
-        } else {
-            throw new UnsupportedOperationException("Unsupported data format");
+        } else if (layout == 2) {
+            logger.debug("MKLDNN layout is used!");
+            return SparseFormat.DENSE;
         }
+        throw new UnsupportedOperationException("Unsupported data format");
     }
 
     public static Shape getShape(PtNDArray ndArray) {
@@ -1158,5 +1159,10 @@ public final class JniUtils {
                 rescaleGrad,
                 clipGrad,
                 momentum);
+    }
+
+    // Internal use only
+    public static int getLayout(PtNDArray array) {
+        return PyTorchLibrary.LIB.torchLayout(array.getHandle());
     }
 }
