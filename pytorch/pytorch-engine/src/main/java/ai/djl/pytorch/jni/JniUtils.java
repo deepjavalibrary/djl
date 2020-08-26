@@ -44,10 +44,14 @@ public final class JniUtils {
 
     private JniUtils() {}
 
-    private static int layoutMapper(SparseFormat fmt) {
+    private static int layoutMapper(SparseFormat fmt, Device device) {
         if (fmt == SparseFormat.DENSE) {
             // Enable MKLDNN with environment variable
-            return Boolean.getBoolean("ai.djl.pytorch.use_mkldnn") ? 2 : 0;
+            // Using MKLDNN with GPU would throw exception on libtorch
+            if (Boolean.getBoolean("ai.djl.pytorch.use_mkldnn") && !device.equals(Device.gpu())) {
+                return 2;
+            }
+            return 0;
         } else if (fmt == SparseFormat.COO) {
             return 1;
         } else {
@@ -94,7 +98,7 @@ public final class JniUtils {
             DataType dType,
             SparseFormat fmt,
             Device device) {
-        int layoutVal = layoutMapper(fmt);
+        int layoutVal = layoutMapper(fmt, device);
         return manager.create(
                 PyTorchLibrary.LIB.torchFromBlob(
                         data,
@@ -110,7 +114,7 @@ public final class JniUtils {
 
     public static PtNDArray createEmptyNdArray(
             PtNDManager manager, Shape shape, DataType dType, Device device, SparseFormat fmt) {
-        int layoutVal = layoutMapper(fmt);
+        int layoutVal = layoutMapper(fmt, device);
         return manager.create(
                 PyTorchLibrary.LIB.torchEmpty(
                         shape.getShape(),
@@ -125,7 +129,7 @@ public final class JniUtils {
 
     public static PtNDArray createZerosNdArray(
             PtNDManager manager, Shape shape, DataType dType, Device device, SparseFormat fmt) {
-        int layoutVal = layoutMapper(fmt);
+        int layoutVal = layoutMapper(fmt, device);
         return manager.create(
                 PyTorchLibrary.LIB.torchZeros(
                         shape.getShape(),
@@ -140,7 +144,7 @@ public final class JniUtils {
 
     public static PtNDArray createOnesNdArray(
             PtNDManager manager, Shape shape, DataType dType, Device device, SparseFormat fmt) {
-        int layoutVal = layoutMapper(fmt);
+        int layoutVal = layoutMapper(fmt, device);
         return manager.create(
                 PyTorchLibrary.LIB.torchOnes(
                         shape.getShape(),
@@ -160,7 +164,7 @@ public final class JniUtils {
             DataType dType,
             Device device,
             SparseFormat fmt) {
-        int layoutVal = layoutMapper(fmt);
+        int layoutVal = layoutMapper(fmt, device);
         return manager.create(
                 PyTorchLibrary.LIB.torchFull(
                         shape.getShape(),
@@ -176,7 +180,7 @@ public final class JniUtils {
 
     public static PtNDArray zerosLike(
             PtNDArray array, DataType dType, Device device, SparseFormat fmt) {
-        int layoutVal = layoutMapper(fmt);
+        int layoutVal = layoutMapper(fmt, device);
         return array.getManager()
                 .create(
                         PyTorchLibrary.LIB.torchZerosLike(
@@ -192,7 +196,7 @@ public final class JniUtils {
 
     public static PtNDArray onesLike(
             PtNDArray array, DataType dType, Device device, SparseFormat fmt) {
-        int layoutVal = layoutMapper(fmt);
+        int layoutVal = layoutMapper(fmt, device);
         return array.getManager()
                 .create(
                         PyTorchLibrary.LIB.torchOnesLike(
@@ -214,7 +218,7 @@ public final class JniUtils {
             DataType dType,
             Device device,
             SparseFormat fmt) {
-        int layoutVal = layoutMapper(fmt);
+        int layoutVal = layoutMapper(fmt, device);
         return manager.create(
                 PyTorchLibrary.LIB.torchArange(
                         start,
@@ -237,7 +241,7 @@ public final class JniUtils {
             DataType dType,
             Device device,
             SparseFormat fmt) {
-        int layoutVal = layoutMapper(fmt);
+        int layoutVal = layoutMapper(fmt, device);
         return manager.create(
                 PyTorchLibrary.LIB.torchLinspace(
                         start,
@@ -824,7 +828,7 @@ public final class JniUtils {
                         std,
                         size.getShape(),
                         dataType.ordinal(),
-                        layoutMapper(SparseFormat.DENSE),
+                        layoutMapper(SparseFormat.DENSE, device),
                         new int[] {
                             PtDeviceType.toDeviceType(device),
                             device.equals(Device.cpu()) ? -1 : device.getDeviceId()
@@ -845,7 +849,7 @@ public final class JniUtils {
                         high,
                         size.getShape(),
                         dataType.ordinal(),
-                        layoutMapper(SparseFormat.DENSE),
+                        layoutMapper(SparseFormat.DENSE, device),
                         new int[] {
                             PtDeviceType.toDeviceType(device),
                             device.equals(Device.cpu()) ? -1 : device.getDeviceId()
@@ -860,7 +864,7 @@ public final class JniUtils {
                         n,
                         m,
                         dataType.ordinal(),
-                        layoutMapper(fmt),
+                        layoutMapper(fmt, device),
                         new int[] {
                             PtDeviceType.toDeviceType(device),
                             device.equals(Device.cpu()) ? -1 : device.getDeviceId()
