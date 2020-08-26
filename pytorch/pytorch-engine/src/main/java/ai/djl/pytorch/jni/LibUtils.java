@@ -308,7 +308,7 @@ public final class LibUtils {
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
             if (flavor.startsWith("cu")
-                    && !lines.contains(flavor + '/' + os + "/native/lib/libtorch.so.gz")) {
+                    && !lines.contains(flavor + '/' + os + "/native/lib/" + libName + ".gz")) {
                 logger.warn("No matching cuda flavor for {} found: {}.", os, flavor);
                 // fallback to CPU
                 flavor = "cpu";
