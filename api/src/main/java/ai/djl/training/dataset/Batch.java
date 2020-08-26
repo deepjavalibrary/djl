@@ -51,7 +51,6 @@ public class Batch implements AutoCloseable {
     /**
      * Creates a new instance of {@code Batch} with the given manager, data and labels.
      *
-     * @param manager the {@link NDManager} to be attached to data and labels
      * @param data the {@link NDList} containing the data
      * @param labels the {@link NDList} containing the labels
      * @param size the number of {@link Record}s in the batch
@@ -59,13 +58,13 @@ public class Batch implements AutoCloseable {
      * @param labelBatchifier the {@link Batchifier} that is used to split labels
      */
     public Batch(
-            NDManager manager,
             NDList data,
             NDList labels,
             int size,
             Batchifier dataBatchifier,
             Batchifier labelBatchifier) {
-        this.manager = manager;
+        // create a temporarily NDManager that matches the device of data, labels
+        this.manager = data.head().getManager().newSubManager();
         data.attach(manager);
         labels.attach(manager);
         this.data = data;
@@ -78,7 +77,6 @@ public class Batch implements AutoCloseable {
     /**
      * Creates a new instance of {@code Batch} with the given manager, data and labels.
      *
-     * @param manager the {@link NDManager} to be attached to data and labels
      * @param data the {@link NDList} containing the data
      * @param labels the {@link NDList} containing the labels
      * @param size (batchSize) the number of {@link Record}s in the batch
@@ -87,10 +85,8 @@ public class Batch implements AutoCloseable {
      * @param progress the progress of the batch if it is part of some kind of iteration like a
      *     dataset iteration. Returns 0 if there is no iteration.
      * @param progressTotal the total or end value for the progress of the batch if it is part of
-     *     some kind of iteration like a dataset iteration. Returns 0 if there is no iteration.
      */
     public Batch(
-            NDManager manager,
             NDList data,
             NDList labels,
             int size,
@@ -98,7 +94,8 @@ public class Batch implements AutoCloseable {
             Batchifier labelBatchifier,
             long progress,
             long progressTotal) {
-        this.manager = manager;
+        // create a temporarily NDManager that matches the device of data, labels
+        this.manager = data.head().getManager().newSubManager();
         data.attach(manager);
         labels.attach(manager);
         this.data = data;
@@ -194,7 +191,6 @@ public class Batch implements AutoCloseable {
             if (data.head().getDevice().equals(devices[0])) {
                 return new Batch[] {
                     new Batch(
-                            manager,
                             data,
                             labels,
                             size,
@@ -207,15 +203,7 @@ public class Batch implements AutoCloseable {
                 NDList d = data.toDevice(devices[0], true);
                 NDList l = labels.toDevice(devices[0], true);
                 return new Batch[] {
-                    new Batch(
-                            manager,
-                            d,
-                            l,
-                            size,
-                            dataBatchifier,
-                            labelBatchifier,
-                            progress,
-                            progressTotal)
+                    new Batch(d, l, size, dataBatchifier, labelBatchifier, progress, progressTotal)
                 };
             }
         }
@@ -232,7 +220,6 @@ public class Batch implements AutoCloseable {
                     (i == splittedData.length - 1) ? (size - i * baseSplitSize) : baseSplitSize;
             splitted[i] =
                     new Batch(
-                            manager,
                             d,
                             l,
                             subSize,

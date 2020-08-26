@@ -34,7 +34,6 @@ public class DatasetUtilsTest {
             NDArray label = manager.zeros(new Shape(6, 1));
             Batch batch =
                     new Batch(
-                            manager,
                             new NDList(data),
                             new NDList(label),
                             6,
@@ -67,7 +66,6 @@ public class DatasetUtilsTest {
             NDArray label = manager.zeros(new Shape(7, 1));
             Batch batch =
                     new Batch(
-                            manager,
                             new NDList(data),
                             new NDList(label),
                             7,
@@ -106,7 +104,6 @@ public class DatasetUtilsTest {
             NDArray label = manager.zeros(new Shape(7, 1));
             Batch batch =
                     new Batch(
-                            manager,
                             new NDList(data),
                             new NDList(label),
                             7,

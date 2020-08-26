@@ -64,7 +64,6 @@ public class VGGTest {
                 NDArray label = manager.ones(new Shape(batchSize, 1));
                 Batch batch =
                         new Batch(
-                                manager,
                                 new NDList(input),
                                 new NDList(label),
                                 batchSize,

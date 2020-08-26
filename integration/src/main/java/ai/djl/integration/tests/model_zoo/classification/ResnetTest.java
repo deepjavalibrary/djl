@@ -78,7 +78,6 @@ public class ResnetTest {
                 NDArray label = manager.ones(new Shape(batchSize, 1));
                 Batch batch =
                         new Batch(
-                                manager,
                                 new NDList(input),
                                 new NDList(label),
                                 batchSize,
@@ -135,7 +134,6 @@ public class ResnetTest {
                 NDArray label = manager.ones(outputShape[0]);
                 Batch batch =
                         new Batch(
-                                manager,
                                 new NDList(data),
                                 new NDList(label),
                                 batchSize,
