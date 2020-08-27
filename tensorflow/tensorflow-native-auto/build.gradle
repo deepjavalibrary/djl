@@ -114,6 +114,10 @@ task uploadTensorflowNativeLibs() {
 }
 
 jar {
+    // this line is to enforce gradle to build the jar
+    // otherwise it don't generate the placeholder jar at times
+    // when there is no java code inside src/main
+    outputs.dir file("build/libs")
     doFirst {
         def dir = file("${project.buildDir}/classes/java/main/native/lib")
         dir.mkdirs();

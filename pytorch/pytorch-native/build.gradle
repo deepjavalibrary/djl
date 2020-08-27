@@ -130,6 +130,10 @@ task compileJNIGPU {
 // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
 jar {
     def placeholder = "${project.buildDir}/placeholder"
+    // this line is to enforce gradle to build the jar
+    // otherwise it don't generate the placeholder jar at times
+    // when there is no java code inside src/main
+    outputs.dir file("build/libs")
     doFirst {
         def versionName = project.version
         if (!isRelease) {
