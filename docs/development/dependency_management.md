@@ -64,9 +64,6 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | pytorch-native-cu92(win-x86_64) (deprecated) | Contains PyTorch native library for Windows with CUDA 9.2 |
 | | [pytorch-engine-precxx11](../../pytorch/pytorch-engine/README.md#for-pre-cxx11-build) | PyTorch engine adapter specific for precxx11 environment like CentOs 7 and Ubuntu 14.04 |
 | | [pytorch-native-cpu-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#centos-7ubuntu-1404-cpu) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
-| | [pytorch-native-cu102-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04|
-| | [pytorch-native-cu101-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
-| | pytorch-native-cu92-precxx11(linux-x86_64) (deprecated) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
 | | | |
 | [ai.djl.tensorflow](https://search.maven.org/search?q=g:ai.djl.tensorflow) | [tensorflow-engine](../../tensorflow/tensorflow-engine/README.md#installation) | TensorFlow engine adapter |
 | | [tensorflow-model-zoo](../../tensorflow/tensorflow-model-zoo/README.md#installation) | Contains state of the art TensorFlow saved bundle models |

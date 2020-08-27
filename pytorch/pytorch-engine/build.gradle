@@ -30,10 +30,9 @@ processResources {
         ]
         if (isPrecxx11) {
             url = url + "/precxx11"
+            // precxx11 only support cpu for now
             files = [
                     "linux-cpu": ["pytorch.properties", "libdjl_torch.so"],
-                    "linux-cu101" : ["pytorch.properties", "libdjl_torch.so"],
-                    "linux-cu102" : ["pytorch.properties", "libdjl_torch.so"],
             ]
         }
         def classesDir = "${project.buildDir}/jnilib"

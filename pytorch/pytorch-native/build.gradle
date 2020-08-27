@@ -204,10 +204,9 @@ task downloadPyTorchNativeLib() {
                 "cu102/libtorch-win-shared-with-deps-${VERSION}.zip"              : "cu102/win"
         ]
         if (isPrecxx11) {
+            // precxx11 only support cpu for now
             files = [
                     "cpu/libtorch-shared-with-deps-${VERSION}%2Bcpu.zip"    : "cpu/linux",
-                    "cu101/libtorch-shared-with-deps-${VERSION}%2Bcu101.zip": "cu101/linux",
-                    "cu102/libtorch-shared-with-deps-${VERSION}.zip"        : "cu102/linux",
             ]
         }
         files.each { entry ->
