@@ -149,13 +149,6 @@ For the native packages:
 
 - ai.djl.pytorch:pytorch-native-cpu-precxx11:1.5.0-post0:linux-x86_64
 
-#### centOS 7/Ubuntu 14.04 GPU
-
-- ai.djl.pytorch:pytorch-native-cu102-precxx11:1.5.0-post0:linux-x86_64 - CUDA 10.2
-- ai.djl.pytorch:pytorch-native-cu101-precxx11:1.5.0-post0:linux-x86_64 - CUDA 10.1
-- ai.djl.pytorch:pytorch-native-cu92-precxx11:1.5.0-post0:linux-x86_64 - CUDA 9.2
-
-
 ### Windows
 
 For the Windows platform, you can choose between CPU and GPU.

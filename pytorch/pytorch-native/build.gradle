@@ -91,10 +91,13 @@ task releaseJNI {
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
             downloadBuild("linux", "cpu", isPrecxx11)
             cleanBuild()
-            downloadBuild("linux", "cu101", isPrecxx11)
-            cleanBuild()
-            downloadBuild("linux", "cu102", isPrecxx11)
-            cleanBuild()
+            // centos only support CPU for now
+            if (!isPrecxx11) {
+                downloadBuild("linux", "cu101", isPrecxx11)
+                cleanBuild()
+                downloadBuild("linux", "cu102", isPrecxx11)
+                cleanBuild()
+            }
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
         }
@@ -234,13 +237,17 @@ task downloadPyTorchNativeLib() {
             if (isPrecxx11) {
                 def libstd = new File("${outputDir}/native/lib/libstdc++.so.6")
                 new URL("https://djl-ai.s3.amazonaws.com/publish/extra/libstdc%2B%2B.so.6").withInputStream {
-                    i -> libstd.withOutputStream { it << i}
+                    i -> libstd.withOutputStream { it << i }
+                }
+            } else {
+                // gzip all files to upload to s3
+                // precxx11 would not take gzip format, therefore skip it
+                fileTree("${outputDir}/native/lib/").exclude("*.gz", "pytorch.properties").each {
+                    f ->
+                        ant.gzip(src: f.absolutePath, destfile: f.absolutePath + ".gz")
+                        delete(f)
                 }
             }
-            // gzip all files
-            fileTree("${outputDir}/native/lib/").exclude("*.gz", "pytorch.properties").each {
-                f -> ant.gzip(src: f.absolutePath, destfile: f.absolutePath + ".gz")
-                    delete(f) }
             delete(file)
             delete("${outputDir}/libtorch")
         }
