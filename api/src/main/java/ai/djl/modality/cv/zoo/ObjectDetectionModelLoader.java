@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.mxnet.zoo.cv.objectdetection;
+package ai.djl.modality.cv.zoo;
 
 import ai.djl.Application;
 import ai.djl.Device;
@@ -24,12 +24,12 @@ import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
 import ai.djl.modality.cv.translator.wrapper.FileTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.UrlTranslatorFactory;
-import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
@@ -57,20 +57,29 @@ import java.util.Map;
  *
  * <p>Today, SSD is not typically used in favor of newer models which outperform it.
  */
-public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, DetectedObjects> {
+public class ObjectDetectionModelLoader extends BaseModelLoader {
 
     private static final Application APPLICATION = Application.CV.OBJECT_DETECTION;
-    private static final String GROUP_ID = MxModelZoo.GROUP_ID;
-    private static final String ARTIFACT_ID = "ssd";
-    private static final String VERSION = "0.0.1";
+
+    protected static final float[] MEAN = {0.485f, 0.456f, 0.406f};
+    protected static final float[] STD = {0.229f, 0.224f, 0.225f};
 
     /**
      * Creates the Model loader from the given repository.
      *
      * @param repository the repository to load the model from
+     * @param groupId the group id of the model
+     * @param artifactId the artifact id of the model
+     * @param version the version number of the model
+     * @param modelZoo the modelZoo type that is being used to get supported engine types
      */
-    public SingleShotDetectionModelLoader(Repository repository) {
-        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION, new MxModelZoo());
+    public ObjectDetectionModelLoader(
+            Repository repository,
+            String groupId,
+            String artifactId,
+            String version,
+            ModelZoo modelZoo) {
+        super(repository, MRL.model(APPLICATION, groupId, artifactId), version, modelZoo);
         FactoryImpl factory = new FactoryImpl();
 
         factories.put(new Pair<>(Image.class, DetectedObjects.class), factory);
@@ -85,6 +94,33 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
     }
 
     /**
+     * Loads the model.
+     *
+     * @return the loaded model
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     * @throws MalformedModelException if the model data is malformed
+     */
+    public ZooModel<Image, DetectedObjects> loadModel()
+            throws MalformedModelException, ModelNotFoundException, IOException {
+        return loadModel(null, null, null);
+    }
+
+    /**
+     * Loads the model.
+     *
+     * @param progress the progress tracker to update while loading the model
+     * @return the loaded model
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     * @throws MalformedModelException if the model data is malformed
+     */
+    public ZooModel<Image, DetectedObjects> loadModel(Progress progress)
+            throws MalformedModelException, ModelNotFoundException, IOException {
+        return loadModel(null, null, progress);
+    }
+
+    /**
      * Loads the model with the given search filters.
      *
      * @param filters the search filters to match against the loaded model
@@ -95,13 +131,15 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
      * @throws ModelNotFoundException if no model with the specified criteria is found
      * @throws MalformedModelException if the model data is malformed
      */
-    @Override
     public ZooModel<Image, DetectedObjects> loadModel(
             Map<String, String> filters, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException {
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, DetectedObjects.class)
+                        .optModelZoo(modelZoo)
+                        .optGroupId(resource.getMrl().getGroupId())
+                        .optArtifactId(resource.getMrl().getArtifactId())
                         .optFilters(filters)
                         .optDevice(device)
                         .optProgress(progress)
@@ -118,14 +156,19 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
             int width = ((Double) arguments.getOrDefault("width", 512d)).intValue();
             int height = ((Double) arguments.getOrDefault("height", 512d)).intValue();
             double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
+            String synsetFileName = (String) arguments.getOrDefault("synsetFileName", "synset.txt");
 
-            return SingleShotDetectionTranslator.builder()
-                    .addTransform(new Resize(width, height))
-                    .addTransform(new ToTensor())
-                    .optSynsetArtifactName("classes.txt")
-                    .optThreshold((float) threshold)
-                    .optRescaleSize(width, height)
-                    .build();
+            SingleShotDetectionTranslator.Builder builder = SingleShotDetectionTranslator.builder();
+            if ((Boolean) arguments.getOrDefault("resize", false)) {
+                builder.addTransform(new Resize(width, height));
+            }
+            builder.addTransform(new ToTensor())
+                    .optSynsetArtifactName(synsetFileName)
+                    .optThreshold((float) threshold);
+            if ((Boolean) arguments.getOrDefault("rescale", false)) {
+                builder.optRescaleSize(width, height);
+            }
+            return builder.build();
         }
     }
 }

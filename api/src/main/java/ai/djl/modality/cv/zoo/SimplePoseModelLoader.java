@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.mxnet.zoo.cv.poseestimation;
+package ai.djl.modality.cv.zoo;
 
 import ai.djl.Application;
 import ai.djl.Device;
@@ -25,12 +25,12 @@ import ai.djl.modality.cv.translator.SimplePoseTranslator;
 import ai.djl.modality.cv.translator.wrapper.FileTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.UrlTranslatorFactory;
-import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
@@ -47,15 +47,10 @@ import java.util.Map;
  *
  * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
  * href="https://arxiv.org/pdf/1804.06208.pdf">Simple Pose</a>.
- *
- * @see ai.djl.mxnet.engine.MxSymbolBlock
  */
-public class SimplePoseModelLoader extends BaseModelLoader<Image, Joints> {
+public class SimplePoseModelLoader extends BaseModelLoader {
 
     private static final Application APPLICATION = Application.CV.POSE_ESTIMATION;
-    private static final String GROUP_ID = MxModelZoo.GROUP_ID;
-    private static final String ARTIFACT_ID = "simple_pose";
-    private static final String VERSION = "0.0.1";
 
     private static final float[] MEAN = {0.485f, 0.456f, 0.406f};
     private static final float[] STD = {0.229f, 0.224f, 0.225f};
@@ -64,9 +59,18 @@ public class SimplePoseModelLoader extends BaseModelLoader<Image, Joints> {
      * Creates the Model loader from the given repository.
      *
      * @param repository the repository to load the model from
+     * @param groupId the group id of the model
+     * @param artifactId the artifact id of the model
+     * @param version the version number of the model
+     * @param modelZoo the modelZoo type that is being used to get supported engine types
      */
-    public SimplePoseModelLoader(Repository repository) {
-        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION, new MxModelZoo());
+    public SimplePoseModelLoader(
+            Repository repository,
+            String groupId,
+            String artifactId,
+            String version,
+            ModelZoo modelZoo) {
+        super(repository, MRL.model(APPLICATION, groupId, artifactId), version, modelZoo);
         FactoryImpl factory = new FactoryImpl();
 
         factories.put(new Pair<>(Image.class, Joints.class), factory);
@@ -75,6 +79,33 @@ public class SimplePoseModelLoader extends BaseModelLoader<Image, Joints> {
         factories.put(
                 new Pair<>(InputStream.class, Joints.class),
                 new InputStreamTranslatorFactory<>(factory));
+    }
+
+    /**
+     * Loads the model.
+     *
+     * @return the loaded model
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     * @throws MalformedModelException if the model data is malformed
+     */
+    public ZooModel<Image, Joints> loadModel()
+            throws MalformedModelException, ModelNotFoundException, IOException {
+        return loadModel(null, null, null);
+    }
+
+    /**
+     * Loads the model.
+     *
+     * @param progress the progress tracker to update while loading the model
+     * @return the loaded model
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     * @throws MalformedModelException if the model data is malformed
+     */
+    public ZooModel<Image, Joints> loadModel(Progress progress)
+            throws MalformedModelException, ModelNotFoundException, IOException {
+        return loadModel(null, null, progress);
     }
 
     /**
@@ -88,13 +119,15 @@ public class SimplePoseModelLoader extends BaseModelLoader<Image, Joints> {
      * @throws ModelNotFoundException if no model with the specified criteria is found
      * @throws MalformedModelException if the model data is malformed
      */
-    @Override
     public ZooModel<Image, Joints> loadModel(
             Map<String, String> filters, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException {
         Criteria<Image, Joints> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, Joints.class)
+                        .optModelZoo(modelZoo)
+                        .optGroupId(resource.getMrl().getGroupId())
+                        .optArtifactId(resource.getMrl().getArtifactId())
                         .optFilters(filters)
                         .optDevice(device)
                         .optProgress(progress)

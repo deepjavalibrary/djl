@@ -13,12 +13,11 @@
 
 package ai.djl.tensorflow.zoo;
 
+import ai.djl.modality.cv.zoo.ImageClassificationModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.tensorflow.engine.TfEngine;
-import ai.djl.tensorflow.zoo.cv.classification.MobileNet;
-import ai.djl.tensorflow.zoo.cv.classification.Resnet;
-import ai.djl.tensorflow.zoo.cv.objectdetction.SingleShotDetectionModelLoader;
+import ai.djl.tensorflow.zoo.cv.objectdetction.TfSsdModelLoader;
 import java.util.Collections;
 import java.util.Set;
 
@@ -30,12 +29,15 @@ public class TfModelZoo implements ModelZoo {
 
     private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
     private static final Repository REPOSITORY = Repository.newInstance("TensorFlow", DJL_REPO_URL);
+    private static final TfModelZoo ZOO = new TfModelZoo();
     public static final String GROUP_ID = "ai.djl.tensorflow";
 
-    public static final Resnet RESNET = new Resnet(REPOSITORY);
-    public static final MobileNet MOBILENET = new MobileNet(REPOSITORY);
-    public static final SingleShotDetectionModelLoader SSD =
-            new SingleShotDetectionModelLoader(REPOSITORY);
+    public static final ImageClassificationModelLoader RESNET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "resnet", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader MOBILENET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "mobilenet", "0.0.1", ZOO);
+    public static final TfSsdModelLoader SSD =
+            new TfSsdModelLoader(REPOSITORY, GROUP_ID, "ssd", "0.0.1", ZOO);
 
     /** {@inheritDoc} */
     @Override

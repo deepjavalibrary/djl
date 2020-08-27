@@ -40,7 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /** Shared code for the {@link ModelLoader} implementations. */
-public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
+public class BaseModelLoader implements ModelLoader {
 
     protected Map<Pair<Type, Type>, TranslatorFactory<?, ?>> factories;
     protected ModelZoo modelZoo;
@@ -66,13 +66,19 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
 
     /** {@inheritDoc} */
     @Override
-    public Resource getResource() {
-        return resource;
+    public String getArtifactId() {
+        return resource.getMrl().getArtifactId();
     }
 
     /** {@inheritDoc} */
     @Override
-    public <S, T> ZooModel<S, T> loadModel(Criteria<S, T> criteria)
+    public Application getApplication() {
+        return resource.getMrl().getApplication();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, O> ZooModel<I, O> loadModel(Criteria<I, O> criteria)
             throws IOException, ModelNotFoundException, MalformedModelException {
         Artifact artifact = resource.match(criteria.getFilters());
         if (artifact == null) {
@@ -84,7 +90,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
         Map<String, Object> arguments = artifact.getArguments(override);
 
         try {
-            TranslatorFactory<S, T> factory = criteria.getTranslatorFactory();
+            TranslatorFactory<I, O> factory = criteria.getTranslatorFactory();
             if (factory == null) {
                 factory = getTranslatorFactory(criteria);
                 if (factory == null) {
@@ -138,7 +144,7 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
             if (application != Application.UNDEFINED) {
                 arguments.put("application", application.getPath());
             }
-            Translator<S, T> translator = factory.newInstance(model, arguments);
+            Translator<I, O> translator = factory.newInstance(model, arguments);
             return new ZooModel<>(model, translator);
         } catch (TranslateException e) {
             throw new ModelNotFoundException("No matching translator found.", e);
@@ -191,8 +197,8 @@ public abstract class BaseModelLoader<I, O> implements ModelLoader<I, O> {
     }
 
     @SuppressWarnings("unchecked")
-    private <S, T> TranslatorFactory<S, T> getTranslatorFactory(Criteria<S, T> criteria) {
-        return (TranslatorFactory<S, T>)
+    private <I, O> TranslatorFactory<I, O> getTranslatorFactory(Criteria<I, O> criteria) {
+        return (TranslatorFactory<I, O>)
                 factories.get(new Pair<>(criteria.getInputClass(), criteria.getOutputClass()));
     }
 }

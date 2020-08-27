@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,29 +10,26 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-
-package ai.djl.basicmodelzoo.cv.object_detection.ssd;
+package ai.djl.modality.cv.zoo;
 
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
+import ai.djl.modality.cv.translator.InstanceSegmentationTranslator;
 import ai.djl.modality.cv.translator.wrapper.FileTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.UrlTranslatorFactory;
-import ai.djl.nn.Block;
-import ai.djl.nn.SequentialBlock;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
@@ -42,30 +39,37 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-/** Model loader for SingleShotDetection(SSD). */
-public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, DetectedObjects> {
+/**
+ * Model loader for Instance Segmentation models.
+ *
+ * <p>The model was trained on Gluon and loaded in DJL in MXNet Symbol Block. See <a
+ * href="https://arxiv.org/pdf/1703.06870.pdf">Mask R-CNN used in the model</a>.
+ */
+public class InstanceSegmentationModelLoader extends BaseModelLoader {
 
-    private static final Application APPLICATION = Application.CV.OBJECT_DETECTION;
-    private static final String GROUP_ID = BasicModelZoo.GROUP_ID;
-    private static final String ARTIFACT_ID = "ssd";
-    private static final String VERSION = "0.0.1";
+    private static final Application APPLICATION = Application.CV.INSTANCE_SEGMENTATION;
+
+    private static final float[] MEAN = {0.485f, 0.456f, 0.406f};
+    private static final float[] STD = {0.229f, 0.224f, 0.225f};
 
     /**
      * Creates the Model loader from the given repository.
      *
      * @param repository the repository to load the model from
+     * @param groupId the group id of the model
+     * @param artifactId the artifact id of the model
+     * @param version the version number of the model
+     * @param modelZoo the modelZoo type that is being used to get supported engine types
      */
-    public SingleShotDetectionModelLoader(Repository repository) {
-        super(
-                repository,
-                MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID),
-                VERSION,
-                new BasicModelZoo());
+    public InstanceSegmentationModelLoader(
+            Repository repository,
+            String groupId,
+            String artifactId,
+            String version,
+            ModelZoo modelZoo) {
+        super(repository, MRL.model(APPLICATION, groupId, artifactId), version, modelZoo);
         FactoryImpl factory = new FactoryImpl();
 
         factories.put(new Pair<>(Image.class, DetectedObjects.class), factory);
@@ -80,6 +84,33 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
     }
 
     /**
+     * Loads the model.
+     *
+     * @return the loaded model
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     * @throws MalformedModelException if the model data is malformed
+     */
+    public ZooModel<Image, DetectedObjects> loadModel()
+            throws MalformedModelException, ModelNotFoundException, IOException {
+        return loadModel(null, null, null);
+    }
+
+    /**
+     * Loads the model.
+     *
+     * @param progress the progress tracker to update while loading the model
+     * @return the loaded model
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     * @throws MalformedModelException if the model data is malformed
+     */
+    public ZooModel<Image, DetectedObjects> loadModel(Progress progress)
+            throws MalformedModelException, ModelNotFoundException, IOException {
+        return loadModel(null, null, progress);
+    }
+
+    /**
      * Loads the model with the given search filters.
      *
      * @param filters the search filters to match against the loaded model
@@ -90,74 +121,20 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
      * @throws ModelNotFoundException if no model with the specified criteria is found
      * @throws MalformedModelException if the model data is malformed
      */
-    @Override
     public ZooModel<Image, DetectedObjects> loadModel(
             Map<String, String> filters, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException {
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, DetectedObjects.class)
+                        .optModelZoo(modelZoo)
+                        .optGroupId(resource.getMrl().getGroupId())
+                        .optArtifactId(resource.getMrl().getArtifactId())
                         .optFilters(filters)
                         .optDevice(device)
                         .optProgress(progress)
                         .build();
         return loadModel(criteria);
-    }
-
-    @SuppressWarnings("unchecked")
-    private Block customSSDBlock(Map<String, Object> arguments) {
-        int numClasses = ((Double) arguments.get("outSize")).intValue();
-        int numFeatures = ((Double) arguments.get("numFeatures")).intValue();
-        boolean globalPool = (boolean) arguments.get("globalPool");
-        int[] numFilters =
-                ((List<Double>) arguments.get("numFilters"))
-                        .stream()
-                        .mapToInt(Double::intValue)
-                        .toArray();
-        List<Float> ratio =
-                ((List<Double>) arguments.get("ratios"))
-                        .stream()
-                        .map(Double::floatValue)
-                        .collect(Collectors.toList());
-        List<List<Float>> sizes =
-                ((List<List<Double>>) arguments.get("sizes"))
-                        .stream()
-                        .map(
-                                size ->
-                                        size.stream()
-                                                .map(Double::floatValue)
-                                                .collect(Collectors.toList()))
-                        .collect(Collectors.toList());
-        List<List<Float>> ratios = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            ratios.add(ratio);
-        }
-        SequentialBlock baseBlock = new SequentialBlock();
-        for (int numFilter : numFilters) {
-            baseBlock.add(SingleShotDetection.getDownSamplingBlock(numFilter));
-        }
-
-        return SingleShotDetection.builder()
-                .setNumClasses(numClasses)
-                .setNumFeatures(numFeatures)
-                .optGlobalPool(globalPool)
-                .setRatios(ratios)
-                .setSizes(sizes)
-                .setBaseNetwork(baseBlock)
-                .build();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected Model createModel(
-            String name,
-            Device device,
-            Artifact artifact,
-            Map<String, Object> arguments,
-            String engine) {
-        Model model = Model.newInstance(name, device, engine);
-        model.setBlock(customSSDBlock(arguments));
-        return model;
     }
 
     private static final class FactoryImpl implements TranslatorFactory<Image, DetectedObjects> {
@@ -166,9 +143,10 @@ public class SingleShotDetectionModelLoader extends BaseModelLoader<Image, Detec
         @Override
         public Translator<Image, DetectedObjects> newInstance(
                 Model model, Map<String, Object> arguments) {
-            return SingleShotDetectionTranslator.builder()
+            return InstanceSegmentationTranslator.builder()
                     .addTransform(new ToTensor())
-                    .optThreshold(((Double) arguments.get("threshold")).floatValue())
+                    .addTransform(new Normalize(MEAN, STD))
+                    .optSynsetArtifactName("classes.txt")
                     .build();
         }
     }

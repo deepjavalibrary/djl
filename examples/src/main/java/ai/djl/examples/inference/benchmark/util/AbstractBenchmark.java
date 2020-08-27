@@ -253,7 +253,7 @@ public abstract class AbstractBenchmark {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected ZooModel<?, ?> loadModel(Arguments arguments, Metrics metrics)
-            throws ModelException, IOException, ClassNotFoundException {
+            throws ModelException, IOException {
         long begin = System.nanoTime();
         String artifactId = arguments.getArtifactId();
         Class<?> input = arguments.getInputClass();

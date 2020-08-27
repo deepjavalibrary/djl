@@ -14,7 +14,9 @@ package ai.djl.integration.tests.model_zoo;
 
 import ai.djl.Model;
 import ai.djl.ModelException;
+import ai.djl.ndarray.NDList;
 import ai.djl.repository.Artifact;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooProvider;
@@ -52,10 +54,15 @@ public class ModelZooTest {
         for (ZooProvider provider : providers) {
             ModelZoo zoo = provider.getModelZoo();
             if (zoo != null) {
-                for (ModelLoader<?, ?> modelLoader : zoo.getModelLoaders()) {
+                for (ModelLoader modelLoader : zoo.getModelLoaders()) {
                     List<Artifact> artifacts = modelLoader.listModels();
                     for (Artifact artifact : artifacts) {
-                        Model model = modelLoader.loadModel(artifact.getProperties());
+                        Criteria<NDList, NDList> criteria =
+                                Criteria.builder()
+                                        .setTypes(NDList.class, NDList.class)
+                                        .optFilters(artifact.getProperties())
+                                        .build();
+                        Model model = modelLoader.loadModel(criteria);
                         model.close();
                     }
                     Utils.deleteQuietly(Paths.get("build/cache"));

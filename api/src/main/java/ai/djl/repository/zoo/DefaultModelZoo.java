@@ -28,7 +28,7 @@ public class DefaultModelZoo implements ModelZoo {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultModelZoo.class);
 
-    private List<ModelLoader<?, ?>> modelLoaders;
+    private List<ModelLoader> modelLoaders;
 
     /**
      * Creates the {@code LocalModelZoo} instance from the given search locations.
@@ -44,7 +44,7 @@ public class DefaultModelZoo implements ModelZoo {
                 logger.debug("Scanning models in repo: {}, {}", repo.getClass(), url);
                 List<MRL> mrls = repo.getResources();
                 for (MRL mrl : mrls) {
-                    modelLoaders.add(new DefaultModelLoader(repo, mrl));
+                    modelLoaders.add(new BaseModelLoader(repo, mrl, null, null));
                 }
             } else {
                 logger.warn("Model location is empty.");
@@ -54,7 +54,7 @@ public class DefaultModelZoo implements ModelZoo {
 
     /** {@inheritDoc} */
     @Override
-    public List<ModelLoader<?, ?>> getModelLoaders() {
+    public List<ModelLoader> getModelLoaders() {
         return modelLoaders;
     }
 

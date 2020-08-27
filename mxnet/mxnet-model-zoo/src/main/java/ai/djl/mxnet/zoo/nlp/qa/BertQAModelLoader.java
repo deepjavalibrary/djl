@@ -42,7 +42,7 @@ import java.util.Map;
  *
  * @see ai.djl.mxnet.engine.MxSymbolBlock
  */
-public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
+public class BertQAModelLoader extends BaseModelLoader {
 
     private static final Application APPLICATION = Application.NLP.QUESTION_ANSWER;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
@@ -70,7 +70,6 @@ public class BertQAModelLoader extends BaseModelLoader<QAInput, String> {
      * @throws ModelNotFoundException if no model with the specified criteria is found
      * @throws MalformedModelException if the model data is malformed
      */
-    @Override
     public ZooModel<QAInput, String> loadModel(
             Map<String, String> filters, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException {

@@ -28,6 +28,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class SingleShotDetectionTest {
+
     @Test
     public void testClassPredictorBlocks() {
         try (NDManager manager = NDManager.newBaseManager()) {

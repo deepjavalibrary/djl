@@ -13,130 +13,40 @@
 package ai.djl.repository.zoo;
 
 import ai.djl.Application;
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.repository.Artifact;
-import ai.djl.repository.Resource;
-import ai.djl.util.Progress;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
-/**
- * A ModelLoader loads a particular {@link ZooModel} from a Repository for a model zoo.
- *
- * @param <I> the input data type
- * @param <O> the output data type
- */
-public interface ModelLoader<I, O> {
-
-    /**
-     * Returns the {@code Resource} of the {@code ModelLoader}.
-     *
-     * @return the {@code Resource} of the {@code ModelLoader}
-     */
-    Resource getResource();
+/** A ModelLoader loads a particular {@link ZooModel} from a Repository for a model zoo. */
+public interface ModelLoader {
 
     /**
      * Returns the artifact ID of the {@code ModelLoader}.
      *
      * @return the artifact ID of the {@code ModelLoader}
      */
-    default String getArtifactId() {
-        return getResource().getMrl().getArtifactId();
-    }
+    String getArtifactId();
 
     /**
      * Returns the application of the {@code ModelLoader}.
      *
      * @return the application of the {@code ModelLoader}
      */
-    default Application getApplication() {
-        return getResource().getMrl().getApplication();
-    }
+    Application getApplication();
 
     /**
      * Loads the model with the given criteria.
      *
-     * @param <S> the input data type
-     * @param <T> the output data type
+     * @param <I> the input data type
+     * @param <O> the output data type
      * @param criteria the criteria to match against the loaded model
      * @return the loaded model
      * @throws IOException for various exceptions loading data from the repository
      * @throws ModelNotFoundException if no model with the specified criteria is found
      * @throws MalformedModelException if the model data is malformed
      */
-    <S, T> ZooModel<S, T> loadModel(Criteria<S, T> criteria)
-            throws IOException, ModelNotFoundException, MalformedModelException;
-
-    /**
-     * Loads the model.
-     *
-     * @return the loaded model
-     * @throws IOException for various exceptions loading data from the repository
-     * @throws ModelNotFoundException if no model with the specified criteria is found
-     * @throws MalformedModelException if the model data is malformed
-     */
-    default ZooModel<I, O> loadModel()
-            throws MalformedModelException, ModelNotFoundException, IOException {
-        return loadModel(null, null, null);
-    }
-
-    /**
-     * Loads the model.
-     *
-     * @param progress the progress tracker to update while loading the model
-     * @return the loaded model
-     * @throws IOException for various exceptions loading data from the repository
-     * @throws ModelNotFoundException if no model with the specified criteria is found
-     * @throws MalformedModelException if the model data is malformed
-     */
-    default ZooModel<I, O> loadModel(Progress progress)
-            throws MalformedModelException, ModelNotFoundException, IOException {
-        return loadModel(null, null, progress);
-    }
-
-    /**
-     * Loads the model with the given search filters.
-     *
-     * @param filters the search filters to match against the loaded model
-     * @return the loaded model
-     * @throws IOException for various exceptions loading data from the repository
-     * @throws ModelNotFoundException if no model with the specified criteria is found
-     * @throws MalformedModelException if the model data is malformed
-     */
-    default ZooModel<I, O> loadModel(Map<String, String> filters)
-            throws MalformedModelException, ModelNotFoundException, IOException {
-        return loadModel(filters, null, null);
-    }
-
-    /**
-     * Loads the model with the given search filters.
-     *
-     * @param filters the search filters to match against the loaded model
-     * @param progress the progress tracker to update while loading the model
-     * @return the loaded model
-     * @throws IOException for various exceptions loading data from the repository
-     * @throws ModelNotFoundException if no model with the specified criteria is found
-     * @throws MalformedModelException if the model data is malformed
-     */
-    default ZooModel<I, O> loadModel(Map<String, String> filters, Progress progress)
-            throws MalformedModelException, ModelNotFoundException, IOException {
-        return loadModel(filters, null, progress);
-    }
-
-    /**
-     * Loads the model with the given search filters.
-     *
-     * @param filters the search filters to match against the loaded model
-     * @param device the device the loaded model should use
-     * @param progress the progress tracker to update while loading the model
-     * @return the loaded model
-     * @throws IOException for various exceptions loading data from the repository
-     * @throws ModelNotFoundException if no model with the specified criteria is found
-     * @throws MalformedModelException if the model data is malformed
-     */
-    ZooModel<I, O> loadModel(Map<String, String> filters, Device device, Progress progress)
+    <I, O> ZooModel<I, O> loadModel(Criteria<I, O> criteria)
             throws IOException, ModelNotFoundException, MalformedModelException;
 
     /**

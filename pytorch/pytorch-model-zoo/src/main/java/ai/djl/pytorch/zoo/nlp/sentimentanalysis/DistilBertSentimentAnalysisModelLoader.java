@@ -40,8 +40,8 @@ import java.util.Map;
  *
  * @see ai.djl.pytorch.engine.PtSymbolBlock
  */
-public class DistilBertSentimentAnalysisModelLoader
-        extends BaseModelLoader<String, Classifications> {
+public class DistilBertSentimentAnalysisModelLoader extends BaseModelLoader {
+
     private static final Application APPLICATION = Application.NLP.SENTIMENT_ANALYSIS;
     private static final String GROUP_ID = PtModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "distilbert";
@@ -57,8 +57,17 @@ public class DistilBertSentimentAnalysisModelLoader
         factories.put(new Pair<>(String.class, Classifications.class), new FactoryImpl());
     }
 
-    /** {@inheritDoc} */
-    @Override
+    /**
+     * Loads the model with the given search filters.
+     *
+     * @param filters the search filters to match against the loaded model
+     * @param device the device the loaded model should use
+     * @param progress the progress tracker to update while loading the model
+     * @return the loaded model
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     * @throws MalformedModelException if the model data is malformed
+     */
     public ZooModel<String, Classifications> loadModel(
             Map<String, String> filters, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException {

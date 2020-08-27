@@ -12,9 +12,9 @@
  */
 package ai.djl.pytorch.zoo;
 
+import ai.djl.modality.cv.zoo.ImageClassificationModelLoader;
 import ai.djl.pytorch.engine.PtEngine;
-import ai.djl.pytorch.zoo.cv.classification.Resnet;
-import ai.djl.pytorch.zoo.cv.objectdetection.SingleShotDetectionModelLoader;
+import ai.djl.pytorch.zoo.cv.objectdetection.PtSsdModelLoader;
 import ai.djl.pytorch.zoo.nlp.qa.BertQAModelLoader;
 import ai.djl.pytorch.zoo.nlp.sentimentanalysis.DistilBertSentimentAnalysisModelLoader;
 import ai.djl.repository.Repository;
@@ -30,11 +30,14 @@ public class PtModelZoo implements ModelZoo {
 
     private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
     private static final Repository REPOSITORY = Repository.newInstance("PyTorch", DJL_REPO_URL);
+    private static final PtModelZoo ZOO = new PtModelZoo();
     public static final String GROUP_ID = "ai.djl.pytorch";
 
-    public static final Resnet RESNET = new Resnet(REPOSITORY);
-    public static final SingleShotDetectionModelLoader SSD =
-            new SingleShotDetectionModelLoader(REPOSITORY);
+    public static final ImageClassificationModelLoader RESNET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "resnet", "0.0.1", ZOO);
+    public static final PtSsdModelLoader SSD =
+            new PtSsdModelLoader(REPOSITORY, GROUP_ID, "ssd", "0.0.1", ZOO);
+
     public static final BertQAModelLoader BERT_QA = new BertQAModelLoader(REPOSITORY);
 
     public static final DistilBertSentimentAnalysisModelLoader DB_SENTIMENT_ANALYSIS =

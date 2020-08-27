@@ -36,7 +36,6 @@ import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
-import ai.djl.util.Progress;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.util.List;
@@ -46,7 +45,7 @@ import java.util.Map;
  * A {@link ai.djl.repository.zoo.ModelLoader} for a {@link WordEmbedding} based on <a
  * href="https://nlp.stanford.edu/projects/glove/">GloVe</a>.
  */
-public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDList> {
+public class GloveWordEmbeddingModelLoader extends BaseModelLoader {
 
     private static final Application APPLICATION = NLP.WORD_EMBEDDING;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
@@ -96,18 +95,20 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader<NDList, NDLis
         return customGloveBlock(model, artifact, arguments);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public ZooModel<NDList, NDList> loadModel(
-            Map<String, String> filters, Device device, Progress progress)
+    /**
+     * Loads the model with the given search filters.
+     *
+     * @return the loaded model
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     * @throws MalformedModelException if the model data is malformed
+     */
+    public ZooModel<NDList, NDList> loadModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)
                         .optApplication(NLP.WORD_EMBEDDING)
-                        .optFilters(filters)
-                        .optDevice(device)
-                        .optProgress(progress)
                         .build();
         return loadModel(criteria);
     }

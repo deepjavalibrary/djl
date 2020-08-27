@@ -45,13 +45,13 @@ public interface ModelZoo {
      *
      * @return the list of all available model families
      */
-    default List<ModelLoader<?, ?>> getModelLoaders() {
-        List<ModelLoader<?, ?>> list = new ArrayList<>();
+    default List<ModelLoader> getModelLoaders() {
+        List<ModelLoader> list = new ArrayList<>();
         try {
             Field[] fields = getClass().getDeclaredFields();
             for (Field field : fields) {
                 if (ModelLoader.class.isAssignableFrom(field.getType())) {
-                    list.add((ModelLoader<?, ?>) field.get(null));
+                    list.add((ModelLoader) field.get(null));
                 }
             }
         } catch (ReflectiveOperationException e) {
@@ -66,8 +66,8 @@ public interface ModelZoo {
      * @param name the name of the model
      * @return the {@link ModelLoader} of the model
      */
-    default ModelLoader<?, ?> getModelLoader(String name) {
-        for (ModelLoader<?, ?> loader : getModelLoaders()) {
+    default ModelLoader getModelLoader(String name) {
+        for (ModelLoader loader : getModelLoaders()) {
             if (name.equals(loader.getArtifactId())) {
                 return loader;
             }
@@ -139,7 +139,7 @@ public interface ModelZoo {
 
         for (ModelZoo zoo : list) {
             String loaderGroupId = zoo.getGroupId();
-            for (ModelLoader<?, ?> loader : zoo.getModelLoaders()) {
+            for (ModelLoader loader : zoo.getModelLoaders()) {
                 Application app = loader.getApplication();
                 String loaderArtifactId = loader.getArtifactId();
                 logger.debug(
@@ -192,8 +192,8 @@ public interface ModelZoo {
             if (zoo == null) {
                 continue;
             }
-            List<ModelLoader<?, ?>> list = zoo.getModelLoaders();
-            for (ModelLoader<?, ?> loader : list) {
+            List<ModelLoader> list = zoo.getModelLoaders();
+            for (ModelLoader loader : list) {
                 Application app = loader.getApplication();
                 final List<Artifact> artifacts = loader.listModels();
                 models.compute(

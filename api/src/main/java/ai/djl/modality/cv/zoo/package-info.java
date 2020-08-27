@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -12,7 +12,7 @@
  */
 
 /**
- * Contains classes for the {@link ai.djl.Application.CV#INSTANCE_SEGMENTATION} models in the {@link
- * ai.djl.mxnet.zoo.MxModelZoo}.
+ * Contains standard {@link ai.djl.repository.zoo.ModelLoader}s for the {@link
+ * ai.djl.Application.CV} application.
  */
-package ai.djl.mxnet.zoo.cv.segmentation;
+package ai.djl.modality.cv.zoo;

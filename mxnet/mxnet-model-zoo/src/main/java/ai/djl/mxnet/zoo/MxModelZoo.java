@@ -12,27 +12,13 @@
  */
 package ai.djl.mxnet.zoo;
 
+import ai.djl.modality.cv.zoo.ActionRecognitionModelLoader;
+import ai.djl.modality.cv.zoo.ImageClassificationModelLoader;
+import ai.djl.modality.cv.zoo.InstanceSegmentationModelLoader;
+import ai.djl.modality.cv.zoo.ObjectDetectionModelLoader;
+import ai.djl.modality.cv.zoo.SimplePoseModelLoader;
+import ai.djl.modality.cv.zoo.YoloModelLoader;
 import ai.djl.mxnet.engine.MxEngine;
-import ai.djl.mxnet.zoo.cv.actionrecognition.ActionRecognitionModelLoader;
-import ai.djl.mxnet.zoo.cv.classification.Alexnet;
-import ai.djl.mxnet.zoo.cv.classification.Darknet;
-import ai.djl.mxnet.zoo.cv.classification.Densenet;
-import ai.djl.mxnet.zoo.cv.classification.Googlenet;
-import ai.djl.mxnet.zoo.cv.classification.InceptionV3;
-import ai.djl.mxnet.zoo.cv.classification.MlpModelLoader;
-import ai.djl.mxnet.zoo.cv.classification.Mobilenet;
-import ai.djl.mxnet.zoo.cv.classification.Resnest;
-import ai.djl.mxnet.zoo.cv.classification.Resnet;
-import ai.djl.mxnet.zoo.cv.classification.Resnext;
-import ai.djl.mxnet.zoo.cv.classification.SeResnext;
-import ai.djl.mxnet.zoo.cv.classification.Senet;
-import ai.djl.mxnet.zoo.cv.classification.Squeezenet;
-import ai.djl.mxnet.zoo.cv.classification.Vgg;
-import ai.djl.mxnet.zoo.cv.classification.Xception;
-import ai.djl.mxnet.zoo.cv.objectdetection.SingleShotDetectionModelLoader;
-import ai.djl.mxnet.zoo.cv.objectdetection.YoloModelLoader;
-import ai.djl.mxnet.zoo.cv.poseestimation.SimplePoseModelLoader;
-import ai.djl.mxnet.zoo.cv.segmentation.InstanceSegmentationModelLoader;
 import ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingModelLoader;
 import ai.djl.mxnet.zoo.nlp.qa.BertQAModelLoader;
 import ai.djl.repository.Repository;
@@ -49,32 +35,51 @@ public class MxModelZoo implements ModelZoo {
     private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
     private static final Repository REPOSITORY = Repository.newInstance("MXNet", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.mxnet";
+    private static final MxModelZoo ZOO = new MxModelZoo();
 
-    public static final SingleShotDetectionModelLoader SSD =
-            new SingleShotDetectionModelLoader(REPOSITORY);
-    public static final YoloModelLoader YOLO = new YoloModelLoader(REPOSITORY);
+    public static final ObjectDetectionModelLoader SSD =
+            new ObjectDetectionModelLoader(REPOSITORY, GROUP_ID, "ssd", "0.0.1", ZOO);
+    public static final YoloModelLoader YOLO =
+            new YoloModelLoader(REPOSITORY, GROUP_ID, "yolo", "0.0.1", ZOO);
 
-    public static final Alexnet ALEXNET = new Alexnet(REPOSITORY);
-    public static final Darknet DARKNET = new Darknet(REPOSITORY);
-    public static final Densenet DENSENET = new Densenet(REPOSITORY);
-    public static final Googlenet GOOGLENET = new Googlenet(REPOSITORY);
-    public static final InceptionV3 INCEPTIONV3 = new InceptionV3(REPOSITORY);
-    public static final MlpModelLoader MLP = new MlpModelLoader(REPOSITORY);
-    public static final Mobilenet MOBILENET = new Mobilenet(REPOSITORY);
-    public static final Resnest RESNEST = new Resnest(REPOSITORY);
-    public static final Resnet RESNET = new Resnet(REPOSITORY);
-    public static final Resnext RESNEXT = new Resnext(REPOSITORY);
-    public static final Senet SENET = new Senet(REPOSITORY);
-    public static final SeResnext SE_RESNEXT = new SeResnext(REPOSITORY);
-    public static final Squeezenet SQUEEZENET = new Squeezenet(REPOSITORY);
-    public static final Vgg VGG = new Vgg(REPOSITORY);
-    public static final Xception XCEPTION = new Xception(REPOSITORY);
+    public static final ImageClassificationModelLoader ALEXNET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "alexnet", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader DARKNET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "darknet", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader DENSENET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "densenet", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader GOOGLENET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "googlenet", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader INCEPTIONV3 =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "inceptionv3", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader MLP =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "mlp", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader MOBILENET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "mobilenet", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader RESNEST =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "resnest", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader RESNET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "resnet", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader RESNEXT =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "resnext", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader SENET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "senet", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader SE_RESNEXT =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "se_resnext", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader SQUEEZENET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "squeezenet", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader VGG =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "vgg", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader XCEPTION =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "xception", "0.0.1", ZOO);
 
-    public static final SimplePoseModelLoader SIMPLE_POSE = new SimplePoseModelLoader(REPOSITORY);
+    public static final SimplePoseModelLoader SIMPLE_POSE =
+            new SimplePoseModelLoader(REPOSITORY, GROUP_ID, "simple_pose", "0.0.1", ZOO);
     public static final InstanceSegmentationModelLoader MASK_RCNN =
-            new InstanceSegmentationModelLoader(REPOSITORY);
+            new InstanceSegmentationModelLoader(REPOSITORY, GROUP_ID, "mask_rcnn", "0.0.1", ZOO);
     public static final ActionRecognitionModelLoader ACTION_RECOGNITION =
-            new ActionRecognitionModelLoader(REPOSITORY);
+            new ActionRecognitionModelLoader(
+                    REPOSITORY, GROUP_ID, "action_recognition", "0.0.1", ZOO);
     public static final BertQAModelLoader BERT_QA = new BertQAModelLoader(REPOSITORY);
     public static final GloveWordEmbeddingModelLoader GLOVE =
             new GloveWordEmbeddingModelLoader(REPOSITORY);

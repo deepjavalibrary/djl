@@ -14,7 +14,7 @@ package ai.djl.basicmodelzoo;
 
 import ai.djl.basicmodelzoo.cv.classification.MlpModelLoader;
 import ai.djl.basicmodelzoo.cv.classification.ResNetModelLoader;
-import ai.djl.basicmodelzoo.cv.object_detection.ssd.SingleShotDetectionModelLoader;
+import ai.djl.basicmodelzoo.cv.object_detection.ssd.SsdModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 import java.util.HashSet;
@@ -29,8 +29,7 @@ public class BasicModelZoo implements ModelZoo {
 
     public static final ResNetModelLoader RESNET = new ResNetModelLoader(REPOSITORY);
     public static final MlpModelLoader MLP = new MlpModelLoader(REPOSITORY);
-    public static final SingleShotDetectionModelLoader SSD =
-            new SingleShotDetectionModelLoader(REPOSITORY);
+    public static final SsdModelLoader SSD = new SsdModelLoader(REPOSITORY);
 
     /** {@inheritDoc} */
     @Override
