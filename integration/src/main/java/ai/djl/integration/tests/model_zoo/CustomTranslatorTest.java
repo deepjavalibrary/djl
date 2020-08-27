@@ -115,7 +115,7 @@ public class CustomTranslatorTest {
         arguments.put("width", "28");
         arguments.put("height", "28");
         arguments.put("flag", Image.Flag.GRAYSCALE.name());
-        arguments.put("softmax", "true");
+        arguments.put("applySoftmax", "true");
         runImageClassification(Application.CV.IMAGE_CLASSIFICATION, arguments);
 
         Path libDir = modelDir.resolve("lib");
@@ -127,7 +127,7 @@ public class CustomTranslatorTest {
         prop.put("width", "28");
         prop.put("height", "28");
         prop.put("flag", Image.Flag.GRAYSCALE.name());
-        prop.put("softmax", "true");
+        prop.put("applySoftmax", "true");
         Path confFile = modelDir.resolve("serving.properties");
         try (Writer writer = Files.newBufferedWriter(confFile)) {
             prop.store(writer, "");
@@ -173,7 +173,11 @@ public class CustomTranslatorTest {
                         .setTypes(Input.class, Output.class)
                         .optApplication(Application.CV.OBJECT_DETECTION)
                         .optModelUrls(modelUrl)
-                        .optArgument("synset", "classes.txt")
+                        .optArgument("width", 512)
+                        .optArgument("height", 512)
+                        .optArgument("resize", true)
+                        .optArgument("rescale", true)
+                        .optArgument("synsetFileName", "classes.txt")
                         .optModelName("ssd_512_resnet50_v1_voc")
                         .build();
 

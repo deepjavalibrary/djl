@@ -21,6 +21,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /** A translator for yolo models. */
 public class YoloTranslator extends ObjectDetectionTranslator {
@@ -76,8 +77,22 @@ public class YoloTranslator extends ObjectDetectionTranslator {
         return new Builder();
     }
 
+    /**
+     * Creates a builder to build a {@code YoloTranslator} with specified arguments.
+     *
+     * @param arguments arguments to specify builder options
+     * @return a new builder
+     */
+    public static Builder builder(Map<String, Object> arguments) {
+        Builder builder = new Builder();
+        builder.configPreProcess(arguments);
+        builder.configPostProcess(arguments);
+
+        return builder;
+    }
+
     /** The builder for {@link YoloTranslator}. */
-    public static class Builder extends BaseBuilder<Builder> {
+    public static class Builder extends ObjectDetectionBuilder<Builder> {
 
         /** {@inheritDoc} */
         @Override

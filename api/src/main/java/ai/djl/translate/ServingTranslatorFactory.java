@@ -14,14 +14,10 @@ package ai.djl.translate;
 
 import ai.djl.Application;
 import ai.djl.Model;
-import ai.djl.modality.Classifications;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.transform.CenterCrop;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
 import ai.djl.ndarray.NDList;
@@ -198,39 +194,11 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
 
     private Translator<Input, Output> getImageClassificationTranslator(
             Map<String, Object> arguments) {
-        int width = getOrDefault(arguments, "width", 224).intValue();
-        int height = getOrDefault(arguments, "height", 224).intValue();
-        String flag = arguments.getOrDefault("flag", Image.Flag.COLOR.name()).toString();
-        boolean softmax = Boolean.parseBoolean(arguments.getOrDefault("softmax", false).toString());
-
-        Translator<Image, Classifications> translator =
-                ImageClassificationTranslator.builder()
-                        .optFlag(Image.Flag.valueOf(flag))
-                        .addTransform(new CenterCrop())
-                        .addTransform(new Resize(width, height))
-                        .addTransform(new ToTensor())
-                        .optApplySoftmax(softmax)
-                        .build();
-        return new ImageServingTranslator(translator);
+        return new ImageServingTranslator(ImageClassificationTranslator.builder(arguments).build());
     }
 
     private Translator<Input, Output> getSsdTranslator(Map<String, Object> arguments) {
-        int width = getOrDefault(arguments, "width", 512).intValue();
-        int height = getOrDefault(arguments, "height", 512).intValue();
-        double threshold = getOrDefault(arguments, "threshold", 0.2d);
-        String flag = arguments.getOrDefault("flag", Image.Flag.COLOR.name()).toString();
-        String synset = arguments.getOrDefault("synset", "synset.txt").toString();
-
-        SingleShotDetectionTranslator translator =
-                SingleShotDetectionTranslator.builder()
-                        .optFlag(Image.Flag.valueOf(flag))
-                        .addTransform(new Resize(width, height))
-                        .addTransform(new ToTensor())
-                        .optThreshold((float) threshold)
-                        .optRescaleSize(width, height)
-                        .optSynsetArtifactName(synset)
-                        .build();
-        return new ImageServingTranslator(translator);
+        return new ImageServingTranslator(SingleShotDetectionTranslator.builder(arguments).build());
     }
 
     private void compileJavaClass(Path dir) {
@@ -251,15 +219,6 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
         } catch (Throwable e) {
             logger.warn("Failed to compile bundled java file", e);
         }
-    }
-
-    private static Double getOrDefault(
-            Map<String, Object> arguments, String key, double defaultValue) {
-        Object value = arguments.get(key);
-        if (value == null) {
-            return defaultValue;
-        }
-        return Double.valueOf(value.toString());
     }
 
     private static final class ImageServingTranslator implements Translator<Input, Output> {
@@ -321,7 +280,7 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
 
         /** {@inheritDoc} */
         @Override
-        public NDList processInput(TranslatorContext ctx, Input input) throws IOException {
+        public NDList processInput(TranslatorContext ctx, Input input) {
             ctx.setAttachment("input", input);
             PairList<String, byte[]> inputs = input.getContent();
             byte[] data = inputs.get("data");

@@ -15,16 +15,12 @@ package ai.djl.pytorch.zoo.cv.objectdetection;
 import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.transform.Normalize;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.zoo.ObjectDetectionModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -64,52 +60,7 @@ public class PtSsdModelLoader extends ObjectDetectionModelLoader {
         @SuppressWarnings("unchecked")
         public Translator<Image, DetectedObjects> newInstance(
                 Model model, Map<String, Object> arguments) {
-            int width = ((Double) arguments.getOrDefault("width", 300)).intValue();
-            int height = ((Double) arguments.getOrDefault("height", 300)).intValue();
-            double threshold = (Double) arguments.getOrDefault("threshold", 0.4d);
-            int figSize = ((Double) arguments.getOrDefault("size", 300)).intValue();
-            int[] featSize;
-            List<Double> list = (List<Double>) arguments.get("feat_size");
-            if (list == null) {
-                featSize = new int[] {38, 19, 10, 5, 3, 1};
-            } else {
-                featSize = list.stream().mapToInt(Double::intValue).toArray();
-            }
-            int[] steps;
-            list = (List<Double>) arguments.get("steps");
-            if (list == null) {
-                steps = new int[] {8, 16, 32, 64, 100, 300};
-            } else {
-                steps = list.stream().mapToInt(Double::intValue).toArray();
-            }
-
-            int[] scale;
-            list = (List<Double>) arguments.get("scale");
-            if (list == null) {
-                scale = new int[] {21, 45, 99, 153, 207, 261, 315};
-            } else {
-                scale = list.stream().mapToInt(Double::intValue).toArray();
-            }
-
-            int[][] aspectRatio;
-            List<List<Double>> ratio = (List<List<Double>>) arguments.get("aspect_ratios");
-            if (ratio == null) {
-                aspectRatio = new int[][] {{2}, {2, 3}, {2, 3}, {2, 3}, {2}, {2}};
-            } else {
-                aspectRatio = new int[ratio.size()][];
-                for (int i = 0; i < aspectRatio.length; ++i) {
-                    aspectRatio[i] = ratio.get(i).stream().mapToInt(Double::intValue).toArray();
-                }
-            }
-
-            return PtSSDTranslator.builder()
-                    .setBoxes(figSize, featSize, steps, scale, aspectRatio)
-                    .addTransform(new Resize(width, height))
-                    .addTransform(new ToTensor())
-                    .addTransform(new Normalize(MEAN, STD))
-                    .optSynsetArtifactName("classes.txt")
-                    .optThreshold((float) threshold)
-                    .build();
+            return PtSsdTranslator.builder(arguments).build();
         }
     }
 }

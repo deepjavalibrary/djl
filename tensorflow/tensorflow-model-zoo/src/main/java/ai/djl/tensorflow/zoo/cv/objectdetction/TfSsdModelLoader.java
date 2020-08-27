@@ -15,8 +15,6 @@ package ai.djl.tensorflow.zoo.cv.objectdetction;
 import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.zoo.ObjectDetectionModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
@@ -67,29 +65,7 @@ public class TfSsdModelLoader extends ObjectDetectionModelLoader {
         public Translator<Image, DetectedObjects> newInstance(
                 Model model, Map<String, Object> arguments) {
 
-            int width = ((Double) arguments.getOrDefault("width", 256)).intValue();
-            int height = ((Double) arguments.getOrDefault("height", 256)).intValue();
-            double threshold = (Double) arguments.getOrDefault("threshold", 0.4d);
-            int maxBoxes = (Integer) arguments.getOrDefault("maxBoxes", 10);
-            String boundingBoxOutputName =
-                    (String) arguments.getOrDefault("boundingBoxOutputName", "detection_boxes");
-            String scoresOutputName =
-                    (String) arguments.getOrDefault("scoresOutputName", "detection_scores");
-            String classLabelOutputName =
-                    (String)
-                            arguments.getOrDefault(
-                                    "classLabelOutputName", "detection_class_labels");
-
-            return TfSsdTranslator.builder()
-                    .optMaxBoxes(maxBoxes)
-                    .optScoresOutputName(scoresOutputName)
-                    .optBoundingBoxOutputName(boundingBoxOutputName)
-                    .optClassLabelOutputName(classLabelOutputName)
-                    .optThreshold((float) threshold)
-                    .optSynsetArtifactName("classes.txt")
-                    .addTransform(new Resize(width, height))
-                    .addTransform(new ToTensor())
-                    .build();
+            return TfSsdTranslator.builder(arguments).build();
         }
     }
 }

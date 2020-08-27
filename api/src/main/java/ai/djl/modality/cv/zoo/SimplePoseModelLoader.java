@@ -18,9 +18,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.Joints;
-import ai.djl.modality.cv.transform.Normalize;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.SimplePoseTranslator;
 import ai.djl.modality.cv.translator.wrapper.FileTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslatorFactory;
@@ -51,9 +48,6 @@ import java.util.Map;
 public class SimplePoseModelLoader extends BaseModelLoader {
 
     private static final Application APPLICATION = Application.CV.POSE_ESTIMATION;
-
-    private static final float[] MEAN = {0.485f, 0.456f, 0.406f};
-    private static final float[] STD = {0.229f, 0.224f, 0.225f};
 
     /**
      * Creates the Model loader from the given repository.
@@ -140,16 +134,8 @@ public class SimplePoseModelLoader extends BaseModelLoader {
         /** {@inheritDoc} */
         @Override
         public Translator<Image, Joints> newInstance(Model model, Map<String, Object> arguments) {
-            int width = ((Double) arguments.getOrDefault("width", 192d)).intValue();
-            int height = ((Double) arguments.getOrDefault("height", 256d)).intValue();
-            double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
-
-            return SimplePoseTranslator.builder()
-                    .addTransform(new Resize(width, height))
-                    .addTransform(new ToTensor())
-                    .addTransform(new Normalize(MEAN, STD))
-                    .optThreshold((float) threshold)
-                    .build();
+            // default size: 192
+            return SimplePoseTranslator.builder(arguments).build();
         }
     }
 }

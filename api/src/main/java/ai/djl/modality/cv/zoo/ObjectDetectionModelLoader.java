@@ -18,8 +18,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
 import ai.djl.modality.cv.translator.wrapper.FileTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslatorFactory;
@@ -60,9 +58,6 @@ import java.util.Map;
 public class ObjectDetectionModelLoader extends BaseModelLoader {
 
     private static final Application APPLICATION = Application.CV.OBJECT_DETECTION;
-
-    protected static final float[] MEAN = {0.485f, 0.456f, 0.406f};
-    protected static final float[] STD = {0.229f, 0.224f, 0.225f};
 
     /**
      * Creates the Model loader from the given repository.
@@ -153,22 +148,7 @@ public class ObjectDetectionModelLoader extends BaseModelLoader {
         @Override
         public Translator<Image, DetectedObjects> newInstance(
                 Model model, Map<String, Object> arguments) {
-            int width = ((Double) arguments.getOrDefault("width", 512d)).intValue();
-            int height = ((Double) arguments.getOrDefault("height", 512d)).intValue();
-            double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
-            String synsetFileName = (String) arguments.getOrDefault("synsetFileName", "synset.txt");
-
-            SingleShotDetectionTranslator.Builder builder = SingleShotDetectionTranslator.builder();
-            if ((Boolean) arguments.getOrDefault("resize", false)) {
-                builder.addTransform(new Resize(width, height));
-            }
-            builder.addTransform(new ToTensor())
-                    .optSynsetArtifactName(synsetFileName)
-                    .optThreshold((float) threshold);
-            if ((Boolean) arguments.getOrDefault("rescale", false)) {
-                builder.optRescaleSize(width, height);
-            }
-            return builder.build();
+            return SingleShotDetectionTranslator.builder(arguments).build();
         }
     }
 }

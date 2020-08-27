@@ -16,7 +16,7 @@ import ai.djl.Model;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
-import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
+import ai.djl.modality.cv.translator.ObjectDetectionTranslator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -30,11 +30,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A {@link PtSSDTranslator} that post-process the {@link NDArray} into {@link DetectedObjects} with
+ * A {@link PtSsdTranslator} that post-process the {@link NDArray} into {@link DetectedObjects} with
  * boundaries. Reference implementation: <a
  * href="https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/Detection/SSD">SSD</a>.
  */
-public class PtSSDTranslator extends SingleShotDetectionTranslator {
+public class PtSsdTranslator extends ObjectDetectionTranslator {
 
     private NDArray boxRecover;
     private int figSize;
@@ -48,7 +48,7 @@ public class PtSSDTranslator extends SingleShotDetectionTranslator {
      *
      * @param builder the builder for the translator
      */
-    protected PtSSDTranslator(Builder builder) {
+    protected PtSsdTranslator(Builder builder) {
         super(builder);
         this.figSize = builder.figSize;
         this.featSize = builder.featSize;
@@ -185,8 +185,22 @@ public class PtSSDTranslator extends SingleShotDetectionTranslator {
         return new Builder();
     }
 
+    /**
+     * Creates a builder to build a {@code PtSSDTranslatorBuilder} with specified arguments.
+     *
+     * @param arguments arguments to specify builder options
+     * @return a new builder
+     */
+    public static Builder builder(Map<String, Object> arguments) {
+        Builder builder = new Builder();
+        builder.configPreProcess(arguments);
+        builder.configPostProcess(arguments);
+
+        return builder;
+    }
+
     /** The builder for SSD translator. */
-    public static class Builder extends SingleShotDetectionTranslator.Builder {
+    public static class Builder extends ObjectDetectionBuilder<Builder> {
 
         private int figSize;
         private int[] featSize;
@@ -214,15 +228,65 @@ public class PtSSDTranslator extends SingleShotDetectionTranslator {
             return this;
         }
 
+        /** {@inheritDoc} */
+        @Override
+        protected Builder self() {
+            return null;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected void configPreProcess(Map<String, Object> arguments) {
+            super.configPreProcess(arguments);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        @SuppressWarnings("unchecked")
+        protected void configPostProcess(Map<String, Object> arguments) {
+            super.configPostProcess(arguments);
+
+            threshold = getFloatValue(arguments, "threshold", 0.4f);
+            figSize = getIntValue(arguments, "size", 300);
+            List<Double> list = (List<Double>) arguments.get("featSize");
+            if (list == null) {
+                featSize = new int[] {38, 19, 10, 5, 3, 1};
+            } else {
+                featSize = list.stream().mapToInt(Double::intValue).toArray();
+            }
+            list = (List<Double>) arguments.get("steps");
+            if (list == null) {
+                steps = new int[] {8, 16, 32, 64, 100, 300};
+            } else {
+                steps = list.stream().mapToInt(Double::intValue).toArray();
+            }
+
+            list = (List<Double>) arguments.get("scale");
+            if (list == null) {
+                scale = new int[] {21, 45, 99, 153, 207, 261, 315};
+            } else {
+                scale = list.stream().mapToInt(Double::intValue).toArray();
+            }
+
+            List<List<Double>> ratio = (List<List<Double>>) arguments.get("aspectRatios");
+            if (ratio == null) {
+                aspectRatio = new int[][] {{2}, {2, 3}, {2, 3}, {2, 3}, {2}, {2}};
+            } else {
+                aspectRatio = new int[ratio.size()][];
+                for (int i = 0; i < aspectRatio.length; ++i) {
+                    aspectRatio[i] = ratio.get(i).stream().mapToInt(Double::intValue).toArray();
+                }
+            }
+        }
+
         /**
          * Builds the translator.
          *
          * @return the new translator
          */
-        @Override
-        public PtSSDTranslator build() {
+        public PtSsdTranslator build() {
             validate();
-            return new PtSSDTranslator(this);
+            return new PtSsdTranslator(this);
         }
     }
 }

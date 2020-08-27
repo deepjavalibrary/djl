@@ -28,6 +28,7 @@ import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A {@link BaseImageTranslator} that post-process the {@link NDArray} into {@link DetectedObjects}
@@ -163,6 +164,20 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
         return new Builder();
     }
 
+    /**
+     * Creates a builder to build a {@code InstanceSegmentationTranslator} with specified arguments.
+     *
+     * @param arguments arguments to specify builder options
+     * @return a new builder
+     */
+    public static Builder builder(Map<String, Object> arguments) {
+        Builder builder = new Builder();
+        builder.configPreProcess(arguments);
+        builder.configPostProcess(arguments);
+
+        return builder;
+    }
+
     /** The builder for Instance Segmentation translator. */
     public static class Builder extends ClassificationBuilder<Builder> {
 
@@ -211,6 +226,15 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
         @Override
         protected Builder self() {
             return this;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected void configPostProcess(Map<String, Object> arguments) {
+            super.configPostProcess(arguments);
+            threshold = getFloatValue(arguments, "threshold", 0.3f);
+            shortEdge = getIntValue(arguments, "shortEdge", 600);
+            maxEdge = getIntValue(arguments, "maxEdge", 1000);
         }
 
         /**

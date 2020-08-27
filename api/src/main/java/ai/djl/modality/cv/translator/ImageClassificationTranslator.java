@@ -21,6 +21,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /** A generic {@link ai.djl.translate.Translator} for Image Classification tasks. */
 public class ImageClassificationTranslator extends BaseImageTranslator<Classifications> {
@@ -68,6 +69,19 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
         return new Builder();
     }
 
+    /**
+     * Creates a builder to build a {@code ImageClassificationTranslator} with specified arguments.
+     *
+     * @param arguments arguments to specify builder options
+     * @return a new builder
+     */
+    public static Builder builder(Map<String, Object> arguments) {
+        Builder builder = new Builder();
+        builder.configPreProcess(arguments);
+        builder.configPostProcess(arguments);
+        return builder;
+    }
+
     /** A Builder to construct a {@code ImageClassificationTranslator}. */
     public static class Builder extends ClassificationBuilder<Builder> {
 
@@ -91,6 +105,13 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
         @Override
         protected Builder self() {
             return this;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected void configPostProcess(Map<String, Object> arguments) {
+            super.configPostProcess(arguments);
+            applySoftmax = getBooleanValue(arguments, "applySoftmax");
         }
 
         /**

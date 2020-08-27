@@ -18,8 +18,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.transform.Normalize;
-import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.InstanceSegmentationTranslator;
 import ai.djl.modality.cv.translator.wrapper.FileTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslatorFactory;
@@ -50,9 +48,6 @@ import java.util.Map;
 public class InstanceSegmentationModelLoader extends BaseModelLoader {
 
     private static final Application APPLICATION = Application.CV.INSTANCE_SEGMENTATION;
-
-    private static final float[] MEAN = {0.485f, 0.456f, 0.406f};
-    private static final float[] STD = {0.229f, 0.224f, 0.225f};
 
     /**
      * Creates the Model loader from the given repository.
@@ -143,11 +138,7 @@ public class InstanceSegmentationModelLoader extends BaseModelLoader {
         @Override
         public Translator<Image, DetectedObjects> newInstance(
                 Model model, Map<String, Object> arguments) {
-            return InstanceSegmentationTranslator.builder()
-                    .addTransform(new ToTensor())
-                    .addTransform(new Normalize(MEAN, STD))
-                    .optSynsetArtifactName("classes.txt")
-                    .build();
+            return InstanceSegmentationTranslator.builder(arguments).build();
         }
     }
 }

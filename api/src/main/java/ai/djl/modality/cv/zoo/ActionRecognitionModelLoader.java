@@ -18,9 +18,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.transform.Normalize;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.translator.wrapper.FileTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslatorFactory;
@@ -51,9 +48,6 @@ import java.util.Map;
 public class ActionRecognitionModelLoader extends BaseModelLoader {
 
     private static final Application APPLICATION = Application.CV.ACTION_RECOGNITION;
-
-    private static final float[] MEAN = {0.485f, 0.456f, 0.406f};
-    private static final float[] STD = {0.229f, 0.224f, 0.225f};
 
     /**
      * Creates the Model loader from the given repository.
@@ -117,16 +111,7 @@ public class ActionRecognitionModelLoader extends BaseModelLoader {
         @Override
         public Translator<Image, Classifications> newInstance(
                 Model model, Map<String, Object> arguments) {
-            // 299 is the minimum length for inception, 224 for vgg
-            int width = ((Double) arguments.getOrDefault("width", 299d)).intValue();
-            int height = ((Double) arguments.getOrDefault("height", 299d)).intValue();
-
-            return ImageClassificationTranslator.builder()
-                    .addTransform(new Resize(width, height))
-                    .addTransform(new ToTensor())
-                    .addTransform(new Normalize(MEAN, STD))
-                    .optSynsetArtifactName("classes.txt")
-                    .build();
+            return ImageClassificationTranslator.builder(arguments).build();
         }
     }
 }

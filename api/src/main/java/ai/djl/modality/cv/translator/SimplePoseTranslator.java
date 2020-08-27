@@ -22,6 +22,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A {@link BaseImageTranslator} that post-process the {@link NDArray} into human {@link Joints}.
@@ -92,18 +93,26 @@ public class SimplePoseTranslator extends BaseImageTranslator<Joints> {
         return new Builder();
     }
 
+    /**
+     * Creates a builder to build a {@code SimplePoseTranslator} with specified arguments.
+     *
+     * @param arguments arguments to specify builder options
+     * @return a new builder
+     */
+    public static Builder builder(Map<String, Object> arguments) {
+        Builder builder = new Builder();
+        builder.configPreProcess(arguments);
+        builder.configPostProcess(arguments);
+
+        return builder;
+    }
+
     /** The builder for Pose Estimation translator. */
     public static class Builder extends BaseBuilder<Builder> {
 
-        float threshold;
+        float threshold = 0.2f;
 
         Builder() {}
-
-        /** {@inheritDoc} */
-        @Override
-        protected Builder self() {
-            return this;
-        }
 
         /**
          * Sets the threshold for prediction accuracy.
@@ -116,6 +125,18 @@ public class SimplePoseTranslator extends BaseImageTranslator<Joints> {
         public Builder optThreshold(float threshold) {
             this.threshold = threshold;
             return self();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected Builder self() {
+            return this;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected void configPostProcess(Map<String, Object> arguments) {
+            threshold = getFloatValue(arguments, "threshold", 0.2f);
         }
 
         /**

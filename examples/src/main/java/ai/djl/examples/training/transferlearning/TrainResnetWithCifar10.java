@@ -52,7 +52,6 @@ import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -183,9 +182,8 @@ public final class TrainResnetWithCifar10 {
 
     private static Classifications testSaveParameters(Block block, Path path)
             throws IOException, ModelException, TranslateException {
-        URL synsetUrl =
-                new URL(
-                        "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset_cifar10.txt");
+        String synsetUrl =
+                "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset_cifar10.txt";
         ImageClassificationTranslator translator =
                 ImageClassificationTranslator.builder()
                         .addTransform(new ToTensor())

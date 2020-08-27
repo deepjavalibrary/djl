@@ -18,9 +18,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.transform.CenterCrop;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.translator.wrapper.FileTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslatorFactory;
@@ -136,17 +133,7 @@ public class ImageClassificationModelLoader extends BaseModelLoader {
         @Override
         public Translator<Image, Classifications> newInstance(
                 Model model, Map<String, Object> arguments) {
-            int width = ((Double) arguments.getOrDefault("width", 224d)).intValue();
-            int height = ((Double) arguments.getOrDefault("height", 224d)).intValue();
-            String flag = (String) arguments.getOrDefault("flag", Image.Flag.COLOR.name());
-
-            return ImageClassificationTranslator.builder()
-                    .optFlag(Image.Flag.valueOf(flag))
-                    .addTransform(new CenterCrop())
-                    .addTransform(new Resize(width, height))
-                    .addTransform(new ToTensor())
-                    .optApplySoftmax(true)
-                    .build();
+            return ImageClassificationTranslator.builder(arguments).build();
         }
     }
 }

@@ -15,8 +15,6 @@ package ai.djl.modality.cv.zoo;
 import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.YoloTranslator;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
@@ -68,17 +66,7 @@ public class YoloModelLoader extends ObjectDetectionModelLoader {
         @Override
         public Translator<Image, DetectedObjects> newInstance(
                 Model model, Map<String, Object> arguments) {
-            int width = ((Double) arguments.getOrDefault("width", 450d)).intValue();
-            int height = ((Double) arguments.getOrDefault("height", 450d)).intValue();
-            double threshold = ((Double) arguments.getOrDefault("threshold", 0.2d));
-
-            return YoloTranslator.builder()
-                    .addTransform(new Resize(width, height))
-                    .addTransform(new ToTensor())
-                    .optSynsetArtifactName("classes.txt")
-                    .optThreshold((float) threshold)
-                    .optRescaleSize(width, height)
-                    .build();
+            return YoloTranslator.builder(arguments).build();
         }
     }
 }

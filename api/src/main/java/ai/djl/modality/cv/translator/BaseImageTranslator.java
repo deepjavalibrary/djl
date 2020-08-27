@@ -14,6 +14,10 @@ package ai.djl.modality.cv.translator;
 
 import ai.djl.Model;
 import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.transform.CenterCrop;
+import ai.djl.modality.cv.transform.Normalize;
+import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Batchifier;
@@ -24,8 +28,11 @@ import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Built-in {@code Translator} that provides default image pre-processing.
@@ -33,6 +40,9 @@ import java.util.List;
  * @param <T> the output object type
  */
 public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
+
+    private static final float[] MEAN = {0.485f, 0.456f, 0.406f};
+    private static final float[] STD = {0.229f, 0.224f, 0.225f};
 
     private Image.Flag flag;
     private Pipeline pipeline;
@@ -74,6 +84,31 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
         return pipeline.transform(new NDList(array));
     }
 
+    protected static int getIntValue(Map<String, Object> arguments, String key, int defaultValue) {
+        Object value = arguments.get(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        return (int) Double.parseDouble(value.toString());
+    }
+
+    protected static float getFloatValue(
+            Map<String, Object> arguments, String key, float defaultValue) {
+        Object value = arguments.get(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        return (float) Double.parseDouble(value.toString());
+    }
+
+    protected static boolean getBooleanValue(Map<String, Object> arguments, String key) {
+        Object value = arguments.get(key);
+        if (value == null) {
+            return false;
+        }
+        return Boolean.parseBoolean(value.toString());
+    }
+
     /**
      * A builder to extend for all classes extending the {@link BaseImageTranslator}.
      *
@@ -82,6 +117,8 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
     @SuppressWarnings("rawtypes")
     public abstract static class BaseBuilder<T extends BaseBuilder> {
 
+        protected int width = 224;
+        protected int height = 224;
         protected Image.Flag flag = Image.Flag.COLOR;
         protected Pipeline pipeline;
         protected Batchifier batchifier = Batchifier.STACK;
@@ -141,6 +178,26 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
                 throw new IllegalArgumentException("pipeline is required.");
             }
         }
+
+        protected void configPreProcess(Map<String, Object> arguments) {
+            width = getIntValue(arguments, "width", 224);
+            height = getIntValue(arguments, "height", 224);
+            if (arguments.containsKey("flag")) {
+                flag = Image.Flag.valueOf(arguments.get("flag").toString());
+            }
+            if (getBooleanValue(arguments, "centerCrop")) {
+                addTransform(new CenterCrop());
+            }
+            if (getBooleanValue(arguments, "resize")) {
+                addTransform(new Resize(width, height));
+            }
+            addTransform(new ToTensor());
+            if (getBooleanValue(arguments, "normalize")) {
+                addTransform(new Normalize(MEAN, STD));
+            }
+        }
+
+        protected void configPostProcess(Map<String, Object> arguments) {}
     }
 
     /** A Builder to construct a {@code ImageClassificationTranslator}. */
@@ -167,8 +224,12 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
          * @param synsetUrl the URL of the synset file
          * @return the builder
          */
-        public T optSynsetUrl(URL synsetUrl) {
-            this.synsetLoader = new SynsetLoader(synsetUrl);
+        public T optSynsetUrl(String synsetUrl) {
+            try {
+                this.synsetLoader = new SynsetLoader(new URL(synsetUrl));
+            } catch (MalformedURLException e) {
+                throw new IllegalArgumentException("Invalid synsetUrl: " + synsetUrl, e);
+            }
             return self();
         }
 
@@ -189,6 +250,23 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
             super.validate();
             if (synsetLoader == null) {
                 synsetLoader = new SynsetLoader("synset.txt");
+            }
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected void configPostProcess(Map<String, Object> arguments) {
+            String synset = (String) arguments.get("synset");
+            if (synset != null) {
+                optSynset(Arrays.asList(synset.split(",")));
+            }
+            String synsetUrl = (String) arguments.get("synsetUrl");
+            if (synsetUrl != null) {
+                optSynsetUrl(synsetUrl);
+            }
+            String synsetFileName = (String) arguments.get("synsetFileName");
+            if (synsetFileName != null) {
+                optSynsetArtifactName(synsetFileName);
             }
         }
     }

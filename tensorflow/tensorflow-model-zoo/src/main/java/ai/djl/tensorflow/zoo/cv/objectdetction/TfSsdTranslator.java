@@ -16,20 +16,21 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
-import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
+import ai.djl.modality.cv.translator.ObjectDetectionTranslator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A {@link TfSsdTranslator} that post-process the {@link NDArray} into {@link DetectedObjects} with
  * boundaries. Reference implementation: <a
  * href="https://tfhub.dev/google/openimages_v4/ssd/mobilenet_v2/1">SSD</a>.
  */
-public class TfSsdTranslator extends SingleShotDetectionTranslator {
+public class TfSsdTranslator extends ObjectDetectionTranslator {
 
     private int maxBoxes;
     private String boundingBoxOutputName;
@@ -49,6 +50,7 @@ public class TfSsdTranslator extends SingleShotDetectionTranslator {
         this.classLabelOutputName = builder.classLabelOutputName;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, Image input) {
         // TensorFlow object detection model does not support batch input
@@ -58,6 +60,7 @@ public class TfSsdTranslator extends SingleShotDetectionTranslator {
         return new NDList(super.processInput(ctx, input).get(0).expandDims(0));
     }
 
+    /** {@inheritDoc} */
     @Override
     public Batchifier getBatchifier() {
         return null;
@@ -114,7 +117,7 @@ public class TfSsdTranslator extends SingleShotDetectionTranslator {
     }
 
     /**
-     * Creates a builder to build a {@code TfSSDTranslatorBuilder}.
+     * Creates a builder to build a {@code TfSSDTranslator}.
      *
      * @return a new builder
      */
@@ -122,8 +125,22 @@ public class TfSsdTranslator extends SingleShotDetectionTranslator {
         return new Builder();
     }
 
+    /**
+     * Creates a builder to build a {@code TfSSDTranslator} with specified arguments.
+     *
+     * @param arguments arguments to specify builder options
+     * @return a new builder
+     */
+    public static Builder builder(Map<String, Object> arguments) {
+        Builder builder = new Builder();
+        builder.configPreProcess(arguments);
+        builder.configPostProcess(arguments);
+
+        return builder;
+    }
+
     /** The builder for TensorFlow SSD translator. */
-    public static class Builder extends SingleShotDetectionTranslator.Builder {
+    public static class Builder extends ObjectDetectionBuilder<Builder> {
 
         private int maxBoxes = 10;
         private String boundingBoxOutputName = "detection_boxes";
@@ -177,12 +194,39 @@ public class TfSsdTranslator extends SingleShotDetectionTranslator {
             return this;
         }
 
+        /** {@inheritDoc} */
+        @Override
+        protected Builder self() {
+            return this;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected void configPreProcess(Map<String, Object> arguments) {
+            super.configPreProcess(arguments);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected void configPostProcess(Map<String, Object> arguments) {
+            super.configPostProcess(arguments);
+            maxBoxes = getIntValue(arguments, "maxBoxes", 10);
+            threshold = getFloatValue(arguments, "threshold", 0.4f);
+            boundingBoxOutputName =
+                    (String) arguments.getOrDefault("boundingBoxOutputName", "detection_boxes");
+            scoresOutputName =
+                    (String) arguments.getOrDefault("scoresOutputName", "detection_scores");
+            classLabelOutputName =
+                    (String)
+                            arguments.getOrDefault(
+                                    "classLabelOutputName", "detection_class_labels");
+        }
+
         /**
          * Builds the translator.
          *
          * @return the new translator
          */
-        @Override
         public TfSsdTranslator build() {
             validate();
             return new TfSsdTranslator(this);

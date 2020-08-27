@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A {@link BaseImageTranslator} that post-process the {@link NDArray} into {@link DetectedObjects}
@@ -36,7 +37,7 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
      *
      * @param builder the builder for the translator
      */
-    protected ObjectDetectionTranslator(BaseBuilder<?> builder) {
+    protected ObjectDetectionTranslator(ObjectDetectionBuilder<?> builder) {
         super(builder);
         this.threshold = builder.threshold;
         this.synsetLoader = builder.synsetLoader;
@@ -54,16 +55,12 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
 
     /** The base builder for the object detection translator. */
     @SuppressWarnings("rawtypes")
-    public abstract static class BaseBuilder<T extends BaseBuilder>
+    public abstract static class ObjectDetectionBuilder<T extends ObjectDetectionBuilder>
             extends ClassificationBuilder<T> {
 
         protected float threshold = 0.2f;
         protected double imageWidth;
         protected double imageHeight;
-
-        /** {@inheritDoc} */
-        @Override
-        protected abstract T self();
 
         /**
          * Sets the threshold for prediction accuracy.
@@ -107,6 +104,16 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
          */
         public double getImageHeight() {
             return imageHeight;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected void configPostProcess(Map<String, Object> arguments) {
+            super.configPostProcess(arguments);
+            if (getBooleanValue(arguments, "rescale")) {
+                optRescaleSize(width, height);
+            }
+            threshold = getFloatValue(arguments, "threshold", 0.2f);
         }
     }
 }

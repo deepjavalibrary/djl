@@ -20,6 +20,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A {@link BaseImageTranslator} that post-process the {@link NDArray} into {@link DetectedObjects}
@@ -82,8 +83,22 @@ public class SingleShotDetectionTranslator extends ObjectDetectionTranslator {
         return new Builder();
     }
 
+    /**
+     * Creates a builder to build a {@code SingleShotDetectionTranslator} with specified arguments.
+     *
+     * @param arguments arguments to specify builder options
+     * @return a new builder
+     */
+    public static Builder builder(Map<String, Object> arguments) {
+        Builder builder = new Builder();
+        builder.configPreProcess(arguments);
+        builder.configPostProcess(arguments);
+
+        return builder;
+    }
+
     /** The builder for SSD translator. */
-    public static class Builder extends BaseBuilder<Builder> {
+    public static class Builder extends ObjectDetectionBuilder<Builder> {
 
         /** {@inheritDoc} */
         @Override
