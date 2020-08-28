@@ -13,17 +13,22 @@
 package ai.djl.training.dataset;
 
 import ai.djl.Device;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrays;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Transform;
 import ai.djl.translate.TranslateException;
+import ai.djl.util.Pair;
 import ai.djl.util.Progress;
 import ai.djl.util.RandomUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -159,6 +164,45 @@ public abstract class RandomAccessDataset implements Dataset {
         }
         ret[ratio.length - 1] = new SubDataset(this, indices, from, size);
         return ret;
+    }
+
+    /**
+     * Returns the dataset contents as a Java array.
+     *
+     * <p>Each Number[] is a flattened dataset record and the Number[][] is the array of all
+     * records.
+     *
+     * @return the dataset contents as a Java array
+     * @throws IOException for various exceptions depending on the dataset
+     * @throws TranslateException if there is an error while processing input
+     */
+    public Pair<Number[][], Number[][]> toArray() throws IOException, TranslateException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            Sampler sampl = new BatchSampler(new SequenceSampler(), 1, false);
+            int size = Math.toIntExact(size());
+            Number[][] data = new Number[size][];
+            Number[][] labels = new Number[size][];
+            int index = 0;
+            for (Batch batch : this.getData(manager, sampl)) {
+                data[index] = flattenRecord(batch.getData());
+                labels[index] = flattenRecord(batch.getLabels());
+                batch.close();
+                index++;
+            }
+            return new Pair<>(data, labels);
+        }
+    }
+
+    private Number[] flattenRecord(NDList data) {
+        NDList flattened =
+                new NDList(data.stream().map(NDArray::flatten).collect(Collectors.toList()));
+        if (flattened.size() == 0) {
+            return null;
+        }
+        if (flattened.size() == 1) {
+            return flattened.get(0).toArray();
+        }
+        return NDArrays.concat(flattened).toArray();
     }
 
     private static void swap(int[] arr, int i, int j) {

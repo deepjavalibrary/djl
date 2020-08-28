@@ -18,6 +18,7 @@ import ai.djl.basicdataset.Cifar10;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Blocks;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -26,11 +27,13 @@ import ai.djl.training.dataset.ArrayDataset;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.BatchSampler;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.RandomSampler;
 import ai.djl.training.dataset.SequenceSampler;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
+import ai.djl.util.Pair;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -291,6 +294,30 @@ public class DatasetTest {
                 executor.shutdown();
                 executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
             }
+        }
+    }
+
+    @Test
+    public void testDatasetToArray() throws IOException, TranslateException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            RandomAccessDataset dataset =
+                    new ArrayDataset.Builder()
+                            .setData(manager.ones(new Shape(5, 4)))
+                            .setSampling(32, false)
+                            .optLabels(manager.zeros(new Shape(5, 2)))
+                            .build();
+            Pair<Number[][], Number[][]> converted = dataset.toArray();
+            Number[][] data = converted.getKey();
+            Number[][] labels = converted.getValue();
+
+            Assert.assertEquals(data.length, 5);
+            Assert.assertEquals(labels.length, 5);
+
+            Assert.assertEquals(data[0].length, 4);
+            Assert.assertEquals(labels[0].length, 2);
+
+            Assert.assertEquals(data[0][0], 1f);
+            Assert.assertEquals(labels[0][0], 0f);
         }
     }
 }
