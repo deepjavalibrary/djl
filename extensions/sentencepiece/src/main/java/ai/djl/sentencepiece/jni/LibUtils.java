@@ -45,6 +45,10 @@ public final class LibUtils {
     private LibUtils() {}
 
     public static void loadLibrary() {
+        if (System.getProperty("os.name").startsWith("Win")) {
+            throw new UnsupportedOperationException("Windows is not supported.");
+        }
+
         String libName = copyJniLibraryFromClasspath();
         logger.debug("Loading sentencepiece library from: {}", libName);
         System.load(libName); // NOPMD

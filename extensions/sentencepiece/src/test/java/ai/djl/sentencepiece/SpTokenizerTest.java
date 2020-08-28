@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -38,6 +39,9 @@ public class SpTokenizerTest {
 
     @Test
     public void testLoadModel() throws IOException {
+        if (System.getProperty("os.name").startsWith("Win")) {
+            throw new SkipException("Skip windows test.");
+        }
         Path modelPath = Paths.get("build/test/models");
         String prefix = "sententpiece_test_model";
         SpTokenizer tokenizer = new SpTokenizer(modelPath, prefix);
@@ -46,6 +50,9 @@ public class SpTokenizerTest {
 
     @Test
     public void testTokenize() throws IOException {
+        if (System.getProperty("os.name").startsWith("Win")) {
+            throw new SkipException("Skip windows test.");
+        }
         Path modelPath = Paths.get("build/test/models");
         String prefix = "sententpiece_test_model";
         SpTokenizer tokenizer = new SpTokenizer(modelPath, prefix);
@@ -59,6 +66,9 @@ public class SpTokenizerTest {
 
     @Test
     public void testEncodeDecode() throws IOException {
+        if (System.getProperty("os.name").startsWith("Win")) {
+            throw new SkipException("Skip windows test.");
+        }
         Path modelPath = Paths.get("build/test/models");
         String prefix = "sententpiece_test_model";
         SpTokenizer tokenizer = new SpTokenizer(modelPath, prefix);
