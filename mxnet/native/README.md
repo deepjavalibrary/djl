@@ -49,16 +49,16 @@ The example list of the s3 files is:
 
 - s3://djl-ai/publish/mxnet-1.6.0/linux/common/libgfortran.so.3
 - s3://djl-ai/publish/mxnet-1.6.0/linux/common/libquadmath.so.0
+- s3://djl-ai/publish/mxnet-1.6.0/linux/cu102mkl/libmxnet.so
 - s3://djl-ai/publish/mxnet-1.6.0/linux/cu101mkl/libmxnet.so
-- s3://djl-ai/publish/mxnet-1.6.0/linux/cu92mkl/libmxnet.so
 - s3://djl-ai/publish/mxnet-1.6.0/linux/mkl/libmxnet.so
 - s3://djl-ai/publish/mxnet-1.6.0/osx/mkl/libmxnet.dylib
 - s3://djl-ai/publish/mxnet-1.6.0/win/common/libgcc_s_seh-1.dll
 - s3://djl-ai/publish/mxnet-1.6.0/win/common/libgfortran-3.dll
 - s3://djl-ai/publish/mxnet-1.6.0/win/common/libopenblas.dll
 - s3://djl-ai/publish/mxnet-1.6.0/win/common/libquadmath-0.dll
+- s3://djl-ai/publish/mxnet-1.6.0/win/cu102mkl/libmxnet.dll
 - s3://djl-ai/publish/mxnet-1.6.0/win/cu101mkl/libmxnet.dll
-- s3://djl-ai/publish/mxnet-1.6.0/win/cu92mkl/libmxnet.dll
 - s3://djl-ai/publish/mxnet-1.6.0/win/mkl/libmxnet.dll
 
 ### Step 3: Test publishing
