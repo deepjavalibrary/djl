@@ -238,14 +238,6 @@ task downloadPyTorchNativeLib() {
                 new URL("https://djl-ai.s3.amazonaws.com/publish/extra/libstdc%2B%2B.so.6").withInputStream {
                     i -> libstd.withOutputStream { it << i }
                 }
-            } else {
-                // gzip all files to upload to s3
-                // precxx11 would not take gzip format, therefore skip it
-                fileTree("${outputDir}/native/lib/").exclude("*.gz", "pytorch.properties").each {
-                    f ->
-                        ant.gzip(src: f.absolutePath, destfile: f.absolutePath + ".gz")
-                        delete(f)
-                }
             }
             delete(file)
             delete("${outputDir}/libtorch")
