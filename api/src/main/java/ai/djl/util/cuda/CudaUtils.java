@@ -36,7 +36,7 @@ public final class CudaUtils {
      * @return {@code true} if CUDA runtime library is in the system
      */
     public static boolean hasCuda() {
-        return LIB != null;
+        return getGpuCount() > 0;
     }
 
     /**
