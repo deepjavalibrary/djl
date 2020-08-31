@@ -23,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,7 +38,6 @@ public final class LibUtils {
     private static final String LIB_NAME = "jnitensorflow";
     private static final Pattern VERSION_PATTERN =
             Pattern.compile("(\\d+\\.\\d+\\.\\d+(-\\w)?)(-SNAPSHOT)?(-\\d+)?");
-    private static final String[] SUPPORTED_CUDA_VERSIONS = {"cu102", "cu101", "cu100", "cu92"};
 
     private LibUtils() {}
 
@@ -78,12 +76,6 @@ public final class LibUtils {
         String cudaArch = platform.getCudaArch();
         String flavor = platform.getFlavor();
         if (flavor.isEmpty()) {
-            flavor = "cpu";
-        } else if (Arrays.asList(SUPPORTED_CUDA_VERSIONS).contains(flavor)) {
-            // we don't need flavor specific binaries for TensorFlow
-            flavor = "gpu";
-        } else {
-            logger.warn("Unsupported GPU platform: {}, fallback to CPU.", flavor);
             flavor = "cpu";
         }
 
@@ -146,7 +138,7 @@ public final class LibUtils {
                 found = true;
                 URL url = new URL(link + '/' + line.replace("+", "%2B"));
                 String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
-                logger.info("Downloading {} ...", fileName);
+                logger.info("Downloading {} ...", url);
                 try (InputStream fis = new GZIPInputStream(url.openStream())) {
                     Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
                 }
