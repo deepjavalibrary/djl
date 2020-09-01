@@ -31,7 +31,7 @@ You can pull the TensorFlow engine from the central Maven repository by includin
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-engine</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.0</version>
     <scope>runtime</scope>
 </dependency>
 ```

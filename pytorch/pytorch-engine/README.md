@@ -24,13 +24,13 @@ The javadocs output is built in the `build/doc/javadoc` folder.
 ## Installation
 You can pull the PyTorch engine from the central Maven repository by including the following dependency:
 
-- ai.djl.pytorch:pytorch-engine:0.6.0
+- ai.djl.pytorch:pytorch-engine:0.7.0
 
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-engine</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -130,14 +130,14 @@ All the package were built with GCC 7, we provided a newer `libstdc++.so.6.24` i
 
 Users are required to use the corresponding `pytorch-engine` package along with the native package.
 
-- ai.djl.pytorch:pytorch-engine-precxx11:0.6.0
+- ai.djl.pytorch:pytorch-engine-precxx11:0.7.0
 
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-engine-precxx11</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>0.6.0</version>
+    <version>0.7.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
