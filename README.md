@@ -116,9 +116,11 @@ gradlew build -x test
 
 **Note:** SpotBugs is not compatible with JDK 11+. SpotBugs will not be executed if you are using JDK 11+.
 
-## Slack channel
+## Community
 
 Join our [<img src='https://cdn3.iconfinder.com/data/icons/social-media-2169/24/social_media_social_media_logo_slack-512.png' width='20px' /> slack channel](https://join.slack.com/t/deepjavalibrary/shared_invite/zt-ar91gjkz-qbXhr1l~LFGEIEeGBibT7w) to get in touch with the development team, for questions and discussions.
+
+Follow our [<img src='https://cdn2.iconfinder.com/data/icons/social-media-2285/512/1_Twitter_colored_svg-512.png' width='20px' /> twitter](https://twitter.com/deepjavalibrary) to see updates about new content, features, and releases.
 
 ## License
 
