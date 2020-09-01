@@ -122,6 +122,8 @@ Join our [<img src='https://cdn3.iconfinder.com/data/icons/social-media-2169/24/
 
 Follow our [<img src='https://cdn2.iconfinder.com/data/icons/social-media-2285/512/1_Twitter_colored_svg-512.png' width='20px' /> twitter](https://twitter.com/deepjavalibrary) to see updates about new content, features, and releases.
 
+关注我们 [<img src='https://www.iconfinder.com/icons/5060515/download/svg/512' width='20px' /> 知乎专栏](https://zhuanlan.zhihu.com/c_1255493231133417472) 获取DJL最新的内容！
+
 ## License
 
 This project is licensed under the [Apache-2.0 License](LICENSE).
