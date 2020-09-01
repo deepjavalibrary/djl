@@ -26,11 +26,11 @@ where we included a higher version of `libstdc++` for you.
 
 For GPU with CUDA 10.1:
 ```bash
-export LD_LIBRARY_PATH=$HOME/.tensorflow/cache/2.3.0-SNAPSHOT-cu101-linux-x86_64/:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$HOME/.tensorflow/cache/2.3.0-cu101-linux-x86_64/:$LD_LIBRARY_PATH
 ```
 For GPU with CUDA 10.2:
 ```bash
-export LD_LIBRARY_PATH=$HOME/.tensorflow/cache/2.3.0-SNAPSHOT-cu102-linux-x86_64/:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$HOME/.tensorflow/cache/2.3.0-cu102-linux-x86_64/:$LD_LIBRARY_PATH
 ```
 OR
 * upgrade your gcc to gcc7+, you can use the following commands:

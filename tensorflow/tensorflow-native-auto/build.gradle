@@ -6,7 +6,7 @@ plugins {
 group "ai.djl.tensorflow"
 
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-version = "2.3.0" + (isRelease ? "" : "-SNAPSHOT")
+version = "${tensorflow_version}" + (isRelease ? "" : "-SNAPSHOT")
 
 repositories {
     maven {
