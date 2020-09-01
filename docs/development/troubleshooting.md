@@ -20,7 +20,7 @@ You can install this package and reboot again to see if the issue persist. You c
 
 CN: Windows 10 加载失败常常是因为缺少 Windows Visual C++ 相关扩展包而导致的。您可以通过下面Windows的步骤来修复系统缺失依赖项。
 
-### 1. Engine dependency is missing
+### 1.1 Engine dependency is missing
 DJL currently supports four engines: MXNet, PyTorch, TensorFlow(experimental) and FastText.
 Please include at least one of those engines and their native library as dependencies.
 For example, adding MXNet engine dependencies:
@@ -52,7 +52,7 @@ Maven:
 </dependency>
 ```
 
-### 2. Intellij Issue
+### 1.2 Intellij Issue
 The error may appear after running the `./gradlew clean` command:
 This issue is caused by a mismatch between IntelliJ and the Gradle runner.
 To fix this, navigate to: `Preferences-> Build Execution Deployment -> Build Tools -> Gradle`. Then, change the `Build and running using:` option to `Gradle`.
@@ -67,7 +67,7 @@ Then, right click the resources folder and select `Rebuild<default>`.
 
 ![FAQ1](https://djl-ai.s3.amazonaws.com/resources/images/FAQ_engine_not_found.png)
 
-### 3. UnsatisfiedLinkError issue
+### 1.3 UnsatisfiedLinkError issue
 You might see the error when DJL tries to load the native library for the engines, but some shared libraries are missing.
 Let's take the PyTorch engine as an example.
 DJL loads libtorch.dylib when creating the Engine instance.
@@ -112,7 +112,7 @@ versions of Windows, you need to pass the version as an argument as follows:
 docker build --build-arg version=<YOUR_VERSION>
 ```
 
-### 4. Failed to extract native file issue
+### 1.4 Failed to extract native file issue
 Sometimes you may only have read-only access on the machine.
 It will cause a failure during engine loading because the cache attempts to write to the home directory.
 For more information, please refer to [DJL Cache Management](cache_management.md).
@@ -215,3 +215,14 @@ nsorflow/cache/2.3.0-SNAPSHOT-cu101-linux-x86_64/libtensorflow.so.2)
 ```
 
 Please set `LD_LIBRARY_PATH` or upgrade gcc version according to the steps on [TensorFlow install page](https://docs.djl.ai/tensorflow/index.html#note)
+
+## 9. X11 error when running object detection notebooks on EC2 instances.
+
+When you run object detection using Jupyter Notebooks on EC2 instances via SSH, sometimes you may face X11 error when drawing bounding boxes. 
+```bash
+java.awt.HeadlessException:
+No X11 DISPLAY variable was set, but this program performed an operation which requires it.
+java.awt.HeadlessException:
+```
+
+Follow the [steps here](https://github.com/aws-samples/d2l-java/blob/master/documentation/troubleshoot.md) to resolve it.
