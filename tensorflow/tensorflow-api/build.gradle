@@ -13,8 +13,11 @@ configurations {
 dependencies {
     api "org.bytedeco:javacpp:1.5.3"
     api "com.google.protobuf:protobuf-java:3.8.0"
-    api "org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT"
+    api("org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT") {
+        exclude group: "org.bytedeco", module: "javacpp"
+    }
     api "org.tensorflow:tensorflow-tools:0.1.0-SNAPSHOT"
+    api "org.tensorflow:ndarray:0.2.0-SNAPSHOT"
 
     exclusion "org.bytedeco:javacpp:1.5.3"
     exclusion "com.google.protobuf:protobuf-java:3.8.0"
@@ -39,7 +42,7 @@ publishing {
                 withXml {
                     Node pomNode = asNode()
                     pomNode.dependencies."*".findAll() {
-                        it.artifactId.text().startsWith("tensorflow-")
+                        it.artifactId.text().startsWith("tensorflow-") || it.artifactId.text().startsWith("ndarray")
                     }.each() {
                         it.parent().remove(it)
                     }
