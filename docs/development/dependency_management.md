@@ -35,6 +35,7 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | Group ID | Artifact ID          | Description       |
 |----------|----------------------|-------------------|
 | [ai.djl](https://search.maven.org/search?q=g:ai.djl) | [api](../../api/README.md#installation) | DJL core API, contains top level, engine-agnostic classes for both inference and training |
+| | [bom](../../bom/README.md) | Bill of Materials (BOM), used to manage DJL package dependencies |
 | | [basicdataset](../../basicdataset/README.md#installation) | Contains a collection of built-in datasets |
 | | [model-zoo](../../model-zoo/README.md#installation) | Contains a collection of built-in engine-agnostic models |
 | | [serving](../../serving/README.md#installation) | Contains an universal model server implementation |
