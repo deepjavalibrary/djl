@@ -18,11 +18,13 @@ import ai.djl.engine.Engine;
 import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.GradientCollector;
-import ai.djl.util.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tensorflow.EagerSession;
 import org.tensorflow.TensorFlow;
+import org.tensorflow.internal.c_api.TF_DeviceList;
+import org.tensorflow.internal.c_api.TF_Status;
+import org.tensorflow.internal.c_api.global.tensorflow;
 
 /**
  * The {@code TfEngine} is an implementation of the {@link Engine} based on the <a
@@ -75,7 +77,21 @@ public final class TfEngine extends Engine {
         if (StandardCapabilities.MKL.equals(capability)) {
             return true;
         } else if (StandardCapabilities.CUDA.equals(capability)) {
-            return Platform.fromSystem().getCudaArch() != null;
+            TF_Status status = tensorflow.TF_NewStatus();
+            TF_DeviceList deviceList =
+                    tensorflow.TFE_ContextListDevices(
+                            tensorflow.TFE_NewContext(tensorflow.TFE_NewContextOptions(), status),
+                            status);
+            int deviceCount = tensorflow.TF_DeviceListCount(deviceList);
+            for (int i = 0; i < deviceCount; i++) {
+                if (tensorflow.TF_DeviceListName(deviceList, i, status)
+                        .getString()
+                        .toLowerCase()
+                        .contains("gpu")) {
+                    return true;
+                }
+            }
+            return false;
         }
         return false;
     }
