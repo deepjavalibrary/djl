@@ -28,7 +28,7 @@ jobs:
         run: |
           ./gradlew publish -Pstaging
           # Publish PyTorch Engine precxx11 to staging repository
-          ./gradlew :pytorch:pytorch-engine:publish -Pstaging -Pprecxx11
+          ./gradlew :pytorch:pytorch-engine:clean :pytorch:pytorch-engine:publish -Pstaging -Pprecxx11
           cd bom
           ./gradlew publish -Pstaging
         env:

@@ -140,7 +140,7 @@ jobs:
         run: |
           ./gradlew publish -Psnapshot
           # Publish PyTorch Engine Precxx11 to snapshot repository
-          ./gradlew :pytorch:pytorch-engine:publish -Psnapshot -Pprecxx11
+          ./gradlew :pytorch:pytorch-engine:clean :pytorch:pytorch-engine:publish -Psnapshot -Pprecxx11
           cd bom
           ./gradlew publish -Psnapshot
         env:
