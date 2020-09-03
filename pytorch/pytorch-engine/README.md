@@ -144,7 +144,7 @@ Users are required to use the corresponding `pytorch-engine` package along with 
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cpu-precxx11</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>0.7.0</version>
+    <version>1.6.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
