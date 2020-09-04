@@ -32,13 +32,13 @@ The javadocs output is generated in the `build/doc/javadoc` folder.
 ## Installation
 You can pull the ONNX Runtime engine from the central Maven repository by including the following dependency:
 
-- ai.djl.onnxruntime:onnxruntime-engine:0.7.0-SNAPSHOT
+- ai.djl.onnxruntime:onnxruntime-engine:0.7.0
 
 ```xml
 <dependency>
     <groupId>ai.djl.onnxruntime</groupId>
     <artifactId>onnxruntime-engine</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.7.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -75,7 +75,7 @@ Maven:
 
 Gradle:
 ```
-    implementation("ai.djl.onnxruntime:onnxruntime-engine:0.7.0-SNAPSHOT") {
+    implementation("ai.djl.onnxruntime:onnxruntime-engine:0.7.0") {
         exclude group: "com.microsoft.onnxruntime", module: "onnxruntime"
     }
     implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.3.1"

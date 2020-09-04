@@ -20,7 +20,7 @@ and the scope as import) as the following:
 <dependency>
     <groupId>ai.djl</groupId>
     <artifactId>bom</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
     <type>pom</type>
     <scope>import</scope>
 </dependency>
