@@ -79,6 +79,8 @@ else()
 
     target_include_directories(djl_torch PUBLIC build/include libtorch_android/${ANDROID_ABI}/include libtorch_android/${ANDROID_ABI}/include/torch/csrc/api/include)
     target_link_libraries(djl_torch
+        -Wl,--gc-sections
+        -Wl,--whole-archive
         libtorch
         libtorch_cpu
         -Wl,--no-whole-archive
