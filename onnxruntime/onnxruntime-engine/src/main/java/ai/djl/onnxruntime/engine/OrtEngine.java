@@ -31,7 +31,7 @@ public final class OrtEngine extends Engine {
 
     public static final String ENGINE_NAME = "OnnxRuntime";
 
-    private Engine secondaryEngine;
+    private Engine alternativeEngine;
     private OrtEnvironment env;
 
     private OrtEngine() {
@@ -49,16 +49,21 @@ public final class OrtEngine extends Engine {
         return ENGINE_NAME;
     }
 
-    Engine getSecondEngine() {
-        if (secondaryEngine == null) {
-            for (Engine availableEngine : Engine.getAllEngines()) {
-                if (!ENGINE_NAME.equals(availableEngine.getEngineName())) {
-                    secondaryEngine = availableEngine;
-                    break;
-                }
+    /** {@inheritDoc} */
+    @Override
+    public int getRank() {
+        return 10;
+    }
+
+    Engine getAlternativeEngine() {
+        if (alternativeEngine == null) {
+            Engine engine = Engine.getInstance();
+            if (engine.getRank() < getRank()) {
+                // alternativeEngine should not have the same rank as ORT
+                alternativeEngine = engine;
             }
         }
-        return secondaryEngine;
+        return alternativeEngine;
     }
 
     /** {@inheritDoc} */
@@ -89,8 +94,8 @@ public final class OrtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager(Device device) {
-        if (getSecondEngine() != null) {
-            return secondaryEngine.newBaseManager(device);
+        if (getAlternativeEngine() != null) {
+            return alternativeEngine.newBaseManager(device);
         }
         return OrtNDManager.getSystemManager().newSubManager(device);
     }

@@ -19,9 +19,9 @@ import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
-import java.util.Collection;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,22 +44,18 @@ public abstract class Engine {
     private static final String DEFAULT_ENGINE = initEngine();
 
     private static synchronized String initEngine() {
-        Engine firstEngine = null;
         ServiceLoader<EngineProvider> loaders = ServiceLoader.load(EngineProvider.class);
         for (EngineProvider provider : loaders) {
             Engine engine = provider.getEngine();
             if (engine != null) {
                 logger.debug("Engine loaded from provider: {}", engine.getEngineName());
-                if (firstEngine == null) {
-                    firstEngine = engine;
-                }
                 ALL_ENGINES.put(engine.getEngineName(), engine);
             } else {
                 logger.warn("Failed to load engine from: {}", provider.getClass().getName());
             }
         }
 
-        if (firstEngine == null) {
+        if (ALL_ENGINES.isEmpty()) {
             logger.debug("No engine found from EngineProvider");
             return null;
         }
@@ -70,7 +66,13 @@ public abstract class Engine {
             if (ALL_ENGINES.size() > 1) {
                 logger.warn("More than one deep learning engines found.");
             }
-            defaultEngine = firstEngine.getEngineName();
+            int rank = Integer.MAX_VALUE;
+            for (Engine engine : ALL_ENGINES.values()) {
+                if (engine.getRank() < rank) {
+                    defaultEngine = engine.getEngineName();
+                    rank = engine.getRank();
+                }
+            }
         } else if (!ALL_ENGINES.containsKey(defaultEngine)) {
             throw new EngineException("Unknown default engine: " + defaultEngine);
         }
@@ -84,6 +86,15 @@ public abstract class Engine {
      * @return the name of the engine
      */
     public abstract String getEngineName();
+
+    /**
+     * Return the rank of the {@code Engine}.
+     *
+     * @return the rank of the engine
+     */
+    public int getRank() {
+        return 1;
+    }
 
     /**
      * Returns the default Engine.
@@ -113,12 +124,12 @@ public abstract class Engine {
     }
 
     /**
-     * Returns a Collection of engines that are loaded.
+     * Returns a set of engine names that are loaded.
      *
-     * @return {@code Collection<Engine>} that are supported
+     * @return a set of engine names that are loaded
      */
-    public static Collection<Engine> getAllEngines() {
-        return ALL_ENGINES.values();
+    public static Set<String> getAllEngines() {
+        return ALL_ENGINES.keySet();
     }
 
     /**

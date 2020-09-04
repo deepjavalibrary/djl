@@ -16,7 +16,6 @@ import ai.djl.engine.Engine;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -68,6 +67,6 @@ public class DefaultModelZoo implements ModelZoo {
     /** {@inheritDoc} */
     @Override
     public Set<String> getSupportedEngines() {
-        return Collections.singleton(Engine.getInstance().getEngineName());
+        return Engine.getAllEngines();
     }
 }
