@@ -1,5 +1,3 @@
-import java.util.regex.Pattern
-
 task release {
     doLast {
         def collection = fileTree("jupyter").filter { it.name.endsWith(".ipynb") }
@@ -34,15 +32,18 @@ task increaseBuildVersion {
         }
         def targetVersion = project.property("targetVersion")
 
-        def file = new File("examples/build.gradle")
-        file.text = file.text.replaceAll("def DJL_VERSION = \".+\"", "def DJL_VERSION = \"${targetVersion}-SNAPSHOT\"")
-
-        file = new File("examples/pom.xml")
+        def file = new File("examples/pom.xml")
         file.text = file.text.replaceAll("<djl.version>.+-SNAPSHOT</djl.version>",
                 "<djl.version>${targetVersion}-SNAPSHOT</djl.version>")
+        file.text = file.text.replaceAll("<version>.+-SNAPSHOT</version>",
+                "<version>${targetVersion}-SNAPSHOT</version>")
 
-        file = new File("build.gradle")
-        file.text = file.text.replaceAll("version = \"[0-9.]+\"", "version = \"${targetVersion}\"")
+        file = new File("gradle.properties")
+        file.text = file.text.replaceAll("djl_version=[0-9.]+", "djl_version=${targetVersion}")
+
+        file = new File("api/README.md")
+        file.text = file.text.replaceAll("<version>.+-SNAPSHOT</version>",
+                "<version>${targetVersion}-SNAPSHOT</version>")
     }
 }
 

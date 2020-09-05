@@ -7,7 +7,7 @@ defaultTasks 'build'
 allprojects {
     group 'ai.djl'
     boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-    version = "0.8.0" + (isRelease ? "" : "-SNAPSHOT")
+    version = "${djl_version}" + (isRelease ? "" : "-SNAPSHOT")
 
     repositories {
         jcenter()
