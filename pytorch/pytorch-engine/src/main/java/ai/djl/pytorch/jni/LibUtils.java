@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -162,10 +163,13 @@ public final class LibUtils {
         if (fallback || flavor.isEmpty()) {
             flavor = "cpu";
         }
+        Path precxx11Lib = nativeDir.resolve("libstdc++.so.6");
+        if (Files.exists(precxx11Lib)) {
+            flavor += "-precxx11"; // NOPMD
+        }
         Properties prop = new Properties();
         try (InputStream stream =
-                LibUtils.class.getResourceAsStream(
-                        "/jnilib/" + classifier + "/" + flavor + "/pytorch.properties")) {
+                LibUtils.class.getResourceAsStream("/jnilib/pytorch.properties")) {
             prop.load(stream);
         } catch (IOException e) {
             throw new IllegalStateException("Cannot find pytorch property file", e);
@@ -179,7 +183,7 @@ public final class LibUtils {
         Path tmp = null;
         try (InputStream stream =
                 LibUtils.class.getResourceAsStream(
-                        "/jnilib/" + classifier + "/" + flavor + "/" + name)) {
+                        "/jnilib/" + classifier + '/' + flavor + '/' + name)) {
             tmp = Files.createTempFile(nativeDir, "jni", "tmp");
             Files.copy(stream, tmp, StandardCopyOption.REPLACE_EXISTING);
             Utils.moveQuietly(tmp, path);
@@ -247,6 +251,10 @@ public final class LibUtils {
         Path tmp = null;
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
+        // TODO: include precxx11 into native jar's flavor property
+        if (Arrays.asList(platform.getLibraries()).contains("libstdc++.so.6")) {
+            flavor += "-precxx11"; // NOPMD
+        }
         String classifier = platform.getClassifier();
         try {
             String libName = System.mapLibraryName(NATIVE_LIB_NAME);

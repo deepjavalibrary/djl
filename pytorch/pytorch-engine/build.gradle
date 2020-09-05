@@ -6,7 +6,6 @@ repositories {
     }
 }
 
-boolean isPrecxx11 = project.hasProperty("precxx11")
 dependencies {
     api project(":api")
 
@@ -18,38 +17,29 @@ dependencies {
 }
 
 processResources {
+    outputs.dir file("${project.buildDir}/jnilib")
     doLast {
-        def url = "https://djl-ai.s3.amazonaws.com/publish/pytorch-${pytorch_version}/jnilib"
-        def files = ["linux-cpu": ["pytorch.properties", "libdjl_torch.so"],
-                     "win-cu101" : ["pytorch.properties", "djl_torch.dll"],
-                     "win-cu102" : ["pytorch.properties", "djl_torch.dll"],
-                     "linux-cu101" : ["pytorch.properties", "libdjl_torch.so"],
-                     "linux-cu102" : ["pytorch.properties", "libdjl_torch.so"],
-                     "osx-cpu"  : ["pytorch.properties", "libdjl_torch.dylib"],
-                     "win-cpu"  : ["pytorch.properties", "djl_torch.dll"],
+        def url = "https://djl-ai.s3.amazonaws.com/publish/pytorch-${pytorch_version}/jnilib/${djl_version}"
+        def files = [
+                "linux-x86_64/cpu/libdjl_torch.so"         : "linux-x86_64/cpu/libdjl_torch.so",
+                "linux-x86_64/cu101/libdjl_torch.so"       : "linux-x86_64/cu101/libdjl_torch.so",
+                "linux-x86_64/cu102/libdjl_torch.so"       : "linux-x86_64/cu102/libdjl_torch.so",
+                "precxx11/linux-x86_64/cpu/libdjl_torch.so": "linux-x86_64/cpu-precxx11/libdjl_torch.so",
+                "osx-x86_64/cpu/libdjl_torch.dylib"        : "osx-x86_64/cpu/libdjl_torch.dylib",
+                "win-x86_64/cpu/djl_torch.dll"             : "win-x86_64/cpu/djl_torch.dll",
+                "win-x86_64/cu101/djl_torch.dll"           : "win-x86_64/cu101/djl_torch.dll",
+                "win-x86_64/cu102/djl_torch.dll"           : "win-x86_64/cu102/djl_torch.dll"
         ]
-        if (isPrecxx11) {
-            url = url + "/precxx11"
-            // precxx11 only support cpu for now
-            files = [
-                    "linux-cpu": ["pytorch.properties", "libdjl_torch.so"],
-            ]
-        }
         def classesDir = "${project.buildDir}/jnilib"
         files.each { entry ->
-            def nameList = entry.key.split("-")
-            def flavor = nameList[1]
-            def classifier = "${nameList[0]}-x86_64"
-            entry.value.each { name ->
-                def downloadPath = new URL("${url}/${classifier}/${flavor}/${name}")
-                def file = file("${classesDir}/${classifier}/${flavor}/${name}")
-                if (!file.exists()) {
-                    project.logger.lifecycle("${url}/${classifier}/${flavor}/${name}")
-                    file.getParentFile().mkdirs()
-                    downloadPath.withInputStream { i -> file.withOutputStream { it << i } }
-                }
-            }
+            project.logger.lifecycle("Downloading ${url}/${entry.key}")
+            def file = new File("${classesDir}/${entry.value}")
+            file.getParentFile().mkdirs()
+            new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }
         }
+        // write properties
+        def propFile = file("${classesDir}/pytorch.properties")
+        propFile.text = "version=${version}\n"
 
         copy {
             from classesDir
@@ -58,7 +48,6 @@ processResources {
     }
 }
 
-
 test {
     environment "PATH", "src/test/bin:${environment.PATH}"
 }
@@ -66,7 +55,6 @@ test {
 publishing {
     publications {
         maven(MavenPublication) {
-            artifactId "pytorch-engine" + (isPrecxx11 ? "-precxx11" : "")
             pom {
                 name = "DJL Engine Adapter for PyTorch"
                 description = "Deep Java Library (DJL) Engine Adapter for PyTorch"

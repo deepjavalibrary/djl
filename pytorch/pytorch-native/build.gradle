@@ -33,11 +33,8 @@ def downloadBuild(String os, String flavor, Boolean isPrecxx11 = false) {
         from tree.files
         into publishDir
     }
-    def versionName = String.format("${project.parent.version}-%s", new Date().format('yyyyMMdd'))
-    def propFile = file("${publishDir}/pytorch.properties")
-    propFile.text = "version=${versionName}\n"
     // for nightly ci
-    def ciDir = "${project.projectDir}/jnilib/${classifier}/${flavor}"
+    def ciDir = "${project.projectDir}/jnilib/${djl_version}/${classifier}/${flavor}"
     copy {
         from publishDir
         into ciDir
@@ -51,14 +48,11 @@ def downloadBuildAndroid() {
             exec {
                 commandLine 'bash', 'build_android.sh', "${abi}"
             }
-            def ciDir = "${project.projectDir}/jnilib/android/${abi}"
+            def ciDir = "${project.projectDir}/jnilib/${djl_version}/android/${abi}"
             copy {
                 from "${project.buildDir}/libdjl_torch.so"
                 into ciDir
             }
-            def versionName = String.format("${project.parent.version}-%s", new Date().format('yyyyMMdd'))
-            def propFile = file("${ciDir}/pytorch.properties")
-            propFile.text = "version=${versionName}\n"
             cleanBuild()
     }
 }
@@ -206,7 +200,7 @@ task downloadPyTorchNativeLib() {
         if (isPrecxx11) {
             // precxx11 only support cpu for now
             files = [
-                    "cpu/libtorch-shared-with-deps-${VERSION}%2Bcpu.zip"    : "cpu/linux",
+                    "cpu/libtorch-shared-with-deps-${VERSION}%2Bcpu.zip": "cpu/linux",
             ]
         }
         files.each { entry ->
