@@ -102,7 +102,7 @@ public final class LibUtils {
                     cacheDir = System.getenv("DJL_CACHE_DIR");
                     if (cacheDir == null || cacheDir.isEmpty()) {
                         String userHome = System.getProperty("user.home");
-                        cacheDir = Paths.get(userHome, ".djl.ai").toString();
+                        return Paths.get(userHome, ".djl.ai").resolve("sentencepiece");
                     }
                 }
             }

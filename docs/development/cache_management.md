@@ -4,9 +4,10 @@ DJL uses cache directories to store downloaded models and Engine specific native
 By default, cache directories are located at current user's home directory:
 
 - `.djl.ai` is the default cache directory stores downloaded models and datasets
-- `.mxnet` is the default cache directory stores Apache MXNet engine native libraries
-- `.pytorch` is the default cache directory stores Pytorch engine native libraries
-- `.tensorflow` is the default cache directory stores TensorFlow engine native libraries
+- `.djl.ai/mxnet` is the default cache directory stores Apache MXNet engine native libraries
+- `.djl.ai/pytorch` is the default cache directory stores Pytorch engine native libraries
+- `.djl.ai/tensorflow` is the default cache directory stores TensorFlow engine native libraries
+- `.djl.ai/sentencepiece` is the default cache directory stores Sentenpiece native libraries
 
 *In the current version, DJL will not clean obsolete cache automatically in the current version.*
 User can clean up unused model or native engine manually.

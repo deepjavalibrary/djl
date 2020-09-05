@@ -171,7 +171,7 @@ public final class LibUtils {
             throw new IllegalStateException("Cannot find pytorch property file", e);
         }
         String version = prop.getProperty("version");
-        Path path = nativeDir.resolve(version + flavor + name);
+        Path path = nativeDir.resolve(version + '-' + flavor + '-' + name);
         if (Files.exists(path)) {
             return path.toAbsolutePath().toString();
         }
@@ -252,7 +252,7 @@ public final class LibUtils {
             String libName = System.mapLibraryName(NATIVE_LIB_NAME);
             Path cacheDir = getCacheDir();
             logger.debug("Using cache dir: {}", cacheDir);
-            Path dir = cacheDir.resolve(version + flavor + '-' + classifier);
+            Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
             Path path = dir.resolve(libName);
             if (Files.exists(path)) {
                 return dir.toAbsolutePath().toString();
@@ -291,7 +291,7 @@ public final class LibUtils {
         String libName = System.mapLibraryName(NATIVE_LIB_NAME);
         Path cacheDir = getCacheDir();
         logger.debug("Using cache dir: {}", cacheDir);
-        Path dir = cacheDir.resolve(version + flavor + '-' + classifier);
+        Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {
             return dir.toAbsolutePath().toString();
@@ -315,7 +315,7 @@ public final class LibUtils {
                 fallback.set(true);
 
                 // check again
-                dir = cacheDir.resolve(version + flavor + '-' + classifier);
+                dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
                 path = dir.resolve(libName);
                 if (Files.exists(path)) {
                     return dir.toAbsolutePath().toString();
@@ -353,12 +353,11 @@ public final class LibUtils {
                     cacheDir = System.getenv("DJL_CACHE_DIR");
                     if (cacheDir == null || cacheDir.isEmpty()) {
                         String userHome = System.getProperty("user.home");
-                        return Paths.get(userHome, ".pytorch/cache");
+                        return Paths.get(userHome, ".djl.ai").resolve("pytorch");
                     }
                 }
-                return Paths.get(cacheDir, "pytorch");
             }
         }
-        return Paths.get(cacheDir, ".pytorch/cache");
+        return Paths.get(cacheDir, "pytorch");
     }
 }

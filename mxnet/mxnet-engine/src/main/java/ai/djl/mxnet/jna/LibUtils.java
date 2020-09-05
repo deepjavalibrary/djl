@@ -269,7 +269,7 @@ public final class LibUtils {
         String libName = System.mapLibraryName(LIB_NAME);
         Path cacheFolder = getCacheDir();
         logger.debug("Using cache dir: {}", cacheFolder);
-        Path dir = cacheFolder.resolve(version + flavor + '-' + classifier);
+        Path dir = cacheFolder.resolve(version + '-' + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {
             return path.toAbsolutePath().toString();
@@ -313,7 +313,7 @@ public final class LibUtils {
 
                 // check again in case fallback to cpu
                 if ("mkl".equals(flavor)) {
-                    dir = cacheFolder.resolve(version + flavor + '-' + classifier);
+                    dir = cacheFolder.resolve(version + '-' + flavor + '-' + classifier);
                     path = dir.resolve(libName);
                     if (Files.exists(path)) {
                         return path.toAbsolutePath().toString();
@@ -361,12 +361,11 @@ public final class LibUtils {
                     cacheDir = System.getenv("DJL_CACHE_DIR");
                     if (cacheDir == null || cacheDir.isEmpty()) {
                         String userHome = System.getProperty("user.home");
-                        return Paths.get(userHome, ".mxnet/cache");
+                        return Paths.get(userHome, ".djl.ai").resolve("mxnet");
                     }
                 }
-                return Paths.get(cacheDir, "mxnet");
             }
         }
-        return Paths.get(cacheDir, ".mxnet/cache");
+        return Paths.get(cacheDir, "mxnet");
     }
 }

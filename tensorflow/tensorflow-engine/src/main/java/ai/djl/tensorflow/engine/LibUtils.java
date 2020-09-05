@@ -157,12 +157,11 @@ public final class LibUtils {
                     cacheDir = System.getenv("DJL_CACHE_DIR");
                     if (cacheDir == null || cacheDir.isEmpty()) {
                         String userHome = System.getProperty("user.home");
-                        return Paths.get(userHome, ".tensorflow/cache");
+                        return Paths.get(userHome, ".djl.ai").resolve("tensorflow");
                     }
                 }
-                return Paths.get(cacheDir, "tensorflow");
             }
         }
-        return Paths.get(cacheDir, ".tensorflow/cache");
+        return Paths.get(cacheDir, "tensorflow");
     }
 }
