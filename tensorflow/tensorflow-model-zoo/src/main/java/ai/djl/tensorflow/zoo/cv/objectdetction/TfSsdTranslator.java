@@ -33,7 +33,6 @@ import java.util.List;
 public class TfSsdTranslator extends SingleShotDetectionTranslator {
 
     private int maxBoxes;
-    private float threshHold;
 
     /**
      * Creates the SSD translator from the given builder.
@@ -43,7 +42,6 @@ public class TfSsdTranslator extends SingleShotDetectionTranslator {
     protected TfSsdTranslator(Builder builder) {
         super(builder);
         this.maxBoxes = builder.maxBoxes;
-        this.threshHold = builder.getThreshold();
     }
 
     @Override
@@ -92,7 +90,7 @@ public class TfSsdTranslator extends SingleShotDetectionTranslator {
             long classId = classIds[i];
             double score = scores[i];
             // classId starts from 0, -1 means background
-            if (classId >= 0 && score > threshHold) {
+            if (classId >= 0 && score > threshold) {
                 if (classId >= classes.size()) {
                     throw new AssertionError("Unexpected index: " + classId);
                 }

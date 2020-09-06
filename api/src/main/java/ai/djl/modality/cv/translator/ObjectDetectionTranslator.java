@@ -92,15 +92,6 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
         }
 
         /**
-         * Get threshold.
-         *
-         * @return threshold
-         */
-        public float getThreshold() {
-            return threshold;
-        }
-
-        /**
          * Get resized image width.
          *
          * @return image width
