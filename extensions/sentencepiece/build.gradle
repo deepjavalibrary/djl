@@ -11,7 +11,6 @@ dependencies {
 }
 
 processResources {
-    inputs.dir file("${project.buildDir}/jnilib")
     outputs.dir file("${project.buildDir}/classes/java/main/native/lib")
     doLast {
         def url = "https://djl-ai.s3.amazonaws.com/publish/sentencepiece-${sentencepiece_version}/jnilib/${djl_version}"
