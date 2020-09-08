@@ -133,7 +133,7 @@ In the *build()* method, we take advantage of CSVParser to get the record of eac
 ```
 public class CSVDataset extends RandomAccessDataset {
 
-    private List<CSVRecord> csvRecords;
+    private final List<CSVRecord> csvRecords;
 
     private CSVDataset(Builder builder) {
         super(builder);
@@ -142,14 +142,14 @@ public class CSVDataset extends RandomAccessDataset {
     ...
     public static final class Builder extends BaseBuilder<Builder> {
         List<CSVRecord> csvRecords;
-    
+
         @Override
         protected Builder self() {
             return this;
         }
-    
-        public CSVDataset build() IOException {
-            String csvFilePath = "/path/malicious_url_data.csv";
+
+        CSVDataset build() throws IOException {
+            String csvFilePath = "path/malicious_url_data.csv";
             try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));
                  CSVParser csvParser =
                     new CSVParser(
@@ -178,19 +178,19 @@ The reason why we use NDList here is that you might have multiple inputs and lab
 public Record get(NDManager manager, long index) {
     // get a CSVRecord given an index
     CSVRecord record = csvRecords.get(Math.toIntExact(index));
-    NDArray datum = manager.create(encode(manager, record.get("url")));
+    NDArray datum = manager.create(encode(record.get("url")));
     NDArray label = manager.create(Float.parseFloat(record.get("isMalicious")));
     return new Record(new NDList(datum), new NDList(label));
 }
 ```
 
 3. Size
-The size of the dataset
+The number of records available to be read in this Dataset.
 Here, we can directly use the size of the List<CSVRecord>.
 
 ```
 @Override
-public long size() {
+public long availableSize() {
     return csvRecords.size();
 }
 ```
