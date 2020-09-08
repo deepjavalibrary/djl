@@ -1,27 +1,21 @@
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
-import ai.djl.repository.dataset.PreparedDataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.util.Progress;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CSVDataset extends RandomAccessDataset {
 
-    private List<CSVRecord> csvRecords;
+    private final List<CSVRecord> csvRecords;
 
     private CSVDataset(Builder builder) {
         super(builder);
@@ -37,7 +31,7 @@ public class CSVDataset extends RandomAccessDataset {
     }
 
     @Override
-    public long size() {
+    public long availableSize() {
         return csvRecords.size();
     }
 
@@ -53,6 +47,9 @@ public class CSVDataset extends RandomAccessDataset {
         }
         return encoding;
     }
+
+    @Override
+    public void prepare(Progress progress) {}
 
     public static final class Builder extends BaseBuilder<Builder> {
 
