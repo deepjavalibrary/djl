@@ -29,6 +29,11 @@ You can also build the latest javadocs locally using the following command:
 ```
 The javadocs output is generated in the `build/doc/javadoc` folder.
 
+#### System Requirements
+
+Read the [System Requirements](https://github.com/microsoft/onnxruntime/blob/master/README.md#system-requirements)
+for the official ONNX Runtime project.
+
 ## Installation
 You can pull the ONNX Runtime engine from the central Maven repository by including the following dependency:
 
@@ -56,19 +61,19 @@ Maven:
 <dependency>
     <groupId>ai.djl.onnxruntime</groupId>
     <artifactId>onnxruntime-engine</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.7.0</version>
     <scope>runtime</scope>
     <exclusions>
         <exclusion>
             <groupId>com.microsoft.onnxruntime</groupId>
-            <artifactId>onnxruntime_gpu</artifactId>
+            <artifactId>onnxruntime</artifactId>
         </exclusion>
     </exclusions>
 </dependency>
 <dependency>
     <groupId>com.microsoft.onnxruntime</groupId>
     <artifactId>onnxruntime_gpu</artifactId>
-    <version>1.3.1</version>
+    <version>1.4.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -78,5 +83,5 @@ Gradle:
     implementation("ai.djl.onnxruntime:onnxruntime-engine:0.7.0") {
         exclude group: "com.microsoft.onnxruntime", module: "onnxruntime"
     }
-    implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.3.1"
+    implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.4.0"
 ```
