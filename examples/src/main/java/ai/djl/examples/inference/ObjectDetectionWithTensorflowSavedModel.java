@@ -75,12 +75,16 @@ public final class ObjectDetectionWithTensorflowSavedModel {
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
         DetectedObjects detection = ObjectDetectionWithTensorflowSavedModel.predict();
-        logger.info("{}", detection);
+        if (detection == null) {
+            logger.info("This example only works for TensorFlow");
+        } else {
+            logger.info("{}", detection);
+        }
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
         if (!"TensorFlow".equals(Engine.getInstance().getEngineName())) {
-            throw new UnsupportedOperationException("This test only for TensorFlow");
+            return null;
         }
 
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");

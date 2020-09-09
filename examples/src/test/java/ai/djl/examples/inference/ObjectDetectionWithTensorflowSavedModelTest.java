@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class ObjectDetectionWithTensorflowSavedModelTest {
@@ -31,6 +32,11 @@ public class ObjectDetectionWithTensorflowSavedModelTest {
         // throttling and will fail the test.
         if (Boolean.getBoolean("nightly")) {
             DetectedObjects result = ObjectDetectionWithTensorflowSavedModel.predict();
+            // only works for TensorFlow
+            if (result == null) {
+                throw new SkipException("Only works for TensorFlow engine.");
+            }
+
             Assert.assertEquals(result.getNumberOfObjects(), 3);
             List<String> objects = Arrays.asList("dog", "bicycle", "car");
             for (Classifications.Classification obj : result.items()) {
