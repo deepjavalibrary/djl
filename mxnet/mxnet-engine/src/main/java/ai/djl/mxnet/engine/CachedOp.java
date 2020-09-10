@@ -51,7 +51,8 @@ public class CachedOp extends NativeResource {
     /**
      * Creates an instance of {@link CachedOp}.
      *
-     * <p>It can be created by using {@link JnaUtils#createCachedOp(MxSymbolBlock, MxNDManager)}
+     * <p>It can be created by using {@link JnaUtils#createCachedOp(MxSymbolBlock, MxNDManager,
+     * boolean)}
      *
      * @param handle the C handle of the CachedOp
      * @param manager the manager used to create the NDArray

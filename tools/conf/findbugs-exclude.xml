@@ -15,5 +15,10 @@
     <Match>
         <Class name="~ai\.djl\.mxnet\.jnarator\.parser\..*"/>
     </Match>
-
+    <!-- function suppression -->
+    <Match>
+        <Bug pattern="DC_DOUBLECHECK"/>
+        <Class name="~ai\.djl\.mxnet\.engine\.MxSymbolBlock"/>
+        <Method name="forward"/>
+    </Match>
 </FindBugsFilter>

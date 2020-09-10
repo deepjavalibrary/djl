@@ -171,7 +171,13 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
             }
         }
         if (op == null) {
-            op = JnaUtils.createCachedOp(this, (MxNDManager) manager);
+            // create CachedOp is not thread-safe
+            // add synchronized block to avoid creating multiple CachedOps
+            synchronized (MxSymbolBlock.class) {
+                if (op == null) {
+                    op = JnaUtils.createCachedOp(this, (MxNDManager) manager, training);
+                }
+            }
         }
         NDList outputs = op.forward(parameterStore, inputs);
         if (outputDescriptions == null) {

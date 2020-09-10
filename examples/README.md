@@ -14,7 +14,6 @@ The following examples are included for inference:
 
 - [Image classification example](docs/image_classification.md)
 - [Single-shot object detection example](docs/object_detection.md)
-- [Multi-threaded inference example](docs/multithread_inference.md)
 - [Bert question and answer example](docs/BERT_question_and_answer.md)
 - [Instance segmentation example](docs/instance_segmentation.md)
 - [Pose estimation example](docs/pose_estimation.md)

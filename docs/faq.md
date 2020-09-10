@@ -42,7 +42,7 @@ multiple GPUs with the appropriate arguments. Follow the steps in the example to
 ### 5. Does DJL support inference on multiple threads?
 Yes. DJL offers multi-threaded inference. If using the MXNet engine for a multi-threaded inference case, you need to 
 specify the 'MXNET_ENGINE_TYPE' environment variable to 'NaiveEngine'. For more information, see the
-[Multi-threaded inference example](../examples/docs/multithread_inference.md).
+[inference_performance_optimization](development/inference_performance_optimization.md).
 
 ### 6. Does DJL support distributed training?
 DJL does not currently support distributed training.
