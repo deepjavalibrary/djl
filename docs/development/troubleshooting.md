@@ -117,6 +117,12 @@ Sometimes you may only have read-only access on the machine.
 It will cause a failure during engine loading because the cache attempts to write to the home directory.
 For more information, please refer to [DJL Cache Management](cache_management.md).
 
+
+### 1.5 Package version mismatch
+
+It happened when you had a wrong version with DJL and Deep Engines. 
+You can check the combination [here](dependency_management.md) and use DJL BOM to solve the issue.
+
 ## 2. IntelliJ throws the `No Log4j 2 configuration file found.` exception.
 The following exception may appear after running the `./gradlew clean` command:
 
@@ -226,3 +232,27 @@ java.awt.HeadlessException:
 ```
 
 Follow the [steps here](https://github.com/aws-samples/d2l-java/blob/master/documentation/troubleshoot.md) to resolve it.
+
+
+## 10. JVM crash
+
+It is very unfortunate to have issue since the error logging is not very clear.
+There are many causes that can trigger this issue. If you have issues debugging,
+please file us an issue on GitHub or on Slack and we can check with you. Here is a summary on the issues we have dealt before.
+
+### 1. Java heap memory not sufficient
+
+Sometimes the OOM issue will trigger the `Core Dump` error message.
+It can be the heap memory overflow and cause a chain of failure from native memory to Java.
+Try to increase the `xmx` may help to reduce this issue,
+you can also try to monitor the heap memory cost to identify if this is the root cause.
+
+### 2. Illegal memory access
+
+This issue is fairly common in the Multithreaded Inference/Training cases and will trigger the `segfault` or `Core Dump` error message.
+The Java GC has kicked in and release some of the pointers beforehand. Generally, you may need to disable the GC happened in this case
+and relying on DJL's `NDManager` to efficiently GC the memory. You can do that by adding flag
+
+```
+-Dai.djl.disable_close_resource_on_finalize=true
+```
