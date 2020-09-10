@@ -12,6 +12,9 @@
  */
 package ai.djl.nn;
 
+import ai.djl.ndarray.types.Shape;
+import ai.djl.util.PairList;
+
 /**
  * {@code SymbolBlock} is a {@link Block} is used to load models that were exported directly from
  * the engine in its native format.
@@ -20,4 +23,11 @@ public interface SymbolBlock extends Block {
 
     /** Removes the last block in the symbolic graph. */
     void removeLastBlock();
+
+    /**
+     * Returns a {@link PairList} of output names and shapes stored in model file.
+     *
+     * @return the {@link PairList} of output names, and shapes
+     */
+    PairList<String, Shape> describeOutput();
 }

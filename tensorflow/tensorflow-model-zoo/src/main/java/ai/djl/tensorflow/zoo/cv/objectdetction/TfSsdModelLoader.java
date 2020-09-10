@@ -66,12 +66,25 @@ public class TfSsdModelLoader extends ObjectDetectionModelLoader {
         @SuppressWarnings("unchecked")
         public Translator<Image, DetectedObjects> newInstance(
                 Model model, Map<String, Object> arguments) {
+
             int width = ((Double) arguments.getOrDefault("width", 256)).intValue();
             int height = ((Double) arguments.getOrDefault("height", 256)).intValue();
             double threshold = (Double) arguments.getOrDefault("threshold", 0.4d);
+            int maxBoxes = (Integer) arguments.getOrDefault("maxBoxes", 10);
+            String boundingBoxOutputName =
+                    (String) arguments.getOrDefault("boundingBoxOutputName", "detection_boxes");
+            String scoresOutputName =
+                    (String) arguments.getOrDefault("scoresOutputName", "detection_scores");
+            String classLabelOutputName =
+                    (String)
+                            arguments.getOrDefault(
+                                    "classLabelOutputName", "detection_class_labels");
 
             return TfSsdTranslator.builder()
-                    .optMaxBoxes(10)
+                    .optMaxBoxes(maxBoxes)
+                    .optScoresOutputName(scoresOutputName)
+                    .optBoundingBoxOutputName(boundingBoxOutputName)
+                    .optClassLabelOutputName(classLabelOutputName)
                     .optThreshold((float) threshold)
                     .optSynsetArtifactName("classes.txt")
                     .addTransform(new Resize(width, height))

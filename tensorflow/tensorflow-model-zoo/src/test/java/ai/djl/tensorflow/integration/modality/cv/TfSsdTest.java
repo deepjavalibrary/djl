@@ -19,11 +19,13 @@ import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
+import ai.djl.util.Pair;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,6 +54,19 @@ public class TfSsdTest {
         Image img = ImageFactory.getInstance().fromFile(file);
         try (ZooModel<Image, DetectedObjects> model = ModelZoo.loadModel(criteria);
                 Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
+            Assert.assertEquals(model.describeInput().get(0).getValue(), new Shape(-1, -1, -1, 3));
+            for (Pair<String, Shape> pair : model.describeOutput()) {
+                if (pair.getKey().contains("label")) {
+                    Assert.assertEquals(pair.getValue(), new Shape(-1, 1));
+                } else if (pair.getKey().contains("box")) {
+                    Assert.assertEquals(pair.getValue(), new Shape(-1, 4));
+                } else if (pair.getKey().contains("score")) {
+                    Assert.assertEquals(pair.getValue(), new Shape(-1, 1));
+                } else {
+                    throw new IllegalStateException("Unexpected output name:" + pair.getKey());
+                }
+            }
+
             DetectedObjects result = predictor.predict(img);
             List<String> classes =
                     result.items()

@@ -12,6 +12,7 @@
  */
 package ai.djl.pytorch.engine;
 
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -28,6 +29,8 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@code PtSymbolBlock} is the PyTorch implementation of {@link SymbolBlock}.
@@ -38,8 +41,11 @@ import java.io.DataOutputStream;
 // TODO: Memory handling
 public class PtSymbolBlock extends NativeResource implements SymbolBlock {
 
+    private static final Logger logger = LoggerFactory.getLogger(PtSymbolBlock.class);
     private PtNDManager manager;
     private boolean isTrain;
+    private PairList<String, Shape> inputDescriptions;
+    private PairList<String, Shape> outputDescriptions;
 
     /**
      * Constructs a {@code PtSymbolBlock}.
@@ -91,7 +97,20 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
                 JniUtils.enableInferenceMode(this);
             }
         }
-        return IValueUtils.forward(this, inputs, training);
+        if (inputDescriptions == null) {
+            inputDescriptions = new PairList<>();
+            for (NDArray array : inputs) {
+                inputDescriptions.add(array.getName(), array.getShape());
+            }
+        }
+        NDList outputs = IValueUtils.forward(this, inputs, training);
+        if (outputDescriptions == null) {
+            outputDescriptions = new PairList<>();
+            for (NDArray array : inputs) {
+                outputDescriptions.add(array.getName(), array.getShape());
+            }
+        }
+        return outputs;
     }
 
     /** {@inheritDoc} */
@@ -133,7 +152,23 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
     /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeInput() {
-        throw new UnsupportedOperationException("Not implemented");
+        if (inputDescriptions == null) {
+            logger.warn(
+                    "Input shapes are unknown, please run predict or forward once"
+                            + "and call describeInput again.");
+        }
+        return inputDescriptions;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PairList<String, Shape> describeOutput() {
+        if (outputDescriptions == null) {
+            logger.warn(
+                    "Output shapes are unknown, please run predict or forward once"
+                            + "and call describeOutput again.");
+        }
+        return outputDescriptions;
     }
 
     /** {@inheritDoc} */

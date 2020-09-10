@@ -14,6 +14,10 @@ package ai.djl.mxnet.integration;
 
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.inference.Predictor;
+import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -25,6 +29,7 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.GradientCollector;
@@ -33,14 +38,30 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
+import ai.djl.translate.TranslateException;
 import ai.djl.util.Pair;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class MxSymbolBlockTest {
+    @Test
+    public void testSymbolModelInputOutput()
+            throws IOException, ModelNotFoundException, MalformedModelException,
+                    TranslateException {
+        try (ZooModel<Image, Classifications> model = MxModelZoo.MLP.loadModel();
+                Predictor<Image, Classifications> predictor = model.newPredictor()) {
+            Path imageFile = Paths.get("../../examples/src/test/resources/0.png");
+            Image img = ImageFactory.getInstance().fromFile(imageFile);
+            predictor.predict(img);
+            Assert.assertEquals(model.describeInput().get(0).getValue(), new Shape(1, 1, 28, 28));
+            Assert.assertEquals(model.describeOutput().get(0).getValue(), new Shape(1, 10));
+        }
+    }
 
     @Test
     public void testForward() throws IOException, ModelNotFoundException, MalformedModelException {

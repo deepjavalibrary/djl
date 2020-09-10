@@ -357,7 +357,7 @@ public class NDArrayCreationOpTest {
     @Test
     public void testFixedSeed() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            if (Engine.getInstance().getEngineName().equals("TensorFlow")) {
+            if ("TensorFlow".equals(Engine.getInstance().getEngineName())) {
                 throw new SkipException("TensorFlow fixed random seed require restart process.");
             }
             int fixedSeed = 1234;

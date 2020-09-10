@@ -211,7 +211,9 @@ public abstract class AbstractBlock implements Block {
     @Override
     public PairList<String, Shape> describeInput() {
         if (!isInitialized()) {
-            throw new IllegalStateException("Parameter of this block are not initialised");
+            throw new IllegalStateException(
+                    "Parameter of this block are not initialised,"
+                            + "please call model.newTrainer and trainer.initialize");
         }
         return new PairList<>(inputNames, Arrays.asList(inputShapes));
     }

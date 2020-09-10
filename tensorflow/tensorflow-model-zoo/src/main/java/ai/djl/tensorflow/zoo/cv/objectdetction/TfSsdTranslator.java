@@ -19,7 +19,6 @@ import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
@@ -28,11 +27,14 @@ import java.util.List;
 /**
  * A {@link TfSsdTranslator} that post-process the {@link NDArray} into {@link DetectedObjects} with
  * boundaries. Reference implementation: <a
- * href="https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/Detection/SSD">SSD</a>.
+ * href="https://tfhub.dev/google/openimages_v4/ssd/mobilenet_v2/1">SSD</a>.
  */
 public class TfSsdTranslator extends SingleShotDetectionTranslator {
 
     private int maxBoxes;
+    private String boundingBoxOutputName;
+    private String scoresOutputName;
+    private String classLabelOutputName;
 
     /**
      * Creates the SSD translator from the given builder.
@@ -42,6 +44,9 @@ public class TfSsdTranslator extends SingleShotDetectionTranslator {
     protected TfSsdTranslator(Builder builder) {
         super(builder);
         this.maxBoxes = builder.maxBoxes;
+        this.boundingBoxOutputName = builder.boundingBoxOutputName;
+        this.scoresOutputName = builder.scoresOutputName;
+        this.classLabelOutputName = builder.classLabelOutputName;
     }
 
     @Override
@@ -61,24 +66,20 @@ public class TfSsdTranslator extends SingleShotDetectionTranslator {
     /** {@inheritDoc} */
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
-        // output orders are not guaranteed
         int len = (int) list.get(0).getShape().get(0);
         float[] scores = new float[len];
         long[] classIds = new long[len];
 
         NDArray boundingBoxes = list.get(0);
         for (NDArray array : list) {
-            DataType dType = array.getDataType();
-            int dim = array.getShape().dimension();
-            if (dType == DataType.FLOAT32 && dim == 1) {
+            if (scoresOutputName.equals(array.getName())) {
                 scores = array.toFloatArray();
-            } else if (dType == DataType.FLOAT32 && dim == 2) {
+            } else if (boundingBoxOutputName.equals(array.getName())) {
                 boundingBoxes = array;
-            } else if (dType == DataType.INT64 && dim == 1) {
+            } else if (classLabelOutputName.equals(array.getName())) {
                 classIds = array.toLongArray();
             } else {
-                throw new IllegalStateException(
-                        "Unexpected result NDArray type:" + dType + ", and dim: " + dim);
+                throw new IllegalStateException("Unexpected result NDArray:" + array.getName());
             }
         }
         List<String> retNames = new ArrayList<>();
@@ -125,6 +126,45 @@ public class TfSsdTranslator extends SingleShotDetectionTranslator {
     public static class Builder extends SingleShotDetectionTranslator.Builder {
 
         private int maxBoxes = 10;
+        private String boundingBoxOutputName = "detection_boxes";
+        private String scoresOutputName = "detection_scores";
+        private String classLabelOutputName = "detection_class_labels";
+
+        /**
+         * Set the output name used for bounding boxes. You can find the output names of TensorFlow
+         * models by calling `model.describeOutput()` after loading it.
+         *
+         * @param boundingBoxOutputName output name for bounding boxes
+         * @return this builder
+         */
+        public Builder optBoundingBoxOutputName(String boundingBoxOutputName) {
+            this.boundingBoxOutputName = boundingBoxOutputName;
+            return this;
+        }
+
+        /**
+         * Set the output name used for detection scores. You can find the output names of
+         * TensorFlow models by calling `model.describeOutput()` after loading it.
+         *
+         * @param scoresOutputName output name for detection scores
+         * @return this builder
+         */
+        public Builder optScoresOutputName(String scoresOutputName) {
+            this.scoresOutputName = scoresOutputName;
+            return this;
+        }
+
+        /**
+         * Set the output name used for class label. You can find the output names of TensorFlow
+         * models by calling `model.describeOutput()` after loading it.
+         *
+         * @param classLabelOutputName output name for class label
+         * @return this builder
+         */
+        public Builder optClassLabelOutputName(String classLabelOutputName) {
+            this.classLabelOutputName = classLabelOutputName;
+            return this;
+        }
 
         /**
          * Set the maximum number of bounding boxes to display.

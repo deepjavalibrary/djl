@@ -29,7 +29,7 @@ public class NDImageUtilsTest {
 
     @Test
     public void testNormalize() {
-        if (Engine.getInstance().getEngineName().equals("TensorFlow")) {
+        if ("TensorFlow".equals(Engine.getInstance().getEngineName())) {
             throw new SkipException("TensorFlow use channels last by default.");
         }
         try (NDManager manager = NDManager.newBaseManager()) {
@@ -67,7 +67,7 @@ public class NDImageUtilsTest {
 
     @Test
     public void testToTensor() {
-        if (Engine.getInstance().getEngineName().equals("TensorFlow")) {
+        if ("TensorFlow".equals(Engine.getInstance().getEngineName())) {
             throw new SkipException("TensorFlow use channels last by default.");
         }
         try (NDManager manager = NDManager.newBaseManager()) {

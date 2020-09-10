@@ -27,7 +27,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
@@ -46,7 +45,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -159,7 +157,6 @@ public final class ObjectDetectionWithTensorflowSavedModel {
     private static final class MyTranslator implements Translator<Image, DetectedObjects> {
 
         private Map<Integer, String> classes;
-        private int maxClassId;
         private int maxBoxes;
         private float threshold;
 
@@ -184,7 +181,6 @@ public final class ObjectDetectionWithTensorflowSavedModel {
         public void prepare(NDManager manager, Model model) throws IOException {
             if (classes == null) {
                 classes = loadSynset();
-                maxClassId = Collections.max(classes.keySet());
             }
         }
 
@@ -192,29 +188,18 @@ public final class ObjectDetectionWithTensorflowSavedModel {
         public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
             // output of tf object-detection models is a list of tensors, hence NDList in djl
             // output NDArray order in the list are not guaranteed
-            int length = 0; // number of boxes in the output
-            for (NDArray array : list) {
-                if (array.getShape().dimension() == 1) {
-                    length = (int) array.getFloat(0);
-                    break;
-                }
-            }
 
             int[] classIds = null;
             float[] probabilities = null;
             NDArray boundingBoxes = null;
             for (NDArray array : list) {
-                Shape shape = array.getShape();
-                if (shape.dimension() == 3 && shape.get(1) == length && shape.get(2) == 4) {
+                if ("detection_boxes".equals(array.getName())) {
                     boundingBoxes = array.get(0);
-                } else if (shape.dimension() == 2 && shape.get(1) == length) {
-                    if (array.lt(1).all().getBoolean()) {
-                        // probabilities are less than 1
-                        probabilities = array.get(0).toFloatArray();
-                    } else if (array.lt(maxClassId).all().getBoolean()) {
-                        // class id is between 1 - number of classes
-                        classIds = array.get(0).toType(DataType.INT32, true).toIntArray();
-                    }
+                } else if ("detection_scores".equals(array.getName())) {
+                    probabilities = array.get(0).toFloatArray();
+                } else if ("detection_classes".equals(array.getName())) {
+                    // class id is between 1 - number of classes
+                    classIds = array.get(0).toType(DataType.INT32, true).toIntArray();
                 }
             }
             Objects.requireNonNull(classIds);

@@ -214,6 +214,12 @@ public class OrtSymbolBlock implements SymbolBlock, AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
+    public PairList<String, Shape> describeOutput() {
+        throw new UnsupportedOperationException("ONNX Runtime not supported");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public BlockList getChildren() {
         throw new UnsupportedOperationException("ONNX Runtime not supported");
     }

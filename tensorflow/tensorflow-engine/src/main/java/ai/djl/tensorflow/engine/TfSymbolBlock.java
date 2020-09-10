@@ -13,6 +13,7 @@
 
 package ai.djl.tensorflow.engine;
 
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -27,6 +28,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.tensorflow.SavedModelBundle;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
@@ -42,6 +44,8 @@ public class TfSymbolBlock implements SymbolBlock {
     private Session session;
     private PairList<String, Shape> inputDescriptions;
     private PairList<String, Shape> outputDescriptions;
+    // store mapping of meaningful key names and actual tensor names used in session
+    private ConcurrentHashMap<String, String> inputOutputNames = new ConcurrentHashMap<>();
 
     public TfSymbolBlock(SavedModelBundle bundle) {
         this.bundle = bundle;
@@ -68,18 +72,23 @@ public class TfSymbolBlock implements SymbolBlock {
         describeOutput();
 
         for (int i = 0; i < inputDescriptions.size(); i++) {
-            runner.feed(inputDescriptions.get(i).getKey(), ((TfNDArray) inputs.get(i)).getTensor());
+            runner.feed(
+                    inputOutputNames.get(inputDescriptions.get(i).getKey()),
+                    ((TfNDArray) inputs.get(i)).getTensor());
         }
         for (int i = 0; i < outputDescriptions.size(); i++) {
-            runner.fetch(outputDescriptions.get(i).getKey());
+            runner.fetch(inputOutputNames.get(outputDescriptions.get(i).getKey()));
         }
         List<Tensor<?>> result = runner.run();
 
         NDList resultNDList = new NDList();
         TfNDManager tfNDManager = (TfNDManager) inputs.head().getManager();
-        for (Tensor<?> tensor : result) {
-            resultNDList.add(tfNDManager.create(tensor));
-            tensor.close();
+        for (int i = 0; i < result.size(); i++) {
+            try (Tensor<?> tensor = result.get(i)) {
+                NDArray array = tfNDManager.create(tensor);
+                array.setName(outputDescriptions.get(i).getKey());
+                resultNDList.add(array);
+            }
         }
         return resultNDList;
     }
@@ -134,8 +143,9 @@ public class TfSymbolBlock implements SymbolBlock {
             SignatureDef servingDefault = signatureDefMap.entrySet().iterator().next().getValue();
             for (Map.Entry<String, TensorInfo> entry : servingDefault.getInputsMap().entrySet()) {
                 TensorShapeProto shapeProto = entry.getValue().getTensorShape();
+                inputOutputNames.put(entry.getKey(), entry.getValue().getName());
                 inputDescriptions.add(
-                        entry.getValue().getName(),
+                        entry.getKey(),
                         new Shape(
                                 shapeProto
                                         .getDimList()
@@ -147,7 +157,9 @@ public class TfSymbolBlock implements SymbolBlock {
         return inputDescriptions;
     }
 
-    PairList<String, Shape> describeOutput() {
+    /** {@inheritDoc} */
+    @Override
+    public PairList<String, Shape> describeOutput() {
         if (outputDescriptions == null) {
             outputDescriptions = new PairList<>();
             Map<String, SignatureDef> signatureDefMap = metaGraphDef.getSignatureDefMap();
@@ -159,8 +171,9 @@ public class TfSymbolBlock implements SymbolBlock {
                         == org.tensorflow.proto.framework.DataType.DT_STRING) {
                     continue;
                 }
+                inputOutputNames.put(entry.getKey(), entry.getValue().getName());
                 outputDescriptions.add(
-                        entry.getValue().getName(),
+                        entry.getKey(),
                         new Shape(
                                 shapeProto
                                         .getDimList()

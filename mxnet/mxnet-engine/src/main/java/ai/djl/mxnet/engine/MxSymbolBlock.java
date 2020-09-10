@@ -15,6 +15,7 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.MalformedModelException;
 import ai.djl.mxnet.jna.JnaUtils;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
@@ -33,6 +34,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@code MxSymbolBlock} is the MXNet implementation of {@link SymbolBlock}.
@@ -44,12 +47,15 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     private static final byte VERSION = 2;
 
+    private static final Logger logger = LoggerFactory.getLogger(MxSymbolBlock.class);
     private NDManager manager;
     private CachedOp op;
     private Symbol symbol;
     private List<Parameter> mxNetParams; // includes input data
     private Map<String, Shape> paramShapes;
     private Shape[] outputShapes;
+    private PairList<String, Shape> inputDescriptions;
+    private PairList<String, Shape> outputDescriptions;
 
     /**
      * Constructs a {@code MxSymbolBlock} for a {@link Symbol}.
@@ -124,12 +130,29 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeInput() {
-        PairList<String, Shape> inputData = new PairList<>();
-        for (String name : inputNames) {
-            // TODO: Save pre-trained input data shape
-            inputData.add(name, new Shape());
+        if (inputDescriptions == null) {
+            inputDescriptions = new PairList<>();
+            for (String name : inputNames) {
+                // Add empty shapes as input shapes are not saved
+                // in MXNet models
+                logger.warn(
+                        "Input shapes are unknown, please run predict or forward once"
+                                + "and call describeInput again.");
+                inputDescriptions.add(name, new Shape());
+            }
         }
-        return inputData;
+        return inputDescriptions;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PairList<String, Shape> describeOutput() {
+        if (outputDescriptions == null) {
+            logger.warn(
+                    "Output shapes are unknown, please run predict or forward once"
+                            + "and call describeOutput again.");
+        }
+        return outputDescriptions;
     }
 
     /** {@inheritDoc} */
@@ -139,10 +162,25 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
+        if (inputDescriptions == null) {
+            inputDescriptions = new PairList<>();
+        }
+        if (inputDescriptions.size() == 0) {
+            for (NDArray array : inputs) {
+                inputDescriptions.add(array.getName(), array.getShape());
+            }
+        }
         if (op == null) {
             op = JnaUtils.createCachedOp(this, (MxNDManager) manager);
         }
-        return op.forward(parameterStore, inputs);
+        NDList outputs = op.forward(parameterStore, inputs);
+        if (outputDescriptions == null) {
+            outputDescriptions = new PairList<>();
+            for (NDArray array : outputs) {
+                outputDescriptions.add(array.getName(), array.getShape());
+            }
+        }
+        return outputs;
     }
 
     /** {@inheritDoc} */

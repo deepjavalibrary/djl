@@ -12,10 +12,14 @@
  */
 package ai.djl;
 
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.SymbolBlock;
+import ai.djl.training.ParameterStore;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import ai.djl.util.Utils;
@@ -28,6 +32,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -102,11 +107,21 @@ public abstract class BaseModel implements Model {
     /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeOutput() {
-        List<String> names = inputData.keys();
-        Shape[] outputShapes =
-                block.getOutputShapes(
-                        manager, inputData.values().toArray(new Shape[inputData.size()]));
-        return new PairList<>(names, Arrays.asList(outputShapes));
+        if (block instanceof SymbolBlock) {
+            return ((SymbolBlock) block).describeOutput();
+        }
+        // create fake input to calculate output shapes
+        NDList input = new NDList();
+        for (Pair<String, Shape> pair : describeInput()) {
+            input.add(manager.ones(pair.getValue()));
+        }
+        List<String> outputNames = new ArrayList<>();
+        NDList output = block.forward(new ParameterStore(manager, true), input, false);
+        Shape[] outputShapes = output.stream().map(NDArray::getShape).toArray(Shape[]::new);
+        for (int i = 0; i < outputShapes.length; i++) {
+            outputNames.add("output" + i);
+        }
+        return new PairList<>(outputNames, Arrays.asList(outputShapes));
     }
 
     /** {@inheritDoc} */
