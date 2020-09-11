@@ -34,6 +34,12 @@ public class MockNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray create(String data) {
+        throw new UnsupportedOperationException("MockNDManager does not support string data");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray create(Shape shape, DataType dataType) {
         return new MockNDArray(this, getDevice(), shape, dataType, null);
     }

@@ -235,6 +235,15 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Creates and initializes a scalar {@link NDArray}. NDArray of String DataType only supports
+     * scalar.
+     *
+     * @param data the String data that needs to be set
+     * @return a new instance of {@link NDArray}
+     */
+    NDArray create(String data);
+
+    /**
      * Creates and initializes a 1D {@link NDArray}.
      *
      * @param data the float array that needs to be set

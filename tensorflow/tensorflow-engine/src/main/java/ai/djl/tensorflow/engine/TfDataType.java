@@ -20,6 +20,7 @@ import org.tensorflow.types.TFloat32;
 import org.tensorflow.types.TFloat64;
 import org.tensorflow.types.TInt32;
 import org.tensorflow.types.TInt64;
+import org.tensorflow.types.TString;
 import org.tensorflow.types.TUint8;
 import org.tensorflow.types.family.TType;
 
@@ -40,6 +41,7 @@ public final class TfDataType {
         map.put(DataType.UINT8, TUint8.DTYPE);
         map.put(DataType.INT8, TUint8.DTYPE);
         map.put(DataType.BOOLEAN, TBool.DTYPE);
+        map.put(DataType.STRING, TString.DTYPE);
         return map;
     }
 
@@ -51,6 +53,7 @@ public final class TfDataType {
         map.put(TInt64.DTYPE, DataType.INT64);
         map.put(TUint8.DTYPE, DataType.UINT8);
         map.put(TBool.DTYPE, DataType.BOOLEAN);
+        map.put(TString.DTYPE, DataType.STRING);
         return map;
     }
 

@@ -30,7 +30,8 @@ public enum DataType {
     INT8(Format.INT, 1),
     INT64(Format.INT, 8),
     BOOLEAN(Format.BOOLEAN, 1),
-    UNKNOWN(Format.UNKNOWN, 0);
+    UNKNOWN(Format.UNKNOWN, 0),
+    STRING(Format.STRING, -1);
 
     /** The general data type format categories. */
     public enum Format {
@@ -38,6 +39,7 @@ public enum DataType {
         UINT,
         INT,
         BOOLEAN,
+        STRING,
         UNKNOWN
     }
 

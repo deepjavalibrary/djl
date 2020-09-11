@@ -42,6 +42,7 @@ import org.tensorflow.op.random.RandomUniform;
 import org.tensorflow.types.TBool;
 import org.tensorflow.types.TFloat32;
 import org.tensorflow.types.TInt32;
+import org.tensorflow.types.TString;
 import org.tensorflow.types.TUint8;
 import org.tensorflow.types.family.TType;
 
@@ -134,6 +135,13 @@ public class TfNDManager extends BaseNDManager {
     public NDArray create(float data) {
         // create scalar tensor with float
         return new TfNDArray(this, TFloat32.scalarOf(data));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(String data) {
+        // create scalar tensor with float
+        return new TfNDArray(this, TString.scalarOf(data));
     }
 
     /** {@inheritDoc} */

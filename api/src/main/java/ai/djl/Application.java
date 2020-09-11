@@ -124,6 +124,7 @@ public class Application {
         Application WORD_EMBEDDING = new Application("nlp/word_embedding");
         Application MACHINE_TRANSLATION = new Application("nlp/machine_translation");
         Application MULTIPLE_CHOICE = new Application("nlp/multiple_choice");
+        Application TEXT_EMBEDDING = new Application("nlp/text_embedding");
     }
 
     /** The common set of applications for tabular data. */

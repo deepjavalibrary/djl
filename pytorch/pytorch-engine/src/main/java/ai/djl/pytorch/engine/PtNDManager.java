@@ -65,6 +65,12 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray create(String data) {
+        throw new UnsupportedOperationException("PyTorch Engine does not support String NDArray");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray create(Shape shape, DataType dataType) {
         return JniUtils.createEmptyNdArray(this, shape, dataType, device, SparseFormat.DENSE);
     }

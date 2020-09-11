@@ -81,6 +81,12 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray create(String data) {
+        throw new UnsupportedOperationException("MXNet Engine does not support String NDArray");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public MxNDArray create(Shape shape, DataType dataType) {
         Pointer handle = JnaUtils.createNdArray(device, shape, dataType, shape.dimension(), false);
         return new MxNDArray(this, handle, device, shape, dataType, false);

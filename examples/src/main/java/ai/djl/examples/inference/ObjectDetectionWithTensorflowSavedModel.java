@@ -74,7 +74,7 @@ public final class ObjectDetectionWithTensorflowSavedModel {
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
         DetectedObjects detection = ObjectDetectionWithTensorflowSavedModel.predict();
         if (detection == null) {
-            logger.info("This example only works for TensorFlow");
+            logger.info("This example only works for TensorFlow Engine");
         } else {
             logger.info("{}", detection);
         }
