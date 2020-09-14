@@ -16,6 +16,7 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - [Cache Management](development/cache_management.md)
 - [Memory Management](development/memory_management.md)
 - [Troubleshooting](development/troubleshooting.md)
+- [Inference Optimization](development/inference_performance_optimization.md)
 
 ## [Jupyter notebook tutorials](../jupyter/README.md)
 
@@ -33,7 +34,6 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 - [Image classification example](../examples/docs/image_classification.md)
 - [Transfer learning example](../examples/docs/train_cifar10_resnet.md)
 - [Train SSD model example](../examples/docs/train_pikachu_ssd.md)
-- [Multi-threaded inference example](../examples/docs/multithread_inference.md)
 - [Bert question and answer example](../examples/docs/BERT_question_and_answer.md)
 - [Instance segmentation example](../examples/docs/instance_segmentation.md)
 - [Pose estimation example](../examples/docs/pose_estimation.md)
@@ -49,8 +49,6 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 ### [PyTorch](../pytorch/README.md)
 
 - [PyTorch Importing](pytorch/how_to_convert_your_model_to_torchscript.md) - Import TorchScript model
-- [Pytorch Inference Optimization](pytorch/how_to_optimize_inference_performance.md) - Improve inference performance
-
 
 ### [TensorFlow](../tensorflow/README.md)
 

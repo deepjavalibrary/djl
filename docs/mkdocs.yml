@@ -55,6 +55,7 @@ nav:
       - 'docs/development/how_to_use_dataset.md'
       - 'docs/how_to_collect_metrics.md'
       - 'docs/development/troubleshooting.md'
+      - 'docs/development/inference_performance_optimization.md'
   - MXNet:
       - Overview: 'mxnet/README.md'
       - MXNet Engine: 'mxnet/mxnet-engine/README.md'
@@ -70,7 +71,6 @@ nav:
       - PyTorch Model Zoo: 'pytorch/pytorch-model-zoo/README.md'
       - Pytorch native library: 'pytorch/pytorch-native/README.md'
       - Import PyTorch Model: 'docs/pytorch/how_to_convert_your_model_to_torchscript.md'
-      - Inference performance tuning: 'docs/pytorch/how_to_optimize_inference_performance.md'
   - TensorFlow:
       - Overview: 'tensorflow/README.md'
       - TensorFlow Engine: 'tensorflow/tensorflow-engine/README.md'
