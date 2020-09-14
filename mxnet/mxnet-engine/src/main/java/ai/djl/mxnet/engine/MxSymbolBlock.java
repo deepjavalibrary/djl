@@ -179,7 +179,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
                 }
             }
         }
-        NDList outputs = op.forward(parameterStore, inputs);
+        NDList outputs = op.forward(parameterStore, inputs, training);
         if (outputDescriptions == null) {
             outputDescriptions = new PairList<>();
             for (NDArray array : outputs) {

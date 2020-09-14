@@ -114,10 +114,10 @@ public class BatchNorm extends AbstractBlock {
             PairList<String, Object> params) {
         NDArray input = inputs.singletonOrThrow();
         Device device = input.getDevice();
-        NDArray gammaArr = parameterStore.getValue(gamma, device);
-        NDArray betaArr = parameterStore.getValue(beta, device);
-        NDArray runningMeanArr = parameterStore.getValue(runningMean, device);
-        NDArray runningVarArr = parameterStore.getValue(runningVar, device);
+        NDArray gammaArr = parameterStore.getValue(gamma, device, training);
+        NDArray betaArr = parameterStore.getValue(beta, device, training);
+        NDArray runningMeanArr = parameterStore.getValue(runningMean, device, training);
+        NDArray runningVarArr = parameterStore.getValue(runningVar, device, training);
         return batchNorm(
                 input,
                 runningMeanArr,

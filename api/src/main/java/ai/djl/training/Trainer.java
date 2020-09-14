@@ -113,7 +113,7 @@ public class Trainer implements AutoCloseable {
                 .forEach(
                         pair -> {
                             for (Device device : devices) {
-                                parameterStore.getValue(pair.getValue(), device);
+                                parameterStore.getValue(pair.getValue(), device, true);
                             }
                         });
     }
@@ -326,7 +326,9 @@ public class Trainer implements AutoCloseable {
                 .forEach(
                         param ->
                                 grads.add(
-                                        parameterStore.getValue(param, devices[0]).getGradient()));
+                                        parameterStore
+                                                .getValue(param, devices[0], true)
+                                                .getGradient()));
 
         NDList list = new NDList(grads.stream().map(NDArray::sum).toArray(NDArray[]::new));
         NDArray gradSum = NDArrays.stack(list);

@@ -81,9 +81,10 @@ public class ParameterStore {
      *
      * @param parameter the parameter to get the value for
      * @param device the device to get the mirror from
+     * @param training true for a training forward pass
      * @return the value of the mirrored parameter on the device
      */
-    public NDArray getValue(Parameter parameter, Device device) {
+    public NDArray getValue(Parameter parameter, Device device, boolean training) {
         // for those optional parameters, they might not be in the ParameterStore
         if (parameter == null) {
             return null;
@@ -122,7 +123,7 @@ public class ParameterStore {
                     array.attach(manager);
                     // some parameter doesn't require grad
                     // for example running_mean in BatchNorm
-                    if (parameter.requireGradient()) {
+                    if (parameter.requireGradient() && training) {
                         array.attachGradient();
                     }
                 }

@@ -130,7 +130,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        inputs = opInputs(parameterStore, inputs);
+        inputs = opInputs(parameterStore, inputs, training);
         NDArrayEx ex = inputs.head().getNDArrayInternal();
         NDList output =
                 ex.rnn(
@@ -226,7 +226,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
         return numDirections == 2;
     }
 
-    protected NDList opInputs(ParameterStore parameterStore, NDList inputs) {
+    protected NDList opInputs(ParameterStore parameterStore, NDList inputs, boolean training) {
         validateInputSize(inputs);
         long batchSize = inputs.head().getShape().get(0);
         inputs = updateInputLayoutToTNC(inputs);
@@ -236,7 +236,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
         NDList result = new NDList(head);
         try (NDList parameterList = new NDList()) {
             for (Parameter parameter : parameters.values()) {
-                NDArray array = parameterStore.getValue(parameter, device);
+                NDArray array = parameterStore.getValue(parameter, device, training);
                 parameterList.add(array.flatten());
             }
             NDArray array = NDArrays.concat(parameterList);

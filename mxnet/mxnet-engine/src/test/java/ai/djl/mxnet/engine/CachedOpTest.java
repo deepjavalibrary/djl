@@ -103,7 +103,7 @@ public class CachedOpTest extends PowerMockTestCase {
                             manager.create(new Shape(2)),
                             manager.create(new Shape(4)),
                             manager.create(new Shape(5)));
-            co.forward(parameterStore, input);
+            co.forward(parameterStore, input, false);
             MxNDArray[] inputNDArray = co.getInputNDArray();
             Assert.assertEquals(inputNDArray[0].getShape(), new Shape(2));
             Assert.assertEquals(inputNDArray[3].getShape(), new Shape(4));
@@ -115,7 +115,7 @@ public class CachedOpTest extends PowerMockTestCase {
             data1.setName("data1");
             NDArray data2 = manager.create(new Shape(2));
             input = new NDList(data2, data1, data0);
-            co.forward(parameterStore, input);
+            co.forward(parameterStore, input, false);
             inputNDArray = co.getInputNDArray();
             Assert.assertEquals(inputNDArray[0].getShape(), new Shape(5));
             Assert.assertEquals(inputNDArray[3].getShape(), new Shape(4));
@@ -127,7 +127,7 @@ public class CachedOpTest extends PowerMockTestCase {
             Assert.assertEquals(inputNDArray[6].getShape(), new Shape(6));
             logger.info("Test: Illegal inputs");
             NDList input2 = new NDList((NDArray) null);
-            co.forward(parameterStore, input2);
+            co.forward(parameterStore, input2, false);
         }
     }
 

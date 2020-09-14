@@ -82,9 +82,10 @@ public class CachedOp extends NativeResource {
      *
      * @param parameterStore the parameterStore
      * @param data the input in {@link NDList} format
+     * @param training true for a training forward pass
      * @return an {@link NDList}
      */
-    public NDList forward(ParameterStore parameterStore, NDList data) {
+    public NDList forward(ParameterStore parameterStore, NDList data, boolean training) {
         // reset the input data index at the beginning
         MxNDArray[] allInputsNDArray = new MxNDArray[parameters.size()];
         // for unit test purpose, we export the current one to global
@@ -97,7 +98,7 @@ public class CachedOp extends NativeResource {
         // fill allInputsNDArray with parameter values on correct device
         for (int index : paramIndices) {
             Parameter parameter = parameters.get(index);
-            MxNDArray value = (MxNDArray) parameterStore.getValue(parameter, device);
+            MxNDArray value = (MxNDArray) parameterStore.getValue(parameter, device, training);
             if (value == null) {
                 throw new NullPointerException("Failed to find parameter from parameterStore");
             }

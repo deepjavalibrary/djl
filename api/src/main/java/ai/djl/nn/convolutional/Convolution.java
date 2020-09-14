@@ -139,8 +139,8 @@ public abstract class Convolution extends AbstractBlock {
             PairList<String, Object> params) {
         NDArray input = inputs.singletonOrThrow();
         Device device = input.getDevice();
-        NDArray weightArr = parameterStore.getValue(weight, device);
-        NDArray biasArr = parameterStore.getValue(bias, device);
+        NDArray weightArr = parameterStore.getValue(weight, device, training);
+        NDArray biasArr = parameterStore.getValue(bias, device, training);
         return convolution(input, weightArr, biasArr, stride, padding, dilation, groups);
     }
 

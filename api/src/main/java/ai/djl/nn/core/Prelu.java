@@ -55,7 +55,7 @@ public class Prelu extends AbstractBlock {
             boolean training,
             PairList<String, Object> params) {
         NDArray input = inputs.singletonOrThrow();
-        NDArray alphaArr = parameterStore.getValue(alpha, input.getDevice());
+        NDArray alphaArr = parameterStore.getValue(alpha, input.getDevice(), training);
         return prelu(input, alphaArr);
     }
 
