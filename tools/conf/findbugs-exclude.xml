@@ -21,4 +21,14 @@
         <Class name="~ai\.djl\.mxnet\.engine\.MxSymbolBlock"/>
         <Method name="forward"/>
     </Match>
+    <Match>
+        <Bug pattern="DC_DOUBLECHECK"/>
+        <Class name="~ai\.djl\.pytorch\.engine\.PtSymbolBlock"/>
+        <Method name="forward"/>
+    </Match>
+    <Match>
+        <Bug pattern="DC_DOUBLECHECK"/>
+        <Class name="~ai\.djl\.tensorflow\.engine\.TfSymbolBlock"/>
+        <Method name="forward"/>
+    </Match>
 </FindBugsFilter>

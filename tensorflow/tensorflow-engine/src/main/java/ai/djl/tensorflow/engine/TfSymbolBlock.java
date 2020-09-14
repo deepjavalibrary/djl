@@ -46,11 +46,13 @@ public class TfSymbolBlock implements SymbolBlock {
     private PairList<String, Shape> outputDescriptions;
     // store mapping of meaningful key names and actual tensor names used in session
     private ConcurrentHashMap<String, String> inputOutputNames = new ConcurrentHashMap<>();
+    private boolean first;
 
     public TfSymbolBlock(SavedModelBundle bundle) {
         this.bundle = bundle;
         session = bundle.session();
         metaGraphDef = bundle.metaGraphDef();
+        first = true;
     }
 
     /** {@inheritDoc} */
@@ -66,11 +68,17 @@ public class TfSymbolBlock implements SymbolBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
+
+        if (first) {
+            synchronized (TfSymbolBlock.class) {
+                if (first) {
+                    describeInput();
+                    describeOutput();
+                    first = false;
+                }
+            }
+        }
         Session.Runner runner = session.runner();
-
-        describeInput();
-        describeOutput();
-
         for (int i = 0; i < inputDescriptions.size(); i++) {
             runner.feed(
                     inputOutputNames.get(inputDescriptions.get(i).getKey()),
@@ -80,9 +88,8 @@ public class TfSymbolBlock implements SymbolBlock {
             runner.fetch(inputOutputNames.get(outputDescriptions.get(i).getKey()));
         }
         List<Tensor<?>> result = runner.run();
-
-        NDList resultNDList = new NDList();
         TfNDManager tfNDManager = (TfNDManager) inputs.head().getManager();
+        NDList resultNDList = new NDList();
         for (int i = 0; i < result.size(); i++) {
             try (Tensor<?> tensor = result.get(i)) {
                 NDArray array = tfNDManager.create(tensor);

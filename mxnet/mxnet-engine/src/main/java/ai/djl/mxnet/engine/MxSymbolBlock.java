@@ -56,6 +56,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
     private Shape[] outputShapes;
     private PairList<String, Shape> inputDescriptions;
     private PairList<String, Shape> outputDescriptions;
+    private boolean first;
 
     /**
      * Constructs a {@code MxSymbolBlock} for a {@link Symbol}.
@@ -81,6 +82,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
             boolean requireGrad = !auxNameSet.contains(name);
             mxNetParams.add(new Parameter(name, this, type, requireGrad));
         }
+        first = true;
     }
 
     /**
@@ -162,31 +164,27 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        if (inputDescriptions == null) {
-            inputDescriptions = new PairList<>();
-        }
-        if (inputDescriptions.size() == 0) {
-            for (NDArray array : inputs) {
-                inputDescriptions.add(array.getName(), array.getShape());
-            }
-        }
-        if (op == null) {
-            // create CachedOp is not thread-safe
-            // add synchronized block to avoid creating multiple CachedOps
+        if (first) {
             synchronized (MxSymbolBlock.class) {
-                if (op == null) {
+                if (first) {
+                    // create CachedOp is not thread-safe
+                    // add synchronized block to avoid creating multiple CachedOps
                     op = JnaUtils.createCachedOp(this, (MxNDManager) manager, training);
+                    inputDescriptions = new PairList<>();
+                    outputDescriptions = new PairList<>();
+                    for (NDArray array : inputs) {
+                        inputDescriptions.add(array.getName(), array.getShape());
+                    }
+                    NDList outputs = op.forward(parameterStore, inputs, training);
+                    for (NDArray array : outputs) {
+                        outputDescriptions.add(array.getName(), array.getShape());
+                    }
+                    first = false;
+                    return outputs;
                 }
             }
         }
-        NDList outputs = op.forward(parameterStore, inputs, training);
-        if (outputDescriptions == null) {
-            outputDescriptions = new PairList<>();
-            for (NDArray array : outputs) {
-                outputDescriptions.add(array.getName(), array.getShape());
-            }
-        }
-        return outputs;
+        return op.forward(parameterStore, inputs, training);
     }
 
     /** {@inheritDoc} */

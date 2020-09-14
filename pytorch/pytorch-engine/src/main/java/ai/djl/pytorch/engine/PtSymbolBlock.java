@@ -46,6 +46,7 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
     private boolean isTrain;
     private PairList<String, Shape> inputDescriptions;
     private PairList<String, Shape> outputDescriptions;
+    private boolean first;
 
     /**
      * Constructs a {@code PtSymbolBlock}.
@@ -62,6 +63,7 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
         manager.attach(getUid(), this);
         // training mode is on by default
         isTrain = true;
+        first = true;
     }
 
     /** {@inheritDoc} */
@@ -97,20 +99,24 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
                 JniUtils.enableInferenceMode(this);
             }
         }
-        if (inputDescriptions == null) {
-            inputDescriptions = new PairList<>();
-            for (NDArray array : inputs) {
-                inputDescriptions.add(array.getName(), array.getShape());
+        if (first) {
+            synchronized (PtSymbolBlock.class) {
+                if (first) {
+                    inputDescriptions = new PairList<>();
+                    outputDescriptions = new PairList<>();
+                    for (NDArray array : inputs) {
+                        inputDescriptions.add(array.getName(), array.getShape());
+                    }
+                    NDList outputs = IValueUtils.forward(this, inputs, training);
+                    for (NDArray array : outputs) {
+                        outputDescriptions.add(array.getName(), array.getShape());
+                    }
+                    first = false;
+                    return outputs;
+                }
             }
         }
-        NDList outputs = IValueUtils.forward(this, inputs, training);
-        if (outputDescriptions == null) {
-            outputDescriptions = new PairList<>();
-            for (NDArray array : inputs) {
-                outputDescriptions.add(array.getName(), array.getShape());
-            }
-        }
-        return outputs;
+        return IValueUtils.forward(this, inputs, training);
     }
 
     /** {@inheritDoc} */
