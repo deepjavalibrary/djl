@@ -15,6 +15,7 @@ package ai.djl.fasttext;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicdataset.RawDataset;
+import ai.djl.fasttext.jni.FtWrapper;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDManager;
@@ -26,20 +27,15 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.Translator;
 import ai.djl.util.PairList;
-import com.github.jfasttext.FastTextWrapper;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import org.bytedeco.javacpp.CharPointer;
-import org.bytedeco.javacpp.PointerPointer;
 
 /**
  * {@code FtModel} is the fastText implementation of {@link Model}.
@@ -48,7 +44,7 @@ import org.bytedeco.javacpp.PointerPointer;
  */
 public class FtModel implements Model {
 
-    FastTextWrapper.FastTextApi fta;
+    FtWrapper fta;
 
     private Path modelDir;
     private String modelName;
@@ -61,7 +57,7 @@ public class FtModel implements Model {
      */
     public FtModel(String name) {
         this.modelName = name;
-        fta = new FastTextWrapper.FastTextApi();
+        fta = FtWrapper.newInstance();
         properties = new ConcurrentHashMap<>();
     }
 
@@ -91,7 +87,7 @@ public class FtModel implements Model {
         }
         fta.loadModel(modelFilePath);
 
-        properties.put("model-type", fta.getModelName().getString());
+        properties.put("model-type", fta.getModelType());
     }
 
     private Path findModelFile(String prefix) {
@@ -119,16 +115,7 @@ public class FtModel implements Model {
      * @return classifications of the input text
      */
     public Classifications classify(String text, int topK) {
-        FastTextWrapper.FloatStringPairVector fspv = fta.predictProba(text, topK);
-
-        int size = Math.min((int) fspv.size(), topK);
-        List<String> classNames = new ArrayList<>(size);
-        List<Double> probabilities = new ArrayList<>(size);
-        for (int i = 0; i < size; ++i) {
-            probabilities.add(Math.exp(fspv.first(i)));
-            classNames.add(fspv.second(i).getString().substring(9));
-        }
-        return new Classifications(classNames, probabilities);
+        return fta.predictProba(text, topK);
     }
 
     /**
@@ -150,7 +137,7 @@ public class FtModel implements Model {
 
         String[] args = config.toCommand(dataset.getData().toString());
 
-        fta.runCmd(args.length, new PointerPointer<CharPointer>(args));
+        fta.runCmd(args);
         setModelFile(modelFile);
 
         TrainingResult result = new TrainingResult();
