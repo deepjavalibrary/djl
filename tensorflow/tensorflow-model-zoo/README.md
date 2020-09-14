@@ -32,10 +32,11 @@ from the central Maven repository by including the following dependency:
 
 ## Pre-trained models
 
-The TensorFlow model zoo contains Computer Vision (CV) models. We currently only support image classification models.
+The TensorFlow model zoo contains Computer Vision (CV) models.
 
 * CV
   * Image Classification
+  * Object Detection
 
 ### How to find a pre-trained model in model zoo
 

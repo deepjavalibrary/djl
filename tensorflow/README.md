@@ -12,6 +12,8 @@ It has the following 4 modules:
 3. [TensorFlow model zoo](tensorflow-model-zoo/README.md): Includes pre-trained TensorFlow models and built-int translators for direct import and use.
 4. [TensorFlow native auto](tensorflow-native/README.md): A placeholder to automatically detect your platform and download the correct native TensorFlow libraries for you.
 
+Refer to [How to import TensorFlow models](https://docs.djl.ai/docs/tensorflow/how_to_import_tensorflow_models_in_DJL.html) for loading TF models in DJL.
+
 ## Installation
 You can pull the TensorFlow engine from the central Maven repository by including the following dependency:
 

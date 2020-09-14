@@ -75,7 +75,7 @@ nav:
       - Overview: 'tensorflow/README.md'
       - TensorFlow Engine: 'tensorflow/tensorflow-engine/README.md'
       - TensorFlow Model Zoo: 'tensorflow/tensorflow-model-zoo/README.md'
-      - Import Keras Model: 'docs/tensorflow/how_to_import_keras_models_in_DJL.md'
+      - Import TensorFlow Model: 'docs/tensorflow/how_to_import_tensorflow_models_in_DJL.md'
   - Utilities:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'

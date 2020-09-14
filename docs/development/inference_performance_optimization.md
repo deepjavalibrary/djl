@@ -87,3 +87,29 @@ It configures the number of the operations JIT interpreter fork to execute in pa
 It configures the number of the threads within the operation. It is set to number of CPU cores by default.
  
 You can find more detail in [PyTorch](https://pytorch.org/docs/stable/notes/cpu_threading_torchscript_inference.html).
+
+
+### TensorFlow
+
+### Multithreading Inference
+You can follow the same steps as other engines for running multithreading inference using TensorFlow engine.
+It's recommended to use one `Predictor` for each thread and avoid using a new `Predictor` for each inference call.
+You can refer to our [Multithreading Benchmark](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/benchmark/MultithreadedBenchmark.java) as an example, 
+here is how to run it using TensorFlow engine.
+
+```bash
+./gradlew benchmark -Dai.djl.default_engine=TensorFlow --args='-c 100 -r {"layers":"50"}'
+```
+
+### oneDNN(MKLDNN) acceleration
+By default, TensorFlow engine comes with oneDNN enabled, no special configuration needed.
+
+### Thread configuration
+It's recommended to use 1 thread for operator parallelism during multithreading inference. 
+You can configure it by setting the following 3 envinronment variables:
+
+```bash
+export OMP_NUM_THREADS=1
+export TF_NUM_INTEROP_THREADS=1
+export TF_NUM_INTRAOP_THREADS=1
+```
