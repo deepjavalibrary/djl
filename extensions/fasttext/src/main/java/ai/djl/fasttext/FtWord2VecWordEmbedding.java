@@ -15,6 +15,7 @@ package ai.djl.fasttext;
 import ai.djl.modality.nlp.embedding.WordEmbedding;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import com.github.jfasttext.FastTextWrapper;
 
 /** An implementation of {@link WordEmbedding} for FastText word embeddings. */
 public class FtWord2VecWordEmbedding implements WordEmbedding {
@@ -55,8 +56,14 @@ public class FtWord2VecWordEmbedding implements WordEmbedding {
     @Override
     public NDArray embedWord(NDManager manager, long index) {
         String word = vocabulary.getToken(index);
-        float[] buf = model.fta.getDataVector(word);
-        return manager.create(buf);
+        FastTextWrapper.RealVector rv = model.fta.getVector(word);
+
+        int size = (int) rv.size();
+        float[] vec = new float[size];
+        for (int i = 0; i < size; ++i) {
+            vec[i] = rv.get(i);
+        }
+        return manager.create(vec);
     }
 
     /** {@inheritDoc} */

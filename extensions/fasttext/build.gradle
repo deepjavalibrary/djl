@@ -1,52 +1,22 @@
 group "ai.djl.fasttext"
 
+repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+}
+
 dependencies {
+    api "com.github.vinhkhuc:jfasttext:0.4"
     api project(":api")
     api project(":basicdataset")
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
-
-    // ModelZoo requires at least one engine in the class path
     testImplementation project(":mxnet:mxnet-engine")
     testImplementation "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
-}
-
-processResources {
-    outputs.dir file("${project.buildDir}/classes/java/main/native/lib")
-    doLast {
-        def url = "https://djl-ai.s3.amazonaws.com/publish/fasttext-${fasttext_version}/jnilib/${djl_version}"
-        def files = [
-                "linux-x86_64": "libjni_fasttext.so",
-                "osx-x86_64"  : "libjni_fasttext.dylib"
-        ]
-        def jniDir = "${project.buildDir}/jnilib"
-        files.each { entry ->
-            def downloadPath = new URL("${url}/${entry.key}/${entry.value}")
-            def file = file("${jniDir}/${entry.key}/${entry.value}")
-            if (!file.exists()) {
-                project.logger.lifecycle("${downloadPath}")
-                file.getParentFile().mkdirs()
-                downloadPath.withInputStream { i -> file.withOutputStream { it << i } }
-            }
-        }
-        def classDir = "${project.buildDir}/classes/java/main/native/lib"
-        file(classDir).mkdirs()
-        copy {
-            from jniDir
-            into classDir
-        }
-        // write properties
-        def versionName = "${fasttext_version}"
-        boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-        if (!isRelease) {
-            versionName += String.format("-%s", new Date().format('yyyyMMdd'))
-        }
-        def propFile = file("${classDir}/fasttext.properties")
-        propFile.text = "version=${versionName}\n"
-    }
 }
 
 publishing {
@@ -58,21 +28,6 @@ publishing {
                 description = "Fasttext Engine Adapter for DJL"
                 url = "http://www.djl.ai/fasttext/${project.name}"
             }
-        }
-    }
-}
-
-apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
-
-task compileJNI {
-    doFirst {
-        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")
-                || System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
-            exec {
-                commandLine 'bash', 'build.sh'
-            }
-        } else {
-            throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
         }
     }
 }
