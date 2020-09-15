@@ -1002,6 +1002,12 @@ public class OrtNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray erfinv() {
+        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArrayEx getNDArrayInternal() {
         throw new UnsupportedOperationException("Not supported for ONNX Runtime");
     }

@@ -497,6 +497,12 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray erfinv() {
+        throw new UnsupportedOperationException("TensorFlow does not support erfinv yet");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray add(Number n) {
         try (NDArray number = manager.create(n).toType(getDataType(), false)) {
             return add(number);

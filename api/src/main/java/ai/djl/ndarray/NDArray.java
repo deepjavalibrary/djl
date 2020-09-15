@@ -4346,6 +4346,22 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
+     * Returns element-wise inverse gauss error function of the {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 0.5f, -1f});
+     * jshell&gt; array.erfinv();
+     * ND: (3) cpu() float32
+     * [0., 0.4769, -inf]
+     * </pre>
+     *
+     * @return The inverse of gauss error of the {@code NDArray}, element-wise
+     */
+    NDArray erfinv();
+
+    /**
      * Returns an internal representative of Native {@code NDArray}.
      *
      * <p>This method should only be used by Engine provider

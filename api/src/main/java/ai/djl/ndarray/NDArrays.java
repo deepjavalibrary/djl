@@ -1970,4 +1970,23 @@ public final class NDArrays {
     public static NDArray logicalXor(NDArray a, NDArray b) {
         return a.logicalXor(b);
     }
+
+    /**
+     * Returns element-wise inverse gauss error function of the input {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 0.5f, -1f});
+     * jshell&gt; NDArrays.erfinv(array);
+     * ND: (3) cpu() float32
+     * [0., 0.4769, -inf]
+     * </pre>
+     *
+     * @param input The input {@code NDArray}
+     * @return The inverse of gauss error of the input, element-wise
+     */
+    public static NDArray erfinv(NDArray input) {
+        return input.erfinv();
+    }
 }

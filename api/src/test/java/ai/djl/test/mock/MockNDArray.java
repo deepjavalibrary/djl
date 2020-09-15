@@ -1090,6 +1090,12 @@ public class MockNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray erfinv() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArrayEx getNDArrayInternal() {
         return new MockNDArrayEx(this);
     }

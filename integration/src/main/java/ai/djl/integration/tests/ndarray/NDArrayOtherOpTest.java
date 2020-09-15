@@ -733,4 +733,14 @@ public class NDArrayOtherOpTest {
             Assert.assertEquals(recovered, array);
         }
     }
+
+    @Test
+    public void testErfinv() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.create(new float[] {0f, 0.5f, -1f});
+            Assertions.assertAlmostEquals(
+                    array.erfinv(),
+                    manager.create(new float[] {0f, 0.4769f, Float.NEGATIVE_INFINITY}));
+        }
+    }
 }

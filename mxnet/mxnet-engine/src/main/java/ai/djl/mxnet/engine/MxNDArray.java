@@ -1449,6 +1449,12 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray erfinv() {
+        return manager.invoke("erfinv", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArrayEx getNDArrayInternal() {
         return mxNDArrayEx;
     }
