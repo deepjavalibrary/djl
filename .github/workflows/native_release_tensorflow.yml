@@ -22,7 +22,9 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Publish to staging repository
         working-directory: tensorflow/tensorflow-native
-        run: ./gradlew publish -Pstaging
+        run: |
+          ./gradlew dTNL
+          ./gradlew publish -Pstaging
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
