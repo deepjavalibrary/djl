@@ -21,7 +21,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Publish to staging repository
-        working-directory: tensorflow/tensorflow-native-auto
+        working-directory: tensorflow/tensorflow-native
         run: ./gradlew publish -Pstaging
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
