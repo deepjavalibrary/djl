@@ -122,6 +122,10 @@ jar {
         def dir = file("${project.buildDir}/classes/java/main/native/lib")
         dir.mkdirs();
         def propFile = new File(dir, "tensorflow.properties")
+        def versionName = project.version
+        if (!isRelease) {
+            versionName += String.format("-%s", new Date().format('yyyyMMdd'))
+        }
         propFile.text = "placeholder=true\nversion=${project.version}\n"
     }
 }
@@ -143,70 +147,169 @@ signing {
     sign publishing.publications
 }
 
-// Only publish if the project directory equals the current directory
-// This means that publishing from the main project does not publish the native jars
-// and the native jars have to be published separately
-if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
-    publishing.repositories {
-        maven {
-            if (project.hasProperty("snapshot")) {
-                name = "snapshot"
-                url = "https://oss.sonatype.org/content/repositories/snapshots/"
-                credentials {
-                    username = findProperty("ossrhUsername")
-                    password = findProperty("ossrhPassword")
+def BINARY_ROOT = "${project.buildDir}/download"
+def flavorNames = file(BINARY_ROOT).list() ?: []
+flavorNames.each { flavor ->
+
+    def platformNames = file("${BINARY_ROOT}/${flavor}").list() ?: []
+
+    def artifactsNames = []
+
+    platformNames.each { osName ->
+        tasks.create(name: "${flavor}-${osName}Jar", type: Jar) {
+            doFirst {
+                def propFile = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib/tensorflow.properties")
+                propFile.delete()
+                def dsStore = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib/.DS_Store")
+                dsStore.delete()
+
+                def versionName = String.format("${version}-%s", new Date().format('yyyyMMdd'))
+                def dir = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib")
+                def sb = new StringBuilder()
+                sb.append("version=${versionName}\nclassifier=${flavor}-${osName}-x86_64\nlibraries=")
+                def first = true
+                for (String name : dir.list().sort()) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sb.append(',')
+                    }
+                    sb.append(name)
                 }
-            } else if (project.hasProperty("staging")) {
-                name = "staging"
-                url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                credentials {
-                    username = findProperty("ossrhUsername")
-                    password = findProperty("ossrhPassword")
+                propFile.text = sb.toString()
+
+                from file("src/main/resources")
+            }
+            from file("${BINARY_ROOT}/${flavor}/${osName}")
+            archiveClassifier = "${osName}-x86_64"
+        }
+        artifactsNames.add(tasks["${flavor}-${osName}Jar"])
+    }
+
+    // Only publish if the project directory equals the current directory
+    // This means that publishing from the main project does not publish the native jars
+    // and the native jars have to be published separately
+    if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
+        publishing.publications.create("${flavor}", MavenPublication) {
+            artifactId "tensorflow-native-${flavor}"
+            from components.java
+            artifacts = artifactsNames
+            artifact jar
+            artifact javadocJar
+            artifact sourcesJar
+            pom {
+                name = "DJL release for TensorFlow native binaries"
+                description = "Deep Java Library (DJL) provided TensorFlow native library binary distribution"
+                url = "http://www.djl.ai/tensorflow/${project.name}"
+                packaging = "jar"
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                    }
                 }
-            } else {
-                name = "local"
-                url = "build/repo"
+
+                scm {
+                    connection = "scm:git:git@github.com:awslabs/djl.git"
+                    developerConnection = "scm:git:git@github.com:awslabs/djl.git"
+                    url = "https://github.com/awslabs/djl"
+                    tag = "HEAD"
+                }
+
+                developers {
+                    developer {
+                        name = "DJL.AI Team"
+                        email = "djl-dev@amazon.com"
+                        organization = "Amazon AI"
+                        organizationUrl = "https://amazon.com"
+                    }
+                }
             }
         }
     }
+}
 
-    publishing {
-        publications {
-            maven(MavenPublication) {
-                from components.java
-                artifacts = [jar, javadocJar, sourcesJar]
-                pom {
-                    name = "DJL release for TensorFlow native binaries"
-                    description = "Deep Java Library (DJL) provided TensorFlow native library binary distribution"
-                    url = "http://www.djl.ai/tensorflow/${project.name}"
-
-                    packaging = "jar"
-
-                    licenses {
-                        license {
-                            name = 'The Apache License, Version 2.0'
-                            url = 'https://www.apache.org/licenses/LICENSE-2.0'
-                        }
-                    }
-
-                    scm {
-                        connection = "scm:git:git@github.com:awslabs/djl.git"
-                        developerConnection = "scm:git:git@github.com:awslabs/djl.git"
-                        url = "https://github.com/awslabs/djl"
-                        tag = "HEAD"
-                    }
-
-                    developers {
-                        developer {
-                            name = "DJL.AI Team"
-                            email = "djl-dev@amazon.com"
-                            organization = "Amazon AI"
-                            organizationUrl = "https://amazon.com"
-                        }
-                    }
-                }
+publishing.repositories {
+    maven {
+        if (project.hasProperty("snapshot")) {
+            name = "snapshot"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+            credentials {
+                username = findProperty("ossrhUsername")
+                password = findProperty("ossrhPassword")
             }
+        } else if (project.hasProperty("staging")) {
+            name = "staging"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = findProperty("ossrhUsername")
+                password = findProperty("ossrhPassword")
+            }
+        } else {
+            name = "local"
+            url = "build/repo"
         }
+    }
+}
+
+import java.util.zip.GZIPInputStream
+
+task downloadTensorflowNativeLib() {
+    doLast {
+        def url = "https://djl-ai.s3.amazonaws.com/publish/tensorflow-${tensorflow_version}"
+        def files = [
+                "linux/cpu/LICENSE.gz"                              : "cpu/linux/META-INF/LICENSE",
+                "linux/cpu/THIRD_PARTY_TF_JNI_LICENSES.gz"          : "cpu/linux/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
+                "linux/cpu/libgomp.so.1.gz"                         : "cpu/linux/native/lib/libgomp.so.1",
+                "linux/cpu/libiomp5.so.gz"                          : "cpu/linux/native/lib/libiomp5.so",
+                "linux/cpu/libjnijavacpp.so.gz"                     : "cpu/linux/native/lib/libjnijavacpp.so",
+                "linux/cpu/libjnimkldnn.so.gz"                      : "cpu/linux/native/lib/libjnimkldnn.so",
+                "linux/cpu/libjnimklml.so.gz"                       : "cpu/linux/native/lib/libjnimklml.so",
+                "linux/cpu/libjnitensorflow.so.gz"                  : "cpu/linux/native/lib/libjnitensorflow.so",
+                "linux/cpu/libmkldnn.so.0.gz"                       : "cpu/linux/native/lib/libmkldnn.so.0",
+                "linux/cpu/libmklml_intel.so.gz"                    : "cpu/linux/native/lib/libmklml_intel.so",
+                "linux/cpu/libtensorflow.so.2.gz"                   : "cpu/linux/native/lib/libtensorflow.so.2",
+                "linux/cpu/libtensorflow_framework.so.2.gz"         : "cpu/linux/native/lib/libtensorflow_framework.so.2",
+                "linux/cu101/LICENSE.gz"                            : "cu101/linux/META-INF/LICENSE",
+                "linux/cu101/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt.gz": "cu101/linux/META-INF/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt",
+                "linux/cu101/THIRD_PARTY_TF_JNI_LICENSES.gz"        : "cu101/linux/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
+                "linux/cu101/libgomp.so.1.gz"                       : "cu101/linux/native/lib/libgomp.so.1",
+                "linux/cu101/libiomp5.so.gz"                        : "cu101/linux/native/lib/libiomp5.so",
+                "linux/cu101/libjnijavacpp.so.gz"                   : "cu101/linux/native/lib/libjnijavacpp.so",
+                "linux/cu101/libjnimkldnn.so.gz"                    : "cu101/linux/native/lib/libjnimkldnn.so",
+                "linux/cu101/libjnimklml.so.gz"                     : "cu101/linux/native/lib/libjnimklml.so",
+                "linux/cu101/libjnitensorflow.so.gz"                : "cu101/linux/native/lib/libjnitensorflow.so",
+                "linux/cu101/libmkldnn.so.0.gz"                     : "cu101/linux/native/lib/libmkldnn.so.0",
+                "linux/cu101/libmklml_intel.so.gz"                  : "cu101/linux/native/lib/libmklml_intel.so",
+                "linux/cu101/libstdc%2B%2B.so.6.gz"                     : "cu101/linux/native/lib/libstdc++.so.6",
+                "linux/cu101/libtensorflow.so.2.gz"                 : "cu101/linux/native/lib/libtensorflow.so.2",
+                "linux/cu101/libtensorflow_framework.so.2.gz"       : "cu101/linux/native/lib/libtensorflow_framework.so.2",
+                "osx/cpu/LICENSE.gz"                                : "cpu/osx/META-INF/LICENSE",
+                "osx/cpu/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt.gz"    : "cpu/osx/META-INF/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt",
+                "osx/cpu/THIRD_PARTY_TF_JNI_LICENSES.gz"            : "cpu/osx/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
+                "osx/cpu/libgcc_s.1.dylib.gz"                       : "cpu/osx/native/lib/libgcc_s.1.dylib",
+                "osx/cpu/libgomp.1.dylib.gz"                        : "cpu/osx/native/lib/libgomp.1.dylib",
+                "osx/cpu/libiomp5.dylib.gz"                         : "cpu/osx/native/lib/libiomp5.dylib",
+                "osx/cpu/libjnijavacpp.dylib.gz"                    : "cpu/osx/native/lib/libjnijavacpp.dylib",
+                "osx/cpu/libjnimkldnn.dylib.gz"                     : "cpu/osx/native/lib/libjnimkldnn.dylib",
+                "osx/cpu/libjnimklml.dylib.gz"                      : "cpu/osx/native/lib/libjnimklml.dylib",
+                "osx/cpu/libjnitensorflow.dylib.gz"                 : "cpu/osx/native/lib/libjnitensorflow.dylib",
+                "osx/cpu/libmkldnn.0.dylib.gz"                      : "cpu/osx/native/lib/libmkldnn.0.dylib",
+                "osx/cpu/libmklml.dylib.gz"                         : "cpu/osx/native/lib/libmklml.dylib",
+                "osx/cpu/libstdc%2B%2B.6.dylib.gz"                  : "cpu/osx/native/lib/libstdc++.6.dylib",
+                "osx/cpu/libtensorflow.2.dylib.gz"                  : "cpu/osx/native/lib/libtensorflow.2.dylib",
+                "osx/cpu/libtensorflow_framework.2.dylib.gz"        : "cpu/osx/native/lib/libtensorflow_framework.2.dylib",
+        ]
+
+        files.each { entry ->
+            project.logger.lifecycle("Downloading ${url}/${entry.key}")
+            def file = new File("${BINARY_ROOT}/${entry.value}")
+            file.getParentFile().mkdirs()
+            new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << new GZIPInputStream(i) } }
+        }
+
+        new File("${BINARY_ROOT}/auto").mkdirs()
     }
 }
 
