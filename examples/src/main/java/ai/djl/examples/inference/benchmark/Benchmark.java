@@ -26,21 +26,20 @@ import java.util.Arrays;
 public final class Benchmark extends AbstractBenchmark {
 
     public static void main(String[] args) {
+        boolean success;
         if (Arrays.asList(args).contains("-t")) {
-            MultithreadedBenchmark.main(args);
-            return;
+            success = new MultithreadedBenchmark().runBenchmark(args);
+        } else {
+            success = new Benchmark().runBenchmark(args);
         }
-        if (new Benchmark().runBenchmark(args)) {
-            System.exit(0); // NOPMD
-        }
-        System.exit(-1); // NOPMD
+        System.exit(success ? 0 : -1); // NOPMD
     }
 
     /** {@inheritDoc} */
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Object predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelException, TranslateException, ClassNotFoundException {
+            throws IOException, ModelException, TranslateException {
         Object inputData = arguments.getInputData();
         try (ZooModel<?, ?> model = loadModel(arguments, metrics)) {
             Object predictResult = null;

@@ -129,6 +129,9 @@ public abstract class AbstractBenchmark {
                 progressBar = new ProgressBar("Iteration", iteration);
                 long begin = System.currentTimeMillis();
                 lastResult = predict(arguments, metrics, iteration);
+                if (lastResult == null) {
+                    return false;
+                }
 
                 if (metrics.hasMetric("mt_start")) {
                     begin = metrics.getMetric("mt_start").get(0).getValue().longValue();

@@ -19,7 +19,6 @@ import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
-import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +45,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
     /** {@inheritDoc} */
     @Override
     public Object predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelException, ClassNotFoundException {
+            throws IOException, ModelException {
         Object inputData = arguments.getInputData();
         ZooModel<?, ?> model = loadModel(arguments, metrics);
 
@@ -80,6 +79,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         }
         if (successThreads != numOfThreads) {
             logger.error("Only {}/{} threads finished.", successThreads, numOfThreads);
+            return null;
         }
 
         return classification;
@@ -123,12 +123,18 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         /** {@inheritDoc} */
         @Override
         @SuppressWarnings("unchecked")
-        public Object call() throws TranslateException {
+        public Object call() throws Exception {
             Object result = null;
             int count = 0;
             int remaining;
             while ((remaining = counter.decrementAndGet()) > 0) {
-                result = predictor.predict(inputData);
+                try {
+                    result = predictor.predict(inputData);
+                } catch (Exception e) {
+                    // stop immediately when we find any exception
+                    counter.set(0);
+                    throw e;
+                }
                 if (collectMemory) {
                     MemoryTrainingListener.collectMemoryInfo(metrics);
                 }
