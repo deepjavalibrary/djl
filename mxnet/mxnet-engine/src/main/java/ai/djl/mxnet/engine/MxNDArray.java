@@ -50,7 +50,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     // use Boolean object to maintain three status: false, true
     // and null which means the flag is not set by the native engine yet
     private Boolean hasGradient;
-    private MxNDManager manager;
+    protected MxNDManager manager;
     private MxNDArrayEx mxNDArrayEx;
 
     /**

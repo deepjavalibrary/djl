@@ -58,7 +58,7 @@ public final class LibUtils {
     private static final Pattern PATH_PATTERN = Pattern.compile("\\s*'(.+)',");
 
     private static final Pattern VERSION_PATTERN =
-            Pattern.compile("(\\d+\\.\\d+\\.\\d+(-\\w+)?)(-SNAPSHOT)?(-\\d+)?");
+            Pattern.compile("(\\d+\\.\\d+\\.\\d+(-[a-zA-Z]+)?)(-SNAPSHOT)?(-\\d+)?");
 
     private LibUtils() {}
 

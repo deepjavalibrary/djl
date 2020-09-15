@@ -44,8 +44,11 @@ public class MxNDManager extends BaseNDManager {
 
     private static final NDArray[] EMPTY = new NDArray[0];
 
-    private MxNDManager(NDManager parent, Device device) {
+    private int version;
+
+    private MxNDManager(NDManager parent, Device device, int version) {
         super(parent, device);
+        this.version = version;
     }
 
     static MxNDManager getSystemManager() {
@@ -65,7 +68,10 @@ public class MxNDManager extends BaseNDManager {
      * @return the created array
      */
     public MxNDArray create(Pointer handle) {
-        return new MxNDArray(this, handle);
+        if (version >= 10700) {
+            return new MxNDArray(this, handle);
+        }
+        return new MxNDArray16(this, handle);
     }
 
     /**
@@ -89,7 +95,10 @@ public class MxNDManager extends BaseNDManager {
     @Override
     public MxNDArray create(Shape shape, DataType dataType) {
         Pointer handle = JnaUtils.createNdArray(device, shape, dataType, shape.dimension(), false);
-        return new MxNDArray(this, handle, device, shape, dataType, false);
+        if (version >= 10700) {
+            return new MxNDArray(this, handle, device, shape, dataType, false);
+        }
+        return new MxNDArray16(this, handle, device, shape, dataType, false);
     }
 
     /** {@inheritDoc} */
@@ -267,7 +276,7 @@ public class MxNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public MxNDManager newSubManager(Device dev) {
-        MxNDManager manager = new MxNDManager(this, dev);
+        MxNDManager manager = new MxNDManager(this, dev, version);
         attach(manager.uid, manager);
         return manager;
     }
@@ -377,7 +386,7 @@ public class MxNDManager extends BaseNDManager {
     private static final class SystemManager extends MxNDManager {
 
         SystemManager() {
-            super(null, Device.defaultDevice());
+            super(null, Device.defaultDevice(), JnaUtils.getVersion());
         }
 
         /** {@inheritDoc} */
