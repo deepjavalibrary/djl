@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,31 +43,158 @@ public final class LibUtils {
     private LibUtils() {}
 
     public static void loadLibrary() {
-        String libName = getTensorFlowLib();
+        String libName = getLibName();
         if (libName != null) {
             logger.debug("Loading TensorFlow library from: {}", libName);
             String path = new File(libName).getParentFile().toString();
             System.setProperty("org.bytedeco.javacpp.platform.preloadpath", path);
         }
+        // defer to tensorflow-core-api to handle loading native library.
     }
 
-    private static String getTensorFlowLib() {
-        URL url =
-                Thread.currentThread()
-                        .getContextClassLoader()
-                        .getResource("native/lib/tensorflow.properties");
-        if (url == null) {
-            // defer to tensorflow-core-api to handle loading native library.
+    public static String getLibName() {
+        String libName = LibUtils.findOverrideLibrary();
+        if (libName == null) {
+            libName = LibUtils.findLibraryInClasspath();
+            if (libName == null) {
+                libName = LIB_NAME;
+            }
+        }
+        return libName;
+    }
+
+    private static String findOverrideLibrary() {
+        String libPath = System.getenv("TENSORFLOW_LIBRARY_PATH");
+        if (libPath != null) {
+            String libName = findLibraryInPath(libPath);
+            if (libName != null) {
+                return libName;
+            }
+        }
+
+        libPath = System.getProperty("java.library.path");
+        if (libPath != null) {
+            return findLibraryInPath(libPath);
+        }
+        return null;
+    }
+
+    private static synchronized String findLibraryInClasspath() {
+        Enumeration<URL> urls;
+        try {
+            URL url =
+                    Thread.currentThread()
+                            .getContextClassLoader()
+                            .getResource("native/lib/tensorflow.properties");
+            if (url == null) {
+                // defer to tensorflow-core-api to handle loading native library.
+                logger.debug("tensorflow.properties not found in class path.");
+                return null;
+            }
+
+            urls =
+                    Thread.currentThread()
+                            .getContextClassLoader()
+                            .getResources("native/lib/tensorflow.properties");
+        } catch (IOException e) {
+            logger.warn("", e);
+            return null;
+        }
+
+        // No native jars
+        if (!urls.hasMoreElements()) {
             logger.debug("tensorflow.properties not found in class path.");
             return null;
         }
 
+        Platform systemPlatform = Platform.fromSystem();
         try {
-            Platform platform = Platform.fromUrl(url);
-            return downloadTensorFlow(platform);
+            Platform matching = null;
+            Platform placeholder = null;
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                Platform platform = Platform.fromUrl(url);
+                if (platform.isPlaceholder()) {
+                    placeholder = platform;
+                } else if (platform.matches(systemPlatform)) {
+                    matching = platform;
+                    break;
+                }
+            }
+
+            if (matching != null) {
+                return loadLibraryFromClasspath(matching);
+            }
+
+            if (placeholder != null) {
+                try {
+                    return downloadTensorFlow(placeholder);
+                } catch (IOException e) {
+                    throw new IllegalStateException(
+                            "Failed to download Tensorflow native library", e);
+                }
+            }
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to download TensorFlow native library", e);
+            throw new IllegalStateException(
+                    "Failed to read Tensorflow native library jar properties", e);
         }
+
+        throw new IllegalStateException(
+                "Your Tensorflow native library jar does not match your operating system. Make sure that the Maven Dependency Classifier matches your system type.");
+    }
+
+    private static String loadLibraryFromClasspath(Platform platform) {
+        Path tmp = null;
+        try {
+            String libName = System.mapLibraryName(LIB_NAME);
+            Path cacheFolder = getCacheDir();
+            logger.debug("Using cache dir: {}", cacheFolder);
+
+            Path dir = cacheFolder.resolve(platform.getVersion() + platform.getClassifier());
+            Path path = dir.resolve(libName);
+            if (Files.exists(path)) {
+                return path.toAbsolutePath().toString();
+            }
+            Files.createDirectories(cacheFolder);
+            tmp = Files.createTempDirectory(cacheFolder, "tmp");
+            for (String file : platform.getLibraries()) {
+                String libPath = "/native/lib/" + file;
+                try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
+                    logger.info("Extracting {} to cache ...", file);
+                    Files.copy(is, tmp.resolve(file), StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+
+            Utils.moveQuietly(tmp, dir);
+            return path.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to extract Tensorflow native library", e);
+        } finally {
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
+        }
+    }
+
+    private static String findLibraryInPath(String libPath) {
+        String[] paths = libPath.split(File.pathSeparator);
+        String mapLibraryName = System.mapLibraryName(LIB_NAME);
+
+        for (String path : paths) {
+            File p = new File(path);
+            if (!p.exists()) {
+                continue;
+            }
+            if (p.isFile() && p.getName().endsWith(mapLibraryName)) {
+                return p.getAbsolutePath();
+            }
+
+            File file = new File(path, mapLibraryName);
+            if (file.exists() && file.isFile()) {
+                return file.getAbsolutePath();
+            }
+        }
+        return null;
     }
 
     private static String downloadTensorFlow(Platform platform) throws IOException {
