@@ -1066,7 +1066,7 @@ public interface NDManager extends AutoCloseable {
      * @return the drawn samples {@link NDArray}
      */
     default NDArray randomUniform(float low, float high, Shape shape) {
-        return randomUniform(low, high, shape, DataType.UNKNOWN);
+        return randomUniform(low, high, shape, DataType.FLOAT32);
     }
 
     /**

@@ -737,10 +737,34 @@ public class NDArrayOtherOpTest {
     @Test
     public void testErfinv() {
         try (NDManager manager = NDManager.newBaseManager()) {
+            // test 1-D
             NDArray array = manager.create(new float[] {0f, 0.5f, -1f});
-            Assertions.assertAlmostEquals(
-                    array.erfinv(),
-                    manager.create(new float[] {0f, 0.4769f, Float.NEGATIVE_INFINITY}));
+            NDArray expected = manager.create(new float[] {0f, 0.4769f, Float.NEGATIVE_INFINITY});
+            Assertions.assertAlmostEquals(array.erfinv(), expected);
+            // test 3-D
+            array = manager.linspace(-1.0f, 1.0f, 9).reshape(3, 1, 3);
+            expected =
+                    manager.create(
+                                    new float[] {
+                                        Float.NEGATIVE_INFINITY,
+                                        -0.8134f,
+                                        -0.4769f,
+                                        -0.2253f,
+                                        0f,
+                                        0.2253f,
+                                        0.4769f,
+                                        0.8134f,
+                                        Float.POSITIVE_INFINITY
+                                    })
+                            .reshape(3, 1, 3);
+            Assertions.assertAlmostEquals(array.erfinv(), expected);
+            // test scalar
+            array = manager.create(1f);
+            expected = manager.create(Float.POSITIVE_INFINITY);
+            Assertions.assertAlmostEquals(array.erfinv(), expected);
+            // test zero-dim
+            array = manager.create(new Shape(2, 0));
+            Assertions.assertAlmostEquals(array.erfinv(), array);
         }
     }
 }

@@ -383,11 +383,7 @@ public class TfNDManager extends BaseNDManager {
     public NDArray randomUniform(float low, float high, Shape shape, DataType dataType) {
         Operand shapeOp = tf.constant(shape.getShape());
         org.tensorflow.DataType dType;
-        if (dataType == DataType.UNKNOWN) {
-            dType = TFloat32.DTYPE;
-        } else {
-            dType = TfDataType.toTf(dataType);
-        }
+        dType = TfDataType.toTf(dataType);
         Operand minVal = tf.dtypes.cast(tf.constant(low), dType);
         Operand maxVal = tf.dtypes.cast(tf.constant(high), dType);
         Operand result;
@@ -413,11 +409,7 @@ public class TfNDManager extends BaseNDManager {
     public NDArray randomNormal(float loc, float scale, Shape shape, DataType dataType) {
         Operand shapeOp = tf.dtypes.cast(tf.constant(shape.getShape()), TInt32.DTYPE);
         org.tensorflow.DataType dType;
-        if (dataType == DataType.UNKNOWN) {
-            dType = TFloat32.DTYPE;
-        } else {
-            dType = TfDataType.toTf(dataType);
-        }
+        dType = TfDataType.toTf(dataType);
         Operand mean = tf.dtypes.cast(tf.constant(loc), dType);
         Operand std = tf.dtypes.cast(tf.constant(scale), dType);
         Operand result;

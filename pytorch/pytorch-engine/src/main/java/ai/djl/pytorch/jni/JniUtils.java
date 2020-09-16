@@ -872,6 +872,10 @@ public final class JniUtils {
                         false));
     }
 
+    public static PtNDArray erfinv(PtNDArray ndArray) {
+        return ndArray.getManager().create(PyTorchLibrary.LIB.torchErfinv(ndArray.getHandle()));
+    }
+
     public static PtNDArray interpolate(
             PtNDArray ndArray, long[] size, int mode, boolean alignCorners) {
         return ndArray.getManager()

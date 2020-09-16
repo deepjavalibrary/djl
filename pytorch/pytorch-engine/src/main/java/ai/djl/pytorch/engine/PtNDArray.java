@@ -609,12 +609,6 @@ public class PtNDArray extends NativeResource implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray erfinv() {
-        throw new UnsupportedOperationException("PyTorch does not support erfinv yet");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PtNDArray neg() {
         return JniUtils.neg(this);
     }
@@ -1254,6 +1248,12 @@ public class PtNDArray extends NativeResource implements NDArray {
     @Override
     public PtNDArray nonzero() {
         throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PtNDArray erfinv() {
+        return JniUtils.erfinv(this);
     }
 
     /** {@inheritDoc} */

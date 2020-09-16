@@ -498,7 +498,9 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray erfinv() {
-        throw new UnsupportedOperationException("TensorFlow does not support erfinv yet");
+        try (Tensor<?> tensor = tf.math.erfinv(getOperand()).asTensor()) {
+            return new TfNDArray(manager, tensor);
+        }
     }
 
     /** {@inheritDoc} */
