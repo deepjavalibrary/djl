@@ -19,8 +19,8 @@ import org.testng.annotations.Test;
 public class PunctuationSeparatorTest {
     @Test
     public void testPreprocess() {
-        String sentence = "Hello.. How are you?!";
-        String expected = "Hello . . How are you ? !";
+        String sentence = "Hello.. How are you?!  @my_alias";
+        String expected = "Hello . . How are you ? ! @ my _ alias";
         SimpleTokenizer tokenizer = new SimpleTokenizer();
         List<String> tokens = tokenizer.tokenize(sentence);
         PunctuationSeparator punctuationSeparator = new PunctuationSeparator();

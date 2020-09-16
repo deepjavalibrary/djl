@@ -26,9 +26,14 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tensorflow.SavedModelBundle;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
@@ -39,20 +44,39 @@ import org.tensorflow.proto.framework.TensorShapeProto;
 
 public class TfSymbolBlock implements SymbolBlock {
 
+    private static final Logger logger = LoggerFactory.getLogger(TfSymbolBlock.class);
+
     private SavedModelBundle bundle;
-    private MetaGraphDef metaGraphDef;
     private Session session;
+    private SignatureDef servingDefault;
     private PairList<String, Shape> inputDescriptions;
     private PairList<String, Shape> outputDescriptions;
     // store mapping of meaningful key names and actual tensor names used in session
     private ConcurrentHashMap<String, String> inputOutputNames = new ConcurrentHashMap<>();
-    private boolean first;
 
-    public TfSymbolBlock(SavedModelBundle bundle) {
+    public TfSymbolBlock(SavedModelBundle bundle, String signatureDefKey) {
         this.bundle = bundle;
         session = bundle.session();
-        metaGraphDef = bundle.metaGraphDef();
-        first = true;
+        MetaGraphDef metaGraphDef = bundle.metaGraphDef();
+        Map<String, SignatureDef> signatureDefMap = metaGraphDef.getSignatureDefMap();
+        if (signatureDefMap.containsKey(signatureDefKey)) {
+            servingDefault = signatureDefMap.get(signatureDefKey);
+        } else {
+            Set<String> keys = signatureDefMap.keySet();
+            logger.warn(
+                    "SignatureDefKey: "
+                            + signatureDefKey
+                            + "not found in Saved Model Bundle."
+                            + "Available keys: "
+                            + String.join(" ", keys)
+                            + "Please use .optOptions(\"SignatureDefKey\", \"value\") with Criteria.builder to load the model."
+                            + "Normally the value is \"default\" for TF1.x models and \"serving_default\" for TF2.x models. "
+                            + "Refer to: https://www.tensorflow.org/guide/saved_model"
+                            + "Loading the model using next available key.");
+            servingDefault = signatureDefMap.get(keys.iterator().next());
+        }
+        describeInput();
+        describeOutput();
     }
 
     /** {@inheritDoc} */
@@ -68,24 +92,31 @@ public class TfSymbolBlock implements SymbolBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
+        Session.Runner runner = session.runner();
+        for (int i = 0; i < inputDescriptions.size(); i++) {
+            String inputName = inputDescriptions.get(i).getKey();
+            String tensorName = inputOutputNames.get(inputName);
 
-        if (first) {
-            synchronized (TfSymbolBlock.class) {
-                if (first) {
-                    describeInput();
-                    describeOutput();
-                    first = false;
+            NDArray inputArray = inputs.get(i);
+            // no name specified in input array, use default order from translator
+            if (inputArray.getName().isEmpty()) {
+                runner.feed(tensorName, ((TfNDArray) inputArray).getTensor());
+            } else {
+                if (inputArray.getName().equals(inputName)) {
+                    runner.feed(tensorName, ((TfNDArray) inputArray).getTensor());
+                } else {
+                    // find the array with correct name
+                    for (NDArray array : inputs) {
+                        if (array.getName().equals(inputName)) {
+                            runner.feed(tensorName, ((TfNDArray) array).getTensor());
+                        }
+                    }
                 }
             }
         }
-        Session.Runner runner = session.runner();
-        for (int i = 0; i < inputDescriptions.size(); i++) {
-            runner.feed(
-                    inputOutputNames.get(inputDescriptions.get(i).getKey()),
-                    ((TfNDArray) inputs.get(i)).getTensor());
-        }
         for (int i = 0; i < outputDescriptions.size(); i++) {
-            runner.fetch(inputOutputNames.get(outputDescriptions.get(i).getKey()));
+            String key = outputDescriptions.get(i).getKey();
+            runner.fetch(inputOutputNames.get(key));
         }
         List<Tensor<?>> result = runner.run();
         TfNDManager tfNDManager = (TfNDManager) inputs.head().getManager();
@@ -143,16 +174,18 @@ public class TfSymbolBlock implements SymbolBlock {
 
     /** {@inheritDoc} */
     @Override
-    public PairList<String, Shape> describeInput() {
+    public final PairList<String, Shape> describeInput() {
         if (inputDescriptions == null) {
             inputDescriptions = new PairList<>();
-            Map<String, SignatureDef> signatureDefMap = metaGraphDef.getSignatureDefMap();
-            SignatureDef servingDefault = signatureDefMap.entrySet().iterator().next().getValue();
-            for (Map.Entry<String, TensorInfo> entry : servingDefault.getInputsMap().entrySet()) {
-                TensorShapeProto shapeProto = entry.getValue().getTensorShape();
-                inputOutputNames.put(entry.getKey(), entry.getValue().getName());
+            Map<String, TensorInfo> inputsMap = servingDefault.getInputsMap();
+            List<String> keys = new ArrayList<>(inputsMap.keySet());
+            Collections.sort(keys);
+            for (String key : keys) {
+                TensorInfo tensorInfo = inputsMap.get(key);
+                TensorShapeProto shapeProto = tensorInfo.getTensorShape();
+                inputOutputNames.put(key, tensorInfo.getName());
                 inputDescriptions.add(
-                        entry.getKey(),
+                        key,
                         new Shape(
                                 shapeProto
                                         .getDimList()
@@ -166,21 +199,22 @@ public class TfSymbolBlock implements SymbolBlock {
 
     /** {@inheritDoc} */
     @Override
-    public PairList<String, Shape> describeOutput() {
+    public final PairList<String, Shape> describeOutput() {
         if (outputDescriptions == null) {
             outputDescriptions = new PairList<>();
-            Map<String, SignatureDef> signatureDefMap = metaGraphDef.getSignatureDefMap();
-            SignatureDef servingDefault = signatureDefMap.entrySet().iterator().next().getValue();
-            for (Map.Entry<String, TensorInfo> entry : servingDefault.getOutputsMap().entrySet()) {
-                TensorShapeProto shapeProto = entry.getValue().getTensorShape();
+            Map<String, TensorInfo> outputsMap = servingDefault.getOutputsMap();
+            List<String> keys = new ArrayList<>(outputsMap.keySet());
+            Collections.sort(keys);
+            for (String key : keys) {
+                TensorInfo tensorInfo = outputsMap.get(key);
+                TensorShapeProto shapeProto = tensorInfo.getTensorShape();
                 // does not support string tensors
-                if (entry.getValue().getDtype()
-                        == org.tensorflow.proto.framework.DataType.DT_STRING) {
+                if (tensorInfo.getDtype() == org.tensorflow.proto.framework.DataType.DT_STRING) {
                     continue;
                 }
-                inputOutputNames.put(entry.getKey(), entry.getValue().getName());
+                inputOutputNames.put(key, tensorInfo.getName());
                 outputDescriptions.add(
-                        entry.getKey(),
+                        key,
                         new Shape(
                                 shapeProto
                                         .getDimList()

@@ -72,6 +72,7 @@ public class HyphenNormalizer implements TextProcessor {
         return temp.toString();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<String> preprocess(final List<String> tokens) {
         return tokens.stream().map(HyphenNormalizer::normalizeHyphens).collect(Collectors.toList());

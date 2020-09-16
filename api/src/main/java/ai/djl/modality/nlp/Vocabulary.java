@@ -27,6 +27,14 @@ public interface Vocabulary {
     String getToken(long index);
 
     /**
+     * Check if the vocabulary contains a token.
+     *
+     * @param token String token to be checked
+     * @return whether this vocabulary contains the token
+     */
+    boolean contains(String token);
+
+    /**
      * Returns the index of the given token.
      *
      * @param token the token

@@ -44,6 +44,12 @@ public class FtVocabulary implements Vocabulary {
 
     /** {@inheritDoc} */
     @Override
+    public boolean contains(String token) {
+        return indicesMap.containsKey(token);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public long size() {
         return indicesMap.size();
     }

@@ -42,6 +42,12 @@ public final class SpVocabulary implements Vocabulary {
 
     /** {@inheritDoc} */
     @Override
+    public boolean contains(String token) {
+        throw new UnsupportedOperationException("Not supported for Sentence Piece");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public long getIndex(String token) {
         return processor.getId(token);
     }

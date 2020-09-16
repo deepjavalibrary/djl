@@ -14,6 +14,7 @@ package ai.djl.modality.nlp.preprocess;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * {@code LowerCaseConvertor} converts every character of the input tokens to it's respective lower
@@ -23,7 +24,7 @@ public class LowerCaseConvertor implements TextProcessor {
 
     private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
-    private Locale locale;
+    private final Locale locale;
 
     /**
      * Creates a {@link TextProcessor} that converts input text into lower case character given the
@@ -46,9 +47,6 @@ public class LowerCaseConvertor implements TextProcessor {
     /** {@inheritDoc} */
     @Override
     public List<String> preprocess(List<String> tokens) {
-        for (int i = 0; i < tokens.size(); i++) {
-            tokens.set(i, tokens.get(i).toLowerCase(locale));
-        }
-        return tokens;
+        return tokens.stream().map(s -> s.toLowerCase(locale)).collect(Collectors.toList());
     }
 }

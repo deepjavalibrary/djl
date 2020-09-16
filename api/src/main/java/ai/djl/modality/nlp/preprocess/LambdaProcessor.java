@@ -13,28 +13,29 @@
 package ai.djl.modality.nlp.preprocess;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-/** {@link TextProcessor} that truncates text to a maximum size. */
-public class TextTruncator implements TextProcessor {
-
-    int maxSize;
+/**
+ * {@code TextProcessor} will apply user defined lambda function on input tokens.
+ *
+ * <p>The function can only support single input and output.
+ */
+public class LambdaProcessor implements TextProcessor {
+    private Function<String, String> processor;
 
     /**
-     * Constructs a {@link TextTruncator}.
+     * Creates a {@code LambdaProcessor} and specify the function to apply.
      *
-     * @param maxSize the size to limit the text to
+     * @param processor The lambda function to apply on input String
      */
-    public TextTruncator(int maxSize) {
-        this.maxSize = maxSize;
+    public LambdaProcessor(Function<String, String> processor) {
+        this.processor = processor;
     }
 
     /** {@inheritDoc} */
     @Override
     public List<String> preprocess(List<String> tokens) {
-        if (tokens.size() <= maxSize) {
-            return tokens;
-        }
-
-        return tokens.subList(0, maxSize);
+        return tokens.stream().map(processor).collect(Collectors.toList());
     }
 }

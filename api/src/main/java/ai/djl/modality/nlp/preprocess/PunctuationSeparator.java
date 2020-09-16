@@ -12,48 +12,24 @@
  */
 package ai.djl.modality.nlp.preprocess;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-/** {@code PunctuationSeparator} separates punction into a separate token. */
+/** {@code PunctuationSeparator} separates punctuation into a separate token. */
 public class PunctuationSeparator implements TextProcessor {
-
-    private static final String DEFAULT_PUNCTUATIONS = ".,!?";
-
-    private String punctuations;
-
-    /**
-     * Creates a {@link TextProcessor} that separates the given punctuations into distinct tokens in
-     * the text.
-     *
-     * @param punctuations the punctuations to be separated
-     */
-    public PunctuationSeparator(String punctuations) {
-        this.punctuations = punctuations;
-    }
-
-    /**
-     * Creates a {@link TextProcessor} that separates the given punctuations into distinct tokens in
-     * the text.
-     */
-    public PunctuationSeparator() {
-        this(DEFAULT_PUNCTUATIONS);
-    }
+    private static final Pattern PATTERN =
+            Pattern.compile(
+                    "\\s*(?<=[\\p{Punct}\\p{IsPunctuation}])|(?=[\\p{Punct}\\p{IsPunctuation}])\\s*");
 
     /** {@inheritDoc} */
     @Override
     public List<String> preprocess(List<String> tokens) {
-        List<String> list = new ArrayList<>();
-        for (String token : tokens) {
-            StringTokenizer tokenizer = new StringTokenizer(token, punctuations, true);
-            while (tokenizer.hasMoreElements()) {
-                String element = tokenizer.nextToken();
-                if (!element.isEmpty()) {
-                    list.add(element);
-                }
-            }
-        }
-        return list;
+        return tokens.stream()
+                .map(PATTERN::split)
+                .flatMap(Arrays::stream)
+                .filter(s -> !s.trim().isEmpty())
+                .collect(Collectors.toList());
     }
 }

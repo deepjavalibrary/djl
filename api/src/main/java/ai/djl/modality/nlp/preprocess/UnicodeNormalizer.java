@@ -54,6 +54,7 @@ public class UnicodeNormalizer implements TextProcessor {
         return Normalizer.normalize(s, DEFAULT_FORM);
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<String> preprocess(final List<String> tokens) {
         return tokens.stream()

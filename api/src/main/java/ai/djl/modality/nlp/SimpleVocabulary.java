@@ -86,6 +86,12 @@ public class SimpleVocabulary implements Vocabulary {
 
     /** {@inheritDoc} */
     @Override
+    public boolean contains(String token) {
+        return tokens.containsKey(token);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getToken(long index) {
         if (index < 0 || index >= indexToToken.size()) {
             return unknownToken;

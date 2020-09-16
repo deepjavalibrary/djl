@@ -85,6 +85,12 @@ public class MxBertVocabulary implements Vocabulary {
 
     /** {@inheritDoc} */
     @Override
+    public boolean contains(String token) {
+        return token2idx.containsKey(token);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public long size() {
         return idx2token.size();
     }

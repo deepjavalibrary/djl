@@ -62,9 +62,9 @@ public class TfModel extends BaseModel {
         if (prefix == null) {
             prefix = modelName;
         }
-        Path exportDir = findModleDir(prefix);
+        Path exportDir = findModelDir(prefix);
         if (exportDir == null) {
-            exportDir = findModleDir("saved_model.pb");
+            exportDir = findModelDir("saved_model.pb");
             if (exportDir == null) {
                 throw new FileNotFoundException("No TensorFlow model found in: " + modelDir);
             }
@@ -72,10 +72,12 @@ public class TfModel extends BaseModel {
         String[] tags = null;
         ConfigProto proto = null;
         RunOptions runOptions = null;
+        String signatureDefKey = "serving_default";
         if (options != null) {
             tags = (String[]) options.get("Tags");
             proto = (ConfigProto) options.get("ConfigProto");
             runOptions = (RunOptions) options.get("RunOptions");
+            signatureDefKey = (String) options.get("SignatureDefKey");
         }
         if (tags == null) {
             tags = new String[] {"serve"};
@@ -91,10 +93,10 @@ public class TfModel extends BaseModel {
         }
 
         SavedModelBundle bundle = loader.load();
-        block = new TfSymbolBlock(bundle);
+        block = new TfSymbolBlock(bundle, signatureDefKey);
     }
 
-    private Path findModleDir(String prefix) {
+    private Path findModelDir(String prefix) {
         Path path = modelDir.resolve(prefix);
         if (!Files.exists(path)) {
             return null;

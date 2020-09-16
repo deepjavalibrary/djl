@@ -62,7 +62,7 @@ public class TfNDArray implements NDArray {
     private TfNDManager manager;
     private Ops tf;
     private Operand<?> operand;
-    private String name;
+    private String name = "";
     private TfNDArrayEx tfNDArrayEx;
     private DataType dataType;
 
