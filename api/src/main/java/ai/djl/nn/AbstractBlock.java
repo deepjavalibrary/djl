@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 
 /**
@@ -126,7 +127,7 @@ public abstract class AbstractBlock implements Block {
      */
     protected final <B extends Block> B addChildBlock(String name, B block) {
         int childNumber = children.size() + 1;
-        children.add(String.format("%02d%s", childNumber, name), block);
+        children.add(String.format(Locale.ENGLISH, "%02d%s", childNumber, name), block);
         return block;
     }
 

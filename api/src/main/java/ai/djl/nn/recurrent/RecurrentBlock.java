@@ -87,13 +87,9 @@ public abstract class RecurrentBlock extends AbstractBlock {
             for (int i = 0; i < numStackedLayers; i++) {
                 for (String direction : directions) {
                     for (String gateString : gateStrings) {
-                        addParameter(
-                                new Parameter(
-                                        String.format(
-                                                "%s_%s_%s_%s",
-                                                direction, i, gateString, parameterType.name()),
-                                        this,
-                                        parameterType));
+                        String name =
+                                direction + '_' + i + '_' + gateString + '_' + parameterType.name();
+                        addParameter(new Parameter(name, this, parameterType));
                     }
                 }
             }

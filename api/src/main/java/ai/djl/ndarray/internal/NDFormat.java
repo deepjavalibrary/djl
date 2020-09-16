@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.Utils;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -175,7 +176,7 @@ public abstract class NDFormat {
                     continue;
                 }
                 double abs = Math.abs(v);
-                String str = String.format("%16e", abs);
+                String str = String.format(Locale.ENGLISH, "%16e", abs);
                 Matcher m = PATTERN.matcher(str);
                 if (!m.matches()) {
                     throw new AssertionError("Invalid decimal value: " + str);
@@ -242,25 +243,25 @@ public abstract class NDFormat {
         public CharSequence format(Number value) {
             double d = value.doubleValue();
             if (Double.isNaN(d)) {
-                return String.format("%" + totalLength + "s", "nan");
+                return String.format(Locale.ENGLISH, "%" + totalLength + "s", "nan");
             } else if (Double.isInfinite(d)) {
                 if (d > 0) {
-                    return String.format("%" + totalLength + "s", "inf");
+                    return String.format(Locale.ENGLISH, "%" + totalLength + "s", "inf");
                 } else {
-                    return String.format("%" + totalLength + "s", "-inf");
+                    return String.format(Locale.ENGLISH, "%" + totalLength + "s", "-inf");
                 }
             }
             if (exponential) {
                 precision = Math.max(PRECISION, precision);
-                return String.format("% ." + precision + "e", value.doubleValue());
+                return String.format(Locale.ENGLISH, "% ." + precision + "e", value.doubleValue());
             }
             if (precision == 0) {
                 String fmt = "%" + (totalLength - 1) + '.' + precision + "f.";
-                return String.format(fmt, value.doubleValue());
+                return String.format(Locale.ENGLISH, fmt, value.doubleValue());
             }
 
             String fmt = "%" + totalLength + '.' + precision + 'f';
-            String ret = String.format(fmt, value.doubleValue());
+            String ret = String.format(Locale.ENGLISH, fmt, value.doubleValue());
             // Replace trailing zeros with space
             char[] chars = ret.toCharArray();
             for (int i = chars.length - 1; i >= 0; --i) {
@@ -279,7 +280,7 @@ public abstract class NDFormat {
         /** {@inheritDoc} */
         @Override
         public CharSequence format(Number value) {
-            return String.format("0x%02X", value.byteValue());
+            return String.format(Locale.ENGLISH, "0x%02X", value.byteValue());
         }
     }
 
@@ -323,9 +324,9 @@ public abstract class NDFormat {
         @Override
         public CharSequence format(Number value) {
             if (exponential) {
-                return String.format("% ." + precision + "e", value.floatValue());
+                return String.format(Locale.ENGLISH, "% ." + precision + "e", value.floatValue());
             }
-            return String.format("%" + totalLength + "d", value.longValue());
+            return String.format(Locale.ENGLISH, "%" + totalLength + "d", value.longValue());
         }
     }
 

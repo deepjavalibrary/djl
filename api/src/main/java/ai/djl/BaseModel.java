@@ -35,6 +35,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -202,7 +203,8 @@ public abstract class BaseModel implements Model {
                         ? Utils.getCurrentEpoch(modelPath, newModelName) + 1
                         : Integer.parseInt(epochValue);
 
-        Path paramFile = modelPath.resolve(String.format("%s-%04d.params", newModelName, epoch));
+        String fileName = String.format(Locale.ENGLISH, "%s-%04d.params", newModelName, epoch);
+        Path paramFile = modelPath.resolve(fileName);
         try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(paramFile))) {
             dos.writeBytes("DJL@");
             dos.writeInt(MODEL_VERSION);
@@ -264,7 +266,7 @@ public abstract class BaseModel implements Model {
             epoch = Integer.parseInt(epochOption.toString());
         }
 
-        return modelDir.resolve(String.format("%s-%04d.params", prefix, epoch));
+        return modelDir.resolve(String.format(Locale.ENGLISH, "%s-%04d.params", prefix, epoch));
     }
 
     protected boolean readParameters(Path paramFile, Map<String, Object> options)
