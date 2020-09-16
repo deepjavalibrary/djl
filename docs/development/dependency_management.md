@@ -67,14 +67,12 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [pytorch-native-cpu-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#centos-7ubuntu-1404-cpu) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
 | | | |
 | [ai.djl.tensorflow](https://search.maven.org/search?q=g:ai.djl.tensorflow) | [tensorflow-engine](../../tensorflow/tensorflow-engine/README.md#installation) | TensorFlow engine adapter |
+| | [tensorflow-api](../../tensorflow/tensorflow-api/README.md#installation) | A redistribution of tensorFlow core java API 2.x |
 | | [tensorflow-model-zoo](../../tensorflow/tensorflow-model-zoo/README.md#installation) | Contains state of the art TensorFlow saved bundle models |
-| | [tensorflow-native-auto](../../tensorflow/tensorflow-engine/README.md#install-tensorflow-native-library) | A placeholder package to automatically download native libraries for your platform |
-| | [tensorflow-api](../../tensorflow/tensorflow-api/README.md#installation) | A redistribution of tensorFlow core java API 2.x |
-| | | |
-| [ai.djl.tensorflow](https://search.maven.org/search?q=g:ai.djl.tensorflow) | [tensorflow-engine](../../tensorflow/tensorflow-engine/README.md#installation) | TensorFlow engine adapter |
-| | [tensorflow-model-zoo](../../tensorflow/tensorflow-model-zoo/README.md#installation) | Contains state of the art TensorFlow symbolic models |
-| | [tensorflow-native-auto](../../tensorflow/tensorflow-engine/README.md#install-tensorflow-native-library) | A placeholder package to automatically download native libraries for your platform |
-| | [tensorflow-api](../../tensorflow/tensorflow-api/README.md#installation) | A redistribution of tensorFlow core java API 2.x |
+| | [tensorflow-native-auto](../../tensorflow/README.md#automatic-recommended) | A placeholder package to automatically download native libraries for your platform |
+| | [tensorflow-native-cpu(osx-x86_64)](../../tensorflow/README.md#macos) | Contains TensorFlow native library for macOS |
+| | [tensorflow-native-cpu(linux-x86_64)](../../tensorflow/README.md#linux-cpu) | Contains TensorFlow native library for Linux |
+| | [tensorflow-native-cu101(linux-x86_84)](../../tensorflow/README.md#linux-gpu) | Contains TensorFlow native library for Linux with CUDA 10.1 |
 | | | |
 | [ai.djl.onnxruntime](https://search.maven.org/search?q=g:ai.djl.onnxruntime) | [onnxruntime-engine](../../onnxruntime/onnxruntime-engine/README.md#installation) | ONNX Runtime engine adapter |
 | | onnxruntime-api(deprecated) | Please use com.microsoft.onnxruntime:onnxruntime instead |
