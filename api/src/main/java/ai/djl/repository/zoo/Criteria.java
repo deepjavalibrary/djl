@@ -481,10 +481,6 @@ public class Criteria<I, O> {
          * @return the {@link Criteria} instance
          */
         public Criteria<I, O> build() {
-            if (inputClass == null || outputClass == null) {
-                throw new IllegalArgumentException(
-                        "Input and output type are required for a Criteria.");
-            }
             return new Criteria<>(this);
         }
     }

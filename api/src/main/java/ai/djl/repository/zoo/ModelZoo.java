@@ -85,7 +85,7 @@ public interface ModelZoo {
     /**
      * Gets the {@link ModelLoader} based on the model name.
      *
-     * @param criteria the name of the model
+     * @param criteria the requirements for the model
      * @param <I> the input data type for preprocessing
      * @param <O> the output data type after postprocessing
      * @return the model that matches the criteria
@@ -153,7 +153,7 @@ public interface ModelZoo {
                 }
                 if (application != Application.UNDEFINED
                         && app != Application.UNDEFINED
-                        && !app.equals(application)) {
+                        && !app.matches(application)) {
                     // filter out ModelLoader by application
                     continue;
                 }
@@ -183,6 +183,25 @@ public interface ModelZoo {
      */
     static Map<Application, List<Artifact>> listModels()
             throws IOException, ModelNotFoundException {
+        return listModels(Criteria.builder().build());
+    }
+
+    /**
+     * Returns the available {@link Application} and their model artifact metadata.
+     *
+     * @param criteria the requirements for the model
+     * @return the available {@link Application} and their model artifact metadata
+     * @throws IOException if failed to download to repository metadata
+     * @throws ModelNotFoundException if failed to parse repository metadata
+     */
+    static Map<Application, List<Artifact>> listModels(Criteria<?, ?> criteria)
+            throws IOException, ModelNotFoundException {
+        String artifactId = criteria.getArtifactId();
+        ModelZoo modelZoo = criteria.getModelZoo();
+        String groupId = criteria.getGroupId();
+        String engine = criteria.getEngine();
+        Application application = criteria.getApplication();
+
         @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<Application, List<Artifact>> models =
                 new TreeMap<>(Comparator.comparing(Application::getPath));
@@ -192,9 +211,29 @@ public interface ModelZoo {
             if (zoo == null) {
                 continue;
             }
+            if (modelZoo != null) {
+                if (groupId != null && !modelZoo.getGroupId().equals(groupId)) {
+                    continue;
+                }
+                Set<String> supportedEngine = modelZoo.getSupportedEngines();
+                if (engine != null && !supportedEngine.contains(engine)) {
+                    continue;
+                }
+            }
             List<ModelLoader> list = zoo.getModelLoaders();
             for (ModelLoader loader : list) {
                 Application app = loader.getApplication();
+                String loaderArtifactId = loader.getArtifactId();
+                if (artifactId != null && !artifactId.equals(loaderArtifactId)) {
+                    // filter out by model loader artifactId
+                    continue;
+                }
+                if (application != Application.UNDEFINED
+                        && app != Application.UNDEFINED
+                        && !app.matches(application)) {
+                    // filter out ModelLoader by application
+                    continue;
+                }
                 final List<Artifact> artifacts = loader.listModels();
                 models.compute(
                         app,

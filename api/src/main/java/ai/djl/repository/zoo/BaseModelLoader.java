@@ -198,6 +198,12 @@ public class BaseModelLoader implements ModelLoader {
 
     @SuppressWarnings("unchecked")
     private <I, O> TranslatorFactory<I, O> getTranslatorFactory(Criteria<I, O> criteria) {
+        if (criteria.getInputClass() == null) {
+            throw new IllegalArgumentException("The criteria must set an input class");
+        }
+        if (criteria.getOutputClass() == null) {
+            throw new IllegalArgumentException("The criteria must set an output class");
+        }
         return (TranslatorFactory<I, O>)
                 factories.get(new Pair<>(criteria.getInputClass(), criteria.getOutputClass()));
     }

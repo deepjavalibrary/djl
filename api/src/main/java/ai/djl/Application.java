@@ -86,6 +86,16 @@ public class Application {
         return path.replace('/', '.').toUpperCase();
     }
 
+    /**
+     * Returns whether this application matches the test application set.
+     *
+     * @param test a application or application set to test against
+     * @return true if it fits within the application set
+     */
+    public boolean matches(Application test) {
+        return path.startsWith(test.path);
+    }
+
     /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
