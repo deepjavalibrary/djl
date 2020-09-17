@@ -87,6 +87,29 @@ if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
                             it.parent().remove(it)
                         }
                     }
+
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                        }
+                    }
+
+                    scm {
+                        connection = "scm:git:git@github.com:awslabs/djl.git"
+                        developerConnection = "scm:git:git@github.com:awslabs/djl.git"
+                        url = "https://github.com/awslabs/djl"
+                        tag = "HEAD"
+                    }
+
+                    developers {
+                        developer {
+                            name = "DJL.AI Team"
+                            email = "djl-dev@amazon.com"
+                            organization = "Amazon AI"
+                            organizationUrl = "https://amazon.com"
+                        }
+                    }
                 }
             }
         }
