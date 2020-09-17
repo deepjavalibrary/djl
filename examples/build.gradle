@@ -57,7 +57,7 @@ task benchmark(type: JavaExec) {
             String[] line = argument.split("=", 2)
             if (line.length == 2) {
                 line = line[1].split(" ");
-                if (line.contains("-t")) {
+                if (line.contains("-t") && System.properties["ai.djl.default_engine"] != "TensorFlow") {
                     environment("MXNET_ENGINE_TYPE", "NaiveEngine")
                     environment("OMP_NUM_THREADS", "1")
                 }
