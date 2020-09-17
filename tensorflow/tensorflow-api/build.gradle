@@ -1,3 +1,8 @@
+plugins {
+    id 'maven-publish'
+    id 'signing'
+}
+
 group "ai.djl.tensorflow"
 
 repositories {
@@ -8,44 +13,103 @@ repositories {
 
 configurations {
     exclusion
+    repachange
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = []
+        }
+    }
 }
 
 dependencies {
     api "org.bytedeco:javacpp:1.5.4"
     api "com.google.protobuf:protobuf-java:3.8.0"
-    api("org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT") {
-        exclude group: "org.bytedeco", module: "javacpp"
-    }
-    api "org.tensorflow:tensorflow-tools:0.1.0-SNAPSHOT"
-    api "org.tensorflow:ndarray:0.2.0-SNAPSHOT"
-
-    exclusion "org.bytedeco:javacpp:1.5.4"
+//    api("org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT") {
+//        exclude group: "org.bytedeco", module: "javacpp"
+//    }
+//    api "org.tensorflow:tensorflow-tools:0.1.0-SNAPSHOT"
+//    api "org.tensorflow:ndarray:0.2.0-SNAPSHOT"
+//
+    exclusion "org.bytedeco:javacpp:1.5.3"
     exclusion "com.google.protobuf:protobuf-java:3.8.0"
+
+    repachange "ai.djl.tensorflow:tensorflow-api:0.7.0"
 }
 
 jar {
     from {
-        (configurations.compileClasspath - configurations.exclusion).collect {
+        (configurations.repachange - configurations.exclusion).collect {
             it.isDirectory() ? it : zipTree(it)
         }
     }
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            pom {
-                name = "DJL release for TensorFlow core api"
-                description = "Deep Java Library (DJL) release for TensorFlow core api"
-                url = "http://www.djl.ai/tensorflow/${project.name}"
+project.tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
 
-                withXml {
-                    Node pomNode = asNode()
-                    pomNode.dependencies."*".findAll() {
-                        it.artifactId.text().startsWith("tensorflow-") || it.artifactId.text().startsWith("ndarray")
-                    }.each() {
-                        it.parent().remove(it)
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+signing {
+    required(project.hasProperty("staging") || project.hasProperty("snapshot"))
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications
+}
+
+// Only publish if the project directory equals the current directory
+// This means that publishing from the main project does not publish the native jars
+// and the native jars have to be published separately
+if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                artifactId "tensorflow-api"
+                from components.java
+                artifacts = [jar, javadocJar, sourcesJar]
+                pom {
+                    name = "DJL release for TensorFlow core api"
+                    description = "Deep Java Library (DJL) release for TensorFlow core api"
+                    url = "http://www.djl.ai/tensorflow/${project.name}"
+
+                    withXml {
+                        Node pomNode = asNode()
+                        pomNode.dependencies."*".findAll() {
+                            it.artifactId.text().startsWith("tensorflow-") || it.artifactId.text().startsWith("ndarray")
+                        }.each() {
+                            it.parent().remove(it)
+                        }
                     }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                if (project.hasProperty("snapshot")) {
+                    name = "snapshot"
+                    url = "https://oss.sonatype.org/content/repositories/snapshots/"
+                    credentials {
+                        username = findProperty("ossrhUsername")
+                        password = findProperty("ossrhPassword")
+                    }
+                } else if (project.hasProperty("staging")) {
+                    name = "staging"
+                    url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    credentials {
+                        username = findProperty("ossrhUsername")
+                        password = findProperty("ossrhPassword")
+                    }
+                } else {
+                    name = "local"
+                    url = "build/repo"
                 }
             }
         }

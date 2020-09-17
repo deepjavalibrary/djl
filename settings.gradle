@@ -22,3 +22,6 @@ include ':extensions:aws-ai'
 include ':extensions:hadoop'
 include ':extensions:fasttext'
 include ':extensions:sentencepiece'
+
+// FIXME: a temporary hack for TF 2.3.0
+project(":tensorflow:tensorflow-api").name = "repackage"

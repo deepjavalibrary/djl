@@ -6,7 +6,6 @@ configure([
         project(':mxnet:mxnet-model-zoo'),
         project(':pytorch:pytorch-engine'),
         project(':pytorch:pytorch-model-zoo'),
-        project(':tensorflow:tensorflow-api'),
         project(':tensorflow:tensorflow-engine'),
         project(':tensorflow:tensorflow-model-zoo'),
         project(':onnxruntime:onnxruntime-engine'),
