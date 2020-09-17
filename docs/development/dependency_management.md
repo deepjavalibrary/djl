@@ -67,7 +67,7 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [pytorch-native-cpu-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#centos-7ubuntu-1404-cpu) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
 | | | |
 | [ai.djl.tensorflow](https://search.maven.org/search?q=g:ai.djl.tensorflow) | [tensorflow-engine](../../tensorflow/tensorflow-engine/README.md#installation) | TensorFlow engine adapter |
-| | [tensorflow-api](../../tensorflow/tensorflow-api/README.md#installation) | A redistribution of tensorFlow core java API 2.x |
+| | [tensorflow-api](../../tensorflow/tensorflow-java-api/README.md#installation) | A redistribution of tensorFlow core java API 2.x |
 | | [tensorflow-model-zoo](../../tensorflow/tensorflow-model-zoo/README.md#installation) | Contains state of the art TensorFlow saved bundle models |
 | | [tensorflow-native-auto](../../tensorflow/README.md#automatic-recommended) | A placeholder package to automatically download native libraries for your platform |
 | | [tensorflow-native-cpu(osx-x86_64)](../../tensorflow/README.md#macos) | Contains TensorFlow native library for macOS |
