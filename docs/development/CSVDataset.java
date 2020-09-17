@@ -50,6 +50,10 @@ public class CSVDataset extends RandomAccessDataset {
 
     @Override
     public void prepare(Progress progress) {}
+    
+    public static Builder builder() {
+        return new Builder();
+    }
 
     public static final class Builder extends BaseBuilder<Builder> {
 
