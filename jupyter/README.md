@@ -14,6 +14,8 @@ This folder contains tutorials that illustrate how to accomplish basic AI tasks 
 - [Transfer learning example](transfer_learning_on_cifar10.ipynb)
 - [Question answering example](BERTQA.ipynb)
 
+You can run our notebook online: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/awslabs/djl/master?filepath=jupyter)
+
 ## Setup
 
 ### JDK 11 (not jre)

@@ -30,8 +30,11 @@ jobs:
       - name: run Notebooks
         run: |
           cd djl_tmp/jupyter
-          rm -rf d2l-java
           bash test_notebook.sh
+      - name: add mybinder link
+        run: |
+          cd djl_tmp
+          python3 tools/scripts/add_online_runner.py
       - name: build docs
         run: |
           cd djl_tmp/docs
