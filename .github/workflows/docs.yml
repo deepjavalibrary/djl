@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.x'
       - name: install Python Dependencies
-        run: pip3 install nbconvert==5.6.1 mkdocs mkdocs-exclude mknotebooks mkdocs-material jupyter Pygments
+        run: pip3 install nbconvert==5.6.1 mkdocs mkdocs-exclude mknotebooks==0.4.1 mkdocs-material jupyter Pygments
       - name: Install IJava kernel
         run: |
           git clone https://github.com/frankfliu/IJava.git
@@ -27,14 +27,14 @@ jobs:
           ./gradlew installKernel
       - name: clone DJL repo to access the DJL parent dir
         run: git clone https://github.com/awslabs/djl djl_tmp
-      - name: run Notebooks
-        run: |
-          cd djl_tmp/jupyter
-          bash test_notebook.sh
       - name: add mybinder link
         run: |
           cd djl_tmp
           python3 tools/scripts/add_online_runner.py
+      - name: run Notebooks
+        run: |
+          cd djl_tmp/jupyter
+          bash test_notebook.sh
       - name: build docs
         run: |
           cd djl_tmp/docs
