@@ -482,7 +482,8 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSigni(JNIEnv*
   API_END()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchErfinv(JNIEnv * env, jobject jthis, jobject jhandle) {
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchErfinv(
+    JNIEnv* env, jobject jthis, jobject jhandle) {
   API_BEGIN()
   const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->erfinv());

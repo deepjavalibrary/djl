@@ -19,8 +19,8 @@
 // The file is the implementation for PyTorch inference operations
 
 struct JITCallGuard {
-  // disable autograd by default
   torch::autograd::AutoGradMode no_autograd_guard{false};
+  torch::NoGradGuard no_grad;
 };
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad(
