@@ -1,6 +1,6 @@
 # Memory Management
 
-Memory is one of the biggest challenge in area of Deep Learning. There are several challenges in Java to manage the memory.
+Memory is one of the biggest challenge in area of deep learning. There are several challenges in Java to manage the memory.
 Firstly, GC(Garbage Collector) doesn't have the control over the native memory.
 Secondly, to close every AutoClosable manually makes the code boilerplate and not practical.
 Thirdly, the system lacks in support of releasing a group of native resources.

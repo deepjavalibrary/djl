@@ -1,7 +1,7 @@
 # How to load model
 
 A model is a collection of artifacts that is created by the training process.
-In Deep Learning, running inference on a Model usually involves pre-processing and post-processing.
+In deep learning, running inference on a Model usually involves pre-processing and post-processing.
 DJL provides a [ZooModel](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/repository/zoo/ZooModel.html) 
 class, which makes it easy to combine data processing with the model.
 

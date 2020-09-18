@@ -15,7 +15,7 @@
  * Contains classes responsible for loading a deep learning engine.
  *
  * <p>Deep Java Library (DJL) is a higher level API that is used alongside implementations built on
- * other Deep Learning engines. By using only the higher level abstractions defined in the core DJL
+ * other deep learning engines. By using only the higher level abstractions defined in the core DJL
  * API, it makes it easy to switch between underlying engines.
  *
  * <p>Each deep learning engine is implemented as a {@link java.util.ServiceLoader} and supplies an

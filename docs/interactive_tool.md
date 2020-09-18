@@ -10,7 +10,7 @@ Without additional setup, you can easily run the tool kits online and export the
 Interactive JShell is a modified version of [JShell](https://docs.oracle.com/javase/9/jshell/introduction-jshell.htm#JSHEL-GUID-630F27C8-1195-4989-9F6B-2C51D46F52C8) equipped with DJL features.
 You can use the existing Java features as well as DJL classes.
 To test out some functions in DJL, use this JShell to try methods defined in the [Javadoc](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/ndarray/NDArray.html).
-We created useful operators to use in your Deep Learning applications.
+We created useful operators to use in your deep learning applications.
 For more information about this JShell, see the [Interactive JShell and Block Runner for DJL](https://github.com/aws-samples/djl-demo/tree/master/web-demo/interactive-console#jshell) demo.
 
 
@@ -78,7 +78,7 @@ There are [tutorials and instructions](../jupyter/README.md#djl---jupyter-notebo
 ## About Future Lab
 
 Future lab is an incubator for future DJL features. We are trying to create a better toolkit/library for Java Developers
-getting close to Deep Learning. We are looking for contributors/testers to explore our latest features.
+getting close to deep learning. We are looking for contributors/testers to explore our latest features.
 
 Here is a list of our ongoing projects (keep updating):
 
