@@ -12,19 +12,22 @@
  */
 package ai.djl.modality.nlp.preprocess;
 
+import java.util.Collections;
 import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class PunctuationSeparatorTest {
+
     @Test
     public void testPreprocess() {
         String sentence = "Hello.. How are you?!  @my_alias";
         String expected = "Hello . . How are you ? ! @ my _ alias";
         SimpleTokenizer tokenizer = new SimpleTokenizer();
-        List<String> tokens = tokenizer.tokenize(sentence);
         PunctuationSeparator punctuationSeparator = new PunctuationSeparator();
-        List<String> processedTokens = punctuationSeparator.preprocess(tokens);
+        List<String> processedTokens =
+                punctuationSeparator.preprocess(Collections.singletonList(sentence));
+        Assert.assertEquals(processedTokens.size(), 12);
         Assert.assertEquals(tokenizer.buildSentence(processedTokens), expected);
     }
 }

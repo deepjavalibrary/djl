@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class PunctuationSeparator implements TextProcessor {
     private static final Pattern PATTERN =
             Pattern.compile(
-                    "\\s*(?<=[\\p{Punct}\\p{IsPunctuation}])|(?=[\\p{Punct}\\p{IsPunctuation}])\\s*");
+                    "\\s+|(?<=[\\p{Punct}\\p{IsPunctuation}])|(?=[\\p{Punct}\\p{IsPunctuation}])");
 
     /** {@inheritDoc} */
     @Override
@@ -29,7 +29,7 @@ public class PunctuationSeparator implements TextProcessor {
         return tokens.stream()
                 .map(PATTERN::split)
                 .flatMap(Arrays::stream)
-                .filter(s -> !s.trim().isEmpty())
+                .filter(s -> !s.isEmpty())
                 .collect(Collectors.toList());
     }
 }
