@@ -99,49 +99,63 @@ public class TfNDManager extends BaseNDManager {
     @Override
     public NDArray create(byte[] data) {
         org.tensorflow.ndarray.Shape shape = org.tensorflow.ndarray.Shape.of(data.length);
-        return new TfNDArray(this, TUint8.tensorOf(shape, DataBuffers.of(data)));
+        try (Tensor<TUint8> tensor = TUint8.tensorOf(shape, DataBuffers.of(data))) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(float[] data) {
         org.tensorflow.ndarray.Shape shape = org.tensorflow.ndarray.Shape.of(data.length);
-        return new TfNDArray(this, TFloat32.tensorOf(shape, DataBuffers.of(data)));
+        try (Tensor<TFloat32> tensor = TFloat32.tensorOf(shape, DataBuffers.of(data))) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(int[] data) {
         org.tensorflow.ndarray.Shape shape = org.tensorflow.ndarray.Shape.of(data.length);
-        return new TfNDArray(this, TInt32.tensorOf(shape, DataBuffers.of(data)));
+        try (Tensor<TInt32> tensor = TInt32.tensorOf(shape, DataBuffers.of(data))) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(boolean[] data) {
         org.tensorflow.ndarray.Shape shape = org.tensorflow.ndarray.Shape.of(data.length);
-        return new TfNDArray(this, TBool.tensorOf(shape, DataBuffers.of(data)));
+        try (Tensor<TBool> tensor = TBool.tensorOf(shape, DataBuffers.of(data))) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(int data) {
         // create scalar tensor with int
-        return new TfNDArray(this, TInt32.scalarOf(data));
+        try (Tensor<TInt32> tensor = TInt32.scalarOf(data)) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(float data) {
         // create scalar tensor with float
-        return new TfNDArray(this, TFloat32.scalarOf(data));
+        try (Tensor<TFloat32> tensor = TFloat32.scalarOf(data)) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(String data) {
         // create scalar tensor with float
-        return new TfNDArray(this, TString.scalarOf(data));
+        try (Tensor<TString> tensor = TString.scalarOf(data)) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     /** {@inheritDoc} */
@@ -203,8 +217,10 @@ public class TfNDManager extends BaseNDManager {
         buf.rewind();
 
         ByteDataBuffer db = DataBuffers.of(buf);
-        Tensor<?> tensor = Tensor.of(TfDataType.toTf(dataType), TfNDArray.toTfShape(shape), db);
-        return new TfNDArray(this, tensor);
+        try (Tensor<?> tensor =
+                Tensor.of(TfDataType.toTf(dataType), TfNDArray.toTfShape(shape), db)) {
+            return new TfNDArray(this, tensor);
+        }
     }
 
     /** {@inheritDoc} */

@@ -54,21 +54,18 @@ public final class UniversalSentenceEncoder {
         inputs.add("The quick brown fox jumps over the lazy dog.");
         inputs.add("I am a sentence for which I would like to get its embedding");
 
-        List<float[]> embeddings = UniversalSentenceEncoder.predict(inputs);
+        float[][] embeddings = UniversalSentenceEncoder.predict(inputs);
         if (embeddings == null) {
             logger.info("This example only works for TensorFlow Engine");
         } else {
             for (int i = 0; i < inputs.size(); i++) {
                 logger.info(
-                        "Embedding for: "
-                                + inputs.get(i)
-                                + "\n"
-                                + Arrays.toString(embeddings.get(i)));
+                        "Embedding for: " + inputs.get(i) + "\n" + Arrays.toString(embeddings[i]));
             }
         }
     }
 
-    public static List<float[]> predict(List<String> inputs)
+    public static float[][] predict(List<String> inputs)
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
         if (!"TensorFlow".equals(Engine.getInstance().getEngineName())) {
@@ -78,45 +75,44 @@ public final class UniversalSentenceEncoder {
         String modelUrl =
                 "https://storage.googleapis.com/tfhub-modules/google/universal-sentence-encoder/4.tar.gz";
 
-        Criteria<NDList, NDList> criteria =
+        Criteria<String[], float[][]> criteria =
                 Criteria.builder()
                         .optApplication(Application.NLP.TEXT_EMBEDDING)
-                        .setTypes(NDList.class, NDList.class)
+                        .setTypes(String[].class, float[][].class)
                         .optModelUrls(modelUrl)
                         .optTranslator(new MyTranslator())
                         .optProgress(new ProgressBar())
                         .build();
-        try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria);
-                Predictor<NDList, NDList> predictor = model.newPredictor();
-                NDManager manager = NDManager.newBaseManager()) {
-            NDList outputs =
-                    predictor.predict(
-                            new NDList(
-                                    inputs.stream()
-                                            .map(manager::create)
-                                            .collect(Collectors.toList())));
-            return outputs.stream().map(NDArray::toFloatArray).collect(Collectors.toList());
+        try (ZooModel<String[], float[][]> model = ModelZoo.loadModel(criteria);
+                Predictor<String[], float[][]> predictor = model.newPredictor()) {
+            return predictor.predict(inputs.toArray(new String[0]));
         }
     }
 
-    private static final class MyTranslator implements Translator<NDList, NDList> {
+    private static final class MyTranslator implements Translator<String[], float[][]> {
 
         MyTranslator() {}
 
         @Override
-        public NDList processInput(TranslatorContext ctx, NDList inputs) {
+        public NDList processInput(TranslatorContext ctx, String[] inputs) {
             // manually stack for faster batch inference
-            return new NDList(NDArrays.stack(inputs));
+            NDManager manager = ctx.getNDManager();
+            NDList inputsList =
+                    new NDList(
+                            Arrays.stream(inputs)
+                                    .map(manager::create)
+                                    .collect(Collectors.toList()));
+            return new NDList(NDArrays.stack(inputsList));
         }
 
         @Override
-        public NDList processOutput(TranslatorContext ctx, NDList list) {
+        public float[][] processOutput(TranslatorContext ctx, NDList list) {
             NDList result = new NDList();
             long numOutputs = list.singletonOrThrow().getShape().get(0);
             for (int i = 0; i < numOutputs; i++) {
                 result.add(list.singletonOrThrow().get(i));
             }
-            return result;
+            return result.stream().map(NDArray::toFloatArray).toArray(float[][]::new);
         }
 
         @Override
