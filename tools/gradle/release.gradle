@@ -53,7 +53,6 @@ task increaseFinalVersion {
             throw new GradleException("previousVersion property is required.")
         }
         def previousVersion = project.property("previousVersion")
-        def releaseVersion = version.replaceAll("-SNAPSHOT", "")
 
         def collection = fileTree("jupyter").filter { it.name.endsWith(".ipynb") }
         collection += fileTree(".").filter {
@@ -61,9 +60,9 @@ task increaseFinalVersion {
         }
 
         collection.each { File file ->
-            file.text = file.text.replaceAll("/${previousVersion}/", "/${releaseVersion}/")
-                    .replaceAll(">${previousVersion}<", ">${releaseVersion}<")
-                    .replaceAll(":${previousVersion}", ":${releaseVersion}")
+            file.text = file.text.replaceAll("/${previousVersion}/", "/${djl_version}/")
+                    .replaceAll(">${previousVersion}<", ">${djl_version}<")
+                    .replaceAll(":${previousVersion}", ":${djl_version}")
         }
     }
 }
