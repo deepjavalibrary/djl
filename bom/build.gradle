@@ -6,7 +6,7 @@ plugins {
 
 group = "ai.djl"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-version = "0.7.0" + (isRelease ? "" : "-SNAPSHOT")
+version = "${djl_version}" + (isRelease ? "" : "-SNAPSHOT")
 
 dependencies {
     constraints {
