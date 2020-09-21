@@ -23,6 +23,7 @@ sourceSets {
 dependencies {
     api "org.bytedeco:javacpp:1.5.4"
     api "com.google.protobuf:protobuf-java:3.8.0"
+    api "ai.djl.tensorflow:tensorflow-api:0.7.0"
 //    api("org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT") {
 //        exclude group: "org.bytedeco", module: "javacpp"
 //    }
