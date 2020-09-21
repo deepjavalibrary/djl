@@ -25,7 +25,6 @@ dependencies {
         api "ai.djl.tensorflow:tensorflow-model-zoo:${version}"
         api "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
         api "ai.djl.pytorch:pytorch-engine:${version}"
-        api "ai.djl.pytorch:pytorch-engine-precxx11:${version}"
         api "ai.djl.pytorch:pytorch-model-zoo:${version}"
         api "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
         api "ai.djl.pytorch:pytorch-native-cpu:${pytorch_version}"
