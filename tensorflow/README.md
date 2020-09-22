@@ -66,7 +66,7 @@ installed on your GPU machine, you can use one of the following library:
 
 #### Linux GPU
 
-- ai.djl.tensorflow:tensorflow-native-cu101:1.6.0:linux-x86_64 - CUDA 10.1
+- ai.djl.tensorflow:tensorflow-native-cu101:2.3.0:linux-x86_64 - CUDA 10.1
 
 ```xml
 <dependency>
