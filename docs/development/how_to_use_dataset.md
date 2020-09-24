@@ -23,7 +23,7 @@ the RandomAccessDataset.
 The following code illustrates an implementation of ArrayDataset.
 The ArrayDataset is recommended only if your dataset is small enough to fit in memory.
 
-```
+```java
 // given you have data1, data2 and label1, label2, label3
 ArrayDataset dataset = new ArrayDataset.Builder()
                               .setData(data1, data2)
@@ -64,7 +64,7 @@ The dataset will take the folder name e.g. `boots`, `pumps`, `shoes` in sorted o
 ### Step 2: Use the Dataset
 Add the following code snippet to your project to use the ImageFolder dataset.
 
-```
+```java
 ImageFolder dataset =
     new ImageFolder.Builder()
     // input the root string
