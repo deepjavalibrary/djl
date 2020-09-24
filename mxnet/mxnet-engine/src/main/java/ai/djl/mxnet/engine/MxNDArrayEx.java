@@ -557,6 +557,37 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    public NDList deconvolution(
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
+            Shape stride,
+            Shape padding,
+            Shape outPadding,
+            Shape dilation,
+            int groups) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("kernel", weight.getShape().slice(2));
+        params.addParam("stride", stride);
+        params.addParam("pad", padding);
+        params.addParam("adj", outPadding);
+        params.addParam("dilate", dilation);
+        params.addParam("num_group", groups);
+        params.addParam("num_filter", weight.getShape().get(0));
+
+        NDList inputs = new NDList(input, weight);
+        if (bias != null) {
+            params.add("no_bias", false);
+            inputs.add(bias);
+        } else {
+            params.add("no_bias", true);
+        }
+
+        return getManager().invoke("_npx_deconvolution", inputs, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDList linear(NDArray input, NDArray weight, NDArray bias) {
         MxOpParams params = new MxOpParams();
         params.addParam("num_hidden", weight.size(0));
