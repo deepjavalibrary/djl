@@ -123,7 +123,7 @@ We create a constructor and pass the CSVRecord list from builder to the class fi
 For builder, we have all we need in `BaseBuilder` so we only need to include the two minimal methods as shown.
 In the *build()* method, we take advantage of CSVParser to get the record of each CSV file and put them in CSVRecord list.
 
-```
+```java
 public class CSVDataset extends RandomAccessDataset {
 
     private final List<CSVRecord> csvRecords;
@@ -166,7 +166,7 @@ The getter returns a Record object which contains encoded inputs and labels.
 Here, we use simple encoding to transform the url String to an int array and create a NDArray on top of it.
 The reason why we use NDList here is that you might have multiple inputs and labels in different tasks.
 
-```
+```java
 @Override
 public Record get(NDManager manager, long index) {
     // get a CSVRecord given an index
@@ -181,7 +181,7 @@ public Record get(NDManager manager, long index) {
 The number of records available to be read in this Dataset.
 Here, we can directly use the size of the List<CSVRecord>.
 
-```
+```java
 @Override
 public long availableSize() {
     return csvRecords.size();
@@ -191,7 +191,7 @@ public long availableSize() {
 Done!
 Now, you can use the CSVDataset with the following code snippet:
 
-```
+```java
 CSVDataset dataset = new CSVDataset.Builder().setSampling(batchSize, false).build();
 for (Batch batch : dataset.getData(model.getNDManager())) {
     // use head to get first NDArray
