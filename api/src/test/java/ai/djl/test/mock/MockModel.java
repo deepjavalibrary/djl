@@ -41,8 +41,7 @@ public class MockModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public void load(Path modelPath, String prefix, Map<String, Object> options)
-            throws IOException {
+    public void load(Path modelPath, String prefix, Map<String, ?> options) throws IOException {
         if (Files.notExists(modelPath)) {
             throw new FileNotFoundException("File not found: " + modelPath);
         }

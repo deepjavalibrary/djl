@@ -133,7 +133,7 @@ public class SimplePoseModelLoader extends BaseModelLoader {
 
         /** {@inheritDoc} */
         @Override
-        public Translator<Image, Joints> newInstance(Model model, Map<String, Object> arguments) {
+        public Translator<Image, Joints> newInstance(Model model, Map<String, ?> arguments) {
             // default size: 192
             return SimplePoseTranslator.builder(arguments).build();
         }

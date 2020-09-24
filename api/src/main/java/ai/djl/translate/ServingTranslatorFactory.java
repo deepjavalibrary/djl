@@ -39,6 +39,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -54,8 +55,9 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
 
     /** {@inheritDoc} */
     @Override
-    public Translator<Input, Output> newInstance(Model model, Map<String, Object> arguments)
+    public Translator<Input, Output> newInstance(Model model, Map<String, ?> arguments)
             throws TranslateException {
+        Map<String, Object> merged = new ConcurrentHashMap<>(arguments);
         Path modelDir = model.getModelPath();
         String className = null;
         Path manifestFile = modelDir.resolve("serving.properties");
@@ -67,7 +69,7 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
                 throw new TranslateException("Failed to load serving.properties file", e);
             }
             for (String key : prop.stringPropertyNames()) {
-                arguments.putIfAbsent(key, prop.getProperty(key));
+                merged.putIfAbsent(key, prop.getProperty(key));
             }
             className = prop.getProperty("translator");
         }
@@ -76,15 +78,15 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
         if (!Files.isDirectory(libPath)) {
             libPath = modelDir.resolve("lib");
             if (!Files.isDirectory(libPath)) {
-                return loadDefaultTranslator(arguments);
+                return loadDefaultTranslator(merged);
             }
         }
         ServingTranslator translator = findTranslator(libPath, className);
         if (translator != null) {
-            translator.setArguments(arguments);
+            translator.setArguments(merged);
             return translator;
         }
-        return loadDefaultTranslator(arguments);
+        return loadDefaultTranslator(merged);
     }
 
     private ServingTranslator findTranslator(Path path, String className) {

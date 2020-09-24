@@ -85,7 +85,7 @@ public class BertQAModelLoader extends BaseModelLoader {
 
         /** {@inheritDoc} */
         @Override
-        public Translator<QAInput, String> newInstance(Model model, Map<String, Object> arguments) {
+        public Translator<QAInput, String> newInstance(Model model, Map<String, ?> arguments) {
             return PtBertQATranslator.builder().build();
         }
     }

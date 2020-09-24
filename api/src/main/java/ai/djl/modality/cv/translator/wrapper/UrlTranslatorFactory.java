@@ -40,7 +40,7 @@ public class UrlTranslatorFactory<T> implements TranslatorFactory<URL, T> {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<URL, T> newInstance(Model model, Map<String, Object> arguments)
+    public Translator<URL, T> newInstance(Model model, Map<String, ?> arguments)
             throws TranslateException {
         return new UrlTranslator<>(factory.newInstance(model, arguments));
     }

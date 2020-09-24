@@ -67,7 +67,7 @@ public class FtModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public void load(Path modelPath, String prefix, Map<String, Object> options)
+    public void load(Path modelPath, String prefix, Map<String, ?> options)
             throws IOException, MalformedModelException {
         if (Files.notExists(modelPath)) {
             throw new FileNotFoundException(

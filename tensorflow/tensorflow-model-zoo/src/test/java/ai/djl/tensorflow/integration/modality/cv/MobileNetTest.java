@@ -18,8 +18,6 @@ import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
@@ -35,17 +33,10 @@ public class MobileNetTest {
 
     @Test
     public void testMobileNetV2() throws IOException, ModelException, TranslateException {
-
-        ImageClassificationTranslator myTranslator =
-                ImageClassificationTranslator.builder()
-                        .addTransform(new Resize(224, 224))
-                        .addTransform(array -> array.div(127.5f).sub(1f))
-                        .build();
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(Image.class, Classifications.class)
-                        .optTranslator(myTranslator)
                         .optArtifactId("mobilenet")
                         .optFilter("flavor", "v2")
                         .optProgress(new ProgressBar())

@@ -40,7 +40,7 @@ public class InputStreamTranslatorFactory<T> implements TranslatorFactory<InputS
 
     /** {@inheritDoc} */
     @Override
-    public Translator<InputStream, T> newInstance(Model model, Map<String, Object> arguments)
+    public Translator<InputStream, T> newInstance(Model model, Map<String, ?> arguments)
             throws TranslateException {
         return new InputStreamTranslator<>(factory.newInstance(model, arguments));
     }

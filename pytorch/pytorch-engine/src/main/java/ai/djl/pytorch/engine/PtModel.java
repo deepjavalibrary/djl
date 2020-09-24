@@ -55,7 +55,7 @@ public class PtModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public void load(Path modelPath, String prefix, Map<String, Object> options)
+    public void load(Path modelPath, String prefix, Map<String, ?> options)
             throws IOException, MalformedModelException {
         modelDir = modelPath.toAbsolutePath();
         if (prefix == null) {

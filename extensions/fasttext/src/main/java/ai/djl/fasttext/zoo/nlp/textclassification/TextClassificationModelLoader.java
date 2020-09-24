@@ -80,7 +80,7 @@ public class TextClassificationModelLoader extends BaseModelLoader {
         /** {@inheritDoc} */
         @Override
         public Translator<String, Classifications> newInstance(
-                Model model, Map<String, Object> arguments) {
+                Model model, Map<String, ?> arguments) {
             return null;
         }
     }

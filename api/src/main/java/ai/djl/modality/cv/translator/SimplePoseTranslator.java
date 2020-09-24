@@ -99,7 +99,7 @@ public class SimplePoseTranslator extends BaseImageTranslator<Joints> {
      * @param arguments arguments to specify builder options
      * @return a new builder
      */
-    public static Builder builder(Map<String, Object> arguments) {
+    public static Builder builder(Map<String, ?> arguments) {
         Builder builder = new Builder();
         builder.configPreProcess(arguments);
         builder.configPostProcess(arguments);
@@ -135,7 +135,7 @@ public class SimplePoseTranslator extends BaseImageTranslator<Joints> {
 
         /** {@inheritDoc} */
         @Override
-        protected void configPostProcess(Map<String, Object> arguments) {
+        protected void configPostProcess(Map<String, ?> arguments) {
             threshold = getFloatValue(arguments, "threshold", 0.2f);
         }
 

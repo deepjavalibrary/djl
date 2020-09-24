@@ -191,7 +191,7 @@ public class PtSsdTranslator extends ObjectDetectionTranslator {
      * @param arguments arguments to specify builder options
      * @return a new builder
      */
-    public static Builder builder(Map<String, Object> arguments) {
+    public static Builder builder(Map<String, ?> arguments) {
         Builder builder = new Builder();
         builder.configPreProcess(arguments);
         builder.configPostProcess(arguments);
@@ -236,14 +236,14 @@ public class PtSsdTranslator extends ObjectDetectionTranslator {
 
         /** {@inheritDoc} */
         @Override
-        protected void configPreProcess(Map<String, Object> arguments) {
+        protected void configPreProcess(Map<String, ?> arguments) {
             super.configPreProcess(arguments);
         }
 
         /** {@inheritDoc} */
         @Override
         @SuppressWarnings("unchecked")
-        protected void configPostProcess(Map<String, Object> arguments) {
+        protected void configPostProcess(Map<String, ?> arguments) {
             super.configPostProcess(arguments);
 
             threshold = getFloatValue(arguments, "threshold", 0.4f);

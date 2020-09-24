@@ -87,7 +87,7 @@ public class MxModel extends BaseModel {
      * @throws IOException Exception for file loading
      */
     @Override
-    public void load(Path modelPath, String prefix, Map<String, Object> options)
+    public void load(Path modelPath, String prefix, Map<String, ?> options)
             throws IOException, MalformedModelException {
         modelDir = modelPath.toAbsolutePath();
         if (prefix == null) {
@@ -178,7 +178,7 @@ public class MxModel extends BaseModel {
     }
 
     @SuppressWarnings("PMD.UseConcurrentHashMap")
-    private void loadParameters(Path paramFile, Map<String, Object> options)
+    private void loadParameters(Path paramFile, Map<String, ?> options)
             throws IOException, MalformedModelException {
         if (readParameters(paramFile, options)) {
             return;

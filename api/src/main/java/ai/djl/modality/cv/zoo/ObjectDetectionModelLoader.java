@@ -147,7 +147,7 @@ public class ObjectDetectionModelLoader extends BaseModelLoader {
         /** {@inheritDoc} */
         @Override
         public Translator<Image, DetectedObjects> newInstance(
-                Model model, Map<String, Object> arguments) {
+                Model model, Map<String, ?> arguments) {
             return SingleShotDetectionTranslator.builder(arguments).build();
         }
     }
