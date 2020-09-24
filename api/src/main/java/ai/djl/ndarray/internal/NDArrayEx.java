@@ -277,6 +277,16 @@ public interface NDArrayEx {
             Shape dilation,
             int groups);
 
+    NDList deconvolution(
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
+            Shape stride,
+            Shape padding,
+            Shape outPadding,
+            Shape dilation,
+            int groups);
+
     NDList linear(NDArray input, NDArray weight, NDArray bias);
 
     NDList embedding(
