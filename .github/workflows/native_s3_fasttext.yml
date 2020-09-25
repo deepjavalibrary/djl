@@ -1,10 +1,10 @@
-name: Native S3 Sentencepiece
+name: Native S3 fastText
 
 on:
   workflow_dispatch:
 
 jobs:
-  build-sentencepiece-jni-cpu:
+  build-fasttext-jni:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -22,11 +22,10 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: install libgoogle-perftools-dev
-        if: runner.os == 'Linux'
-        run: sudo apt-get install libgoogle-perftools-dev
       - name: Release JNI prep
-        run: ./gradlew :extensions:sentencepiece:compileJNI
+        run: |
+            ./gradlew :extensions:fasttext:compileJNI
+            ./gradlew :extensions:fasttext:test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -35,4 +34,4 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-0.1.92/jnilib/
+          aws s3 sync extensions/fasttext/jnilib s3://djl-ai/publish/fasttext-0.9.2/jnilib/
