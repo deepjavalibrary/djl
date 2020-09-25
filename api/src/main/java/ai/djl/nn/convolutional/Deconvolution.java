@@ -46,7 +46,7 @@ import java.io.IOException;
  */
 public abstract class Deconvolution extends AbstractBlock {
 
-    private static final byte VERSION = 3;
+    private static final byte VERSION = 1;
 
     protected Shape kernelShape;
     protected Shape stride;
