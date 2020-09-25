@@ -78,7 +78,7 @@ public class Conv1dTranspose extends Deconvolution {
      * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, width)
      * @return the output of the conv1dtranspose operation
      */
-    public static NDList conv1dtranspose(NDArray input, NDArray weight) {
+    public static NDList conv1dTranspose(NDArray input, NDArray weight) {
         return conv1dtranspose(
                 input, weight, null, new Shape(1), new Shape(0), new Shape(0), new Shape(1));
     }
