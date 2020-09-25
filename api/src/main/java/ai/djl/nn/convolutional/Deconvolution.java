@@ -154,7 +154,7 @@ public abstract class Deconvolution extends AbstractBlock {
             throws IOException, MalformedModelException {
         if (version == VERSION) {
             readInputShapes(is);
-        } else if (version != 1) {
+        } else {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
     }
