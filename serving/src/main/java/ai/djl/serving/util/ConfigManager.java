@@ -75,21 +75,14 @@ public final class ConfigManager {
     private ConfigManager(Arguments args) {
         prop = new Properties();
 
-        String filePath = args.getConfigFile();
-        if (filePath == null) {
-            filePath = System.getProperty("ai.djl.conf", null);
-        }
-        if (filePath != null && !filePath.isEmpty()) {
-            Path file = Paths.get(filePath);
-            if (Files.isRegularFile(file)) {
-                try (InputStream stream = Files.newInputStream(file)) {
-                    prop.load(stream);
-                } catch (IOException e) {
-                    throw new IllegalArgumentException("Unable to read configuration file", e);
-                }
-            } else {
-                throw new IllegalArgumentException("Configuration file not found: " + file);
+        Path file = args.getConfigFile();
+        if (file != null) {
+            try (InputStream stream = Files.newInputStream(file)) {
+                prop.load(stream);
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Unable to read configuration file", e);
             }
+            prop.put("configFile", file.toString());
         }
 
         String modelStore = args.getModelStore();
