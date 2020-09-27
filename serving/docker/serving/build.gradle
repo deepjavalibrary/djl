@@ -1,0 +1,27 @@
+plugins {
+    id "java"
+}
+
+repositories {
+    jcenter()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+}
+
+dependencies {
+    implementation platform("ai.djl:bom:0.8.0")
+    runtimeOnly "ai.djl:serving:0.9.0-SNAPSHOT"
+    runtimeOnly "ai.djl.mxnet:mxnet-engine"
+    runtimeOnly "ai.djl.mxnet:mxnet-native-auto"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+task copyLibs(type: Copy) {
+    into "../libs"
+    from configurations.runtimeClasspath
+}
