@@ -12,6 +12,9 @@
  */
 package ai.djl.serving;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -74,8 +77,22 @@ public final class Arguments {
      *
      * @return the configuration file path
      */
-    public String getConfigFile() {
-        return configFile;
+    public Path getConfigFile() {
+        if (configFile == null) {
+            configFile = System.getProperty("ai.djl.conf", null);
+        }
+        if (configFile != null) {
+            Path file = Paths.get(configFile);
+            if (!Files.isRegularFile(file)) {
+                throw new IllegalArgumentException("Configuration file not found: " + configFile);
+            }
+            return file;
+        }
+        Path file = Paths.get("config.properties");
+        if (Files.isRegularFile(file)) {
+            return file;
+        }
+        return null;
     }
 
     /**
