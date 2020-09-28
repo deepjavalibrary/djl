@@ -58,16 +58,16 @@ task benchmark(type: JavaExec) {
             if (line.length == 2) {
                 line = line[1].split(" ");
                 if (line.contains("-t")) {
-                    if (System.properties["ai.djl.default_engine"] == "MXNet") {
-                        environment("MXNET_ENGINE_TYPE", "NaiveEngine")
-                        environment("OMP_NUM_THREADS", "1")
-                    } else if (System.properties["ai.djl.default_engine"] == "PyTorch") {
+                    if (System.properties["ai.djl.default_engine"] == "PyTorch") {
                         System.setProperty("ai.djl.pytorch.num_interop_threads", "1")
                         System.setProperty("ai.djl.pytorch.num_threads", "1")
                     } else if (System.properties["ai.djl.default_engine"] == "TensorFlow") {
                         environment("OMP_NUM_THREADS", "1")
                         environment("TF_NUM_INTEROP_THREADS", "1")
                         environment("TF_NUM_INTRAOP_THREADS", "1")
+                    } else {
+                        environment("MXNET_ENGINE_TYPE", "NaiveEngine")
+                        environment("OMP_NUM_THREADS", "1")
                     }
                 }
                 break;
