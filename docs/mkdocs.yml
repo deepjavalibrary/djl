@@ -12,7 +12,7 @@ theme:
   logo: website/img/DJL.svg
   favicon: website/img/favicon.png
   features:
-    - tabs
+    - navigation.tabs
   palette:
     primary: light-blue
     accent: light-blue
