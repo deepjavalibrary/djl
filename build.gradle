@@ -1,13 +1,16 @@
 plugins {
-    id "com.github.spotbugs" version "4.2.0" apply false
+    id "com.github.spotbugs" version "2.0.0" apply false
 }
+
+// workaround gradle bug
+ext.SpotBugsTask = com.github.spotbugs.SpotBugsTask
 
 defaultTasks 'build'
 
 allprojects {
     group 'ai.djl'
     boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-    version = "${djl_version}" + (isRelease ? "" : "-SNAPSHOT")
+    version = "0.4.1" + (isRelease ? "" : "-SNAPSHOT")
 
     repositories {
         jcenter()
@@ -32,17 +35,12 @@ configure(javaProjects()) {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
     compileJava.options.encoding = "UTF-8"
-    compileTestJava.options.encoding = "UTF-8"
-    if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
-        compileJava.options.compilerArgs.addAll(["--release", "8"])
-    }
 
     apply from: file("${rootProject.projectDir}/tools/gradle/java-formatter.gradle")
     apply from: file("${rootProject.projectDir}/tools/gradle/check.gradle")
 
     test {
-        // tensorflow mobilenet and resnet require more cpu memory
-        maxHeapSize = "4096m"
+        maxHeapSize = "1024m"
         doFirst {
             if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
                 jvmArgs = [
@@ -64,8 +62,6 @@ configure(javaProjects()) {
             systemProperties System.getProperties()
             systemProperties.remove("user.dir")
             systemProperty "ai.djl.logging.level", "debug"
-            systemProperty "org.slf4j.simpleLogger.defaultLogLevel", "debug"
-            systemProperty "org.slf4j.simpleLogger.log.org.mortbay.log", "warn"
             systemProperty "disableProgressBar", "true"
             systemProperty "nightly", System.getProperty("nightly", "false")
             if (gradle.startParameter.offline) {
@@ -91,3 +87,4 @@ configure(javaProjects()) {
 apply from: file("${rootProject.projectDir}/tools/gradle/publish.gradle")
 apply from: file("${rootProject.projectDir}/tools/gradle/jacoco.gradle")
 apply from: file("${rootProject.projectDir}/tools/gradle/release.gradle")
+

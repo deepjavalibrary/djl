@@ -5,13 +5,11 @@
 
     <groupId>ai.djl</groupId>
     <artifactId>examples</artifactId>
-    <version>0.9.0-SNAPSHOT</version>
+    <version>0.4.0</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <djl.version>0.9.0-SNAPSHOT</djl.version>
-        <exec.mainClass>ai.djl.examples.inference.ObjectDetection</exec.mainClass>
     </properties>
 
     <repositories>
@@ -40,27 +38,27 @@
         <dependency>
             <groupId>ai.djl</groupId>
             <artifactId>api</artifactId>
-            <version>${djl.version}</version>
+            <version>0.4.0</version>
         </dependency>
         <dependency>
             <groupId>ai.djl</groupId>
             <artifactId>basicdataset</artifactId>
-            <version>${djl.version}</version>
+            <version>0.4.0</version>
         </dependency>
         <dependency>
             <groupId>ai.djl</groupId>
             <artifactId>model-zoo</artifactId>
-            <version>${djl.version}</version>
+            <version>0.4.0</version>
         </dependency>
         <dependency>
             <groupId>ai.djl.mxnet</groupId>
             <artifactId>mxnet-model-zoo</artifactId>
-            <version>${djl.version}</version>
+            <version>0.4.0</version>
         </dependency>
         <dependency>
             <groupId>ai.djl.mxnet</groupId>
             <artifactId>mxnet-engine</artifactId>
-            <version>${djl.version}</version>
+            <version>0.4.0</version>
         </dependency>
         <dependency>
             <!--
@@ -68,7 +66,7 @@
             -->
             <groupId>ai.djl.mxnet</groupId>
             <artifactId>mxnet-native-auto</artifactId>
-            <version>1.7.0-backport</version>
+            <version>1.6.0</version>
             <scope>runtime</scope>
         </dependency>
 
