@@ -30,7 +30,7 @@ import java.io.IOException;
 
 /**
  * Transposed convolution, also named fractionally-strided convolution <a
- * href="https://arxiv.org/pdf/1603.07285">Dumoulin & Visin</a> or deconvolution <a
+ * href="https://arxiv.org/pdf/1603.07285">Dumoulin &amp; Visin</a> or deconvolution <a
  * href="https://ieeexplore.ieee.org/document/7298965">Long et al., 2015</a>, serves this purpose.
  *
  * <p>The need for transposed convolutions generally arises from the desire to use a transformation
@@ -236,7 +236,7 @@ public abstract class Deconvolution extends AbstractBlock {
             return self();
         }
         /**
-         * Sets the outPadding along each dimension. Defaults to 0 along each dimension.
+         * Sets the out_padding along each dimension. Defaults to 0 along each dimension.
          *
          * @param outPadding the shape of out_padding along each dimension
          * @return this Builder
