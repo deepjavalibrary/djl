@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -34,8 +34,8 @@ import ai.djl.util.Preconditions;
  *   <li>{@code weight: (num_filter, channel, kernel[0])}
  *   <li>{@code bias: (num_filter,)}
  *   <li>{@code out: (batch_size, num_filter, out_width)} <br>
- *       {@code out_width = f(width, kernel[0], pad[0], o_pad[0], stride[0], dilate[0])} <br>
- *       {@code where f(x, k, p, o_p, s, d) = (x-1)*s-2*p+k+o_p}
+ *       {@code out_width = f(width, kernel[0], pad[0], oPad[0], stride[0], dilate[0])} <br>
+ *       {@code where f(x, k, p, oP, s, d) = (x-1)*s-2*p+k+oP}
  * </ul>
  *
  * <p>Both {@code weight} and {@code bias} are learn-able parameters.
@@ -76,7 +76,7 @@ public class Conv1dTranspose extends Deconvolution {
      *
      * @param input the input {@code NDArray} of shape (batchSize, inputChannel, width)
      * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, width)
-     * @return the output of the conv1dtranspose operation
+     * @return the output of the conv1dTranspose operation
      */
     public static NDList conv1dTranspose(NDArray input, NDArray weight) {
         return conv1dTranspose(
@@ -89,7 +89,7 @@ public class Conv1dTranspose extends Deconvolution {
      * @param input the input {@code NDArray} of shape (batchSize, inputChannel, width)
      * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, width)
      * @param bias bias {@code NDArray} of shape (outChannel)
-     * @return the output of the conv1dtranspose operation
+     * @return the output of the conv1dTranspose operation
      */
     public static NDList conv1dTranspose(NDArray input, NDArray weight, NDArray bias) {
         return conv1dTranspose(
@@ -103,7 +103,7 @@ public class Conv1dTranspose extends Deconvolution {
      * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, width)
      * @param bias bias {@code NDArray} of shape (outChannel)
      * @param stride the stride of the deconvolving kernel: Shape(width)
-     * @return the output of the conv1dtranspose operation
+     * @return the output of the conv1dTranspose operation
      */
     public static NDList conv1dTranspose(
             NDArray input, NDArray weight, NDArray bias, Shape stride) {
@@ -119,7 +119,7 @@ public class Conv1dTranspose extends Deconvolution {
      * @param bias bias {@code NDArray} of shape (outChannel)
      * @param stride the stride of the deconvolving kernel: Shape(width)
      * @param padding implicit paddings on both sides of the input: Shape(width)
-     * @return the output of the conv1dtranspose operation
+     * @return the output of the conv1dTranspose operation
      */
     public static NDList conv1dTranspose(
             NDArray input, NDArray weight, NDArray bias, Shape stride, Shape padding) {
@@ -135,8 +135,8 @@ public class Conv1dTranspose extends Deconvolution {
      * @param stride the stride of the deconvolving kernel: Shape(width)
      * @param padding implicit paddings on both sides of the input: Shape(width)
      * @param outPadding Controls the amount of implicit zero-paddings on both sides of the output
-     *     for output_padding number of points for each dimension.
-     * @return the output of the conv1dtranspose operation
+     *     for outputPadding number of points for each dimension.
+     * @return the output of the conv1dTranspose operation
      */
     public static NDList conv1dTranspose(
             NDArray input,
@@ -157,9 +157,9 @@ public class Conv1dTranspose extends Deconvolution {
      * @param stride the stride of the convolving kernel: Shape(width)
      * @param padding implicit paddings on both sides of the input: Shape(width)
      * @param outPadding Controls the amount of implicit zero-paddings on both sides of the output
-     *     for output_padding number of points for each dimension.
+     *     for outputPadding number of points for each dimension.
      * @param dilation the spacing between kernel elements: Shape(width)
-     * @return the output of the conv1d operation
+     * @return the output of the conv1dTranspose operation
      */
     public static NDList conv1dTranspose(
             NDArray input,
@@ -181,11 +181,11 @@ public class Conv1dTranspose extends Deconvolution {
      * @param stride the stride of the deconvolving kernel: Shape(width)
      * @param padding implicit paddings on both sides of the input: Shape(width)
      * @param outPadding Controls the amount of implicit zero-paddings on both sides of the output
-     *     for output_padding number of points for each dimension. Shape(width)
+     *     for outputPadding number of points for each dimension. Shape(width)
      * @param dilation the spacing between kernel elements: Shape(width)
      * @param groups split input into groups: input channel(input.size(1)) should be divisible by
      *     the number of groups
-     * @return the output of the conv1dtranspose operation
+     * @return the output of the conv1dTranspose operation
      */
     public static NDList conv1dTranspose(
             NDArray input,
@@ -198,19 +198,19 @@ public class Conv1dTranspose extends Deconvolution {
             int groups) {
         Preconditions.checkArgument(
                 input.getShape().dimension() == 3 && weight.getShape().dimension() == 3,
-                "the shape of input or weight doesn't match the conv1dtranspose");
+                "the shape of input or weight doesn't match the conv1dTranspose");
         Preconditions.checkArgument(
                 stride.dimension() == 1
                         && padding.dimension() == 1
                         && outPadding.dimension() == 1
                         && dilation.dimension() == 1,
-                "the shape of stride or padding or dilation doesn't match the conv1dtranspose");
+                "the shape of stride or padding or dilation doesn't match the conv1dTranspose");
         return Deconvolution.deconvolution(
                 input, weight, bias, stride, padding, outPadding, dilation, groups);
     }
 
     /**
-     * Creates a builder to build a {@code Conv1d}.
+     * Creates a builder to build a {@code Conv1dTranpose}.
      *
      * @return a new builder
      */

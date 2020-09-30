@@ -149,7 +149,7 @@ public class Conv2dTranspose extends Deconvolution {
      * @param stride the stride of the deconvolving kernel: Shape(height, width)
      * @param padding implicit paddings on both sides of the input: Shape(height, width)
      * @param outPadding Controls the amount of implicit zero-paddings on both sides of the output
-     *     for output_padding number of points for each dimension.
+     *     for outputPadding number of points for each dimension.
      * @return the output of the conv2dTranspose operation
      */
     public static NDList conv2dTranspose(
@@ -172,7 +172,7 @@ public class Conv2dTranspose extends Deconvolution {
      * @param stride the stride of the deconvolving kernel: Shape(height, width)
      * @param padding implicit paddings on both sides of the input: Shape(height, width)
      * @param outPadding Controls the amount of implicit zero-paddings on both sides of the output
-     *     for output_padding number of points for each dimension.
+     *     for outputPadding number of points for each dimension.
      * @param dilation the spacing between kernel elements: Shape(height, width)
      * @return the output of the conv2dTranspose operation
      */
@@ -197,7 +197,7 @@ public class Conv2dTranspose extends Deconvolution {
      * @param stride the stride of the deconvolving kernel: Shape(height, width)
      * @param padding implicit paddings on both sides of the input: Shape(height, width)
      * @param outPadding Controls the amount of implicit zero-paddings on both sides of the output
-     *     for output_padding number of points for each dimension. Shape(height, width)
+     *     for outputPadding number of points for each dimension. Shape(height, width)
      * @param dilation the spacing between kernel elements: Shape(height, width)
      * @param groups split input into groups: input channel(input.size(1)) should be divisible by
      *     the number of groups
@@ -214,13 +214,13 @@ public class Conv2dTranspose extends Deconvolution {
             int groups) {
         Preconditions.checkArgument(
                 input.getShape().dimension() == 4 && weight.getShape().dimension() == 4,
-                "the shape of input or weight doesn't match the conv2dtranspose");
+                "the shape of input or weight doesn't match the conv2dTranspose");
         Preconditions.checkArgument(
                 stride.dimension() == 2
                         && padding.dimension() == 2
                         && outPadding.dimension() == 2
                         && dilation.dimension() == 2,
-                "the shape of stride or padding or dilation doesn't match the conv2dtranspose");
+                "the shape of stride or padding or dilation doesn't match the conv2dTranspose");
         return Deconvolution.deconvolution(
                 input, weight, bias, stride, padding, outPadding, dilation, groups);
     }
