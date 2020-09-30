@@ -29,9 +29,15 @@ import ai.djl.util.Preconditions;
  *   <li>{@code weight: (num_filter, channel, kernel[0], kernel[1])}
  *   <li>{@code bias: (num_filter,)}
  *   <li>{@code out: (batch_size, num_filter, out_height, out_width)} <br>
+<<<<<<<<< Temporary merge branch 1
+ *       {@code out_height = f(height, kernel[0], pad[0], o_pad[0], stride[0], dilate[0])} <br>
+ *       {@code out_width = f(width, kernel[1], pad[1], o_pad[1], stride[1], dilate[1])} <br>
+ *       {@code where f(x, k, p, o_p, s, d) = (x-1)*s-2*p+k+o_p}
+=========
  *       {@code out_height = f(height, kernel[0], pad[0], oPad[0], stride[0], dilate[0])} <br>
  *       {@code out_width = f(width, kernel[1], pad[1], oPad[1], stride[1], dilate[1])} <br>
  *       {@code where f(x, k, p, oP, s, d) = (x-1)*s-2*p+k+oP}
+>>>>>>>>> Temporary merge branch 2
  * </ul>
  *
  * <p>Both {@code weight} and {@code bias} are learn-able parameters.
@@ -73,10 +79,17 @@ public class Conv2dTranspose extends Deconvolution {
      * @param input the input {@code NDArray} of shape (batchSize, inputChannel, height, width)
      * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, height,
      *     width)
+<<<<<<<<< Temporary merge branch 1
+     * @return the output of the conv2dtranspose operation
+     */
+    public static NDList conv2dtranspose(NDArray input, NDArray weight) {
+        return conv2dtranspose(
+=========
      * @return the output of the conv2dTranspose operation
      */
     public static NDList conv2dTranspose(NDArray input, NDArray weight) {
         return conv2dTranspose(
+>>>>>>>>> Temporary merge branch 2
                 input,
                 weight,
                 null,
@@ -93,10 +106,17 @@ public class Conv2dTranspose extends Deconvolution {
      * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, height,
      *     width)
      * @param bias bias {@code NDArray} of shape (outChannel)
+<<<<<<<<< Temporary merge branch 1
+     * @return the output of the conv2dtranspose operation
+     */
+    public static NDList conv2dtranspose(NDArray input, NDArray weight, NDArray bias) {
+        return conv2dtranspose(
+=========
      * @return the output of the conv2dTranspose operation
      */
     public static NDList conv2dTranspose(NDArray input, NDArray weight, NDArray bias) {
         return conv2dTranspose(
+>>>>>>>>> Temporary merge branch 2
                 input,
                 weight,
                 bias,
@@ -114,11 +134,19 @@ public class Conv2dTranspose extends Deconvolution {
      *     width)
      * @param bias bias {@code NDArray} of shape (outChannel)
      * @param stride the stride of the deconvolving kernel: Shape(height, width)
+<<<<<<<<< Temporary merge branch 1
+     * @return the output of the conv2dtranspose operation
+     */
+    public static NDList conv2dtranspose(
+            NDArray input, NDArray weight, NDArray bias, Shape stride) {
+        return conv2dtranspose(
+=========
      * @return the output of the conv2dTranspose operation
      */
     public static NDList conv2dTranspose(
             NDArray input, NDArray weight, NDArray bias, Shape stride) {
         return conv2dTranspose(
+>>>>>>>>> Temporary merge branch 2
                 input, weight, bias, stride, new Shape(0, 0), new Shape(0, 0), new Shape(1, 1));
     }
 
@@ -131,11 +159,19 @@ public class Conv2dTranspose extends Deconvolution {
      * @param bias bias {@code NDArray} of shape (outChannel)
      * @param stride the stride of the deconvolving kernel: Shape(height, width)
      * @param padding implicit paddings on both sides of the input: Shape(height, width)
+<<<<<<<<< Temporary merge branch 1
+     * @return the output of the conv2dtranspose operation
+     */
+    public static NDList conv2dtranspose(
+            NDArray input, NDArray weight, NDArray bias, Shape stride, Shape padding) {
+        return conv2dtranspose(
+=========
      * @return the output of the conv2dTranspose operation
      */
     public static NDList conv2dTranspose(
             NDArray input, NDArray weight, NDArray bias, Shape stride, Shape padding) {
         return conv2dTranspose(
+>>>>>>>>> Temporary merge branch 2
                 input, weight, bias, stride, padding, new Shape(0, 0), new Shape(1, 1));
     }
 
@@ -149,17 +185,27 @@ public class Conv2dTranspose extends Deconvolution {
      * @param stride the stride of the deconvolving kernel: Shape(height, width)
      * @param padding implicit paddings on both sides of the input: Shape(height, width)
      * @param outPadding Controls the amount of implicit zero-paddings on both sides of the output
-     *     for outputPadding number of points for each dimension.
+     *     for output_padding number of points for each dimension.
+<<<<<<<<< Temporary merge branch 1
+     * @return the output of the conv2dtranspose operation
+     */
+    public static NDList conv2dtranspose(
+=========
      * @return the output of the conv2dTranspose operation
      */
     public static NDList conv2dTranspose(
+>>>>>>>>> Temporary merge branch 2
             NDArray input,
             NDArray weight,
             NDArray bias,
             Shape stride,
             Shape padding,
             Shape outPadding) {
+<<<<<<<<< Temporary merge branch 1
+        return conv2dtranspose(input, weight, bias, stride, padding, outPadding, new Shape(1, 1));
+=========
         return conv2dTranspose(input, weight, bias, stride, padding, outPadding, new Shape(1, 1));
+>>>>>>>>> Temporary merge branch 2
     }
 
     /**
@@ -172,11 +218,17 @@ public class Conv2dTranspose extends Deconvolution {
      * @param stride the stride of the deconvolving kernel: Shape(height, width)
      * @param padding implicit paddings on both sides of the input: Shape(height, width)
      * @param outPadding Controls the amount of implicit zero-paddings on both sides of the output
-     *     for outputPadding number of points for each dimension.
+     *     for output_padding number of points for each dimension.
      * @param dilation the spacing between kernel elements: Shape(height, width)
+<<<<<<<<< Temporary merge branch 1
+     * @return the output of the conv2dtranspose operation
+     */
+    public static NDList conv2dtranspose(
+=========
      * @return the output of the conv2dTranspose operation
      */
     public static NDList conv2dTranspose(
+>>>>>>>>> Temporary merge branch 2
             NDArray input,
             NDArray weight,
             NDArray bias,
@@ -184,7 +236,11 @@ public class Conv2dTranspose extends Deconvolution {
             Shape padding,
             Shape outPadding,
             Shape dilation) {
+<<<<<<<<< Temporary merge branch 1
+        return conv2dtranspose(input, weight, bias, stride, padding, outPadding, dilation, 1);
+=========
         return conv2dTranspose(input, weight, bias, stride, padding, outPadding, dilation, 1);
+>>>>>>>>> Temporary merge branch 2
     }
 
     /**
@@ -197,13 +253,19 @@ public class Conv2dTranspose extends Deconvolution {
      * @param stride the stride of the deconvolving kernel: Shape(height, width)
      * @param padding implicit paddings on both sides of the input: Shape(height, width)
      * @param outPadding Controls the amount of implicit zero-paddings on both sides of the output
-     *     for outputPadding number of points for each dimension. Shape(height, width)
+     *     for output_padding number of points for each dimension. Shape(height, width)
      * @param dilation the spacing between kernel elements: Shape(height, width)
      * @param groups split input into groups: input channel(input.size(1)) should be divisible by
      *     the number of groups
+<<<<<<<<< Temporary merge branch 1
+     * @return the output of the conv2dtranspose operation
+     */
+    public static NDList conv2dtranspose(
+=========
      * @return the output of the conv2dTranspose operation
      */
     public static NDList conv2dTranspose(
+>>>>>>>>> Temporary merge branch 2
             NDArray input,
             NDArray weight,
             NDArray bias,
@@ -214,13 +276,13 @@ public class Conv2dTranspose extends Deconvolution {
             int groups) {
         Preconditions.checkArgument(
                 input.getShape().dimension() == 4 && weight.getShape().dimension() == 4,
-                "the shape of input or weight doesn't match the conv2dTranspose");
+                "the shape of input or weight doesn't match the conv2dtranspose");
         Preconditions.checkArgument(
                 stride.dimension() == 2
                         && padding.dimension() == 2
                         && outPadding.dimension() == 2
                         && dilation.dimension() == 2,
-                "the shape of stride or padding or dilation doesn't match the conv2dTranspose");
+                "the shape of stride or padding or dilation doesn't match the conv2dtranspose");
         return Deconvolution.deconvolution(
                 input, weight, bias, stride, padding, outPadding, dilation, groups);
     }
