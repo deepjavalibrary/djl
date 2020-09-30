@@ -43,6 +43,7 @@ nav:
   - 'docs/README.md'
   - 'examples/README.md'
   - 'docs/development/README.md'
+  - 'docs/roadmap.md'
   - 'docs/faq.md'
   - User manual:
       - 'docs/development/setup.md'
@@ -76,7 +77,7 @@ nav:
       - TensorFlow Engine: 'tensorflow/tensorflow-engine/README.md'
       - TensorFlow Model Zoo: 'tensorflow/tensorflow-model-zoo/README.md'
       - Import TensorFlow Model: 'docs/tensorflow/how_to_import_tensorflow_models_in_DJL.md'
-  - Utilities:
+  - Extensions:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'
       - Hadoop support: 'extensions/hadoop/README.md'
