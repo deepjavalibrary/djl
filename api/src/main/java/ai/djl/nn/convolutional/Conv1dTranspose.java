@@ -1,9 +1,5 @@
 /*
-<<<<<<<<< Temporary merge branch 1
  * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-=========
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
->>>>>>>>> Temporary merge branch 2
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -92,7 +88,7 @@ public class Conv1dTranspose extends Deconvolution {
      * @param input the input {@code NDArray} of shape (batchSize, inputChannel, width)
      * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, width)
      * @param bias bias {@code NDArray} of shape (outChannel)
-     * @return the output of the conv1dtranspose operation
+     * @return the output of the conv1dTranspose operation
      */
     public static NDList conv1dTranspose(NDArray input, NDArray weight, NDArray bias) {
         return conv1dTranspose(input, weight, bias, new Shape(1), new Shape(0), new Shape(0), new Shape(1));
@@ -105,7 +101,7 @@ public class Conv1dTranspose extends Deconvolution {
      * @param weight filters {@code NDArray} of shape (outChannel, inputChannel/groups, width)
      * @param bias bias {@code NDArray} of shape (outChannel)
      * @param stride the stride of the deconvolving kernel: Shape(width)
-     * @return the output of the conv1dtranspose operation
+     * @return the output of the conv1dTranspose operation
      */
 
     public static NDList conv1dTranspose(NDArray input, NDArray weight, NDArray bias, Shape stride) {
@@ -120,7 +116,7 @@ public class Conv1dTranspose extends Deconvolution {
      * @param bias bias {@code NDArray} of shape (outChannel)
      * @param stride the stride of the deconvolving kernel: Shape(width)
      * @param padding implicit paddings on both sides of the input: Shape(width)
-     * @return the output of the conv1dtranspose operation
+     * @return the output of the conv1dTranspose operation
      */
     public static NDList conv1dTranspose(
             NDArray input, NDArray weight, NDArray bias, Shape stride, Shape padding) {
