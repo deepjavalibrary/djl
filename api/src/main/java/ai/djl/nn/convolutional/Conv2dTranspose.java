@@ -29,15 +29,9 @@ import ai.djl.util.Preconditions;
  *   <li>{@code weight: (num_filter, channel, kernel[0], kernel[1])}
  *   <li>{@code bias: (num_filter,)}
  *   <li>{@code out: (batch_size, num_filter, out_height, out_width)} <br>
-<<<<<<<<< Temporary merge branch 1
- *       {@code out_height = f(height, kernel[0], pad[0], o_pad[0], stride[0], dilate[0])} <br>
- *       {@code out_width = f(width, kernel[1], pad[1], o_pad[1], stride[1], dilate[1])} <br>
- *       {@code where f(x, k, p, o_p, s, d) = (x-1)*s-2*p+k+o_p}
-=========
  *       {@code out_height = f(height, kernel[0], pad[0], oPad[0], stride[0], dilate[0])} <br>
  *       {@code out_width = f(width, kernel[1], pad[1], oPad[1], stride[1], dilate[1])} <br>
  *       {@code where f(x, k, p, oP, s, d) = (x-1)*s-2*p+k+oP}
->>>>>>>>> Temporary merge branch 2
  * </ul>
  *
  * <p>Both {@code weight} and {@code bias} are learn-able parameters.
