@@ -42,6 +42,9 @@ public class CookingStackExchangeTest {
 
     @Test
     public void testTrainTextClassification() throws IOException {
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            throw new SkipException("fastText is not supported on windows");
+        }
         try (FtModel model = new FtModel("cooking")) {
             CookingStackExchange dataset = CookingStackExchange.builder().build();
 
@@ -62,6 +65,9 @@ public class CookingStackExchangeTest {
     @Test
     public void testTextClassification()
             throws IOException, MalformedModelException, ModelNotFoundException {
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            throw new SkipException("fastText is not supported on windows");
+        }
         try (ZooModel<String, Classifications> model =
                 FtModelZoo.COOKING_STACKEXCHANGE.loadModel()) {
             FtModel ftModel = (FtModel) model.getWrappedModel();
@@ -74,6 +80,9 @@ public class CookingStackExchangeTest {
 
     @Test
     public void testWord2Vec() throws IOException, MalformedModelException, ModelNotFoundException {
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            throw new SkipException("fastText is not supported on windows");
+        }
         try (ZooModel<String, Classifications> model =
                         FtModelZoo.COOKING_STACKEXCHANGE.loadModel();
                 NDManager manager = NDManager.newBaseManager()) {
@@ -90,6 +99,9 @@ public class CookingStackExchangeTest {
 
     @Test(enabled = false)
     public void testBlazingText() throws IOException, ModelException {
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            throw new SkipException("fastText is not supported on windows");
+        }
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");
         }

@@ -53,7 +53,7 @@ public class TrainResNetTest {
             Engine.getInstance().setRandomSeed(SEED);
             TrainingResult result = TrainResnetWithCifar10.runExample(args);
             Assert.assertTrue(result.getTrainEvaluation("Accuracy") >= 0.8f);
-            Assert.assertTrue(result.getValidateEvaluation("Accuracy") >= 0.7f);
+            Assert.assertTrue(result.getValidateEvaluation("Accuracy") >= 0.68f);
             Assert.assertTrue(result.getValidateLoss() < 1.1);
         }
     }
