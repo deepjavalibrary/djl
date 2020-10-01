@@ -12,7 +12,7 @@
  */
 
 /**
- * Contains classes that define convolutional operations extending {@link
- * ai.djl.nn.convolutional.Convolution} and {@link ai.djl.nn.convolutional.Deconvolution}.
+ * Contains classes that define convolutional operations extending {@link ai.djl.nn.convolutional.Convolution} and 
+ * {@link ai.djl.nn.convolutional.Deconvolution}.
  */
 package ai.djl.nn.convolutional;
