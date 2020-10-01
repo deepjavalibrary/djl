@@ -108,9 +108,9 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
 
         /** {@inheritDoc} */
         @Override
-        protected void configPostProcess(Map<String, Object> arguments) {
+        protected void configPostProcess(Map<String, ?> arguments) {
             super.configPostProcess(arguments);
-            if (getBooleanValue(arguments, "rescale")) {
+            if (getBooleanValue(arguments, "rescale", false)) {
                 optRescaleSize(width, height);
             }
             threshold = getFloatValue(arguments, "threshold", 0.2f);

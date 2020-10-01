@@ -26,7 +26,9 @@
       "arguments": {
         "width": 224,
         "height": 224,
-        "resize": true
+        "resize": true,
+        "toTensor": false,
+        "normalize": "103.939,116.779,123.68,1,1,1"
       },
       "files": {
         "synset": {

@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.translate;
 
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
@@ -27,8 +28,11 @@ public class PaddingStackBatchifierTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDList[] input = new NDList[5];
             for (int i = 0; i < 5; i++) {
-                input[i] =
-                        new NDList(manager.zeros(new Shape(10, i + 1)), manager.zeros(new Shape()));
+                NDArray array1 = manager.zeros(new Shape(10, i + 1));
+                NDArray array2 = manager.zeros(new Shape());
+                array1.setName("array1");
+                array2.setName("array2");
+                input[i] = new NDList(array1, array2);
             }
             Batchifier batchifier =
                     PaddingStackBatchifier.builder()
@@ -40,6 +44,9 @@ public class PaddingStackBatchifierTest {
             Assert.assertEquals(actual.size(), 2);
             Assert.assertEquals(actual.get(0).getShape(), new Shape(5, 10, 5));
             Assert.assertEquals(actual.get(1).getShape(), new Shape(5));
+            // assert names are kept after bachify
+            Assert.assertEquals(actual.get(0).getName(), "array1");
+            Assert.assertEquals(actual.get(1).getName(), "array2");
         }
     }
 

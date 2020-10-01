@@ -63,7 +63,7 @@ public class TfSsdModelLoader extends ObjectDetectionModelLoader {
         @Override
         @SuppressWarnings("unchecked")
         public Translator<Image, DetectedObjects> newInstance(
-                Model model, Map<String, Object> arguments) {
+                Model model, Map<String, ?> arguments) {
 
             return TfSsdTranslator.builder(arguments).build();
         }

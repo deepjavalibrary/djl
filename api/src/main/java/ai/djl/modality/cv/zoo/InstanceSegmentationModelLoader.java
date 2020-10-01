@@ -137,7 +137,7 @@ public class InstanceSegmentationModelLoader extends BaseModelLoader {
         /** {@inheritDoc} */
         @Override
         public Translator<Image, DetectedObjects> newInstance(
-                Model model, Map<String, Object> arguments) {
+                Model model, Map<String, ?> arguments) {
             return InstanceSegmentationTranslator.builder(arguments).build();
         }
     }

@@ -250,8 +250,7 @@ public abstract class BaseModel implements Model {
         super.finalize();
     }
 
-    protected Path paramPathResolver(String prefix, Map<String, Object> options)
-            throws IOException {
+    protected Path paramPathResolver(String prefix, Map<String, ?> options) throws IOException {
         Object epochOption = null;
         if (options != null) {
             epochOption = options.get("epoch");
@@ -269,7 +268,7 @@ public abstract class BaseModel implements Model {
         return modelDir.resolve(String.format(Locale.ENGLISH, "%s-%04d.params", prefix, epoch));
     }
 
-    protected boolean readParameters(Path paramFile, Map<String, Object> options)
+    protected boolean readParameters(Path paramFile, Map<String, ?> options)
             throws IOException, MalformedModelException {
         logger.debug("Try to load model from {}", paramFile);
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(paramFile))) {

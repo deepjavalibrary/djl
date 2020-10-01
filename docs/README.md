@@ -52,7 +52,7 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 
 ### [TensorFlow](../tensorflow/README.md)
 
-- [Keras Imporint](tensorflow/how_to_import_keras_models_in_DJL.md)
+- [TensorFlow Importing](tensorflow/how_to_import_tensorflow_models_in_DJL.md)
 
 ### [ONNX Runtime](../onnxruntime/onnxruntime-engine/README.md)
 
@@ -68,5 +68,7 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 
 - [Setup development environment](development/setup.md)
 - [Development guideline](development/development_guideline.md)
+
+## [Roadmap](roadmap.md)
 
 ## [FAQ](faq.md)

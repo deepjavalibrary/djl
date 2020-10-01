@@ -269,7 +269,7 @@ public class Shape {
     }
 
     /**
-     * Joins a this shape with axes.
+     * Joins this shape with axes.
      *
      * @param axes the axes to join
      * @return the joined {@code Shape}
@@ -279,7 +279,7 @@ public class Shape {
     }
 
     /**
-     * Joins a this shape with specified {@code other} shape.
+     * Joins this shape with specified {@code other} shape.
      *
      * @param other the shape to join
      * @return the joined {@code Shape}

@@ -87,8 +87,15 @@ public class BertQAModelLoader extends BaseModelLoader {
 
         /** {@inheritDoc} */
         @Override
-        public Translator<QAInput, String> newInstance(Model model, Map<String, Object> arguments) {
-            int seqLength = (int) arguments.getOrDefault("seqLength", 384);
+        public Translator<QAInput, String> newInstance(Model model, Map<String, ?> arguments) {
+            int seqLength;
+            Object value = arguments.get("seqLength");
+            if (value == null) {
+                seqLength = 384;
+            } else {
+                seqLength = Integer.parseInt(value.toString());
+            }
+
             return MxBertQATranslator.builder().setSeqLength(seqLength).build();
         }
     }

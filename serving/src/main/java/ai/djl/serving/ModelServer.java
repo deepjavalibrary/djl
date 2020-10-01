@@ -272,6 +272,7 @@ public class ModelServer {
                     Files.list(modelStoreDir)
                             .filter(
                                     p -> {
+                                        logger.info("Found file in model_store: {}", p);
                                         try {
                                             return !Files.isHidden(p) && Files.isDirectory(p)
                                                     || FilenameUtils.isArchiveFile(p.toString());
@@ -295,6 +296,7 @@ public class ModelServer {
         }
 
         for (String url : urls) {
+            logger.info("Initializing model: {}", url);
             int workers = configManager.getDefaultWorkers();
             CompletableFuture<ModelInfo> future = modelManager.registerModel(null, url, 1, 100);
             ModelInfo info = future.join();

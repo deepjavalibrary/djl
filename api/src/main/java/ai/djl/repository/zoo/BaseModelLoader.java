@@ -85,9 +85,9 @@ public class BaseModelLoader implements ModelLoader {
             throw new ModelNotFoundException("Model not found.");
         }
 
-        Map<String, Object> override = criteria.getArguments();
         Progress progress = criteria.getProgress();
-        Map<String, Object> arguments = artifact.getArguments(override);
+        Map<String, Object> arguments = artifact.getArguments(criteria.getArguments());
+        Map<String, String> options = artifact.getOptions(criteria.getOptions());
 
         try {
             TranslatorFactory<I, O> factory = criteria.getTranslatorFactory();
@@ -139,7 +139,7 @@ public class BaseModelLoader implements ModelLoader {
             if (criteria.getBlock() != null) {
                 model.setBlock(criteria.getBlock());
             }
-            model.load(modelPath, null, criteria.getOptions());
+            model.load(modelPath, null, options);
             Application application = criteria.getApplication();
             if (application != Application.UNDEFINED) {
                 arguments.put("application", application.getPath());

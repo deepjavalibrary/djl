@@ -40,7 +40,7 @@ public class Criteria<I, O> {
     private ModelZoo modelZoo;
     private Map<String, String> filters;
     private Map<String, Object> arguments;
-    private Map<String, Object> options;
+    private Map<String, String> options;
     private TranslatorFactory<I, O> factory;
     private Block block;
     private String modelName;
@@ -159,7 +159,7 @@ public class Criteria<I, O> {
      *
      * @return the model loading options
      */
-    public Map<String, Object> getOptions() {
+    public Map<String, String> getOptions() {
         return options;
     }
 
@@ -221,7 +221,7 @@ public class Criteria<I, O> {
         ModelZoo modelZoo;
         Map<String, String> filters;
         Map<String, Object> arguments;
-        Map<String, Object> options;
+        Map<String, String> options;
         TranslatorFactory<I, O> factory;
         Block block;
         String modelName;
@@ -422,7 +422,7 @@ public class Criteria<I, O> {
          * @param options the model loading options
          * @return this {@code Builder}
          */
-        public Builder<I, O> optOptions(Map<String, Object> options) {
+        public Builder<I, O> optOptions(Map<String, String> options) {
             this.options = options;
             return this;
         }
@@ -434,7 +434,7 @@ public class Criteria<I, O> {
          * @param value the model loading option value
          * @return this {@code Builder}
          */
-        public Builder<I, O> optOption(String key, Object value) {
+        public Builder<I, O> optOption(String key, String value) {
             if (options == null) {
                 options = new HashMap<>();
             }
@@ -495,7 +495,7 @@ public class Criteria<I, O> {
 
         /** {@inheritDoc} */
         @Override
-        public Translator<I, O> newInstance(Model model, Map<String, Object> arguments) {
+        public Translator<I, O> newInstance(Model model, Map<String, ?> arguments) {
             return translator;
         }
     }

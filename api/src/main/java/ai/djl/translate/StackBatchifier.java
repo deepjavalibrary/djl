@@ -44,10 +44,13 @@ public class StackBatchifier implements Batchifier {
             NDList result = new NDList(numInputKinds);
             for (int i = 0; i < numInputKinds; i++) {
                 NDList inputsOfKind = new NDList(batchSize);
+                String inputName = inputs[0].get(i).getName();
                 for (NDList input : inputs) {
                     inputsOfKind.add(input.get(i));
                 }
                 NDArray stacked = NDArrays.stack(new NDList(inputsOfKind));
+                // keep the name for stacked inputs
+                stacked.setName(inputName);
                 result.add(stacked);
             }
 

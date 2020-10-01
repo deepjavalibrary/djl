@@ -40,7 +40,7 @@ public class FileTranslatorFactory<T> implements TranslatorFactory<Path, T> {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<Path, T> newInstance(Model model, Map<String, Object> arguments)
+    public Translator<Path, T> newInstance(Model model, Map<String, ?> arguments)
             throws TranslateException {
         return new FileTranslator<>(factory.newInstance(model, arguments));
     }

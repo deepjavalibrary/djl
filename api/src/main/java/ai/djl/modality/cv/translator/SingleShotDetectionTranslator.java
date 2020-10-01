@@ -89,7 +89,7 @@ public class SingleShotDetectionTranslator extends ObjectDetectionTranslator {
      * @param arguments arguments to specify builder options
      * @return a new builder
      */
-    public static Builder builder(Map<String, Object> arguments) {
+    public static Builder builder(Map<String, ?> arguments) {
         Builder builder = new Builder();
         builder.configPreProcess(arguments);
         builder.configPostProcess(arguments);

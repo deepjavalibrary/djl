@@ -65,7 +65,7 @@ public class YoloModelLoader extends ObjectDetectionModelLoader {
 
         @Override
         public Translator<Image, DetectedObjects> newInstance(
-                Model model, Map<String, Object> arguments) {
+                Model model, Map<String, ?> arguments) {
             return YoloTranslator.builder(arguments).build();
         }
     }

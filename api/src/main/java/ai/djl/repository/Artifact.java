@@ -16,7 +16,6 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,6 +33,7 @@ public class Artifact {
     private String name;
     private Map<String, String> properties;
     private Map<String, Object> arguments;
+    private Map<String, String> options;
     private Map<String, Item> files;
 
     private transient Metadata metadata;
@@ -162,8 +162,34 @@ public class Artifact {
      * @param arguments the new arguments
      * @see Repository
      */
-    public void setArguments(LinkedHashMap<String, Object> arguments) {
+    public void setArguments(Map<String, Object> arguments) {
         this.arguments = arguments;
+    }
+
+    /**
+     * Returns the artifact options.
+     *
+     * @param override the override options to the default options
+     * @return the artifact options
+     */
+    public Map<String, String> getOptions(Map<String, String> override) {
+        Map<String, String> map = new ConcurrentHashMap<>();
+        if (options != null) {
+            map.putAll(options);
+        }
+        if (override != null) {
+            map.putAll(override);
+        }
+        return map;
+    }
+
+    /**
+     * Sets the artifact arguments.
+     *
+     * @param options the new arguments
+     */
+    public void setOptions(Map<String, String> options) {
+        this.options = options;
     }
 
     /**

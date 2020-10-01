@@ -31,6 +31,5 @@ public interface TranslatorFactory<I, O> {
      * @return a new instance of the {@code Translator} class
      * @throws TranslateException if failed to create Translator instance
      */
-    Translator<I, O> newInstance(Model model, Map<String, Object> arguments)
-            throws TranslateException;
+    Translator<I, O> newInstance(Model model, Map<String, ?> arguments) throws TranslateException;
 }

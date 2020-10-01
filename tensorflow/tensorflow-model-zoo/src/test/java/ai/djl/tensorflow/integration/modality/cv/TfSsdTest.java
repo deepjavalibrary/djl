@@ -36,9 +36,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TfSsdTest {
+
     @Test
     public void testTfSSD() throws IOException, ModelException, TranslateException {
-
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
@@ -46,7 +46,6 @@ public class TfSsdTest {
                         .optArtifactId("ssd")
                         .optFilter("backbone", "mobilenet_v2")
                         .optEngine("TensorFlow")
-                        .optOption("Tags", new String[] {})
                         .optProgress(new ProgressBar())
                         .build();
 

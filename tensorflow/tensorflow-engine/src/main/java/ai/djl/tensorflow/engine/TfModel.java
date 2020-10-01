@@ -14,6 +14,7 @@ package ai.djl.tensorflow.engine;
 
 import ai.djl.BaseModel;
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -21,11 +22,13 @@ import ai.djl.nn.Block;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
+import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,8 +59,8 @@ public class TfModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public void load(Path modelPath, String prefix, Map<String, Object> options)
-            throws FileNotFoundException {
+    public void load(Path modelPath, String prefix, Map<String, ?> options)
+            throws FileNotFoundException, MalformedModelException {
         modelDir = modelPath.toAbsolutePath();
         if (prefix == null) {
             prefix = modelName;
@@ -70,13 +73,42 @@ public class TfModel extends BaseModel {
             }
         }
         String[] tags = null;
-        ConfigProto proto = null;
+        ConfigProto configProto = null;
         RunOptions runOptions = null;
         String signatureDefKey = "serving_default";
         if (options != null) {
-            tags = (String[]) options.get("Tags");
-            proto = (ConfigProto) options.get("ConfigProto");
-            runOptions = (RunOptions) options.get("RunOptions");
+            Object tagOption = options.get("Tags");
+            if (tagOption instanceof String[]) {
+                tags = (String[]) tagOption;
+            } else if (tagOption instanceof String) {
+                if (((String) tagOption).isEmpty()) {
+                    tags = new String[0];
+                } else {
+                    tags = ((String) tagOption).split(",");
+                }
+            }
+            Object config = options.get("ConfigProto");
+            if (config instanceof ConfigProto) {
+                configProto = (ConfigProto) config;
+            } else if (config instanceof String) {
+                try {
+                    byte[] buf = Base64.getDecoder().decode((String) config);
+                    configProto = ConfigProto.parseFrom(buf);
+                } catch (InvalidProtocolBufferException e) {
+                    throw new MalformedModelException("Invalid ConfigProto: " + config, e);
+                }
+            }
+            Object run = options.get("RunOptions");
+            if (run instanceof RunOptions) {
+                runOptions = (RunOptions) run;
+            } else if (run instanceof String) {
+                try {
+                    byte[] buf = Base64.getDecoder().decode((String) run);
+                    runOptions = RunOptions.parseFrom(buf);
+                } catch (InvalidProtocolBufferException e) {
+                    throw new MalformedModelException("Invalid RunOptions: " + run, e);
+                }
+            }
             signatureDefKey = (String) options.get("SignatureDefKey");
         }
         if (tags == null) {
@@ -85,8 +117,8 @@ public class TfModel extends BaseModel {
 
         SavedModelBundle.Loader loader =
                 SavedModelBundle.loader(exportDir.toString()).withTags(tags);
-        if (proto != null) {
-            loader.withConfigProto(proto);
+        if (configProto != null) {
+            loader.withConfigProto(configProto);
         }
         if (runOptions != null) {
             loader.withRunOptions(runOptions);
@@ -141,6 +173,7 @@ public class TfModel extends BaseModel {
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
         return new Predictor<>(this, translator, first.getAndSet(false));
     }
+
     /** {@inheritDoc} */
     @Override
     public NDManager getNDManager() {

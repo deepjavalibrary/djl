@@ -29,6 +29,9 @@
         "threshold": 0.4,
         "synsetFileName": "classes.txt"
       },
+      "options": {
+        "Tags": ""
+      },
       "files": {
         "classes": {
           "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/tensorflow/openimage_v4_classes.txt",

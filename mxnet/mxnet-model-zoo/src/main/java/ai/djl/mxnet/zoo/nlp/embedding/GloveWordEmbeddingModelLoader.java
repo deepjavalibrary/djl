@@ -117,7 +117,7 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader {
 
         /** {@inheritDoc} */
         @Override
-        public Translator<String, NDList> newInstance(Model model, Map<String, Object> arguments) {
+        public Translator<String, NDList> newInstance(Model model, Map<String, ?> arguments) {
             String unknownToken = (String) arguments.get("unknownToken");
             return new TranslatorImpl(unknownToken);
         }

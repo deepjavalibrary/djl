@@ -110,7 +110,7 @@ public class ActionRecognitionModelLoader extends BaseModelLoader {
         /** {@inheritDoc} */
         @Override
         public Translator<Image, Classifications> newInstance(
-                Model model, Map<String, Object> arguments) {
+                Model model, Map<String, ?> arguments) {
             return ImageClassificationTranslator.builder(arguments).build();
         }
     }

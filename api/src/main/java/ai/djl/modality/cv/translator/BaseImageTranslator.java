@@ -84,27 +84,34 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
         return pipeline.transform(new NDList(array));
     }
 
-    protected static int getIntValue(Map<String, Object> arguments, String key, int defaultValue) {
+    protected static String getStringValue(Map<String, ?> arguments, String key, String def) {
         Object value = arguments.get(key);
         if (value == null) {
-            return defaultValue;
+            return def;
+        }
+        return value.toString();
+    }
+
+    protected static int getIntValue(Map<String, ?> arguments, String key, int def) {
+        Object value = arguments.get(key);
+        if (value == null) {
+            return def;
         }
         return (int) Double.parseDouble(value.toString());
     }
 
-    protected static float getFloatValue(
-            Map<String, Object> arguments, String key, float defaultValue) {
+    protected static float getFloatValue(Map<String, ?> arguments, String key, float def) {
         Object value = arguments.get(key);
         if (value == null) {
-            return defaultValue;
+            return def;
         }
         return (float) Double.parseDouble(value.toString());
     }
 
-    protected static boolean getBooleanValue(Map<String, Object> arguments, String key) {
+    protected static boolean getBooleanValue(Map<String, ?> arguments, String key, boolean def) {
         Object value = arguments.get(key);
         if (value == null) {
-            return false;
+            return def;
         }
         return Boolean.parseBoolean(value.toString());
     }
@@ -179,25 +186,50 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
             }
         }
 
-        protected void configPreProcess(Map<String, Object> arguments) {
+        protected void configPreProcess(Map<String, ?> arguments) {
             width = getIntValue(arguments, "width", 224);
             height = getIntValue(arguments, "height", 224);
             if (arguments.containsKey("flag")) {
                 flag = Image.Flag.valueOf(arguments.get("flag").toString());
             }
-            if (getBooleanValue(arguments, "centerCrop")) {
+            if (getBooleanValue(arguments, "centerCrop", false)) {
                 addTransform(new CenterCrop());
             }
-            if (getBooleanValue(arguments, "resize")) {
+            if (getBooleanValue(arguments, "resize", false)) {
                 addTransform(new Resize(width, height));
             }
-            addTransform(new ToTensor());
-            if (getBooleanValue(arguments, "normalize")) {
+            if (getBooleanValue(arguments, "toTensor", true)) {
+                addTransform(new ToTensor());
+            }
+            String normalize = getStringValue(arguments, "normalize", "false");
+            if ("true".equals(normalize)) {
                 addTransform(new Normalize(MEAN, STD));
+            } else if (!"false".equals(normalize)) {
+                String[] tokens = normalize.split("\\s*,\\s*");
+                if (tokens.length != 6) {
+                    throw new IllegalArgumentException("Invalid normalize value: " + normalize);
+                }
+                float[] mean = {
+                    Float.parseFloat(tokens[0]),
+                    Float.parseFloat(tokens[1]),
+                    Float.parseFloat(tokens[2])
+                };
+                float[] std = {
+                    Float.parseFloat(tokens[3]),
+                    Float.parseFloat(tokens[4]),
+                    Float.parseFloat(tokens[5])
+                };
+                addTransform(new Normalize(mean, std));
+            }
+            String range = (String) arguments.get("range");
+            if ("0,1".equals(range)) {
+                addTransform(a -> a.div(255f));
+            } else if ("-1,1".equals(range)) {
+                addTransform(a -> a.div(128f).sub(1));
             }
         }
 
-        protected void configPostProcess(Map<String, Object> arguments) {}
+        protected void configPostProcess(Map<String, ?> arguments) {}
     }
 
     /** A Builder to construct a {@code ImageClassificationTranslator}. */
@@ -255,7 +287,7 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
 
         /** {@inheritDoc} */
         @Override
-        protected void configPostProcess(Map<String, Object> arguments) {
+        protected void configPostProcess(Map<String, ?> arguments) {
             String synset = (String) arguments.get("synset");
             if (synset != null) {
                 optSynset(Arrays.asList(synset.split(",")));

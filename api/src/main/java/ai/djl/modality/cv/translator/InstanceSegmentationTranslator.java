@@ -170,7 +170,7 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
      * @param arguments arguments to specify builder options
      * @return a new builder
      */
-    public static Builder builder(Map<String, Object> arguments) {
+    public static Builder builder(Map<String, ?> arguments) {
         Builder builder = new Builder();
         builder.configPreProcess(arguments);
         builder.configPostProcess(arguments);
@@ -230,7 +230,7 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
 
         /** {@inheritDoc} */
         @Override
-        protected void configPostProcess(Map<String, Object> arguments) {
+        protected void configPostProcess(Map<String, ?> arguments) {
             super.configPostProcess(arguments);
             threshold = getFloatValue(arguments, "threshold", 0.3f);
             shortEdge = getIntValue(arguments, "shortEdge", 600);

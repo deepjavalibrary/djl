@@ -35,4 +35,4 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync extensions/sentencepiece/build/jnilib s3://djl-ai/publish/sentencepiece-0.1.92/jnilib
+          aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-0.1.92/jnilib/

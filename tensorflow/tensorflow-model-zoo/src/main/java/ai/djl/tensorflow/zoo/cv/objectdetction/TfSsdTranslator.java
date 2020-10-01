@@ -131,7 +131,7 @@ public class TfSsdTranslator extends ObjectDetectionTranslator {
      * @param arguments arguments to specify builder options
      * @return a new builder
      */
-    public static Builder builder(Map<String, Object> arguments) {
+    public static Builder builder(Map<String, ?> arguments) {
         Builder builder = new Builder();
         builder.configPreProcess(arguments);
         builder.configPostProcess(arguments);
@@ -202,24 +202,21 @@ public class TfSsdTranslator extends ObjectDetectionTranslator {
 
         /** {@inheritDoc} */
         @Override
-        protected void configPreProcess(Map<String, Object> arguments) {
+        protected void configPreProcess(Map<String, ?> arguments) {
             super.configPreProcess(arguments);
         }
 
         /** {@inheritDoc} */
         @Override
-        protected void configPostProcess(Map<String, Object> arguments) {
+        protected void configPostProcess(Map<String, ?> arguments) {
             super.configPostProcess(arguments);
             maxBoxes = getIntValue(arguments, "maxBoxes", 10);
             threshold = getFloatValue(arguments, "threshold", 0.4f);
             boundingBoxOutputName =
-                    (String) arguments.getOrDefault("boundingBoxOutputName", "detection_boxes");
-            scoresOutputName =
-                    (String) arguments.getOrDefault("scoresOutputName", "detection_scores");
+                    getStringValue(arguments, "boundingBoxOutputName", "detection_boxes");
+            scoresOutputName = getStringValue(arguments, "scoresOutputName", "detection_scores");
             classLabelOutputName =
-                    (String)
-                            arguments.getOrDefault(
-                                    "classLabelOutputName", "detection_class_labels");
+                    getStringValue(arguments, "classLabelOutputName", "detection_class_labels");
         }
 
         /**
