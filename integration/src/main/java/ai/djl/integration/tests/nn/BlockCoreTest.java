@@ -30,7 +30,9 @@ import ai.djl.nn.ParallelBlock;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv1d;
+import ai.djl.nn.convolutional.Conv1dTranspose;
 import ai.djl.nn.convolutional.Conv2d;
+import ai.djl.nn.convolutional.Conv2dTranspose;
 import ai.djl.nn.convolutional.Conv3d;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
@@ -292,6 +294,40 @@ public class BlockCoreTest {
     }
 
     @Test
+    public void testConv1dTranspose() throws IOException, MalformedModelException {
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+
+        Block block =
+                Conv1dTranspose.builder()
+                        .setKernelShape(new Shape(2))
+                        .setFilters(1)
+                        .optBias(false)
+                        .build();
+
+        try (Model model = Model.newInstance("model")) {
+            model.setBlock(block);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(1, 1, 4);
+                trainer.initialize(inputShape);
+
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.create(new float[] {19, 84, 20, 10}, inputShape);
+                NDArray expected =
+                        manager.create(new float[] {19, 103, 104, 30, 10}, new Shape(1, 1, 5));
+                NDArray out = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assert.assertEquals(out, expected);
+
+                Shape[] outputShape = block.getOutputShapes(manager, new Shape[] {inputShape});
+                Assert.assertEquals(out.getShape(), outputShape[0]);
+
+                testEncode(manager, block);
+            }
+        }
+    }
+
+    @Test
     public void testConv2d() throws IOException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
@@ -313,6 +349,43 @@ public class BlockCoreTest {
                         manager.create(
                                 new float[] {22, 24, 25, 21, 26, 23, 39, 31, 19},
                                 new Shape(1, 1, 3, 3));
+
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assertions.assertAlmostEquals(result, expected);
+
+                testEncode(manager, block);
+            }
+        }
+    }
+
+    @Test
+    public void testConv2dTranspose() throws IOException, MalformedModelException {
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+
+        Block block =
+                Conv2dTranspose.builder().setKernelShape(new Shape(2, 2)).setFilters(1).build();
+        try (Model model = Model.newInstance("model")) {
+            model.setBlock(block);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(1, 1, 4, 4);
+                trainer.initialize(inputShape);
+
+                NDManager manager = trainer.getManager();
+                NDArray data =
+                        manager.create(
+                                new float[] {
+                                    19, 84, 20, 10, 4, 24, 22, 10, 3, 3, 8, 12, 36, 32, 6, 2
+                                },
+                                inputShape);
+                NDArray expected =
+                        manager.create(
+                                new float[] {
+                                    19, 103, 104, 30, 10, 23, 131, 150, 62, 20, 7, 34, 57, 52, 22,
+                                    39, 74, 49, 28, 14, 36, 68, 38, 8, 2
+                                },
+                                new Shape(1, 1, 5, 5));
 
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assertions.assertAlmostEquals(result, expected);

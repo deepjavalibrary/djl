@@ -342,6 +342,20 @@ public class TfNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    public NDList deconvolution(
+            NDArray input,
+            NDArray weight,
+            NDArray bias,
+            Shape stride,
+            Shape padding,
+            Shape outPadding,
+            Shape dilation,
+            int groups) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDList linear(NDArray input, NDArray weight, NDArray bias) {
         throw new UnsupportedOperationException("Not implemented");
     }
