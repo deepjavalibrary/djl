@@ -20,7 +20,6 @@ import ai.djl.examples.training.transferlearning.TrainResnetWithCifar10;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
@@ -29,18 +28,18 @@ public class TrainResNetTest {
     private static final int SEED = 1234;
 
     @Test
-    public void testTrainResNet()
-            throws ParseException, ModelException, IOException, TranslateException {
+    public void testTrainResNet() throws ModelException, IOException, TranslateException {
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
         String[] args = {"-e", "2", "-g", "4", "-m", "10", "-s", "-p"};
 
-        TrainResnetWithCifar10.runExample(args);
+        TrainingResult result = TrainResnetWithCifar10.runExample(args);
+        Assert.assertNotNull(result);
     }
 
     @Test
     public void testTrainResNetSymbolicNightly()
-            throws ParseException, ModelException, IOException, TranslateException {
+            throws ModelException, IOException, TranslateException {
         // this is nightly test
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");
@@ -52,6 +51,8 @@ public class TrainResNetTest {
 
             Engine.getInstance().setRandomSeed(SEED);
             TrainingResult result = TrainResnetWithCifar10.runExample(args);
+            Assert.assertNotNull(result);
+
             Assert.assertTrue(result.getTrainEvaluation("Accuracy") >= 0.8f);
             Assert.assertTrue(result.getValidateEvaluation("Accuracy") >= 0.68f);
             Assert.assertTrue(result.getValidateLoss() < 1.1);
@@ -60,7 +61,7 @@ public class TrainResNetTest {
 
     @Test
     public void testTrainResNetImperativeNightly()
-            throws ParseException, ModelException, IOException, TranslateException {
+            throws ModelException, IOException, TranslateException {
         // this is nightly test
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");
@@ -72,6 +73,8 @@ public class TrainResNetTest {
 
             Engine.getInstance().setRandomSeed(SEED);
             TrainingResult result = TrainResnetWithCifar10.runExample(args);
+            Assert.assertNotNull(result);
+
             Assert.assertTrue(result.getTrainEvaluation("Accuracy") >= 0.9f);
             Assert.assertTrue(result.getValidateEvaluation("Accuracy") >= 0.75f);
             Assert.assertTrue(result.getValidateLoss() < 1);

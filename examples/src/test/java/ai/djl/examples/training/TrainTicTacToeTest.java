@@ -14,26 +14,27 @@ package ai.djl.examples.training;
 
 import ai.djl.engine.Engine;
 import ai.djl.training.TrainingResult;
-import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TrainTicTacToeTest {
 
     @Test
-    public void testTrainTicTacToe() throws ParseException {
+    public void testTrainTicTacToe() {
         if (Boolean.getBoolean("nightly")) {
             String[] args = new String[] {"-g", "1"};
 
             Engine.getInstance().setRandomSeed(1234);
 
             TrainingResult result = TrainTicTacToe.runExample(args);
+            Assert.assertNotNull(result);
+
             float winRate = result.getValidateEvaluation("winRate");
             Assert.assertTrue(winRate > 0.8f, "Win Rate: " + winRate);
         } else {
             String[] args = new String[] {"-g", "1", "-e", "1", "-m", "1"};
-
-            TrainTicTacToe.runExample(args);
+            TrainingResult result = TrainTicTacToe.runExample(args);
+            Assert.assertNotNull(result);
         }
     }
 }

@@ -12,16 +12,18 @@
  */
 package ai.djl.examples.training;
 
+import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import org.apache.commons.cli.ParseException;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TrainCaptchaTest {
 
     @Test
-    public void testTrainCaptcha() throws IOException, ParseException, TranslateException {
+    public void testTrainCaptcha() throws IOException, TranslateException {
         String[] args = new String[] {"-g", "1", "-e", "1", "-m", "2"};
-        TrainCaptcha.runExample(args);
+        TrainingResult result = TrainCaptcha.runExample(args);
+        Assert.assertNotNull(result);
     }
 }

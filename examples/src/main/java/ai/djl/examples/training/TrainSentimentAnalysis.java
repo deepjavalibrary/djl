@@ -65,7 +65,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.apache.commons.cli.ParseException;
 
 public final class TrainSentimentAnalysis {
     private static final List<TextProcessor> TEXT_PROCESSORS =
@@ -78,15 +77,19 @@ public final class TrainSentimentAnalysis {
     private TrainSentimentAnalysis() {}
 
     public static void main(String[] args)
-            throws IOException, ParseException, ModelNotFoundException, MalformedModelException,
+            throws IOException, ModelNotFoundException, MalformedModelException,
                     TranslateException {
         TrainSentimentAnalysis.runExample(args);
     }
 
     public static TrainingResult runExample(String[] args)
-            throws IOException, ParseException, ModelNotFoundException, MalformedModelException,
+            throws IOException, ModelNotFoundException, MalformedModelException,
                     TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
+        if (arguments == null) {
+            return null;
+        }
+
         ExecutorService executorService = Executors.newFixedThreadPool(8);
         Criteria<String, NDList> criteria =
                 Criteria.builder()

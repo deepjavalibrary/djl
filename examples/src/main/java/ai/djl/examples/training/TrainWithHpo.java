@@ -40,7 +40,6 @@ import ai.djl.util.Pair;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,13 +49,15 @@ public final class TrainWithHpo {
 
     private TrainWithHpo() {}
 
-    public static void main(String[] args) throws IOException, ParseException, TranslateException {
+    public static void main(String[] args) throws IOException, TranslateException {
         TrainWithHpo.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args)
-            throws IOException, ParseException, TranslateException {
+    public static TrainingResult runExample(String[] args) throws IOException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
+        if (arguments == null) {
+            return null;
+        }
 
         // get training and validation dataset
         RandomAccessDataset trainingSet = getDataset(Dataset.Usage.TRAIN, arguments);

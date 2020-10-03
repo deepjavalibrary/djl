@@ -33,7 +33,6 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import org.apache.commons.cli.ParseException;
 
 /**
  * An example of training an image classification (MNIST) model.
@@ -46,13 +45,15 @@ public final class TrainMnist {
 
     private TrainMnist() {}
 
-    public static void main(String[] args) throws IOException, ParseException, TranslateException {
+    public static void main(String[] args) throws IOException, TranslateException {
         TrainMnist.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args)
-            throws IOException, ParseException, TranslateException {
+    public static TrainingResult runExample(String[] args) throws IOException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
+        if (arguments == null) {
+            return null;
+        }
 
         // Construct neural network
         Block block =

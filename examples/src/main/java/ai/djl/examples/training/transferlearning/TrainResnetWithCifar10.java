@@ -55,7 +55,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,14 +71,16 @@ public final class TrainResnetWithCifar10 {
 
     private TrainResnetWithCifar10() {}
 
-    public static void main(String[] args)
-            throws ParseException, ModelException, IOException, TranslateException {
+    public static void main(String[] args) throws ModelException, IOException, TranslateException {
         TrainResnetWithCifar10.runExample(args);
     }
 
     public static TrainingResult runExample(String[] args)
-            throws IOException, ParseException, ModelException, TranslateException {
+            throws IOException, ModelException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
+        if (arguments == null) {
+            return null;
+        }
 
         try (Model model = getModel(arguments)) {
             // get training dataset
@@ -217,7 +218,7 @@ public final class TrainResnetWithCifar10 {
     }
 
     private static RandomAccessDataset getDataset(Dataset.Usage usage, Arguments arguments)
-            throws IOException, TranslateException {
+            throws IOException {
         Pipeline pipeline =
                 new Pipeline(
                         new ToTensor(),
