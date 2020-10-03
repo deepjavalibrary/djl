@@ -38,19 +38,20 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import org.apache.commons.cli.ParseException;
 
 public final class TrainMnistWithLSTM {
 
     private TrainMnistWithLSTM() {}
 
-    public static void main(String[] args) throws IOException, ParseException, TranslateException {
+    public static void main(String[] args) throws IOException, TranslateException {
         TrainMnistWithLSTM.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args)
-            throws IOException, ParseException, TranslateException {
+    public static TrainingResult runExample(String[] args) throws IOException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
+        if (arguments == null) {
+            return null;
+        }
 
         try (Model model = Model.newInstance("lstm")) {
             model.setBlock(getLSTMModel());

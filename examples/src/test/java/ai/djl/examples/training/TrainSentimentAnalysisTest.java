@@ -13,17 +13,18 @@
 
 package ai.djl.examples.training;
 
+import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import org.apache.commons.cli.ParseException;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TrainSentimentAnalysisTest {
 
     @Test
-    public void testTrainSentimentAnalysis()
-            throws IOException, ParseException, TranslateException {
+    public void testTrainSentimentAnalysis() throws IOException, TranslateException {
         String[] args = new String[] {"-g", "1", "-e", "1", "-m", "2"};
-        TrainSeq2Seq.runExample(args);
+        TrainingResult result = TrainSeq2Seq.runExample(args);
+        Assert.assertNotNull(result);
     }
 }

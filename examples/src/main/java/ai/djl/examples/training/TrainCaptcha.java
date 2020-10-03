@@ -38,7 +38,6 @@ import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import org.apache.commons.cli.ParseException;
 
 /**
  * An example of training a CAPTCHA solving model.
@@ -51,13 +50,15 @@ public final class TrainCaptcha {
 
     private TrainCaptcha() {}
 
-    public static void main(String[] args) throws IOException, ParseException, TranslateException {
+    public static void main(String[] args) throws IOException, TranslateException {
         TrainCaptcha.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args)
-            throws ParseException, IOException, TranslateException {
+    public static TrainingResult runExample(String[] args) throws IOException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
+        if (arguments == null) {
+            return null;
+        }
 
         try (Model model = Model.newInstance("captcha")) {
             model.setBlock(getBlock());

@@ -54,19 +54,21 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.apache.commons.cli.ParseException;
 
 public final class TrainSeq2Seq {
 
     private TrainSeq2Seq() {}
 
-    public static void main(String[] args) throws IOException, ParseException, TranslateException {
+    public static void main(String[] args) throws IOException, TranslateException {
         TrainSeq2Seq.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args)
-            throws IOException, ParseException, TranslateException {
+    public static TrainingResult runExample(String[] args) throws IOException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
+        if (arguments == null) {
+            return null;
+        }
+
         ExecutorService executorService = Executors.newFixedThreadPool(8);
         try (Model model = Model.newInstance("seq2seqMTEn-Fr")) {
             // get training and validation dataset

@@ -54,7 +54,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.cli.ParseException;
 
 /**
  * An example of training a simple Single Shot Detection (SSD) model.
@@ -67,13 +66,15 @@ public final class TrainPikachu {
 
     private TrainPikachu() {}
 
-    public static void main(String[] args) throws IOException, ParseException, TranslateException {
+    public static void main(String[] args) throws IOException, TranslateException {
         TrainPikachu.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args)
-            throws IOException, ParseException, TranslateException {
+    public static TrainingResult runExample(String[] args) throws IOException, TranslateException {
         Arguments arguments = Arguments.parseArgs(args);
+        if (arguments == null) {
+            return null;
+        }
 
         try (Model model = Model.newInstance("pikachu-ssd")) {
             model.setBlock(getSsdTrainBlock());

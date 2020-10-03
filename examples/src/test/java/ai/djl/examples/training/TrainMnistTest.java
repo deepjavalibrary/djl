@@ -18,19 +18,19 @@ import ai.djl.modality.Classifications;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TrainMnistTest {
 
     @Test
-    public void testTrainMnist()
-            throws ModelException, TranslateException, IOException, ParseException {
+    public void testTrainMnist() throws ModelException, TranslateException, IOException {
         if (Boolean.getBoolean("nightly")) {
             String[] args = new String[] {"-g", "1"};
 
             TrainingResult result = TrainMnist.runExample(args);
+            Assert.assertNotNull(result);
+
             float accuracy = result.getValidateEvaluation("Accuracy");
             float loss = result.getValidateLoss();
             Assert.assertTrue(accuracy > 0.9f, "Accuracy: " + accuracy);

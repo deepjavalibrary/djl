@@ -34,7 +34,6 @@ import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.tracker.LinearTracker;
 import ai.djl.training.tracker.Tracker;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,12 +49,15 @@ public final class TrainTicTacToe {
 
     private TrainTicTacToe() {}
 
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) {
         TrainTicTacToe.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args) throws ParseException {
+    public static TrainingResult runExample(String[] args) {
         Arguments arguments = Arguments.parseArgs(args);
+        if (arguments == null) {
+            return null;
+        }
 
         int epoch = arguments.getEpoch();
         int batchSize = arguments.getBatchSize();
