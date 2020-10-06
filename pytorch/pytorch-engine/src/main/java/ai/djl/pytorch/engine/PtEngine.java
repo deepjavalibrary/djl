@@ -15,6 +15,7 @@ package ai.djl.pytorch.engine;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
+import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDManager;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
@@ -51,9 +52,8 @@ public final class PtEngine extends Engine {
             logger.info("Number of intra-op threads is " + JniUtils.getNumThreads());
             return new PtEngine();
         } catch (Throwable t) {
-            logger.warn("Failed to load PyTorch native library", t);
+            throw new EngineException("Failed to load PyTorch native library", t);
         }
-        return null;
     }
 
     /** {@inheritDoc} */

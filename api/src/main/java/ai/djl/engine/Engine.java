@@ -43,15 +43,18 @@ public abstract class Engine {
 
     private static final String DEFAULT_ENGINE = initEngine();
 
+    private static EngineException exception;
+
     private static synchronized String initEngine() {
         ServiceLoader<EngineProvider> loaders = ServiceLoader.load(EngineProvider.class);
         for (EngineProvider provider : loaders) {
-            Engine engine = provider.getEngine();
-            if (engine != null) {
+            try {
+                Engine engine = provider.getEngine();
                 logger.debug("Engine loaded from provider: {}", engine.getEngineName());
                 ALL_ENGINES.put(engine.getEngineName(), engine);
-            } else {
-                logger.warn("Failed to load engine from: {}", provider.getClass().getName());
+            } catch (EngineException e) {
+                exception = e;
+                logger.warn("Failed to load engine from: " + provider.getClass().getName(), e);
             }
         }
 
@@ -107,7 +110,8 @@ public abstract class Engine {
             throw new EngineException(
                     "No deep learning engine found."
                             + System.lineSeparator()
-                            + "Please refer to https://github.com/awslabs/djl/blob/master/docs/development/troubleshooting.md for more details.");
+                            + "Please refer to https://github.com/awslabs/djl/blob/master/docs/development/troubleshooting.md for more details.",
+                    exception);
         }
         return getEngine(System.getProperty("ai.djl.default_engine", DEFAULT_ENGINE));
     }

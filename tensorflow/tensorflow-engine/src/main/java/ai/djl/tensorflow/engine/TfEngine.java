@@ -15,11 +15,10 @@ package ai.djl.tensorflow.engine;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
+import ai.djl.engine.EngineException;
 import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.GradientCollector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tensorflow.EagerSession;
 import org.tensorflow.TensorFlow;
 import org.tensorflow.internal.c_api.TF_DeviceList;
@@ -35,8 +34,6 @@ import org.tensorflow.internal.c_api.global.tensorflow;
  */
 public final class TfEngine extends Engine {
 
-    private static final Logger logger = LoggerFactory.getLogger(TfEngine.class);
-
     public static final String ENGINE_NAME = "TensorFlow";
 
     private TfEngine() {}
@@ -47,10 +44,9 @@ public final class TfEngine extends Engine {
             EagerSession.getDefault();
 
             return new TfEngine();
-        } catch (Throwable e) {
-            logger.warn("Failed load TensorFlow native library.", e);
+        } catch (Throwable t) {
+            throw new EngineException("Failed to load TensorFlow native library", t);
         }
-        return null;
     }
 
     /** {@inheritDoc} */
