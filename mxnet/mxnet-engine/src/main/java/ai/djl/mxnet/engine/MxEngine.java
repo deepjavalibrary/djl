@@ -15,6 +15,7 @@ package ai.djl.mxnet.engine;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
+import ai.djl.engine.EngineException;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.jna.LibUtils;
 import ai.djl.ndarray.NDManager;
@@ -54,9 +55,8 @@ public final class MxEngine extends Engine {
 
             return new MxEngine();
         } catch (Throwable t) {
-            logger.warn("Failed to load MXNet native library", t);
+            throw new EngineException("Failed to load MXNet native library", t);
         }
-        return null;
     }
 
     /** {@inheritDoc} */
