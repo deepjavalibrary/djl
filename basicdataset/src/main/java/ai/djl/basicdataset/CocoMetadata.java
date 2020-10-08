@@ -12,13 +12,7 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.modality.cv.output.Rectangle;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
-import java.lang.reflect.Type;
 import java.util.List;
 
 /** A metadata class to represent the structure of annotations in Coco. */
@@ -64,7 +58,7 @@ public class CocoMetadata {
         private long id;
 
         @SerializedName("bbox")
-        private Rectangle bBox;
+        private double[] bBox;
 
         private double area;
 
@@ -94,7 +88,7 @@ public class CocoMetadata {
          *
          * @return the bounding box of this annotation
          */
-        public Rectangle getBoundingBox() {
+        public double[] getBoundingBox() {
             return bBox;
         }
 
@@ -177,20 +171,6 @@ public class CocoMetadata {
          */
         public long getId() {
             return id;
-        }
-    }
-
-    /** A {@link JsonDeserializer} for the {@link Rectangle} class. */
-    public static final class RectangleDeserializer implements JsonDeserializer<Rectangle> {
-
-        /** {@inheritDoc} */
-        @Override
-        public Rectangle deserialize(
-                JsonElement json, Type typeOfT, JsonDeserializationContext ctx) {
-            JsonArray array = json.getAsJsonArray();
-            return new Rectangle(
-                    array.get(0).getAsDouble(), array.get(1).getAsDouble(),
-                    array.get(2).getAsDouble(), array.get(3).getAsDouble());
         }
     }
 }

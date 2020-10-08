@@ -31,7 +31,11 @@ public class CocoTest {
     @Test(enabled = false)
     public void testCocoRemote() throws IOException, TranslateException {
         CocoDetection coco =
-                CocoDetection.builder().optUsage(Dataset.Usage.TEST).setSampling(1, true).build();
+                CocoDetection.builder()
+                        .optUsage(Dataset.Usage.TEST)
+                        .setSampling(1, true)
+                        .optLimit(3)
+                        .build();
 
         try (Model model = Model.newInstance("model")) {
             TrainingConfig config = new DefaultTrainingConfig(Loss.l2Loss());
