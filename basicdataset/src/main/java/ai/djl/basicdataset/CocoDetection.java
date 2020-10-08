@@ -15,7 +15,6 @@ package ai.djl.basicdataset;
 import ai.djl.Application.CV;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -125,15 +124,6 @@ public class CocoDetection extends RandomAccessDataset {
         return imagePaths.size();
     }
 
-    private double[] convertRecToList(Rectangle rect) {
-        double[] list = new double[5];
-        list[0] = rect.getX();
-        list[1] = rect.getY();
-        list[2] = rect.getWidth();
-        list[3] = rect.getHeight();
-        return list;
-    }
-
     private List<double[]> getLabels(CocoUtils coco, long imageId) {
         List<Long> annotationIds = coco.getAnnotationIdByImageId(imageId);
         if (annotationIds == null) {
@@ -143,11 +133,12 @@ public class CocoDetection extends RandomAccessDataset {
         List<double[]> label = new ArrayList<>();
         for (long annotationId : annotationIds) {
             CocoMetadata.Annotation annotation = coco.getAnnotationById(annotationId);
-            Rectangle bBox = annotation.getBoundingBox();
             if (annotation.getArea() > 0) {
-                double[] list = convertRecToList(bBox);
+                double[] box = annotation.getBoundingBox();
                 // add the category label
                 // map the original one to incremental index
+                double[] list = new double[5];
+                System.arraycopy(box, 0, list, 0, 4);
                 list[4] = coco.mapCategoryId(annotation.getCategoryId());
                 label.add(list);
             }
