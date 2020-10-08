@@ -17,7 +17,7 @@ theme:
     primary: light-blue
     accent: light-blue
 google_analytics:
-  - UA-159559852-2
+  - UA-159559852-3
   - auto
 extra:
   social:
