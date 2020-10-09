@@ -21,15 +21,24 @@ public class DeviceTest {
     @Test
     public void testDevice() {
         Assert.assertEquals(Device.cpu(), Device.of("cpu", -1));
+
         if (Device.getGpuCount() > 0) {
             Assert.assertEquals(Device.gpu(), Device.defaultDevice());
+            Assert.assertEquals(Device.gpu(), Device.of("gpu", 0));
         } else {
             Assert.assertEquals(Device.cpu(), Device.defaultDevice());
+            Assert.assertNull(Device.gpu());
         }
-        Assert.assertEquals(Device.gpu(), Device.of("gpu", 0));
-        Assert.assertEquals(Device.gpu(3), Device.of("gpu", 3));
+
+        if (Device.getGpuCount() > 2) {
+            Assert.assertEquals(Device.gpu(3), Device.of("gpu", 3));
+        } else {
+            Assert.assertNull(Device.gpu(3));
+        }
+
         Assert.assertNotEquals(Device.cpu(), Device.gpu());
         Device dev = Device.of("myDevice", 1);
+        Assert.assertNotNull(dev);
         Assert.assertEquals(dev.getDeviceType(), "myDevice");
     }
 }
