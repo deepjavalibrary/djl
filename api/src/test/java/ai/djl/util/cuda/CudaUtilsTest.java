@@ -31,7 +31,7 @@ public class CudaUtilsTest {
             return;
         }
         // Possible to have CUDA and not have a GPU.
-        if (CudaUtils.getGpuCount() == 0) {
+        if (Device.getGpuCount() == 0) {
             return;
         }
 
