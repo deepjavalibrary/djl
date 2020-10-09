@@ -59,8 +59,13 @@ public final class Device {
         if (Type.CPU.equals(deviceType)) {
             return CPU;
         }
-        if (Type.GPU.equals(deviceType) && getGpuCount() == 0) {
-            return null;
+        if (Type.GPU.equals(deviceType)) {
+            if (getGpuCount() == 0) return null;
+            try {
+                CudaUtils.getComputeCapability(deviceId);
+            } catch (Exception e) {
+                return null;
+            }
         }
         String key = deviceType + '-' + deviceId;
         return CACHE.computeIfAbsent(key, k -> new Device(deviceType, deviceId));
