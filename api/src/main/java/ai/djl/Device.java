@@ -60,7 +60,9 @@ public final class Device {
             return CPU;
         }
         if (Type.GPU.equals(deviceType)) {
-            if (getGpuCount() == 0) return null;
+            if (getGpuCount() == 0) {
+                return null;
+            }
             try {
                 CudaUtils.getComputeCapability(deviceId);
             } catch (Exception e) {
