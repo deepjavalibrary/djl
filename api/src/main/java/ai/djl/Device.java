@@ -53,11 +53,14 @@ public final class Device {
      *
      * @param deviceType the device type, typically CPU or GPU
      * @param deviceId the deviceId on the hardware.
-     * @return a {@code Device} instance
+     * @return a {@code Device} instance, null if not available
      */
     public static Device of(String deviceType, int deviceId) {
         if (Type.CPU.equals(deviceType)) {
             return CPU;
+        }
+        if (Type.GPU.equals(deviceType) && getGpuCount() == 0) {
+            return null;
         }
         String key = deviceType + '-' + deviceId;
         return CACHE.computeIfAbsent(key, k -> new Device(deviceType, deviceId));
