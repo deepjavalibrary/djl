@@ -59,18 +59,20 @@ public final class Device {
         if (Type.CPU.equals(deviceType)) {
             return CPU;
         }
-        if (Type.GPU.equals(deviceType)) {
-            if (getGpuCount() == 0) {
-                return null;
-            }
-            try {
-                CudaUtils.getComputeCapability(deviceId);
-            } catch (Exception e) {
-                return null;
-            }
-        }
         String key = deviceType + '-' + deviceId;
-        return CACHE.computeIfAbsent(key, k -> new Device(deviceType, deviceId));
+        return CACHE.computeIfAbsent(key, k -> {
+            if (Type.GPU.equals(deviceType)) {
+                if (getGpuCount() == 0) {
+                    throw new IllegalArgumentException("Unable to create GPU Device, no GPUs available");
+                }
+                try {
+                    CudaUtils.getComputeCapability(deviceId);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Unable to create GPU Device with ID " + deviceId + ": " + e.getMessage());
+                }
+            }
+            return new Device(deviceType, deviceId);
+        });
     }
 
     /**
