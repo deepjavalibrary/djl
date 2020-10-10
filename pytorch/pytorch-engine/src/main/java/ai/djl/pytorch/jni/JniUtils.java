@@ -256,6 +256,13 @@ public final class JniUtils {
                         false));
     }
 
+    public static PtNDArray createSparseCoo(PtNDArray indices, PtNDArray values, Shape shape) {
+        return values.getManager()
+                .create(
+                        PyTorchLibrary.LIB.torchSparseCoo(
+                                shape.getShape(), indices.getHandle(), values.getHandle(), false));
+    }
+
     public static PtNDArray to(PtNDArray ndArray, DataType dataType, Device device, boolean copy) {
         PtNDManager manager = ndArray.getManager();
         // the device of the manager should always match the one in NDArray which the manager attach

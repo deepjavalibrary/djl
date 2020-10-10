@@ -155,6 +155,12 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray createCoo(Buffer data, long[][] indices, Shape shape) {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDList load(Path path) {
         return JnaUtils.loadNdArray(this, path, device);
     }

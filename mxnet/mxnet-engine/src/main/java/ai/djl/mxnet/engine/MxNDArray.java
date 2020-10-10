@@ -561,6 +561,9 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
         if (fmt == SparseFormat.DENSE) {
             throw new IllegalArgumentException("Default type is not allowed");
         }
+        if (fmt != SparseFormat.CSR && fmt != SparseFormat.ROW_SPARSE) {
+            throw new UnsupportedOperationException(fmt + "is not supported");
+        }
         if (fmt == getSparseFormat()) {
             return duplicate();
         }

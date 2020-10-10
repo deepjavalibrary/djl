@@ -34,8 +34,12 @@ processResources {
         files.each { entry ->
             project.logger.lifecycle("Downloading ${url}/${entry.key}")
             def file = new File("${classesDir}/${entry.value}")
-            file.getParentFile().mkdirs()
-            new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }
+            if (file.exists()) {
+                project.logger.lifecycle("prebuilt or cached file found for ${entry.value}")
+            } else {
+                file.getParentFile().mkdirs()
+                new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }
+            }
         }
         // write properties
         def propFile = file("${classesDir}/pytorch.properties")

@@ -118,13 +118,24 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape) {
-        throw new UnsupportedOperationException("Not implemented");
+        throw new UnsupportedOperationException("PyTorch doesn't support CSR");
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
-        throw new UnsupportedOperationException("Not implemented");
+        throw new UnsupportedOperationException("PyTorch doesn't support Row Sparse");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray createCoo(Buffer data, long[][] indices, Shape shape) {
+        // length should be the same as indices dim 1
+        try (NDArray valueNd = create(data, new Shape(indices[0].length))) {
+            try (NDArray indicesNd = create(indices)) {
+                return JniUtils.createSparseCoo((PtNDArray) indicesNd, (PtNDArray) valueNd, shape);
+            }
+        }
     }
 
     /** {@inheritDoc} */

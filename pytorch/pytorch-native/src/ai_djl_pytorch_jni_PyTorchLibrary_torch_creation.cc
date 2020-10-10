@@ -141,3 +141,19 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchEye(JNIEnv
   return utils::CreatePointer<torch::Tensor>(env, tensor_ptr);
   API_END_RETURN();
 }
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSparseCoo(
+    JNIEnv* env, jobject jthis, jlongArray jshape, jobject jindices, jobject jvalue, jboolean jrequired_grad) {
+  API_BEGIN()
+  const auto* indices_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jindices);
+  const auto* val_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jvalue);
+  const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
+  const auto options = torch::TensorOptions()
+                           .device(val_ptr->device())
+                           .layout(torch::kSparse)
+                           .requires_grad(JNI_TRUE == jrequired_grad)
+                           .dtype(val_ptr->dtype());
+  const auto* result_ptr = new torch::Tensor(torch::sparse_coo_tensor(*indices_ptr, *val_ptr, shape_vec, options));
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END_RETURN();
+}

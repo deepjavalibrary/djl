@@ -95,11 +95,32 @@ public class NDArrayCreationOpTest {
     }
 
     @Test
+    public void testCreateCooMatrix() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            long[][] indices = {{0, 1, 1}, {2, 0, 2}};
+            float[] values = {3, 4, 5};
+            FloatBuffer buf = FloatBuffer.wrap(values);
+            NDArray nd = manager.createCoo(buf, indices, new Shape(2, 4));
+            NDArray expected =
+                    manager.create(new float[] {0, 0, 3, 0, 4, 0, 5, 0}, new Shape(2, 4));
+            Assert.assertTrue(nd.isSparse());
+            Assert.assertEquals(nd.toDense(), expected);
+        }
+    }
+
+    @Test
     public void testCreateNDArrayAndConvertToSparse() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray nd = manager.ones(new Shape(3, 5));
-            NDArray sparse = nd.toSparse(SparseFormat.CSR);
-            Assert.assertSame(sparse.getSparseFormat(), SparseFormat.CSR);
+            NDArray sparse;
+            if ("MXNet".equals(Engine.getInstance().getEngineName())) {
+                sparse = nd.toSparse(SparseFormat.CSR);
+                Assert.assertSame(sparse.getSparseFormat(), SparseFormat.CSR);
+            } else if ("PyTorch".equals(Engine.getInstance().getEngineName())) {
+                sparse = nd.toSparse(SparseFormat.COO);
+                Assert.assertSame(sparse.getSparseFormat(), SparseFormat.COO);
+            }
+            throw new UnsupportedOperationException("Engine not supported");
         }
     }
 

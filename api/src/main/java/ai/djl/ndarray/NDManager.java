@@ -585,6 +585,16 @@ public interface NDManager extends AutoCloseable {
     NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape);
 
     /**
+     * Creates a Coordinate Format (COO) Matrix.
+     *
+     * @param data the data to set for the Coordinate format {@link NDArray}
+     * @param indices the matrix represent indices
+     * @param shape the {@link Shape} of the {@link NDArray}
+     * @return a new instance of {@link NDArray}
+     */
+    NDArray createCoo(Buffer data, long[][] indices, Shape shape);
+
+    /**
      * Decodes {@link NDArray} through byte array.
      *
      * @param bytes byte array to load from
