@@ -158,7 +158,13 @@ public final class CudaUtils {
                     return null;
                 }
                 Pattern p = Pattern.compile("cudart64_\\d+\\.dll");
-                String[] searchPath = path.split(";");
+                String cudaPath = System.getenv("CUDA_PATH");
+                String[] searchPath;
+                if (cudaPath == null) {
+                    searchPath = path.split(";");
+                } else {
+                    searchPath = (cudaPath + "\\bin\\;" + path).split(";");
+                }
                 for (String item : searchPath) {
                     File dir = new File(item);
                     File[] files = dir.listFiles(n -> p.matcher(n.getName()).matches());
