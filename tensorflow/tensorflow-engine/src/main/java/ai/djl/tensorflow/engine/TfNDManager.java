@@ -237,6 +237,12 @@ public class TfNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray createCoo(Buffer data, long[][] indices, Shape shape) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDList load(Path path) {
         throw new UnsupportedOperationException("Not implemented");
     }

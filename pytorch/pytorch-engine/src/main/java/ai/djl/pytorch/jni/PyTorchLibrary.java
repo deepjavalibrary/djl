@@ -75,6 +75,9 @@ final class PyTorchLibrary {
     native Pointer torchOnesLike(
             Pointer handle, int dType, int layout, int[] device, boolean requiredGrad);
 
+    native Pointer torchSparseCoo(
+            long[] shape, Pointer indicesHandle, Pointer valueHandle, boolean requiredGrad);
+
     native Pointer torchArange(
             float start,
             float end,

@@ -56,6 +56,11 @@ public class MockNDManager implements NDManager {
         return null;
     }
 
+    @Override
+    public NDArray createCoo(Buffer data, long[][] indices, Shape shape) {
+        return null;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDList load(Path path) {
