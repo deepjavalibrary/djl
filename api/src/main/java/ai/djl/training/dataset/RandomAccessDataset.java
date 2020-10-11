@@ -408,6 +408,7 @@ public abstract class RandomAccessDataset implements Dataset {
             this.indices = indices;
             this.from = from;
             this.to = to;
+            limit = Long.MAX_VALUE;
         }
 
         /** {@inheritDoc} */
