@@ -26,6 +26,7 @@ import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
+import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
@@ -106,5 +107,14 @@ public class ImageFolderTest {
                 pikachuBatch.close();
             }
         }
+    }
+
+    @Test
+    public void testRandomSplit() throws IOException, TranslateException {
+        Repository repository = Repository.newInstance("test", "src/test/resources/imagefolder");
+        ImageFolder dataset =
+                ImageFolder.builder().setRepository(repository).setSampling(1, false).build();
+        RandomAccessDataset[] sets = dataset.randomSplit(75, 25);
+        Assert.assertEquals(sets[0].size(), 2);
     }
 }
