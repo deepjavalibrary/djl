@@ -24,8 +24,6 @@ import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.RandomUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@code MxEngine} is an implementation of the {@link Engine} based on the <a
@@ -35,8 +33,6 @@ import org.slf4j.LoggerFactory;
  * Engine#getEngine(String)} with the Engine name "MXNet".
  */
 public final class MxEngine extends Engine {
-
-    private static final Logger logger = LoggerFactory.getLogger(MxEngine.class);
 
     public static final String ENGINE_NAME = "MXNet";
 
@@ -123,25 +119,13 @@ public final class MxEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public void debugEnvironment() {
-        super.debugEnvironment();
-        logger.info("MXNet Library: {}", LibUtils.getLibName());
-        logger.info("MXNet Features: {}", String.join(", ", JnaUtils.getFeatures()));
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
-        sb.append("Name: ")
-                .append(getEngineName())
-                .append(", version: ")
-                .append(getVersion())
-                .append(", capabilities: [\n");
+        sb.append(getEngineName()).append(':').append(getVersion()).append(", capabilities: [\n");
         for (String feature : JnaUtils.getFeatures()) {
             sb.append("\t").append(feature).append(",\n"); // NOPMD
         }
-        sb.append(']');
+        sb.append("]\nMXNet Library: ").append(LibUtils.getLibName());
         return sb.toString();
     }
 }

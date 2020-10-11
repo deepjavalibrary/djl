@@ -69,7 +69,7 @@ public final class OrtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "1.3.0";
+        return "1.4.0";
     }
 
     /** {@inheritDoc} */
@@ -110,5 +110,18 @@ public final class OrtEngine extends Engine {
     @Override
     public void setRandomSeed(int seed) {
         throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(200);
+        sb.append(getEngineName()).append(':').append(getVersion()).append(", ");
+        if (alternativeEngine != null) {
+            sb.append("Alternative engine: ").append(alternativeEngine.getEngineName());
+        } else {
+            sb.append("No alternative engine found");
+        }
+        return sb.toString();
     }
 }
