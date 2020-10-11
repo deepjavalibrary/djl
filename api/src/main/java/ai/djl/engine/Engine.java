@@ -19,6 +19,11 @@ import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
+import ai.djl.util.cuda.CudaUtils;
+import java.lang.management.MemoryUsage;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -219,9 +224,75 @@ public abstract class Engine {
      */
     public abstract void setRandomSeed(int seed);
 
-    /** Logs debug information about the environment for use when debugging environment issues. */
-    public void debugEnvironment() {
-        logger.info("Engine name: {}", getEngineName());
-        logger.info("Engine version: {}", getVersion());
+    /** Prints debug information about the environment for debugging environment issues. */
+    @SuppressWarnings("PMD.SystemPrintln")
+    public static void debugEnvironment() {
+        System.out.println("----------- System Properties -----------");
+        System.getProperties().forEach((k, v) -> System.out.println(k + ": " + v));
+
+        System.out.println();
+        System.out.println("--------- Environment Variables ---------");
+        System.getenv().forEach((k, v) -> System.out.println(k + ": " + v));
+
+        System.out.println();
+        System.out.println("-------------- Directories --------------");
+        try {
+            Path temp = Paths.get(System.getProperty("java.io.tmpdir"));
+            System.out.println("temp directory: " + temp.toString());
+            Files.createTempFile("test", ".tmp");
+
+            Path path = getEngineCacheDir();
+            System.out.println("Engine cache directory: " + path.toAbsolutePath().toString());
+            Files.createDirectories(path);
+            if (!Files.isWritable(path)) {
+                System.out.println("Engine cache directory is not writable!!!");
+            }
+        } catch (Throwable e) {
+            e.printStackTrace(System.out);
+        }
+
+        System.out.println();
+        System.out.println("------------------ CUDA -----------------");
+        int gpuCount = Device.getGpuCount();
+        System.out.println("GPU Count: " + gpuCount);
+        System.out.println("Default Device: " + Device.defaultDevice());
+        if (gpuCount > 0) {
+            System.out.println("CUDA: " + CudaUtils.getCudaVersionString());
+            System.out.println("ARCH: " + CudaUtils.getComputeCapability(0));
+        }
+        for (int i = 0; i < gpuCount; ++i) {
+            Device device = Device.gpu(i);
+            MemoryUsage mem = CudaUtils.getGpuMemory(device);
+            System.out.println("GPU(" + i + ") memory used: " + mem.getCommitted() + " bytes");
+        }
+
+        System.out.println();
+        System.out.println("----------------- Engines ---------------");
+        System.out.println("Default Engine: " + DEFAULT_ENGINE);
+        for (Engine engine : ALL_ENGINES.values()) {
+            System.out.println(engine);
+        }
+        if (exception != null) {
+            System.out.println("Last error:");
+            exception.printStackTrace(System.out);
+        }
+    }
+
+    private static Path getEngineCacheDir() {
+        String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
+        if (cacheDir == null || cacheDir.isEmpty()) {
+            cacheDir = System.getenv("ENGINE_CACHE_DIR");
+            if (cacheDir == null || cacheDir.isEmpty()) {
+                cacheDir = System.getProperty("DJL_CACHE_DIR");
+                if (cacheDir == null || cacheDir.isEmpty()) {
+                    cacheDir = System.getenv("DJL_CACHE_DIR");
+                    if (cacheDir == null || cacheDir.isEmpty()) {
+                        String userHome = System.getProperty("user.home");
+                        return Paths.get(userHome, ".djl.ai");
+                    }
+                }
+            }
+        }
+        return Paths.get(cacheDir);
     }
 }

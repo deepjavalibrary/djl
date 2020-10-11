@@ -115,4 +115,19 @@ public final class TfEngine extends Engine {
     public void setRandomSeed(int seed) {
         TfNDManager.setRandomSeed(seed);
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(200);
+        sb.append(getEngineName())
+                .append(':')
+                .append(getVersion())
+                .append(", capabilities: [\n\t" + StandardCapabilities.MKL + ",\n");
+        if (hasCapability(StandardCapabilities.CUDA)) {
+            sb.append("\t").append(StandardCapabilities.CUDA).append(",\n"); // NOPMD
+        }
+        sb.append("]\nTensorFlow Library: ").append(LibUtils.getLibName());
+        return sb.toString();
+    }
 }

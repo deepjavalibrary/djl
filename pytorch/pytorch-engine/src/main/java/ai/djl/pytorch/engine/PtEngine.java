@@ -103,4 +103,16 @@ public final class PtEngine extends Engine {
     public void setRandomSeed(int seed) {
         JniUtils.setSeed(seed);
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(200);
+        sb.append(getEngineName()).append(':').append(getVersion()).append(", capabilities: [\n");
+        for (String feature : JniUtils.getFeatures()) {
+            sb.append("\t").append(feature).append(",\n"); // NOPMD
+        }
+        sb.append("]\nPyTorch Library: ").append(LibUtils.getLibName());
+        return sb.toString();
+    }
 }

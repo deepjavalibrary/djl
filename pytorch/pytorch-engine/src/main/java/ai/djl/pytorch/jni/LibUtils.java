@@ -66,6 +66,15 @@ public final class LibUtils {
             System.loadLibrary(LIB_NAME); // NOPMD
             return;
         }
+        String libName = getLibName();
+        logger.debug("Loading pytorch library from: {}", libName);
+        if (System.getProperty("os.name").startsWith("Win")) {
+            loadWinDependencies(libName);
+        }
+        System.load(libName); // NOPMD
+    }
+
+    public static String getLibName() {
         String libName = findOverrideLibrary();
         if (libName == null) {
             AtomicBoolean fallback = new AtomicBoolean(false);
@@ -76,11 +85,7 @@ public final class LibUtils {
                 throw new IllegalStateException("Native library not found");
             }
         }
-        logger.debug("Loading pytorch library from: {}", libName);
-        if (System.getProperty("os.name").startsWith("Win")) {
-            loadWinDependencies(libName);
-        }
-        System.load(libName); // NOPMD
+        return libName;
     }
 
     private static void loadWinDependencies(String libName) {

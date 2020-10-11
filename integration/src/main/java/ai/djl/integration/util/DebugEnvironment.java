@@ -12,9 +12,7 @@
  */
 package ai.djl.integration.util;
 
-import ai.djl.Device;
 import ai.djl.engine.Engine;
-import ai.djl.util.cuda.CudaUtils;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
@@ -22,13 +20,10 @@ import java.lang.management.MemoryUsage;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** Emits debug information about the user environment. */
+@SuppressWarnings("PMD.SystemPrintln")
 public final class DebugEnvironment {
-
-    private static final Logger logger = LoggerFactory.getLogger(DebugEnvironment.class);
 
     private DebugEnvironment() {}
 
@@ -39,20 +34,10 @@ public final class DebugEnvironment {
      * @throws IOException if failed to get environment data
      */
     public static void main(String[] args) throws IOException {
-        logger.info("----------System Properties----------");
-        System.getProperties().forEach((k, v) -> logger.info(k + ": " + v));
+        Engine.debugEnvironment();
 
-        logger.info("");
-        logger.info("----------Environment Variables----------");
-        System.getenv().forEach((k, v) -> logger.info(k + ": " + v));
-
-        logger.info("");
-        logger.info("----------Default Engine----------");
-        Engine engine = Engine.getInstance();
-        engine.debugEnvironment();
-
-        logger.info("");
-        logger.info("----------Hardware----------");
+        System.out.println();
+        System.out.println("--------------- Hardware --------------");
         hardware();
     }
 
@@ -61,54 +46,38 @@ public final class DebugEnvironment {
         Runtime rt = Runtime.getRuntime();
 
         /* Total number of processors or cores available to the JVM */
-        logger.info("Available processors (cores): {}", rt.availableProcessors());
+        System.out.println("Available processors (cores): " + rt.availableProcessors());
 
-        logger.info("Byte Order: " + ByteOrder.nativeOrder().toString());
+        System.out.println("Byte Order: " + ByteOrder.nativeOrder().toString());
 
         /* Total amount of free memory available to the JVM */
-        logger.info("Free memory (bytes): {}", rt.freeMemory());
+        System.out.println("Free memory (bytes): " + rt.freeMemory());
 
         /* This will return Long.MAX_VALUE if there is no preset limit */
         long maxMemory = rt.maxMemory();
         /* Maximum amount of memory the JVM will attempt to use */
-        logger.info(
-                "Maximum memory (bytes): {}",
-                (maxMemory == Long.MAX_VALUE ? "no limit" : maxMemory));
+        System.out.println(
+                "Maximum memory (bytes): "
+                        + (maxMemory == Long.MAX_VALUE ? "no limit" : maxMemory));
 
         /* Total memory currently available to the JVM */
-        logger.info("Total memory available to JVM (bytes): {}", rt.totalMemory());
+        System.out.println("Total memory available to JVM (bytes): " + rt.totalMemory());
 
         MemoryMXBean memBean = ManagementFactory.getMemoryMXBean();
         MemoryUsage heap = memBean.getHeapMemoryUsage();
         MemoryUsage nonHeap = memBean.getNonHeapMemoryUsage();
 
-        logger.info("Heap committed: {}", heap.getCommitted());
-        logger.info("Heap nonCommitted: {}", nonHeap.getCommitted());
-
-        int gpuCount = Device.getGpuCount();
-        logger.info("GPU Count: {}", gpuCount);
-        logger.info("Default Device: {}", Device.defaultDevice());
-        if (gpuCount > 0) {
-            logger.info("CUDA: {}", CudaUtils.getCudaVersionString());
-            logger.info("ARCH: {}", CudaUtils.getComputeCapability(0));
-        }
-
-        // CudaUtils.getGpuMemory() will allocates memory on GPUs if CUDA runtime is not
-        // initialized.
-        for (int i = 0; i < gpuCount; ++i) {
-            Device device = Device.gpu(i);
-            MemoryUsage mem = CudaUtils.getGpuMemory(device);
-            logger.info("GPU {} memory used: {} bytes", i, mem.getCommitted());
-        }
+        System.out.println("Heap committed: " + heap.getCommitted());
+        System.out.println("Heap nonCommitted: " + nonHeap.getCommitted());
 
         if (!TestUtils.isWindows()) {
-            logger.info("GCC: ");
+            System.out.println("GCC: ");
             Process process = rt.exec("gcc --version");
             try (Scanner gccOut =
                     new Scanner(process.getInputStream(), StandardCharsets.UTF_8.name())) {
                 gccOut.useDelimiter(System.lineSeparator());
                 while (gccOut.hasNext()) {
-                    logger.info(gccOut.next());
+                    System.out.println(gccOut.next());
                 }
             }
         }
