@@ -63,20 +63,24 @@ nav:
       - MXNet Model Zoo: 'mxnet/mxnet-model-zoo/README.md'
       - MXNet native library: 'mxnet/native/README.md'
       - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
+      - Load a MXNet Model: 'jupyter/load_mxnet_model.ipynb'
   - ONNX Runtime:
       - Overview: 'onnxruntime/onnxruntime-engine/README.md'
       - ONNX runtime Hybrid Engine: 'docs/onnxruntime/hybrid_engine.md'
+      - Load a ONNX Model: 'jupyter/onnxruntime/machine_learning_with_ONNXRuntime.ipynb'
   - PyTorch:
       - Overview: 'pytorch/README.md'
       - PyTorch Engine: 'pytorch/pytorch-engine/README.md'
       - PyTorch Model Zoo: 'pytorch/pytorch-model-zoo/README.md'
       - Pytorch native library: 'pytorch/pytorch-native/README.md'
       - Import PyTorch Model: 'docs/pytorch/how_to_convert_your_model_to_torchscript.md'
+      - Load a PyTorch Model: 'jupyter/load_pytorch_model.ipynb'
   - TensorFlow:
       - Overview: 'tensorflow/README.md'
       - TensorFlow Engine: 'tensorflow/tensorflow-engine/README.md'
       - TensorFlow Model Zoo: 'tensorflow/tensorflow-model-zoo/README.md'
       - Import TensorFlow Model: 'docs/tensorflow/how_to_import_tensorflow_models_in_DJL.md'
+      - Load a TensorFlow Model: 'jupyter/tensorflow/pneumonia_detection.ipynb'
   - Extensions:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'
