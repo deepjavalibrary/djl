@@ -13,6 +13,7 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Model;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
 import ai.djl.training.DefaultTrainingConfig;
@@ -20,11 +21,11 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.dataset.Record;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import org.apache.commons.csv.CSVRecord;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -55,89 +56,50 @@ public class AirfoilRandomAccessTest {
             AirfoilRandomAccess airfoil =
                     AirfoilRandomAccess.builder()
                             .optUsage(Dataset.Usage.TRAIN)
+                            .addFeature("chordlen")
+                            .addFeature("freq")
                             .setSampling(32, true)
                             .build();
 
-            airfoil.addFeature("freq");
-            airfoil.addFeature("chordlen");
-
-            airfoil.prepare();
-
-            CSVRecord record0 = airfoil.getCSVRecord(0);
-            CSVRecord record3 = airfoil.getCSVRecord(3);
-
-            Assert.assertEquals(record0.get("freq"), "800");
-            Assert.assertEquals(record3.get("freq"), "1600");
-
-            Assert.assertEquals(record0.get("ssoundpres"), "126.201");
-            Assert.assertEquals(record3.get("ssoundpres"), "127.591");
+            try (Trainer trainer = model.newTrainer(config)) {
+                Batch batch = trainer.iterateDataset(airfoil).iterator().next();
+                Assert.assertEquals(batch.getData().size(), 1);
+                Assert.assertEquals(batch.getLabels().size(), 1);
+                batch.close();
+            }
 
             float epsilon = (float) 1e-4;
-            Assert.assertEquals(
-                    airfoil.getFeatureNDArray(manager, 0).toFloatArray(),
-                    new float[] {0.3048f, 800f},
-                    epsilon);
+            Record record = airfoil.get(manager, 0);
+            NDList data = record.getData();
+            NDList labels = record.getLabels();
 
-            Assert.assertEquals(
-                    airfoil.get(manager, 0).getData().head().toFloatArray(),
-                    new float[] {0.3048f, 800f},
-                    epsilon);
-            Assert.assertEquals(
-                    airfoil.get(manager, 0).getLabels().head().toFloatArray(),
-                    new float[] {126.201f},
-                    epsilon);
-
-            try (Trainer trainer = model.newTrainer(config)) {
-                for (Batch batch : trainer.iterateDataset(airfoil)) {
-                    Assert.assertEquals(batch.getData().size(), 1);
-                    Assert.assertEquals(batch.getLabels().size(), 1);
-                    batch.close();
-                }
-            }
+            Assert.assertEquals(data.head().toFloatArray(), new float[] {0.3048f, 800f}, epsilon);
+            Assert.assertEquals(labels.head().toFloatArray(), new float[] {126.201f}, epsilon);
         }
     }
 
     @Test
     public void testAirfoilRemotePreprocessing() throws IOException, TranslateException {
-        int batchSize = 10;
-        int n = 1500;
-
         AirfoilRandomAccess airfoil =
                 AirfoilRandomAccess.builder()
                         .optUsage(Dataset.Usage.TRAIN)
-                        .setSampling(batchSize, true)
+                        .optNormalize(true)
+                        .optLimit(1500)
+                        .setSampling(10, true)
                         .build();
 
-        // Select Features
-        airfoil.addAllFeatures();
-        airfoil.selectFirstN(n);
-        airfoil.whitenAll();
+        airfoil.prepare();
 
         NDManager manager = NDManager.newBaseManager();
-        TrainingConfig config =
-                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optInitializer(Initializer.ONES);
+
+        Record record = airfoil.get(manager, 0);
+        NDList data = record.getData();
+        NDList labels = record.getLabels();
 
         float epsilon = (float) 1e-4;
-        Assert.assertEquals(
-                airfoil.get(manager, 0).getData().head().toFloatArray(),
-                new float[] {-1.1448f, 1.797f, 1.3109f, -0.6443f, -0.6603f},
-                epsilon);
-        Assert.assertEquals(
-                airfoil.get(manager, 0).getLabels().head().toFloatArray(),
-                new float[] {0.1937f},
-                epsilon);
 
-        try (Model model = Model.newInstance("model")) {
-            model.setBlock(Blocks.identityBlock());
-
-            try (Trainer trainer = model.newTrainer(config)) {
-                for (Batch batch : trainer.iterateDataset(airfoil)) {
-                    Assert.assertEquals(batch.getData().size(), 1);
-                    Assert.assertEquals(batch.getLabels().size(), 1);
-                    batch.close();
-                }
-            }
-        }
+        float[] expected = {-0.6603f, -1.1448f, 1.797f, 1.3109f, -0.6443f};
+        Assert.assertEquals(data.head().toFloatArray(), expected, epsilon);
+        Assert.assertEquals(labels.head().toFloatArray(), new float[] {0.1937f}, epsilon);
     }
 }
