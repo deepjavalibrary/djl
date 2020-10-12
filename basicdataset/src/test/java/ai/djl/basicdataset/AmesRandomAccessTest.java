@@ -13,6 +13,7 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Model;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
 import ai.djl.training.DefaultTrainingConfig;
@@ -20,11 +21,11 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.dataset.Record;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import org.apache.commons.csv.CSVRecord;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -56,38 +57,28 @@ public class AmesRandomAccessTest {
             AmesRandomAccess amesRandomAccess =
                     AmesRandomAccess.builder()
                             .optUsage(Dataset.Usage.TRAIN)
+                            .addFeature("MiscVal")
+                            .addFeature("id")
+                            .addFeature("alley", true)
                             .setSampling(32, true)
                             .build();
 
-            // Feature selection and options
-            // Features start all enabled
-            amesRandomAccess.removeAllFeatures();
-            amesRandomAccess.addFeature("alley");
-            amesRandomAccess.addFeature("MiscVal");
-            amesRandomAccess.addFeature("id");
-            amesRandomAccess.setOneHotEncode("alley", true); // 3 diff types (grvl, pave, na)
-
             amesRandomAccess.prepare();
 
-            CSVRecord record0 = amesRandomAccess.getCSVRecord(0);
-            CSVRecord record3 = amesRandomAccess.getCSVRecord(3);
+            long size = amesRandomAccess.size();
+            Assert.assertEquals(size, 1460);
 
-            Assert.assertEquals(record0.get("LotShape"), "Reg");
-            Assert.assertEquals(record3.get("LotShape"), "IR1");
-
-            Assert.assertEquals(record0.get("YearBuilt"), "2003");
-            Assert.assertEquals(record3.get("YearBuilt"), "1915");
-
-            Assert.assertEquals(
-                    amesRandomAccess.getFeatureNDArray(manager, 0).toFloatArray(),
-                    new float[] {0, 1, 1, 0, 0});
+            Record record = amesRandomAccess.get(manager, 0);
+            NDList data = record.getData();
+            NDList labels = record.getLabels();
+            Assert.assertEquals(data.head().toFloatArray(), new float[] {0, 1, 1, 0, 0});
+            Assert.assertEquals(labels.singletonOrThrow().toFloatArray()[0], 208500.0);
 
             try (Trainer trainer = model.newTrainer(config)) {
-                for (Batch batch : trainer.iterateDataset(amesRandomAccess)) {
-                    Assert.assertEquals(batch.getData().size(), 1);
-                    Assert.assertEquals(batch.getLabels().size(), 1);
-                    batch.close();
-                }
+                Batch batch = trainer.iterateDataset(amesRandomAccess).iterator().next();
+                Assert.assertEquals(batch.getData().size(), 1);
+                Assert.assertEquals(batch.getLabels().size(), 1);
+                batch.close();
             }
         }
     }

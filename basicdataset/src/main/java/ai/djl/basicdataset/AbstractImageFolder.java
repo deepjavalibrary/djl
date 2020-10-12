@@ -136,8 +136,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset {
      *
      * @param <T> the builder type
      */
-    @SuppressWarnings("rawtypes")
-    public abstract static class ImageFolderBuilder<T extends ImageFolderBuilder>
+    public abstract static class ImageFolderBuilder<T extends ImageFolderBuilder<T>>
             extends BaseBuilder<T> {
 
         Repository repository;

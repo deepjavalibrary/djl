@@ -212,8 +212,7 @@ public abstract class RandomAccessDataset implements Dataset {
     }
 
     /** The Builder to construct a {@link RandomAccessDataset}. */
-    @SuppressWarnings("rawtypes")
-    public abstract static class BaseBuilder<T extends BaseBuilder> {
+    public abstract static class BaseBuilder<T extends BaseBuilder<T>> {
 
         protected Sampler sampler;
         protected Batchifier dataBatchifier = Batchifier.STACK;

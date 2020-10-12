@@ -13,30 +13,23 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Application;
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.Resource;
-import ai.djl.training.dataset.RandomAccessDataset;
-import ai.djl.training.dataset.Record;
-import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Files;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 /**
@@ -44,29 +37,21 @@ import org.apache.commons.csv.CSVRecord;
  *
  * <p>1503 instances 6 attributes
  */
-public final class AirfoilRandomAccess extends RandomAccessDataset {
+public final class AirfoilRandomAccess extends CsvDataset {
 
     private static final String ARTIFACT_ID = "airfoil";
-    private static final String[] FEATURE_ARRAY = {
-        "freq", "aoa", "chordlen", "freestreamvel", "ssdt"
+
+    private static final String[] COLUMNS = {
+        "freq", "aoa", "chordlen", "freestreamvel", "ssdt", "ssoundpres"
     };
 
-    private Set<String> features; // features currently included
-    private Set<String> availableFeatures; // features not included
-    private String label; // only 1 label for now
-
-    // TODO: add support for more types(in generic)
-    // TODO: move away from CSVRecord for storing data
-    // as common-csv only always reading(no modifying)
-    private List<CSVRecord> csvRecords; // dataset
-
-    private Usage usage;
-    private float[][] data;
-    private float[] labelArray;
-    private Map<String, Integer> stringToIndex;
-
     private Resource resource;
+    private Usage usage;
     private boolean prepared;
+
+    private boolean normalize;
+    private Map<String, Float> mean;
+    private Map<String, Float> std;
 
     /**
      * Creates an instance of {@code RandomAccessDataset} with the arguments in {@link
@@ -74,232 +59,12 @@ public final class AirfoilRandomAccess extends RandomAccessDataset {
      *
      * @param builder a builder with the required arguments
      */
-    private AirfoilRandomAccess(Builder builder) {
+    AirfoilRandomAccess(Builder builder) {
         super(builder);
         MRL mrl = MRL.dataset(Application.Tabular.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, "1.0");
         usage = builder.usage;
-
-        features = new HashSet<>();
-        availableFeatures = new HashSet<>(Arrays.asList(FEATURE_ARRAY));
-        label = "ssoundpres";
-
-        stringToIndex = new HashMap<>();
-        for (int i = 0; i < FEATURE_ARRAY.length; i++) {
-            stringToIndex.put(FEATURE_ARRAY[i], i);
-        }
-        stringToIndex.put(label, FEATURE_ARRAY.length);
-    }
-
-    /**
-     * Remove mean and rescale variance to 1 for all features.
-     *
-     * @throws IOException for various exceptions depending on the dataset
-     * @throws TranslateException if there is an error while processing input
-     */
-    public void whitenAll() throws IOException, TranslateException {
-        prepare();
-        float[] meanArray = new float[FEATURE_ARRAY.length + 1];
-        float[] sdArray = new float[FEATURE_ARRAY.length + 1];
-
-        /* Mean Calculation */
-        for (CSVRecord record : csvRecords) {
-            for (String feature : FEATURE_ARRAY) {
-                int index = stringToIndex.get(feature);
-                meanArray[index] += getRecordFloat(record, feature);
-            }
-            int index = stringToIndex.get(label);
-            meanArray[index] += getRecordFloat(record, label);
-        }
-
-        for (int i = 0; i < meanArray.length; i++) {
-            meanArray[i] /= size();
-        }
-        /* End Mean Calculation */
-
-        /* Standard Deviation Calculation */
-        for (CSVRecord record : csvRecords) {
-            for (String feature : FEATURE_ARRAY) {
-                int index = stringToIndex.get(feature);
-                sdArray[index] +=
-                        (float) Math.pow(getRecordFloat(record, feature) - meanArray[index], 2);
-            }
-            int index = stringToIndex.get(label);
-            sdArray[index] += (float) Math.pow(getRecordFloat(record, label) - meanArray[index], 2);
-        }
-
-        for (int i = 0; i < sdArray.length; i++) {
-            sdArray[i] = (float) Math.sqrt(sdArray[i] / csvRecords.size());
-        }
-        /* End Standard Deviation Calculation */
-
-        data = new float[(int) size()][getFeatureArraySize()];
-        labelArray = new float[(int) size()];
-
-        /* Whiten Data */
-        for (int i = 0; i < size(); i++) {
-            CSVRecord record = csvRecords.get(i);
-            for (String feature : FEATURE_ARRAY) {
-                int index = stringToIndex.get(feature);
-                data[i][index] =
-                        (getRecordFloat(record, feature) - meanArray[index]) / sdArray[index];
-            }
-            labelArray[i] =
-                    (getRecordFloat(record, label) - meanArray[FEATURE_ARRAY.length])
-                            / sdArray[FEATURE_ARRAY.length];
-        }
-    }
-
-    /**
-     * Gets the feature order of the columns.
-     *
-     * @return a list of the features in order shown in the FeatureNDArray
-     */
-    public List<String> getFeatureOrder() {
-        return new ArrayList<>(features);
-    }
-
-    /**
-     * Returns float for a given record and feature.
-     *
-     * @param record record which holds the raw data
-     * @param feature feature to be selected
-     * @return float
-     */
-    public float getRecordFloat(CSVRecord record, String feature) {
-        return Float.parseFloat(record.get(feature));
-    }
-
-    /**
-     * Chooses the 1st N records to be used (not reversible).
-     *
-     * <p>TODO: make standalone without need for whiten() after to set data[] (speed penalty)
-     *
-     * @param n number of records to be used starting from the beginning
-     * @throws IOException for various exceptions depending on the dataset
-     * @throws TranslateException if there is an error while processing input
-     */
-    public void selectFirstN(int n) throws IOException, TranslateException {
-        prepare();
-        csvRecords.subList(n, csvRecords.size()).clear();
-    }
-
-    /**
-     * Creates a builder to build a {@link AirfoilRandomAccess}.
-     *
-     * @return a new builder
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * Returns the label value for a given index.
-     *
-     * @param index index of label
-     * @return float value wrapped in a float array
-     */
-    public float[] getLabel(int index) {
-        // Set for sound only currently
-        // TODO: Adjust for any feature to be returned
-        return new float[] {labelArray[index]};
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected Record get(NDManager manager, long index) {
-        int idx = Math.toIntExact(index);
-        NDList d = new NDList(getFeatureNDArray(manager, idx));
-        NDList l = new NDList(manager.create(getLabel(idx)));
-        return new Record(d, l);
-    }
-
-    /**
-     * Returns the CSVRecord for a given index.
-     *
-     * @param index index of desired record
-     * @return the requested CSVRecord
-     */
-    public CSVRecord getCSVRecord(int index) {
-        return csvRecords.get(index);
-    }
-
-    /**
-     * Returns the float value of the record's feature in a float[].
-     *
-     * @param record The CSVRecord to get the feature from
-     * @param feature The feature value to be acquired
-     * @return the float value of the feature wrapped in a float array
-     */
-    public float[] getValueFloat(CSVRecord record, String feature) {
-        return new float[] {Float.parseFloat(record.get(feature))};
-    }
-
-    /**
-     * Returns the size of the feature array(column count).
-     *
-     * @return size of enabled features
-     */
-    public int getFeatureArraySize() {
-        return features.size(); // get count of enabled features
-    }
-
-    /**
-     * Return the NDArray at index 'index' with the set features.
-     *
-     * @param manager NDManager to maintain created NDArray
-     * @param index Index of wanted NDArray
-     * @return NDArray of features
-     */
-    public NDArray getFeatureNDArray(NDManager manager, int index) {
-        float[] newFeatureArray = new float[getFeatureArraySize()];
-
-        int i = 0;
-        for (String feature : features) {
-            int featureIndex = stringToIndex.get(feature);
-            newFeatureArray[i] = data[index][featureIndex];
-            i++;
-        }
-
-        return manager.create(newFeatureArray);
-    }
-
-    /** Move all currently set features to available. */
-    public void removeAllFeatures() {
-        availableFeatures.addAll(features);
-        features.clear();
-    }
-
-    /** Move all available features to set. */
-    public void addAllFeatures() {
-        features.addAll(availableFeatures);
-        availableFeatures.clear();
-    }
-
-    /**
-     * Adds a feature if it exists.
-     *
-     * @param feature requested feature
-     */
-    public void addFeature(String feature) {
-        feature = feature.toLowerCase();
-        if (availableFeatures.contains(feature)) {
-            availableFeatures.remove(feature);
-            features.add(feature);
-        }
-    }
-
-    /**
-     * Removes a feature from the active set if it exists.
-     *
-     * @param feature to be removed feature
-     */
-    public void removeFeature(String feature) {
-        feature = feature.toLowerCase();
-        if (features.contains(feature)) {
-            features.remove(feature);
-            availableFeatures.add(feature);
-        }
+        normalize = builder.normalize;
     }
 
     /** {@inheritDoc} */
@@ -325,50 +90,89 @@ public final class AirfoilRandomAccess extends RandomAccessDataset {
                 throw new UnsupportedOperationException("Validation data not available.");
         }
 
-        try (Reader reader = Files.newBufferedReader(csvFile);
-                CSVParser csvParser =
-                        new CSVParser(
-                                reader,
-                                CSVFormat.TDF
-                                        .withHeader(
-                                                "freq",
-                                                "aoa",
-                                                "chordlen",
-                                                "freestreamvel",
-                                                "ssdt",
-                                                "ssoundpres")
-                                        .withIgnoreHeaderCase()
-                                        .withTrim())) {
-            csvRecords = csvParser.getRecords();
-        }
+        csvUrl = csvFile.toUri().toURL();
+        super.prepare(progress);
 
-        data = new float[(int) size()][FEATURE_ARRAY.length];
-        labelArray = new float[(int) size()];
+        if (normalize) {
+            mean = new HashMap<>();
+            std = new HashMap<>();
 
-        // Set data array
-        for (int i = 0; i < csvRecords.size(); i++) {
-            for (String feature : FEATURE_ARRAY) {
-                int featureIndex = stringToIndex.get(feature);
-                data[i][featureIndex] = getRecordFloat(getCSVRecord(i), feature);
+            for (Feature feature : features) {
+                calculateMean(feature.getName());
+                calculateStd(feature.getName());
             }
-            labelArray[i] = getRecordFloat(getCSVRecord(i), label);
+            for (Feature feature : labels) {
+                calculateMean(feature.getName());
+                calculateStd(feature.getName());
+            }
         }
         prepared = true;
     }
 
     /** {@inheritDoc} */
     @Override
-    protected long availableSize() {
-        return csvRecords.size();
+    public List<String> getColumnNames() {
+        return Arrays.asList(COLUMNS).subList(0, 5);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected NDList toNDList(NDManager manager, CSVRecord record, List<Feature> selected) {
+        int length = selected.size();
+        ByteBuffer bb = manager.allocateDirect(length * 4);
+        FloatBuffer buf = bb.asFloatBuffer();
+        int index = 0;
+        for (Feature feature : selected) {
+            String name = feature.getName();
+            float value = Float.parseFloat(record.get(name));
+            if (normalize) {
+                value = (value - mean.get(name)) / std.get(name);
+            }
+            buf.put(value);
+            ++index;
+        }
+        buf.rewind();
+        return new NDList(manager.create(buf, new Shape(length)));
+    }
+
+    private void calculateMean(String column) {
+        float sum = 0;
+        long size = size();
+        for (int i = 0; i < size; ++i) {
+            CSVRecord record = csvRecords.get(i);
+            sum += Float.parseFloat(record.get(column));
+        }
+        mean.put(column, sum / size);
+    }
+
+    private void calculateStd(String column) {
+        float average = mean.get(column);
+        float sum = 0;
+        long size = size();
+        for (int i = 0; i < size; ++i) {
+            CSVRecord record = csvRecords.get(i);
+            sum += (float) Math.pow(Float.parseFloat(record.get(column)) - average, 2);
+        }
+        std.put(column, (float) Math.sqrt(sum / size));
+    }
+
+    /**
+     * Creates a builder to build a {@link AirfoilRandomAccess}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
     }
 
     /** A builder to construct a {@link AirfoilRandomAccess}. */
-    public static final class Builder extends BaseBuilder<Builder> {
+    public static final class Builder extends CsvBuilder<Builder> {
 
         Repository repository;
         String groupId;
         String artifactId;
         Usage usage;
+        boolean normalize;
 
         /** Constructs a new builder. */
         Builder() {
@@ -376,6 +180,7 @@ public final class AirfoilRandomAccess extends RandomAccessDataset {
             groupId = BasicDatasets.GROUP_ID;
             artifactId = ARTIFACT_ID;
             usage = Usage.TRAIN;
+            csvFormat = CSVFormat.TDF.withHeader(COLUMNS).withIgnoreHeaderCase().withTrim();
         }
 
         /** {@inheritDoc} */
@@ -392,7 +197,7 @@ public final class AirfoilRandomAccess extends RandomAccessDataset {
          */
         public Builder optUsage(Usage usage) {
             this.usage = usage;
-            return self();
+            return this;
         }
 
         /**
@@ -403,7 +208,7 @@ public final class AirfoilRandomAccess extends RandomAccessDataset {
          */
         public Builder optRepository(Repository repository) {
             this.repository = repository;
-            return self();
+            return this;
         }
 
         /**
@@ -435,11 +240,46 @@ public final class AirfoilRandomAccess extends RandomAccessDataset {
         }
 
         /**
-         * Builds the new {@link AirfoilRandomAccess}.
+         * Sets if normalize the dataset.
          *
-         * @return the new {@link AirfoilRandomAccess}
+         * @param normalize true to normalize the dataset
+         * @return the builder
          */
+        public Builder optNormalize(boolean normalize) {
+            this.normalize = normalize;
+            return this;
+        }
+
+        /**
+         * Returns the available features of this dataset.
+         *
+         * @return a list of feature names
+         */
+        public List<String> getAvailableFeatures() {
+            return Arrays.asList(COLUMNS);
+        }
+
+        /**
+         * Adds a feature to the features set.
+         *
+         * @param name the name of the feature
+         * @return this builder
+         */
+        public Builder addFeature(String name) {
+            return addFeature(new Feature(name, true));
+        }
+
+        /** {@inheritDoc} */
+        @Override
         public AirfoilRandomAccess build() {
+            if (features.isEmpty()) {
+                for (int i = 0; i < 5; ++i) {
+                    addFeature(COLUMNS[i]);
+                }
+            }
+            if (labels.isEmpty()) {
+                addNumericLabel("ssoundpres");
+            }
             return new AirfoilRandomAccess(this);
         }
     }
