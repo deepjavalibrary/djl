@@ -31,8 +31,7 @@ extra:
       link: https://zhuanlan.zhihu.com/c_1255493231133417472
 docs_dir: '../'
 plugins:
-  - search:
-      prebuild_index: true
+  - search
   - mknotebooks
   - exclude:
       regex:
