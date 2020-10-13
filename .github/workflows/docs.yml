@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.x'
       - name: install Python Dependencies
-        run: pip3 install nbconvert mkdocs mkdocs-exclude mknotebooks mkdocs-material jupyter Pygments
+        run: pip3 install nbconvert mkdocs mkdocs-exclude mknotebooks mkdocs-material==6.0.1 jupyter Pygments
       - name: Install IJava kernel
         run: |
           git clone https://github.com/frankfliu/IJava.git
