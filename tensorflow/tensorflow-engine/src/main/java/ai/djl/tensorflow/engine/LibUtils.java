@@ -48,6 +48,8 @@ public final class LibUtils {
             logger.debug("Loading TensorFlow library from: {}", libName);
             String path = new File(libName).getParentFile().toString();
             System.setProperty("org.bytedeco.javacpp.platform.preloadpath", path);
+            // workaround javacpp physical memory check bug
+            System.setProperty("org.bytedeco.javacpp.maxPhysicalBytes", "0");
         }
         // defer to tensorflow-core-api to handle loading native library.
     }
