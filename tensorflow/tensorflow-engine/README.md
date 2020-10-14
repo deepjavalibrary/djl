@@ -47,7 +47,7 @@ It will automatically determine the appropriate jars for your system based on th
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-native-auto</artifactId>
-    <version>2.3.0</version>
+    <version>2.3.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
