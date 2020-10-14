@@ -1,44 +1,23 @@
 group "ai.djl.tensorflow"
 
-repositories {
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
-}
-
 configurations {
     exclusion
-    repachange
-}
-
-// TODO: remove this when upgrade to TF 2.4
-sourceSets {
-    main {
-        resources {
-            srcDirs = []
-        }
-    }
 }
 
 dependencies {
     api "org.bytedeco:javacpp:1.5.4"
     api "com.google.protobuf:protobuf-java:3.8.0"
-    api "ai.djl.tensorflow:tensorflow-api:0.7.0"
-//    api("org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT") {
-//        exclude group: "org.bytedeco", module: "javacpp"
-//    }
-//    api "org.tensorflow:tensorflow-tools:0.1.0-SNAPSHOT"
-//    api "org.tensorflow:ndarray:0.2.0-SNAPSHOT"
-//
-    exclusion "org.bytedeco:javacpp:1.5.3"
-    exclusion "com.google.protobuf:protobuf-java:3.8.0"
+    api("org.tensorflow:tensorflow-core-api:0.2.0") {
+        exclude group: "org.bytedeco", module: "javacpp"
+    }
 
-    repachange "ai.djl.tensorflow:tensorflow-api:0.7.0"
+    exclusion "org.bytedeco:javacpp:1.5.4"
+    exclusion "com.google.protobuf:protobuf-java:3.8.0"
 }
 
 jar {
     from {
-        (configurations.repachange - configurations.exclusion).collect {
+        (configurations.compileClasspath - configurations.exclusion).collect {
             it.isDirectory() ? it : zipTree(it)
         }
     }
@@ -47,7 +26,6 @@ jar {
 publishing {
     publications {
         maven(MavenPublication) {
-            artifactId "tensorflow-api"
             pom {
                 name = "DJL release for TensorFlow core api"
                 description = "Deep Java Library (DJL) release for TensorFlow core api"
