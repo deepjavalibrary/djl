@@ -401,6 +401,13 @@ public class TfNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray randomInteger(long low, long high, Shape shape, DataType dataType) {
+        // the closest operator is randomUniform but it doesn't support long
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public NDArray randomUniform(float low, float high, Shape shape, DataType dataType) {
         Operand shapeOp = tf.constant(shape.getShape());
@@ -453,13 +460,13 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray randomMultinomial(int n, NDArray pValues, Shape shape) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray randomMultinomial(int n, NDArray pValues) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */

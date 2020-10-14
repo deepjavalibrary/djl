@@ -19,7 +19,23 @@
 
 // The file is the implementation for PyTorch random sampling operations
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_atNormal(JNIEnv* env, jobject jthis, jdouble jmean,
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRandint(JNIEnv* env, jobject jthis, jlong jlow,
+    jlong jhigh, jlongArray jsizes, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequire_grad) {
+  API_BEGIN()
+  const std::vector<int64_t> size_vec = utils::GetVecFromJLongArray(env, jsizes);
+  const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequire_grad);
+  torch::Tensor tensor = torch::randint(jlow, jhigh, size_vec, c10::nullopt, options);
+  // Tensor Option for mkldnn is not working
+  // explicitly convert to mkldnn
+  if (jlayout == 2) {
+    tensor = tensor.to_mkldnn();
+  }
+  const auto* result_ptr = new torch::Tensor(tensor);
+  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNormal(JNIEnv* env, jobject jthis, jdouble jmean,
     jdouble jstd, jlongArray jsizes, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequire_grad) {
   API_BEGIN()
   const std::vector<int64_t> size_vec = utils::GetVecFromJLongArray(env, jsizes);

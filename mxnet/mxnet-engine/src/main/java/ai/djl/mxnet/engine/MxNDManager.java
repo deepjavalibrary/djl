@@ -228,6 +228,18 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray randomInteger(long low, long high, Shape shape, DataType dataType) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("low", low);
+        params.addParam("high", high);
+        params.addParam("shape", shape);
+        params.setDevice(device);
+        params.setDataType(dataType);
+        return invoke("_npi_random_randint", params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray randomUniform(float low, float high, Shape shape, DataType dataType) {
         MxOpParams params = new MxOpParams();
         params.addParam("low", low);

@@ -140,6 +140,12 @@ public class OrtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray randomInteger(long low, long high, Shape shape, DataType dataType) {
+        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray randomUniform(float low, float high, Shape shape, DataType dataType) {
         throw new UnsupportedOperationException("Not supported for ONNX Runtime");
     }

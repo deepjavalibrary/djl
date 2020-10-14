@@ -1062,6 +1062,17 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Returns random integer values from low (inclusive) to high (exclusive).
+     *
+     * @param low Lowest (signed) longs to be drawn from the distribution
+     * @param high one above the largest (signed) long to be drawn from the distribution
+     * @param shape the {@link Shape} of the {@link NDArray}
+     * @param dataType the {@link DataType} of the {@link NDArray}
+     * @return the drawn samples {@link NDArray}
+     */
+    NDArray randomInteger(long low, long high, Shape shape, DataType dataType);
+
+    /**
      * Draws samples from a uniform distribution.
      *
      * <p>Samples are uniformly distributed over the half-open interval [low, high) (includes low,

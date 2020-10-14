@@ -822,6 +822,27 @@ public final class JniUtils {
         return ndArray.getManager().create(PyTorchLibrary.LIB.torchIsInf(ndArray.getHandle()));
     }
 
+    public static PtNDArray randint(
+            PtNDManager manager,
+            long low,
+            long high,
+            Shape size,
+            DataType dataType,
+            Device device) {
+        return manager.create(
+                PyTorchLibrary.LIB.torchRandint(
+                        low,
+                        high,
+                        size.getShape(),
+                        dataType.ordinal(),
+                        layoutMapper(SparseFormat.DENSE, device),
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
+                        false));
+    }
+
     public static PtNDArray normal(
             PtNDManager manager,
             double mean,
@@ -830,7 +851,7 @@ public final class JniUtils {
             DataType dataType,
             Device device) {
         return manager.create(
-                PyTorchLibrary.LIB.atNormal(
+                PyTorchLibrary.LIB.torchNormal(
                         mean,
                         std,
                         size.getShape(),

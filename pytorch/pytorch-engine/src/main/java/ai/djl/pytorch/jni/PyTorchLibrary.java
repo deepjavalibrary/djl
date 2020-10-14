@@ -320,7 +320,16 @@ final class PyTorchLibrary {
 
     native Pointer torchIsInf(Pointer self);
 
-    native Pointer atNormal(
+    native Pointer torchRandint(
+            long low,
+            long high,
+            long[] sizes,
+            int dType,
+            int layout,
+            int[] device,
+            boolean requiredGrad);
+
+    native Pointer torchNormal(
             double mean,
             double std,
             long[] sizes,
