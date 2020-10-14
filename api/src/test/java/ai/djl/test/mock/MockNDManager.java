@@ -105,6 +105,12 @@ public class MockNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray randomInteger(long low, long high, Shape shape, DataType dataType) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray randomUniform(float low, float high, Shape shape, DataType dataType) {
         return null;
     }

@@ -21,6 +21,8 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.testing.Assertions;
+import ai.djl.util.Pair;
+import ai.djl.util.PairList;
 import java.nio.FloatBuffer;
 import java.util.stream.IntStream;
 import org.testng.Assert;
@@ -360,13 +362,40 @@ public class NDArrayCreationOpTest {
     }
 
     @Test
-    public void testRandomGeneration() {
+    public void testRandomInteger() {
+        PairList<Long, Long> testCases = new PairList<>();
+        testCases.add(0L, 2L);
+        testCases.add(1000000L, 2000000L);
+        testCases.add(-1234567L, 1234567L);
+        try (NDManager manager = NDManager.newBaseManager()) {
+            for (Pair<Long, Long> testCase : testCases) {
+                long low = testCase.getKey();
+                long high = testCase.getValue();
+                NDArray randLong =
+                        manager.randomInteger(low, high, new Shape(100, 100), DataType.INT64);
+                double mean = randLong.toType(DataType.FLOAT64, false).mean().getDouble();
+                long max = randLong.max().getLong();
+                long min = randLong.min().getLong();
+                Assert.assertTrue(max < high);
+                Assert.assertTrue(min >= low);
+                Assert.assertTrue(mean >= low && mean < high);
+            }
+        }
+    }
+
+    @Test
+    public void testRandomUniform() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray uniform = manager.randomUniform(0, 10, new Shape(1000, 1000));
             Assert.assertTrue(uniform.min().getFloat() >= 0f);
             Assert.assertTrue(uniform.max().getFloat() < 100f);
             Assertions.assertAlmostEquals(uniform.mean().getFloat(), 5f, 1e-2f, 1e-2f);
+        }
+    }
 
+    @Test
+    public void testRandomNormal() {
+        try (NDManager manager = NDManager.newBaseManager()) {
             NDArray normal = manager.randomNormal(new Shape(1000, 1000));
             NDArray mean = normal.mean();
             NDArray std = normal.sub(mean).pow(2).mean();

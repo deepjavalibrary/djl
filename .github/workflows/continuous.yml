@@ -40,8 +40,10 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: check disk space
         run: df -h
-      - name: Compile JNI
+      - name: Workaround for startup run
+        run: ./gradlew :pytorch:pytorch-engine:jar clean
       # If there are code change on JNI, we need to rebuild to pass tests under pytorch folder
+      - name: Compile JNI
         run: ./gradlew :pytorch:pytorch-native:compileJNI
       - name: Build with Gradle
         run: ./gradlew build jRR
