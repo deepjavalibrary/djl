@@ -19,10 +19,11 @@ configurations {
 }
 
 dependencies {
-    download "org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT:linux-x86_64-mkl-gpu"
-    download "org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT:linux-x86_64-mkl"
-    download "org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT:macosx-x86_64-mkl"
-    download "org.tensorflow:tensorflow-core-api:0.2.0-SNAPSHOT:windows-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.2.0:linux-x86_64-gpu"
+    download "org.tensorflow:tensorflow-core-api:0.2.0:linux-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.2.0:macosx-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.2.0:windows-x86_64"
+    /*
     download("org.bytedeco:mkl-dnn:${mkl_dnn_version}:macosx-x86_64") {
         exclude group: "org.bytedeco", module: "javacpp"
     }
@@ -31,7 +32,7 @@ dependencies {
     }
     download("org.bytedeco:mkl-dnn:${mkl_dnn_version}:windows-x86_64") {
         exclude group: "org.bytedeco", module: "javacpp"
-    }
+    }*/
 }
 
 task uploadTensorflowNativeLibs() {
@@ -64,32 +65,33 @@ task uploadTensorflowNativeLibs() {
         }
 
         def tfUnzipDir = "${buildDir}/native/org/tensorflow/internal/c_api"
-        def mklUnzipDir = "${buildDir}/native/org/bytedeco/mkldnn"
+        // def mklUnzipDir = "${buildDir}/native/org/bytedeco/mkldnn"
 
-        ant.move(file: "${tfUnzipDir}/linux-x86_64-mkl/", toFile: "${buildDir}/native/linux/cpu/")
-        ant.move(file: "${tfUnzipDir}/linux-x86_64-mkl-gpu/", toFile: "${buildDir}/native/linux/gpu/")
-        ant.move(file: "${tfUnzipDir}/macosx-x86_64-mkl/", toFile: "${buildDir}/native/osx/cpu/")
+        ant.move(file: "${tfUnzipDir}/linux-x86_64/", toFile: "${buildDir}/native/linux/cpu/")
+        ant.move(file: "${tfUnzipDir}/linux-x86_64-gpu/", toFile: "${buildDir}/native/linux/cu101/")
+        ant.move(file: "${tfUnzipDir}/macosx-x86_64/", toFile: "${buildDir}/native/osx/cpu/")
         ant.move(file: "${tfUnzipDir}/windows-x86_64/", toFile: "${buildDir}/native/win/cpu/")
         //No windows gpu support for TF 2.3.0 yet
         //ant.move(file: "${tfUnzipDir}/windows-x86_64-gpu/", toFile: "${buildDir}/native/win/gpu/")
 
+        /*
         copy {
             from "${mklUnzipDir}/linux-x86_64/"
             into "${buildDir}/native/linux/gpu/"
         }
-//        copy {
-//            from "${mklUnzipDir}/windows-x86_64/lib/"
-//            into "${buildDir}/native/win/gpu/"
-//        }
-
+        copy {
+            from "${mklUnzipDir}/windows-x86_64/lib/"
+            into "${buildDir}/native/win/gpu/"
+        }
         ant.move(file: "${mklUnzipDir}/linux-x86_64/", toFile: "${buildDir}/native/linux/cpu/")
         ant.move(file: "${mklUnzipDir}/macosx-x86_64/", toFile: "${buildDir}/native/osx/cpu/")
         ant.move(file: "${mklUnzipDir}/windows-x86_64/lib", toFile: "${buildDir}/native/win/cpu")
+        */
 
         def f = new File("${buildDir}/native/files.txt")
         def uploadDirs = [
                 "${buildDir}/native/linux/cpu/",
-                "${buildDir}/native/linux/gpu/",
+                "${buildDir}/native/linux/cu101/",
                 "${buildDir}/native/osx/cpu/",
                 "${buildDir}/native/win/cpu/",
                 //"${buildDir}/native/win/gpu/"
@@ -105,7 +107,6 @@ task uploadTensorflowNativeLibs() {
         delete("${buildDir}/native/org/")
         delete("${buildDir}/native/com/")
         delete("${buildDir}/native/google/")
-
 
         exec {
             commandLine "aws", "s3", "sync", "${buildDir}/native/", "s3://djl-ai/publish/tensorflow-${tensorflow_version}/"
@@ -259,47 +260,68 @@ task downloadTensorflowNativeLib() {
     doLast {
         def url = "https://djl-ai.s3.amazonaws.com/publish/tensorflow-${tensorflow_version}"
         def files = [
-                "linux/cpu/LICENSE.gz"                              : "cpu/linux/META-INF/LICENSE",
-                "linux/cpu/THIRD_PARTY_TF_JNI_LICENSES.gz"          : "cpu/linux/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
-                "linux/cpu/libgomp.so.1.gz"                         : "cpu/linux/native/lib/libgomp.so.1",
-                "linux/cpu/libiomp5.so.gz"                          : "cpu/linux/native/lib/libiomp5.so",
-                "linux/cpu/libjnijavacpp.so.gz"                     : "cpu/linux/native/lib/libjnijavacpp.so",
-                "linux/cpu/libjnimkldnn.so.gz"                      : "cpu/linux/native/lib/libjnimkldnn.so",
-                "linux/cpu/libjnimklml.so.gz"                       : "cpu/linux/native/lib/libjnimklml.so",
-                "linux/cpu/libjnitensorflow.so.gz"                  : "cpu/linux/native/lib/libjnitensorflow.so",
-                "linux/cpu/libmkldnn.so.0.gz"                       : "cpu/linux/native/lib/libmkldnn.so.0",
-                "linux/cpu/libmklml_intel.so.gz"                    : "cpu/linux/native/lib/libmklml_intel.so",
-                "linux/cpu/libtensorflow.so.2.gz"                   : "cpu/linux/native/lib/libtensorflow.so.2",
-                "linux/cpu/libtensorflow_framework.so.2.gz"         : "cpu/linux/native/lib/libtensorflow_framework.so.2",
-                "linux/cu101/LICENSE.gz"                            : "cu101/linux/META-INF/LICENSE",
-                "linux/cu101/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt.gz": "cu101/linux/META-INF/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt",
-                "linux/cu101/THIRD_PARTY_TF_JNI_LICENSES.gz"        : "cu101/linux/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
-                "linux/cu101/libgomp.so.1.gz"                       : "cu101/linux/native/lib/libgomp.so.1",
-                "linux/cu101/libiomp5.so.gz"                        : "cu101/linux/native/lib/libiomp5.so",
-                "linux/cu101/libjnijavacpp.so.gz"                   : "cu101/linux/native/lib/libjnijavacpp.so",
-                "linux/cu101/libjnimkldnn.so.gz"                    : "cu101/linux/native/lib/libjnimkldnn.so",
-                "linux/cu101/libjnimklml.so.gz"                     : "cu101/linux/native/lib/libjnimklml.so",
-                "linux/cu101/libjnitensorflow.so.gz"                : "cu101/linux/native/lib/libjnitensorflow.so",
-                "linux/cu101/libmkldnn.so.0.gz"                     : "cu101/linux/native/lib/libmkldnn.so.0",
-                "linux/cu101/libmklml_intel.so.gz"                  : "cu101/linux/native/lib/libmklml_intel.so",
-                "linux/cu101/libstdc%2B%2B.so.6.gz"                     : "cu101/linux/native/lib/libstdc++.so.6",
-                "linux/cu101/libtensorflow.so.2.gz"                 : "cu101/linux/native/lib/libtensorflow.so.2",
-                "linux/cu101/libtensorflow_framework.so.2.gz"       : "cu101/linux/native/lib/libtensorflow_framework.so.2",
-                "osx/cpu/LICENSE.gz"                                : "cpu/osx/META-INF/LICENSE",
-                "osx/cpu/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt.gz"    : "cpu/osx/META-INF/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt",
-                "osx/cpu/THIRD_PARTY_TF_JNI_LICENSES.gz"            : "cpu/osx/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
-                "osx/cpu/libgcc_s.1.dylib.gz"                       : "cpu/osx/native/lib/libgcc_s.1.dylib",
-                "osx/cpu/libgomp.1.dylib.gz"                        : "cpu/osx/native/lib/libgomp.1.dylib",
-                "osx/cpu/libiomp5.dylib.gz"                         : "cpu/osx/native/lib/libiomp5.dylib",
-                "osx/cpu/libjnijavacpp.dylib.gz"                    : "cpu/osx/native/lib/libjnijavacpp.dylib",
-                "osx/cpu/libjnimkldnn.dylib.gz"                     : "cpu/osx/native/lib/libjnimkldnn.dylib",
-                "osx/cpu/libjnimklml.dylib.gz"                      : "cpu/osx/native/lib/libjnimklml.dylib",
-                "osx/cpu/libjnitensorflow.dylib.gz"                 : "cpu/osx/native/lib/libjnitensorflow.dylib",
-                "osx/cpu/libmkldnn.0.dylib.gz"                      : "cpu/osx/native/lib/libmkldnn.0.dylib",
-                "osx/cpu/libmklml.dylib.gz"                         : "cpu/osx/native/lib/libmklml.dylib",
-                "osx/cpu/libstdc%2B%2B.6.dylib.gz"                  : "cpu/osx/native/lib/libstdc++.6.dylib",
-                "osx/cpu/libtensorflow.2.dylib.gz"                  : "cpu/osx/native/lib/libtensorflow.2.dylib",
-                "osx/cpu/libtensorflow_framework.2.dylib.gz"        : "cpu/osx/native/lib/libtensorflow_framework.2.dylib",
+                "linux/cpu/libjnitensorflow.so.gz"                        : "cpu/linux/native/lib/libjnitensorflow.so",
+                "linux/cpu/libtensorflow_cc.so.2.gz"                      : "cpu/linux/native/lib/libtensorflow_cc.so.2",
+                "linux/cpu/libtensorflow_framework.so.2.gz"               : "cpu/linux/native/lib/libtensorflow_framework.so.2",
+                "linux/cpu/LICENSE.gz"                                    : "cpu/linux/META-INF/LICENSE",
+                "linux/cpu/THIRD_PARTY_TF_JNI_LICENSES.gz"                : "cpu/linux/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
+                "linux/cu101/libjnitensorflow.so.gz"                      : "cu101/linux/native/lib/libjnitensorflow.so",
+                "linux/cu101/libtensorflow_cc.so.2.gz"                    : "cu101/linux/native/lib/libtensorflow_cc.so.2",
+                "linux/cu101/libtensorflow_framework.so.2.gz"             : "cu101/linux/native/lib/libtensorflow_framework.so.2",
+                "linux/cu101/LICENSE.gz"                                  : "cu101/linux/META-INF/LICENSE",
+                "linux/cu101/THIRD_PARTY_TF_JNI_LICENSES.gz"              : "cu101/linux/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
+                "osx/cpu/libjnitensorflow.dylib.gz"                       : "cpu/osx/native/lib/libjnitensorflow.dylib",
+                "osx/cpu/libtensorflow_cc.2.dylib.gz"                     : "cpu/osx/native/lib/libtensorflow_cc.2.dylib",
+                "osx/cpu/libtensorflow_framework.2.dylib.gz"              : "cpu/osx/native/lib/libtensorflow_framework.2.dylib",
+                "osx/cpu/LICENSE.gz"                                      : "cpu/osx/META-INF/LICENSE",
+                "osx/cpu/THIRD_PARTY_TF_JNI_LICENSES.gz"                  : "cpu/osx/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
+                "win/cpu/api-ms-win-core-console-l1-1-0.dll.gz"           : "cpu/win/native/lib/api-ms-win-core-console-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-datetime-l1-1-0.dll.gz"          : "cpu/win/native/lib/api-ms-win-core-datetime-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-debug-l1-1-0.dll.gz"             : "cpu/win/native/lib/api-ms-win-core-debug-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-errorhandling-l1-1-0.dll.gz"     : "cpu/win/native/lib/api-ms-win-core-errorhandling-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-file-l1-1-0.dll.gz"              : "cpu/win/native/lib/api-ms-win-core-file-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-file-l1-2-0.dll.gz"              : "cpu/win/native/lib/api-ms-win-core-file-l1-2-0.dll",
+                "win/cpu/api-ms-win-core-file-l2-1-0.dll.gz"              : "cpu/win/native/lib/api-ms-win-core-file-l2-1-0.dll",
+                "win/cpu/api-ms-win-core-handle-l1-1-0.dll.gz"            : "cpu/win/native/lib/api-ms-win-core-handle-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-heap-l1-1-0.dll.gz"              : "cpu/win/native/lib/api-ms-win-core-heap-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-interlocked-l1-1-0.dll.gz"       : "cpu/win/native/lib/api-ms-win-core-interlocked-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-libraryloader-l1-1-0.dll.gz"     : "cpu/win/native/lib/api-ms-win-core-libraryloader-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-localization-l1-2-0.dll.gz"      : "cpu/win/native/lib/api-ms-win-core-localization-l1-2-0.dll",
+                "win/cpu/api-ms-win-core-memory-l1-1-0.dll.gz"            : "cpu/win/native/lib/api-ms-win-core-memory-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-namedpipe-l1-1-0.dll.gz"         : "cpu/win/native/lib/api-ms-win-core-namedpipe-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-processenvironment-l1-1-0.dll.gz": "cpu/win/native/lib/api-ms-win-core-processenvironment-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-processthreads-l1-1-0.dll.gz"    : "cpu/win/native/lib/api-ms-win-core-processthreads-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-processthreads-l1-1-1.dll.gz"    : "cpu/win/native/lib/api-ms-win-core-processthreads-l1-1-1.dll",
+                "win/cpu/api-ms-win-core-profile-l1-1-0.dll.gz"           : "cpu/win/native/lib/api-ms-win-core-profile-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-rtlsupport-l1-1-0.dll.gz"        : "cpu/win/native/lib/api-ms-win-core-rtlsupport-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-string-l1-1-0.dll.gz"            : "cpu/win/native/lib/api-ms-win-core-string-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-synch-l1-1-0.dll.gz"             : "cpu/win/native/lib/api-ms-win-core-synch-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-synch-l1-2-0.dll.gz"             : "cpu/win/native/lib/api-ms-win-core-synch-l1-2-0.dll",
+                "win/cpu/api-ms-win-core-sysinfo-l1-1-0.dll.gz"           : "cpu/win/native/lib/api-ms-win-core-sysinfo-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-timezone-l1-1-0.dll.gz"          : "cpu/win/native/lib/api-ms-win-core-timezone-l1-1-0.dll",
+                "win/cpu/api-ms-win-core-util-l1-1-0.dll.gz"              : "cpu/win/native/lib/api-ms-win-core-util-l1-1-0.dll",
+                "win/cpu/api-ms-win-crt-convert-l1-1-0.dll.gz"            : "cpu/win/native/lib/api-ms-win-crt-convert-l1-1-0.dll",
+                "win/cpu/api-ms-win-crt-environment-l1-1-0.dll.gz"        : "cpu/win/native/lib/api-ms-win-crt-environment-l1-1-0.dll",
+                "win/cpu/api-ms-win-crt-filesystem-l1-1-0.dll.gz"         : "cpu/win/native/lib/api-ms-win-crt-filesystem-l1-1-0.dll",
+                "win/cpu/api-ms-win-crt-heap-l1-1-0.dll.gz"               : "cpu/win/native/lib/api-ms-win-crt-heap-l1-1-0.dll",
+                "win/cpu/api-ms-win-crt-locale-l1-1-0.dll.gz"             : "cpu/win/native/lib/api-ms-win-crt-locale-l1-1-0.dll",
+                "win/cpu/api-ms-win-crt-math-l1-1-0.dll.gz"               : "cpu/win/native/lib/api-ms-win-crt-math-l1-1-0.dll",
+                "win/cpu/api-ms-win-crt-multibyte-l1-1-0.dll.gz"          : "cpu/win/native/lib/api-ms-win-crt-multibyte-l1-1-0.dll",
+                "win/cpu/api-ms-win-crt-runtime-l1-1-0.dll.gz"            : "cpu/win/native/lib/api-ms-win-crt-runtime-l1-1-0.dll",
+                "win/cpu/api-ms-win-crt-stdio-l1-1-0.dll.gz"              : "cpu/win/native/lib/api-ms-win-crt-stdio-l1-1-0.dll",
+                "win/cpu/api-ms-win-crt-string-l1-1-0.dll.gz"             : "cpu/win/native/lib/api-ms-win-crt-string-l1-1-0.dll",
+                "win/cpu/api-ms-win-crt-time-l1-1-0.dll.gz"               : "cpu/win/native/lib/api-ms-win-crt-time-l1-1-0.dll",
+                "win/cpu/api-ms-win-crt-utility-l1-1-0.dll.gz"            : "cpu/win/native/lib/api-ms-win-crt-utility-l1-1-0.dll",
+                "win/cpu/concrt140.dll.gz"                                : "cpu/win/native/lib/concrt140.dll",
+                "win/cpu/jnitensorflow.dll.gz"                            : "cpu/win/native/lib/jnitensorflow.dll",
+                "win/cpu/LICENSE.gz"                                      : "cpu/win/META-INF/LICENSE",
+                "win/cpu/msvcp140.dll.gz"                                 : "cpu/win/native/lib/msvcp140.dll",
+                "win/cpu/tensorflow_cc.dll.gz"                            : "cpu/win/native/lib/tensorflow_cc.dll",
+                "win/cpu/THIRD_PARTY_TF_JNI_LICENSES.gz"                  : "cpu/win/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
+                "win/cpu/ucrtbase.dll.gz"                                 : "cpu/win/native/lib/ucrtbase.dll",
+                "win/cpu/vcomp140.dll.gz"                                 : "cpu/win/native/lib/vcomp140.dll",
+                "win/cpu/vcruntime140_1.dll.gz"                           : "cpu/win/native/lib/vcruntime140_1.dll",
+                "win/cpu/vcruntime140.dll.gz"                             : "cpu/win/native/lib/vcruntime140.dll",
         ]
 
         files.each { entry ->

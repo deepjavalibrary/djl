@@ -25,6 +25,7 @@ import ai.djl.translate.Translator;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -115,8 +116,19 @@ public class TfModel extends BaseModel {
             tags = new String[] {"serve"};
         }
 
-        SavedModelBundle.Loader loader =
-                SavedModelBundle.loader(exportDir.toString()).withTags(tags);
+        SavedModelBundle.Loader loader = SavedModelBundle.loader(exportDir.toString());
+        if (tags.length > 0) {
+            loader.withTags(tags);
+        } else {
+            // FIXME: workaround TF-java bug
+            try {
+                Field field = SavedModelBundle.Loader.class.getDeclaredField("tags");
+                field.setAccessible(true);
+                field.set(loader, tags);
+            } catch (ReflectiveOperationException e) {
+                throw new AssertionError(e);
+            }
+        }
         if (configProto != null) {
             loader.withConfigProto(configProto);
         }

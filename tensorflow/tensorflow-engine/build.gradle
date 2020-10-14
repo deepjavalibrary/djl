@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
     api project(":api")
-    api project(":tensorflow:tensorflow-java-api")
+    api project(":tensorflow:tensorflow-api")
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
