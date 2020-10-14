@@ -99,14 +99,14 @@ different from the directory or archive file:
 For example:
 
 ```
-files:///var/models/resnet.zip?artifact_id=resenet-18&model_name=resnet-18v1
+file:///var/models/resnet.zip?artifact_id=resenet-18&model_name=resnet-18v1
 ```
 
 If your the directory or archive file has nested folder, are include the folder name in url to let DJL know where
 to find model files:
 
 ```
-files://var/models/resnet.zip?artifact_id=resenet-18&model_name=saved_model/resnet-18
+file://var/models/resnet.zip?artifact_id=resenet-18&model_name=saved_model/resnet-18
 ```
 
 ### Load model from a URL
@@ -119,7 +119,6 @@ Criteria<Image, Classifications> criteria = Criteria.builder()
         .setTypes(Image.class, Classifications.class) // defines input and output data type
         .optTranslator(ImageClassificationTranslator.builder().setSynsetArtifactName("synset.txt").build())
         .optModelUrls("https://djl-ai.s3.amazonaws.com/resources/benchmark/squeezenet_v1.1.tar.gz") // search models in specified path
-        .optArtifactId("ai.djl.localmodelzoo:squeezenet_v1.1") // defines which model to load
         .build();
 
 ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
