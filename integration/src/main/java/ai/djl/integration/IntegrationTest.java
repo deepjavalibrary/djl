@@ -359,7 +359,7 @@ public class IntegrationTest {
                     result = TestResult.SKIPPED;
                 } else if (e.getCause() instanceof UnsupportedOperationException) {
                     logger.info("Test {}.{} UNSUPPORTED", getName(), method.getName());
-                    logger.debug("", e.getCause());
+                    logger.trace("", e.getCause());
                     result = TestResult.UNSUPPORTED;
                 } else {
                     logger.error("Test {}.{} FAILED", getName(), method.getName());
