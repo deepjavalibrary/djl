@@ -11,8 +11,14 @@
  * and limitations under the License.
  */
 
-#ifndef DJL_TORCH_DJL_PYTORCH_JNI_ERROR_H
-#define DJL_TORCH_DJL_PYTORCH_JNI_ERROR_H
+#ifndef DJL_TORCH_DJL_PYTORCH_JNI_EXCEPTION_H
+#define DJL_TORCH_DJL_PYTORCH_JNI_EXCEPTION_H
+
+#define DJL_CHECK_WITH_MSG(cond, error_msg)                              \
+  if (!cond) {                                                           \
+    jclass jexception = env->FindClass("ai/djl/engine/EngineException"); \
+    env->ThrowNew(jexception, error_msg);                                \
+  }
 
 /*
  * Macros to guard beginning and end section of all functions
@@ -40,4 +46,4 @@
   API_END()              \
   return 0;
 
-#endif  // DJL_TORCH_DJL_PYTORCH_JNI_ERROR_H
+#endif  // DJL_TORCH_DJL_PYTORCH_JNI_EXCEPTION_H

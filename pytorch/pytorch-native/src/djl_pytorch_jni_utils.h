@@ -33,7 +33,7 @@ static constexpr const jint RELEASE_MODE = JNI_ABORT;
 
 #if !defined(__ANDROID__)
 // for image interpolation
-typedef c10::variant<
+typedef torch::variant<
   torch::enumtype::kNearest,
   torch::enumtype::kLinear,
   torch::enumtype::kBilinear,
@@ -42,7 +42,7 @@ typedef c10::variant<
   torch::enumtype::kArea> mode_t;
 #endif
 
-inline jint GetDTypeFromScalarType(const c10::ScalarType& type) {
+inline jint GetDTypeFromScalarType(const torch::ScalarType& type) {
   if (torch::kFloat32 == type) {
     return 0;
   } else if (torch::kFloat64 == type) {
@@ -64,7 +64,7 @@ inline jint GetDTypeFromScalarType(const c10::ScalarType& type) {
   }
 }
 
-inline c10::ScalarType GetScalarTypeFromDType(jint dtype) {
+inline torch::ScalarType GetScalarTypeFromDType(jint dtype) {
   switch (dtype) {
     case 0:
       return torch::kFloat32;
@@ -163,16 +163,16 @@ inline std::vector<float> GetVecFromJFloatArray(JNIEnv* env, jfloatArray jarray)
   return vec;
 }
 
-inline c10::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
+inline torch::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
   jint* device = env->GetIntArrayElements(jdevice, JNI_FALSE);
-  auto device_type = static_cast<c10::DeviceType>(*device);
+  auto device_type = static_cast<torch::DeviceType>(*device);
   int device_idx = *(device + 1);
-  if (device_type == c10::DeviceType::CPU) {
+  if (device_type == torch::DeviceType::CPU) {
     device_idx = -1;
   }
-  c10::Device c10_device(device_type, device_idx);
+  torch::Device torch_device(device_type, device_idx);
   env->ReleaseIntArrayElements(jdevice, device, RELEASE_MODE);
-  return c10_device;
+  return torch_device;
 }
 
 #if !defined(__ANDROID__)

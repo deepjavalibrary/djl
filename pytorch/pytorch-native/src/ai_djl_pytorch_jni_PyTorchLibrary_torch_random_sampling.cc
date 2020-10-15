@@ -14,7 +14,7 @@
 #include <torch/torch.h>
 
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
-#include "djl_pytorch_jni_error.h"
+#include "djl_pytorch_jni_exception.h"
 #include "djl_pytorch_jni_utils.h"
 
 // The file is the implementation for PyTorch random sampling operations
@@ -24,7 +24,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRandint(JN
   API_BEGIN()
   const std::vector<int64_t> size_vec = utils::GetVecFromJLongArray(env, jsizes);
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequire_grad);
-  torch::Tensor tensor = torch::randint(jlow, jhigh, size_vec, c10::nullopt, options);
+  torch::Tensor tensor = torch::randint(jlow, jhigh, size_vec, torch::nullopt, options);
   // Tensor Option for mkldnn is not working
   // explicitly convert to mkldnn
   if (jlayout == 2) {
@@ -40,7 +40,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNormal(JNI
   API_BEGIN()
   const std::vector<int64_t> size_vec = utils::GetVecFromJLongArray(env, jsizes);
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequire_grad);
-  torch::Tensor tensor = torch::normal(jmean, jstd, size_vec, c10::nullopt, options);
+  torch::Tensor tensor = torch::normal(jmean, jstd, size_vec, torch::nullopt, options);
   // Tensor Option for mkldnn is not working
   // explicitly convert to mkldnn
   if (jlayout == 2) {
