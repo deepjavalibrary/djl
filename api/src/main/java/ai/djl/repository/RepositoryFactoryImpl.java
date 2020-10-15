@@ -13,6 +13,7 @@
 package ai.djl.repository;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,6 +52,14 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         RepositoryFactory factory = REGISTRY.get(scheme);
         if (factory != null) {
             return factory.newInstance(name, url);
+        }
+
+        try {
+            if (!"file".equals(scheme)) {
+                uri.toURL();
+            }
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Malformed URL: " + url, e);
         }
 
         String uriPath = uri.getPath();
