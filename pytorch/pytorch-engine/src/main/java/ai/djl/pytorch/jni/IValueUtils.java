@@ -13,12 +13,19 @@
 
 package ai.djl.pytorch.jni;
 
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.pytorch.engine.PtSymbolBlock;
+import ai.djl.util.Pair;
+import ai.djl.util.PairList;
+import ai.djl.util.Preconditions;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 /** IValueUtils is utility class to deal with IValue in PyTorch. */
 public final class IValueUtils {
@@ -28,11 +35,32 @@ public final class IValueUtils {
     /**
      * Create IValue Pointer from NDArray.
      *
-     * @param array {@link PtNDArray}
+     * @param arrayHandle the handle for PyTorch Tensor
      * @return IValue Pointer
      */
-    public static Pointer toIValuePointer(PtNDArray array) {
-        return PyTorchLibrary.LIB.iValueCreateFromTensor(array.getHandle());
+    public static Pointer toIValuePointer(Pointer arrayHandle) {
+        return PyTorchLibrary.LIB.iValueFromTensor(arrayHandle);
+    }
+
+    /**
+     * Create List IValue Pointer from pointer array.
+     *
+     * @param pointers pointer array
+     * @return IValue Pointer
+     */
+    public static Pointer iValueFromList(Pointer[] pointers) {
+        return PyTorchLibrary.LIB.iValueFromList(pointers);
+    }
+
+    /**
+     * Create Dict IValue Pointer from pointer with its key name.
+     *
+     * @param pointers pointer array
+     * @param names the key value of the pointer
+     * @return IValue Pointer
+     */
+    public static Pointer iValueFromDict(Pointer[] pointers, String[] names) {
+        return PyTorchLibrary.LIB.iValueFromDict(pointers, names);
     }
 
     /**
@@ -207,9 +235,66 @@ public final class IValueUtils {
                 inputs.stream()
                         .map(input -> ((PtNDArray) input).getHandle())
                         .toArray(Pointer[]::new);
-
-        Pointer result = PyTorchLibrary.LIB.moduleForward(block.getHandle(), arrayHandles, isTrain);
+        String[] names = inputs.stream().map(NDArray::getName).toArray(String[]::new);
+        Pointer[] iValueInputs = getInputs(arrayHandles, names);
+        Pointer result = PyTorchLibrary.LIB.moduleForward(block.getHandle(), iValueInputs, isTrain);
         PtNDManager manager = (PtNDManager) inputs.get(0).getManager();
         return forwardHelper(result, manager);
+    }
+
+    private static boolean isNameList(String name) {
+        return Pattern.matches("\\w+\\[]", name);
+    }
+
+    private static boolean isNameDict(String name) {
+        return name.contains(".");
+    }
+
+    private static Pointer[] getInputs(Pointer[] arrays, String[] names) {
+        List<PairList<String, Pointer>> outputs = new ArrayList<>();
+        Map<String, Integer> indexMap = new ConcurrentHashMap<>();
+        for (int i = 0; i < arrays.length; i++) {
+            String name = names[i];
+            if (name == null || (!isNameList(name) && !isNameDict(name))) {
+                PairList<String, Pointer> list = new PairList<>();
+                list.add(new Pair<>(null, toIValuePointer(arrays[i])));
+                outputs.add(list);
+                continue;
+            }
+            String mapKey = null;
+            boolean isDict = isNameDict(names[i]);
+            if (isDict) {
+                String[] strings = names[i].split("\\.");
+                Preconditions.checkArgument(
+                        strings.length == 2,
+                        "Please make sure you only include one '.' in the name. Nested Map is not supported!");
+                name = strings[0];
+                mapKey = strings[1];
+            }
+            if (!indexMap.containsKey(name)) {
+                outputs.add(new PairList<>());
+                indexMap.put(name, outputs.size() - 1);
+            }
+            if (isDict) {
+                outputs.get(indexMap.get(name)).add(new Pair<>(mapKey, arrays[i]));
+            } else {
+                outputs.get(indexMap.get(name)).add(new Pair<>(name, arrays[i]));
+            }
+        }
+        Pointer[] pointers = new Pointer[outputs.size()];
+        for (int i = 0; i < outputs.size(); ++i) {
+            // not List, Dict input
+            if (outputs.get(i).size() == 1 && outputs.get(i).get(0).getKey() == null) {
+                pointers[i] = outputs.get(i).get(0).getValue();
+            } else if (isNameList(outputs.get(i).get(0).getKey())) {
+                pointers[i] = iValueFromList(outputs.get(i).valueArray(new Pointer[0]));
+            } else {
+                PairList<String, Pointer> dict = outputs.get(i);
+                pointers[i] =
+                        iValueFromDict(
+                                dict.valueArray(new Pointer[0]), dict.keyArray(new String[0]));
+            }
+        }
+        return pointers;
     }
 }

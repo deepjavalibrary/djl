@@ -18,7 +18,7 @@
 #include <sstream>
 
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
-#include "djl_pytorch_jni_error.h"
+#include "djl_pytorch_jni_exception.h"
 #include "djl_pytorch_jni_utils.h"
 
 #if defined(__ANDROID__)

@@ -26,6 +26,7 @@ set(SOURCE_FILES
     "src/ai_djl_pytorch_jni_PyTorchLibrary_system.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_nn_functional.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_inference.cc"
+    "src/ai_djl_pytorch_jni_PyTorchLibrary_ivalue.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_optim.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_comparison.cc"
     "src/ai_djl_pytorch_jni_PyTorchLibrary_tensor.cc"
@@ -37,7 +38,7 @@ set(SOURCE_FILES
     "src/ai_djl_pytorch_jni_PyTorchLibrary_torch_other.cc"
     "src/djl_pytorch_jni_log.cc"
     "src/djl_pytorch_jni_log.h"
-    "src/djl_pytorch_jni_error.h")
+    "src/djl_pytorch_jni_exception.h")
 
 add_library(djl_torch SHARED ${SOURCE_FILES})
 # build host

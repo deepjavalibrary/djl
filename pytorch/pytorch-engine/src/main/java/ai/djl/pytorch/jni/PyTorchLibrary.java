@@ -440,9 +440,13 @@ final class PyTorchLibrary {
 
     native void moduleTrain(Pointer handle);
 
-    native Pointer moduleForward(Pointer moduleHandle, Pointer[] arrayHandles, boolean isTrain);
+    native Pointer moduleForward(Pointer moduleHandle, Pointer[] iValueHandles, boolean isTrain);
 
-    native Pointer iValueCreateFromTensor(Pointer tensorHandle);
+    native Pointer iValueFromTensor(Pointer tensorHandle);
+
+    native Pointer iValueFromList(Pointer[] tensorHandles);
+
+    native Pointer iValueFromDict(Pointer[] tensorHandles, String[] names);
 
     native Pointer iValueToTensor(Pointer iValueHandle);
 
