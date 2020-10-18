@@ -98,6 +98,21 @@ public interface TrainingListener {
         }
 
         /**
+         * A default {@link TrainingListener} set including batch output logging.
+         *
+         * @param frequency the frequency of epoch to print out
+         * @return the new set of listeners
+         */
+        static TrainingListener[] logging(int frequency) {
+            return new TrainingListener[] {
+                new EpochTrainingListener(),
+                new EvaluatorTrainingListener(),
+                new DivergenceCheckTrainingListener(),
+                new LoggingTrainingListener(frequency)
+            };
+        }
+
+        /**
          * A default {@link TrainingListener} set including batch output logging and output
          * directory.
          *

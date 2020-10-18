@@ -31,15 +31,35 @@ public class LoggingTrainingListener implements TrainingListener {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingTrainingListener.class);
 
-    private int numEpochs;
+    private int frequency;
 
+    private int numEpochs;
     private ProgressBar trainingProgressBar;
     private ProgressBar validateProgressBar;
+
+    /** Constructs a {@code LoggingTrainingListener} instance. */
+    public LoggingTrainingListener() {}
+
+    /**
+     * Constructs a {@code LoggingTrainingListener} instance with specified steps.
+     *
+     * <p>Print out logs every {@code frequency} epoch.
+     *
+     * @param frequency the frequency of epoch to print out
+     */
+    public LoggingTrainingListener(int frequency) {
+        this.frequency = frequency;
+    }
 
     /** {@inheritDoc} */
     @Override
     public void onEpoch(Trainer trainer) {
-        logger.info("Epoch {} finished.", numEpochs + 1);
+        numEpochs++;
+        if (frequency > 1 && numEpochs % frequency != 1) {
+            return;
+        }
+
+        logger.info("Epoch {} finished.", numEpochs);
 
         Metrics metrics = trainer.getMetrics();
         if (metrics != null) {
@@ -69,13 +89,15 @@ public class LoggingTrainingListener implements TrainingListener {
                 logger.info("validation has not been run.");
             }
         }
-
-        numEpochs++;
     }
 
     /** {@inheritDoc} */
     @Override
     public void onTrainingBatch(Trainer trainer, BatchData batchData) {
+        if (frequency > 1 && numEpochs % frequency != 1) {
+            return;
+        }
+
         if (trainingProgressBar == null) {
             trainingProgressBar =
                     new ProgressBar("Training", batchData.getBatch().getProgressTotal());
@@ -109,6 +131,10 @@ public class LoggingTrainingListener implements TrainingListener {
     /** {@inheritDoc} */
     @Override
     public void onValidationBatch(Trainer trainer, BatchData batchData) {
+        if (frequency > 1 && numEpochs % frequency != 1) {
+            return;
+        }
+
         if (validateProgressBar == null) {
             validateProgressBar =
                     new ProgressBar("Validating", batchData.getBatch().getProgressTotal());
