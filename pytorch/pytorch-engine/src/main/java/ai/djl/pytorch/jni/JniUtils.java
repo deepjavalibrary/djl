@@ -76,7 +76,7 @@ public final class JniUtils {
         PyTorchLibrary.LIB.torchSetNumThreads(threads);
     }
 
-    public static Set<String> getFeatures() {
+    public static synchronized Set<String> getFeatures() {
         if (configs != null) {
             return configs;
         }
@@ -88,6 +88,31 @@ public final class JniUtils {
 
     public static void setSeed(long seed) {
         PyTorchLibrary.LIB.torchManualSeed(seed);
+    }
+
+    /**
+     * Calls this method to start profile the area you are interested in.
+     *
+     * <p>Example usage
+     *
+     * <pre>
+     *      JniUtils.startProfile(false, true, true);
+     *      Predictor.predict(img);
+     *      JniUtils.stopProfile(outputFile)
+     * </pre>
+     *
+     * @param useCuda Enables timing of CUDA events as well using the cudaEvent API.
+     * @param recordShape If shapes recording is set, information about input dimensions will be
+     *     collected
+     * @param profileMemory Whether to report memory usage
+     */
+    public static synchronized void startProfile(
+            boolean useCuda, boolean recordShape, boolean profileMemory) {
+        PyTorchLibrary.LIB.torchStartProfile(useCuda, recordShape, profileMemory);
+    }
+
+    public static synchronized void stopProfiler(String outputFile) {
+        PyTorchLibrary.LIB.torchStopProfile(outputFile);
     }
 
     // TODO: Unchecked Datatype and device mapping

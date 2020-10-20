@@ -96,7 +96,7 @@ public class BufferedImageFactory extends ImageFactory {
             throw new IllegalArgumentException("Shape should only have three dimension follow CHW");
         }
         if (array.getDataType() != DataType.UINT8 && array.getDataType() != DataType.INT8) {
-            throw new IllegalArgumentException("Datatype should be INT8");
+            throw new IllegalArgumentException("Datatype should be INT8 or UINT8");
         }
         if (shape.get(0) == 1) {
             throw new UnsupportedOperationException("Grayscale image is not supported");

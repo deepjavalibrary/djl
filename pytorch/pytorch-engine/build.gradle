@@ -13,6 +13,7 @@ dependencies {
         exclude group: "junit", module: "junit"
     }
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
+    testRuntimeOnly project(":pytorch:pytorch-model-zoo")
     testRuntimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
 }
 
