@@ -89,3 +89,27 @@ jobs:
         with:
           name: mxnet-model-zoo
           path: mxnet/mxnet-model-zoo/build/reports
+      - name: pytorch-engine test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: pytorch-engine
+          path: pytorch/pytorch-engine/build/reports
+      - name: pytorch-model-zoo test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: pytorch-model-zoo
+          path: pytorch/pytorch-model-zoo/build/reports
+      - name: tensorflow-engine test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: tensorflow-engine
+          path: tensorflow/tensorflow-engine/build/reports
+      - name: tensorflow-model-zoo test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: tensorflow-model-zoo
+          path: tensorflow/tensorflow-model-zoo/build/reports
