@@ -36,13 +36,13 @@ Choose a native library based on your platform and needs:
 We offer an automatic option that will download the native libraries into [cache folder](../docs/development/cache_management.md) the first time you run DJL.
 It will automatically determine the appropriate jars for your system based on the platform and GPU support.
 
-- ai.djl.tensorflow:tensorflow-native-auto:2.3.0
+- ai.djl.tensorflow:tensorflow-native-auto:2.3.1
 
 ```xml
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-native-auto</artifactId>
-    <version>2.3.0</version>
+    <version>2.3.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -50,14 +50,14 @@ It will automatically determine the appropriate jars for your system based on th
 ### macOS
 For macOS, you can use the following library:
 
-- ai.djl.tensorflow:tensorflow-native-cpu:2.3.0:osx-x86_64
+- ai.djl.tensorflow:tensorflow-native-cpu:2.3.1:osx-x86_64
 
 ```xml
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-native-cpu</artifactId>
     <classifier>osx-x86_64</classifier>
-    <version>2.3.0</version>
+    <version>2.3.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -68,29 +68,20 @@ installed on your GPU machine, you can use one of the following library:
 
 #### Linux GPU
 
-- ai.djl.tensorflow:tensorflow-native-cu101:2.3.0:linux-x86_64 - CUDA 10.1
+- ai.djl.tensorflow:tensorflow-native-cu101:2.3.1:linux-x86_64 - CUDA 10.1
 
 ```xml
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-native-cu101</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>2.3.0</version>
+    <version>2.3.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
 
-*Note: If you have gcc version less than 7.0, you will need to do either one of the following because
-TensorFlow requires a higher version of `libstdc++`:
-
-* Set `LD_LIBRARY_PATH` environment variable to the TensorFlow native library path
-where we included a higher version of `libstdc++` for you.
-
-```bash
-export LD_LIBRARY_PATH=$HOME/.tensorflow/cache/2.3.0-cu101-linux-x86_64/:$LD_LIBRARY_PATH
-```
-
-* upgrade your gcc to gcc7+, you can use the following commands:
+*Note: If you have gcc version less than 7.0, you will need to upgrade your gcc to gcc7+.
+you can use the following commands:
 
 ```bash
 sudo apt-get update && \
@@ -104,7 +95,7 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60
 
 ### Linux CPU
 
-- ai.djl.tensorflow:tensorflow-native-cpu:2.3.0:linux-x86_64
+- ai.djl.tensorflow:tensorflow-native-cpu:2.3.1:linux-x86_64
 
 ```xml
 <dependency>
@@ -112,6 +103,21 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60
     <artifactId>tensorflow-native-cpu</artifactId>
     <classifier>linux-x86_64</classifier>
     <scope>runtime</scope>
-    <version>2.3.0</version>
+    <version>2.3.1</version>
+</dependency>
+```
+
+### Windows
+For Windows, you can use the following library:
+
+- ai.djl.tensorflow:tensorflow-native-cpu:2.3.1:win-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.tensorflow</groupId>
+    <artifactId>tensorflow-native-cpu</artifactId>
+    <classifier>win-x86_64</classifier>
+    <version>2.3.1</version>
+    <scope>runtime</scope>
 </dependency>
 ```
