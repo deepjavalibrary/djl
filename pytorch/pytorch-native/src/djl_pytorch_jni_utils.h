@@ -220,6 +220,16 @@ inline torch::TensorOptions CreateTensorOptions(
   return options;
 }
 
+inline std::string GetStringFromJString(JNIEnv* env, jstring jstr) {
+  if (jstr == nullptr) {
+    return std::string();
+  }
+  const char* c_str = env->GetStringUTFChars(jstr, JNI_FALSE);
+  std::string str = std::string(c_str);
+  env->ReleaseStringUTFChars(jstr, c_str);
+  return str;
+}
+
 }  // namespace utils
 
 #endif  // DJL_TORCH_DJL_PYTORCH_JNI_UTILS_H

@@ -34,6 +34,10 @@ final class PyTorchLibrary {
 
     native void torchShowConfig(Set<String> set);
 
+    native void torchStartProfile(boolean useCuda, boolean recordShape, boolean profileMemory);
+
+    native void torchStopProfile(String outputFile);
+
     native long[] torchSizes(Pointer handle);
 
     native byte[] torchDataPtr(Pointer handle);

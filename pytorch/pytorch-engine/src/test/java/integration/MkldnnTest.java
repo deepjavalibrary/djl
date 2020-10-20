@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 public class MkldnnTest {
 
     @Test
-    public void testMKLDNNForPyTorch() {
+    public void testMkldnn() {
         System.setProperty("ai.djl.pytorch.use_mkldnn", "true");
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray[] arrays = {
@@ -45,6 +45,8 @@ public class MkldnnTest {
             // run sanity check, if two arrays are on different layout, it will throw exception
             Arrays.stream(arrays).reduce(NDArray::add);
             Arrays.stream(arrays).forEach(NDArray::toString);
+        } finally {
+            System.setProperty("ai.djl.pytorch.use_mkldnn", "false");
         }
     }
 }

@@ -12,6 +12,8 @@
  */
 #include <torch/torch.h>
 
+#include <fstream>
+
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_error.h"
 #include "djl_pytorch_jni_utils.h"
@@ -22,6 +24,8 @@
 #endif /* USE_PTHREADPOOL */
 #include <caffe2/utils/threadpool/pthreadpool-cpp.h>
 #endif
+
+using namespace torch::autograd::profiler;
 
 // The file is the implementation for PyTorch system-wide operations
 
@@ -112,5 +116,38 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchShowConfig(
     env->CallBooleanMethod(jset, add_method_id, jfeature);
     env->DeleteLocalRef(jfeature);
   }
+  API_END()
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStartProfile(
+    JNIEnv* env, jobject jthis, jboolean juse_cuda, jboolean jrecord_shape, jboolean jprofile_memory) {
+  API_BEGIN()
+  if (profilerEnabled()) {
+    jclass jexception = env->FindClass("ai/djl/engine/EngineException");
+    env->ThrowNew(jexception, "please call stopProfile before you start a new section");
+  }
+  enableProfiler(ProfilerConfig(juse_cuda ? ProfilerState::CUDA : ProfilerState::CPU,
+      /* report_input_shapes */ jrecord_shape,
+      /* profile_memory */ jprofile_memory));
+  API_END()
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStopProfile(
+    JNIEnv* env, jobject jthis, jstring joutput_file) {
+  API_BEGIN()
+  if (!profilerEnabled()) {
+    jclass jexception = env->FindClass("ai/djl/engine/EngineException");
+    env->ThrowNew(jexception, "please call startProfiler() before you use stopProfile!");
+  }
+  std::string output_file = utils::GetStringFromJString(env, joutput_file);
+  std::ofstream file(output_file);
+  std::vector<std::vector<Event>> event_lists = disableProfiler();
+  std::vector<Event*> events;
+  for (auto& l : event_lists) {
+    for (auto& e : l) {
+      events.emplace_back(&e);
+    }
+  }
+  writeProfilerEventsToStream(file, events);
   API_END()
 }
