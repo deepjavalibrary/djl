@@ -59,6 +59,7 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [pytorch-native-cpu(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-cpu) | Contains PyTorch native library for Windows |
 | | [pytorch-native-cpu(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-cpu) | Contains PyTorch native library for Linux |
 | | [pytorch-native-cu102(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-gpu) | Contains PyTorch native library for Linux with CUDA 10.2 |
+| | [pytorch-native-cu102(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-gpu) | Contains PyTorch native library for Windows with CUDA 10.2 |
 | | [pytorch-native-cu101(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-gpu) | Contains PyTorch native library for Linux with CUDA 10.1 |
 | | [pytorch-native-cu101(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-gpu) | Contains PyTorch native library for Windows with CUDA 10.1 |
 | | pytorch-native-cu92(linux-x86_64) (deprecated) | Contains PyTorch native library for Linux with CUDA 9.2 |
@@ -72,6 +73,7 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [tensorflow-native-auto](../../tensorflow/README.md#automatic-recommended) | A placeholder package to automatically download native libraries for your platform |
 | | [tensorflow-native-cpu(osx-x86_64)](../../tensorflow/README.md#macos) | Contains TensorFlow native library for macOS |
 | | [tensorflow-native-cpu(linux-x86_64)](../../tensorflow/README.md#linux-cpu) | Contains TensorFlow native library for Linux |
+| | [tensorflow-native-cpu(win-x86_64)](../../tensorflow/README.md#windows-cpu) | Contains TensorFlow native library for Windows |
 | | [tensorflow-native-cu101(linux-x86_84)](../../tensorflow/README.md#linux-gpu) | Contains TensorFlow native library for Linux with CUDA 10.1 |
 | | | |
 | [ai.djl.onnxruntime](https://search.maven.org/search?q=g:ai.djl.onnxruntime) | [onnxruntime-engine](../../onnxruntime/onnxruntime-engine/README.md#installation) | ONNX Runtime engine adapter |

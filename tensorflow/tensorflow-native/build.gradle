@@ -71,7 +71,7 @@ task uploadTensorflowNativeLibs() {
         ant.move(file: "${tfUnzipDir}/linux-x86_64-gpu/", toFile: "${buildDir}/native/linux/cu101/")
         ant.move(file: "${tfUnzipDir}/macosx-x86_64/", toFile: "${buildDir}/native/osx/cpu/")
         ant.move(file: "${tfUnzipDir}/windows-x86_64/", toFile: "${buildDir}/native/win/cpu/")
-        //No windows gpu support for TF 2.3.0 yet
+        //No windows gpu support for TF 2.3.1 yet
         //ant.move(file: "${tfUnzipDir}/windows-x86_64-gpu/", toFile: "${buildDir}/native/win/gpu/")
 
         /*
