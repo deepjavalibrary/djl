@@ -63,7 +63,7 @@ public class ProfilerTest {
                                             manager.zeros(new Shape(3, 224, 224), DataType.UINT8));
                     JniUtils.startProfile(false, true, true);
                     predictor.predict(image);
-                    JniUtils.stopProfiler(outputFile);
+                    JniUtils.stopProfile(outputFile);
                 } catch (TranslateException e) {
                     e.printStackTrace();
                 }

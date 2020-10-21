@@ -111,7 +111,7 @@ public final class JniUtils {
         PyTorchLibrary.LIB.torchStartProfile(useCuda, recordShape, profileMemory);
     }
 
-    public static synchronized void stopProfiler(String outputFile) {
+    public static synchronized void stopProfile(String outputFile) {
         PyTorchLibrary.LIB.torchStopProfile(outputFile);
     }
 

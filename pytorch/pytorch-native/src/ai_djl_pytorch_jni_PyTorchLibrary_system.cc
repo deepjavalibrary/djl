@@ -11,8 +11,11 @@
  * and limitations under the License.
  */
 #include <torch/torch.h>
+// clang-format off
+#include <torch/csrc/jit/frontend/code_template.h>
+// clang-format on
 
-#include <fstream>
+#include <sstream>
 
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_error.h"
@@ -119,6 +122,131 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchShowConfig(
   API_END()
 }
 
+std::string ToString(const std::vector<std::vector<int64_t>>& shapes) {
+  std::ostringstream oss;
+  oss << "[";
+  for (auto i = 0; i < shapes.size(); ++i) {
+    oss << "[";
+    if (!shapes[i].empty()) {
+      std::copy(shapes[i].begin(), shapes[i].end() - 1, std::ostream_iterator<int64_t>(oss, ", "));
+      oss << shapes[i].back();
+    }
+    if (i == shapes.size() - 1) {
+      oss << "]";
+    } else {
+      oss << "], ";
+    }
+  }
+  oss << "]";
+  return oss.str();
+}
+
+inline std::string FormatMemory(int64_t bytes) {
+  int64_t kb = 1024;
+  int64_t mb = 1024 * 1024;
+  int64_t gb = 1024 * 1024 * 1024;
+  std::ostringstream oss;
+  oss.precision(2);
+  if (std::abs(bytes) >= gb) {
+    oss << std::fixed << static_cast<double>(bytes / gb) << " Gb";
+  } else if (std::abs(bytes) >= mb) {
+    oss << std::fixed << static_cast<double>(bytes / mb) << " Mb";
+  } else if (std::abs(bytes) >= kb) {
+    oss << std::fixed << static_cast<double>(bytes / kb) << " Kb";
+  } else {
+    oss << bytes << " b";
+  }
+  return oss.str();
+}
+
+// the code snippet is copied from torch/csrc/autograd/profiler.cpp
+static torch::jit::CodeTemplate event_template(R"(
+{
+  "name": "${name}",
+  "ph": "X",
+  "ts": ${ts},
+  "dur": ${dur},
+  "tid": ${tid},
+  "pid": "CPU Functions",
+  "shape": ${shape},
+  "cpu mem": "${cpu_mem}",
+  "args": {}
+})");
+
+// The function doesn't support GPU yet
+// You can refer to
+// https://github.com/pytorch/pytorch/blob/8908f6ad8e9f2815b4ec49e15eefa467ffee03c3/torch/autograd/profiler.py#L925
+void WriteProfilerEventsToStream(std::ostream& out, const std::vector<std::vector<Event*>>& thread_events) {
+  TORCH_CHECK(out, "Could not open file");
+  std::set<std::string> filtered_out_names = {
+      "profiler::_record_function_enter", "profiler::_record_function_exit", "is_leaf", "output_nr", "_version"};
+  Event* profiler_start = nullptr;
+  for (const auto& events : thread_events) {
+    for (auto e : events) {
+      if (0 == strcmp(e->name(), "__start_profile")) {
+        profiler_start = e;
+        break;
+      }
+    }
+  }
+  TORCH_CHECK(profiler_start, "Could not find __start_profile mark");
+
+  struct PairHash {
+    size_t operator()(std::pair<at::RecordFunctionHandle, int> p) const noexcept {
+      return std::hash<at::RecordFunctionHandle>()(p.first) ^ std::hash<int64_t>()(p.second);
+    }
+  };
+  out << "[\n";
+  bool first = true;
+  for (const std::vector<Event*>& thread_event_list : thread_events) {
+    // accumulated memory allocations per handle
+    std::unordered_map<std::pair<at::RecordFunctionHandle, int64_t>, int64_t, PairHash> cpu_memory_allocs;
+    std::unordered_map<std::pair<at::RecordFunctionHandle, int64_t>, Event*, PairHash> events_map;
+    std::set<std::pair<at::RecordFunctionHandle, int64_t>> filtered_handles;
+    for (Event* evt : thread_event_list) {
+      auto event_key = std::make_pair<at::RecordFunctionHandle, int64_t>(evt->handle(), evt->node_id());
+      if (filtered_out_names.find(evt->name()) != filtered_out_names.end() ||
+          filtered_handles.find(event_key) != filtered_handles.end()) {
+        filtered_handles.insert(event_key);
+        continue;
+      }
+      if (evt->kind() == "push") {
+        events_map[event_key] = evt;
+        cpu_memory_allocs[event_key] = 0;
+      } else if (evt->kind() == "pop") {
+        if (!first) {
+          out << ",\n";
+        }
+        first = false;
+        auto it = events_map.find(event_key);
+        auto mem_it = cpu_memory_allocs.find(event_key);
+        TORCH_CHECK(it != events_map.end(), "Unmatched pop event");
+        Event* start = it->second;
+        int64_t memory_usage = mem_it->second;
+
+        torch::jit::TemplateEnv env;
+        env.s("name", start->name());
+        env.d("ts", profiler_start->cpu_elapsed_us(*start));
+        env.d("dur", start->cpu_elapsed_us(*evt));
+        env.d("tid", start->thread_id());
+        // we add extra info here
+        env.s("shape", ToString(start->shapes()));
+        env.s("cpu_mem", FormatMemory(memory_usage));
+        out << event_template.format(env);
+
+        events_map.erase(it);
+        cpu_memory_allocs.erase(mem_it);
+      } else if (evt->kind() == "memory_alloc") {
+        for (const auto& e : cpu_memory_allocs) {
+          cpu_memory_allocs[e.first] += evt->cpu_memory_usage();
+        }
+      }
+    }
+  }
+  out << "]\n";
+}
+// end of copies
+
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStartProfile(
     JNIEnv* env, jobject jthis, jboolean juse_cuda, jboolean jrecord_shape, jboolean jprofile_memory) {
   API_BEGIN()
@@ -142,12 +270,14 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStopProfile(
   std::string output_file = utils::GetStringFromJString(env, joutput_file);
   std::ofstream file(output_file);
   std::vector<std::vector<Event>> event_lists = disableProfiler();
-  std::vector<Event*> events;
+  std::vector<std::vector<Event*>> event_ptr_lists;
   for (auto& l : event_lists) {
+    std::vector<Event*> events;
     for (auto& e : l) {
       events.emplace_back(&e);
     }
+    event_ptr_lists.emplace_back(events);
   }
-  writeProfilerEventsToStream(file, events);
+  WriteProfilerEventsToStream(file, event_ptr_lists);
   API_END()
 }
