@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package integration;
+package ai.djl.pytorch.integration;
 
 import ai.djl.Application;
 import ai.djl.MalformedModelException;

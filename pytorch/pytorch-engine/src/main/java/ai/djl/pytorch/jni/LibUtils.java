@@ -17,6 +17,7 @@ import ai.djl.util.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -71,7 +72,7 @@ public final class LibUtils {
         if (System.getProperty("os.name").startsWith("Win")) {
             loadWinDependencies(libName);
         }
-        System.load(libName); // NOPMD
+        loadNativeLibrary(libName);
     }
 
     public static String getLibName() {
@@ -107,14 +108,14 @@ public final class LibUtils {
                             })
                     .map(path -> path.toAbsolutePath().toString())
                     .forEach(System::load);
-            System.load(libDir.resolve("fbgemm.dll").toAbsolutePath().toString());
-            System.load(libDir.resolve("torch_cpu.dll").toAbsolutePath().toString());
+            loadNativeLibrary(libDir.resolve("fbgemm.dll").toAbsolutePath().toString());
+            loadNativeLibrary(libDir.resolve("torch_cpu.dll").toAbsolutePath().toString());
             if (Files.exists(libDir.resolve("c10_cuda.dll"))) {
                 // Windows System.load is global load
-                System.load(libDir.resolve("c10_cuda.dll").toAbsolutePath().toString());
-                System.load(libDir.resolve("torch_cuda.dll").toAbsolutePath().toString());
+                loadNativeLibrary(libDir.resolve("c10_cuda.dll").toAbsolutePath().toString());
+                loadNativeLibrary(libDir.resolve("torch_cuda.dll").toAbsolutePath().toString());
             }
-            System.load(libDir.resolve("torch.dll").toAbsolutePath().toString());
+            loadNativeLibrary(libDir.resolve("torch.dll").toAbsolutePath().toString());
         } catch (IOException e) {
             throw new IllegalArgumentException("Folder not exist! " + libDir, e);
         }
@@ -289,6 +290,20 @@ public final class LibUtils {
                 Utils.deleteQuietly(tmp);
             }
         }
+    }
+
+    private static void loadNativeLibrary(String path) {
+        String nativeHelper = System.getProperty("ai.djl.pytorch.native_helper");
+        if (nativeHelper != null && !nativeHelper.isEmpty()) {
+            try {
+                Class<?> clazz = Class.forName(nativeHelper);
+                Method method = clazz.getDeclaredMethod("load", String.class);
+                method.invoke(null, path);
+            } catch (ReflectiveOperationException e) {
+                throw new IllegalArgumentException("Invalid native_helper: " + nativeHelper, e);
+            }
+        }
+        System.load(path); // NOPMD
     }
 
     private static String downloadPyTorch(Platform platform, AtomicBoolean fallback)

@@ -10,5 +10,19 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-/** The integration test for testing PyTorch specific features. */
-package integration;
+package ai.djl.pytorch.jni;
+
+/** A helper class allows engine shared library to be loaded from different class loader. */
+public final class NativeHelper {
+
+    private NativeHelper() {}
+
+    /**
+     * Load native shared library from file.
+     *
+     * @param path the file to load
+     */
+    public static void load(String path) {
+        System.load(path); // NOPMD
+    }
+}
