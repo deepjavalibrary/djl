@@ -22,15 +22,18 @@ public class TrainTicTacToeTest {
     @Test
     public void testTrainTicTacToe() {
         if (Boolean.getBoolean("nightly")) {
-            String[] args = new String[] {"-g", "1"};
-
+            String[] args = new String[] {"-g", "1", "-e", "6"};
             Engine.getInstance().setRandomSeed(1234);
 
             TrainingResult result = TrainTicTacToe.runExample(args);
             Assert.assertNotNull(result);
 
-            float winRate = result.getValidateEvaluation("winRate");
-            Assert.assertTrue(winRate > 0.8f, "Win Rate: " + winRate);
+            float trainWinRate = result.getTrainEvaluation("winRate");
+            Assert.assertTrue(trainWinRate > 0.8f, "Train win Rate: " + trainWinRate);
+
+            float validationWinRate = result.getValidateEvaluation("winRate");
+            // TicTacToe game run is deterministic when training is false, thus winRate is either 0 or 1
+            Assert.assertEquals(validationWinRate, 1f, "Validation Win Rate: " + validationWinRate);
         } else {
             String[] args = new String[] {"-g", "1", "-e", "1", "-m", "1"};
             TrainingResult result = TrainTicTacToe.runExample(args);
