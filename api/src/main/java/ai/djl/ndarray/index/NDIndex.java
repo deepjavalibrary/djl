@@ -46,8 +46,10 @@ import java.util.stream.Stream;
  */
 public class NDIndex {
 
+    /* Android regex requires escape } char as well */
     private static final Pattern ITEM_PATTERN =
-            Pattern.compile("(\\*)|((-?\\d+|\\{})?:(-?\\d+|\\{})?(:(-?\\d+|\\{}))?)|(-?\\d+|\\{})");
+            Pattern.compile(
+                    "(\\*)|((-?\\d+|\\{\\})?:(-?\\d+|\\{\\})?(:(-?\\d+|\\{\\}))?)|(-?\\d+|\\{\\})");
 
     private int rank;
     private List<NDIndexElement> indices;
