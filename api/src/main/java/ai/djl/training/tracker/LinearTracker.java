@@ -140,7 +140,7 @@ public class LinearTracker implements Tracker {
                         slope < 0, "The slope must be negative for a min value");
                 Preconditions.checkArgument(
                         min < baseValue, "The min must be smaller than the base value");
-                maxUpdates = Math.round((baseValue - min) / slope);
+                maxUpdates = -Math.round((baseValue - min) / slope);
             } else if (maxUpdates == null) {
                 // Default to no max if none set
                 maxUpdates = Integer.MAX_VALUE;

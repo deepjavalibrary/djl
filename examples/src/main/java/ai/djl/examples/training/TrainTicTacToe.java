@@ -32,6 +32,7 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
+import ai.djl.training.optimizer.Adam;
 import ai.djl.training.tracker.LinearTracker;
 import ai.djl.training.tracker.Tracker;
 import org.slf4j.Logger;
@@ -63,7 +64,8 @@ public final class TrainTicTacToe {
         int batchSize = arguments.getBatchSize();
         int replayBufferSize = 1024;
         int gamesPerEpoch = 128;
-        int validationGamesPerEpoch = 32;
+        // Validation is deterministic, thus one game is enough
+        int validationGamesPerEpoch = 1;
         float rewardDiscount = 0.9f;
 
         if (arguments.getLimit() != Long.MAX_VALUE) {
@@ -88,19 +90,21 @@ public final class TrainTicTacToe {
                 RlAgent agent = new QAgent(trainer, rewardDiscount);
                 Tracker exploreRate =
                         new LinearTracker.Builder()
-                                .setBaseValue(1f)
+                                .setBaseValue(0.9f)
                                 .optSlope(-.9f / (epoch * gamesPerEpoch * 7))
-                                .optMinValue(0.1f)
+                                .optMinValue(0.01f)
                                 .build();
                 agent = new EpsilonGreedy(agent, exploreRate);
 
                 float validationWinRate = 0;
+                float trainWinRate = 0;
                 for (int i = 0; i < epoch; i++) {
                     int trainingWins = 0;
                     for (int j = 0; j < gamesPerEpoch; j++) {
                         float result = game.runEnvironment(agent, true);
                         Step[] batchSteps = game.getBatch();
                         agent.trainBatch(batchSteps);
+                        trainer.step();
 
                         // Record if the game was won
                         if (result > 0) {
@@ -108,7 +112,8 @@ public final class TrainTicTacToe {
                         }
                     }
 
-                    logger.info("Training wins: {}", ((float) trainingWins / gamesPerEpoch));
+                    trainWinRate = (float) trainingWins / gamesPerEpoch;
+                    logger.info("Training wins: {}", trainWinRate);
 
                     trainer.notifyListeners(listener -> listener.onEpoch(trainer));
 
@@ -129,6 +134,7 @@ public final class TrainTicTacToe {
 
                 TrainingResult trainingResult = trainer.getTrainingResult();
                 trainingResult.getEvaluations().put("validate_winRate", validationWinRate);
+                trainingResult.getEvaluations().put("train_winRate", trainWinRate);
                 return trainingResult;
             }
         }
@@ -152,6 +158,8 @@ public final class TrainTicTacToe {
 
     public static DefaultTrainingConfig setupTrainingConfig() {
         return new DefaultTrainingConfig(Loss.l2Loss())
-                .addTrainingListeners(TrainingListener.Defaults.basic());
+                .addTrainingListeners(TrainingListener.Defaults.basic())
+                .optOptimizer(
+                        Adam.builder().optLearningRateTracker(Tracker.fixed(0.0001F)).build());
     }
 }
