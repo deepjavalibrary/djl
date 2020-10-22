@@ -60,7 +60,7 @@ public class PointerArray extends Memory {
         if (o == null) {
             return false;
         }
-        return (o instanceof Pointer)
+        return (o instanceof PointerArray)
                 && (((PointerArray) o).numElements() == numElements())
                 && super.equals(o);
     }
