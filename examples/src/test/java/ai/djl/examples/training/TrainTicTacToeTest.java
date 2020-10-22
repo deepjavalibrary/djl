@@ -32,7 +32,7 @@ public class TrainTicTacToeTest {
             Assert.assertTrue(trainWinRate > 0.8f, "Train win Rate: " + trainWinRate);
 
             float validationWinRate = result.getValidateEvaluation("winRate");
-            // TicTacToe game run is deterministic when training is false, thus winRate is either 0 or 1
+            // TicTacToe game run is deterministic when training == false, thus winRate == 0 | 1
             Assert.assertEquals(validationWinRate, 1f, "Validation Win Rate: " + validationWinRate);
         } else {
             String[] args = new String[] {"-g", "1", "-e", "1", "-m", "1"};

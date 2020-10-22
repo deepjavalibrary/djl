@@ -159,6 +159,7 @@ public final class TrainTicTacToe {
     public static DefaultTrainingConfig setupTrainingConfig() {
         return new DefaultTrainingConfig(Loss.l2Loss())
                 .addTrainingListeners(TrainingListener.Defaults.basic())
-                .optOptimizer(Adam.builder().optLearningRateTracker(Tracker.fixed(0.0001F)).build());
+                .optOptimizer(
+                        Adam.builder().optLearningRateTracker(Tracker.fixed(0.0001F)).build());
     }
 }

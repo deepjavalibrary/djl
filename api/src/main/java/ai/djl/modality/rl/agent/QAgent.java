@@ -89,16 +89,19 @@ public class QAgent implements RlAgent {
                 new BatchData(null, new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
         for (Step step : batchSteps) {
 
-            NDList[] preInput = buildInputs(step.getPreObservation(), Collections.singletonList(step.getAction()));
+            NDList[] preInput =
+                    buildInputs(
+                            step.getPreObservation(), Collections.singletonList(step.getAction()));
             NDList[] postInputs = buildInputs(step.getPostObservation(), step.getPostActionSpace());
             NDList[] allInputs =
                     Stream.concat(Arrays.stream(preInput), Arrays.stream(postInputs))
                             .toArray(NDList[]::new);
 
             try (GradientCollector collector = trainer.newGradientCollector()) {
-                NDArray results = trainer.forward(batchifier.batchify(allInputs))
-                        .singletonOrThrow()
-                        .squeeze(-1);
+                NDArray results =
+                        trainer.forward(batchifier.batchify(allInputs))
+                                .singletonOrThrow()
+                                .squeeze(-1);
                 NDList preQ = new NDList(results.get(0));
                 NDList postQ;
                 if (step.isDone()) {
