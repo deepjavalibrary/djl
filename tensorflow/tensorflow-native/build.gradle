@@ -23,6 +23,7 @@ dependencies {
     download "org.tensorflow:tensorflow-core-api:0.2.0:linux-x86_64"
     download "org.tensorflow:tensorflow-core-api:0.2.0:macosx-x86_64"
     download "org.tensorflow:tensorflow-core-api:0.2.0:windows-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.2.0:windows-x86_64-gpu"
     /*
     download("org.bytedeco:mkl-dnn:${mkl_dnn_version}:macosx-x86_64") {
         exclude group: "org.bytedeco", module: "javacpp"
@@ -65,28 +66,12 @@ task uploadTensorflowNativeLibs() {
         }
 
         def tfUnzipDir = "${buildDir}/native/org/tensorflow/internal/c_api"
-        // def mklUnzipDir = "${buildDir}/native/org/bytedeco/mkldnn"
 
         ant.move(file: "${tfUnzipDir}/linux-x86_64/", toFile: "${buildDir}/native/linux/cpu/")
         ant.move(file: "${tfUnzipDir}/linux-x86_64-gpu/", toFile: "${buildDir}/native/linux/cu101/")
         ant.move(file: "${tfUnzipDir}/macosx-x86_64/", toFile: "${buildDir}/native/osx/cpu/")
         ant.move(file: "${tfUnzipDir}/windows-x86_64/", toFile: "${buildDir}/native/win/cpu/")
-        //No windows gpu support for TF 2.3.1 yet
-        //ant.move(file: "${tfUnzipDir}/windows-x86_64-gpu/", toFile: "${buildDir}/native/win/gpu/")
-
-        /*
-        copy {
-            from "${mklUnzipDir}/linux-x86_64/"
-            into "${buildDir}/native/linux/gpu/"
-        }
-        copy {
-            from "${mklUnzipDir}/windows-x86_64/lib/"
-            into "${buildDir}/native/win/gpu/"
-        }
-        ant.move(file: "${mklUnzipDir}/linux-x86_64/", toFile: "${buildDir}/native/linux/cpu/")
-        ant.move(file: "${mklUnzipDir}/macosx-x86_64/", toFile: "${buildDir}/native/osx/cpu/")
-        ant.move(file: "${mklUnzipDir}/windows-x86_64/lib", toFile: "${buildDir}/native/win/cpu")
-        */
+        ant.move(file: "${tfUnzipDir}/windows-x86_64-gpu/", toFile: "${buildDir}/native/win/cu101/")
 
         def f = new File("${buildDir}/native/files.txt")
         def uploadDirs = [
@@ -94,7 +79,7 @@ task uploadTensorflowNativeLibs() {
                 "${buildDir}/native/linux/cu101/",
                 "${buildDir}/native/osx/cpu/",
                 "${buildDir}/native/win/cpu/",
-                //"${buildDir}/native/win/gpu/"
+                "${buildDir}/native/win/cu101/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
