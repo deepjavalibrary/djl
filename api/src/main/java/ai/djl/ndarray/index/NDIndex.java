@@ -106,7 +106,7 @@ public class NDIndex {
      *
      * @param indices a comma separated list of indices corresponding to either subsections,
      *     everything, or slices on a particular dimension
-     * @param args arguments to replace the varaible "{}" in the indices string. Can be an integer,
+     * @param args arguments to replace the variable "{}" in the indices string. Can be an integer,
      *     long, boolean {@link NDArray}, or integer {@link NDArray}.
      * @see <a href="https://docs.scipy.org/doc/numpy/reference/arrays.indexing.html">Numpy
      *     Indexing</a>
@@ -185,7 +185,7 @@ public class NDIndex {
      * Updates the NDIndex by appending indices to the array.
      *
      * @param indices the indices to add similar to {@link #NDIndex(String, Object...)}
-     * @param args arguments to replace the varaible "{}" in the indices string. Can be an integer,
+     * @param args arguments to replace the variable "{}" in the indices string. Can be an integer,
      *     long, boolean {@link NDArray}, or integer {@link NDArray}.
      * @return the updated {@link NDIndex}
      * @see #NDIndex(String, Object...)
