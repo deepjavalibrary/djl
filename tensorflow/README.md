@@ -108,7 +108,16 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60
 ```
 
 ### Windows
-For Windows, you can use the following library:
+
+For the Windows platform, you have to use [Automatic](#automatic-(recommended)) package if you want to use GPU.
+
+#### Windows GPU
+
+- ai.djl.tensorflow:tensorflow-native-auto:2.3.1
+
+    This package supports CUDA 10.1 for Windows.
+
+### Windows CPU
 
 - ai.djl.tensorflow:tensorflow-native-cpu:2.3.1:win-x86_64
 
