@@ -39,5 +39,5 @@ jobs:
         run: |
           mkdir -p jnilib/${{ runner.os }}
           cp bazel-bin/tensorflow/lite/java/libtensorflowlite_jni.so jnilib/${{ runner.os }}
-          cp libtensorflowlitelib.jar jnilib
+          cp bazel-bin/tensorflow/lite/java/libtensorflowlitelib.jar jnilib
           aws s3 sync jnilib s3://djl-ai/publish/tflite-2.3.1/jnilib
