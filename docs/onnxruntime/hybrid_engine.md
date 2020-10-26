@@ -12,7 +12,7 @@ The minimum dependencies for the ONNX Runtime Engine are:
 
 ```
 runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine:0.8.0"
-runtimeOnly "ai.djl.onnxruntime:onnxruntime-native-auto:1.4.0"
+runtimeOnly "com.microsoft.onnxruntime:onnxruntime:1.4.0"
 ```
 
 To use it along with Apache MXNet for additional API support, add the following two dependencies:
