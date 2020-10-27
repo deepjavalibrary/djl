@@ -84,7 +84,7 @@ public class ParameterStore {
      * @param training true for a training forward pass
      * @return the value of the mirrored parameter on the device
      */
-    public NDArray getValue(Parameter parameter, Device device, boolean training) {
+    public synchronized NDArray getValue(Parameter parameter, Device device, boolean training) {
         // for those optional parameters, they might not be in the ParameterStore
         if (parameter == null) {
             return null;
@@ -119,14 +119,12 @@ public class ParameterStore {
                 }
             } else {
                 if (copy || !array.getDevice().equals(device)) {
-                    synchronized (array) {
-                        array = array.toDevice(device, true);
-                        array.attach(manager);
-                        // some parameter doesn't require grad
-                        // for example running_mean in BatchNorm
-                        if (parameter.requireGradient() && training) {
-                            array.attachGradient();
-                        }
+                    array = array.toDevice(device, true);
+                    array.attach(manager);
+                    // some parameter doesn't require grad
+                    // for example running_mean in BatchNorm
+                    if (parameter.requireGradient() && training) {
+                        array.attachGradient();
                     }
                 }
                 data.add(array);
