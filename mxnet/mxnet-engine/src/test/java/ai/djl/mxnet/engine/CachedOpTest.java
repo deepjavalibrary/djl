@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.IObjectFactory;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
@@ -54,6 +55,12 @@ public class CachedOpTest extends PowerMockTestCase {
         mockStatic(LibUtils.class);
         MxnetLibrary library = new MockMxnetLibrary();
         PowerMockito.when(LibUtils.loadLibrary()).thenReturn(library);
+        System.setProperty("MXNET_UNIT_TEST", "TRUE");
+    }
+
+    @AfterClass
+    public void cleanup() {
+        System.setProperty("MXNET_UNIT_TEST", "FALSE");
     }
 
     @Test(expectedExceptions = NullPointerException.class)

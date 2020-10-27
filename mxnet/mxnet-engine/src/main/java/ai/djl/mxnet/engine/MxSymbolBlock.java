@@ -49,7 +49,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     private static final Logger logger = LoggerFactory.getLogger(MxSymbolBlock.class);
     private NDManager manager;
-    private CachedOp op;
+    private ThreadLocal<CachedOp> opHolder;
     private Symbol symbol;
     private List<Parameter> mxNetParams; // includes input data
     private Map<String, Shape> paramShapes;
@@ -72,6 +72,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
         this.manager = manager;
         this.symbol = symbol;
         inputNames = new ArrayList<>();
+        opHolder = new ThreadLocal<>();
 
         String[] allNames = symbol.getAllNames();
         mxNetParams = new ArrayList<>(allNames.length);
@@ -164,24 +165,24 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        if (first) {
-            synchronized (MxSymbolBlock.class) {
-                if (first) {
-                    // create CachedOp is not thread-safe
-                    // add synchronized block to avoid creating multiple CachedOps
-                    op = JnaUtils.createCachedOp(this, (MxNDManager) manager, training);
-                    inputDescriptions = new PairList<>();
-                    outputDescriptions = new PairList<>();
-                    for (NDArray array : inputs) {
-                        inputDescriptions.add(array.getName(), array.getShape());
-                    }
-                    NDList outputs = op.forward(parameterStore, inputs, training);
-                    for (NDArray array : outputs) {
-                        outputDescriptions.add(array.getName(), array.getShape());
-                    }
-                    first = false;
-                    return outputs;
+        CachedOp op = opHolder.get();
+        if (op == null) {
+            op = JnaUtils.createCachedOp(this, (MxNDManager) manager, training);
+            opHolder.set(op);
+        }
+        synchronized (MxSymbolBlock.class) {
+            if (first) {
+                inputDescriptions = new PairList<>();
+                outputDescriptions = new PairList<>();
+                for (NDArray array : inputs) {
+                    inputDescriptions.add(array.getName(), array.getShape());
                 }
+                NDList outputs = op.forward(parameterStore, inputs, training);
+                for (NDArray array : outputs) {
+                    outputDescriptions.add(array.getName(), array.getShape());
+                }
+                first = false;
+                return outputs;
             }
         }
         return op.forward(parameterStore, inputs, training);

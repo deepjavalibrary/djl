@@ -88,8 +88,11 @@ public class CachedOp extends NativeResource {
     public NDList forward(ParameterStore parameterStore, NDList data, boolean training) {
         // reset the input data index at the beginning
         MxNDArray[] allInputsNDArray = new MxNDArray[parameters.size()];
-        // for unit test purpose, we export the current one to global
-        this.debugInputs = allInputsNDArray;
+        String unitTest = System.getProperty("MXNET_UNIT_TEST");
+        if ("TRUE".equals(unitTest)) {
+            // for unit test purpose, we export the current one to global
+            this.debugInputs = allInputsNDArray;
+        }
         // check device of input
         Device device = data.head().getDevice();
         // get the manager of the data

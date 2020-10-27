@@ -17,7 +17,6 @@ import ai.djl.mxnet.engine.MxNDArray;
 import ai.djl.mxnet.engine.MxNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.training.Trainer;
 import ai.djl.util.PairList;
 import com.sun.jna.Pointer;
@@ -87,17 +86,8 @@ public class FunctionInfo {
     private NDArray[] invoke(MxNDManager manager, PointerArray src, PairList<String, ?> params) {
         PointerByReference destRef = new PointerByReference();
 
-        PairList<Pointer, SparseFormat> pairList =
-                JnaUtils.imperativeInvoke(handle, src, destRef, params);
-        return pairList.stream()
-                .map(
-                        pair -> {
-                            if (pair.getValue() != SparseFormat.DENSE) {
-                                return manager.create(pair.getKey(), pair.getValue());
-                            }
-                            return manager.create(pair.getKey());
-                        })
-                .toArray(MxNDArray[]::new);
+        List<Pointer> list = JnaUtils.imperativeInvoke(handle, src, destRef, params);
+        return list.stream().map(manager::create).toArray(MxNDArray[]::new);
     }
 
     /**
