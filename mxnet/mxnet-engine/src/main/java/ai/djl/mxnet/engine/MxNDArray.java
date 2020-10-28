@@ -334,7 +334,28 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
             throw new IllegalArgumentException(
                     "shape are diff. Required: " + destShape + ", Actual " + inShape);
         }
-        manager.invoke("_npi_copyto", new NDArray[] {this}, new NDArray[] {ndArray}, null);
+        try {
+            manager.invoke("_npi_copyto", new NDArray[] {this}, new NDArray[] {ndArray}, null);
+        } catch (IllegalArgumentException e) {
+            // TODO workaround for customer multithreading issue
+            if (!e.getMessage().contains("Unknown Sparse type")) {
+                throw e;
+            }
+            int count = 0;
+            int maxTries = 3;
+            while (true) {
+                try {
+                    manager.invoke(
+                            "_npi_copyto", new NDArray[] {this}, new NDArray[] {ndArray}, null);
+                    break;
+                } catch (IllegalArgumentException ex) {
+                    if (!e.getMessage().contains("Unknown Sparse type") || count == maxTries) {
+                        throw ex;
+                    }
+                    count++;
+                }
+            }
+        }
     }
 
     /** {@inheritDoc} */
