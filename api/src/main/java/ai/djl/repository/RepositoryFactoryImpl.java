@@ -15,6 +15,8 @@ package ai.djl.repository;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -54,12 +56,26 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             return factory.newInstance(name, url);
         }
 
-        try {
-            if (!"file".equals(scheme)) {
-                uri.toURL();
+        if ("jar".equals(scheme)) {
+            String p = uri.getPath();
+            if (p.startsWith("/")) {
+                p = p.substring(1);
             }
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Malformed URL: " + url, e);
+            URL u = Thread.currentThread().getContextClassLoader().getResource(p);
+            if (u == null) {
+                throw new IllegalArgumentException("Resource not found: " + url);
+            }
+            try {
+                uri = u.toURI();
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("Resource not found: " + url, e);
+            }
+        } else if (!"file".equals(scheme)) {
+            try {
+                uri.toURL();
+            } catch (MalformedURLException e) {
+                throw new IllegalArgumentException("Malformed URL: " + url, e);
+            }
         }
 
         String uriPath = uri.getPath();
@@ -90,6 +106,11 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             if (FilenameUtils.isArchiveFile(fileName)) {
                 return new SimpleUrlRepository(name, uri, names[0], names[1]);
             }
+        } else if ("jar".equals(scheme)) {
+            if (!FilenameUtils.isArchiveFile(fileName)) {
+                throw new IllegalArgumentException("Only archive file is supported for res URL.");
+            }
+            return new JarRepository(name, uri, names[0], names[1]);
         }
         return new RemoteRepository(name, uri);
     }
