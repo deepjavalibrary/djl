@@ -47,6 +47,7 @@ public class Arguments {
     private int duration;
     private int iteration;
     private int threads;
+    private int delay;
     private Shape[] inputShapes;
     private boolean help;
 
@@ -73,6 +74,9 @@ public class Arguments {
         if (cmd.hasOption("criteria")) {
             Type type = new TypeToken<Map<String, String>>() {}.getType();
             criteria = JsonUtils.GSON.fromJson(cmd.getOptionValue("criteria"), type);
+        }
+        if (cmd.hasOption("delay")) {
+            delay = Integer.parseInt(cmd.getOptionValue("delay"));
         }
         if (cmd.hasOption("input-shapes")) {
             String shape = cmd.getOptionValue("input-shapes");
@@ -139,6 +143,13 @@ public class Arguments {
                         .hasArg()
                         .argName("NUMBER_THREADS")
                         .desc("Number of inference threads.")
+                        .build());
+        options.addOption(
+                Option.builder("l")
+                        .longOpt("delay")
+                        .hasArg()
+                        .argName("DELAY")
+                        .desc("Delay of incremental threads.")
                         .build());
         options.addOption(
                 Option.builder("o")
@@ -233,6 +244,10 @@ public class Arguments {
             return ImageFactory.getInstance().fromFile(getImageFile());
         }
         return null;
+    }
+
+    public int getDelay() {
+        return delay;
     }
 
     public Shape[] getInputShapes() {
