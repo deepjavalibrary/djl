@@ -60,7 +60,7 @@ public class MxNDArrayTest extends PowerMockTestCase {
             Assert.assertEquals(nd.getShape(), new Shape(1, 2, 3));
             Assert.assertEquals(nd.getDevice(), Device.gpu(1));
             Assert.assertEquals(nd.getDataType(), DataType.FLOAT32);
-            Assert.assertEquals(nd.getSparseFormat(), SparseFormat.CSR);
+            Assert.assertEquals(nd.getSparseFormat(), SparseFormat.DENSE);
         }
     }
 
