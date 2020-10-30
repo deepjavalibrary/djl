@@ -50,6 +50,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         ZooModel<?, ?> model = loadModel(arguments, metrics);
 
         int numOfThreads = arguments.getThreads();
+        int delay = arguments.getDelay();
         AtomicInteger counter = new AtomicInteger(iteration);
         logger.info("Multithreaded inference with {} threads.", numOfThreads);
 
@@ -63,17 +64,30 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         int successThreads = 0;
         try {
             metrics.addMetric("mt_start", System.currentTimeMillis(), "mills");
-            List<Future<Object>> futures = executorService.invokeAll(callables);
-            for (Future<Object> future : futures) {
-                try {
-                    classification = future.get();
-                    ++successThreads;
-                } catch (InterruptedException | ExecutionException e) {
-                    logger.error("", e);
+            try {
+                List<Future<Object>> futures;
+                if (delay > 0) {
+                    futures = new ArrayList<>();
+                    for (PredictorCallable callable : callables) {
+                        futures.add(executorService.submit(callable));
+                        Thread.sleep(delay);
+                    }
+                } else {
+                    futures = executorService.invokeAll(callables);
                 }
+
+                for (Future<Object> future : futures) {
+                    classification = future.get();
+                    if (classification != null) {
+                        ++successThreads;
+                    }
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error("", e);
             }
-        } catch (InterruptedException e) {
-            logger.error("", e);
+            for (PredictorCallable callable : callables) {
+                callable.close();
+            }
         } finally {
             executorService.shutdown();
         }
@@ -127,7 +141,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
             Object result = null;
             int count = 0;
             int remaining;
-            while ((remaining = counter.decrementAndGet()) > 0) {
+            while ((remaining = counter.decrementAndGet()) > 0 || result == null) {
                 try {
                     result = predictor.predict(inputData);
                 } catch (Exception e) {
@@ -146,6 +160,10 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
             }
             logger.debug("Worker-{}: finished.", workerId);
             return result;
+        }
+
+        public void close() {
+            predictor.close();
         }
     }
 }
