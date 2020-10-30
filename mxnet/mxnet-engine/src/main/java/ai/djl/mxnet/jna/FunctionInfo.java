@@ -16,7 +16,6 @@ import ai.djl.Device;
 import ai.djl.mxnet.engine.MxNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.training.Trainer;
 import ai.djl.util.PairList;
 import com.sun.jna.Pointer;
@@ -89,12 +88,7 @@ public class FunctionInfo {
         Pointer[] pointers = JnaUtils.imperativeInvoke(handle, src, destRef, params);
         NDArray[] ret = new NDArray[pointers.length];
         for (int i = 0; i < pointers.length; ++i) {
-            SparseFormat format = JnaUtils.getStorageType(pointers[i]);
-            if (format != SparseFormat.DENSE) {
-                ret[i] = manager.create(pointers[i], format);
-            } else {
-                ret[i] = manager.create(pointers[i]);
-            }
+            ret[i] = manager.create(pointers[i]);
         }
         return ret;
     }

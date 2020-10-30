@@ -741,7 +741,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
                     .apply(new Object[] {handle, out_storage_type});
         }
 
-        out_storage_type.put(0, 2);
+        out_storage_type.put(0, 0);
         return 0;
     }
 
