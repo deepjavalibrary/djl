@@ -91,6 +91,8 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         } finally {
             executorService.shutdown();
         }
+
+        model.close();
         if (successThreads != numOfThreads) {
             logger.error("Only {}/{} threads finished.", successThreads, numOfThreads);
             return null;
