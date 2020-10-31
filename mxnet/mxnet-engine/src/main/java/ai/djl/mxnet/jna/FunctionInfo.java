@@ -88,7 +88,7 @@ public class FunctionInfo {
         Pointer[] pointers = JnaUtils.imperativeInvoke(handle, src, destRef, params);
         NDArray[] ret = new NDArray[pointers.length];
         for (int i = 0; i < pointers.length; ++i) {
-            ret[i] = manager.create(pointers[i]);
+            ret[i] = manager.create(pointers[i], null);
         }
         return ret;
     }
