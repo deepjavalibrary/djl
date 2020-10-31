@@ -199,9 +199,7 @@ public final class TrainSentimentAnalysis {
                                                 (m) -> m.ones(new Shape(1)).mul(paddingTokenValue))
                                         .build())
                         .setSourceConfiguration(
-                                new TextData.Configuration()
-                                        .setTextEmbedding(new ModelZooTextEmbedding(embeddingModel))
-                                        .setTextProcessors(TEXT_PROCESSORS))
+                                new TextData.Configuration().setTextProcessors(TEXT_PROCESSORS))
                         .optUsage(usage)
                         .optExecutor(executorService, 8)
                         .optLimit(arguments.getLimit())
