@@ -65,13 +65,14 @@ public class MxNDManager extends BaseNDManager {
      * Creates an MxNDArray with the given Native Memory Pointer and attaches to this manager.
      *
      * @param handle the array's native memory pointer
+     * @param format the {@link SparseFormat}
      * @return the created array
      */
-    public MxNDArray create(Pointer handle) {
+    public MxNDArray create(Pointer handle, SparseFormat format) {
         if (version >= 10700) {
-            return new MxNDArray(this, handle);
+            return new MxNDArray(this, handle, format);
         }
-        return new MxNDArray16(this, handle);
+        return new MxNDArray16(this, handle, format);
     }
 
     /** {@inheritDoc} */
@@ -108,7 +109,7 @@ public class MxNDManager extends BaseNDManager {
                         new DataType[] {indptrNd.getDataType(), indicesNd.getDataType()},
                         new Shape[] {indptrNd.getShape(), indicesNd.getShape()},
                         false);
-        MxNDArray sparse = create(handle);
+        MxNDArray sparse = create(handle, fmt);
         MxNDArray dataNd = create(new Shape(data.remaining()), dataType);
         dataNd.set(data);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, dataNd, -1);
@@ -133,7 +134,7 @@ public class MxNDManager extends BaseNDManager {
                         new DataType[] {indicesNd.getDataType()},
                         new Shape[] {indicesNd.getShape()},
                         false);
-        MxNDArray sparse = create(handle);
+        MxNDArray sparse = create(handle, fmt);
         MxNDArray dataNd = create(dataShape, dataType);
         dataNd.set(data);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, dataNd, -1);

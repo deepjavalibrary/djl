@@ -70,7 +70,7 @@ public class NDArrayCreationOpTest {
             long[] indptr = {0, 2, 2, 3};
             long[] indices = {0, 2, 1};
             NDArray nd = manager.createCSR(buf, indptr, indices, new Shape(3, 4));
-            float[] array = nd.toDense().toFloatArray();
+            float[] array = nd.toFloatArray();
             Assert.assertEquals(array[0], expected[0]);
             Assert.assertEquals(array[2], expected[1]);
             Assert.assertEquals(array[9], expected[2]);
@@ -85,7 +85,7 @@ public class NDArrayCreationOpTest {
             FloatBuffer buf = FloatBuffer.wrap(expected);
             long[] indices = {0, 1, 3};
             NDArray nd = manager.createRowSparse(buf, new Shape(3, 2), indices, new Shape(4, 2));
-            float[] array = nd.toDense().toFloatArray();
+            float[] array = nd.toFloatArray();
             Assert.assertEquals(array[0], expected[0]);
             Assert.assertEquals(array[1], expected[1]);
             Assert.assertEquals(array[2], expected[2]);

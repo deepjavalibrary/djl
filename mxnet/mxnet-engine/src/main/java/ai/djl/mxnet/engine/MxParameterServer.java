@@ -99,8 +99,8 @@ public class MxParameterServer extends NativeResource implements ParameterServer
         public void apply(String parameterId, Pointer recv, Pointer local, Pointer handle) {
             // updater callback arguments order is: index, gradient, weight.
             try (MxNDManager manager = MxNDManager.getSystemManager().newSubManager()) {
-                MxNDArray grad = manager.create(recv);
-                MxNDArray weight = manager.create(local);
+                MxNDArray grad = manager.create(recv, null);
+                MxNDArray weight = manager.create(local, null);
                 optimizer.update(parameterId, weight, grad);
             }
         }

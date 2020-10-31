@@ -418,12 +418,12 @@ public final class JnaUtils {
         NDList ndList = new NDList();
         if (nameCount == 0) {
             for (Pointer handle : handles) {
-                ndList.add(manager.create(handle));
+                ndList.add(manager.create(handle, null));
             }
         } else {
             String[] names = namesRef.getValue().getStringArray(0, nameCount);
             for (int i = 0; i < ndArrayCount; i++) {
-                NDArray array = manager.create(handles[i]);
+                NDArray array = manager.create(handles[i], null);
                 array.setName(names[i]);
                 ndList.add(array);
             }
@@ -1778,7 +1778,7 @@ public final class JnaUtils {
         Pointer[] ptrArray = ref.getValue().getPointerArray(0, numOutputs);
         MxNDArray[] output = new MxNDArray[numOutputs];
         for (int i = 0; i < numOutputs; i++) {
-            output[i] = manager.create(ptrArray[i]);
+            output[i] = manager.create(ptrArray[i], null);
         }
         return output;
     }

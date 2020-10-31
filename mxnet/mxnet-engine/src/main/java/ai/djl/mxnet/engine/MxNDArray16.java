@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.ndarray.types.SparseFormat;
 import com.sun.jna.Pointer;
 
 /** MXNet 1.6.0 {@code MxNDArray} implementation. */
@@ -31,8 +32,8 @@ public class MxNDArray16 extends MxNDArray {
         super(manager, handle, device, shape, dataType, hasGradient);
     }
 
-    MxNDArray16(MxNDManager manager, Pointer handle) {
-        super(manager, handle);
+    MxNDArray16(MxNDManager manager, Pointer handle, SparseFormat format) {
+        super(manager, handle, format);
     }
 
     /** {@inheritDoc} */
