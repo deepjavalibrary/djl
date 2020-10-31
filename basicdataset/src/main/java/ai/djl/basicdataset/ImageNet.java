@@ -101,23 +101,24 @@ public class ImageNet extends AbstractImageFolder {
     }
 
     private void loadSynset() {
-        InputStream classStream =
-                Thread.currentThread()
-                        .getContextClassLoader()
-                        .getResourceAsStream("imagenet/classes.json");
-        if (classStream == null) {
-            throw new AssertionError("Missing imagenet/classes.json in jar resource");
-        }
-        Reader reader = new InputStreamReader(classStream, StandardCharsets.UTF_8);
-        String[][] classes = JsonUtils.GSON.fromJson(reader, String[][].class);
-        wordNetIds = new String[classes.length];
-        classNames = new String[classes.length];
-        classFull = new String[classes.length];
-        for (int i = 0; i < classes.length; i++) {
-            wordNetIds[i] = classes[i][0];
-            classNames[i] = classes[i][1];
-            classFull[i] = classes[i][2];
-            synset.add(wordNetIds[i] + ", " + classNames[i] + ", " + classFull[i]);
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try (InputStream classStream = cl.getResourceAsStream("imagenet/classes.json")) {
+            if (classStream == null) {
+                throw new AssertionError("Missing imagenet/classes.json in jar resource");
+            }
+            Reader reader = new InputStreamReader(classStream, StandardCharsets.UTF_8);
+            String[][] classes = JsonUtils.GSON.fromJson(reader, String[][].class);
+            wordNetIds = new String[classes.length];
+            classNames = new String[classes.length];
+            classFull = new String[classes.length];
+            for (int i = 0; i < classes.length; i++) {
+                wordNetIds[i] = classes[i][0];
+                classNames[i] = classes[i][1];
+                classFull[i] = classes[i][2];
+                synset.add(wordNetIds[i] + ", " + classNames[i] + ", " + classFull[i]);
+            }
+        } catch (IOException e) {
+            throw new AssertionError("Failed to read imagenet/classes.json file.", e);
         }
     }
 
