@@ -1,0 +1,39 @@
+group 'ai.djl.paddlepaddle'
+
+repositories {
+    mavenLocal()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+}
+
+dependencies {
+    api project(":paddlepaddle:paddlepaddle-engine")
+
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+    testRuntimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}-SNAPSHOT"
+    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
+}
+
+task syncS3(type: Exec) {
+    commandLine "sh", "-c", "find . -name .DS_Store | xargs rm && aws s3 sync src/test/resources/mlrepo s3://djl-ai/mlrepo --acl public-read"
+
+    standardOutput = new ByteArrayOutputStream()
+    ext.output = {
+        return standardOutput.toString()
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "DJL model zoo for PaddlePaddle"
+                description = "DJL model zoo for PaddlePaddle"
+                url = "http://www.djl.ai/paddlepaddle/${project.name}"
+            }
+        }
+    }
+}
