@@ -5,6 +5,8 @@ configure([
         project(':serving'),
         project(':mxnet:mxnet-engine'),
         project(':mxnet:mxnet-model-zoo'),
+        project(':paddlepaddle:paddlepaddle-engine'),
+        project(':paddlepaddle:paddlepaddle-model-zoo'),
         project(':pytorch:pytorch-engine'),
         project(':pytorch:pytorch-model-zoo'),
         project(':tensorflow:tensorflow-api'),
