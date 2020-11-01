@@ -1,0 +1,261 @@
+plugins {
+    id 'maven-publish'
+    id 'signing'
+}
+
+group "ai.djl.paddlepaddle"
+
+boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
+version = "${paddlepaddle_version}" + (isRelease ? "" : "-SNAPSHOT")
+
+task prepareNativeLibs() {
+    doLast {
+        delete "${buildDir}/native"
+
+        def files = [
+                "linux/cu101": "https://files.pythonhosted.org/packages/fd/39/0b6c02541d5bfb89d922eee937b91911f11af65a243048440cfad9900ded/paddlepaddle_gpu-1.8.5.post107-cp38-cp38-manylinux1_x86_64.whl",
+                "linux/cpu"  : "https://files.pythonhosted.org/packages/6e/5b/385753db54c16b676683369f901b83a5e93429f667a37b640630d678ad93/paddlepaddle-1.8.5-cp38-cp38-manylinux1_x86_64.whl",
+                "osx/cpu"    : "https://files.pythonhosted.org/packages/ea/bf/06d7ecbebcc5c1925a2d831b441cfbac41e019c233a726c8938ed35253b9/paddlepaddle-1.8.5-cp38-cp38-macosx_10_14_x86_64.whl",
+                "win/cu101"  : "https://files.pythonhosted.org/packages/6f/23/97e5e3176f6289896e4ac4bbceffc93b5ea8c3edd7fbc008558368924612/paddlepaddle_gpu-1.8.5.post107-cp38-cp38-win_amd64.whl",
+                "win/cpu"    : "https://files.pythonhosted.org/packages/06/6e/5f32bad36f115669427cd77e73064084c7f5153481d3904e8bdd7b7e7a17/paddlepaddle-1.8.5-cp38-cp38-win_amd64.whl"
+        ]
+
+        def downloadDir = file("${buildDir}/download")
+        downloadDir.mkdirs();
+
+        files.each { entry ->
+            String url = entry.value;
+            String fileName = url.substring(url.lastIndexOf('/') + 1);
+            File file = new File(downloadDir, fileName);
+            if (!file.exists()) {
+                project.logger.lifecycle("Downloading ${entry.key} -> ${url}")
+                new URL(url).withInputStream { i -> file.withOutputStream { it << i } }
+            }
+
+            project.logger.lifecycle("Extracting native files from: ${fileName}")
+            copy {
+                from {
+                    zipTree(file).matching { include 'paddle/libs/**' }
+                }
+                into "${buildDir}/native/tmp"
+            }
+
+            File srcDir = new File("${buildDir}/native/tmp/paddle/libs")
+            File nativeDir = new File("${buildDir}/native/${entry.key}")
+            nativeDir.getParentFile().mkdirs();
+            srcDir.renameTo(nativeDir)
+            delete "${buildDir}/native/tmp"
+        }
+
+        exec {
+            commandLine "sh", "-c", "find ${buildDir}/native -type f | xargs gzip"
+        }
+
+        def f = new File("${buildDir}/native/files.txt")
+        def uploadDirs = [
+                "${buildDir}/native/linux/cpu/",
+                "${buildDir}/native/linux/cu101/",
+                "${buildDir}/native/osx/cpu/",
+                "${buildDir}/native/win/cpu/",
+                "${buildDir}/native/win/cu101/"
+        ]
+        uploadDirs.each { item ->
+            fileTree(item).files.name.each {
+                def out = item - "${buildDir}/native/"
+                f << out + it
+                f << "\n"
+            }
+        }
+
+        exec {
+            commandLine "aws", "s3", "sync", "${buildDir}/native/", "s3://djl-ai/publish/paddlepaddle-${paddlepaddle_version}/"
+        }
+    }
+}
+
+jar {
+    // this line is to enforce gradle to build the jar
+    // otherwise it don't generate the placeholder jar at times
+    // when there is no java code inside src/main
+    outputs.dir file("build/libs")
+    doFirst {
+        def dir = file("${project.buildDir}/classes/java/main/native/lib")
+        dir.mkdirs();
+        def propFile = new File(dir, "paddlepaddle.properties")
+        def versionName = project.version
+        if (!isRelease) {
+            versionName += String.format("-%s", new Date().format('yyyyMMdd'))
+        }
+        propFile.text = "placeholder=true\nversion=${project.version}\n"
+    }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+project.tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+
+signing {
+    required(project.hasProperty("staging") || project.hasProperty("snapshot"))
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications
+}
+
+def BINARY_ROOT = "${project.buildDir}/download"
+def flavorNames = file(BINARY_ROOT).list() ?: []
+flavorNames.each { flavor ->
+
+    def platformNames = file("${BINARY_ROOT}/${flavor}").list() ?: []
+
+    def artifactsNames = []
+
+    platformNames.each { osName ->
+        tasks.create(name: "${flavor}-${osName}Jar", type: Jar) {
+            doFirst {
+                def propFile = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib/paddlepaddle.properties")
+                propFile.delete()
+                def dsStore = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib/.DS_Store")
+                dsStore.delete()
+
+                def versionName = String.format("${version}-%s", new Date().format('yyyyMMdd'))
+                def dir = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib")
+                def sb = new StringBuilder()
+                sb.append("version=${versionName}\nclassifier=${flavor}-${osName}-x86_64\nlibraries=")
+                def first = true
+                for (String name : dir.list().sort()) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sb.append(',')
+                    }
+                    sb.append(name)
+                }
+                propFile.text = sb.toString()
+
+                from file("src/main/resources")
+            }
+            from file("${BINARY_ROOT}/${flavor}/${osName}")
+            archiveClassifier = "${osName}-x86_64"
+        }
+        artifactsNames.add(tasks["${flavor}-${osName}Jar"])
+    }
+
+    // Only publish if the project directory equals the current directory
+    // This means that publishing from the main project does not publish the native jars
+    // and the native jars have to be published separately
+    if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
+        publishing.publications.create("${flavor}", MavenPublication) {
+            artifactId "paddlepaddle-native-${flavor}"
+            from components.java
+            artifacts = artifactsNames
+            artifact jar
+            artifact javadocJar
+            artifact sourcesJar
+            pom {
+                name = "DJL release for PaddlePaddle native binaries"
+                description = "Deep Java Library (DJL) provided PaddlePaddle native library binary distribution"
+                url = "http://www.djl.ai/paddlepaddle/${project.name}"
+                packaging = "jar"
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                    }
+                }
+
+                scm {
+                    connection = "scm:git:git@github.com:awslabs/djl.git"
+                    developerConnection = "scm:git:git@github.com:awslabs/djl.git"
+                    url = "https://github.com/awslabs/djl"
+                    tag = "HEAD"
+                }
+
+                developers {
+                    developer {
+                        name = "DJL.AI Team"
+                        email = "djl-dev@amazon.com"
+                        organization = "Amazon AI"
+                        organizationUrl = "https://amazon.com"
+                    }
+                }
+            }
+        }
+    }
+}
+
+publishing.repositories {
+    maven {
+        if (project.hasProperty("snapshot")) {
+            name = "snapshot"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+            credentials {
+                username = findProperty("ossrhUsername")
+                password = findProperty("ossrhPassword")
+            }
+        } else if (project.hasProperty("staging")) {
+            name = "staging"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = findProperty("ossrhUsername")
+                password = findProperty("ossrhPassword")
+            }
+        } else {
+            name = "local"
+            url = "build/repo"
+        }
+    }
+}
+
+
+import java.util.zip.GZIPInputStream
+
+task downloadpaddlepaddleNativeLib() {
+    doLast {
+        def url = "https://djl-ai.s3.amazonaws.com/publish/paddlepaddle-${paddlepaddle_version}"
+        def files = [
+                "linux/cpu/libdnnl.so.1.gz"            : "cpu/linux/native/lib/libdnnl.so.1",
+                "linux/cpu/libiomp5.so.gz"             : "cpu/linux/native/lib/libiomp5.so",
+                "linux/cpu/libmkldnn.so.0.gz"          : "cpu/linux/native/lib/libmkldnn.so.0",
+                "linux/cpu/libmklml_intel.so.gz"       : "cpu/linux/native/lib/libmklml_intel.so",
+                "linux/cpu/libpaddle_framework.so.gz"  : "cpu/linux/native/lib/libpaddle_framework.so",
+                "linux/cpu/libwarpctc.so.gz"           : "cpu/linux/native/lib/libwarpctc.so",
+                "linux/cu101/libdnnl.so.1.gz"          : "cu101/linux/native/lib/libdnnl.so.1",
+                "linux/cu101/libiomp5.so.gz"           : "cu101/linux/native/lib/libiomp5.so",
+                "linux/cu101/libmkldnn.so.0.gz"        : "cu101/linux/native/lib/libmkldnn.so.0",
+                "linux/cu101/libmklml_intel.so.gz"     : "cu101/linux/native/lib/libmklml_intel.so",
+                "linux/cu101/libpaddle_framework.so.gz": "cu101/linux/native/lib/libpaddle_framework.so",
+                "linux/cu101/libwarpctc.so.gz"         : "cu101/linux/native/lib/libwarpctc.so",
+                "osx/cpu/libwarpctc.dylib.gz"          : "cpu/osx/native/lib/libwarpctc.dylib",
+                "win/cpu/libiomp5md.dll.gz"            : "cpu/win/native/lib/libiomp5md.dll",
+                "win/cpu/mkldnn.dll.gz"                : "cpu/win/native/lib/mkldnn.dll",
+                "win/cpu/mklml.dll.gz"                 : "cpu/win/native/lib/mklml.dll",
+                "win/cpu/msvcr120.dll.gz"              : "cpu/win/native/lib/msvcr120.dll",
+                "win/cpu/warpctc.dll.gz"               : "cpu/win/native/lib/warpctc.dll",
+                "win/cu101/libiomp5md.dll.gz"          : "cu101/win/native/lib/libiomp5md.dll",
+                "win/cu101/mkldnn.dll.gz"              : "cu101/win/native/lib/mkldnn.dll",
+                "win/cu101/mklml.dll.gz"               : "cu101/win/native/lib/mklml.dll",
+                "win/cu101/msvcr120.dll.gz"            : "cu101/win/native/lib/msvcr120.dll",
+                "win/cu101/warpctc.dll.gz"             : "cu101/win/native/lib/warpctc.dll",
+        ]
+
+        files.each { entry ->
+            project.logger.lifecycle("Downloading ${url}/${entry.key}")
+            def file = new File("${BINARY_ROOT}/${entry.value}")
+            file.getParentFile().mkdirs()
+            new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << new GZIPInputStream(i) } }
+        }
+
+        new File("${BINARY_ROOT}/auto").mkdirs()
+    }
+}
+
+if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
+    tasks.getByName("spotbugsMain").enabled = false
+}
