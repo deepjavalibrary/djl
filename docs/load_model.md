@@ -106,13 +106,19 @@ If your the directory or archive file has nested folder, are include the folder 
 to find model files:
 
 ```
-file://var/models/resnet.zip?artifact_id=resenet-18&model_name=saved_model/resnet-18
+file:///var/models/resnet.zip?artifact_id=resenet-18&model_name=saved_model/resnet-18
 ```
 
 ### Load model from a URL
 
-DJL supports loading a model from a HTTP(s) URL. Since a model consists multiple files, the URL must be
+DJL supports loading a model from a URL. Since a model consists multiple files, some of URL must be
 an [archive file](#current-supported-archive-formats).
+
+Current supported URL scheme:
+
+- file:// load a model from local directory or archive file
+- http(s):// load a model from an archive file from web server  
+- jar:// load a model from an archive file in the class path
 
 ```java
 Criteria<Image, Classifications> criteria = Criteria.builder()
