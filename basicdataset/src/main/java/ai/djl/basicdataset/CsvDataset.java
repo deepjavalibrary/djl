@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.basicdataset.utils.DynamicBuffer;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
@@ -23,7 +24,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -102,20 +102,14 @@ public class CsvDataset extends RandomAccessDataset {
     }
 
     protected NDList toNDList(NDManager manager, CSVRecord record, List<Feature> selected) {
-        int length = 0;
-        for (Feature feature : selected) {
-            length += feature.featurizer.length();
-        }
-
-        ByteBuffer bb = manager.allocateDirect(length * 4);
-        FloatBuffer buf = bb.asFloatBuffer();
+        DynamicBuffer bb = new DynamicBuffer();
         for (Feature feature : selected) {
             String name = feature.getName();
             String value = record.get(name);
-            feature.featurizer.featurize(buf, value);
+            feature.featurizer.featurize(bb, value);
         }
-        buf.rewind();
-        return new NDList(manager.create(buf, new Shape(length)));
+        FloatBuffer buf = bb.getBuffer();
+        return new NDList(manager.create(buf, new Shape(bb.getLength())));
     }
 
     /** Used to build a {@link CsvDataset}. */
@@ -292,19 +286,12 @@ public class CsvDataset extends RandomAccessDataset {
     public interface Featurizer {
 
         /**
-         * Returns the encoded float array length.
-         *
-         * @return the encoded float array length
-         */
-        int length();
-
-        /**
          * Puts encoded data into the float buffer.
          *
          * @param buf the float buffer to be filled
          * @param input the string input
          */
-        void featurize(FloatBuffer buf, String input);
+        void featurize(DynamicBuffer buf, String input);
     }
 
     /** A class contains feature name and its {@code Featurizer}. */
@@ -374,13 +361,7 @@ public class CsvDataset extends RandomAccessDataset {
 
         /** {@inheritDoc} */
         @Override
-        public int length() {
-            return 1;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void featurize(FloatBuffer buf, String input) {
+        public void featurize(DynamicBuffer buf, String input) {
             buf.put(Float.parseFloat(input));
         }
     }
@@ -403,21 +384,11 @@ public class CsvDataset extends RandomAccessDataset {
 
         /** {@inheritDoc} */
         @Override
-        public int length() {
+        public void featurize(DynamicBuffer buf, String input) {
             if (onehotEncode) {
-                return map.size();
-            }
-            return 1;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void featurize(FloatBuffer buf, String input) {
-            if (onehotEncode) {
-                int pos = buf.position();
-                buf.position(pos + map.get(input));
-                buf.put(1);
-                buf.position(pos + map.size());
+                for (int i = 0; i < map.size(); ++i) {
+                    buf.put(i == map.get(input) ? 1 : 0);
+                }
                 return;
             }
 
