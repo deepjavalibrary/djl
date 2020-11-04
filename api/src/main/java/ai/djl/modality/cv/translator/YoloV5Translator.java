@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -280,7 +280,7 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
         /** Optional location within the source image for the location of the recognized object. */
         private Rectangle location;
 
-        private IntermediateResult(
+        IntermediateResult(
                 String id, double confidence, int detectedClass, Rectangle location) {
             this.confidence = confidence;
             this.id = id;
