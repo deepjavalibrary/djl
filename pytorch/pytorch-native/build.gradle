@@ -6,7 +6,7 @@ plugins {
 group = "ai.djl.pytorch"
 apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
-def VERSION = "1.6.0"
+def VERSION = "1.7.0"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 boolean isPrecxx11 = project.hasProperty("precxx11")
 version = VERSION + (isRelease ? "" : "-SNAPSHOT")
@@ -194,8 +194,10 @@ task downloadPyTorchNativeLib() {
                 "cpu/libtorch-win-shared-with-deps-${VERSION}%2Bcpu.zip"          : "cpu/win",
                 "cu101/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu101.zip": "cu101/linux",
                 "cu102/libtorch-cxx11-abi-shared-with-deps-${VERSION}.zip"        : "cu102/linux",
+                "cu110/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu110.zip": "cu110/linux",
                 "cu101/libtorch-win-shared-with-deps-${VERSION}%2Bcu101.zip"      : "cu101/win",
-                "cu102/libtorch-win-shared-with-deps-${VERSION}.zip"              : "cu102/win"
+                "cu102/libtorch-win-shared-with-deps-${VERSION}.zip"              : "cu102/win",
+                "cu110/libtorch-win-shared-with-deps-${VERSION}%2Bcu110.zip"      : "cu110/win"
         ]
         if (isPrecxx11) {
             // precxx11 only support cpu for now
