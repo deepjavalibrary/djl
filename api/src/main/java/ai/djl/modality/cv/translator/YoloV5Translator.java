@@ -18,10 +18,10 @@ import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
-import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -30,21 +30,19 @@ import java.util.PriorityQueue;
  * here: https://github.com/ultralytics/yolov5
  */
 public class YoloV5Translator extends ObjectDetectionTranslator {
+
     private YoloOutputType yoloOutputLayerType;
-    private double nmsThresh = 0.4;
+    private float nmsThreshold;
 
     /**
      * Constructs an ImageTranslator with the provided builder.
      *
      * @param builder the data to build with
      */
-    public YoloV5Translator(Builder builder) {
-        this(builder, YoloOutputType.AUTO);
-    }
-
-    protected YoloV5Translator(Builder builder, YoloOutputType yoloOutputLayerType) {
+    protected YoloV5Translator(Builder builder) {
         super(builder);
-        this.yoloOutputLayerType = yoloOutputLayerType;
+        yoloOutputLayerType = builder.outputType;
+        nmsThreshold = builder.nmsThreshold;
     }
 
     /**
@@ -97,24 +95,6 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
         return (a.getWidth()) * (a.getHeight()) + (b.getWidth()) * (b.getHeight()) - i;
     }
 
-    /**
-     * Returns the threshold value used for non max suppression.
-     *
-     * @return The threshold value
-     */
-    public double getNmsThresh() {
-        return nmsThresh;
-    }
-
-    /**
-     * Configure the threshold value for non max suppression.
-     *
-     * @param nmsThresh Threshold value for non max suppression
-     */
-    public void setNmsThresh(double nmsThresh) {
-        this.nmsThresh = nmsThresh;
-    }
-
     protected DetectedObjects nms(List<IntermediateResult> list) {
         List<String> retClasses = new ArrayList<>();
         List<Double> retProbs = new ArrayList<>();
@@ -150,7 +130,7 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
                 for (int j = 1; j < detections.length; j++) {
                     IntermediateResult detection = detections[j];
                     Rectangle location = detection.getLocation();
-                    if (boxIou(rec, location) < nmsThresh) {
+                    if (boxIou(rec, location) < nmsThreshold) {
                         pq.add(detection);
                     }
                 }
@@ -190,16 +170,10 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
                 float yPos = boxes[1];
                 float w = boxes[2];
                 float h = boxes[3];
+                Rectangle rect =
+                        new Rectangle(Math.max(0, xPos - w / 2), Math.max(0, yPos - h / 2), w, h);
                 intermediateResults.add(
-                        new IntermediateResult(
-                                classes.get(maxIndex),
-                                score,
-                                maxIndex,
-                                new Rectangle(
-                                        Math.max(0, xPos - w / 2),
-                                        Math.max(0, yPos - h / 2),
-                                        w,
-                                        h)));
+                        new IntermediateResult(classes.get(maxIndex), score, maxIndex, rect));
             }
         }
         return nms(intermediateResults);
@@ -214,8 +188,6 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
         switch (yoloOutputLayerType) {
-            case BOX:
-                return processFromBoxOutput(list);
             case DETECT:
                 return processFromDetectOutput();
             case AUTO:
@@ -224,12 +196,14 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
                 } else {
                     return processFromBoxOutput(list);
                 }
+            case BOX:
             default:
                 return processFromBoxOutput(list);
         }
     }
 
-    protected enum YoloOutputType {
+    /** A enum represents the Yolo output type. */
+    public enum YoloOutputType {
         BOX,
         DETECT,
         AUTO
@@ -237,6 +211,47 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
 
     /** The builder for {@link YoloV5Translator}. */
     public static class Builder extends ObjectDetectionBuilder<YoloV5Translator.Builder> {
+
+        YoloOutputType outputType = YoloOutputType.AUTO;
+        float nmsThreshold = 0.4f;
+
+        /**
+         * Sets the {@code YoloOutputType}.
+         *
+         * @param outputType the {@code YoloOutputType}
+         * @return this builder
+         */
+        public Builder optOutputType(YoloOutputType outputType) {
+            this.outputType = outputType;
+            return this;
+        }
+
+        /**
+         * Sets the NMS threshold.
+         *
+         * @param nmsThreshold the NMS threshold
+         * @return this builder
+         */
+        public Builder optNmsThreshold(float nmsThreshold) {
+            this.nmsThreshold = nmsThreshold;
+            return this;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected Builder self() {
+            return this;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected void configPostProcess(Map<String, ?> arguments) {
+            super.configPostProcess(arguments);
+            String type = getStringValue(arguments, "outputType", "AUTO");
+            outputType = YoloOutputType.valueOf(type.toUpperCase(Locale.ENGLISH));
+            nmsThreshold = getFloatValue(arguments, "nmsThreshold", 0.4f);
+        }
+
         /**
          * Builds the translator.
          *
@@ -245,43 +260,35 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
         public YoloV5Translator build() {
             // custom pipeline to match default YoloV5 input layer
             if (pipeline == null) {
-                pipeline =
-                        new Pipeline()
-                                .add(
-                                        array ->
-                                                array.transpose(2, 0, 1)
-                                                        .toType(DataType.FLOAT32, false)
-                                                        .div(255));
+                addTransform(
+                        array -> array.transpose(2, 0, 1).toType(DataType.FLOAT32, false).div(255));
             }
             validate();
             return new YoloV5Translator(this);
         }
-
-        /** {@inheritDoc} */
-        @Override
-        protected YoloV5Translator.Builder self() {
-            return this;
-        }
     }
 
     private static final class IntermediateResult {
+
         /**
          * A sortable score for how good the recognition is relative to others. Higher should be
          * better.
          */
         private double confidence;
+
         /** Display name for the recognition. */
         private int detectedClass;
+
         /**
          * A unique identifier for what has been recognized. Specific to the class, not the instance
          * of the object.
          */
         private String id;
+
         /** Optional location within the source image for the location of the recognized object. */
         private Rectangle location;
 
-        IntermediateResult(
-                String id, double confidence, int detectedClass, Rectangle location) {
+        IntermediateResult(String id, double confidence, int detectedClass, Rectangle location) {
             this.confidence = confidence;
             this.id = id;
             this.detectedClass = detectedClass;
