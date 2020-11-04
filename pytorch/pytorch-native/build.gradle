@@ -79,6 +79,8 @@ task releaseJNI {
             cleanBuild()
             downloadBuild("win", "cu102")
             cleanBuild()
+            downloadBuild("win", "cu110")
+            cleanBuild()
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
             downloadBuild("osx", "cpu")
             cleanBuild()
@@ -90,6 +92,8 @@ task releaseJNI {
                 downloadBuild("linux", "cu101", isPrecxx11)
                 cleanBuild()
                 downloadBuild("linux", "cu102", isPrecxx11)
+                cleanBuild()
+                downloadBuild("linux", "cu110", isPrecxx11)
                 cleanBuild()
             }
         } else {

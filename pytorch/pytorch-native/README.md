@@ -80,8 +80,8 @@ It uses clang-format to format the code.
 
 ### Step 3: Upload the new version of libtorch dependencies to S3
 
-1. Spin up a EC2 instance and `cd pytorch/pytorch-native && ./gradlew downloadPyTorchNativeLib`
-2. `cd build/native/lib` and gzip all dependencies
+1. Spin up a EC2 instance and `cd pytorch/pytorch-native && ./gradlew dPTNL`
+2. `cd build/native/lib` and gzip all dependencies (`gzip -r download`)
 3. Create a new pytorch-X.X.X in ai.djl/publish bucket with djl-prod account.
 4. `aws s3 sync build/native/lib s3://djl-ai/publish/pytorch-X.X.X`
 
