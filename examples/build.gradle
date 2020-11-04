@@ -59,6 +59,7 @@ task benchmark(type: JavaExec) {
                 line = line[1].split(" ");
                 if (line.contains("-t")) {
                     if (System.properties["ai.djl.default_engine"] == "PyTorch") {
+                        System.setProperty("ai.djl.disable_close_resource_on_finalize", "true")
                         System.setProperty("ai.djl.pytorch.num_interop_threads", "1")
                         System.setProperty("ai.djl.pytorch.num_threads", "1")
                     } else if (System.properties["ai.djl.default_engine"] == "TensorFlow") {
@@ -66,6 +67,7 @@ task benchmark(type: JavaExec) {
                         environment("TF_NUM_INTEROP_THREADS", "1")
                         environment("TF_NUM_INTRAOP_THREADS", "1")
                     } else {
+                        System.setProperty("ai.djl.disable_close_resource_on_finalize", "true")
                         environment("MXNET_ENGINE_TYPE", "NaiveEngine")
                         environment("OMP_NUM_THREADS", "1")
                     }
