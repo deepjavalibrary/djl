@@ -24,7 +24,8 @@ import org.testng.annotations.Test;
 
 public class TrainSentimentAnalysisTest {
 
-    @Test
+    // TODO: enable after fix the test
+    @Test(enabled = false)
     public void testTrainSentimentAnalysis()
             throws MalformedModelException, ModelNotFoundException, TranslateException,
                     IOException {

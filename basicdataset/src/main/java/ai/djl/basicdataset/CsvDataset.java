@@ -20,6 +20,7 @@ import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.util.Progress;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
@@ -32,6 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -74,10 +76,17 @@ public class CsvDataset extends RandomAccessDataset {
     /** {@inheritDoc} */
     @Override
     public void prepare(Progress progress) throws IOException {
-        try (Reader reader = new InputStreamReader(csvUrl.openStream(), StandardCharsets.UTF_8)) {
+        try (Reader reader = new InputStreamReader(getCsvStream(), StandardCharsets.UTF_8)) {
             CSVParser csvParser = new CSVParser(reader, csvFormat);
             csvRecords = csvParser.getRecords();
         }
+    }
+
+    private InputStream getCsvStream() throws IOException {
+        if (csvUrl.getFile().endsWith(".gz")) {
+            return new GZIPInputStream(csvUrl.openStream());
+        }
+        return csvUrl.openStream();
     }
 
     /**
