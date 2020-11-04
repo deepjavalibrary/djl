@@ -1,4 +1,4 @@
-# DJL Future Lab
+# Interactive Development
 
 This sections introduces the amazing toolkits that the DJL team developed to simplify the Java user experience.
 Without additional setup, you can easily run the tool kits online and export the project into your local system. Let’s get started.
