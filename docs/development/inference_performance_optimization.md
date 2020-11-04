@@ -1,4 +1,4 @@
-# Inference Performance Optimization with DJL
+# Inference Performance Optimization
 
 The document covers several tricks of how you can tune your inference performance based on the engine you use 
 including multithreading support, engine threads configuration and how to enable DNNL(MKLDNN).

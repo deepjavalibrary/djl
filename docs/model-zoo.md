@@ -1,4 +1,4 @@
-# DJL - Model Zoo
+# Model Zoo
 
 Deep Java Library's (DJL) Model Zoo is more than a collection of pre-trained models. It's a bridge between a model vendor and a consumer. It provides a framework for developers to create and publish their own models. 
 

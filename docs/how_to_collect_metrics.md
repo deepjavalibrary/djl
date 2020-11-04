@@ -1,5 +1,4 @@
-# Metrics in DJL
-
+# Metrics
 
 Deep Java Library (DJL) comes with utility classes to make it easy to capture performance metrics
 and other metrics during runtime. These metrics can be used to analyze and monitor inference,

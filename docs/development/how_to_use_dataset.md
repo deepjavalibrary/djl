@@ -1,4 +1,4 @@
-# Dataset in DJL
+# Dataset Creation
 
 The Dataset in DJL represents both the raw data and loading process.
 RandomAccessDataset implements the Dataset interface and provides comprehensive data loading functionality.
@@ -85,7 +85,7 @@ List<String> synset = dataset.getSynset();
 
 Typically, you would add pre-processing pipelines like Resize(), in order to batchify the dataset, and ToTensor(), which converts the image NDArray to Tensor NDArray.
 
-## How to create your own dataset
+## How to create a custom dataset
 
 If the provided Datasets don't meet your requirements, you can also easily extend our dataset to create your own customized dataset.
 

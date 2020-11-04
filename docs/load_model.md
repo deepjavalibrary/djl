@@ -1,4 +1,4 @@
-# How to load model
+# Model Loading
 
 A model is a collection of artifacts that is created by the training process.
 In deep learning, running inference on a Model usually involves pre-processing and post-processing.

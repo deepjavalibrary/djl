@@ -37,50 +37,60 @@ plugins:
       regex:
         - '.*\.(symbol|params|pt|jar|gz|zip|txt|json|sh|bat|cmd|puml|g4|java|py|cc|h|pro|properties|xml|gradlew|gradle|Dockerfile|RepositoryFactory|EngineProvider|ZooProvider)$|(docker|integration|testing|tools)/.*$'
 nav:
-  - HOME: 'README.md'
-  - 'docs/quick_start.md'
-  - 'docs/interactive_tool.md'
-  - 'docs/README.md'
-  - 'examples/README.md'
-  - 'docs/development/README.md'
-  - 'docs/roadmap.md'
-  - 'docs/faq.md'
-  - User manual:
-      - 'docs/development/setup.md'
-      - 'docs/model-zoo.md'
-      - 'docs/dataset.md'
-      - 'docs/load_model.md'
+  - Home:
+      - Main: 'README.md'
+      - 'docs/quick_start.md'
+      - 'docs/README.md'
+      - 'examples/README.md'
+      - 'docs/interactive_tool.md'
+      - Contributor Documentation:
+          - Main: 'docs/development/README.md'
+          - 'docs/development/setup.md'
+          - 'docs/development/development_guideline.md'
+          - 'docs/development/troubleshooting.md'
+          - 'docs/development/add_model_to_model-zoo.md'
+      - 'docs/roadmap.md'
+      - 'docs/faq.md'
+  - User Manual:
+      - Models:
+          - 'docs/load_model.md'
+          - 'docs/model-zoo.md'
+      - Datasets:
+          - 'docs/dataset.md'
+          - 'docs/development/how_to_use_dataset.md'
       - 'docs/development/configure_logging.md'
+      - 'docs/how_to_collect_metrics.md'
       - 'docs/development/cache_management.md'
       - 'docs/development/memory_management.md'
-      - 'docs/development/how_to_use_dataset.md'
-      - 'docs/how_to_collect_metrics.md'
-      - 'docs/development/troubleshooting.md'
       - 'docs/development/inference_performance_optimization.md'
-  - MXNet:
+  - Apache MXNet:
       - Overview: 'mxnet/README.md'
-      - MXNet Engine: 'mxnet/mxnet-engine/README.md'
-      - MXNet Model Zoo: 'mxnet/mxnet-model-zoo/README.md'
-      - MXNet native library: 'mxnet/native/README.md'
       - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
       - Load a MXNet Model: 'jupyter/load_mxnet_model.ipynb'
+      - Modules:
+        - MXNet Engine: 'mxnet/mxnet-engine/README.md'
+        - MXNet Model Zoo: 'mxnet/mxnet-model-zoo/README.md'
+        - MXNet native library: 'mxnet/native/README.md'
   - ONNX Runtime:
-      - Overview: 'onnxruntime/onnxruntime-engine/README.md'
       - ONNX runtime Hybrid Engine: 'docs/onnxruntime/hybrid_engine.md'
       - Load a ONNX Model: 'jupyter/onnxruntime/machine_learning_with_ONNXRuntime.ipynb'
+      - Module: 'onnxruntime/onnxruntime-engine/README.md'
   - PyTorch:
       - Overview: 'pytorch/README.md'
-      - PyTorch Engine: 'pytorch/pytorch-engine/README.md'
-      - PyTorch Model Zoo: 'pytorch/pytorch-model-zoo/README.md'
-      - Pytorch native library: 'pytorch/pytorch-native/README.md'
-      - Import PyTorch Model: 'docs/pytorch/how_to_convert_your_model_to_torchscript.md'
-      - Load a PyTorch Model: 'jupyter/load_pytorch_model.ipynb'
+      - Importing from PyTorch:
+        - Converting the Model: 'docs/pytorch/how_to_convert_your_model_to_torchscript.md'
+        - Loading the Model: 'jupyter/load_pytorch_model.ipynb'
+      - Modules:
+        - PyTorch Engine: 'pytorch/pytorch-engine/README.md'
+        - PyTorch Model Zoo: 'pytorch/pytorch-model-zoo/README.md'
+        - Pytorch native library: 'pytorch/pytorch-native/README.md'
   - TensorFlow:
       - Overview: 'tensorflow/README.md'
-      - TensorFlow Engine: 'tensorflow/tensorflow-engine/README.md'
-      - TensorFlow Model Zoo: 'tensorflow/tensorflow-model-zoo/README.md'
       - Import TensorFlow Model: 'docs/tensorflow/how_to_import_tensorflow_models_in_DJL.md'
       - Load a TensorFlow Model: 'jupyter/tensorflow/pneumonia_detection.ipynb'
+      - Modules:
+        - TensorFlow Engine: 'tensorflow/tensorflow-engine/README.md'
+        - TensorFlow Model Zoo: 'tensorflow/tensorflow-model-zoo/README.md'
   - Extensions:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'
