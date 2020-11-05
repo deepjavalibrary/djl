@@ -271,9 +271,6 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
-        if (getSparseFormat() != SparseFormat.DENSE) {
-            throw new IllegalStateException("Please convert sparse NDArray to dense");
-        }
         Shape sh = getShape();
         DataType dType = getDataType();
         long product = sh.size();
@@ -287,9 +284,6 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
-        if (getSparseFormat() != SparseFormat.DENSE) {
-            throw new IllegalStateException("Unsupported operation for Sparse");
-        }
         int size = data.remaining();
         // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
         DataType inputType = DataType.fromBuffer(data);
