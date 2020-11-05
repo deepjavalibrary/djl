@@ -59,6 +59,7 @@ public final class FashionMnist extends ArrayDataset {
     private FashionMnist(FashionMnist.Builder builder) {
         super(builder);
         this.manager = builder.manager;
+        this.manager.setName("fashionmnist");
         this.usage = builder.usage;
         MRL mrl = MRL.dataset(CV.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, "1.0");

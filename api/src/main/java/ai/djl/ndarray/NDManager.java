@@ -642,6 +642,20 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Sets the name for the NDManager.
+     *
+     * @param name the name assigned to the manager
+     */
+    void setName(String name);
+
+    /**
+     * Gets the name of the NDManager.
+     *
+     * @return name
+     */
+    String getName();
+
+    /**
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.
      *
      * @param shape the {@link Shape} of the {@link NDArray}

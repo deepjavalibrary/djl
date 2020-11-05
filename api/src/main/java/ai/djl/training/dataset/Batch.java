@@ -71,6 +71,7 @@ public class Batch implements AutoCloseable {
             long progress,
             long progressTotal) {
         this.manager = manager;
+        this.manager.setName("batch");
         data.attach(manager);
         labels.attach(manager);
         this.data = data;

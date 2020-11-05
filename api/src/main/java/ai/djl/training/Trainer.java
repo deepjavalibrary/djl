@@ -83,6 +83,7 @@ public class Trainer implements AutoCloseable {
     public Trainer(Model model, TrainingConfig trainingConfig) {
         this.model = model;
         manager = model.getNDManager().newSubManager();
+        manager.setName("trainer");
         devices = trainingConfig.getDevices();
         loss = trainingConfig.getLossFunction();
         dataManager = trainingConfig.getDataManager();

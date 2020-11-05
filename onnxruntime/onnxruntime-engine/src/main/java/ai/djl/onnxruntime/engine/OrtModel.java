@@ -49,6 +49,7 @@ public class OrtModel extends BaseModel {
     OrtModel(String name, NDManager manager, OrtEnvironment env) {
         super(name);
         this.manager = manager;
+        this.manager.setName("ortModel");
         this.env = env;
         dataType = DataType.FLOAT32;
     }

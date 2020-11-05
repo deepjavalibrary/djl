@@ -62,6 +62,7 @@ public class MxModel extends BaseModel {
         dataType = DataType.FLOAT32;
         properties = new ConcurrentHashMap<>();
         manager = MxNDManager.getSystemManager().newSubManager(device);
+        manager.setName("mxModel");
     }
 
     /**

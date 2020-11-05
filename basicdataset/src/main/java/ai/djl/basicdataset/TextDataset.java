@@ -61,6 +61,7 @@ public abstract class TextDataset extends RandomAccessDataset {
                 new TextData(
                         TextData.getDefaultConfiguration().update(builder.targetConfiguration));
         manager = builder.manager;
+        manager.setName("textDataset");
         usage = builder.usage;
     }
 

@@ -57,6 +57,7 @@ public final class Cifar10 extends ArrayDataset {
     Cifar10(Builder builder) {
         super(builder);
         this.manager = builder.manager;
+        this.manager.setName("cifar10");
         this.usage = builder.usage;
         MRL mrl = MRL.dataset(CV.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, "1.0");

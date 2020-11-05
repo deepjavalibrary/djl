@@ -69,6 +69,16 @@ public class MockNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public void setName(String name) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray zeros(Shape shape, DataType dataType) {
         return null;
     }
