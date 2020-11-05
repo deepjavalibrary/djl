@@ -119,14 +119,12 @@ public class ParameterStore {
                 }
             } else {
                 if (copy || !array.getDevice().equals(device)) {
-                    synchronized (array) {
-                        array = array.toDevice(device, true);
-                        array.attach(manager);
-                        // some parameter doesn't require grad
-                        // for example running_mean in BatchNorm
-                        if (parameter.requireGradient() && training) {
-                            array.attachGradient();
-                        }
+                    array = array.toDevice(device, true);
+                    array.attach(manager);
+                    // some parameter doesn't require grad
+                    // for example running_mean in BatchNorm
+                    if (parameter.requireGradient() && training) {
+                        array.attachGradient();
                     }
                 }
                 data.add(array);
