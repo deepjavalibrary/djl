@@ -481,7 +481,7 @@ public final class JnaUtils {
         checkCall(LIB.MXNDArraySyncCopyFromCPU(ndArray, pointer, size));
     }
 
-    public static Pointer[] imperativeInvoke(
+    public static PairList<Pointer, SparseFormat> imperativeInvoke(
             Pointer function,
             PointerArray inputs,
             PointerByReference destRef,
@@ -495,11 +495,12 @@ public final class JnaUtils {
             keys = params.keyArray(EMPTY_ARRAY);
             values = params.values().stream().map(Object::toString).toArray(String[]::new);
         }
+        PointerByReference destSType = new PointerByReference();
         IntBuffer numOutputs = IntBuffer.allocate(1);
         numOutputs.put(0, 1);
 
         checkCall(
-                LIB.MXImperativeInvoke(
+                LIB.MXImperativeInvokeEx(
                         function,
                         inputs.numElements(),
                         inputs,
@@ -507,9 +508,16 @@ public final class JnaUtils {
                         destRef,
                         keys.length,
                         keys,
-                        values));
+                        values,
+                        destSType));
         int numOfOutputs = numOutputs.get(0);
-        return destRef.getValue().getPointerArray(0, numOfOutputs);
+        Pointer[] ptrArray = destRef.getValue().getPointerArray(0, numOfOutputs);
+        int[] sTypes = destSType.getValue().getIntArray(0, numOfOutputs);
+        PairList<Pointer, SparseFormat> pairList = new PairList<>();
+        for (int i = 0; i < numOfOutputs; i++) {
+            pairList.add(ptrArray[i], SparseFormat.fromValue(sTypes[i]));
+        }
+        return pairList;
     }
 
     public static SparseFormat getStorageType(Pointer ndArray) {
@@ -1713,7 +1721,7 @@ public final class JnaUtils {
      * @param training true if CachedOp is created to forward in traning otherwise, false
      * @return a CachedOp for inference
      */
-    public static synchronized CachedOp createCachedOp(
+    public static CachedOp createCachedOp(
             MxSymbolBlock block, MxNDManager manager, boolean training) {
         Symbol symbol = block.getSymbol();
 
@@ -1773,12 +1781,20 @@ public final class JnaUtils {
         PointerArray array = new PointerArray(inputHandles);
         IntBuffer buf = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
-        checkCall(LIB.MXInvokeCachedOp(cachedOpHandle, inputs.length, array, buf, ref));
+        PointerByReference outSTypeRef = new PointerByReference();
+        checkCall(
+                LIB.MXInvokeCachedOpEx(
+                        cachedOpHandle, inputs.length, array, buf, ref, outSTypeRef));
         int numOutputs = buf.get();
         Pointer[] ptrArray = ref.getValue().getPointerArray(0, numOutputs);
+        int[] sTypes = outSTypeRef.getValue().getIntArray(0, numOutputs);
         MxNDArray[] output = new MxNDArray[numOutputs];
         for (int i = 0; i < numOutputs; i++) {
-            output[i] = manager.create(ptrArray[i]);
+            if (sTypes[i] != 0) {
+                output[i] = manager.create(ptrArray[i], SparseFormat.fromValue(sTypes[i]));
+            } else {
+                output[i] = manager.create(ptrArray[i]);
+            }
         }
         return output;
     }

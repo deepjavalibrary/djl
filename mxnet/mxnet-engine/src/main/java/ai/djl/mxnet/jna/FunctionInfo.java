@@ -13,6 +13,7 @@
 package ai.djl.mxnet.jna;
 
 import ai.djl.Device;
+import ai.djl.mxnet.engine.MxNDArray;
 import ai.djl.mxnet.engine.MxNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
@@ -56,8 +57,7 @@ public class FunctionInfo {
         checkDevices(dest);
         PointerArray srcHandles = JnaUtils.toPointerArray(src);
         PointerByReference destRef = new PointerByReference(JnaUtils.toPointerArray(dest));
-        JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params);
-        return 0;
+        return JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params).size();
     }
 
     /**
@@ -86,17 +86,18 @@ public class FunctionInfo {
      */
     private NDArray[] invoke(MxNDManager manager, PointerArray src, PairList<String, ?> params) {
         PointerByReference destRef = new PointerByReference();
-        Pointer[] pointers = JnaUtils.imperativeInvoke(handle, src, destRef, params);
-        NDArray[] ret = new NDArray[pointers.length];
-        for (int i = 0; i < pointers.length; ++i) {
-            SparseFormat format = JnaUtils.getStorageType(pointers[i]);
-            if (format != SparseFormat.DENSE) {
-                ret[i] = manager.create(pointers[i], format);
-            } else {
-                ret[i] = manager.create(pointers[i]);
-            }
-        }
-        return ret;
+
+        PairList<Pointer, SparseFormat> pairList =
+                JnaUtils.imperativeInvoke(handle, src, destRef, params);
+        return pairList.stream()
+                .map(
+                        pair -> {
+                            if (pair.getValue() != SparseFormat.DENSE) {
+                                return manager.create(pair.getKey(), pair.getValue());
+                            }
+                            return manager.create(pair.getKey());
+                        })
+                .toArray(MxNDArray[]::new);
     }
 
     /**
