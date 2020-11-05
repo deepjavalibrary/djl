@@ -36,6 +36,7 @@ public interface ParameterServer extends AutoCloseable {
     default void update(String parameterId, NDArray[] params) {
         NDArray[] grads = Arrays.stream(params).map(NDArray::getGradient).toArray(NDArray[]::new);
         update(parameterId, grads, params);
+        Arrays.stream(grads).forEach(NDArray::close);
     }
     /**
      * Updates the parameter of a key from Parameter Server.
