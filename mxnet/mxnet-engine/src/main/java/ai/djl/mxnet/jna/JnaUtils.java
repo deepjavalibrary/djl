@@ -27,7 +27,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.Parameter;
 import ai.djl.util.PairList;
-import ai.djl.util.Preconditions;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
@@ -64,9 +63,6 @@ public final class JnaUtils {
     private static final String[] OP_NAME_PREFIX = {
         "_contrib_", "_linalg_", "_sparse_", "_image_", "_random_"
     };
-
-    public static final String MXNET_THREAD_SAFE_PREDICTOR =
-            "ai.djl.mxnet.use_thread_safe_predictor";
 
     private static final MxnetLibrary LIB = LibUtils.loadLibrary();
 
@@ -1750,20 +1746,7 @@ public final class JnaUtils {
         String[] keys = {"data_indices", "param_indices", "static_alloc", "static_shape"};
         String[] values = {dataIndices.values().toString(), paramIndices.toString(), "1", "1"};
 
-        // thread-safe CachedOp doesn't support training
-        if (training) {
-            Preconditions.checkArgument(
-                    !useThreadSafePredictor(), "thread-safe Predictor doesn't support training.");
-        }
-
-        checkCall(
-                LIB.MXCreateCachedOpEX(
-                        symbolHandle,
-                        keys.length,
-                        keys,
-                        values,
-                        ref,
-                        (byte) (useThreadSafePredictor() ? 1 : 0)));
+        checkCall(LIB.MXCreateCachedOpEx(symbolHandle, keys.length, keys, values, ref));
 
         return new CachedOp(ref.getValue(), manager, parameters, paramIndices, dataIndices);
     }
@@ -1797,10 +1780,6 @@ public final class JnaUtils {
             }
         }
         return output;
-    }
-
-    public static boolean useThreadSafePredictor() {
-        return Boolean.getBoolean(MXNET_THREAD_SAFE_PREDICTOR);
     }
 
     public static void checkCall(int ret) {
