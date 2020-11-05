@@ -78,11 +78,14 @@ public class ResnetTest {
                 NDArray label = manager.ones(new Shape(batchSize, 1));
                 Batch batch =
                         new Batch(
+                                manager.newSubManager(),
                                 new NDList(input),
                                 new NDList(label),
                                 batchSize,
                                 Batchifier.STACK,
-                                Batchifier.STACK);
+                                Batchifier.STACK,
+                                0,
+                                0);
                 PairList<String, Parameter> parameters = resNet50.getParameters();
                 EasyTrain.trainBatch(trainer, batch);
                 trainer.step();
@@ -134,11 +137,14 @@ public class ResnetTest {
                 NDArray label = manager.ones(outputShape[0]);
                 Batch batch =
                         new Batch(
+                                manager.newSubManager(),
                                 new NDList(data),
                                 new NDList(label),
                                 batchSize,
                                 Batchifier.STACK,
-                                Batchifier.STACK);
+                                Batchifier.STACK,
+                                0,
+                                0);
                 EasyTrain.trainBatch(trainer, batch);
             }
         }

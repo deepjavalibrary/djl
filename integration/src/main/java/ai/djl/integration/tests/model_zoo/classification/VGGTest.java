@@ -64,11 +64,14 @@ public class VGGTest {
                 NDArray label = manager.ones(new Shape(batchSize, 1));
                 Batch batch =
                         new Batch(
+                                manager.newSubManager(),
                                 new NDList(input),
                                 new NDList(label),
                                 batchSize,
                                 Batchifier.STACK,
-                                Batchifier.STACK);
+                                Batchifier.STACK,
+                                0,
+                                0);
                 PairList<String, Parameter> parameters = vgg.getParameters();
                 EasyTrain.trainBatch(trainer, batch);
                 trainer.step();

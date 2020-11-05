@@ -188,6 +188,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
             batchLabels = batchLabels.toDevice(device, false);
         }
         return new Batch(
+                subManager,
                 batchData,
                 batchLabels,
                 batchSize,
