@@ -35,11 +35,14 @@ public class DatasetUtilsTest {
             NDArray label = manager.zeros(new Shape(6, 1));
             Batch batch =
                     new Batch(
+                            manager.newSubManager(),
                             new NDList(data),
                             new NDList(label),
                             6,
                             Batchifier.STACK,
-                            Batchifier.STACK);
+                            Batchifier.STACK,
+                            0,
+                            0);
 
             Batch[] split = batch.split(devices, true);
 
@@ -65,11 +68,14 @@ public class DatasetUtilsTest {
             NDArray label = manager.zeros(new Shape(7, 1));
             Batch batch =
                     new Batch(
+                            manager.newSubManager(),
                             new NDList(data),
                             new NDList(label),
                             7,
                             Batchifier.STACK,
-                            Batchifier.STACK);
+                            Batchifier.STACK,
+                            0,
+                            0);
 
             Batch[] split = batch.split(devices, false);
 
@@ -99,11 +105,14 @@ public class DatasetUtilsTest {
             NDArray label = manager.zeros(new Shape(7, 1));
             Batch batch =
                     new Batch(
+                            manager.newSubManager(),
                             new NDList(data),
                             new NDList(label),
                             7,
                             Batchifier.STACK,
-                            Batchifier.STACK);
+                            Batchifier.STACK,
+                            0,
+                            0);
 
             Batch[] split = batch.split(devices, false);
 

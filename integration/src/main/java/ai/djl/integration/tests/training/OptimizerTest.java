@@ -300,11 +300,14 @@ public class OptimizerTest {
         NDArray label = data.mul(2);
         Batch batch =
                 new Batch(
+                        manager.newSubManager(),
                         new NDList(data),
                         new NDList(label),
                         batchSize,
                         Batchifier.STACK,
-                        Batchifier.STACK);
+                        Batchifier.STACK,
+                        0,
+                        0);
         EasyTrain.trainBatch(trainer, batch);
         trainer.step();
         return NDArrays.stack(
