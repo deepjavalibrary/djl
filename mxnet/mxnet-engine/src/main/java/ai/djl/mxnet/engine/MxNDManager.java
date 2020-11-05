@@ -74,6 +74,17 @@ public class MxNDManager extends BaseNDManager {
         return new MxNDArray16(this, handle);
     }
 
+    /**
+     * Creates a sparse MxNDArray with the given Native Memory Pointer and attaches to this manager.
+     *
+     * @param handle the array's native memory pointer
+     * @param fmt the sparse format to use
+     * @return the created array
+     */
+    public MxSparseNDArray create(Pointer handle, SparseFormat fmt) {
+        return new MxSparseNDArray(this, handle, fmt);
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray create(String data) {
@@ -92,7 +103,7 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape) {
+    public MxSparseNDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape) {
         SparseFormat fmt = SparseFormat.CSR;
         DataType dataType = DataType.fromBuffer(data);
         MxNDArray indptrNd = create(new Shape(indptr.length), DataType.INT64);
@@ -108,7 +119,7 @@ public class MxNDManager extends BaseNDManager {
                         new DataType[] {indptrNd.getDataType(), indicesNd.getDataType()},
                         new Shape[] {indptrNd.getShape(), indicesNd.getShape()},
                         false);
-        MxNDArray sparse = create(handle);
+        MxSparseNDArray sparse = create(handle, fmt);
         MxNDArray dataNd = create(new Shape(data.remaining()), dataType);
         dataNd.set(data);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, dataNd, -1);
@@ -119,7 +130,8 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
+    public MxSparseNDArray createRowSparse(
+            Buffer data, Shape dataShape, long[] indices, Shape shape) {
         SparseFormat fmt = SparseFormat.ROW_SPARSE;
         DataType dataType = DataType.fromBuffer(data);
         MxNDArray indicesNd = create(new Shape(indices.length), DataType.INT64);
@@ -133,7 +145,7 @@ public class MxNDManager extends BaseNDManager {
                         new DataType[] {indicesNd.getDataType()},
                         new Shape[] {indicesNd.getShape()},
                         false);
-        MxNDArray sparse = create(handle);
+        MxSparseNDArray sparse = create(handle, fmt);
         MxNDArray dataNd = create(dataShape, dataType);
         dataNd.set(data);
         JnaUtils.ndArraySyncCopyFromNdArray(sparse, dataNd, -1);
