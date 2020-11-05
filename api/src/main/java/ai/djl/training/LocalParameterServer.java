@@ -15,7 +15,6 @@ package ai.djl.training;
 import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.training.optimizer.Optimizer;
-import java.util.Arrays;
 
 /** {@code LocalParameterServer} is an implementation of the {@code ParameterServer} interface. */
 public class LocalParameterServer implements ParameterServer {
@@ -60,7 +59,6 @@ public class LocalParameterServer implements ParameterServer {
                 }
             }
         }
-        Arrays.stream(grads).forEach(NDArray::close);
     }
 
     /** {@inheritDoc} */
