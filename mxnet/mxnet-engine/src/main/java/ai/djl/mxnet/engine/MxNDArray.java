@@ -71,7 +71,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
             Shape shape,
             DataType dataType,
             boolean hasGradient) {
-        this(manager, handle, null);
+        this(manager, handle);
         this.device = device;
         // shape check
         if (Arrays.stream(shape.getShape()).anyMatch(s -> s < 0)) {
@@ -83,6 +83,19 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     }
 
     /**
+     * Constructs an MxNDArray from a native handle (internal. Use {@link NDManager} instead).
+     *
+     * @param manager the manager to attach the new array to
+     * @param handle the pointer to the native MxNDArray memory
+     */
+    MxNDArray(MxNDManager manager, Pointer handle) {
+        super(handle);
+        this.manager = manager;
+        mxNDArrayEx = new MxNDArrayEx(this);
+        manager.attach(getUid(), this);
+    }
+
+    /**
      * Constructs a sparse MxNDArray from a native handle (internal. Use {@link NDManager} instead).
      *
      * @param manager the manager to attach the new array to
@@ -90,10 +103,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
      * @param fmt the sparse format
      */
     MxNDArray(MxNDManager manager, Pointer handle, SparseFormat fmt) {
-        super(handle);
-        this.manager = manager;
-        mxNDArrayEx = new MxNDArrayEx(this);
-        manager.attach(getUid(), this);
+        this(manager, handle);
         this.sparseFormat = fmt;
     }
 
@@ -245,7 +255,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
                             + "on your NDArray or block.setInitializer() on your Block");
         }
         Pointer pointer = JnaUtils.getGradient(getHandle());
-        return manager.create(pointer, null);
+        return manager.create(pointer);
     }
 
     /** {@inheritDoc} */
@@ -262,9 +272,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     @Override
     public ByteBuffer toByteBuffer() {
         if (getSparseFormat() != SparseFormat.DENSE) {
-            try (NDArray array = toDense()) {
-                return array.toByteBuffer();
-            }
+            throw new IllegalStateException("Please convert sparse NDArray to dense");
         }
         Shape sh = getShape();
         DataType dType = getDataType();
@@ -279,8 +287,7 @@ public class MxNDArray extends NativeResource implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
-        if (sparseFormat != null && sparseFormat != SparseFormat.DENSE) {
-            // Reduce getSparseFormat() call, throw EngineException if escaped this check
+        if (getSparseFormat() != SparseFormat.DENSE) {
             throw new IllegalStateException("Unsupported operation for Sparse");
         }
         int size = data.remaining();
