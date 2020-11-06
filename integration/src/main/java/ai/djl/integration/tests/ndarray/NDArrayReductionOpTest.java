@@ -98,10 +98,10 @@ public class NDArrayReductionOpTest {
             // scalar
             array = manager.create(2f);
             Assert.assertEquals(array.sum().getFloat(), 2f);
-            // TODO wait for MXNet numpy sum bug fix
+
             // zero-dim
-            // array = manager.create(new Shape(1, 1, 0));
-            // Assert.assertEquals(array.sum().getFloat(), 0f);
+            array = manager.create(new Shape(1, 1, 0));
+            Assert.assertEquals(array.sum().getFloat(), 0f);
         }
     }
 
@@ -127,10 +127,10 @@ public class NDArrayReductionOpTest {
             // scalar
             array = manager.create(5f);
             Assert.assertEquals(array.prod().getFloat(), 5f);
-            // TODO wait for MXNet numpy prod bug fix
+
             // zero-dim
-            // array = manager.create(new Shape(0, 0, 0));
-            // Assert.assertEquals(array.prod().getFloat(), 1f);
+            array = manager.create(new Shape(0, 0, 0));
+            Assert.assertEquals(array.prod().getFloat(), 0f);
         }
     }
 
@@ -154,10 +154,10 @@ public class NDArrayReductionOpTest {
             // scalar
             array = manager.create(5f);
             Assert.assertEquals(array.mean().getFloat(), 5f);
-            // TODO disable for now until MXNet np mean bug fix
+
             // zero-dim
-            // array = manager.create(new Shape(0, 0, 0));
-            // Assert.assertEquals(array.mean().getFloat(), Float.NaN);
+            array = manager.create(new Shape(0, 0, 0));
+            Assert.assertEquals(array.mean().getFloat(), 0f);
         }
     }
 
