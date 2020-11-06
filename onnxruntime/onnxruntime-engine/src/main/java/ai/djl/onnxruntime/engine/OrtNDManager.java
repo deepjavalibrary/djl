@@ -105,13 +105,43 @@ public class OrtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray zeros(Shape shape, DataType dataType) {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+        int bytes = dataType.getNumOfBytes();
+        int size = Math.toIntExact(bytes * shape.size());
+        ByteBuffer buffer = allocateDirect(size);
+        return create(dataType.asDataType(buffer), shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray ones(Shape shape, DataType dataType) {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+        long size = shape.size();
+        int bytes = Math.toIntExact(dataType.getNumOfBytes() * size);
+        ByteBuffer buffer = allocateDirect(bytes);
+        for (int i = 0; i < size; ++i) {
+            switch (dataType) {
+                case BOOLEAN:
+                case INT8:
+                case UINT8:
+                    buffer.put((byte) 1);
+                    break;
+                case FLOAT32:
+                    buffer.putFloat(1f);
+                    break;
+                case FLOAT64:
+                    buffer.putDouble(1);
+                    break;
+                case INT32:
+                    buffer.putInt(1);
+                    break;
+                case INT64:
+                    buffer.putLong(1);
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unsupported dataType: " + dataType);
+            }
+        }
+        buffer.rewind();
+        return create(dataType.asDataType(buffer), shape, dataType);
     }
 
     /** {@inheritDoc} */
