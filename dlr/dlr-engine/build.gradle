@@ -1,0 +1,15 @@
+group "ai.djl.dlr"
+
+repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+}
+
+dependencies {
+    api project(":api")
+}
+
+test {
+    environment "PATH", "src/test/bin:${environment.PATH}"
+}

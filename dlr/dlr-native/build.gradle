@@ -1,0 +1,18 @@
+plugins {
+    id 'maven-publish'
+    id 'signing'
+}
+
+apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
+
+task compileJNI {
+    doFirst {
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
+            exec {
+                commandLine 'bash', 'build.sh'
+            }
+        } else {
+            throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
+        }
+    }
+}
