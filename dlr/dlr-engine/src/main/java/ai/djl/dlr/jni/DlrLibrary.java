@@ -28,31 +28,25 @@ final class DlrLibrary {
 
     native String getDlrWeightName(long handle, int index);
 
-    native int getDlrInput(long handle, String jname, long[] shape, float[] input, int dim);
+    native void setDLRInput(long handle, String name, long[] shape, float[] input, int dim);
 
-    native int getDlrInput(long handle, String jname, float[] input);
+    native long[] getDlrOutputShape(long handle, int index);
 
-    native int getDlrOutputShape(long jhandle, int index, long[] shape);
-
-    native int getDlrOutput(long handle, int index, float[] output);
-
-    native int getDlrOutputDim(long handle, int index);
-
-    native long getDlrOutputSize(long handle, int index);
+    native float[] getDlrOutput(long handle, int index);
 
     native int getDlrNumOutputs(long handle);
 
     native long createDlrModel(String modelPath, int deviceType, int deviceId);
 
-    native int deleteDlrModel(long handle);
+    native void deleteDlrModel(long handle);
 
-    native int runDlrModel(long handle);
-
-    native String dlrGetLastError();
+    native void runDlrModel(long handle);
 
     native String getDlrBackend(long handle);
 
-    native int setDlrNumThreads(long handle, int threads);
+    native String getDlrVersion();
 
-    native int useDlrCPUAffinity(long handle, boolean use);
+    native void setDlrNumThreads(long handle, int threads);
+
+    native void useDlrCPUAffinity(long handle, boolean use);
 }
