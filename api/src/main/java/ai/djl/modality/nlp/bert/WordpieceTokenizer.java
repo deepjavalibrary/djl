@@ -54,6 +54,8 @@ public class WordpieceTokenizer extends SimpleTokenizer {
 
     @Override
     public List<String> tokenize(String sentence) {
+        StringBuilder sb = new StringBuilder();
+        List<String> subTokens = new ArrayList<>();
         List<String> outputTokens = new ArrayList<>();
         for (String token : super.tokenize(sentence.trim())) {
             char[] chars = token.toCharArray();
@@ -63,12 +65,12 @@ public class WordpieceTokenizer extends SimpleTokenizer {
             }
             boolean isBad = false;
             int start = 0;
-            List<String> subTokens = new ArrayList<>();
+            subTokens.clear();
             String currentSubString = null;
             while (start < chars.length) {
                 int end = chars.length;
                 while (start < end) {
-                    StringBuilder sb = new StringBuilder();
+                    sb.setLength(0);
                     sb.append(token, start, end);
                     if (start > 0) {
                         sb.insert(0, "##");
