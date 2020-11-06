@@ -10,37 +10,50 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-
-package ai.djl.onnxruntime.engine;
+package ai.djl.dlr.engine;
 
 import ai.djl.Device;
 import ai.djl.Model;
+import ai.djl.dlr.jni.JniUtils;
+import ai.djl.dlr.jni.LibUtils;
 import ai.djl.engine.Engine;
+import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.GradientCollector;
-import ai.onnxruntime.OrtEnvironment;
 
 /**
- * The {@code OrtEngine} is an implementation of the {@link Engine} based on the <a
- * href="https://microsoft.github.io/onnxruntime/">ONNX Runtime Deep Learning Library</a>.
+ * The {@code DlrEngine} is an implementation of the {@link Engine} based on the <a
+ * href="https://github.com/neo-ai/neo-ai-dlr">Neo DLR</a>.
  *
- * <p>To get an instance of the {@code OrtEngine} when it is not the default Engine, call {@link
- * Engine#getEngine(String)} with the Engine name "OnnxRuntime".
+ * <p>To get an instance of the {@code DlrEngine} when it is not the default Engine, call {@link
+ * Engine#getEngine(String)} with the Engine name "DLR".
  */
-public final class OrtEngine extends Engine {
+public final class DlrEngine extends Engine {
 
-    public static final String ENGINE_NAME = "OnnxRuntime";
+    public static final String ENGINE_NAME = "DLR";
 
     private Engine alternativeEngine;
-    private OrtEnvironment env;
 
-    private OrtEngine() {
-        // init OrtRuntime
-        this.env = OrtEnvironment.getEnvironment();
-    }
+    private DlrEngine() {}
 
     static Engine newInstance() {
-        return new OrtEngine();
+        try {
+            LibUtils.loadLibrary();
+            return new DlrEngine();
+        } catch (Throwable t) {
+            throw new EngineException("Failed to load DLR native library", t);
+        }
+    }
+
+    private Engine getAlternativeEngine() {
+        if (alternativeEngine == null) {
+            Engine engine = Engine.getInstance();
+            if (engine.getRank() < getRank()) {
+                // alternativeEngine should not have the same rank as DLR
+                alternativeEngine = engine;
+            }
+        }
+        return alternativeEngine;
     }
 
     /** {@inheritDoc} */
@@ -55,34 +68,22 @@ public final class OrtEngine extends Engine {
         return 10;
     }
 
-    private Engine getAlternativeEngine() {
-        if (alternativeEngine == null) {
-            Engine engine = Engine.getInstance();
-            if (engine.getRank() < getRank()) {
-                // alternativeEngine should not have the same rank as ORT
-                alternativeEngine = engine;
-            }
-        }
-        return alternativeEngine;
-    }
-
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "1.4.0";
+        return JniUtils.getDlrVersion();
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean hasCapability(String capability) {
-        // TODO: Support GPU
         return false;
     }
 
     /** {@inheritDoc} */
     @Override
     public Model newModel(String name, Device device) {
-        return new OrtModel(name, newBaseManager(device), env);
+        return new DlrModel(name, newBaseManager(device));
     }
 
     /** {@inheritDoc} */
@@ -97,19 +98,20 @@ public final class OrtEngine extends Engine {
         if (getAlternativeEngine() != null) {
             return alternativeEngine.newBaseManager(device);
         }
-        return OrtNDManager.getSystemManager().newSubManager(device);
+        throw new IllegalStateException(
+                "please include at least one engine from TensorFlow, PyTorch and MXNet to run the DLR model");
     }
 
     /** {@inheritDoc} */
     @Override
     public GradientCollector newGradientCollector() {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+        throw new UnsupportedOperationException("Not supported for DLR");
     }
 
     /** {@inheritDoc} */
     @Override
     public void setRandomSeed(int seed) {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+        throw new UnsupportedOperationException("Not supported for DLR");
     }
 
     /** {@inheritDoc} */

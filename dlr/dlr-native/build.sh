@@ -10,12 +10,11 @@ elif [[ -n $(command -v sysctl) ]]; then
     NUM_PROC=$(sysctl -n hw.ncpu)
 fi
 
-PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
-VERSION=release-1.5.0-rc
+VERSION=v1.5.0
 
 if [ ! -d "neo-ai-dlr" ];
 then
-  git clone https://github.com/stu1130/neo-ai-dlr.git -b $VERSION --recursive
+  git clone https://github.com/neo-ai/neo-ai-dlr.git -b $VERSION --recursive
 fi
 
 if [ ! -d "build" ];
@@ -23,7 +22,10 @@ then
   mkdir build
 fi
 cd build
-mkdir classes
+if [ ! -d "classes" ];
+then
+  mkdir classes
+fi
 javac -sourcepath ../../dlr-engine/src/main/java/ ../../dlr-engine/src/main/java/ai/djl/dlr/jni/DlrLibrary.java -h include -d classes
 cmake  ..
 cmake --build . --config Release -- -j "${NUM_PROC}"
