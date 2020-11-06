@@ -204,7 +204,7 @@ void WriteProfilerEventsToStream(std::ostream& out, const std::vector<std::vecto
     std::unordered_map<std::pair<at::RecordFunctionHandle, int64_t>, Event*, PairHash> events_map;
     std::set<std::pair<at::RecordFunctionHandle, int64_t>> filtered_handles;
     for (Event* evt : thread_event_list) {
-      auto event_key = std::make_pair<at::RecordFunctionHandle, int64_t>(evt->handle(), evt->node_id());
+      auto event_key = std::make_pair<at::RecordFunctionHandle, int64_t>(evt->handle(), evt->nodeId());
       if (filtered_out_names.find(evt->name()) != filtered_out_names.end() ||
           filtered_handles.find(event_key) != filtered_handles.end()) {
         filtered_handles.insert(event_key);
@@ -226,9 +226,9 @@ void WriteProfilerEventsToStream(std::ostream& out, const std::vector<std::vecto
 
         torch::jit::TemplateEnv env;
         env.s("name", start->name());
-        env.d("ts", profiler_start->cpu_elapsed_us(*start));
-        env.d("dur", start->cpu_elapsed_us(*evt));
-        env.d("tid", start->thread_id());
+        env.d("ts", profiler_start->cpuElapsedUs(*start));
+        env.d("dur", start->cpuElapsedUs(*evt));
+        env.d("tid", start->threadId());
         // we add extra info here
         env.s("shape", ToString(start->shapes()));
         env.s("cpu_mem", FormatMemory(memory_usage));
@@ -238,7 +238,7 @@ void WriteProfilerEventsToStream(std::ostream& out, const std::vector<std::vecto
         cpu_memory_allocs.erase(mem_it);
       } else if (evt->kind() == "memory_alloc") {
         for (const auto& e : cpu_memory_allocs) {
-          cpu_memory_allocs[e.first] += evt->cpu_memory_usage();
+          cpu_memory_allocs[e.first] += evt->cpuMemoryUsage();
         }
       }
     }

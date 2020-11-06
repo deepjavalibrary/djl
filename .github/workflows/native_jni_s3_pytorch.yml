@@ -126,6 +126,12 @@ jobs:
           unzip.exe cudnn.zip
           cp.exe -a cuda/include cuda/lib cuda/bin "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.1/"
           cp.exe -a cuda/include cuda/lib cuda/bin "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.2/"
+          rm.exe -Rf cuda102.exe cuda.exe cudnn.zip cuda
+      - name: Install CUDA 11
+        shell: cmd
+        run: |
+          curl.exe -L http://developer.download.nvidia.com/compute/cuda/11.0.2/local_installers/cuda_11.0.2_451.48_win10.exe -o cuda.exe
+          cuda.exe -s
       - name: Release JNI
         shell: cmd
         run: |
@@ -133,6 +139,7 @@ jobs:
           set "CUDA_PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.2"
           set "CUDA_PATH_V10_2=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.2"
           set "CUDA_PATH_V10_1=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.1"
+          set "CUDA_PATH_V11_0=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.0"
           set "PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.1\bin;%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.1\libnvvp;%PATH%"
           gradlew :pytorch:pytorch-native:releaseJNI
       - name: Upload compiled jni library
@@ -186,6 +193,6 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.6.0/jnilib
+          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.7.0/jnilib
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"

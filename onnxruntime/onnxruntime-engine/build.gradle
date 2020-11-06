@@ -1,5 +1,11 @@
 group "ai.djl.onnxruntime"
 
+repositories {
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+}
+
 dependencies {
     api project(":api")
     api "com.microsoft.onnxruntime:onnxruntime:${onnxruntime_version}"
@@ -9,7 +15,7 @@ dependencies {
     }
 
     testRuntimeOnly project(":pytorch:pytorch-engine")
-    testRuntimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
+    testRuntimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}-SNAPSHOT"
     testRuntimeOnly "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 

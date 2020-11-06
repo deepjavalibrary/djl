@@ -14,7 +14,7 @@ dependencies {
     }
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
     testRuntimeOnly project(":pytorch:pytorch-model-zoo")
-    testRuntimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
+    testRuntimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}-SNAPSHOT"
 }
 
 processResources {
@@ -25,11 +25,13 @@ processResources {
                 "linux-x86_64/cpu/libdjl_torch.so"         : "linux-x86_64/cpu/libdjl_torch.so",
                 "linux-x86_64/cu101/libdjl_torch.so"       : "linux-x86_64/cu101/libdjl_torch.so",
                 "linux-x86_64/cu102/libdjl_torch.so"       : "linux-x86_64/cu102/libdjl_torch.so",
+                "linux-x86_64/cu110/libdjl_torch.so"       : "linux-x86_64/cu110/libdjl_torch.so",
                 "precxx11/linux-x86_64/cpu/libdjl_torch.so": "linux-x86_64/cpu-precxx11/libdjl_torch.so",
                 "osx-x86_64/cpu/libdjl_torch.dylib"        : "osx-x86_64/cpu/libdjl_torch.dylib",
                 "win-x86_64/cpu/djl_torch.dll"             : "win-x86_64/cpu/djl_torch.dll",
                 "win-x86_64/cu101/djl_torch.dll"           : "win-x86_64/cu101/djl_torch.dll",
-                "win-x86_64/cu102/djl_torch.dll"           : "win-x86_64/cu102/djl_torch.dll"
+                "win-x86_64/cu102/djl_torch.dll"           : "win-x86_64/cu102/djl_torch.dll",
+                "win-x86_64/cu110/djl_torch.dll"           : "win-x86_64/cu110/djl_torch.dll"
         ]
         def classesDir = "${project.buildDir}/jnilib"
         files.each { entry ->
