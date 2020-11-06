@@ -13,6 +13,7 @@ jobs:
         with:
           repository: apache/incubator-mxnet
           ref: v1.7.x
+          submodules: 'recursive'
       - name: Install Dependencies
         run: |
           brew install nasm automake ninja libtool
