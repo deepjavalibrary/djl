@@ -53,6 +53,7 @@ public final class Mnist extends ArrayDataset {
     private Mnist(Builder builder) {
         super(builder);
         this.manager = builder.manager;
+        this.manager.setName("mnist");
         this.usage = builder.usage;
         MRL mrl = MRL.dataset(CV.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, "1.0");

@@ -95,6 +95,7 @@ public class Predictor<I, O> implements AutoCloseable {
     public Predictor(Model model, Translator<I, O> translator, boolean copy) {
         this.model = model;
         this.manager = model.getNDManager().newSubManager();
+        this.manager.setName("predictor");
         this.translator = translator;
         block = model.getBlock();
         parameterStore = new ParameterStore(manager, copy);
@@ -260,6 +261,7 @@ public class Predictor<I, O> implements AutoCloseable {
 
         PredictorContext() {
             ctxManager = manager.newSubManager();
+            ctxManager.setName("predictor ctx");
             attachments = new ConcurrentHashMap<>();
         }
 

@@ -29,6 +29,7 @@ public abstract class BaseNDManager implements NDManager {
 
     protected NDManager parent;
     protected String uid;
+    protected String name;
     protected Device device;
     protected Map<String, Reference<AutoCloseable>> resources;
     protected AtomicBoolean closed = new AtomicBoolean(false);
@@ -38,6 +39,18 @@ public abstract class BaseNDManager implements NDManager {
         this.device = Device.defaultIfNull(device);
         resources = new ConcurrentHashMap<>();
         uid = UUID.randomUUID().toString();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return this.name == null ? uid : this.name;
     }
 
     /** {@inheritDoc} */
@@ -61,11 +74,11 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        String parentUID = parent == null ? "No Parent" : ((BaseNDManager) parent).uid;
-        return "UID: "
-                + uid
-                + " Parent UID: "
-                + parentUID
+        String parentName = parent == null ? "No Parent" : parent.getName();
+        return "Name: "
+                + getName()
+                + " Parent Name: "
+                + parentName
                 + " isOpen: "
                 + isOpen()
                 + " Resource size: "

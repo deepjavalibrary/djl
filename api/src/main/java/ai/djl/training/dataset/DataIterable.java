@@ -84,6 +84,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
             Device device) {
         this.dataset = dataset;
         this.manager = manager.newSubManager();
+        this.manager.setName("dataIter");
         this.dataBatchifier = dataBatchifier;
         this.labelBatchifier = labelBatchifier;
         this.pipeline = pipeline;
@@ -159,6 +160,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
 
     private Batch fetch(List<Long> indices, int progress) throws IOException {
         NDManager subManager = manager.newSubManager();
+        subManager.setName("dataIter fetch");
         int batchSize = indices.size();
         NDList[] data = new NDList[batchSize];
         NDList[] labels = new NDList[batchSize];

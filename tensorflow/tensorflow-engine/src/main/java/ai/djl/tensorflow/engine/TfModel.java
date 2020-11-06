@@ -55,6 +55,7 @@ public class TfModel extends BaseModel {
         device = Device.defaultIfNull(device);
         properties = new ConcurrentHashMap<>();
         manager = TfNDManager.getSystemManager().newSubManager(device);
+        manager.setName("tfModel");
         first = new AtomicBoolean(true);
     }
 
