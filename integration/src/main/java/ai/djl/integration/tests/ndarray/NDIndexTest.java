@@ -148,7 +148,9 @@ public class NDIndexTest {
     public void testSetScalar() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+            NDArray expected = manager.create(new float[] {0, 2, 3, 4}, new Shape(2, 2));
             original.setScalar(new NDIndex(0, 0), 0);
+            Assert.assertEquals(original, expected);
             original.setScalar(new NDIndex(0), 1);
         }
     }
