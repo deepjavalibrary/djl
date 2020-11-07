@@ -20,22 +20,22 @@ final class FastTextLibrary {
 
     private FastTextLibrary() {}
 
-    native Pointer createFastText();
+    native long createFastText();
 
-    native void freeFastText(Pointer handle);
+    native void freeFastText(long handle);
 
-    native void loadModel(Pointer handle, String filePath);
+    native void loadModel(long handle, String filePath);
 
     native boolean checkModel(String filePath);
 
-    native void unloadModel(Pointer handle);
+    native void unloadModel(long handle);
 
-    native String getModelType(Pointer handle);
+    native String getModelType(long handle);
 
     native int predictProba(
-            Pointer handle, String text, int topK, String[] classes, float[] probabilities);
+            long handle, String text, int topK, String[] classes, float[] probabilities);
 
-    native float[] getWordVector(Pointer handle, String word);
+    native float[] getWordVector(long handle, String word);
 
     native int runCmd(String[] args);
 }

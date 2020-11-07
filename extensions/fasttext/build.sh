@@ -13,17 +13,16 @@ PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 VERSION=v0.9.2
 
 pushd "$WORK_DIR"
-if [ ! -d "download" ];
+if [ ! -d "fastText" ];
 then
-  git clone https://github.com/facebookresearch/fastText.git -b $VERSION download
+  git clone https://github.com/facebookresearch/fastText.git -b $VERSION
 fi
 
-mkdir -p build/fasttext
-cd build/fasttext
-cmake ../../download
-cmake --build . --config Release -- -j "${NUM_PROC}"
-cd ..
-
+if [ ! -d "build" ];
+then
+  mkdir build
+fi
+cd build
 rm -rf classes
 mkdir classes
 javac -sourcepath ../src/main/java/ ../src/main/java/ai/djl/fasttext/jni/FastTextLibrary.java -h include -d classes

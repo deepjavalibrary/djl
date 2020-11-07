@@ -7,11 +7,11 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(JNI REQUIRED)
 
-set(fasttext_STATIC_LIBRARIES ${CMAKE_CURRENT_BINARY_DIR}/fasttext/libfasttext_pic.a)
+add_subdirectory(fastText)
 
 add_library(jni_fasttext SHARED src/main/native/ai_djl_fasttext_jni_FastTextLibrary.cc)
 target_include_directories(jni_fasttext PUBLIC
     ${JNI_INCLUDE_DIRS}
-    download/src
+    fastText/src
     build/include)
-target_link_libraries(jni_fasttext ${fasttext_STATIC_LIBRARIES})
+target_link_libraries(jni_fasttext fasttext-static_pic)

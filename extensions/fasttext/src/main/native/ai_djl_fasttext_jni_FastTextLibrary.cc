@@ -27,8 +27,6 @@
 #include "utils.cc"
 #include "vector.cc"
 
-static constexpr const char* const POINTER_CLASS = "ai/djl/fasttext/jni/Pointer";
-
 struct FastTextPrivateMembers {
   std::shared_ptr<fasttext::Args> args_;
   std::shared_ptr<fasttext::Dictionary> dict_;
@@ -36,35 +34,6 @@ struct FastTextPrivateMembers {
   std::shared_ptr<fasttext::Matrix> output_;
   std::shared_ptr<fasttext::Model> model_;
 };
-
-template <typename T>
-inline T* GetPointerFromJHandle(JNIEnv* env, jobject jhandle) {
-  jclass jexception = env->FindClass("java/lang/NullPointerException");
-  jclass cls = env->FindClass(POINTER_CLASS);
-  jmethodID get_value = env->GetMethodID(cls, "getValue", "()J");
-  if (get_value == nullptr) {
-    env->ThrowNew(jexception, "getValue method not found!");
-  }
-  jlong ptr = env->CallLongMethod(jhandle, get_value);
-  return reinterpret_cast<T*>(ptr);
-}
-
-template <typename T>
-inline jobject CreatePointer(JNIEnv* env, const T* ptr) {
-  jclass jexception = env->FindClass("java/lang/NullPointerException");
-  jclass cls = env->FindClass(POINTER_CLASS);
-  if (cls == nullptr) {
-    env->ThrowNew(jexception, "Pointer class not found!");
-  }
-  jmethodID init = env->GetMethodID(cls, "<init>", "(J)V");
-  jobject new_obj = env->NewObject(cls, init, ptr);
-  if (new_obj == nullptr) {
-    env->ThrowNew(jexception, "object created failed");
-  }
-  env->DeleteLocalRef(jexception);
-  env->DeleteLocalRef(cls);
-  return new_obj;
-}
 
 inline std::string jstringToString(JNIEnv* env, jstring array) {
   jsize len = env->GetStringUTFLength(array);
@@ -127,20 +96,20 @@ inline std::vector<int> GetVectorFromIntArray(JNIEnv* env, jintArray array) {
   return vec;
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_createFastText(JNIEnv* env, jobject jthis) {
+JNIEXPORT jlong JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_createFastText(JNIEnv* env, jobject jthis) {
   auto* fasttext_ptr = new fasttext::FastText();
-  return CreatePointer<fasttext::FastText>(env, fasttext_ptr);
+  return reinterpret_cast<uintptr_t>(fasttext_ptr);
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_freeFastText(
-    JNIEnv* env, jobject jthis, jobject jhandle) {
-  auto* fasttext_ptr = GetPointerFromJHandle<fasttext::FastText>(env, jhandle);
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  auto* fasttext_ptr = reinterpret_cast<fasttext::FastText*>(jhandle);
   delete fasttext_ptr;
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_loadModel(
-    JNIEnv* env, jobject jthis, jobject jhandle, jstring jpath) {
-  auto* fasttext_ptr = GetPointerFromJHandle<fasttext::FastText>(env, jhandle);
+    JNIEnv* env, jobject jthis, jlong jhandle, jstring jpath) {
+  auto* fasttext_ptr = reinterpret_cast<fasttext::FastText*>(jhandle);
   const std::string path_string = jstringToString(env, jpath);
   try {
     fasttext_ptr->loadModel(path_string);
@@ -167,9 +136,8 @@ JNIEXPORT jboolean JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_checkModel(
   return true;
 }
 
-JNIEXPORT void JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_unloadModel(
-    JNIEnv* env, jobject jthis, jobject jhandle) {
-  auto* fasttext_ptr = GetPointerFromJHandle<fasttext::FastText>(env, jhandle);
+JNIEXPORT void JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_unloadModel(JNIEnv* env, jobject jthis, jlong jhandle) {
+  auto* fasttext_ptr = reinterpret_cast<fasttext::FastText*>(jhandle);
 
   FastTextPrivateMembers* privateMembers = (FastTextPrivateMembers*)fasttext_ptr;
   privateMembers->args_.reset();
@@ -180,10 +148,10 @@ JNIEXPORT void JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_unloadModel(
 }
 
 JNIEXPORT jstring JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_getModelType(
-    JNIEnv* env, jobject jthis, jobject jhandle) {
-  auto* fasttext_ptr = GetPointerFromJHandle<fasttext::FastText>(env, jhandle);
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  auto* fasttext_ptr = reinterpret_cast<fasttext::FastText*>(jhandle);
 
-  FastTextPrivateMembers* privateMembers = (FastTextPrivateMembers*)fasttext_ptr;
+  auto* privateMembers = (FastTextPrivateMembers*)fasttext_ptr;
   model_name modelName = privateMembers->args_->model;
   if (modelName == model_name::cbow) {
     return env->NewStringUTF("cbow");
@@ -199,8 +167,8 @@ JNIEXPORT jstring JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_getModelType(
 }
 
 JNIEXPORT jint JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_predictProba(
-    JNIEnv* env, jobject jthis, jobject jhandle, jstring jtext, jint top_k, jobjectArray jclasses, jfloatArray jprob) {
-  auto* fasttext_ptr = GetPointerFromJHandle<fasttext::FastText>(env, jhandle);
+    JNIEnv* env, jobject jthis, jlong jhandle, jstring jtext, jint top_k, jobjectArray jclasses, jfloatArray jprob) {
+  auto* fasttext_ptr = reinterpret_cast<fasttext::FastText*>(jhandle);
   std::string text = jstringToString(env, jtext);
   std::istringstream in(text);
   std::vector<std::pair<real, std::string>> predictions;
@@ -219,10 +187,10 @@ JNIEXPORT jint JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_predictProba(
 }
 
 JNIEXPORT jfloatArray JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_getWordVector(
-    JNIEnv* env, jobject jthis, jobject jhandle, jstring word) {
+    JNIEnv* env, jobject jthis, jlong jhandle, jstring word) {
   std::string word_str = jstringToString(env, word);
-  auto* fasttext_ptr = GetPointerFromJHandle<fasttext::FastText>(env, jhandle);
-  FastTextPrivateMembers* privateMembers = (FastTextPrivateMembers*)fasttext_ptr;
+  auto* fasttext_ptr = reinterpret_cast<fasttext::FastText*>(jhandle);
+  auto* privateMembers = (FastTextPrivateMembers*)fasttext_ptr;
 
   Vector vec(privateMembers->args_->dim);
   fasttext_ptr->getWordVector(vec, word_str);
