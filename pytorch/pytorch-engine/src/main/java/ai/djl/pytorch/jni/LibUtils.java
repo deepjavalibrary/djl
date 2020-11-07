@@ -26,8 +26,10 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -94,23 +96,47 @@ public final class LibUtils {
         if (libDir == null) {
             throw new IllegalArgumentException("Invalid library path!");
         }
+
+        Set<String> loadLater =
+                new HashSet<>(
+                        Arrays.asList(
+                                "c10_cuda.dll",
+                                "torch.dll",
+                                "torch_cpu.dll",
+                                "torch_cuda.dll",
+                                "fbgemm.dll"));
+
         try (Stream<Path> paths = Files.walk(libDir)) {
             paths.filter(
                             path -> {
                                 String name = path.getFileName().toString();
-                                return !"c10_cuda.dll".equals(name)
-                                        && !"torch.dll".equals(name)
-                                        && !"torch_cpu.dll".equals(name)
-                                        && !"torch_cuda.dll".equals(name)
-                                        && !"fbgemm.dll".equals(name)
+                                return !loadLater.contains(name)
                                         && Files.isRegularFile(path)
-                                        && !name.endsWith("djl_torch.dll");
+                                        && !name.endsWith("djl_torch.dll")
+                                        && !name.startsWith("cudnn");
                             })
                     .map(path -> path.toAbsolutePath().toString())
                     .forEach(System::load);
             loadNativeLibrary(libDir.resolve("fbgemm.dll").toAbsolutePath().toString());
             loadNativeLibrary(libDir.resolve("torch_cpu.dll").toAbsolutePath().toString());
             if (Files.exists(libDir.resolve("c10_cuda.dll"))) {
+                if (Files.exists((libDir.resolve("cudnn64_8.dll")))) {
+                    loadNativeLibrary(libDir.resolve("cudnn64_8.dll").toAbsolutePath().toString());
+                    loadNativeLibrary(
+                            libDir.resolve("cudnn_ops_infer64_8.dll").toAbsolutePath().toString());
+                    loadNativeLibrary(
+                            libDir.resolve("cudnn_ops_train64_8.dll").toAbsolutePath().toString());
+                    loadNativeLibrary(
+                            libDir.resolve("cudnn_cnn_infer64_8.dll").toAbsolutePath().toString());
+                    loadNativeLibrary(
+                            libDir.resolve("cudnn_cnn_train64_8.dll").toAbsolutePath().toString());
+                    loadNativeLibrary(
+                            libDir.resolve("cudnn_adv_infer64_8.dll").toAbsolutePath().toString());
+                    loadNativeLibrary(
+                            libDir.resolve("cudnn_adv_train64_8.dll").toAbsolutePath().toString());
+                } else if (Files.exists((libDir.resolve("cudnn64_7.dll")))) {
+                    loadNativeLibrary(libDir.resolve("cudnn64_7.dll").toAbsolutePath().toString());
+                }
                 // Windows System.load is global load
                 loadNativeLibrary(libDir.resolve("c10_cuda.dll").toAbsolutePath().toString());
                 loadNativeLibrary(libDir.resolve("torch_cuda.dll").toAbsolutePath().toString());
