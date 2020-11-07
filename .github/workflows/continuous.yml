@@ -43,8 +43,10 @@ jobs:
       - name: Workaround for startup run
         run: ./gradlew :pytorch:pytorch-engine:jar clean
       # If there are code change on JNI, we need to rebuild to pass tests under pytorch folder
-      - name: Compile JNI
+      - name: Compile PyTorch JNI
         run: ./gradlew :pytorch:pytorch-native:compileJNI
+      - name: Compile fastText JNI
+        run: ./gradlew :extension:fasttext:compileJNI
       - name: Build with Gradle
         run: ./gradlew build jRR
       - name: API test results

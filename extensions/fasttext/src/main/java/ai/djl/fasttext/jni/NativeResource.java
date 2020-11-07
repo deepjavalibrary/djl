@@ -18,19 +18,17 @@ import org.slf4j.LoggerFactory;
 
 /**
  * {@code NativeResource} is an internal class for {@link AutoCloseable} blocks of memory created in
- * the PyTorch Engine.
+ * the fastText Engine.
  */
 public abstract class NativeResource implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeResource.class);
 
-    protected final AtomicReference<Pointer> handle;
-    private String uid;
+    protected AtomicReference<Long> handle;
     private Exception exception;
 
-    protected NativeResource(Pointer pointer) {
-        this.handle = new AtomicReference<>(pointer);
-        uid = String.valueOf(pointer.getValue());
+    protected NativeResource(long handle) {
+        this.handle = new AtomicReference<>(handle);
         if (logger.isTraceEnabled()) {
             exception = new Exception();
         }
@@ -42,29 +40,19 @@ public abstract class NativeResource implements AutoCloseable {
      * @return whether this resource has been released
      */
     public boolean isReleased() {
-        return handle.get() == null;
+        return handle == null;
     }
 
     /**
-     * Gets the {@link Pointer} to this resource.
+     * Gets the long type handle to this resource.
      *
-     * @return the {@link Pointer} to this resource
+     * @return the long type handle to this resource
      */
-    protected Pointer getHandle() {
-        Pointer pointer = handle.get();
-        if (pointer == null) {
+    protected long getHandle() {
+        if (handle == null) {
             throw new IllegalStateException("Native resource has been release already.");
         }
-        return pointer;
-    }
-
-    /**
-     * Gets the unique ID of this resource.
-     *
-     * @return the unique ID of this resource
-     */
-    public final String getUid() {
-        return uid;
+        return handle.get();
     }
 
     /** {@inheritDoc} */
@@ -77,11 +65,11 @@ public abstract class NativeResource implements AutoCloseable {
     @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
-        if (handle.get() != null) {
+        if (handle != null) {
             if (exception != null) {
                 logger.warn(
                         "Resource ({}) was not closed explicitly: {}",
-                        getUid(),
+                        getHandle(),
                         getClass().getSimpleName());
                 logger.warn("Resource was created:", exception);
             }

@@ -87,7 +87,7 @@ public final class FtWrapper extends NativeResource {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        Pointer pointer = handle.getAndSet(null);
+        Long pointer = handle.getAndSet(null);
         if (pointer != null) {
             FastTextLibrary.LIB.freeFastText(pointer);
         }
