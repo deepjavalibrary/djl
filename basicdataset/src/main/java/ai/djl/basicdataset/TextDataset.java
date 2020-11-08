@@ -24,6 +24,8 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Repository;
 import ai.djl.repository.Resource;
 import ai.djl.training.dataset.RandomAccessDataset;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -45,6 +47,7 @@ public abstract class TextDataset extends RandomAccessDataset {
 
     protected Resource resource;
     protected boolean prepared;
+    protected List<Sample> samples;
 
     /**
      * Creates a new instance of {@link RandomAccessDataset} with the given necessary
@@ -113,6 +116,23 @@ public abstract class TextDataset extends RandomAccessDataset {
     }
 
     /**
+     * Returns a list of sample information.
+     *
+     * @return a list of sample information
+     */
+    public List<Sample> getSamples() {
+        if (samples == null) {
+            samples = new ArrayList<>();
+            for (int i = 0; i < size(); i++) {
+                List<String> text = getProcessedText(i, true);
+                samples.add(new Sample(i, text.size()));
+            }
+            samples.sort(Comparator.comparingInt(o -> o.sentenceLength));
+        }
+        return samples;
+    }
+
+    /**
      * Performs pre-processing steps on text data such as tokenising, applying {@link
      * ai.djl.modality.nlp.preprocess.TextProcessor}s, creating vocabulary, and word embeddings.
      *
@@ -124,6 +144,42 @@ public abstract class TextDataset extends RandomAccessDataset {
         TextData textData = source ? sourceTextData : targetTextData;
         textData.preprocess(
                 manager, newTextData.subList(0, (int) Math.min(limit, newTextData.size())));
+    }
+
+    /** A class stores {@code TextDataset} sample information. */
+    public static final class Sample {
+
+        private int sentenceLength;
+        private long index;
+
+        /**
+         * Constructs a new {@code Sample} instance.
+         *
+         * @param index the index
+         * @param sentenceLength the sentence length
+         */
+        public Sample(int index, int sentenceLength) {
+            this.index = index;
+            this.sentenceLength = sentenceLength;
+        }
+
+        /**
+         * Returns the sentence length.
+         *
+         * @return the sentence length
+         */
+        public int getSentenceLength() {
+            return sentenceLength;
+        }
+
+        /**
+         * Returns the sample index.
+         *
+         * @return the sample index
+         */
+        public long getIndex() {
+            return index;
+        }
     }
 
     /** Abstract Builder that helps build a {@link TextDataset}. */

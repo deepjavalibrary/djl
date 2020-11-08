@@ -201,11 +201,10 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
     }
 
     private void preFetch() {
-        List<Long> indices;
         if (!sample.hasNext()) {
             return;
         }
-        indices = sample.next();
+        List<Long> indices = sample.next();
         Callable<Batch> task = new PreFetchCallable(indices);
         Future<Batch> result = executor.submit(task);
         queue.offer(result);
