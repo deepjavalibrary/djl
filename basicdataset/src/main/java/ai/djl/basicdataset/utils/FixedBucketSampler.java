@@ -17,12 +17,13 @@ import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Sampler;
 import ai.djl.util.RandomUtils;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@code FixedBucketSampler} is a {@code Sampler} to be used with {@link TextDataset}, and {@link
@@ -31,10 +32,11 @@ import java.util.TreeSet;
  * sampling is random across epochs.
  */
 public class FixedBucketSampler implements Sampler {
-    private Set<Bucket> buckets;
+
+    private static final Logger logger = LoggerFactory.getLogger(FixedBucketSampler.class);
+
     private int numBuckets;
     private int batchSize;
-    private boolean dropLast;
     private boolean shuffle;
 
     /**
@@ -43,14 +45,15 @@ public class FixedBucketSampler implements Sampler {
      *
      * @param batchSize the batch size
      * @param numBuckets the number of buckets
-     * @param dropLast whether to drop the last incomplete batch
      * @param shuffle whether to shuffle data randomyl while sampling
      */
-    public FixedBucketSampler(int batchSize, int numBuckets, boolean dropLast, boolean shuffle) {
+    public FixedBucketSampler(int batchSize, int numBuckets, boolean shuffle) {
         this.numBuckets = numBuckets;
         this.batchSize = batchSize;
-        this.dropLast = dropLast;
         this.shuffle = shuffle;
+        if (batchSize == 1) {
+            logger.warn("FixedBucketSampler is not meaningful with batch size 1.");
+        }
     }
 
     /**
@@ -61,7 +64,7 @@ public class FixedBucketSampler implements Sampler {
      * @param numBuckets the number of buckets
      */
     public FixedBucketSampler(int batchSize, int numBuckets) {
-        this(numBuckets, batchSize, false, true);
+        this(batchSize, numBuckets, true);
     }
 
     /**
@@ -71,13 +74,17 @@ public class FixedBucketSampler implements Sampler {
      * @param batchSize the batch size
      */
     public FixedBucketSampler(int batchSize) {
-        this(10, batchSize);
+        this(batchSize, 10);
     }
 
     /** {@inheritDoc} */
     @Override
     public Iterator<List<Long>> sample(RandomAccessDataset dataset) {
-        return new Iterate(dataset);
+        if (!(dataset instanceof TextDataset)) {
+            throw new IllegalArgumentException(
+                    "FixedBucketSampler can only be used with TextDataset");
+        }
+        return new Iterate((TextDataset) dataset);
     }
 
     /** {@inheritDoc} */
@@ -86,119 +93,70 @@ public class FixedBucketSampler implements Sampler {
         return batchSize;
     }
 
-    private static class Sample {
-        int sentenceLength;
-        long index;
-
-        public Sample(int index, int sentenceLength) {
-            this.index = index;
-            this.sentenceLength = sentenceLength;
-        }
-    }
-
-    private static class Bucket {
-        Set<Sample> samples;
-        int index;
-
-        public Bucket(int index, Set<Sample> samples) {
-            this.index = index;
-            this.samples = samples;
-        }
-    }
-
     private class Iterate implements Iterator<List<Long>> {
-        private long current;
-        private long size;
 
-        public Iterate(RandomAccessDataset dataset) {
-            if (dropLast) {
-                this.size = dataset.size() / batchSize;
-            } else {
-                this.size = (dataset.size() + batchSize - 1) / batchSize;
-            }
+        private List<List<TextDataset.Sample>> buckets;
+        private List<int[]> bucketBatch;
+        private int current;
 
-            if (!(dataset instanceof TextDataset)) {
-                throw new IllegalStateException(
-                        "FixedBucketSampler can only be used with TextDataset");
+        public Iterate(TextDataset dataset) {
+            buckets = new ArrayList<>(numBuckets);
+            bucketBatch = new ArrayList<>();
+            List<TextDataset.Sample> samples = dataset.getSamples();
+            int min = samples.get(0).getSentenceLength();
+            int max = samples.get(samples.size() - 1).getSentenceLength();
+            int step = Math.max((1 + max - min) / numBuckets, 1);
+            Set<Integer> set = new HashSet<>(numBuckets);
+            for (int i = 0; i < numBuckets; ++i) {
+                set.add(Math.max(max - (numBuckets - i - 1) * step, min));
             }
-            if (buckets == null) {
-                List<Sample> samples = new ArrayList<>();
-                for (int i = 0; i < dataset.size(); i++) {
-                    samples.add(
-                            new Sample(
-                                    i, ((TextDataset) dataset).getProcessedText(i, true).size()));
-                }
-                samples.sort(Comparator.comparingInt(o -> o.sentenceLength));
-                buckets = new TreeSet<>(Comparator.comparingInt(o -> o.index));
-                int bucketSize = samples.size() / numBuckets;
-                int bucketNumber = 0;
-                for (int i = 0; i < samples.size(); i = i + bucketSize) {
-                    int end = i + bucketSize;
-                    if (end > samples.size()) {
-                        end = samples.size();
+            int[] bucketKeys = set.stream().mapToInt(Integer::intValue).toArray();
+
+            int index = 0;
+            List<TextDataset.Sample> list = new ArrayList<>();
+            for (TextDataset.Sample sample : samples) {
+                if (sample.getSentenceLength() > bucketKeys[index]) {
+                    if (!list.isEmpty()) {
+                        buckets.add(list);
+                        list = new ArrayList<>();
                     }
-                    buckets.add(new Bucket(bucketNumber++, new HashSet<>(samples.subList(i, end))));
+                    ++index;
                 }
+                list.add(sample);
+            }
+            if (!list.isEmpty()) {
+                buckets.add(list);
+            }
+            for (int i = 0; i < buckets.size(); ++i) {
+                List<TextDataset.Sample> bucket = buckets.get(i);
+                for (int j = 0; j < bucket.size(); j += batchSize) {
+                    bucketBatch.add(new int[] {i, j});
+                }
+            }
+            if (shuffle) {
+                Collections.shuffle(bucketBatch, RandomUtils.RANDOM);
+                buckets.forEach(l -> Collections.shuffle(l, RandomUtils.RANDOM));
             }
         }
 
         /** {@inheritDoc} */
         @Override
         public boolean hasNext() {
-            return current < size;
+            return current < bucketBatch.size();
         }
 
         /** {@inheritDoc} */
         @Override
         public List<Long> next() {
-            int collected = 0;
-            List<Sample> allSamples = new ArrayList<>();
-
-            Iterator<Bucket> iterator = buckets.iterator();
-            Bucket bucket = firstBucket(iterator);
-            while (collected < batchSize) {
-                Set<Sample> samples = bucket.samples;
-                List<Sample> bucketSamples = new ArrayList<>();
-                for (Sample sample : samples) {
-                    bucketSamples.add(sample);
-                    collected++;
-                    if (collected >= batchSize) {
-                        break;
-                    }
-                }
-                for (Sample sample : bucketSamples) {
-                    samples.remove(sample);
-                }
-                allSamples.addAll(bucketSamples);
-                if (collected >= batchSize) {
-                    break;
-                }
-                if (!iterator.hasNext()) {
-                    if (shuffle) {
-                        iterator = buckets.iterator();
-                    } else {
-                        throw new IllegalStateException("Code should never reach here");
-                    }
-                }
-                bucket = iterator.next();
-            }
-            List<Long> next = new ArrayList<>();
-            for (Sample sample : allSamples) {
-                next.add(sample.index);
+            int[] batch = bucketBatch.get(current);
+            List<Long> ret = new ArrayList<>();
+            List<TextDataset.Sample> bucket = buckets.get(batch[0]);
+            int end = Math.min(bucket.size(), batch[1] + batchSize);
+            for (int i = batch[1]; i < end; ++i) {
+                ret.add(bucket.get(i).getIndex());
             }
             current++;
-            return next;
-        }
-
-        private Bucket firstBucket(Iterator<Bucket> iterator) {
-            if (shuffle) {
-                int firstIndex = RandomUtils.nextInt(buckets.size());
-                for (int i = 0; i < firstIndex - 1; i++) {
-                    iterator.next();
-                }
-                return iterator.next();
-            }
-            return iterator.next();
+            return ret;
         }
     }
 }

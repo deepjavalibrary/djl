@@ -25,9 +25,10 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class FixedBucketSamplerTest {
+
     @Test
     public void testFixedBucketSampler() throws IOException, TranslateException {
-        FixedBucketSampler fixedBucketSampler = new FixedBucketSampler(10, 100, false, true);
+        FixedBucketSampler fixedBucketSampler = new FixedBucketSampler(10, 10, false);
         TatoebaEnglishFrenchDataset dataset =
                 TatoebaEnglishFrenchDataset.builder()
                         .setSampling(fixedBucketSampler)
@@ -41,47 +42,28 @@ public class FixedBucketSamplerTest {
                                         .optIncludeValidLengths(true)
                                         .addPad(0, 0, (m) -> m.ones(new Shape(1)), 10)
                                         .build())
+                        .optLimit(200)
                         .build();
+
+        dataset.prepare();
 
         Iterator<List<Long>> iterator = fixedBucketSampler.sample(dataset);
         long count = 0;
         Set<Long> indicesSet = new HashSet<>();
         while (iterator.hasNext()) {
             List<Long> indices = iterator.next();
-            int max = Integer.MIN_VALUE;
-            int min = Integer.MAX_VALUE;
-            for (Long index : indices) {
-                int size = dataset.getProcessedText(index, true).size();
-                if (size > max) {
-                    max = size;
-                }
-                if (size < min) {
-                    min = size;
-                }
-            }
             indicesSet.addAll(indices);
-            count = count + indices.size();
+            count += indices.size();
         }
         Assert.assertEquals(count, dataset.size());
         Assert.assertEquals(indicesSet.size(), dataset.size());
 
-        fixedBucketSampler = new FixedBucketSampler(10, 100, false, false);
+        fixedBucketSampler = new FixedBucketSampler(10, 5, true);
         iterator = fixedBucketSampler.sample(dataset);
         count = 0;
-        indicesSet = new HashSet<>();
+        indicesSet.clear();
         while (iterator.hasNext()) {
             List<Long> indices = iterator.next();
-            int max = Integer.MIN_VALUE;
-            int min = Integer.MAX_VALUE;
-            for (Long index : indices) {
-                int size = dataset.getProcessedText(index, true).size();
-                if (size > max) {
-                    max = size;
-                }
-                if (size < min) {
-                    min = size;
-                }
-            }
             indicesSet.addAll(indices);
             count = count + indices.size();
         }
