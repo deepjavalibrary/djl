@@ -83,7 +83,7 @@ public class TimeMeasureTrainingListener extends TrainingListenerAdapter {
     }
 
     private static void dumpTrainingTimeInfo(Metrics metrics, String logDir) {
-        if (logDir == null) {
+        if (metrics == null || logDir == null) {
             return;
         }
         try {
