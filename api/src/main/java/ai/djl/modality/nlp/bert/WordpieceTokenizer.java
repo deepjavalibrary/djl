@@ -79,6 +79,8 @@ public class WordpieceTokenizer extends SimpleTokenizer {
                     if (vocabulary.contains(subString)) {
                         currentSubString = subString;
                         break;
+                    } else {
+                        currentSubString = null;
                     }
                     end--;
                 }
@@ -87,6 +89,9 @@ public class WordpieceTokenizer extends SimpleTokenizer {
                     break;
                 }
                 subTokens.add(currentSubString);
+                if (subTokens.size() > maxInputChars) {
+                    throw new IllegalStateException("Too many subTokens for: '" + sentence + '\'');
+                }
                 start = end;
             }
             if (isBad) {
