@@ -160,7 +160,7 @@ public abstract class RandomAccessDataset implements Dataset {
         for (int i = 0; i < ratio.length - 1; ++i) {
             int to = from + (int) (ratio[i] / sum * size);
             ret[i] = new SubDataset(this, indices, from, to);
-            from += to;
+            from = to;
         }
         ret[ratio.length - 1] = new SubDataset(this, indices, from, size);
         return ret;
@@ -407,6 +407,15 @@ public abstract class RandomAccessDataset implements Dataset {
             this.indices = indices;
             this.from = from;
             this.to = to;
+            this.sampler = dataset.sampler;
+            this.dataBatchifier = dataset.dataBatchifier;
+            this.labelBatchifier = dataset.labelBatchifier;
+            this.pipeline = dataset.pipeline;
+            this.targetPipeline = dataset.targetPipeline;
+            this.executor = dataset.executor;
+            this.prefetchNumber = dataset.prefetchNumber;
+            this.device = dataset.device;
+
             limit = Long.MAX_VALUE;
         }
 
@@ -423,12 +432,6 @@ public abstract class RandomAccessDataset implements Dataset {
         @Override
         protected long availableSize() {
             return to - from;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Iterable<Batch> getData(NDManager manager) throws IOException, TranslateException {
-            return dataset.getData(manager);
         }
 
         /** {@inheritDoc} */
