@@ -70,7 +70,7 @@ public class CocoDetection extends RandomAccessDataset {
 
     /** {@inheritDoc} */
     @Override
-    protected Record get(NDManager manager, long index) throws IOException {
+    public Record get(NDManager manager, long index) throws IOException {
         int idx = Math.toIntExact(index);
         NDList d =
                 new NDList(

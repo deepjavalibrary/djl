@@ -80,7 +80,7 @@ public class CaptchaDataset extends RandomAccessDataset {
 
     /** {@inheritDoc} */
     @Override
-    protected Record get(NDManager manager, long index) throws IOException {
+    public Record get(NDManager manager, long index) throws IOException {
         String item = items.get(Math.toIntExact(index));
         Path imagePath =
                 resource.getRepository().getFile(dataItem, pathPrefix + '/' + item + ".jpeg");

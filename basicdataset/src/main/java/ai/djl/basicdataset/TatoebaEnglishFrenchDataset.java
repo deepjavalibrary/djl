@@ -100,8 +100,9 @@ public class TatoebaEnglishFrenchDataset extends TextDataset {
         prepared = true;
     }
 
+    /** {@inheritDoc} */
     @Override
-    protected Record get(NDManager manager, long index) {
+    public Record get(NDManager manager, long index) {
         NDList data = new NDList();
         NDList labels = new NDList();
         data.add(sourceTextData.getEmbedding(manager, index));

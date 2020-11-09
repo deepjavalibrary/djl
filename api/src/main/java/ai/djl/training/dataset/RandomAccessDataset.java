@@ -75,7 +75,7 @@ public abstract class RandomAccessDataset implements Dataset {
      * @return a {@link Record} that contains the data and label of the requested data item
      * @throws IOException if an I/O error occurs
      */
-    protected abstract Record get(NDManager manager, long index) throws IOException;
+    public abstract Record get(NDManager manager, long index) throws IOException;
 
     /** {@inheritDoc} */
     @Override
@@ -164,6 +164,20 @@ public abstract class RandomAccessDataset implements Dataset {
         }
         ret[ratio.length - 1] = new SubDataset(this, indices, from, size);
         return ret;
+    }
+
+    /**
+     * Returns a view of the portion of this data between the specified {@code fromIndex},
+     * inclusive, and {@code toIndex}, exclusive.
+     *
+     * @param fromIndex low endpoint (inclusive) of the subDataset
+     * @param toIndex high endpoint (exclusive) of the subData
+     * @return a view of the specified range within this dataset
+     */
+    public RandomAccessDataset subDataset(int fromIndex, int toIndex) {
+        int size = Math.toIntExact(size());
+        int[] indices = IntStream.range(0, size).toArray();
+        return new SubDataset(this, indices, fromIndex, toIndex);
     }
 
     /**
