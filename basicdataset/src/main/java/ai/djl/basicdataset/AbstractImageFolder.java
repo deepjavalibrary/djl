@@ -64,7 +64,7 @@ public abstract class AbstractImageFolder extends RandomAccessDataset {
 
     /** {@inheritDoc} */
     @Override
-    protected Record get(NDManager manager, long index) throws IOException {
+    public Record get(NDManager manager, long index) throws IOException {
         Pair<String, Integer> item = items.get(Math.toIntExact(index));
 
         Path imagePath = getImagePath(item.getKey());

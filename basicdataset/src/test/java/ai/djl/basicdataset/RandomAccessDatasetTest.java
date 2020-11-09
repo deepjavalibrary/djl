@@ -18,6 +18,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.training.dataset.ArrayDataset;
 import ai.djl.training.dataset.BatchSampler;
 import ai.djl.training.dataset.RandomAccessDataset;
+import ai.djl.training.dataset.Record;
 import ai.djl.training.dataset.SequenceSampler;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -45,6 +46,11 @@ public class RandomAccessDatasetTest {
 
             long total = sets[0].size() + sets[1].size() + sets[2].size();
             Assert.assertEquals(total, dataset.size());
+
+            RandomAccessDataset subset = dataset.subDataset(10, 25);
+            Assert.assertEquals(15, subset.size());
+            Record record = subset.get(manager, 0);
+            Assert.assertEquals(record.getData().head().getLong(), 10);
         }
     }
 }
