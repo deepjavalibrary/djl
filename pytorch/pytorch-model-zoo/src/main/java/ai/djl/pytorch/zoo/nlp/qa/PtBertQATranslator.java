@@ -13,6 +13,7 @@
 package ai.djl.pytorch.zoo.nlp.qa;
 
 import ai.djl.Model;
+import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.bert.BertToken;
 import ai.djl.modality.nlp.bert.BertTokenizer;
@@ -21,7 +22,6 @@ import ai.djl.modality.nlp.translator.QATranslator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.pytorch.zoo.nlp.PtBertVocabulary;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.util.List;
@@ -44,7 +44,12 @@ public class PtBertQATranslator extends QATranslator {
     /** {@inheritDoc} */
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
-        vocabulary = model.getArtifact("bert-base-uncased-vocab.txt", PtBertVocabulary::parse);
+        vocabulary =
+                SimpleVocabulary.builder()
+                        .optMinFrequency(1)
+                        .addFromTextFile(model.getArtifact("bert-base-uncased-vocab.txt").getPath())
+                        .optUnknownToken("[UNK]")
+                        .build();
         tokenizer = new BertTokenizer();
     }
 
@@ -80,8 +85,8 @@ public class PtBertQATranslator extends QATranslator {
      *
      * @return a new builder
      */
-    public static PtBertQATranslator.Builder builder() {
-        return new PtBertQATranslator.Builder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     /** The builder for Bert QA translator. */

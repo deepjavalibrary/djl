@@ -18,6 +18,7 @@ import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.bert.BertFullTokenizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -108,7 +109,13 @@ public final class BertClassification {
 
         @Override
         public void prepare(NDManager manager, Model model) {
-            tokenizer = new BertFullTokenizer(vocabularyPath, true);
+            SimpleVocabulary vocabulary =
+                    SimpleVocabulary.builder()
+                            .optMinFrequency(1)
+                            .addFromTextFile(vocabularyPath)
+                            .optUnknownToken("[UNK]")
+                            .build();
+            tokenizer = new BertFullTokenizer(vocabulary, true);
         }
 
         @Override

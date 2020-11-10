@@ -101,8 +101,7 @@ public class TextData {
         }
 
         if (vocabulary == null) {
-            SimpleVocabulary.VocabularyBuilder vocabularyBuilder =
-                    new SimpleVocabulary.VocabularyBuilder();
+            SimpleVocabulary.Builder vocabularyBuilder = SimpleVocabulary.builder();
             vocabularyBuilder
                     .optMinFrequency(3)
                     .optReservedTokens(reservedTokens)
