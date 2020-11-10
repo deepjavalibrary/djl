@@ -180,6 +180,8 @@ public final class TrainAmazonReviewRanking {
             SimpleVocabulary vocab = tokenizer.getVocabulary();
             List<String> tokens = tokenizer.tokenize(input);
             tokens = tokens.size() > maxLength ? tokens.subList(0, maxLength) : tokens;
+            tokens.add(0, "[CLS]");
+            tokens.add("[SEP]");
             tokens.forEach(token -> buf.put(vocab.getIndex(token)));
         }
     }
