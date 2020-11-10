@@ -19,7 +19,7 @@
 
 // The file is the implementation for PyTorch random sampling operations
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRandint(JNIEnv* env, jobject jthis, jlong jlow,
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRandint(JNIEnv* env, jobject jthis, jlong jlow,
     jlong jhigh, jlongArray jsizes, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequire_grad) {
   API_BEGIN()
   const std::vector<int64_t> size_vec = utils::GetVecFromJLongArray(env, jsizes);
@@ -31,11 +31,11 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRandint(JN
     tensor = tensor.to_mkldnn();
   }
   const auto* result_ptr = new torch::Tensor(tensor);
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNormal(JNIEnv* env, jobject jthis, jdouble jmean,
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNormal(JNIEnv* env, jobject jthis, jdouble jmean,
     jdouble jstd, jlongArray jsizes, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequire_grad) {
   API_BEGIN()
   const std::vector<int64_t> size_vec = utils::GetVecFromJLongArray(env, jsizes);
@@ -47,13 +47,12 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNormal(JNI
     tensor = tensor.to_mkldnn();
   }
   const auto* result_ptr = new torch::Tensor(tensor);
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_tensorUniform(JNIEnv* env, jobject jthis,
-    jdouble jfrom, jdouble jto, jlongArray jsizes, jint jdtype, jint jlayout, jintArray jdevice,
-    jboolean jrequire_grad) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_tensorUniform(JNIEnv* env, jobject jthis, jdouble jfrom,
+    jdouble jto, jlongArray jsizes, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequire_grad) {
   API_BEGIN()
   const std::vector<int64_t> size_vec = utils::GetVecFromJLongArray(env, jsizes);
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequire_grad);
@@ -64,6 +63,6 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_tensorUniform(J
     tensor = tensor.to_mkldnn();
   }
   const auto* result_ptr = new torch::Tensor(tensor);
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }

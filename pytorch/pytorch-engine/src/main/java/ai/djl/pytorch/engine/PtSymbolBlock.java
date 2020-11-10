@@ -23,7 +23,6 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.pytorch.jni.IValueUtils;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.NativeResource;
-import ai.djl.pytorch.jni.Pointer;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
@@ -57,7 +56,7 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
      * @param manager the manager to use for the block
      * @param handle the module handle
      */
-    public PtSymbolBlock(PtNDManager manager, Pointer handle) {
+    public PtSymbolBlock(PtNDManager manager, long handle) {
         super(handle);
         this.manager = manager;
         manager.attach(getUid(), this);
@@ -69,7 +68,7 @@ public class PtSymbolBlock extends NativeResource implements SymbolBlock {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        Pointer pointer = handle.getAndSet(null);
+        Long pointer = handle.getAndSet(null);
         if (pointer != null) {
             JniUtils.deleteModule(pointer);
             manager.detach(getUid());

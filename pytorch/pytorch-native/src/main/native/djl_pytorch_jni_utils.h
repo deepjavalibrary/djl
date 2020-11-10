@@ -27,9 +27,9 @@
 
 namespace utils {
 
-static constexpr const char* const POINTER_CLASS = "ai/djl/pytorch/jni/Pointer";
-
 static constexpr const jint RELEASE_MODE = JNI_ABORT;
+
+static constexpr const jlong NULL_PTR = 0;
 
 #if !defined(__ANDROID__)
 // for image interpolation
@@ -89,78 +89,54 @@ inline torch::ScalarType GetScalarTypeFromDType(jint dtype) {
 }
 
 template <typename T>
-inline T* GetPointerFromJHandle(JNIEnv* env, jobject jhandle) {
-  jclass jexception = env->FindClass("java/lang/NullPointerException");
-  jclass cls = env->FindClass(POINTER_CLASS);
-  jmethodID get_value = env->GetMethodID(cls, "getValue", "()J");
-  if (get_value == nullptr) {
-    env->ThrowNew(jexception, "getValue method not found!");
-  }
-  jlong ptr = env->CallLongMethod(jhandle, get_value);
-  return reinterpret_cast<T*>(ptr);
-}
-
-template <typename T>
-inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jobjectArray jhandles) {
-  jclass jexception = env->FindClass("java/lang/NullPointerException");
-  jclass cls = env->FindClass(POINTER_CLASS);
-  jmethodID get_value = env->GetMethodID(cls, "getValue", "()J");
+inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jlongArray jhandles) {
   jsize length = env->GetArrayLength(jhandles);
+  jlong* jptrs = env->GetLongArrayElements(jhandles, JNI_FALSE);
   std::vector<T> vec;
   vec.reserve(length);
-  for (auto i = 0; i < length; ++i) {
-    jobject jhandle = env->GetObjectArrayElement(jhandles, i);
-    if (jhandle == nullptr) {
-      env->ThrowNew(jexception, "Pointer not found!");
-    }
-    jlong ptr = env->CallLongMethod(jhandle, get_value);
-    vec.emplace_back(*(reinterpret_cast<T*>(ptr)));
+  for (size_t i = 0; i < length; ++i) {
+    vec.emplace_back(*(reinterpret_cast<T*>(jptrs[i])));
   }
-  env->DeleteLocalRef(jexception);
-  env->DeleteLocalRef(cls);
-  env->DeleteLocalRef(jhandles);
+  env->ReleaseLongArrayElements(jhandles, jptrs, RELEASE_MODE);
   return std::move(vec);
 }
 
-template <typename T>
-inline jobject CreatePointer(JNIEnv* env, const T* ptr) {
-  jclass jexception = env->FindClass("java/lang/NullPointerException");
-  jclass cls = env->FindClass(POINTER_CLASS);
-  if (cls == nullptr) {
-    env->ThrowNew(jexception, "Pointer class not found!");
+template <typename T1, typename T2>
+inline jlongArray GetPtrArrayFromContainer(JNIEnv* env, T1 list) {
+  size_t len = list.size();
+  jlongArray jarray = env->NewLongArray(len);
+  std::vector<jlong> jptrs;
+  jptrs.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    const auto* element_ptr = new T2(list[i]);
+    jptrs[i] = reinterpret_cast<uintptr_t>(element_ptr);
   }
-  jmethodID init = env->GetMethodID(cls, "<init>", "(J)V");
-  jobject new_obj = env->NewObject(cls, init, ptr);
-  if (new_obj == nullptr) {
-    env->ThrowNew(jexception, "object created failed");
-  }
-  env->DeleteLocalRef(jexception);
-  env->DeleteLocalRef(cls);
-  return new_obj;
+  env->SetLongArrayRegion(jarray, 0, len, jptrs.data());
+  return jarray;
 }
 
 inline std::vector<int64_t> GetVecFromJLongArray(JNIEnv* env, jlongArray jarray) {
   jlong* jarr = env->GetLongArrayElements(jarray, JNI_FALSE);
   jsize length = env->GetArrayLength(jarray);
-  const std::vector<int64_t> vec(jarr, jarr + length);
+  std::vector<int64_t> vec(jarr, jarr + length);
   env->ReleaseLongArrayElements(jarray, jarr, RELEASE_MODE);
-  return vec;
+  return std::move(vec);
 }
 
 inline std::vector<int32_t> GetVecFromJIntArray(JNIEnv* env, jintArray jarray) {
   jint* jarr = env->GetIntArrayElements(jarray, JNI_FALSE);
   jsize length = env->GetArrayLength(jarray);
-  const std::vector<int32_t> vec(jarr, jarr + length);
+  std::vector<int32_t> vec(jarr, jarr + length);
   env->ReleaseIntArrayElements(jarray, jarr, RELEASE_MODE);
-  return vec;
+  return std::move(vec);
 }
 
 inline std::vector<float> GetVecFromJFloatArray(JNIEnv* env, jfloatArray jarray) {
   jfloat* jarr = env->GetFloatArrayElements(jarray, JNI_FALSE);
   jsize length = env->GetArrayLength(jarray);
-  const std::vector<float> vec(jarr, jarr + length);
+  std::vector<float> vec(jarr, jarr + length);
   env->ReleaseFloatArrayElements(jarray, jarr, RELEASE_MODE);
-  return vec;
+  return std::move(vec);
 }
 
 inline torch::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {

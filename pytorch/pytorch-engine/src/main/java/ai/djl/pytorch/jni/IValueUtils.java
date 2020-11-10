@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /** IValueUtils is utility class to deal with IValue in PyTorch. */
 public final class IValueUtils {
@@ -38,7 +39,7 @@ public final class IValueUtils {
      * @param arrayHandle the handle for PyTorch Tensor
      * @return IValue Pointer
      */
-    public static Pointer toIValuePointer(Pointer arrayHandle) {
+    public static long toIValuePointer(long arrayHandle) {
         return PyTorchLibrary.LIB.iValueFromTensor(arrayHandle);
     }
 
@@ -48,7 +49,7 @@ public final class IValueUtils {
      * @param pointers pointer array
      * @return IValue Pointer
      */
-    public static Pointer iValueFromList(Pointer[] pointers) {
+    public static long iValueFromList(long[] pointers) {
         return PyTorchLibrary.LIB.iValueFromList(pointers);
     }
 
@@ -59,94 +60,94 @@ public final class IValueUtils {
      * @param names the key value of the pointer
      * @return IValue Pointer
      */
-    public static Pointer iValueFromDict(Pointer[] pointers, String[] names) {
+    public static long iValueFromDict(long[] pointers, String[] names) {
         return PyTorchLibrary.LIB.iValueFromDict(pointers, names);
     }
 
     /**
      * Check IValue is a container of {@link PtNDArray}.
      *
-     * @param iValueHandle IValue {@link Pointer}
+     * @param iValueHandle IValue pointer
      * @return result
      */
-    public static boolean isNDArray(Pointer iValueHandle) {
+    public static boolean isNDArray(long iValueHandle) {
         return PyTorchLibrary.LIB.iValueIsTensor(iValueHandle);
     }
 
     /**
      * Check IValue is a container of {@link NDList}.
      *
-     * @param iValueHandle IValue {@link Pointer}
+     * @param iValueHandle IValue pointer
      * @return result
      */
-    public static boolean isNDList(Pointer iValueHandle) {
+    public static boolean isNDList(long iValueHandle) {
         return PyTorchLibrary.LIB.iValueIsTensorList(iValueHandle);
     }
 
     /**
      * Check IValue is a container of IValue List.
      *
-     * @param iValueHandle IValue {@link Pointer}
+     * @param iValueHandle IValue pointer
      * @return result
      */
-    public static boolean isList(Pointer iValueHandle) {
+    public static boolean isList(long iValueHandle) {
         return PyTorchLibrary.LIB.iValueIsList(iValueHandle);
     }
 
     /**
      * Check IValue is a container of IValue Tuple.
      *
-     * @param iValueHandle IValue {@link Pointer}
+     * @param iValueHandle IValue pointer
      * @return result
      */
-    public static boolean isTuple(Pointer iValueHandle) {
+    public static boolean isTuple(long iValueHandle) {
         return PyTorchLibrary.LIB.iValueIsTuple(iValueHandle);
     }
 
     /**
      * Check IValue is a container of IValue Map.
      *
-     * @param iValueHandle IValue {@link Pointer}
+     * @param iValueHandle IValue pointer
      * @return result
      */
-    public static boolean isMap(Pointer iValueHandle) {
+    public static boolean isMap(long iValueHandle) {
         return PyTorchLibrary.LIB.iValueIsMap(iValueHandle);
     }
 
     /**
      * Check IValue is a container of String.
      *
-     * @param iValueHandle IValue {@link Pointer}
+     * @param iValueHandle IValue pointer
      * @return result
      */
-    public static boolean isString(Pointer iValueHandle) {
+    public static boolean isString(long iValueHandle) {
         return PyTorchLibrary.LIB.iValueIsString(iValueHandle);
     }
 
     /**
      * Extract IValue with a {@link PtNDArray} value.
      *
-     * @param iValueHandle IValue {@link Pointer}
+     * @param iValueHandle IValue pointer
      * @param manager {@link PtNDManager} that creates {@link PtNDArray}
      * @return {@link ai.djl.ndarray.NDArray}
      */
-    public static PtNDArray toNDArray(Pointer iValueHandle, PtNDManager manager) {
-        Pointer ndHandle = PyTorchLibrary.LIB.iValueToTensor(iValueHandle);
-        return manager.create(ndHandle);
+    public static PtNDArray toNDArray(long iValueHandle, PtNDManager manager) {
+        long ndHandle = PyTorchLibrary.LIB.iValueToTensor(iValueHandle);
+        return new PtNDArray(manager, ndHandle);
     }
 
     /**
      * Extract IValue to {@link NDList}.
      *
-     * @param iValueHandle IValue {@link Pointer}
+     * @param iValueHandle IValue pointer
      * @param manager {@link PtNDManager} that creates {@link PtNDArray}
      * @return {@link NDList}
      */
-    public static NDList toNDList(Pointer iValueHandle, PtNDManager manager) {
-        Pointer[] ndHandles = PyTorchLibrary.LIB.iValueToTensorList(iValueHandle);
+    public static NDList toNDList(long iValueHandle, PtNDManager manager) {
+        long[] ndHandles = PyTorchLibrary.LIB.iValueToTensorList(iValueHandle);
         NDList list = new NDList();
-        for (Pointer handle : ndHandles) {
-            list.add(manager.create(handle));
+        for (long handle : ndHandles) {
+            list.add(new PtNDArray(manager, handle));
         }
         return list;
     }
@@ -154,20 +155,20 @@ public final class IValueUtils {
     /**
      * Extract IValue to String.
      *
-     * @param iValueHandle IValue {@link Pointer}
+     * @param iValueHandle IValue pointer
      * @return String
      */
-    public static String toString(Pointer iValueHandle) {
+    public static String toString(long iValueHandle) {
         return PyTorchLibrary.LIB.iValueToString(iValueHandle);
     }
 
     /**
      * Extract IValue to an IValue Array.
      *
-     * @param iValueHandle IValue {@link Pointer}
+     * @param iValueHandle IValue pointer
      * @return IValue array
      */
-    public static Pointer[] toIValueArray(Pointer iValueHandle) {
+    public static long[] toIValueArray(long iValueHandle) {
         if (isTuple(iValueHandle)) {
             return PyTorchLibrary.LIB.iValueToListFromTuple(iValueHandle);
         }
@@ -177,32 +178,32 @@ public final class IValueUtils {
     /**
      * Extract IValue to a Map.
      *
-     * @param iValueHandle IValue {@link Pointer}
+     * @param iValueHandle IValue pointer
      * @return IValue Map
      */
-    public static Map<Pointer, Pointer> toIValueMap(Pointer iValueHandle) {
-        Pointer[] iValueHandles = PyTorchLibrary.LIB.iValueToMap(iValueHandle);
-        Map<Pointer, Pointer> map = new ConcurrentHashMap<>();
+    public static Map<Long, Long> toIValueMap(long iValueHandle) {
+        long[] iValueHandles = PyTorchLibrary.LIB.iValueToMap(iValueHandle);
+        Map<Long, Long> map = new ConcurrentHashMap<>();
         for (int i = 0; i < iValueHandles.length; i += 2) {
             map.put(iValueHandles[i], iValueHandles[i + 1]);
         }
         return map;
     }
 
-    private static NDList forwardHelper(Pointer iValueHandle, PtNDManager manager) {
+    private static NDList forwardHelper(long iValueHandle, PtNDManager manager) {
         NDList list = new NDList();
         if (isNDArray(iValueHandle)) {
             list.add(toNDArray(iValueHandle, manager));
         } else if (isNDList(iValueHandle)) {
             list.addAll(toNDList(iValueHandle, manager));
         } else if (isList(iValueHandle) || isTuple(iValueHandle)) {
-            for (Pointer handle : toIValueArray(iValueHandle)) {
+            for (long handle : toIValueArray(iValueHandle)) {
                 list.addAll(forwardHelper(handle, manager));
             }
         } else if (isMap(iValueHandle)) {
             // Only allows <String, NDArray> type of map
-            Map<Pointer, Pointer> map = toIValueMap(iValueHandle);
-            for (Map.Entry<Pointer, Pointer> entry : map.entrySet()) {
+            Map<Long, Long> map = toIValueMap(iValueHandle);
+            for (Map.Entry<Long, Long> entry : map.entrySet()) {
                 String name = toString(entry.getKey());
                 // free the IValue handle
                 PyTorchLibrary.LIB.torchDeleteIValue(entry.getKey());
@@ -231,13 +232,11 @@ public final class IValueUtils {
      * @return result {@link NDList}
      */
     public static NDList forward(PtSymbolBlock block, NDList inputs, boolean isTrain) {
-        Pointer[] arrayHandles =
-                inputs.stream()
-                        .map(input -> ((PtNDArray) input).getHandle())
-                        .toArray(Pointer[]::new);
+        long[] arrayHandles =
+                inputs.stream().mapToLong(input -> ((PtNDArray) input).getHandle()).toArray();
         String[] names = inputs.stream().map(NDArray::getName).toArray(String[]::new);
-        Pointer[] iValueInputs = getInputs(arrayHandles, names);
-        Pointer result = PyTorchLibrary.LIB.moduleForward(block.getHandle(), iValueInputs, isTrain);
+        long[] iValueInputs = getInputs(arrayHandles, names);
+        long result = PyTorchLibrary.LIB.moduleForward(block.getHandle(), iValueInputs, isTrain);
         PtNDManager manager = (PtNDManager) inputs.get(0).getManager();
         return forwardHelper(result, manager);
     }
@@ -250,13 +249,13 @@ public final class IValueUtils {
         return name.contains(".");
     }
 
-    private static Pointer[] getInputs(Pointer[] arrays, String[] names) {
-        List<PairList<String, Pointer>> outputs = new ArrayList<>();
+    private static long[] getInputs(long[] arrays, String[] names) {
+        List<PairList<String, Long>> outputs = new ArrayList<>();
         Map<String, Integer> indexMap = new ConcurrentHashMap<>();
         for (int i = 0; i < arrays.length; i++) {
             String name = names[i];
             if (name == null || (!isNameList(name) && !isNameDict(name))) {
-                PairList<String, Pointer> list = new PairList<>();
+                PairList<String, Long> list = new PairList<>();
                 list.add(new Pair<>(null, toIValuePointer(arrays[i])));
                 outputs.add(list);
                 continue;
@@ -281,20 +280,32 @@ public final class IValueUtils {
                 outputs.get(indexMap.get(name)).add(new Pair<>(name, arrays[i]));
             }
         }
-        Pointer[] pointers = new Pointer[outputs.size()];
+        long[] pointers = new long[outputs.size()];
         for (int i = 0; i < outputs.size(); ++i) {
             // not List, Dict input
             if (outputs.get(i).size() == 1 && outputs.get(i).get(0).getKey() == null) {
                 pointers[i] = outputs.get(i).get(0).getValue();
             } else if (isNameList(outputs.get(i).get(0).getKey())) {
-                pointers[i] = iValueFromList(outputs.get(i).valueArray(new Pointer[0]));
+                pointers[i] =
+                        iValueFromList(
+                                toPrimitiveLongArray(outputs.get(i).valueArray(new Long[0])));
             } else {
-                PairList<String, Pointer> dict = outputs.get(i);
+                PairList<String, Long> dict = outputs.get(i);
                 pointers[i] =
                         iValueFromDict(
-                                dict.valueArray(new Pointer[0]), dict.keyArray(new String[0]));
+                                toPrimitiveLongArray(dict.valueArray(new Long[0])),
+                                dict.keyArray(new String[0]));
             }
         }
         return pointers;
+    }
+
+    private static long[] toPrimitiveLongArray(Long[] array) {
+        if (array == null) {
+            return null;
+        } else if (array.length == 0) {
+            return new long[0];
+        }
+        return Stream.of(array).mapToLong(Long::longValue).toArray();
     }
 }

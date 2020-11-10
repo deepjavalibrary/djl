@@ -18,28 +18,28 @@
 
 // The file is the implementation for PyTorch neural network functional ops
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSoftmax(
-    JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim, jint jdtype) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSoftmax(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlong jdim, jint jdtype) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->softmax(jdim, utils::GetScalarTypeFromDType(jdtype)));
-  return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLogSoftmax(
-    JNIEnv* env, jobject jthis, jobject jhandle, jlong jdim, jint jdtype) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLogSoftmax(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlong jdim, jint jdtype) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->log_softmax(jdim, utils::GetScalarTypeFromDType(jdtype)));
-  return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNInterpolate(
-    JNIEnv* env, jobject jthis, jobject jhandle, jlongArray jsize, jint jmode, jboolean jalign_corners) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNInterpolate(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlongArray jsize, jint jmode, jboolean jalign_corners) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const auto size_vec = utils::GetVecFromJLongArray(env, jsize);
 #if defined(__ANDROID__)
   torch::Tensor result;
@@ -63,33 +63,32 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNInterpol
   }
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::interpolate(*tensor_ptr, options));
 #endif
-  return utils::CreatePointer<const torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLinear(
-    JNIEnv* env, jobject jthis, jobject jinput, jobject jweight, jobject jbias) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLinear(
+    JNIEnv* env, jobject jthis, jlong jinput, jlong jweight, jlong jbias) {
   API_BEGIN()
-  auto* input_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jinput);
-  auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jweight);
+  auto* input_ptr = reinterpret_cast<torch::Tensor*>(jinput);
+  auto* weight_ptr = reinterpret_cast<torch::Tensor*>(jweight);
   torch::Tensor bias = {};
-  if (!env->IsSameObject(jbias, nullptr)) {
-    bias = *utils::GetPointerFromJHandle<const torch::Tensor>(env, jbias);
+  if (jbias != utils::NULL_PTR) {
+    bias = *reinterpret_cast<torch::Tensor*>(jbias);
   }
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::linear(*input_ptr, *weight_ptr, bias));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNConvNd(JNIEnv* env, jobject jthis,
-    jobject jinput, jobject jweight, jobject jbias, jlongArray jstride, jlongArray jpadding, jlongArray jdilation,
-    jint jgroups) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNConvNd(JNIEnv* env, jobject jthis, jlong jinput,
+    jlong jweight, jlong jbias, jlongArray jstride, jlongArray jpadding, jlongArray jdilation, jint jgroups) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
-  const auto* weigtht_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jweight);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
+  const auto* weigtht_ptr = reinterpret_cast<torch::Tensor*>(jweight);
   torch::Tensor bias = {};
-  if (!env->IsSameObject(jbias, nullptr)) {
-    bias = *utils::GetPointerFromJHandle<const torch::Tensor>(env, jbias);
+  if (jbias != utils::NULL_PTR) {
+    bias = *reinterpret_cast<torch::Tensor*>(jbias);
   }
   const std::vector<int64_t> strideVec = utils::GetVecFromJLongArray(env, jstride);
   const std::vector<int64_t> paddingVec = utils::GetVecFromJLongArray(env, jpadding);
@@ -107,116 +106,113 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNConvNd(J
     result_ptr =
         new torch::Tensor(torch::conv3d(*tensor_ptr, *weigtht_ptr, bias, strideVec, paddingVec, dilationVec, jgroups));
   }
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNBatchNorm(JNIEnv* env, jobject jthis,
-    jobject jinput, jobject jrunning_mean, jobject jrunning_var, jobject jweight, jobject jbias, jboolean jtraining,
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNBatchNorm(JNIEnv* env, jobject jthis,
+    jlong jinput, jlong jrunning_mean, jlong jrunning_var, jlong jweight, jlong jbias, jboolean jtraining,
     jdouble jmomentum, jdouble jeps) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
-  const auto* running_mean_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jrunning_mean);
-  const auto* running_var_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jrunning_var);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
+  const auto* running_mean_ptr = reinterpret_cast<torch::Tensor*>(jrunning_mean);
+  const auto* running_var_ptr = reinterpret_cast<torch::Tensor*>(jrunning_var);
   torch::Tensor weight = {};
   torch::Tensor bias = {};
-  if (!env->IsSameObject(jweight, nullptr)) {
-    weight = *utils::GetPointerFromJHandle<const torch::Tensor>(env, jweight);
+  if (jweight != utils::NULL_PTR) {
+    weight = *reinterpret_cast<torch::Tensor*>(jweight);
   }
-  if (!env->IsSameObject(jbias, nullptr)) {
-    bias = *utils::GetPointerFromJHandle<const torch::Tensor>(env, jbias);
+  if (jbias != utils::NULL_PTR) {
+    bias = *reinterpret_cast<torch::Tensor*>(jbias);
   }
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::batch_norm(*tensor_ptr, *running_mean_ptr,
       *running_var_ptr,
       torch::nn::functional::BatchNormFuncOptions().weight(weight).bias(bias).momentum(jmomentum).eps(jeps).training(
           jtraining)));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNDropout(
-    JNIEnv* env, jobject jthis, jobject jinput, jdouble probability, jboolean jtraining) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNDropout(
+    JNIEnv* env, jobject jthis, jlong jinput, jdouble probability, jboolean jtraining) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::dropout(
       *tensor_ptr, torch::nn::functional::DropoutFuncOptions().p(probability).training(jtraining)));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRelu(
-    JNIEnv* env, jobject jthis, jobject jinput) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRelu(JNIEnv* env, jobject jthis, jlong jinput) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   // FIIXME the compiled libtorch have reference error
   // use torch::relu() for now until the fix
   const auto* result_ptr = new torch::Tensor(torch::relu(*tensor_ptr));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNSoftPlus(
-    JNIEnv* env, jobject jthis, jobject jinput) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNSoftPlus(
+    JNIEnv* env, jobject jthis, jlong jinput) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::softplus(*tensor_ptr));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNSoftSign(
-    JNIEnv* env, jobject jthis, jobject jinput) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNSoftSign(
+    JNIEnv* env, jobject jthis, jlong jinput) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::softsign(*tensor_ptr));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLeakyRelu(
-    JNIEnv* env, jobject jthis, jobject jinput, jdouble jnegative_slope) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLeakyRelu(
+    JNIEnv* env, jobject jthis, jlong jinput, jdouble jnegative_slope) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::leaky_relu(
       *tensor_ptr, torch::nn::functional::LeakyReLUFuncOptions().negative_slope(jnegative_slope)));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNElu(
-    JNIEnv* env, jobject jthis, jobject jinput, jdouble jalpha) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNElu(
+    JNIEnv* env, jobject jthis, jlong jinput, jdouble jalpha) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   const auto* result_ptr =
       new torch::Tensor(torch::nn::functional::elu(*tensor_ptr, torch::nn::functional::ELUFuncOptions().alpha(jalpha)));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNSelu(
-    JNIEnv* env, jobject jthis, jobject jinput) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNSelu(JNIEnv* env, jobject jthis, jlong jinput) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   // FIIXME the compiled libtorch have reference error
   // use torch::selu() for now until the fix
   const auto* result_ptr = new torch::Tensor(torch::selu(*tensor_ptr));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNGelu(
-    JNIEnv* env, jobject jthis, jobject jinput) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNGelu(JNIEnv* env, jobject jthis, jlong jinput) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::gelu(*tensor_ptr));
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNMaxPool(JNIEnv* env, jobject jthis,
-    jobject jhandle, jlongArray jkernel, jlongArray jstride, jlongArray jpadding, jboolean jceil_mode) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNMaxPool(JNIEnv* env, jobject jthis, jlong jhandle,
+    jlongArray jkernel, jlongArray jstride, jlongArray jpadding, jboolean jceil_mode) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const std::vector<int64_t> kernel_vec = utils::GetVecFromJLongArray(env, jkernel);
   const std::vector<int64_t> stride_vec = utils::GetVecFromJLongArray(env, jstride);
   const std::vector<int64_t> padding_vec = utils::GetVecFromJLongArray(env, jpadding);
@@ -241,15 +237,15 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNMaxPool(
                                                            .padding(padding_vec)
                                                            .ceil_mode(jceil_mode)));
   }
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAvgPool(JNIEnv* env, jobject jthis,
-    jobject jinput, jlongArray jkernel_size, jlongArray jstride, jlongArray jpaddiing, jboolean jceil_mode,
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAvgPool(JNIEnv* env, jobject jthis, jlong jinput,
+    jlongArray jkernel_size, jlongArray jstride, jlongArray jpaddiing, jboolean jceil_mode,
     jboolean jcount_include_pad) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   const std::vector<int64_t> kernel_vec = utils::GetVecFromJLongArray(env, jkernel_size);
   const std::vector<int64_t> stride_vec = utils::GetVecFromJLongArray(env, jstride);
   const std::vector<int64_t> padding_vec = utils::GetVecFromJLongArray(env, jpaddiing);
@@ -275,14 +271,14 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAvgPool(
                                                            .padding(padding_vec)
                                                            .ceil_mode(jceil_mode)));
   }
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAdaptiveAvgPool(
-    JNIEnv* env, jobject jthis, jobject jhandle, jlongArray joutput_size) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAdaptiveAvgPool(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlongArray joutput_size) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const std::vector<int64_t> output_vec = utils::GetVecFromJLongArray(env, joutput_size);
 
   torch::Tensor* result_ptr = nullptr;
@@ -297,14 +293,14 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAdaptive
     result_ptr = new torch::Tensor(torch::nn::functional::adaptive_avg_pool3d(
         *tensor_ptr, torch::nn::functional::AdaptiveAvgPool3dFuncOptions(output_vec)));
   }
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAdaptiveMaxPool(
-    JNIEnv* env, jobject jthis, jobject jhandle, jlongArray joutput_size) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAdaptiveMaxPool(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlongArray joutput_size) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jhandle);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const std::vector<int64_t> output_vec = utils::GetVecFromJLongArray(env, joutput_size);
 
   torch::Tensor* result_ptr = nullptr;
@@ -319,14 +315,14 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAdaptive
     result_ptr = new torch::Tensor(torch::nn::functional::adaptive_max_pool3d(
         *tensor_ptr, torch::nn::functional::AdaptiveMaxPool3dFuncOptions(output_vec)));
   }
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLpPool(JNIEnv* env, jobject jthis,
-    jobject jinput, jdouble jnorm_type, jlongArray jkernel_size, jlongArray jstride, jboolean jceil_mode) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLpPool(JNIEnv* env, jobject jthis, jlong jinput,
+    jdouble jnorm_type, jlongArray jkernel_size, jlongArray jstride, jboolean jceil_mode) {
   API_BEGIN()
-  const auto* tensor_ptr = utils::GetPointerFromJHandle<const torch::Tensor>(env, jinput);
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   const std::vector<int64_t> kernel_vec = utils::GetVecFromJLongArray(env, jkernel_size);
   const std::vector<int64_t> stride_vec = utils::GetVecFromJLongArray(env, jstride);
 
@@ -339,6 +335,6 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLpPool(J
     result_ptr = new torch::Tensor(torch::nn::functional::lp_pool2d(*tensor_ptr,
         torch::nn::functional::LPPool2dFuncOptions(jnorm_type, kernel_vec).stride(stride_vec).ceil_mode(jceil_mode)));
   }
-  return utils::CreatePointer<torch::Tensor>(env, result_ptr);
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }

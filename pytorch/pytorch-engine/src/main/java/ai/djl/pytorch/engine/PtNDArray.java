@@ -22,7 +22,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.NativeResource;
-import ai.djl.pytorch.jni.Pointer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -57,7 +56,7 @@ public class PtNDArray extends NativeResource implements NDArray {
      * @param manager the manager to attach the new array to
      * @param handle the pointer to the native PyTorch memory
      */
-    PtNDArray(PtNDManager manager, Pointer handle) {
+    public PtNDArray(PtNDManager manager, long handle) {
         super(handle);
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
@@ -1301,9 +1300,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        Pointer pointer = handle.getAndSet(null);
+        Long pointer = handle.getAndSet(null);
         if (pointer != null) {
-            JniUtils.deleteNdArray(pointer);
+            JniUtils.deleteNDArray(pointer);
             manager.detach(getUid());
             manager = null;
         }
