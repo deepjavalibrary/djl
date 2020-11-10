@@ -17,15 +17,15 @@
 
 // The file is the implementation for PyTorch training operations
 
-JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(JNIEnv* env, jobject jthis, jobject jweight,
-    jobject jgrad, jobject jmean, jobject jvariance, jfloat learning_rate, jfloat weight_decay, jfloat rescale_grad,
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(JNIEnv* env, jobject jthis, jlong jweight,
+    jlong jgrad, jlong jmean, jlong jvariance, jfloat learning_rate, jfloat weight_decay, jfloat rescale_grad,
     jfloat clip_grad, jfloat beta1, jfloat beta2, jfloat eps) {
   API_BEGIN()
   torch::autograd::AutoGradMode no_autograd_guard{false};
-  const auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jweight);
-  const auto grad = utils::GetPointerFromJHandle<torch::Tensor>(env, jgrad)->clone();
-  const auto* mean_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jmean);
-  const auto* variance_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jvariance);
+  const auto* weight_ptr = reinterpret_cast<torch::Tensor*>(jweight);
+  const auto grad = reinterpret_cast<torch::Tensor*>(jgrad)->clone();
+  const auto* mean_ptr = reinterpret_cast<torch::Tensor*>(jmean);
+  const auto* variance_ptr = reinterpret_cast<torch::Tensor*>(jvariance);
   // following this formula: rescaled_grad = clip(rescale_grad * grad, clip_gradient)) + wd * weight
   if (rescale_grad != 1.0) {
     grad.mul_(rescale_grad);
@@ -41,15 +41,15 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(JNIEnv*
   API_END()
 }
 
-JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_sgdUpdate(JNIEnv* env, jobject jthis, jobject jweight,
-    jobject jgrad, jobject jstate, jfloat learning_rate, jfloat weight_decay, jfloat rescale_grad, jfloat clip_grad,
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_sgdUpdate(JNIEnv* env, jobject jthis, jlong jweight,
+    jlong jgrad, jlong jstate, jfloat learning_rate, jfloat weight_decay, jfloat rescale_grad, jfloat clip_grad,
     jfloat momentum) {
   API_BEGIN()
   // disable gradient calculation
   torch::autograd::AutoGradMode no_autograd_guard{false};
-  const auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jweight);
+  const auto* weight_ptr = reinterpret_cast<torch::Tensor*>(jweight);
   // use clone to avoid input grad change
-  auto grad = utils::GetPointerFromJHandle<torch::Tensor>(env, jgrad)->clone();
+  auto grad = reinterpret_cast<torch::Tensor*>(jgrad)->clone();
   // following this formula: rescaled_grad = clip(rescale_grad * grad, clip_gradient)) + wd * weight
   if (rescale_grad != 1.0) {
     grad.mul_(rescale_grad);
@@ -64,17 +64,17 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_sgdUpdate(JNIEnv* 
   if (momentum == 0.0) {
     weight_ptr->sub_(grad);
   } else {
-    const auto* state_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jstate);
+    const auto* state_ptr = reinterpret_cast<torch::Tensor*>(jstate);
     state_ptr->mul_(momentum).add_(grad);
     weight_ptr->sub_(*state_ptr);
   }
   API_END()
 }
 
-JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_zeroGrad(JNIEnv* env, jobject jthis, jobject jhandle) {
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_zeroGrad(JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
   torch::NoGradGuard NoGradGuard;
-  const auto* weight_ptr = utils::GetPointerFromJHandle<torch::Tensor>(env, jhandle);
+  const auto* weight_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   // the check is only for batch_size < # of gpus
   // where some required_grad weights never call backward
   // TODO we should avoid the create parameter but not applying backward

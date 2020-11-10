@@ -22,7 +22,6 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.pytorch.jni.JniUtils;
-import ai.djl.pytorch.jni.Pointer;
 import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -50,17 +49,6 @@ public class PtNDManager extends BaseNDManager {
     @Override
     public ByteBuffer allocateDirect(int capacity) {
         return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
-    }
-
-    /**
-     * Creates an {@link PtNDArray} with the given Native Memory Pointer and attaches to this
-     * manager.
-     *
-     * @param handle the array's native memory pointer
-     * @return the created array
-     */
-    public PtNDArray create(Pointer handle) {
-        return new PtNDArray(this, handle);
     }
 
     /** {@inheritDoc} */

@@ -24,13 +24,13 @@ public abstract class NativeResource implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeResource.class);
 
-    protected final AtomicReference<Pointer> handle;
-    private String uid;
+    protected final AtomicReference<Long> handle;
+    private final String uid;
     private Exception exception;
 
-    protected NativeResource(Pointer pointer) {
-        this.handle = new AtomicReference<>(pointer);
-        uid = String.valueOf(pointer.getValue());
+    protected NativeResource(long handle) {
+        this.handle = new AtomicReference<>(handle);
+        uid = String.valueOf(handle);
         if (logger.isTraceEnabled()) {
             exception = new Exception();
         }
@@ -46,12 +46,12 @@ public abstract class NativeResource implements AutoCloseable {
     }
 
     /**
-     * Gets the {@link Pointer} to this resource.
+     * Gets the long type pointer to this resource.
      *
-     * @return the {@link Pointer} to this resource
+     * @return the long type pointer to this resource
      */
-    protected Pointer getHandle() {
-        Pointer pointer = handle.get();
+    protected long getHandle() {
+        Long pointer = handle.get();
         if (pointer == null) {
             throw new IllegalStateException("Native resource has been release already.");
         }

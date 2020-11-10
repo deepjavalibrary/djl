@@ -148,11 +148,11 @@ inline std::string FormatMemory(int64_t bytes) {
   std::ostringstream oss;
   oss.precision(2);
   if (std::abs(bytes) >= gb) {
-    oss << std::fixed << static_cast<double>(bytes / gb) << " Gb";
+    oss << std::fixed << static_cast<double>(bytes) / gb << " Gb";
   } else if (std::abs(bytes) >= mb) {
-    oss << std::fixed << static_cast<double>(bytes / mb) << " Mb";
+    oss << std::fixed << static_cast<double>(bytes) / mb << " Mb";
   } else if (std::abs(bytes) >= kb) {
-    oss << std::fixed << static_cast<double>(bytes / kb) << " Kb";
+    oss << std::fixed << static_cast<double>(bytes) / kb << " Kb";
   } else {
     oss << bytes << " b";
   }

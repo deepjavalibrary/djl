@@ -23,7 +23,7 @@ struct JITCallGuard {
   torch::NoGradGuard no_grad;
 };
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad(
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad(
     JNIEnv* env, jobject jthis, jstring jpath, jintArray jarray, jobjectArray jefnames, jobjectArray jefvalues) {
   API_BEGIN()
   const std::string path = utils::GetStringFromJString(env, jpath);
@@ -38,43 +38,42 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad(
   const torch::jit::script::Module module = torch::jit::load(path, device, map);
   const auto* module_ptr = new torch::jit::script::Module(module);
   for (size_t i = 0; i < len; ++i) {
-      auto jname = (jstring)env->GetObjectArrayElement(jefnames, i);
-      auto name = utils::GetStringFromJString(env, jname);
-      env->SetObjectArrayElement(jefvalues, i, env->NewStringUTF(map[name].c_str()));
+    auto jname = (jstring)env->GetObjectArrayElement(jefnames, i);
+    auto name = utils::GetStringFromJString(env, jname);
+    env->SetObjectArrayElement(jefvalues, i, env->NewStringUTF(map[name].c_str()));
   }
-  return utils::CreatePointer<torch::jit::script::Module>(env, module_ptr);
+  return reinterpret_cast<uintptr_t>(module_ptr);
   API_END_RETURN()
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleEval(
-    JNIEnv* env, jobject jthis, jobject module_handle) {
+    JNIEnv* env, jobject jthis, jlong module_handle) {
   API_BEGIN()
-  auto* module_ptr = utils::GetPointerFromJHandle<torch::jit::script::Module>(env, module_handle);
+  auto* module_ptr = reinterpret_cast<torch::jit::script::Module*>(module_handle);
   module_ptr->eval();
   API_END()
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleTrain(
-    JNIEnv* env, jobject jthis, jobject module_handle) {
+    JNIEnv* env, jobject jthis, jlong module_handle) {
   API_BEGIN()
-  auto* module_ptr = utils::GetPointerFromJHandle<torch::jit::script::Module>(env, module_handle);
+  auto* module_ptr = reinterpret_cast<torch::jit::script::Module*>(module_handle);
   module_ptr->train(true);
   API_END()
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
-    JNIEnv* env, jobject jthis, jobject module_handle, jobjectArray jivalue_ptrs, jboolean jis_train) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
+    JNIEnv* env, jobject jthis, jlong module_handle, jlongArray jivalue_ptrs, jboolean jis_train) {
   API_BEGIN()
-  auto* module_ptr = utils::GetPointerFromJHandle<torch::jit::script::Module>(env, module_handle);
-  auto len = static_cast<size_t>(env->GetArrayLength(jivalue_ptrs));
+  auto* module_ptr = reinterpret_cast<torch::jit::script::Module*>(module_handle);
+  size_t len = env->GetArrayLength(jivalue_ptrs);
+  jlong* jptrs = env->GetLongArrayElements(jivalue_ptrs, JNI_FALSE);
   std::vector<torch::IValue> inputs;
   inputs.reserve(len);
-  for (size_t i = 0; i < len; ++i) {
-    auto* ivalue_ptr =
-        utils::GetPointerFromJHandle<const torch::IValue>(env, env->GetObjectArrayElement(jivalue_ptrs, i));
-    inputs.emplace_back(*ivalue_ptr);
+  for (auto i = 0; i < len; ++i) {
+    inputs.emplace_back(*reinterpret_cast<torch::IValue*>(jptrs[i]));
   }
-  auto output = [&]() {
+  torch::IValue output = [&]() {
     if (jis_train) {
       return module_ptr->forward(inputs);
     }
@@ -82,25 +81,22 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
     JITCallGuard guard;
     return module_ptr->forward(inputs);
   }();
-
   // release resource
   // each IValue is created by new, free the memory after the inference
-  for (size_t i = 0; i < len; ++i) {
-    auto* ivalue_ptr =
-        utils::GetPointerFromJHandle<const torch::IValue>(env, env->GetObjectArrayElement(jivalue_ptrs, i));
-    delete ivalue_ptr;
+  for (auto i = 0; i < len; ++i) {
+    delete reinterpret_cast<torch::IValue*>(jptrs[i]);
   }
-  env->DeleteLocalRef(jivalue_ptrs);
-
+  env->ReleaseLongArrayElements(jivalue_ptrs, jptrs, utils::RELEASE_MODE);
   const auto* result_ptr = new torch::IValue(output);
-  return utils::CreatePointer<torch::IValue>(env, result_ptr);
+  std::cout << "isTensor " << result_ptr->isTensor() << std::endl;
+  return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDeleteModule(
-    JNIEnv* env, jobject jthis, jobject jhandle) {
+    JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
-  const auto* module_ptr = utils::GetPointerFromJHandle<const torch::jit::script::Module>(env, jhandle);
+  auto* module_ptr = reinterpret_cast<torch::jit::script::Module*>(jhandle);
   delete module_ptr;
   API_END()
 }
