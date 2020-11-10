@@ -51,6 +51,7 @@ import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.PaddingStackBatchifier;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 
 public final class TrainAmazonReviewRanking {
@@ -82,12 +83,13 @@ public final class TrainAmazonReviewRanking {
                                 "https://alpha-djl-demos.s3.amazonaws.com/model/examples/distilbert.zip")
                         .optProgress(new ProgressBar())
                         .build();
+        int maxTokenLength = 64;
         try (Model model = Model.newInstance("AmazonReviewRatingClassification");
                 ZooModel<NDList, NDList> embedding = ModelZoo.loadModel(criteria)) {
             // Prepare dataset
             BertFullTokenizer tokenizer =
                     new BertFullTokenizer(embedding.getArtifact("vocab.txt").getPath(), true);
-            CsvDataset amazonReviewDataset = getDataset(arguments, tokenizer);
+            CsvDataset amazonReviewDataset = getDataset(arguments, tokenizer, maxTokenLength);
             // split data with 7:3 train:valid ratio
             RandomAccessDataset[] datasets = amazonReviewDataset.randomSplit(7, 3);
             RandomAccessDataset trainingSet = datasets[0];
@@ -108,15 +110,18 @@ public final class TrainAmazonReviewRanking {
         }
     }
 
-    private static CsvDataset getDataset(Arguments arguments, BertFullTokenizer tokenizer) {
+    private static CsvDataset getDataset(
+            Arguments arguments, BertFullTokenizer tokenizer, int maxLength) {
         String amazonReview =
-                "https://github.com/data-science-on-aws/workshop/raw/master/07_train/data/amazon_reviews_us_Digital_Software_v1_00.tsv.gz";
+                "https://alpha-djl-demos.s3.amazonaws.com/dataset/nlp/amazon_reviews_us_Digital_Software_v1_00.tsv.gz";
         float paddingToken = tokenizer.getVocabulary().getIndex("[PAD]");
         return CsvDataset.builder()
                 .optCsvUrl(amazonReview)
                 .setCsvFormat(CSVFormat.TDF.withQuote(null).withHeader())
                 .setSampling(arguments.getBatchSize(), true)
-                .addFeature(new CsvDataset.Feature("review_body", new BertFeaturizer(tokenizer)))
+                .addFeature(
+                        new CsvDataset.Feature(
+                                "review_body", new BertFeaturizer(tokenizer, maxLength)))
                 .addNumericLabel("star_rating")
                 .optDataBatchifier(
                         PaddingStackBatchifier.builder()
@@ -162,16 +167,20 @@ public final class TrainAmazonReviewRanking {
     private static final class BertFeaturizer implements CsvDataset.Featurizer {
 
         private final BertFullTokenizer tokenizer;
+        private final int maxLength;
 
-        public BertFeaturizer(BertFullTokenizer tokenizer) {
+        public BertFeaturizer(BertFullTokenizer tokenizer, int maxLength) {
             this.tokenizer = tokenizer;
+            this.maxLength = maxLength;
         }
 
         /** {@inheritDoc} */
         @Override
         public void featurize(DynamicBuffer buf, String input) {
             SimpleVocabulary vocab = tokenizer.getVocabulary();
-            tokenizer.tokenize(input).forEach(token -> buf.put(vocab.getIndex(token)));
+            List<String> tokens = tokenizer.tokenize(input);
+            tokens = tokens.size() > maxLength ? tokens.subList(0, maxLength) : tokens;
+            tokens.forEach(token -> buf.put(vocab.getIndex(token)));
         }
     }
 
