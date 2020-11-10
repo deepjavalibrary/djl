@@ -75,6 +75,17 @@ public class Input {
     }
 
     /**
+     * Returns the value to which the specified key is mapped.
+     *
+     * @param key the key whose associated value is to be returned
+     * @param defaultValue the default mapping of the key
+     * @return the value to which the specified key is mapped
+     */
+    public String getProperty(String key, String defaultValue) {
+        return properties.getOrDefault(key, defaultValue);
+    }
+
+    /**
      * Returns the content of the input.
      *
      * <p>A {@code Input} may contains multiple data.

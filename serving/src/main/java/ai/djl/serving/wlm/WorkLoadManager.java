@@ -45,7 +45,15 @@ class WorkLoadManager {
 
     public boolean hasWorker(String modelName) {
         List<WorkerThread> worker = workers.get(modelName);
-        return worker != null && !worker.isEmpty();
+        if (worker == null || worker.isEmpty()) {
+            return false;
+        }
+        for (WorkerThread thread : worker) {
+            if (thread.isRunning()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getNumRunningWorkers(String modelName) {
@@ -83,7 +91,7 @@ class WorkLoadManager {
             } else {
                 for (int i = currentWorkers - 1; i >= maxWorker; --i) {
                     WorkerThread thread = threads.remove(i);
-                    thread.shutdown();
+                    thread.shutdown(WorkerState.WORKER_SCALED_DOWN);
                 }
             }
         }
