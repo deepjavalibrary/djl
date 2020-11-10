@@ -21,16 +21,10 @@ import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.modality.nlp.preprocess.TextCleaner;
 import ai.djl.modality.nlp.preprocess.TextProcessor;
 import ai.djl.modality.nlp.preprocess.UnicodeNormalizer;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * BertFullTokenizer runs end to end tokenization of input text
@@ -44,8 +38,6 @@ import org.slf4j.LoggerFactory;
  */
 public class BertFullTokenizer extends SimpleTokenizer {
 
-    private static final Logger logger = LoggerFactory.getLogger(BertFullTokenizer.class);
-
     private SimpleVocabulary vocabulary;
     private List<TextProcessor> basicBertPreprocessors;
     private WordpieceTokenizer wordpieceTokenizer;
@@ -53,11 +45,11 @@ public class BertFullTokenizer extends SimpleTokenizer {
     /**
      * Creates an instance of {@code BertFullTokenizer}.
      *
-     * @param filepath the path to vocabulary file
+     * @param vocabulary the BERT vocabulary
      * @param lowerCase whether to convert tokens to lowercase
      */
-    public BertFullTokenizer(String filepath, boolean lowerCase) {
-        parse(filepath);
+    public BertFullTokenizer(SimpleVocabulary vocabulary, boolean lowerCase) {
+        this.vocabulary = vocabulary;
         basicBertPreprocessors = getPreprocessors(lowerCase);
         wordpieceTokenizer = new WordpieceTokenizer(vocabulary, "[UNK]", 200);
     }
@@ -102,27 +94,5 @@ public class BertFullTokenizer extends SimpleTokenizer {
         processors.add(new PunctuationSeparator());
         processors.add(new LambdaProcessor(String::trim));
         return processors;
-    }
-
-    private void parse(String path) {
-        List<String> tokens = new ArrayList<>();
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(path))) {
-            String token;
-            while ((token = reader.readLine()) != null) {
-                token = token.trim();
-                if (!token.isEmpty()) {
-                    tokens.add(token);
-                }
-            }
-        } catch (IOException e) {
-            logger.error("Failed read token file", e);
-        }
-
-        vocabulary =
-                new SimpleVocabulary.VocabularyBuilder()
-                        .optMinFrequency(1)
-                        .add(tokens)
-                        .optUnknownToken("[UNK]")
-                        .build();
     }
 }

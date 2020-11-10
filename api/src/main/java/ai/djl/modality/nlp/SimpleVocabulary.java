@@ -12,6 +12,10 @@
  */
 package ai.djl.modality.nlp;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,9 +24,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** The simple implementation of Vocabulary. */
 public class SimpleVocabulary implements Vocabulary {
+
+    private static final Logger logger = LoggerFactory.getLogger(SimpleVocabulary.class);
 
     private Map<String, TokenInfo> tokens = new ConcurrentHashMap<>();
     private List<String> indexToToken = new ArrayList<>();
@@ -179,6 +188,48 @@ public class SimpleVocabulary implements Vocabulary {
         public VocabularyBuilder addAll(List<List<String>> sentences) {
             this.sentences.addAll(sentences);
             return this;
+        }
+
+        /**
+         * Adds a text vocabulary to the {@link SimpleVocabulary}.
+         *
+         * <pre>
+         *   Example text file(vocab.txt):
+         *   token1
+         *   token2
+         *   token3
+         *   will be mapped to index of 0 1 2
+         * </pre>
+         *
+         * @param path the path to the text file
+         * @return this {@code VocabularyBuilder}
+         */
+        public VocabularyBuilder addFromTextFile(String path) {
+            List<String> tokens = new ArrayList<>();
+            try (BufferedReader reader = Files.newBufferedReader(Paths.get(path))) {
+                String token;
+                while ((token = reader.readLine()) != null) {
+                    token = token.trim();
+                    if (!token.isEmpty()) {
+                        tokens.add(token);
+                    }
+                }
+            } catch (IOException e) {
+                logger.error("Failed read token file", e);
+            }
+            return add(tokens);
+        }
+
+        /**
+         * Adds a customized vocabulary to the {@link SimpleVocabulary}.
+         *
+         * @param path the path to load the file
+         * @param lambda the function to parse the vocabulary file
+         * @return this {@code VocabularyBuilder}
+         */
+        public VocabularyBuilder addFromCustomizedFile(
+                String path, Function<String, List<String>> lambda) {
+            return add(lambda.apply(path));
         }
 
         /**

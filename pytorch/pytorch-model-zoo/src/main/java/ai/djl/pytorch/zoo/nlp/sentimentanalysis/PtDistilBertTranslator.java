@@ -14,12 +14,12 @@ package ai.djl.pytorch.zoo.nlp.sentimentanalysis;
 
 import ai.djl.Model;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.bert.BertTokenizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.pytorch.zoo.nlp.PtBertVocabulary;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.StackBatchifier;
 import ai.djl.translate.Translator;
@@ -48,9 +48,14 @@ public class PtDistilBertTranslator implements Translator<String, Classification
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
         vocabulary =
-                model.getArtifact(
-                        "distilbert-base-uncased-finetuned-sst-2-english-vocab.txt",
-                        PtBertVocabulary::parse);
+                new SimpleVocabulary.VocabularyBuilder()
+                        .optMinFrequency(1)
+                        .addFromTextFile(
+                                model.getArtifact(
+                                                "distilbert-base-uncased-finetuned-sst-2-english-vocab.txt")
+                                        .getPath())
+                        .optUnknownToken("[UNK]")
+                        .build();
         tokenizer = new BertTokenizer();
     }
 

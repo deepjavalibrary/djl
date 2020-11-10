@@ -13,6 +13,7 @@
 package ai.djl.mxnet.zoo.nlp.qa;
 
 import ai.djl.Model;
+import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.bert.BertToken;
 import ai.djl.modality.nlp.bert.BertTokenizer;
@@ -24,8 +25,14 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
+import com.google.gson.annotations.SerializedName;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,7 +56,25 @@ public class MxBertQATranslator extends QATranslator {
     /** {@inheritDoc} */
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
-        vocabulary = model.getArtifact("vocab.json", MxBertVocabulary::parse);
+        vocabulary =
+                new SimpleVocabulary.VocabularyBuilder()
+                        .optMinFrequency(1)
+                        .addFromCustomizedFile(
+                                model.getArtifact("vocab.json").toString(),
+                                url -> {
+                                    try (Reader reader =
+                                            new InputStreamReader(
+                                                    new URL(url).openStream(),
+                                                    StandardCharsets.UTF_8)) {
+                                        VocabParser parser =
+                                                JsonUtils.GSON.fromJson(reader, VocabParser.class);
+                                        return parser.idx2token;
+                                    } catch (IOException e) {
+                                        throw new IllegalStateException(e);
+                                    }
+                                })
+                        .optUnknownToken("[UNK]")
+                        .build();
         tokenizer = new BertTokenizer();
     }
 
@@ -146,5 +171,11 @@ public class MxBertQATranslator extends QATranslator {
             }
             return new MxBertQATranslator(this);
         }
+    }
+
+    private static class VocabParser {
+
+        @SerializedName("idx_to_token")
+        List<String> idx2token;
     }
 }
