@@ -29,6 +29,7 @@ import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
 import com.google.gson.annotations.SerializedName;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
@@ -57,22 +58,10 @@ public class MxBertQATranslator extends QATranslator {
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
         vocabulary =
-                new SimpleVocabulary.VocabularyBuilder()
+                SimpleVocabulary.builder()
                         .optMinFrequency(1)
                         .addFromCustomizedFile(
-                                model.getArtifact("vocab.json").toString(),
-                                url -> {
-                                    try (Reader reader =
-                                            new InputStreamReader(
-                                                    new URL(url).openStream(),
-                                                    StandardCharsets.UTF_8)) {
-                                        VocabParser parser =
-                                                JsonUtils.GSON.fromJson(reader, VocabParser.class);
-                                        return parser.idx2token;
-                                    } catch (IOException e) {
-                                        throw new IllegalStateException(e);
-                                    }
-                                })
+                                model.getArtifact("vocab.json").toString(), VocabParser::parseToken)
                         .optUnknownToken("[UNK]")
                         .build();
         tokenizer = new BertTokenizer();
@@ -173,9 +162,18 @@ public class MxBertQATranslator extends QATranslator {
         }
     }
 
-    private static class VocabParser {
+    private static final class VocabParser {
 
         @SerializedName("idx_to_token")
         List<String> idx2token;
+
+        public static List<String> parseToken(String file) {
+            try (InputStream is = new URL(file).openStream();
+                    Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                return JsonUtils.GSON.fromJson(reader, VocabParser.class).idx2token;
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Invalid url: " + file, e);
+            }
+        }
     }
 }

@@ -160,11 +160,23 @@ public final class Utils {
      * @throws IOException if read file failed
      */
     public static List<String> readLines(Path file) throws IOException {
+        return readLines(file, false);
+    }
+
+    /**
+     * Reads all lines from a file.
+     *
+     * @param file the file to be read
+     * @param trim true if you want to trim the line and exclude empty lines
+     * @return all lines in the file
+     * @throws IOException if read file failed
+     */
+    public static List<String> readLines(Path file, boolean trim) throws IOException {
         if (Files.notExists(file)) {
             return Collections.emptyList();
         }
         try (InputStream is = Files.newInputStream(file)) {
-            return readLines(is);
+            return readLines(is, trim);
         }
     }
 
@@ -175,11 +187,29 @@ public final class Utils {
      * @return all lines from the input
      */
     public static List<String> readLines(InputStream is) {
+        return readLines(is, false);
+    }
+
+    /**
+     * Reads all lines from the specified InputStream.
+     *
+     * @param is the InputStream to read
+     * @param trim true if you want to trim the line and exclude empty lines
+     * @return all lines from the input
+     */
+    public static List<String> readLines(InputStream is, boolean trim) {
         List<String> list = new ArrayList<>();
         try (Scanner scanner =
                 new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\\n|\\r\\n")) {
             while (scanner.hasNext()) {
-                list.add(scanner.next());
+                String line = scanner.next();
+                if (trim) {
+                    line = line.trim();
+                    if (line.isEmpty()) {
+                        continue;
+                    }
+                }
+                list.add(line);
             }
         }
         return list;

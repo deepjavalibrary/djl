@@ -110,7 +110,7 @@ public final class BertClassification {
         @Override
         public void prepare(NDManager manager, Model model) {
             SimpleVocabulary vocabulary =
-                    new SimpleVocabulary.VocabularyBuilder()
+                    SimpleVocabulary.builder()
                             .optMinFrequency(1)
                             .addFromTextFile(vocabularyPath)
                             .optUnknownToken("[UNK]")

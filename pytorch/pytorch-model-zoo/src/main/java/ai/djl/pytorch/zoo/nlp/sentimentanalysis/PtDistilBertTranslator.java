@@ -25,6 +25,7 @@ import ai.djl.translate.StackBatchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,13 +48,11 @@ public class PtDistilBertTranslator implements Translator<String, Classification
     /** {@inheritDoc} */
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
+        URL url = model.getArtifact("distilbert-base-uncased-finetuned-sst-2-english-vocab.txt");
         vocabulary =
-                new SimpleVocabulary.VocabularyBuilder()
+                SimpleVocabulary.builder()
                         .optMinFrequency(1)
-                        .addFromTextFile(
-                                model.getArtifact(
-                                                "distilbert-base-uncased-finetuned-sst-2-english-vocab.txt")
-                                        .getPath())
+                        .addFromTextFile(url.getPath())
                         .optUnknownToken("[UNK]")
                         .build();
         tokenizer = new BertTokenizer();

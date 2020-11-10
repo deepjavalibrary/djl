@@ -45,7 +45,7 @@ public class PtBertQATranslator extends QATranslator {
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
         vocabulary =
-                new SimpleVocabulary.VocabularyBuilder()
+                SimpleVocabulary.builder()
                         .optMinFrequency(1)
                         .addFromTextFile(model.getArtifact("bert-base-uncased-vocab.txt").getPath())
                         .optUnknownToken("[UNK]")
@@ -85,8 +85,8 @@ public class PtBertQATranslator extends QATranslator {
      *
      * @return a new builder
      */
-    public static PtBertQATranslator.Builder builder() {
-        return new PtBertQATranslator.Builder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     /** The builder for Bert QA translator. */
