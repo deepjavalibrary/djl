@@ -14,4 +14,4 @@ target_include_directories(sentencepiece_native PUBLIC
     ${JNI_INCLUDE_DIRS}
     sentencepiece/src
     build/include)
-target_link_libraries(sentencepiece_native sentencepiece)
+target_link_libraries(sentencepiece_native sentencepiece-static)
