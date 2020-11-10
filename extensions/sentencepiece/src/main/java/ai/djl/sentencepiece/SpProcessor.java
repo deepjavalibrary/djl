@@ -70,6 +70,9 @@ final class SpProcessor extends NativeResource {
 
     @Override
     public void close() {
-        SentencePieceLibrary.LIB.deleteSentencePieceProcessor(getHandle());
+        Long pointer = handle.get();
+        if (pointer != null) {
+            SentencePieceLibrary.LIB.deleteSentencePieceProcessor(pointer);
+        }
     }
 }

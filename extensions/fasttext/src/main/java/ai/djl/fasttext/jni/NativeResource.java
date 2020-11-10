@@ -66,7 +66,7 @@ public abstract class NativeResource implements AutoCloseable {
     @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
-        if (handle != null) {
+        if (handle.get() != null) {
             if (exception != null) {
                 logger.warn(
                         "Resource ({}) was not closed explicitly: {}",
@@ -74,8 +74,8 @@ public abstract class NativeResource implements AutoCloseable {
                         getClass().getSimpleName());
                 logger.warn("Resource was created:", exception);
             }
+            close();
         }
-        close();
         super.finalize();
     }
 }

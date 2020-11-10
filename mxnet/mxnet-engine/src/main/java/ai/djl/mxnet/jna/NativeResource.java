@@ -86,8 +86,8 @@ public abstract class NativeResource implements AutoCloseable {
                         getClass().getSimpleName());
                 logger.warn("Resource was created:", exception);
             }
+            close();
         }
-        close();
         super.finalize();
     }
 }
