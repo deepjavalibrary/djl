@@ -89,7 +89,7 @@ inline jobjectArray Get2DIntArrayFrom2DVector(JNIEnv* env, const std::vector<std
 inline std::vector<int> GetVectorFromIntArray(JNIEnv* env, jintArray array) {
   jsize len = env->GetArrayLength(array);
 
-  void* data = env->GetPrimitiveArrayCritical(array, nullptr);
+  void* data = env->GetPrimitiveArrayCritical(array, JNI_FALSE);
   std::vector<int> vec((int*)data, ((int*)data) + len);
   env->ReleasePrimitiveArrayCritical(array, data, JNI_ABORT);
 

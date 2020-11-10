@@ -45,6 +45,8 @@ jobs:
       # If there are code change on JNI, we need to rebuild to pass tests under pytorch folder
       - name: Compile PyTorch JNI
         run: ./gradlew :pytorch:pytorch-native:compileJNI
+      - name: Compile Sentencepiece JNI
+        run: ./gradlew :extension:sentencepiece:compileJNI
       - name: Compile fastText JNI
         run: ./gradlew :extension:fasttext:compileJNI
       - name: Build with Gradle
