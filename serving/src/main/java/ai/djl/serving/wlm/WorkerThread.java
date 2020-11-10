@@ -59,20 +59,25 @@ class WorkerThread implements Runnable {
         try {
             while (isRunning()) {
                 req = aggregator.getRequest();
-                List<Output> reply = predictor.batchPredict(req);
-                aggregator.sendResponse(reply);
+                try {
+                    List<Output> reply = predictor.batchPredict(req);
+                    aggregator.sendResponse(reply);
+                } catch (TranslateException e) {
+                    logger.warn("Failed to predict", e);
+                    aggregator.sendError();
+                }
                 req = null;
             }
         } catch (InterruptedException e) {
             logger.debug("Shutting down the thread .. Scaling down.");
-        } catch (TranslateException e) {
-            logger.warn("Failed to predict", e);
+        } catch (Throwable t) {
+            logger.error("Server error", t);
         } finally {
             currentThread.set(null);
+            shutdown(WorkerState.WORKER_STOPPED);
             if (req != null) {
                 aggregator.sendError();
             }
-            setState(WorkerState.WORKER_STOPPED);
         }
     }
 
@@ -96,14 +101,15 @@ class WorkerThread implements Runnable {
         return state;
     }
 
-    public void shutdown() {
+    public void shutdown(WorkerState state) {
         running.set(false);
-        setState(WorkerState.WORKER_SCALED_DOWN);
+        setState(state);
         Thread thread = currentThread.getAndSet(null);
         if (thread != null) {
             thread.interrupt();
             aggregator.sendError();
         }
+        predictor.close();
     }
 
     private String getWorkerName() {
