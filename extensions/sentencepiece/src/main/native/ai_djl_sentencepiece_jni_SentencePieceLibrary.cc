@@ -2,45 +2,21 @@
 
 #include "sentencepiece_processor.h"
 
-static constexpr const char* const POINTER_CLASS = "ai/djl/sentencepiece/jni/Pointer";
-
-template <typename T>
-inline T* GetPointerFromJHandle(JNIEnv* env, jobject jhandle) {
-  jclass jexception = env->FindClass("java/lang/NullPointerException");
-  jclass cls = env->FindClass(POINTER_CLASS);
-  jmethodID get_value = env->GetMethodID(cls, "getValue", "()J");
-  if (get_value == nullptr) {
-    env->ThrowNew(jexception, "getValue method not found!");
+inline void CheckStatus(JNIEnv* env, const sentencepiece::util::Status& status) {
+  jclass jexception = env->FindClass("ai/djl/engine/EngineException");
+  if (!status.ok()) {
+    env->ThrowNew(jexception, status.ToString().c_str());
   }
-  jlong ptr = env->CallLongMethod(jhandle, get_value);
-  return reinterpret_cast<T*>(ptr);
 }
 
-template <typename T>
-inline jobject CreatePointer(JNIEnv* env, const T* ptr) {
-  jclass jexception = env->FindClass("java/lang/NullPointerException");
-  jclass cls = env->FindClass(POINTER_CLASS);
-  if (cls == nullptr) {
-    env->ThrowNew(jexception, "Pointer class not found!");
+inline std::string GetStringFromJString(JNIEnv* env, jstring jstr) {
+  if (jstr == nullptr) {
+    return std::string();
   }
-  jmethodID init = env->GetMethodID(cls, "<init>", "(J)V");
-  jobject new_obj = env->NewObject(cls, init, ptr);
-  if (new_obj == nullptr) {
-    env->ThrowNew(jexception, "object created failed");
-  }
-  env->DeleteLocalRef(jexception);
-  env->DeleteLocalRef(cls);
-  return new_obj;
-}
-
-inline std::string jstringToString(JNIEnv* env, jstring array) {
-  jsize len = env->GetStringUTFLength(array);
-
-  const char* str = env->GetStringUTFChars(array, nullptr);
-  std::string s(str, len);
-  env->ReleaseStringUTFChars(array, str);
-
-  return s;
+  const char* c_str = env->GetStringUTFChars(jstr, JNI_FALSE);
+  std::string str = std::string(c_str);
+  env->ReleaseStringUTFChars(jstr, c_str);
+  return str;
 }
 
 // String[]
@@ -61,13 +37,15 @@ inline jobjectArray Get2DStringArrayFrom2DVector(JNIEnv* env, const std::vector<
   return array;
 }
 
-inline void GetVectorFromStringArray(JNIEnv* env, jobjectArray array, std::vector<std::string>* vec) {
+inline std::vector<std::string> GetVectorFromStringArray(JNIEnv* env, jobjectArray array) {
+  std::vector<std::string> vec;
   jsize len = env->GetArrayLength(array);
-  vec->resize(len);
+  vec.reserve(len);
   for (int i = 0; i < len; ++i) {
-    std::string stdStr = jstringToString(env, (jstring)env->GetObjectArrayElement(array, i));
-    (*vec)[i] = stdStr;
+    std::string str = GetStringFromJString(env, (jstring)env->GetObjectArrayElement(array, i));
+    vec.emplace_back(str);
   }
+  return std::move(vec);
 }
 
 inline jintArray GetIntArrayFromVector(JNIEnv* env, const std::vector<int>& vec) {
@@ -86,98 +64,76 @@ inline jobjectArray Get2DIntArrayFrom2DVector(JNIEnv* env, const std::vector<std
 
 inline std::vector<int> GetVectorFromIntArray(JNIEnv* env, jintArray array) {
   jsize len = env->GetArrayLength(array);
-
-  void* data = env->GetPrimitiveArrayCritical(array, nullptr);
+  void* data = env->GetPrimitiveArrayCritical(array, JNI_FALSE);
   std::vector<int> vec((int*)data, ((int*)data) + len);
   env->ReleasePrimitiveArrayCritical(array, data, JNI_ABORT);
-
   return vec;
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_createSentencePieceProcessor(
+JNIEXPORT jlong JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_createSentencePieceProcessor(
     JNIEnv* env, jobject jthis) {
   auto* processor_ptr = new sentencepiece::SentencePieceProcessor();
-  return CreatePointer<sentencepiece::SentencePieceProcessor>(env, processor_ptr);
+  return reinterpret_cast<uintptr_t>(processor_ptr);
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_loadModel(
-    JNIEnv* env, jobject jthis, jobject jhandle, jstring jpath) {
-  jclass jexception = env->FindClass("ai/djl/engine/EngineException");
-  auto* processor_ptr = GetPointerFromJHandle<sentencepiece::SentencePieceProcessor>(env, jhandle);
-  const std::string path_string = jstringToString(env, jpath);
-  const auto status = processor_ptr->Load(path_string);
-  if (!status.ok()) {
-    env->ThrowNew(jexception, status.ToString().c_str());
-  }
+    JNIEnv* env, jobject jthis, jlong jhandle, jstring jpath) {
+  auto* processor_ptr = reinterpret_cast<sentencepiece::SentencePieceProcessor*>(jhandle);
+  const std::string path_string = GetStringFromJString(env, jpath);
+  CheckStatus(env, processor_ptr->Load(path_string));
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_deleteSentencePieceProcessor(
-    JNIEnv* env, jobject jthis, jobject jhandle) {
-  auto* processor_ptr = GetPointerFromJHandle<sentencepiece::SentencePieceProcessor>(env, jhandle);
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  auto* processor_ptr = reinterpret_cast<sentencepiece::SentencePieceProcessor*>(jhandle);
   delete processor_ptr;
 }
 
 JNIEXPORT jobjectArray JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_tokenize(
-    JNIEnv* env, jobject jthis, jobject jhandle, jstring jtext) {
-  jclass jexception = env->FindClass("ai/djl/engine/EngineException");
-  auto* processor_ptr = GetPointerFromJHandle<sentencepiece::SentencePieceProcessor>(env, jhandle);
-  const std::string text = jstringToString(env, jtext);
+    JNIEnv* env, jobject jthis, jlong jhandle, jstring jtext) {
+  auto* processor_ptr = reinterpret_cast<sentencepiece::SentencePieceProcessor*>(jhandle);
+  const std::string text = GetStringFromJString(env, jtext);
   std::vector<std::string> pieces;
-  const auto status = processor_ptr->Encode(text, &pieces);
-  if (!status.ok()) {
-    env->ThrowNew(jexception, status.ToString().c_str());
-  }
+  CheckStatus(env, processor_ptr->Encode(text, &pieces));
   return GetStringArrayFromVector(env, pieces);
 }
 
 JNIEXPORT jintArray JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_encode(
-    JNIEnv* env, jobject jthis, jobject jhandle, jstring jtext) {
-  jclass jexception = env->FindClass("ai/djl/engine/EngineException");
-  auto* processor_ptr = GetPointerFromJHandle<sentencepiece::SentencePieceProcessor>(env, jhandle);
-  const std::string text = jstringToString(env, jtext);
+    JNIEnv* env, jobject jthis, jlong jhandle, jstring jtext) {
+  auto* processor_ptr = reinterpret_cast<sentencepiece::SentencePieceProcessor*>(jhandle);
+  const std::string text = GetStringFromJString(env, jtext);
   std::vector<int> ids;
-  const auto status = processor_ptr->Encode(text, &ids);
-  if (!status.ok()) {
-    env->ThrowNew(jexception, status.ToString().c_str());
-  }
+  CheckStatus(env, processor_ptr->Encode(text, &ids));
   return GetIntArrayFromVector(env, ids);
 }
 
 JNIEXPORT jstring JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_detokenize(
-    JNIEnv* env, jobject jthis, jobject jhandle, jobjectArray jtokens) {
-  jclass jexception = env->FindClass("ai/djl/engine/EngineException");
-  auto* processor_ptr = GetPointerFromJHandle<sentencepiece::SentencePieceProcessor>(env, jhandle);
-  std::vector<std::string> pieces;
-  GetVectorFromStringArray(env, jtokens, &pieces);
+    JNIEnv* env, jobject jthis, jlong jhandle, jobjectArray jtokens) {
+  auto* processor_ptr = reinterpret_cast<sentencepiece::SentencePieceProcessor*>(jhandle);
+  std::vector<std::string> pieces = GetVectorFromStringArray(env, jtokens);
   std::string detokenized;
-  const auto status = processor_ptr->Decode(pieces, &detokenized);
-  if (!status.ok()) {
-    env->ThrowNew(jexception, status.ToString().c_str());
-  }
+  CheckStatus(env, processor_ptr->Decode(pieces, &detokenized));
   return env->NewStringUTF(detokenized.c_str());
 }
 
 JNIEXPORT jstring JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_decode(
-    JNIEnv* env, jobject jthis, jobject jhandle, jintArray jids) {
+    JNIEnv* env, jobject jthis, jlong jhandle, jintArray jids) {
   jclass jexception = env->FindClass("ai/djl/engine/EngineException");
-  auto* processor_ptr = GetPointerFromJHandle<sentencepiece::SentencePieceProcessor>(env, jhandle);
+  auto* processor_ptr = reinterpret_cast<sentencepiece::SentencePieceProcessor*>(jhandle);
   std::vector<int> ids = GetVectorFromIntArray(env, jids);
   std::string detokenized;
-  const auto status = processor_ptr->Decode(ids, &detokenized);
-  if (!status.ok()) {
-    env->ThrowNew(jexception, status.ToString().c_str());
-  }
+  CheckStatus(env, processor_ptr->Decode(ids, &detokenized));
   return env->NewStringUTF(detokenized.c_str());
 }
 
 JNIEXPORT jstring JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_idToPiece(
-    JNIEnv* env, jobject jthis, jobject jhandle, jint jid) {
-  auto* processor_ptr = GetPointerFromJHandle<sentencepiece::SentencePieceProcessor>(env, jhandle);
+    JNIEnv* env, jobject jthis, jlong jhandle, jint jid) {
+  auto* processor_ptr = reinterpret_cast<sentencepiece::SentencePieceProcessor*>(jhandle);
   return env->NewStringUTF(processor_ptr->IdToPiece(jid).c_str());
 }
 
 JNIEXPORT int JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_pieceToId(
-    JNIEnv* env, jobject jthis, jobject jhandle, jstring jpiece) {
-  auto* processor_ptr = GetPointerFromJHandle<sentencepiece::SentencePieceProcessor>(env, jhandle);
-  return processor_ptr->PieceToId(jstringToString(env, jpiece));
+    JNIEnv* env, jobject jthis, jlong jhandle, jstring jpiece) {
+  auto* processor_ptr = reinterpret_cast<sentencepiece::SentencePieceProcessor*>(jhandle);
+  return processor_ptr->PieceToId(GetStringFromJString(env, jpiece));
 }

@@ -40,7 +40,7 @@ public abstract class NativeResource implements AutoCloseable {
      * @return whether this resource has been released
      */
     public boolean isReleased() {
-        return handle == null;
+        return handle.get() == null;
     }
 
     /**
@@ -49,10 +49,11 @@ public abstract class NativeResource implements AutoCloseable {
      * @return the long type handle to this resource
      */
     protected long getHandle() {
-        if (handle == null) {
+        Long pointer = handle.get();
+        if (pointer == null) {
             throw new IllegalStateException("Native resource has been release already.");
         }
-        return handle.get();
+        return pointer;
     }
 
     /** {@inheritDoc} */

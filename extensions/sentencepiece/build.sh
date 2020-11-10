@@ -13,16 +13,16 @@ PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 VERSION=v0.1.92
 
 pushd $WORK_DIR
-if [ ! -d "download" ];
+if [ ! -d "sentencepiece" ];
 then
-  git clone https://github.com/google/sentencepiece.git -b $VERSION download
+  git clone https://github.com/google/sentencepiece.git -b $VERSION
 fi
 
-mkdir -p build/sentencepiece
-cd build/sentencepiece
-cmake ../../download
-cmake --build . --config Release -- -j "${NUM_PROC}"
-cd ..
+if [ ! -d "build" ];
+then
+  mkdir build
+fi
+cd build
 
 rm -rf classes
 mkdir classes

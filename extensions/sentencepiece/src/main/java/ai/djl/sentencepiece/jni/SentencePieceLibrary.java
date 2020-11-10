@@ -20,21 +20,21 @@ public final class SentencePieceLibrary {
 
     private SentencePieceLibrary() {}
 
-    public native Pointer createSentencePieceProcessor();
+    public native long createSentencePieceProcessor();
 
-    public native void loadModel(Pointer handle, String filePath);
+    public native void loadModel(long handle, String filePath);
 
-    public native void deleteSentencePieceProcessor(Pointer handle);
+    public native void deleteSentencePieceProcessor(long handle);
 
-    public native String[] tokenize(Pointer handle, String text);
+    public native String[] tokenize(long handle, String text);
 
-    public native int[] encode(Pointer handle, String text);
+    public native int[] encode(long handle, String text);
 
-    public native String detokenize(Pointer handle, String[] tokens);
+    public native String detokenize(long handle, String[] tokens);
 
-    public native String decode(Pointer handle, int[] ids);
+    public native String decode(long handle, int[] ids);
 
-    public native String idToPiece(Pointer handle, int id);
+    public native String idToPiece(long handle, int id);
 
-    public native int pieceToId(Pointer handle, String piece);
+    public native int pieceToId(long handle, String piece);
 }
