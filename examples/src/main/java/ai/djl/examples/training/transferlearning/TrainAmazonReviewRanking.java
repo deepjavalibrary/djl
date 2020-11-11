@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.training;
+package ai.djl.examples.training.transferlearning;
 
 import ai.djl.Application;
 import ai.djl.Device;
@@ -113,6 +113,7 @@ public final class TrainAmazonReviewRanking {
                 EasyTrain.fit(trainer, arguments.getEpoch(), trainingSet, validationSet);
                 return trainer.getTrainingResult();
             }
+            // model.save("your-model-path"); // save the model
         }
     }
 
