@@ -15,6 +15,7 @@ package ai.djl.serving.http;
 import ai.djl.ModelException;
 import ai.djl.modality.Input;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.serving.util.ConfigManager;
 import ai.djl.serving.util.NettyUtils;
 import ai.djl.serving.wlm.Job;
 import ai.djl.serving.wlm.ModelInfo;
@@ -69,7 +70,7 @@ public class InferenceRequestHandler extends HttpRequestHandler {
                 handleInvocations(ctx, req, decoder);
                 break;
             case "predictions":
-                handlePredictions(ctx, req, segments);
+                handlePredictions(ctx, req, decoder, segments);
                 break;
             default:
                 throw new AssertionError("Invalid request uri: " + req.uri());
@@ -77,12 +78,15 @@ public class InferenceRequestHandler extends HttpRequestHandler {
     }
 
     private void handlePredictions(
-            ChannelHandlerContext ctx, FullHttpRequest req, String[] segments)
+            ChannelHandlerContext ctx,
+            FullHttpRequest req,
+            QueryStringDecoder decoder,
+            String[] segments)
             throws ModelNotFoundException {
         if (segments.length < 3) {
             throw new ResourceNotFoundException();
         }
-        predict(ctx, req, null, segments[2]);
+        predict(ctx, req, decoder, segments[2]);
     }
 
     private void handleInvocations(
@@ -108,13 +112,50 @@ public class InferenceRequestHandler extends HttpRequestHandler {
             throw new BadRequestException("Parameter model_name is required.");
         }
 
-        if (HttpMethod.OPTIONS.equals(req.method())) {
-            ModelManager modelManager = ModelManager.getInstance();
-            ModelInfo model = modelManager.getModels().get(modelName);
-            if (model == null) {
+        ModelManager modelManager = ModelManager.getInstance();
+        ModelInfo model = modelManager.getModels().get(modelName);
+        if (model == null) {
+            String regex = ConfigManager.getInstance().getModelUrlPattern();
+            if (regex == null) {
                 throw new ModelNotFoundException("Model not found: " + modelName);
             }
+            String modelUrl = input.getProperty("model_url", null);
+            if (modelUrl == null) {
+                byte[] buf = input.getContent().get("model_url");
+                if (buf == null) {
+                    throw new ModelNotFoundException("Parameter model_url is required.");
+                }
+                modelUrl = new String(buf, StandardCharsets.UTF_8);
+                if (!modelUrl.matches(regex)) {
+                    throw new ModelNotFoundException("Permission denied: " + modelUrl);
+                }
+            }
 
+            logger.info("Loading model {} from: {}", modelName, modelUrl);
+
+            modelManager
+                    .registerModel(modelName, modelUrl, 1, 0)
+                    .thenAccept(m -> modelManager.updateModel(modelName, 1, 1))
+                    .thenApply(
+                            p -> {
+                                try {
+                                    modelManager.addJob(new Job(ctx, modelName, input));
+                                } catch (ModelNotFoundException e) {
+                                    logger.warn("Unexpected error", e);
+                                    NettyUtils.sendError(ctx, e);
+                                }
+                                return null;
+                            })
+                    .exceptionally(
+                            t -> {
+                                logger.warn("Unexpected error", t);
+                                NettyUtils.sendError(ctx, t);
+                                return null;
+                            });
+            return;
+        }
+
+        if (HttpMethod.OPTIONS.equals(req.method())) {
             NettyUtils.sendJsonResponse(ctx, "{}");
             return;
         }
