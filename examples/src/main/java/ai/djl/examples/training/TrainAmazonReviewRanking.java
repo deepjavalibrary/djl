@@ -86,9 +86,15 @@ public final class TrainAmazonReviewRanking {
         int maxTokenLength = 64;
         try (Model model = Model.newInstance("AmazonReviewRatingClassification");
                 ZooModel<NDList, NDList> embedding = ModelZoo.loadModel(criteria)) {
+            // Prepare the vocabulary
+            SimpleVocabulary vocabulary =
+                    SimpleVocabulary.builder()
+                            .optMinFrequency(1)
+                            .addFromTextFile(embedding.getArtifact("vocab.txt").getPath())
+                            .optUnknownToken("[UNK]")
+                            .build();
             // Prepare dataset
-            BertFullTokenizer tokenizer =
-                    new BertFullTokenizer(embedding.getArtifact("vocab.txt").getPath(), true);
+            BertFullTokenizer tokenizer = new BertFullTokenizer(vocabulary, true);
             CsvDataset amazonReviewDataset = getDataset(arguments, tokenizer, maxTokenLength);
             // split data with 7:3 train:valid ratio
             RandomAccessDataset[] datasets = amazonReviewDataset.randomSplit(7, 3);
@@ -137,11 +143,7 @@ public final class TrainAmazonReviewRanking {
                 .add(Activation::relu)
                 .add(Dropout.builder().optRate(0.2f).build())
                 .add(Linear.builder().setUnits(5).build()) // 5 star rating
-                .add(
-                        list ->
-                                new NDList(
-                                        list.singletonOrThrow()
-                                                .get(":,0"))); // follow HF classifier
+                .addSingleton(nd -> nd.get(":,0")); // follow HF classifier
     }
 
     private static DefaultTrainingConfig setupTrainingConfig(
@@ -182,7 +184,9 @@ public final class TrainAmazonReviewRanking {
             tokens = tokens.size() > maxLength ? tokens.subList(0, maxLength) : tokens;
             tokens.add(0, "[CLS]");
             tokens.add("[SEP]");
+            buf.put(vocab.getIndex("[CLS]"));
             tokens.forEach(token -> buf.put(vocab.getIndex(token)));
+            buf.put(vocab.getIndex("[SEP]"));
         }
     }
 
@@ -200,10 +204,10 @@ public final class TrainAmazonReviewRanking {
             try {
                 // batch shape (batchsize, maximum length)
                 NDArray data = batch.getData().head();
-                long batchsize = data.getShape().get(0);
+                long batchSize = data.getShape().get(0);
                 float maxLength = data.getShape().get(1);
                 return embedding.predict(
-                        new NDList(data, data.getManager().full(new Shape(batchsize), maxLength)));
+                        new NDList(data, data.getManager().full(new Shape(batchSize), maxLength)));
             } catch (TranslateException e) {
                 throw new IllegalArgumentException(e.getMessage(), e);
             }

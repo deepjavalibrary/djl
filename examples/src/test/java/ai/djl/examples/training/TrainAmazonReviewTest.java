@@ -15,17 +15,14 @@ package ai.djl.examples.training;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
-public class TrainSentimentAnalysisTest {
-
+public class TrainAmazonReviewTest {
     @Test
-    public void testTrainSentimentAnalysis()
+    public void testRankTraining()
             throws MalformedModelException, ModelNotFoundException, TranslateException,
                     IOException {
         // this is nightly test
@@ -36,12 +33,5 @@ public class TrainSentimentAnalysisTest {
             String[] args = new String[] {"-e", "1", "-g", "1"};
             TrainSentimentAnalysis.runExample(args);
         }
-    }
-
-    @Test
-    public void testTrainSentimentAnalysisSeq2Seq() throws IOException, TranslateException {
-        String[] args = new String[] {"-g", "1", "-e", "1", "-m", "2"};
-        TrainingResult result = TrainSeq2Seq.runExample(args);
-        Assert.assertNotNull(result);
     }
 }
