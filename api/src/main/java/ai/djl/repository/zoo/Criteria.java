@@ -19,6 +19,8 @@ import ai.djl.nn.Block;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Progress;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -328,6 +330,18 @@ public class Criteria<I, O> {
          */
         public Builder<I, O> optModelUrls(String modelUrls) {
             this.modelZoo = new DefaultModelZoo(modelUrls);
+            return this;
+        }
+
+        /**
+         * Sets the optional model path of the {@link ModelLoader} for this criteria.
+         *
+         * @param modelPath the path to the model folder/files
+         * @return this {@code Builder}
+         * @throws MalformedURLException wrong path format
+         */
+        public Builder<I, O> optModelPath(Path modelPath) throws MalformedURLException {
+            this.modelZoo = new DefaultModelZoo(modelPath.toUri().toURL().toString());
             return this;
         }
 
