@@ -22,9 +22,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: install libgoogle-perftools-dev
-        if: runner.os == 'Linux'
-        run: sudo apt-get install libgoogle-perftools-dev
       - name: Release JNI prep
         run: |
           ./gradlew :extensions:sentencepiece:compileJNI
