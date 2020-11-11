@@ -49,6 +49,7 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
@@ -107,9 +108,9 @@ public final class TrainSentimentAnalysis {
                     modelZooTextEmbedding
                             .preprocessTextToEmbed(Collections.singletonList("<unk>"))[0];
             StanfordMovieReview trainingSet =
-                    getDataset(embedding, Dataset.Usage.TRAIN, executorService, arguments);
+                    getDataset(Dataset.Usage.TRAIN, executorService, arguments);
             StanfordMovieReview validateSet =
-                    getDataset(embedding, Dataset.Usage.TEST, executorService, arguments);
+                    getDataset(Dataset.Usage.TEST, executorService, arguments);
             model.setBlock(getModel());
 
             // setup training configuration
@@ -171,21 +172,21 @@ public final class TrainSentimentAnalysis {
                 trainer -> {
                     TrainingResult result = trainer.getTrainingResult();
                     Model model = trainer.getModel();
+                    float accuracy = result.getValidateEvaluation("Accuracy");
+                    model.setProperty("Accuracy", String.format("%.5f", accuracy));
                     model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
                 });
 
         return new DefaultTrainingConfig(new SoftmaxCrossEntropyLoss())
                 .optDataManager(new EmbeddingDataManager(embedding))
+                .addEvaluator(new Accuracy())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }
 
     public static StanfordMovieReview getDataset(
-            Model embeddingModel,
-            Dataset.Usage usage,
-            ExecutorService executorService,
-            Arguments arguments)
+            Dataset.Usage usage, ExecutorService executorService, Arguments arguments)
             throws IOException, TranslateException {
         StanfordMovieReview stanfordMovieReview =
                 StanfordMovieReview.builder()
