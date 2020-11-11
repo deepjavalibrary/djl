@@ -1164,6 +1164,9 @@ public class PtNDArray extends NativeResource implements NDArray {
         if (isEmpty()) {
             throw new IllegalArgumentException("attempt to get argMax of an empty NDArray");
         }
+        if (isScalar()) {
+            return (PtNDArray) manager.create(0L);
+        }
         return JniUtils.argMax(this);
     }
 
@@ -1182,6 +1185,9 @@ public class PtNDArray extends NativeResource implements NDArray {
     public PtNDArray argMin() {
         if (isEmpty()) {
             throw new IllegalArgumentException("attempt to get argMin of an empty NDArray");
+        }
+        if (isScalar()) {
+            return (PtNDArray) manager.create(0L);
         }
         return JniUtils.argMin(this);
     }

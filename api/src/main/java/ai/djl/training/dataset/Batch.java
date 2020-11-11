@@ -181,7 +181,7 @@ public class Batch implements AutoCloseable {
                 NDList l = labels.toDevice(devices[0], true);
                 return new Batch[] {
                     new Batch(
-                            manager.newSubManager(),
+                            manager.newSubManager(devices[0]),
                             d,
                             l,
                             size,
@@ -205,7 +205,7 @@ public class Batch implements AutoCloseable {
                     (i == splittedData.length - 1) ? (size - i * baseSplitSize) : baseSplitSize;
             splitted[i] =
                     new Batch(
-                            manager.newSubManager(),
+                            manager.newSubManager(devices[i]),
                             d,
                             l,
                             subSize,
