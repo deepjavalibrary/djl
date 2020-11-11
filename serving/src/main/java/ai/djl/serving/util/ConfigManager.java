@@ -63,6 +63,7 @@ public final class ConfigManager {
     private static final String MAX_REQUEST_SIZE = "max_request_size";
     private static final String MODEL_SERVER_HOME = "model_server_home";
     private static final String MODEL_STORE = "model_store";
+    private static final String MODEL_URL_PATTERN = "model_url_pattern";
 
     // Configuration which are not documented or enabled through environment variables
     private static final String USE_NATIVE_IO = "use_native_io";
@@ -233,6 +234,15 @@ public final class ConfigManager {
      */
     public String getModelStore() {
         return getCanonicalPath(prop.getProperty(MODEL_STORE));
+    }
+
+    /**
+     * Returns the allowed model url pattern regex.
+     *
+     * @return the allowed model url pattern regex
+     */
+    public String getModelUrlPattern() {
+        return prop.getProperty(MODEL_URL_PATTERN);
     }
 
     /**

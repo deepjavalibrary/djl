@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation platform("ai.djl:bom:0.8.0")
+    implementation platform("ai.djl:bom:0.9.0-SNAPSHOT")
     runtimeOnly "ai.djl:serving:0.9.0-SNAPSHOT"
     runtimeOnly "ai.djl.mxnet:mxnet-engine"
     runtimeOnly "ai.djl.mxnet:mxnet-native-auto"
