@@ -12,7 +12,7 @@
  */
 package ai.djl.serving;
 
-import ai.djl.modality.Classifications;
+import ai.djl.modality.Classifications.Classification;
 import ai.djl.serving.http.DescribeModelResponse;
 import ai.djl.serving.http.ErrorResponse;
 import ai.djl.serving.http.ListModelsResponse;
@@ -22,6 +22,7 @@ import ai.djl.serving.util.Connector;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
 import ai.djl.util.cuda.CudaUtils;
+import com.google.gson.reflect.TypeToken;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -57,12 +58,14 @@ import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -218,8 +221,10 @@ public class ModelServerTest {
         channel.writeAndFlush(req);
 
         latch.await();
-        Classifications classifications = JsonUtils.GSON.fromJson(result, Classifications.class);
-        Assert.assertEquals(classifications.best().getClassName(), "0");
+
+        Type type = new TypeToken<List<Classification>>() {}.getType();
+        List<Classification> classifications = JsonUtils.GSON.fromJson(result, type);
+        Assert.assertEquals(classifications.get(0).getClassName(), "0");
     }
 
     private void testInvocations(Channel channel) throws InterruptedException {
@@ -233,8 +238,9 @@ public class ModelServerTest {
         channel.writeAndFlush(req);
         latch.await();
 
-        Classifications classifications = JsonUtils.GSON.fromJson(result, Classifications.class);
-        Assert.assertEquals(classifications.best().getClassName(), "0");
+        Type type = new TypeToken<List<Classification>>() {}.getType();
+        List<Classification> classifications = JsonUtils.GSON.fromJson(result, type);
+        Assert.assertEquals(classifications.get(0).getClassName(), "0");
     }
 
     private void testInvocationsMultipart(Channel channel)
@@ -262,8 +268,9 @@ public class ModelServerTest {
 
         latch.await();
 
-        Classifications classifications = JsonUtils.GSON.fromJson(result, Classifications.class);
-        Assert.assertEquals(classifications.best().getClassName(), "0");
+        Type type = new TypeToken<List<Classification>>() {}.getType();
+        List<Classification> classifications = JsonUtils.GSON.fromJson(result, type);
+        Assert.assertEquals(classifications.get(0).getClassName(), "0");
     }
 
     private void testRegisterModelAsync(Channel channel)
