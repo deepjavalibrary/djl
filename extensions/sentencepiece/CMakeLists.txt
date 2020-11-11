@@ -4,7 +4,11 @@ project(sentencepiece-native)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
+# disable tcmalloc to avoid extra dependency
+# TODO enable it when they fix static link tcmalloc option
+set(SPM_ENABLE_TCMALLOC OFF CACHE BOOL "Build sentencepiece static library")
+# disable shared library as we only link static library
+set(SPM_ENABLE_SHARED OFF CACHE BOOL "Build sentencepiece static library")
 find_package(JNI REQUIRED)
 
 add_subdirectory(sentencepiece)
