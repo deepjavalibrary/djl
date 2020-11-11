@@ -18,6 +18,7 @@ import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.Classifications.Classification;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
@@ -35,10 +36,12 @@ import ai.djl.translate.TranslateException;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
 import ai.djl.util.ZipUtils;
+import com.google.gson.reflect.TypeToken;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -194,8 +197,9 @@ public class CustomTranslatorTest {
             Output output = predictor.predict(input);
             Assert.assertEquals(output.getRequestId(), "1");
             String content = new String(output.getContent(), StandardCharsets.UTF_8);
-            Classifications result = JsonUtils.GSON.fromJson(content, Classifications.class);
-            Assert.assertEquals(result.best().getClassName(), "car");
+            Type type = new TypeToken<List<Classification>>() {}.getType();
+            List<Classification> result = JsonUtils.GSON.fromJson(content, type);
+            Assert.assertEquals(result.get(0).getClassName(), "car");
         }
     }
 
@@ -216,8 +220,9 @@ public class CustomTranslatorTest {
             Output output = predictor.predict(input);
             Assert.assertEquals(output.getRequestId(), "1");
             String content = new String(output.getContent(), StandardCharsets.UTF_8);
-            Classifications result = JsonUtils.GSON.fromJson(content, Classifications.class);
-            Assert.assertEquals(result.best().getClassName(), "0");
+            Type type = new TypeToken<List<Classification>>() {}.getType();
+            List<Classification> result = JsonUtils.GSON.fromJson(content, type);
+            Assert.assertEquals(result.get(0).getClassName(), "0");
         }
     }
 

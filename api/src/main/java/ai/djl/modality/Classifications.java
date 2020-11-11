@@ -14,7 +14,11 @@ package ai.djl.modality;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -186,6 +190,17 @@ public class Classifications implements Serializable {
             }
             probability = (int) (probability * 100000) / 100000f;
             return String.format("class: \"%s\", probability: %.5f", className, probability);
+        }
+    }
+
+    /** A customized Gson serializer to serialize the {@code Classifications} object. */
+    public static final class ClassificationsSerializer implements JsonSerializer<Classifications> {
+
+        /** {@inheritDoc} */
+        @Override
+        public JsonElement serialize(Classifications src, Type type, JsonSerializationContext ctx) {
+            List<?> list = src.topK(5);
+            return ctx.serialize(list);
         }
     }
 }
