@@ -97,7 +97,7 @@ public class GradientCollectorIntegrationTest {
             // y = w * x + b
             NDArray label = data.dot(weight).add(bias);
             // add noise
-            label.add(
+            label.addi(
                     manager.randomNormal(
                             0f, 0.01f, label.getShape(), DataType.FLOAT32, manager.getDevice()));
 
