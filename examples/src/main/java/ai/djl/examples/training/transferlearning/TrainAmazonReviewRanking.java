@@ -183,8 +183,6 @@ public final class TrainAmazonReviewRanking {
             SimpleVocabulary vocab = tokenizer.getVocabulary();
             List<String> tokens = tokenizer.tokenize(input);
             tokens = tokens.size() > maxLength ? tokens.subList(0, maxLength) : tokens;
-            tokens.add(0, "[CLS]");
-            tokens.add("[SEP]");
             buf.put(vocab.getIndex("[CLS]"));
             tokens.forEach(token -> buf.put(vocab.getIndex(token)));
             buf.put(vocab.getIndex("[SEP]"));
@@ -210,7 +208,7 @@ public final class TrainAmazonReviewRanking {
                 return embedding.predict(
                         new NDList(data, data.getManager().full(new Shape(batchSize), maxLength)));
             } catch (TranslateException e) {
-                throw new IllegalArgumentException(e.getMessage(), e);
+                throw new IllegalArgumentException("word embedding failed", e);
             }
         }
     }
