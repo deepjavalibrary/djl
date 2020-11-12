@@ -7,6 +7,19 @@ repositories {
     }
 }
 
+processResources {
+    def outputDir = file("${project.projectDir}/src/main/include")
+    doLast {
+        def url = "https://raw.githubusercontent.com/PaddlePaddle/Paddle/v${paddlepaddle_version}/paddle/fluid/inference/capi/paddle_c_api.h"
+        project.logger.lifecycle("Downloading ${url}")
+        def file = new File("${outputDir}/paddle_c_api.h")
+        if (!file.exists()) {
+            file.getParentFile().mkdirs()
+            new URL(url).withInputStream { i -> file.withOutputStream { it << i } }
+        }
+    }
+}
+
 dependencies {
     api project(":api")
 

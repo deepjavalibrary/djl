@@ -11,5 +11,9 @@
  * and limitations under the License.
  */
 
-/** Contains implementations of interfaces within the DJL API for the PaddlePaddle Engine. */
-package ai.djl.paddlepaddle.engine;
+package ai.djl.paddlepaddle.jna;
+
+import com.sun.jna.Library;
+
+/** The Paddle JNA library. */
+public interface PaddleLibrary extends Library {}
