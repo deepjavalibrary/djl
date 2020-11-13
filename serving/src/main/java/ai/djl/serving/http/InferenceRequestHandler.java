@@ -136,7 +136,7 @@ public class InferenceRequestHandler extends HttpRequestHandler {
             modelManager
                     .registerModel(modelName, modelUrl, 1, 0)
                     .thenAccept(m -> modelManager.updateModel(modelName, 1, 1))
-                    .thenApply(
+                    .thenAccept(
                             p -> {
                                 try {
                                     modelManager.addJob(new Job(ctx, modelName, input));
@@ -144,7 +144,6 @@ public class InferenceRequestHandler extends HttpRequestHandler {
                                     logger.warn("Unexpected error", e);
                                     NettyUtils.sendError(ctx, e);
                                 }
-                                return null;
                             })
                     .exceptionally(
                             t -> {
