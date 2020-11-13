@@ -97,24 +97,25 @@ final class NDSerializer {
             dis = new DataInputStream(is);
         }
 
-        String name = null;
-        // Newer version of NDArray
-        if ("NDAR".equals(dis.readUTF())) {
-            // NDArray encode version
-            int version = dis.readInt();
-            if (version < 1 || version > VERSION) {
-                throw new IllegalArgumentException("Unexpected NDArray encode version " + version);
-            }
-            if (version > 1) {
-                byte flag = dis.readByte();
-                if (flag == 1) {
-                    name = dis.readUTF();
-                }
-            }
-
-            dis.readUTF(); // ignore SparseFormat
+        if (!"NDAR".equals(dis.readUTF())) {
+            throw new IllegalArgumentException("Malformed NDArray data");
         }
-        // else ignored as reading SparseFormat for the old version
+
+        // NDArray encode version
+        int version = dis.readInt();
+        if (version < 1 || version > VERSION) {
+            throw new IllegalArgumentException("Unexpected NDArray encode version " + version);
+        }
+
+        String name = null;
+        if (version > 1) {
+            byte flag = dis.readByte();
+            if (flag == 1) {
+                name = dis.readUTF();
+            }
+        }
+
+        dis.readUTF(); // ignore SparseFormat
 
         // DataType - 1 byte
         DataType dataType = DataType.valueOf(dis.readUTF());

@@ -76,7 +76,10 @@ public class NDList extends ArrayList<NDArray> implements AutoCloseable {
     public static NDList decode(NDManager manager, byte[] byteArray) {
         try (DataInputStream dis = new DataInputStream(new ByteArrayInputStream(byteArray))) {
             int size = dis.readInt();
-            NDList list = new NDList(size);
+            if (size < 0) {
+                throw new IllegalArgumentException("Invalid NDList size: " + size);
+            }
+            NDList list = new NDList();
             for (int i = 0; i < size; i++) {
                 list.add(i, manager.decode(dis));
             }
@@ -241,7 +244,7 @@ public class NDList extends ArrayList<NDArray> implements AutoCloseable {
             dos.flush();
             return baos.toByteArray();
         } catch (IOException e) {
-            throw new IllegalStateException("NDList is not writable", e);
+            throw new AssertionError("NDList is not writable", e);
         }
     }
 
