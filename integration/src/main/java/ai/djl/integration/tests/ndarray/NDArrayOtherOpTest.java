@@ -21,6 +21,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
+import ai.djl.util.Hex;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -727,9 +728,21 @@ public class NDArrayOtherOpTest {
     @Test
     public void testEncodeDecode() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray array = manager.create(new long[] {0, 3, 4, 2}, new Shape(2, 2));
+            NDArray array = manager.create(new byte[] {0, 3}, new Shape(2));
             byte[] bytes = array.encode();
             NDArray recovered = NDArray.decode(manager, bytes);
+            Assert.assertEquals(recovered, array);
+
+            array.setName("data");
+            bytes = array.encode();
+            recovered = NDArray.decode(manager, bytes);
+            Assert.assertEquals(recovered.getName(), "data");
+
+            // Legacy NDArray
+            String s =
+                    "00044e44415200000001000544454e53450004494e543800000001000000000000000200000001003f000000020003";
+            bytes = Hex.toByteArray(s);
+            recovered = NDArray.decode(manager, bytes);
             Assert.assertEquals(recovered, array);
         }
     }
