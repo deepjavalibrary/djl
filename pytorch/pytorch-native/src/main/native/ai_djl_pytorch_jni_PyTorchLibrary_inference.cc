@@ -24,12 +24,24 @@ struct JITCallGuard {
 };
 
 JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad(
-    JNIEnv* env, jobject jthis, jstring jpath, jintArray jarray) {
+    JNIEnv* env, jobject jthis, jstring jpath, jintArray jarray, jobjectArray jefnames, jobjectArray jefvalues) {
   API_BEGIN()
   const std::string path = utils::GetStringFromJString(env, jpath);
   const torch::Device device = utils::GetDeviceFromJDevice(env, jarray);
-  const torch::jit::script::Module module = torch::jit::load(path, device);
+  std::unordered_map<std::string, std::string> map;
+  size_t len = static_cast<size_t>(env->GetArrayLength(jefnames));
+  for (size_t i = 0; i < len; ++i) {
+    auto jname = (jstring)env->GetObjectArrayElement(jefnames, i);
+    auto name = utils::GetStringFromJString(env, jname);
+    map[name] = "";
+  }
+  const torch::jit::script::Module module = torch::jit::load(path, device, map);
   const auto* module_ptr = new torch::jit::script::Module(module);
+  for (size_t i = 0; i < len; ++i) {
+      auto jname = (jstring)env->GetObjectArrayElement(jefnames, i);
+      auto name = utils::GetStringFromJString(env, jname);
+      env->SetObjectArrayElement(jefvalues, i, env->NewStringUTF(map[name].c_str()));
+  }
   return utils::CreatePointer<torch::jit::script::Module>(env, module_ptr);
   API_END_RETURN()
 }

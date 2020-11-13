@@ -434,7 +434,8 @@ final class PyTorchLibrary {
     native void torchBackward(
             Pointer inputHandle, Pointer gradHandle, boolean keepGraph, boolean createGraph);
 
-    native Pointer moduleLoad(String path, int[] device);
+    native Pointer moduleLoad(
+            String path, int[] device, String[] extraFileNames, String[] extraFileValues);
 
     native void moduleEval(Pointer handle);
 

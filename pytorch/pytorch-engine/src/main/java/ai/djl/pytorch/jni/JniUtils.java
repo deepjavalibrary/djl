@@ -1158,14 +1158,21 @@ public final class JniUtils {
         PyTorchLibrary.LIB.torchDeleteModule(pointer);
     }
 
-    public static PtSymbolBlock loadModule(PtNDManager manager, Path path, Device device) {
+    public static PtSymbolBlock loadModule(
+            PtNDManager manager,
+            Path path,
+            Device device,
+            String[] extraFileKeys,
+            String[] extraFileValues) {
         Pointer handle =
                 PyTorchLibrary.LIB.moduleLoad(
                         path.toString(),
                         new int[] {
                             PtDeviceType.toDeviceType(device),
                             device.equals(Device.cpu()) ? -1 : device.getDeviceId()
-                        });
+                        },
+                        extraFileKeys,
+                        extraFileValues);
         return new PtSymbolBlock(manager, handle);
     }
 

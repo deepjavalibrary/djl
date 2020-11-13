@@ -163,7 +163,8 @@ public interface ModelZoo {
                 } catch (ModelNotFoundException e) {
                     logger.trace("", e);
                     logger.debug(
-                            "input/output type found for ModelLoader: {} {}:{}",
+                            "{} for ModelLoader: {} {}:{}",
+                            e.getMessage(),
                             app,
                             groupId,
                             loaderArtifactId);
