@@ -100,10 +100,10 @@ public final class ModelManager {
                         String actualModelName;
                         if (modelName == null || modelName.isEmpty()) {
                             actualModelName = model.getName();
+                            actualModelName = actualModelName.replaceAll("(\\W|^_)", "_");
                         } else {
                             actualModelName = modelName;
                         }
-                        actualModelName = actualModelName.replaceAll("(\\W|^_)", "_");
 
                         ModelInfo modelInfo =
                                 new ModelInfo(
