@@ -70,7 +70,23 @@ public class PtModel extends BaseModel {
                     throw new FileNotFoundException(".pt file not found in: " + modelDir);
                 }
             }
-            block = JniUtils.loadModule((PtNDManager) manager, modelFile, manager.getDevice());
+            String[] extraFileKeys = new String[0];
+            String[] extraFileValues = new String[0];
+            // load jit extra files
+            if (options.containsKey("extraFiles")) {
+                extraFileKeys = ((String) options.get("extraFiles")).split(",");
+                extraFileValues = new String[extraFileKeys.length];
+            }
+            block =
+                    JniUtils.loadModule(
+                            (PtNDManager) manager,
+                            modelFile,
+                            manager.getDevice(),
+                            extraFileKeys,
+                            extraFileValues);
+            for (int i = 0; i < extraFileKeys.length; i++) {
+                properties.put(extraFileKeys[i], extraFileValues[i]);
+            }
         } else {
             Path paramFile = paramPathResolver(prefix, options);
             if (paramFile == null) {
