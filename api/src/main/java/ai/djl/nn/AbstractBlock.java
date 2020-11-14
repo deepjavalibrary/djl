@@ -398,9 +398,13 @@ public abstract class AbstractBlock implements Block {
 
     protected void readInputShapes(DataInputStream is) throws IOException {
         int len = is.readInt();
-        inputShapes = new Shape[len];
+        Shape[] shapes = new Shape[len];
         for (int i = 0; i < len; ++i) {
-            inputShapes[i] = Shape.decode(is);
+            shapes[i] = Shape.decode(is);
+        }
+        if (inputShapes == null) {
+            // load inputShapes from parameter file if Block has not been initialized
+            inputShapes = shapes;
         }
     }
 
