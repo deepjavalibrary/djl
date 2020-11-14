@@ -410,7 +410,7 @@ public class CsvDataset extends RandomAccessDataset {
             if (!autoMap) {
                 throw new IllegalArgumentException("Value: " + input + " not found in the map.");
             }
-            int value = map.size() - 1;
+            int value = map.size();
             map.put(input, value);
             buf.put(value);
         }
