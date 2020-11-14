@@ -31,7 +31,7 @@ public class SsdModelLoader extends ObjectDetectionModelLoader {
 
     private static final String GROUP_ID = BasicModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "ssd";
-    private static final String VERSION = "0.0.1";
+    private static final String VERSION = "0.0.2";
 
     /**
      * Creates the Model loader from the given repository.

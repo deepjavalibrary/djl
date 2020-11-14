@@ -15,32 +15,6 @@
   },
   "artifacts": [
     {
-      "version": "0.0.1",
-      "snapshot": false,
-      "name": "mlp",
-      "properties": {
-        "dataset": "mnist"
-      },
-      "arguments": {
-        "flag": "GRAYSCALE",
-        "width": 28,
-        "height": 28
-      },
-      "files": {
-        "synset": {
-          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/synset_mnist.txt",
-          "sha1Hash": "24637c71f916ff1abc46f7974cc317ff1de13ec1",
-          "name": "synset.txt",
-          "size": 19
-        },
-        "parameters": {
-          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/mlp/0.0.1/mlp-0000.params",
-          "sha1Hash": "a848dc6c63097d2e2d01f236fcfba1652f50ce6b",
-          "size": 438097
-        }
-      }
-    },
-    {
       "version": "0.0.2",
       "snapshot": false,
       "name": "mlp",
@@ -68,6 +42,37 @@
           "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/mlp/0.0.1/mlp-0000.params",
           "sha1Hash": "a848dc6c63097d2e2d01f236fcfba1652f50ce6b",
           "size": 438097
+        }
+      }
+    },
+    {
+      "version": "0.0.3",
+      "snapshot": false,
+      "name": "mlp",
+      "properties": {
+        "dataset": "mnist"
+      },
+      "arguments": {
+        "flag": "GRAYSCALE",
+        "width": 28,
+        "height": 28,
+        "output": 10,
+        "hidden": [
+          128,
+          64
+        ]
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/synset_mnist.txt",
+          "sha1Hash": "24637c71f916ff1abc46f7974cc317ff1de13ec1",
+          "name": "synset.txt",
+          "size": 19
+        },
+        "parameters": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/mlp/0.0.3/mlp-0000.params.gz",
+          "sha1Hash": "ee8307b352c5a2116a40478d2870c34a46e906a0",
+          "size": 410639
         }
       }
     }

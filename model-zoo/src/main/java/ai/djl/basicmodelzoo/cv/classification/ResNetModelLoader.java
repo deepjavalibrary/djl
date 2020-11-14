@@ -29,7 +29,7 @@ public class ResNetModelLoader extends ImageClassificationModelLoader {
 
     private static final String GROUP_ID = BasicModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "resnet";
-    private static final String VERSION = "0.0.1";
+    private static final String VERSION = "0.0.2";
 
     /**
      * Creates the Model loader from the given repository.

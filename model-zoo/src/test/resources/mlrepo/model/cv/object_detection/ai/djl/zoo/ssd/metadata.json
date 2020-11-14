@@ -75,6 +75,68 @@
           "size": 3742997
         }
       }
+    },
+    {
+      "version": "0.0.2",
+      "snapshot": false,
+      "name": "ssd",
+      "properties": {
+        "flavor": "tiny",
+        "dataset": "pikachu"
+      },
+      "arguments": {
+        "width": 256,
+        "height": 256,
+        "numFeatures": 3,
+        "numFilters": [
+          16,
+          32,
+          64
+        ],
+        "ratios": [
+          1,
+          2,
+          0.5
+        ],
+        "sizes": [
+          [
+            0.2,
+            0.272
+          ],
+          [
+            0.37,
+            0.447
+          ],
+          [
+            0.54,
+            0.619
+          ],
+          [
+            0.71,
+            0.79
+          ],
+          [
+            0.88,
+            0.961
+          ]
+        ],
+        "outSize": 1,
+        "globalPool": true,
+        "threshold": 0.6
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/zoo/synset_pikachu.txt",
+          "sha1Hash": "e4409822ba1d95bebcec2dfaf8f8b3d2e7c8291e",
+          "name": "synset.txt",
+          "size": 7
+        },
+        "parameters": {
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/zoo/ssd/0.0.2/ssd-0000.params.gz",
+          "sha1Hash": "82f8617ce9ae25b9cd258148c300012336cb40dc",
+          "size": 3755599
+        }
+      }
     }
   ]
 }

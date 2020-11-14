@@ -49,6 +49,42 @@
           "size": 87626602
         }
       }
+    },
+    {
+      "version": "0.0.2",
+      "snapshot": false,
+      "name": "resnetv1",
+      "properties": {
+        "layers": "50",
+        "flavor": "v1",
+        "dataset": "cifar10"
+      },
+      "arguments": {
+        "width": 32,
+        "height": 32,
+        "centerCrop": true,
+        "resize": true,
+        "numLayers": 50,
+        "outSize": 10,
+        "imageShape": [
+          3,
+          32,
+          32
+        ]
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/synset_cifar10.txt",
+          "sha1Hash": "9e5321bb62ab5bb5ffb9c20fb8538c9466ce799e",
+          "name": "synset.txt",
+          "size": 59
+        },
+        "parameters": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/zoo/resnet/0.0.2/resnetv1-0000.params.gz",
+          "sha1Hash": "0d810aa0f47a2bf8683de5395bc131d47b204282",
+          "size": 87629142
+        }
+      }
     }
   ]
 }
