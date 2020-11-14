@@ -27,7 +27,7 @@ public class MlpModelLoader extends ImageClassificationModelLoader {
 
     private static final String GROUP_ID = BasicModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "mlp";
-    private static final String VERSION = "0.0.2";
+    private static final String VERSION = "0.0.3";
 
     /**
      * Creates the Model loader from the given repository.
