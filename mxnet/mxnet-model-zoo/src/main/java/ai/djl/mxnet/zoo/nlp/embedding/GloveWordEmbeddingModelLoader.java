@@ -50,7 +50,7 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader {
     private static final Application APPLICATION = NLP.WORD_EMBEDDING;
     private static final String GROUP_ID = MxModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "glove";
-    private static final String VERSION = "0.0.1";
+    private static final String VERSION = "0.0.2";
 
     /**
      * Constructs a {@link GloveWordEmbeddingModelLoader} given the repository.

@@ -36,6 +36,29 @@
           "size": 1842598
         }
       }
+    },
+    {
+      "version": "0.0.2",
+      "snapshot": false,
+      "name": "glove",
+      "properties": {
+        "dimensions": "50"
+      },
+      "arguments": {
+        "unknownToken": "\u003cunk\u003e"
+      },
+      "files": {
+        "parameters": {
+          "uri": "0.0.2/glove-0000.params.gz",
+          "sha1Hash": "6a488c1582fac501fa49beb4048e4cf46c6eac08",
+          "size": 73333216
+        },
+        "idx_to_token": {
+          "uri": "0.0.2/idx_to_token.txt.gz",
+          "sha1Hash": "1d47c555791752866a4dcd8452f2eb6c28b62022",
+          "size": 1842598
+        }
+      }
     }
   ]
 }
