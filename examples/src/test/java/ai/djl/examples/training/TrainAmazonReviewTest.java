@@ -14,6 +14,7 @@ package ai.djl.examples.training;
 
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.examples.training.transferlearning.TrainAmazonReviewRanking;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class TrainAmazonReviewTest {
+
     @Test
     public void testRankTraining()
             throws MalformedModelException, ModelNotFoundException, TranslateException,
@@ -29,9 +31,12 @@ public class TrainAmazonReviewTest {
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");
         }
+        String[] args;
         if (Device.getGpuCount() > 0) {
-            String[] args = new String[] {"-e", "1", "-g", "1"};
-            TrainSentimentAnalysis.runExample(args);
+            args = new String[] {"-e", "1", "-g", "1"};
+        } else {
+            args = new String[] {"-e", "1", "-m", "2"};
         }
+        TrainAmazonReviewRanking.runExample(args);
     }
 }
