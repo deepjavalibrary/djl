@@ -1,1 +1,1 @@
-ai.djl.paddlepaddle.engine.TfEngineProvider
+ai.djl.paddlepaddle.engine.PpEngineProvider
