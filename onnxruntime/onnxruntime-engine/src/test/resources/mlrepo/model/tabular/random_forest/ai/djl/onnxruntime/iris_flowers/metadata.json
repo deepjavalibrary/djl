@@ -1,0 +1,34 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "tabular/random_forest",
+  "groupId": "ai.djl.onnxruntime",
+  "artifactId": "iris_flowers",
+  "name": "iris_flowers",
+  "description": "Iris flowers classification model",
+  "website": "http://www.djl.ai/onnxruntime-engine",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "iris_flowers",
+      "properties": {
+        "dataset": "iris_flowers"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/iris_flowers.zip",
+          "sha1Hash": "5be8fd2f91cb1f631e69a4ddfd6905ba5f26226f",
+          "name": "",
+          "size": 5941
+        }
+      }
+    }
+  ]
+}
