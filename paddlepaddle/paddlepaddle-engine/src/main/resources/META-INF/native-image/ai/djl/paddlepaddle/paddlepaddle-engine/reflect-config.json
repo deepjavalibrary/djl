@@ -1,6 +1,6 @@
 [
   {
-    "name": "ai.djl.paddlepaddle.engine.TfEngineProvider",
+    "name": "ai.djl.paddlepaddle.engine.PpEngineProvider",
     "allDeclaredConstructors": true,
     "allPublicConstructors": true,
     "allDeclaredMethods": true,

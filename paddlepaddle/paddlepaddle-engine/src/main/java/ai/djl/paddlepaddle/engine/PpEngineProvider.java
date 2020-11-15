@@ -10,6 +10,22 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+package ai.djl.paddlepaddle.engine;
 
-/** Contains the built-in {@link ai.djl.paddlepaddle.zoo.PpModelZoo}. */
-package ai.djl.paddlepaddle.zoo;
+import ai.djl.engine.Engine;
+import ai.djl.engine.EngineProvider;
+
+/** {@code PpEngineProvider} is the ONNX Runtime implementation of {@link EngineProvider}. */
+public class PpEngineProvider implements EngineProvider {
+
+    private static Engine engine;
+
+    /** {@inheritDoc} */
+    @Override
+    public synchronized Engine getEngine() {
+        if (engine == null) {
+            engine = PpEngine.newInstance();
+        }
+        return engine;
+    }
+}

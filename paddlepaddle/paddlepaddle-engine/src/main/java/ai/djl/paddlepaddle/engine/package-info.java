@@ -11,7 +11,5 @@
  * and limitations under the License.
  */
 
-/**
- * Contains implementations of interfaces within the DJL API for the PaddlePaddle Engine.
- */
+/** Contains implementations of interfaces within the DJL API for the PaddlePaddle Engine. */
 package ai.djl.paddlepaddle.engine;
