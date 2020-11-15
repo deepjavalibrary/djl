@@ -10,6 +10,19 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-
-/** Contains the built-in {@link ai.djl.paddlepaddle.zoo.PpModelZoo}. */
 package ai.djl.paddlepaddle.zoo;
+
+import ai.djl.repository.zoo.ModelZoo;
+import ai.djl.repository.zoo.ZooProvider;
+
+/**
+ * An PyTorch model zoo provider implements the {@link ai.djl.repository.zoo.ZooProvider} interface.
+ */
+public class PpZooProvider implements ZooProvider {
+
+    /** {@inheritDoc} */
+    @Override
+    public ModelZoo getModelZoo() {
+        return new PpModelZoo();
+    }
+}
