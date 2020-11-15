@@ -141,5 +141,6 @@ public class Application {
     public interface Tabular {
         Application ANY = new Application("tabular");
         Application LINEAR_REGRESSION = new Application("tabular/linear_regression");
+        Application RANDOM_FOREST = new Application("tabular/random_forest");
     }
 }
