@@ -84,7 +84,14 @@ task benchmark(type: JavaExec) {
     systemProperty("file.encoding", "UTF-8")
     classpath = sourceSets.main.runtimeClasspath
     // restrict the jvm heap size for better monitoring benchmark
-    applicationDefaultJvmArgs = ["-Xmx2g"]
+    jvmArgs = ["-Xmx2g"]
+    if (Boolean.getBoolean("loggc")) {
+        if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
+            jvmArgs += ["-XX:+PrintGCTimeStamps", "-Xloggc:build/gc.log"]
+        } else {
+            jvmArgs += ["-Xlog:gc*=debug:file=build/gc.log"]
+        }
+    }
     main = "ai.djl.examples.inference.benchmark.Benchmark"
 }
 tasks.distTar.enabled = false
