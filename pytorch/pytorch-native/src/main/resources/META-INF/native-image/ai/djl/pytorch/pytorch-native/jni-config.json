@@ -23,13 +23,6 @@
     "allPublicMethods": true
   },
   {
-    "name": "ai.djl.pytorch.jni.Pointer",
-    "allDeclaredConstructors": true,
-    "allPublicConstructors": true,
-    "allDeclaredMethods": true,
-    "allPublicMethods": true
-  },
-  {
     "name": "org.slf4j.Logger",
     "allDeclaredConstructors": true,
     "allPublicConstructors": true,
