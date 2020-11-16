@@ -20,6 +20,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
 import ai.djl.training.GradientCollector;
+import ai.djl.util.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,6 +103,7 @@ public final class PtEngine extends Engine {
     @Override
     public void setRandomSeed(int seed) {
         JniUtils.setSeed(seed);
+        RandomUtils.RANDOM.setSeed(seed);
     }
 
     /** {@inheritDoc} */

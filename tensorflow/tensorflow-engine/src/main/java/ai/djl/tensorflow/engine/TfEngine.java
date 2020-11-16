@@ -19,6 +19,7 @@ import ai.djl.engine.EngineException;
 import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.GradientCollector;
+import ai.djl.util.RandomUtils;
 import org.tensorflow.EagerSession;
 import org.tensorflow.TensorFlow;
 import org.tensorflow.internal.c_api.TF_DeviceList;
@@ -114,6 +115,7 @@ public final class TfEngine extends Engine {
     @Override
     public void setRandomSeed(int seed) {
         TfNDManager.setRandomSeed(seed);
+        RandomUtils.RANDOM.setSeed(seed);
     }
 
     /** {@inheritDoc} */
