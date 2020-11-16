@@ -15,16 +15,16 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.jna.MxnetLibrary;
-import ai.djl.mxnet.jna.NativeResource;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
+import ai.djl.util.NativeResource;
 import com.sun.jna.Pointer;
 import java.util.Arrays;
 
 /** {@code MxParameterServer} is the MXNet implementation of {@link ParameterServer}. */
-public class MxParameterServer extends NativeResource implements ParameterServer {
+public class MxParameterServer extends NativeResource<Pointer> implements ParameterServer {
 
     @SuppressWarnings("PMD.SingularField")
     // use class field to hold the OptimizerCallback which prevent it from being gc.

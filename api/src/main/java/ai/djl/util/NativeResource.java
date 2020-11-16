@@ -10,25 +10,27 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.sentencepiece.jni;
+package ai.djl.util;
 
+import com.sun.jna.Pointer;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * {@code NativeResource} is an internal class for {@link AutoCloseable} blocks of memory created in
- * the PyTorch Engine.
+ * the different engines.
  */
-public abstract class NativeResource implements AutoCloseable {
-
+public abstract class NativeResource<T> implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(NativeResource.class);
 
-    protected final AtomicReference<Long> handle;
+    protected final AtomicReference<T> handle;
+    private String uid;
     private Exception exception;
 
-    protected NativeResource(long pointer) {
-        this.handle = new AtomicReference<>(pointer);
+    protected NativeResource(T handle) {
+        this.handle = new AtomicReference<>(handle);
+        uid = handle.toString();
         if (logger.isTraceEnabled()) {
             exception = new Exception();
         }
@@ -44,16 +46,25 @@ public abstract class NativeResource implements AutoCloseable {
     }
 
     /**
-     * Gets the long type handle to this resource.
+     * Gets the {@link Pointer} to this resource.
      *
-     * @return the long type handle to this resource
+     * @return the {@link Pointer} to this resource
      */
-    protected long getHandle() {
-        Long pointer = handle.get();
-        if (pointer == null) {
+    public T getHandle() {
+        T reference = handle.get();
+        if (reference == null) {
             throw new IllegalStateException("Native resource has been release already.");
         }
-        return pointer;
+        return reference;
+    }
+
+    /**
+     * Gets the unique ID of this resource.
+     *
+     * @return the unique ID of this resource
+     */
+    public final String getUid() {
+        return uid;
     }
 
     /** {@inheritDoc} */
@@ -70,7 +81,7 @@ public abstract class NativeResource implements AutoCloseable {
             if (exception != null) {
                 logger.warn(
                         "Resource ({}) was not closed explicitly: {}",
-                        getHandle(),
+                        getUid(),
                         getClass().getSimpleName());
                 logger.warn("Resource was created:", exception);
             }

@@ -22,9 +22,9 @@ import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.pytorch.jni.IValueUtils;
 import ai.djl.pytorch.jni.JniUtils;
-import ai.djl.pytorch.jni.NativeResource;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.util.NativeResource;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * String)}.
  */
 // TODO: Memory handling
-public class PtSymbolBlock extends NativeResource implements SymbolBlock {
+public class PtSymbolBlock extends NativeResource<Long> implements SymbolBlock {
 
     private static final Logger logger = LoggerFactory.getLogger(PtSymbolBlock.class);
     private PtNDManager manager;

@@ -419,12 +419,12 @@ public final class JniUtils {
     }
 
     public static PtNDArray stack(PtNDArray[] arrays, int dim) {
-        long[] pointers = Arrays.stream(arrays).mapToLong(NativeResource::getHandle).toArray();
+        long[] pointers = Arrays.stream(arrays).mapToLong(PtNDArray::getHandle).toArray();
         return new PtNDArray(arrays[0].getManager(), PyTorchLibrary.LIB.torchStack(pointers, dim));
     }
 
     public static PtNDArray cat(PtNDArray[] arrays, long dim) {
-        long[] pointers = Arrays.stream(arrays).mapToLong(NativeResource::getHandle).toArray();
+        long[] pointers = Arrays.stream(arrays).mapToLong(PtNDArray::getHandle).toArray();
         return new PtNDArray(arrays[0].getManager(), PyTorchLibrary.LIB.torchCat(pointers, dim));
     }
 

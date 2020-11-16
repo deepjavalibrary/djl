@@ -14,7 +14,6 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
 import ai.djl.mxnet.jna.JnaUtils;
-import ai.djl.mxnet.jna.NativeResource;
 import ai.djl.ndarray.LazyNDArray;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -23,6 +22,7 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.util.NativeResource;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import java.nio.Buffer;
@@ -35,7 +35,7 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 /** {@code MxNDArray} is the MXNet implementation of {@link NDArray}. */
-public class MxNDArray extends NativeResource implements LazyNDArray {
+public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     private static final int MAX_SIZE = 100;
     private static final int MAX_DEPTH = 10;
