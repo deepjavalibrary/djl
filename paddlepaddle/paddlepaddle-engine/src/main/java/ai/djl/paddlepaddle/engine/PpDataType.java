@@ -19,30 +19,28 @@ import java.util.concurrent.ConcurrentHashMap;
 /** Helper to convert between {@link DataType} an the PaddlePaddle internal DataTypes. */
 public final class PpDataType {
 
-    private static Map<DataType, String> toPaddlePaddleMap = createMapToPaddlePaddle();
-    private static Map<String, DataType> fromPaddlePaddleMap = createMapFromPaddlePaddle();
+    private static Map<DataType, Integer> toPaddlePaddleMap = createMapToPaddlePaddle();
+    private static Map<Integer, DataType> fromPaddlePaddleMap = createMapFromPaddlePaddle();
 
     private PpDataType() {}
 
-    private static Map<DataType, String> createMapToPaddlePaddle() {
-        Map<DataType, String> map = new ConcurrentHashMap<>();
-        map.put(DataType.FLOAT32, "float32");
-        map.put(DataType.FLOAT64, "float64");
-        map.put(DataType.INT8, "int8");
-        map.put(DataType.INT32, "int32");
-        map.put(DataType.INT64, "int64");
-        map.put(DataType.UINT8, "uint8");
+    private static Map<DataType, Integer> createMapToPaddlePaddle() {
+        Map<DataType, Integer> map = new ConcurrentHashMap<>();
+        map.put(DataType.FLOAT32, 0);
+        map.put(DataType.INT32, 1);
+        map.put(DataType.INT64, 2);
+        map.put(DataType.INT8, 3);
+        map.put(DataType.UNKNOWN, 4);
         return map;
     }
 
-    private static Map<String, DataType> createMapFromPaddlePaddle() {
-        Map<String, DataType> map = new ConcurrentHashMap<>();
-        map.put("float32", DataType.FLOAT32);
-        map.put("float64", DataType.FLOAT64);
-        map.put("int8", DataType.INT8);
-        map.put("int32", DataType.INT32);
-        map.put("int64", DataType.INT64);
-        map.put("uint8", DataType.UINT8);
+    private static Map<Integer, DataType> createMapFromPaddlePaddle() {
+        Map<Integer, DataType> map = new ConcurrentHashMap<>();
+        map.put(0, DataType.FLOAT32);
+        map.put(1, DataType.INT32);
+        map.put(2, DataType.INT64);
+        map.put(3, DataType.INT8);
+        map.put(4, DataType.UNKNOWN);
         return map;
     }
 
@@ -52,7 +50,7 @@ public final class PpDataType {
      * @param ppType the type String to convert
      * @return the {@link DataType}
      */
-    public static DataType fromPaddlePaddle(String ppType) {
+    public static DataType fromPaddlePaddle(int ppType) {
         return fromPaddlePaddleMap.get(ppType);
     }
 
@@ -62,7 +60,12 @@ public final class PpDataType {
      * @param jType the java {@link DataType} to convert
      * @return the converted PaddlePaddle type string
      */
-    public static String toPaddlePaddle(DataType jType) {
-        return toPaddlePaddleMap.get(jType);
+    public static int toPaddlePaddle(DataType jType) {
+        Integer ppType = toPaddlePaddleMap.get(jType);
+        if (ppType == null) {
+            throw new UnsupportedOperationException(
+                    "PaddlePaddle doesn't support dataType: " + jType);
+        }
+        return ppType;
     }
 }
