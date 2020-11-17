@@ -41,4 +41,4 @@ jobs:
           aws-region: us-east-2
       - name: Upload native DJL to S3
         run: |
-          aws s3 cp *dlr.* s3://djl-ai/publish/dlr-${DLR_VERSION}/native/osx/
+          aws s3 cp lib/*dlr.* s3://djl-ai/publish/dlr-${DLR_VERSION}/native/osx/
