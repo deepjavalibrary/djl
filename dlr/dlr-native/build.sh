@@ -27,5 +27,5 @@ then
   mkdir classes
 fi
 javac -sourcepath ../../dlr-engine/src/main/java/ ../../dlr-engine/src/main/java/ai/djl/dlr/jni/DlrLibrary.java -h include -d classes
-cmake  ..
+cmake ..
 cmake --build . --config Release -- -j "${NUM_PROC}"
