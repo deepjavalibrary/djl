@@ -14,12 +14,12 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
 import ai.djl.mxnet.jna.JnaUtils;
-import ai.djl.mxnet.jna.NativeResource;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
 import ai.djl.training.ParameterStore;
+import ai.djl.util.NativeResource;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import com.sun.jna.Pointer;
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * analyzing the input shape. It requires minimum input to do inference because most of the
  * information can be obtained from the model itself.
  */
-public class CachedOp extends NativeResource {
+public class CachedOp extends NativeResource<Pointer> {
 
     private static final Logger logger = LoggerFactory.getLogger(CachedOp.class);
 

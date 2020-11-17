@@ -13,8 +13,8 @@
 package ai.djl.mxnet.engine;
 
 import ai.djl.mxnet.jna.JnaUtils;
-import ai.djl.mxnet.jna.NativeResource;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.util.NativeResource;
 import ai.djl.util.PairList;
 import ai.djl.util.Utils;
 import com.sun.jna.Pointer;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * @see <a href="https://mxnet.incubator.apache.org/api/python/docs/api/symbol/index.html">MXNet
  *     Symbol</a>
  */
-public class Symbol extends NativeResource {
+public class Symbol extends NativeResource<Pointer> {
 
     //    private String[] argParams;
     //    private String[] auxParams;

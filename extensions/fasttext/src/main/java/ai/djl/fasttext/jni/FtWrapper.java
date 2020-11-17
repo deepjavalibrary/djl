@@ -13,12 +13,13 @@
 package ai.djl.fasttext.jni;
 
 import ai.djl.modality.Classifications;
+import ai.djl.util.NativeResource;
 import java.util.ArrayList;
 import java.util.List;
 
 /** A class containing utilities to interact with the fastText JNI layer. */
 @SuppressWarnings("MissingJavadocMethod")
-public final class FtWrapper extends NativeResource {
+public final class FtWrapper extends NativeResource<Long> {
 
     private static RuntimeException libraryStatus;
 

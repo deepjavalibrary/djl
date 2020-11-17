@@ -21,7 +21,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.pytorch.jni.JniUtils;
-import ai.djl.pytorch.jni.NativeResource;
+import ai.djl.util.NativeResource;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /** {@code PtNDArray} is the PyTorch implementation of {@link NDArray}. */
-public class PtNDArray extends NativeResource implements NDArray {
+public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     private static final int MAX_SIZE = 100;
     private static final int MAX_DEPTH = 10;

@@ -14,7 +14,6 @@
 package ai.djl.dlr.engine;
 
 import ai.djl.dlr.jni.JniUtils;
-import ai.djl.dlr.jni.NativeResource;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -24,6 +23,7 @@ import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.util.NativeResource;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -34,7 +34,7 @@ import java.io.DataOutputStream;
  * <p>You can create a {@code DlrSymbolBlock} using {@link ai.djl.Model#load(java.nio.file.Path,
  * String)}.
  */
-public class DlrSymbolBlock extends NativeResource implements SymbolBlock {
+public class DlrSymbolBlock extends NativeResource<Long> implements SymbolBlock {
 
     /**
      * Constructs a {@code DlrSymbolBlock}.
