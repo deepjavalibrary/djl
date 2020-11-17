@@ -86,32 +86,38 @@ public class InferenceRequestHandler extends HttpRequestHandler {
         if (segments.length < 3) {
             throw new ResourceNotFoundException();
         }
-        predict(ctx, req, decoder, segments[2]);
+        Input input = parseRequest(ctx, req, decoder);
+        predict(ctx, req, input, segments[2]);
     }
 
     private void handleInvocations(
             ChannelHandlerContext ctx, FullHttpRequest req, QueryStringDecoder decoder)
             throws ModelNotFoundException {
+        Input input = parseRequest(ctx, req, decoder);
         String modelName = NettyUtils.getParameter(decoder, "model_name", null);
         if ((modelName == null || modelName.isEmpty())) {
+            modelName = input.getProperty("model_name", null);
+            if (modelName == null) {
+                byte[] buf = input.getContent().get("model_name");
+                if (buf != null) {
+                    modelName = new String(buf, StandardCharsets.UTF_8);
+                }
+            }
+        }
+        if (modelName == null) {
             if (ModelManager.getInstance().getStartupModels().size() == 1) {
                 modelName = ModelManager.getInstance().getStartupModels().iterator().next();
             }
+            if (modelName == null) {
+                throw new BadRequestException("Parameter model_name is required.");
+            }
         }
-        predict(ctx, req, decoder, modelName);
+        predict(ctx, req, input, modelName);
     }
 
     private void predict(
-            ChannelHandlerContext ctx,
-            FullHttpRequest req,
-            QueryStringDecoder decoder,
-            String modelName)
+            ChannelHandlerContext ctx, FullHttpRequest req, Input input, String modelName)
             throws ModelNotFoundException {
-        Input input = parseRequest(ctx, req, decoder);
-        if (modelName == null) {
-            throw new BadRequestException("Parameter model_name is required.");
-        }
-
         ModelManager modelManager = ModelManager.getInstance();
         ModelInfo model = modelManager.getModels().get(modelName);
         if (model == null) {
