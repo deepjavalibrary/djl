@@ -8,7 +8,7 @@ set -e
 function run_test {
     base=$(basename $1)
     # Workaround on crashes
-    if [[ "$base" == transfer_learning_on_cifar10* ]]; then
+    if [[ "$base" == transfer_learning_on_cifar10* ||  "$base" == rank_classification_using_BERT* ]]; then
         jupyter nbconvert --to notebook --inplace $1
     else
         jupyter nbconvert --to notebook --execute --ExecutePreprocessor.timeout=600 --inplace $1

@@ -35,12 +35,10 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.training.DataManager;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
-import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.listener.CheckpointsTrainingListener;
@@ -72,13 +70,11 @@ public final class TrainAmazonReviewRanking {
             return null;
         }
 
-        NoopTranslator translator = new NoopTranslator();
-        translator.setBatchifier(null);
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .optApplication(Application.NLP.WORD_EMBEDDING)
                         .setTypes(NDList.class, NDList.class)
-                        .optTranslator(translator)
+                        .optTranslator(new NoopTranslator(null))
                         .optModelUrls(
                                 "https://alpha-djl-demos.s3.amazonaws.com/model/examples/distilbert.zip")
                         .optProgress(new ProgressBar())
@@ -100,12 +96,12 @@ public final class TrainAmazonReviewRanking {
             RandomAccessDataset[] datasets = amazonReviewDataset.randomSplit(7, 3);
             RandomAccessDataset trainingSet = datasets[0];
             RandomAccessDataset validationSet = datasets[1];
-            // create classification layer
-            model.setBlock(getClassifier());
-            DefaultTrainingConfig config = setupTrainingConfig(arguments, embedding.newPredictor());
+            // create training model
+            model.setBlock(getBlock(embedding.newPredictor()));
+            DefaultTrainingConfig config = setupTrainingConfig(arguments);
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
-                Shape encoderInputShape = new Shape(arguments.getBatchSize(), 10, 768);
+                Shape encoderInputShape = new Shape(arguments.getBatchSize(), maxTokenLength);
 
                 // initialize trainer with proper input shape
                 trainer.initialize(encoderInputShape);
@@ -120,7 +116,7 @@ public final class TrainAmazonReviewRanking {
     private static CsvDataset getDataset(
             Arguments arguments, BertFullTokenizer tokenizer, int maxLength) {
         String amazonReview =
-                "https://alpha-djl-demos.s3.amazonaws.com/dataset/nlp/amazon_reviews_us_Digital_Software_v1_00.tsv.gz";
+                "https://s3.amazonaws.com/amazon-reviews-pds/tsv/amazon_reviews_us_Digital_Software_v1_00.tsv.gz";
         float paddingToken = tokenizer.getVocabulary().getIndex("[PAD]");
         return CsvDataset.builder()
                 .optCsvUrl(amazonReview)
@@ -138,8 +134,25 @@ public final class TrainAmazonReviewRanking {
                 .build();
     }
 
-    private static Block getClassifier() {
+    private static Block getBlock(Predictor<NDList, NDList> embedder) {
         return new SequentialBlock()
+                // text embedding layer
+                .add(
+                        ndList -> {
+                            NDArray data = ndList.singletonOrThrow();
+                            long batchSize = data.getShape().get(0);
+                            float maxLength = data.getShape().get(1);
+                            try {
+                                return embedder.predict(
+                                        new NDList(
+                                                data,
+                                                data.getManager()
+                                                        .full(new Shape(batchSize), maxLength)));
+                            } catch (TranslateException e) {
+                                throw new IllegalArgumentException("embedding error", e);
+                            }
+                        })
+                // Classification layers
                 .add(Linear.builder().setUnits(768).build()) // pre classifier
                 .add(Activation::relu)
                 .add(Dropout.builder().optRate(0.2f).build())
@@ -147,8 +160,7 @@ public final class TrainAmazonReviewRanking {
                 .addSingleton(nd -> nd.get(":,0")); // follow HF classifier
     }
 
-    private static DefaultTrainingConfig setupTrainingConfig(
-            Arguments arguments, Predictor<NDList, NDList> predictor) {
+    private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         String outputDir = arguments.getOutputDir();
         CheckpointsTrainingListener listener = new CheckpointsTrainingListener(outputDir);
         listener.setSaveModelCallback(
@@ -162,7 +174,6 @@ public final class TrainAmazonReviewRanking {
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
                 .optDevices(Device.getDevices(1))
-                .optDataManager(new EmbeddingDataManager(predictor))
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }
@@ -186,30 +197,6 @@ public final class TrainAmazonReviewRanking {
             buf.put(vocab.getIndex("[CLS]"));
             tokens.forEach(token -> buf.put(vocab.getIndex(token)));
             buf.put(vocab.getIndex("[SEP]"));
-        }
-    }
-
-    private static final class EmbeddingDataManager extends DataManager {
-
-        private final Predictor<NDList, NDList> embedding;
-
-        public EmbeddingDataManager(Predictor<NDList, NDList> embedding) {
-            this.embedding = embedding;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public NDList getData(Batch batch) {
-            try {
-                // batch shape (batchsize, maximum length)
-                NDArray data = batch.getData().head();
-                long batchSize = data.getShape().get(0);
-                float maxLength = data.getShape().get(1);
-                return embedding.predict(
-                        new NDList(data, data.getManager().full(new Shape(batchSize), maxLength)));
-            } catch (TranslateException e) {
-                throw new IllegalArgumentException("word embedding failed", e);
-            }
         }
     }
 }
