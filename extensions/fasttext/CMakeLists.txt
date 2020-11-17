@@ -3,7 +3,6 @@ project(jni_fasttext)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(JNI REQUIRED)
 

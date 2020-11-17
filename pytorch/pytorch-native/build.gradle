@@ -34,6 +34,9 @@ def downloadBuild(String os, String flavor, Boolean isPrecxx11 = false) {
         into publishDir
     }
     // for nightly ci
+    // the reason why we duplicate the folder here is to insert djl_version into the path
+    // so different versions of JNI wouldn't override each other. We don't also want publishDir
+    // to have djl_version as engine would require to know that during the System.load()
     def ciDir = "${project.projectDir}/jnilib/${djl_version}/${classifier}/${flavor}"
     copy {
         from publishDir

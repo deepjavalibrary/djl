@@ -63,7 +63,7 @@ JNIEXPORT void JNICALL Java_ai_djl_dlr_jni_DlrLibrary_setDLRInput(
   const char* name = env->GetStringUTFChars(jname, JNI_FALSE);
   ;
   auto* handle = reinterpret_cast<DLRModelHandle*>(jhandle);
-  CheckStatus(env, SetDLRInput(handle, name, shape_body, input_body, jdim));
+  CheckStatus(env, SetDLRInput(handle, name, reinterpret_cast<int64_t*>(shape_body), input_body, jdim));
   env->ReleaseFloatArrayElements(jinput, input_body, JNI_ABORT);
   env->ReleaseLongArrayElements(jshape, shape_body, JNI_ABORT);
   env->ReleaseStringUTFChars(jname, name);
@@ -75,8 +75,8 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_dlr_jni_DlrLibrary_getDlrOutputShape(
   int64_t size;
   int dim;
   CheckStatus(env, GetDLROutputSizeDim(handle, jindex, &size, &dim));
-  int64_t shape[dim];
-  CheckStatus(env, GetDLROutputShape(handle, jindex, shape));
+  jlong shape[dim];
+  CheckStatus(env, GetDLROutputShape(handle, jindex, reinterpret_cast<int64_t*>(shape)));
   jlongArray res = env->NewLongArray(dim);
   env->SetLongArrayRegion(res, 0, dim, shape);
   return res;
