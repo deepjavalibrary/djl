@@ -238,7 +238,7 @@ task downloadPyTorchNativeLib() {
             }
             if (isPrecxx11) {
                 def libstd = new File("${outputDir}/native/lib/libstdc++.so.6")
-                new URL("https://djl-ai.s3.amazonaws.com/publish/extra/libstdc%2B%2B.so.6").withInputStream {
+                new URL("https://publish.djl.ai/extra/libstdc%2B%2B.so.6").withInputStream {
                     i -> libstd.withOutputStream { it << i }
                 }
             }
@@ -290,7 +290,7 @@ flavorNames.each { flavor ->
 
                 if (isPrecxx11) {
                     def libstd = new File(metaInf, "ATTRIBUTION")
-                    libstd.text = new URL("https://djl-ai.s3.amazonaws.com/publish/extra/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt").text
+                    libstd.text = new URL("https://publish.djl.ai/extra/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt").text
                 }
             }
             from file("${BINARY_ROOT}/${flavor}/${osName}")

@@ -20,7 +20,7 @@ dependencies {
 processResources {
     outputs.dir file("${project.buildDir}/jnilib")
     doLast {
-        def url = "https://djl-ai.s3.amazonaws.com/publish/pytorch-${pytorch_version}/jnilib/${djl_version}"
+        def url = "https://publish.djl.ai/pytorch-${pytorch_version}/jnilib/${djl_version}"
         def files = [
                 "linux-x86_64/cpu/libdjl_torch.so"         : "linux-x86_64/cpu/libdjl_torch.so",
                 "linux-x86_64/cu101/libdjl_torch.so"       : "linux-x86_64/cu101/libdjl_torch.so",

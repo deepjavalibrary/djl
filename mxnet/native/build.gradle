@@ -164,7 +164,7 @@ import java.util.zip.GZIPInputStream
 
 task downloadMxnetNativeLib() {
     doLast {
-        def url = "https://djl-ai.s3.amazonaws.com/publish/mxnet-${VERSION}"
+        def url = "https://publish.djl.ai/mxnet-${VERSION}"
         def files = [
                 "linux/common/libgfortran.so.3.gz": "mkl/linux/native/lib/libgfortran.so.3",
                 "linux/common/libgomp.so.1.gz"    : "mkl/linux/native/lib/libgomp.so.1",

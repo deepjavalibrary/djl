@@ -282,7 +282,7 @@ public final class LibUtils {
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Unexpected version: " + version);
         }
-        String link = "https://djl-ai.s3.amazonaws.com/publish/mxnet-" + matcher.group(1);
+        String link = "https://publish.djl.ai/mxnet-" + matcher.group(1);
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
             if (cudaArch != null) {

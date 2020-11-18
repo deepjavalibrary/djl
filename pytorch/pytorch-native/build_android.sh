@@ -18,7 +18,7 @@ if [[ ! -d libtorch_android/"$1" ]]; then
     else
         mkdir -p libtorch_android/"$1"
         cd libtorch_android/"$1"
-        curl -s https://djl-ai.s3.amazonaws.com/publish/pytorch-"{$VERSION}/android_native/{$1}"_native.zip | jar xv
+        curl -s https://publish.djl.ai/pytorch-"{$VERSION}/android_native/{$1}"_native.zip | jar xv
         cd ../../
     fi
 fi
