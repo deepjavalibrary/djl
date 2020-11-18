@@ -65,7 +65,7 @@ mxnet -> mxnet-engine -> src -> main -> resources
 
 Then, right click the resources folder and select `Rebuild<default>`.
 
-![FAQ1](https://djl-ai.s3.amazonaws.com/resources/images/FAQ_engine_not_found.png)
+![FAQ1](https://resources.djl.ai/images/FAQ_engine_not_found.png)
 
 ### 1.3 UnsatisfiedLinkError issue
 You might see the error when DJL tries to load the native library for the engines, but some shared libraries are missing.
@@ -141,7 +141,7 @@ examples -> src -> main -> resources -> log4j2.xml
 
 Then, right click the `log4j2.xml` file and select `Recompile log4j2.xml`.
 
-![FAQ2](https://djl-ai.s3.amazonaws.com/resources/images/FAQ_log_recompile.png)
+![FAQ2](https://resources.djl.ai/images/FAQ_log_recompile.png)
 
 
 ## 4. How to run DJL using other versions of Apache MXNet?

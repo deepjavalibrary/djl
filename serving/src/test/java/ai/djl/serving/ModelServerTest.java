@@ -278,7 +278,7 @@ public class ModelServerTest {
         result = null;
         latch = new CountDownLatch(1);
 
-        String url = "https://djl-ai.s3.amazonaws.com/resources/test-models/mlp.tar.gz";
+        String url = "https://resources.djl.ai/test-models/mlp.tar.gz";
         HttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1,
@@ -327,7 +327,7 @@ public class ModelServerTest {
         result = null;
         latch = new CountDownLatch(1);
 
-        String url = "https://djl-ai.s3.amazonaws.com/resources/test-models/mlp.tar.gz";
+        String url = "https://resources.djl.ai/test-models/mlp.tar.gz";
         HttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1,
@@ -593,7 +593,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
-        String url = "https://djl-ai.s3.amazonaws.com/resources/test-models/mlp.tar.gz";
+        String url = "https://resources.djl.ai/test-models/mlp.tar.gz";
         DefaultFullHttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1,

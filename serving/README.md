@@ -51,7 +51,7 @@ The model server will be listening on port 8080.
 You can also load a model for serving on start up:
 
 ```sh
-./gradlew run --args="-m https://djl-ai.s3.amazonaws.com/resources/test-models/mlp.tar.gz"
+./gradlew run --args="-m https://resources.djl.ai/test-models/mlp.tar.gz"
 ```
 
 Open another terminal, and type the following command to test the inference REST API:

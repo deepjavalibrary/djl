@@ -30,7 +30,7 @@ public class SpVocabularyTest {
         Path modelFile = Paths.get("build/test/models/sententpiece_test_model.model");
         if (Files.notExists(modelFile)) {
             DownloadUtils.download(
-                    "https://djl-ai.s3.amazonaws.com/resources/test-models/sententpiece_test_model.model",
+                    "https://resources.djl.ai/test-models/sententpiece_test_model.model",
                     "build/test/models/sententpiece_test_model.model");
         }
     }
