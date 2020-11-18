@@ -17,7 +17,7 @@ dependencies {
 processResources {
     outputs.dir file("${project.buildDir}/classes/java/main/native/lib")
     doLast {
-        def url = "https://djl-ai.s3.amazonaws.com/publish/fasttext-${fasttext_version}/jnilib/${djl_version}"
+        def url = "https://publish.djl.ai/fasttext-${fasttext_version}/jnilib/${djl_version}"
         def files = [
                 "linux-x86_64": "libjni_fasttext.so",
                 "osx-x86_64"  : "libjni_fasttext.dylib"

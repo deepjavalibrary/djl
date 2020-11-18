@@ -243,7 +243,7 @@ import java.util.zip.GZIPInputStream
 
 task downloadTensorflowNativeLib() {
     doLast {
-        def url = "https://djl-ai.s3.amazonaws.com/publish/tensorflow-${tensorflow_version}"
+        def url = "https://publish.djl.ai/tensorflow-${tensorflow_version}"
         def files = [
                 "linux/cpu/libjnitensorflow.so.gz"                        : "cpu/linux/native/lib/libjnitensorflow.so",
                 "linux/cpu/libtensorflow_cc.so.2.gz"                      : "cpu/linux/native/lib/libtensorflow_cc.so.2",
