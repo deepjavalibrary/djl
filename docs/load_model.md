@@ -124,7 +124,7 @@ Current supported URL scheme:
 Criteria<Image, Classifications> criteria = Criteria.builder()
         .setTypes(Image.class, Classifications.class) // defines input and output data type
         .optTranslator(ImageClassificationTranslator.builder().setSynsetArtifactName("synset.txt").build())
-        .optModelUrls("https://djl-ai.s3.amazonaws.com/resources/benchmark/squeezenet_v1.1.tar.gz") // search models in specified path
+        .optModelUrls("https://resources.djl.ai/benchmark/squeezenet_v1.1.tar.gz") // search models in specified path
         .build();
 
 ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);

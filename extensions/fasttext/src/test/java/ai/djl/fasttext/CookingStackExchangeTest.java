@@ -106,9 +106,7 @@ public class CookingStackExchangeTest {
             throw new SkipException("Nightly only");
         }
 
-        URL url =
-                new URL(
-                        "https://djl-ai.s3.amazonaws.com/resources/test-models/blazingtext_classification.bin");
+        URL url = new URL("https://resources.djl.ai/test-models/blazingtext_classification.bin");
         Path path = Paths.get("build/tmp/model");
         Path modelFile = path.resolve("text_classification.bin");
         if (!Files.exists(modelFile)) {
