@@ -29,14 +29,18 @@ import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class DlrTest {
 
-    @Test(enabled = false)
+    @Test
     public void testDlr()
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
+        if (!System.getProperty("os.name").toLowerCase().startsWith("mac")) {
+            throw new SkipException("test only work on mac");
+        }
         ImageClassificationTranslator translator =
                 ImageClassificationTranslator.builder()
                         .addTransform(new Resize(224, 224))

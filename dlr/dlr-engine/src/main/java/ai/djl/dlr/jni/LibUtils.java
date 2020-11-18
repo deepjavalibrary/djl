@@ -12,6 +12,25 @@
  */
 package ai.djl.dlr.jni;
 
+import ai.djl.util.Platform;
+import ai.djl.util.Utils;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Utilities for finding the DLR Engine binary on the System.
  *
@@ -24,12 +43,299 @@ package ai.djl.dlr.jni;
 @SuppressWarnings("MissingJavadocMethod")
 public final class LibUtils {
 
+    private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
+
+    private static final String LIB_NAME = "djl_dlr";
+    private static final String NATIVE_LIB_NAME = "dlr";
+
+    private static final Pattern VERSION_PATTERN =
+            Pattern.compile("(\\d+\\.\\d+\\.\\d+(-\\w)?)(-SNAPSHOT)?(-\\d+)?");
+
     private LibUtils() {}
 
     public static void loadLibrary() {
-        // TODO implement
-        System.load("/Users/leecheng/.djl.ai/dlr/1.5.0-SNAPSHOT-cpu-osx-x86_64/libdlr.dylib");
-        System.load(
-                "/Users/leecheng/.djl.ai/dlr/1.5.0-SNAPSHOT-cpu-osx-x86_64/0.9.0-SNAPSHOT-cpu-libdjl_dlr.dylib");
+        String nativePath = findNativeOverrideLibrary();
+        Path cacheDir;
+        if (nativePath == null) {
+            String nativeLibDir = findNativeLibrary();
+            if (nativeLibDir != null) {
+                cacheDir = Paths.get(nativeLibDir);
+                nativePath = nativeLibDir + "/" + System.mapLibraryName(NATIVE_LIB_NAME);
+            } else {
+                throw new IllegalStateException("Native library not found");
+            }
+        } else {
+            Platform platform;
+            try {
+                platform = getPlatformFromProperties();
+            } catch (IOException e) {
+                throw new IllegalStateException(
+                        "Failed to read DLR native library jar properties", e);
+            }
+            if (platform == null) {
+                throw new IllegalStateException(
+                        "Your DLR native library jar does not match your operating system. Make sure the Maven Dependency Classifier matches your system type.");
+            }
+            cacheDir = getCacheDir(platform);
+        }
+        String jniPath = copyJniLibraryFromClasspath(cacheDir);
+        System.load(nativePath); // NOPMD
+        logger.debug("Loading DLR native library from: {}", nativePath);
+        System.load(jniPath); // NOPMD
+        logger.debug("Loading DLR JNI library from: {}", jniPath);
+    }
+
+    private static synchronized String findNativeLibrary() {
+        try {
+            Platform platform = getPlatformFromProperties();
+            Platform systemPlatform = Platform.fromSystem();
+
+            if (platform != null && platform.isPlaceholder()) {
+                try {
+                    return downloadDlr(platform);
+                } catch (IOException e) {
+                    throw new IllegalStateException("Failed to download DLR native library", e);
+                }
+            }
+
+            if (platform != null && platform.matches(systemPlatform)) {
+                return copyNativeLibraryFromClasspath(platform);
+            }
+
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to read DLR native library jar properties", e);
+        }
+        throw new IllegalStateException(
+                "Your DLR native library jar does not match your operating system. Make sure the Maven Dependency Classifier matches your system type.");
+    }
+
+    private static String copyNativeLibraryFromClasspath(Platform platform) {
+        Path tmp = null;
+        try {
+            String libName = System.mapLibraryName(NATIVE_LIB_NAME);
+            Path cacheDir = getCacheDir(platform);
+            Path path = cacheDir.resolve(libName);
+            if (Files.exists(path)) {
+                return cacheDir.toAbsolutePath().toString();
+            }
+
+            Path dlrCacheRoot = getCacheDir();
+            Files.createDirectories(dlrCacheRoot);
+            tmp = Files.createTempDirectory(dlrCacheRoot, "tmp");
+            for (String file : platform.getLibraries()) {
+                String libPath = "/native/lib/" + file;
+                try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
+                    Files.copy(is, tmp.resolve(file), StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+
+            Utils.moveQuietly(tmp, cacheDir);
+            return cacheDir.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to extract DLR native library", e);
+        } finally {
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
+        }
+    }
+
+    private static String findLibraryInPath(String libPath) {
+        String[] paths = libPath.split(File.pathSeparator);
+        List<String> mappedLibNames;
+        mappedLibNames = Collections.singletonList(System.mapLibraryName(NATIVE_LIB_NAME));
+
+        for (String path : paths) {
+            File p = new File(path);
+            if (!p.exists()) {
+                continue;
+            }
+            for (String name : mappedLibNames) {
+                if (p.isFile() && p.getName().endsWith(name)) {
+                    return p.getAbsolutePath();
+                }
+
+                File file = new File(path, name);
+                if (file.exists() && file.isFile()) {
+                    return file.getAbsolutePath();
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String findNativeOverrideLibrary() {
+        String libPath = System.getenv("DLR_LIBRARY_PATH");
+        if (libPath != null) {
+            String libName = findLibraryInPath(libPath);
+            if (libName != null) {
+                return libName;
+            }
+        }
+
+        libPath = System.getProperty("java.library.path");
+        if (libPath != null) {
+            return findLibraryInPath(libPath);
+        }
+        return null;
+    }
+
+    private static String copyJniLibraryFromClasspath(Path nativeDir) {
+        String name = System.mapLibraryName(LIB_NAME);
+        Platform platform = Platform.fromSystem();
+        String classifier = platform.getClassifier();
+        String flavor = platform.getFlavor();
+        if (flavor.isEmpty()) {
+            flavor = "cpu";
+        }
+        Properties prop = new Properties();
+        try (InputStream stream = LibUtils.class.getResourceAsStream("/jnilib/dlr.properties")) {
+            prop.load(stream);
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot find DLR property file", e);
+        }
+        String version = prop.getProperty("version");
+        Path path = nativeDir.resolve(version + '-' + flavor + '-' + name);
+        if (Files.exists(path)) {
+            return path.toAbsolutePath().toString();
+        }
+        Path tmp = null;
+        try (InputStream stream =
+                LibUtils.class.getResourceAsStream(
+                        "/jnilib/" + classifier + '/' + flavor + '/' + name)) {
+            if (stream == null) {
+                throw new UnsupportedOperationException("DLR is not supported by this platform");
+            }
+            tmp = Files.createTempFile(nativeDir, "jni", "tmp");
+            Files.copy(stream, tmp, StandardCopyOption.REPLACE_EXISTING);
+            Utils.moveQuietly(tmp, path);
+            return path.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot copy jni files", e);
+        } finally {
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
+        }
+    }
+
+    private static String downloadDlr(Platform platform) throws IOException {
+        String version = platform.getVersion();
+        String flavor = platform.getFlavor();
+        if (flavor.isEmpty()) {
+            flavor = "cpu";
+        }
+        String os = platform.getOsPrefix();
+
+        String libName = System.mapLibraryName(NATIVE_LIB_NAME);
+        Path cacheDir = getCacheDir(platform);
+        Path path = cacheDir.resolve(libName);
+        if (Files.exists(path)) {
+            return cacheDir.toAbsolutePath().toString();
+        }
+        // if files not found
+        Path dlrCacheRoot = getCacheDir();
+        Files.createDirectories(dlrCacheRoot);
+
+        Matcher matcher = VERSION_PATTERN.matcher(version);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Unexpected version: " + version);
+        }
+        String link = "https://djl-ai.s3.amazonaws.com/publish/dlr-" + matcher.group(1) + "/native";
+        Path tmp = null;
+        try (InputStream is = new URL(link + "/files.txt").openStream()) {
+            List<String> lines = Utils.readLines(is);
+            if (flavor.startsWith("cu")
+                    && !lines.contains(flavor + '/' + os + "/native/lib/" + libName)) {
+                logger.warn("No matching cuda flavor for {} found: {}.", os, flavor);
+                // fallback to CPU
+                flavor = "cpu";
+
+                // check again
+                path = cacheDir.resolve(libName);
+                if (Files.exists(path)) {
+                    return cacheDir.toAbsolutePath().toString();
+                }
+            }
+
+            tmp = Files.createTempDirectory(dlrCacheRoot, "tmp");
+            for (String line : lines) {
+                if (line.startsWith(os + '/' + flavor + '/')) {
+                    URL url = new URL(link + '/' + line);
+                    String fileName = line.substring(line.lastIndexOf('/') + 1);
+                    logger.info("Downloading {} ...", url);
+                    try (InputStream fis = url.openStream()) {
+                        Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+                    }
+                }
+            }
+
+            Utils.moveQuietly(tmp, cacheDir);
+            return cacheDir.toAbsolutePath().toString();
+        } finally {
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
+        }
+    }
+
+    private static Path getCacheDir() {
+        String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
+        if (cacheDir == null || cacheDir.isEmpty()) {
+            cacheDir = System.getenv("ENGINE_CACHE_DIR");
+            if (cacheDir == null || cacheDir.isEmpty()) {
+                cacheDir = System.getProperty("DJL_CACHE_DIR");
+                if (cacheDir == null || cacheDir.isEmpty()) {
+                    cacheDir = System.getenv("DJL_CACHE_DIR");
+                    if (cacheDir == null || cacheDir.isEmpty()) {
+                        String userHome = System.getProperty("user.home");
+                        return Paths.get(userHome, ".djl.ai").resolve("dlr");
+                    }
+                }
+            }
+        }
+        return Paths.get(cacheDir, "dlr");
+    }
+
+    private static Path getCacheDir(Platform platform) {
+        String version = platform.getVersion();
+        String flavor = platform.getFlavor();
+        if (flavor.isEmpty()) {
+            flavor = "cpu";
+        }
+        String classifier = platform.getClassifier();
+        Path cacheDir = getCacheDir();
+        logger.debug("Using cache dir: {}", cacheDir);
+        return cacheDir.resolve(version + '-' + flavor + '-' + classifier);
+    }
+
+    private static Platform getPlatformFromProperties() throws IOException {
+        Enumeration<URL> urls;
+        try {
+            urls =
+                    Thread.currentThread()
+                            .getContextClassLoader()
+                            .getResources("native/lib/dlr.properties");
+        } catch (IOException e) {
+            logger.warn("", e);
+            return null;
+        }
+        // No native jars
+        if (!urls.hasMoreElements()) {
+            return null;
+        }
+
+        Platform systemPlatform = Platform.fromSystem();
+        Platform placeholder = null;
+        while (urls.hasMoreElements()) {
+            URL url = urls.nextElement();
+            Platform platform = Platform.fromUrl(url);
+            if (platform.isPlaceholder()) {
+                placeholder = platform;
+            } else if (platform.matches(systemPlatform)) {
+                return platform;
+            }
+        }
+        return placeholder;
     }
 }
