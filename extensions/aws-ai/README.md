@@ -17,8 +17,8 @@ The following pseudocode demonstrates how to load model from S3:
         Criteria.builder()
                 .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                 .setTypes(Image.class, Classifications.class)
-                .optModelUrls("s3://djl-misc/test/models/resnet18?artifact_id=resnet&model_name=resent18_v1")
-                .optArtifactId("resnet")
+                .optModelUrls("s3://djl-misc/test/models/resnet18")
+                .optModelName("resent18_v1")
                 .optProgress(new ProgressBar())
                 .build();
 
