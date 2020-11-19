@@ -17,12 +17,9 @@ import ai.djl.engine.Engine;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,7 +35,7 @@ public abstract class BaseNDManager implements NDManager {
     protected String uid;
     protected String name;
     protected Device device;
-    protected Map<String, Reference<AutoCloseable>> resources;
+    protected ConcurrentHashMap<String, AutoCloseable> resources;
     protected AtomicBoolean closed = new AtomicBoolean(false);
 
     protected BaseNDManager(NDManager parent, Device device) {
@@ -218,13 +215,7 @@ public abstract class BaseNDManager implements NDManager {
         if (closed.get()) {
             throw new IllegalStateException("NDManager has been closed already.");
         }
-        WeakReference<AutoCloseable> ref;
-        if (Boolean.getBoolean("ai.djl.disable_close_resource_on_finalize")) {
-            ref = new HardReference(resource);
-        } else {
-            ref = new WeakReference<>(resource);
-        }
-        resources.put(resourceId, ref);
+        resources.put(resourceId, resource);
     }
 
     /** {@inheritDoc} */
@@ -260,14 +251,11 @@ public abstract class BaseNDManager implements NDManager {
     @Override
     public synchronized void close() {
         if (!closed.getAndSet(true)) {
-            for (Reference<AutoCloseable> resource : resources.values()) {
-                AutoCloseable closeable = resource.get();
-                if (closeable != null) {
-                    try {
-                        closeable.close();
-                    } catch (Exception e) {
-                        logger.error("Resource close failed.", e);
-                    }
+            for (AutoCloseable closeable : resources.values()) {
+                try {
+                    closeable.close();
+                } catch (Exception e) {
+                    logger.error("Resource close failed.", e);
                 }
             }
             parent.detach(uid);
@@ -291,26 +279,10 @@ public abstract class BaseNDManager implements NDManager {
                 .append(resources.size());
 
         System.out.println(sb.toString()); // NOPMD
-        for (Reference<AutoCloseable> ref : resources.values()) {
-            AutoCloseable c = ref.get();
+        for (AutoCloseable c : resources.values()) {
             if (c instanceof BaseNDManager) {
                 ((BaseNDManager) c).debugDump(level + 1);
             }
-        }
-    }
-
-    /** The workaround custom Reference class to avoid GC to close NDArray. */
-    private static final class HardReference extends WeakReference<AutoCloseable> {
-
-        private AutoCloseable obj;
-
-        HardReference(AutoCloseable obj) {
-            super(obj);
-            this.obj = obj;
-        }
-
-        private AutoCloseable getReference() {
-            return obj;
         }
     }
 }

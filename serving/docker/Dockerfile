@@ -28,7 +28,7 @@ ENV TF_NUM_INTEROP_THREADS=1
 ENV TF_NUM_INTRAOP_THREADS=1
 ENV TF_CPP_MIN_LOG_LEVEL=1
 ENV MXNET_ENGINE_TYPE=NaiveEngine
-ENV JAVA_OPTS="-Dai.djl.disable_close_resource_on_finalize=true -Dai.djl.pytorch.num_interop_threads=1"
+ENV JAVA_OPTS="-Dai.djl.pytorch.num_interop_threads=1"
 
 ENTRYPOINT ["/usr/local/bin/dockerd-entrypoint.sh"]
 CMD ["serve"]

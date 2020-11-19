@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
  * the different engines.
  */
 public abstract class NativeResource<T> implements AutoCloseable {
+
     private static final Logger logger = LoggerFactory.getLogger(NativeResource.class);
 
     protected final AtomicReference<T> handle;
