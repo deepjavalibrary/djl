@@ -74,9 +74,8 @@ public final class TrainAmazonReviewRanking {
                 Criteria.builder()
                         .optApplication(Application.NLP.WORD_EMBEDDING)
                         .setTypes(NDList.class, NDList.class)
+                        .optModelUrls("https://resources.djl.ai/test-models/distilbert.zip")
                         .optTranslator(new NoopTranslator(null))
-                        .optModelUrls(
-                                "https://alpha-djl-demos.s3.amazonaws.com/model/examples/distilbert.zip")
                         .optProgress(new ProgressBar())
                         .build();
         int maxTokenLength = 64;
