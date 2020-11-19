@@ -152,6 +152,10 @@ Users are required to use the corresponding `pytorch-engine` package along with 
 
 ### Windows
 
+PyTorch requires Visual C++ Redistributable Packages. If you encounter an UnsatisfiedLinkError while using
+DJL on Windows, please download and install
+[Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) and reboot.
+
 For the Windows platform, you can choose between CPU and GPU.
 
 #### Windows GPU
