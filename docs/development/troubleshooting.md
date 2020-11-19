@@ -21,7 +21,7 @@ You can install this package and reboot again to see if the issue persist. You c
 CN: Windows 10 加载失败常常是因为缺少 Windows Visual C++ 相关扩展包而导致的。您可以通过下面Windows的步骤来修复系统缺失依赖项。
 
 ### 1.1 Engine dependency is missing
-DJL currently supports four engines: MXNet, PyTorch, TensorFlow(experimental) and FastText.
+DJL currently supports four engines: MXNet, PyTorch, TensorFlow and FastText.
 Please include at least one of those engines and their native library as dependencies.
 For example, adding MXNet engine dependencies:
 
