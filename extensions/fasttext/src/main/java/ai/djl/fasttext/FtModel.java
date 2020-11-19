@@ -202,12 +202,6 @@ public class FtModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public void cast(DataType dataType) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PairList<String, Shape> describeInput() {
         return null;
     }

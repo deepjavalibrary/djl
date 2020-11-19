@@ -16,12 +16,8 @@ import ai.djl.BaseModel;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.dlr.jni.JniUtils;
-import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
-import ai.djl.training.Trainer;
-import ai.djl.training.TrainingConfig;
-import ai.djl.translate.Translator;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -80,35 +76,5 @@ public class DlrModel extends BaseModel {
         if (Files.notExists(graph) || !Files.isRegularFile(graph)) {
             throw new FileNotFoundException("graph file(.json) is missing");
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Trainer newTrainer(TrainingConfig trainingConfig) {
-        throw new UnsupportedOperationException("Not supported for DlrModel");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new Predictor<>(this, translator, false);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String[] getArtifactNames() {
-        return new String[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void cast(DataType dataType) {
-        throw new UnsupportedOperationException("Not supported for DlrModel");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void close() {
-        manager.close();
     }
 }
