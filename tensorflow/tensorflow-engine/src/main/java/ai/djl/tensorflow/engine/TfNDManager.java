@@ -16,12 +16,10 @@ import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -29,7 +27,6 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
-import java.nio.file.Path;
 import org.tensorflow.EagerSession;
 import org.tensorflow.Operand;
 import org.tensorflow.Tensor;
@@ -225,41 +222,6 @@ public class TfNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray createCoo(Buffer data, long[][] indices, Shape shape) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList load(Path path) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void invoke(
-            String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {}
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Engine getEngine() {
         return Engine.getEngine(TfEngine.ENGINE_NAME);
     }
@@ -401,13 +363,6 @@ public class TfNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray randomInteger(long low, long high, Shape shape, DataType dataType) {
-        // the closest operator is randomUniform but it doesn't support long
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public NDArray randomUniform(float low, float high, Shape shape, DataType dataType) {
         Operand shapeOp = tf.constant(shape.getShape());
@@ -455,18 +410,6 @@ public class TfNDManager extends BaseNDManager {
         try (Tensor<?> tensor = tf.math.add(tf.math.mul(result, std), mean).asTensor()) {
             return new TfNDArray(this, tensor);
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray randomMultinomial(int n, NDArray pValues, Shape shape) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray randomMultinomial(int n, NDArray pValues) {
-        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */

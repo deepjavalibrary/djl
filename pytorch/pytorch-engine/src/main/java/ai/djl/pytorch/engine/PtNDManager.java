@@ -16,13 +16,11 @@ import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.pytorch.jni.JniUtils;
-import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -30,7 +28,6 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
-import java.nio.file.Path;
 
 /** {@code PtNDManager} is the PyTorch implementation of {@link NDManager}. */
 public class PtNDManager extends BaseNDManager {
@@ -49,12 +46,6 @@ public class PtNDManager extends BaseNDManager {
     @Override
     public ByteBuffer allocateDirect(int capacity) {
         return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(String data) {
-        throw new UnsupportedOperationException("PyTorch Engine does not support String NDArray");
     }
 
     /** {@inheritDoc} */
@@ -105,18 +96,6 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape) {
-        throw new UnsupportedOperationException("PyTorch doesn't support CSR");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
-        throw new UnsupportedOperationException("PyTorch doesn't support Row Sparse");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray createCoo(Buffer data, long[][] indices, Shape shape) {
         // length should be the same as indices dim 1
         try (NDArray valueNd = create(data, new Shape(indices[0].length))) {
@@ -124,12 +103,6 @@ public class PtNDManager extends BaseNDManager {
                 return JniUtils.createSparseCoo((PtNDArray) indicesNd, (PtNDArray) valueNd, shape);
             }
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList load(Path path) {
-        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -205,18 +178,6 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray randomMultinomial(int n, NDArray pValues) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray randomMultinomial(int n, NDArray pValues, Shape shape) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PtNDManager newSubManager() {
         return newSubManager(device);
     }
@@ -227,19 +188,6 @@ public class PtNDManager extends BaseNDManager {
         PtNDManager manager = new PtNDManager(this, device);
         attach(manager.uid, manager);
         return manager;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void invoke(
-            String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
-        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
