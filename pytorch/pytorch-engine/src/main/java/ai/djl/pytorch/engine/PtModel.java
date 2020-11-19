@@ -16,13 +16,11 @@ import ai.djl.BaseModel;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.inference.Predictor;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
-import ai.djl.translate.Translator;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -129,13 +127,6 @@ public class PtModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        // TODO: modify copy
-        return new Predictor<>(this, translator, false);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public String[] getArtifactNames() {
         try {
             List<Path> files =
@@ -154,17 +145,5 @@ public class PtModel extends BaseModel {
         } catch (IOException e) {
             throw new AssertionError("Failed list files", e);
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void cast(DataType dataType) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void close() {
-        manager.close();
     }
 }

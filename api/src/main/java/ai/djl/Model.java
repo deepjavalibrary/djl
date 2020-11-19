@@ -299,7 +299,9 @@ public interface Model extends AutoCloseable {
      *
      * @param dataType the target dataType you would like to cast to
      */
-    void cast(DataType dataType);
+    default void cast(DataType dataType) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 
     /**
      * Converts the model to use a lower precision quantized network.

@@ -15,12 +15,8 @@ package ai.djl.onnxruntime.engine;
 import ai.djl.BaseModel;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
-import ai.djl.training.Trainer;
-import ai.djl.training.TrainingConfig;
-import ai.djl.translate.Translator;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import java.io.FileNotFoundException;
@@ -92,35 +88,5 @@ public class OrtModel extends BaseModel {
             }
         }
         return modelFile;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Trainer newTrainer(TrainingConfig trainingConfig) {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new Predictor<>(this, translator, false);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String[] getArtifactNames() {
-        return new String[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void cast(DataType dataType) {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void close() {
-        manager.close();
     }
 }

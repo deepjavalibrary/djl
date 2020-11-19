@@ -15,13 +15,8 @@ package ai.djl.tensorflow.engine;
 import ai.djl.BaseModel;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
-import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.nn.Block;
-import ai.djl.training.Trainer;
-import ai.djl.training.TrainingConfig;
-import ai.djl.translate.Translator;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -33,16 +28,12 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import org.tensorflow.SavedModelBundle;
 import org.tensorflow.proto.framework.ConfigProto;
 import org.tensorflow.proto.framework.RunOptions;
 
 public class TfModel extends BaseModel {
-
-    private AtomicBoolean first;
-    private NDManager manager;
 
     /**
      * Constructs a new Model on a given device.
@@ -56,7 +47,6 @@ public class TfModel extends BaseModel {
         properties = new ConcurrentHashMap<>();
         manager = TfNDManager.getSystemManager().newSubManager(device);
         manager.setName("tfModel");
-        first = new AtomicBoolean(true);
     }
 
     /** {@inheritDoc} */
@@ -177,18 +167,6 @@ public class TfModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public Trainer newTrainer(TrainingConfig trainingConfig) {
-        throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new Predictor<>(this, translator, first.getAndSet(false));
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDManager getNDManager() {
         return manager;
     }
@@ -217,14 +195,8 @@ public class TfModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public void cast(DataType dataType) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void close() {
-        manager.close();
+        super.close();
         if (block != null) {
             block.clear();
         }

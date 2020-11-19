@@ -12,6 +12,7 @@
  */
 package ai.djl;
 
+import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -20,6 +21,9 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
+import ai.djl.training.Trainer;
+import ai.djl.training.TrainingConfig;
+import ai.djl.translate.Translator;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import ai.djl.util.Utils;
@@ -86,6 +90,18 @@ public abstract class BaseModel implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public Trainer newTrainer(TrainingConfig trainingConfig) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
+        return new Predictor<>(this, translator, false);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void setDataType(DataType dataType) {
         this.dataType = dataType;
     }
@@ -94,6 +110,12 @@ public abstract class BaseModel implements Model {
     @Override
     public DataType getDataType() {
         return dataType;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        manager.close();
     }
 
     /** {@inheritDoc} */
@@ -123,6 +145,12 @@ public abstract class BaseModel implements Model {
             outputNames.add("output" + i);
         }
         return new PairList<>(outputNames, Arrays.asList(outputShapes));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String[] getArtifactNames() {
+        throw new UnsupportedOperationException("Not supported!");
     }
 
     /** {@inheritDoc} */

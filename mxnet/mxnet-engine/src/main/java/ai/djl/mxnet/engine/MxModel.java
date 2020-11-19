@@ -16,7 +16,6 @@ import ai.djl.BaseModel;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.inference.Predictor;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -25,7 +24,6 @@ import ai.djl.nn.Parameter;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
-import ai.djl.translate.Translator;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -132,18 +130,6 @@ public class MxModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new Predictor<>(this, translator, false);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void cast(DataType dataType) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public String[] getArtifactNames() {
         try {
             List<Path> files =
@@ -169,7 +155,7 @@ public class MxModel extends BaseModel {
     public void close() {
         // TODO workaround for MXNet Engine crash issue
         JnaUtils.waitAll();
-        manager.close();
+        super.close();
     }
 
     @SuppressWarnings("PMD.UseConcurrentHashMap")
