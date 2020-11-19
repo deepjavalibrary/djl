@@ -109,6 +109,10 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60
 
 ### Windows
 
+TensorFlow requires Visual C++ Redistributable Packages. If you encounter an UnsatisfiedLinkError while using
+DJL on Windows, please download and install
+[Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) and reboot.
+
 For the Windows platform, you have to use [Automatic](#automatic-(recommended)) package if you want to use GPU.
 
 #### Windows GPU

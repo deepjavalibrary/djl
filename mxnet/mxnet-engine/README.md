@@ -117,6 +117,10 @@ installed on your GPU machine, you can use one of the following library:
 
 ### Windows
 
+Apache MXNet requires Visual C++ Redistributable Packages. If you encounter an UnsatisfiedLinkError while using
+DJL on Windows, please download and install
+[Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) and reboot.
+
 For the Windows platform, you can use CPU package. MXNet windows GPU native
 library size are large, we no longer provide GPU package, instead you have to
 use [Automatic](#automatic-(recommended)) package.
