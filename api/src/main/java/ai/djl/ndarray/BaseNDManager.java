@@ -13,8 +13,15 @@
 package ai.djl.ndarray;
 
 import ai.djl.Device;
+import ai.djl.engine.Engine;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.util.PairList;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,6 +50,48 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public ByteBuffer allocateDirect(int capacity) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(String data) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(Shape shape, DataType dataType) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray createCSR(Buffer data, long[] indptr, long[] indices, Shape shape) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray createCoo(Buffer data, long[][] indices, Shape shape) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList load(Path path) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -55,6 +104,72 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray zeros(Shape shape, DataType dataType) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray ones(Shape shape, DataType dataType) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray full(Shape shape, float value, DataType dataType) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray arange(float start, float stop, float step, DataType dataType) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray eye(int rows, int cols, int k, DataType dataType) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray linspace(float start, float stop, int num, boolean endpoint) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomInteger(long low, long high, Shape shape, DataType dataType) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomUniform(float low, float high, Shape shape, DataType dataType) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomNormal(float loc, float scale, Shape shape, DataType dataType) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomMultinomial(int n, NDArray pValues) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray randomMultinomial(int n, NDArray pValues, Shape shape) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public boolean isOpen() {
         return !closed.get();
     }
@@ -63,6 +178,18 @@ public abstract class BaseNDManager implements NDManager {
     @Override
     public NDManager getParentManager() {
         return parent;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDManager newSubManager() {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDManager newSubManager(Device device) {
+        throw new UnsupportedOperationException("Not supported!");
     }
 
     /** {@inheritDoc} */
@@ -108,6 +235,25 @@ public abstract class BaseNDManager implements NDManager {
             return;
         }
         resources.remove(resourceId);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void invoke(
+            String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Engine getEngine() {
+        throw new UnsupportedOperationException("Not supported!");
     }
 
     /** {@inheritDoc} */
