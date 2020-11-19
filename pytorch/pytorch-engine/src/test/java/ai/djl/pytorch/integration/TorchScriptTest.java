@@ -44,8 +44,7 @@ public class TorchScriptTest {
                     Criteria.builder()
                             .setTypes(NDList.class, NDList.class)
                             .optTranslator(translator)
-                            .optModelUrls(
-                                    "https://alpha-djl-demos.s3.amazonaws.com/model/integration-test/dict_input.zip")
+                            .optModelUrls("https://resources.djl.ai/test-models/dict_input.zip")
                             .optProgress(new ProgressBar())
                             .build();
 
