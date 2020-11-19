@@ -72,7 +72,7 @@ Criteria<Image, Classifications> criteria = Criteria.builder()
         .setTypes(Image.class, Classifications.class) // defines input and output data type
         .optTranslator(ImageClassificationTranslator.builder().setSynsetArtifactName("synset.txt").build())
         .optModelUrls("file:///var/models/my_resnet50") // search models in specified path
-        .optArtifactId("ai.djl.localmodelzoo:my_resnet50") // defines which model to load
+        .optModelName("resnet50") // specify model file prefix
         .build();
 
 ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);

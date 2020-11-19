@@ -93,7 +93,6 @@ Criteria<Image, Classifications> criteria =
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(Image.class, Classifications.class)
                         .optTranslator(myTranslator)
-                        .optArtifactId("mobilenet")
                         .optFilter("flavor", "v2")
                         .optProgress(new ProgressBar())
                         .build();
@@ -120,7 +119,6 @@ Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(Image.class, DetectedObjects.class)
-                        .optArtifactId("ssd")
                         .optFilter("backbone", "mobilenet_v2")
                         .optEngine("TensorFlow")
                         .optOption("Tags", new String[] {})
@@ -143,11 +141,11 @@ It will show you the number of inputs and number of outputs required, their name
 
 - Write `processInput` and `processOutput` methods:
 
-The input of `processInput` can be any Object and output must be `NDList` for DJL to run inference. 
-You can convert your inputs to NDArrays in the order described by `model.describeInput()`, 
-and add names for each NDArray using `NDArray.setName` method. 
+The input of `processInput` can be any Object and output must be `NDList` for DJL to run inference.
+You can convert your inputs to NDArrays in the order described by `model.describeInput()`,
+and add names for each NDArray using `NDArray.setName` method.
 Then you can assemble the NDArrays into a NDList and return it to the `Predictor`.
 
-Similarly, `processOutput` takes a NDList as input and convert it back to any Object. 
+Similarly, `processOutput` takes a NDList as input and convert it back to any Object.
 For models with multiple outputs, you already know the outputs orders by calling `model.describeOutput` in step 1.
 You can also use `NDArray.getName` to figure out what does the output represent.

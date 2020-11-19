@@ -16,7 +16,7 @@ The following pseudocode demonstrates how to load model from HDFS url:
                 .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                 .setTypes(Image.class, Classifications.class)
                 .optModelUrls("hdfs://localhost:63049/resnet.tar.z")
-                .optArtifactId("resnet")
+                .optModelName("resnet18-v1")
                 .build();
 
     ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
