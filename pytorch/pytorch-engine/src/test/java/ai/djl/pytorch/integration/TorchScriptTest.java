@@ -24,7 +24,6 @@ import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
@@ -37,13 +36,9 @@ public class TorchScriptTest {
     public void testDictInput()
             throws MalformedModelException, ModelNotFoundException, IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NoopTranslator translator = new NoopTranslator();
-            translator.setBatchifier(null);
-
             Criteria<NDList, NDList> criteria =
                     Criteria.builder()
                             .setTypes(NDList.class, NDList.class)
-                            .optTranslator(translator)
                             .optModelUrls("https://resources.djl.ai/test-models/dict_input.zip")
                             .optProgress(new ProgressBar())
                             .build();

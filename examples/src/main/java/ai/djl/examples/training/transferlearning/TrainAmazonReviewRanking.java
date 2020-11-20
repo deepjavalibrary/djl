@@ -45,7 +45,6 @@ import ai.djl.training.listener.CheckpointsTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.PaddingStackBatchifier;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -75,7 +74,6 @@ public final class TrainAmazonReviewRanking {
                         .optApplication(Application.NLP.WORD_EMBEDDING)
                         .setTypes(NDList.class, NDList.class)
                         .optModelUrls("https://resources.djl.ai/test-models/distilbert.zip")
-                        .optTranslator(new NoopTranslator(null))
                         .optProgress(new ProgressBar())
                         .build();
         int maxTokenLength = 64;

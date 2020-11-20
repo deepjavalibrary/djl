@@ -107,7 +107,8 @@ public class ResnetTest {
             throws IOException, ModelNotFoundException, TranslateException,
                     MalformedModelException {
         try (ZooModel<Image, Classifications> model = getModel()) {
-            try (Predictor<NDList, NDList> predictor = model.newPredictor(new NoopTranslator())) {
+            NoopTranslator translator = new NoopTranslator(Batchifier.STACK);
+            try (Predictor<NDList, NDList> predictor = model.newPredictor(translator)) {
                 NDList input = new NDList(model.getNDManager().ones(new Shape(3, 32, 32)));
                 List<NDList> inputs = Collections.nCopies(16, input);
                 predictor.batchPredict(inputs);
