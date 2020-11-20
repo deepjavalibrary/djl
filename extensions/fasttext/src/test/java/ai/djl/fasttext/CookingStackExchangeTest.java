@@ -53,6 +53,7 @@ public class CookingStackExchangeTest {
                     FtTrainingConfig.builder()
                             .setOutputDir(Paths.get("build"))
                             .setModelName("cooking")
+                            .optEpoch(5)
                             .optLoss(FtTrainingConfig.FtLoss.HS)
                             .build();
 
@@ -97,7 +98,7 @@ public class CookingStackExchangeTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test
     public void testBlazingText() throws IOException, ModelException {
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
             throw new SkipException("fastText is not supported on windows");
@@ -117,11 +118,10 @@ public class CookingStackExchangeTest {
         }
 
         try (FtModel model = new FtModel("text_classification")) {
-            model.load(path);
-            Classifications result =
-                    model.classify(
-                            "Convair was an american aircraft manufacturing company which later expanded into rockets and spacecraft .",
-                            5);
+            model.load(modelFile);
+            String text =
+                    "Convair was an american aircraft manufacturing company which later expanded into rockets and spacecraft .";
+            Classifications result = model.classify(text, 5);
 
             logger.info("{}", result);
             Assert.assertEquals(result.item(0).getClassName(), "Company");

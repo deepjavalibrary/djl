@@ -99,6 +99,17 @@ public class PtModel extends BaseModel {
     }
 
     private Path findModelFile(String prefix) {
+        if (Files.isRegularFile(modelDir)) {
+            Path file = modelDir;
+            modelDir = modelDir.getParent();
+            String fileName = file.toFile().getName();
+            if (fileName.endsWith(".pt")) {
+                modelName = fileName.substring(0, fileName.length() - 3);
+            } else {
+                modelName = fileName;
+            }
+            return file;
+        }
         Path modelFile = modelDir.resolve(prefix);
         if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
             if (prefix.endsWith(".pt")) {

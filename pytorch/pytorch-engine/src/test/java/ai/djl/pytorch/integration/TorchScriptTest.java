@@ -13,19 +13,19 @@
 
 package ai.djl.pytorch.integration;
 
-import ai.djl.MalformedModelException;
+import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import java.nio.file.Path;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -33,8 +33,7 @@ import org.testng.annotations.Test;
 public class TorchScriptTest {
 
     @Test
-    public void testDictInput()
-            throws MalformedModelException, ModelNotFoundException, IOException {
+    public void testDictInput() throws ModelException, IOException, TranslateException {
         try (NDManager manager = NDManager.newBaseManager()) {
             Criteria<NDList, NDList> criteria =
                     Criteria.builder()
@@ -43,15 +42,26 @@ public class TorchScriptTest {
                             .optProgress(new ProgressBar())
                             .build();
 
+            Path modelFile;
+            try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria);
+                    Predictor<NDList, NDList> predictor = model.newPredictor()) {
+                NDArray array = manager.ones(new Shape(2, 2));
+                array.setName("input1.input");
+                NDList output = predictor.predict(new NDList(array));
+                Assert.assertEquals(output.singletonOrThrow(), array);
+
+                modelFile = model.getModelPath().resolve(model.getName() + ".pt");
+            }
+
+            criteria =
+                    Criteria.builder()
+                            .setTypes(NDList.class, NDList.class)
+                            .optModelPath(modelFile)
+                            .optProgress(new ProgressBar())
+                            .build();
+
             try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria)) {
-                try (Predictor<NDList, NDList> predictor = model.newPredictor()) {
-                    NDArray array = manager.ones(new Shape(2, 2));
-                    array.setName("input1.input");
-                    NDList output = predictor.predict(new NDList(array));
-                    Assert.assertEquals(output.singletonOrThrow(), array);
-                } catch (TranslateException e) {
-                    e.printStackTrace();
-                }
+                Assert.assertEquals(model.getName(), "dict_input");
             }
         }
     }
