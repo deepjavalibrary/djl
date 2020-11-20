@@ -94,7 +94,11 @@ public class TopKAccuracy extends AbstractAccuracy {
                                                                 ":, {}", numClasses - j - 1);
                                                 return jPrediction
                                                         .flatten()
-                                                    .eq(label.flatten().toType(DataType.INT64, false))
+                                                        .eq(
+                                                                label.flatten()
+                                                                        .toType(
+                                                                                DataType.INT64,
+                                                                                false))
                                                         .countNonzero();
                                             })
                                     .toArray(NDArray[]::new));
