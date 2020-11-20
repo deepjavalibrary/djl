@@ -13,11 +13,22 @@
 package ai.djl.paddlepaddle.jna;
 
 import com.sun.jna.Native;
+import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-
+/**
+ * Utilities for finding the Paddle Engine binary on the System.
+ *
+ * <p>The Engine will be searched for in a variety of locations in the following order:
+ *
+ * <ol>
+ *   <li>In the path specified by the Paddle_LIBRARY_PATH environment variable
+ *   <li>In a jar file location in the classpath. These jars can be created with the paddle-native
+ *       module.
+ * </ol>
+ */
+@SuppressWarnings("MissingJavadocMethod")
 public final class LibUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
