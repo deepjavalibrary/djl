@@ -1,6 +1,9 @@
 buildscript {
 
     repositories {
+        maven {
+            url "https://mlrepo.djl.ai/maven/"
+        }
         google()
         jcenter()
     }
