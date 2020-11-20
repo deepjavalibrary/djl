@@ -11,7 +11,7 @@ dependencies {
     implementation project(":api")
     implementation project(":mxnet:mxnet-engine")
 
-    runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.7.0-b"
+    runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
