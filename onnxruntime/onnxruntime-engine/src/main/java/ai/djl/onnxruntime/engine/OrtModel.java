@@ -55,9 +55,6 @@ public class OrtModel extends BaseModel {
     public void load(Path modelPath, String prefix, Map<String, ?> options)
             throws IOException, MalformedModelException {
         modelDir = modelPath.toAbsolutePath();
-        if (prefix == null) {
-            prefix = modelName;
-        }
         if (block != null) {
             throw new UnsupportedOperationException("ONNX Runtime does not support dynamic blocks");
         }
@@ -77,6 +74,20 @@ public class OrtModel extends BaseModel {
     }
 
     private Path findModelFile(String prefix) {
+        if (Files.isRegularFile(modelDir)) {
+            Path file = modelDir;
+            modelDir = modelDir.getParent();
+            String fileName = file.toFile().getName();
+            if (fileName.endsWith(".onnx")) {
+                modelName = fileName.substring(0, fileName.length() - 5);
+            } else {
+                modelName = fileName;
+            }
+            return file;
+        }
+        if (prefix == null) {
+            prefix = modelName;
+        }
         Path modelFile = modelDir.resolve(prefix);
         if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
             if (prefix.endsWith(".onnx")) {

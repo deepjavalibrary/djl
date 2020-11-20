@@ -12,6 +12,7 @@
  */
 package ai.djl.onnxruntime.engine;
 
+import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
@@ -21,6 +22,7 @@ import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import java.nio.file.Path;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
@@ -41,6 +43,16 @@ public class OrtTest {
                     Predictor<IrisFlower, Classifications> predictor = model.newPredictor()) {
                 Classifications classifications = predictor.predict(virginica);
                 Assert.assertEquals(classifications.best().getClassName(), "virginica");
+
+                Model m = Model.newInstance("model", "OnnxRuntime");
+                Path path = model.getModelPath();
+                Assert.assertThrows(() -> m.load(path, null));
+                Assert.assertThrows(() -> m.load(path, "invalid.onnx"));
+
+                Path modleFile = path.resolve(model.getName() + ".onnx");
+                m.load(modleFile);
+
+                m.close();
             }
         } catch (UnsatisfiedLinkError e) {
             /*

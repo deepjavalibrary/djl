@@ -38,30 +38,19 @@ public class SpTokenizerTest {
     }
 
     @Test
-    public void testLoadModel() throws IOException {
-        if (System.getProperty("os.name").startsWith("Win")) {
-            throw new SkipException("Skip windows test.");
-        }
-        Path modelPath = Paths.get("build/test/models");
-        String prefix = "sententpiece_test_model";
-        SpTokenizer tokenizer = new SpTokenizer(modelPath, prefix);
-        tokenizer.getProcessor().close();
-    }
-
-    @Test
     public void testTokenize() throws IOException {
         if (System.getProperty("os.name").startsWith("Win")) {
             throw new SkipException("Skip windows test.");
         }
-        Path modelPath = Paths.get("build/test/models");
-        String prefix = "sententpiece_test_model";
-        SpTokenizer tokenizer = new SpTokenizer(modelPath, prefix);
-        String original = "Hello World";
-        List<String> tokens = tokenizer.tokenize(original);
-        List<String> expected = Arrays.asList("▁He", "ll", "o", "▁", "W", "or", "l", "d");
-        Assert.assertEquals(tokens, expected);
-        String recovered = tokenizer.buildSentence(tokens);
-        Assert.assertEquals(original, recovered);
+        Path modelPath = Paths.get("build/test/models/sententpiece_test_model.model");
+        try (SpTokenizer tokenizer = new SpTokenizer(modelPath)) {
+            String original = "Hello World";
+            List<String> tokens = tokenizer.tokenize(original);
+            List<String> expected = Arrays.asList("▁He", "ll", "o", "▁", "W", "or", "l", "d");
+            Assert.assertEquals(tokens, expected);
+            String recovered = tokenizer.buildSentence(tokens);
+            Assert.assertEquals(original, recovered);
+        }
     }
 
     @Test
@@ -71,13 +60,14 @@ public class SpTokenizerTest {
         }
         Path modelPath = Paths.get("build/test/models");
         String prefix = "sententpiece_test_model";
-        SpTokenizer tokenizer = new SpTokenizer(modelPath, prefix);
-        String original = "Hello World";
-        SpProcessor processor = tokenizer.getProcessor();
-        int[] ids = processor.encode(original);
-        int[] expected = new int[] {151, 88, 21, 4, 321, 54, 31, 17};
-        Assert.assertEquals(ids, expected);
-        String recovered = processor.decode(ids);
-        Assert.assertEquals(recovered, original);
+        try (SpTokenizer tokenizer = new SpTokenizer(modelPath, prefix)) {
+            String original = "Hello World";
+            SpProcessor processor = tokenizer.getProcessor();
+            int[] ids = processor.encode(original);
+            int[] expected = new int[] {151, 88, 21, 4, 321, 54, 31, 17};
+            Assert.assertEquals(ids, expected);
+            String recovered = processor.decode(ids);
+            Assert.assertEquals(recovered, original);
+        }
     }
 }

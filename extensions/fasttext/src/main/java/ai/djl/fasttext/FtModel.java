@@ -70,9 +70,6 @@ public class FtModel implements Model {
                     "Model directory doesn't exist: " + modelPath.toAbsolutePath());
         }
         modelDir = modelPath.toAbsolutePath();
-        if (prefix == null) {
-            prefix = modelName;
-        }
         Path modelFile = findModelFile(prefix);
         if (modelFile == null) {
             modelFile = findModelFile(modelDir.toFile().getName());
@@ -91,6 +88,20 @@ public class FtModel implements Model {
     }
 
     private Path findModelFile(String prefix) {
+        if (Files.isRegularFile(modelDir)) {
+            Path file = modelDir;
+            modelDir = modelDir.getParent();
+            String fileName = file.toFile().getName();
+            if (fileName.endsWith(".ftz") || fileName.endsWith(".bin")) {
+                modelName = fileName.substring(0, fileName.length() - 4);
+            } else {
+                modelName = fileName;
+            }
+            return file;
+        }
+        if (prefix == null) {
+            prefix = modelName;
+        }
         Path modelFile = modelDir.resolve(prefix);
         if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
             if (prefix.endsWith(".ftz") || prefix.endsWith(".bin")) {

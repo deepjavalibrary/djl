@@ -24,10 +24,19 @@ import java.util.List;
  * {@code SpTokenizer} is a SentencePiece implementation of the {@link Tokenizer} interface that
  * converts sentences into token.
  */
-public class SpTokenizer implements Tokenizer {
+public class SpTokenizer implements Tokenizer, AutoCloseable {
 
-    private Path modelDir;
     private SpProcessor processor;
+
+    /**
+     * Create a SentencePiece Tokenizer from existing models.
+     *
+     * @param modelPath the directory or file path of the model location
+     * @throws IOException when IO operation fails in loading a resource
+     */
+    public SpTokenizer(Path modelPath) throws IOException {
+        this(modelPath, null);
+    }
 
     /**
      * Create a SentencePiece Tokenizer from existing models.
@@ -53,6 +62,12 @@ public class SpTokenizer implements Tokenizer {
         return processor.buildSentence(tokens.toArray(new String[0]));
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        processor.close();
+    }
+
     SpProcessor getProcessor() {
         return processor;
     }
@@ -60,13 +75,13 @@ public class SpTokenizer implements Tokenizer {
     private void loadModel(Path modelPath, String prefix) throws IOException {
         if (Files.notExists(modelPath)) {
             throw new FileNotFoundException(
-                    "Model directory doesn't exist: " + modelPath.toAbsolutePath());
+                    "Model path doesn't exist: " + modelPath.toAbsolutePath());
         }
-        modelDir = modelPath.toAbsolutePath();
-        Path modelFile = findModelFile(prefix);
+        Path modelDir = modelPath.toAbsolutePath();
+        Path modelFile = findModelFile(modelDir, prefix);
         if (modelFile == null) {
             // TODO: support proto and IOStream model
-            modelFile = findModelFile(modelDir.toFile().getName());
+            modelFile = findModelFile(modelDir, modelDir.toFile().getName());
             if (modelFile == null) {
                 throw new FileNotFoundException("No .model found in : " + modelPath);
             }
@@ -76,13 +91,16 @@ public class SpTokenizer implements Tokenizer {
         processor.loadModel(modelFilePath);
     }
 
-    private Path findModelFile(String prefix) {
-        Path modelFile = modelDir.resolve(prefix);
+    private Path findModelFile(Path modelPath, String prefix) {
+        if (Files.isRegularFile(modelPath)) {
+            return modelPath;
+        }
+        Path modelFile = modelPath.resolve(prefix);
         if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
             if (prefix.endsWith(".model")) {
                 return null;
             }
-            modelFile = modelDir.resolve(prefix + ".model");
+            modelFile = modelPath.resolve(prefix + ".model");
             if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
                 return null;
             }
