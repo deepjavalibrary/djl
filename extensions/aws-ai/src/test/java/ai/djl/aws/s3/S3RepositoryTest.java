@@ -22,7 +22,6 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.translate.NoopTranslator;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -57,7 +56,6 @@ public class S3RepositoryTest {
                         .optModelUrls(
                                 "s3://djl-ai/mlrepo/model/cv/image_classification/ai/djl/mxnet/mlp/0.0.1")
                         .optModelName("mlp")
-                        .optTranslator(new NoopTranslator())
                         .build();
 
         try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria)) {
@@ -81,7 +79,6 @@ public class S3RepositoryTest {
                         .setTypes(NDList.class, NDList.class)
                         .optModelUrls("s3://djl-ai/resources/test-models/mlp.tar.gz")
                         .optModelName("mlp")
-                        .optTranslator(new NoopTranslator())
                         .build();
 
         try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria)) {

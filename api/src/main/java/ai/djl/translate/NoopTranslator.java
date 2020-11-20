@@ -28,14 +28,8 @@ public class NoopTranslator implements Translator<NDList, NDList> {
         this.batchifier = batchifier;
     }
 
-    /**
-     * Constructs a {@link NoopTranslator}.
-     *
-     * <p>Uses the {@link Batchifier#STACK} as default.
-     */
-    public NoopTranslator() {
-        this(Batchifier.STACK);
-    }
+    /** Constructs a {@link NoopTranslator}. */
+    public NoopTranslator() {}
 
     /** {@inheritDoc} */
     @Override

@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.nn.core.Embedding;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.translate.Batchifier;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
 import java.util.List;
@@ -36,7 +37,7 @@ public class ModelZooTextEmbedding implements TextEmbedding, AutoCloseable {
      */
     @SuppressWarnings("unchecked")
     public ModelZooTextEmbedding(Model model) {
-        predictor = model.newPredictor(new NoopTranslator());
+        predictor = model.newPredictor(new NoopTranslator(Batchifier.STACK));
         try {
             embedding = (Embedding<String>) model.getBlock();
         } catch (ClassCastException e) {
