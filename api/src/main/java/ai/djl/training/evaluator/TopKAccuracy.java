@@ -75,7 +75,7 @@ public class TopKAccuracy extends AbstractAccuracy {
         // number of labels and predictions should be the same
         checkLabelShapes(label, prediction);
         // ascending by default
-        NDArray topKPrediction = prediction.argSort(axis).toType(DataType.INT32, false);
+        NDArray topKPrediction = prediction.argSort(axis).toType(DataType.INT64, false);
         int numDims = topKPrediction.getShape().dimension();
         NDArray numCorrect;
         if (numDims == 1) {
@@ -94,7 +94,11 @@ public class TopKAccuracy extends AbstractAccuracy {
                                                                 ":, {}", numClasses - j - 1);
                                                 return jPrediction
                                                         .flatten()
-                                                        .eq(label.flatten())
+                                                        .eq(
+                                                                label.flatten()
+                                                                        .toType(
+                                                                                DataType.INT64,
+                                                                                false))
                                                         .countNonzero();
                                             })
                                     .toArray(NDArray[]::new));

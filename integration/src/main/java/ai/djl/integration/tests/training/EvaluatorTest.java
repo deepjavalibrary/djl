@@ -42,6 +42,18 @@ public class EvaluatorTest {
                     accuracy,
                     expectedAccuracy,
                     "Wrong accuracy, expected: " + expectedAccuracy + ", actual: " + accuracy);
+
+            labels = manager.create(new long[] {0, 1, 1}, new Shape(3));
+
+            acc = new Accuracy();
+            acc.addAccumulator("");
+            acc.updateAccumulator("", new NDList(labels), new NDList(predictions));
+            accuracy = acc.getAccumulator("");
+            expectedAccuracy = 2.f / 3;
+            Assert.assertEquals(
+                    accuracy,
+                    expectedAccuracy,
+                    "Wrong accuracy, expected: " + expectedAccuracy + ", actual: " + accuracy);
         }
     }
 
@@ -60,6 +72,17 @@ public class EvaluatorTest {
             topKAccuracy.updateAccumulator("", new NDList(labels), new NDList(predictions));
             float expectedAccuracy = 1.f / 3;
             float accuracy = topKAccuracy.getAccumulator("");
+            Assert.assertEquals(
+                    accuracy,
+                    expectedAccuracy,
+                    "Wrong accuracy, expected: " + expectedAccuracy + ", actual: " + accuracy);
+
+            labels = manager.create(new long[] {0, 1, 2}, new Shape(3));
+            topKAccuracy = new TopKAccuracy(2);
+            topKAccuracy.addAccumulator("");
+            topKAccuracy.updateAccumulator("", new NDList(labels), new NDList(predictions));
+            expectedAccuracy = 1.f / 3;
+            accuracy = topKAccuracy.getAccumulator("");
             Assert.assertEquals(
                     accuracy,
                     expectedAccuracy,
