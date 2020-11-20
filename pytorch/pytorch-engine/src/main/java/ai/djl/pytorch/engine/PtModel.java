@@ -71,7 +71,7 @@ public class PtModel extends BaseModel {
             String[] extraFileKeys = new String[0];
             String[] extraFileValues = new String[0];
             // load jit extra files
-            if (options.containsKey("extraFiles")) {
+            if (options != null && options.containsKey("extraFiles")) {
                 extraFileKeys = ((String) options.get("extraFiles")).split(",");
                 extraFileValues = new String[extraFileKeys.length];
             }
