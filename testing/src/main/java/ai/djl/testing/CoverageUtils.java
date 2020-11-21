@@ -98,7 +98,7 @@ public final class CoverageUtils {
 
     private static List<Class<?>> getClasses(Class<?> clazz)
             throws IOException, ReflectiveOperationException, URISyntaxException {
-        ClassLoader appClassLoader = clazz.getClassLoader();
+        ClassLoader appClassLoader = Thread.currentThread().getContextClassLoader();
         Field field = appClassLoader.getClass().getDeclaredField("ucp");
         field.setAccessible(true);
         Object ucp = field.get(appClassLoader);
@@ -227,10 +227,10 @@ public final class CoverageUtils {
         return null;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "PMD.UseProperClassLoader"})
     private static Object newProxyInstance(Class<?> clazz) {
-        return Proxy.newProxyInstance(
-                clazz.getClassLoader(), new Class[] {clazz}, (proxy, method, args) -> null);
+        ClassLoader cl = clazz.getClassLoader();
+        return Proxy.newProxyInstance(cl, new Class[] {clazz}, (proxy, method, args) -> null);
     }
 
     private static final class TestClassLoader extends URLClassLoader {

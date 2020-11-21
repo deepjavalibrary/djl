@@ -65,7 +65,7 @@ public final class LibUtils {
     public static void loadLibrary() {
         // TODO workaround to make it work on Android Studio
         // It should search for several places to find the native library
-        if (System.getProperty("java.vendor.url").equals("http://www.android.com/")) {
+        if ("http://www.android.com/".equals(System.getProperty("java.vendor.url"))) {
             System.loadLibrary(LIB_NAME); // NOPMD
             return;
         }

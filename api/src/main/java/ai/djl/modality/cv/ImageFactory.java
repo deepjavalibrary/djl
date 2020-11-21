@@ -30,7 +30,7 @@ public abstract class ImageFactory {
 
     private static ImageFactory newInstance() {
         String className = "ai.djl.modality.cv.BufferedImageFactory";
-        if (System.getProperty("java.vendor.url").equals("http://www.android.com/")) {
+        if ("http://www.android.com/".equals(System.getProperty("java.vendor.url"))) {
             className = "ai.djl.android.core.BitmapImageFactory";
         }
         try {

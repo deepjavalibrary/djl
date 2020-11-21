@@ -95,7 +95,7 @@ public class NDImageUtilsTest {
         }
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void testResize() {
         try (NDManager manager = NDManager.newBaseManager()) {
             Image.Interpolation[] interpolations = {
@@ -127,13 +127,20 @@ public class NDImageUtilsTest {
                 expected = manager.ones(new Shape(5, 50, 25, 3));
                 Assertions.assertAlmostEquals(result, expected);
 
-                // test zero-dim
-                image = manager.create(new Shape(0, 2, 3));
-                // throw IllegalArgumentException
-                result = NDImageUtils.resize(image, 20);
-                batchImages = manager.create(new Shape(5, 0, 1, 3));
-                // throw IllegalArgumentException
-                result = NDImageUtils.resize(batchImages, 20);
+                Assert.expectThrows(
+                        IllegalArgumentException.class,
+                        () -> {
+                            // test zero-dim
+                            NDArray img = manager.create(new Shape(0, 2, 3));
+                            NDImageUtils.resize(img, 20);
+                        });
+
+                Assert.expectThrows(
+                        IllegalArgumentException.class,
+                        () -> {
+                            NDArray img = manager.create(new Shape(5, 0, 1, 3));
+                            NDImageUtils.resize(img, 20);
+                        });
             }
         }
     }

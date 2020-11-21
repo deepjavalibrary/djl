@@ -197,7 +197,7 @@ public class NDIndex {
         rank += indexItems.length;
         int argIndex = 0;
         for (int i = 0; i < indexItems.length; ++i) {
-            if (indexItems[i].trim().equals("...")) {
+            if ("...".equals(indexItems[i].trim())) {
                 // make sure ellipsis appear only once
                 if (ellipsisIndex != -1) {
                     throw new IllegalArgumentException(
