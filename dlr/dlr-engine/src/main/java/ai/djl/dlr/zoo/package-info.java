@@ -10,20 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.onnxruntime.zoo;
 
-import ai.djl.repository.zoo.ModelZoo;
-import ai.djl.repository.zoo.ZooProvider;
-
-/**
- * An Onnx Runtime model zoo provider implements the {@link ai.djl.repository.zoo.ZooProvider}
- * interface.
- */
-public class OrtZooProvider implements ZooProvider {
-
-    /** {@inheritDoc} */
-    @Override
-    public ModelZoo getModelZoo() {
-        return new OrtModelZoo();
-    }
-}
+/** Contains the built-in {@link ai.djl.dlr.zoo.DlrModelZoo}. */
+package ai.djl.dlr.zoo;

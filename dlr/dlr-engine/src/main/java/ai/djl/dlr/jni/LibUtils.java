@@ -28,7 +28,8 @@ public final class LibUtils {
 
     public static void loadLibrary() {
         // TODO implement
-        System.load("/Users/leecheng/workspace/djl/dlr/dlr-native/libdlr.dylib");
-        System.load("/Users/leecheng/.djl.ai/dlr/1.5.0-cpu-osx-x86_64/libdjl_dlr.dylib");
+        System.load("/Users/leecheng/.djl.ai/dlr/1.5.0-SNAPSHOT-cpu-osx-x86_64/libdlr.dylib");
+        System.load(
+                "/Users/leecheng/.djl.ai/dlr/1.5.0-SNAPSHOT-cpu-osx-x86_64/0.9.0-SNAPSHOT-cpu-libdjl_dlr.dylib");
     }
 }

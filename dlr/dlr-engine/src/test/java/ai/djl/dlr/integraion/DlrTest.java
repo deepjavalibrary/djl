@@ -12,6 +12,7 @@
  */
 package ai.djl.dlr.integraion;
 
+import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
@@ -24,6 +25,7 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
@@ -43,10 +45,11 @@ public class DlrTest {
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, Classifications.class)
+                        .optApplication(Application.CV.IMAGE_CLASSIFICATION)
+                        .optFilter("layers", "50")
                         .optTranslator(translator)
-                        // TODO use the model from S3
-                        .optModelUrls("file:///Users/leecheng/workspace/python/tvm_model_old")
-                        .optEngine("DLR") // use DLR engine
+                        .optEngine("DLR")
+                        .optProgress(new ProgressBar())
                         .build();
         Image image =
                 ImageFactory.getInstance()
