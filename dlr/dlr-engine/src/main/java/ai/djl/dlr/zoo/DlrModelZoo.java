@@ -10,25 +10,26 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.onnxruntime.zoo;
+package ai.djl.dlr.zoo;
 
+import ai.djl.dlr.engine.DlrEngine;
 import ai.djl.engine.Engine;
-import ai.djl.onnxruntime.engine.OrtEngine;
-import ai.djl.onnxruntime.zoo.tabular.randomforest.IrisClassificationModelLoader;
+import ai.djl.modality.cv.zoo.ImageClassificationModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 import java.util.HashSet;
 import java.util.Set;
 
-/** OrtModelZoo is a repository that contains all Onnx models for DJL. */
-public class OrtModelZoo implements ModelZoo {
+/** DlrModelZoo is a repository that contains all dlr models for DJL. */
+public class DlrModelZoo implements ModelZoo {
 
     private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
-    private static final Repository REPOSITORY = Repository.newInstance("Ort", DJL_REPO_URL);
-    public static final String GROUP_ID = "ai.djl.onnxruntime";
+    private static final Repository REPOSITORY = Repository.newInstance("Dlr", DJL_REPO_URL);
+    public static final String GROUP_ID = "ai.djl.dlr";
+    private static final DlrModelZoo ZOO = new DlrModelZoo();
 
-    public static final IrisClassificationModelLoader IRIS_FLOWER =
-            new IrisClassificationModelLoader(REPOSITORY);
+    public static final ImageClassificationModelLoader RESNET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "resnet", "0.0.1", ZOO);
 
     /** {@inheritDoc} */
     @Override
@@ -41,7 +42,7 @@ public class OrtModelZoo implements ModelZoo {
     public Set<String> getSupportedEngines() {
         Set<String> set = new HashSet<>();
         set.add(Engine.getInstance().getEngineName());
-        set.add(OrtEngine.ENGINE_NAME);
+        set.add(DlrEngine.ENGINE_NAME);
         return set;
     }
 }
