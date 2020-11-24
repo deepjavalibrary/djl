@@ -98,8 +98,7 @@ public final class DlrEngine extends Engine {
         if (getAlternativeEngine() != null) {
             return alternativeEngine.newBaseManager(device);
         }
-        throw new IllegalStateException(
-                "please include at least one engine from TensorFlow, PyTorch and MXNet to run the DLR model");
+        return DlrNDManager.getSystemManager().newSubManager(device);
     }
 
     /** {@inheritDoc} */
