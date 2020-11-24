@@ -13,7 +13,6 @@ dependencies {
         exclude group: "junit", module: "junit"
     }
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
-    testRuntimeOnly project(":model-zoo")
     testRuntimeOnly project(":pytorch:pytorch-engine")
     testRuntimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}-SNAPSHOT"
     testRuntimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
@@ -24,7 +23,8 @@ processResources {
     doLast {
         def url = "https://publish.djl.ai/dlr-${dlr_version}/jnilib/${djl_version}"
         def files = [
-                "osx-x86_64/cpu/libdjl_dlr.dylib": "osx-x86_64/cpu/libdjl_dlr.dylib",
+                "osx-x86_64/cpu/libdjl_dlr.dylib" : "osx-x86_64/cpu/libdjl_dlr.dylib",
+                "linux-x86_64/cpu/libdjl_dlr.so"  : "linux-x86_64/cpu/libdjl_dlr.so"
         ]
         def classesDir = "${project.buildDir}/jnilib"
         files.each { entry ->

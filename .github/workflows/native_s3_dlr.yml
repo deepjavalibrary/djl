@@ -8,7 +8,12 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ macos-10.15 ]
+        operating-system: [macos-10.15, ubuntu-16.04]
+        include:
+          - operating-system: macos-10.15
+            os: osx
+          - operating-system: ubuntu-16.04
+            os: linux
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 1.8
@@ -41,5 +46,5 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - name: Upload native DJL to S3
-        run: aws s3 cp *dlr.* s3://djl-ai/publish/dlr-${{ env.DLR_VERSION }}/native/osx/cpu/
+        run: aws s3 cp *dlr.* s3://djl-ai/publish/dlr-${{ env.DLR_VERSION }}/native/${{ matrix.os }}/cpu/
         working-directory: neo-ai-dlr/build/lib
