@@ -38,6 +38,8 @@ task compileJNI {
     doFirst {
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
             build("osx", "cpu")
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            build("linux", "cpu")
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
         }
@@ -109,7 +111,8 @@ task downloadDlrNativeLib() {
     doLast {
         def url = "https://djl-ai.s3.amazonaws.com/publish/dlr-${dlr_version}/native"
         def files = [
-                "osx/cpu/libdlr.dylib"       : "cpu/osx/native/lib/libdlr.dylib"
+                "osx/cpu/libdlr.dylib"       : "cpu/osx/native/lib/libdlr.dylib",
+                "linux/cpu/libdlr.so"        : "cpu/linux/native/lib/libdlr.so"
         ]
 
         files.each { entry ->
