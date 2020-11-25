@@ -54,6 +54,47 @@
           "size": 4340
         }
       }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet50_v1",
+      "properties": {
+        "layers": "50",
+        "flavor": "v1",
+        "dataset": "imagenet",
+        "engine": "mxnet",
+        "os": "linux"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "size": 31675
+        },
+        "module": {
+          "uri": "0.0.1/resnet50_v1.so.gz",
+          "sha1Hash": "8856bd48baf8f57daebd8f661de6c5d9df28a327",
+          "size": 155416
+        },
+        "parameters": {
+          "uri": "0.0.1/resnet50_v1.params.gz",
+          "sha1Hash": "cd8dce9dd75c8dc08aea5a336f357ebab699fcbf",
+          "size": 88594592
+        },
+        "graph": {
+          "uri": "0.0.1/resnet50_v1.json.gz",
+          "sha1Hash": "7110540e55b3e80d9bc01e08ab92adaa86141240",
+          "size": 4340
+        }
+      }
     }
   ]
 }

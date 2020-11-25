@@ -38,8 +38,13 @@ public class DlrTest {
     public void testDlr()
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
-        if (!System.getProperty("os.name").toLowerCase().startsWith("mac")) {
-            throw new SkipException("test only work on mac");
+        String os;
+        if (System.getProperty("os.name").toLowerCase().startsWith("mac")) {
+            os = "osx";
+        } else if (System.getProperty("os.name").toLowerCase().startsWith("linux")) {
+            os = "linux";
+        } else {
+            throw new SkipException("test only work on mac and windows");
         }
         ImageClassificationTranslator translator =
                 ImageClassificationTranslator.builder()
@@ -51,6 +56,7 @@ public class DlrTest {
                         .setTypes(Image.class, Classifications.class)
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .optFilter("layers", "50")
+                        .optFilter("os", os)
                         .optTranslator(translator)
                         .optEngine("DLR")
                         .optProgress(new ProgressBar())

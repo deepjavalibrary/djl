@@ -63,8 +63,19 @@ public class DlrModel extends BaseModel {
     }
 
     private void checkModelFiles(String prefix) throws IOException {
+        String libExt;
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.startsWith("mac")) {
+            libExt = ".dylib";
+        } else if (os.startsWith("linux")) {
+            libExt = ".so";
+        } else if (os.startsWith("win")) {
+            libExt = ".dll";
+        } else {
+            throw new IllegalStateException("found unsupported os");
+        }
         // TODO make the check platform independent
-        Path module = modelDir.resolve(prefix + ".dylib");
+        Path module = modelDir.resolve(prefix + libExt);
         if (Files.notExists(module) || !Files.isRegularFile(module)) {
             throw new FileNotFoundException("module file(.so/.dylib/.dll) is missing");
         }
