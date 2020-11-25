@@ -51,3 +51,16 @@ processResources {
 test {
     environment "PATH", "src/test/bin:${environment.PATH}"
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId "dlr-engine"
+            pom {
+                name = "DJL Engine Adapter for DLR"
+                description = "Deep Java Library (DJL) Engine Adapter for DLR"
+                url = "http://www.djl.ai/dlr/${project.name}"
+            }
+        }
+    }
+}
