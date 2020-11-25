@@ -15,7 +15,6 @@ package ai.djl.modality.cv.translator;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.translate.TranslatorContext;
@@ -150,26 +149,27 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
     }
 
     private DetectedObjects processFromBoxOutput(NDList list) {
-        NDArray ndArray = list.get(0);
+        float[] flattened = list.get(0).toFloatArray();
         ArrayList<IntermediateResult> intermediateResults = new ArrayList<>();
-        for (long i = 0; i < ndArray.size(0); i++) {
-            float[] boxes = ndArray.get(i).toFloatArray();
+        int sizeClasses = classes.size();
+        int stride = 5 + sizeClasses;
+        int size = flattened.length / stride;
+        for (int i = 0; i < size; i++) {
+            int indexBase = i * stride;
             float maxClass = 0;
             int maxIndex = 0;
-            float[] clazzes = new float[classes.size()];
-            System.arraycopy(boxes, 5, clazzes, 0, clazzes.length);
-            for (int c = 0; c < clazzes.length; c++) {
-                if (clazzes[c] > maxClass) {
-                    maxClass = clazzes[c];
+            for (int c = 0; c < sizeClasses; c++) {
+                if (flattened[indexBase + c + 5] > maxClass) {
+                    maxClass = flattened[indexBase + c + 5];
                     maxIndex = c;
                 }
             }
-            float score = maxClass * boxes[4];
+            float score = maxClass * flattened[indexBase + 4];
             if (score > threshold) {
-                float xPos = boxes[0];
-                float yPos = boxes[1];
-                float w = boxes[2];
-                float h = boxes[3];
+                float xPos = flattened[indexBase];
+                float yPos = flattened[indexBase + 1];
+                float w = flattened[indexBase + 2];
+                float h = flattened[indexBase + 3];
                 Rectangle rect =
                         new Rectangle(Math.max(0, xPos - w / 2), Math.max(0, yPos - h / 2), w, h);
                 intermediateResults.add(
