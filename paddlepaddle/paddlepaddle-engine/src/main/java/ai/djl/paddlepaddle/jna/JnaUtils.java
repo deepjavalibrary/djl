@@ -13,9 +13,14 @@
 package ai.djl.paddlepaddle.jna;
 
 import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.paddlepaddle.engine.PpDataType;
+import ai.djl.paddlepaddle.engine.PpNDArray;
+import ai.djl.paddlepaddle.engine.PpNDManager;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+import java.nio.Buffer;
+import java.util.Arrays;
 
 /**
  * A class containing utilities to interact with the MXNet Engine's Java Native Access (JNA) layer.
@@ -23,12 +28,44 @@ import com.sun.jna.Pointer;
 @SuppressWarnings("MissingJavadocMethod")
 public final class JnaUtils {
 
-    private static final PaddleLibrary LIB = Native.load(PaddleLibrary.class);
+    private static final PaddleLibrary LIB = LibUtils.loadLibrary();
 
     private JnaUtils() {}
+
+    public static PpNDArray createNdArray(
+            PpNDManager manager, Buffer data, Shape shape, DataType dtype) {
+        Pointer tensor = LIB.PD_NewPaddleTensor();
+        LIB.PD_SetPaddleTensorDType(tensor, PpDataType.toPaddlePaddle(dtype));
+        long[] shapes = shape.getShape();
+        int[] size = Arrays.stream(shapes).mapToInt(Math::toIntExact).toArray();
+        LIB.PD_SetPaddleTensorShape(tensor, size, size.length);
+
+        Pointer paddleBuffer = LIB.PD_NewPaddleBuf();
+        int length = Math.toIntExact(dtype.getNumOfBytes() * shape.size());
+        Pointer pointer = Native.getDirectBufferPointer(data);
+        LIB.PD_PaddleBufReset(tensor, pointer, length);
+        LIB.PD_SetPaddleTensorData(tensor, paddleBuffer);
+        return new PpNDArray(manager, tensor, shape, dtype);
+    }
+
+    public static void freeNdArray(Pointer tensor) {
+        LIB.PD_DeletePaddleTensor(tensor);
+    }
+
+    public static void setNdArrayName(Pointer tensor, String name) {
+        LIB.PD_SetPaddleTensorName(tensor, name);
+    }
+
+    public static String getNdArrayName(Pointer tensor) {
+        return LIB.PD_GetPaddleTensorName(tensor);
+    }
 
     public static DataType getDataType(Pointer pointer) {
         int type = LIB.PD_GetPaddleTensorDType(pointer);
         return PpDataType.fromPaddlePaddle(type);
+    }
+
+    public static String getVersion() {
+        return "2.0.0";
     }
 }

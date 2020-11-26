@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
+import ai.djl.paddlepaddle.jna.JnaUtils;
 import ai.djl.training.GradientCollector;
 
 /**
@@ -30,8 +31,11 @@ public final class PpEngine extends Engine {
     public static final String ENGINE_NAME = "PaddlePaddle";
 
     private Engine alternativeEngine;
+    private String version;
 
-    private PpEngine() {}
+    private PpEngine() {
+        version = JnaUtils.getVersion();
+    }
 
     static Engine newInstance() {
         return new PpEngine();
@@ -63,7 +67,7 @@ public final class PpEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "2.0.0";
+        return version;
     }
 
     /** {@inheritDoc} */
@@ -91,7 +95,7 @@ public final class PpEngine extends Engine {
         if (getAlternativeEngine() != null) {
             return alternativeEngine.newBaseManager(device);
         }
-        return null;
+        return PpNDManager.getSystemManager().newSubManager(device);
     }
 
     /** {@inheritDoc} */

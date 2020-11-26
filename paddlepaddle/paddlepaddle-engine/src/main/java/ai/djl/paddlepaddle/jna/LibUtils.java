@@ -12,8 +12,22 @@
  */
 package ai.djl.paddlepaddle.jna;
 
+import ai.djl.util.Platform;
+import ai.djl.util.Utils;
 import com.sun.jna.Native;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +48,8 @@ public final class LibUtils {
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
 
     private static final String LIB_NAME = "paddle_fluid";
+    private static final Pattern VERSION_PATTERN =
+            Pattern.compile("(\\d+\\.\\d+\\.\\d+)(-SNAPSHOT)?(-\\d+)?");
 
     private LibUtils() {}
 
@@ -47,7 +63,7 @@ public final class LibUtils {
     public static String getLibName() {
         String libName = LibUtils.findOverrideLibrary();
         if (libName == null) {
-            // libName = LibUtils.findLibraryInClasspath();
+            libName = LibUtils.findLibraryInClasspath();
             if (libName == null) {
                 libName = LIB_NAME;
             }
@@ -71,6 +87,93 @@ public final class LibUtils {
         return null;
     }
 
+    private static synchronized String findLibraryInClasspath() {
+        Enumeration<URL> urls;
+        try {
+            urls =
+                    Thread.currentThread()
+                            .getContextClassLoader()
+                            .getResources("native/lib/paddlepaddle.properties");
+        } catch (IOException e) {
+            logger.warn("", e);
+            return null;
+        }
+
+        // No native jars
+        if (!urls.hasMoreElements()) {
+            logger.debug("paddlepaddle.properties not found in class path.");
+            return null;
+        }
+
+        Platform systemPlatform = Platform.fromSystem();
+        try {
+            Platform matching = null;
+            Platform placeholder = null;
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                Platform platform = Platform.fromUrl(url);
+                if (platform.isPlaceholder()) {
+                    placeholder = platform;
+                } else if (platform.matches(systemPlatform)) {
+                    matching = platform;
+                    break;
+                }
+            }
+
+            if (matching != null) {
+                return loadLibraryFromClasspath(matching);
+            }
+
+            if (placeholder != null) {
+                try {
+                    return downloadLibrary(placeholder);
+                } catch (IOException e) {
+                    throw new IllegalStateException(
+                            "Failed to download PaddlePaddle native library", e);
+                }
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Failed to read PaddlePaddle native library jar properties", e);
+        }
+
+        throw new IllegalStateException(
+                "Your PaddlePaddle native library jar does not match your operating system. Make sure that the Maven Dependency Classifier matches your system type.");
+    }
+
+    private static String loadLibraryFromClasspath(Platform platform) {
+        Path tmp = null;
+        try {
+            String libName = System.mapLibraryName(LIB_NAME);
+            Path cacheFolder = getCacheDir();
+            logger.debug("Using cache dir: {}", cacheFolder);
+
+            Path dir = cacheFolder.resolve(platform.getVersion() + platform.getClassifier());
+            Path path = dir.resolve(libName);
+            if (Files.exists(path)) {
+                return path.toAbsolutePath().toString();
+            }
+            Files.createDirectories(cacheFolder);
+            tmp = Files.createTempDirectory(cacheFolder, "tmp");
+            for (String file : platform.getLibraries()) {
+                String libPath = "/native/lib/" + file;
+                try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
+                    logger.info("Extracting {} to cache ...", file);
+                    Files.copy(is, tmp.resolve(file), StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+
+            Utils.moveQuietly(tmp, dir);
+            return path.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to extract PaddlePaddle native library", e);
+        } finally {
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
+        }
+    }
+
     private static String findLibraryInPath(String libPath) {
         String[] paths = libPath.split(File.pathSeparator);
         String mappedLibNames = System.mapLibraryName(LIB_NAME);
@@ -90,5 +193,86 @@ public final class LibUtils {
             }
         }
         return null;
+    }
+
+    private static String downloadLibrary(Platform platform) throws IOException {
+        String version = platform.getVersion();
+        String flavor = platform.getFlavor();
+        if (flavor.isEmpty()) {
+            flavor = "cpu";
+        }
+        String classifier = platform.getClassifier();
+        String os = platform.getOsPrefix();
+
+        String libName = System.mapLibraryName(LIB_NAME);
+        Path cacheDir = getCacheDir();
+        logger.debug("Using cache dir: {}", cacheDir);
+        Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
+        Path path = dir.resolve(libName);
+        if (Files.exists(path)) {
+            return path.toAbsolutePath().toString();
+        }
+
+        Files.createDirectories(cacheDir);
+        Path tmp = Files.createTempDirectory(cacheDir, "tmp");
+
+        Matcher matcher = VERSION_PATTERN.matcher(version);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Unexpected version: " + version);
+        }
+        String link = "https://publish.djl.ai/paddlepaddle-" + matcher.group(1);
+        try (InputStream is = new URL(link + "/files.txt").openStream()) {
+            List<String> lines = Utils.readLines(is);
+            if (flavor.startsWith("cu")
+                    && !lines.contains(flavor + '/' + os + "/native/lib/" + libName)) {
+                logger.warn("No matching cuda flavor for {} found: {}.", os, flavor);
+                // fallback to CPU
+                flavor = "cpu";
+
+                // check again
+                dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
+                path = dir.resolve(libName);
+                if (Files.exists(path)) {
+                    return cacheDir.toAbsolutePath().toString();
+                }
+            }
+
+            tmp = Files.createTempDirectory(cacheDir, "tmp");
+            for (String line : lines) {
+                if (line.startsWith(os + '/' + flavor + '/')) {
+                    URL url = new URL(link + '/' + line);
+                    String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
+                    logger.info("Downloading {} ...", url);
+                    try (InputStream fis = new GZIPInputStream(url.openStream())) {
+                        Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+                    }
+                }
+            }
+
+            Utils.moveQuietly(tmp, dir);
+            return path.toAbsolutePath().toString();
+        } finally {
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
+        }
+    }
+
+    private static Path getCacheDir() {
+        String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
+        if (cacheDir == null || cacheDir.isEmpty()) {
+            cacheDir = System.getenv("ENGINE_CACHE_DIR");
+            if (cacheDir == null || cacheDir.isEmpty()) {
+                cacheDir = System.getProperty("DJL_CACHE_DIR");
+                if (cacheDir == null || cacheDir.isEmpty()) {
+                    cacheDir = System.getenv("DJL_CACHE_DIR");
+                    if (cacheDir == null || cacheDir.isEmpty()) {
+                        String userHome = System.getProperty("user.home");
+                        return Paths.get(userHome, ".djl.ai").resolve("paddle");
+                    }
+                }
+            }
+        }
+        return Paths.get(cacheDir, "paddle");
     }
 }
