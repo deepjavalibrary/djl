@@ -20,11 +20,29 @@ import com.sun.jna.Pointer;
 @SuppressWarnings({"missingjavadocmethod", "methodname"})
 public interface PaddleLibrary extends Library {
 
+    Pointer PD_NewAnalysisConfig();
+
+    Pointer PD_NewPaddleTensor();
+
+    void PD_DeletePaddleTensor(Pointer tensor);
+
     String PD_GetPaddleTensorName(Pointer tensor);
+
+    void PD_SetPaddleTensorName(Pointer tensor, String name);
+
+    void PD_SetPaddleTensorDType(Pointer tensor, int dtype);
+
+    void PD_SetPaddleTensorData(Pointer tensor, Pointer buf);
 
     void PD_SetPaddleTensorShape(Pointer tensor, int[] shape, int size);
 
     int PD_GetPaddleTensorDType(Pointer tensor);
 
     Pointer PD_GetPaddleTensorData(Pointer tensor);
+
+    int[] PD_GetPaddleTensorShape(Pointer tensor, int[] shape);
+
+    Pointer PD_NewPaddleBuf();
+
+    void PD_PaddleBufReset(Pointer buf, Pointer data, int size);
 }
