@@ -13,11 +13,11 @@ task prepareNativeLibs() {
         delete "${buildDir}/native"
 
         def files = [
-                "linux/cu101": "https://files.pythonhosted.org/packages/fd/39/0b6c02541d5bfb89d922eee937b91911f11af65a243048440cfad9900ded/paddlepaddle_gpu-1.8.5.post107-cp38-cp38-manylinux1_x86_64.whl",
-                "linux/cpu"  : "https://files.pythonhosted.org/packages/6e/5b/385753db54c16b676683369f901b83a5e93429f667a37b640630d678ad93/paddlepaddle-1.8.5-cp38-cp38-manylinux1_x86_64.whl",
-                "osx/cpu"    : "https://files.pythonhosted.org/packages/ea/bf/06d7ecbebcc5c1925a2d831b441cfbac41e019c233a726c8938ed35253b9/paddlepaddle-1.8.5-cp38-cp38-macosx_10_14_x86_64.whl",
-                "win/cu101"  : "https://files.pythonhosted.org/packages/6f/23/97e5e3176f6289896e4ac4bbceffc93b5ea8c3edd7fbc008558368924612/paddlepaddle_gpu-1.8.5.post107-cp38-cp38-win_amd64.whl",
-                "win/cpu"    : "https://files.pythonhosted.org/packages/06/6e/5f32bad36f115669427cd77e73064084c7f5153481d3904e8bdd7b7e7a17/paddlepaddle-1.8.5-cp38-cp38-win_amd64.whl"
+                // "linux/cu101": "",
+                // "linux/cpu"  : "",
+                "osx/cpu": "https://paddle-inference-lib.bj.bcebos.com/mac/2.0-rc/cpu_avx_openblas/paddle_inference_install_dir.tgz",
+                // "win/cu101"  : "",
+                "win/cpu": "https://paddle-wheel.bj.bcebos.com/2.0.0-rc0/win-infer/mkl/cpu/paddle_inference_install_dir.zip"
         ]
 
         def downloadDir = file("${buildDir}/download")
@@ -33,18 +33,35 @@ task prepareNativeLibs() {
             }
 
             project.logger.lifecycle("Extracting native files from: ${fileName}")
-            copy {
-                from {
-                    zipTree(file).matching { include 'paddle/libs/**' }
+            if (fileName.endsWith(".zip")) {
+                copy {
+                    from {
+                        zipTree(file).matching { include "**/*.dll" }
+                    }
+                    eachFile {
+                        path = name
+                    }
+                    into "${buildDir}/native/${entry.key}"
                 }
-                into "${buildDir}/native/tmp"
+            } else if (fileName.endsWith(".tgz")) {
+                File tmpDir = new File("${buildDir}/native/tmp")
+                tmpDir.mkdirs()
+                exec {
+                    workingDir tmpDir
+                    commandLine "sh", "-c", "tar xvfz ${file.absolutePath}"
+                }
+                copy {
+                    from(tmpDir) {
+                        include '**/*.dylib'
+                        include '**/*.so'
+                    }
+                    eachFile {
+                        path = name
+                    }
+                    into "${buildDir}/native/${entry.key}"
+                }
+                delete "${buildDir}/native/tmp"
             }
-
-            File srcDir = new File("${buildDir}/native/tmp/paddle/libs")
-            File nativeDir = new File("${buildDir}/native/${entry.key}")
-            nativeDir.getParentFile().mkdirs();
-            srcDir.renameTo(nativeDir)
-            delete "${buildDir}/native/tmp"
         }
 
         exec {
@@ -216,33 +233,15 @@ publishing.repositories {
 
 import java.util.zip.GZIPInputStream
 
-task downloadpaddlepaddleNativeLib() {
+task downloadPaddlePaddleNativeLib() {
     doLast {
-        def url = "https://djl-ai.s3.amazonaws.com/publish/paddlepaddle-${paddlepaddle_version}"
+        def url = "https://publish.djl.ai/paddlepaddle-${paddlepaddle_version}"
         def files = [
-                "linux/cpu/libdnnl.so.1.gz"            : "cpu/linux/native/lib/libdnnl.so.1",
-                "linux/cpu/libiomp5.so.gz"             : "cpu/linux/native/lib/libiomp5.so",
-                "linux/cpu/libmkldnn.so.0.gz"          : "cpu/linux/native/lib/libmkldnn.so.0",
-                "linux/cpu/libmklml_intel.so.gz"       : "cpu/linux/native/lib/libmklml_intel.so",
-                "linux/cpu/libpaddle_framework.so.gz"  : "cpu/linux/native/lib/libpaddle_framework.so",
-                "linux/cpu/libwarpctc.so.gz"           : "cpu/linux/native/lib/libwarpctc.so",
-                "linux/cu101/libdnnl.so.1.gz"          : "cu101/linux/native/lib/libdnnl.so.1",
-                "linux/cu101/libiomp5.so.gz"           : "cu101/linux/native/lib/libiomp5.so",
-                "linux/cu101/libmkldnn.so.0.gz"        : "cu101/linux/native/lib/libmkldnn.so.0",
-                "linux/cu101/libmklml_intel.so.gz"     : "cu101/linux/native/lib/libmklml_intel.so",
-                "linux/cu101/libpaddle_framework.so.gz": "cu101/linux/native/lib/libpaddle_framework.so",
-                "linux/cu101/libwarpctc.so.gz"         : "cu101/linux/native/lib/libwarpctc.so",
-                "osx/cpu/libwarpctc.dylib.gz"          : "cpu/osx/native/lib/libwarpctc.dylib",
-                "win/cpu/libiomp5md.dll.gz"            : "cpu/win/native/lib/libiomp5md.dll",
-                "win/cpu/mkldnn.dll.gz"                : "cpu/win/native/lib/mkldnn.dll",
-                "win/cpu/mklml.dll.gz"                 : "cpu/win/native/lib/mklml.dll",
-                "win/cpu/msvcr120.dll.gz"              : "cpu/win/native/lib/msvcr120.dll",
-                "win/cpu/warpctc.dll.gz"               : "cpu/win/native/lib/warpctc.dll",
-                "win/cu101/libiomp5md.dll.gz"          : "cu101/win/native/lib/libiomp5md.dll",
-                "win/cu101/mkldnn.dll.gz"              : "cu101/win/native/lib/mkldnn.dll",
-                "win/cu101/mklml.dll.gz"               : "cu101/win/native/lib/mklml.dll",
-                "win/cu101/msvcr120.dll.gz"            : "cu101/win/native/lib/msvcr120.dll",
-                "win/cu101/warpctc.dll.gz"             : "cu101/win/native/lib/warpctc.dll",
+                "osx/cpu/libpaddle_fluid.dylib.gz": "cpu/osx/native/lib/libpaddle_fluid.dylib",
+                "win/cpu/paddle_fluid.dll.gz"     : "cpu/win/native/lib/paddle_fluid.dll",
+                "win/cpu/mklml.dll.gz"            : "cpu/win/native/lib/mklml.dll",
+                "win/cpu/mkldnn.dll.gz"           : "cpu/win/native/lib/mkldnn.dll",
+                "win/cpu/libiomp5md.dll.gz"       : "cpu/win/native/lib/libiomp5md.dll",
         ]
 
         files.each { entry ->
