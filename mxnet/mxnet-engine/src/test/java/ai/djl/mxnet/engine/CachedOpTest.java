@@ -22,6 +22,7 @@ import ai.djl.mxnet.jna.PointerArray;
 import ai.djl.mxnet.test.MockMxnetLibrary;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterType;
@@ -58,7 +59,7 @@ public class CachedOpTest extends PowerMockTestCase {
 
     @Test(expectedExceptions = NullPointerException.class)
     public void testForward() {
-        try (MxNDManager manager = MxNDManager.getSystemManager().newSubManager()) {
+        try (NDManager manager = MxNDManager.getSystemManager().newSubManager()) {
             List<Parameter> params = new ArrayList<>();
             Parameter parameter =
                     new Parameter("data0", new SequentialBlock(), ParameterType.OTHER, false);
@@ -96,7 +97,12 @@ public class CachedOpTest extends PowerMockTestCase {
 
             ParameterStore parameterStore = new ParameterStore(manager, false);
             CachedOp co =
-                    new CachedOp(new PointerArray(), manager, params, paramIndices, dataIndices);
+                    new CachedOp(
+                            new PointerArray(),
+                            (MxNDManager) manager,
+                            params,
+                            paramIndices,
+                            dataIndices);
             logger.info("Test: Positioned input");
             NDList input =
                     new NDList(
