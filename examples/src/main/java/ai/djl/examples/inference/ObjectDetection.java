@@ -14,6 +14,7 @@ package ai.djl.examples.inference;
 
 import ai.djl.Application;
 import ai.djl.ModelException;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
@@ -52,11 +53,18 @@ public final class ObjectDetection {
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
+        String backbone;
+        if ("TensorFlow".equals(Engine.getInstance().getEngineName())) {
+            backbone = "mobilenet_v2";
+        } else {
+            backbone = "resnet50";
+        }
+
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(Image.class, DetectedObjects.class)
-                        .optFilter("backbone", "resnet50")
+                        .optFilter("backbone", backbone)
                         .optProgress(new ProgressBar())
                         .build();
 
