@@ -38,7 +38,7 @@ public final class LibUtils {
 
     private static final String LIB_NAME = "jnitensorflow";
     private static final Pattern VERSION_PATTERN =
-            Pattern.compile("(\\d+\\.\\d+\\.\\d+(-\\w)?)(-SNAPSHOT)?(-\\d+)?");
+            Pattern.compile("(\\d+\\.\\d+\\.\\d+(-[a-z]+)?)(-SNAPSHOT)?(-\\d+)?");
 
     private LibUtils() {}
 

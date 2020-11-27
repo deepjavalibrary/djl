@@ -27,7 +27,7 @@ public final class JniUtils {
 
     private JniUtils() {}
 
-    public static void setDLRInput(long modelHandle, NDArray input, int index) {
+    public static void setDlrInput(long modelHandle, NDArray input, int index) {
         long[] shape = input.getShape().getShape();
         float[] data = input.toFloatArray();
         String name = DlrLibrary.LIB.getDlrInputName(modelHandle, index);
@@ -65,7 +65,7 @@ public final class JniUtils {
         DlrLibrary.LIB.setDlrNumThreads(modelHandle, threads);
     }
 
-    public static void useDlrCPUAffinity(long modelHandle, boolean use) {
+    public static void useDlrCpuAffinity(long modelHandle, boolean use) {
         DlrLibrary.LIB.useDlrCPUAffinity(modelHandle, use);
     }
 

@@ -18,7 +18,6 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
 import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,12 +42,6 @@ public abstract class BaseNDManager implements NDManager {
         this.device = Device.defaultIfNull(device);
         resources = new ConcurrentHashMap<>();
         uid = UUID.randomUUID().toString();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ByteBuffer allocateDirect(int capacity) {
-        throw new UnsupportedOperationException("Not supported!");
     }
 
     /** {@inheritDoc} */
@@ -180,13 +173,7 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDManager newSubManager() {
-        throw new UnsupportedOperationException("Not supported!");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDManager newSubManager(Device device) {
-        throw new UnsupportedOperationException("Not supported!");
+        return newSubManager(device);
     }
 
     /** {@inheritDoc} */

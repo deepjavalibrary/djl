@@ -19,6 +19,8 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 
@@ -37,6 +39,20 @@ public class DlrNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public ByteBuffer allocateDirect(int capacity) {
+        return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public DlrNDManager newSubManager(Device dev) {
+        DlrNDManager manager = new DlrNDManager(this, dev);
+        attach(manager.uid, manager);
+        return manager;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public DlrNDArray create(Buffer data, Shape shape, DataType dataType) {
         if (dataType != DataType.FLOAT32 && !(data instanceof FloatBuffer)) {
             throw new UnsupportedOperationException("DLR only supports float32");
@@ -50,7 +66,7 @@ public class DlrNDManager extends BaseNDManager {
         if (dataType != DataType.FLOAT32) {
             throw new UnsupportedOperationException("DLR only supports float32");
         }
-        int size = (int) shape.size();
+        int size = Math.toIntExact(shape.size());
         float[] data = new float[size];
         return new DlrNDArray(this, FloatBuffer.wrap(data), shape);
     }
@@ -61,7 +77,7 @@ public class DlrNDManager extends BaseNDManager {
         if (dataType != DataType.FLOAT32) {
             throw new UnsupportedOperationException("DLR only supports float32");
         }
-        int size = (int) shape.size();
+        int size = Math.toIntExact(shape.size());
         float[] data = new float[size];
         Arrays.fill(data, 1f);
         return new DlrNDArray(this, FloatBuffer.wrap(data), shape);

@@ -13,7 +13,7 @@
 package ai.djl.dlr.integraion;
 
 import ai.djl.Application;
-import ai.djl.MalformedModelException;
+import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
@@ -22,12 +22,13 @@ import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
@@ -35,16 +36,14 @@ import org.testng.annotations.Test;
 public class DlrTest {
 
     @Test
-    public void testDlr()
-            throws MalformedModelException, ModelNotFoundException, IOException,
-                    TranslateException {
+    public void testDlr() throws ModelException, IOException, TranslateException {
         String os;
         if (System.getProperty("os.name").toLowerCase().startsWith("mac")) {
             os = "osx";
         } else if (System.getProperty("os.name").toLowerCase().startsWith("linux")) {
             os = "linux";
         } else {
-            throw new SkipException("test only work on mac and windows");
+            throw new SkipException("test only work on mac and Linux");
         }
         ImageClassificationTranslator translator =
                 ImageClassificationTranslator.builder()
@@ -61,14 +60,12 @@ public class DlrTest {
                         .optEngine("DLR")
                         .optProgress(new ProgressBar())
                         .build();
-        Image image =
-                ImageFactory.getInstance()
-                        .fromUrl(
-                                "https://raw.githubusercontent.com/dmlc/mxnet.js/main/data/cat.png");
+        Path file = Paths.get("../../examples/src/test/resources/kitten.jpg");
+        Image image = ImageFactory.getInstance().fromFile(file);
         try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
                 Predictor<Image, Classifications> predictor = model.newPredictor()) {
-            Classifications classifications = predictor.predict(image);
-            Assert.assertEquals("n02123159 tiger cat", classifications.best().getClassName());
+            Classifications result = predictor.predict(image);
+            Assert.assertEquals(result.best().getClassName(), "n02123045 tabby, tabby cat");
         }
     }
 }

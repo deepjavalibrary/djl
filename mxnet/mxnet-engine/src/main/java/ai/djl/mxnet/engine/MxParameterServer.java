@@ -17,6 +17,7 @@ import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.jna.MxnetLibrary;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.NativeResource;
@@ -98,9 +99,10 @@ public class MxParameterServer extends NativeResource<Pointer> implements Parame
         @Override
         public void apply(String parameterId, Pointer recv, Pointer local, Pointer handle) {
             // updater callback arguments order is: index, gradient, weight.
-            try (MxNDManager manager = MxNDManager.getSystemManager().newSubManager()) {
-                MxNDArray grad = manager.create(recv);
-                MxNDArray weight = manager.create(local);
+            try (NDManager manager = MxNDManager.getSystemManager().newSubManager()) {
+                MxNDManager m = (MxNDManager) manager;
+                MxNDArray grad = m.create(recv);
+                MxNDArray weight = m.create(local);
                 optimizer.update(parameterId, weight, grad);
             }
         }

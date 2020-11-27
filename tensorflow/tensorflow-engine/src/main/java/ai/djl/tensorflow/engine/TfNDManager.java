@@ -414,24 +414,6 @@ public class TfNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager getParentManager() {
-        return parent;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Device getDevice() {
-        return device;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public TfNDManager newSubManager() {
-        return newSubManager(device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public TfNDManager newSubManager(Device device) {
         TfNDManager manager = new TfNDManager(this, device);
         attach(manager.uid, manager);
@@ -439,18 +421,6 @@ public class TfNDManager extends BaseNDManager {
         manager.getEagerSession();
         manager.getTf();
         return manager;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isOpen() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void detach(String resourceId) {
-        resources.remove(resourceId);
     }
 
     /** {@inheritDoc} */

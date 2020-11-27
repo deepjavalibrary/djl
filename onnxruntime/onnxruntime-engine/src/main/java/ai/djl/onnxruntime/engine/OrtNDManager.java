@@ -107,12 +107,6 @@ public class OrtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public OrtNDManager newSubManager() {
-        return newSubManager(device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public OrtNDManager newSubManager(Device device) {
         OrtNDManager manager = new OrtNDManager(this, device, env);
         attach(manager.uid, manager);

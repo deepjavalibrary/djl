@@ -269,12 +269,6 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public MxNDManager newSubManager() {
-        return newSubManager(device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public MxNDManager newSubManager(Device dev) {
         MxNDManager manager = new MxNDManager(this, dev, version);
         attach(manager.uid, manager);
