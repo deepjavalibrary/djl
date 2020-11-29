@@ -16,7 +16,6 @@ package ai.djl.mxnet.jna;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import ai.djl.Device;
-import ai.djl.mxnet.test.MockMxnetLibrary;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;

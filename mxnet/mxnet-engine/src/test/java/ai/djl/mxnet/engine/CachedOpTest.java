@@ -17,9 +17,8 @@ package ai.djl.mxnet.engine;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import ai.djl.mxnet.jna.LibUtils;
+import ai.djl.mxnet.jna.MockMxnetLibrary;
 import ai.djl.mxnet.jna.MxnetLibrary;
-import ai.djl.mxnet.jna.PointerArray;
-import ai.djl.mxnet.test.MockMxnetLibrary;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -29,6 +28,7 @@ import ai.djl.nn.ParameterType;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+import com.sun.jna.Memory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -98,7 +98,7 @@ public class CachedOpTest extends PowerMockTestCase {
             ParameterStore parameterStore = new ParameterStore(manager, false);
             CachedOp co =
                     new CachedOp(
-                            new PointerArray(),
+                            new Memory(4),
                             (MxNDManager) manager,
                             params,
                             paramIndices,

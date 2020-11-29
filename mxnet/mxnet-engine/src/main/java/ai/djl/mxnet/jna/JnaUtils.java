@@ -478,10 +478,7 @@ public final class JnaUtils {
     }
 
     public static PairList<Pointer, SparseFormat> imperativeInvoke(
-            Pointer function,
-            PointerArray inputs,
-            PointerByReference destRef,
-            PairList<String, ?> params) {
+            Pointer function, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
         String[] keys;
         String[] values;
         if (params == null) {
@@ -491,6 +488,10 @@ public final class JnaUtils {
             keys = params.keyArray(EMPTY_ARRAY);
             values = params.values().stream().map(Object::toString).toArray(String[]::new);
         }
+        StringArray keyArray = new StringArray(keys);
+        StringArray valueArray = new StringArray(values);
+        PointerArray srcArray = toPointerArray(src);
+        PointerByReference destRef = new PointerByReference(toPointerArray(dest));
         PointerByReference destSType = new PointerByReference();
         IntBuffer numOutputs = IntBuffer.allocate(1);
         numOutputs.put(0, 1);
@@ -498,13 +499,13 @@ public final class JnaUtils {
         checkCall(
                 LIB.MXImperativeInvokeEx(
                         function,
-                        inputs.numElements(),
-                        inputs,
+                        src.length,
+                        srcArray,
                         numOutputs,
                         destRef,
                         keys.length,
-                        keys,
-                        values,
+                        keyArray,
+                        valueArray,
                         destSType));
         int numOfOutputs = numOutputs.get(0);
         Pointer[] ptrArray = destRef.getValue().getPointerArray(0, numOfOutputs);
@@ -1757,11 +1758,7 @@ public final class JnaUtils {
 
     public static MxNDArray[] cachedOpInvoke(
             MxNDManager manager, Pointer cachedOpHandle, MxNDArray[] inputs) {
-        Pointer[] inputHandles = new Pointer[inputs.length];
-        for (int i = 0; i < inputs.length; i++) {
-            inputHandles[i] = inputs[i].getHandle();
-        }
-        PointerArray array = new PointerArray(inputHandles);
+        PointerArray array = toPointerArray(inputs);
         IntBuffer buf = IntBuffer.allocate(1);
         PointerByReference ref = new PointerByReference();
         PointerByReference outSTypeRef = new PointerByReference();
@@ -1788,7 +1785,7 @@ public final class JnaUtils {
         }
     }
 
-    static PointerArray toPointerArray(NDList vals) {
+    private static PointerArray toPointerArray(NDList vals) {
         Pointer[] valPointers = new Pointer[vals.size()];
         for (int i = 0; i < vals.size(); i++) {
             valPointers[i] = ((MxNDArray) vals.get(i)).getHandle();
@@ -1796,7 +1793,10 @@ public final class JnaUtils {
         return new PointerArray(valPointers);
     }
 
-    static PointerArray toPointerArray(NDArray[] vals) {
+    private static PointerArray toPointerArray(NDArray[] vals) {
+        if (vals == null) {
+            return null;
+        }
         Pointer[] valPointers = new Pointer[vals.length];
         for (int i = 0; i < vals.length; i++) {
             valPointers[i] = ((MxNDArray) vals[i]).getHandle();

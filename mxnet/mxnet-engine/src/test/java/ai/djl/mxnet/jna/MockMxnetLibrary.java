@@ -10,13 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.mxnet.test;
+package ai.djl.mxnet.jna;
 
-import ai.djl.mxnet.jna.MXCallbackList;
-import ai.djl.mxnet.jna.MxnetLibrary;
-import ai.djl.mxnet.jna.NativeSize;
-import ai.djl.mxnet.jna.NativeSizeByReference;
-import ai.djl.mxnet.jna.PointerArray;
+import ai.djl.mxnet.test.TestHelper;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import java.nio.ByteBuffer;
@@ -1111,8 +1107,8 @@ public class MockMxnetLibrary implements MxnetLibrary {
             IntBuffer num_outputs,
             PointerByReference outputs,
             int num_params,
-            String[] param_keys,
-            String[] param_vals,
+            StringArray param_keys,
+            StringArray param_vals,
             PointerByReference out_stypes) {
         if (functions.containsKey("MXImperativeInvokeEx")) {
             return functions

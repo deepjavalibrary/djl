@@ -17,8 +17,8 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import ai.djl.engine.Engine;
 import ai.djl.mxnet.jna.LibUtils;
+import ai.djl.mxnet.jna.MockMxnetLibrary;
 import ai.djl.mxnet.jna.MxnetLibrary;
-import ai.djl.mxnet.test.MockMxnetLibrary;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
