@@ -44,11 +44,10 @@ public class ImageNetTest {
             TrainingConfig config = new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss());
 
             try (Trainer trainer = model.newTrainer(config)) {
-                for (Batch batch : trainer.iterateDataset(imagenet)) {
-                    Assert.assertEquals(batch.getData().size(), 1);
-                    Assert.assertEquals(batch.getLabels().size(), 1);
-                    batch.close();
-                }
+                Batch batch = trainer.iterateDataset(imagenet).iterator().next();
+                Assert.assertEquals(batch.getData().size(), 1);
+                Assert.assertEquals(batch.getLabels().size(), 1);
+                batch.close();
             }
         }
     }

@@ -44,11 +44,10 @@ public class FashionMnistTest {
                             .build();
 
             try (Trainer trainer = model.newTrainer(config)) {
-                for (Batch batch : trainer.iterateDataset(fashionMnist)) {
-                    Assert.assertEquals(batch.getData().size(), 1);
-                    Assert.assertEquals(batch.getLabels().size(), 1);
-                    batch.close();
-                }
+                Batch batch = trainer.iterateDataset(fashionMnist).iterator().next();
+                Assert.assertEquals(batch.getData().size(), 1);
+                Assert.assertEquals(batch.getLabels().size(), 1);
+                batch.close();
             }
         }
     }

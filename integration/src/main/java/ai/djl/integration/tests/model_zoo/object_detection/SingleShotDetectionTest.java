@@ -117,6 +117,7 @@ public class SingleShotDetectionTest {
                 .optUsage(Dataset.Usage.TEST)
                 .optPipeline(pipeline)
                 .setSampling(32, true)
+                .optLimit(64)
                 .build();
     }
 
