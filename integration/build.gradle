@@ -50,6 +50,7 @@ run {
     systemProperties System.getProperties()
     systemProperties.remove("user.dir")
     systemProperty("file.encoding", "UTF-8")
+    jvmArgs "-Xverify:none"
 }
 
 jacocoTestReport {
