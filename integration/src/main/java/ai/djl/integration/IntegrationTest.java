@@ -347,8 +347,10 @@ public class IntegrationTest {
             TestResult result;
             Method method = testMethods.get(index);
             try {
+                long begin = System.nanoTime();
                 method.invoke(object);
-                logger.info("Test {}.{} PASSED", getName(), method.getName());
+                String time = String.format("%.3f", (System.nanoTime() - begin) / 1000_0000f);
+                logger.info("Test {}.{} PASSED, duration: {}", getName(), method.getName(), time);
                 result = TestResult.SUCCESS;
             } catch (IllegalAccessException | InvocationTargetException e) {
                 if (expectedException(method, e)) {

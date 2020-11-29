@@ -279,11 +279,12 @@ public class DatasetTest {
             Cifar10 cifar10 =
                     Cifar10.builder()
                             .optManager(manager)
-                            .setSampling(100, true)
+                            .setSampling(2, true)
                             .optUsage(Dataset.Usage.TEST)
                             // you could start trying prefetchNumber with 2 * number of threads.
                             // This number should be adjusted based on your machines and data.
                             .optExecutor(executor, 4)
+                            .optLimit(32)
                             .build();
 
             try (Trainer trainer = model.newTrainer(config)) {

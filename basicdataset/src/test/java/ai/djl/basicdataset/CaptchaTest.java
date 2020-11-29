@@ -41,11 +41,10 @@ public class CaptchaTest {
                             .build();
 
             try (Trainer trainer = model.newTrainer(config)) {
-                for (Batch batch : trainer.iterateDataset(captchaDataset)) {
-                    Assert.assertEquals(batch.getData().size(), 1);
-                    Assert.assertEquals(batch.getLabels().size(), 6);
-                    batch.close();
-                }
+                Batch batch = trainer.iterateDataset(captchaDataset).iterator().next();
+                Assert.assertEquals(batch.getData().size(), 1);
+                Assert.assertEquals(batch.getLabels().size(), 6);
+                batch.close();
             }
         }
     }

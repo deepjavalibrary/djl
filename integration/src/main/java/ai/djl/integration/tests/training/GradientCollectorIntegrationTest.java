@@ -36,6 +36,7 @@ import ai.djl.training.tracker.Tracker;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class GradientCollectorIntegrationTest {
@@ -73,6 +74,10 @@ public class GradientCollectorIntegrationTest {
 
     @Test
     public void testTrain() throws IOException, TranslateException {
+        if (!Boolean.getBoolean("nightly")) {
+            throw new SkipException("Nightly only");
+        }
+
         int numOfData = 1000;
         int batchSize = 10;
         int epochs = 10;
