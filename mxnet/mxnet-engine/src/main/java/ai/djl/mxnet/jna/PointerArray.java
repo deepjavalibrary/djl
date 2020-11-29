@@ -24,7 +24,8 @@ import com.sun.jna.Pointer;
  * @see com.sun.jna.ptr.PointerByReference
  * @see Function
  */
-public class PointerArray extends Memory {
+@SuppressWarnings("checkstyle:EqualsHashCode")
+class PointerArray extends Memory {
 
     private int length;
 
@@ -54,20 +55,6 @@ public class PointerArray extends Memory {
     /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (o == null) {
-            return false;
-        }
-        return (o instanceof PointerArray)
-                && (((PointerArray) o).numElements() == numElements())
-                && super.equals(o);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int hashCode() {
-        return super.hashCode() ^ this.numElements();
+        return o == this;
     }
 }

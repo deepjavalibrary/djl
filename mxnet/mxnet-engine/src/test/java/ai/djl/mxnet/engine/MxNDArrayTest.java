@@ -17,14 +17,14 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import ai.djl.Device;
 import ai.djl.mxnet.jna.LibUtils;
+import ai.djl.mxnet.jna.MockMxnetLibrary;
 import ai.djl.mxnet.jna.NativeSize;
-import ai.djl.mxnet.jna.PointerArray;
-import ai.djl.mxnet.test.MockMxnetLibrary;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -57,7 +57,7 @@ public class MxNDArrayTest extends PowerMockTestCase {
     public void testNDArrayCreation() {
         // By default the Mock lib will return the following set up
         try (NDManager manager = MxNDManager.getSystemManager().newSubManager();
-                MxNDArray nd = new MxNDArray((MxNDManager) manager, new PointerArray())) {
+                MxNDArray nd = new MxNDArray((MxNDManager) manager, new Memory(4))) {
             Assert.assertEquals(nd.getShape(), new Shape(1, 2, 3));
             Assert.assertEquals(nd.getDevice(), Device.gpu(1));
             Assert.assertEquals(nd.getDataType(), DataType.FLOAT32);

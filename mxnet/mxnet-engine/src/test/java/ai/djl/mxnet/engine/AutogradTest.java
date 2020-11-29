@@ -16,7 +16,7 @@ package ai.djl.mxnet.engine;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import ai.djl.mxnet.jna.LibUtils;
-import ai.djl.mxnet.test.MockMxnetLibrary;
+import ai.djl.mxnet.jna.MockMxnetLibrary;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import org.powermock.api.mockito.PowerMockito;

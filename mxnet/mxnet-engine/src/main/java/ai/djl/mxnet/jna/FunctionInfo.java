@@ -21,7 +21,6 @@ import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.training.Trainer;
 import ai.djl.util.PairList;
 import com.sun.jna.Pointer;
-import com.sun.jna.ptr.PointerByReference;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,9 +54,7 @@ public class FunctionInfo {
             NDManager manager, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
         checkDevices(src);
         checkDevices(dest);
-        PointerArray srcHandles = JnaUtils.toPointerArray(src);
-        PointerByReference destRef = new PointerByReference(JnaUtils.toPointerArray(dest));
-        return JnaUtils.imperativeInvoke(handle, srcHandles, destRef, params).size();
+        return JnaUtils.imperativeInvoke(handle, src, dest, params).size();
     }
 
     /**
@@ -71,31 +68,16 @@ public class FunctionInfo {
      */
     public NDArray[] invoke(NDManager manager, NDArray[] src, PairList<String, ?> params) {
         checkDevices(src);
-        PointerArray srcHandles = JnaUtils.toPointerArray(src);
-        return invoke((MxNDManager) manager, srcHandles, params);
-    }
-
-    /**
-     * Calls an operator with the given arguments.
-     *
-     * @param manager the manager to attach the result to
-     * @param src the input NDArray pointers to the operator
-     * @param params the non-NDArray arguments to the operator. Should be a {@code PairList<String,
-     *     String>}
-     * @return the error code or zero for no errors
-     */
-    private NDArray[] invoke(MxNDManager manager, PointerArray src, PairList<String, ?> params) {
-        PointerByReference destRef = new PointerByReference();
-
         PairList<Pointer, SparseFormat> pairList =
-                JnaUtils.imperativeInvoke(handle, src, destRef, params);
+                JnaUtils.imperativeInvoke(handle, src, null, params);
+        final MxNDManager mxManager = (MxNDManager) manager;
         return pairList.stream()
                 .map(
                         pair -> {
                             if (pair.getValue() != SparseFormat.DENSE) {
-                                return manager.create(pair.getKey(), pair.getValue());
+                                return mxManager.create(pair.getKey(), pair.getValue());
                             }
-                            return manager.create(pair.getKey());
+                            return mxManager.create(pair.getKey());
                         })
                 .toArray(MxNDArray[]::new);
     }
