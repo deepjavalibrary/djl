@@ -66,11 +66,13 @@ public class DlrSymbolBlock extends NativeResource<Long> implements SymbolBlock 
         // TODO maybe verify the number of inputs
         // currently we assume the order of the input NDList is the same
         // as the model input
-        for (int i = 0; i < inputs.size(); ++i) {
-            JniUtils.setDlrInput(modelHandle, inputs.get(i), i);
+        synchronized (DlrSymbolBlock.class) {
+            for (int i = 0; i < inputs.size(); ++i) {
+                JniUtils.setDlrInput(modelHandle, inputs.get(i), i);
+            }
+            JniUtils.runDlrModel(modelHandle);
+            return JniUtils.getDlrOutputs(modelHandle, manager);
         }
-        JniUtils.runDlrModel(modelHandle);
-        return JniUtils.getDlrOutputs(modelHandle, manager);
     }
 
     /** {@inheritDoc} */

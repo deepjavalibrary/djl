@@ -29,7 +29,6 @@ import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
-import java.nio.FloatBuffer;
 import java.time.Duration;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -288,10 +287,7 @@ public abstract class AbstractBenchmark {
                         /** {@inheritDoc} */
                         @Override
                         public Object processOutput(TranslatorContext ctx, NDList list) {
-                            FloatBuffer fb = list.get(0).toByteBuffer().asFloatBuffer();
-                            float[] ret = new float[fb.remaining()];
-                            fb.get(ret);
-                            return ret;
+                            return list.get(0).toFloatArray();
                         }
 
                         /** {@inheritDoc} */
