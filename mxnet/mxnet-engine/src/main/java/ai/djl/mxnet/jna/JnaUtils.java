@@ -506,8 +506,8 @@ public final class JnaUtils {
             keys = params.keyArray(EMPTY_ARRAY);
             values = params.values().stream().map(Object::toString).toArray(String[]::new);
         }
-        StringArray keyArray = new StringArray(keys);
-        StringArray valueArray = new StringArray(values);
+        StringArray keyArray = StringArray.of(keys);
+        StringArray valueArray = StringArray.of(values);
         PointerArray srcArray = toPointerArray(src);
         PointerArray destArray = toPointerArray(dest);
         PointerByReference destRef = REFS.acquire();
@@ -537,6 +537,9 @@ public final class JnaUtils {
         REFS.recycle(destRef);
         REFS.recycle(destSType);
         srcArray.recycle();
+        keyArray.recycle();
+        valueArray.recycle();
+
         if (destArray != null) {
             destArray.recycle();
         }
