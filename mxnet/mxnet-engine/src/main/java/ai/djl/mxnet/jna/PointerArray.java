@@ -25,7 +25,9 @@ import com.sun.jna.Pointer;
  * @see Function
  */
 @SuppressWarnings("checkstyle:EqualsHashCode")
-class PointerArray extends Memory {
+final class PointerArray extends Memory {
+
+    private static final ObjectPool<PointerArray> POOL = new ObjectPool<>(null, null);
 
     private int length;
 
@@ -34,22 +36,38 @@ class PointerArray extends Memory {
      *
      * @param arg the pointers to include in the array
      */
-    public PointerArray(Pointer... arg) {
+    private PointerArray(Pointer... arg) {
         super(Native.POINTER_SIZE * (arg.length + 1));
         length = arg.length;
-        for (int i = 0; i < arg.length; i++) {
-            setPointer(i * Native.POINTER_SIZE, arg[i]);
-        }
-        setPointer(Native.POINTER_SIZE * arg.length, null);
+        setPointers(arg);
     }
 
     /**
-     * Returns the number of array elements.
+     * Acquires a pooled {@code PointerArray} object if available, otherwise a new instance is
+     * created.
      *
-     * @return the number of array elements
+     * @param arg the pointers to include in the array
+     * @return a {@code PointerArray} object
      */
-    public int numElements() {
-        return length;
+    public static PointerArray of(Pointer... arg) {
+        PointerArray array = POOL.acquire();
+        if (array != null && array.length >= arg.length) {
+            array.setPointers(arg);
+            return array;
+        }
+        return new PointerArray(arg);
+    }
+
+    /** Recycles this instance and return it back to the pool. */
+    public void recycle() {
+        POOL.recycle(this);
+    }
+
+    private void setPointers(Pointer[] pointers) {
+        for (int i = 0; i < pointers.length; i++) {
+            setPointer(i * Native.POINTER_SIZE, pointers[i]);
+        }
+        setPointer(Native.POINTER_SIZE * length, null);
     }
 
     /** {@inheritDoc} */
