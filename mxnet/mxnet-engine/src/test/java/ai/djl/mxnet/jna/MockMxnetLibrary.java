@@ -13,6 +13,7 @@
 package ai.djl.mxnet.jna;
 
 import ai.djl.mxnet.test.TestHelper;
+import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import java.nio.ByteBuffer;
@@ -429,7 +430,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
                     .apply(new Object[] {shape, ndim, dev_type, dev_id, delay_alloc, dtype, out});
         }
 
-        out.setValue(new PointerArray());
+        out.setValue(new Memory(4));
         return 0;
     }
 
@@ -573,12 +574,12 @@ public class MockMxnetLibrary implements MxnetLibrary {
         out_name_size.put(0, 3);
 
         PointerArray ndarrays =
-                new PointerArray(
+                PointerArray.of(
                         TestHelper.toPointer("A:" + fname),
                         TestHelper.toPointer("B:b"),
                         TestHelper.toPointer("C:c"));
         PointerArray names =
-                new PointerArray(
+                PointerArray.of(
                         TestHelper.toPointer("A:" + fname),
                         TestHelper.toPointer("B:b"),
                         TestHelper.toPointer("C:c"));
@@ -1127,7 +1128,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
                             });
         }
         num_outputs.put(1);
-        outputs.setValue(new PointerArray(TestHelper.toPointer("test")));
+        outputs.setValue(PointerArray.of(TestHelper.toPointer("test")));
         out_stypes.setValue(TestHelper.toPointer(new int[] {1}));
         return 0;
     }
@@ -1325,7 +1326,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
         num_outputs.put(0, 3);
         PointerArray arr =
-                new PointerArray(
+                PointerArray.of(
                         TestHelper.toPointer("a"),
                         TestHelper.toPointer("b"),
                         TestHelper.toPointer("c"));
@@ -1353,7 +1354,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
         num_outputs.put(0, 3);
         PointerArray arr =
-                new PointerArray(
+                PointerArray.of(
                         TestHelper.toPointer("a"),
                         TestHelper.toPointer("b"),
                         TestHelper.toPointer("c"));
@@ -1383,7 +1384,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
         }
 
         PointerArray pa =
-                new PointerArray(
+                PointerArray.of(
                         TestHelper.toPointer("softmax"),
                         TestHelper.toPointer("_npi_copyto"),
                         TestHelper.toPointer("_np_zeros_like"));
@@ -1506,7 +1507,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
             return functions.get("MXSymbolCreateFromFile").apply(new Object[] {fname, out});
         }
 
-        out.setValue(new PointerArray());
+        out.setValue(new Memory(4));
         return 0;
     }
 
@@ -3958,7 +3959,7 @@ public class MockMxnetLibrary implements MxnetLibrary {
 
         out_size.put(0, 5);
         PointerArray ndarrays =
-                new PointerArray(
+                PointerArray.of(
                         TestHelper.toPointer("a"),
                         TestHelper.toPointer("b"),
                         TestHelper.toPointer("c"),

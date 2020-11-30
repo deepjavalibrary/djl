@@ -509,8 +509,9 @@ public final class JnaUtils {
         StringArray keyArray = new StringArray(keys);
         StringArray valueArray = new StringArray(values);
         PointerArray srcArray = toPointerArray(src);
+        PointerArray destArray = toPointerArray(dest);
         PointerByReference destRef = REFS.acquire();
-        destRef.setValue(toPointerArray(dest));
+        destRef.setValue(destArray);
         PointerByReference destSType = REFS.acquire();
         IntBuffer numOutputs = IntBuffer.allocate(1);
         numOutputs.put(0, 1);
@@ -535,6 +536,10 @@ public final class JnaUtils {
         }
         REFS.recycle(destRef);
         REFS.recycle(destSType);
+        srcArray.recycle();
+        if (destArray != null) {
+            destArray.recycle();
+        }
         return pairList;
     }
 
@@ -651,8 +656,10 @@ public final class JnaUtils {
 
     public static void autogradBackward(NDList array, int retainGraph) {
         PointerByReference ref = REFS.acquire();
-        checkCall(LIB.MXAutogradBackward(array.size(), toPointerArray(array), ref, retainGraph));
+        PointerArray pa = toPointerArray(array);
+        checkCall(LIB.MXAutogradBackward(array.size(), pa, ref, retainGraph));
         REFS.recycle(ref);
+        pa.recycle();
     }
 
     public static void autogradBackwardExecute(
@@ -672,11 +679,14 @@ public final class JnaUtils {
         varRef.setValue(varHandles);
         gradRef.setValue(gradHandles);
         gradSparseFormatRef.setValue(gradSparseFormat);
+        PointerArray inputHandles = toPointerArray(array);
+        PointerArray ogradHandles = PointerArray.of();
+
         checkCall(
                 LIB.MXAutogradBackwardEx(
                         numOutput,
-                        toPointerArray(array),
-                        toPointerArray(new NDList()),
+                        inputHandles,
+                        ogradHandles,
                         numVariables,
                         varRef,
                         retainGraph,
@@ -687,6 +697,8 @@ public final class JnaUtils {
         REFS.recycle(varRef);
         REFS.recycle(gradRef);
         REFS.recycle(gradSparseFormatRef);
+        inputHandles.recycle();
+        ogradHandles.recycle();
     }
 
     public static Pointer autogradGetSymbol(NDArray array) {
@@ -732,25 +744,33 @@ public final class JnaUtils {
 
     public static void parameterStoreInit(Pointer handle, int num, String[] keys, NDList vals) {
         checkNDArray(handle, "initialize the parameter store with");
-        checkCall(LIB.MXKVStoreInitEx(handle, num, keys, toPointerArray(vals)));
+        PointerArray pa = toPointerArray(vals);
+        checkCall(LIB.MXKVStoreInitEx(handle, num, keys, pa));
+        pa.recycle();
     }
 
     public static void parameterStorePush(
             Pointer handle, int num, String[] keys, NDList vals, int priority) {
         checkNDArray(handle, "push to the parameter store with");
-        checkCall(LIB.MXKVStorePushEx(handle, num, keys, toPointerArray(vals), priority));
+        PointerArray pa = toPointerArray(vals);
+        checkCall(LIB.MXKVStorePushEx(handle, num, keys, pa, priority));
+        pa.recycle();
     }
 
     public static void parameterStorePull(
             Pointer handle, int num, int[] keys, NDList vals, int priority) {
         checkNDArray(handle, "pull from the parameter store with");
-        checkCall(LIB.MXKVStorePull(handle, num, keys, toPointerArray(vals), priority));
+        PointerArray pa = toPointerArray(vals);
+        checkCall(LIB.MXKVStorePull(handle, num, keys, pa, priority));
+        pa.recycle();
     }
 
     public static void parameterStorePull(
             Pointer handle, int num, String[] keys, NDList vals, int priority) {
         checkNDArray(handle, "pull from the parameter store with");
-        checkCall(LIB.MXKVStorePullEx(handle, num, keys, toPointerArray(vals), priority));
+        PointerArray pa = toPointerArray(vals);
+        checkCall(LIB.MXKVStorePullEx(handle, num, keys, pa, priority));
+        pa.recycle();
     }
 
     public static void parameterStorePushPull(
@@ -763,6 +783,9 @@ public final class JnaUtils {
             NDList outputs,
             int priority) {
         checkNDArray(handle, "push from the parameter store with");
+        PointerArray inputHandles = toPointerArray(inputs);
+        PointerArray outputHandles = toPointerArray(outputs);
+
         checkCall(
                 LIB.MXKVStorePushPullEx(
                         handle,
@@ -770,9 +793,11 @@ public final class JnaUtils {
                         inputKeys,
                         outputNum,
                         outputKey,
-                        toPointerArray(inputs),
-                        toPointerArray(outputs),
+                        inputHandles,
+                        outputHandles,
                         priority));
+        inputHandles.recycle();
+        outputHandles.recycle();
     }
 
     public static void parameterStoreSetUpdater(
@@ -1810,8 +1835,8 @@ public final class JnaUtils {
 
     public static MxNDArray[] cachedOpInvoke(
             MxNDManager manager, Pointer cachedOpHandle, MxNDArray[] inputs) {
-        PointerArray array = toPointerArray(inputs);
         IntBuffer buf = IntBuffer.allocate(1);
+        PointerArray array = toPointerArray(inputs);
         PointerByReference ref = REFS.acquire();
         PointerByReference outSTypeRef = REFS.acquire();
         checkCall(
@@ -1830,6 +1855,7 @@ public final class JnaUtils {
         }
         REFS.recycle(ref);
         REFS.recycle(outSTypeRef);
+        array.recycle();
         return output;
     }
 
@@ -1844,7 +1870,7 @@ public final class JnaUtils {
         for (int i = 0; i < vals.size(); i++) {
             valPointers[i] = ((MxNDArray) vals.get(i)).getHandle();
         }
-        return new PointerArray(valPointers);
+        return PointerArray.of(valPointers);
     }
 
     private static PointerArray toPointerArray(NDArray[] vals) {
@@ -1855,7 +1881,7 @@ public final class JnaUtils {
         for (int i = 0; i < vals.length; i++) {
             valPointers[i] = ((MxNDArray) vals[i]).getHandle();
         }
-        return new PointerArray(valPointers);
+        return PointerArray.of(valPointers);
     }
 
     private static void checkNDArray(Pointer pointer, String msg) {
