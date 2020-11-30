@@ -1,8 +1,8 @@
-# Hybrid Engine for ONNX Runtime
+# Hybrid Engine for ONNX Runtime and DLR
 
 ## Introduction
 
-ONNX Runtime is a DL library with limited support for NDArray operations.
+ONNX Runtime and DLR are a DL library with limited support for NDArray operations.
 Currently, it only covers the basic NDArray creation methods. To better support the necessary preprocessing and postprocessing,
 you can use one of the other Engine along with it to run in a hybrid mode.
 
@@ -12,6 +12,10 @@ The minimum dependencies for the ONNX Runtime Engine are:
 
 ```
 runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine:0.8.0"
+```
+
+```
+runtimeOnly "ai.djl.dlr:dlr-engine:0.9.0-SNAPSHOT"
 ```
 
 To use it along with Apache MXNet for additional API support, add the following two dependencies:
