@@ -14,8 +14,6 @@ package ai.djl.util;
 
 import com.sun.jna.Pointer;
 import java.util.concurrent.atomic.AtomicReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@code NativeResource} is an internal class for {@link AutoCloseable} blocks of memory created in
@@ -23,18 +21,12 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class NativeResource<T> implements AutoCloseable {
 
-    private static final Logger logger = LoggerFactory.getLogger(NativeResource.class);
-
     protected final AtomicReference<T> handle;
     private String uid;
-    private Exception exception;
 
     protected NativeResource(T handle) {
         this.handle = new AtomicReference<>(handle);
         uid = handle.toString();
-        if (logger.isTraceEnabled()) {
-            exception = new Exception();
-        }
     }
 
     /**
@@ -72,22 +64,5 @@ public abstract class NativeResource<T> implements AutoCloseable {
     @Override
     public void close() {
         throw new UnsupportedOperationException("Not implemented.");
-    }
-
-    /** {@inheritDoc} */
-    @SuppressWarnings("deprecation")
-    @Override
-    protected void finalize() throws Throwable {
-        if (handle.get() != null) {
-            if (exception != null) {
-                logger.warn(
-                        "Resource ({}) was not closed explicitly: {}",
-                        getUid(),
-                        getClass().getSimpleName());
-                logger.warn("Resource was created:", exception);
-            }
-            close();
-        }
-        super.finalize();
     }
 }
