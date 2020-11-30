@@ -52,6 +52,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class JnaUtils {
 
     public static final String[] EMPTY_ARRAY = new String[0];
+    public static final ObjectPool<PointerByReference> REFS =
+            new ObjectPool<>(PointerByReference::new, r -> r.setValue(null));
 
     /** An enum that enumerates the statuses of numpy mode. */
     public enum NumpyMode {
@@ -84,7 +86,7 @@ public final class JnaUtils {
 
     public static Set<String> getAllOpNames() {
         IntBuffer outSize = IntBuffer.allocate(1);
-        PointerByReference outArray = new PointerByReference();
+        PointerByReference outArray = REFS.acquire();
 
         checkCall(LIB.MXListAllOpNames(outSize, outArray));
 
@@ -95,6 +97,7 @@ public final class JnaUtils {
         for (Pointer p : pointers) {
             set.add(p.getString(0, StandardCharsets.UTF_8.name()));
         }
+        REFS.recycle(outArray);
         return set;
     }
 
@@ -102,15 +105,17 @@ public final class JnaUtils {
         Set<String> opNames = JnaUtils.getAllOpNames();
         Map<String, FunctionInfo> map = new ConcurrentHashMap<>();
 
+        PointerByReference ref = REFS.acquire();
         for (String opName : opNames) {
-            PointerByReference ref = new PointerByReference();
             checkCall(LIB.NNGetOpHandle(opName, ref));
 
             String functionName = getOpNamePrefix(opName);
 
             // System.out.println("Name: " + opName + "/" + functionName);
             map.put(functionName, getFunctionByName(opName, functionName, ref.getValue()));
+            ref.setValue(null);
         }
+        REFS.recycle(ref);
         return map;
     }
 
@@ -126,9 +131,9 @@ public final class JnaUtils {
         String[] nameRef = {name};
         String[] description = new String[1];
         IntBuffer numArgs = IntBuffer.allocate(1);
-        PointerByReference argNameRef = new PointerByReference();
-        PointerByReference argTypeRef = new PointerByReference();
-        PointerByReference argDescRef = new PointerByReference();
+        PointerByReference argNameRef = REFS.acquire();
+        PointerByReference argTypeRef = REFS.acquire();
+        PointerByReference argDescRef = REFS.acquire();
         String[] keyVarArgs = new String[1];
         String[] returnType = new String[1];
 
@@ -155,6 +160,10 @@ public final class JnaUtils {
                 arguments.add(argNames[i], argTypes[i]);
             }
         }
+
+        REFS.recycle(argNameRef);
+        REFS.recycle(argTypeRef);
+        REFS.recycle(argDescRef);
 
         return new FunctionInfo(handle, functionName, arguments);
     }
@@ -224,12 +233,13 @@ public final class JnaUtils {
     }
 
     private static Set<String> getFeaturesInternal() {
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
         NativeSizeByReference outSize = new NativeSizeByReference();
         checkCall(LIB.MXLibInfoFeatures(ref, outSize));
 
         int size = outSize.getValue().intValue();
         if (size == 0) {
+            REFS.recycle(ref);
             return Collections.emptySet();
         }
 
@@ -244,6 +254,7 @@ public final class JnaUtils {
                 set.add(feature.getName());
             }
         }
+        REFS.recycle(ref);
         return set;
     }
 
@@ -333,13 +344,15 @@ public final class JnaUtils {
         int deviceId = (deviceType != 1) ? device.getDeviceId() : -1;
         int delay = delayedAlloc ? 1 : 0;
 
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
         int[] shapeArray = Arrays.stream(shape.getShape()).mapToInt(Math::toIntExact).toArray();
         checkCall(
                 LIB.MXNDArrayCreateEx(
                         shapeArray, size, deviceType, deviceId, delay, dtype.ordinal(), ref));
 
-        return ref.getValue();
+        Pointer pointer = ref.getValue();
+        REFS.recycle(ref);
+        return pointer;
     }
 
     public static Pointer createSparseNdArray(
@@ -354,7 +367,7 @@ public final class JnaUtils {
         int deviceType = MxDeviceType.toDeviceType(device);
         int deviceId = (deviceType != 1) ? device.getDeviceId() : -1;
         int delay = delayedAlloc ? 1 : 0;
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
         IntBuffer auxDTypesInt =
                 IntBuffer.wrap(Arrays.stream(auxDTypes).mapToInt(DataType::ordinal).toArray());
         IntBuffer auxNDims =
@@ -374,7 +387,9 @@ public final class JnaUtils {
                         auxNDims,
                         auxShapesInt,
                         ref));
-        return ref.getValue();
+        Pointer pointer = ref.getValue();
+        REFS.recycle(ref);
+        return pointer;
     }
 
     public static void ndArraySyncCopyFromNdArray(MxNDArray dest, MxNDArray src, int location) {
@@ -400,8 +415,8 @@ public final class JnaUtils {
 
     public static NDList loadNdArray(MxNDManager manager, Path path, Device device) {
         IntBuffer handlesSize = IntBuffer.allocate(1);
-        PointerByReference handlesRef = new PointerByReference();
-        PointerByReference namesRef = new PointerByReference();
+        PointerByReference handlesRef = REFS.acquire();
+        PointerByReference namesRef = REFS.acquire();
         IntBuffer namesSize = IntBuffer.allocate(1);
         checkCall(LIB.MXNDArrayLoad(path.toString(), handlesSize, handlesRef, namesSize, namesRef));
         int ndArrayCount = handlesSize.get();
@@ -424,6 +439,9 @@ public final class JnaUtils {
                 ndList.add(array);
             }
         }
+
+        REFS.recycle(namesRef);
+        REFS.recycle(handlesRef);
 
         // MXNet always load NDArray on CPU
         if (Device.cpu().equals(device)) {
@@ -491,8 +509,9 @@ public final class JnaUtils {
         StringArray keyArray = new StringArray(keys);
         StringArray valueArray = new StringArray(values);
         PointerArray srcArray = toPointerArray(src);
-        PointerByReference destRef = new PointerByReference(toPointerArray(dest));
-        PointerByReference destSType = new PointerByReference();
+        PointerByReference destRef = REFS.acquire();
+        destRef.setValue(toPointerArray(dest));
+        PointerByReference destSType = REFS.acquire();
         IntBuffer numOutputs = IntBuffer.allocate(1);
         numOutputs.put(0, 1);
 
@@ -514,6 +533,8 @@ public final class JnaUtils {
         for (int i = 0; i < numOfOutputs; i++) {
             pairList.add(ptrArray[i], SparseFormat.fromValue(sTypes[i]));
         }
+        REFS.recycle(destRef);
+        REFS.recycle(destSType);
         return pairList;
     }
 
@@ -536,14 +557,16 @@ public final class JnaUtils {
 
     public static Shape getShape(Pointer ndArray) {
         IntBuffer dim = IntBuffer.allocate(1);
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
         checkNDArray(ndArray, "get the shape of");
         checkCall(LIB.MXNDArrayGetShapeEx(ndArray, dim, ref));
         int nDim = dim.get();
         if (nDim == 0) {
+            REFS.recycle(ref);
             return new Shape();
         }
         int[] shape = ref.getValue().getIntArray(0, nDim);
+        REFS.recycle(ref);
         return new Shape(Arrays.stream(shape).asLongStream().toArray());
     }
 
@@ -617,18 +640,19 @@ public final class JnaUtils {
 
     public static void autogradMarkVariables(
             int numVar, Pointer varHandles, IntBuffer reqsArray, Pointer gradHandles) {
-        PointerByReference varRef = new PointerByReference(varHandles);
-        PointerByReference gradRef = new PointerByReference(gradHandles);
+        PointerByReference varRef = REFS.acquire();
+        PointerByReference gradRef = REFS.acquire();
+        varRef.setValue(varHandles);
+        gradRef.setValue(gradHandles);
         checkCall(LIB.MXAutogradMarkVariables(numVar, varRef, reqsArray, gradRef));
+        REFS.recycle(varRef);
+        REFS.recycle(gradRef);
     }
 
     public static void autogradBackward(NDList array, int retainGraph) {
-        checkCall(
-                LIB.MXAutogradBackward(
-                        array.size(),
-                        toPointerArray(array),
-                        new PointerByReference(),
-                        retainGraph));
+        PointerByReference ref = REFS.acquire();
+        checkCall(LIB.MXAutogradBackward(array.size(), toPointerArray(array), ref, retainGraph));
+        REFS.recycle(ref);
     }
 
     public static void autogradBackwardExecute(
@@ -642,9 +666,12 @@ public final class JnaUtils {
             int isTrain,
             Pointer gradHandles,
             Pointer gradSparseFormat) {
-        PointerByReference varRef = new PointerByReference(varHandles);
-        PointerByReference gradRef = new PointerByReference(gradHandles);
-        PointerByReference gradSparseFormatRef = new PointerByReference(gradSparseFormat);
+        PointerByReference varRef = REFS.acquire();
+        PointerByReference gradRef = REFS.acquire();
+        PointerByReference gradSparseFormatRef = REFS.acquire();
+        varRef.setValue(varHandles);
+        gradRef.setValue(gradHandles);
+        gradSparseFormatRef.setValue(gradSparseFormat);
         checkCall(
                 LIB.MXAutogradBackwardEx(
                         numOutput,
@@ -657,13 +684,18 @@ public final class JnaUtils {
                         isTrain,
                         gradRef,
                         gradSparseFormatRef));
+        REFS.recycle(varRef);
+        REFS.recycle(gradRef);
+        REFS.recycle(gradSparseFormatRef);
     }
 
     public static Pointer autogradGetSymbol(NDArray array) {
         Pointer handle = ((MxNDArray) array).getHandle();
-        PointerByReference out = new PointerByReference();
+        PointerByReference out = REFS.acquire();
         checkCall(LIB.MXAutogradGetSymbol(handle, out));
-        return out.getValue();
+        Pointer pointer = out.getValue();
+        REFS.recycle(out);
+        return pointer;
     }
 
     public static int isNumpyMode() {
@@ -678,16 +710,20 @@ public final class JnaUtils {
     }
 
     public static Pointer getGradient(Pointer handle) {
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
         checkNDArray(handle, "get the gradient for");
         checkCall(LIB.MXNDArrayGetGrad(handle, ref));
-        return ref.getValue();
+        Pointer pointer = ref.getValue();
+        REFS.recycle(ref);
+        return pointer;
     }
 
     public static Pointer parameterStoreCreate(String type) {
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
         checkCall(LIB.MXKVStoreCreate(type, ref));
-        return ref.getValue();
+        Pointer pointer = ref.getValue();
+        REFS.recycle(ref);
+        return pointer;
     }
 
     public static void parameterStoreClose(Pointer handle) {
@@ -876,17 +912,21 @@ public final class JnaUtils {
     /////////////////////////////////
 
     public static Pointer getSymbolOutput(Pointer symbol, int index) {
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
         checkCall(LIB.MXSymbolGetOutput(symbol, index, ref));
-        return ref.getValue();
+        Pointer pointer = ref.getValue();
+        REFS.recycle(ref);
+        return pointer;
     }
 
     public static String[] listSymbolOutputs(Pointer symbol) {
         IntBuffer size = IntBuffer.allocate(1);
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
 
         checkCall(LIB.MXSymbolListOutputs(symbol, size, ref));
-        return toStringArray(ref, size.get());
+        String[] ret = toStringArray(ref, size.get());
+        REFS.recycle(ref);
+        return ret;
     }
 
     /* Need tests
@@ -963,35 +1003,43 @@ public final class JnaUtils {
 
     public static String[] listSymbolNames(Pointer symbol) {
         IntBuffer size = IntBuffer.allocate(1);
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
 
         checkCall(LIB.NNSymbolListInputNames(symbol, 0, size, ref));
 
-        return toStringArray(ref, size.get());
+        String[] ret = toStringArray(ref, size.get());
+        REFS.recycle(ref);
+        return ret;
     }
 
     public static String[] listSymbolArguments(Pointer symbol) {
         IntBuffer size = IntBuffer.allocate(1);
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
 
         checkCall(LIB.MXSymbolListArguments(symbol, size, ref));
 
-        return toStringArray(ref, size.get());
+        String[] ret = toStringArray(ref, size.get());
+        REFS.recycle(ref);
+        return ret;
     }
 
     public static String[] listSymbolAuxiliaryStates(Pointer symbol) {
         IntBuffer size = IntBuffer.allocate(1);
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
 
         checkCall(LIB.MXSymbolListAuxiliaryStates(symbol, size, ref));
 
-        return toStringArray(ref, size.get());
+        String[] ret = toStringArray(ref, size.get());
+        REFS.recycle(ref);
+        return ret;
     }
 
     public static Pointer getSymbolInternals(Pointer symbol) {
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
         checkCall(LIB.MXSymbolGetInternals(symbol, ref));
-        return ref.getValue();
+        Pointer pointer = ref.getValue();
+        REFS.recycle(ref);
+        return pointer;
     }
 
     /* Need tests
@@ -1082,9 +1130,11 @@ public final class JnaUtils {
      */
 
     public static Pointer createSymbolFromFile(String path) {
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
         checkCall(LIB.MXSymbolCreateFromFile(path, ref));
-        return ref.getValue();
+        Pointer pointer = ref.getValue();
+        REFS.recycle(ref);
+        return pointer;
     }
 
     private static List<Shape> recoverShape(
@@ -1127,14 +1177,14 @@ public final class JnaUtils {
         long[] flattenedShapeArray = flattened.getShape();
 
         NativeSizeByReference inShapeSize = new NativeSizeByReference();
-        PointerByReference inShapeNDim = new PointerByReference();
-        PointerByReference inShapeData = new PointerByReference();
+        PointerByReference inShapeNDim = REFS.acquire();
+        PointerByReference inShapeData = REFS.acquire();
         NativeSizeByReference outShapeSize = new NativeSizeByReference();
-        PointerByReference outShapeNDim = new PointerByReference();
-        PointerByReference outShapeData = new PointerByReference();
+        PointerByReference outShapeNDim = REFS.acquire();
+        PointerByReference outShapeData = REFS.acquire();
         NativeSizeByReference auxShapeSize = new NativeSizeByReference();
-        PointerByReference auxShapeNDim = new PointerByReference();
-        PointerByReference auxShapeData = new PointerByReference();
+        PointerByReference auxShapeNDim = REFS.acquire();
+        PointerByReference auxShapeData = REFS.acquire();
         IntBuffer complete = IntBuffer.allocate(1);
         checkCall(
                 LIB.MXSymbolInferShapeEx64(
@@ -1741,15 +1791,17 @@ public final class JnaUtils {
 
         // Creating CachedOp
         Pointer symbolHandle = symbol.getHandle();
-        PointerByReference ref = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
 
         // static_alloc and static_shape are enabled by default
         String[] keys = {"data_indices", "param_indices", "static_alloc", "static_shape"};
         String[] values = {dataIndices.values().toString(), paramIndices.toString(), "1", "1"};
 
         checkCall(LIB.MXCreateCachedOpEx(symbolHandle, keys.length, keys, values, ref));
+        Pointer pointer = ref.getValue();
+        REFS.recycle(ref);
 
-        return new CachedOp(ref.getValue(), manager, parameters, paramIndices, dataIndices);
+        return new CachedOp(pointer, manager, parameters, paramIndices, dataIndices);
     }
 
     public static void freeCachedOp(Pointer handle) {
@@ -1760,8 +1812,8 @@ public final class JnaUtils {
             MxNDManager manager, Pointer cachedOpHandle, MxNDArray[] inputs) {
         PointerArray array = toPointerArray(inputs);
         IntBuffer buf = IntBuffer.allocate(1);
-        PointerByReference ref = new PointerByReference();
-        PointerByReference outSTypeRef = new PointerByReference();
+        PointerByReference ref = REFS.acquire();
+        PointerByReference outSTypeRef = REFS.acquire();
         checkCall(
                 LIB.MXInvokeCachedOpEx(
                         cachedOpHandle, inputs.length, array, buf, ref, outSTypeRef));
@@ -1776,6 +1828,8 @@ public final class JnaUtils {
                 output[i] = manager.create(ptrArray[i]);
             }
         }
+        REFS.recycle(ref);
+        REFS.recycle(outSTypeRef);
         return output;
     }
 
