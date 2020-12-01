@@ -42,7 +42,6 @@ public class CachedOp extends NativeResource<Pointer> {
     private static final Logger logger = LoggerFactory.getLogger(CachedOp.class);
 
     private List<Parameter> parameters;
-    private MxNDArray[] debugInputs;
     private PairList<String, Integer> dataIndices;
     private Map<String, Integer> dataIndicesMap;
     private List<Integer> paramIndices;
@@ -88,11 +87,10 @@ public class CachedOp extends NativeResource<Pointer> {
     public NDList forward(ParameterStore parameterStore, NDList data, boolean training) {
         // reset the input data index at the beginning
         MxNDArray[] allInputsNDArray = new MxNDArray[parameters.size()];
-        // for unit test purpose, we export the current one to global
-        this.debugInputs = allInputsNDArray;
         // check device of input
         Device device = data.head().getDevice();
         // get the manager of the data
+
         MxNDManager inputManager = (MxNDManager) data.head().getManager();
 
         // fill allInputsNDArray with parameter values on correct device
@@ -134,15 +132,6 @@ public class CachedOp extends NativeResource<Pointer> {
         }
         MxNDArray[] result = JnaUtils.cachedOpInvoke(inputManager, getHandle(), allInputsNDArray);
         return new NDList(result);
-    }
-
-    /**
-     * Gets an input NDArray. For unit tests only.
-     *
-     * @return an array of NDArray
-     */
-    MxNDArray[] getInputNDArray() {
-        return debugInputs;
     }
 
     /** {@inheritDoc} */
