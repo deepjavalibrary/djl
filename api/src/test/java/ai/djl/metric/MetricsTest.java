@@ -48,10 +48,10 @@ public class MetricsTest {
 
         Set<String> metricNames = metrics.getMetricNames();
         Assert.assertEquals(metricNames.size(), 3);
-        Assert.assertEquals(metricNames.contains("m1"), true);
-        Assert.assertEquals(metricNames.contains("m2"), true);
-        Assert.assertEquals(metricNames.contains("m3"), true);
-        Assert.assertEquals(metricNames.contains("m4"), false);
+        Assert.assertTrue(metricNames.contains("m1"));
+        Assert.assertTrue(metricNames.contains("m2"));
+        Assert.assertTrue(metricNames.contains("m3"));
+        Assert.assertFalse(metricNames.contains("m4"));
     }
 
     @Test
