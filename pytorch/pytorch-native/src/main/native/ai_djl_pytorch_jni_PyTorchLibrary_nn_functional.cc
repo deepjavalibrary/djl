@@ -50,8 +50,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNInterpolat
   } else if (jmode == 3) {
     result = torch::upsample_bicubic2d(*tensor_ptr, size_vec, jalign_corners);
   } else {
-    jclass jexception = env->FindClass("ai/djl/engine/EngineException");
-    env->ThrowNew(jexception, "This kind of mode is not supported on Android");
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, "This kind of mode is not supported on Android");
   }
   const auto* result_ptr = new torch::Tensor(result);
 #else

@@ -20,6 +20,7 @@
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_exception.h"
 #include "djl_pytorch_jni_utils.h"
+#include "ai_djl_pytorch_jni_cache.h"
 
 #if defined(__ANDROID__)
 #ifndef USE_PTHREADPOOL
@@ -76,14 +77,13 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchManualSeed(JN
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchShowConfig(
     JNIEnv* env, jobject jthis, jobject jset) {
   API_BEGIN()
-  jclass jexception = env->FindClass("java/lang/NullPointerException");
   jclass set_class = env->GetObjectClass(jset);
   if (set_class == nullptr) {
-    env->ThrowNew(jexception, "Java Set class is not found");
+    env->ThrowNew(NULL_PTR_EXCEPTION_CLASS, "Java Set class is not found");
   }
   jmethodID add_method_id = env->GetMethodID(set_class, "add", "(Ljava/lang/Object;)Z");
   if (add_method_id == nullptr) {
-    env->ThrowNew(jexception, "The add method in Set is not found");
+    env->ThrowNew(NULL_PTR_EXCEPTION_CLASS, "The add method in Set is not found");
   }
   std::string feature;
   jstring jfeature;
@@ -251,8 +251,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStartProfile(
     JNIEnv* env, jobject jthis, jboolean juse_cuda, jboolean jrecord_shape, jboolean jprofile_memory) {
   API_BEGIN()
   if (profilerEnabled()) {
-    jclass jexception = env->FindClass("ai/djl/engine/EngineException");
-    env->ThrowNew(jexception, "please call stopProfile before you start a new section");
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, "please call stopProfile before you start a new section");
   }
   enableProfiler(ProfilerConfig(juse_cuda ? ProfilerState::CUDA : ProfilerState::CPU,
       /* report_input_shapes */ jrecord_shape,
@@ -264,8 +263,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStopProfile(
     JNIEnv* env, jobject jthis, jstring joutput_file) {
   API_BEGIN()
   if (!profilerEnabled()) {
-    jclass jexception = env->FindClass("ai/djl/engine/EngineException");
-    env->ThrowNew(jexception, "please call startProfiler() before you use stopProfile!");
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, "please call startProfiler() before you use stopProfile!");
   }
   std::string output_file = utils::GetStringFromJString(env, joutput_file);
   std::ofstream file(output_file);

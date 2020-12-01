@@ -12,37 +12,20 @@
  */
 #include "djl_pytorch_jni_log.h"
 
-static inline jobject get_log_object(JNIEnv* env) {
-  auto cls = env->FindClass(JNIUTILS_CLASS);
-  assert(cls);
-  auto log_field = env->GetStaticFieldID(cls, "logger", "Lorg/slf4j/Logger;");
-  assert(log_field);
-  auto log_obj = env->GetStaticObjectField(cls, log_field);
-  assert(log_obj);
-  return log_obj;
-}
+#include "ai_djl_pytorch_jni_cache.h"
 
-static inline jmethodID get_log_method(JNIEnv* env, jobject log, const std::string& name) {
-  auto method_id = env->GetMethodID(env->GetObjectClass(log), name.c_str(), "(Ljava/lang/String;)V");
-  assert(method_id);
-  return method_id;
-}
+static inline jobject get_log_object(JNIEnv* env) { return env->GetStaticObjectField(JNI_UTILS_CLASS, LOGGER_FIELD); }
 
-Log::Log(JNIEnv* env)
-    : env(env),
-      logger(get_log_object(env)),
-      info_method(get_log_method(env, logger, "info")),
-      debug_method(get_log_method(env, logger, "debug")),
-      error_method(get_log_method(env, logger, "error")) {}
+Log::Log(JNIEnv* env) : env(env), logger(get_log_object(env)) {}
 
 void Log::info(const std::string& message) {
-  env->CallVoidMethod(logger, info_method, env->NewStringUTF(message.c_str()));
+  env->CallVoidMethod(logger, INFO_METHOD, env->NewStringUTF(message.c_str()));
 }
 
 void Log::debug(const std::string& message) {
-  env->CallVoidMethod(logger, debug_method, env->NewStringUTF(message.c_str()));
+  env->CallVoidMethod(logger, DEBUG_METHOD, env->NewStringUTF(message.c_str()));
 }
 
 void Log::error(const std::string& message) {
-  env->CallVoidMethod(logger, error_method, env->NewStringUTF(message.c_str()));
+  env->CallVoidMethod(logger, ERROR_METHOD, env->NewStringUTF(message.c_str()));
 }

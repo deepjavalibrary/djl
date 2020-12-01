@@ -14,10 +14,11 @@
 #ifndef DJL_TORCH_DJL_PYTORCH_JNI_EXCEPTION_H
 #define DJL_TORCH_DJL_PYTORCH_JNI_EXCEPTION_H
 
+#include "ai_djl_pytorch_jni_cache.h"
+
 #define DJL_CHECK_WITH_MSG(cond, error_msg)                              \
   if (!cond) {                                                           \
-    jclass jexception = env->FindClass("ai/djl/engine/EngineException"); \
-    env->ThrowNew(jexception, error_msg);                                \
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, error_msg);                    \
   }
 
 /*
@@ -30,14 +31,12 @@
 #define API_END()                                                        \
   }                                                                      \
   catch (const c10::Error& e) {                                          \
-    jclass jexception = env->FindClass("ai/djl/engine/EngineException"); \
     Log log(env);                                                        \
     log.debug(e.what());                                                 \
-    env->ThrowNew(jexception, e.what_without_backtrace());               \
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, e.what_without_backtrace());               \
   }                                                                      \
   catch (const std::exception& e_) {                                     \
-    jclass jexception = env->FindClass("ai/djl/engine/EngineException"); \
-    env->ThrowNew(jexception, e_.what());                                \
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, e_.what());                                \
   }
 
 // TODO refactor all jni functions to c style function which mean
