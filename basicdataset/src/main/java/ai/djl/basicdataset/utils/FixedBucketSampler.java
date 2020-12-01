@@ -45,7 +45,7 @@ public class FixedBucketSampler implements Sampler {
      *
      * @param batchSize the batch size
      * @param numBuckets the number of buckets
-     * @param shuffle whether to shuffle data randomyl while sampling
+     * @param shuffle whether to shuffle data randomly while sampling
      */
     public FixedBucketSampler(int batchSize, int numBuckets, boolean shuffle) {
         this.numBuckets = numBuckets;

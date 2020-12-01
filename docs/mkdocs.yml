@@ -26,7 +26,7 @@ extra:
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/deepjavalibrary
     - icon: fontawesome/brands/slack
-      link: https://deepjavalibrary.slack.com/
+      link: https://join.slack.com/t/deepjavalibrary/shared_invite/zt-ar91gjkz-qbXhr1l~LFGEIEeGBibT7w
     - icon: fontawesome/brands/zhihu
       link: https://zhuanlan.zhihu.com/c_1255493231133417472
 docs_dir: '../'
