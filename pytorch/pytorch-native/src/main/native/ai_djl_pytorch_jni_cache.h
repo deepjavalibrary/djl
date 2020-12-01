@@ -10,29 +10,22 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-#ifndef DJL_TORCH_DJL_PYTORCH_JNI_LOG_H
-#define DJL_TORCH_DJL_PYTORCH_JNI_LOG_H
 
-#include <jni.h>
+#ifndef DJL_TORCH_AI_DJL_PYTORCH_JNI_CACHE_H
+#define DJL_TORCH_AI_DJL_PYTORCH_JNI_CACHE_H
 
-#include <cassert>
-#include <iostream>
-#include <string>
+#include "jni.h"
 
-/**
- * The Log class is for logging the C++ message with slf4j
- * which helps the Java developer to debug.
- */
-class Log {
- public:
-  explicit Log(JNIEnv* env);
-  void info(const std::string& message);
-  void debug(const std::string& message);
-  void error(const std::string& message);
+extern jclass NULL_PTR_EXCEPTION_CLASS;
+extern jclass ILLEGAL_STATE_EXCEPTION_CLASS;
+extern jclass ENGINE_EXCEPTION_CLASS;
+extern jclass JNI_UTILS_CLASS;
+extern jclass LOG4J_LOGGER_CLASS;
+extern jfieldID LOGGER_FIELD;
+extern jmethodID INFO_METHOD;
+extern jmethodID DEBUG_METHOD;
+extern jmethodID ERROR_METHOD;
 
- private:
-  JNIEnv* env;
-  const jobject logger;
-};
+static jint JNI_VERSION = JNI_VERSION_1_8;
 
-#endif  // DJL_TORCH_DJL_PYTORCH_JNI_LOG_H
+#endif //DJL_TORCH_AI_DJL_PYTORCH_JNI_CACHE_H

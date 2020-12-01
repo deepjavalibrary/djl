@@ -11,6 +11,7 @@
  * and limitations under the License.
  */
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
+#include "ai_djl_pytorch_jni_cache.h"
 #include "djl_pytorch_jni_exception.h"
 #include "djl_pytorch_jni_utils.h"
 
@@ -36,11 +37,10 @@ JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDType(JNIEnv*
 JNIEXPORT jintArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDevice(
     JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
-  jclass jexception = env->FindClass("java/lang/NullPointerException");
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   jintArray result = env->NewIntArray(2);
   if (result == nullptr) {
-    env->ThrowNew(jexception, "Unable to create int array");
+    env->ThrowNew(NULL_PTR_EXCEPTION_CLASS, "Unable to create int array");
   }
   jint temp_device[] = {static_cast<int>(tensor_ptr->device().type()), tensor_ptr->device().index()};
   env->SetIntArrayRegion(result, 0, 2, temp_device);
@@ -50,7 +50,6 @@ JNIEXPORT jintArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDevice(
 
 JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLayout(JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
-  jclass jexception = env->FindClass("java/lang/IllegalStateException");
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   auto layout = tensor_ptr->layout();
   switch (layout) {
@@ -61,7 +60,8 @@ JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLayout(JNIEnv
     case torch::kMkldnn:
       return 2;
     default:
-      env->ThrowNew(jexception, "Internal PyTorch error, layout should only have kStrided, kSparse or kMkldnn");
+      env->ThrowNew(ILLEGAL_STATE_EXCEPTION_CLASS,
+          "Internal PyTorch error, layout should only have kStrided, kSparse or kMkldnn");
   }
   API_END_RETURN()
 }

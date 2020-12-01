@@ -38,7 +38,9 @@ set(SOURCE_FILES
     "src/main/native/ai_djl_pytorch_jni_PyTorchLibrary_torch_other.cc"
     "src/main/native/djl_pytorch_jni_log.cc"
     "src/main/native/djl_pytorch_jni_log.h"
-    "src/main/native/djl_pytorch_jni_exception.h")
+    "src/main/native/djl_pytorch_jni_exception.h"
+    "src/main/native/ai_djl_pytorch_jni_cache.h"
+    "src/main/native/ai_djl_pytorch_jni_cache.cc")
 
 add_library(djl_torch SHARED ${SOURCE_FILES})
 # build host
