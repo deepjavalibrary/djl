@@ -15,13 +15,10 @@ package ai.djl.mxnet.jna;
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
 import com.sun.jna.Native;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -55,7 +52,6 @@ public final class LibUtils {
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
 
     private static final String LIB_NAME = "mxnet";
-    private static final Pattern PATH_PATTERN = Pattern.compile("\\s*'(.+)',");
 
     private static final Pattern VERSION_PATTERN =
             Pattern.compile("(\\d+\\.\\d+\\.\\d+(-[a-z]+)?)(-SNAPSHOT)?(-\\d+)?");
@@ -74,13 +70,7 @@ public final class LibUtils {
         if (libName == null) {
             libName = LibUtils.findLibraryInClasspath();
             if (libName == null) {
-                libName = searchPythonPath("python3 -m site");
-                if (libName == null) {
-                    libName = searchPythonPath("python -m site");
-                    if (libName == null) {
-                        libName = LIB_NAME;
-                    }
-                }
+                libName = LIB_NAME;
             }
         }
         return libName;
@@ -211,44 +201,6 @@ public final class LibUtils {
                 if (file.exists() && file.isFile()) {
                     return file.getAbsolutePath();
                 }
-            }
-        }
-        return null;
-    }
-
-    private static String searchPythonPath(String cmd) {
-        String libName;
-        if (com.sun.jna.Platform.isMac()) {
-            // pip package use libmxnet.so instead of libmxnet.dylib, JNA by default only
-            // load .dylib file, we have to use absolute path to load libmxnet.so
-            libName = "libmxnet.so";
-        } else {
-            libName = System.mapLibraryName(LIB_NAME);
-        }
-
-        try {
-            Process process = Runtime.getRuntime().exec(cmd);
-            try (BufferedReader reader =
-                    new BufferedReader(
-                            new InputStreamReader(
-                                    process.getInputStream(), StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    Matcher m = PATH_PATTERN.matcher(line);
-                    if (m.matches()) {
-                        File dir = new File(m.group(1));
-                        if (dir.isDirectory()) {
-                            File file = new File(dir, "mxnet/" + libName);
-                            if (file.exists()) {
-                                return file.getAbsolutePath();
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("Failed execute cmd: " + cmd, e);
             }
         }
         return null;
