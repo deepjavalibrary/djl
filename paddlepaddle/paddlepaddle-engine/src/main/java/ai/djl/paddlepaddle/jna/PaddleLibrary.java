@@ -20,8 +20,32 @@ import com.sun.jna.Pointer;
 @SuppressWarnings({"missingjavadocmethod", "methodname"})
 public interface PaddleLibrary extends Library {
 
+    // Paddle Inference config
     Pointer PD_NewAnalysisConfig();
 
+    // config modification
+    void PD_DeleteAnalysisConfig(Pointer config);
+
+    void PD_SetCpuMathLibraryNumThreads(Pointer config, int cpu_math_library_num_threads);
+
+    void PD_SwitchUseFeedFetchOps(Pointer config, boolean x);
+
+    void PD_SwitchSpecifyInputNames(Pointer config, boolean x);
+
+    void PD_SwitchIrDebug(Pointer config, boolean x);
+
+    void PD_EnableMKLDNN(Pointer config);
+
+    void PD_EnableMkldnnBfloat16(Pointer config);
+
+    void PD_EnableMkldnnQuantizer(Pointer config);
+
+    void PD_SetMkldnnCacheCapacity(Pointer config, int capacity);
+
+    // config value check
+    boolean PD_UseFeedFetchOpsEnabled(Pointer config);
+
+    // Paddle Tensor
     Pointer PD_NewPaddleTensor();
 
     void PD_DeletePaddleTensor(Pointer tensor);
