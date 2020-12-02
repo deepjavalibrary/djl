@@ -8,11 +8,12 @@ assignees: ''
 ---
 
 ## Description
+
 (A clear and concise description of what the feature is.)
 
-### Will this change the current api? How?
+Will this change the current api? How?
 
-### Who will benefit from this enhancement?
+Who will benefit from this enhancement?
 
 ## References
 - list reference and related literature
