@@ -388,7 +388,7 @@ public class NDArrayCreationOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray uniform = manager.randomUniform(0, 10, new Shape(1000, 1000));
             Assert.assertTrue(uniform.min().getFloat() >= 0f);
-            Assert.assertTrue(uniform.max().getFloat() < 100f);
+            Assert.assertTrue(uniform.max().getFloat() < 10f);
             Assertions.assertAlmostEquals(uniform.mean().getFloat(), 5f, 1e-2f, 1e-2f);
         }
     }
@@ -399,7 +399,7 @@ public class NDArrayCreationOpTest {
             NDArray normal = manager.randomNormal(new Shape(1000, 1000));
             NDArray mean = normal.mean();
             NDArray std = normal.sub(mean).pow(2).mean();
-            Assertions.assertAlmostEquals(normal.mean().getFloat(), 0f, 2e-2f, 2e-2f);
+            Assertions.assertAlmostEquals(mean.getFloat(), 0f, 2e-2f, 2e-2f);
             Assertions.assertAlmostEquals(std.getFloat(), 1f, 2e-2f, 2e-2f);
         }
     }
