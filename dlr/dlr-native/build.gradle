@@ -10,13 +10,13 @@ boolean isRelease = project.hasProperty("release") || project.hasProperty("stagi
 version = "${dlr_version}" + (isRelease ? "" : "-SNAPSHOT")
 def BINARY_ROOT = "${project.buildDir}/download"
 
-def build(String os, String flavor) {
+def buildJNI(String os) {
     exec {
         commandLine 'bash', 'build.sh'
     }
     def engineDir = "${project.parent.projectDir}/dlr-engine"
     def classifier = "${os}-x86_64"
-    def publishDir = "${engineDir}/build/jnilib/${classifier}/${flavor}"
+    def publishDir = "${engineDir}/build/jnilib/${classifier}"
     copy {
         def tree = fileTree(project.buildDir)
         tree.include("libdjl_dlr.*")
@@ -27,7 +27,7 @@ def build(String os, String flavor) {
     // the reason why we duplicate the folder here is to insert djl_version into the path
     // so different versions of JNI wouldn't override each other. We don't also want publishDir
     // to have djl_version as engine would require to know that during the System.load()
-    def ciDir = "${project.projectDir}/jnilib/${djl_version}/${classifier}/${flavor}"
+    def ciDir = "${project.projectDir}/jnilib/${djl_version}/${classifier}"
     copy {
         from publishDir
         into ciDir
@@ -37,9 +37,9 @@ def build(String os, String flavor) {
 task compileJNI {
     doFirst {
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
-            build("osx", "cpu")
+            buildJNI("osx")
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
-            build("linux", "cpu")
+            buildJNI("linux")
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
         }
