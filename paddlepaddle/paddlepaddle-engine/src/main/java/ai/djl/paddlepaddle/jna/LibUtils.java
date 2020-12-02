@@ -47,7 +47,7 @@ public final class LibUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
 
-    private static final String LIB_NAME = "paddle_fluid";
+    private static final String LIB_NAME = "paddle_fluid_c";
     private static final Pattern VERSION_PATTERN =
             Pattern.compile("(\\d+\\.\\d+\\.\\d+)(-SNAPSHOT)?(-\\d+)?");
 
