@@ -26,7 +26,7 @@ public interface PaddleLibrary extends Library {
     // config modification
     void PD_DeleteAnalysisConfig(Pointer config);
 
-    void PD_SetCpuMathLibraryNumThreads(Pointer config, int cpu_math_library_num_threads);
+    void PD_SetCpuMathLibraryNumThreads(Pointer config, int cpuMathLibraryNumThreads);
 
     void PD_SwitchUseFeedFetchOps(Pointer config, boolean x);
 
@@ -66,7 +66,12 @@ public interface PaddleLibrary extends Library {
 
     int[] PD_GetPaddleTensorShape(Pointer tensor, int[] shape);
 
+    // Paddle Buffer: the data container for paddle Tensor
     Pointer PD_NewPaddleBuf();
 
-    void PD_PaddleBufReset(Pointer buf, Pointer data, int size);
+    void PD_PaddleBufReset(Pointer buf, Pointer data, long size);
+
+    Pointer PD_PaddleBufData(Pointer buf);
+
+    long PD_PaddleBufLength(Pointer buf);
 }

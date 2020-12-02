@@ -20,6 +20,8 @@ import ai.djl.paddlepaddle.engine.PpNDManager;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 
 /**
@@ -41,11 +43,25 @@ public final class JnaUtils {
         LIB.PD_SetPaddleTensorShape(tensor, size, size.length);
 
         Pointer paddleBuffer = LIB.PD_NewPaddleBuf();
-        int length = Math.toIntExact(dtype.getNumOfBytes() * shape.size());
+        long length = dtype.getNumOfBytes() * shape.size();
         Pointer pointer = Native.getDirectBufferPointer(data);
-        LIB.PD_PaddleBufReset(tensor, pointer, length);
+        LIB.PD_PaddleBufReset(paddleBuffer, pointer, length);
         LIB.PD_SetPaddleTensorData(tensor, paddleBuffer);
         return new PpNDArray(manager, tensor, shape, dtype);
+    }
+
+    public static Pointer getBufferPointerFromNd(PpNDArray array) {
+        Pointer bufHandle = LIB.PD_GetPaddleTensorData(array.getHandle());
+        return LIB.PD_PaddleBufData(bufHandle);
+    }
+
+    public static ByteBuffer getByteBufferFromNd(PpNDArray array) {
+        Pointer bufHandle = LIB.PD_GetPaddleTensorData(array.getHandle());
+        int length = Math.toIntExact(LIB.PD_PaddleBufLength(bufHandle));
+        Pointer buf = LIB.PD_PaddleBufData(bufHandle);
+        byte[] bytes = new byte[length];
+        buf.read(0, bytes, 0, length);
+        return ByteBuffer.wrap(bytes).order(ByteOrder.nativeOrder());
     }
 
     public static void freeNdArray(Pointer tensor) {
