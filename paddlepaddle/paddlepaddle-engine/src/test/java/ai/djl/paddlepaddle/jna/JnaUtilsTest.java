@@ -15,14 +15,23 @@ package ai.djl.paddlepaddle.jna;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class JnaUtilsTest {
 
     @Test
-    public void testNewNDArray() {
+    public void testNDArrayCreation() {
         try (NDManager manager = NDManager.newBaseManager(null, "PaddlePaddle")) {
             NDArray array = manager.zeros(new Shape(1, 2));
+            float[] expected = new float[] {0, 0};
+            Assert.assertEquals(array.toFloatArray(), expected);
+            array = manager.ones(new Shape(1, 2));
+            expected = new float[] {1, 1};
+            Assert.assertEquals(array.toFloatArray(), expected);
+            expected = new float[] {1, 3, 2};
+            array = manager.create(expected);
+            Assert.assertEquals(array.toFloatArray(), expected);
         }
     }
 }

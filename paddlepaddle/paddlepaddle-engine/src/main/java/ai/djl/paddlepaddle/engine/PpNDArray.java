@@ -72,6 +72,9 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
+        if (dataType == null) {
+            dataType = JnaUtils.getDataType(getHandle());
+        }
         return dataType;
     }
 
@@ -148,14 +151,8 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public float[] toFloatArray() {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public ByteBuffer toByteBuffer() {
-        throw new UnsupportedOperationException("Not supported");
+        return JnaUtils.getByteBufferFromNd(this);
     }
 
     /** {@inheritDoc} */
