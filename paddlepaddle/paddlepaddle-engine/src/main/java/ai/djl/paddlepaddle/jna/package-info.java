@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains classes to interface with the underlying MXNet Engine. */
+/** Contains classes to interface with the underlying PaddlePaddle Engine. */
 package ai.djl.paddlepaddle.jna;

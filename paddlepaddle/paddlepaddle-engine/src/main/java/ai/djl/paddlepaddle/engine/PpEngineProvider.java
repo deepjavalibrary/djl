@@ -15,7 +15,7 @@ package ai.djl.paddlepaddle.engine;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineProvider;
 
-/** {@code PpEngineProvider} is the ONNX Runtime implementation of {@link EngineProvider}. */
+/** {@code PpEngineProvider} is the PaddlePaddle implementation of {@link EngineProvider}. */
 public class PpEngineProvider implements EngineProvider {
 
     private static Engine engine;
