@@ -88,7 +88,6 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
   }
   env->ReleaseLongArrayElements(jivalue_ptrs, jptrs, utils::RELEASE_MODE);
   const auto* result_ptr = new torch::IValue(output);
-  std::cout << "isTensor " << result_ptr->isTensor() << std::endl;
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
