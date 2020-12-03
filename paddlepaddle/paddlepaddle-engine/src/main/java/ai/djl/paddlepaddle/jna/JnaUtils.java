@@ -17,8 +17,13 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.paddlepaddle.engine.PpDataType;
 import ai.djl.paddlepaddle.engine.PpNDArray;
 import ai.djl.paddlepaddle.engine.PpNDManager;
+import ai.djl.util.NativeResource;
+import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
+import com.sun.jna.ptr.PointerByReference;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -90,8 +95,16 @@ public final class JnaUtils {
         return new Shape(Arrays.stream(shape).asLongStream().toArray());
     }
 
-    public static AnalysisConfig newAnalysisConfig() {
-        return new AnalysisConfig(LIB.PD_NewAnalysisConfig());
+    public static Pointer newAnalysisConfig() {
+        return LIB.PD_NewAnalysisConfig();
+    }
+
+    public static void disableGpu(AnalysisConfig config) {
+        LIB.PD_DisableGpu(config.getHandle());
+    }
+
+    public static void setGpu(AnalysisConfig config, int memory, int deviceId) {
+        LIB.PD_EnableUseGpu(config.getHandle(), memory, deviceId);
     }
 
     public static void loadModel(AnalysisConfig config, String modelDir, String paramsPath) {
@@ -99,6 +112,20 @@ public final class JnaUtils {
             paramsPath = modelDir;
         }
         LIB.PD_SetModel(config.getHandle(), modelDir, paramsPath);
+    }
+
+    public static void deleteConfig(AnalysisConfig config) {
+        LIB.PD_DeleteAnalysisConfig(config.getHandle());
+    }
+
+    public static PpNDArray[] runInference(AnalysisConfig config, PpNDArray[] inputs, int batchSize) {
+        PointerArray inputPtr = new PointerArray(Arrays.stream(inputs).map(PpNDArray::getHandle).toArray(Pointer[]::new));
+        PointerByReference outputPtr = new PointerByReference();
+        IntBuffer outSizeBuf = IntBuffer.allocate(1);
+        LIB.PD_PredictorRun(config.getHandle(), inputPtr, inputs.length, outputPtr, outSizeBuf, batchSize);
+        Pointer[] handles = outputPtr.getValue().getPointerArray(0, outSizeBuf.get());
+        PpNDManager manager = (PpNDManager) inputs[0].getManager();
+        return Arrays.stream(handles).map(ptr -> new PpNDArray(manager, ptr)).toArray(PpNDArray[]::new);
     }
 
     public static String getVersion() {

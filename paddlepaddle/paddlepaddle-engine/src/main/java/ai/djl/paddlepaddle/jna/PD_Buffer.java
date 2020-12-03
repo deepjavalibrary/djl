@@ -27,28 +27,4 @@ public class PD_Buffer extends Structure {
     public PD_Buffer(Pointer peer) {
         super(peer);
     }
-
-    public Pointer getData() {
-        return data;
-    }
-
-    public void setData(Pointer data) {
-        this.data = data;
-    }
-
-    public NativeSize getLength() {
-        return length;
-    }
-
-    public void setLength(NativeSize length) {
-        this.length = length;
-    }
-
-    public NativeSize getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(NativeSize capacity) {
-        this.capacity = capacity;
-    }
 }

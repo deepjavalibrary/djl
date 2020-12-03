@@ -15,6 +15,8 @@ package ai.djl.paddlepaddle.jna;
 
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
+import com.sun.jna.ptr.PointerByReference;
+
 import java.nio.IntBuffer;
 
 /** The Paddle JNA library. */
@@ -43,8 +45,16 @@ public interface PaddleLibrary extends Library {
 
     void PD_SetMkldnnCacheCapacity(Pointer config, int capacity);
 
+    void PD_EnableUseGpu(Pointer config, int memoryPoolInitSizeMb, int deviceId);
+
+    void PD_DisableGpu(Pointer config);
+
     // config value check
     boolean PD_UseFeedFetchOpsEnabled(Pointer config);
+
+    int PD_GpuDeviceId(Pointer config);
+
+    boolean PD_UseGpu(Pointer config);
 
     // Paddle Tensor
     Pointer PD_NewPaddleTensor();
@@ -90,4 +100,10 @@ public interface PaddleLibrary extends Library {
     String PD_GetInputName(Pointer predictor, int index);
 
     String PD_GetOutputName(Pointer predictor, int index);
+
+    // Inference APIs
+    boolean PD_PredictorRun(Pointer config,
+                         Pointer inputs, int in_size,
+                         PointerByReference output_data,
+                         IntBuffer out_size, int batch_size);
 }
