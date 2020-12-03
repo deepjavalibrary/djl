@@ -22,6 +22,7 @@ import com.sun.jna.Pointer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.Arrays;
 
 /**
@@ -69,21 +70,24 @@ public final class JnaUtils {
         LIB.PD_DeletePaddleTensor(tensor);
     }
 
-    public static void setNdArrayName(Pointer tensor, String name) {
-        LIB.PD_SetPaddleTensorName(tensor, name);
+    public static void setNdArrayName(PpNDArray nd, String name) {
+        LIB.PD_SetPaddleTensorName(nd.getHandle(), name);
     }
 
-    public static String getNdArrayName(Pointer tensor) {
-        return LIB.PD_GetPaddleTensorName(tensor);
+    public static String getNdArrayName(PpNDArray nd) {
+        return LIB.PD_GetPaddleTensorName(nd.getHandle());
     }
 
-    public static DataType getDataType(Pointer pointer) {
-        int type = LIB.PD_GetPaddleTensorDType(pointer);
+    public static DataType getDataType(PpNDArray nd) {
+        int type = LIB.PD_GetPaddleTensorDType(nd.getHandle());
         return PpDataType.fromPaddlePaddle(type);
     }
 
-    public static String getVersion() {
-        return "2.0.0";
+    public static Shape getShape(PpNDArray nd) {
+        IntBuffer outSize = IntBuffer.allocate(1);
+        Pointer shapePtr = LIB.PD_GetPaddleTensorShape(nd.getHandle(), outSize);
+        int[] shape = shapePtr.getIntArray(0, outSize.get());
+        return new Shape(Arrays.stream(shape).asLongStream().toArray());
     }
 
     public static AnalysisConfig newAnalysisConfig() {
@@ -95,5 +99,9 @@ public final class JnaUtils {
             paramsPath = modelDir;
         }
         LIB.PD_SetModel(config.getHandle(), modelDir, paramsPath);
+    }
+
+    public static String getVersion() {
+        return "2.0.0";
     }
 }
