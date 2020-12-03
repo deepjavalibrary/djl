@@ -85,4 +85,15 @@ public final class JnaUtils {
     public static String getVersion() {
         return "2.0.0";
     }
+
+    public static AnalysisConfig newAnalysisConfig() {
+        return new AnalysisConfig(LIB.PD_NewAnalysisConfig());
+    }
+
+    public static void loadModel(AnalysisConfig config, String modelDir, String paramsPath) {
+        if (paramsPath == null) {
+            paramsPath = modelDir;
+        }
+        LIB.PD_SetModel(config.getHandle(), modelDir, paramsPath);
+    }
 }
