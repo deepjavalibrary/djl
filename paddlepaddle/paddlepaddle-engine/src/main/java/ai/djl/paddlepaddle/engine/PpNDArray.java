@@ -60,20 +60,20 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public String getName() {
-        return JnaUtils.getNdArrayName(handle.get());
+        return JnaUtils.getNdArrayName(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void setName(String name) {
-        JnaUtils.setNdArrayName(handle.get(), name);
+        JnaUtils.setNdArrayName(this, name);
     }
 
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
         if (dataType == null) {
-            dataType = JnaUtils.getDataType(getHandle());
+            dataType = JnaUtils.getDataType(this);
         }
         return dataType;
     }
@@ -87,6 +87,9 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public Shape getShape() {
+        if (shape == null) {
+            shape = JnaUtils.getShape(this);
+        }
         return shape;
     }
 
