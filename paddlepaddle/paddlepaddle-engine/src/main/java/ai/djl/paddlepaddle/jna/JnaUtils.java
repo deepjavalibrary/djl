@@ -25,7 +25,8 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 
 /**
- * A class containing utilities to interact with the PaddlePaddle Engine's Java Native Access (JNA) layer.
+ * A class containing utilities to interact with the PaddlePaddle Engine's Java Native Access (JNA)
+ * layer.
  */
 @SuppressWarnings("MissingJavadocMethod")
 public final class JnaUtils {
