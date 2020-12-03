@@ -15,6 +15,7 @@ package ai.djl.paddlepaddle.jna;
 
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
+import java.nio.IntBuffer;
 
 /** The Paddle JNA library. */
 @SuppressWarnings({"missingjavadocmethod", "methodname"})
@@ -64,7 +65,7 @@ public interface PaddleLibrary extends Library {
 
     Pointer PD_GetPaddleTensorData(Pointer tensor);
 
-    int[] PD_GetPaddleTensorShape(Pointer tensor, int[] shape);
+    Pointer PD_GetPaddleTensorShape(Pointer tensor, IntBuffer shape);
 
     // Paddle Buffer: the data container for paddle Tensor
     Pointer PD_NewPaddleBuf();
@@ -76,4 +77,17 @@ public interface PaddleLibrary extends Library {
     long PD_PaddleBufLength(Pointer buf);
 
     void PD_SetModel(Pointer config, String modelDir, String paramsPath);
+
+    // Paddle Predictor
+    Pointer PD_NewPredictor(Pointer config);
+
+    void PD_DeletePredictor(Pointer predictor);
+
+    int PD_GetInputNum(Pointer predictor);
+
+    int PD_GetOutputNum(Pointer predictor);
+
+    String PD_GetInputName(Pointer predictor, int index);
+
+    String PD_GetOutputName(Pointer predictor, int index);
 }
