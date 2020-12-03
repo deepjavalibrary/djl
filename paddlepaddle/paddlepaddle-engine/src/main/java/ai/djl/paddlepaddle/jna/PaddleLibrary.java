@@ -74,4 +74,6 @@ public interface PaddleLibrary extends Library {
     Pointer PD_PaddleBufData(Pointer buf);
 
     long PD_PaddleBufLength(Pointer buf);
+
+    void PD_SetModel(Pointer config, String modelDir, String paramsPath);
 }
