@@ -12,6 +12,7 @@
  */
 package ai.djl.paddlepaddle.jna;
 
+import ai.djl.Device;
 import ai.djl.util.NativeResource;
 import com.sun.jna.Pointer;
 
@@ -23,7 +24,32 @@ import com.sun.jna.Pointer;
  */
 class AnalysisConfig extends NativeResource<Pointer> {
 
-    AnalysisConfig(Pointer handle) {
+    public static AnalysisConfig newInstance() {
+        return new AnalysisConfig(JnaUtils.newAnalysisConfig());
+    }
+
+    private AnalysisConfig(Pointer handle) {
         super(handle);
     }
+
+    AnalysisConfig setModel(String modelDir, String paramsPath) {
+        JnaUtils.loadModel(this, modelDir, paramsPath);
+        return this;
+    }
+
+    AnalysisConfig setDevice(Device device) {
+        if (device.equals(Device.cpu())) {
+            JnaUtils.disableGpu(this);
+        } else {
+            JnaUtils.setGpu(this, 1000, device.getDeviceId());
+        }
+        return this;
+    }
+
+    @Override
+    public void close() {
+        JnaUtils.deleteConfig(this);
+        super.close();
+    }
+
 }

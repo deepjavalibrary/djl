@@ -35,6 +35,18 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
     private DataType dataType;
 
     /**
+     * Constructs an PpNDArray from a native handle (internal. Use {@link NDManager} instead).
+     *
+     * @param manager the manager to attach the new array to
+     * @param handle the pointer to the native MxNDArray memory
+     */
+    public PpNDArray(PpNDManager manager, Pointer handle) {
+        super(handle);
+        this.manager = manager;
+        manager.attach(getUid(), this);
+    }
+
+    /**
      * Constructs an PaddlePaddle NDArray from a {@link PpNDManager} (internal. Use {@link
      * NDManager} instead).
      *

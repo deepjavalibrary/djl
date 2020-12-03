@@ -23,8 +23,8 @@ public class JnaUtilsTest {
 
     @Test
     public void testNDArrayCreation() {
-        if (!System.getProperty("os.name").startsWith("Mac")) {
-            throw new SkipException("Only macOS is supported.");
+        if (System.getProperty("os.name").startsWith("Linux")) {
+            throw new SkipException("Linux is not supported.");
         }
         try (NDManager manager = NDManager.newBaseManager(null, "PaddlePaddle")) {
             NDArray array = manager.zeros(new Shape(1, 2));
