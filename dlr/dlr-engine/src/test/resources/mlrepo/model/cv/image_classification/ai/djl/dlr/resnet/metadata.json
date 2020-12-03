@@ -23,7 +23,8 @@
         "flavor": "v1",
         "dataset": "imagenet",
         "engine": "mxnet",
-        "os": "osx"
+        "os": "osx",
+        "target": "cpu"
       },
       "arguments": {
         "width": 224,
@@ -64,7 +65,8 @@
         "flavor": "v1",
         "dataset": "imagenet",
         "engine": "mxnet",
-        "os": "linux"
+        "os": "linux",
+        "target": "cpu"
       },
       "arguments": {
         "width": 224,

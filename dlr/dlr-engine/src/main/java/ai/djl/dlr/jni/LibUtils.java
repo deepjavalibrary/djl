@@ -201,8 +201,8 @@ public final class LibUtils {
         }
         Path tmp = null;
         try (InputStream stream =
-                LibUtils.class.getResourceAsStream(
-                        "/jnilib/" + classifier + '/' + flavor + '/' + name)) {
+                // both cpu & gpu share the same jnilib
+                LibUtils.class.getResourceAsStream("/jnilib/" + classifier + '/' + name)) {
             if (stream == null) {
                 throw new UnsupportedOperationException("DLR is not supported by this platform");
             }

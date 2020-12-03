@@ -23,8 +23,8 @@ processResources {
     doLast {
         def url = "https://publish.djl.ai/dlr-${dlr_version}/jnilib/${djl_version}"
         def files = [
-                "osx-x86_64/cpu/libdjl_dlr.dylib" : "osx-x86_64/cpu/libdjl_dlr.dylib",
-                "linux-x86_64/cpu/libdjl_dlr.so"  : "linux-x86_64/cpu/libdjl_dlr.so"
+                "osx-x86_64/libdjl_dlr.dylib" : "osx-x86_64/libdjl_dlr.dylib",
+                "linux-x86_64/libdjl_dlr.so"  : "linux-x86_64/libdjl_dlr.so"
         ]
         def classesDir = "${project.buildDir}/jnilib"
         files.each { entry ->

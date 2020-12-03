@@ -56,4 +56,6 @@ jobs:
         run: |
           DLR_VERSION="$(cat gradle.properties | awk -F '=' '/dlr_version/ {print $2}')"
           aws s3 sync jnilib s3://djl-ai/publish/dlr-${DLR_VERSION}/jnilib
-      # TODO add test here
+      - name: Run test
+        run: |
+          ./gradlew :dlr:dlr-engine:test
