@@ -83,8 +83,8 @@
         },
         "module": {
           "uri": "0.0.1/resnet50_v1.so.gz",
-          "sha1Hash": "8856bd48baf8f57daebd8f661de6c5d9df28a327",
-          "size": 155416
+          "sha1Hash": "1659f124f5112699ab9668cdb5bfcd857ffd5b6c",
+          "size": 158944
         },
         "parameters": {
           "uri": "0.0.1/resnet50_v1.params.gz",
