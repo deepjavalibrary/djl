@@ -123,7 +123,7 @@ public class OrtNDManager extends BaseNDManager {
     private static final class SystemManager extends OrtNDManager {
 
         SystemManager() {
-            super(null, null, OrtEnvironment.getEnvironment());
+            super(null, Device.defaultDevice(), OrtEnvironment.getEnvironment());
         }
 
         /** {@inheritDoc} */

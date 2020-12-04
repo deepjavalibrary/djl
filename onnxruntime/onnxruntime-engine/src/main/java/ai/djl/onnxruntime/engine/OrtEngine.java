@@ -16,6 +16,7 @@ package ai.djl.onnxruntime.engine;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
+import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.GradientCollector;
 import ai.onnxruntime.OrtEnvironment;
@@ -95,6 +96,10 @@ public final class OrtEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         if (getAlternativeEngine() != null) {
+            // if this engine doesn't support GPU, fallback to CPU
+            if (!hasCapability(StandardCapabilities.CUDA)) {
+                device = Device.cpu();
+            }
             return alternativeEngine.newBaseManager(device);
         }
         return OrtNDManager.getSystemManager().newSubManager(device);

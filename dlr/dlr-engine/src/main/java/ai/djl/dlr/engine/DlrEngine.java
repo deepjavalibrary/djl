@@ -18,6 +18,7 @@ import ai.djl.dlr.jni.JniUtils;
 import ai.djl.dlr.jni.LibUtils;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
+import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.GradientCollector;
 
@@ -96,6 +97,10 @@ public final class DlrEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         if (getAlternativeEngine() != null) {
+            // if this engine doesn't support GPU, fallback to CPU
+            if (!hasCapability(StandardCapabilities.CUDA)) {
+                device = Device.cpu();
+            }
             return alternativeEngine.newBaseManager(device);
         }
         return DlrNDManager.getSystemManager().newSubManager(device);

@@ -87,7 +87,7 @@ public class DlrNDManager extends BaseNDManager {
     private static final class SystemManager extends DlrNDManager {
 
         SystemManager() {
-            super(null, null);
+            super(null, Device.defaultDevice());
         }
 
         /** {@inheritDoc} */
