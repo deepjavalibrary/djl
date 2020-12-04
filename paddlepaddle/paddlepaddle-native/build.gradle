@@ -8,6 +8,52 @@ group "ai.djl.paddlepaddle"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 version = "${paddlepaddle_version}" + (isRelease ? "" : "-SNAPSHOT")
 
+def downloadBuild(String os, String flavor, Boolean isPrecxx11 = false) {
+    exec {
+        if (os == "win") {
+            commandLine "${project.projectDir}/build.cmd", "${flavor}"
+        } else {
+            if (isPrecxx11) {
+                commandLine 'bash', 'build.sh', "${flavor}", "precxx11"
+            } else {
+                commandLine 'bash', 'build.sh', "${flavor}"
+            }
+        }
+    }
+    def engineDir = "${project.parent.projectDir}/paddlepaddle-engine"
+    def classifier = "${os}-x86_64"
+    def publishDir = "${engineDir}/build/jnilib/${classifier}/${flavor}"
+    copy {
+        def tree = fileTree(project.buildDir)
+        tree.include("**/libdjl_paddle.*", "**/djl_paddle.dll")
+        from tree.files
+        into publishDir
+    }
+    // for nightly ci
+    // the reason why we duplicate the folder here is to insert djl_version into the path
+    // so different versions of JNI wouldn't override each other. We don't also want publishDir
+    // to have djl_version as engine would require to know that during the System.load()
+    def ciDir = "${project.projectDir}/jnilib/${djl_version}/${classifier}/${flavor}"
+    copy {
+        from publishDir
+        into ciDir
+    }
+}
+
+task compileJNI {
+    doFirst {
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
+            downloadBuild("win", "cpu")
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
+            downloadBuild("osx", "cpu")
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            downloadBuild("linux", "cpu")
+        } else {
+            throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
+        }
+    }
+}
+
 task prepareNativeLibs() {
     doLast {
         delete "${buildDir}/native"
