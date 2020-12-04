@@ -34,7 +34,7 @@ public class AnalysisConfig extends NativeResource<Pointer> {
     }
 
     public AnalysisConfig setModel(String modelDir, String paramsPath) {
-        JnaUtils.loadModel(this, modelDir, paramsPath);
+        JnaUtils.setModel(this, modelDir, paramsPath);
         return this;
     }
 
@@ -42,7 +42,7 @@ public class AnalysisConfig extends NativeResource<Pointer> {
         if (device.equals(Device.cpu())) {
             JnaUtils.disableGpu(this);
         } else {
-            JnaUtils.setGpu(this, 1000, device.getDeviceId());
+            JnaUtils.setGpu(this, 100, device.getDeviceId());
         }
         return this;
     }
@@ -52,5 +52,4 @@ public class AnalysisConfig extends NativeResource<Pointer> {
         JnaUtils.deleteConfig(this);
         super.close();
     }
-
 }
