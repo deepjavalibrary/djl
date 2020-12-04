@@ -186,7 +186,7 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public Engine getEngine() {
+    public final Engine getEngine() {
         return Engine.getEngine(PtEngine.ENGINE_NAME);
     }
 
@@ -194,7 +194,7 @@ public class PtNDManager extends BaseNDManager {
     private static final class SystemManager extends PtNDManager {
 
         SystemManager() {
-            super(null, Device.defaultDevice());
+            super(null, null);
         }
 
         /** {@inheritDoc} */

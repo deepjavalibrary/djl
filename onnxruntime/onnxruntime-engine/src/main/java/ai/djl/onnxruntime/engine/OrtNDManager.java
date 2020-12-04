@@ -115,7 +115,7 @@ public class OrtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public Engine getEngine() {
+    public final Engine getEngine() {
         return Engine.getEngine(OrtEngine.ENGINE_NAME);
     }
 
