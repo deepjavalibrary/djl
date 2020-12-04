@@ -35,6 +35,10 @@ jobs:
         run: |
           cd djl_tmp/jupyter
           bash test_notebook.sh
+      - name: clone demos
+        run: |
+          cd djl_tmp/docs
+          git clone https://github.com/aws-samples/djl-demo.git demos
       - name: build docs
         run: |
           cd djl_tmp/docs
