@@ -21,7 +21,6 @@ import ai.djl.paddlepaddle.engine.PpNDManager;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
-
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -105,7 +104,7 @@ public final class JnaUtils {
         LIB.PD_EnableUseGpu(config.getHandle(), memory, deviceId);
     }
 
-    public static void loadModel(AnalysisConfig config, String modelDir, String paramsPath) {
+    public static void setModel(AnalysisConfig config, String modelDir, String paramsPath) {
         if (paramsPath == null) {
             paramsPath = modelDir;
         }
@@ -116,14 +115,20 @@ public final class JnaUtils {
         LIB.PD_DeleteAnalysisConfig(config.getHandle());
     }
 
-    public static PpNDArray[] runInference(AnalysisConfig config, PpNDArray[] inputs, int batchSize) {
-        PointerArray inputPtr = new PointerArray(Arrays.stream(inputs).map(PpNDArray::getHandle).toArray(Pointer[]::new));
+    public static PpNDArray[] runInference(
+            AnalysisConfig config, PpNDArray[] inputs, int batchSize) {
+        PointerArray inputPtr =
+                new PointerArray(
+                        Arrays.stream(inputs).map(PpNDArray::getHandle).toArray(Pointer[]::new));
         PointerByReference outputPtr = new PointerByReference();
         IntBuffer outSizeBuf = IntBuffer.allocate(1);
-        LIB.PD_PredictorRun(config.getHandle(), inputPtr, inputs.length, outputPtr, outSizeBuf, batchSize);
+        LIB.PD_PredictorRun(
+                config.getHandle(), inputPtr, inputs.length, outputPtr, outSizeBuf, batchSize);
         Pointer[] handles = outputPtr.getValue().getPointerArray(0, outSizeBuf.get());
         PpNDManager manager = (PpNDManager) inputs[0].getManager();
-        return Arrays.stream(handles).map(ptr -> new PpNDArray(manager, ptr)).toArray(PpNDArray[]::new);
+        return Arrays.stream(handles)
+                .map(ptr -> new PpNDArray(manager, ptr))
+                .toArray(PpNDArray[]::new);
     }
 
     public static String getVersion() {

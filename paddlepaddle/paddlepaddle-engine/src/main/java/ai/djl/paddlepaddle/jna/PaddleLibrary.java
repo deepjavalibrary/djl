@@ -16,7 +16,6 @@ package ai.djl.paddlepaddle.jna;
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
-
 import java.nio.IntBuffer;
 
 /** The Paddle JNA library. */
@@ -102,8 +101,11 @@ public interface PaddleLibrary extends Library {
     String PD_GetOutputName(Pointer predictor, int index);
 
     // Inference APIs
-    boolean PD_PredictorRun(Pointer config,
-                         Pointer inputs, int in_size,
-                         PointerByReference output_data,
-                         IntBuffer out_size, int batch_size);
+    boolean PD_PredictorRun(
+            Pointer config,
+            Pointer inputs,
+            int in_size,
+            PointerByReference output_data,
+            IntBuffer out_size,
+            int batch_size);
 }
