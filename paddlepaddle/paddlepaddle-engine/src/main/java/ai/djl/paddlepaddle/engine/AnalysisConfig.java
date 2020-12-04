@@ -10,9 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.paddlepaddle.jna;
+package ai.djl.paddlepaddle.engine;
 
 import ai.djl.Device;
+import ai.djl.paddlepaddle.jna.JnaUtils;
 import ai.djl.util.NativeResource;
 import com.sun.jna.Pointer;
 
@@ -22,7 +23,7 @@ import com.sun.jna.Pointer;
  * <p>Provides model path setting, forecast engine running equipment selection and multiple
  * optimization prediction processes.
  */
-class AnalysisConfig extends NativeResource<Pointer> {
+public class AnalysisConfig extends NativeResource<Pointer> {
 
     public static AnalysisConfig newInstance() {
         return new AnalysisConfig(JnaUtils.newAnalysisConfig());
@@ -32,12 +33,12 @@ class AnalysisConfig extends NativeResource<Pointer> {
         super(handle);
     }
 
-    AnalysisConfig setModel(String modelDir, String paramsPath) {
+    public AnalysisConfig setModel(String modelDir, String paramsPath) {
         JnaUtils.loadModel(this, modelDir, paramsPath);
         return this;
     }
 
-    AnalysisConfig setDevice(Device device) {
+    public AnalysisConfig setDevice(Device device) {
         if (device.equals(Device.cpu())) {
             JnaUtils.disableGpu(this);
         } else {
