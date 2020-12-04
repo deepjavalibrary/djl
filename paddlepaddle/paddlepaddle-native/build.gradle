@@ -8,16 +8,12 @@ group "ai.djl.paddlepaddle"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 version = "${paddlepaddle_version}" + (isRelease ? "" : "-SNAPSHOT")
 
-def downloadBuild(String os, String flavor, Boolean isPrecxx11 = false) {
+def downloadBuild(String os, String flavor) {
     exec {
         if (os == "win") {
             commandLine "${project.projectDir}/build.cmd", "${flavor}"
         } else {
-            if (isPrecxx11) {
-                commandLine 'bash', 'build.sh', "${flavor}", "precxx11"
-            } else {
-                commandLine 'bash', 'build.sh', "${flavor}"
-            }
+            commandLine 'bash', 'build.sh', "${flavor}"
         }
     }
     def engineDir = "${project.parent.projectDir}/paddlepaddle-engine"
