@@ -222,7 +222,7 @@ public class TfNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public Engine getEngine() {
+    public final Engine getEngine() {
         return Engine.getEngine(TfEngine.ENGINE_NAME);
     }
 
@@ -435,7 +435,7 @@ public class TfNDManager extends BaseNDManager {
     private static final class SystemManager extends TfNDManager {
 
         SystemManager() {
-            super(null, Device.defaultDevice());
+            super(null, null);
         }
 
         /** {@inheritDoc} */

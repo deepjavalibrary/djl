@@ -13,7 +13,6 @@
 package ai.djl.ndarray;
 
 import ai.djl.Device;
-import ai.djl.engine.Engine;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
@@ -39,7 +38,7 @@ public abstract class BaseNDManager implements NDManager {
 
     protected BaseNDManager(NDManager parent, Device device) {
         this.parent = parent;
-        this.device = Device.defaultIfNull(device);
+        this.device = Device.defaultIfNull(device, getEngine());
         resources = new ConcurrentHashMap<>();
         uid = UUID.randomUUID().toString();
     }
@@ -225,12 +224,6 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
-        throw new UnsupportedOperationException("Not supported!");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Engine getEngine() {
         throw new UnsupportedOperationException("Not supported!");
     }
 

@@ -361,7 +361,7 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public Engine getEngine() {
+    public final Engine getEngine() {
         return Engine.getEngine(MxEngine.ENGINE_NAME);
     }
 
@@ -380,7 +380,7 @@ public class MxNDManager extends BaseNDManager {
     private static final class SystemManager extends MxNDManager {
 
         SystemManager() {
-            super(null, Device.defaultDevice(), JnaUtils.getVersion());
+            super(null, null, JnaUtils.getVersion());
         }
 
         /** {@inheritDoc} */

@@ -13,6 +13,7 @@
 package ai.djl.dlr.engine;
 
 import ai.djl.Device;
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
@@ -35,6 +36,12 @@ public class DlrNDManager extends BaseNDManager {
 
     static DlrNDManager getSystemManager() {
         return SYSTEM_MANAGER;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final Engine getEngine() {
+        return Engine.getEngine(DlrEngine.ENGINE_NAME);
     }
 
     /** {@inheritDoc} */
