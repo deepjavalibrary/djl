@@ -14,14 +14,12 @@ package ai.djl.paddlepaddle.jna;
 
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.paddlepaddle.engine.AnalysisConfig;
 import ai.djl.paddlepaddle.engine.PpDataType;
 import ai.djl.paddlepaddle.engine.PpNDArray;
 import ai.djl.paddlepaddle.engine.PpNDManager;
-import ai.djl.util.NativeResource;
-import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
-import com.sun.jna.Structure;
 import com.sun.jna.ptr.PointerByReference;
 
 import java.nio.Buffer;

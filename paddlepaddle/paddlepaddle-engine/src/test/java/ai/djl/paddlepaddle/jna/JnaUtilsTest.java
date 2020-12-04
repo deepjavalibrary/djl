@@ -16,16 +16,12 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class JnaUtilsTest {
 
     @Test
     public void testNDArrayCreation() {
-        if (System.getProperty("os.name").startsWith("Linux")) {
-            throw new SkipException("Linux is not supported.");
-        }
         try (NDManager manager = NDManager.newBaseManager(null, "PaddlePaddle")) {
             NDArray array = manager.zeros(new Shape(1, 2));
             float[] expected = new float[] {0, 0};
