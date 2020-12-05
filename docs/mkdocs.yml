@@ -66,6 +66,7 @@ nav:
       - 'docs/development/cache_management.md'
       - 'docs/development/memory_management.md'
       - 'docs/development/inference_performance_optimization.md'
+      - 'docs/development/benchmark_with_djl.md'
   - Apache MXNet:
       - Overview: 'mxnet/README.md'
       - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
@@ -75,7 +76,7 @@ nav:
         - MXNet Model Zoo: 'mxnet/mxnet-model-zoo/README.md'
         - MXNet native library: 'mxnet/native/README.md'
   - ONNX Runtime:
-      - ONNX runtime Hybrid Engine: 'docs/onnxruntime/hybrid_engine.md'
+      - ONNX runtime Hybrid Engine: 'docs/hybrid_engine.md'
       - Load a ONNX Model: 'jupyter/onnxruntime/machine_learning_with_ONNXRuntime.ipynb'
       - Module: 'onnxruntime/onnxruntime-engine/README.md'
   - PyTorch:
