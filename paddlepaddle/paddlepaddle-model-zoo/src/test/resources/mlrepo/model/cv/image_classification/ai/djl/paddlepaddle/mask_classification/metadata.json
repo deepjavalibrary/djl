@@ -1,0 +1,60 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
+  "groupId": "ai.djl.paddlepaddle",
+  "artifactId": "mask_classification",
+  "name": "mask_classification",
+  "description": "Mask classification",
+  "website": "http://www.djl.ai/paddlepaddle/paddlepaddle-model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "mask_classification",
+      "properties": {
+        "flavor": "mobile"
+      },
+      "files": {
+        "classes": {
+          "uri": "0.0.1/synset.txt.gz",
+          "sha1Hash": "a75862066b291d88753352e60e46c943726015ac",
+          "size": 40
+        },
+        "model": {
+          "uri": "0.0.1/pyramidbox_lite_mobile_mask.zip",
+          "sha1Hash": "2c31c077377abb3304cae7ef78ed00d7886e80c8",
+          "name": "",
+          "size": 445715
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "mask_classification",
+      "properties": {
+        "flavor": "server"
+      },
+      "files": {
+        "classes": {
+          "uri": "0.0.1/synset.txt.gz",
+          "sha1Hash": "a75862066b291d88753352e60e46c943726015ac",
+          "size": 40
+        },
+        "model": {
+          "uri": "0.0.1/pyramidbox_lite_server_mask.zip",
+          "sha1Hash": "f38999d5712fd9e5d80f79b615ba1a4e034f13ef",
+          "name": "",
+          "size": 445705
+        }
+      }
+    }
+  ]
+}
