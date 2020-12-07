@@ -30,6 +30,10 @@ public class DlrNDManagerTest {
             NDArray ones = manager.ones(new Shape(1, 2));
             data = ones.toFloatArray();
             Assert.assertEquals(data[0], 1);
+
+            NDArray array = manager.create(new float[] {0f, 1f, 2f, 3f});
+            float[] expected = new float[] {0f, 1f, 2f, 3f};
+            Assert.assertEquals(array.toFloatArray(), expected);
         }
     }
 }
