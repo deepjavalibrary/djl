@@ -33,6 +33,8 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
     private PpNDManager manager;
     private Shape shape;
     private DataType dataType;
+    // TODO: we cannot close the inference NDArray, should remove after JNI
+    private boolean notClose;
 
     /**
      * Constructs an PpNDArray from a native handle (internal. Use {@link NDManager} instead).
@@ -44,6 +46,11 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
         super(handle);
         this.manager = manager;
         manager.attach(getUid(), this);
+    }
+
+    public PpNDArray(PpNDManager manager, Pointer handle, boolean notClose) {
+        this(manager, handle);
+        this.notClose = notClose;
     }
 
     /**
@@ -1005,6 +1012,9 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void close() {
+        if (notClose) {
+            return;
+        }
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
             JnaUtils.freeNdArray(pointer);
