@@ -32,6 +32,7 @@ public class PpModel extends BaseModel {
      * Constructs a new Model on a given device.
      *
      * @param name the model name
+     * @param manager the {@link NDManager} to holds the NDArray
      */
     PpModel(String name, NDManager manager) {
         super(name);
