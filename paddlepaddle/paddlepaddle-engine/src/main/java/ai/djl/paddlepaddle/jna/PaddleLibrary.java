@@ -19,7 +19,7 @@ import com.sun.jna.ptr.PointerByReference;
 import java.nio.IntBuffer;
 
 /** The Paddle JNA library. */
-@SuppressWarnings({"missingjavadocmethod", "methodname"})
+@SuppressWarnings({"missingjavadocmethod", "methodname", "checkstyle:ParameterName", "PMD"})
 public interface PaddleLibrary extends Library {
 
     // Paddle Inference config

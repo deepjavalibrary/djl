@@ -30,6 +30,7 @@ public final class PpDataType {
         map.put(DataType.INT32, 1);
         map.put(DataType.INT64, 2);
         map.put(DataType.INT8, 3);
+        map.put(DataType.UINT8, 3);
         map.put(DataType.UNKNOWN, 4);
         return map;
     }

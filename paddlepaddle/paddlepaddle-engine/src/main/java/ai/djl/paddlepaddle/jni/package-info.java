@@ -10,17 +10,5 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+/** Contains classes to interface with the underlying PaddlePaddle Engine. */
 package ai.djl.paddlepaddle.jni;
-
-import java.nio.ByteBuffer;
-
-/** A class containing utilities to interact with the PaddlePaddle Engine's JNI layer. */
-@SuppressWarnings("missingjavadocmethod")
-final class PaddleLibrary {
-
-    static final PaddleLibrary LIB = new PaddleLibrary();
-
-    private PaddleLibrary() {}
-
-    native long paddleCreateTensor(ByteBuffer data, long length, int[] shape, int dType);
-}
