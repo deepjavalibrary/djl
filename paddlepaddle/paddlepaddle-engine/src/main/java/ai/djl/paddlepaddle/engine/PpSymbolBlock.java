@@ -27,7 +27,11 @@ public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     AnalysisConfig config;
 
-    /** Constructs a new {@code PpSymbolBlock} instance. */
+    /**
+     * Constructs a new {@code PpSymbolBlock} instance.
+     *
+     * @param config the {@link AnalysisConfig} that holds the model information.
+     */
     public PpSymbolBlock(AnalysisConfig config) {
         super((byte) 0);
         this.config = config;

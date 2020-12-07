@@ -125,9 +125,7 @@ public final class JnaUtils {
 
     public static PpNDArray[] runInference(
             AnalysisConfig config, PpNDArray[] inputs, int batchSize) {
-        PointerArray inputPtr =
-                new PointerArray(
-                        Arrays.stream(inputs).map(PpNDArray::getHandle).toArray(Pointer[]::new));
+        // FIXME: only single input are supported in C
         PointerByReference outputPtr = new PointerByReference();
         IntBuffer outSizeBuf = IntBuffer.allocate(1);
         LIB.PD_PredictorRun(

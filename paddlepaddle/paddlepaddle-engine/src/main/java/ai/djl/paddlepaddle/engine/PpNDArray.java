@@ -48,6 +48,13 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
         manager.attach(getUid(), this);
     }
 
+    /**
+     * Constructs an PpNDArray from a native handle (internal. Use {@link NDManager} instead).
+     *
+     * @param manager the manager to attach the new array to
+     * @param handle the pointer to the native MxNDArray memory
+     * @param notClose not close the NDArray (inference use only)
+     */
     public PpNDArray(PpNDManager manager, Pointer handle, boolean notClose) {
         this(manager, handle);
         this.notClose = notClose;
