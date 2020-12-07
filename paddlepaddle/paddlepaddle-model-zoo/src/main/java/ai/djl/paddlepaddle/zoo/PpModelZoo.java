@@ -12,7 +12,6 @@
  */
 package ai.djl.paddlepaddle.zoo;
 
-import ai.djl.modality.cv.zoo.ImageClassificationModelLoader;
 import ai.djl.paddlepaddle.engine.PpEngine;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
@@ -27,8 +26,11 @@ public class PpModelZoo implements ModelZoo {
     private static final PpModelZoo ZOO = new PpModelZoo();
     public static final String GROUP_ID = "ai.djl.paddlepaddle";
 
-    public static final ImageClassificationModelLoader RESNET =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "resnet", "0.0.1", ZOO);
+    public static final PpFaceDetection FACE_DETECTION =
+            new PpFaceDetection(REPOSITORY, GROUP_ID, "face_detection", "0.0.1", ZOO);
+
+    public static final PpMaskClassification MASK_DETECTION =
+            new PpMaskClassification(REPOSITORY, GROUP_ID, "mask_detection", "0.0.1", ZOO);
 
     /** {@inheritDoc} */
     @Override
