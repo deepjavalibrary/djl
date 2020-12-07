@@ -78,7 +78,6 @@ public class MaskDetectionTest {
         DetectedObjects detectedObjects;
         try (ZooModel<Image, DetectedObjects> model = ModelZoo.loadModel(criteria);
                 Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
-
             return predictor.predict(img);
         }
     }

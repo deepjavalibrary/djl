@@ -32,7 +32,6 @@ public class PpModel extends BaseModel {
      * Constructs a new Model on a given device.
      *
      * @param name the model name
-     * @param device the device the model should be located on
      */
     PpModel(String name, NDManager manager) {
         super(name);
@@ -61,11 +60,17 @@ public class PpModel extends BaseModel {
         modelDir = modelPath.toAbsolutePath();
         Path modelFile = modelDir.resolve("model");
         if (Files.exists(modelFile)) {
+            // TODO: Allow only files in the zip folder
+            if (Files.isDirectory(modelFile)) {
+                load(modelPath.resolve("model"), prefix, options);
+                return;
+            }
             Path paramFile = modelDir.resolve("params");
             if (Files.notExists(paramFile)) {
                 throw new FileNotFoundException("params file not found in: " + modelDir);
             }
             JnaUtils.setModel(config, modelFile.toString(), paramFile.toString());
+            setBlock(new PpSymbolBlock(config));
             return;
         }
 
@@ -74,6 +79,7 @@ public class PpModel extends BaseModel {
             throw new FileNotFoundException("no __model__ or model file found in: " + modelDir);
         }
         JnaUtils.setModel(config, modelDir.toString(), null);
+        setBlock(new PpSymbolBlock(config));
     }
 
     /** {@inheritDoc} */

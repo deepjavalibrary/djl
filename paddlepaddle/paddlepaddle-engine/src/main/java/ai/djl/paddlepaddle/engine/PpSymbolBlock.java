@@ -12,20 +12,25 @@
  */
 package ai.djl.paddlepaddle.engine;
 
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.SymbolBlock;
+import ai.djl.paddlepaddle.jna.JnaUtils;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 
 /** {@code PpSymbolBlock} is the PaddlePaddle implementation of {@link SymbolBlock}. */
 public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
 
+    AnalysisConfig config;
+
     /** Constructs a new {@code PpSymbolBlock} instance. */
-    public PpSymbolBlock() {
+    public PpSymbolBlock(AnalysisConfig config) {
         super((byte) 0);
+        this.config = config;
     }
 
     /** {@inheritDoc} */
@@ -35,8 +40,44 @@ public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        // TODO: add implementation here
-        return null;
+        NDManager inputManager = inputs.head().getManager();
+        try (PpNDManager tempManager = PpNDManager.getSystemManager().newSubManager()) {
+            boolean foreignEngine =
+                    !PpEngine.ENGINE_NAME.equals(inputManager.getEngine().getEngineName());
+            PpNDArray[] result =
+                    JnaUtils.runInference(
+                            config, getInputs(inputs, foreignEngine, tempManager), -1);
+            return getOutputs(result, foreignEngine, inputManager);
+        }
+    }
+
+    private PpNDArray[] getInputs(NDList inputs, boolean foreignEngine, PpNDManager tempManager) {
+        PpNDArray[] inputArray = new PpNDArray[inputs.size()];
+        for (int i = 0; i < inputArray.length; i++) {
+            if (foreignEngine) {
+                NDArray array = inputs.get(i);
+                inputArray[i] =
+                        tempManager.create(
+                                array.toByteBuffer(), array.getShape(), array.getDataType());
+            } else {
+                inputArray[i] = (PpNDArray) inputs.get(i);
+            }
+        }
+        return inputArray;
+    }
+
+    private NDList getOutputs(PpNDArray[] outputs, boolean foreignEngine, NDManager inputManager) {
+        NDList list = new NDList(outputs.length);
+        for (PpNDArray output : outputs) {
+            if (foreignEngine) {
+                list.add(
+                        inputManager.create(
+                                output.toByteBuffer(), output.getShape(), output.getDataType()));
+            } else {
+                list.add(output);
+            }
+        }
+        return list;
     }
 
     /** {@inheritDoc} */

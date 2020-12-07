@@ -115,6 +115,14 @@ public final class JnaUtils {
         LIB.PD_DeleteAnalysisConfig(config.getHandle());
     }
 
+    public static Pointer newPredictor(AnalysisConfig config) {
+        return LIB.PD_NewPredictor(config.getHandle());
+    }
+
+    public static void deletePredictor(Pointer predictor) {
+        LIB.PD_DeletePredictor(predictor);
+    }
+
     public static PpNDArray[] runInference(
             AnalysisConfig config, PpNDArray[] inputs, int batchSize) {
         PointerArray inputPtr =
@@ -123,11 +131,16 @@ public final class JnaUtils {
         PointerByReference outputPtr = new PointerByReference();
         IntBuffer outSizeBuf = IntBuffer.allocate(1);
         LIB.PD_PredictorRun(
-                config.getHandle(), inputPtr, inputs.length, outputPtr, outSizeBuf, batchSize);
-        Pointer[] handles = outputPtr.getValue().getPointerArray(0, outSizeBuf.get());
+                config.getHandle(),
+                inputs[0].getHandle(),
+                inputs.length,
+                outputPtr,
+                outSizeBuf,
+                batchSize);
+        Pointer[] handles = outputPtr.getPointer().getPointerArray(0, outSizeBuf.get());
         PpNDManager manager = (PpNDManager) inputs[0].getManager();
         return Arrays.stream(handles)
-                .map(ptr -> new PpNDArray(manager, ptr))
+                .map(ptr -> new PpNDArray(manager, ptr, true))
                 .toArray(PpNDArray[]::new);
     }
 
