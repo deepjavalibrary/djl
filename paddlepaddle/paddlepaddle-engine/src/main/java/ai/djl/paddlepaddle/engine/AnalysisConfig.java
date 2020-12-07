@@ -25,28 +25,16 @@ import com.sun.jna.Pointer;
  */
 public class AnalysisConfig extends NativeResource<Pointer> {
 
-    public static AnalysisConfig newInstance() {
-        return new AnalysisConfig(JnaUtils.newAnalysisConfig());
-    }
-
-    private AnalysisConfig(Pointer handle) {
-        super(handle);
-    }
-
-    public AnalysisConfig setModel(String modelDir, String paramsPath) {
-        JnaUtils.setModel(this, modelDir, paramsPath);
-        return this;
-    }
-
-    public AnalysisConfig setDevice(Device device) {
+    AnalysisConfig(Device device) {
+        super(JnaUtils.newAnalysisConfig());
         if (device.equals(Device.cpu())) {
             JnaUtils.disableGpu(this);
         } else {
             JnaUtils.setGpu(this, 100, device.getDeviceId());
         }
-        return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         JnaUtils.deleteConfig(this);
