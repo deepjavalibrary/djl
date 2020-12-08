@@ -105,9 +105,6 @@ public final class JnaUtils {
     }
 
     public static void setModel(AnalysisConfig config, String modelDir, String paramsPath) {
-        if (paramsPath == null) {
-            paramsPath = modelDir;
-        }
         LIB.PD_SetModel(config.getHandle(), modelDir, paramsPath);
     }
 
@@ -115,8 +112,24 @@ public final class JnaUtils {
         LIB.PD_DeleteAnalysisConfig(config.getHandle());
     }
 
+    public static void disableFeedFetchOp(AnalysisConfig config) {
+        LIB.PD_SwitchUseFeedFetchOps(config.getHandle(), false);
+    }
+
+    public static void useInputNames(AnalysisConfig config) {
+        LIB.PD_SwitchSpecifyInputNames(config.getHandle(), true);
+    }
+
     public static Pointer newPredictor(AnalysisConfig config) {
         return LIB.PD_NewPredictor(config.getHandle());
+    }
+
+    public static int getInputNum(Pointer predictor) {
+        return LIB.PD_GetInputNum(predictor);
+    }
+
+    public static String getInputName(Pointer predictor, int index) {
+        return LIB.PD_GetInputName(predictor, index);
     }
 
     public static void deletePredictor(Pointer predictor) {
