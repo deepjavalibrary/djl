@@ -35,9 +35,9 @@
         },
         "model": {
           "uri": "0.0.1/pyramidbox_lite_mobile.zip",
-          "sha1Hash": "8cc519f8c1cad7467658769b80bd99af4edcaa86",
+          "sha1Hash": "59481df58670e454265497a3a9312dfa33b60abf",
           "name": "",
-          "size": 2818653
+          "size": 2784359
         }
       }
     },
@@ -59,9 +59,9 @@
         },
         "model": {
           "uri": "0.0.1/pyramidbox_lite_server.zip",
-          "sha1Hash": "a4d9dcf45de078d6535854e99a9ad266fbd4816a",
+          "sha1Hash": "8d8ada90819c504b2087f17305c86d42afd7bdf2",
           "name": "",
-          "size": 7032294
+          "size": 6999383
         }
       }
     }
