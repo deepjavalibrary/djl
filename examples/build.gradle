@@ -22,6 +22,9 @@ dependencies {
         runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
     } else if (System.getProperty("ai.djl.default_engine") == "OnnxRuntime") {
         runtimeOnly project(":onnxruntime:onnxruntime-engine")
+    } else if (System.getProperty("ai.djl.default_engine") == "DLR") {
+        runtimeOnly project(":dlr:dlr-engine")
+        runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}-SNAPSHOT"
     } else {
         runtimeOnly project(":mxnet:mxnet-model-zoo")
         runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"

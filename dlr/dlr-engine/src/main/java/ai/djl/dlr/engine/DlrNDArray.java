@@ -22,7 +22,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -30,7 +29,7 @@ import java.util.UUID;
 public class DlrNDArray implements NDArray {
 
     private DlrNDManager manager;
-    private FloatBuffer data;
+    private ByteBuffer data;
     private Shape shape;
     private String name;
     private boolean isClosed;
@@ -44,7 +43,7 @@ public class DlrNDArray implements NDArray {
      * @param data the underlying data
      * @param shape the shape of {@code DlrNDArray}
      */
-    DlrNDArray(DlrNDManager manager, FloatBuffer data, Shape shape) {
+    DlrNDArray(DlrNDManager manager, ByteBuffer data, Shape shape) {
         this.manager = manager;
         this.data = data;
         this.shape = shape;
@@ -157,18 +156,8 @@ public class DlrNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public float[] toFloatArray() {
-        if (getDataType() != DataType.FLOAT32) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required float, Actual " + getDataType());
-        }
-        return data.array();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public ByteBuffer toByteBuffer() {
-        throw new UnsupportedOperationException("Not supported for DLR");
+        return data;
     }
 
     /** {@inheritDoc} */
