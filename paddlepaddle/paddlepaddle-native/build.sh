@@ -12,7 +12,10 @@ PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 
 pushd $WORK_DIR
 
+echo "Trying to find paddle folder..."
+
 if [[ ! -d "paddle" ]]; then
+  echo "Folder not found. Downloading C++ package..."
   if [[ $PLATFORM == 'linux' ]]; then
     if [[ $1 == "cpu" ]]; then
       curl -s https://paddle-inference-lib.bj.bcebos.com/latest-cpu-avx-mkl/fluid_inference.tgz -o paddle.tgz

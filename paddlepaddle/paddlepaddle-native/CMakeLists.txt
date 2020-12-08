@@ -9,6 +9,7 @@ find_package(JNI REQUIRED)
 set(SOURCE_FILES
         "src/main/native/djl_paddle_jni_utils.h"
         "src/main/native/ai_djl_paddlepaddle_jni_PaddleLibrary_tensor.cc"
+        "src/main/native/ai_djl_paddlepaddle_jni_PaddleLibrary_inference.cc"
         )
 
 link_directories(paddle/paddle/lib)
