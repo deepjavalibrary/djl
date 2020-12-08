@@ -28,10 +28,10 @@
           "size": 40
         },
         "model": {
-          "uri": "0.0.1/pyramidbox_lite_mobile_mask.zip",
-          "sha1Hash": "2c31c077377abb3304cae7ef78ed00d7886e80c8",
+          "uri": "0.0.1/mask_detector_mobile.zip",
+          "sha1Hash": "1ed24849e547e41e6591e79f26daa9037d445a1b",
           "name": "",
-          "size": 445715
+          "size": 414584
         }
       }
     },
@@ -49,10 +49,10 @@
           "size": 40
         },
         "model": {
-          "uri": "0.0.1/pyramidbox_lite_server_mask.zip",
-          "sha1Hash": "f38999d5712fd9e5d80f79b615ba1a4e034f13ef",
+          "uri": "0.0.1/mask_detector_server.zip",
+          "sha1Hash": "b9a0a9125595d82ed28db0281765e19757827fb3",
           "name": "",
-          "size": 445705
+          "size": 414594
         }
       }
     }
