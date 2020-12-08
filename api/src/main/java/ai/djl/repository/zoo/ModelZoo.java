@@ -83,6 +83,23 @@ public interface ModelZoo {
     Set<String> getSupportedEngines();
 
     /**
+     * Returns whether a model zoo with the group id is available.
+     *
+     * @param groupId the model zoo group id to check for
+     * @return whether a model zoo with the group id is available
+     */
+    static boolean hasModelZoo(String groupId) {
+        ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
+        for (ZooProvider provider : providers) {
+            ModelZoo zoo = provider.getModelZoo();
+            if (zoo.getGroupId().equals(groupId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Gets the {@link ModelLoader} based on the model name.
      *
      * @param criteria the requirements for the model
