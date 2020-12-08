@@ -23,3 +23,9 @@ JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_paddleCreateT
     tensor_ptr->shape = utils::GetVecFromJIntArray(env, jshape);
     return reinterpret_cast<uintptr_t>(tensor_ptr);
 }
+
+JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deleteTensor
+        (JNIEnv *env, jobject jthis, jlong jhandle) {
+    const auto* tensor_ptr = reinterpret_cast<paddle::PaddleTensor*>(jhandle);
+    delete tensor_ptr;
+}
