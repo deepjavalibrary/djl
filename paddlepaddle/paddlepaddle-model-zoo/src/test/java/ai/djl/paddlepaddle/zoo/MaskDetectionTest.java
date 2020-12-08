@@ -20,10 +20,15 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
+import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.modality.cv.translator.BaseImageTranslator;
+import ai.djl.ndarray.NDList;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
+import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.util.List;
 import org.testng.Assert;
@@ -72,13 +77,46 @@ public class MaskDetectionTest {
                         .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(Image.class, DetectedObjects.class)
                         .optArtifactId("face_detection")
+                        .optTranslator(
+                                new FaceTranslator(
+                                        FaceTranslator.builder()
+                                                .addTransform(new Resize(256, 256))
+                                                .addTransform(new ToTensor())))
                         .optFilter("flavor", "mobile")
                         .build();
 
-        DetectedObjects detectedObjects;
         try (ZooModel<Image, DetectedObjects> model = ModelZoo.loadModel(criteria);
                 Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
             return predictor.predict(img);
+        }
+    }
+
+    static class FaceTranslator extends BaseImageTranslator<DetectedObjects> {
+
+        /**
+         * Constructs an ImageTranslator with the provided builder.
+         *
+         * @param builder the data to build with
+         */
+        public FaceTranslator(Builder builder) {
+            super(builder);
+        }
+
+        @Override
+        public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws Exception {
+            return null;
+        }
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        static class Builder extends BaseBuilder<Builder> {
+
+            @Override
+            protected Builder self() {
+                return this;
+            }
         }
     }
 }
