@@ -23,4 +23,9 @@ final class PaddleLibrary {
     private PaddleLibrary() {}
 
     native long paddleCreateTensor(ByteBuffer data, long length, int[] shape, int dType);
+
+    native void deleteTensor(long handle);
+
+    native long createAnalysisConfig(String modelDir, String paramDir, int deviceId);
+
 }
