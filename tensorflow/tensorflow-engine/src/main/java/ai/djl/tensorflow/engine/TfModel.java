@@ -100,7 +100,9 @@ public class TfModel extends BaseModel {
                     throw new MalformedModelException("Invalid RunOptions: " + run, e);
                 }
             }
-            signatureDefKey = (String) options.get("SignatureDefKey");
+            if (options.containsKey("SignatureDefKey")) {
+                signatureDefKey = (String) options.get("SignatureDefKey");
+            }
         }
         if (tags == null) {
             tags = new String[] {"serve"};
