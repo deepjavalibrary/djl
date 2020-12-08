@@ -40,6 +40,7 @@ public class ImageClassificationTest {
                         .setTypes(NDList.class, NDList.class)
                         .optModelUrls(
                                 "http://paddle-inference-dist.bj.bcebos.com/resnet50_model.tar.gz")
+                        .optModelName("model")
                         .optEngine("PaddlePaddle")
                         .optProgress(new ProgressBar())
                         .build();

@@ -59,28 +59,40 @@ public class PpModel extends BaseModel {
     @Override
     public void load(Path modelPath, String prefix, Map<String, ?> options) throws IOException {
         modelDir = modelPath.toAbsolutePath();
-        Path modelFile = modelDir.resolve("model");
-        if (Files.exists(modelFile)) {
-            // TODO: Allow only files in the zip folder
-            if (Files.isDirectory(modelFile)) {
-                load(modelPath.resolve("model"), prefix, options);
-                return;
+        String[] modelFiles = findModelFile(modelDir);
+        if (modelFiles == null) {
+            modelFiles = findModelFile(modelPath.resolve(modelName));
+            if (modelFiles == null) {
+                throw new FileNotFoundException("no __model__ or model file found in: " + modelDir);
             }
-            Path paramFile = modelDir.resolve("params");
-            if (Files.notExists(paramFile)) {
-                throw new FileNotFoundException("params file not found in: " + modelDir);
-            }
-            JnaUtils.setModel(config, modelFile.toString(), paramFile.toString());
-            setBlock(new PpSymbolBlock(config));
-            return;
         }
 
-        modelFile = modelDir.resolve("__model__");
-        if (Files.notExists(modelFile)) {
-            throw new FileNotFoundException("no __model__ or model file found in: " + modelDir);
-        }
-        JnaUtils.setModel(config, modelDir.toString(), null);
+        JnaUtils.setModel(config, modelFiles[0], modelFiles[1]);
         setBlock(new PpSymbolBlock(config));
+    }
+
+    private String[] findModelFile(Path dir) {
+        String[] paths = new String[2];
+        Path modelFile = dir.resolve("model");
+        if (Files.isRegularFile(modelFile)) {
+            paths[0] = modelFile.toString();
+            Path paramFile = dir.resolve("params");
+            if (Files.isRegularFile(paramFile)) {
+                paths[1] = paramFile.toString();
+            }
+            return paths;
+        }
+
+        modelFile = dir.resolve("__model__");
+        if (Files.isRegularFile(modelFile)) {
+            paths[0] = modelFile.toString();
+            Path paramFile = dir.resolve("__params__");
+            if (Files.isRegularFile(paramFile)) {
+                paths[1] = paramFile.toString();
+            }
+            return paths;
+        }
+        return null;
     }
 
     /** {@inheritDoc} */
