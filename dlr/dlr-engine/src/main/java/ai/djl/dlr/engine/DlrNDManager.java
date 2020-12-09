@@ -13,6 +13,7 @@
 package ai.djl.dlr.engine;
 
 import ai.djl.Device;
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
@@ -39,6 +40,12 @@ public class DlrNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public final Engine getEngine() {
+        return Engine.getEngine(DlrEngine.ENGINE_NAME);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public ByteBuffer allocateDirect(int capacity) {
         return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     }
@@ -57,7 +64,11 @@ public class DlrNDManager extends BaseNDManager {
         if (dataType != DataType.FLOAT32 && !(data instanceof FloatBuffer)) {
             throw new UnsupportedOperationException("DLR only supports float32");
         }
-        return new DlrNDArray(this, (FloatBuffer) data, shape);
+        int size = data.remaining();
+        int numOfBytes = dataType.getNumOfBytes();
+        ByteBuffer bb = ByteBuffer.allocate(size * numOfBytes);
+        bb.asFloatBuffer().put((FloatBuffer) data);
+        return new DlrNDArray(this, bb, shape);
     }
 
     /** {@inheritDoc} */
@@ -68,7 +79,7 @@ public class DlrNDManager extends BaseNDManager {
         }
         int size = Math.toIntExact(shape.size());
         float[] data = new float[size];
-        return new DlrNDArray(this, FloatBuffer.wrap(data), shape);
+        return create(data, shape);
     }
 
     /** {@inheritDoc} */
@@ -80,7 +91,8 @@ public class DlrNDManager extends BaseNDManager {
         int size = Math.toIntExact(shape.size());
         float[] data = new float[size];
         Arrays.fill(data, 1f);
-        return new DlrNDArray(this, FloatBuffer.wrap(data), shape);
+
+        return create(data, shape);
     }
 
     /** The SystemManager is the root {@link DlrNDManager} of which all others are children. */

@@ -31,7 +31,7 @@ sourceSets {
 checkstyleMain.source = 'src/main/java'
 pmdMain.source = 'src/main/java'
 
-task jnarator(dependsOn: [":mxnet:jnarator:jar", "checkHeaderFile"]) {
+task jnarator(dependsOn: ":mxnet:jnarator:jar") {
     outputs.dir "${project.buildDir}/generated-src"
     doLast {
         File jnaGenerator = project(":mxnet:jnarator").jar.outputs.files.singleFile

@@ -46,7 +46,6 @@ public class PtModel extends BaseModel {
      */
     PtModel(String name, Device device) {
         super(name);
-        device = Device.defaultIfNull(device);
         manager = PtNDManager.getSystemManager().newSubManager(device);
         manager.setName("ptModel");
         dataType = DataType.FLOAT32;

@@ -56,7 +56,6 @@ public class MxModel extends BaseModel {
      */
     MxModel(String name, Device device) {
         super(name);
-        device = Device.defaultIfNull(device);
         dataType = DataType.FLOAT32;
         properties = new ConcurrentHashMap<>();
         manager = MxNDManager.getSystemManager().newSubManager(device);
