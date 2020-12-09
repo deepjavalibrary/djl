@@ -110,4 +110,11 @@ public class PpModel extends BaseModel {
         sb.append("\n)");
         return sb.toString();
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        JnaUtils.deleteConfig(config);
+        super.close();
+    }
 }

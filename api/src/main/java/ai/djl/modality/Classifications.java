@@ -171,6 +171,10 @@ public class Classifications implements Serializable {
             return className;
         }
 
+        public void setClassName(String name) {
+            this.className = name;
+        }
+
         /**
          * Returns the probability.
          *

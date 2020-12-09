@@ -29,3 +29,29 @@ JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deleteTensor
     const auto* tensor_ptr = reinterpret_cast<paddle::PaddleTensor*>(jhandle);
     delete tensor_ptr;
 }
+
+JNIEXPORT jintArray JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_getTensorShape
+        (JNIEnv *env, jobject jthis, jlong jhandle) {
+    auto tensor_ptr = reinterpret_cast<paddle::PaddleTensor*>(jhandle);
+    auto shape = tensor_ptr->shape;
+    int len = shape.size();
+    jintArray jarray = env->NewIntArray(len);
+    env->SetIntArrayRegion(jarray, 0, len, shape.data());
+    return jarray;
+}
+
+JNIEXPORT jint JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_getTensorDType
+        (JNIEnv *env, jobject jthis, jlong jhandle) {
+    auto tensor_ptr = reinterpret_cast<paddle::PaddleTensor*>(jhandle);
+    return tensor_ptr->dtype;
+}
+
+JNIEXPORT jbyteArray JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_getTensorData
+        (JNIEnv *env, jobject jthis, jlong jhandle) {
+    auto tensor_ptr = reinterpret_cast<paddle::PaddleTensor*>(jhandle);
+    auto buf = &tensor_ptr->data;
+    int len = buf->length();
+    jbyteArray jarray = env->NewByteArray(len);
+    env->SetByteArrayRegion(jarray, 0, len, static_cast<const jbyte*>(buf->data()));
+    return jarray;
+}

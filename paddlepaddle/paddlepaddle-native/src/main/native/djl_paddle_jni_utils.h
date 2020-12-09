@@ -40,6 +40,15 @@ namespace utils {
         env->ReleaseStringUTFChars(jstr, c_str);
         return str;
     }
+
+    // String[]
+    inline jobjectArray GetStringArrayFromVector(JNIEnv* env, const std::vector<std::string>& vec) {
+        jobjectArray array = env->NewObjectArray(vec.size(), env->FindClass("Ljava/lang/String;"), nullptr);
+        for (int i = 0; i < vec.size(); ++i) {
+            env->SetObjectArrayElement(array, i, env->NewStringUTF(vec[i].c_str()));
+        }
+        return array;
+    }
 }
 
 #endif //DJL_PADDLE_DJL_PADDLE_JNI_UTILS_H

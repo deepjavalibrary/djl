@@ -14,11 +14,12 @@
 #include "djl_paddle_jni_utils.h"
 #include<paddle_api.h>
 #include<paddle_inference_api.h>
+#include <numeric>
 
 JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_createAnalysisConfig
         (JNIEnv *env, jobject jthis, jstring jmodel_dir, jstring jparam_dir, jint device_id) {
     auto config = new paddle::AnalysisConfig;
-    if (jparam_dir == NULL) {
+    if (jparam_dir == nullptr) {
         config->SetModel(utils::GetStringFromJString(env, jmodel_dir));
     } else {
         config->SetModel(utils::GetStringFromJString(env, jmodel_dir), utils::GetStringFromJString(env, jparam_dir));
@@ -29,4 +30,102 @@ JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_createAnalysi
         config->EnableUseGpu(100, device_id);
     }
     return reinterpret_cast<uintptr_t>(config);
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deleteAnalysisConfig
+        (JNIEnv *env, jobject jthis, jlong jhandle) {
+    const auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
+    delete config_ptr;
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_createPredictor
+        (JNIEnv *env, jobject jthis, jlong jconfig) {
+    const auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jconfig);
+    auto predictor = paddle::CreatePaddlePredictor(*config_ptr).release();
+    return reinterpret_cast<uintptr_t>(predictor);
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deletePredictor
+        (JNIEnv *env, jobject jthis, jlong jhandle) {
+    const auto* predictor = reinterpret_cast<paddle::PaddlePredictor*>(jhandle);
+    delete predictor;
+}
+
+JNIEXPORT jobjectArray JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_getInputNames
+        (JNIEnv *env, jobject jthis, jlong jhandle) {
+    const auto predictor = reinterpret_cast<paddle::PaddlePredictor*>(jhandle);
+    return utils::GetStringArrayFromVector(env, predictor->GetInputNames());
+}
+
+void tensor_to_ztensor(paddle::ZeroCopyTensor* z_tensor, paddle::PaddleTensor* tensor) {
+    z_tensor->Reshape(tensor->shape);
+    switch (tensor->dtype) {
+        case paddle::PaddleDType::FLOAT32:
+            z_tensor->copy_from_cpu(static_cast<float*>(tensor->data.data()));
+            break;
+        case paddle::PaddleDType::INT32:
+            z_tensor->copy_from_cpu(static_cast<int32_t*>(tensor->data.data()));
+            break;
+        case paddle::PaddleDType::INT64:
+            z_tensor->copy_from_cpu(static_cast<int64_t*>(tensor->data.data()));
+            break;
+        case paddle::PaddleDType::UINT8:
+            z_tensor->copy_from_cpu(static_cast<uint8_t*>(tensor->data.data()));
+            break;
+    }
+}
+
+void ztensor_to_tensor(paddle::ZeroCopyTensor* z_tensor, paddle::PaddleTensor* tensor) {
+    tensor->name = z_tensor->name();
+    tensor->dtype = z_tensor->type();
+    tensor->shape = z_tensor->shape();
+    std::vector<int> output_shape = z_tensor->shape();
+    int out_num = std::accumulate(output_shape.begin(), output_shape.end(), 1, std::multiplies<int>());
+    auto dtype = z_tensor->type();
+    if (dtype == paddle::PaddleDType::FLOAT32) {
+        int size = sizeof(float);
+        auto paddleBuf = paddle::PaddleBuf(out_num * size);
+        z_tensor->copy_to_cpu(static_cast<float*>(paddleBuf.data()));
+        tensor->data = paddleBuf;
+    } else if (dtype == paddle::PaddleDType::INT32) {
+        int size = sizeof(int32_t);
+        auto paddleBuf = paddle::PaddleBuf(out_num * size);
+        tensor->data = paddleBuf;
+        z_tensor->copy_to_cpu(static_cast<int32_t *>(paddleBuf.data()));
+    } else if (dtype == paddle::PaddleDType::INT64) {
+        int size = sizeof(int64_t);
+        auto paddleBuf = paddle::PaddleBuf(out_num * size);
+        tensor->data = paddleBuf;
+        z_tensor->copy_to_cpu(static_cast<int64_t *>(paddleBuf.data()));
+    } else if (dtype == paddle::PaddleDType::UINT8) {
+        int size = sizeof(uint8_t);
+        auto paddleBuf = paddle::PaddleBuf(out_num * size);
+        z_tensor->copy_to_cpu(static_cast<uint8_t *>(paddleBuf.data()));
+        tensor->data = paddleBuf;
+    }
+}
+
+JNIEXPORT jlongArray JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_runInference
+        (JNIEnv *env, jobject jthis, jlong jhandle, jlongArray jtensor_ptrs) {
+    const auto predictor = reinterpret_cast<paddle::PaddlePredictor*>(jhandle);
+    jsize len = env->GetArrayLength(jtensor_ptrs);
+    jlong* jptrs = env->GetLongArrayElements(jtensor_ptrs, JNI_FALSE);
+    for (size_t i = 0; i < len; ++i) {
+        auto tensor = reinterpret_cast<paddle::PaddleTensor*>(jptrs[i]);
+        auto z_tensor = predictor->GetInputTensor(tensor->name);
+        tensor_to_ztensor(z_tensor.get(), tensor);
+    }
+    predictor->ZeroCopyRun();
+    auto output_names = predictor->GetOutputNames();
+    int output_len = output_names.size();
+    jlongArray jarray = env->NewLongArray(output_len);
+    std::vector<jlong> ptr_vec;
+    for (auto & output_name : output_names) {
+        auto out_ztensor = predictor->GetOutputTensor(output_name);
+        auto tensor_ptr = new paddle::PaddleTensor{};
+        ztensor_to_tensor(out_ztensor.get(), tensor_ptr);
+        ptr_vec.push_back(reinterpret_cast<uintptr_t>(tensor_ptr));
+    }
+    env->SetLongArrayRegion(jarray, 0, output_len, ptr_vec.data());
+    return jarray;
 }
