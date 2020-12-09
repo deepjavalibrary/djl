@@ -135,12 +135,6 @@ Follow our [<img src='https://cdn2.iconfinder.com/data/icons/social-media-2285/5
 * [DJL Demos](https://docs.djl.ai/docs/demos/index.html)
 * [Dive into Deep Learning Book Java version](https://d2l.djl.ai/)
 
-Also checkout these cool projects using DJL:
-
-* [Clojure API for DJL](https://github.com/kimim/clj-djl)
-* [Reinforcement Learning Flappy Bird game using DJL](https://github.com/kingyuluk/RL-FlappyBird)
-* [nifi djl processor](https://github.com/tspannhw/nifi-djl-processor)
-* [Fast DJL](https://github.com/Jzow/FastDJL)
 ## License
 
 This project is licensed under the [Apache-2.0 License](LICENSE).
