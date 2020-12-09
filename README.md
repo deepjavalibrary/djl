@@ -128,6 +128,13 @@ Follow our [<img src='https://cdn2.iconfinder.com/data/icons/social-media-2285/5
 
 关注我们 [<img src='https://www.iconfinder.com/icons/5060515/download/svg/512' width='20px' /> 知乎专栏](https://zhuanlan.zhihu.com/c_1255493231133417472) 获取DJL最新的内容！
 
+## Useful Links
+
+* [DJL Website](https://djl.ai/)
+* [Documentation](https://docs.djl.ai/)
+* [DJL Demos](https://docs.djl.ai/docs/demos/index.html)
+* [Dive into Deep Learning Book Java version](https://d2l.djl.ai/)
+
 ## License
 
 This project is licensed under the [Apache-2.0 License](LICENSE).
