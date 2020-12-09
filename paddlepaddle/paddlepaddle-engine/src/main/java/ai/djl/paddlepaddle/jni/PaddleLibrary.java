@@ -26,6 +26,21 @@ final class PaddleLibrary {
 
     native void deleteTensor(long handle);
 
+    native int[] getTensorShape(long handle);
+
+    native int getTensorDType(long handle);
+
+    native byte[] getTensorData(long handle);
+
     native long createAnalysisConfig(String modelDir, String paramDir, int deviceId);
 
+    native void deleteAnalysisConfig(long handle);
+
+    native long createPredictor(long configHandle);
+
+    native void deletePredictor(long handle);
+
+    native String[] getInputNames(long handle);
+
+    native long[] runInference(long handle, long[] inputHandles);
 }

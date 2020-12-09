@@ -30,7 +30,7 @@ public class PpModelZoo implements ModelZoo {
             new PpFaceDetection(REPOSITORY, GROUP_ID, "face_detection", "0.0.1", ZOO);
 
     public static final PpMaskClassification MASK_DETECTION =
-            new PpMaskClassification(REPOSITORY, GROUP_ID, "mask_detection", "0.0.1", ZOO);
+            new PpMaskClassification(REPOSITORY, GROUP_ID, "mask_classification", "0.0.1", ZOO);
 
     /** {@inheritDoc} */
     @Override
