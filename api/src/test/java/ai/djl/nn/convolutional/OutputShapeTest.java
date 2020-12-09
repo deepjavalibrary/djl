@@ -19,7 +19,7 @@ import org.testng.annotations.BeforeClass;
 
 public abstract class OutputShapeTest {
 
-    protected static NDManager manager;
+    static NDManager manager;
 
     @BeforeClass
     public static void setupManager() {
