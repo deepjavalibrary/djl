@@ -13,6 +13,7 @@
 package ai.djl.paddlepaddle.zoo;
 
 import ai.djl.Application;
+import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
@@ -21,11 +22,15 @@ import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
+import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.Batchifier;
@@ -36,8 +41,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -51,33 +56,52 @@ public class MaskDetectionTest {
         Image img = ImageFactory.getInstance().fromUrl(url);
 
         DetectedObjects boxes = detectFaces(img);
-        saveBoundingBoxImage(img, boxes);
         List<DetectedObjects.DetectedObject> faces = boxes.items();
         Assert.assertEquals(faces.size(), 3);
-
-        Rectangle rect = faces.get(0).getBoundingBox().getBounds();
+        List<Image> subImgs = new ArrayList<>();
         int width = img.getWidth();
         int height = img.getHeight();
-        Image faceImg =
-                img.getSubimage(
-                        (int) (rect.getX() * width),
-                        (int) (rect.getY() * height),
-                        (int) (rect.getWidth() * width),
-                        (int) (rect.getHeight() * height));
+        for (DetectedObjects.DetectedObject face : faces) {
+            Rectangle rect = face.getBoundingBox().getBounds();
+            subImgs.add(
+                    img.getSubimage(
+                            (int) (rect.getX() * width),
+                            (int) (rect.getY() * height),
+                            (int) (rect.getWidth() * width),
+                            (int) (rect.getHeight() * height)));
+        }
+        List<Classifications> classifications = classifyMasks(subImgs);
+        for (int i = 0; i < classifications.size(); i++) {
+            System.out.println(classifications.get(i).best().getClassName());
+            faces.get(i).setClassName(classifications.get(i).best().getClassName());
+        }
+        saveBoundingBoxImage(img, boxes);
+    }
 
+    private static List<Classifications> classifyMasks(List<Image> images)
+            throws ModelNotFoundException, IOException, TranslateException,
+                    MalformedModelException {
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(Image.class, Classifications.class)
+                        .optTranslator(
+                                ImageClassificationTranslator.builder()
+                                        .addTransform(new Resize(128, 128))
+                                        .addTransform(new ToTensor())
+                                        .optApplySoftmax(true)
+                                        .build())
                         .optArtifactId("mask_classification")
-                        .optFilter("flavor", "mobile")
+                        .optFilter("flavor", "server")
                         .build();
-
+        List<Classifications> result = new ArrayList<>();
         try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
                 Predictor<Image, Classifications> predictor = model.newPredictor()) {
-            Classifications classifications = predictor.predict(faceImg);
-            Assert.assertEquals(classifications.best().getClassName(), "MASK");
+            for (Image img : images) {
+                result.add(predictor.predict(img));
+            }
         }
+        return result;
     }
 
     private static DetectedObjects detectFaces(Image img)
@@ -87,8 +111,8 @@ public class MaskDetectionTest {
                         .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(Image.class, DetectedObjects.class)
                         .optArtifactId("face_detection")
-                        .optTranslator(new FaceTranslator(0.5f))
-                        .optFilter("flavor", "mobile")
+                        .optTranslator(new FaceTranslator(0.5f, 0.7f))
+                        .optFilter("flavor", "server")
                         .build();
 
         try (ZooModel<Image, DetectedObjects> model = ModelZoo.loadModel(criteria);
@@ -114,19 +138,32 @@ public class MaskDetectionTest {
     static class FaceTranslator implements Translator<Image, DetectedObjects> {
 
         private float shrink;
-        List<String> className;
+        private float threshold;
+        private List<String> className;
 
-        FaceTranslator(float shrink) {
+        FaceTranslator(float shrink, float threshold) {
             this.shrink = shrink;
+            this.threshold = threshold;
             className = Arrays.asList("Not Face", "Face");
         }
 
         @Override
         public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws Exception {
-            float[] array = list.singletonOrThrow().toFloatArray();
-            List<String> names = Collections.singletonList(className.get((int) array[0]));
-            List<Double> prob = Collections.singletonList((double) array[1]);
-            List<BoundingBox> boxes = Collections.singletonList(new Rectangle(array[2], array[3], array[4] - array[2], array[5] - array[3]));
+            NDArray result = list.singletonOrThrow();
+            float[] probabilities = result.get(":,1").toFloatArray();
+            List<String> names = new ArrayList<>();
+            List<Double> prob = new ArrayList<>();
+            List<BoundingBox> boxes = new ArrayList<>();
+            for (int i = 0; i < probabilities.length; i++) {
+                if (probabilities[i] >= threshold) {
+                    float[] array = result.get(i).toFloatArray();
+                    names.add(className.get((int) array[0]));
+                    prob.add((double) probabilities[i]);
+                    boxes.add(
+                            new Rectangle(
+                                    array[2], array[3], array[4] - array[2], array[5] - array[3]));
+                }
+            }
             return new DetectedObjects(names, prob, boxes);
         }
 
@@ -134,16 +171,20 @@ public class MaskDetectionTest {
         public NDList processInput(TranslatorContext ctx, Image input) throws Exception {
             NDArray array = input.toNDArray(ctx.getNDManager());
             Shape shape = array.getShape();
-            array = NDImageUtils.resize(array, (int) (shape.get(0) * shrink), (int) (shape.get(1) * shrink));
-            array = array.transpose(2, 0, 1).flip(0); // HWC -> CHW + RGB -> BGR
-            NDArray mean = ctx.getNDManager().create(new float[]{104f, 117f, 123f}, new Shape(3, 1, 1));
+            array =
+                    NDImageUtils.resize(
+                            array, (int) (shape.get(1) * shrink), (int) (shape.get(0) * shrink));
+            array = array.transpose(2, 0, 1); // HWC -> CHW
+            NDArray mean =
+                    ctx.getNDManager().create(new float[] {104f, 117f, 123f}, new Shape(3, 1, 1));
             array = array.sub(mean).mul(0.007843f); // normalization
+            array = array.expandDims(0); // make batch dimension
             return new NDList(array);
         }
 
         @Override
         public Batchifier getBatchifier() {
-            return Batchifier.STACK;
+            return null;
         }
     }
 }
