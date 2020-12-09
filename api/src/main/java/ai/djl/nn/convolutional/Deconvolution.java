@@ -140,10 +140,11 @@ public abstract class Deconvolution extends AbstractBlock {
         shape[1] = filters;
         for (int i = 0; i < numDimensions() - 2; i++) {
             shape[2 + i] =
-                    (inputs[0].get(2 + i) - 1) * stride.get(0)
-                            - 2 * padding.get(0)
-                            + kernelShape.get(i)
-                            + outPadding.get(i);
+                    (inputs[0].get(2 + i) - 1) * stride.get(i)
+                            - 2 * padding.get(i)
+                            + dilation.get(i) * (kernelShape.get(i) - 1)
+                            + outPadding.get(i)
+                            + 1;
         }
         return new Shape[] {new Shape(shape)};
     }
