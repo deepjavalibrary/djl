@@ -214,12 +214,12 @@ public final class LibUtils {
         }
 
         Files.createDirectories(cacheDir);
-        Path tmp = Files.createTempDirectory(cacheDir, "tmp");
-
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Unexpected version: " + version);
         }
+
+        Path tmp = null;
         String link = "https://publish.djl.ai/paddlepaddle-" + matcher.group(1);
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
