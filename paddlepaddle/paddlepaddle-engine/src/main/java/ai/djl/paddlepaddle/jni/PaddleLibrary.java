@@ -34,9 +34,13 @@ final class PaddleLibrary {
 
     native long createAnalysisConfig(String modelDir, String paramDir, int deviceId);
 
+    native void useFeedFetchOp(long handle);
+
     native void deleteAnalysisConfig(long handle);
 
     native long createPredictor(long configHandle);
+
+    native long clonePredictor(long handle);
 
     native void deletePredictor(long handle);
 
