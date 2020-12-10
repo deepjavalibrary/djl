@@ -32,6 +32,13 @@ JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_createAnalysi
     return reinterpret_cast<uintptr_t>(config);
 }
 
+JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_useFeedFetchOp
+        (JNIEnv *env, jobject jthis, jlong jhandle) {
+    const auto config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
+    config_ptr->SwitchUseFeedFetchOps(true);
+}
+
+
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deleteAnalysisConfig
         (JNIEnv *env, jobject jthis, jlong jhandle) {
     const auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
@@ -43,6 +50,13 @@ JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_createPredict
     const auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jconfig);
     auto predictor = paddle::CreatePaddlePredictor(*config_ptr).release();
     return reinterpret_cast<uintptr_t>(predictor);
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_clonePredictor
+        (JNIEnv *env, jobject jthis, jlong jhandle) {
+    const auto predictor = reinterpret_cast<paddle::PaddlePredictor*>(jhandle);
+    auto cloned = predictor->Clone().release();
+    return reinterpret_cast<uintptr_t>(cloned);
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deletePredictor
