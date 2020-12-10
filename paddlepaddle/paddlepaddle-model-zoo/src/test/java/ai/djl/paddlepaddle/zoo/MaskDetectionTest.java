@@ -22,6 +22,10 @@ import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
+import ai.djl.modality.cv.transform.Normalize;
+import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -61,19 +65,14 @@ public class MaskDetectionTest {
         List<String> names = new ArrayList<>();
         List<Double> prob = new ArrayList<>();
         List<BoundingBox> rect = new ArrayList<>();
-
-        Path outputDir = Paths.get("build/output");
-        Files.createDirectories(outputDir);
-        for (int i = 0; i < faces.size(); i++) {
-            Image subImg = getSubImage(img, faces.get(i).getBoundingBox());
-            subImg.save(Files.newOutputStream(outputDir.resolve(i + ".png")), "png");
+        for (DetectedObjects.DetectedObject face : faces) {
+            Image subImg = getSubImage(img, face.getBoundingBox());
             Classifications classifications = classifier.predict(subImg);
             names.add(classifications.best().getClassName());
-            prob.add(faces.get(i).getProbability());
-            rect.add(faces.get(i).getBoundingBox());
-            System.out.println(classifications);
+            prob.add(face.getProbability());
+            rect.add(face.getBoundingBox());
         }
-        // Assert.assertEquals(names, Arrays.asList("No Mask", "Mask", "Mask"));
+        Assert.assertEquals(names, Arrays.asList("NO MASK", "MASK", "MASK"));
         saveBoundingBoxImage(img, new DetectedObjects(names, prob, rect));
     }
 
@@ -81,11 +80,24 @@ public class MaskDetectionTest {
         Rectangle rect = box.getBounds();
         int width = img.getWidth();
         int height = img.getHeight();
-        return img.getSubimage(
-                (int) (rect.getX() * width),
-                (int) (rect.getY() * height),
-                (int) (rect.getWidth() * width),
-                (int) (rect.getHeight() * height));
+        int[] squareBox =
+                extendSquare(
+                        rect.getX() * width,
+                        rect.getY() * height,
+                        rect.getWidth() * width,
+                        rect.getHeight() * height,
+                        0.18);
+        return img.getSubimage(squareBox[0], squareBox[1], squareBox[2], squareBox[2]);
+    }
+
+    private static int[] extendSquare(
+            double xmin, double ymin, double width, double height, double percentage) {
+        double centerx = xmin + width / 2;
+        double centery = ymin + height / 2;
+        double maxDist = Math.max(width / 2, height / 2) * (1 + percentage);
+        return new int[] {
+            (int) (centerx - maxDist), (int) (centery - maxDist), (int) (2 * maxDist)
+        };
     }
 
     private static Predictor<Image, Classifications> getClassifier()
@@ -94,7 +106,16 @@ public class MaskDetectionTest {
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(Image.class, Classifications.class)
-                        .optTranslator(new MaskClassificationTranslator())
+                        .optTranslator(
+                                ImageClassificationTranslator.builder()
+                                        .addTransform(new Resize(128, 128))
+                                        .addTransform(new ToTensor())
+                                        .addTransform(
+                                                new Normalize(
+                                                        new float[] {0.5f, 0.5f, 0.5f},
+                                                        new float[] {1.0f, 1.0f, 1.0f}))
+                                        .addTransform(nd -> nd.flip(0)) // RGB -> GBR
+                                        .build())
                         .optArtifactId("mask_classification")
                         .optFilter("flavor", "server")
                         .build();
@@ -131,35 +152,6 @@ public class MaskDetectionTest {
         Path imagePath = outputDir.resolve("test.png");
         // OpenJDK can't save jpg with alpha channel
         newImage.save(Files.newOutputStream(imagePath), "png");
-    }
-
-    static class MaskClassificationTranslator implements Translator<Image, Classifications> {
-
-        private List<String> classNames;
-
-        MaskClassificationTranslator() {
-            this.classNames = Arrays.asList("No Mask", "Mask");
-        }
-
-        @Override
-        public Classifications processOutput(TranslatorContext ctx, NDList list) {
-            return new Classifications(classNames, list.singletonOrThrow());
-        }
-
-        @Override
-        public NDList processInput(TranslatorContext ctx, Image input) {
-            NDArray array = input.toNDArray(ctx.getNDManager());
-            array = NDImageUtils.resize(array, 128, 128);
-            array = array.transpose(2, 0, 1); // HWC -> CHW
-            array = array.div(256f).sub(0.5f); // normalization
-            array = array.expandDims(0); // make batch dimension
-            return new NDList(array);
-        }
-
-        @Override
-        public Batchifier getBatchifier() {
-            return null;
-        }
     }
 
     static class FaceTranslator implements Translator<Image, DetectedObjects> {
