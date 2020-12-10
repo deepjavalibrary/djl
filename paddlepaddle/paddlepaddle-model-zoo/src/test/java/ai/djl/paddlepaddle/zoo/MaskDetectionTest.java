@@ -22,9 +22,6 @@ import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -49,7 +46,7 @@ import org.testng.annotations.Test;
 
 public class MaskDetectionTest {
 
-    @Test(enabled = false)
+    @Test
     public void testMaskDetection() throws IOException, ModelException, TranslateException {
         String url =
                 "https://raw.githubusercontent.com/PaddlePaddle/PaddleHub/release/v1.5/demo/mask_detection/python/images/mask.jpg";
@@ -58,50 +55,48 @@ public class MaskDetectionTest {
         DetectedObjects boxes = detectFaces(img);
         List<DetectedObjects.DetectedObject> faces = boxes.items();
         Assert.assertEquals(faces.size(), 3);
-        List<Image> subImgs = new ArrayList<>();
-        int width = img.getWidth();
-        int height = img.getHeight();
-        for (DetectedObjects.DetectedObject face : faces) {
-            Rectangle rect = face.getBoundingBox().getBounds();
-            subImgs.add(
-                    img.getSubimage(
-                            (int) (rect.getX() * width),
-                            (int) (rect.getY() * height),
-                            (int) (rect.getWidth() * width),
-                            (int) (rect.getHeight() * height)));
+
+        // Start classification
+        Predictor<Image, Classifications> classifier = getClassifier();
+        List<String> names = new ArrayList<>();
+        List<Double> prob = new ArrayList<>();
+        List<BoundingBox> rect = new ArrayList<>();
+        for (int i = 0; i < faces.size(); i++) {
+            Image subImg = getSubImage(img, faces.get(i).getBoundingBox());
+            subImg.save(Files.newOutputStream(Paths.get("build/output/" + i + ".png")), "png");
+            Classifications classifications = classifier.predict(subImg);
+            names.add(classifications.best().getClassName());
+            prob.add(faces.get(i).getProbability());
+            rect.add(faces.get(i).getBoundingBox());
+            System.out.println(classifications);
         }
-        List<Classifications> classifications = classifyMasks(subImgs);
-        for (int i = 0; i < classifications.size(); i++) {
-            System.out.println(classifications.get(i).best().getClassName());
-            faces.get(i).setClassName(classifications.get(i).best().getClassName());
-        }
-        saveBoundingBoxImage(img, boxes);
+        // Assert.assertEquals(names, Arrays.asList("No Mask", "Mask", "Mask"));
+        saveBoundingBoxImage(img, new DetectedObjects(names, prob, rect));
     }
 
-    private static List<Classifications> classifyMasks(List<Image> images)
-            throws ModelNotFoundException, IOException, TranslateException,
-                    MalformedModelException {
+    private static Image getSubImage(Image img, BoundingBox box) {
+        Rectangle rect = box.getBounds();
+        int width = img.getWidth();
+        int height = img.getHeight();
+        return img.getSubimage(
+                (int) (rect.getX() * width),
+                (int) (rect.getY() * height),
+                (int) (rect.getWidth() * width),
+                (int) (rect.getHeight() * height));
+    }
+
+    private static Predictor<Image, Classifications> getClassifier()
+            throws MalformedModelException, ModelNotFoundException, IOException {
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(Image.class, Classifications.class)
-                        .optTranslator(
-                                ImageClassificationTranslator.builder()
-                                        .addTransform(new Resize(128, 128))
-                                        .addTransform(new ToTensor())
-                                        .optApplySoftmax(true)
-                                        .build())
+                        .optTranslator(new MaskClassicationTranslator())
                         .optArtifactId("mask_classification")
                         .optFilter("flavor", "server")
                         .build();
-        List<Classifications> result = new ArrayList<>();
-        try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
-                Predictor<Image, Classifications> predictor = model.newPredictor()) {
-            for (Image img : images) {
-                result.add(predictor.predict(img));
-            }
-        }
-        return result;
+        ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
+        return model.newPredictor();
     }
 
     private static DetectedObjects detectFaces(Image img)
@@ -133,6 +128,38 @@ public class MaskDetectionTest {
         Path imagePath = outputDir.resolve("test.png");
         // OpenJDK can't save jpg with alpha channel
         newImage.save(Files.newOutputStream(imagePath), "png");
+    }
+
+    static class MaskClassicationTranslator implements Translator<Image, Classifications> {
+
+        private List<String> classNames;
+
+        MaskClassicationTranslator() {
+            this.classNames = Arrays.asList("No Mask", "Mask");
+        }
+
+        @Override
+        public Classifications processOutput(TranslatorContext ctx, NDList list) throws Exception {
+            return new Classifications(classNames, list.singletonOrThrow());
+        }
+
+        @Override
+        public NDList processInput(TranslatorContext ctx, Image input) throws Exception {
+            NDArray array = input.toNDArray(ctx.getNDManager());
+            array = NDImageUtils.centerCrop(array, 128, 128);
+            array = NDImageUtils.resize(array, 128, 128);
+            array = array.transpose(2, 0, 1); // HWC -> CHW
+            NDArray mean =
+                    ctx.getNDManager().create(new float[] {0.5f, 0.5f, 0.5f}, new Shape(3, 1, 1));
+            array = array.div(255).sub(mean); // normalization
+            array = array.expandDims(0); // make batch dimension
+            return new NDList(array);
+        }
+
+        @Override
+        public Batchifier getBatchifier() {
+            return null;
+        }
     }
 
     static class FaceTranslator implements Translator<Image, DetectedObjects> {
