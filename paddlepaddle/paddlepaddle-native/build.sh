@@ -19,18 +19,20 @@ if [[ ! -d "paddle" ]]; then
   if [[ $PLATFORM == 'linux' ]]; then
     if [[ $1 == "cpu" ]]; then
       curl -s https://paddle-inference-lib.bj.bcebos.com/latest-cpu-avx-mkl/fluid_inference.tgz -o paddle.tgz
+      tar -xvzf paddle.tgz
+      mv fluid_inference paddle
     else
       echo "$1 is not supported."
       exit 1
     fi
   elif [[ $PLATFORM == 'darwin' ]]; then
     curl -s https://paddle-inference-lib.bj.bcebos.com/mac%2F2.0-rc%2Fcpu_avx_openblas%2Fpaddle_inference_install_dir.tgz -o paddle.tgz
+    tar -xvzf paddle.tgz
+    mv paddle_inference_install_dir paddle
   else
     echo "$PLATFORM is not supported."
     exit 1
   fi
-  tar -xvzf paddle.tgz
-  mv paddle_inference_install_dir paddle
 fi
 
 rm -rf build

@@ -16,9 +16,8 @@
 
 JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_paddleCreateTensor
         (JNIEnv *env, jobject jthis, jobject jbuffer, jlong jlength, jintArray jshape, jint jdtype) {
-    auto paddleBuf = paddle::PaddleBuf(env->GetDirectBufferAddress(jbuffer), jlength);
     auto tensor_ptr = new paddle::PaddleTensor{};
-    tensor_ptr->data = paddleBuf;
+    tensor_ptr->data.Reset(env->GetDirectBufferAddress(jbuffer), jlength);
     tensor_ptr->dtype = static_cast<paddle::PaddleDType>(jdtype);
     tensor_ptr->shape = utils::GetVecFromJIntArray(env, jshape);
     return reinterpret_cast<uintptr_t>(tensor_ptr);
