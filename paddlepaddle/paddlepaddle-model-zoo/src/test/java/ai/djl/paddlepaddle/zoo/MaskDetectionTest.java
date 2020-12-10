@@ -149,12 +149,9 @@ public class MaskDetectionTest {
         @Override
         public NDList processInput(TranslatorContext ctx, Image input) {
             NDArray array = input.toNDArray(ctx.getNDManager());
-            array = NDImageUtils.centerCrop(array, 128, 128);
             array = NDImageUtils.resize(array, 128, 128);
             array = array.transpose(2, 0, 1); // HWC -> CHW
-            NDArray mean =
-                    ctx.getNDManager().create(new float[] {0.5f, 0.5f, 0.5f}, new Shape(3, 1, 1));
-            array = array.div(255).sub(mean); // normalization
+            array = array.div(256f).sub(0.5f); // normalization
             array = array.expandDims(0); // make batch dimension
             return new NDList(array);
         }
