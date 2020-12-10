@@ -5,7 +5,6 @@ on:
 
 jobs:
   build-paddle-jni-cpu:
-    if: github.repository == 'awslabs/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:

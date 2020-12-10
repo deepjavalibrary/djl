@@ -29,15 +29,12 @@ JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_createAnalysi
     } else {
         config->EnableUseGpu(100, device_id);
     }
+    config->SwitchUseFeedFetchOps(false);
+    // optional: config->SwitchIrOptim(false); optimize performance
+    // config->EnableMKLDNN(); not supporting multi-thread
+    // config->SetCpuMathLibraryNumThreads(); set to 1 for multi-thread
     return reinterpret_cast<uintptr_t>(config);
 }
-
-JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_useFeedFetchOp
-        (JNIEnv *env, jobject jthis, jlong jhandle) {
-    const auto config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
-    config_ptr->SwitchUseFeedFetchOps(true);
-}
-
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deleteAnalysisConfig
         (JNIEnv *env, jobject jthis, jlong jhandle) {
@@ -98,24 +95,22 @@ void ztensor_to_tensor(paddle::ZeroCopyTensor* z_tensor, paddle::PaddleTensor* t
     auto dtype = z_tensor->type();
     if (dtype == paddle::PaddleDType::FLOAT32) {
         int size = sizeof(float);
-        auto paddleBuf = paddle::PaddleBuf(out_num * size);
-        z_tensor->copy_to_cpu(static_cast<float*>(paddleBuf.data()));
-        tensor->data = paddleBuf;
+        tensor->data.Resize(out_num * size);
+        z_tensor->copy_to_cpu(static_cast<float*>(tensor->data.data()));
     } else if (dtype == paddle::PaddleDType::INT32) {
         int size = sizeof(int32_t);
-        auto paddleBuf = paddle::PaddleBuf(out_num * size);
-        tensor->data = paddleBuf;
-        z_tensor->copy_to_cpu(static_cast<int32_t *>(paddleBuf.data()));
+        tensor->data.Resize(out_num * size);
+        z_tensor->copy_to_cpu(static_cast<int32_t *>(tensor->data.data()));
     } else if (dtype == paddle::PaddleDType::INT64) {
         int size = sizeof(int64_t);
-        auto paddleBuf = paddle::PaddleBuf(out_num * size);
-        tensor->data = paddleBuf;
-        z_tensor->copy_to_cpu(static_cast<int64_t *>(paddleBuf.data()));
+        tensor->data.Resize(out_num * size);
+        z_tensor->copy_to_cpu(static_cast<int64_t *>(tensor->data.data()));
     } else if (dtype == paddle::PaddleDType::UINT8) {
         int size = sizeof(uint8_t);
-        auto paddleBuf = paddle::PaddleBuf(out_num * size);
-        z_tensor->copy_to_cpu(static_cast<uint8_t *>(paddleBuf.data()));
-        tensor->data = paddleBuf;
+        tensor->data.Resize(out_num * size);
+        z_tensor->copy_to_cpu(static_cast<uint8_t *>(tensor->data.data()));
+    } else {
+        // throw error
     }
 }
 
