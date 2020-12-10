@@ -29,7 +29,7 @@ public class DlrPredictor<I, O> extends Predictor<I, O> {
      *
      * @param model the model on which the predictions are based
      * @param modelDir the path to the model artifacts
-     * @param device the device that the model
+     * @param device the device that the model use
      * @param translator the translator to be used
      */
     public DlrPredictor(
