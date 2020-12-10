@@ -61,9 +61,12 @@ public class MaskDetectionTest {
         List<String> names = new ArrayList<>();
         List<Double> prob = new ArrayList<>();
         List<BoundingBox> rect = new ArrayList<>();
+
+        Path outputDir = Paths.get("build/output");
+        Files.createDirectories(outputDir);
         for (int i = 0; i < faces.size(); i++) {
             Image subImg = getSubImage(img, faces.get(i).getBoundingBox());
-            subImg.save(Files.newOutputStream(Paths.get("build/output/" + i + ".png")), "png");
+            subImg.save(Files.newOutputStream(outputDir.resolve(i + ".png")), "png");
             Classifications classifications = classifier.predict(subImg);
             names.add(classifications.best().getClassName());
             prob.add(faces.get(i).getProbability());
@@ -91,7 +94,7 @@ public class MaskDetectionTest {
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(Image.class, Classifications.class)
-                        .optTranslator(new MaskClassicationTranslator())
+                        .optTranslator(new MaskClassificationTranslator())
                         .optArtifactId("mask_classification")
                         .optFilter("flavor", "server")
                         .build();
@@ -130,21 +133,21 @@ public class MaskDetectionTest {
         newImage.save(Files.newOutputStream(imagePath), "png");
     }
 
-    static class MaskClassicationTranslator implements Translator<Image, Classifications> {
+    static class MaskClassificationTranslator implements Translator<Image, Classifications> {
 
         private List<String> classNames;
 
-        MaskClassicationTranslator() {
+        MaskClassificationTranslator() {
             this.classNames = Arrays.asList("No Mask", "Mask");
         }
 
         @Override
-        public Classifications processOutput(TranslatorContext ctx, NDList list) throws Exception {
+        public Classifications processOutput(TranslatorContext ctx, NDList list) {
             return new Classifications(classNames, list.singletonOrThrow());
         }
 
         @Override
-        public NDList processInput(TranslatorContext ctx, Image input) throws Exception {
+        public NDList processInput(TranslatorContext ctx, Image input) {
             NDArray array = input.toNDArray(ctx.getNDManager());
             array = NDImageUtils.centerCrop(array, 128, 128);
             array = NDImageUtils.resize(array, 128, 128);
@@ -175,7 +178,7 @@ public class MaskDetectionTest {
         }
 
         @Override
-        public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws Exception {
+        public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
             NDArray result = list.singletonOrThrow();
             float[] probabilities = result.get(":,1").toFloatArray();
             List<String> names = new ArrayList<>();
@@ -195,7 +198,7 @@ public class MaskDetectionTest {
         }
 
         @Override
-        public NDList processInput(TranslatorContext ctx, Image input) throws Exception {
+        public NDList processInput(TranslatorContext ctx, Image input) {
             NDArray array = input.toNDArray(ctx.getNDManager());
             Shape shape = array.getShape();
             array =
