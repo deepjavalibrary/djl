@@ -23,10 +23,10 @@ public class DlrNDManagerTest {
 
     @Test
     public void testNDArray() {
+        if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+            throw new SkipException("test only work on mac and Linux");
+        }
         try (NDManager manager = DlrNDManager.getSystemManager().newSubManager()) {
-            if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-                throw new SkipException("test only work on mac and Linux");
-            }
             NDArray zeros = manager.zeros(new Shape(1, 2));
             float[] data = zeros.toFloatArray();
             Assert.assertEquals(data[0], 0);
