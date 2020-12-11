@@ -24,6 +24,10 @@ import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.util.NativeResource;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -183,9 +187,43 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
-        PtNDArray other = getManager().create(data, getShape(), getDataType());
-        JniUtils.set(this, other);
-        other.close();
+        int size = data.remaining();
+        if (size != size()) {
+            throw new IllegalArgumentException(
+                    "size mismatch! the NDArray has size " + size() + " but set with size " + size);
+        }
+        if (data.isDirect() && data instanceof ByteBuffer) {
+            JniUtils.set(this, (ByteBuffer) data);
+            return;
+        }
+        // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
+        DataType inputType = DataType.fromBuffer(data);
+
+        int numOfBytes = inputType.getNumOfBytes();
+        ByteBuffer buf = manager.allocateDirect(size * numOfBytes);
+        switch (inputType) {
+            case FLOAT32:
+                buf.asFloatBuffer().put((FloatBuffer) data);
+                break;
+            case FLOAT64:
+                buf.asDoubleBuffer().put((DoubleBuffer) data);
+                break;
+            case UINT8:
+            case INT8:
+            case BOOLEAN:
+                buf.put((ByteBuffer) data);
+                break;
+            case INT32:
+                buf.asIntBuffer().put((IntBuffer) data);
+                break;
+            case INT64:
+                buf.asLongBuffer().put((LongBuffer) data);
+                break;
+            case FLOAT16:
+            default:
+                throw new UnsupportedOperationException("data type is not supported!");
+        }
+        JniUtils.set(this, buf);
     }
 
     /** {@inheritDoc} */
