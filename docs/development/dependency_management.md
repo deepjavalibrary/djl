@@ -58,6 +58,8 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [pytorch-native-cpu(osx-x86_64)](../../pytorch/pytorch-engine/README.md#macos) | Contains PyTorch native library for macOS |
 | | [pytorch-native-cpu(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-cpu) | Contains PyTorch native library for Windows |
 | | [pytorch-native-cpu(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-cpu) | Contains PyTorch native library for Linux |
+| | [pytorch-native-cu110(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-gpu) | Contains PyTorch native library for Linux with CUDA 11.0 |
+| | [pytorch-native-cu110(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-gpu) | Contains PyTorch native library for Windows with CUDA 11.0 |
 | | [pytorch-native-cu102(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-gpu) | Contains PyTorch native library for Linux with CUDA 10.2 |
 | | [pytorch-native-cu102(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-gpu) | Contains PyTorch native library for Windows with CUDA 10.2 |
 | | [pytorch-native-cu101(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-gpu) | Contains PyTorch native library for Linux with CUDA 10.1 |
