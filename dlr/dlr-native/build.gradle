@@ -10,6 +10,10 @@ boolean isRelease = project.hasProperty("release") || project.hasProperty("stagi
 version = "${dlr_version}" + (isRelease ? "" : "-SNAPSHOT")
 def BINARY_ROOT = "${project.buildDir}/download"
 
+dependencies {
+    api project(":dlr:dlr-engine")
+}
+
 def buildJNI(String os) {
     exec {
         commandLine 'bash', 'build.sh'
