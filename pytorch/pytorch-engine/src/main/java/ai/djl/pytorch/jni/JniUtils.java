@@ -355,8 +355,8 @@ public final class JniUtils {
                 ndArray.getHandle(), value.getHandle(), minIndices, maxIndices, stepIndices);
     }
 
-    public static void set(PtNDArray self, PtNDArray other) {
-        PyTorchLibrary.LIB.torchSet(self.getHandle(), other.getHandle());
+    public static void set(PtNDArray self, ByteBuffer data) {
+        PyTorchLibrary.LIB.torchSet(self.getHandle(), data);
     }
 
     public static PtNDArray pick(PtNDArray ndArray, PtNDArray index, long dim) {

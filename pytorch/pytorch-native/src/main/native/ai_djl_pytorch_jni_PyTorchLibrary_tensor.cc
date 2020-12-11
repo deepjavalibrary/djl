@@ -108,11 +108,18 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexPut(JNIE
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSet(
-    JNIEnv* env, jobject jthis, jlong jself, jlong jreplace) {
+    JNIEnv* env, jobject jthis, jlong jhandle, jobject jbuffer) {
   API_BEGIN()
-  const auto* self_ptr = reinterpret_cast<torch::Tensor*>(jself);
-  const auto* replace_ptr = reinterpret_cast<torch::Tensor*>(jreplace);
-  self_ptr->set_(*replace_ptr);
+  torch::AutoNonVariableTypeMode guard;
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  torch::ArrayRef<int64_t> sizes = tensor_ptr->sizes();
+  torch::ArrayRef<int64_t> strides = at::detail::defaultStrides(sizes);
+  torch::Storage storage(torch::Storage::use_byte_size_t(),
+      at::detail::computeStorageNbytes(sizes, strides, tensor_ptr->dtype().itemsize()),
+      torch::DataPtr(env->GetDirectBufferAddress(jbuffer), tensor_ptr->device()),
+      /*allocator=*/nullptr,
+      /*resizable=*/false);
+  tensor_ptr->set_(storage, 0, sizes);
   API_END()
 }
 

@@ -182,7 +182,7 @@ final class PyTorchLibrary {
             long[] maxIndices,
             long[] stepIndices);
 
-    native void torchSet(long selfHandle, long otherHandle);
+    native void torchSet(long handle, ByteBuffer data);
 
     native long torchSlice(long handle, long dim, long start, long end, long step);
 
