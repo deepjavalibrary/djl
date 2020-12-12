@@ -124,19 +124,25 @@ public final class JniUtils {
             DataType dType,
             SparseFormat fmt,
             Device device) {
-        int layoutVal = layoutMapper(fmt, device);
-        return new PtNDArray(
-                manager,
+        int layout = layoutMapper(fmt, device);
+        long handle =
                 PyTorchLibrary.LIB.torchFromBlob(
                         data,
                         shape.getShape(),
                         dType.ordinal(),
-                        layoutVal,
+                        layout,
                         new int[] {
                             PtDeviceType.toDeviceType(device),
                             device.equals(Device.cpu()) ? -1 : device.getDeviceId()
                         },
-                        false));
+                        false);
+
+        if (layout == 1 || layout == 2 || Device.Type.GPU.equals(device.getDeviceType())) {
+            // MKLDNN & COO & GPU device will explicitly make a copy in native code
+            // so we don't want to hold a reference on Java side
+            return new PtNDArray(manager, handle);
+        }
+        return new PtNDArray(manager, handle, data);
     }
 
     public static PtNDArray createEmptyNdArray(

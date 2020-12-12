@@ -26,8 +26,8 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(JNI
   if (jdtype != 8) {
     options = options.dtype(utils::GetScalarTypeFromDType(jdtype));
   }
-  // call the clone() to let tensor own the memory
-  torch::Tensor result = torch::from_blob(env->GetDirectBufferAddress(jbuffer), shape_vec, options).clone();
+  // the java side hold the reference for the directByteBuffer
+  torch::Tensor result = torch::from_blob(env->GetDirectBufferAddress(jbuffer), shape_vec, options);
   // from_blob doesn't support torch::kSparse and torch::kMkldnn, so explicit cast the type here
   if (jlayout == 1) {
     result = result.to_sparse();

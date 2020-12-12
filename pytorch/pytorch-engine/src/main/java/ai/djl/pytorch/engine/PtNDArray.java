@@ -54,8 +54,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     private PtNDManager manager;
     private PtNDArrayEx ptNDArrayEx;
 
+    // keep a reference to direct buffer to avoid GC release the memory
+    private ByteBuffer dataRef;
+
     /**
-     * Constructs an PyTorch from a native handle (internal. Use {@link NDManager} instead).
+     * Constructs a PyTorch {@code NDArray} from a native handle (internal. Use {@link NDManager}
+     * instead).
      *
      * @param manager the manager to attach the new array to
      * @param handle the pointer to the native PyTorch memory
@@ -65,6 +69,22 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
         manager.attach(getUid(), this);
+    }
+
+    /**
+     * Constructs a PyTorch {@code NDArray} from a native handle (internal. Use {@link NDManager}
+     * instead) with the data that is hold on Java side.
+     *
+     * @param manager the manager to attach the new array to
+     * @param handle the pointer to the native PyTorch memory
+     * @param data the direct buffer of the data
+     */
+    public PtNDArray(PtNDManager manager, long handle, ByteBuffer data) {
+        super(handle);
+        this.manager = manager;
+        this.ptNDArrayEx = new PtNDArrayEx(this);
+        manager.attach(getUid(), this);
+        dataRef = data;
     }
 
     /** {@inheritDoc} */
@@ -193,6 +213,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
                     "size mismatch! the NDArray has size " + size() + " but set with size " + size);
         }
         if (data.isDirect() && data instanceof ByteBuffer) {
+            dataRef = (ByteBuffer) data;
             JniUtils.set(this, (ByteBuffer) data);
             return;
         }
@@ -200,30 +221,30 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         DataType inputType = DataType.fromBuffer(data);
 
         int numOfBytes = inputType.getNumOfBytes();
-        ByteBuffer buf = manager.allocateDirect(size * numOfBytes);
+        dataRef = manager.allocateDirect(size * numOfBytes);
         switch (inputType) {
             case FLOAT32:
-                buf.asFloatBuffer().put((FloatBuffer) data);
+                dataRef.asFloatBuffer().put((FloatBuffer) data);
                 break;
             case FLOAT64:
-                buf.asDoubleBuffer().put((DoubleBuffer) data);
+                dataRef.asDoubleBuffer().put((DoubleBuffer) data);
                 break;
             case UINT8:
             case INT8:
             case BOOLEAN:
-                buf.put((ByteBuffer) data);
+                dataRef.put((ByteBuffer) data);
                 break;
             case INT32:
-                buf.asIntBuffer().put((IntBuffer) data);
+                dataRef.asIntBuffer().put((IntBuffer) data);
                 break;
             case INT64:
-                buf.asLongBuffer().put((LongBuffer) data);
+                dataRef.asLongBuffer().put((LongBuffer) data);
                 break;
             case FLOAT16:
             default:
                 throw new UnsupportedOperationException("data type is not supported!");
         }
-        JniUtils.set(this, buf);
+        JniUtils.set(this, dataRef);
     }
 
     /** {@inheritDoc} */
@@ -1343,6 +1364,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             JniUtils.deleteNDArray(pointer);
             manager.detach(getUid());
             manager = null;
+            dataRef = null;
         }
     }
 }
