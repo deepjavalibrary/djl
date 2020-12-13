@@ -55,6 +55,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     private PtNDArrayEx ptNDArrayEx;
 
     // keep a reference to direct buffer to avoid GC release the memory
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private ByteBuffer dataRef;
 
     /**
@@ -212,8 +213,14 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             throw new IllegalArgumentException(
                     "size mismatch! the NDArray has size " + size() + " but set with size " + size);
         }
+        // TODO how do we handle the exception happened in the middle
+        dataRef = null;
         if (data.isDirect() && data instanceof ByteBuffer) {
-            dataRef = (ByteBuffer) data;
+            // If NDArray is on the GPU, it is native code responsibility to control the data life
+            // cycle
+            if (!Device.Type.GPU.equals(getDevice().getDeviceType())) {
+                dataRef = (ByteBuffer) data;
+            }
             JniUtils.set(this, (ByteBuffer) data);
             return;
         }
@@ -221,30 +228,34 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         DataType inputType = DataType.fromBuffer(data);
 
         int numOfBytes = inputType.getNumOfBytes();
-        dataRef = manager.allocateDirect(size * numOfBytes);
+        ByteBuffer buf = manager.allocateDirect(size * numOfBytes);
         switch (inputType) {
             case FLOAT32:
-                dataRef.asFloatBuffer().put((FloatBuffer) data);
+                buf.asFloatBuffer().put((FloatBuffer) data);
                 break;
             case FLOAT64:
-                dataRef.asDoubleBuffer().put((DoubleBuffer) data);
+                buf.asDoubleBuffer().put((DoubleBuffer) data);
                 break;
             case UINT8:
             case INT8:
             case BOOLEAN:
-                dataRef.put((ByteBuffer) data);
+                buf.put((ByteBuffer) data);
                 break;
             case INT32:
-                dataRef.asIntBuffer().put((IntBuffer) data);
+                buf.asIntBuffer().put((IntBuffer) data);
                 break;
             case INT64:
-                dataRef.asLongBuffer().put((LongBuffer) data);
+                buf.asLongBuffer().put((LongBuffer) data);
                 break;
             case FLOAT16:
             default:
                 throw new UnsupportedOperationException("data type is not supported!");
         }
-        JniUtils.set(this, dataRef);
+        // If NDArray is on the GPU, it is native code responsibility to control the data life cycle
+        if (!Device.Type.GPU.equals(getDevice().getDeviceType())) {
+            dataRef = buf;
+        }
+        JniUtils.set(this, buf);
     }
 
     /** {@inheritDoc} */

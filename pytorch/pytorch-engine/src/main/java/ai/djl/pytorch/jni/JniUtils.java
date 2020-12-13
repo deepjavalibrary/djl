@@ -362,6 +362,7 @@ public final class JniUtils {
     }
 
     public static void set(PtNDArray self, ByteBuffer data) {
+        // Note the ByteBuffer here is directByteBuffer
         PyTorchLibrary.LIB.torchSet(self.getHandle(), data);
     }
 

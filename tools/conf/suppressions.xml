@@ -2,7 +2,6 @@
 <!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
     "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
-    <suppress checks="." files="MockMxnetLibrary.java" />
     <suppress checks="FileLength" files="NDArray.java" />
 
     <suppress checks="(AvoidStaticImport|ImportOrder)" files="src[\\/]test[\\/]java[\\/]"/>
