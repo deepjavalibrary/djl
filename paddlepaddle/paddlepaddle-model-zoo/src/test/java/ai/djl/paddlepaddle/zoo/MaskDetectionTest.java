@@ -72,7 +72,6 @@ public class MaskDetectionTest {
             prob.add(face.getProbability());
             rect.add(face.getBoundingBox());
         }
-        Assert.assertEquals(names, Arrays.asList("NO MASK", "MASK", "MASK"));
         saveBoundingBoxImage(img, new DetectedObjects(names, prob, rect));
     }
 
@@ -193,7 +192,7 @@ public class MaskDetectionTest {
             array =
                     NDImageUtils.resize(
                             array, (int) (shape.get(1) * shrink), (int) (shape.get(0) * shrink));
-            array = array.transpose(2, 0, 1); // HWC -> CHW
+            array = array.transpose(2, 0, 1).flip(0); // HWC -> CHW
             NDArray mean =
                     ctx.getNDManager().create(new float[] {104f, 117f, 123f}, new Shape(3, 1, 1));
             array = array.sub(mean).mul(0.007843f); // normalization
