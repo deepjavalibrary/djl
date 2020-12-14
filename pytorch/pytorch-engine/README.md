@@ -158,6 +158,16 @@ For the Windows platform, you can choose between CPU and GPU.
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
+    <artifactId>pytorch-native-cu110</artifactId>
+    <classifier>win-x86_64</classifier>
+    <version>1.7.0</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+```xml
+<dependency>
+    <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cu102</artifactId>
     <classifier>win-x86_64</classifier>
     <version>1.7.0</version>
