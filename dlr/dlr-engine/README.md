@@ -1,4 +1,4 @@
-# DJL - DLR engine implementation
+# DJL - DLR engine implementation(Experimental)
 
 ## Overview
 This module contains the Deep Java Library (DJL) EngineProvider for DLR.
@@ -46,5 +46,9 @@ You can use environment variable to specify your custom dlr by
 export DLR_LIBRARY_PATH=path/to/your/dlr
 ```
 
-## Limitation
-DLR engine is still under development. The supported platform are limited to Macosx, Linux CPU and we are still actively testing multithreading capability.
+## Platform Limitation
+DLR engine is still under development. The supported platform are limited to Macosx, Linux CPU. If you would like to use other platforms, please let us know.
+
+# Multi-threading Capabilities
+TVM runtime itself doesn't support multi-threading. As a result, when creating a new Predictor, we will copy the tvm model to avoid sharing the states.
+We are still actively testing multithreading capability.

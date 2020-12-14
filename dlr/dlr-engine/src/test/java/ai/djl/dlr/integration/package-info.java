@@ -12,4 +12,4 @@
  */
 
 /** Contains classes to interface with the underlying DLR Engine. */
-package ai.djl.dlr.integraion;
+package ai.djl.dlr.integration;

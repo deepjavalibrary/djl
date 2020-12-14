@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.dlr.integraion;
+package ai.djl.dlr.integration;
 
 import ai.djl.Application;
 import ai.djl.ModelException;
