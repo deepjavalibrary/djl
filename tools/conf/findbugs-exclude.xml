@@ -31,4 +31,8 @@
         <Class name="~ai\.djl\.tensorflow\.engine\.TfSymbolBlock"/>
         <Method name="forward"/>
     </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="~ai\.djl\.pytorch\.engine\.PtNDArray"/>
+    </Match>
 </FindBugsFilter>
