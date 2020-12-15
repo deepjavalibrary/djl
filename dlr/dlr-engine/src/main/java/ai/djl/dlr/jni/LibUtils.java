@@ -241,7 +241,7 @@ public final class LibUtils {
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Unexpected version: " + version);
         }
-        String link = "https://djl-ai.s3.amazonaws.com/publish/dlr-" + matcher.group(1) + "/native";
+        String link = "https://publish.djl.ai/dlr-" + matcher.group(1) + "/native";
         Path tmp = null;
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);

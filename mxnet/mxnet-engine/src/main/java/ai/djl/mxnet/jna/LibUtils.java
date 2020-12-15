@@ -228,12 +228,13 @@ public final class LibUtils {
         }
 
         Files.createDirectories(cacheFolder);
-        Path tmp = Files.createTempDirectory(cacheFolder, "tmp");
 
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Unexpected version: " + version);
         }
+
+        Path tmp = Files.createTempDirectory(cacheFolder, "tmp");
         String link = "https://publish.djl.ai/mxnet-" + matcher.group(1);
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
@@ -297,9 +298,7 @@ public final class LibUtils {
             Utils.moveQuietly(tmp, dir);
             return path.toAbsolutePath().toString();
         } finally {
-            if (tmp != null) {
-                Utils.deleteQuietly(tmp);
-            }
+            Utils.deleteQuietly(tmp);
         }
     }
 
