@@ -24,6 +24,10 @@ import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.RandomUtils;
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * The {@code MxEngine} is an implementation of the {@link Engine} based on the <a
@@ -48,6 +52,19 @@ public final class MxEngine extends Engine {
 
             // Workaround MXNet shutdown crash issue
             Runtime.getRuntime().addShutdownHook(new Thread(JnaUtils::waitAll)); // NOPMD
+
+            // load extra MXNet library
+            String paths = System.getenv("MXNET_EXTRA_LIBRARY_PATH");
+            if (paths != null) {
+                String[] files = paths.split(",");
+                for (String file : files) {
+                    Path path = Paths.get(file);
+                    if (Files.notExists(path)) {
+                        throw new FileNotFoundException("Extra Library not found: " + file);
+                    }
+                    JnaUtils.loadLib(path.toAbsolutePath().toString(), 1);
+                }
+            }
 
             return new MxEngine();
         } catch (Throwable t) {

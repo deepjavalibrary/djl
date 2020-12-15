@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -113,17 +112,6 @@ public class MxModel extends BaseModel {
         }
         loadParameters(paramFile, options);
         // TODO: Check if Symbol has all names that params file have
-        // load extra MXNet library
-        if (options != null && options.containsKey("MxLoadExtraLib")) {
-            String[] files = ((String) options.get("MxLoadExtraLib")).split(",");
-            for (String file : files) {
-                Path path = Paths.get(file);
-                if (Files.notExists(path)) {
-                    throw new FileNotFoundException("Extra Library not found: " + file);
-                }
-                JnaUtils.loadLib(path.toAbsolutePath().toString(), 1);
-            }
-        }
         if (options != null && options.containsKey("MxOptimizeFor")) {
             String optimization = (String) options.get("MxOptimizeFor");
             ((MxSymbolBlock) block).optimizeFor(optimization);
