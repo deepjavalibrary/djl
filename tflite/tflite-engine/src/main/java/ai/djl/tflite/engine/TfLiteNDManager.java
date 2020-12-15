@@ -42,10 +42,6 @@ public class TfLiteNDManager extends BaseNDManager {
         return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     }
 
-    TfLiteNDArray create() {
-        return new TfLiteNDArray(this);
-    }
-
     /** {@inheritDoc} */
     @Override
     public TfLiteNDArray create(Buffer data, Shape shape, DataType dataType) {
