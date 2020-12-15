@@ -195,7 +195,6 @@ public interface Model extends AutoCloseable {
      * @return the {@link NDManager}
      */
     NDManager getNDManager();
-
     /**
      * Creates a new {@link Trainer} instance for a Model.
      *
