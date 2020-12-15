@@ -114,8 +114,8 @@ public class MxModel extends BaseModel {
         loadParameters(paramFile, options);
         // TODO: Check if Symbol has all names that params file have
         // load extra MXNet library
-        if (options != null && options.containsKey("MxloadExtraLib")) {
-            String[] files = ((String) options.get("MxloadExtraLib")).split(",");
+        if (options != null && options.containsKey("MxLoadExtraLib")) {
+            String[] files = ((String) options.get("MxLoadExtraLib")).split(",");
             for (String file : files) {
                 Path path = Paths.get(file);
                 if (Files.notExists(path)) {
