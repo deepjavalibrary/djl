@@ -1281,6 +1281,7 @@ public final class JnaUtils {
         Arrays.stream(placeHolders).forEach(REFS::recycle);
         return ptr;
     }
+
     /* Need tests
     public static Pointer createSymbolFromJson(String json) {
         PointerByReference ref = new PointerByReference();

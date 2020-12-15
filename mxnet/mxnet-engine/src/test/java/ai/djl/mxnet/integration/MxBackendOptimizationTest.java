@@ -15,25 +15,18 @@ package ai.djl.mxnet.integration;
 import ai.djl.mxnet.engine.MxNDManager;
 import ai.djl.mxnet.engine.Symbol;
 import ai.djl.ndarray.NDManager;
-import ai.djl.training.util.DownloadUtils;
-import java.io.IOException;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 public class MxBackendOptimizationTest {
-
-    @BeforeTest
-    public void downloadSymbol() throws IOException {
-        String url =
-                "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet18_v1-symbol.json";
-        DownloadUtils.download(url, "build/symbol/resnet18_v1-symbol.json");
-    }
 
     @Test
     public void testOptimizedFor() {
         // TODO: Add Customized plugin test
         try (MxNDManager manager = (MxNDManager) NDManager.newBaseManager()) {
-            Symbol symbol = Symbol.load(manager, "build/symbol/resnet18_v1-symbol.json");
+            Symbol symbol =
+                    Symbol.load(
+                            manager,
+                            "../mxnet-model-zoo/src/test/resources/mlrepo/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet50_v1-symbol.json");
             Symbol optimized = symbol.optimizeFor("test", manager.getDevice());
             optimized.close();
         }
