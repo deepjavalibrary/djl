@@ -25,19 +25,22 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.UUID;
+import org.tensorflow.lite.Tensor;
 
 /** {@code TfLiteNDArray} is the TFLite implementation of {@link NDArray}. */
 public class TfLiteNDArray implements NDArray {
 
     private TfLiteNDManager manager;
+    private Tensor tensor;
     private String name;
     private boolean isClosed;
     private String uid;
 
-    TfLiteNDArray(TfLiteNDManager manager) {
+    TfLiteNDArray(TfLiteNDManager manager, Tensor tensor) {
         this.manager = manager;
         uid = UUID.randomUUID().toString();
         manager.attach(uid, this);
+        this.tensor = tensor;
     }
 
     /** {@inheritDoc} */

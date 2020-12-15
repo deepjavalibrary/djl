@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import org.tensorflow.lite.Interpreter;
 
 /**
  * {@code TfLiteModel} is the TFLite implementation of {@link Model}.
@@ -31,23 +32,24 @@ import java.util.Map;
  */
 public class TfLiteModel extends BaseModel {
 
+    TfLiteNDManager manager;
+
     /**
      * Constructs a new Model on a given device.
      *
      * @param name the model name
-     * @param manager the {@link NDManager} to holds the NDArray
      */
-    TfLiteModel(String name, NDManager manager) {
+    TfLiteModel(String name) {
         super(name);
-        this.manager = manager;
-        this.manager.setName("TfLiteModel");
+        manager = (TfLiteNDManager) TfLiteNDManager.getSystemManager().newSubManager();
+        manager.setName("TfLiteModel");
         dataType = DataType.FLOAT32;
     }
 
     /** {@inheritDoc} */
     @Override
     public void load(Path modelPath, String prefix, Map<String, ?> options)
-            throws IOException, MalformedModelException {
+            throws IOException {
         modelDir = modelPath.toAbsolutePath();
         if (block != null) {
             throw new UnsupportedOperationException("TFLite does not support dynamic blocks");
@@ -59,6 +61,8 @@ public class TfLiteModel extends BaseModel {
                 throw new FileNotFoundException("TFLite model file not found in: " + modelPath);
             }
         }
+        Interpreter interpreter = new Interpreter(modelFile.toFile());
+        setBlock(new TfLiteSymbolBlock(interpreter, manager));
     }
 
     private Path findModelFile(String prefix) {

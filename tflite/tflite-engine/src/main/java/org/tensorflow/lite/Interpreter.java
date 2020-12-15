@@ -289,21 +289,14 @@ public final class Interpreter implements AutoCloseable {
    *     appropriate read position. A {@code null} value is allowed only if the caller is using a
    *     {@link Delegate} that allows buffer handle interop, and such a buffer has been bound to the
    *     input {@link Tensor}.
-   * @param output a multidimensional array of output data, or a {@link Buffer} of primitive types
-   *     including int, float, long, and byte. When a {@link Buffer} is used, the caller must ensure
-   *     that it is set the appropriate write position. A null value is allowed only if the caller
-   *     is using a {@link Delegate} that allows buffer handle interop, and such a buffer has been
-   *     bound to the output {@link Tensor}. See {@link Options#setAllowBufferHandleOutput}.
    * @throws IllegalArgumentException if {@code input} or {@code output} is null or empty, or if
    *     error occurs when running the inference.
    * @throws IllegalArgumentException (EXPERIMENTAL, subject to change) if the inference is
    *     interrupted by {@code setCancelled(true)}.
    */
-  public void run(Object input, Object output) {
+  public void run(Object input) {
     Object[] inputs = {input};
-    Map<Integer, Object> outputs = new HashMap<>();
-    outputs.put(0, output);
-    runForMultipleInputsOutputs(inputs, outputs);
+    runForMultipleInputsOutputs(inputs);
   }
 
   /**
@@ -334,17 +327,13 @@ public final class Interpreter implements AutoCloseable {
    *     input path. When {@link Buffer} is used, its content should remain unchanged until model
    *     inference is done, and the caller must ensure that the {@link Buffer} is at the appropriate
    *     read position.
-   * @param outputs a map mapping output indices to multidimensional arrays of output data or {@link
-   *     Buffer}s of primitive types including int, float, long, and byte. It only needs to keep
-   *     entries for the outputs to be used. When a {@link Buffer} is used, the caller must ensure
-   *     that it is set the appropriate write position.
    * @throws IllegalArgumentException if {@code inputs} or {@code outputs} is null or empty, or if
    *     error occurs when running the inference.
    */
   public void runForMultipleInputsOutputs(
-      Object[] inputs, Map<Integer, Object> outputs) {
+      Object[] inputs) {
     checkNotClosed();
-    wrapper.run(inputs, outputs);
+    wrapper.run(inputs);
   }
 
   /**

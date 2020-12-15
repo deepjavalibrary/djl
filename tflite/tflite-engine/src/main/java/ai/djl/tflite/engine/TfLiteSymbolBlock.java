@@ -13,6 +13,7 @@
 
 package ai.djl.tflite.engine;
 
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -25,6 +26,8 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.nio.Buffer;
+import org.tensorflow.lite.Interpreter;
 
 /**
  * {@code TfLiteSymbolBlock} is the TFLite implementation of {@link SymbolBlock}.
@@ -33,6 +36,14 @@ import java.io.DataOutputStream;
  * String)}.
  */
 public class TfLiteSymbolBlock implements SymbolBlock, AutoCloseable {
+
+    private TfLiteNDManager manager;
+    private Interpreter interpreter;
+
+    public TfLiteSymbolBlock(Interpreter interpreter, TfLiteNDManager manager) {
+        this.interpreter = interpreter;
+        this.manager = manager;
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -47,7 +58,15 @@ public class TfLiteSymbolBlock implements SymbolBlock, AutoCloseable {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        return null;
+        Object[] intInput = inputs.stream().map(NDArray::toByteBuffer).toArray();
+        interpreter.runForMultipleInputsOutputs(intInput);
+
+        int outputSize = interpreter.getOutputTensorCount();
+        NDList result = new NDList(outputSize);
+        for (int i = 0; i < outputSize; i++) {
+            result.add(new TfLiteNDArray(manager, interpreter.getOutputTensor(i)));
+        }
+        return result;
     }
 
     /** {@inheritDoc} */
@@ -143,6 +162,6 @@ public class TfLiteSymbolBlock implements SymbolBlock, AutoCloseable {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        //  TODO:
+        interpreter.close();
     }
 }

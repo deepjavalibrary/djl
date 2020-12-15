@@ -77,7 +77,7 @@ public final class TfLiteEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public Model newModel(String name, Device device) {
-        return new TfLiteModel(name, newBaseManager(device));
+        return new TfLiteModel(name);
     }
 
     /** {@inheritDoc} */
