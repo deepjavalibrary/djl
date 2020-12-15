@@ -12,6 +12,7 @@ configure([
         project(':tensorflow:tensorflow-model-zoo'),
         project(':onnxruntime:onnxruntime-engine'),
         project(':dlr:dlr-engine'),
+        project(':tflite:tflite-engine'),
         project(':extensions:aws-ai'),
         project(':extensions:fasttext'),
         project(':extensions:hadoop'),
