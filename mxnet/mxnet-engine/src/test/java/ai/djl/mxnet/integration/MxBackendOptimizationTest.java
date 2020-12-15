@@ -34,7 +34,8 @@ public class MxBackendOptimizationTest {
         // TODO: Add Customized plugin test
         try (MxNDManager manager = (MxNDManager) NDManager.newBaseManager()) {
             Symbol symbol = Symbol.load(manager, "build/symbol/resnet18_v1-symbol.json");
-            symbol.optimizeFor("test", manager.getDevice());
+            Symbol optimized = symbol.optimizeFor("test", manager.getDevice());
+            optimized.close();
         }
     }
 }
