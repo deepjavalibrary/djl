@@ -129,6 +129,17 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
         return symbol;
     }
 
+    /**
+     * Applies Optimization algorithm for the model.
+     *
+     * @param optimization the name of the optimization
+     */
+    public void optimizeFor(String optimization) {
+        Symbol newSymbol = symbol.optimizeFor(optimization, manager.getDevice());
+        symbol.close();
+        symbol = newSymbol;
+    }
+
     /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeInput() {
