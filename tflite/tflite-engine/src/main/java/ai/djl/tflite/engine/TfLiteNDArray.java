@@ -158,6 +158,9 @@ public class TfLiteNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
+        if (data == null) {
+            data = tensor.buffer();
+        }
         return data;
     }
 
