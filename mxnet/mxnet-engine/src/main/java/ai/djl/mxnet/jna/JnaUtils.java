@@ -1240,6 +1240,48 @@ public final class JnaUtils {
         return null;
     }
 
+    public static void loadLib(String path, int verbose) {
+        checkCall(LIB.MXLoadLib(path, verbose));
+    }
+
+    public static Pointer optimizeFor(Symbol current, String backend, Device device) {
+        // TODO: Support partition on parameters
+        PointerByReference returnedSymbolHandle = REFS.acquire();
+        // placeHolders
+        PointerByReference[] placeHolders = {
+            REFS.acquire(),
+            REFS.acquire(),
+            REFS.acquire(),
+            REFS.acquire(),
+            REFS.acquire(),
+            REFS.acquire()
+        };
+        // there is no need to update parameters
+        checkCall(
+                LIB.MXOptimizeForBackend(
+                        current.getHandle(),
+                        backend,
+                        MxDeviceType.toDeviceType(device),
+                        returnedSymbolHandle,
+                        0,
+                        placeHolders[0],
+                        0,
+                        placeHolders[1],
+                        0,
+                        new String[0],
+                        new String[0],
+                        IntBuffer.allocate(1),
+                        placeHolders[2],
+                        placeHolders[3],
+                        IntBuffer.allocate(1),
+                        placeHolders[4],
+                        placeHolders[5]));
+        Pointer ptr = returnedSymbolHandle.getValue();
+        REFS.recycle(returnedSymbolHandle);
+        Arrays.stream(placeHolders).forEach(REFS::recycle);
+        return ptr;
+    }
+
     /* Need tests
     public static Pointer createSymbolFromJson(String json) {
         PointerByReference ref = new PointerByReference();

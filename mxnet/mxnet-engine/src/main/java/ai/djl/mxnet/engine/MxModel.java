@@ -112,6 +112,10 @@ public class MxModel extends BaseModel {
         }
         loadParameters(paramFile, options);
         // TODO: Check if Symbol has all names that params file have
+        if (options != null && options.containsKey("MxOptimizeFor")) {
+            String optimization = (String) options.get("MxOptimizeFor");
+            ((MxSymbolBlock) block).optimizeFor(optimization);
+        }
     }
 
     /** {@inheritDoc} */
