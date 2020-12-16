@@ -13,9 +13,7 @@
 package ai.djl.tflite.engine;
 
 import ai.djl.BaseModel;
-import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -48,8 +46,7 @@ public class TfLiteModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public void load(Path modelPath, String prefix, Map<String, ?> options)
-            throws IOException {
+    public void load(Path modelPath, String prefix, Map<String, ?> options) throws IOException {
         modelDir = modelPath.toAbsolutePath();
         if (block != null) {
             throw new UnsupportedOperationException("TFLite does not support dynamic blocks");

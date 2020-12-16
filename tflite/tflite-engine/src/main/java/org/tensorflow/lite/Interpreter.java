@@ -20,9 +20,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Driver class to drive model inference with TensorFlow Lite.
@@ -68,8 +66,8 @@ import java.util.Map;
  * be implicitly resized according to that array's shape. When inputs are provided as {@link Buffer}
  * types, no implicit resizing is done; the caller must ensure that the {@link Buffer} byte size
  * either matches that of the corresponding tensor, or that they first resize the tensor via {@link
- * Interpreter#resizeInput}. Tensor shape and type information can be obtained via the {@link Tensor} class,
- * available via {@link #getInputTensor(int)} and {@link #getOutputTensor(int)}.
+ * Interpreter#resizeInput}. Tensor shape and type information can be obtained via the {@link
+ * Tensor} class, available via {@link #getInputTensor(int)} and {@link #getOutputTensor(int)}.
  *
  * <p><b>WARNING:</b>Instances of a {@code Interpreter} is <b>not</b> thread-safe. A {@code
  * Interpreter} owns resources that <b>must</b> be explicitly freed by invoking {@link #close()}
@@ -79,476 +77,482 @@ import java.util.Map;
  */
 public final class Interpreter implements AutoCloseable {
 
-  /** An options class for controlling runtime interpreter behavior. */
-  public static class Options {
-    public Options() {}
+    /** An options class for controlling runtime interpreter behavior. */
+    public static class Options {
+        public Options() {}
+
+        /**
+         * Sets the number of threads to be used for ops that support multi-threading. Defaults to a
+         * platform-dependent value.
+         */
+        public Options setNumThreads(int numThreads) {
+            this.numThreads = numThreads;
+            return this;
+        }
+
+        /**
+         * Sets whether to use NN API (if available) for op execution. Defaults to false (disabled).
+         */
+        public Options setUseNNAPI(boolean useNNAPI) {
+            this.useNNAPI = useNNAPI;
+            return this;
+        }
+
+        /**
+         * Adds a {@link Delegate} to be applied during interpreter creation.
+         *
+         * <p>WARNING: This is an experimental interface that is subject to change.
+         */
+        public Options addDelegate(Delegate delegate) {
+            delegates.add(delegate);
+            return this;
+        }
+
+        /**
+         * Advanced: Set if buffer handle output is allowed.
+         *
+         * <p>When a {@link Delegate} supports hardware acceleration, the interpreter will make the
+         * data of output tensors available in the CPU-allocated tensor buffers by default. If the
+         * client can consume the buffer handle directly (e.g. reading output from OpenGL texture),
+         * it can set this flag to false, avoiding the copy of data to the CPU buffer. The delegate
+         * documentation should indicate whether this is supported and how it can be used.
+         *
+         * <p>WARNING: This is an experimental interface that is subject to change.
+         */
+        public Options setAllowBufferHandleOutput(boolean allow) {
+            this.allowBufferHandleOutput = allow;
+            return this;
+        }
+
+        /**
+         * Advanced: Set if the interpreter is able to be cancelled.
+         *
+         * @see {@link Interpreter#setCancelled(boolean)}.
+         */
+        public Options setCancellable(boolean allow) {
+            this.allowCancellation = allow;
+            return this;
+        }
+
+        /**
+         * Experimental: Enable an optimized set of floating point CPU kernels (provided by
+         * XNNPACK).
+         *
+         * <p>Enabling this flag will enable use of a new, highly optimized set of CPU kernels
+         * provided via the XNNPACK delegate. Currently, this is restricted to a subset of floating
+         * point operations. Eventually, we plan to enable this by default, as it can provide
+         * significant peformance benefits for many classes of floating point models. See
+         * https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/delegates/xnnpack/README.md
+         * for more details.
+         *
+         * <p>Things to keep in mind when enabling this flag:
+         *
+         * <ul>
+         *   <li>Startup time and resize time may increase.
+         *   <li>Baseline memory consumption may increase.
+         *   <li>May be ignored if another delegate (eg NNAPI) have been applied.
+         *   <li>Quantized models will not see any benefit.
+         * </ul>
+         *
+         * <p>WARNING: This is an experimental interface that is subject to change.
+         */
+        public Options setUseXNNPACK(boolean useXNNPACK) {
+            this.useXNNPACK = useXNNPACK;
+            return this;
+        }
+
+        int numThreads = -1;
+        Boolean useNNAPI;
+        Boolean allowFp16PrecisionForFp32;
+        Boolean allowBufferHandleOutput;
+        Boolean allowCancellation;
+        Boolean useXNNPACK;
+        final List<Delegate> delegates = new ArrayList<>();
+    }
 
     /**
-     * Sets the number of threads to be used for ops that support multi-threading. Defaults to a
-     * platform-dependent value.
+     * Initializes a {@code Interpreter}
+     *
+     * @param modelFile: a File of a pre-trained TF Lite model.
+     * @throws IllegalArgumentException if {@code modelFile} does not encode a valid TensorFlow Lite
+     *     model.
      */
-    public Options setNumThreads(int numThreads) {
-      this.numThreads = numThreads;
-      return this;
-    }
-
-    /** Sets whether to use NN API (if available) for op execution. Defaults to false (disabled). */
-    public Options setUseNNAPI(boolean useNNAPI) {
-      this.useNNAPI = useNNAPI;
-      return this;
+    public Interpreter(File modelFile) {
+        this(modelFile, /*options = */ null);
     }
 
     /**
-     * Adds a {@link Delegate} to be applied during interpreter creation.
+     * Initializes a {@code Interpreter} and specifies the number of threads used for inference.
      *
-     * <p>WARNING: This is an experimental interface that is subject to change.
+     * @param modelFile: a file of a pre-trained TF Lite model
+     * @param numThreads: number of threads to use for inference
+     * @deprecated Prefer using the {@link #Interpreter(File,Options)} constructor. This method will
+     *     be removed in a future release.
      */
-    public Options addDelegate(Delegate delegate) {
-      delegates.add(delegate);
-      return this;
+    @Deprecated
+    public Interpreter(File modelFile, int numThreads) {
+        this(modelFile, new Options().setNumThreads(numThreads));
     }
 
     /**
-     * Advanced: Set if buffer handle output is allowed.
+     * Initializes a {@code Interpreter} and specifies the number of threads used for inference.
      *
-     * <p>When a {@link Delegate} supports hardware acceleration, the interpreter will make the data
-     * of output tensors available in the CPU-allocated tensor buffers by default. If the client can
-     * consume the buffer handle directly (e.g. reading output from OpenGL texture), it can set this
-     * flag to false, avoiding the copy of data to the CPU buffer. The delegate documentation should
-     * indicate whether this is supported and how it can be used.
-     *
-     * <p>WARNING: This is an experimental interface that is subject to change.
+     * @param modelFile: a file of a pre-trained TF Lite model
+     * @param options: a set of options for customizing interpreter behavior
+     * @throws IllegalArgumentException if {@code modelFile} does not encode a valid TensorFlow Lite
+     *     model.
      */
-    public Options setAllowBufferHandleOutput(boolean allow) {
-      this.allowBufferHandleOutput = allow;
-      return this;
+    public Interpreter(File modelFile, Options options) {
+        wrapper = new NativeInterpreterWrapper(modelFile.getAbsolutePath(), options);
     }
 
     /**
-     * Advanced: Set if the interpreter is able to be cancelled.
+     * Initializes a {@code Interpreter} with a {@code ByteBuffer} of a model file.
      *
-     * @see {@link Interpreter#setCancelled(boolean)}.
+     * <p>The ByteBuffer should not be modified after the construction of a {@code Interpreter}. The
+     * {@code ByteBuffer} can be either a {@code MappedByteBuffer} that memory-maps a model file, or
+     * a direct {@code ByteBuffer} of nativeOrder() that contains the bytes content of a model.
+     *
+     * @throws IllegalArgumentException if {@code byteBuffer} is not a {@link MappedByteBuffer} nor
+     *     a direct {@link ByteBuffer} of nativeOrder.
      */
-    public Options setCancellable(boolean allow) {
-      this.allowCancellation = allow;
-      return this;
+    public Interpreter(ByteBuffer byteBuffer) {
+        this(byteBuffer, /* options= */ null);
     }
 
     /**
-     * Experimental: Enable an optimized set of floating point CPU kernels (provided by XNNPACK).
+     * Initializes a {@code Interpreter} with a {@code ByteBuffer} of a model file and specifies the
+     * number of threads used for inference.
      *
-     * <p>Enabling this flag will enable use of a new, highly optimized set of CPU kernels provided
-     * via the XNNPACK delegate. Currently, this is restricted to a subset of floating point
-     * operations. Eventually, we plan to enable this by default, as it can provide significant
-     * peformance benefits for many classes of floating point models. See
-     * https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/delegates/xnnpack/README.md
-     * for more details.
+     * <p>The ByteBuffer should not be modified after the construction of a {@code Interpreter}. The
+     * {@code ByteBuffer} can be either a {@code MappedByteBuffer} that memory-maps a model file, or
+     * a direct {@code ByteBuffer} of nativeOrder() that contains the bytes content of a model.
      *
-     * <p>Things to keep in mind when enabling this flag:
+     * @deprecated Prefer using the {@link #Interpreter(ByteBuffer,Options)} constructor. This
+     *     method will be removed in a future release.
+     */
+    @Deprecated
+    public Interpreter(ByteBuffer byteBuffer, int numThreads) {
+        this(byteBuffer, new Options().setNumThreads(numThreads));
+    }
+
+    /**
+     * Initializes a {@code Interpreter} with a {@code MappedByteBuffer} to the model file.
+     *
+     * <p>The {@code MappedByteBuffer} should remain unchanged after the construction of a {@code
+     * Interpreter}.
+     *
+     * @deprecated Prefer using the {@link #Interpreter(ByteBuffer,Options)} constructor. This
+     *     method will be removed in a future release.
+     */
+    @Deprecated
+    public Interpreter(MappedByteBuffer mappedByteBuffer) {
+        this(mappedByteBuffer, /* options= */ null);
+    }
+
+    /**
+     * Initializes a {@code Interpreter} with a {@code ByteBuffer} of a model file and a set of
+     * custom {@link Options}.
+     *
+     * <p>The ByteBuffer should not be modified after the construction of a {@code Interpreter}. The
+     * {@code ByteBuffer} can be either a {@link MappedByteBuffer} that memory-maps a model file, or
+     * a direct {@link ByteBuffer} of nativeOrder() that contains the bytes content of a model.
+     *
+     * @throws IllegalArgumentException if {@code byteBuffer} is not a {@link MappedByteBuffer} nor
+     *     a direct {@link ByteBuffer} of nativeOrder.
+     */
+    public Interpreter(ByteBuffer byteBuffer, Options options) {
+        wrapper = new NativeInterpreterWrapper(byteBuffer, options);
+    }
+
+    /**
+     * Runs model inference if the model takes only one input, and provides only one output.
+     *
+     * <p>Warning: The API is more efficient if a {@link Buffer} (preferably direct, but not
+     * required) is used as the input/output data type. Please consider using {@link Buffer} to feed
+     * and fetch primitive data for better performance. The following concrete {@link Buffer} types
+     * are supported:
      *
      * <ul>
-     *   <li>Startup time and resize time may increase.
-     *   <li>Baseline memory consumption may increase.
-     *   <li>May be ignored if another delegate (eg NNAPI) have been applied.
-     *   <li>Quantized models will not see any benefit.
+     *   <li>{@link ByteBuffer} - compatible with any underlying primitive Tensor type.
+     *   <li>{@link java.nio.FloatBuffer} - compatible with float Tensors.
+     *   <li>{@link java.nio.IntBuffer} - compatible with int32 Tensors.
+     *   <li>{@link java.nio.LongBuffer} - compatible with int64 Tensors.
      * </ul>
      *
-     * <p>WARNING: This is an experimental interface that is subject to change.
+     * Note that boolean types are only supported as arrays, not {@link Buffer}s, or as scalar
+     * inputs.
+     *
+     * @param input an array or multidimensional array, or a {@link Buffer} of primitive types
+     *     including int, float, long, and byte. {@link Buffer} is the preferred way to pass large
+     *     input data for primitive types, whereas string types require using the
+     *     (multi-dimensional) array input path. When a {@link Buffer} is used, its content should
+     *     remain unchanged until model inference is done, and the caller must ensure that the
+     *     {@link Buffer} is at the appropriate read position. A {@code null} value is allowed only
+     *     if the caller is using a {@link Delegate} that allows buffer handle interop, and such a
+     *     buffer has been bound to the input {@link Tensor}.
+     * @throws IllegalArgumentException if {@code input} or {@code output} is null or empty, or if
+     *     error occurs when running the inference.
+     * @throws IllegalArgumentException (EXPERIMENTAL, subject to change) if the inference is
+     *     interrupted by {@code setCancelled(true)}.
      */
-    public Options setUseXNNPACK(boolean useXNNPACK) {
-      this.useXNNPACK = useXNNPACK;
-      return this;
+    public void run(Object input) {
+        Object[] inputs = {input};
+        runForMultipleInputsOutputs(inputs);
     }
 
-    int numThreads = -1;
-    Boolean useNNAPI;
-    Boolean allowFp16PrecisionForFp32;
-    Boolean allowBufferHandleOutput;
-    Boolean allowCancellation;
-    Boolean useXNNPACK;
-    final List<Delegate> delegates = new ArrayList<>();
-  }
-
-  /**
-   * Initializes a {@code Interpreter}
-   *
-   * @param modelFile: a File of a pre-trained TF Lite model.
-   * @throws IllegalArgumentException if {@code modelFile} does not encode a valid TensorFlow Lite
-   *     model.
-   */
-  public Interpreter(File modelFile) {
-    this(modelFile, /*options = */ null);
-  }
-
-  /**
-   * Initializes a {@code Interpreter} and specifies the number of threads used for inference.
-   *
-   * @param modelFile: a file of a pre-trained TF Lite model
-   * @param numThreads: number of threads to use for inference
-   * @deprecated Prefer using the {@link #Interpreter(File,Options)} constructor. This method will
-   *     be removed in a future release.
-   */
-  @Deprecated
-  public Interpreter(File modelFile, int numThreads) {
-    this(modelFile, new Options().setNumThreads(numThreads));
-  }
-
-  /**
-   * Initializes a {@code Interpreter} and specifies the number of threads used for inference.
-   *
-   * @param modelFile: a file of a pre-trained TF Lite model
-   * @param options: a set of options for customizing interpreter behavior
-   * @throws IllegalArgumentException if {@code modelFile} does not encode a valid TensorFlow Lite
-   *     model.
-   */
-  public Interpreter(File modelFile, Options options) {
-    wrapper = new NativeInterpreterWrapper(modelFile.getAbsolutePath(), options);
-  }
-
-  /**
-   * Initializes a {@code Interpreter} with a {@code ByteBuffer} of a model file.
-   *
-   * <p>The ByteBuffer should not be modified after the construction of a {@code Interpreter}. The
-   * {@code ByteBuffer} can be either a {@code MappedByteBuffer} that memory-maps a model file, or a
-   * direct {@code ByteBuffer} of nativeOrder() that contains the bytes content of a model.
-   *
-   * @throws IllegalArgumentException if {@code byteBuffer} is not a {@link MappedByteBuffer} nor a
-   *     direct {@link ByteBuffer} of nativeOrder.
-   */
-  public Interpreter(ByteBuffer byteBuffer) {
-    this(byteBuffer, /* options= */ null);
-  }
-
-  /**
-   * Initializes a {@code Interpreter} with a {@code ByteBuffer} of a model file and specifies the
-   * number of threads used for inference.
-   *
-   * <p>The ByteBuffer should not be modified after the construction of a {@code Interpreter}. The
-   * {@code ByteBuffer} can be either a {@code MappedByteBuffer} that memory-maps a model file, or a
-   * direct {@code ByteBuffer} of nativeOrder() that contains the bytes content of a model.
-   *
-   * @deprecated Prefer using the {@link #Interpreter(ByteBuffer,Options)} constructor. This method
-   *     will be removed in a future release.
-   */
-  @Deprecated
-  public Interpreter(ByteBuffer byteBuffer, int numThreads) {
-    this(byteBuffer, new Options().setNumThreads(numThreads));
-  }
-
-  /**
-   * Initializes a {@code Interpreter} with a {@code MappedByteBuffer} to the model file.
-   *
-   * <p>The {@code MappedByteBuffer} should remain unchanged after the construction of a {@code
-   * Interpreter}.
-   *
-   * @deprecated Prefer using the {@link #Interpreter(ByteBuffer,Options)} constructor. This method
-   *     will be removed in a future release.
-   */
-  @Deprecated
-  public Interpreter(MappedByteBuffer mappedByteBuffer) {
-    this(mappedByteBuffer, /* options= */ null);
-  }
-
-  /**
-   * Initializes a {@code Interpreter} with a {@code ByteBuffer} of a model file and a set of custom
-   * {@link Options}.
-   *
-   * <p>The ByteBuffer should not be modified after the construction of a {@code Interpreter}. The
-   * {@code ByteBuffer} can be either a {@link MappedByteBuffer} that memory-maps a model file, or a
-   * direct {@link ByteBuffer} of nativeOrder() that contains the bytes content of a model.
-   *
-   * @throws IllegalArgumentException if {@code byteBuffer} is not a {@link MappedByteBuffer} nor a
-   *     direct {@link ByteBuffer} of nativeOrder.
-   */
-  public Interpreter(ByteBuffer byteBuffer, Options options) {
-    wrapper = new NativeInterpreterWrapper(byteBuffer, options);
-  }
-
-  /**
-   * Runs model inference if the model takes only one input, and provides only one output.
-   *
-   * <p>Warning: The API is more efficient if a {@link Buffer} (preferably direct, but not required)
-   * is used as the input/output data type. Please consider using {@link Buffer} to feed and fetch
-   * primitive data for better performance. The following concrete {@link Buffer} types are
-   * supported:
-   *
-   * <ul>
-   *   <li>{@link ByteBuffer} - compatible with any underlying primitive Tensor type.
-   *   <li>{@link java.nio.FloatBuffer} - compatible with float Tensors.
-   *   <li>{@link java.nio.IntBuffer} - compatible with int32 Tensors.
-   *   <li>{@link java.nio.LongBuffer} - compatible with int64 Tensors.
-   * </ul>
-   *
-   * Note that boolean types are only supported as arrays, not {@link Buffer}s, or as scalar inputs.
-   *
-   * @param input an array or multidimensional array, or a {@link Buffer} of primitive types
-   *     including int, float, long, and byte. {@link Buffer} is the preferred way to pass large
-   *     input data for primitive types, whereas string types require using the (multi-dimensional)
-   *     array input path. When a {@link Buffer} is used, its content should remain unchanged until
-   *     model inference is done, and the caller must ensure that the {@link Buffer} is at the
-   *     appropriate read position. A {@code null} value is allowed only if the caller is using a
-   *     {@link Delegate} that allows buffer handle interop, and such a buffer has been bound to the
-   *     input {@link Tensor}.
-   * @throws IllegalArgumentException if {@code input} or {@code output} is null or empty, or if
-   *     error occurs when running the inference.
-   * @throws IllegalArgumentException (EXPERIMENTAL, subject to change) if the inference is
-   *     interrupted by {@code setCancelled(true)}.
-   */
-  public void run(Object input) {
-    Object[] inputs = {input};
-    runForMultipleInputsOutputs(inputs);
-  }
-
-  /**
-   * Runs model inference if the model takes multiple inputs, or returns multiple outputs.
-   *
-   * <p>Warning: The API is more efficient if {@link Buffer}s (preferably direct, but not required)
-   * are used as the input/output data types. Please consider using {@link Buffer} to feed and fetch
-   * primitive data for better performance. The following concrete {@link Buffer} types are
-   * supported:
-   *
-   * <ul>
-   *   <li>{@link ByteBuffer} - compatible with any underlying primitive Tensor type.
-   *   <li>{@link java.nio.FloatBuffer} - compatible with float Tensors.
-   *   <li>{@link java.nio.IntBuffer} - compatible with int32 Tensors.
-   *   <li>{@link java.nio.LongBuffer} - compatible with int64 Tensors.
-   * </ul>
-   *
-   * Note that boolean types are only supported as arrays, not {@link Buffer}s, or as scalar inputs.
-   *
-   * <p>Note: {@code null} values for invididual elements of {@code inputs} and {@code outputs} is
-   * allowed only if the caller is using a {@link Delegate} that allows buffer handle interop, and
-   * such a buffer has been bound to the corresponding input or output {@link Tensor}(s).
-   *
-   * @param inputs an array of input data. The inputs should be in the same order as inputs of the
-   *     model. Each input can be an array or multidimensional array, or a {@link Buffer} of
-   *     primitive types including int, float, long, and byte. {@link Buffer} is the preferred way
-   *     to pass large input data, whereas string types require using the (multi-dimensional) array
-   *     input path. When {@link Buffer} is used, its content should remain unchanged until model
-   *     inference is done, and the caller must ensure that the {@link Buffer} is at the appropriate
-   *     read position.
-   * @throws IllegalArgumentException if {@code inputs} or {@code outputs} is null or empty, or if
-   *     error occurs when running the inference.
-   */
-  public void runForMultipleInputsOutputs(
-      Object[] inputs) {
-    checkNotClosed();
-    wrapper.run(inputs);
-  }
-
-  /**
-   * Expicitly updates allocations for all tensors, if necessary.
-   *
-   * <p>This will propagate shapes and memory allocations for all dependent tensors using the input
-   * tensor shape(s) as given.
-   *
-   * <p>Note: This call is *purely optional*. Tensor allocation will occur automatically during
-   * execution if any input tensors have been resized. This call is most useful in determining the
-   * shapes for any output tensors before executing the graph, e.g.,
-   *
-   * <pre>{@code
-   * interpreter.resizeInput(0, new int[]{1, 4, 4, 3}));
-   * interpreter.allocateTensors();
-   * FloatBuffer input = FloatBuffer.allocate(interpreter.getInputTensor(0),numElements());
-   * // Populate inputs...
-   * FloatBuffer output = FloatBuffer.allocate(interpreter.getOutputTensor(0).numElements());
-   * interpreter.run(input, output)
-   * // Process outputs...
-   * }</pre>
-   *
-   * @throws IllegalStateException if the graph's tensors could not be successfully allocated.
-   */
-  public void allocateTensors() {
-    checkNotClosed();
-    wrapper.allocateTensors();
-  }
-
-  /**
-   * Resizes idx-th input of the native model to the given dims.
-   *
-   * @throws IllegalArgumentException if {@code idx} is negtive or is not smaller than the number of
-   *     model inputs; or if error occurs when resizing the idx-th input.
-   */
-  public void resizeInput(int idx, int[] dims) {
-    checkNotClosed();
-    wrapper.resizeInput(idx, dims, false);
-  }
-
-  /**
-   * Resizes idx-th input of the native model to the given dims.
-   *
-   * <p>When `strict` is True, only unknown dimensions can be resized. Unknown dimensions are
-   * indicated as `-1` in the array returned by `Tensor.shapeSignature()`.
-   *
-   * @throws IllegalArgumentException if {@code idx} is negtive or is not smaller than the number of
-   *     model inputs; or if error occurs when resizing the idx-th input. Additionally, the error
-   *     occurs when attempting to resize a tensor with fixed dimensions when `struct` is True.
-   */
-  public void resizeInput(int idx, int[] dims, boolean strict) {
-    checkNotClosed();
-    wrapper.resizeInput(idx, dims, strict);
-  }
-
-  /** Gets the number of input tensors. */
-  public int getInputTensorCount() {
-    checkNotClosed();
-    return wrapper.getInputTensorCount();
-  }
-
-  /**
-   * Gets index of an input given the op name of the input.
-   *
-   * @throws IllegalArgumentException if {@code opName} does not match any input in the model used
-   *     to initialize the {@link Interpreter}.
-   */
-  public int getInputIndex(String opName) {
-    checkNotClosed();
-    return wrapper.getInputIndex(opName);
-  }
-
-  /**
-   * Gets the Tensor associated with the provdied input index.
-   *
-   * @throws IllegalArgumentException if {@code inputIndex} is negtive or is not smaller than the
-   *     number of model inputs.
-   */
-  public Tensor getInputTensor(int inputIndex) {
-    checkNotClosed();
-    return wrapper.getInputTensor(inputIndex);
-  }
-
-  /** Gets the number of output Tensors. */
-  public int getOutputTensorCount() {
-    checkNotClosed();
-    return wrapper.getOutputTensorCount();
-  }
-
-  /**
-   * Gets index of an output given the op name of the output.
-   *
-   * @throws IllegalArgumentException if {@code opName} does not match any output in the model used
-   *     to initialize the {@link Interpreter}.
-   */
-  public int getOutputIndex(String opName) {
-    checkNotClosed();
-    return wrapper.getOutputIndex(opName);
-  }
-
-  /**
-   * Gets the Tensor associated with the provdied output index.
-   *
-   * <p>Note: Output tensor details (e.g., shape) may not be fully populated until after inference
-   * is executed. If you need updated details *before* running inference (e.g., after resizing an
-   * input tensor, which may invalidate output tensor shapes), use {@link #allocateTensors()} to
-   * explicitly trigger allocation and shape propagation. Note that, for graphs with output shapes
-   * that are dependent on input *values*, the output shape may not be fully determined until
-   * running inference.
-   *
-   * @throws IllegalArgumentException if {@code outputIndex} is negtive or is not smaller than the
-   *     number of model outputs.
-   */
-  public Tensor getOutputTensor(int outputIndex) {
-    checkNotClosed();
-    return wrapper.getOutputTensor(outputIndex);
-  }
-
-  /**
-   * Returns native inference timing.
-   *
-   * @throws IllegalArgumentException if the model is not initialized by the {@link Interpreter}.
-   */
-  public Long getLastNativeInferenceDurationNanoseconds() {
-    checkNotClosed();
-    return wrapper.getLastNativeInferenceDurationNanoseconds();
-  }
-
-  /**
-   * Sets the number of threads to be used for ops that support multi-threading.
-   *
-   * @deprecated Prefer using {@link Options#setNumThreads(int)} directly for controlling thread
-   *     multi-threading. This method will be removed in a future release.
-   */
-  @Deprecated
-  public void setNumThreads(int numThreads) {
-    checkNotClosed();
-    wrapper.setNumThreads(numThreads);
-  }
-
-  /**
-   * Advanced: Modifies the graph with the provided {@link Delegate}.
-   *
-   * @throws IllegalArgumentException if error occurs when modifying graph with {@code delegate}.
-   * @deprecated Prefer using {@link Options#addDelegate} to provide delegates at creation time.
-   *     This method will be removed in a future release.
-   */
-  @Deprecated
-  public void modifyGraphWithDelegate(Delegate delegate) {
-    checkNotClosed();
-    wrapper.modifyGraphWithDelegate(delegate);
-  }
-
-  /**
-   * Advanced: Resets all variable tensors to the default value.
-   *
-   * <p>If a variable tensor doesn't have an associated buffer, it will be reset to zero.
-   *
-   * <p>WARNING: This is an experimental API and subject to change.
-   */
-  public void resetVariableTensors() {
-    checkNotClosed();
-    wrapper.resetVariableTensors();
-  }
-
-  /**
-   * Advanced: Interrupts inference in the middle of a call to {@link Interpreter#run}.
-   *
-   * <p>A cancellation flag will be set to true when this function gets called. The interpreter will
-   * check the flag between Op invocations, and if it's {@code true}, the interpreter will stop
-   * execution. The interpreter will remain a cancelled state until explicitly "uncancelled" by
-   * {@code setCancelled(false)}.
-   *
-   * <p>WARNING: This is an experimental API and subject to change.
-   *
-   * @param cancelled {@code true} to cancel inference in a best-effort way; {@code false} to
-   *     resume.
-   * @throws IllegalStateException if the interpreter is not initialized with the cancellable
-   *     option, which is by default off.
-   * @see {@link Interpreter.Options#setCancellable(boolean)}.
-   */
-  public void setCancelled(boolean cancelled) {
-    wrapper.setCancelled(cancelled);
-  }
-
-  int getExecutionPlanLength() {
-    checkNotClosed();
-    return wrapper.getExecutionPlanLength();
-  }
-
-  /** Release resources associated with the {@code Interpreter}. */
-  @Override
-  public void close() {
-    if (wrapper != null) {
-      wrapper.close();
-      wrapper = null;
+    /**
+     * Runs model inference if the model takes multiple inputs, or returns multiple outputs.
+     *
+     * <p>Warning: The API is more efficient if {@link Buffer}s (preferably direct, but not
+     * required) are used as the input/output data types. Please consider using {@link Buffer} to
+     * feed and fetch primitive data for better performance. The following concrete {@link Buffer}
+     * types are supported:
+     *
+     * <ul>
+     *   <li>{@link ByteBuffer} - compatible with any underlying primitive Tensor type.
+     *   <li>{@link java.nio.FloatBuffer} - compatible with float Tensors.
+     *   <li>{@link java.nio.IntBuffer} - compatible with int32 Tensors.
+     *   <li>{@link java.nio.LongBuffer} - compatible with int64 Tensors.
+     * </ul>
+     *
+     * Note that boolean types are only supported as arrays, not {@link Buffer}s, or as scalar
+     * inputs.
+     *
+     * <p>Note: {@code null} values for invididual elements of {@code inputs} and {@code outputs} is
+     * allowed only if the caller is using a {@link Delegate} that allows buffer handle interop, and
+     * such a buffer has been bound to the corresponding input or output {@link Tensor}(s).
+     *
+     * @param inputs an array of input data. The inputs should be in the same order as inputs of the
+     *     model. Each input can be an array or multidimensional array, or a {@link Buffer} of
+     *     primitive types including int, float, long, and byte. {@link Buffer} is the preferred way
+     *     to pass large input data, whereas string types require using the (multi-dimensional)
+     *     array input path. When {@link Buffer} is used, its content should remain unchanged until
+     *     model inference is done, and the caller must ensure that the {@link Buffer} is at the
+     *     appropriate read position.
+     * @throws IllegalArgumentException if {@code inputs} or {@code outputs} is null or empty, or if
+     *     error occurs when running the inference.
+     */
+    public void runForMultipleInputsOutputs(Object[] inputs) {
+        checkNotClosed();
+        wrapper.run(inputs);
     }
-  }
 
-  // for Object.finalize, see https://bugs.openjdk.java.net/browse/JDK-8165641
-  @SuppressWarnings("deprecation")
-  @Override
-  protected void finalize() throws Throwable {
-    try {
-      close();
-    } finally {
-      super.finalize();
+    /**
+     * Expicitly updates allocations for all tensors, if necessary.
+     *
+     * <p>This will propagate shapes and memory allocations for all dependent tensors using the
+     * input tensor shape(s) as given.
+     *
+     * <p>Note: This call is *purely optional*. Tensor allocation will occur automatically during
+     * execution if any input tensors have been resized. This call is most useful in determining the
+     * shapes for any output tensors before executing the graph, e.g.,
+     *
+     * <pre>{@code
+     * interpreter.resizeInput(0, new int[]{1, 4, 4, 3}));
+     * interpreter.allocateTensors();
+     * FloatBuffer input = FloatBuffer.allocate(interpreter.getInputTensor(0),numElements());
+     * // Populate inputs...
+     * FloatBuffer output = FloatBuffer.allocate(interpreter.getOutputTensor(0).numElements());
+     * interpreter.run(input, output)
+     * // Process outputs...
+     * }</pre>
+     *
+     * @throws IllegalStateException if the graph's tensors could not be successfully allocated.
+     */
+    public void allocateTensors() {
+        checkNotClosed();
+        wrapper.allocateTensors();
     }
-  }
 
-  private void checkNotClosed() {
-    if (wrapper == null) {
-      throw new IllegalStateException("Internal error: The Interpreter has already been closed.");
+    /**
+     * Resizes idx-th input of the native model to the given dims.
+     *
+     * @throws IllegalArgumentException if {@code idx} is negtive or is not smaller than the number
+     *     of model inputs; or if error occurs when resizing the idx-th input.
+     */
+    public void resizeInput(int idx, int[] dims) {
+        checkNotClosed();
+        wrapper.resizeInput(idx, dims, false);
     }
-  }
 
-  NativeInterpreterWrapper wrapper;
+    /**
+     * Resizes idx-th input of the native model to the given dims.
+     *
+     * <p>When `strict` is True, only unknown dimensions can be resized. Unknown dimensions are
+     * indicated as `-1` in the array returned by `Tensor.shapeSignature()`.
+     *
+     * @throws IllegalArgumentException if {@code idx} is negtive or is not smaller than the number
+     *     of model inputs; or if error occurs when resizing the idx-th input. Additionally, the
+     *     error occurs when attempting to resize a tensor with fixed dimensions when `struct` is
+     *     True.
+     */
+    public void resizeInput(int idx, int[] dims, boolean strict) {
+        checkNotClosed();
+        wrapper.resizeInput(idx, dims, strict);
+    }
+
+    /** Gets the number of input tensors. */
+    public int getInputTensorCount() {
+        checkNotClosed();
+        return wrapper.getInputTensorCount();
+    }
+
+    /**
+     * Gets index of an input given the op name of the input.
+     *
+     * @throws IllegalArgumentException if {@code opName} does not match any input in the model used
+     *     to initialize the {@link Interpreter}.
+     */
+    public int getInputIndex(String opName) {
+        checkNotClosed();
+        return wrapper.getInputIndex(opName);
+    }
+
+    /**
+     * Gets the Tensor associated with the provdied input index.
+     *
+     * @throws IllegalArgumentException if {@code inputIndex} is negtive or is not smaller than the
+     *     number of model inputs.
+     */
+    public Tensor getInputTensor(int inputIndex) {
+        checkNotClosed();
+        return wrapper.getInputTensor(inputIndex);
+    }
+
+    /** Gets the number of output Tensors. */
+    public int getOutputTensorCount() {
+        checkNotClosed();
+        return wrapper.getOutputTensorCount();
+    }
+
+    /**
+     * Gets index of an output given the op name of the output.
+     *
+     * @throws IllegalArgumentException if {@code opName} does not match any output in the model
+     *     used to initialize the {@link Interpreter}.
+     */
+    public int getOutputIndex(String opName) {
+        checkNotClosed();
+        return wrapper.getOutputIndex(opName);
+    }
+
+    /**
+     * Gets the Tensor associated with the provdied output index.
+     *
+     * <p>Note: Output tensor details (e.g., shape) may not be fully populated until after inference
+     * is executed. If you need updated details *before* running inference (e.g., after resizing an
+     * input tensor, which may invalidate output tensor shapes), use {@link #allocateTensors()} to
+     * explicitly trigger allocation and shape propagation. Note that, for graphs with output shapes
+     * that are dependent on input *values*, the output shape may not be fully determined until
+     * running inference.
+     *
+     * @throws IllegalArgumentException if {@code outputIndex} is negtive or is not smaller than the
+     *     number of model outputs.
+     */
+    public Tensor getOutputTensor(int outputIndex) {
+        checkNotClosed();
+        return wrapper.getOutputTensor(outputIndex);
+    }
+
+    /**
+     * Returns native inference timing.
+     *
+     * @throws IllegalArgumentException if the model is not initialized by the {@link Interpreter}.
+     */
+    public Long getLastNativeInferenceDurationNanoseconds() {
+        checkNotClosed();
+        return wrapper.getLastNativeInferenceDurationNanoseconds();
+    }
+
+    /**
+     * Sets the number of threads to be used for ops that support multi-threading.
+     *
+     * @deprecated Prefer using {@link Options#setNumThreads(int)} directly for controlling thread
+     *     multi-threading. This method will be removed in a future release.
+     */
+    @Deprecated
+    public void setNumThreads(int numThreads) {
+        checkNotClosed();
+        wrapper.setNumThreads(numThreads);
+    }
+
+    /**
+     * Advanced: Modifies the graph with the provided {@link Delegate}.
+     *
+     * @throws IllegalArgumentException if error occurs when modifying graph with {@code delegate}.
+     * @deprecated Prefer using {@link Options#addDelegate} to provide delegates at creation time.
+     *     This method will be removed in a future release.
+     */
+    @Deprecated
+    public void modifyGraphWithDelegate(Delegate delegate) {
+        checkNotClosed();
+        wrapper.modifyGraphWithDelegate(delegate);
+    }
+
+    /**
+     * Advanced: Resets all variable tensors to the default value.
+     *
+     * <p>If a variable tensor doesn't have an associated buffer, it will be reset to zero.
+     *
+     * <p>WARNING: This is an experimental API and subject to change.
+     */
+    public void resetVariableTensors() {
+        checkNotClosed();
+        wrapper.resetVariableTensors();
+    }
+
+    /**
+     * Advanced: Interrupts inference in the middle of a call to {@link Interpreter#run}.
+     *
+     * <p>A cancellation flag will be set to true when this function gets called. The interpreter
+     * will check the flag between Op invocations, and if it's {@code true}, the interpreter will
+     * stop execution. The interpreter will remain a cancelled state until explicitly "uncancelled"
+     * by {@code setCancelled(false)}.
+     *
+     * <p>WARNING: This is an experimental API and subject to change.
+     *
+     * @param cancelled {@code true} to cancel inference in a best-effort way; {@code false} to
+     *     resume.
+     * @throws IllegalStateException if the interpreter is not initialized with the cancellable
+     *     option, which is by default off.
+     * @see {@link Interpreter.Options#setCancellable(boolean)}.
+     */
+    public void setCancelled(boolean cancelled) {
+        wrapper.setCancelled(cancelled);
+    }
+
+    int getExecutionPlanLength() {
+        checkNotClosed();
+        return wrapper.getExecutionPlanLength();
+    }
+
+    /** Release resources associated with the {@code Interpreter}. */
+    @Override
+    public void close() {
+        if (wrapper != null) {
+            wrapper.close();
+            wrapper = null;
+        }
+    }
+
+    // for Object.finalize, see https://bugs.openjdk.java.net/browse/JDK-8165641
+    @SuppressWarnings("deprecation")
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+            close();
+        } finally {
+            super.finalize();
+        }
+    }
+
+    private void checkNotClosed() {
+        if (wrapper == null) {
+            throw new IllegalStateException(
+                    "Internal error: The Interpreter has already been closed.");
+        }
+    }
+
+    NativeInterpreterWrapper wrapper;
 }
