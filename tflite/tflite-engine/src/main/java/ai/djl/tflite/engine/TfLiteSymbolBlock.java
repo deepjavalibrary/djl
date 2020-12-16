@@ -39,7 +39,7 @@ public class TfLiteSymbolBlock implements SymbolBlock, AutoCloseable {
     private TfLiteNDManager manager;
     private Interpreter interpreter;
 
-    public TfLiteSymbolBlock(Interpreter interpreter, TfLiteNDManager manager) {
+    TfLiteSymbolBlock(Interpreter interpreter, TfLiteNDManager manager) {
         this.interpreter = interpreter;
         this.manager = manager;
     }
