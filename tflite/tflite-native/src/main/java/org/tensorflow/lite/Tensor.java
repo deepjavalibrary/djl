@@ -139,20 +139,12 @@ public final class Tensor {
         return shapeSignatureCopy;
     }
 
-    /**
-     * Returns the (global) index of the tensor within the owning {@link Interpreter}.
-     *
-     * @hide
-     */
+    /** Returns the (global) index of the tensor within the owning {@link Interpreter}. */
     public int index() {
         return index(nativeHandle);
     }
 
-    /**
-     * Returns the name of the tensor within the owning {@link Interpreter}.
-     *
-     * @hide
-     */
+    /** Returns the name of the tensor within the owning {@link Interpreter}. */
     public String name() {
         return name(nativeHandle);
     }

@@ -124,11 +124,7 @@ public final class Interpreter implements AutoCloseable {
             return this;
         }
 
-        /**
-         * Advanced: Set if the interpreter is able to be cancelled.
-         *
-         * @see {@link Interpreter#setCancelled(boolean)}.
-         */
+        /** Advanced: Set if the interpreter is able to be cancelled. */
         public Options setCancellable(boolean allow) {
             this.allowCancellation = allow;
             return this;
@@ -516,7 +512,6 @@ public final class Interpreter implements AutoCloseable {
      *     resume.
      * @throws IllegalStateException if the interpreter is not initialized with the cancellable
      *     option, which is by default off.
-     * @see {@link Interpreter.Options#setCancellable(boolean)}.
      */
     public void setCancelled(boolean cancelled) {
         wrapper.setCancelled(cancelled);

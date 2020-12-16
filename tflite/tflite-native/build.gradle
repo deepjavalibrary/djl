@@ -20,7 +20,7 @@ jar {
     doFirst {
         def versionName = project.version
         if (!isRelease) {
-            version += String.format("-%s", new Date().format('yyyyMMdd'))
+            versionName += String.format("-%s", new Date().format('yyyyMMdd'))
         }
         def dir = file("${placeholder}/native/lib")
         dir.mkdirs()
@@ -75,8 +75,8 @@ task downloadTfliteNativeLib() {
     doLast {
         def url = "https://djl-ai.s3.amazonaws.com/publish/tflite-${tflite_version}/jnilib"
         def files = [
-                "macOS/libtensorflowlite_jni.so": "cpu/osx/native/lib/libtflite.dylib",
-                "Linux/libtensorflowlite_jni.so": "cpu/linux/native/lib/libtflite.so"
+                "macOS/libtensorflowlite_jni.so": "cpu/osx/native/lib/libtensorflowlite_jni.dylib",
+                "Linux/libtensorflowlite_jni.so": "cpu/linux/native/lib/libtensorflowlite_jni.so"
         ]
 
         files.each { entry ->
@@ -121,6 +121,7 @@ flavorNames.each { flavor ->
             }
             from file("${BINARY_ROOT}/${flavor}/${osName}")
             from file("src/main/resources")
+            from file("${project.buildDir}/classes")
             archiveClassifier = "${osName}-x86_64"
         }
         artifactsNames.add(tasks["${flavor}-${osName}Jar"])
@@ -169,3 +170,7 @@ flavorNames.each { flavor ->
         }
     }
 }
+
+checkstyleMain.enabled = false
+pmdMain.enabled = false
+tasks.getByName("spotbugsMain").enabled = false
