@@ -32,7 +32,9 @@ public final class TfLiteEngine extends Engine {
 
     private Engine alternativeEngine;
 
-    private TfLiteEngine() {}
+    private TfLiteEngine() {
+        LibUtils.loadLibrary();
+    }
 
     static Engine newInstance() {
         return new TfLiteEngine();
@@ -77,7 +79,8 @@ public final class TfLiteEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public Model newModel(String name, Device device) {
-        return new TfLiteModel(name);
+        // We need pass TfLiteManager explicitly
+        return new TfLiteModel(name, newBaseManager(device));
     }
 
     /** {@inheritDoc} */

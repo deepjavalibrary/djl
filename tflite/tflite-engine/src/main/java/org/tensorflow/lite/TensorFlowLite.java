@@ -18,23 +18,7 @@ package org.tensorflow.lite;
 /** Static utility methods loading the TensorFlowLite runtime. */
 public final class TensorFlowLite {
 
-    private static final String LIBNAME = "tensorflowlite_jni";
-
-    private static final Throwable LOAD_LIBRARY_EXCEPTION;
     private static volatile boolean isInit = false;
-
-    static {
-        // Attempt to load the default native libraries. If unavailable, cache the exception; the
-        // client
-        // may choose to link the native deps into their own custom native library.
-        Throwable loadLibraryException = null;
-        try {
-            System.loadLibrary(LIBNAME);
-        } catch (UnsatisfiedLinkError e) {
-            loadLibraryException = e;
-        }
-        LOAD_LIBRARY_EXCEPTION = loadLibraryException;
-    }
 
     private TensorFlowLite() {}
 
@@ -70,22 +54,8 @@ public final class TensorFlowLite {
             return;
         }
 
-        try {
-            // Try to invoke a native method (the method itself doesn't really matter) to ensure
-            // that
-            // native libs are available.
-            nativeRuntimeVersion();
-            isInit = true;
-        } catch (UnsatisfiedLinkError e) {
-            // Prefer logging the original library loading exception if native methods are
-            // unavailable.
-            Throwable exceptionToLog = LOAD_LIBRARY_EXCEPTION != null ? LOAD_LIBRARY_EXCEPTION : e;
-            throw new UnsatisfiedLinkError(
-                    "Failed to load native TensorFlow Lite methods. Check "
-                            + "that the correct native libraries are present, and, if using "
-                            + "a custom native library, have been properly loaded via System.loadLibrary():\n  "
-                            + exceptionToLog);
-        }
+        nativeRuntimeVersion();
+        isInit = true;
     }
 
     public static native String nativeRuntimeVersion();

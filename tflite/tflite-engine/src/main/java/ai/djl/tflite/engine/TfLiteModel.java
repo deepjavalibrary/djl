@@ -14,6 +14,7 @@ package ai.djl.tflite.engine;
 
 import ai.djl.BaseModel;
 import ai.djl.Model;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,10 +37,11 @@ public class TfLiteModel extends BaseModel {
      * Constructs a new Model on a given device.
      *
      * @param name the model name
+     * @param manager the {@link NDManager} to holds the NDArray
      */
-    TfLiteModel(String name) {
+    TfLiteModel(String name, NDManager manager) {
         super(name);
-        manager = (TfLiteNDManager) TfLiteNDManager.getSystemManager().newSubManager();
+        this.manager = (TfLiteNDManager) TfLiteNDManager.getSystemManager().newSubManager();
         manager.setName("TfLiteModel");
         dataType = DataType.FLOAT32;
     }
