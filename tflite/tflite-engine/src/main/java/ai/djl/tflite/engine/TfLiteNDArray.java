@@ -32,6 +32,9 @@ public class TfLiteNDArray implements NDArray {
 
     private TfLiteNDManager manager;
     private Tensor tensor;
+    private ByteBuffer data;
+    private Shape shape;
+    private DataType dataType;
     private String name;
     private boolean isClosed;
     private String uid;
@@ -41,6 +44,13 @@ public class TfLiteNDArray implements NDArray {
         uid = UUID.randomUUID().toString();
         manager.attach(uid, this);
         this.tensor = tensor;
+    }
+
+    TfLiteNDArray(TfLiteNDManager manager, ByteBuffer data, Shape shape, DataType dataType) {
+        this.manager = manager;
+        this.data = data;
+        this.shape = shape;
+        this.dataType = dataType;
     }
 
     /** {@inheritDoc} */
@@ -70,7 +80,7 @@ public class TfLiteNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
-        return null;
+        return dataType;
     }
 
     /** {@inheritDoc} */
@@ -83,7 +93,7 @@ public class TfLiteNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public Shape getShape() {
-        return null;
+        return shape;
     }
 
     /** {@inheritDoc} */
@@ -148,8 +158,7 @@ public class TfLiteNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
-        // TODO:
-        return null;
+        return data;
     }
 
     /** {@inheritDoc} */

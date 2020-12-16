@@ -22,6 +22,7 @@ import ai.djl.ndarray.types.Shape;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 /** {@code TfLiteNDManager} is the TFLite implementation of {@link NDManager}. */
 public class TfLiteNDManager extends BaseNDManager {
@@ -45,7 +46,14 @@ public class TfLiteNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public TfLiteNDArray create(Buffer data, Shape shape, DataType dataType) {
-        return null;
+        if (data.isDirect() && data instanceof ByteBuffer) {
+            return new TfLiteNDArray(this, (ByteBuffer) data, shape, dataType);
+        }
+        int size = data.remaining();
+        int numOfBytes = dataType.getNumOfBytes();
+        ByteBuffer bb = ByteBuffer.allocate(size * numOfBytes);
+        bb.asFloatBuffer().put((FloatBuffer) data);
+        return new TfLiteNDArray(this, bb, shape, dataType);
     }
 
     /** {@inheritDoc} */
