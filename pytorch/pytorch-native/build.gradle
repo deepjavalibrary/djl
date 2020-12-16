@@ -141,7 +141,7 @@ jar {
     doFirst {
         def versionName = project.version
         if (!isRelease) {
-            version += String.format("-%s", new Date().format('yyyyMMdd'))
+            versionName += String.format("-%s", new Date().format('yyyyMMdd'))
         }
         def dir = file("${placeholder}/native/lib")
         dir.mkdirs()
