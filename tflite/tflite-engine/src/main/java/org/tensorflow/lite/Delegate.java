@@ -27,13 +27,13 @@ package org.tensorflow.lite;
  * the delegate implementation must explicitly support this.
  */
 public interface Delegate {
-  /**
-   * Returns a native handle to the TensorFlow Lite delegate implementation.
-   *
-   * <p>Note: The Java {@link Delegate} maintains ownership of the native delegate instance, and
-   * must ensure its existence for the duration of usage with any {@link Interpreter}.
-   *
-   * @return The native delegate handle.
-   */
-  public long getNativeHandle();
+    /**
+     * Returns a native handle to the TensorFlow Lite delegate implementation.
+     *
+     * <p>Note: The Java {@link Delegate} maintains ownership of the native delegate instance, and
+     * must ensure its existence for the duration of usage with any {@link Interpreter}.
+     *
+     * @return The native delegate handle.
+     */
+    public long getNativeHandle();
 }

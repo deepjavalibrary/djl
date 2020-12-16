@@ -26,7 +26,6 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.nio.Buffer;
 import org.tensorflow.lite.Interpreter;
 
 /**
