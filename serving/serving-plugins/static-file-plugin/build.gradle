@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+
+
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+}
+
+
+
+test {
+    maxParallelForks = 1
+}
+
+

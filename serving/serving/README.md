@@ -37,13 +37,13 @@ You can pull the server from the central Maven repository by including the follo
 Use the following command to start model server locally:
 
 ```sh
-cd serving
+cd serving/serving-core
 
 # for Linux/macOS:
 ./gradlew run
 
 # for Windows:
-..\..\gradlew run
+..\..\..\gradlew run
 ```
 
 The model server will be listening on port 8080.
