@@ -121,7 +121,7 @@ flavorNames.each { flavor ->
             }
             from file("${BINARY_ROOT}/${flavor}/${osName}")
             from file("src/main/resources")
-            from file("${project.buildDir}/classes")
+            from file("${project.buildDir}/classes/java/main")
             archiveClassifier = "${osName}-x86_64"
         }
         artifactsNames.add(tasks["${flavor}-${osName}Jar"])
