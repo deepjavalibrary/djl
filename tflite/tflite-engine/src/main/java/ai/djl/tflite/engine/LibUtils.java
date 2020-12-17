@@ -54,6 +54,7 @@ public final class LibUtils {
         String libName = findLibraryInClasspath();
         if (libName == null) {
             System.loadLibrary(LIB_NAME); // NOPMD
+            return;
         }
         logger.debug("Loading TFLite native library from: {}", libName);
         System.load(libName); // NOPMD
