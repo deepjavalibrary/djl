@@ -96,6 +96,8 @@ public interface ModelZoo {
     static <I, O> ZooModel<I, O> loadModel(Criteria<I, O> criteria)
             throws IOException, ModelNotFoundException, MalformedModelException {
         Logger logger = LoggerFactory.getLogger(ModelZoo.class);
+        logger.debug("Loading model with {}", criteria);
+
         String artifactId = criteria.getArtifactId();
         ModelZoo modelZoo = criteria.getModelZoo();
         String groupId = criteria.getGroupId();
@@ -125,54 +127,59 @@ public interface ModelZoo {
                 }
                 if (groupId != null && !zoo.getGroupId().equals(groupId)) {
                     // filter out ModelZoo by groupId
-                    logger.debug("Ignored ModelZoo by groupId: {}", zoo.getGroupId());
+                    logger.debug("Ignore ModelZoo {} by groupId: {}", zoo.getGroupId(), groupId);
                     continue;
                 }
                 Set<String> supportedEngine = zoo.getSupportedEngines();
                 if (engine != null && !supportedEngine.contains(engine)) {
-                    logger.debug("Ignored ModelZoo by specified engine: {}", zoo.getGroupId());
+                    logger.debug("Ignore ModelZoo {} by engine: {}", zoo.getGroupId(), engine);
                     continue;
                 }
                 list.add(zoo);
             }
         }
 
+        Exception lastException = null;
         for (ModelZoo zoo : list) {
             String loaderGroupId = zoo.getGroupId();
             for (ModelLoader loader : zoo.getModelLoaders()) {
                 Application app = loader.getApplication();
                 String loaderArtifactId = loader.getArtifactId();
-                logger.debug(
-                        "Checking ModelLoader: {} {}:{}",
-                        app.getPath(),
-                        loaderGroupId,
-                        loaderArtifactId);
+                logger.debug("Checking ModelLoader: {}", loader);
                 if (artifactId != null && !artifactId.equals(loaderArtifactId)) {
                     // filter out by model loader artifactId
+                    logger.debug(
+                            "artifactId mismatch for ModelLoader: {}:{}",
+                            loaderGroupId,
+                            loaderArtifactId);
                     continue;
                 }
                 if (application != Application.UNDEFINED
                         && app != Application.UNDEFINED
                         && !app.matches(application)) {
                     // filter out ModelLoader by application
+                    logger.debug(
+                            "application mismatch for ModelLoader: {}:{}",
+                            loaderGroupId,
+                            loaderArtifactId);
                     continue;
                 }
 
                 try {
                     return loader.loadModel(criteria);
                 } catch (ModelNotFoundException e) {
+                    lastException = e;
                     logger.trace("", e);
                     logger.debug(
-                            "{} for ModelLoader: {} {}:{}",
+                            "{} for ModelLoader: {}:{}",
                             e.getMessage(),
-                            app,
-                            groupId,
+                            loaderGroupId,
                             loaderArtifactId);
                 }
             }
         }
         throw new ModelNotFoundException(
-                "No matching model with specified Input/Output type found.");
+                "No matching model with specified Input/Output type found.", lastException);
     }
 
     /**

@@ -95,6 +95,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
                                             f.endsWith("metadata.json")
                                                     && Files.isRegularFile(f)
                                                     && !f.getParent().equals(path))) {
+                        logger.debug("Found local repository: {}", path);
                         return new LocalRepository(name, path);
                     }
                 } catch (IOException e) {
