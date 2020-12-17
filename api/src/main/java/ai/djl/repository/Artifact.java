@@ -12,6 +12,7 @@
  */
 package ai.djl.repository;
 
+import ai.djl.util.JsonUtils;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Collections;
@@ -305,23 +306,12 @@ public class Artifact {
         } else {
             sb.append(name).append(':');
         }
-        sb.append(version == null ? "N/A" : version).append(" {");
+        sb.append(version == null ? "N/A" : version);
         if (properties != null) {
-            boolean first = true;
-            for (Map.Entry<String, String> entry : properties.entrySet()) {
-                if (first) {
-                    first = false;
-                } else {
-                    sb.append(',');
-                }
-                sb.append('"')
-                        .append(entry.getKey())
-                        .append("\":\"")
-                        .append(entry.getValue())
-                        .append('"');
-            }
+            sb.append(' ').append(JsonUtils.GSON.toJson(properties));
+        } else {
+            sb.append(" {}");
         }
-        sb.append('}');
         return sb.toString();
     }
 
