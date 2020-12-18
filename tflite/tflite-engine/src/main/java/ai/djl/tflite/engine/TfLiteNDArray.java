@@ -101,7 +101,7 @@ public class TfLiteNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public SparseFormat getSparseFormat() {
-        throw new UnsupportedOperationException("Not supported for TFLite");
+        return SparseFormat.DENSE;
     }
 
     /** {@inheritDoc} */
@@ -143,9 +143,24 @@ public class TfLiteNDArray implements NDArray {
                 double[] doubleResult =
                         Arrays.stream(array).mapToDouble(Number::doubleValue).toArray();
                 return manager.create(doubleResult).reshape(shape);
+            case FLOAT32:
+                float[] floatResult = new float[array.length];
+                for (int i = 0; i < array.length; i++) {
+                    floatResult[i] = array[i].floatValue();
+                }
+                return manager.create(floatResult).reshape(shape);
             case INT32:
                 int[] intResult = Arrays.stream(array).mapToInt(Number::intValue).toArray();
                 return manager.create(intResult).reshape(shape);
+            case INT64:
+                long[] longResult = Arrays.stream(array).mapToLong(Number::longValue).toArray();
+                return manager.create(longResult).reshape(shape);
+            case INT8:
+                byte[] booleanResult = new byte[array.length];
+                for (int i = 0; i < array.length; i++) {
+                    booleanResult[i] = array[i].byteValue();
+                }
+                return manager.create(booleanResult).reshape(shape);
             default:
                 throw new UnsupportedOperationException(
                         "Type conversion is not supported for TFLite for data type "

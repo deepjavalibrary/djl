@@ -169,7 +169,7 @@ public final class Tensor {
      * @throws IllegalArgumentException if the tensor is a scalar or if {@code src} is not
      *     compatible with the tensor (for example, mismatched data types or shapes).
      */
-    void setTo(Object src) {
+    public void setTo(Object src) {
         if (src == null) {
             if (hasDelegateBufferHandle(nativeHandle)) {
                 return;
@@ -188,7 +188,7 @@ public final class Tensor {
         }
     }
 
-    private void setTo(Buffer src) {
+    public void setTo(Buffer src) {
         // Note that we attempt to use a direct memcpy optimization for direct, native-ordered
         // buffers.
         // There are no base Buffer#order() or Buffer#put() methods, so again we have to ugly cast.
@@ -233,7 +233,7 @@ public final class Tensor {
      * @throws IllegalArgumentException if {@code dst} is not compatible with the tensor (for
      *     example, mismatched data types or shapes).
      */
-    Object copyTo(Object dst) {
+    public Object copyTo(Object dst) {
         if (dst == null) {
             if (hasDelegateBufferHandle(nativeHandle)) {
                 return dst;
@@ -251,7 +251,7 @@ public final class Tensor {
         return dst;
     }
 
-    private void copyTo(Buffer dst) {
+    public void copyTo(Buffer dst) {
         // There is no base Buffer#put() method, so we have to ugly cast.
         if (dst instanceof ByteBuffer) {
             ((ByteBuffer) dst).put(buffer());
