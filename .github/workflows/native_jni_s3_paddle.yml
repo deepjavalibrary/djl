@@ -2,9 +2,12 @@ name: Native JNI S3 Paddle
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron:  '0 10 * * *'
 
 jobs:
   build-paddle-jni-cpu:
+    if: github.repository == 'awslabs/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
