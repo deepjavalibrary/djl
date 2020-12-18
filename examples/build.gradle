@@ -68,7 +68,6 @@ task benchmark(type: JavaExec) {
                         System.setProperty("ai.djl.pytorch.num_threads", "1")
                     } else if (System.properties["ai.djl.default_engine"] == "TensorFlow") {
                         environment("OMP_NUM_THREADS", "1")
-                        environment("TF_NUM_INTEROP_THREADS", "1")
                         environment("TF_NUM_INTRAOP_THREADS", "1")
                     } else {
                         environment("MXNET_ENGINE_TYPE", "NaiveEngine")
