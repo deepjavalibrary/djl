@@ -31,8 +31,6 @@ import org.tensorflow.lite.Interpreter;
  */
 public class TfLiteModel extends BaseModel {
 
-    TfLiteNDManager manager;
-
     /**
      * Constructs a new Model on a given device.
      *
@@ -41,7 +39,7 @@ public class TfLiteModel extends BaseModel {
      */
     TfLiteModel(String name, NDManager manager) {
         super(name);
-        this.manager = (TfLiteNDManager) TfLiteNDManager.getSystemManager().newSubManager();
+        this.manager = TfLiteNDManager.getSystemManager().newSubManager();
         manager.setName("TfLiteModel");
         dataType = DataType.FLOAT32;
     }
@@ -61,7 +59,13 @@ public class TfLiteModel extends BaseModel {
             }
         }
         Interpreter interpreter = new Interpreter(modelFile.toFile());
-        setBlock(new TfLiteSymbolBlock(interpreter, manager));
+        setBlock(new TfLiteSymbolBlock(interpreter, getNDManager()));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public TfLiteNDManager getNDManager() {
+        return (TfLiteNDManager) super.getNDManager();
     }
 
     private Path findModelFile(String prefix) {

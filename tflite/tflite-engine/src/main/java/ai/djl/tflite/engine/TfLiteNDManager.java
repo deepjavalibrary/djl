@@ -22,7 +22,10 @@ import ai.djl.ndarray.types.Shape;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 
 /** {@code TfLiteNDManager} is the TFLite implementation of {@link NDManager}. */
 public class TfLiteNDManager extends BaseNDManager {
@@ -49,11 +52,38 @@ public class TfLiteNDManager extends BaseNDManager {
         if (data.isDirect() && data instanceof ByteBuffer) {
             return new TfLiteNDArray(this, (ByteBuffer) data, shape, dataType);
         }
+
         int size = data.remaining();
-        int numOfBytes = dataType.getNumOfBytes();
-        ByteBuffer bb = ByteBuffer.allocate(size * numOfBytes);
-        bb.asFloatBuffer().put((FloatBuffer) data);
-        return new TfLiteNDArray(this, bb, shape, dataType);
+        // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
+        DataType inputType = DataType.fromBuffer(data);
+
+        int numOfBytes = inputType.getNumOfBytes();
+        ByteBuffer buf = allocateDirect(size * numOfBytes);
+
+        switch (inputType) {
+            case FLOAT32:
+                buf.asFloatBuffer().put((FloatBuffer) data);
+                break;
+            case FLOAT64:
+                buf.asDoubleBuffer().put((DoubleBuffer) data);
+                break;
+            case UINT8:
+            case INT8:
+            case BOOLEAN:
+                buf.put((ByteBuffer) data);
+                break;
+            case INT32:
+                buf.asIntBuffer().put((IntBuffer) data);
+                break;
+            case INT64:
+                buf.asLongBuffer().put((LongBuffer) data);
+                break;
+            case FLOAT16:
+            default:
+                throw new AssertionError("Show never happen");
+        }
+        buf.rewind();
+        return new TfLiteNDArray(this, buf, shape, dataType);
     }
 
     /** {@inheritDoc} */
