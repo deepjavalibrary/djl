@@ -24,7 +24,7 @@ dependencies {
         runtimeOnly project(":onnxruntime:onnxruntime-engine")
     } else if (System.getProperty("ai.djl.default_engine") == "DLR") {
         runtimeOnly project(":dlr:dlr-engine")
-        runtimeOnly "ai.djl.dlr:dlr-native-auto:1.5.0-SNAPSHOT"
+        runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
     } else {
         runtimeOnly project(":mxnet:mxnet-model-zoo")
         runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
