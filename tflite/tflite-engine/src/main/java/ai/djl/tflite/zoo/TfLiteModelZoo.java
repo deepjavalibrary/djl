@@ -13,7 +13,7 @@
 package ai.djl.tflite.zoo;
 
 import ai.djl.engine.Engine;
-import ai.djl.modality.cv.zoo.ObjectDetectionModelLoader;
+import ai.djl.modality.cv.zoo.ImageClassificationModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.tflite.engine.TfLiteEngine;
@@ -28,8 +28,8 @@ public class TfLiteModelZoo implements ModelZoo {
     public static final String GROUP_ID = "ai.djl.tflite";
     private static final TfLiteModelZoo ZOO = new TfLiteModelZoo();
 
-    public static final ObjectDetectionModelLoader SSD =
-            new ObjectDetectionModelLoader(REPOSITORY, GROUP_ID, "ssd", "0.0.1", ZOO);
+    public static final ImageClassificationModelLoader MOBILENET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "mobilenet", "0.0.1", ZOO);
 
     /** {@inheritDoc} */
     @Override

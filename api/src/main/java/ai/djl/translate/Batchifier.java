@@ -30,6 +30,24 @@ public interface Batchifier {
     Batchifier STACK = new StackBatchifier();
 
     /**
+     * Returns a batchifier from a batchifier name.
+     *
+     * @param name the batchifier name
+     * @return the batchifier with the given name
+     * @throws IllegalArgumentException if an invalid name is given
+     */
+    static Batchifier fromString(String name) {
+        switch (name) {
+            case "stack":
+                return STACK;
+            case "none":
+                return null;
+            default:
+                throw new IllegalArgumentException("Invalid batchifier name");
+        }
+    }
+
+    /**
      * Converts an array of {@link NDList} into an NDList.
      *
      * <p>The size of the input array is the batch size. The data in each of the {@link NDList} are

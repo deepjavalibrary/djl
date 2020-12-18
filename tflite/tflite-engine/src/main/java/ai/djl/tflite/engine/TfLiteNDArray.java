@@ -44,6 +44,8 @@ public class TfLiteNDArray implements NDArray {
         uid = UUID.randomUUID().toString();
         manager.attach(uid, this);
         this.tensor = tensor;
+        shape = new Shape(Arrays.stream(tensor.shape()).mapToLong(i -> i).toArray());
+        dataType = TfLiteDataType.fromTf(tensor.dataType());
     }
 
     TfLiteNDArray(TfLiteNDManager manager, ByteBuffer data, Shape shape, DataType dataType) {
@@ -128,7 +130,27 @@ public class TfLiteNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
-        throw new UnsupportedOperationException("Not supported for TFLite");
+        if (dataType.equals(this.dataType)) {
+            if (copy) {
+                return new TfLiteNDArray(manager, toByteBuffer().duplicate(), shape, dataType);
+            } else {
+                return this;
+            }
+        }
+        Number[] array = toArray();
+        switch (dataType) {
+            case FLOAT64:
+                double[] doubleResult =
+                        Arrays.stream(array).mapToDouble(Number::doubleValue).toArray();
+                return manager.create(doubleResult).reshape(shape);
+            case INT32:
+                int[] intResult = Arrays.stream(array).mapToInt(Number::intValue).toArray();
+                return manager.create(intResult).reshape(shape);
+            default:
+                throw new UnsupportedOperationException(
+                        "Type conversion is not supported for TFLite for data type "
+                                + dataType.toString());
+        }
     }
 
     /** {@inheritDoc} */
@@ -743,7 +765,11 @@ public class TfLiteNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray reshape(Shape shape) {
-        throw new UnsupportedOperationException("Not supported for TFLite");
+        if (tensor != null) {
+            throw new UnsupportedOperationException("Not supported for TFLite");
+        } else {
+            return new TfLiteNDArray(manager, data, shape, dataType);
+        }
     }
 
     /** {@inheritDoc} */
