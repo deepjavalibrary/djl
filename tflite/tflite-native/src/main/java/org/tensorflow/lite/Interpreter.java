@@ -169,7 +169,7 @@ public final class Interpreter implements AutoCloseable {
     /**
      * Initializes a {@code Interpreter}
      *
-     * @param modelFile: a File of a pre-trained TF Lite model.
+     * @param modelFile a File of a pre-trained TF Lite model.
      * @throws IllegalArgumentException if {@code modelFile} does not encode a valid TensorFlow Lite
      *     model.
      */
@@ -180,8 +180,8 @@ public final class Interpreter implements AutoCloseable {
     /**
      * Initializes a {@code Interpreter} and specifies the number of threads used for inference.
      *
-     * @param modelFile: a file of a pre-trained TF Lite model
-     * @param numThreads: number of threads to use for inference
+     * @param modelFile a file of a pre-trained TF Lite model
+     * @param numThreads number of threads to use for inference
      * @deprecated Prefer using the {@link #Interpreter(File,Options)} constructor. This method will
      *     be removed in a future release.
      */
@@ -193,8 +193,8 @@ public final class Interpreter implements AutoCloseable {
     /**
      * Initializes a {@code Interpreter} and specifies the number of threads used for inference.
      *
-     * @param modelFile: a file of a pre-trained TF Lite model
-     * @param options: a set of options for customizing interpreter behavior
+     * @param modelFile a file of a pre-trained TF Lite model
+     * @param options a set of options for customizing interpreter behavior
      * @throws IllegalArgumentException if {@code modelFile} does not encode a valid TensorFlow Lite
      *     model.
      */

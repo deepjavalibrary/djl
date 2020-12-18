@@ -36,6 +36,8 @@ java {
     withSourcesJar()
 }
 
+javadoc.options.addStringOption('Xdoclint:none', '-quiet')
+
 project.tasks.withType(GenerateModuleMetadata) {
     enabled = false
 }
