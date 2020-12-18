@@ -83,6 +83,11 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | onnxruntime-native-auto(deprecated) | Please use com.microsoft.onnxruntime:onnxruntime instead |
 | | onnxruntime-native-cpu(deprecated) | Please use com.microsoft.onnxruntime:onnxruntime instead |
 | | | |
+| [ai.djl.dlr](https://search.maven.org/search?q=g:ai.djl.dlr) | [dlr-engine](../../dlr/dlr-engine/README.md#installation) | Neo DLR engine adapter |
+| | [dlr-native-auto](../../dlr/dlr-engine/README.md#automatic-recommended) | A placeholder package to automatically download native libraries for your platform |
+| | [dlr-native-cpu(osx-x86_64)](../../dlr/dlr-engine/README.md#macos) | Contains Neo LR native library for macOS |
+| | [dlr-native-cpu(linux-x86_64)](../../dlr/dlr-engine/README.md#linux) | Contains Neo DLR native library for Linux |
+| | | |
 | [ai.djl.android](https://search.maven.org/search?q=g:ai.djl.android) | [core](../../android/README.md#installation) | Contains Android specific utilities (e.g. ImageFactory) for DJL |
 | | [pytorch-native](../../android/README.md#installation) | Contains DJL PyTorch Android native package |
 | | | |

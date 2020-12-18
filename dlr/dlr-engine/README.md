@@ -29,19 +29,68 @@ The javadocs output is generated in the `build/doc/javadoc` folder.
 ## Installation
 You can pull the DLR engine from the central Maven repository by including the following dependency:
 
-- ai.djl.dlr:dlr-engine:0.9.0-SNAPSHOT
+- ai.djl.dlr:dlr-engine:0.9.0
 
 ```xml
 <dependency>
     <groupId>ai.djl.dlr</groupId>
     <artifactId>dlr-engine</artifactId>
-    <version>0.9.0-SNAPSHOT</version>
+    <version>0.9.0</version>
     <scope>runtime</scope>
+</dependency>
+```
+
+Besides the `dlr-engine` library, you may also need to include the Neo DLR native library in your project.
+
+Choose a native library based on your platform and needs:
+
+### Automatic (Recommended)
+
+We offer an automatic option that will download the native libraries into [cache folder](../../docs/development/cache_management.md) the first time you run DJL.
+It will automatically determine the appropriate jars for your system based on the platform and GPU support.
+
+```xml
+<dependency>
+    <groupId>ai.djl.dlr</groupId>
+    <artifactId>dlr-native-auto</artifactId>
+    <version>1.6.0</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+### macOS
+For macOS, you can use the following library:
+
+- ai.djl.dlr:dlr-native-cpu:1.6.0:osx-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.dlr</groupId>
+    <artifactId>dlr-native-cpu</artifactId>
+    <version>1.6.0</version>
+    <scope>runtime</scope>
+    <classifier>osx-x86_64</classifier>
+</dependency>
+```
+
+### Linux
+For Linux, you can use the following library:
+
+- ai.djl.dlr:dlr-native-cpu:1.6.0:linux-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.dlr</groupId>
+    <artifactId>dlr-native-cpu</artifactId>
+    <version>1.6.0</version>
+    <scope>runtime</scope>
+    <classifier>linux-x86_64</classifier>
 </dependency>
 ```
 
 ## Load your own custom dlr
 You can use environment variable to specify your custom dlr by
+
 ```
 export DLR_LIBRARY_PATH=path/to/your/dlr
 ```
