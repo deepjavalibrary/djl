@@ -14,7 +14,7 @@ package ai.djl.modality.nlp;
 
 import ai.djl.util.Utils;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -214,9 +214,9 @@ public class SimpleVocabulary implements Vocabulary {
          * @param path the path to the text file
          * @return this {@code VocabularyBuilder}
          */
-        public Builder addFromTextFile(String path) {
+        public Builder addFromTextFile(Path path) {
             try {
-                add(Utils.readLines(Paths.get(path), true));
+                add(Utils.readLines(path, true));
             } catch (IOException e) {
                 logger.error("Failed read token file", e);
             }

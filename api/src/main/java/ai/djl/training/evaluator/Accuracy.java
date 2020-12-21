@@ -60,6 +60,7 @@ public class Accuracy extends AbstractAccuracy {
         if (!label.getShape().equals(prediction.getShape())) {
             // Multi-class, sparse label
             predictionReduced = prediction.argMax(axis);
+            predictionReduced = predictionReduced.reshape(label.getShape());
         } else {
             // Multi-class, one-hot label
             predictionReduced = prediction;
