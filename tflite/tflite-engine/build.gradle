@@ -1,11 +1,5 @@
 group "ai.djl.tflite"
 
-repositories {
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
-}
-
 dependencies {
     api project(":api")
     api "ai.djl.tflite:tflite-native-auto:${tflite_version}-SNAPSHOT"

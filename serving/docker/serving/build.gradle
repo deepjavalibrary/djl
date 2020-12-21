@@ -2,14 +2,6 @@ plugins {
     id "java"
 }
 
-repositories {
-    jcenter()
-    mavenLocal()
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
-}
-
 dependencies {
     implementation platform("ai.djl:bom:0.9.0-SNAPSHOT")
     runtimeOnly "ai.djl:serving:0.9.0-SNAPSHOT"
