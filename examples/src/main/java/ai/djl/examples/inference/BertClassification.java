@@ -34,6 +34,7 @@ import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -112,7 +113,7 @@ public final class BertClassification {
             SimpleVocabulary vocabulary =
                     SimpleVocabulary.builder()
                             .optMinFrequency(1)
-                            .addFromTextFile(vocabularyPath)
+                            .addFromTextFile(Paths.get(vocabularyPath))
                             .optUnknownToken("[UNK]")
                             .build();
             tokenizer = new BertFullTokenizer(vocabulary, true);

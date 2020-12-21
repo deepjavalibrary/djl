@@ -1164,7 +1164,28 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray repeat(Shape desiredShape) {
-        throw new UnsupportedOperationException("Not implemented");
+        return repeat(repeatsToMatchShape(desiredShape));
+    }
+
+    private long[] repeatsToMatchShape(Shape desiredShape) {
+        Shape curShape = getShape();
+        int dimension = curShape.dimension();
+        if (desiredShape.dimension() > dimension) {
+            throw new IllegalArgumentException("The desired shape has too many dimensions");
+        }
+        if (desiredShape.dimension() < dimension) {
+            int additionalDimensions = dimension - desiredShape.dimension();
+            desiredShape = curShape.slice(0, additionalDimensions).addAll(desiredShape);
+        }
+        long[] repeats = new long[dimension];
+        for (int i = 0; i < dimension; i++) {
+            if (curShape.get(i) == 0 || desiredShape.get(i) % curShape.get(i) != 0) {
+                throw new IllegalArgumentException(
+                        "The desired shape is not a multiple of the original shape");
+            }
+            repeats[i] = Math.round(Math.ceil((double) desiredShape.get(i) / curShape.get(i)));
+        }
+        return repeats;
     }
 
     /** {@inheritDoc} */
