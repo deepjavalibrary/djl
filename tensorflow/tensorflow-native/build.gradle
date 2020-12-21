@@ -8,12 +8,6 @@ group "ai.djl.tensorflow"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 version = "${tensorflow_version}" + (isRelease ? "" : "-SNAPSHOT")
 
-repositories {
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
-}
-
 configurations {
     download
 }

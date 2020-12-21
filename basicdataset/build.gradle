@@ -1,9 +1,3 @@
-repositories {
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-}
-
 dependencies {
     api project(":api")
     api "org.apache.commons:commons-csv:${commons_csv_version}"
