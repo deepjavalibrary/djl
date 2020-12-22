@@ -12,6 +12,37 @@ dependencies {
     testRuntimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
 }
 
+processResources {
+    outputs.dir file("${project.buildDir}/jnilib")
+    doLast {
+        def url = "https://publish.djl.ai/paddlepaddle-${paddlepaddle_version}/jnilib"
+        def files = [
+                "${djl_version}/linux-x86_64/cpu/libdjl_paddle.so"         : "linux-x86_64/cpu/libdjl_paddle.so",
+                "${djl_version}/osx-x86_64/cpu/libdjl_paddle.dylib"        : "osx-x86_64/cpu/libdjl_paddle.dylib",
+                "${djl_version}/win-x86_64/cpu/djl_paddle.dll"             : "win-x86_64/cpu/djl_paddle.dll"
+        ]
+        def classesDir = "${project.buildDir}/jnilib"
+        files.each { entry ->
+            project.logger.lifecycle("Downloading ${url}/${entry.key}")
+            def file = new File("${classesDir}/${entry.value}")
+            if (file.exists()) {
+                project.logger.lifecycle("prebuilt or cached file found for ${entry.value}")
+            } else {
+                file.getParentFile().mkdirs()
+                new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }
+            }
+        }
+        // write properties
+        def propFile = file("${classesDir}/paddlepaddle.properties")
+        propFile.text = "version=${version}\n"
+
+        copy {
+            from classesDir
+            into "${project.buildDir}/classes/java/main/jnilib"
+        }
+    }
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
