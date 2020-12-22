@@ -68,12 +68,14 @@ public final class LibUtils {
             if (libName == null) {
                 throw new IllegalStateException("Native library not found");
             }
-            Path nativeLibDir = Paths.get(libName).getParent();
-            if (nativeLibDir == null || !nativeLibDir.toFile().isDirectory()) {
-                throw new IllegalStateException("Native folder cannot be found");
-            }
-            libName = copyJniLibraryFromClasspath(nativeLibDir);
         }
+        System.load(libName); // NOPMD
+        // TODO: change this part to load from cache directory
+        Path nativeLibDir = Paths.get(libName).getParent();
+        if (nativeLibDir == null || !nativeLibDir.toFile().isDirectory()) {
+            throw new IllegalStateException("Native folder cannot be found");
+        }
+        libName = copyJniLibraryFromClasspath(nativeLibDir);
         return libName;
     }
 
