@@ -24,8 +24,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -46,19 +44,12 @@ public class PtBertQATranslator extends QATranslator {
     /** {@inheritDoc} */
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
-        try {
-            vocabulary =
-                    SimpleVocabulary.builder()
-                            .optMinFrequency(1)
-                            .addFromTextFile(
-                                    Paths.get(
-                                            model.getArtifact("bert-base-uncased-vocab.txt")
-                                                    .toURI()))
-                            .optUnknownToken("[UNK]")
-                            .build();
-        } catch (URISyntaxException e) {
-            throw new IOException("Vocabulary not found", e);
-        }
+        vocabulary =
+                SimpleVocabulary.builder()
+                        .optMinFrequency(1)
+                        .addFromTextFile(model.getArtifact("bert-base-uncased-vocab.txt"))
+                        .optUnknownToken("[UNK]")
+                        .build();
         tokenizer = new BertTokenizer();
     }
 

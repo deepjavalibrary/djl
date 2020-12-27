@@ -51,7 +51,6 @@ import ai.djl.translate.PaddingStackBatchifier;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import org.apache.commons.csv.CSVFormat;
@@ -93,7 +92,7 @@ public final class TrainAmazonReviewRanking {
             SimpleVocabulary vocabulary =
                     SimpleVocabulary.builder()
                             .optMinFrequency(1)
-                            .addFromTextFile(Paths.get(embedding.getArtifact("vocab.txt").toURI()))
+                            .addFromTextFile(embedding.getArtifact("vocab.txt"))
                             .optUnknownToken("[UNK]")
                             .build();
             // Prepare dataset

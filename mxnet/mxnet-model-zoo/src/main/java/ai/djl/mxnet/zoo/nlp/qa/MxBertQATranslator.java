@@ -61,7 +61,7 @@ public class MxBertQATranslator extends QATranslator {
                 SimpleVocabulary.builder()
                         .optMinFrequency(1)
                         .addFromCustomizedFile(
-                                model.getArtifact("vocab.json").toString(), VocabParser::parseToken)
+                                model.getArtifact("vocab.json"), VocabParser::parseToken)
                         .optUnknownToken("[UNK]")
                         .build();
         tokenizer = new BertTokenizer();
@@ -167,12 +167,12 @@ public class MxBertQATranslator extends QATranslator {
         @SerializedName("idx_to_token")
         List<String> idx2token;
 
-        public static List<String> parseToken(String file) {
-            try (InputStream is = new URL(file).openStream();
+        public static List<String> parseToken(URL url) {
+            try (InputStream is = url.openStream();
                     Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
                 return JsonUtils.GSON.fromJson(reader, VocabParser.class).idx2token;
             } catch (IOException e) {
-                throw new IllegalArgumentException("Invalid url: " + file, e);
+                throw new IllegalArgumentException("Invalid url: " + url, e);
             }
         }
     }

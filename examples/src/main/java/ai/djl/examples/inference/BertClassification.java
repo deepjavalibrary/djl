@@ -109,7 +109,7 @@ public final class BertClassification {
         }
 
         @Override
-        public void prepare(NDManager manager, Model model) {
+        public void prepare(NDManager manager, Model model) throws IOException {
             SimpleVocabulary vocabulary =
                     SimpleVocabulary.builder()
                             .optMinFrequency(1)
