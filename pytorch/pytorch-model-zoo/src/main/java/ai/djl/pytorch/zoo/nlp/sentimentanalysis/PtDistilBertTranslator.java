@@ -25,9 +25,7 @@ import ai.djl.translate.StackBatchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,16 +49,12 @@ public class PtDistilBertTranslator implements Translator<String, Classification
     @Override
     public void prepare(NDManager manager, Model model) throws IOException {
         URL url = model.getArtifact("distilbert-base-uncased-finetuned-sst-2-english-vocab.txt");
-        try {
-            vocabulary =
-                    SimpleVocabulary.builder()
-                            .optMinFrequency(1)
-                            .addFromTextFile(Paths.get(url.toURI()))
-                            .optUnknownToken("[UNK]")
-                            .build();
-        } catch (URISyntaxException e) {
-            throw new IOException("Vocabulary not found", e);
-        }
+        vocabulary =
+                SimpleVocabulary.builder()
+                        .optMinFrequency(1)
+                        .addFromTextFile(url)
+                        .optUnknownToken("[UNK]")
+                        .build();
         tokenizer = new BertTokenizer();
     }
 

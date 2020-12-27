@@ -14,6 +14,8 @@ package ai.djl.modality.nlp;
 
 import ai.djl.util.Utils;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,13 +25,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** The simple implementation of Vocabulary. */
 public class SimpleVocabulary implements Vocabulary {
-
-    private static final Logger logger = LoggerFactory.getLogger(SimpleVocabulary.class);
 
     private Map<String, TokenInfo> tokens = new ConcurrentHashMap<>();
     private List<String> indexToToken = new ArrayList<>();
@@ -213,12 +211,23 @@ public class SimpleVocabulary implements Vocabulary {
          *
          * @param path the path to the text file
          * @return this {@code VocabularyBuilder}
+         * @throws IOException if failed to read vocabulary file
          */
-        public Builder addFromTextFile(Path path) {
-            try {
-                add(Utils.readLines(path, true));
-            } catch (IOException e) {
-                logger.error("Failed read token file", e);
+        public Builder addFromTextFile(Path path) throws IOException {
+            add(Utils.readLines(path, true));
+            return this;
+        }
+
+        /**
+         * Adds a text vocabulary to the {@link SimpleVocabulary}.
+         *
+         * @param url the text file url
+         * @return this {@code VocabularyBuilder}
+         * @throws IOException if failed to read vocabulary file
+         */
+        public Builder addFromTextFile(URL url) throws IOException {
+            try (InputStream is = url.openStream()) {
+                add(Utils.readLines(is, true));
             }
             return this;
         }
@@ -226,12 +235,12 @@ public class SimpleVocabulary implements Vocabulary {
         /**
          * Adds a customized vocabulary to the {@link SimpleVocabulary}.
          *
-         * @param path the path to load the file
+         * @param url the text file url
          * @param lambda the function to parse the vocabulary file
          * @return this {@code VocabularyBuilder}
          */
-        public Builder addFromCustomizedFile(String path, Function<String, List<String>> lambda) {
-            return add(lambda.apply(path));
+        public Builder addFromCustomizedFile(URL url, Function<URL, List<String>> lambda) {
+            return add(lambda.apply(url));
         }
 
         /**
