@@ -39,6 +39,7 @@ dependencies {
         api "ai.djl.onnxruntime:onnxruntime-engine:${version}"
         api "ai.djl.dlr:dlr-engine:${version}"
         api "ai.djl.dlr:dlr-native-auto:${dlr_version}"
+        api "ai.djl.dlr:dlr-native-cpu:${dlr_version}"
         api "ai.djl.aws:aws-ai:${version}"
         api "ai.djl.fasttext:fasttext-engine:${version}"
         api "ai.djl.hadoop:hadoop:${version}"
