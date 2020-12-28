@@ -17,6 +17,7 @@
 
 #include <sstream>
 
+#include "utils.h"
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_exception.h"
 #include "djl_pytorch_jni_utils.h"
@@ -265,7 +266,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStopProfile(
   if (!profilerEnabled()) {
     env->ThrowNew(ENGINE_EXCEPTION_CLASS, "please call startProfiler() before you use stopProfile!");
   }
-  std::string output_file = utils::GetStringFromJString(env, joutput_file);
+  std::string output_file = utils::jni::GetStringFromJString(env, joutput_file);
   std::ofstream file(output_file);
   std::vector<std::vector<Event>> event_lists = disableProfiler();
   std::vector<std::vector<Event*>> event_ptr_lists;

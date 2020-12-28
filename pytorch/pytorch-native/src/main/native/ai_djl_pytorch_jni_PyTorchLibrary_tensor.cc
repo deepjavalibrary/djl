@@ -241,7 +241,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGrad(JNIEnv*
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->grad());
   if (!tensor_ptr->grad().defined()) {
-    return utils::NULL_PTR;
+    return utils::jni::NULL_PTR;
   }
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()

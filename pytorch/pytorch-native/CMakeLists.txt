@@ -8,12 +8,14 @@ if(BUILD_ANDROID AND NOT DEFINED ANDROID_ABI)
     message(FATAL_ERROR "Please specify ANDROID_ABI!")
 endif()
 
+# find utils header
+find_path(UTILS_INCLUDE_DIR NAMES utils.h PATHS ${PROJECT_SOURCE_DIR}/../../api/src/main/native/shared REQUIRED)
+
 if(NOT BUILD_ANDROID)
     message("Building djl_torch with the host...")
     find_package(Torch REQUIRED)
     find_package(JNI REQUIRED)
 
-    include_directories(${JNI_INCLUDE_DIRS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 else()
     message("Building djl_torch with ${ANDROID_ABI}...")
@@ -46,7 +48,7 @@ add_library(djl_torch SHARED ${SOURCE_FILES})
 # build host
 if(NOT BUILD_ANDROID)
     target_link_libraries(djl_torch "${TORCH_LIBRARIES}")
-    target_include_directories(djl_torch PUBLIC build/include)
+    target_include_directories(djl_torch PUBLIC build/include ${JNI_INCLUDE_DIRS} ${UTILS_INCLUDE_DIR})
     set_property(TARGET djl_torch PROPERTY CXX_STANDARD 14)
     # We have to kill the default rpath and use current dir
     set(CMAKE_SKIP_RPATH TRUE)
