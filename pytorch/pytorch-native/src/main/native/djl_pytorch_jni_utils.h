@@ -16,20 +16,17 @@
 #include <c10/util/typeid.h>
 #include <c10/util/variant.h>
 #include <torch/csrc/api/include/torch/enum.h>
-#include <jni.h>
 #include <torch/script.h>
 
+#include <jni.h>
 #include <iostream>
 
+#include "utils.h"
 #include "djl_pytorch_jni_log.h"
 
 // The file is utilities that are used for JNI
 
 namespace utils {
-
-static constexpr const jint RELEASE_MODE = JNI_ABORT;
-
-static constexpr const jlong NULL_PTR = 0;
 
 #if !defined(__ANDROID__)
 // for image interpolation
@@ -88,57 +85,6 @@ inline torch::ScalarType GetScalarTypeFromDType(jint dtype) {
   }
 }
 
-template <typename T>
-inline std::vector<T> GetObjectVecFromJHandles(JNIEnv* env, jlongArray jhandles) {
-  jsize length = env->GetArrayLength(jhandles);
-  jlong* jptrs = env->GetLongArrayElements(jhandles, JNI_FALSE);
-  std::vector<T> vec;
-  vec.reserve(length);
-  for (size_t i = 0; i < length; ++i) {
-    vec.emplace_back(*(reinterpret_cast<T*>(jptrs[i])));
-  }
-  env->ReleaseLongArrayElements(jhandles, jptrs, RELEASE_MODE);
-  return std::move(vec);
-}
-
-template <typename T1, typename T2>
-inline jlongArray GetPtrArrayFromContainer(JNIEnv* env, T1 list) {
-  size_t len = list.size();
-  jlongArray jarray = env->NewLongArray(len);
-  std::vector<jlong> jptrs;
-  jptrs.reserve(len);
-  for (size_t i = 0; i < len; ++i) {
-    const auto* element_ptr = new T2(list[i]);
-    jptrs[i] = reinterpret_cast<uintptr_t>(element_ptr);
-  }
-  env->SetLongArrayRegion(jarray, 0, len, jptrs.data());
-  return jarray;
-}
-
-inline std::vector<int64_t> GetVecFromJLongArray(JNIEnv* env, jlongArray jarray) {
-  jlong* jarr = env->GetLongArrayElements(jarray, JNI_FALSE);
-  jsize length = env->GetArrayLength(jarray);
-  std::vector<int64_t> vec(jarr, jarr + length);
-  env->ReleaseLongArrayElements(jarray, jarr, RELEASE_MODE);
-  return std::move(vec);
-}
-
-inline std::vector<int32_t> GetVecFromJIntArray(JNIEnv* env, jintArray jarray) {
-  jint* jarr = env->GetIntArrayElements(jarray, JNI_FALSE);
-  jsize length = env->GetArrayLength(jarray);
-  std::vector<int32_t> vec(jarr, jarr + length);
-  env->ReleaseIntArrayElements(jarray, jarr, RELEASE_MODE);
-  return std::move(vec);
-}
-
-inline std::vector<float> GetVecFromJFloatArray(JNIEnv* env, jfloatArray jarray) {
-  jfloat* jarr = env->GetFloatArrayElements(jarray, JNI_FALSE);
-  jsize length = env->GetArrayLength(jarray);
-  std::vector<float> vec(jarr, jarr + length);
-  env->ReleaseFloatArrayElements(jarray, jarr, RELEASE_MODE);
-  return std::move(vec);
-}
-
 inline torch::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
   jint* device = env->GetIntArrayElements(jdevice, JNI_FALSE);
   auto device_type = static_cast<torch::DeviceType>(*device);
@@ -147,7 +93,7 @@ inline torch::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
     device_idx = -1;
   }
   torch::Device torch_device(device_type, device_idx);
-  env->ReleaseIntArrayElements(jdevice, device, RELEASE_MODE);
+  env->ReleaseIntArrayElements(jdevice, device, utils::jni::RELEASE_MODE);
   return torch_device;
 }
 
@@ -167,9 +113,9 @@ inline mode_t GetInterpolationMode(jint jmode) {
 #endif
 
 inline std::vector<torch::indexing::TensorIndex> CreateTensorIndex(JNIEnv* env, jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {
-  const auto min_indices = GetVecFromJLongArray(env, jmin_indices);
-  const auto max_indices = GetVecFromJLongArray(env, jmax_indices);
-  const auto step_indices = GetVecFromJLongArray(env, jstep_indices);
+  const auto min_indices = utils::jni::GetVecFromJLongArray(env, jmin_indices);
+  const auto max_indices = utils::jni::GetVecFromJLongArray(env, jmax_indices);
+  const auto step_indices = utils::jni::GetVecFromJLongArray(env, jstep_indices);
   std::vector<torch::indexing::TensorIndex> indices;
   indices.reserve(min_indices.size());
   for (size_t i = 0; i < min_indices.size(); ++i) {
@@ -194,16 +140,6 @@ inline torch::TensorOptions CreateTensorOptions(
     options = options.dtype(GetScalarTypeFromDType(jdtype));
   }
   return options;
-}
-
-inline std::string GetStringFromJString(JNIEnv* env, jstring jstr) {
-  if (jstr == nullptr) {
-    return std::string();
-  }
-  const char* c_str = env->GetStringUTFChars(jstr, JNI_FALSE);
-  std::string str = std::string(c_str);
-  env->ReleaseStringUTFChars(jstr, c_str);
-  return str;
 }
 
 }  // namespace utils
