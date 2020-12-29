@@ -51,7 +51,6 @@ public class PpMaskClassification extends ImageClassificationModelLoader {
 
         /** {@inheritDoc} */
         @Override
-        @SuppressWarnings("unchecked")
         public Translator<Image, Classifications> newInstance(
                 Model model, Map<String, ?> arguments) {
             return ImageClassificationTranslator.builder(arguments).build();
