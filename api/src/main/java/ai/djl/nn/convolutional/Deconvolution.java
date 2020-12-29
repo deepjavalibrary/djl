@@ -127,7 +127,7 @@ public abstract class Deconvolution extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     protected void beforeInitialize(Shape[] inputs) {
-        this.inputShapes = inputs;
+        super.beforeInitialize(inputs);
         Shape inputShape = inputs[0];
         Block.validateLayout(getExpectedLayout(), inputShape.getLayout());
     }

@@ -180,7 +180,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public void beforeInitialize(Shape[] inputs) {
-        this.inputShapes = inputs;
+        super.beforeInitialize(inputs);
         Shape inputShape = inputs[0];
         Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
         inputs[0] = new Shape(inputShape.get(1), inputShape.get(0), inputShape.get(2));

@@ -35,6 +35,8 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Adam;
 import ai.djl.training.tracker.LinearTracker;
 import ai.djl.training.tracker.Tracker;
+import java.io.IOException;
+import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,11 +52,11 @@ public final class TrainTicTacToe {
 
     private TrainTicTacToe() {}
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         TrainTicTacToe.runExample(args);
     }
 
-    public static TrainingResult runExample(String[] args) {
+    public static TrainingResult runExample(String[] args) throws IOException {
         Arguments arguments = Arguments.parseArgs(args);
         if (arguments == null) {
             return null;
@@ -135,6 +137,8 @@ public final class TrainTicTacToe {
                 TrainingResult trainingResult = trainer.getTrainingResult();
                 trainingResult.getEvaluations().put("validate_winRate", validationWinRate);
                 trainingResult.getEvaluations().put("train_winRate", trainWinRate);
+
+                model.save(Paths.get("build/model"), "tictactoe");
                 return trainingResult;
             }
         }
