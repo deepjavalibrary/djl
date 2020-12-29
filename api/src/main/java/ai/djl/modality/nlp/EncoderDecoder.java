@@ -49,6 +49,7 @@ public class EncoderDecoder extends AbstractBlock {
         super(VERSION);
         this.encoder = addChildBlock("Encoder", encoder);
         this.decoder = addChildBlock("Decoder", decoder);
+        inputNames = Arrays.asList("encoderInput", "decoderInput");
     }
 
     /** {@inheritDoc} */
@@ -57,7 +58,6 @@ public class EncoderDecoder extends AbstractBlock {
         if (!isInitialized()) {
             throw new IllegalStateException("Parameter of this block are not initialised");
         }
-        inputNames = Arrays.asList("encoderInput", "decoderInput");
         return new PairList<>(inputNames, Arrays.asList(inputShapes));
     }
 

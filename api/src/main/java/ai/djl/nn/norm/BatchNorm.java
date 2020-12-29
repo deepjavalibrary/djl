@@ -139,7 +139,7 @@ public class BatchNorm extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public void beforeInitialize(Shape[] inputShapes) {
-        this.inputShapes = inputShapes;
+        super.beforeInitialize(inputShapes);
         inChannels = inputShapes[0].size(axis);
     }
 
