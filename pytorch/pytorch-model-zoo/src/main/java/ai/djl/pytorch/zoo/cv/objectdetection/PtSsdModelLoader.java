@@ -57,7 +57,6 @@ public class PtSsdModelLoader extends ObjectDetectionModelLoader {
 
         /** {@inheritDoc} */
         @Override
-        @SuppressWarnings("unchecked")
         public Translator<Image, DetectedObjects> newInstance(
                 Model model, Map<String, ?> arguments) {
             return PtSsdTranslator.builder(arguments).build();

@@ -50,7 +50,6 @@ public class PpFaceDetection extends ObjectDetectionModelLoader {
 
         /** {@inheritDoc} */
         @Override
-        @SuppressWarnings("unchecked")
         public Translator<Image, DetectedObjects> newInstance(
                 Model model, Map<String, ?> arguments) {
             return PpFaceDetectionTranslator.builder(arguments).build();
