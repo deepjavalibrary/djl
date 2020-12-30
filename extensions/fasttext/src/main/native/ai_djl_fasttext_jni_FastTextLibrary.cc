@@ -14,6 +14,8 @@
 
 #include <numeric>
 
+#include <djl/utils.h>
+
 #include "args.h"
 #include "dictionary.h"
 #include "fasttext.cc"
@@ -35,67 +37,6 @@ struct FastTextPrivateMembers {
   std::shared_ptr<fasttext::Model> model_;
 };
 
-inline std::string jstringToString(JNIEnv* env, jstring array) {
-  jsize len = env->GetStringUTFLength(array);
-
-  const char* str = env->GetStringUTFChars(array, nullptr);
-  std::string s(str, len);
-  env->ReleaseStringUTFChars(array, str);
-
-  return s;
-}
-
-// String[]
-inline jobjectArray GetStringArrayFromVector(JNIEnv* env, const std::vector<std::string>& vec) {
-  jobjectArray array = env->NewObjectArray(vec.size(), env->FindClass("Ljava/lang/String;"), nullptr);
-  for (int i = 0; i < vec.size(); ++i) {
-    env->SetObjectArrayElement(array, i, env->NewStringUTF(vec[i].c_str()));
-  }
-  return array;
-}
-
-// String[][]
-inline jobjectArray Get2DStringArrayFrom2DVector(JNIEnv* env, const std::vector<std::vector<std::string>>& vec) {
-  jobjectArray array = env->NewObjectArray(vec.size(), env->FindClass("[Ljava/lang/String;"), nullptr);
-  for (int i = 0; i < vec.size(); ++i) {
-    env->SetObjectArrayElement(array, i, GetStringArrayFromVector(env, vec[i]));
-  }
-  return array;
-}
-
-inline void GetVectorFromStringArray(JNIEnv* env, jobjectArray array, std::vector<std::string>* vec) {
-  jsize len = env->GetArrayLength(array);
-  vec->resize(len);
-  for (int i = 0; i < len; ++i) {
-    std::string stdStr = jstringToString(env, (jstring)env->GetObjectArrayElement(array, i));
-    (*vec)[i] = stdStr;
-  }
-}
-
-inline jintArray GetIntArrayFromVector(JNIEnv* env, const std::vector<int>& vec) {
-  jintArray array = env->NewIntArray(vec.size());
-  env->SetIntArrayRegion(array, 0, vec.size(), vec.data());
-  return array;
-}
-
-inline jobjectArray Get2DIntArrayFrom2DVector(JNIEnv* env, const std::vector<std::vector<int>>& vec) {
-  jobjectArray array = env->NewObjectArray(vec.size(), env->FindClass("[I"), nullptr);
-  for (int i = 0; i < vec.size(); ++i) {
-    env->SetObjectArrayElement(array, i, GetIntArrayFromVector(env, vec[i]));
-  }
-  return array;
-}
-
-inline std::vector<int> GetVectorFromIntArray(JNIEnv* env, jintArray array) {
-  jsize len = env->GetArrayLength(array);
-
-  void* data = env->GetPrimitiveArrayCritical(array, JNI_FALSE);
-  std::vector<int> vec((int*)data, ((int*)data) + len);
-  env->ReleasePrimitiveArrayCritical(array, data, JNI_ABORT);
-
-  return vec;
-}
-
 JNIEXPORT jlong JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_createFastText(JNIEnv* env, jobject jthis) {
   auto* fasttext_ptr = new fasttext::FastText();
   return reinterpret_cast<uintptr_t>(fasttext_ptr);
@@ -110,7 +51,7 @@ JNIEXPORT void JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_freeFastText(
 JNIEXPORT void JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_loadModel(
     JNIEnv* env, jobject jthis, jlong jhandle, jstring jpath) {
   auto* fasttext_ptr = reinterpret_cast<fasttext::FastText*>(jhandle);
-  const std::string path_string = jstringToString(env, jpath);
+  const std::string path_string = djl::utils::jni::GetStringFromJString(env, jpath);
   try {
     fasttext_ptr->loadModel(path_string);
   } catch (const std::invalid_argument& e) {
@@ -121,7 +62,7 @@ JNIEXPORT void JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_loadModel(
 
 JNIEXPORT jboolean JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_checkModel(
     JNIEnv* env, jobject jthis, jstring jpath) {
-  const std::string filename = jstringToString(env, jpath);
+  const std::string filename = djl::utils::jni::GetStringFromJString(env, jpath);
   std::ifstream in(filename, std::ifstream::binary);
   int32_t magic;
   int32_t version;
@@ -169,7 +110,7 @@ JNIEXPORT jstring JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_getModelType(
 JNIEXPORT jint JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_predictProba(
     JNIEnv* env, jobject jthis, jlong jhandle, jstring jtext, jint top_k, jobjectArray jclasses, jfloatArray jprob) {
   auto* fasttext_ptr = reinterpret_cast<fasttext::FastText*>(jhandle);
-  std::string text = jstringToString(env, jtext);
+  std::string text = djl::utils::jni::GetStringFromJString(env, jtext);
   std::istringstream in(text);
   std::vector<std::pair<real, std::string>> predictions;
   fasttext_ptr->predictLine(in, predictions, top_k, 0.0);
@@ -188,7 +129,7 @@ JNIEXPORT jint JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_predictProba(
 
 JNIEXPORT jfloatArray JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_getWordVector(
     JNIEnv* env, jobject jthis, jlong jhandle, jstring word) {
-  std::string word_str = jstringToString(env, word);
+  std::string word_str = djl::utils::jni::GetStringFromJString(env, word);
   auto* fasttext_ptr = reinterpret_cast<fasttext::FastText*>(jhandle);
   auto* privateMembers = (FastTextPrivateMembers*)fasttext_ptr;
 
@@ -201,8 +142,7 @@ JNIEXPORT jfloatArray JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_getWordVe
 }
 
 JNIEXPORT int JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_runCmd(JNIEnv* env, jobject jthis, jobjectArray args) {
-  std::vector<std::string> vec;
-  GetVectorFromStringArray(env, args, &vec);
+  std::vector<std::string> vec = djl::utils::jni::GetVecFromJStringArray(env, args);
   if (vec.size() < 2) {
     printUsage();
     return -1;

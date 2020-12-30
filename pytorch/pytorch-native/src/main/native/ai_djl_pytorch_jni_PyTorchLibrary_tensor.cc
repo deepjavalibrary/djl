@@ -13,7 +13,7 @@
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "ai_djl_pytorch_jni_cache.h"
 #include "djl_pytorch_jni_exception.h"
-#include "djl_pytorch_jni_utils.h"
+#include "djl_pytorch_utils.h"
 
 // The file is the implementation for PyTorch tensor core functionality operation
 
@@ -241,7 +241,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGrad(JNIEnv*
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->grad());
   if (!tensor_ptr->grad().defined()) {
-    return utils::jni::NULL_PTR;
+    return djl::utils::jni::NULL_PTR;
   }
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()

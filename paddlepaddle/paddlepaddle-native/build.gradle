@@ -4,6 +4,7 @@ plugins {
 }
 
 group "ai.djl.paddlepaddle"
+apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 version = "${paddlepaddle_version}" + (isRelease ? "" : "-SNAPSHOT")

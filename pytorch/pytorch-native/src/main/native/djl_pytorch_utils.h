@@ -21,7 +21,8 @@
 #include <jni.h>
 #include <iostream>
 
-#include "utils.h"
+#include <djl/utils.h>
+
 #include "djl_pytorch_jni_log.h"
 
 // The file is utilities that are used for JNI
@@ -93,7 +94,7 @@ inline torch::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
     device_idx = -1;
   }
   torch::Device torch_device(device_type, device_idx);
-  env->ReleaseIntArrayElements(jdevice, device, utils::jni::RELEASE_MODE);
+  env->ReleaseIntArrayElements(jdevice, device, djl::utils::jni::RELEASE_MODE);
   return torch_device;
 }
 
@@ -113,9 +114,9 @@ inline mode_t GetInterpolationMode(jint jmode) {
 #endif
 
 inline std::vector<torch::indexing::TensorIndex> CreateTensorIndex(JNIEnv* env, jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {
-  const auto min_indices = utils::jni::GetVecFromJLongArray(env, jmin_indices);
-  const auto max_indices = utils::jni::GetVecFromJLongArray(env, jmax_indices);
-  const auto step_indices = utils::jni::GetVecFromJLongArray(env, jstep_indices);
+  const auto min_indices = djl::utils::jni::GetVecFromJLongArray(env, jmin_indices);
+  const auto max_indices = djl::utils::jni::GetVecFromJLongArray(env, jmax_indices);
+  const auto step_indices = djl::utils::jni::GetVecFromJLongArray(env, jstep_indices);
   std::vector<torch::indexing::TensorIndex> indices;
   indices.reserve(min_indices.size());
   for (size_t i = 0; i < min_indices.size(); ++i) {

@@ -10,9 +10,11 @@ find_library(PADDLE_LIBRARY
         PATHS paddle/paddle
         PATH_SUFFIXES lib
         DOC "The paddlepaddle library")
+find_path(UTILS_INCLUDE_DIR NAMES djl/utils.h PATHS ${PROJECT_SOURCE_DIR}/../../api/src/main/native REQUIRED)
+
 
 set(SOURCE_FILES
-        "src/main/native/djl_paddle_jni_utils.h"
+        "src/main/native/djl_paddle_utils.h"
         "src/main/native/ai_djl_paddlepaddle_jni_PaddleLibrary_tensor.cc"
         "src/main/native/ai_djl_paddlepaddle_jni_PaddleLibrary_inference.cc"
         )
@@ -20,6 +22,7 @@ set(SOURCE_FILES
 add_library(djl_paddle SHARED ${SOURCE_FILES})
 target_include_directories(djl_paddle PUBLIC
     ${JNI_INCLUDE_DIRS}
+    ${UTILS_INCLUDE_DIR}
     paddle/paddle/include
     build/include)
 target_link_libraries(djl_paddle ${PADDLE_LIBRARY})

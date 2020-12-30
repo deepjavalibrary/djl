@@ -9,7 +9,7 @@ if(BUILD_ANDROID AND NOT DEFINED ANDROID_ABI)
 endif()
 
 # find utils header
-find_path(UTILS_INCLUDE_DIR NAMES utils.h PATHS ${PROJECT_SOURCE_DIR}/../../api/src/main/native/shared REQUIRED)
+find_path(UTILS_INCLUDE_DIR NAMES djl/utils.h PATHS ${PROJECT_SOURCE_DIR}/../../api/src/main/native REQUIRED)
 
 if(NOT BUILD_ANDROID)
     message("Building djl_torch with the host...")
@@ -24,7 +24,7 @@ else()
 endif()
 
 set(SOURCE_FILES
-    "src/main/native/djl_pytorch_jni_utils.h"
+    "src/main/native/djl_pytorch_utils.h"
     "src/main/native/ai_djl_pytorch_jni_PyTorchLibrary_system.cc"
     "src/main/native/ai_djl_pytorch_jni_PyTorchLibrary_nn_functional.cc"
     "src/main/native/ai_djl_pytorch_jni_PyTorchLibrary_inference.cc"

@@ -17,7 +17,7 @@ class CppFormatterPlugin implements Plugin<Project> {
             return
         }
         ProcessBuilder pb = new ProcessBuilder("${clang.absolutePath}",
-                "-style={BasedOnStyle: Google, ColumnLimit: 120, AlignAfterOpenBracket: DontAlign}",
+                "-style={BasedOnStyle: Google, IndentWidth:2, ColumnLimit: 120, AlignAfterOpenBracket: DontAlign}",
                 "${f.getAbsolutePath()}")
         Process process = pb.start()
         InputStream is = process.getInputStream()

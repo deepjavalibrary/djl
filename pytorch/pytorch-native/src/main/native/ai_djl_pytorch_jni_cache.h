@@ -14,7 +14,7 @@
 #ifndef DJL_TORCH_AI_DJL_PYTORCH_JNI_CACHE_H
 #define DJL_TORCH_AI_DJL_PYTORCH_JNI_CACHE_H
 
-#include "jni.h"
+#include <jni.h>
 
 extern jclass NULL_PTR_EXCEPTION_CLASS;
 extern jclass ILLEGAL_STATE_EXCEPTION_CLASS;
