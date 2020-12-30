@@ -10,10 +10,11 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+#include <djl/utils.h>
+
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_exception.h"
-#include "djl_pytorch_jni_utils.h"
-#include "utils.h"
+#include "djl_pytorch_utils.h"
 
 // The file is the implementation for PyTorch tensor reduction ops
 
@@ -125,7 +126,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSum__J_3JZ(
     JNIEnv* env, jobject jthis, jlong jhandle, jlongArray jdims, jboolean jkeep_dim) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  const std::vector<int64_t> dims = utils::jni::GetVecFromJLongArray(env, jdims);
+  const std::vector<int64_t> dims = djl::utils::jni::GetVecFromJLongArray(env, jdims);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->sum(dims, jkeep_dim == JNI_TRUE));
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()

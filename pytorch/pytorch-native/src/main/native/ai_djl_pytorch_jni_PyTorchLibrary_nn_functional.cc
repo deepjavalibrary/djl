@@ -11,11 +11,11 @@
  * and limitations under the License.
  */
 #include <torch/torch.h>
+#include <djl/utils.h>
 
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_exception.h"
-#include "djl_pytorch_jni_utils.h"
-#include "utils.h"
+#include "djl_pytorch_utils.h"
 
 // The file is the implementation for PyTorch neural network functional ops
 
@@ -41,7 +41,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNInterpolat
     JNIEnv* env, jobject jthis, jlong jhandle, jlongArray jsize, jint jmode, jboolean jalign_corners) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  const auto size_vec = utils::jni::GetVecFromJLongArray(env, jsize);
+  const auto size_vec = djl::utils::jni::GetVecFromJLongArray(env, jsize);
 #if defined(__ANDROID__)
   torch::Tensor result;
   if (jmode == 0) {
@@ -73,7 +73,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLinear(
   auto* input_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   auto* weight_ptr = reinterpret_cast<torch::Tensor*>(jweight);
   torch::Tensor bias = {};
-  if (jbias != utils::jni::NULL_PTR) {
+  if (jbias != djl::utils::jni::NULL_PTR) {
     bias = *reinterpret_cast<torch::Tensor*>(jbias);
   }
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::linear(*input_ptr, *weight_ptr, bias));
@@ -87,12 +87,12 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNConvNd(JNI
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   const auto* weigtht_ptr = reinterpret_cast<torch::Tensor*>(jweight);
   torch::Tensor bias = {};
-  if (jbias != utils::jni::NULL_PTR) {
+  if (jbias != djl::utils::jni::NULL_PTR) {
     bias = *reinterpret_cast<torch::Tensor*>(jbias);
   }
-  const std::vector<int64_t> strideVec = utils::jni::GetVecFromJLongArray(env, jstride);
-  const std::vector<int64_t> paddingVec = utils::jni::GetVecFromJLongArray(env, jpadding);
-  const std::vector<int64_t> dilationVec = utils::jni::GetVecFromJLongArray(env, jdilation);
+  const std::vector<int64_t> strideVec = djl::utils::jni::GetVecFromJLongArray(env, jstride);
+  const std::vector<int64_t> paddingVec = djl::utils::jni::GetVecFromJLongArray(env, jpadding);
+  const std::vector<int64_t> dilationVec = djl::utils::jni::GetVecFromJLongArray(env, jdilation);
 
   torch::Tensor* result_ptr = nullptr;
   long dim = weigtht_ptr->dim() - 2;
@@ -119,10 +119,10 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNBatchNorm(
   const auto* running_var_ptr = reinterpret_cast<torch::Tensor*>(jrunning_var);
   torch::Tensor weight = {};
   torch::Tensor bias = {};
-  if (jweight != utils::jni::NULL_PTR) {
+  if (jweight != djl::utils::jni::NULL_PTR) {
     weight = *reinterpret_cast<torch::Tensor*>(jweight);
   }
-  if (jbias != utils::jni::NULL_PTR) {
+  if (jbias != djl::utils::jni::NULL_PTR) {
     bias = *reinterpret_cast<torch::Tensor*>(jbias);
   }
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::batch_norm(*tensor_ptr, *running_mean_ptr,
@@ -213,9 +213,9 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNMaxPool(JN
     jlongArray jkernel, jlongArray jstride, jlongArray jpadding, jboolean jceil_mode) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  const std::vector<int64_t> kernel_vec = utils::jni::GetVecFromJLongArray(env, jkernel);
-  const std::vector<int64_t> stride_vec = utils::jni::GetVecFromJLongArray(env, jstride);
-  const std::vector<int64_t> padding_vec = utils::jni::GetVecFromJLongArray(env, jpadding);
+  const std::vector<int64_t> kernel_vec = djl::utils::jni::GetVecFromJLongArray(env, jkernel);
+  const std::vector<int64_t> stride_vec = djl::utils::jni::GetVecFromJLongArray(env, jstride);
+  const std::vector<int64_t> padding_vec = djl::utils::jni::GetVecFromJLongArray(env, jpadding);
   torch::Tensor* result_ptr = nullptr;
   long dim = tensor_ptr->dim() - 2;
   if (dim == 1) {
@@ -246,9 +246,9 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAvgPool(JN
     jboolean jcount_include_pad) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
-  const std::vector<int64_t> kernel_vec = utils::jni::GetVecFromJLongArray(env, jkernel_size);
-  const std::vector<int64_t> stride_vec = utils::jni::GetVecFromJLongArray(env, jstride);
-  const std::vector<int64_t> padding_vec = utils::jni::GetVecFromJLongArray(env, jpaddiing);
+  const std::vector<int64_t> kernel_vec = djl::utils::jni::GetVecFromJLongArray(env, jkernel_size);
+  const std::vector<int64_t> stride_vec = djl::utils::jni::GetVecFromJLongArray(env, jstride);
+  const std::vector<int64_t> padding_vec = djl::utils::jni::GetVecFromJLongArray(env, jpaddiing);
 
   torch::Tensor* result_ptr = nullptr;
   long dim = tensor_ptr->dim() - 2;
@@ -279,7 +279,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAdaptiveAv
     JNIEnv* env, jobject jthis, jlong jhandle, jlongArray joutput_size) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  const std::vector<int64_t> output_vec = utils::jni::GetVecFromJLongArray(env, joutput_size);
+  const std::vector<int64_t> output_vec = djl::utils::jni::GetVecFromJLongArray(env, joutput_size);
 
   torch::Tensor* result_ptr = nullptr;
   long dim = tensor_ptr->dim() - 2;
@@ -301,7 +301,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNAdaptiveMa
     JNIEnv* env, jobject jthis, jlong jhandle, jlongArray joutput_size) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  const std::vector<int64_t> output_vec = utils::jni::GetVecFromJLongArray(env, joutput_size);
+  const std::vector<int64_t> output_vec = djl::utils::jni::GetVecFromJLongArray(env, joutput_size);
 
   torch::Tensor* result_ptr = nullptr;
   long dim = tensor_ptr->dim() - 2;
@@ -323,8 +323,8 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLpPool(JNI
     jdouble jnorm_type, jlongArray jkernel_size, jlongArray jstride, jboolean jceil_mode) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
-  const std::vector<int64_t> kernel_vec = utils::jni::GetVecFromJLongArray(env, jkernel_size);
-  const std::vector<int64_t> stride_vec = utils::jni::GetVecFromJLongArray(env, jstride);
+  const std::vector<int64_t> kernel_vec = djl::utils::jni::GetVecFromJLongArray(env, jkernel_size);
+  const std::vector<int64_t> stride_vec = djl::utils::jni::GetVecFromJLongArray(env, jstride);
 
   torch::Tensor* result_ptr = nullptr;
   long dim = tensor_ptr->dim() - 2;
