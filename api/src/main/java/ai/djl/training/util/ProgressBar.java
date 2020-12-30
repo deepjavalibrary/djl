@@ -27,6 +27,7 @@ public final class ProgressBar implements Progress {
     private long max;
     private long progress;
     private int currentPercent;
+    private char progressChar = getProgressChar();
 
     /** Creates an instance of {@code ProgressBar} with a maximum value of 1. */
     public ProgressBar() {
@@ -113,7 +114,7 @@ public final class ProgressBar implements Progress {
         sb.append(String.format("%3d", percent)).append("% |");
         for (int i = 0; i < TOTAL_BAR_LENGTH; ++i) {
             if (i <= percent * TOTAL_BAR_LENGTH / 100) {
-                sb.append('█');
+                sb.append(progressChar);
             } else {
                 sb.append(' ');
             }
@@ -135,5 +136,17 @@ public final class ProgressBar implements Progress {
             return message;
         }
         return message.substring(0, 4) + "..." + message.substring(len - 5);
+    }
+
+    private static char getProgressChar() {
+        if (System.getProperty("os.name").startsWith("Win")) {
+            return '=';
+        } else if (System.getProperty("os.name").startsWith("Linux")) {
+            String lang = System.getenv("LANG");
+            if (lang == null || !lang.contains("UTF-8")) {
+                return '=';
+            }
+        }
+        return '█';
     }
 }
