@@ -68,7 +68,7 @@ JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deletePredicto
 JNIEXPORT jobjectArray JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_getInputNames
         (JNIEnv* env, jobject jthis, jlong jhandle) {
   auto* predictor = reinterpret_cast<paddle::PaddlePredictor*>(jhandle);
-  return djl::utils::jni::GetStringArrayFromVector(env, predictor->GetInputNames());
+  return djl::utils::jni::GetStringArrayFromVec(env, predictor->GetInputNames());
 }
 
 JNIEXPORT jlongArray JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_runInference
