@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
 
 public class ImageClassificationTest {
 
-    @Test
+    @Test(enabled = false)
     public void testImageClassification()
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {

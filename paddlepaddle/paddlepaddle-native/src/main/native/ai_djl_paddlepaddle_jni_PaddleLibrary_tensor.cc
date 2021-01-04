@@ -54,3 +54,16 @@ JNIEXPORT jobject JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_getTensorDa
   int len = buf->length();
   return env->NewDirectByteBuffer(buf->data(), len);
 }
+
+JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_setTensorName
+        (JNIEnv* env, jobject jthis, jlong jhandle, jstring jname) {
+    auto tensor_ptr = reinterpret_cast<paddle::PaddleTensor*>(jhandle);
+    tensor_ptr->name = djl::utils::jni::GetStringFromJString(env, jname);
+}
+
+
+JNIEXPORT jstring JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_getTensorName
+        (JNIEnv* env, jobject jthis, jlong jhandle) {
+    auto tensor_ptr = reinterpret_cast<paddle::PaddleTensor*>(jhandle);
+    return env->NewStringUTF(tensor_ptr->name.c_str());
+}

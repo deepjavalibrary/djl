@@ -16,7 +16,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
-import ai.djl.paddlepaddle.jna.JnaUtils;
+import ai.djl.paddlepaddle.jni.JniUtils;
 import ai.djl.training.GradientCollector;
 
 /**
@@ -34,7 +34,7 @@ public final class PpEngine extends Engine {
     private String version;
 
     private PpEngine() {
-        version = JnaUtils.getVersion();
+        version = JniUtils.getVersion();
     }
 
     static Engine newInstance() {

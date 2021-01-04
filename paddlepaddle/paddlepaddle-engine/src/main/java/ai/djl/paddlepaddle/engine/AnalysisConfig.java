@@ -12,10 +12,8 @@
  */
 package ai.djl.paddlepaddle.engine;
 
-import ai.djl.Device;
-import ai.djl.paddlepaddle.jna.JnaUtils;
+import ai.djl.paddlepaddle.jni.JniUtils;
 import ai.djl.util.NativeResource;
-import com.sun.jna.Pointer;
 
 /**
  * This class is used to create paddlepaddle engine configuration.
@@ -23,21 +21,21 @@ import com.sun.jna.Pointer;
  * <p>Provides model path setting, forecast engine running equipment selection and multiple
  * optimization prediction processes.
  */
-public class AnalysisConfig extends NativeResource<Pointer> {
+public class AnalysisConfig extends NativeResource<Long> {
 
-    AnalysisConfig(Device device) {
-        super(JnaUtils.newAnalysisConfig());
-        if (device.equals(Device.cpu())) {
-            JnaUtils.disableGpu(this);
-        } else {
-            JnaUtils.setGpu(this, 100, device.getDeviceId());
-        }
+    AnalysisConfig(long handle) {
+        super(handle);
+    }
+
+    /** Uses feed-fetch operation mode. */
+    public void useFeedFetchOp() {
+        JniUtils.useFeedFetchOp(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void close() {
-        JnaUtils.deleteConfig(this);
+        JniUtils.deleteConfig(this);
         super.close();
     }
 }

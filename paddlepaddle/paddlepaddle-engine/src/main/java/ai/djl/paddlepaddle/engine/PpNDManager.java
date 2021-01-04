@@ -19,7 +19,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.paddlepaddle.jna.JnaUtils;
+import ai.djl.paddlepaddle.jni.JniUtils;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -71,7 +71,7 @@ public class PpNDManager extends BaseNDManager {
     @Override
     public PpNDArray create(Buffer data, Shape shape, DataType dataType) {
         if (data.isDirect() && data instanceof ByteBuffer) {
-            return JnaUtils.createNdArray(this, data, shape, dataType);
+            return JniUtils.createNdArray(this, (ByteBuffer) data, shape, dataType);
         }
         int size = data.remaining();
         // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
@@ -102,7 +102,7 @@ public class PpNDManager extends BaseNDManager {
             default:
                 throw new AssertionError("Show never happen");
         }
-        return JnaUtils.createNdArray(this, buf, shape, dataType);
+        return JniUtils.createNdArray(this, buf, shape, dataType);
     }
 
     /** {@inheritDoc} */

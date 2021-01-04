@@ -16,7 +16,7 @@ import ai.djl.BaseModel;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
-import ai.djl.paddlepaddle.jna.JnaUtils;
+import ai.djl.paddlepaddle.jni.JniUtils;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,6 +27,7 @@ import java.util.Map;
 public class PpModel extends BaseModel {
 
     private AnalysisConfig config;
+    private PaddlePredictor paddlePredictor;
 
     /**
      * Constructs a new Model on a given device.
@@ -37,7 +38,6 @@ public class PpModel extends BaseModel {
     PpModel(String name, NDManager manager) {
         super(name);
         this.manager = manager;
-        config = new AnalysisConfig(manager.getDevice());
         dataType = DataType.FLOAT32;
         manager.setName("PpModel");
     }
@@ -66,9 +66,11 @@ public class PpModel extends BaseModel {
                 throw new FileNotFoundException("no __model__ or model file found in: " + modelDir);
             }
         }
-
-        JnaUtils.setModel(config, modelFiles[0], modelFiles[1]);
-        setBlock(new PpSymbolBlock(config));
+        config =
+                new AnalysisConfig(
+                        JniUtils.createConfig(modelFiles[0], modelFiles[1], manager.getDevice()));
+        paddlePredictor = new PaddlePredictor(JniUtils.createPredictor(config));
+        setBlock(new PpSymbolBlock(paddlePredictor));
     }
 
     private String[] findModelFile(Path dir) {
@@ -114,7 +116,8 @@ public class PpModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        JnaUtils.deleteConfig(config);
+        JniUtils.deletePredictor(paddlePredictor);
+        JniUtils.deleteConfig(config);
         super.close();
     }
 }
