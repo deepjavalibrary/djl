@@ -10,5 +10,27 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-/** The integration test for testing PaddlePaddle specific features. */
-package ai.djl.paddlepaddle.jna;
+package ai.djl.paddlepaddle.engine;
+
+import ai.djl.paddlepaddle.jni.JniUtils;
+import ai.djl.util.NativeResource;
+
+/** PaddlePaddle C++ Predictor. */
+public class PaddlePredictor extends NativeResource<Long> {
+
+    PaddlePredictor(long handle) {
+        super(handle);
+    }
+
+    /** {@inheritDoc} */
+    public PaddlePredictor copy() {
+        return new PaddlePredictor(JniUtils.clonePredictor(this));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        JniUtils.deletePredictor(this);
+        super.close();
+    }
+}

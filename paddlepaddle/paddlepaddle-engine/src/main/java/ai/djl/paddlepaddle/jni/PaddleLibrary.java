@@ -32,6 +32,10 @@ final class PaddleLibrary {
 
     native ByteBuffer getTensorData(long handle);
 
+    native void setTensorName(long handle, String name);
+
+    native String getTensorName(long handle);
+
     native long createAnalysisConfig(String modelDir, String paramDir, int deviceId);
 
     native void useFeedFetchOp(long handle);

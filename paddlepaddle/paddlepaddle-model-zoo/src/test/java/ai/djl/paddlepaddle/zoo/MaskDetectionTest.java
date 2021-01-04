@@ -50,7 +50,7 @@ import org.testng.annotations.Test;
 
 public class MaskDetectionTest {
 
-    @Test
+    @Test(enabled = false)
     public void testMaskDetection() throws IOException, ModelException, TranslateException {
         String url =
                 "https://raw.githubusercontent.com/PaddlePaddle/PaddleHub/release/v1.5/demo/mask_detection/python/images/mask.jpg";

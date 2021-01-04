@@ -20,15 +20,14 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
-import ai.djl.paddlepaddle.jna.JnaUtils;
+import ai.djl.paddlepaddle.jni.JniUtils;
 import ai.djl.util.NativeResource;
-import com.sun.jna.Pointer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /** {@code PpNDArray} is the PaddlePaddle implementation of {@link NDArray}. */
-public class PpNDArray extends NativeResource<Pointer> implements NDArray {
+public class PpNDArray extends NativeResource<Long> implements NDArray {
 
     private PpNDManager manager;
     private Shape shape;
@@ -42,7 +41,7 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
      * @param manager the manager to attach the new array to
      * @param handle the pointer to the native MxNDArray memory
      */
-    public PpNDArray(PpNDManager manager, Pointer handle) {
+    public PpNDArray(PpNDManager manager, long handle) {
         super(handle);
         this.manager = manager;
         manager.attach(getUid(), this);
@@ -55,7 +54,7 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
      * @param handle the pointer to the native MxNDArray memory
      * @param notClose not close the NDArray (inference use only)
      */
-    public PpNDArray(PpNDManager manager, Pointer handle, boolean notClose) {
+    public PpNDArray(PpNDManager manager, long handle, boolean notClose) {
         this(manager, handle);
         this.notClose = notClose;
     }
@@ -69,7 +68,7 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
      * @param shape the shape of {@code PpNDArray}
      * @param dataType the data type of {@code PpNDArray}
      */
-    public PpNDArray(PpNDManager manager, Pointer pointer, Shape shape, DataType dataType) {
+    public PpNDArray(PpNDManager manager, long pointer, Shape shape, DataType dataType) {
         super(pointer);
         this.manager = manager;
         this.shape = shape;
@@ -86,20 +85,20 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public String getName() {
-        return JnaUtils.getNdArrayName(this);
+        return JniUtils.getNameFromNd(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void setName(String name) {
-        JnaUtils.setNdArrayName(this, name);
+        JniUtils.setNdName(this, name);
     }
 
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
         if (dataType == null) {
-            dataType = JnaUtils.getDataType(this);
+            dataType = JniUtils.getDTypeFromNd(this);
         }
         return dataType;
     }
@@ -114,7 +113,7 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
     @Override
     public Shape getShape() {
         if (shape == null) {
-            shape = JnaUtils.getShape(this);
+            shape = JniUtils.getShapeFromNd(this);
         }
         return shape;
     }
@@ -181,7 +180,7 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
-        return JnaUtils.getByteBufferFromNd(this);
+        return JniUtils.getByteBufferFromNd(this);
     }
 
     /** {@inheritDoc} */
@@ -1022,9 +1021,9 @@ public class PpNDArray extends NativeResource<Pointer> implements NDArray {
         if (notClose) {
             return;
         }
-        Pointer pointer = handle.getAndSet(null);
+        Long pointer = handle.getAndSet(null);
         if (pointer != null) {
-            JnaUtils.freeNdArray(pointer);
+            JniUtils.deleteNd(pointer);
         }
     }
 }

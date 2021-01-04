@@ -18,23 +18,25 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.SymbolBlock;
-import ai.djl.paddlepaddle.jna.JnaUtils;
+import ai.djl.paddlepaddle.jni.JniUtils;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 
 /** {@code PpSymbolBlock} is the PaddlePaddle implementation of {@link SymbolBlock}. */
 public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
 
-    AnalysisConfig config;
+    private PaddlePredictor predictor;
+    private ThreadLocal<PaddlePredictor> localPredictorHolder;
 
     /**
      * Constructs a new {@code PpSymbolBlock} instance.
      *
-     * @param config the {@link AnalysisConfig} that holds the model information.
+     * @param predictor {@link PaddlePredictor} that holds the model information.
      */
-    public PpSymbolBlock(AnalysisConfig config) {
+    public PpSymbolBlock(PaddlePredictor predictor) {
         super((byte) 0);
-        this.config = config;
+        this.predictor = predictor;
+        localPredictorHolder = new ThreadLocal<>();
     }
 
     /** {@inheritDoc} */
@@ -44,13 +46,19 @@ public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
+        // TODO: always clones new predictor
+        PaddlePredictor localPredictor = localPredictorHolder.get();
+        if (localPredictor == null) {
+            localPredictor = predictor.copy();
+            localPredictorHolder.set(localPredictor);
+        }
         NDManager inputManager = inputs.head().getManager();
         try (PpNDManager tempManager = PpNDManager.getSystemManager().newSubManager()) {
             boolean foreignEngine =
                     !PpEngine.ENGINE_NAME.equals(inputManager.getEngine().getEngineName());
             PpNDArray[] result =
-                    JnaUtils.runInference(
-                            config, getInputs(inputs, foreignEngine, tempManager), -1);
+                    JniUtils.predictorForward(
+                            localPredictor, getInputs(inputs, foreignEngine, tempManager));
             return getOutputs(result, foreignEngine, inputManager);
         }
     }

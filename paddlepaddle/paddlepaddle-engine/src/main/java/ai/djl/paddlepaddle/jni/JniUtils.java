@@ -12,6 +12,17 @@
  */
 package ai.djl.paddlepaddle.jni;
 
+import ai.djl.Device;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.paddlepaddle.engine.AnalysisConfig;
+import ai.djl.paddlepaddle.engine.PaddlePredictor;
+import ai.djl.paddlepaddle.engine.PpDataType;
+import ai.djl.paddlepaddle.engine.PpNDArray;
+import ai.djl.paddlepaddle.engine.PpNDManager;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
 /**
  * A class containing utilities to interact with the Paddle Engine's Java Native Interface (JNI)
  * layer.
@@ -20,7 +31,78 @@ package ai.djl.paddlepaddle.jni;
 public final class JniUtils {
     private JniUtils() {}
 
-    public static int getTensorDType(long handle) {
-        return PaddleLibrary.LIB.getTensorDType(handle);
+    public static PpNDArray createNdArray(
+            PpNDManager manager, ByteBuffer data, Shape shape, DataType dtype) {
+        int[] intShape = Arrays.stream(shape.getShape()).mapToInt(Math::toIntExact).toArray();
+        long handle =
+                PaddleLibrary.LIB.paddleCreateTensor(
+                        data, data.position(), intShape, PpDataType.toPaddlePaddle(dtype));
+        return new PpNDArray(manager, handle);
+    }
+
+    public static DataType getDTypeFromNd(PpNDArray array) {
+        int type = PaddleLibrary.LIB.getTensorDType(array.getHandle());
+        return PpDataType.fromPaddlePaddle(type);
+    }
+
+    public static ByteBuffer getByteBufferFromNd(PpNDArray array) {
+        return PaddleLibrary.LIB.getTensorData(array.getHandle());
+    }
+
+    public static Shape getShapeFromNd(PpNDArray array) {
+        int[] shape = PaddleLibrary.LIB.getTensorShape(array.getHandle());
+        return new Shape(Arrays.stream(shape).asLongStream().toArray());
+    }
+
+    public static void setNdName(PpNDArray array, String name) {
+        PaddleLibrary.LIB.setTensorName(array.getHandle(), name);
+    }
+
+    public static String getNameFromNd(PpNDArray array) {
+        return PaddleLibrary.LIB.getTensorName(array.getHandle());
+    }
+
+    public static void deleteNd(Long handle) {
+        PaddleLibrary.LIB.deleteTensor(handle);
+    }
+
+    public static long createConfig(String modelDir, String paramDir, Device device) {
+        int deviceId = device == Device.cpu() ? -1 : device.getDeviceId();
+        return PaddleLibrary.LIB.createAnalysisConfig(modelDir, paramDir, deviceId);
+    }
+
+    public static void useFeedFetchOp(AnalysisConfig config) {
+        PaddleLibrary.LIB.useFeedFetchOp(config.getHandle());
+    }
+
+    public static void deleteConfig(AnalysisConfig config) {
+        PaddleLibrary.LIB.deleteAnalysisConfig(config.getHandle());
+    }
+
+    public static long createPredictor(AnalysisConfig config) {
+        return PaddleLibrary.LIB.createPredictor(config.getHandle());
+    }
+
+    public static long clonePredictor(PaddlePredictor predictor) {
+        return PaddleLibrary.LIB.clonePredictor(predictor.getHandle());
+    }
+
+    public static void deletePredictor(PaddlePredictor predictor) {
+        PaddleLibrary.LIB.deletePredictor(predictor.getHandle());
+    }
+
+    public static PpNDArray[] predictorForward(PaddlePredictor predictor, PpNDArray[] inputs) {
+        long[] handles = Arrays.stream(inputs).mapToLong(PpNDArray::getHandle).toArray();
+        long[] outputs = PaddleLibrary.LIB.runInference(predictor.getHandle(), handles);
+        PpNDManager manager = (PpNDManager) inputs[0].getManager();
+        PpNDArray[] arrays = new PpNDArray[outputs.length];
+        for (int i = 0; i < outputs.length; i++) {
+            arrays[i] = new PpNDArray(manager, outputs[i]);
+        }
+        return arrays;
+    }
+
+    public static String getVersion() {
+        return "2.0.0";
     }
 }
