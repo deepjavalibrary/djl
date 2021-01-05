@@ -15,9 +15,9 @@ package ai.djl.training.hyperparameter;
 import ai.djl.Model;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
+import ai.djl.training.TrainingConfig;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
@@ -80,7 +80,7 @@ public abstract class EasyHpo {
         Model model = buildModel(hpVals);
 
         // setup training configuration
-        DefaultTrainingConfig config = setupTrainingConfig(hpVals);
+        TrainingConfig config = setupTrainingConfig(hpVals);
 
         try (Trainer trainer = model.newTrainer(config)) {
             trainer.setMetrics(new Metrics());

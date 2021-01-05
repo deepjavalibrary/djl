@@ -20,6 +20,7 @@ import ai.djl.examples.training.util.Arguments;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.TrainingConfig;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset.Usage;
 import ai.djl.training.dataset.RandomAccessDataset;
@@ -66,7 +67,7 @@ public final class TrainWithHpo {
         }
 
         @Override
-        protected DefaultTrainingConfig setupTrainingConfig(HpSet hpVals) {
+        protected TrainingConfig setupTrainingConfig(HpSet hpVals) {
             String outputDir = arguments.getOutputDir();
             CheckpointsTrainingListener listener = new CheckpointsTrainingListener(outputDir);
             listener.setSaveModelCallback(
