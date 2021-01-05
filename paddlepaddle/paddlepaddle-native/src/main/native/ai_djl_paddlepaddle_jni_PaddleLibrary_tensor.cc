@@ -47,12 +47,14 @@ JNIEXPORT jint JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_getTensorDType
   return tensor_ptr->dtype;
 }
 
-JNIEXPORT jobject JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_getTensorData
+JNIEXPORT jbyteArray JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_getTensorData
   (JNIEnv* env, jobject jthis, jlong jhandle) {
   auto tensor_ptr = reinterpret_cast<paddle::PaddleTensor*>(jhandle);
   auto buf = &tensor_ptr->data;
   int len = buf->length();
-  return env->NewDirectByteBuffer(buf->data(), len);
+  jbyteArray result = env->NewByteArray(len);
+  env->SetByteArrayRegion(result, 0, len, static_cast<const jbyte*>(buf->data()));
+  return result;
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_setTensorName

@@ -47,7 +47,7 @@ public final class JniUtils {
     }
 
     public static ByteBuffer getByteBufferFromNd(PpNDArray array) {
-        ByteBuffer bb = PaddleLibrary.LIB.getTensorData(array.getHandle());
+        ByteBuffer bb = ByteBuffer.wrap(PaddleLibrary.LIB.getTensorData(array.getHandle()));
         return bb.order(ByteOrder.nativeOrder());
     }
 

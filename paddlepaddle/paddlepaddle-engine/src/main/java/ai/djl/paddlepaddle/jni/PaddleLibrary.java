@@ -30,7 +30,7 @@ final class PaddleLibrary {
 
     native int getTensorDType(long handle);
 
-    native ByteBuffer getTensorData(long handle);
+    native byte[] getTensorData(long handle);
 
     native void setTensorName(long handle, String name);
 
