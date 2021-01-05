@@ -90,6 +90,7 @@ public class PtNDManager extends BaseNDManager {
             default:
                 throw new AssertionError("Show never happen");
         }
+        buf.rewind();
         return JniUtils.createNdFromByteBuffer(
                 this, buf, shape, dataType, SparseFormat.DENSE, device);
     }

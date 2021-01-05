@@ -57,7 +57,7 @@ task prepareNativeLibs() {
 
         def files = [
                 // "linux/cu101": "",
-                "linux/cpu" : "https://paddle-inference-lib.bj.bcebos.com/latest-cpu-avx-mkl/fluid_inference.tgz",
+                "linux/cpu" : "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-2.0-rc1-gcc54.tgz",
                 "osx/cpu": "https://paddle-inference-lib.bj.bcebos.com/mac/2.0-rc/cpu_avx_openblas/paddle_inference_install_dir.tgz",
                 // "win/cu101"  : "",
                 "win/cpu": "https://paddle-wheel.bj.bcebos.com/2.0.0-rc0/win-infer/mkl/cpu/paddle_inference_install_dir.zip"
@@ -96,7 +96,7 @@ task prepareNativeLibs() {
                 copy {
                     from(tmpDir) {
                         include '**/*.dylib'
-                        include '**/*.so'
+                        include '**/*.so*'
                     }
                     eachFile {
                         path = name

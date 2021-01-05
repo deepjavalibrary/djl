@@ -30,7 +30,6 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.paddlepaddle.jni.LibUtils;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
@@ -51,10 +50,8 @@ import org.testng.annotations.Test;
 
 public class MaskDetectionTest {
 
-    @Test(enabled = false)
+    @Test
     public void testMaskDetection() throws IOException, ModelException, TranslateException {
-        // Require user to override PADDLE_LIBRARY_PATH
-        LibUtils.loadLibrary();
         String url =
                 "https://raw.githubusercontent.com/PaddlePaddle/PaddleHub/release/v1.5/demo/mask_detection/python/images/mask.jpg";
         Image img = ImageFactory.getInstance().fromUrl(url);

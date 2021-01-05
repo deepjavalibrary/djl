@@ -251,6 +251,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             default:
                 throw new UnsupportedOperationException("data type is not supported!");
         }
+        buf.rewind();
         // If NDArray is on the GPU, it is native code responsibility to control the data life cycle
         if (!Device.Type.GPU.equals(getDevice().getDeviceType())) {
             dataRef = buf;

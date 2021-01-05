@@ -102,6 +102,7 @@ public class PpNDManager extends BaseNDManager {
             default:
                 throw new AssertionError("Show never happen");
         }
+        buf.rewind();
         return JniUtils.createNdArray(this, buf, shape, dataType);
     }
 

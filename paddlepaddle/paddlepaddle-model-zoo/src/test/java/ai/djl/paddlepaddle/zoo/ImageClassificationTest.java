@@ -19,7 +19,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.paddlepaddle.jni.LibUtils;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
@@ -32,12 +31,10 @@ import org.testng.annotations.Test;
 
 public class ImageClassificationTest {
 
-    @Test(enabled = false)
+    @Test
     public void testImageClassification()
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
-        // Require user to override PADDLE_LIBRARY_PATH
-        LibUtils.loadLibrary();
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)

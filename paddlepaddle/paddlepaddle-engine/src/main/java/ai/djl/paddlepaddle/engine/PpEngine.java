@@ -17,6 +17,7 @@ import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
 import ai.djl.paddlepaddle.jni.JniUtils;
+import ai.djl.paddlepaddle.jni.LibUtils;
 import ai.djl.training.GradientCollector;
 
 /**
@@ -38,6 +39,7 @@ public final class PpEngine extends Engine {
     }
 
     static Engine newInstance() {
+        LibUtils.loadLibrary();
         return new PpEngine();
     }
 
