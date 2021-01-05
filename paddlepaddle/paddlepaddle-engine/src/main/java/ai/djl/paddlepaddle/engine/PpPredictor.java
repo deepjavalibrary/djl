@@ -23,6 +23,8 @@ import ai.djl.translate.Translator;
  */
 public class PpPredictor<I, O> extends Predictor<I, O> {
 
+    PaddlePredictor predictor;
+
     /**
      * Creates a new instance of {@code PaddlePredictor}.
      *
@@ -32,6 +34,7 @@ public class PpPredictor<I, O> extends Predictor<I, O> {
      */
     public PpPredictor(Model model, PaddlePredictor predictor, Translator<I, O> translator) {
         super(model, translator);
+        this.predictor = predictor;
         block = new PpSymbolBlock(predictor);
     }
 
@@ -39,6 +42,6 @@ public class PpPredictor<I, O> extends Predictor<I, O> {
     @Override
     public void close() {
         super.close();
-        ((PpSymbolBlock) block).close();
+        this.predictor.close();
     }
 }

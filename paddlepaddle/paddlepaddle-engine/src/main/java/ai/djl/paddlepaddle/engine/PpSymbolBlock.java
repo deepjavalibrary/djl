@@ -24,7 +24,7 @@ import ai.djl.util.PairList;
 import java.util.Arrays;
 
 /** {@code PpSymbolBlock} is the PaddlePaddle implementation of {@link SymbolBlock}. */
-public class PpSymbolBlock extends AbstractBlock implements SymbolBlock, AutoCloseable {
+public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     private PaddlePredictor predictor;
     private String[] inputNames;
@@ -51,7 +51,6 @@ public class PpSymbolBlock extends AbstractBlock implements SymbolBlock, AutoClo
             throw new IllegalArgumentException(
                     "Input number mismatch, requires: " + Arrays.toString(inputNames));
         }
-        // TODO: always clones new predictor
         NDManager inputManager = inputs.head().getManager();
         try (PpNDManager tempManager = PpNDManager.getSystemManager().newSubManager()) {
             boolean foreignEngine =
@@ -108,11 +107,5 @@ public class PpSymbolBlock extends AbstractBlock implements SymbolBlock, AutoClo
     @Override
     public PairList<String, Shape> describeOutput() {
         throw new UnsupportedOperationException("Not implemented.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void close() {
-        predictor.close();
     }
 }
