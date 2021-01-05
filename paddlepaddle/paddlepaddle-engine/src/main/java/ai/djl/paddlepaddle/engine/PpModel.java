@@ -14,9 +14,11 @@ package ai.djl.paddlepaddle.engine;
 
 import ai.djl.BaseModel;
 import ai.djl.Model;
+import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.paddlepaddle.jni.JniUtils;
+import ai.djl.translate.Translator;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -111,6 +113,11 @@ public class PpModel extends BaseModel {
         }
         sb.append("\n)");
         return sb.toString();
+    }
+
+    @Override
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
+        return new PpPredictor<>(this, paddlePredictor.copy(), translator);
     }
 
     /** {@inheritDoc} */

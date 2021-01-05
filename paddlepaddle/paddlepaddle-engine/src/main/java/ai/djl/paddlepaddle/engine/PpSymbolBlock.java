@@ -24,10 +24,9 @@ import ai.djl.util.PairList;
 import java.util.Arrays;
 
 /** {@code PpSymbolBlock} is the PaddlePaddle implementation of {@link SymbolBlock}. */
-public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
+public class PpSymbolBlock extends AbstractBlock implements SymbolBlock, AutoCloseable {
 
     private PaddlePredictor predictor;
-    private ThreadLocal<PaddlePredictor> localPredictorHolder;
     private String[] inputNames;
 
     /**
@@ -39,7 +38,6 @@ public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
         super((byte) 0);
         this.predictor = predictor;
         inputNames = JniUtils.getInputNames(predictor);
-        localPredictorHolder = new ThreadLocal<>();
     }
 
     /** {@inheritDoc} */
@@ -54,20 +52,13 @@ public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
                     "Input number mismatch, requires: " + Arrays.toString(inputNames));
         }
         // TODO: always clones new predictor
-        PaddlePredictor localPredictor = localPredictorHolder.get();
-        if (localPredictor == null) {
-            localPredictor = predictor.copy();
-            localPredictorHolder.set(localPredictor);
-        }
         NDManager inputManager = inputs.head().getManager();
         try (PpNDManager tempManager = PpNDManager.getSystemManager().newSubManager()) {
             boolean foreignEngine =
                     !PpEngine.ENGINE_NAME.equals(inputManager.getEngine().getEngineName());
             PpNDArray[] result =
                     JniUtils.predictorForward(
-                            localPredictor,
-                            getInputs(inputs, foreignEngine, tempManager),
-                            inputNames);
+                            predictor, getInputs(inputs, foreignEngine, tempManager), inputNames);
             return getOutputs(result, foreignEngine, inputManager);
         }
     }
@@ -117,5 +108,11 @@ public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
     @Override
     public PairList<String, Shape> describeOutput() {
         throw new UnsupportedOperationException("Not implemented.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        predictor.close();
     }
 }

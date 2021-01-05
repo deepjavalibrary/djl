@@ -31,6 +31,5 @@ public class PaddlePredictor extends NativeResource<Long> {
     @Override
     public void close() {
         JniUtils.deletePredictor(this);
-        super.close();
     }
 }
