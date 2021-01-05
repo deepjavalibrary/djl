@@ -116,43 +116,48 @@ public class SimpleUrlRepository extends AbstractRepository {
             return metadata;
         }
 
-        HttpURLConnection conn = null;
-        try {
-            resolved = true;
-            conn = (HttpURLConnection) uri.toURL().openConnection();
-            conn.setRequestMethod("HEAD");
-            int code = conn.getResponseCode();
-            if (code != 200) {
-                logger.info("request error: " + code);
-                return null;
-            }
-            int contentLength = conn.getContentLength();
+        Artifact artifact = new Artifact();
+        Map<String, Artifact.Item> files = new ConcurrentHashMap<>();
+        Artifact.Item item = new Artifact.Item();
+        item.setUri(uri.getPath());
+        item.setName(""); // avoid creating extra folder
+        item.setArtifact(artifact);
+        item.setSize(getContentLength());
+        files.put(artifactId, item);
+        artifact.setFiles(files);
+        artifact.setName(modelName);
 
-            Artifact artifact = new Artifact();
-            Map<String, Artifact.Item> files = new ConcurrentHashMap<>();
-            Artifact.Item item = new Artifact.Item();
-            item.setUri(uri.getPath());
-            item.setName(""); // avoid creating extra folder
-            item.setArtifact(artifact);
-            item.setSize(contentLength);
-            files.put(artifactId, item);
-            artifact.setFiles(files);
-            artifact.setName(modelName);
+        metadata = new Metadata.MatchAllMetadata();
+        metadata.setApplication(Application.UNDEFINED);
+        metadata.setGroupId(DefaultModelZoo.GROUP_ID);
+        metadata.setArtifactId(artifactId);
+        metadata.setArtifacts(Collections.singletonList(artifact));
+        String hash = md5hash(uri.toString());
+        MRL mrl = MRL.model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
+        metadata.setRepositoryUri(mrl.toURI());
+        return metadata;
+    }
 
-            metadata = new Metadata.MatchAllMetadata();
-            metadata.setApplication(Application.UNDEFINED);
-            metadata.setGroupId(DefaultModelZoo.GROUP_ID);
-            metadata.setArtifactId(artifactId);
-            metadata.setArtifacts(Collections.singletonList(artifact));
-            String hash = md5hash(uri.toString());
-            MRL mrl = MRL.model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
-            metadata.setRepositoryUri(mrl.toURI());
-
-            return metadata;
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
+    private long getContentLength() throws IOException {
+        String scheme = uri.getScheme();
+        if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
+            HttpURLConnection conn = null;
+            try {
+                resolved = true;
+                conn = (HttpURLConnection) uri.toURL().openConnection();
+                conn.setRequestMethod("HEAD");
+                int code = conn.getResponseCode();
+                if (code != 200) {
+                    logger.info("request error: " + code);
+                    return -1;
+                }
+                return conn.getContentLength();
+            } finally {
+                if (conn != null) {
+                    conn.disconnect();
+                }
             }
         }
+        return -1;
     }
 }
