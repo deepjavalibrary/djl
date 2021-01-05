@@ -117,7 +117,7 @@ public abstract class EasyHpo {
      * @param hpVals the hyperparameters to train with
      * @return the {@link ai.djl.training.TrainingConfig} to use to train each hyperparameter set
      */
-    protected abstract DefaultTrainingConfig setupTrainingConfig(HpSet hpVals);
+    protected abstract TrainingConfig setupTrainingConfig(HpSet hpVals);
 
     /**
      * Builds the {@link Model} and {@link ai.djl.nn.Block} to train.
