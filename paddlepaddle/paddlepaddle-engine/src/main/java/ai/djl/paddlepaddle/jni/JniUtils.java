@@ -21,6 +21,7 @@ import ai.djl.paddlepaddle.engine.PpDataType;
 import ai.djl.paddlepaddle.engine.PpNDArray;
 import ai.djl.paddlepaddle.engine.PpNDManager;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 
 /**
@@ -46,7 +47,9 @@ public final class JniUtils {
     }
 
     public static ByteBuffer getByteBufferFromNd(PpNDArray array) {
-        return PaddleLibrary.LIB.getTensorData(array.getHandle());
+        ByteBuffer bb = PaddleLibrary.LIB.getTensorData(array.getHandle());
+        bb.order(ByteOrder.nativeOrder());
+        return bb;
     }
 
     public static Shape getShapeFromNd(PpNDArray array) {
