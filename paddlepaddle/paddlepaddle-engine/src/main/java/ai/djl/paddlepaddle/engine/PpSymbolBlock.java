@@ -21,12 +21,14 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.paddlepaddle.jni.JniUtils;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+import java.util.Arrays;
 
 /** {@code PpSymbolBlock} is the PaddlePaddle implementation of {@link SymbolBlock}. */
 public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     private PaddlePredictor predictor;
     private ThreadLocal<PaddlePredictor> localPredictorHolder;
+    private String[] inputNames;
 
     /**
      * Constructs a new {@code PpSymbolBlock} instance.
@@ -36,6 +38,7 @@ public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
     public PpSymbolBlock(PaddlePredictor predictor) {
         super((byte) 0);
         this.predictor = predictor;
+        inputNames = JniUtils.getInputNames(predictor);
         localPredictorHolder = new ThreadLocal<>();
     }
 
@@ -46,6 +49,10 @@ public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
+        if (inputNames.length != inputs.size()) {
+            throw new IllegalArgumentException(
+                    "Input number mismatch, requires: " + Arrays.toString(inputNames));
+        }
         // TODO: always clones new predictor
         PaddlePredictor localPredictor = localPredictorHolder.get();
         if (localPredictor == null) {
@@ -58,7 +65,9 @@ public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
                     !PpEngine.ENGINE_NAME.equals(inputManager.getEngine().getEngineName());
             PpNDArray[] result =
                     JniUtils.predictorForward(
-                            localPredictor, getInputs(inputs, foreignEngine, tempManager));
+                            localPredictor,
+                            getInputs(inputs, foreignEngine, tempManager),
+                            inputNames);
             return getOutputs(result, foreignEngine, inputManager);
         }
     }
