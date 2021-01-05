@@ -91,15 +91,24 @@ public final class JniUtils {
         PaddleLibrary.LIB.deletePredictor(predictor.getHandle());
     }
 
-    public static PpNDArray[] predictorForward(PaddlePredictor predictor, PpNDArray[] inputs) {
-        long[] handles = Arrays.stream(inputs).mapToLong(PpNDArray::getHandle).toArray();
-        long[] outputs = PaddleLibrary.LIB.runInference(predictor.getHandle(), handles);
+    public static PpNDArray[] predictorForward(
+            PaddlePredictor predictor, PpNDArray[] inputs, String[] inputNames) {
+        long[] inputHandles = new long[inputs.length];
+        for (int i = 0; i < inputs.length; i++) {
+            inputs[i].setName(inputNames[i]);
+            inputHandles[i] = inputs[i].getHandle();
+        }
+        long[] outputs = PaddleLibrary.LIB.runInference(predictor.getHandle(), inputHandles);
         PpNDManager manager = (PpNDManager) inputs[0].getManager();
         PpNDArray[] arrays = new PpNDArray[outputs.length];
         for (int i = 0; i < outputs.length; i++) {
             arrays[i] = new PpNDArray(manager, outputs[i]);
         }
         return arrays;
+    }
+
+    public static String[] getInputNames(PaddlePredictor predictor) {
+        return PaddleLibrary.LIB.getInputNames(predictor.getHandle());
     }
 
     public static String getVersion() {
