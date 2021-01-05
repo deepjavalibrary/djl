@@ -3,7 +3,6 @@ configure([
         project(':basicdataset'),
         project(':model-zoo'),
         project(':serving'),
-        project(':easy'),
         project(':mxnet:mxnet-engine'),
         project(':mxnet:mxnet-model-zoo'),
         project(':pytorch:pytorch-engine'),
