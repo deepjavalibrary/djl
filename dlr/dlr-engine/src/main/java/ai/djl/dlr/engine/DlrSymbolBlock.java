@@ -16,17 +16,11 @@ package ai.djl.dlr.engine;
 import ai.djl.dlr.jni.JniUtils;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
-import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.BlockList;
-import ai.djl.nn.ParameterList;
+import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
-import ai.djl.training.initializer.Initializer;
-import ai.djl.util.NativeResource;
 import ai.djl.util.PairList;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * {@code DlrSymbolBlock} is the DLR implementation of {@link SymbolBlock}.
@@ -34,8 +28,10 @@ import java.io.DataOutputStream;
  * <p>You can create a {@code DlrSymbolBlock} using {@link ai.djl.Model#load(java.nio.file.Path,
  * String)}.
  */
-public class DlrSymbolBlock extends NativeResource<Long> implements SymbolBlock {
+public class DlrSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
 
+    private static final byte VERSION = 1;
+    private AtomicReference<Long> handle;
     /**
      * Constructs a {@code DlrSymbolBlock}.
      *
@@ -45,13 +41,8 @@ public class DlrSymbolBlock extends NativeResource<Long> implements SymbolBlock 
      * @param handle the handle for native DLR model
      */
     public DlrSymbolBlock(long handle) {
-        super(handle);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void removeLastBlock() {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
+        super(VERSION);
+        this.handle = new AtomicReference<>(handle);
     }
 
     /** {@inheritDoc} */
@@ -61,7 +52,7 @@ public class DlrSymbolBlock extends NativeResource<Long> implements SymbolBlock 
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        long modelHandle = getHandle();
+        long modelHandle = handle.get();
         NDManager manager = inputs.head().getManager();
         // TODO maybe verify the number of inputs
         // currently we assume the order of the input NDList is the same
@@ -71,96 +62,6 @@ public class DlrSymbolBlock extends NativeResource<Long> implements SymbolBlock 
         }
         JniUtils.runDlrModel(modelHandle);
         return JniUtils.getDlrOutputs(modelHandle, manager);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer) {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer, String paramName) {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isInitialized() {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void cast(DataType dataType) {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void clear() {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PairList<String, Shape> describeInput() {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PairList<String, Shape> describeOutput() {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BlockList getChildren() {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ParameterList getDirectParameters() {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ParameterList getParameters() {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void saveParameters(DataOutputStream os) {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void loadParameters(NDManager manager, DataInputStream is) {
-        throw new UnsupportedOperationException("not supported for DlrSymbolBlock");
     }
 
     /** {@inheritDoc} */
