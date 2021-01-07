@@ -49,7 +49,7 @@ class JavaFormatterPlugin implements Plugin<Project> {
                             continue
                         }
 
-                        String src = file.text
+                        String src = new String(file.bytes, "UTF-8")
                         String formatted = formatter.formatSource(src)
                         formatted = RemoveUnusedImports.removeUnusedImports(formatted, RemoveUnusedImports.JavadocOnlyImports.KEEP)
                         formatted = ImportOrderer.reorderImports(formatted);
