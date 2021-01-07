@@ -14,17 +14,37 @@ package ai.djl.easy.cv;
 
 import ai.djl.Application.CV;
 import ai.djl.MalformedModelException;
+import ai.djl.Model;
+import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.easy.Performance;
 import ai.djl.easy.RequireZoo;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.modality.cv.translator.ImageClassificationTranslator;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Block;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
+import ai.djl.training.Trainer;
+import ai.djl.training.TrainingConfig;
+import ai.djl.training.dataset.Dataset.Usage;
+import ai.djl.training.evaluator.Accuracy;
+import ai.djl.training.listener.TrainingListener;
+import ai.djl.training.loss.Loss;
+import ai.djl.translate.TranslateException;
+import ai.djl.translate.Translator;
 import java.io.IOException;
+import java.util.List;
 
 /** ImageClassification takes an image and classifies the main subject of the image. */
 public final class ImageClassification {
+
     private ImageClassification() {}
 
     /**
@@ -35,7 +55,7 @@ public final class ImageClassification {
      * @param classes what {@link Classes} the image is classified into
      * @param performance the performance tradeoff (see {@link Performance}
      * @param <I> the input type
-     * @return a pretrained and ready to use model from our model zoo
+     * @return the model as a {@link ZooModel} with the {@link Translator} included
      * @throws MalformedModelException if the model zoo model is broken
      * @throws ModelNotFoundException if the model could not be found
      * @throws IOException if the model could not be loaded
@@ -51,22 +71,11 @@ public final class ImageClassification {
         switch (classes) {
             case IMAGENET:
                 RequireZoo.mxnet();
+                String layers = performance.switchPerformance("18", "50", "152");
                 criteria.optGroupId("ai.djl.mxnet")
                         .optArtifactId("resnet")
-                        .optFilter("dataset", "imagenet");
-                switch (performance) {
-                    case FAST:
-                        criteria.optFilter("layers", "18");
-                        break;
-                    case BALANCED:
-                        criteria.optFilter("layers", "50");
-                        break;
-                    case ACCURATE:
-                        criteria.optFilter("layers", "152");
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Unknown performance");
-                }
+                        .optFilter("dataset", "imagenet")
+                        .optFilter("layers", layers);
                 break;
             case DIGITS:
                 RequireZoo.basic();
@@ -81,12 +90,59 @@ public final class ImageClassification {
         return ModelZoo.loadModel(criteria.build());
     }
 
-    /*
-    I am leaving this commented out as an example of what the DJL-Easy train API should look like.
-    public static <I> ZooModel<I, Classifications> train(Class<I> input, Dataset dataset, Performance performance) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+    /**
+     * Trains the recommended image classification model on a custom dataset.
+     *
+     * @param datasetFactory to build the datasets to train on and validate against
+     * @param performance to determine the desired model tradeoffs
+     * @return the model as a {@link ZooModel} with the {@link Translator} included
+     * @throws IOException if the dataset could not be loaded
+     * @throws TranslateException if the translator has errors
      */
+    public static ZooModel<Image, Classifications> train(
+            ImageClassificationDatasetFactory datasetFactory, Performance performance)
+            throws IOException, TranslateException {
+
+        int channels = datasetFactory.getImageChannels();
+        int width = datasetFactory.getImageWidth();
+        int height = datasetFactory.getImageHeight();
+        Shape imageShape = new Shape(channels, height, width);
+        List<String> classes = datasetFactory.getClasses();
+
+        // Determine the layers based on performance
+        int numLayers = performance.switchPerformance(18, 50, 152);
+
+        Block block =
+                ResNetV1.builder()
+                        .setImageShape(imageShape)
+                        .setNumLayers(numLayers)
+                        .setOutSize(classes.size())
+                        .build();
+        Model model = Model.newInstance("ImageClassification");
+        model.setBlock(block);
+
+        TrainingConfig trainingConfig =
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .addEvaluator(new Accuracy())
+                        .addTrainingListeners(TrainingListener.Defaults.basic());
+
+        try (Trainer trainer = model.newTrainer(trainingConfig)) {
+            trainer.initialize(new Shape(1).addAll(imageShape));
+            EasyTrain.fit(
+                    trainer,
+                    35,
+                    datasetFactory.build(Usage.TRAIN),
+                    datasetFactory.build(Usage.VALIDATION));
+        }
+
+        Translator<Image, Classifications> translator =
+                ImageClassificationTranslator.builder()
+                        .optSynset(classes)
+                        .addTransform(new Resize(width, height))
+                        .addTransform(new ToTensor())
+                        .build();
+        return new ZooModel<>(model, translator);
+    }
 
     /**
      * The possible classes to classify the images into.

@@ -144,20 +144,33 @@ public final class Device {
     }
 
     /**
+     * Returns an array of devices.
+     *
+     * <p>If GPUs are available, it will return an array of {@code Device} of size
+     * \(min(numAvailable, maxGpus)\). Else, it will return an array with a single CPU device.
+     *
+     * @return an array of devices
+     */
+    public static Device[] getDevices() {
+        return getDevices(-1);
+    }
+
+    /**
      * Returns an array of devices given the maximum number of GPUs to use.
      *
      * <p>If GPUs are available, it will return an array of {@code Device} of size
      * \(min(numAvailable, maxGpus)\). Else, it will return an array with a single CPU device.
      *
-     * @param maxGpus the max number of GPUs to use
+     * @param maxGpus the max number of GPUs to use. Use 0 for no GPUs and -1 for no max.
      * @return an array of devices
      */
     public static Device[] getDevices(int maxGpus) {
         int count = getGpuCount();
-        if (maxGpus <= 0 || count <= 0) {
+        if (maxGpus == 0 || count <= 0) {
             return new Device[] {CPU};
+        } else if (maxGpus >= 0) {
+            count = Math.min(maxGpus, count);
         }
-        count = Math.min(maxGpus, count);
 
         Device[] devices = new Device[count];
         for (int i = 0; i < count; ++i) {
