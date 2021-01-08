@@ -14,3 +14,9 @@ libs
 *.dylib
 *.dll
 *.class
+
+# Eclipse
+.settings
+.project
+.classpath
+bin/
