@@ -26,7 +26,7 @@ from the central Maven repository by including the following dependency:
 <dependency>
     <groupId>ai.djl.paddlepaddle</groupId>
     <artifactId>paddlepaddle-model-zoo</artifactId>
-    <version>0.8.0</version>
+    <version>0.10.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -36,7 +36,7 @@ The PaddlePaddle model zoo contains Computer Vision (CV) models.
 
 * CV
   * Image Classification
-  * Object Detection
+  * FaceMask Detection
 
 ### How to find a pre-trained model in model zoo
 

@@ -95,6 +95,12 @@ nav:
       - Modules:
         - TensorFlow Engine: 'tensorflow/tensorflow-engine/README.md'
         - TensorFlow Model Zoo: 'tensorflow/tensorflow-model-zoo/README.md'
+  - PaddlePaddle:
+      - Overview: 'paddlepaddle/README.md'
+      - Load a PaddlePaddle Model: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
+      - Modules:
+          - PaddlePaddle Engine: 'paddlepaddle/paddlepaddle-engine/README.md'
+          - TensorFlow Model Zoo: 'paddlepaddle/paddlepaddle-model-zoo/README.md'
   - Extensions:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'
