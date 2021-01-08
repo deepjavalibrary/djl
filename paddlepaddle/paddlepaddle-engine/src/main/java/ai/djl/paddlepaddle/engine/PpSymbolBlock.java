@@ -16,7 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.AbstractBlock;
+import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.paddlepaddle.jni.JniUtils;
 import ai.djl.training.ParameterStore;
@@ -24,8 +24,9 @@ import ai.djl.util.PairList;
 import java.util.Arrays;
 
 /** {@code PpSymbolBlock} is the PaddlePaddle implementation of {@link SymbolBlock}. */
-public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
+public class PpSymbolBlock extends AbstractSymbolBlock {
 
+    private static final byte VERSION = 1;
     private PaddlePredictor predictor;
     private String[] inputNames;
 
@@ -35,7 +36,7 @@ public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
      * @param predictor {@link PaddlePredictor} that holds the model information.
      */
     public PpSymbolBlock(PaddlePredictor predictor) {
-        super((byte) 0);
+        super(VERSION);
         this.predictor = predictor;
         inputNames = JniUtils.getInputNames(predictor);
     }
@@ -95,17 +96,5 @@ public class PpSymbolBlock extends AbstractBlock implements SymbolBlock {
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return new Shape[0];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void removeLastBlock() {
-        throw new UnsupportedOperationException("Not implemented.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PairList<String, Shape> describeOutput() {
-        throw new UnsupportedOperationException("Not implemented.");
     }
 }
