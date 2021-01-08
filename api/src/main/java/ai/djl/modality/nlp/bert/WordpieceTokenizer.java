@@ -52,6 +52,7 @@ public class WordpieceTokenizer extends SimpleTokenizer {
         this.vocabulary = vocabulary;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<String> tokenize(String sentence) {
         StringBuilder sb = new StringBuilder();

@@ -39,8 +39,10 @@ import org.tensorflow.proto.framework.TensorShapeProto;
 
 public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
 
-    private static final byte VERSION = 1;
     private static final Logger logger = LoggerFactory.getLogger(TfSymbolBlock.class);
+
+    private static final byte VERSION = 1;
+
     private SavedModelBundle bundle;
     private Session session;
     private SignatureDef servingDefault;

@@ -68,6 +68,7 @@ final class SpProcessor extends NativeResource<Long> {
         return SentencePieceLibrary.LIB.decode(getHandle(), ids);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         Long pointer = handle.get();

@@ -83,6 +83,7 @@ public class BananaDetection extends RandomAccessDataset {
         return new Builder();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Record get(NDManager manager, long index) throws IOException {
         int idx = Math.toIntExact(index);
@@ -96,11 +97,13 @@ public class BananaDetection extends RandomAccessDataset {
         return new Record(d, l);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected long availableSize() {
         return imagePaths.size();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void prepare(Progress progress) throws IOException, TranslateException {
         if (prepared) {

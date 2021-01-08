@@ -103,11 +103,13 @@ public final class BertClassification {
             this.vocabularyPath = vocabularyPath;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Batchifier getBatchifier() {
             return null;
         }
 
+        /** {@inheritDoc} */
         @Override
         public void prepare(NDManager manager, Model model) throws IOException {
             SimpleVocabulary vocabulary =
@@ -119,6 +121,7 @@ public final class BertClassification {
             tokenizer = new BertFullTokenizer(vocabulary, true);
         }
 
+        /** {@inheritDoc} */
         @Override
         public NDList processInput(TranslatorContext ctx, String[] inputs) {
             NDManager inputManager = ctx.getNDManager();
@@ -188,6 +191,7 @@ public final class BertClassification {
             return outputList;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Classifications[] processOutput(TranslatorContext ctx, NDList list) {
             NDArray batchOutput = list.singletonOrThrow();

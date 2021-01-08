@@ -45,9 +45,10 @@ import org.slf4j.LoggerFactory;
  */
 public class MxSymbolBlock extends AbstractSymbolBlock {
 
+    private static final Logger logger = LoggerFactory.getLogger(MxSymbolBlock.class);
+
     private static final byte VERSION = 2;
 
-    private static final Logger logger = LoggerFactory.getLogger(MxSymbolBlock.class);
     private NDManager manager;
     private CachedOp op;
     private Symbol symbol;

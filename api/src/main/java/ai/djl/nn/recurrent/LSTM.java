@@ -115,6 +115,7 @@ public class LSTM extends RecurrentBlock {
         this.beginStateCell = beginStates.get(1);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void resetBeginStates() {
         beginState = null;

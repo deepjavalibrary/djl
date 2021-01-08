@@ -24,21 +24,26 @@ public final class TestUtils {
 
     public static TextEmbedding getTextEmbedding(NDManager manager, int embeddingSize) {
         return new TextEmbedding() {
+
+            /** {@inheritDoc} */
             @Override
             public long[] preprocessTextToEmbed(List<String> text) {
                 return new long[text.size()];
             }
 
+            /** {@inheritDoc} */
             @Override
             public NDArray embedText(NDManager manager, long[] textIndices) {
                 return manager.zeros(new Shape(textIndices.length, embeddingSize));
             }
 
+            /** {@inheritDoc} */
             @Override
             public NDArray embedText(NDArray textIndices) {
                 return null;
             }
 
+            /** {@inheritDoc} */
             @Override
             public List<String> unembedText(NDArray textEmbedding) {
                 return null;
