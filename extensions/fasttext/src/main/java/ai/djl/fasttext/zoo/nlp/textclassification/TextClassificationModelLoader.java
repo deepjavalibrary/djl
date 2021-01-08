@@ -65,6 +65,7 @@ public class TextClassificationModelLoader extends BaseModelLoader {
         return loadModel(criteria);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Model createModel(
             String name,

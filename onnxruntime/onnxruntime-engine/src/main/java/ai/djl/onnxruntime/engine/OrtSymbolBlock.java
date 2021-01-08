@@ -46,7 +46,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
 
     private static final byte VERSION = 1;
+
     private OrtSession session;
+
     /**
      * Constructs a {@code OrtSymbolBlock}.
      *

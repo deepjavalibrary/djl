@@ -47,6 +47,7 @@ public class ManagementRequestHandler extends HttpRequestHandler {
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void handleRequest(
             ChannelHandlerContext ctx,

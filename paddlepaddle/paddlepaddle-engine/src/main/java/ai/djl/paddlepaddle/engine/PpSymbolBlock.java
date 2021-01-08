@@ -27,6 +27,7 @@ import java.util.Arrays;
 public class PpSymbolBlock extends AbstractSymbolBlock {
 
     private static final byte VERSION = 1;
+
     private PaddlePredictor predictor;
     private String[] inputNames;
 

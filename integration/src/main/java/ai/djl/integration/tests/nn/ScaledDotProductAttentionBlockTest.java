@@ -785,6 +785,7 @@ public class ScaledDotProductAttentionBlockTest {
             this.constants = constants;
         }
 
+        /** {@inheritDoc} */
         @Override
         public NDArray initialize(NDManager manager, Shape shape, DataType dataType) {
             // test data is from TF, to get the same result the weights need to be transposed

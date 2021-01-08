@@ -430,6 +430,7 @@ public class TfNDArrayEx implements NDArrayEx {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray normalize(float[] mean, float[] std) {
         // TODO: TensorFlow does not support channels first on CPU for conv2d
@@ -443,6 +444,7 @@ public class TfNDArrayEx implements NDArrayEx {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray toTensor() {
         // TODO: TensorFlow does not support channels first on CPU for conv2d
@@ -489,26 +491,31 @@ public class TfNDArrayEx implements NDArrayEx {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomFlipLeftRight() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomFlipTopBottom() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomBrightness(float brightness) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomHue(float hue) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomColorJitter(
             float brightness, float contrast, float saturation, float hue) {

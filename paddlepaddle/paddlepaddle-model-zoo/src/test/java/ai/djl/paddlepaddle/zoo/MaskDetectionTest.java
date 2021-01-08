@@ -168,6 +168,7 @@ public class MaskDetectionTest {
             className = Arrays.asList("Not Face", "Face");
         }
 
+        /** {@inheritDoc} */
         @Override
         public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
             NDArray result = list.singletonOrThrow();
@@ -188,6 +189,7 @@ public class MaskDetectionTest {
             return new DetectedObjects(names, prob, boxes);
         }
 
+        /** {@inheritDoc} */
         @Override
         public NDList processInput(TranslatorContext ctx, Image input) {
             NDArray array = input.toNDArray(ctx.getNDManager());
@@ -203,6 +205,7 @@ public class MaskDetectionTest {
             return new NDList(array);
         }
 
+        /** {@inheritDoc} */
         @Override
         public Batchifier getBatchifier() {
             return null;

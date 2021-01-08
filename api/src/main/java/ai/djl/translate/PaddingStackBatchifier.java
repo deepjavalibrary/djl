@@ -40,6 +40,7 @@ public final class PaddingStackBatchifier implements Batchifier {
         includeValidLengths = builder.includeValidLengths;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList batchify(NDList[] inputs) {
         NDList validLengths = new NDList(inputs.length);
@@ -85,6 +86,7 @@ public final class PaddingStackBatchifier implements Batchifier {
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList[] unbatchify(NDList inputs) {
         if (!includeValidLengths) {
@@ -108,6 +110,7 @@ public final class PaddingStackBatchifier implements Batchifier {
         return split;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList[] split(NDList list, int numOfSlices, boolean evenSplit) {
         if (!includeValidLengths) {

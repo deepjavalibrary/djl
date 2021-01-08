@@ -35,8 +35,10 @@ import org.slf4j.LoggerFactory;
 // TODO: Memory handling
 public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
 
-    private static final byte VERSION = 1;
     private static final Logger logger = LoggerFactory.getLogger(PtSymbolBlock.class);
+
+    private static final byte VERSION = 1;
+
     private AtomicReference<Long> handle;
     private String uid;
     private PtNDManager manager;
