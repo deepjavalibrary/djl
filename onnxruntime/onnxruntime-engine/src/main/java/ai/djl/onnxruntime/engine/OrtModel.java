@@ -100,4 +100,11 @@ public class OrtModel extends BaseModel {
         }
         return modelFile;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        ((OrtSymbolBlock) block).close();
+        super.close();
+    }
 }
