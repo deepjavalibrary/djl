@@ -93,6 +93,10 @@ public final class ImageClassification {
     /**
      * Trains the recommended image classification model on a custom dataset.
      *
+     * <p>In order to train on a custom dataset, you must create a custom {@link
+     * ai.djl.basicdataset.ImageClassificationDataset} to load your data and a {@link
+     * ImageClassificationDatasetFactory} to build it.
+     *
      * @param datasetFactory to build the datasets to train on and validate against
      * @param performance to determine the desired model tradeoffs
      * @return the model as a {@link ZooModel} with the {@link Translator} included
