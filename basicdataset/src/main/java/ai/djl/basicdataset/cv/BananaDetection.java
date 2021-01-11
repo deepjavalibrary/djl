@@ -10,9 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.basicdataset;
+package ai.djl.basicdataset.cv;
 
-import ai.djl.Application.CV;
+import ai.djl.Application;
+import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -27,6 +28,7 @@ import ai.djl.repository.Resource;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.Pipeline;
+import ai.djl.translate.TranslateException;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
 import com.google.gson.reflect.TypeToken;
@@ -40,32 +42,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/** Pikachu image detection dataset that contains multiple Pikachus in each image. */
-public class PikachuDetection extends RandomAccessDataset {
+/**
+ * Banana image detection dataset contains a 3 x 256 x 256 image in the dataset with a banana of
+ * varying sizes in each image. There are 1000 training images and 100 testing images.
+ */
+public class BananaDetection extends RandomAccessDataset {
 
     private static final String VERSION = "1.0";
-    private static final String ARTIFACT_ID = "pikachu";
+    private static final String ARTIFACT_ID = "banana";
 
-    private Usage usage;
-    private Image.Flag flag;
-    private List<Path> imagePaths;
-    private List<float[]> labels;
+    private final Usage usage;
+    private final Image.Flag flag;
+    private final List<Path> imagePaths;
+    private final List<float[]> labels;
 
-    private Resource resource;
+    private final Resource resource;
     private boolean prepared;
 
-    protected PikachuDetection(Builder builder) {
+    /**
+     * Creates a new instance of {@link RandomAccessDataset} with the given necessary
+     * configurations.
+     *
+     * @param builder a builder with the necessary configurations
+     */
+    public BananaDetection(Builder builder) {
         super(builder);
         usage = builder.usage;
         flag = builder.flag;
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
-        MRL mrl = MRL.dataset(CV.ANY, builder.groupId, builder.artifactId);
+        MRL mrl = MRL.dataset(Application.CV.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, VERSION);
     }
 
     /**
-     * Creates a new builder to build a {@link PikachuDetection}.
+     * Creates a new builder to build a {@link BananaDetection}.
      *
      * @return a new builder
      */
@@ -75,7 +86,27 @@ public class PikachuDetection extends RandomAccessDataset {
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(Progress progress) throws IOException {
+    public Record get(NDManager manager, long index) throws IOException {
+        int idx = Math.toIntExact(index);
+        NDList d =
+                new NDList(
+                        ImageFactory.getInstance()
+                                .fromFile(imagePaths.get(idx))
+                                .toNDArray(manager, flag));
+        NDArray label = manager.create(labels.get(idx));
+        NDList l = new NDList(label.reshape(new Shape(1).addAll(label.getShape())));
+        return new Record(d, l);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected long availableSize() {
+        return imagePaths.size();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void prepare(Progress progress) throws IOException, TranslateException {
         if (prepared) {
             return;
         }
@@ -106,13 +137,13 @@ public class PikachuDetection extends RandomAccessDataset {
                 String imgName = entry.getKey();
                 List<Float> label = entry.getValue();
                 // Class label
-                labelArray[0] = label.get(4);
+                labelArray[0] = label.get(0);
 
                 // Bounding box labels
-                labelArray[1] = label.get(5);
-                labelArray[2] = label.get(6);
-                labelArray[3] = label.get(7);
-                labelArray[4] = label.get(8);
+                labelArray[1] = label.get(1);
+                labelArray[2] = label.get(2);
+                labelArray[3] = label.get(3);
+                labelArray[4] = label.get(4);
                 imagePaths.add(usagePath.resolve(imgName));
                 labels.add(labelArray);
             }
@@ -120,28 +151,8 @@ public class PikachuDetection extends RandomAccessDataset {
         prepared = true;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Record get(NDManager manager, long index) throws IOException {
-        int idx = Math.toIntExact(index);
-        NDList d =
-                new NDList(
-                        ImageFactory.getInstance()
-                                .fromFile(imagePaths.get(idx))
-                                .toNDArray(manager, flag));
-        NDArray label = manager.create(labels.get(idx));
-        NDList l = new NDList(label.reshape(new Shape(1).addAll(label.getShape())));
-        return new Record(d, l);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected long availableSize() {
-        return imagePaths.size();
-    }
-
-    /** A builder for a {@link PikachuDetection}. */
-    public static final class Builder extends BaseBuilder<Builder> {
+    /** A builder for a {@link BananaDetection}. */
+    public static final class Builder extends BaseBuilder<BananaDetection.Builder> {
 
         Repository repository;
         String groupId;
@@ -160,7 +171,7 @@ public class PikachuDetection extends RandomAccessDataset {
 
         /** {@inheritDoc} */
         @Override
-        public Builder self() {
+        public BananaDetection.Builder self() {
             return this;
         }
 
@@ -170,7 +181,7 @@ public class PikachuDetection extends RandomAccessDataset {
          * @param usage the usage
          * @return this builder
          */
-        public Builder optUsage(Usage usage) {
+        public BananaDetection.Builder optUsage(Usage usage) {
             this.usage = usage;
             return self();
         }
@@ -181,7 +192,7 @@ public class PikachuDetection extends RandomAccessDataset {
          * @param repository the repository
          * @return this builder
          */
-        public Builder optRepository(Repository repository) {
+        public BananaDetection.Builder optRepository(Repository repository) {
             this.repository = repository;
             return self();
         }
@@ -192,7 +203,7 @@ public class PikachuDetection extends RandomAccessDataset {
          * @param groupId the groupId}
          * @return this builder
          */
-        public Builder optGroupId(String groupId) {
+        public BananaDetection.Builder optGroupId(String groupId) {
             this.groupId = groupId;
             return this;
         }
@@ -203,7 +214,7 @@ public class PikachuDetection extends RandomAccessDataset {
          * @param artifactId the artifactId
          * @return this builder
          */
-        public Builder optArtifactId(String artifactId) {
+        public BananaDetection.Builder optArtifactId(String artifactId) {
             if (artifactId.contains(":")) {
                 String[] tokens = artifactId.split(":");
                 groupId = tokens[0];
@@ -220,21 +231,21 @@ public class PikachuDetection extends RandomAccessDataset {
          * @param flag the color mode flag
          * @return this builder
          */
-        public Builder optFlag(Image.Flag flag) {
+        public BananaDetection.Builder optFlag(Image.Flag flag) {
             this.flag = flag;
             return self();
         }
 
         /**
-         * Builds the {@link PikachuDetection}.
+         * Builds the {@link BananaDetection}.
          *
-         * @return the {@link PikachuDetection}
+         * @return the {@link BananaDetection}
          */
-        public PikachuDetection build() {
+        public BananaDetection build() {
             if (pipeline == null) {
                 pipeline = new Pipeline(new ToTensor());
             }
-            return new PikachuDetection(this);
+            return new BananaDetection(this);
         }
     }
 }

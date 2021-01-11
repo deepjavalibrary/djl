@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.basicdataset.nlp.AmazonReview;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;

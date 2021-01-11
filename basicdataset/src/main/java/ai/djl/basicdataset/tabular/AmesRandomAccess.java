@@ -10,9 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.basicdataset;
+package ai.djl.basicdataset.tabular;
 
 import ai.djl.Application.Tabular;
+import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;

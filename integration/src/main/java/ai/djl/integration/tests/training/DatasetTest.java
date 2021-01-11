@@ -14,7 +14,7 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.Device;
 import ai.djl.Model;
-import ai.djl.basicdataset.Cifar10;
+import ai.djl.basicdataset.cv.classification.Cifar10;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;

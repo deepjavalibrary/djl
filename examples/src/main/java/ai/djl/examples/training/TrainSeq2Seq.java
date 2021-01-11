@@ -14,8 +14,8 @@ package ai.djl.examples.training;
 
 import ai.djl.Device;
 import ai.djl.Model;
-import ai.djl.basicdataset.TatoebaEnglishFrenchDataset;
-import ai.djl.basicdataset.TextDataset;
+import ai.djl.basicdataset.nlp.TatoebaEnglishFrenchDataset;
+import ai.djl.basicdataset.nlp.TextDataset;
 import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.basicmodelzoo.nlp.SimpleTextDecoder;
 import ai.djl.basicmodelzoo.nlp.SimpleTextEncoder;

@@ -10,9 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.basicdataset;
+package ai.djl.basicdataset.tabular;
 
 import ai.djl.Application;
+import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
@@ -54,8 +55,7 @@ public final class AirfoilRandomAccess extends CsvDataset {
     private Map<String, Float> std;
 
     /**
-     * Creates an instance of {@code RandomAccessDataset} with the arguments in {@link
-     * FashionMnist.Builder}.
+     * Creates an instance of {@code RandomAccessDataset} with the arguments in {@link Builder}.
      *
      * @param builder a builder with the required arguments
      */
