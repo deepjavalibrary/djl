@@ -43,6 +43,20 @@ configure(javaProjects()) {
         compileJava.options.compilerArgs.addAll(["--release", "8"])
     }
 
+    apply plugin: 'eclipse'
+
+    eclipse {
+        jdt.file.withProperties { props ->
+            props.setProperty "org.eclipse.jdt.core.circularClasspath", "warning"
+        }
+        classpath {
+            sourceSets.test.java {
+                srcDirs = ["src/test/java"]
+                exclude "**/package-info.java"
+            }
+        }
+    }
+
     apply from: file("${rootProject.projectDir}/tools/gradle/java-formatter.gradle")
     apply from: file("${rootProject.projectDir}/tools/gradle/check.gradle")
 

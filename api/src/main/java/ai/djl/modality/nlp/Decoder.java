@@ -63,6 +63,7 @@ public abstract class Decoder extends AbstractBlock {
         return block.forward(parameterStore, inputs, training, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         block.initialize(manager, dataType, inputShapes);

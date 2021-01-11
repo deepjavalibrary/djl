@@ -943,6 +943,7 @@ public class TfLiteNDArray implements NDArray {
         throw new UnsupportedOperationException("Not supported for TFLite");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray flip(int... axes) {
         throw new UnsupportedOperationException("Not supported for TFLite");

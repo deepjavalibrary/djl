@@ -50,6 +50,7 @@ class WorkerThread implements Runnable {
         predictor = model.getModel().newPredictor();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void run() {
         Thread thread = Thread.currentThread();

@@ -524,26 +524,31 @@ public class PtNDArrayEx implements NDArrayEx {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomFlipLeftRight() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomFlipTopBottom() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomBrightness(float brightness) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomHue(float hue) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomColorJitter(
             float brightness, float contrast, float saturation, float hue) {

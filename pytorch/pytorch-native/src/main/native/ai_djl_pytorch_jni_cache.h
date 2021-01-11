@@ -25,7 +25,7 @@ extern jfieldID LOGGER_FIELD;
 extern jmethodID INFO_METHOD;
 extern jmethodID DEBUG_METHOD;
 extern jmethodID ERROR_METHOD;
-
-static jint JNI_VERSION = JNI_VERSION_1_8;
+// the highest version Android JNI version is 1.6
+static jint JNI_VERSION = JNI_VERSION_1_6;
 
 #endif //DJL_TORCH_AI_DJL_PYTORCH_JNI_CACHE_H

@@ -121,6 +121,26 @@ gradlew build -x test
 
 **Note:** SpotBugs is not compatible with JDK 11+. SpotBugs will not be executed if you are using JDK 11+.
 
+### Importing into eclipse
+
+to import source project into eclipse
+
+```sh
+# for Linux/macOS:
+./gradlew eclipse
+
+
+# for Windows:
+gradlew eclipse
+
+```
+
+in eclipse 
+
+file->import->gradle->existing gradle project
+
+**Note:** please set your workspace text encoding setting to UTF-8
+
 ## Community
 
 Join our [<img src='https://cdn3.iconfinder.com/data/icons/social-media-2169/24/social_media_social_media_logo_slack-512.png' width='20px' /> slack channel](https://join.slack.com/t/deepjavalibrary/shared_invite/zt-ar91gjkz-qbXhr1l~LFGEIEeGBibT7w) to get in touch with the development team, for questions and discussions.

@@ -701,6 +701,7 @@ public class ModelServerTest {
                     .handler(
                             new ChannelInitializer<Channel>() {
 
+                                /** {@inheritDoc} */
                                 @Override
                                 public void initChannel(Channel ch) {
                                     ChannelPipeline p = ch.pipeline();
@@ -726,6 +727,7 @@ public class ModelServerTest {
     @ChannelHandler.Sharable
     private class TestHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
 
+        /** {@inheritDoc} */
         @Override
         public void channelRead0(ChannelHandlerContext ctx, FullHttpResponse msg) {
             httpStatus = msg.status();
@@ -734,6 +736,7 @@ public class ModelServerTest {
             latch.countDown();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             Logger logger = LoggerFactory.getLogger(TestHandler.class);

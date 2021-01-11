@@ -63,6 +63,7 @@ public class YoloModelLoader extends ObjectDetectionModelLoader {
 
     private static final class FactoryImpl implements TranslatorFactory<Image, DetectedObjects> {
 
+        /** {@inheritDoc} */
         @Override
         public Translator<Image, DetectedObjects> newInstance(
                 Model model, Map<String, ?> arguments) {

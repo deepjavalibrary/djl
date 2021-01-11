@@ -115,6 +115,7 @@ public class PpModel extends BaseModel {
         return sb.toString();
     }
 
+    /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
         return new PpPredictor<>(this, paddlePredictor.copy(), translator);

@@ -911,6 +911,7 @@ public class OrtNDArray implements NDArray {
         throw new UnsupportedOperationException("Not supported for ONNX Runtime");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray flip(int... axes) {
         throw new UnsupportedOperationException("Not supported for ONNX Runtime");

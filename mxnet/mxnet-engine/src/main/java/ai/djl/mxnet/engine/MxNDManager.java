@@ -165,6 +165,7 @@ public class MxNDManager extends BaseNDManager {
         return fill("_npi_ones", shape, dataType);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray full(Shape shape, float value, DataType dataType) {
         MxOpParams params = new MxOpParams();
