@@ -227,7 +227,11 @@ public abstract class AbstractRepository implements Repository {
         try (TarArchiveInputStream tis = new TarArchiveInputStream(bis)) {
             TarArchiveEntry entry;
             while ((entry = tis.getNextTarEntry()) != null) {
-                Path file = dir.resolve(entry.getName()).toAbsolutePath();
+                String entryName = entry.getName();
+                if (entryName.contains("..")) {
+                    throw new IOException("Malicious zip entry: " + entryName);
+                }
+                Path file = dir.resolve(entryName).toAbsolutePath();
                 if (entry.isDirectory()) {
                     Files.createDirectories(file);
                 } else {

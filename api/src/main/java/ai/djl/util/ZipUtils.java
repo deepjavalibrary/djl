@@ -39,6 +39,9 @@ public final class ZipUtils {
         ZipEntry entry;
         while ((entry = zis.getNextEntry()) != null) {
             String name = entry.getName();
+            if (name.contains("..")) {
+                throw new IOException("Malicious zip entry: " + name);
+            }
             Path file = dest.resolve(name).toAbsolutePath();
             if (entry.isDirectory()) {
                 Files.createDirectories(file);
