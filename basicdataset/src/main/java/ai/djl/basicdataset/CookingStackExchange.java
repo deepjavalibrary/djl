@@ -57,6 +57,7 @@ public class CookingStackExchange implements RawDataset<Path> {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void prepare(Progress progress) throws IOException {
         if (prepared) {

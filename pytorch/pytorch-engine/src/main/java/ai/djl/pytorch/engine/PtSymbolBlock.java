@@ -15,19 +15,14 @@ package ai.djl.pytorch.engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.BlockList;
-import ai.djl.nn.ParameterList;
+import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.pytorch.jni.IValueUtils;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.ParameterStore;
-import ai.djl.training.initializer.Initializer;
-import ai.djl.util.NativeResource;
 import ai.djl.util.PairList;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,9 +33,14 @@ import org.slf4j.LoggerFactory;
  * String)}.
  */
 // TODO: Memory handling
-public class PtSymbolBlock extends NativeResource<Long> implements SymbolBlock {
+public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(PtSymbolBlock.class);
+
+    private static final byte VERSION = 1;
+
+    private AtomicReference<Long> handle;
+    private String uid;
     private PtNDManager manager;
     private boolean isTrain;
     private PairList<String, Shape> inputDescriptions;
@@ -57,9 +57,11 @@ public class PtSymbolBlock extends NativeResource<Long> implements SymbolBlock {
      * @param handle the module handle
      */
     public PtSymbolBlock(PtNDManager manager, long handle) {
-        super(handle);
+        super(VERSION);
+        this.handle = new AtomicReference<>(handle);
         this.manager = manager;
-        manager.attach(getUid(), this);
+        uid = String.valueOf(handle);
+        manager.attach(uid, this);
         // training mode is on by default
         isTrain = true;
         first = true;
@@ -71,15 +73,9 @@ public class PtSymbolBlock extends NativeResource<Long> implements SymbolBlock {
         Long pointer = handle.getAndSet(null);
         if (pointer != null) {
             JniUtils.deleteModule(pointer);
-            manager.detach(getUid());
+            manager.detach(uid);
             manager = null;
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void removeLastBlock() {
-        throw new UnsupportedOperationException("Not supported for PyTorch");
     }
 
     /** {@inheritDoc} */
@@ -120,42 +116,6 @@ public class PtSymbolBlock extends NativeResource<Long> implements SymbolBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void setInitializer(Initializer initializer) {
-        throw new UnsupportedOperationException("Not supported for PyTorch");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer, String paramName) {
-        throw new UnsupportedOperationException("Not supported for PyTorch");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        throw new UnsupportedOperationException("Not supported for PyTorch");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isInitialized() {
-        return true;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void cast(DataType dataType) {
-        throw new UnsupportedOperationException("Not supported for PyTorch");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void clear() {
-        throw new UnsupportedOperationException("Not supported for PyTorch");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PairList<String, Shape> describeInput() {
         if (inputDescriptions == null) {
             logger.warn(
@@ -178,43 +138,20 @@ public class PtSymbolBlock extends NativeResource<Long> implements SymbolBlock {
 
     /** {@inheritDoc} */
     @Override
-    public BlockList getChildren() {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ParameterList getDirectParameters() {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ParameterList getParameters() {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return new Shape[0];
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void saveParameters(DataOutputStream os) {
-        throw new UnsupportedOperationException("Not supported for PyTorch");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void loadParameters(NDManager manager, DataInputStream is) {
-        throw new UnsupportedOperationException("Not supported for PyTorch");
+    /**
+     * Get the native PyTorch model pointer.
+     *
+     * @return the pointer
+     */
+    public Long getHandle() {
+        Long reference = handle.get();
+        if (reference == null) {
+            throw new IllegalStateException("PyTorch model handle has been released!");
+        }
+        return reference;
     }
 }

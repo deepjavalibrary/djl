@@ -18,6 +18,8 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * {@code NativeResource} is an internal class for {@link AutoCloseable} blocks of memory created in
  * the different engines.
+ *
+ * @param <T> the resource that could map to a native pointer or java object
  */
 public abstract class NativeResource<T> implements AutoCloseable {
 

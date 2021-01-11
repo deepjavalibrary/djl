@@ -98,6 +98,7 @@ public class TicTacToe implements RlEnv {
         return step;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Step[] getBatch() {
         return replayBuffer.getBatch();

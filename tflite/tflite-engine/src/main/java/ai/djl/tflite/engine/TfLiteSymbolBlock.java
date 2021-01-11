@@ -15,17 +15,10 @@ package ai.djl.tflite.engine;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
-import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.BlockList;
-import ai.djl.nn.ParameterList;
+import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
-import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import org.tensorflow.lite.Interpreter;
 
 /**
@@ -34,20 +27,17 @@ import org.tensorflow.lite.Interpreter;
  * <p>You can create a {@code TfLiteSymbolBlock} using {@link ai.djl.Model#load(java.nio.file.Path,
  * String)}.
  */
-public class TfLiteSymbolBlock implements SymbolBlock, AutoCloseable {
+public class TfLiteSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
+
+    private static final byte VERSION = 1;
 
     private TfLiteNDManager manager;
     private Interpreter interpreter;
 
     TfLiteSymbolBlock(Interpreter interpreter, TfLiteNDManager manager) {
+        super(VERSION);
         this.interpreter = interpreter;
         this.manager = manager;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void removeLastBlock() {
-        throw new UnsupportedOperationException("TFLite not supported");
     }
 
     /** {@inheritDoc} */
@@ -66,96 +56,6 @@ public class TfLiteSymbolBlock implements SymbolBlock, AutoCloseable {
             result.add(new TfLiteNDArray(manager, interpreter.getOutputTensor(i)));
         }
         return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer) {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer, String paramName) {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isInitialized() {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void cast(DataType dataType) {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void clear() {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PairList<String, Shape> describeInput() {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PairList<String, Shape> describeOutput() {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BlockList getChildren() {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ParameterList getDirectParameters() {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ParameterList getParameters() {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void saveParameters(DataOutputStream os) {
-        throw new UnsupportedOperationException("TFLite not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void loadParameters(NDManager manager, DataInputStream is) {
-        throw new UnsupportedOperationException("TFLite not supported");
     }
 
     /** {@inheritDoc} */

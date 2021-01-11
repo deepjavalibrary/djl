@@ -776,6 +776,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("_npx__image_random_flip_left_right", array, null);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomFlipTopBottom() {
         if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
@@ -784,6 +785,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("_npx__image_random_flip_top_bottom", array, null);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomBrightness(float brightness) {
         if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
@@ -797,6 +799,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("_npx__image_random_brightness", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomHue(float hue) {
         if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
@@ -810,6 +813,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("_npx__image_random_hue", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomColorJitter(
             float brightness, float contrast, float saturation, float hue) {

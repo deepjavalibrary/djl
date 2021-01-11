@@ -52,6 +52,7 @@ public class TrainableTextEmbedding extends AbstractBlock implements TextEmbeddi
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray embedText(NDArray textIndices) throws EmbeddingException {
         throw new UnsupportedOperationException(
@@ -69,6 +70,7 @@ public class TrainableTextEmbedding extends AbstractBlock implements TextEmbeddi
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(
             ParameterStore parameterStore,
@@ -78,11 +80,13 @@ public class TrainableTextEmbedding extends AbstractBlock implements TextEmbeddi
         return trainableWordEmbedding.forward(parameterStore, inputs, training, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         trainableWordEmbedding.initialize(manager, dataType, inputShapes);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return trainableWordEmbedding.getOutputShapes(manager, inputShapes);

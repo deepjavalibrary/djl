@@ -1200,6 +1200,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         return JniUtils.dot(this, (PtNDArray) other);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray matMul(NDArray other) {
         if (isScalar() || other.isScalar()) {
@@ -1220,6 +1221,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         return JniUtils.transpose(this, axis1, axis2);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray flip(int... axes) {
         return JniUtils.flip(this, Arrays.stream(axes).mapToLong(ele -> (long) ele).toArray());

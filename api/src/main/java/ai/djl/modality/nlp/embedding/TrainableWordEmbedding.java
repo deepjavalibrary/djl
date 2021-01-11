@@ -93,6 +93,7 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
         return embed(word);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray embedWord(NDArray index) throws EmbeddingException {
         throw new UnsupportedOperationException(
@@ -134,6 +135,7 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
         return new String(byteArray, StandardCharsets.UTF_8);
     }
 
+    /** {@inheritDoc} */
     @Override
     public long embed(String item) {
         if (vocabularyContains(item)) {
@@ -147,6 +149,7 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Optional<String> unembed(long index) {
         if (index == 0) {
@@ -168,6 +171,7 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
         return new TrainableWordEmbedding.Builder();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean hasItem(String item) {
         return false;

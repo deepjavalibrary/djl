@@ -19,6 +19,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 /** A class handling unhandled inbound HTTP requests. */
 public class InvalidRequestHandler extends HttpRequestHandler {
 
+    /** {@inheritDoc} */
     @Override
     protected void handleRequest(
             ChannelHandlerContext ctx,

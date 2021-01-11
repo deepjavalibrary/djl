@@ -19,11 +19,9 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.BlockList;
-import ai.djl.nn.ParameterList;
+import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
-import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
 import ai.onnxruntime.OnnxJavaType;
 import ai.onnxruntime.OnnxSequence;
@@ -33,8 +31,6 @@ import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
 import ai.onnxruntime.SequenceInfo;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +43,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>You can create a {@code OrtSymbolBlock} using {@link ai.djl.Model#load(java.nio.file.Path,
  * String)}.
  */
-public class OrtSymbolBlock implements SymbolBlock, AutoCloseable {
+public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
+
+    private static final byte VERSION = 1;
 
     private OrtSession session;
 
@@ -60,6 +58,7 @@ public class OrtSymbolBlock implements SymbolBlock, AutoCloseable {
      * @param session the {@link OrtSession} contains the model information
      */
     public OrtSymbolBlock(OrtSession session) {
+        super(VERSION);
         this.session = session;
     }
 
@@ -168,96 +167,6 @@ public class OrtSymbolBlock implements SymbolBlock, AutoCloseable {
         } catch (OrtException e) {
             throw new EngineException(e);
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer) {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer, String paramName) {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isInitialized() {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void cast(DataType dataType) {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void clear() {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PairList<String, Shape> describeInput() {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PairList<String, Shape> describeOutput() {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public BlockList getChildren() {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ParameterList getDirectParameters() {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ParameterList getParameters() {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void saveParameters(DataOutputStream os) {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void loadParameters(NDManager manager, DataInputStream is) {
-        throw new UnsupportedOperationException("ONNX Runtime not supported");
     }
 
     /** {@inheritDoc} */

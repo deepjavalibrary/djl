@@ -95,4 +95,11 @@ public class TfLiteModel extends BaseModel {
         }
         return modelFile;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        ((TfLiteSymbolBlock) block).close();
+        super.close();
+    }
 }
