@@ -15,7 +15,7 @@ runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine:0.9.0"
 ```
 
 ```
-runtimeOnly "ai.djl.dlr:dlr-engine:0.9.0-SNAPSHOT"
+runtimeOnly "ai.djl.dlr:dlr-engine:0.9.0"
 ```
 
 To use it along with Apache MXNet for additional API support, add the following two dependencies:
