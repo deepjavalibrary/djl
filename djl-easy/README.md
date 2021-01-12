@@ -34,6 +34,6 @@ You can pull the module from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl</groupId>
     <artifactId>easy</artifactId>
-    <version>0.9.0-SNAPSHOT</version>
+    <version>0.10.0-SNAPSHOT</version>
 </dependency>
 ```
