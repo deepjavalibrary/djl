@@ -14,13 +14,8 @@ package ai.djl.basicdataset;
 
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Repository;
 import ai.djl.repository.Resource;
-import ai.djl.training.dataset.RandomAccessDataset;
-import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
@@ -38,14 +33,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A dataset for loading image files stored in a folder structure. */
-public abstract class AbstractImageFolder extends RandomAccessDataset {
+public abstract class AbstractImageFolder extends ImageClassificationDataset {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractImageFolder.class);
 
     private static final Set<String> EXT =
             new HashSet<>(Arrays.asList(".jpg", ".jpeg", ".png", ".bmp", ".wbmp", ".gif"));
 
-    protected Image.Flag flag;
     protected List<String> synset;
     protected PairList<String, Integer> items;
     protected Resource resource;
@@ -55,7 +49,6 @@ public abstract class AbstractImageFolder extends RandomAccessDataset {
 
     protected AbstractImageFolder(ImageFolderBuilder<?> builder) {
         super(builder);
-        this.flag = builder.flag;
         this.maxDepth = builder.maxDepth;
         this.synset = new ArrayList<>();
         this.items = new PairList<>();
@@ -64,14 +57,18 @@ public abstract class AbstractImageFolder extends RandomAccessDataset {
 
     /** {@inheritDoc} */
     @Override
-    public Record get(NDManager manager, long index) throws IOException {
+    protected Image getImage(long index) throws IOException {
+        ImageFactory imageFactory = ImageFactory.getInstance();
         Pair<String, Integer> item = items.get(Math.toIntExact(index));
-
         Path imagePath = getImagePath(item.getKey());
-        NDArray array = ImageFactory.getInstance().fromFile(imagePath).toNDArray(manager, flag);
-        NDList d = new NDList(array);
-        NDList l = new NDList(manager.create(item.getValue()));
-        return new Record(d, l);
+        return imageFactory.fromFile(imagePath);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected long getClassNumber(long index) {
+        Pair<String, Integer> item = items.get(Math.toIntExact(index));
+        return item.getValue();
     }
 
     /** {@inheritDoc} */
@@ -140,23 +137,11 @@ public abstract class AbstractImageFolder extends RandomAccessDataset {
             extends BaseBuilder<T> {
 
         Repository repository;
-        Image.Flag flag;
         int maxDepth;
 
         protected ImageFolderBuilder() {
             flag = Image.Flag.COLOR;
             maxDepth = 1;
-        }
-
-        /**
-         * Sets the optional color mode flag.
-         *
-         * @param flag the color mode flag
-         * @return this builder
-         */
-        public T optFlag(Image.Flag flag) {
-            this.flag = flag;
-            return self();
         }
 
         /**

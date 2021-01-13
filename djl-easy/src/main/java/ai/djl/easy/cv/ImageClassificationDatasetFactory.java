@@ -12,11 +12,17 @@
  */
 package ai.djl.easy.cv;
 
+import ai.djl.basicdataset.ImageClassificationDataset;
 import ai.djl.easy.DatasetFactory;
+import ai.djl.training.dataset.Dataset.Usage;
 import java.util.List;
 
 /** A {@link DatasetFactory} for {@link ImageClassification}. */
 public interface ImageClassificationDatasetFactory extends DatasetFactory {
+
+    /** {@inheritDoc} */
+    @Override
+    ImageClassificationDataset build(Usage usage);
 
     /**
      * Returns the number of channels in the images in the dataset.
