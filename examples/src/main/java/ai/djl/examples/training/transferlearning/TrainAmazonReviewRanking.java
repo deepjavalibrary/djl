@@ -16,7 +16,7 @@ import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.ModelException;
-import ai.djl.basicdataset.CsvDataset;
+import ai.djl.basicdataset.tabular.CsvDataset;
 import ai.djl.basicdataset.utils.DynamicBuffer;
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;

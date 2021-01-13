@@ -14,7 +14,7 @@ package ai.djl.fasttext;
 
 import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
-import ai.djl.basicdataset.CookingStackExchange;
+import ai.djl.basicdataset.nlp.CookingStackExchange;
 import ai.djl.fasttext.zoo.FtModelZoo;
 import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;

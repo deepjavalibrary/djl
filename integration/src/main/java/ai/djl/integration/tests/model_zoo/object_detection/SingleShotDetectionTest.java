@@ -16,7 +16,7 @@ package ai.djl.integration.tests.model_zoo.object_detection;
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
-import ai.djl.basicdataset.PikachuDetection;
+import ai.djl.basicdataset.cv.PikachuDetection;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.inference.Predictor;
 import ai.djl.integration.util.TestUtils;

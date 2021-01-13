@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.basicdataset.nlp.TatoebaEnglishFrenchDataset;
 import ai.djl.basicdataset.utils.FixedBucketSampler;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.PaddingStackBatchifier;

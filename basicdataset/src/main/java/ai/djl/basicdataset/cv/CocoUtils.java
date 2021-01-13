@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.basicdataset;
+package ai.djl.basicdataset.cv;
 
 import ai.djl.util.JsonUtils;
 import java.io.IOException;
@@ -121,11 +121,10 @@ public class CocoUtils {
     }
 
     /**
-     * Returns an {@link ai.djl.basicdataset.CocoMetadata.Annotation} that corresponds to a given
-     * annotation id.
+     * Returns an {@link CocoMetadata.Annotation} that corresponds to a given annotation id.
      *
      * @param annotationId the annotation id to retrieve an annotation for
-     * @return an {@link ai.djl.basicdataset.CocoMetadata.Annotation}
+     * @return an {@link CocoMetadata.Annotation}
      */
     public CocoMetadata.Annotation getAnnotationById(long annotationId) {
         return annotationMap.get(annotationId);

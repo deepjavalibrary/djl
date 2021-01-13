@@ -10,9 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.basicdataset;
+package ai.djl.basicdataset.cv.classification;
 
 import ai.djl.Application.CV;
+import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.engine.Engine;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDArray;
@@ -32,34 +33,28 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- * FashMnist is a dataset from Zalando article images
- * https://github.com/zalandoresearch/fashion-mnist.
+ * MNIST handwritten digits dataset from http://yann.lecun.com/exdb/mnist.
  *
  * <p>Each sample is an image (in 3-D NDArray) with shape (28, 28, 1).
  */
-public final class FashionMnist extends ArrayDataset {
+public final class Mnist extends ArrayDataset {
 
     public static final int IMAGE_WIDTH = 28;
     public static final int IMAGE_HEIGHT = 28;
     public static final int NUM_CLASSES = 10;
 
-    private static final String ARTIFACT_ID = "fashmnist";
+    private static final String ARTIFACT_ID = "mnist";
 
-    private final NDManager manager;
-    private final Usage usage;
+    private NDManager manager;
+    private Usage usage;
 
     private Resource resource;
     private boolean prepared;
 
-    /**
-     * Creates a new instance of {@code ArrayDataset} with the arguments in {@link Builder}.
-     *
-     * @param builder a builder with the required arguments
-     */
-    private FashionMnist(FashionMnist.Builder builder) {
+    private Mnist(Builder builder) {
         super(builder);
         this.manager = builder.manager;
-        this.manager.setName("fashionmnist");
+        this.manager.setName("mnist");
         this.usage = builder.usage;
         MRL mrl = MRL.dataset(CV.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, "1.0");
@@ -70,8 +65,8 @@ public final class FashionMnist extends ArrayDataset {
      *
      * @return a new builder
      */
-    public static FashionMnist.Builder builder() {
-        return new FashionMnist.Builder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     /** {@inheritDoc} */
@@ -100,7 +95,6 @@ public final class FashionMnist extends ArrayDataset {
             default:
                 throw new UnsupportedOperationException("Validation data not available.");
         }
-
         labels = new NDArray[] {readLabel(labelItem)};
         data = new NDArray[] {readData(imageItem, labels[0].size())};
         prepared = true;
@@ -113,9 +107,7 @@ public final class FashionMnist extends ArrayDataset {
             }
 
             byte[] buf = Utils.toByteArray(is);
-            try (NDArray array =
-                    manager.create(
-                            new Shape(length, IMAGE_WIDTH, IMAGE_HEIGHT, 1), DataType.UINT8)) {
+            try (NDArray array = manager.create(new Shape(length, 28, 28, 1), DataType.UINT8)) {
                 array.set(buf);
                 return array.toType(DataType.FLOAT32, false);
             }
@@ -136,14 +128,14 @@ public final class FashionMnist extends ArrayDataset {
         }
     }
 
-    /** A builder for a {@link FashionMnist}. */
+    /** A builder for a {@link Mnist}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
-        NDManager manager;
-        Repository repository;
-        String groupId;
-        String artifactId;
-        Usage usage;
+        private NDManager manager;
+        private Repository repository;
+        private String groupId;
+        private String artifactId;
+        private Usage usage;
 
         /** Constructs a new builder. */
         Builder() {
@@ -151,6 +143,7 @@ public final class FashionMnist extends ArrayDataset {
             groupId = BasicDatasets.GROUP_ID;
             artifactId = ARTIFACT_ID;
             usage = Usage.TRAIN;
+            pipeline = new Pipeline(new ToTensor());
             manager = Engine.getInstance().newBaseManager();
         }
 
@@ -227,11 +220,8 @@ public final class FashionMnist extends ArrayDataset {
          *
          * @return the {@link Mnist}
          */
-        public FashionMnist build() {
-            if (pipeline == null) {
-                pipeline = new Pipeline(new ToTensor());
-            }
-            return new FashionMnist(this);
+        public Mnist build() {
+            return new Mnist(this);
         }
     }
 }

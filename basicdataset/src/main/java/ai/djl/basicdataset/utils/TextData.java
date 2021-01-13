@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset.utils;
 
+import ai.djl.basicdataset.nlp.TextDataset;
 import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
@@ -35,7 +36,7 @@ import java.util.Locale;
  * {@link TextData} is a utility for managing textual data within a {@link
  * ai.djl.training.dataset.Dataset}.
  *
- * <p>See {@link ai.djl.basicdataset.TextDataset} for an example.
+ * <p>See {@link TextDataset} for an example.
  */
 public class TextData {
 

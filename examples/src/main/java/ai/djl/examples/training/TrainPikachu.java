@@ -15,7 +15,7 @@ package ai.djl.examples.training;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.basicdataset.PikachuDetection;
+import ai.djl.basicdataset.cv.PikachuDetection;
 import ai.djl.basicmodelzoo.cv.object_detection.ssd.SingleShotDetection;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.inference.Predictor;

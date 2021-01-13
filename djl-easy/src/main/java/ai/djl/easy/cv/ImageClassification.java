@@ -15,6 +15,8 @@ package ai.djl.easy.cv;
 import ai.djl.Application.CV;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.basicdataset.cv.classification.ImageNet;
+import ai.djl.basicdataset.cv.classification.Mnist;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.easy.Performance;
 import ai.djl.easy.RequireZoo;
@@ -94,8 +96,8 @@ public final class ImageClassification {
      * Trains the recommended image classification model on a custom dataset.
      *
      * <p>In order to train on a custom dataset, you must create a custom {@link
-     * ai.djl.basicdataset.ImageClassificationDataset} to load your data and a {@link
-     * ImageClassificationDatasetFactory} to build it.
+     * ai.djl.basicdataset.cv.classification.ImageClassificationDataset} to load your data and a
+     * {@link ImageClassificationDatasetFactory} to build it.
      *
      * @param datasetFactory to build the datasets to train on and validate against
      * @param performance to determine the desired model tradeoffs
@@ -158,7 +160,7 @@ public final class ImageClassification {
         /**
          * Imagenet is a standard dataset of 1000 diverse classes.
          *
-         * <p>The dataset can be found at {@link ai.djl.basicdataset.ImageNet}. You can <a
+         * <p>The dataset can be found at {@link ImageNet}. You can <a
          * href="https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/image_classification/ai/djl/mxnet/synset.txt">view
          * the list of classes here</a>.
          */
@@ -167,7 +169,7 @@ public final class ImageClassification {
         /**
          * Classify images of the digits 0-9.
          *
-         * <p>This contains models trained using the {@link ai.djl.basicdataset.Mnist} dataset.
+         * <p>This contains models trained using the {@link Mnist} dataset.
          */
         DIGITS
     }

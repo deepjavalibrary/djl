@@ -10,14 +10,17 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.basicdataset;
+package ai.djl.basicdataset.cv;
 
 import ai.djl.Application.CV;
+import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
@@ -25,60 +28,50 @@ import ai.djl.repository.Resource;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.Pipeline;
+import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
+import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
+import java.io.Reader;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-/**
- * Coco image detection dataset from http://cocodataset.org/#home.
- *
- * <p>Each image might have different {@link ai.djl.ndarray.types.Shape}s.
- */
-public class CocoDetection extends RandomAccessDataset {
+/** Pikachu image detection dataset that contains multiple Pikachus in each image. */
+public class PikachuDetection extends RandomAccessDataset {
 
-    private static final String ARTIFACT_ID = "coco";
+    private static final String VERSION = "1.0";
+    private static final String ARTIFACT_ID = "pikachu";
 
     private Usage usage;
     private Image.Flag flag;
     private List<Path> imagePaths;
-    private List<double[][]> labels;
+    private List<float[]> labels;
 
     private Resource resource;
     private boolean prepared;
 
-    CocoDetection(Builder builder) {
+    protected PikachuDetection(Builder builder) {
         super(builder);
         usage = builder.usage;
         flag = builder.flag;
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
         MRL mrl = MRL.dataset(CV.ANY, builder.groupId, builder.artifactId);
-        resource = new Resource(builder.repository, mrl, "1.0");
+        resource = new Resource(builder.repository, mrl, VERSION);
     }
 
     /**
-     * Creates a builder to build a {@link CocoDetection}.
+     * Creates a new builder to build a {@link PikachuDetection}.
      *
      * @return a new builder
      */
     public static Builder builder() {
         return new Builder();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Record get(NDManager manager, long index) throws IOException {
-        int idx = Math.toIntExact(index);
-        NDList d =
-                new NDList(
-                        ImageFactory.getInstance()
-                                .fromFile(imagePaths.get(idx))
-                                .toNDArray(manager, flag));
-        NDList l = new NDList(manager.create(labels.get(idx)));
-        return new Record(d, l);
     }
 
     /** {@inheritDoc} */
@@ -90,32 +83,56 @@ public class CocoDetection extends RandomAccessDataset {
 
         Artifact artifact = resource.getDefaultArtifact();
         resource.prepare(artifact, progress);
-        Path root = resource.getRepository().getResourceDirectory(artifact);
 
-        Path jsonFile;
+        Path root = resource.getRepository().getResourceDirectory(artifact);
+        Path usagePath;
         switch (usage) {
             case TRAIN:
-                jsonFile = root.resolve("annotations").resolve("instances_train2017.json");
+                usagePath = Paths.get("train");
                 break;
             case TEST:
-                jsonFile = root.resolve("annotations").resolve("instances_val2017.json");
+                usagePath = Paths.get("test");
                 break;
             case VALIDATION:
             default:
                 throw new UnsupportedOperationException("Validation data not available.");
         }
-        CocoUtils coco = new CocoUtils(jsonFile);
-        coco.prepare();
-        List<Long> imageIds = coco.getImageIds();
-        for (long id : imageIds) {
-            Path imagePath = root.resolve(coco.getRelativeImagePath(id));
-            List<double[]> labelOfImageId = getLabels(coco, id);
-            if (!labelOfImageId.isEmpty()) {
-                imagePaths.add(imagePath);
-                labels.add(labelOfImageId.toArray(new double[0][]));
+        usagePath = root.resolve(usagePath);
+        Path indexFile = usagePath.resolve("index.file");
+        try (Reader reader = Files.newBufferedReader(indexFile)) {
+            Type mapType = new TypeToken<Map<String, List<Float>>>() {}.getType();
+            Map<String, List<Float>> metadata = JsonUtils.GSON.fromJson(reader, mapType);
+            for (Map.Entry<String, List<Float>> entry : metadata.entrySet()) {
+                float[] labelArray = new float[5];
+                String imgName = entry.getKey();
+                List<Float> label = entry.getValue();
+                // Class label
+                labelArray[0] = label.get(4);
+
+                // Bounding box labels
+                labelArray[1] = label.get(5);
+                labelArray[2] = label.get(6);
+                labelArray[3] = label.get(7);
+                labelArray[4] = label.get(8);
+                imagePaths.add(usagePath.resolve(imgName));
+                labels.add(labelArray);
             }
         }
         prepared = true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Record get(NDManager manager, long index) throws IOException {
+        int idx = Math.toIntExact(index);
+        NDList d =
+                new NDList(
+                        ImageFactory.getInstance()
+                                .fromFile(imagePaths.get(idx))
+                                .toNDArray(manager, flag));
+        NDArray label = manager.create(labels.get(idx));
+        NDList l = new NDList(label.reshape(new Shape(1).addAll(label.getShape())));
+        return new Record(d, l);
     }
 
     /** {@inheritDoc} */
@@ -124,36 +141,14 @@ public class CocoDetection extends RandomAccessDataset {
         return imagePaths.size();
     }
 
-    private List<double[]> getLabels(CocoUtils coco, long imageId) {
-        List<Long> annotationIds = coco.getAnnotationIdByImageId(imageId);
-        if (annotationIds == null) {
-            return Collections.emptyList();
-        }
-
-        List<double[]> label = new ArrayList<>();
-        for (long annotationId : annotationIds) {
-            CocoMetadata.Annotation annotation = coco.getAnnotationById(annotationId);
-            if (annotation.getArea() > 0) {
-                double[] box = annotation.getBoundingBox();
-                // add the category label
-                // map the original one to incremental index
-                double[] list = new double[5];
-                System.arraycopy(box, 0, list, 0, 4);
-                list[4] = coco.mapCategoryId(annotation.getCategoryId());
-                label.add(list);
-            }
-        }
-        return label;
-    }
-
-    /** A builder to construct a {@link CocoDetection}. */
+    /** A builder for a {@link PikachuDetection}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
-        Image.Flag flag;
         Repository repository;
         String groupId;
         String artifactId;
         Usage usage;
+        Image.Flag flag;
 
         /** Constructs a new builder. */
         Builder() {
@@ -173,7 +168,7 @@ public class CocoDetection extends RandomAccessDataset {
         /**
          * Sets the optional usage.
          *
-         * @param usage the new usage
+         * @param usage the usage
          * @return this builder
          */
         public Builder optUsage(Usage usage) {
@@ -232,15 +227,15 @@ public class CocoDetection extends RandomAccessDataset {
         }
 
         /**
-         * Builds the new {@link CocoDetection}.
+         * Builds the {@link PikachuDetection}.
          *
-         * @return the new {@link CocoDetection}
+         * @return the {@link PikachuDetection}
          */
-        public CocoDetection build() {
+        public PikachuDetection build() {
             if (pipeline == null) {
                 pipeline = new Pipeline(new ToTensor());
             }
-            return new CocoDetection(this);
+            return new PikachuDetection(this);
         }
     }
 }

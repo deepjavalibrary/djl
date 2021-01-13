@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.basicdataset;
+package ai.djl.basicdataset.cv.classification;
 
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.training.dataset.Dataset;
