@@ -125,7 +125,7 @@ public interface ModelZoo {
         if (modelZoo != null) {
             logger.debug("Searching model in specified model zoo: {}", modelZoo.getGroupId());
             if (groupId != null && !modelZoo.getGroupId().equals(groupId)) {
-                throw new ModelNotFoundException("groupId conflict with ModelZoo criteria.");
+                throw new ModelNotFoundException("groupId conflict with ModelZoo criteria." + modelZoo.getGroupId() + " v.s. " + groupId);
             }
             Set<String> supportedEngine = modelZoo.getSupportedEngines();
             if (engine != null && !supportedEngine.contains(engine)) {
