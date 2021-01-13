@@ -126,7 +126,7 @@ public class DefaultTrainingConfig implements TrainingConfig {
     @Override
     public Device[] getDevices() {
         if (devices == null) {
-            return Device.getDevices(Integer.MAX_VALUE);
+            return Device.getDevices();
         }
         return devices;
     }

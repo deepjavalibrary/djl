@@ -1,6 +1,7 @@
 dependencies {
     api project(":api")
     api project(":basicdataset")
+    api project(":model-zoo")
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 
     api project(":testing")
@@ -9,7 +10,6 @@ dependencies {
     }
 
     // Current engines and model zoos used for inference
-    runtimeOnly project(":model-zoo")
     // runtimeOnly project(":pytorch:pytorch-engine")
     // runtimeOnly project(":pytorch:pytorch-model-zoo")
     // runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
