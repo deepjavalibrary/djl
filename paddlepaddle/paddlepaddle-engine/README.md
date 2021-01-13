@@ -30,16 +30,12 @@ You can pull the PaddlePaddle engine from the central Maven repository by includ
 <dependency>
     <groupId>ai.djl.paddlepaddle</groupId>
     <artifactId>paddlepaddle-engine</artifactId>
-    <version>0.8.0</version>
+    <version>0.10.0-SNAPSHOT</version>
     <scope>runtime</scope>
 </dependency>
 ```
 
 Besides the `paddlepaddle-engine` library, you may also need to include the PaddlePaddle native library in your project.
-All current provided PaddlePaddle native libraries come from PaddlePaddle pip package:
-
-- https://pypi.org/project/paddlepaddle/#files
-- https://pypi.org/project/paddlepaddle-gpu/#files
 
 Choose a native library based on your platform and needs:
 
@@ -52,110 +48,12 @@ It will automatically determine the appropriate jars for your system based on th
 <dependency>
     <groupId>ai.djl.paddlepaddle</groupId>
     <artifactId>paddlepaddle-native-auto</artifactId>
-    <version>1.8.5</version>
+    <version>2.0.0-SNAPSHOT</version>
     <scope>runtime</scope>
 </dependency>
 ```
 
-### macOS
-For macOS, you can use the following library:
+### Mac/Windows/Linux standalone native jarss
 
-- ai.djl.paddlepaddle:paddlepaddle-native-mkl:1.8.5:osx-x86_64
-
-    This package takes advantage of the Intel MKL library to boost performance.
-
-```xml
-<dependency>
-    <groupId>ai.djl.paddlepaddle</groupId>
-    <artifactId>paddlepaddle-native-mkl</artifactId>
-    <classifier>osx-x86_64</classifier>
-    <version>1.8.5</version>
-    <scope>runtime</scope>
-</dependency>
-```
-
-### Linux
-For the Linux platform, you can choose between CPU, GPU. If you have Nvidia [CUDA](https://en.wikipedia.org/wiki/CUDA)
-installed on your GPU machine, you can use one of the following library:
-
-#### Linux GPU
-
-- ai.djl.paddlepaddle:paddlepaddle-native-cu102:1.8.5:linux-x86_64 - CUDA 10.2
-- ai.djl.paddlepaddle:paddlepaddle-native-cu101:1.8.5:linux-x86_64 - CUDA 10.1
-
-```xml
-<dependency>
-    <groupId>ai.djl.paddlepaddle</groupId>
-    <artifactId>paddlepaddle-native-cu102</artifactId>
-    <classifier>linux-x86_64</classifier>
-    <version>1.8.5</version>
-    <scope>runtime</scope>
-</dependency>
-```
-
-```xml
-<dependency>
-    <groupId>ai.djl.paddlepaddle</groupId>
-    <artifactId>paddlepaddle-native-cu101</artifactId>
-    <classifier>linux-x86_64</classifier>
-    <version>1.8.5</version>
-    <scope>runtime</scope>
-</dependency>
-```
-
-#### Linux CPU
-
-- ai.djl.paddlepaddle:paddlepaddle-native-cpu:1.8.5:linux-x86_64
-
-```xml
-<dependency>
-    <groupId>ai.djl.paddlepaddle</groupId>
-    <artifactId>paddlepaddle-native-cpu</artifactId>
-    <classifier>linux-x86_64</classifier>
-    <scope>runtime</scope>
-    <version>1.8.5</version>
-</dependency>
-```
-
-### Windows
-
-For the Windows platform, you can use CPU package.
-
-#### Windows GPU
-
-- ai.djl.paddlepaddle:paddlepaddle-native-cu102:1.8.5:win-x86_64 - CUDA 10.2
-- ai.djl.paddlepaddle:paddlepaddle-native-cu101:1.8.5:win-x86_64 - CUDA 10.1
-
-```xml
-<dependency>
-    <groupId>ai.djl.paddlepaddle</groupId>
-    <artifactId>paddlepaddle-native-cu102</artifactId>
-    <classifier>win-x86_64</classifier>
-    <version>1.8.5</version>
-    <scope>runtime</scope>
-</dependency>
-```
-
-```xml
-<dependency>
-    <groupId>ai.djl.paddlepaddle</groupId>
-    <artifactId>paddlepaddle-native-cu101</artifactId>
-    <classifier>win-x86_64</classifier>
-    <version>1.8.5</version>
-    <scope>runtime</scope>
-</dependency>
-```
-
-### Windows CPU
-
-- ai.djl.paddlepaddle:paddlepaddle-native-cpu:1.8.5:win-x86_64
-
-```xml
-<dependency>
-    <groupId>ai.djl.paddlepaddle</groupId>
-    <artifactId>paddlepaddle-native-cpu</artifactId>
-    <classifier>win-x86_64</classifier>
-    <scope>runtime</scope>
-    <version>1.8.5</version>
-</dependency>
-```
+Currently, PaddlePaddle 2.0.0 is still under development, we will update here once it is released. You may use the auto jar
+to have 2.0.0-rc1 releases for testing.
