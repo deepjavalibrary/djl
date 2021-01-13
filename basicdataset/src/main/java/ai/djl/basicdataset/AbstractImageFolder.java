@@ -57,7 +57,8 @@ public abstract class AbstractImageFolder extends ImageClassificationDataset {
 
     /** {@inheritDoc} */
     @Override
-    public Image getImage(ImageFactory imageFactory, long index) throws IOException {
+    protected Image getImage(long index) throws IOException {
+        ImageFactory imageFactory = ImageFactory.getInstance();
         Pair<String, Integer> item = items.get(Math.toIntExact(index));
         Path imagePath = getImagePath(item.getKey());
         return imageFactory.fromFile(imagePath);
@@ -65,7 +66,7 @@ public abstract class AbstractImageFolder extends ImageClassificationDataset {
 
     /** {@inheritDoc} */
     @Override
-    public long getClassNumber(long index) throws IOException {
+    protected long getClassNumber(long index) {
         Pair<String, Integer> item = items.get(Math.toIntExact(index));
         return item.getValue();
     }

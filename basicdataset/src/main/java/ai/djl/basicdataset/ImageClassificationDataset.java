@@ -13,7 +13,6 @@
 package ai.djl.basicdataset;
 
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.ImageFactory;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.RandomAccessDataset;
@@ -26,7 +25,7 @@ import java.io.IOException;
  */
 public abstract class ImageClassificationDataset extends RandomAccessDataset {
 
-    Image.Flag flag;
+    private Image.Flag flag;
 
     /**
      * Creates a new instance of {@link RandomAccessDataset} with the given necessary
@@ -42,27 +41,24 @@ public abstract class ImageClassificationDataset extends RandomAccessDataset {
     /**
      * Returns the image at the given index in the dataset.
      *
-     * @param imageFactory the imageFactory that can be used to create the {@link Image}
      * @param index the index (if the dataset is a list of data items)
      * @return the image
      * @throws IOException if the image could not be loaded
      */
-    public abstract Image getImage(ImageFactory imageFactory, long index) throws IOException;
+    protected abstract Image getImage(long index) throws IOException;
 
     /**
      * Returns the class of the data item at the given index.
      *
      * @param index the index (if the dataset is a list of data items)
      * @return the class number or the index into the list of classes of the desired class name
-     * @throws IOException if the data could not be loaded
      */
-    public abstract long getClassNumber(long index) throws IOException;
+    protected abstract long getClassNumber(long index);
 
     /** {@inheritDoc} */
     @Override
     public Record get(NDManager manager, long index) throws IOException {
-        ImageFactory imageFactory = ImageFactory.getInstance();
-        NDList data = new NDList(getImage(imageFactory, index).toNDArray(manager, flag));
+        NDList data = new NDList(getImage(index).toNDArray(manager, flag));
         NDList label = new NDList(manager.create(getClassNumber(index)));
         return new Record(data, label);
     }
