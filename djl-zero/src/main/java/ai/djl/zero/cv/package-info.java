@@ -12,8 +12,6 @@
  */
 
 /**
- * Contains a no deep learning knowledge required wrapper over DJL.
- *
- * <p><a href="https://docs.djl.ai/easy/index.html">See more details</a>.
+ * Contains pretrained models and training for Computer Vision({@link ai.djl.Application.CV}) tasks.
  */
-package ai.djl.easy;
+package ai.djl.zero.cv;

@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.easy.cv;
+package ai.djl.zero.cv;
 
 import ai.djl.Application.CV;
 import ai.djl.MalformedModelException;
@@ -18,8 +18,6 @@ import ai.djl.Model;
 import ai.djl.basicdataset.cv.classification.ImageNet;
 import ai.djl.basicdataset.cv.classification.Mnist;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
-import ai.djl.easy.Performance;
-import ai.djl.easy.RequireZoo;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.transform.Resize;
@@ -41,6 +39,8 @@ import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
+import ai.djl.zero.Performance;
+import ai.djl.zero.RequireZoo;
 import java.io.IOException;
 import java.util.List;
 

@@ -11,5 +11,9 @@
  * and limitations under the License.
  */
 
-/** Contains tests for {@link ai.djl.easy.cv}. */
-package ai.djl.easy.cv;
+/**
+ * Contains a zero deep learning knowledge required wrapper over DJL.
+ *
+ * <p><a href="https://docs.djl.ai/zero/index.html">See more details</a>.
+ */
+package ai.djl.zero;

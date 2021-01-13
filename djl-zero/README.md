@@ -1,8 +1,8 @@
-# DJL Easy
+# DJL Zero
 
 ## Overview
 
-This module is a no deep learning knowledge required wrapper over DJL. Instead of worrying about finding a model or how to train, this will provide a simple recommendation for your deep learning application. It is the easiest way to get started with DJL and get a solution for your deep learning problem.
+This module is a zero deep learning knowledge required wrapper over DJL. Instead of worrying about finding a model or how to train, this will provide a simple recommendation for your deep learning application. It is the easiest way to get started with DJL and get a solution for your deep learning problem.
 
 ## List of Applications
 
@@ -13,7 +13,7 @@ This module contains the following applications:
 
 ## Documentation
 
-The latest javadocs can be found on the [djl.ai website](https://javadoc.io/doc/ai.djl/easy/latest/index.html).
+The latest javadocs can be found on the [djl.ai website](https://javadoc.io/doc/ai.djl/zero/latest/index.html).
 
 You can also build the latest javadocs locally using the following command:
 
@@ -33,7 +33,7 @@ You can pull the module from the central Maven repository by including the follo
 ```xml
 <dependency>
     <groupId>ai.djl</groupId>
-    <artifactId>easy</artifactId>
+    <artifactId>djl-zero</artifactId>
     <version>0.10.0-SNAPSHOT</version>
 </dependency>
 ```
