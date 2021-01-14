@@ -94,7 +94,7 @@ public final class BertBlock extends AbstractBlock {
         this.embeddingDropout =
                 addChildBlock(
                         "embeddingDropout",
-                        Dropout.builder().optProbability(builder.hiddenDropoutProbability).build());
+                        Dropout.builder().optRate(builder.hiddenDropoutProbability).build());
         // the transformer blocks
         this.transformerEncoderBlocks = new ArrayList<>(builder.transformerBlockCount);
         for (int i = 0; i < builder.transformerBlockCount; ++i) {
@@ -112,10 +112,7 @@ public final class BertBlock extends AbstractBlock {
         this.pooling =
                 addChildBlock(
                         "poolingProjection",
-                        Linear.builder()
-                                .setOutChannels(builder.embeddingSize)
-                                .optBias(true)
-                                .build());
+                        Linear.builder().setUnits(builder.embeddingSize).optBias(true).build());
     }
 
     /**
@@ -238,9 +235,9 @@ public final class BertBlock extends AbstractBlock {
             ParameterStore ps, NDArray tokenIds, NDArray typeIds, NDArray masks, boolean training) {
         MemoryScope initScope = MemoryScope.from(tokenIds).add(typeIds, masks);
         // Create embeddings for inputs
-        NDArray embeddedTokens = tokenEmbedding.forward(ps, tokenIds);
-        NDArray embeddedTypes = typeEmbedding.forward(ps, typeIds);
-        NDArray embeddedPositions = ps.getValue(positionEmebdding, tokenIds.getDevice());
+        NDArray embeddedTokens = tokenEmbedding.forward(ps, tokenIds, training);
+        NDArray embeddedTypes = typeEmbedding.forward(ps, typeIds, training);
+        NDArray embeddedPositions = ps.getValue(positionEmebdding, tokenIds.getDevice(), training);
         // Merge them to one embedding by adding them
         // (We can just add the position embedding, even though it does not have a batch dimension:
         // the tensor is automagically "broadcast" i.e. repeated in the batch dimension. That
@@ -400,8 +397,8 @@ public final class BertBlock extends AbstractBlock {
         }*/
 
         /**
-         * Sets the maximum sequence length this model can process. Memory & compute requirements of
-         * the attention mechanism is O(n²), so large values can easily exhaust your GPU memory!
+         * Sets the maximum sequence length this model can process. Memory and compute requirements
+         * of the attention mechanism is O(n²), so large values can easily exhaust your GPU memory!
          *
          * @param maxSequenceLength the maximum sequence length this model can process.
          * @return this builder

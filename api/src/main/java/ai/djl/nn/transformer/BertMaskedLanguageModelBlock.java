@@ -53,7 +53,7 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
                 addChildBlock(
                         "sequenceProjection",
                         Linear.builder()
-                                .setOutChannels(bertBlock.getEmbeddingSize())
+                                .setUnits(bertBlock.getEmbeddingSize())
                                 .optBias(true)
                                 .build());
         this.sequenceNorm = addChildBlock("sequenceNorm", BatchNorm.builder().optAxis(1).build());
@@ -158,7 +158,7 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
         final NDArray logits = normalizedTokens.dot(embeddingTransposed); // (B * I, D)
         // we add an offset for each dictionary entry
         final NDArray logitsWithBias =
-                logits.add(ps.getValue(dictionaryBias, logits.getDevice())); // (B * I, D)
+                logits.add(ps.getValue(dictionaryBias, logits.getDevice(), training)); // (B * I, D)
         // now we apply log Softmax to get proper log probabilities
         final NDArray logProbs = logitsWithBias.logSoftmax(1); // (B * I, D)
 

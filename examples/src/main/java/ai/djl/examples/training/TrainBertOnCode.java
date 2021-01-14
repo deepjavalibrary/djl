@@ -27,11 +27,13 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.TruncatedNormalInitializer;
-import ai.djl.training.listener.TrainingListener;
+import ai.djl.training.listener.TrainingListener.Defaults;
 import ai.djl.training.optimizer.Adam;
 import ai.djl.training.optimizer.Optimizer;
-import ai.djl.training.optimizer.learningrate.PolynomialDecayLearningRateTracker;
-import ai.djl.training.optimizer.learningrate.WarmUpMode;
+import ai.djl.training.tracker.PolynomialDecayTracker;
+import ai.djl.training.tracker.Tracker;
+import ai.djl.training.tracker.WarmUpTracker;
+import ai.djl.training.tracker.WarmUpTracker.Mode;
 import ai.djl.translate.Batchifier;
 import java.io.File;
 import java.io.IOException;
@@ -120,15 +122,18 @@ public final class TrainBertOnCode {
     }
 
     private static Trainer createBertPretrainingTrainer(Model model) {
-        PolynomialDecayLearningRateTracker learningRateTracker =
-                PolynomialDecayLearningRateTracker.builder()
-                        .optBaseLearningRate(5e-5f)
-                        .optWarmUpBeginLearningRate(0f)
+        Tracker learningRateTracker =
+                WarmUpTracker.builder()
+                        .optWarmUpBeginValue(0f)
                         .optWarmUpSteps(1000)
-                        .optWarmUpMode(WarmUpMode.LINEAR)
-                        .setEndLearningRate(5e-5f / 1000)
-                        .setDecaySteps(100000)
-                        .optPower(1f)
+                        .optWarmUpMode(Mode.LINEAR)
+                        .setMainTracker(
+                                PolynomialDecayTracker.builder()
+                                        .setBaseValue(5e-5f)
+                                        .setEndLearningRate(5e-5f / 1000)
+                                        .setDecaySteps(100000)
+                                        .optPower(1f)
+                                        .build())
                         .build();
         Optimizer optimizer =
                 Adam.builder()
@@ -139,7 +144,7 @@ public final class TrainBertOnCode {
                 new DefaultTrainingConfig(new BertPretrainingLoss())
                         .optOptimizer(optimizer)
                         // TODO: why does this not log *anything*?
-                        .addTrainingListeners(TrainingListener.Defaults.logging());
+                        .addTrainingListeners(Defaults.logging());
         return model.newTrainer(trainingConfig);
     }
 
@@ -179,8 +184,16 @@ public final class TrainBertOnCode {
                         nextSentenceLabelsFromList(ndManager, instances),
                         batchFromList(ndManager, instances, MaskedInstance::getMaskedIds),
                         batchFromList(ndManager, instances, MaskedInstance::getLabelMask));
+        // TODO: Use batch progress
         return new Batch(
-                ndManager, inputs, labels, instances.size(), Batchifier.STACK, Batchifier.STACK);
+                ndManager,
+                inputs,
+                labels,
+                instances.size(),
+                Batchifier.STACK,
+                Batchifier.STACK,
+                0,
+                0);
     }
 
     private static NDArray batchFromList(NDManager ndManager, List<int[]> batchData) {

@@ -51,18 +51,12 @@ public class PointwiseFeedForwardBlock extends AbstractBlock {
         int count = 0;
         for (final int hiddenSize : hiddenSizes) {
             addChildBlock(
-                    "linear_" + count,
-                    Linear.builder()
-                            .optBias(true)
-                            .optFlatten(false)
-                            .setOutChannels(hiddenSize)
-                            .build());
+                    "linear_" + count, Linear.builder().optBias(true).setUnits(hiddenSize).build());
             addChildBlock("activation_" + count, new LambdaBlock(activationFunction));
             ++count;
         }
         // add output layer without activation
-        addChildBlock(
-                "output_layer", Linear.builder().optBias(true).setOutChannels(outputSize).build());
+        addChildBlock("output_layer", Linear.builder().optBias(true).setUnits(outputSize).build());
     }
 
     @Override

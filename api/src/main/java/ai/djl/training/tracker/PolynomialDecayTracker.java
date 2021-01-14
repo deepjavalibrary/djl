@@ -10,45 +10,42 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.training.optimizer.learningrate;
+package ai.djl.training.tracker;
 
-/** Polynomial decay learning rate. */
-@SuppressWarnings("PMD")
-public class PolynomialDecayLearningRateTracker extends LearningRateTracker {
+/** Polynomial decay {@link Tracker}. */
+public class PolynomialDecayTracker implements Tracker {
 
-    protected float endLearningRate;
-    protected int decaySteps;
-    protected float power;
+    private float baseValue;
+    private float endLearningRate;
+    private int decaySteps;
+    private float power;
 
     /**
-     * Builds a PolynomialDecayLearningRateTracker.
+     * Builds a PolynomialDecayTracker.
      *
      * @param builder parameters
      */
-    public PolynomialDecayLearningRateTracker(final Builder builder) {
-        super(builder);
+    public PolynomialDecayTracker(Builder builder) {
         if (Float.isNaN(builder.endLearningRate)) {
             throw new IllegalArgumentException("End learning rate is not set.");
         }
         if (builder.decaySteps <= 0) {
             throw new IllegalArgumentException("Decay steps is not set.");
         }
+        this.baseValue = builder.baseValue;
         this.endLearningRate = builder.endLearningRate;
         this.decaySteps = builder.decaySteps;
         this.power = builder.power;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public float getNewLearningRate(final int numUpdate) {
-        if (numUpdate < warmUpSteps) {
-            return getWarmUpLearningRate(numUpdate);
-        }
-        int step = Math.max(0, Math.min(numUpdate - warmUpSteps, decaySteps));
-        double decayedLearningRate =
-                (baseLearningRate - endLearningRate)
+    public float getNewValue(int numUpdate) {
+        int step = Math.max(0, Math.min(numUpdate, decaySteps));
+        return (float)
+                ((baseValue - endLearningRate)
                                 * Math.pow(1.0 - (double) step / (double) decaySteps, power)
-                        + endLearningRate;
-        return (float) decayedLearningRate;
+                        + endLearningRate);
     }
 
     /**
@@ -60,12 +57,24 @@ public class PolynomialDecayLearningRateTracker extends LearningRateTracker {
         return new Builder();
     }
 
-    /** Builder for PolynomialDecayLearningRateTracker. */
-    public static class Builder extends LearningRateTracker.LrBaseBuilder<Builder> {
+    /** Builder for PolynomialDecayTracker. */
+    public static class Builder {
 
-        protected float endLearningRate = Float.NaN;
-        protected int decaySteps = -1;
-        protected float power = 1f;
+        private float baseValue;
+        private float endLearningRate = Float.NaN;
+        private int decaySteps = -1;
+        private float power = 1f;
+
+        /**
+         * Sets the initial value after no steps.
+         *
+         * @param baseValue the initial value
+         * @return this {@code Builder}
+         */
+        public Builder setBaseValue(float baseValue) {
+            this.baseValue = baseValue;
+            return this;
+        }
 
         /**
          * Sets the learning rate at which to end rate decay.
@@ -75,7 +84,7 @@ public class PolynomialDecayLearningRateTracker extends LearningRateTracker {
          */
         public Builder setEndLearningRate(float endLearningRate) {
             this.endLearningRate = endLearningRate;
-            return self();
+            return this;
         }
 
         /**
@@ -86,7 +95,7 @@ public class PolynomialDecayLearningRateTracker extends LearningRateTracker {
          */
         public Builder setDecaySteps(int decaySteps) {
             this.decaySteps = decaySteps;
-            return self();
+            return this;
         }
 
         /**
@@ -97,21 +106,16 @@ public class PolynomialDecayLearningRateTracker extends LearningRateTracker {
          */
         public Builder optPower(float power) {
             this.power = power;
-            return self();
+            return this;
         }
 
         /**
-         * Builds a PolynomialDecayLearningRateTracker.
+         * Builds a PolynomialDecayTracker.
          *
-         * @return a PolynomialDecayLearningRateTracker
+         * @return a PolynomialDecayTracker
          */
-        public PolynomialDecayLearningRateTracker build() {
-            return new PolynomialDecayLearningRateTracker(this);
-        }
-
-        @Override
-        protected Builder self() {
-            return this;
+        public PolynomialDecayTracker build() {
+            return new PolynomialDecayTracker(this);
         }
     }
 }

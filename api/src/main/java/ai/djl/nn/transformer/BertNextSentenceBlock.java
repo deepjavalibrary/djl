@@ -35,8 +35,7 @@ public class BertNextSentenceBlock extends AbstractBlock {
         super(VERSION);
         this.binaryClassifier =
                 addChildBlock(
-                        "binaryClassifier",
-                        Linear.builder().setOutChannels(2).optBias(true).build());
+                        "binaryClassifier", Linear.builder().setUnits(2).optBias(true).build());
     }
 
     @Override

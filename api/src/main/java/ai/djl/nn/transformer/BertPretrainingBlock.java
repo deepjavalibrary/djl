@@ -23,7 +23,7 @@ import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.util.Arrays;
 
-/** Creates a block that performs all bert pretraining tasks (next sentence & masked language). */
+/** Creates a block that performs all bert pretraining tasks (next sentence and masked language). */
 public class BertPretrainingBlock extends AbstractBlock {
 
     private static final byte VERSION = 1;
@@ -104,7 +104,7 @@ public class BertPretrainingBlock extends AbstractBlock {
         final NDArray nextSentenceProbabilities = nsBlock.forward(ps, pooledOutput, training);
         // de-mask masked tokens
         final NDArray embeddingTable =
-                bertBlock.getTokenEmbedding().getValue(ps, embeddedSequence.getDevice());
+                bertBlock.getTokenEmbedding().getValue(ps, embeddedSequence.getDevice(), training);
         final NDArray logProbs =
                 mlBlock.forward(ps, embeddedSequence, maskedIndices, embeddingTable, training);
 

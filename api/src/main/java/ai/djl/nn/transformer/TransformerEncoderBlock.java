@@ -67,7 +67,7 @@ public class TransformerEncoderBlock extends AbstractBlock {
                                 .setHeadCount(headCount)
                                 .optAttentionProbsDropoutProb(dropoutProbability)
                                 .build());
-        this.selfAttentionDropout = Dropout.builder().optProbability(dropoutProbability).build();
+        this.selfAttentionDropout = Dropout.builder().optRate(dropoutProbability).build();
         this.attentionNorm = addChildBlock("attentionNorm", BatchNorm.builder().optAxis(2).build());
         this.pointWisefullyConnected =
                 addChildBlock(
@@ -76,7 +76,7 @@ public class TransformerEncoderBlock extends AbstractBlock {
                                 Collections.singletonList(hiddenSize),
                                 embeddingSize,
                                 activationFunction));
-        this.fullyConnectedDropout = Dropout.builder().optProbability(dropoutProbability).build();
+        this.fullyConnectedDropout = Dropout.builder().optRate(dropoutProbability).build();
         this.outputNorm = addChildBlock("outputNorm", BatchNorm.builder().optAxis(2).build());
     }
 

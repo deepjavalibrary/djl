@@ -68,7 +68,7 @@ public class BertMaskedLanguageModelLoss extends Loss {
     /**
      * Calculates the percentage of correctly predicted masked tokens.
      *
-     * @param labels expected tokens & mask
+     * @param labels expected tokens and mask
      * @param predictions prediction of a bert model
      * @return the percentage of correctly predicted masked tokens
      */
