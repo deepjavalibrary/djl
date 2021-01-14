@@ -63,13 +63,7 @@ public class EncoderDecoder extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(ParameterStore parameterStore, NDList inputs, boolean training) {
-        return forward(parameterStore, inputs, training, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,
@@ -79,6 +73,12 @@ public class EncoderDecoder extends AbstractBlock {
         }
         throw new UnsupportedOperationException(
                 "EncoderDecoder prediction has not been implemented yet");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList forward(ParameterStore parameterStore, NDList inputs, boolean training) {
+        return forward(parameterStore, inputs, training, null);
     }
 
     /** {@inheritDoc} */

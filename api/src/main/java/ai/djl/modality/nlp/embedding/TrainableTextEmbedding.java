@@ -72,7 +72,7 @@ public class TrainableTextEmbedding extends AbstractBlock implements TextEmbeddi
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,

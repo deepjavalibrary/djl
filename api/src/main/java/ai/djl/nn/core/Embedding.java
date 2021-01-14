@@ -123,7 +123,7 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,

@@ -83,21 +83,7 @@ public class Predictor<I, O> implements AutoCloseable {
     private NDManager manager;
     Metrics metrics;
     protected Block block;
-    private ParameterStore parameterStore;
-
-    /**
-     * Creates a new instance of {@code BasePredictor} with the given {@link Model} and {@link
-     * Translator}.
-     *
-     * @param model the model on which the predictions are based
-     * @param translator the translator to be used
-     */
-    public Predictor(Model model, Translator<I, O> translator) {
-        this.model = model;
-        this.manager = model.getNDManager().newSubManager();
-        this.manager.setName("predictor");
-        this.translator = translator;
-    }
+    protected ParameterStore parameterStore;
 
     /**
      * Creates a new instance of {@code BasePredictor} with the given {@link Model} and {@link
