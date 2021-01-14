@@ -25,7 +25,6 @@ target_include_directories(djl_paddle PUBLIC
     ${UTILS_INCLUDE_DIR}
     paddle/paddle/include
     paddle/third_party/install/gflags/include
-    paddle/third_party/install/glog/include
     build/include)
 target_link_libraries(djl_paddle ${PADDLE_LIBRARY})
 

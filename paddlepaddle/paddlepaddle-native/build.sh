@@ -33,9 +33,6 @@ if [[ ! -d "paddle" ]]; then
   mv paddle_inference_install_dir paddle
 fi
 
-curl -O https://raw.githubusercontent.com/PaddlePaddle/Paddle/v2.0.0-rc1/paddle/fluid/platform/init.h
-mv init.h paddle/paddle/include/
-
 rm -rf build
 mkdir build && cd build
 

@@ -85,8 +85,10 @@ public final class LibUtils {
             if (libDir == null) {
                 throw new IllegalStateException("Native folder cannot be found");
             }
-            String[] args = {"--mklml_dir=\"" + libDir.toAbsolutePath().toString() + "/\""};
-            JniUtils.loadExtraDir(args);
+            String[] args = {
+                "dummy", "--mklml_dir=\"" + libDir.toAbsolutePath().toString() + "/\""
+            };
+            PaddleLibrary.LIB.loadExtraDir(args);
         }
     }
 

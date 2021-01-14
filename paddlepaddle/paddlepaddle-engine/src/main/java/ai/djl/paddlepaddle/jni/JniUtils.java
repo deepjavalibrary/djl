@@ -31,15 +31,6 @@ import java.util.Arrays;
 public final class JniUtils {
     private JniUtils() {}
 
-    private static String[] libArgs;
-
-    public static void loadExtraDir(String[] args) {
-        if (args != null) {
-            libArgs = args;
-        }
-        PaddleLibrary.LIB.loadExtraDir(libArgs);
-    }
-
     public static PpNDArray createNdArray(
             PpNDManager manager, ByteBuffer data, Shape shape, DataType dtype) {
         int[] intShape = Arrays.stream(shape.getShape()).mapToInt(Math::toIntExact).toArray();
@@ -90,7 +81,6 @@ public final class JniUtils {
     }
 
     public static long createPredictor(long config) {
-        loadExtraDir(null);
         return PaddleLibrary.LIB.createPredictor(config);
     }
 

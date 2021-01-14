@@ -15,9 +15,8 @@
 
 #include <djl/utils.h>
 
-#include <paddle_api.h>
-#include <init.h>
 #include <paddle_inference_api.h>
+#include <gflags/gflags.h>
 
 JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_createAnalysisConfig
         (JNIEnv* env, jobject jthis, jstring jmodel_dir, jstring jparam_dir, jint device_id) {
@@ -41,10 +40,17 @@ JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_createAnalysi
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_loadExtraDir
-        (JNIEnv* env, jobject jthis, jobjectArray args) {
+        (JNIEnv* env, jobject jthis, jobjectArray jargs) {
     // like --mkl-lib="libpath"
-    auto vec_arg = djl::utils::jni::GetVecFromJStringArray(env, args);
-    paddle::framework::InitGflags(vec_arg);
+    auto vec_arg = djl::utils::jni::GetVecFromJStringArray(env, jargs);
+    std::vector<char *> argv;
+    int size = vec_arg.size();
+    argv.reserve(vec_arg.size());
+    for (auto &arg : vec_arg) {
+        argv.push_back(const_cast<char *>(arg.data()));
+    }
+    char** array = argv.data();
+    gflags::ParseCommandLineFlags(&size, &array, true);
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deleteAnalysisConfig
