@@ -16,7 +16,6 @@
 #include <djl/utils.h>
 
 #include <paddle_inference_api.h>
-#include <gflags/gflags.h>
 
 JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_createAnalysisConfig
         (JNIEnv* env, jobject jthis, jstring jmodel_dir, jstring jparam_dir, jint device_id) {
@@ -50,7 +49,7 @@ JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_loadExtraDir
         argv.push_back(const_cast<char *>(arg.data()));
     }
     char** array = argv.data();
-    gflags::ParseCommandLineFlags(&size, &array, true);
+    std::cout<< "Pending Paddle fix to proceed with the option" << std::endl;
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deleteAnalysisConfig
