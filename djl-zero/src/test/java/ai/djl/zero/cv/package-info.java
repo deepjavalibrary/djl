@@ -11,8 +11,5 @@
  * and limitations under the License.
  */
 
-/**
- * Contains easy pretrained models and training for Computer Vision({@link ai.djl.Application.CV})
- * tasks.
- */
-package ai.djl.easy.cv;
+/** Contains tests for {@link ai.djl.zero.cv}. */
+package ai.djl.zero.cv;

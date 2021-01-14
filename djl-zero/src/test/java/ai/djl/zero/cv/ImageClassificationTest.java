@@ -10,14 +10,14 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.easy.cv;
+package ai.djl.zero.cv;
 
 import ai.djl.MalformedModelException;
-import ai.djl.easy.Performance;
-import ai.djl.easy.cv.ImageClassification.Classes;
 import ai.djl.modality.cv.Image;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.zero.Performance;
+import ai.djl.zero.cv.ImageClassification.Classes;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;

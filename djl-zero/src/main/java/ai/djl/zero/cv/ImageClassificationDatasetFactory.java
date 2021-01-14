@@ -10,11 +10,11 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.easy.cv;
+package ai.djl.zero.cv;
 
 import ai.djl.basicdataset.ImageClassificationDataset;
-import ai.djl.easy.DatasetFactory;
 import ai.djl.training.dataset.Dataset.Usage;
+import ai.djl.zero.DatasetFactory;
 import java.util.List;
 
 /** A {@link DatasetFactory} for {@link ImageClassification}. */
