@@ -14,6 +14,7 @@
 package ai.djl.examples.inference;
 
 import ai.djl.Application;
+import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
@@ -56,6 +57,8 @@ public final class SentimentAnalysis {
                 Criteria.builder()
                         .optApplication(Application.NLP.SENTIMENT_ANALYSIS)
                         .setTypes(String.class, Classifications.class)
+                        // This model was traced on CPU and can only run on CPU
+                        .optDevice(Device.cpu())
                         .optProgress(new ProgressBar())
                         .build();
 
