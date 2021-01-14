@@ -23,6 +23,7 @@ import ai.djl.serving.wlm.ModelManager;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
@@ -64,7 +65,16 @@ public class InferenceRequestHandler extends HttpRequestHandler {
             throws ModelException {
         switch (segments[1]) {
             case "ping":
-                ModelManager.getInstance().workerStatus(ctx);
+                // TODO: Check if its OK to send other 2xx errors to ALB for "Partial Healthy"
+                // and "Unhealthy"
+                ModelManager.getInstance()
+                        .workerStatus(ctx)
+                        .thenAccept(
+                                response ->
+                                        NettyUtils.sendJsonResponse(
+                                                ctx,
+                                                new StatusResponse(response),
+                                                HttpResponseStatus.OK));
                 break;
             case "invocations":
                 handleInvocations(ctx, req, decoder);

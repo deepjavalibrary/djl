@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.basicdataset.nlp.CookingStackExchange;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;

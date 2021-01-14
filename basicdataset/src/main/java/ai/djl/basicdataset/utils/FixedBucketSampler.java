@@ -12,7 +12,7 @@
  */
 package ai.djl.basicdataset.utils;
 
-import ai.djl.basicdataset.TextDataset;
+import ai.djl.basicdataset.nlp.TextDataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Sampler;
 import ai.djl.util.RandomUtils;

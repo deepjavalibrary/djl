@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.basicdataset.cv.BananaDetection;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,43 +10,53 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.basicdataset;
+package ai.djl.basicdataset.nlp;
 
-import ai.djl.Application;
+import ai.djl.Application.NLP;
+import ai.djl.basicdataset.BasicDatasets;
+import ai.djl.basicdataset.RawDataset;
+import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.Resource;
+import ai.djl.training.dataset.Batch;
+import ai.djl.training.dataset.Dataset;
 import ai.djl.util.Progress;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.csv.CSVFormat;
 
 /**
- * The {@link AmazonReview} dataset contains a {@link ai.djl.Application.NLP#SENTIMENT_ANALYSIS} set
- * of reviews and their sentiment ratings.
+ * A text classification dataset contains questions from cooking.stackexchange.com and their
+ * associated tags on the site.
  */
-public class AmazonReview extends CsvDataset {
+public class CookingStackExchange implements RawDataset<Path> {
 
-    private static final String VERSION = "1.0";
-    private static final String ARTIFACT_ID = "amazon_reviews";
+    private static final String ARTIFACT_ID = "cooking_stackexchange";
+
+    private Dataset.Usage usage;
+    private Path root;
 
     private Resource resource;
-    private String datasetName;
     private boolean prepared;
 
-    /**
-     * Creates a new instance of {@link AmazonReview} with the given necessary configurations.
-     *
-     * @param builder a builder with the necessary configurations
-     */
-    protected AmazonReview(Builder builder) {
-        super(builder);
-        MRL mrl = MRL.dataset(Application.NLP.ANY, builder.groupId, builder.artifactId);
-        resource = new Resource(builder.repository, mrl, VERSION);
-        datasetName = builder.datasetName;
+    CookingStackExchange(Builder builder) {
+        this.usage = builder.usage;
+        MRL mrl = MRL.dataset(NLP.ANY, builder.groupId, builder.artifactId);
+        resource = new Resource(builder.repository, mrl, "1.0");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Path getData() throws IOException {
+        prepare(null);
+        return root;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Iterable<Batch> getData(NDManager manager) {
+        return null;
     }
 
     /** {@inheritDoc} */
@@ -56,20 +66,27 @@ public class AmazonReview extends CsvDataset {
             return;
         }
 
-        Map<String, String> filter = new ConcurrentHashMap<>();
-        filter.put("dataset", datasetName);
-        Artifact artifact = resource.match(filter);
+        Artifact artifact = resource.getDefaultArtifact();
         resource.prepare(artifact, progress);
 
-        Path dir = resource.getRepository().getResourceDirectory(artifact);
-        Path csvFile = dir.resolve(artifact.getFiles().values().iterator().next().getName());
-        csvUrl = csvFile.toUri().toURL();
-        super.prepare(progress);
+        Artifact.Item item;
+        switch (usage) {
+            case TRAIN:
+                item = artifact.getFiles().get("train");
+                break;
+            case TEST:
+                item = artifact.getFiles().get("test");
+                break;
+            case VALIDATION:
+            default:
+                throw new IOException("Only training and testing dataset supported.");
+        }
+        root = resource.getRepository().getFile(item, "").toAbsolutePath();
         prepared = true;
     }
 
     /**
-     * Creates a new builder to build a {@code AmazonReview}.
+     * Creates a builder to build a {@code CookingStackExchange}.
      *
      * @return a new builder
      */
@@ -77,33 +94,26 @@ public class AmazonReview extends CsvDataset {
         return new Builder();
     }
 
-    /** A builder to construct a {@code AmazonReview}. */
-    public static final class Builder extends CsvBuilder<AmazonReview.Builder> {
+    /** A builder to construct a {@link CookingStackExchange}. */
+    public static final class Builder {
 
         Repository repository;
         String groupId;
         String artifactId;
-        String datasetName;
+        Dataset.Usage usage;
 
         /** Constructs a new builder. */
         Builder() {
             repository = BasicDatasets.REPOSITORY;
             groupId = BasicDatasets.GROUP_ID;
             artifactId = ARTIFACT_ID;
-            csvFormat = CSVFormat.TDF.withQuote(null).withHeader();
-            datasetName = "us_Digital_Software";
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Builder self() {
-            return this;
+            usage = Dataset.Usage.TRAIN;
         }
 
         /**
-         * Sets the optional repository.
+         * Sets the optional repository for the dataset.
          *
-         * @param repository the repository
+         * @param repository the new repository
          * @return this builder
          */
         public Builder optRepository(Repository repository) {
@@ -140,26 +150,23 @@ public class AmazonReview extends CsvDataset {
         }
 
         /**
-         * Sets the name of the subset of Amazon Reviews.
+         * Sets the optional usage for the dataset.
          *
-         * @param datasetName the name of the dataset
+         * @param usage the usage
          * @return this builder
          */
-        public Builder optDatasetName(String datasetName) {
-            this.datasetName = datasetName;
+        public Builder optUsage(Dataset.Usage usage) {
+            this.usage = usage;
             return this;
         }
 
-        /** {@inheritDoc} */
-        @Override
-        public AmazonReview build() {
-            if (features.isEmpty()) {
-                throw new IllegalStateException("Missing features.");
-            }
-            if (labels.isEmpty()) {
-                addNumericLabel("star_rating");
-            }
-            return new AmazonReview(this);
+        /**
+         * Builds a new {@code CookingStackExchange}.
+         *
+         * @return the new {@code CookingStackExchange}
+         */
+        public CookingStackExchange build() {
+            return new CookingStackExchange(this);
         }
     }
 }

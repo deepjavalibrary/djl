@@ -16,7 +16,7 @@ import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.basicdataset.StanfordMovieReview;
+import ai.djl.basicdataset.nlp.StanfordMovieReview;
 import ai.djl.basicdataset.utils.FixedBucketSampler;
 import ai.djl.basicdataset.utils.TextData;
 import ai.djl.examples.training.util.Arguments;

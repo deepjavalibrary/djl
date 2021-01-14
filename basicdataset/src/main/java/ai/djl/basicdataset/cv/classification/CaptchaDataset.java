@@ -10,9 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.basicdataset;
+package ai.djl.basicdataset.cv.classification;
 
 import ai.djl.Application.CV;
+import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -145,7 +146,7 @@ public class CaptchaDataset extends RandomAccessDataset {
         }
     }
 
-    /** A builder for a {@link ai.djl.basicdataset.CaptchaDataset}. */
+    /** A builder for a {@link CaptchaDataset}. */
     public static final class Builder extends BaseBuilder<Builder> {
 
         Repository repository;

@@ -12,6 +12,7 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.basicdataset.nlp.StanfordMovieReview;
 import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.Record;

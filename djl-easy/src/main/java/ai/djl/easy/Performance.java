@@ -27,5 +27,27 @@ public enum Performance {
     BALANCED,
 
     /** Accurate prioritizes accuracy over speed. */
-    ACCURATE
+    ACCURATE;
+
+    /**
+     * Returns the value matching this.
+     *
+     * @param fast the value to return if this is fast
+     * @param balanced the value to return if this is balanced
+     * @param accurate the value to return if this is accurate
+     * @param <T> the value type
+     * @return the value matching this
+     */
+    public <T> T switchPerformance(T fast, T balanced, T accurate) {
+        switch (this) {
+            case FAST:
+                return fast;
+            case BALANCED:
+                return balanced;
+            case ACCURATE:
+                return accurate;
+            default:
+                throw new IllegalArgumentException("Unknown performance");
+        }
+    }
 }
