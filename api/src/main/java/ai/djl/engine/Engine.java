@@ -46,14 +46,23 @@ public abstract class Engine {
 
     private static final Map<String, Engine> ALL_ENGINES = new ConcurrentHashMap<>();
 
-    private static final String DEFAULT_ENGINE = initEngine();
+    private static String defaultEngine;
 
     private static EngineException exception;
 
+    static {
+        initEngine(Thread.currentThread().getContextClassLoader());
+    }
+
     private Device defaultDevice;
 
-    private static synchronized String initEngine() {
-        ServiceLoader<EngineProvider> loaders = ServiceLoader.load(EngineProvider.class);
+    /**
+     * Initialize {@code Engine} with custom {@code ClassLoader}.
+     *
+     * @param loader a custom ClassLoader
+     */
+    public static synchronized void initEngine(ClassLoader loader) {
+        ServiceLoader<EngineProvider> loaders = ServiceLoader.load(EngineProvider.class, loader);
         for (EngineProvider provider : loaders) {
             try {
                 Engine engine = provider.getEngine();
@@ -67,10 +76,10 @@ public abstract class Engine {
 
         if (ALL_ENGINES.isEmpty()) {
             logger.debug("No engine found from EngineProvider");
-            return null;
+            return;
         }
 
-        String defaultEngine = System.getenv("DJL_DEFAULT_ENGINE");
+        defaultEngine = System.getenv("DJL_DEFAULT_ENGINE");
         defaultEngine = System.getProperty("ai.djl.default_engine", defaultEngine);
         if (defaultEngine == null || defaultEngine.isEmpty()) {
             if (ALL_ENGINES.size() > 1) {
@@ -87,7 +96,6 @@ public abstract class Engine {
             throw new EngineException("Unknown default engine: " + defaultEngine);
         }
         logger.debug("Found default engine: {}", defaultEngine);
-        return defaultEngine;
     }
 
     /**
@@ -113,14 +121,14 @@ public abstract class Engine {
      * @see EngineProvider
      */
     public static Engine getInstance() {
-        if (DEFAULT_ENGINE == null) {
+        if (defaultEngine == null) {
             throw new EngineException(
                     "No deep learning engine found."
                             + System.lineSeparator()
                             + "Please refer to https://github.com/awslabs/djl/blob/master/docs/development/troubleshooting.md for more details.",
                     exception);
         }
-        return getEngine(System.getProperty("ai.djl.default_engine", DEFAULT_ENGINE));
+        return getEngine(System.getProperty("ai.djl.default_engine", defaultEngine));
     }
 
     /**
@@ -286,7 +294,7 @@ public abstract class Engine {
 
         System.out.println();
         System.out.println("----------------- Engines ---------------");
-        System.out.println("Default Engine: " + DEFAULT_ENGINE);
+        System.out.println("Default Engine: " + defaultEngine);
         for (Engine engine : ALL_ENGINES.values()) {
             System.out.println(engine);
         }
