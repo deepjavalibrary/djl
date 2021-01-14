@@ -36,6 +36,8 @@ final class PaddleLibrary {
 
     native String getTensorName(long handle);
 
+    native void loadExtraDir(String[] args);
+
     native long createAnalysisConfig(String modelDir, String paramDir, int deviceId);
 
     native void useFeedFetchOp(long handle);

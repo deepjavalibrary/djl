@@ -15,7 +15,6 @@ package ai.djl.paddlepaddle.jni;
 import ai.djl.Device;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.paddlepaddle.engine.AnalysisConfig;
 import ai.djl.paddlepaddle.engine.PaddlePredictor;
 import ai.djl.paddlepaddle.engine.PpDataType;
 import ai.djl.paddlepaddle.engine.PpNDArray;
@@ -37,7 +36,7 @@ public final class JniUtils {
         int[] intShape = Arrays.stream(shape.getShape()).mapToInt(Math::toIntExact).toArray();
         long handle =
                 PaddleLibrary.LIB.paddleCreateTensor(
-                        data, data.position(), intShape, PpDataType.toPaddlePaddle(dtype));
+                        data, data.remaining(), intShape, PpDataType.toPaddlePaddle(dtype));
         return new PpNDArray(manager, handle);
     }
 
@@ -73,16 +72,16 @@ public final class JniUtils {
         return PaddleLibrary.LIB.createAnalysisConfig(modelDir, paramDir, deviceId);
     }
 
-    public static void useFeedFetchOp(AnalysisConfig config) {
-        PaddleLibrary.LIB.useFeedFetchOp(config.getHandle());
+    public static void useFeedFetchOp(long config) {
+        PaddleLibrary.LIB.useFeedFetchOp(config);
     }
 
-    public static void deleteConfig(AnalysisConfig config) {
-        PaddleLibrary.LIB.deleteAnalysisConfig(config.getHandle());
+    public static void deleteConfig(long config) {
+        PaddleLibrary.LIB.deleteAnalysisConfig(config);
     }
 
-    public static long createPredictor(AnalysisConfig config) {
-        return PaddleLibrary.LIB.createPredictor(config.getHandle());
+    public static long createPredictor(long config) {
+        return PaddleLibrary.LIB.createPredictor(config);
     }
 
     public static long clonePredictor(PaddlePredictor predictor) {

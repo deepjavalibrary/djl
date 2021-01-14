@@ -28,7 +28,6 @@ import java.util.Map;
 /** {@code PpModel} is the PaddlePaddle implementation of {@link Model}. */
 public class PpModel extends BaseModel {
 
-    private AnalysisConfig config;
     private PaddlePredictor paddlePredictor;
 
     /**
@@ -68,10 +67,9 @@ public class PpModel extends BaseModel {
                 throw new FileNotFoundException("no __model__ or model file found in: " + modelDir);
             }
         }
-        config =
-                new AnalysisConfig(
-                        JniUtils.createConfig(modelFiles[0], modelFiles[1], manager.getDevice()));
+        long config = JniUtils.createConfig(modelFiles[0], modelFiles[1], manager.getDevice());
         paddlePredictor = new PaddlePredictor(JniUtils.createPredictor(config));
+        JniUtils.deleteConfig(config);
         setBlock(new PpSymbolBlock(paddlePredictor));
     }
 
@@ -83,6 +81,8 @@ public class PpModel extends BaseModel {
             Path paramFile = dir.resolve("params");
             if (Files.isRegularFile(paramFile)) {
                 paths[1] = paramFile.toString();
+            } else {
+                paths[0] = dir.toString();
             }
             return paths;
         }
@@ -93,6 +93,8 @@ public class PpModel extends BaseModel {
             Path paramFile = dir.resolve("__params__");
             if (Files.isRegularFile(paramFile)) {
                 paths[1] = paramFile.toString();
+            } else {
+                paths[0] = dir.toString();
             }
             return paths;
         }
@@ -125,7 +127,6 @@ public class PpModel extends BaseModel {
     @Override
     public void close() {
         JniUtils.deletePredictor(paddlePredictor);
-        JniUtils.deleteConfig(config);
         super.close();
     }
 }

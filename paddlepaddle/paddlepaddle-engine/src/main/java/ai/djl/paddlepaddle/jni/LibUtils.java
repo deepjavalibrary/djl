@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
@@ -55,13 +56,6 @@ public final class LibUtils {
     private LibUtils() {}
 
     public static void loadLibrary() {
-        String libName = getLibName();
-        logger.debug("Loading paddle library from: {}", libName);
-
-        System.load(libName); // NOPMD
-    }
-
-    public static String getLibName() {
         String libName = LibUtils.findOverrideLibrary();
         if (libName == null) {
             libName = LibUtils.findLibraryInClasspath();
@@ -69,6 +63,12 @@ public final class LibUtils {
                 throw new IllegalStateException("Native library not found");
             }
         }
+        if (System.getProperty("os.name").startsWith("Linux")) {
+            loadLinuxDependencies(libName);
+        } else if (System.getProperty("os.name").startsWith("Win")) {
+            loadWindowsDependencies(libName);
+        }
+        logger.debug("Now loading " + libName);
         System.load(libName); // NOPMD
         // TODO: change this part to load from cache directory
         Path nativeLibDir = Paths.get(libName).getParent();
@@ -76,7 +76,42 @@ public final class LibUtils {
             throw new IllegalStateException("Native folder cannot be found");
         }
         libName = copyJniLibraryFromClasspath(nativeLibDir);
-        return libName;
+        logger.debug("Loading paddle library from: {}", libName);
+        System.load(libName); // NOPMD
+
+        // post configure extralib path
+        if (System.getProperty("os.name").startsWith("Linux")) {
+            Path libDir = Paths.get(libName).getParent();
+            if (libDir == null) {
+                throw new IllegalStateException("Native folder cannot be found");
+            }
+            String[] args = {
+                "dummy", "--mklml_dir=\"" + libDir.toAbsolutePath().toString() + "/\""
+            };
+            PaddleLibrary.LIB.loadExtraDir(args);
+        }
+    }
+
+    public static void loadLinuxDependencies(String libName) {
+        Path libDir = Paths.get(libName).getParent();
+        List<String> names = Arrays.asList("libiomp5.so", "libdnnl.so.1");
+        names.forEach(
+                name -> {
+                    String lib = libDir.resolve(name).toAbsolutePath().toString();
+                    logger.debug("Now loading " + lib);
+                    System.load(lib);
+                });
+    }
+
+    public static void loadWindowsDependencies(String libName) {
+        Path libDir = Paths.get(libName).getParent();
+        List<String> names = Arrays.asList("libiomp5md.dll", "mklml.dll", "mkldnn.dll");
+        names.forEach(
+                name -> {
+                    String lib = libDir.resolve(name).toAbsolutePath().toString();
+                    logger.debug("Now loading " + lib);
+                    System.load(libDir.resolve(name).toAbsolutePath().toString());
+                });
     }
 
     private static String findOverrideLibrary() {

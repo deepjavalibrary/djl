@@ -321,6 +321,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
             default:
                 throw new UnsupportedOperationException("data type is not supported!");
         }
+        buf.rewind();
         JnaUtils.syncCopyFromCPU(getHandle(), buf, size);
     }
 

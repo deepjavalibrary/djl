@@ -15,17 +15,16 @@
 
 #include <djl/utils.h>
 
-#include <paddle_api.h>
 #include <paddle_inference_api.h>
 
 JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_createAnalysisConfig
         (JNIEnv* env, jobject jthis, jstring jmodel_dir, jstring jparam_dir, jint device_id) {
-  auto config = new paddle::AnalysisConfig{};
+    paddle::AnalysisConfig* config;
   if (jparam_dir == nullptr) {
-    config->SetModel(djl::utils::jni::GetStringFromJString(env, jmodel_dir));
+      config = new paddle::AnalysisConfig(djl::utils::jni::GetStringFromJString(env, jmodel_dir));
   } else {
-    config->SetModel(djl::utils::jni::GetStringFromJString(env, jmodel_dir),
-                     djl::utils::jni::GetStringFromJString(env, jparam_dir));
+      config = new paddle::AnalysisConfig(djl::utils::jni::GetStringFromJString(env, jmodel_dir),
+                                          djl::utils::jni::GetStringFromJString(env, jparam_dir));
   }
   if (device_id == -1) {
     config->DisableGpu();
@@ -37,6 +36,20 @@ JNIEXPORT jlong JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_createAnalysi
   // config->EnableMKLDNN(); not supporting multi-thread
   // config->SetCpuMathLibraryNumThreads(); set to 1 for multi-thread
   return reinterpret_cast<uintptr_t>(config);
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_loadExtraDir
+        (JNIEnv* env, jobject jthis, jobjectArray jargs) {
+    // like --mkl-lib="libpath"
+    auto vec_arg = djl::utils::jni::GetVecFromJStringArray(env, jargs);
+    std::vector<char *> argv;
+    int size = vec_arg.size();
+    argv.reserve(vec_arg.size());
+    for (auto &arg : vec_arg) {
+        argv.push_back(const_cast<char *>(arg.data()));
+    }
+    char** array = argv.data();
+    std::cout<< "Pending Paddle fix to proceed with the option" << std::endl;
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deleteAnalysisConfig
