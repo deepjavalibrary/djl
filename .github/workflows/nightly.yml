@@ -167,10 +167,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Install NDK
-        run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${NDK_VERSION}" --sdk_root=${ANDROID_SDK_ROOT}
+        run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${NDK_VERSION}"
       - name: publish android package to Snapshot
         run: |
-          export ANDROID_NDK=${ANDROID_HOME}/ndk-bundle
+          export ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}
           cd android
           ./gradlew :pytorch-native:assemble
           ./gradlew publish -Psnapshot
