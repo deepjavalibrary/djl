@@ -121,7 +121,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,

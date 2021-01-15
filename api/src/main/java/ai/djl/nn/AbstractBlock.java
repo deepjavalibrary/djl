@@ -116,6 +116,26 @@ public abstract class AbstractBlock implements Block {
         this.version = version;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public final NDList forward(
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
+        NDManager paramsManager = parameterStore.getManager();
+        if (!isInitialized()) {
+            initialize(paramsManager, DataType.FLOAT32, inputs.getShapes());
+        }
+        return forwardInternal(parameterStore, inputs, training, params);
+    }
+
+    protected abstract NDList forwardInternal(
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params);
+
     /**
      * Use this to add a child block to this block.
      *
