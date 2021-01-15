@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -12,7 +12,7 @@
  */
 package ai.djl.repository.responseencoder;
 
-import com.google.gson.Gson;
+import ai.djl.util.JsonUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -42,8 +42,7 @@ public class JsonResponse {
      * @param entity the response
      */
     public void send(ChannelHandlerContext ctx, FullHttpRequest request, Object entity) {
-        Gson gson = new Gson();
-        String serialized = gson.toJson(entity);
+        String serialized = JsonUtils.GSON_PRETTY.toJson(entity);
         ByteBuf buffer = ctx.alloc().buffer(serialized.length());
         buffer.writeCharSequence(serialized, CharsetUtil.UTF_8);
 
@@ -64,7 +63,7 @@ public class JsonResponse {
      */
     private void sendAndCleanupConnection(
             ChannelHandlerContext ctx, FullHttpRequest request, FullHttpResponse response) {
-        final boolean keepAlive = HttpUtil.isKeepAlive(request);
+        boolean keepAlive = HttpUtil.isKeepAlive(request);
         HttpUtil.setContentLength(response, response.content().readableBytes());
         if (!keepAlive) {
             // We're going to close the connection as soon as the response is sent,

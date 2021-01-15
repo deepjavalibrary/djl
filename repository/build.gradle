@@ -1,4 +1,3 @@
-
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
@@ -12,15 +11,13 @@ node {
     download = true
 }
 
-
 dependencies {
     implementation "io.netty:netty-all:${netty_version}"
-    implementation "com.sun.activation:javax.activation:${activation_version}"
     implementation "com.google.code.gson:gson:${gson_version}"
-	implementation project(':model-zoo')
-	implementation project(':mxnet:mxnet-model-zoo')
-	implementation project(':tensorflow:tensorflow-model-zoo')
-	implementation project(':pytorch:pytorch-model-zoo:')
+    implementation project(':model-zoo')
+    implementation project(':mxnet:mxnet-model-zoo')
+    implementation project(':tensorflow:tensorflow-model-zoo')
+    implementation project(':pytorch:pytorch-model-zoo:')
 }
 
 

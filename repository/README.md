@@ -2,7 +2,7 @@
 
 ## Overview
 
-This module contains an universal model repository web interface implementation.
+This module contains a universal model repository web interface implementation.
 
 ## Documentation
 

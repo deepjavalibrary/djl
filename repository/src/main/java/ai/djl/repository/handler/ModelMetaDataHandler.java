@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -12,15 +12,14 @@
  */
 package ai.djl.repository.handler;
 
-import ai.djl.Application;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.responseencoder.JsonResponse;
+import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
-import java.util.HashMap;
-import java.util.List;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -56,24 +55,18 @@ public class ModelMetaDataHandler extends SimpleChannelInboundHandler<FullHttpRe
      *
      * @param ctx the context
      * @param request the full request
-     * @throws Exception any exception during execution.
      */
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request)
-            throws Exception {
-
+    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
         CompletableFuture.supplyAsync(
                         () -> {
                             try {
                                 return ModelZoo.listModels();
-                            } catch (Exception ex) {
+                            } catch (IOException | ModelNotFoundException ex) {
                                 throw new IllegalArgumentException(ex.getMessage(), ex);
                             }
                         })
-                .exceptionally((ex) -> new HashMap<Application, List<Artifact>>())
-                .thenAccept(
-                        modelMap -> {
-                            jsonResponse.send(ctx, request, modelMap);
-                        });
+                .exceptionally((ex) -> Collections.emptyMap())
+                .thenAccept(modelMap -> jsonResponse.send(ctx, request, modelMap));
     }
 }
