@@ -28,10 +28,10 @@ jobs:
       - name: install Python Dependencies
         run: pip install numpy ninja pyyaml mkl mkl-include setuptools cmake cffi
       - name: Install NDK
-        run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${NDK_VERSION}" --sdk_root=${ANDROID_SDK_ROOT}
+        run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${NDK_VERSION}"
       - name: build android
         run: |
-          export ANDROID_NDK=${ANDROID_HOME}/ndk-bundle
+          export ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}
           export ANDROID_ABI=${{ matrix.format }}
           cd android_pytorch_tmp
           bash ./scripts/build_android.sh
