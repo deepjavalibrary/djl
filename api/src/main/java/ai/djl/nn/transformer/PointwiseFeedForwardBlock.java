@@ -59,11 +59,13 @@ public class PointwiseFeedForwardBlock extends AbstractBlock {
         addChildBlock("output_layer", Linear.builder().optBias(true).setUnits(outputSize).build());
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return new Shape[] {outputShape};
     }
 
+    /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         inputNames = Collections.singletonList("input");
@@ -85,8 +87,9 @@ public class PointwiseFeedForwardBlock extends AbstractBlock {
         outputShape = lastShape;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore ps, NDList inputs, boolean training, PairList<String, Object> params) {
         // go through all layers
         NDList layerResult = inputs;

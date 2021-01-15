@@ -57,12 +57,14 @@ public final class IdEmbedding extends AbstractBlock {
         return new Shape[] {inputShapes[0].addAll(new Shape(embeddingSize))};
     }
 
+    /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore ps, NDList inputs, boolean training, PairList<String, Object> params) {
         return forward(ps, inputs, training);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(ParameterStore ps, NDList inputs, boolean training) {
         return new NDList(inputs.singletonOrThrow());

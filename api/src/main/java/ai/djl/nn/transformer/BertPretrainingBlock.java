@@ -47,6 +47,7 @@ public class BertPretrainingBlock extends AbstractBlock {
         this.nsBlock = addChildBlock("BertNextSentenceBlock", new BertNextSentenceBlock());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(
             final NDManager manager, final DataType dataType, final Shape... inputShapes) {
@@ -61,12 +62,14 @@ public class BertPretrainingBlock extends AbstractBlock {
         nsBlock.initialize(manager, dataType, pooledOutput);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore ps, NDList inputs, boolean training, PairList<String, Object> params) {
         return forward(ps, inputs, training);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(ParameterStore ps, NDList inputs, boolean training) {
         NDArray tokenIds = inputs.get(0);
@@ -115,13 +118,7 @@ public class BertPretrainingBlock extends AbstractBlock {
         return new NDList(nextSentenceProbabilities, logProbs);
     }
 
-    /**
-     * Returns the output shapes.
-     *
-     * @param inputShapes tokenIds int, (B, S), typeIds int, (B, S), sequenceMasks int, (B, S),
-     *     maskedIndices int, (B, I)
-     * @return next sentence probabilities (B, 2), masked token probabilities (B, I, D)
-     */
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         final long batchSize = inputShapes[0].get(0);
