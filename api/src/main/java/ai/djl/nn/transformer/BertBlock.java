@@ -151,12 +151,7 @@ public final class BertBlock extends AbstractBlock {
         return typeDictionarySize;
     }
 
-    /**
-     * Gets the output shapes.
-     *
-     * @param inputShapes tokenIds (B, S), typeIds (B, S), masks (B, S)
-     * @return embeddings (B, S, E), pooled classifier (B, E)
-     */
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         final long B = inputShapes[0].get(0);
@@ -164,6 +159,7 @@ public final class BertBlock extends AbstractBlock {
         return new Shape[] {new Shape(B, S, embeddingSize), new Shape(B, embeddingSize)};
     }
 
+    /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         beforeInitialize(inputShapes);
@@ -201,12 +197,14 @@ public final class BertBlock extends AbstractBlock {
         return broadcastOnes.matMul(mask3D);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore ps, NDList inputs, boolean training, PairList<String, Object> params) {
         return forward(ps, inputs, training);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(final ParameterStore ps, final NDList inputs, boolean training) {
         // First input are the tokens.

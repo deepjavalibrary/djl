@@ -80,11 +80,13 @@ public class TransformerEncoderBlock extends AbstractBlock {
         this.outputNorm = addChildBlock("outputNorm", BatchNorm.builder().optAxis(2).build());
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return inputShapes;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         selfAttentionBlock.initialize(manager, dataType, inputShapes);
@@ -93,8 +95,9 @@ public class TransformerEncoderBlock extends AbstractBlock {
         outputNorm.initialize(manager, dataType, inputShapes);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             final ParameterStore ps,
             final NDList inputs,
             final boolean training,
@@ -102,6 +105,7 @@ public class TransformerEncoderBlock extends AbstractBlock {
         return forward(ps, inputs, training);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(final ParameterStore ps, final NDList inputs, final boolean training) {
         final NDArray embedding = inputs.head();

@@ -96,6 +96,7 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
         return MissingOps.gatherNd(flattenedSequences, absoluteIndices);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(
             final NDManager manager, final DataType dataType, final Shape... inputShapes) {
@@ -105,8 +106,9 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
         sequenceNorm.initialize(manager, dataType, new Shape(-1, width));
     }
 
+    /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             final ParameterStore ps,
             final NDList inputs,
             final boolean training,
@@ -114,6 +116,7 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
         return forward(ps, inputs, training);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(final ParameterStore ps, final NDList inputs, final boolean training) {
         final NDArray sequenceOutput = inputs.get(0); // (B, S, E)
@@ -167,6 +170,7 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
         return logProbs;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(final NDManager manager, final Shape[] inputShapes) {
         final int batchSize = (int) inputShapes[0].get(0);

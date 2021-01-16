@@ -38,18 +38,21 @@ public class BertNextSentenceBlock extends AbstractBlock {
                         "binaryClassifier", Linear.builder().setUnits(2).optBias(true).build());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         this.inputNames = Arrays.asList("pooledOutput");
         this.binaryClassifier.initialize(manager, dataType, inputShapes);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore ps, NDList inputs, boolean training, PairList<String, Object> params) {
         return forward(ps, inputs, training);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList forward(ParameterStore ps, NDList inputs, boolean training) {
         return new NDList(forward(ps, inputs.singletonOrThrow(), training));
@@ -70,6 +73,7 @@ public class BertNextSentenceBlock extends AbstractBlock {
                 .logSoftmax(1);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return new Shape[] {new Shape(inputShapes[0].get(0), 2)};
