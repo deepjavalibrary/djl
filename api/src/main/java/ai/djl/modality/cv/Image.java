@@ -110,7 +110,23 @@ public interface Image {
     /** Flag indicates the color channel options for images. */
     enum Flag {
         GRAYSCALE,
-        COLOR
+        COLOR;
+
+        /**
+         * Returns the number of channels for this flag.
+         *
+         * @return the number of channels for this flag
+         */
+        public int numChannels() {
+            switch (this) {
+                case GRAYSCALE:
+                    return 1;
+                case COLOR:
+                    return 3;
+                default:
+                    throw new IllegalArgumentException("Invalid FLAG");
+            }
+        }
     }
 
     /** Type indicates the type options for images. */
