@@ -13,7 +13,6 @@
 package ai.djl.repository.handler;
 
 import ai.djl.repository.FilenameUtils;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -42,7 +41,6 @@ import io.netty.util.CharsetUtil;
 import io.netty.util.internal.SystemPropertyUtil;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -52,7 +50,6 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -75,7 +72,6 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Ful
     public static final String HTTP_DATE_GMT_TIMEZONE = "GMT";
     public static final int HTTP_CACHE_SECONDS = 60;
     private static final Pattern INSECURE_URI = Pattern.compile(".*[<>&\"].*");
-    private static final Pattern ALLOWED_FILE_NAME = Pattern.compile("[^-._]?[^<>&\"]*");
 
     private FullHttpRequest request;
 
@@ -134,11 +130,7 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Ful
         }
 
         if (Files.isDirectory(file)) {
-            if (uri.endsWith("/")) {
-                sendListing(ctx, file, uri);
-            } else {
-                sendRedirect(ctx, uri + '/');
-            }
+            sendError(ctx, HttpResponseStatus.NOT_FOUND);
             return;
         }
 
@@ -276,62 +268,6 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Ful
 
         // Convert to absolute path.
         return SystemPropertyUtil.get("user.dir") + File.separator + uri;
-    }
-
-    private void sendListing(ChannelHandlerContext ctx, Path dir, String dirPath)
-            throws IOException {
-        StringBuilder buf =
-                new StringBuilder()
-                        .append(
-                                "<!DOCTYPE html>\r\n<html><head><meta charset='utf-8' /><title>Listing of: ")
-                        .append(dirPath)
-                        .append("</title></head><body>\r\n<h3>Listing of: ")
-                        .append(dirPath)
-                        .append("</h3>\r\n<ul><li><a href=\"../\">..</a></li>\r\n");
-
-        Files.walk(dir)
-                .sorted(Comparator.reverseOrder())
-                .forEach(
-                        path -> {
-                            try {
-                                if (Files.isHidden(path) || !Files.isReadable(path)) {
-                                    return;
-                                }
-
-                                String name = path.toString();
-                                if (!ALLOWED_FILE_NAME.matcher(name).matches()) {
-                                    return;
-                                }
-
-                                buf.append("<li><a href=\"")
-                                        .append(name)
-                                        .append("\">")
-                                        .append(name)
-                                        .append("</a></li>\r\n");
-                            } catch (IOException ignore) {
-                                // ignore
-                            }
-                        });
-
-        buf.append("</ul></body></html>\r\n");
-
-        ByteBuf buffer = ctx.alloc().buffer(buf.length());
-        buffer.writeCharSequence(buf.toString(), CharsetUtil.UTF_8);
-
-        FullHttpResponse response =
-                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buffer);
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=UTF-8");
-
-        sendAndCleanupConnection(ctx, response);
-    }
-
-    private void sendRedirect(ChannelHandlerContext ctx, String newUri) {
-        FullHttpResponse response =
-                new DefaultFullHttpResponse(
-                        HttpVersion.HTTP_1_1, HttpResponseStatus.FOUND, Unpooled.EMPTY_BUFFER);
-        response.headers().set(HttpHeaderNames.LOCATION, newUri);
-
-        sendAndCleanupConnection(ctx, response);
     }
 
     private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {

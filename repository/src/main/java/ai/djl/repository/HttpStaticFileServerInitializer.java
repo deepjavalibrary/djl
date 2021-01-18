@@ -29,7 +29,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
  */
 public class HttpStaticFileServerInitializer extends ChannelInitializer<SocketChannel> {
 
-    private final SslContext sslCtx;
+    private SslContext sslCtx;
 
     /**
      * constructs the initializer.
