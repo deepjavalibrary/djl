@@ -24,6 +24,7 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class TfLiteTest {
@@ -32,6 +33,9 @@ public class TfLiteTest {
     void testTflite()
             throws IOException, MalformedModelException, TranslateException,
                     ModelNotFoundException {
+        if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+            throw new SkipException("test only work on mac and Linux");
+        }
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, Classifications.class)
