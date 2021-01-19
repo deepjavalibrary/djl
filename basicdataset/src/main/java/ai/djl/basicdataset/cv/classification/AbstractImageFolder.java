@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -46,10 +47,14 @@ public abstract class AbstractImageFolder extends ImageClassificationDataset {
     protected boolean prepared;
 
     private int maxDepth;
+    private Integer imageWidth;
+    private Integer imageHeight;
 
     protected AbstractImageFolder(ImageFolderBuilder<?> builder) {
         super(builder);
         this.maxDepth = builder.maxDepth;
+        this.imageWidth = builder.imageWidth;
+        this.imageHeight = builder.imageHeight;
         this.synset = new ArrayList<>();
         this.items = new PairList<>();
         this.resource = new Resource(builder.repository, null, "1.0");
@@ -128,6 +133,24 @@ public abstract class AbstractImageFolder extends ImageClassificationDataset {
         return EXT.contains(path.substring(extensionIndex).toLowerCase());
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Optional<Integer> getImageWidth() {
+        return Optional.ofNullable(imageWidth);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Optional<Integer> getImageHeight() {
+        return Optional.ofNullable(imageWidth);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<String> getClasses() {
+        return synset;
+    }
+
     /**
      * Used to build an {@link AbstractImageFolder}.
      *
@@ -138,6 +161,8 @@ public abstract class AbstractImageFolder extends ImageClassificationDataset {
 
         Repository repository;
         int maxDepth;
+        Integer imageWidth;
+        Integer imageHeight;
 
         protected ImageFolderBuilder() {
             maxDepth = 1;
@@ -184,6 +209,40 @@ public abstract class AbstractImageFolder extends ImageClassificationDataset {
          */
         public T optMaxDepth(int maxDepth) {
             this.maxDepth = maxDepth;
+            return self();
+        }
+
+        /**
+         * Sets the size of the images.
+         *
+         * @param size the size (both width and height)
+         * @return this builder
+         */
+        public T optImageSize(int size) {
+            this.imageWidth = size;
+            this.imageHeight = size;
+            return self();
+        }
+
+        /**
+         * Sets the width of the images.
+         *
+         * @param width the width of the images
+         * @return this builder
+         */
+        public T optImageWidth(int width) {
+            this.imageWidth = width;
+            return self();
+        }
+
+        /**
+         * Sets the height of the images.
+         *
+         * @param height the height of the images
+         * @return this builder
+         */
+        public T optImageHeight(int height) {
+            this.imageHeight = height;
             return self();
         }
     }

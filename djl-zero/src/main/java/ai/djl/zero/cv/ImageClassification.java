@@ -15,6 +15,7 @@ package ai.djl.zero.cv;
 import ai.djl.Application.CV;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.basicdataset.cv.classification.ImageClassificationDataset;
 import ai.djl.basicdataset.cv.classification.ImageNet;
 import ai.djl.basicdataset.cv.classification.Mnist;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
@@ -33,7 +34,7 @@ import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
-import ai.djl.training.dataset.Dataset.Usage;
+import ai.djl.training.dataset.Dataset;
 import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
@@ -96,24 +97,37 @@ public final class ImageClassification {
      * Trains the recommended image classification model on a custom dataset.
      *
      * <p>In order to train on a custom dataset, you must create a custom {@link
-     * ai.djl.basicdataset.cv.classification.ImageClassificationDataset} to load your data and a
-     * {@link ImageClassificationDatasetFactory} to build it.
+     * ImageClassificationDataset} to load your data.
      *
-     * @param datasetFactory to build the datasets to train on and validate against
+     * @param dataset the data to train with
      * @param performance to determine the desired model tradeoffs
      * @return the model as a {@link ZooModel} with the {@link Translator} included
      * @throws IOException if the dataset could not be loaded
      * @throws TranslateException if the translator has errors
      */
     public static ZooModel<Image, Classifications> train(
-            ImageClassificationDatasetFactory datasetFactory, Performance performance)
+            ImageClassificationDataset dataset, Performance performance)
             throws IOException, TranslateException {
 
-        int channels = datasetFactory.getImageChannels();
-        int width = datasetFactory.getImageWidth();
-        int height = datasetFactory.getImageHeight();
+        int channels = dataset.getImageChannels();
+        int width =
+                dataset.getImageWidth()
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "The dataset must have a fixed image width"));
+        int height =
+                dataset.getImageHeight()
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "The dataset must have a fixed image height"));
         Shape imageShape = new Shape(channels, height, width);
-        List<String> classes = datasetFactory.getClasses();
+        List<String> classes = dataset.getClasses();
+
+        Dataset[] splitDataset = dataset.randomSplit(8, 2);
+        Dataset trainDataset = splitDataset[0];
+        Dataset validateDataset = splitDataset[1];
 
         // Determine the layers based on performance
         int numLayers = performance.switchPerformance(18, 50, 152);
@@ -134,11 +148,7 @@ public final class ImageClassification {
 
         try (Trainer trainer = model.newTrainer(trainingConfig)) {
             trainer.initialize(new Shape(1).addAll(imageShape));
-            EasyTrain.fit(
-                    trainer,
-                    35,
-                    datasetFactory.build(Usage.TRAIN),
-                    datasetFactory.build(Usage.VALIDATION));
+            EasyTrain.fit(trainer, 35, trainDataset, validateDataset);
         }
 
         Translator<Image, Classifications> translator =
