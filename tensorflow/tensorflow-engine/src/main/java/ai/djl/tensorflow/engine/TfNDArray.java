@@ -180,6 +180,12 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray stopGradient() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public double[] toDoubleArray() {
         double[] result = new double[(int) getShape().size()];
         try (Tensor<?> tensor = operand.asTensor()) {

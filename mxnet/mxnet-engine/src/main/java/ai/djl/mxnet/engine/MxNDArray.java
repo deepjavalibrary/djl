@@ -268,6 +268,11 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         return hasGradient;
     }
 
+    @Override
+    public NDArray stopGradient() {
+        return manager.invoke("stop_gradient", this, null);
+    }
+
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {

@@ -167,6 +167,12 @@ public class OrtNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray stopGradient() {
+        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public ByteBuffer toByteBuffer() {
         ByteBuffer bb = tensor.getByteBuffer();
         bb.order(ByteOrder.nativeOrder());
