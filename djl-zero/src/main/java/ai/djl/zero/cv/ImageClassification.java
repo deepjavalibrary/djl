@@ -21,9 +21,6 @@ import ai.djl.basicdataset.cv.classification.Mnist;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.repository.zoo.Criteria;
@@ -151,12 +148,7 @@ public final class ImageClassification {
             EasyTrain.fit(trainer, 35, trainDataset, validateDataset);
         }
 
-        Translator<Image, Classifications> translator =
-                ImageClassificationTranslator.builder()
-                        .optSynset(classes)
-                        .addTransform(new Resize(width, height))
-                        .addTransform(new ToTensor())
-                        .build();
+        Translator<Image, Classifications> translator = dataset.makeTranslator();
         return new ZooModel<>(model, translator);
     }
 

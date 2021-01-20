@@ -12,13 +12,19 @@
  */
 package ai.djl.basicdataset.cv.classification;
 
+import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
+import ai.djl.translate.Pipeline;
+import ai.djl.translate.Translator;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +81,28 @@ public abstract class ImageClassificationDataset extends RandomAccessDataset {
         NDList data = new NDList(image);
         NDList label = new NDList(manager.create(getClassNumber(index)));
         return new Record(data, label);
+    }
+
+    /**
+     * Returns the {@link ImageClassificationTranslator} matching the format of this dataset.
+     *
+     * @return the {@link ImageClassificationTranslator} matching the format of this dataset
+     */
+    public Translator<Image, Classifications> makeTranslator() {
+        Pipeline pipeline = new Pipeline();
+
+        // Resize the image if the image size is fixed
+        Optional<Integer> width = getImageWidth();
+        Optional<Integer> height = getImageHeight();
+        if (width.isPresent() && height.isPresent()) {
+            pipeline.add(new Resize(width.get(), height.get()));
+        }
+        pipeline.add(new ToTensor());
+
+        return ImageClassificationTranslator.builder()
+                .optSynset(getClasses())
+                .setPipeline(pipeline)
+                .build();
     }
 
     /**
