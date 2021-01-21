@@ -388,6 +388,40 @@ final class PyTorchLibrary {
             double momentum,
             double eps);
 
+    native long[] torchNNRnn(
+            long inputHandle,
+            long hxHandle,
+            long[] paramHandles,
+            boolean hasBiases,
+            int numLayers,
+            int activation,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst);
+
+    native long[] torchNNGru(
+            long inputHandle,
+            long hxHandle,
+            long[] paramHandles,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst);
+
+    native long[] torchNNLstm(
+            long inputHandle,
+            long[] hxHandles,
+            long[] paramHandles,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst);
+
     native long torchNNAvgPool(
             long inputHandle,
             long[] kernel,

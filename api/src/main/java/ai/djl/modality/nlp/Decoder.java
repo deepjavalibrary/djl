@@ -46,13 +46,6 @@ public abstract class Decoder extends AbstractBlock {
         this.block = addChildBlock("Block", block);
     }
 
-    /**
-     * Sets the state of the encoder as the initial state of the decoder.
-     *
-     * @param encoderStates the states of the encoder
-     */
-    public abstract void initState(NDList encoderStates);
-
     /** {@inheritDoc} */
     @Override
     protected NDList forwardInternal(

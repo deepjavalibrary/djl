@@ -62,7 +62,7 @@ inline jlongArray GetPtrArrayFromContainer(JNIEnv* env, T1 list) {
   return jarray;
 }
 
-inline std::vector <int64_t> GetVecFromJLongArray(JNIEnv* env, jlongArray jarray) {
+inline std::vector<int64_t> GetVecFromJLongArray(JNIEnv* env, jlongArray jarray) {
   jlong* jarr = env->GetLongArrayElements(jarray, JNI_FALSE);
   jsize length = env->GetArrayLength(jarray);
   std::vector<int64_t> vec(jarr, jarr + length);
@@ -86,7 +86,7 @@ inline std::vector<float> GetVecFromJFloatArray(JNIEnv* env, jfloatArray jarray)
   return std::move(vec);
 }
 
-inline std::vector <std::string> GetVecFromJStringArray(JNIEnv* env, jobjectArray array) {
+inline std::vector<std::string> GetVecFromJStringArray(JNIEnv* env, jobjectArray array) {
   std::vector <std::string> vec;
   jsize len = env->GetArrayLength(array);
   vec.reserve(len);

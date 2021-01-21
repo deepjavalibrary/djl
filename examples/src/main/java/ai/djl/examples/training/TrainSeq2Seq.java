@@ -122,16 +122,20 @@ public final class TrainSeq2Seq {
                         sourceEmbedding,
                         new LSTM.Builder()
                                 .setStateSize(32)
-                                .setNumStackedLayers(2)
+                                .setNumLayers(2)
                                 .optDropRate(0)
+                                .optBatchFirst(true)
+                                .optReturnState(true)
                                 .build());
         SimpleTextDecoder simpleTextDecoder =
                 new SimpleTextDecoder(
                         targetEmbedding,
                         new LSTM.Builder()
                                 .setStateSize(32)
-                                .setNumStackedLayers(2)
+                                .setNumLayers(2)
                                 .optDropRate(0)
+                                .optBatchFirst(true)
+                                .optReturnState(false)
                                 .build(),
                         vocabSize);
         return new EncoderDecoder(simpleTextEncoder, simpleTextDecoder);

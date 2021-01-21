@@ -12,7 +12,15 @@
  */
 package ai.djl.nn.recurrent;
 
+import ai.djl.Device;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.internal.NDArrayEx;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.Parameter;
+import ai.djl.training.ParameterStore;
+import ai.djl.util.PairList;
 import ai.djl.util.Preconditions;
 
 /**
@@ -32,6 +40,7 @@ import ai.djl.util.Preconditions;
  */
 public class RNN extends RecurrentBlock {
 
+    private Activation activation;
     /**
      * Creates a vanilla RNN block.
      *
@@ -39,8 +48,52 @@ public class RNN extends RecurrentBlock {
      */
     RNN(Builder builder) {
         super(builder);
-        mode = builder.activation == Activation.RELU ? "rnn_relu" : "rnn_tanh";
+        activation = builder.activation;
         gates = 1;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected NDList forwardInternal(
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
+        NDArrayEx ex = inputs.head().getNDArrayInternal();
+        Device device = inputs.head().getDevice();
+        NDList rnnParams = new NDList();
+        for (Parameter parameter : parameters.values()) {
+            rnnParams.add(parameterStore.getValue(parameter, device, training));
+        }
+
+        NDArray input = inputs.head();
+        if (inputs.size() == 1) {
+            int batchIndex = batchFirst ? 0 : 1;
+            inputs.add(
+                    input.getManager()
+                            .zeros(
+                                    new Shape(
+                                            (long) numLayers * getNumDirections(),
+                                            input.size(batchIndex),
+                                            stateSize)));
+        }
+        NDList outputs =
+                ex.rnn(
+                        input,
+                        inputs.get(1),
+                        rnnParams,
+                        hasBiases,
+                        numLayers,
+                        activation,
+                        dropRate,
+                        training,
+                        bidirectional,
+                        batchFirst);
+        if (returnState) {
+            return outputs;
+        }
+        outputs.stream().skip(1).forEach(NDArray::close);
+        return new NDList(outputs.get(0));
     }
 
     /**
@@ -79,8 +132,7 @@ public class RNN extends RecurrentBlock {
          */
         public RNN build() {
             Preconditions.checkArgument(
-                    stateSize > 0 && numStackedLayers > 0,
-                    "Must set stateSize and numStackedLayers");
+                    stateSize > 0 && numLayers > 0, "Must set stateSize and numLayers");
             return new RNN(this);
         }
     }

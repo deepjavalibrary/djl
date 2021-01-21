@@ -32,8 +32,6 @@ public class SimpleTextDecoder extends Decoder {
 
     private static final byte VERSION = 1;
 
-    private RecurrentBlock recurrentBlock;
-
     /**
      * Contructs a new instance of {@code SimpleTextDecoder} with the given {@link RecurrentBlock}.
      * Use this constructor if you are planning to use pre-trained embeddings that don't need
@@ -60,7 +58,6 @@ public class SimpleTextDecoder extends Decoder {
             RecurrentBlock recurrentBlock,
             long vocabSize) {
         super(VERSION, getBlock(trainableTextEmbedding, recurrentBlock, vocabSize));
-        this.recurrentBlock = recurrentBlock;
     }
 
     private static Block getBlock(
@@ -73,12 +70,6 @@ public class SimpleTextDecoder extends Decoder {
                 .add(recurrentBlock)
                 .add(Linear.builder().setUnits(vocabSize).build());
         return sequentialBlock;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void initState(NDList encoderStates) {
-        recurrentBlock.setBeginStates(encoderStates);
     }
 
     /** {@inheritDoc} */
