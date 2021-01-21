@@ -194,6 +194,12 @@ public class TfLiteNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray stopGradient() {
+        throw new UnsupportedOperationException("Not supported for TFLite");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public ByteBuffer toByteBuffer() {
         if (data == null) {
             data = tensor.buffer();

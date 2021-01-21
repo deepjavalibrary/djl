@@ -156,6 +156,12 @@ public class DlrNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray stopGradient() {
+        throw new UnsupportedOperationException("Not supported for DLR");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public ByteBuffer toByteBuffer() {
         return data;
     }
