@@ -74,4 +74,18 @@ public final class FilenameUtils {
         }
         return name;
     }
+
+    /**
+     * Returns the file name extension of the file.
+     *
+     * @param fileName the file name
+     * @return the file name extension
+     */
+    public static String getFileExtension(String fileName) {
+        int pos = fileName.lastIndexOf('.');
+        if (pos > 0) {
+            return fileName.substring(pos + 1);
+        }
+        return "";
+    }
 }

@@ -201,6 +201,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray stopGradient() {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public ByteBuffer toByteBuffer() {
         return JniUtils.getByteBuffer(this);
     }
@@ -251,6 +257,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             default:
                 throw new UnsupportedOperationException("data type is not supported!");
         }
+        buf.rewind();
         // If NDArray is on the GPU, it is native code responsibility to control the data life cycle
         if (!Device.Type.GPU.equals(getDevice().getDeviceType())) {
             dataRef = buf;

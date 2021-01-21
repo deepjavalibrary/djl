@@ -42,7 +42,7 @@ public class TfLiteSymbolBlock extends AbstractSymbolBlock implements AutoClosea
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,

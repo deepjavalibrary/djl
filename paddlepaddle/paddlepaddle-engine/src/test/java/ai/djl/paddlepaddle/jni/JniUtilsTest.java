@@ -20,10 +20,8 @@ import org.testng.annotations.Test;
 
 public class JniUtilsTest {
 
-    @Test(enabled = false)
+    @Test
     void createNDArray() {
-        // Require user to override PADDLE_LIBRARY_PATH
-        LibUtils.loadLibrary();
         try (NDManager manager = NDManager.newBaseManager(null, "PaddlePaddle")) {
             NDArray array = manager.zeros(new Shape(1, 2));
             float[] expected = new float[] {0, 0};

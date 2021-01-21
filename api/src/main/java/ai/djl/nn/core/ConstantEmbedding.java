@@ -43,7 +43,7 @@ public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedE
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,

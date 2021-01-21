@@ -68,6 +68,7 @@ public class DlrNDManager extends BaseNDManager {
         int numOfBytes = dataType.getNumOfBytes();
         ByteBuffer bb = ByteBuffer.allocate(size * numOfBytes);
         bb.asFloatBuffer().put((FloatBuffer) data);
+        bb.rewind();
         return new DlrNDArray(this, bb, shape);
     }
 

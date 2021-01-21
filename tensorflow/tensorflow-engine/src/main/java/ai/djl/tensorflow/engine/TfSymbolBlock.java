@@ -85,7 +85,7 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,

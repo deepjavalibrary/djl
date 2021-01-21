@@ -13,6 +13,7 @@
 package ai.djl.ndarray;
 
 import ai.djl.Device;
+import ai.djl.ndarray.types.Shape;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -246,6 +247,15 @@ public class NDList extends ArrayList<NDArray> implements AutoCloseable {
         } catch (IOException e) {
             throw new AssertionError("NDList is not writable", e);
         }
+    }
+
+    /**
+     * Gets all of shapes in the {@code NDList}.
+     *
+     * @return shapes in {@code NDList}
+     */
+    public Shape[] getShapes() {
+        return stream().map(NDArray::getShape).toArray(Shape[]::new);
     }
 
     /** {@inheritDoc} */

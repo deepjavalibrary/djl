@@ -43,7 +43,7 @@ public interface Tracker {
      * @return the {@link WarmUpTracker} {@link WarmUpTracker.Builder}
      */
     static WarmUpTracker.Builder warmUp() {
-        return new WarmUpTracker.Builder();
+        return WarmUpTracker.builder();
     }
 
     /**

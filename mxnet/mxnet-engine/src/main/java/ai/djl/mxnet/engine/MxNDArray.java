@@ -268,6 +268,11 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         return hasGradient;
     }
 
+    @Override
+    public NDArray stopGradient() {
+        return manager.invoke("stop_gradient", this, null);
+    }
+
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
@@ -321,6 +326,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
             default:
                 throw new UnsupportedOperationException("data type is not supported!");
         }
+        buf.rewind();
         JnaUtils.syncCopyFromCPU(getHandle(), buf, size);
     }
 
