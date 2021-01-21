@@ -171,4 +171,14 @@ public class NDIndexTest {
             Assert.assertEquals(original.get(index), expected);
         }
     }
+
+    @Test
+    public void testSetByFunctionIncrements() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.ones(new Shape(1, 5));
+            original.set(new NDIndex(":, 0::2"), array -> array.mul(-1).add(1));
+            NDArray expected = manager.create(new float[][] {{0, 1, 0, 1, 0}});
+            Assert.assertEquals(original, expected);
+        }
+    }
 }
