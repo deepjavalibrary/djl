@@ -24,7 +24,7 @@ For Mac:
 ```bash
 brew tap homebrew/cask-versions
 brew update
-brew cask install adoptopenjdk8
+brew install --cask adoptopenjdk8
 ```
 
 You can also download and install [Oracle JDK](https://www.oracle.com/technetwork/java/javase/overview/index.html)
