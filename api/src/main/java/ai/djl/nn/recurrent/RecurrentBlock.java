@@ -175,9 +175,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
                 new Shape((long) numStackedLayers * numDirections, nShape, stateSize)
             };
         }
-        return new Shape[] {
-            nonStateOutputShape
-        };
+        return new Shape[] {nonStateOutputShape};
     }
 
     /** {@inheritDoc} */
