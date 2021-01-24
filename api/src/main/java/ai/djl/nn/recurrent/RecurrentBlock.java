@@ -164,16 +164,19 @@ public abstract class RecurrentBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
-        // Input shape at this point is TNC. Output Shape should be NTS
+        // Input shape at this point is NTC. Output Shape should be NTS
         Shape inputShape = inputs[0];
+        Long nShape = inputShape.get(0);
+        Long tShape = inputShape.get(1);
+        Shape nonStateOutputShape = new Shape(nShape, tShape, stateSize * numDirections);
         if (stateOutputs) {
             return new Shape[] {
-                new Shape(inputShape.get(1), inputShape.get(0), stateSize * numDirections),
-                new Shape(numStackedLayers * numDirections, inputShape.get(1), stateSize)
+                nonStateOutputShape,
+                new Shape((long) numStackedLayers * numDirections, nShape, stateSize)
             };
         }
         return new Shape[] {
-            new Shape(inputShape.get(1), inputShape.get(0), stateSize * numDirections)
+            nonStateOutputShape
         };
     }
 
@@ -183,7 +186,6 @@ public abstract class RecurrentBlock extends AbstractBlock {
         super.beforeInitialize(inputs);
         Shape inputShape = inputs[0];
         Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
-        inputs[0] = new Shape(inputShape.get(1), inputShape.get(0), inputShape.get(2));
     }
 
     /** {@inheritDoc} */
@@ -227,22 +229,24 @@ public abstract class RecurrentBlock extends AbstractBlock {
         long batchSize = inputs.head().getShape().get(0);
         inputs = updateInputLayoutToTNC(inputs);
         NDArray head = inputs.head();
+        NDManager manager = head.getManager();
         Device device = head.getDevice();
 
         NDList result = new NDList(head);
         try (NDList parameterList = new NDList()) {
             for (Parameter parameter : parameters.values()) {
-                NDArray array = parameterStore.getValue(parameter, device, training);
+                NDArray array = parameterStore.getValue(parameter, device, training).duplicate();
+                array.attach(manager);
                 parameterList.add(array.flatten());
             }
             NDArray array = NDArrays.concat(parameterList);
             result.add(array);
         }
-        Shape stateShape = new Shape(numStackedLayers * numDirections, batchSize, stateSize);
+        Shape stateShape = new Shape((long) numStackedLayers * numDirections, batchSize, stateSize);
         if (beginState != null) {
             result.add(beginState);
         } else {
-            result.add(inputs.head().getManager().zeros(stateShape));
+            result.add(manager.zeros(stateShape));
         }
         if (useSequenceLength) {
             result.add(inputs.get(1));
