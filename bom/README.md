@@ -3,7 +3,7 @@
 BOM stands for Bill Of Materials. Maven lets us define the versions of the dependencies or transitive
 dependencies in a separate POM. A BOM package is a POM only jar file that is used to control the versions
 of a project’s dependencies and provide a central place to define and update those versions. 
-See [Naven document](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#dependency-management)
+See [Maven document](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#dependency-management)
 about how BOM works.
 
 DJL's BOM package provides a flexibility way for developers to add DJL dependencies to their project
