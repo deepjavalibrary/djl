@@ -166,8 +166,8 @@ public abstract class RecurrentBlock extends AbstractBlock {
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
         // Input shape at this point is NTC. Output Shape should be NTS
         Shape inputShape = inputs[0];
-        Long nShape = inputShape.get(0);
-        Long tShape = inputShape.get(1);
+        long nShape = inputShape.get(0);
+        long tShape = inputShape.get(1);
         Shape nonStateOutputShape = new Shape(nShape, tShape, stateSize * numDirections);
         if (stateOutputs) {
             return new Shape[] {
@@ -233,9 +233,9 @@ public abstract class RecurrentBlock extends AbstractBlock {
         NDList result = new NDList(head);
         try (NDList parameterList = new NDList()) {
             for (Parameter parameter : parameters.values()) {
-                NDArray array = parameterStore.getValue(parameter, device, training).duplicate();
+                NDArray array = parameterStore.getValue(parameter, device, training).flatten();
                 array.attach(manager);
-                parameterList.add(array.flatten());
+                parameterList.add(array);
             }
             NDArray array = NDArrays.concat(parameterList);
             result.add(array);

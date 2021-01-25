@@ -136,9 +136,9 @@ public class LSTM extends RecurrentBlock {
         NDList result = new NDList(head);
         try (NDList parameterList = new NDList()) {
             for (Parameter parameter : parameters.values()) {
-                NDArray array = parameterStore.getValue(parameter, device, training).duplicate();
+                NDArray array = parameterStore.getValue(parameter, device, training).flatten();
                 array.attach(manager);
-                parameterList.add(array.flatten());
+                parameterList.add(array);
             }
             NDArray array = NDArrays.concat(parameterList);
             result.add(array);
