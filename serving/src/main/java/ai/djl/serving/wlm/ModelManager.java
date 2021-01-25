@@ -186,7 +186,8 @@ public final class ModelManager {
 
     /**
      * Adds an inference job to the job queue.
-     *
+     * assign to job to the next free worker.
+     * 
      * @param job an inference job to be executed
      * @return {@code true} if submit success
      * @throws ModelNotFoundException if the model is not registered
@@ -197,11 +198,7 @@ public final class ModelManager {
         if (model == null) {
             throw new ModelNotFoundException("Model not found: " + modelName);
         }
-
-        if (wlm.hasWorker(modelName)) {
-            return model.addJob(job);
-        }
-        return false;
+        return wlm.addJob(modelName,job);
     }
 
     /**

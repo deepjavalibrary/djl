@@ -16,7 +16,11 @@ import ai.djl.inference.Predictor;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.translate.TranslateException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,8 +30,6 @@ import org.slf4j.LoggerFactory;
 class WorkerThread implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkerThread.class);
-
-    private static final AtomicInteger WORKER_COUNTER = new AtomicInteger(1);
 
     private ModelInfo model;
     private Predictor<Input, Output> predictor;
@@ -40,14 +42,18 @@ class WorkerThread implements Runnable {
     private WorkerState state;
     private int workerId;
     private long startTime;
+   
 
+    private WorkerIDGenerator workerIDGenerator=new WorkerIDGenerator();
+    
     public WorkerThread(int gpuId, ModelInfo model, BatchAggregator aggregator) {
         this.model = model;
         this.aggregator = aggregator;
         this.gpuId = gpuId;
-        this.workerId = WORKER_COUNTER.getAndIncrement();
+        this.workerId = workerIDGenerator.generate();
         this.startTime = System.currentTimeMillis();
         predictor = model.getModel().newPredictor();
+       
     }
 
     /** {@inheritDoc} */
@@ -56,17 +62,21 @@ class WorkerThread implements Runnable {
         Thread thread = Thread.currentThread();
         thread.setName(getWorkerName());
         currentThread.set(thread);
+        this.state=WorkerState.WORKER_STARTED;
         List<Input> req = null;
         try {
             while (isRunning()) {
-                req = aggregator.getRequest();
-                try {
-                    List<Output> reply = predictor.batchPredict(req);
-                    aggregator.sendResponse(reply);
-                } catch (TranslateException e) {
-                    logger.warn("Failed to predict", e);
-                    aggregator.sendError();
-                }
+        	List<Job> jobsToExecute=pollBatch();
+        	if (jobsToExecute!=null && !jobsToExecute.isEmpty()) {
+                    req = aggregator.getRequest(jobsToExecute);
+                    try {
+                        List<Output> reply = predictor.batchPredict(req);
+                        aggregator.sendResponse(reply);
+                    } catch (TranslateException e) {
+                        logger.warn("Failed to predict", e);
+                        aggregator.sendError();
+                    }
+        	}
                 req = null;
             }
         } catch (InterruptedException e) {
@@ -80,6 +90,42 @@ class WorkerThread implements Runnable {
                 aggregator.sendError();
             }
         }
+    }
+    
+    /**
+     * Fills in the list with a batch of jobs.
+     *
+     * @param list the batch queue to be filled
+     * @throws InterruptedException if interrupted
+     */
+    private List<Job> pollBatch() throws InterruptedException {
+     //   try {
+     //   }
+//            Job job = jobQueue.take();
+//            logger.trace("get first job: {}", job.getRequestId());
+//
+//            list.add(job);
+//            long begin = System.currentTimeMillis();
+//            long maxDelay = model.getMaxBatchDelay();
+//            for (int i = 0; i < model.getBatchSize() - 1 && maxDelay > 0; ++i) {
+//                job = jobQueue.poll(maxDelay, TimeUnit.MILLISECONDS);
+//                if (job == null) {
+//                    break;
+//                }
+//                long end = System.currentTimeMillis();
+//                maxDelay -= end - begin;
+//                begin = end;
+//                list.add(job);
+//            }
+	// jobQueue.poll
+	List<Job> list=new ArrayList<>(model.getBatchSize());
+	Job job=jobQueue.poll(2, TimeUnit.SECONDS);
+	if (job!=null) {
+	    list.add(job);
+	    jobQueue.drainTo(list,model.getBatchSize()-1);
+            logger.trace("sending jobs, size: {}", list.size());
+	}
+        return list;
     }
 
     public int getWorkerId() {
@@ -100,6 +146,17 @@ class WorkerThread implements Runnable {
 
     public WorkerState getState() {
         return state;
+    }
+    
+    /**
+     * append a job into the jobQueue.
+     * @param job
+     * @return true if sucessfully added, false of capacity of the current work-queue exceeded
+     */
+    public boolean addJob(Job job) {
+	if ((!running.get()) || state!=WorkerState.WORKER_STARTED)
+	    return false;
+        return jobQueue.offer(job);
     }
 
     public void shutdown(WorkerState state) {

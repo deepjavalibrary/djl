@@ -28,9 +28,9 @@ class BatchAggregator {
         jobs = new ArrayList<>();
     }
 
-    public List<Input> getRequest() throws InterruptedException {
-        model.pollBatch(jobs);
-
+    public List<Input> getRequest(List<Job> jobs) throws InterruptedException {
+      //  model.pollBatch(jobs);
+	this.jobs=jobs;
         List<Input> list = new ArrayList<>(jobs.size());
         for (Job job : jobs) {
             job.setScheduled();

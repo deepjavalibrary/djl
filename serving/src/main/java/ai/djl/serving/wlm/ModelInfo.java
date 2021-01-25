@@ -33,11 +33,12 @@ public class ModelInfo implements AutoCloseable {
 
     private int minWorkers;
     private int maxWorkers;
+    private int queueSize;
     private int batchSize;
     private int maxBatchDelay;
-    private ReentrantLock lock;
+//    private ReentrantLock lock;
 
-    private LinkedBlockingDeque<Job> jobs;
+ //   private LinkedBlockingDeque<Job> jobs;
 
     private ZooModel<Input, Output> model;
 
@@ -56,8 +57,9 @@ public class ModelInfo implements AutoCloseable {
         this.model = model;
         batchSize = 1;
         maxBatchDelay = 100;
-        jobs = new LinkedBlockingDeque<>(queueSize);
-        lock = new ReentrantLock();
+        this.queueSize = queueSize;
+//        jobs = new LinkedBlockingDeque<>(queueSize);
+ //       lock = new ReentrantLock();
     }
 
     /**
@@ -168,15 +170,20 @@ public class ModelInfo implements AutoCloseable {
         this.maxBatchDelay = maxBatchDelay;
     }
 
+    // returns the size of the Queue
+    public int getQueueSize() {
+	return queueSize;
+    }
     /**
      * Adds a job to the queue.
      *
      * @param job an inference job
      * @return {@code true} if the queue is full
      */
-    public boolean addJob(Job job) {
-        return jobs.offer(job);
-    }
+    //TODO the MOdelInfo must not be responsible for thread handling and job execution, responsibility for this should be in the WorkLoadManager
+ //   public boolean addJob(Job job) {
+ //       return jobs.offer(job);
+  //  }
 
     /**
      * Fills in the list with a batch of jobs.
@@ -184,30 +191,31 @@ public class ModelInfo implements AutoCloseable {
      * @param list the batch queue to be filled
      * @throws InterruptedException if interrupted
      */
-    public void pollBatch(List<Job> list) throws InterruptedException {
-        try {
-            lock.lockInterruptibly();
-            Job job = jobs.take();
-            logger.trace("get first job: {}", job.getRequestId());
-
-            list.add(job);
-            long begin = System.currentTimeMillis();
-            long maxDelay = maxBatchDelay;
-            for (int i = 0; i < batchSize - 1 && maxDelay > 0; ++i) {
-                job = jobs.poll(maxDelay, TimeUnit.MILLISECONDS);
-                if (job == null) {
-                    break;
-                }
-                long end = System.currentTimeMillis();
-                maxDelay -= end - begin;
-                begin = end;
-                list.add(job);
-            }
-            logger.trace("sending jobs, size: {}", list.size());
-        } finally {
-            lock.unlock();
-        }
-    }
+    //TODO the MOdelInfo must not be responsible for thread handling and job execution, responsibility for this should be in the WorkLoadManager
+//    public void pollBatch(List<Job> list) throws InterruptedException {
+//        try {
+//            lock.lockInterruptibly();
+//            Job job = jobs.take();
+//            logger.trace("get first job: {}", job.getRequestId());
+//
+//            list.add(job);
+//            long begin = System.currentTimeMillis();
+//            long maxDelay = maxBatchDelay;
+//            for (int i = 0; i < batchSize - 1 && maxDelay > 0; ++i) {
+//                job = jobs.poll(maxDelay, TimeUnit.MILLISECONDS);
+//                if (job == null) {
+//                    break;
+//                }
+//                long end = System.currentTimeMillis();
+//                maxDelay -= end - begin;
+//                begin = end;
+//                list.add(job);
+//            }
+//            logger.trace("sending jobs, size: {}", list.size());
+//        } finally {
+//            lock.unlock();
+//        }
+//    }
 
     /** {@inheritDoc} */
     @Override
@@ -216,4 +224,5 @@ public class ModelInfo implements AutoCloseable {
             model.close();
         }
     }
+
 }

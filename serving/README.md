@@ -87,3 +87,147 @@ curl -X POST http://127.0.0.1:8080/predictions/mlp -F "data=@../examples/src/tes
   ]
 }
 ```
+
+### REST API
+
+
+#### ping
+url:	/ping
+
+method: GET
+
+example:
+
+```sh
+curl -X GET http://localhost:8080/ping
+```
+
+returns
+json 
+
+```sh
+{
+  "status": {Healthy|Partial Healthy|Unhealthy}
+}
+```
+
+
+
+
+#### models - list loaded models
+url:	/models
+
+method: GET
+
+example:
+
+```sh
+curl -X GET http://localhost:8080/models
+```
+
+returns
+json 
+
+```sh
+{
+  "models": [
+    {
+      "modelName": {modelName},
+      "modelUrl": {urlWhereTheModelIsLoadedFrom}
+    }
+  ]
+}
+```
+
+
+
+####	models - get model instance information
+url:	/models/{modelName}
+
+method: GET
+
+example:
+
+```sh
+curl -X GET http://localhost:8080/models/mlp
+```
+
+
+returns
+json 
+
+```sh
+{
+  "modelName": {modelName},
+  "modelUrl": {urlWhereTheModelIsLoadedFrom},
+  "minWorkers": 8,
+  "maxWorkers": 8,
+  "batchSize": 1,
+  "maxBatchDelay": 100,
+  "status": {Healthy|Partial Healthy|Unhealthy},
+  "loadedAtStartup": {true|false},
+  "workers": [
+    {
+      "id": 1,
+      "startTime": {ISO timestamp},
+      "status": {READY|UNLOADING},
+      "gpu": {true|false}
+    },
+    
+	...
+	
+    {
+      "id": {n},
+      "startTime": {ISO timestamp},
+      "status": {READY|UNLOADING},
+      "gpu": {true|false}
+    }
+  ]
+}
+```
+
+#### models - unregister a model
+url:	/models/{modelName}
+
+method: DELETE
+
+example:
+curl -X DELETE http://localhost:8080/models/mlp
+
+returns
+json 
+
+```sh
+{
+  "status": "Model \"{modelName}\" unregistered"
+}
+```
+
+
+#### models - scale model worker instances
+url:	/models/{modelName}?{min_worker}={integer}&{max_worker}={integer}
+
+min_worker is optional
+max_worker is optional
+
+method: PUT
+
+example:
+curl -X PUT "http://localhost:8080/models/mlp?min_worker=4&max_worker=12"
+
+returns
+json 
+
+```sh
+{
+  "status": "Model \"{modelName}\" worker scaled."
+}
+```
+
+
+
+
+#### prediction - run a prediction using a loaded model
+```sh
+curl -X POST {host}/predictions/mlp -F "data=@../examples/src/test/resources/0.png"
+```

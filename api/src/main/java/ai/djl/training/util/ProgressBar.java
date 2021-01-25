@@ -147,6 +147,6 @@ public final class ProgressBar implements Progress {
                 return '=';
             }
         }
-        return '█';
+        return '>';
     }
 }

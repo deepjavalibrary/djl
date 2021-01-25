@@ -12,13 +12,16 @@
  */
 package ai.djl.serving.wlm;
 
+import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.serving.util.ConfigManager;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class WorkLoadManager {
@@ -27,12 +30,20 @@ class WorkLoadManager {
     private AtomicInteger gpuCounter;
     private ExecutorService threadPool;
     private ConcurrentHashMap<String, List<WorkerThread>> workers;
-
+    private ConcurrentHashMap<String, LinkedBlockingDeque<Job>> jobQueues;
+    private LinkedBlockingDeque<Job> jobQueue;
+    
+    private class WorkerPool {
+	List<WorkerThread> workers;
+	LinkedBlockingDeque<Job> jobQueues;
+    }
+    
     public WorkLoadManager(ConfigManager configManager) {
         this.configManager = configManager;
         this.gpuCounter = new AtomicInteger(0);
         threadPool = Executors.newCachedThreadPool();
         workers = new ConcurrentHashMap<>();
+   //     this.jobQueue = new LinkedBlockingDeque<>(model.getQueueSize());
     }
 
     public List<WorkerThread> getWorkers(String modelName) {
@@ -42,18 +53,37 @@ class WorkLoadManager {
         }
         return list;
     }
+    
+    /**
+     * Adds an inference job to the job queue of the next free worker.
+     * scales up worker if necessary
+     * 
+     * @param modelName the model to use
+     * @param job an inference job to be executed
+     * @return {@code true} if submit success, false otherwise
+     * @throws ModelNotFoundException if the model is not registered
+     */
+    public boolean addJob(String modelName, Job job) {
+	boolean accepted=false;
+	List<WorkerThread> workers=getWorkers(modelName);
+	Iterator<WorkerThread> iterator=workers.iterator();
+	while (!accepted && iterator.hasNext()) {
+	    accepted=iterator.next().addJob(job);
+	}
+	if (!accepted) {
+	    WorkerThread newWorker=scaleUpWorkers(modelName);
+	}
+	return accepted;
+    }
 
-    public boolean hasWorker(String modelName) {
-        List<WorkerThread> worker = workers.get(modelName);
-        if (worker == null || worker.isEmpty()) {
-            return false;
-        }
-        for (WorkerThread thread : worker) {
-            if (thread.isRunning()) {
-                return true;
-            }
-        }
-        return false;
+    /**
+     * @param modelName
+     * @return
+     */
+    private WorkerThread scaleUpWorkers(String modelName) {
+	
+	// TODO Auto-generated method stub
+	return null;
     }
 
     public int getNumRunningWorkers(String modelName) {
@@ -117,3 +147,5 @@ class WorkLoadManager {
         }
     }
 }
+
+

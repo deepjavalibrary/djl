@@ -296,16 +296,12 @@ public final class NettyUtils {
      * @param def the default value
      * @return the parameter's integer value
      */
-    public static int getIntParameter(QueryStringDecoder decoder, String key, int def) {
+    public static int getIntParameter(QueryStringDecoder decoder, String key, int def) throws NumberFormatException {
         String value = getParameter(decoder, key, null);
-        if (value == null) {
+        if (value == null || value.isBlank()) {
             return def;
         }
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            return def;
-        }
+        return Integer.parseInt(value);
     }
 
     /**
