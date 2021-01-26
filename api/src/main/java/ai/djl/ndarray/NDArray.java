@@ -2444,7 +2444,7 @@ public interface NDArray extends AutoCloseable {
     NDArray sum();
 
     /**
-     * Returns the minimum of this {@code NDArray} along given axes.
+     * Returns the sum of this {@code NDArray} along given axes.
      *
      * <p>Examples
      *
@@ -2473,7 +2473,7 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
-     * Returns the minimum of this {@code NDArray} along given axes.
+     * Returns the sum of this {@code NDArray} along given axes.
      *
      * <p>Examples
      *
