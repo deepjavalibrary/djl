@@ -46,6 +46,8 @@ class FixedTracker implements Tracker {
 
         private float value;
 
+        private Builder() {}
+
         public Builder setValue(float value) {
             this.value = value;
             return this;

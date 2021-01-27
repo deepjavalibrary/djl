@@ -33,7 +33,7 @@ public interface Tracker {
      * @return the {@link FactorTracker} {@link ai.djl.training.tracker.FactorTracker.Builder}
      */
     static FactorTracker.Builder factor() {
-        return new FactorTracker.Builder();
+        return FactorTracker.builder();
     }
 
     /**
@@ -54,7 +54,7 @@ public interface Tracker {
      *     ai.djl.training.tracker.MultiFactorTracker.Builder}
      */
     static MultiFactorTracker.Builder multiFactor() {
-        return new MultiFactorTracker.Builder();
+        return MultiFactorTracker.builder();
     }
 
     /**
@@ -64,7 +64,7 @@ public interface Tracker {
      * @return the {@link CosineTracker} {@link ai.djl.training.tracker.CosineTracker.Builder}
      */
     static CosineTracker.Builder cosine() {
-        return new CosineTracker.Builder();
+        return CosineTracker.builder();
     }
 
     /**

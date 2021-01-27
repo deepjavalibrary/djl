@@ -58,12 +58,14 @@ public class PolynomialDecayTracker implements Tracker {
     }
 
     /** Builder for PolynomialDecayTracker. */
-    public static class Builder {
+    public static final class Builder {
 
         private float baseValue;
         private float endLearningRate = Float.NaN;
         private int decaySteps = -1;
         private float power = 1f;
+
+        private Builder() {}
 
         /**
          * Sets the initial value after no steps.
