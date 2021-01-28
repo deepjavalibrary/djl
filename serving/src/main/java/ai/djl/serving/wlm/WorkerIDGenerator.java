@@ -15,15 +15,20 @@ package ai.djl.serving.wlm;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @author erik.bamberg@web.de
+ * class to generate an unique worker id.
  *
+ * @author erik.bamberg@web.de
  */
 public class WorkerIDGenerator {
 
     private static final AtomicInteger WORKER_COUNTER = new AtomicInteger(1);
 
+    /**
+     * generate a new worker id.
+     *
+     * @return returns a new id.
+     */
     public int generate() {
-	return WORKER_COUNTER.getAndIncrement();
+        return WORKER_COUNTER.getAndIncrement();
     }
-    
 }

@@ -16,17 +16,9 @@ import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.repository.zoo.ZooModel;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** A class represent a loaded model and it's metadata. */
 public class ModelInfo implements AutoCloseable {
-
-    private static final Logger logger = LoggerFactory.getLogger(ModelInfo.class);
 
     private String modelName;
     private String modelUrl;
@@ -36,9 +28,7 @@ public class ModelInfo implements AutoCloseable {
     private int queueSize;
     private int batchSize;
     private int maxBatchDelay;
-//    private ReentrantLock lock;
-
- //   private LinkedBlockingDeque<Job> jobs;
+    private long maxIdleTime;
 
     private ZooModel<Input, Output> model;
 
@@ -57,9 +47,9 @@ public class ModelInfo implements AutoCloseable {
         this.model = model;
         batchSize = 1;
         maxBatchDelay = 100;
+        // TODO make this configurable
+        this.maxIdleTime = 60; // default max idle time 60s
         this.queueSize = queueSize;
-//        jobs = new LinkedBlockingDeque<>(queueSize);
- //       lock = new ReentrantLock();
     }
 
     /**
@@ -96,6 +86,24 @@ public class ModelInfo implements AutoCloseable {
      */
     public Path getModelDir() {
         return model.getModelPath();
+    }
+
+    /**
+     * returns the configured maxIdleTime of workers.
+     *
+     * @return the maxIdleTime
+     */
+    public long getMaxIdleTime() {
+        return maxIdleTime;
+    }
+
+    /**
+     * set the configured maxIdleTime of workers.
+     *
+     * @param maxIdleTime the maxIdleTime to set
+     */
+    public void setMaxIdleTime(long maxIdleTime) {
+        this.maxIdleTime = maxIdleTime;
     }
 
     /**
@@ -170,52 +178,14 @@ public class ModelInfo implements AutoCloseable {
         this.maxBatchDelay = maxBatchDelay;
     }
 
-    // returns the size of the Queue
+    /**
+     * returns the configured size of the workers queue.
+     *
+     * @return requested size of the workers queue.
+     */
     public int getQueueSize() {
-	return queueSize;
+        return queueSize;
     }
-    /**
-     * Adds a job to the queue.
-     *
-     * @param job an inference job
-     * @return {@code true} if the queue is full
-     */
-    //TODO the MOdelInfo must not be responsible for thread handling and job execution, responsibility for this should be in the WorkLoadManager
- //   public boolean addJob(Job job) {
- //       return jobs.offer(job);
-  //  }
-
-    /**
-     * Fills in the list with a batch of jobs.
-     *
-     * @param list the batch queue to be filled
-     * @throws InterruptedException if interrupted
-     */
-    //TODO the MOdelInfo must not be responsible for thread handling and job execution, responsibility for this should be in the WorkLoadManager
-//    public void pollBatch(List<Job> list) throws InterruptedException {
-//        try {
-//            lock.lockInterruptibly();
-//            Job job = jobs.take();
-//            logger.trace("get first job: {}", job.getRequestId());
-//
-//            list.add(job);
-//            long begin = System.currentTimeMillis();
-//            long maxDelay = maxBatchDelay;
-//            for (int i = 0; i < batchSize - 1 && maxDelay > 0; ++i) {
-//                job = jobs.poll(maxDelay, TimeUnit.MILLISECONDS);
-//                if (job == null) {
-//                    break;
-//                }
-//                long end = System.currentTimeMillis();
-//                maxDelay -= end - begin;
-//                begin = end;
-//                list.add(job);
-//            }
-//            logger.trace("sending jobs, size: {}", list.size());
-//        } finally {
-//            lock.unlock();
-//        }
-//    }
 
     /** {@inheritDoc} */
     @Override
@@ -224,5 +194,4 @@ public class ModelInfo implements AutoCloseable {
             model.close();
         }
     }
-
 }

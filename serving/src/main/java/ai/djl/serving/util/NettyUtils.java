@@ -295,10 +295,11 @@ public final class NettyUtils {
      * @param key the parameter key
      * @param def the default value
      * @return the parameter's integer value
+     * @throws NumberFormatException exception is thrown when the parameter-value is not numeric.
      */
-    public static int getIntParameter(QueryStringDecoder decoder, String key, int def) throws NumberFormatException {
+    public static int getIntParameter(QueryStringDecoder decoder, String key, int def) {
         String value = getParameter(decoder, key, null);
-        if (value == null || value.isBlank()) {
+        if (value == null || value.isEmpty()) {
             return def;
         }
         return Integer.parseInt(value);

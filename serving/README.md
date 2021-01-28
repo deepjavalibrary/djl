@@ -213,7 +213,10 @@ max_worker is optional
 method: PUT
 
 example:
+
+```sh
 curl -X PUT "http://localhost:8080/models/mlp?min_worker=4&max_worker=12"
+```
 
 returns
 json 
@@ -231,3 +234,13 @@ json
 ```sh
 curl -X POST {host}/predictions/mlp -F "data=@../examples/src/test/resources/0.png"
 ```
+
+## Logging
+you can set the logging level on the command-line adding a parameter for the JVM
+
+```sh
+-Dai.djl.logging.level={FATAL|ERROR|WARN|INFO|DEBUG|TRACE}
+```
+
+
+

@@ -298,6 +298,7 @@ public class ModelServer {
         for (String url : urls) {
             logger.info("Initializing model: {}", url);
             int workers = configManager.getDefaultWorkers();
+
             CompletableFuture<ModelInfo> future = modelManager.registerModel(null, url, 1, 100);
             ModelInfo info = future.join();
             String modelName = info.getModelName();

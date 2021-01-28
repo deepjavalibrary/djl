@@ -110,6 +110,7 @@ public final class ModelManager {
                                         configManager.getJobQueueSize());
                         modelInfo.setBatchSize(batchSize);
                         modelInfo.setMaxBatchDelay(maxBatchDelay);
+
                         ModelInfo existingModel = models.putIfAbsent(actualModelName, modelInfo);
                         if (existingModel != null) {
                             // model already exists
@@ -185,9 +186,8 @@ public final class ModelManager {
     }
 
     /**
-     * Adds an inference job to the job queue.
-     * assign to job to the next free worker.
-     * 
+     * Adds an inference job to the job queue. assign to job to the next free worker.
+     *
      * @param job an inference job to be executed
      * @return {@code true} if submit success
      * @throws ModelNotFoundException if the model is not registered
@@ -198,7 +198,7 @@ public final class ModelManager {
         if (model == null) {
             throw new ModelNotFoundException("Model not found: " + modelName);
         }
-        return wlm.addJob(modelName,job);
+        return wlm.addJob(model, job);
     }
 
     /**

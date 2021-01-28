@@ -17,20 +17,41 @@ import ai.djl.modality.Output;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
 
-class BatchAggregator {
+/**
+ * abstract class for all BatchAggregators. A batch aggregator check working queue and combines
+ * multiple job into one batch. batches of jobs are used cause optimisations in separate engines.
+ *
+ * @author erik.bamberg@web.de
+ */
+abstract class BatchAggregator {
 
-    private ModelInfo model;
-    private List<Job> jobs;
+    protected ModelInfo model;
+    protected List<Job> jobs;
+    protected LinkedBlockingDeque<Job> jobQueue;
 
-    public BatchAggregator(ModelInfo model) {
+    /**
+     * constructs a batch aggregator.
+     *
+     * @param model the model to use.
+     * @param jobQueue the job queue for polling data from.
+     */
+    public BatchAggregator(ModelInfo model, LinkedBlockingDeque<Job> jobQueue) {
         this.model = model;
+        this.jobQueue = jobQueue;
         jobs = new ArrayList<>();
     }
 
-    public List<Input> getRequest(List<Job> jobs) throws InterruptedException {
-      //  model.pollBatch(jobs);
-	this.jobs=jobs;
+    /**
+     * poll the queue and return a list of Input Objects for the model.
+     *
+     * @return list of input objects to pass to the model.
+     * @throws InterruptedException if thread gets interrupted while waiting for new data in the
+     *     queue.
+     */
+    public List<Input> getRequest() throws InterruptedException {
+        jobs = pollBatch();
         List<Input> list = new ArrayList<>(jobs.size());
         for (Job job : jobs) {
             job.setScheduled();
@@ -39,6 +60,11 @@ class BatchAggregator {
         return list;
     }
 
+    /**
+     * sends to response to all waiting clients.
+     *
+     * @param outputs list of model-outputs in same order as the input objects.
+     */
     public void sendResponse(List<Output> outputs) {
         if (jobs.size() != outputs.size()) {
             throw new IllegalStateException("Not all jobs get response.");
@@ -56,10 +82,28 @@ class BatchAggregator {
         jobs.clear();
     }
 
+    /** sends an internal server error. */
     public void sendError() {
         for (Job job : jobs) {
             job.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal server error");
         }
         jobs.clear();
     }
+
+    /**
+     * Fills in the list with a batch of jobs.
+     *
+     * @return a list of jobs read by this batch interation.
+     * @throws InterruptedException if interrupted
+     */
+    protected abstract List<Job> pollBatch() throws InterruptedException;
+
+    /**
+     * checks if this batchaggregator and the thread can be shutdown or if this aggregator waits for
+     * more data.
+     *
+     * @return true/false. true if we can shutdown the thread. for example when max idle time
+     *     exceeded in temporary batch aggregator.
+     */
+    public abstract boolean isFinished();
 }

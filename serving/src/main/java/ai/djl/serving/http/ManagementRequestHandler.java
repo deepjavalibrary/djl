@@ -166,7 +166,7 @@ public class ManagementRequestHandler extends HttpRequestHandler {
     private void handleScaleModel(
             ChannelHandlerContext ctx, QueryStringDecoder decoder, String modelName)
             throws ModelNotFoundException {
-	try {
+        try {
             int minWorkers = NettyUtils.getIntParameter(decoder, "min_worker", 1);
             int maxWorkers = NettyUtils.getIntParameter(decoder, "max_worker", minWorkers);
             if (maxWorkers < minWorkers) {
@@ -178,10 +178,16 @@ public class ManagementRequestHandler extends HttpRequestHandler {
                 throw new ModelNotFoundException("Model not found: " + modelName);
             }
             modelManager.updateModel(modelName, minWorkers, maxWorkers);
-            String msg = "Model \"" + modelName + "\" worker scaled. New Worker configuration min workers:"+minWorkers+" max workers:"+maxWorkers;
+            String msg =
+                    "Model \""
+                            + modelName
+                            + "\" worker scaled. New Worker configuration min workers:"
+                            + minWorkers
+                            + " max workers:"
+                            + maxWorkers;
             NettyUtils.sendJsonResponse(ctx, new StatusResponse(msg));
-	} catch (NumberFormatException ex) {
-	    throw new BadRequestException("parameter is invalid number."+ex.getMessage(),ex);
-	}
+        } catch (NumberFormatException ex) {
+            throw new BadRequestException("parameter is invalid number." + ex.getMessage(), ex);
+        }
     }
 }

@@ -34,6 +34,6 @@ public class BadRequestException extends IllegalArgumentException {
      * @param ex root cause
      */
     public BadRequestException(String message, NumberFormatException ex) {
-	super (message,ex);
+        super(message, ex);
     }
 }
