@@ -137,6 +137,16 @@ public final class IValueUtils {
     }
 
     /**
+     * Extract IValue with a {@link PtNDArray} value.
+     *
+     * @param arrayHandle array handle
+     * @param iValueHandle IValue {@link Pointer}
+     */
+    public static void toNDArrayCopy(Pointer arrayHandle, Pointer iValueHandle) {
+        PyTorchLibrary.LIB.iValueToTensorCopy(arrayHandle, iValueHandle);
+    }
+
+    /**
      * Extract IValue to {@link NDList}.
      *
      * @param iValueHandle IValue pointer
@@ -190,15 +200,20 @@ public final class IValueUtils {
         return map;
     }
 
-    private static NDList forwardHelper(long iValueHandle, PtNDManager manager) {
+    private static NDList forwardHelper(long iValueHandle, NDList output, PtNDManager manager) {
         NDList list = new NDList();
         if (isNDArray(iValueHandle)) {
+            if (output != null) {
+                toNDArrayCopy(((PtNDArray)output.get(0)).getHandle(), iValueHandle);
+                PyTorchLibrary.LIB.torchDeleteIValue(iValueHandle);
+                return output;
+            }
             list.add(toNDArray(iValueHandle, manager));
         } else if (isNDList(iValueHandle)) {
             list.addAll(toNDList(iValueHandle, manager));
         } else if (isList(iValueHandle) || isTuple(iValueHandle)) {
             for (long handle : toIValueArray(iValueHandle)) {
-                list.addAll(forwardHelper(handle, manager));
+                list.addAll(forwardHelper(handle, output, manager));
             }
         } else if (isMap(iValueHandle)) {
             // Only allows <String, NDArray> type of map
@@ -231,14 +246,14 @@ public final class IValueUtils {
      * @param isTrain is running on training mode
      * @return result {@link NDList}
      */
-    public static NDList forward(PtSymbolBlock block, NDList inputs, boolean isTrain) {
+    public static NDList forward(PtSymbolBlock block, NDList inputs, NDList output, boolean isTrain) {
         long[] arrayHandles =
                 inputs.stream().mapToLong(input -> ((PtNDArray) input).getHandle()).toArray();
         String[] names = inputs.stream().map(NDArray::getName).toArray(String[]::new);
         long[] iValueInputs = getInputs(arrayHandles, names);
         long result = PyTorchLibrary.LIB.moduleForward(block.getHandle(), iValueInputs, isTrain);
         PtNDManager manager = (PtNDManager) inputs.get(0).getManager();
-        return forwardHelper(result, manager);
+        return forwardHelper(result, output, manager);
     }
 
     private static boolean isNameList(String name) {

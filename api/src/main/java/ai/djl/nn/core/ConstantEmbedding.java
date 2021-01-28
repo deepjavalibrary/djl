@@ -45,6 +45,7 @@ public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedE
     public NDList forward(
             ParameterStore parameterStore,
             NDList inputs,
+            NDList output,
             boolean training,
             PairList<String, Object> params) {
         NDManager manager = inputs.get(0).getManager();

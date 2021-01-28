@@ -126,6 +126,7 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
     public NDList forward(
             ParameterStore parameterStore,
             NDList inputs,
+            NDList output,
             boolean training,
             PairList<String, Object> params) {
         NDList opInputs = opInputs(parameterStore, inputs, training);

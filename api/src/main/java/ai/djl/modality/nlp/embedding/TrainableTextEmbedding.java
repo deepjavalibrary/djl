@@ -73,6 +73,7 @@ public class TrainableTextEmbedding extends AbstractBlock implements TextEmbeddi
     public NDList forward(
             ParameterStore parameterStore,
             NDList inputs,
+            NDList output,
             boolean training,
             PairList<String, Object> params) {
         return trainableWordEmbedding.forward(parameterStore, inputs, training, params);

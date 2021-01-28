@@ -125,12 +125,24 @@ public class Predictor<I, O> implements AutoCloseable {
      */
     @SuppressWarnings("PMD.AvoidRethrowingException")
     public O predict(I input) throws TranslateException {
-        return batchPredict(Collections.singletonList(input)).get(0);
+        return batchPredict(Collections.singletonList(input), null).get(0);
     }
 
-    private NDList predict(NDList ndList) {
+    /**
+     * Predicts an item for inference.
+     *
+     * @param input the input
+     * @return the output object defined by the user
+     * @throws TranslateException if an error occurs during prediction
+     */
+    @SuppressWarnings("PMD.AvoidRethrowingException")
+    public O predict(I input, NDList output) throws TranslateException {
+        return batchPredict(Collections.singletonList(input), output).get(0);
+    }
+
+    private NDList predict(NDList ndList, NDList output) {
         logger.trace("Predictor input data: {}", ndList);
-        return block.forward(parameterStore, ndList, false);
+        return block.forward(parameterStore, ndList, output, false);
     }
 
     /**
@@ -142,6 +154,18 @@ public class Predictor<I, O> implements AutoCloseable {
      */
     @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.IdenticalCatchBranches"})
     public List<O> batchPredict(List<I> inputs) throws TranslateException {
+        return batchPredict(inputs, null);
+    }
+
+    /**
+     * Predicts a batch for inference.
+     *
+     * @param inputs a list of inputs
+     * @return a list of output objects defined by the user
+     * @throws TranslateException if an error occurs during prediction
+     */
+    @SuppressWarnings("PMD.AvoidRethrowingException")
+    public List<O> batchPredict(List<I> inputs, NDList output) throws TranslateException {
         long begin = System.nanoTime();
         try (PredictorContext context = new PredictorContext()) {
             if (!prepared) {
@@ -157,7 +181,7 @@ public class Predictor<I, O> implements AutoCloseable {
                     NDList ndList = translator.processInput(context, input);
                     preprocessEnd(ndList);
 
-                    NDList result = predict(ndList);
+                    NDList result = predict(ndList, output);
                     predictEnd(result);
 
                     ret.add(translator.processOutput(context, result));
@@ -170,7 +194,7 @@ public class Predictor<I, O> implements AutoCloseable {
             NDList inputBatch = processInputs(context, inputs);
             preprocessEnd(inputBatch);
 
-            NDList result = predict(inputBatch);
+            NDList result = predict(inputBatch, output);
             predictEnd(result);
 
             List<O> ret = processOutputs(context, result);

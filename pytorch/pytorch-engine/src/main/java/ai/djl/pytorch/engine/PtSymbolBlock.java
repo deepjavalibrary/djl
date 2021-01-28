@@ -87,6 +87,7 @@ public class PtSymbolBlock extends NativeResource<Long> implements SymbolBlock {
     public NDList forward(
             ParameterStore parameterStore,
             NDList inputs,
+            NDList output,
             boolean training,
             PairList<String, Object> params) {
         // TODO refactor the forward to not take ParameterStore
@@ -106,7 +107,7 @@ public class PtSymbolBlock extends NativeResource<Long> implements SymbolBlock {
                     for (NDArray array : inputs) {
                         inputDescriptions.add(array.getName(), array.getShape());
                     }
-                    NDList outputs = IValueUtils.forward(this, inputs, training);
+                    NDList outputs = IValueUtils.forward(this, inputs, output, training);
                     for (NDArray array : outputs) {
                         outputDescriptions.add(array.getName(), array.getShape());
                     }
@@ -115,7 +116,7 @@ public class PtSymbolBlock extends NativeResource<Long> implements SymbolBlock {
                 }
             }
         }
-        return IValueUtils.forward(this, inputs, training);
+        return IValueUtils.forward(this, inputs, output, training);
     }
 
     /** {@inheritDoc} */

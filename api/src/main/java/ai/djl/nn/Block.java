@@ -114,7 +114,33 @@ public interface Block {
      * @return the output of the forward pass
      */
     default NDList forward(ParameterStore parameterStore, NDList inputs, boolean training) {
-        return forward(parameterStore, inputs, training, null);
+        return forward(parameterStore, inputs, null, training, null);
+    }
+
+    /**
+     * Applies the operating function of the block once. This method should be called only on blocks
+     * that are initialized.
+     *
+     * @param parameterStore the parameter store
+     * @param inputs the input NDList
+     * @param training true for a training forward pass
+     * @return the output of the forward pass
+     */
+    default NDList forward(ParameterStore parameterStore, NDList inputs, NDList output, boolean training) {
+        return forward(parameterStore, inputs, output, training, null);
+    }
+
+    /**
+     * Applies the operating function of the block once. This method should be called only on blocks
+     * that are initialized.
+     *
+     * @param parameterStore the parameter store
+     * @param inputs the input NDList
+     * @param training true for a training forward pass
+     * @return the output of the forward pass
+     */
+    default NDList forward(ParameterStore parameterStore, NDList inputs, boolean training, PairList<String, Object> params) {
+        return forward(parameterStore, inputs, null, training, params);
     }
 
     /**
@@ -130,6 +156,7 @@ public interface Block {
     NDList forward(
             ParameterStore parameterStore,
             NDList inputs,
+            NDList output,
             boolean training,
             PairList<String, Object> params);
 

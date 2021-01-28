@@ -124,6 +124,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
     public NDList forward(
             ParameterStore parameterStore,
             NDList inputs,
+            NDList o,
             boolean training,
             PairList<String, Object> params) {
         inputs = opInputs(parameterStore, inputs, training);

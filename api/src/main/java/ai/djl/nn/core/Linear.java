@@ -75,6 +75,7 @@ public class Linear extends AbstractBlock {
     public NDList forward(
             ParameterStore parameterStore,
             NDList inputs,
+            NDList output,
             boolean training,
             PairList<String, Object> params) {
         NDArray input = inputs.singletonOrThrow();

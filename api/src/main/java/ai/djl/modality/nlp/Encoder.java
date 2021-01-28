@@ -57,6 +57,7 @@ public abstract class Encoder extends AbstractBlock {
     public NDList forward(
             ParameterStore parameterStore,
             NDList inputs,
+            NDList output,
             boolean training,
             PairList<String, Object> params) {
         return block.forward(parameterStore, inputs, training, params);

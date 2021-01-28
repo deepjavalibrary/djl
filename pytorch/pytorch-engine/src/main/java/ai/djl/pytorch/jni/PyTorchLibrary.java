@@ -434,6 +434,8 @@ final class PyTorchLibrary {
 
     native long iValueToTensor(long iValueHandle);
 
+    native void iValueToTensorCopy(long iValueHandle, long tensorHandle);
+
     native long[] iValueToTensorList(long iValueHandle);
 
     native long[] iValueToList(long iValueHandle);

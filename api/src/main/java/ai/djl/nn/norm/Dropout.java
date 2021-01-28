@@ -66,6 +66,7 @@ public class Dropout extends AbstractBlock {
     public NDList forward(
             ParameterStore parameterStore,
             NDList inputs,
+            NDList output,
             boolean training,
             PairList<String, Object> params) {
         return dropout(inputs.singletonOrThrow(), rate, training);

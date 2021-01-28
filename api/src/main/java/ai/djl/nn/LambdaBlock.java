@@ -63,6 +63,7 @@ public class LambdaBlock extends AbstractBlock {
     public NDList forward(
             ParameterStore parameterStore,
             NDList inputs,
+            NDList output,
             boolean training,
             PairList<String, Object> params) {
         return lambda.apply(inputs);

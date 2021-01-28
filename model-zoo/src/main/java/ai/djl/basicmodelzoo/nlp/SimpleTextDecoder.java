@@ -86,6 +86,7 @@ public class SimpleTextDecoder extends Decoder {
     public NDList forward(
             ParameterStore parameterStore,
             NDList inputs,
+            NDList o,
             boolean training,
             PairList<String, Object> params) {
         if (training) {
