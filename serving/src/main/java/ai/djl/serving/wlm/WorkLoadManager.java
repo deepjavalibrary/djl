@@ -140,6 +140,7 @@ class WorkLoadManager {
         if (pool != null) {
             List<WorkerThread> threads = pool.getWorkers();
             if (threads != null) {
+                threads.removeIf(t -> t.getState() == WorkerState.WORKER_STOPPED);
                 for (WorkerThread thread : threads) {
                     if ((thread.getState() != WorkerState.WORKER_STOPPED)
                             && (thread.getState() != WorkerState.WORKER_ERROR)
