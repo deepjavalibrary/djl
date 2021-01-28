@@ -155,7 +155,10 @@ public class InferenceRequestHandler extends HttpRequestHandler {
                     .thenAccept(
                             p -> {
                                 try {
-                                    modelManager.addJob(new Job(ctx, modelName, input));
+                                    if (!modelManager.addJob(new Job(ctx, modelName, input)) ) {
+                                        throw new ServiceUnavailableException(
+                                                "No worker is available to serve request: " + modelName);                                	
+                                    }
                                 } catch (ModelNotFoundException e) {
                                     logger.warn("Unexpected error", e);
                                     NettyUtils.sendError(ctx, e);
