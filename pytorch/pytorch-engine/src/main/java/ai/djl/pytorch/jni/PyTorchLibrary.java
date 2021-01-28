@@ -119,6 +119,8 @@ final class PyTorchLibrary {
 
     native void torchRemainderi(long self, long other);
 
+    native long torchRot90(long self, long k, long[] axes);
+
     native long torchPow(long self, long exponent);
 
     native void torchPowi(long self, long exponent);

@@ -666,6 +666,13 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchMean(ndArray.getHandle(), dim, keepDim));
     }
 
+    public static PtNDArray rot90(PtNDArray ndArray, int times, int[] axes) {
+        long[] longaxes = Arrays.stream(axes).mapToLong(i -> i).toArray();
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchRot90(ndArray.getHandle(), times, longaxes));
+    }
+
     public static PtNDArray sum(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchSum(ndArray.getHandle()));
