@@ -37,16 +37,19 @@ class WorkerThread implements Runnable {
     private WorkerState state;
     private int workerId;
     private long startTime;
+    private boolean fixPoolThread;
 
     private WorkerIDGenerator workerIDGenerator = new WorkerIDGenerator();
 
-    public WorkerThread(int gpuId, ModelInfo model, BatchAggregator aggregator) {
+    public WorkerThread(
+            int gpuId, ModelInfo model, BatchAggregator aggregator, boolean fixPoolThread) {
         this.model = model;
         this.aggregator = aggregator;
         this.gpuId = gpuId;
         this.workerId = workerIDGenerator.generate();
         this.startTime = System.currentTimeMillis();
         predictor = model.getModel().newPredictor();
+        this.fixPoolThread = fixPoolThread;
     }
 
     /** {@inheritDoc} */
@@ -131,5 +134,16 @@ class WorkerThread implements Runnable {
             // Don't update the state if it was terminated on purpose.. Scaling in..
             this.state = newState;
         }
+    }
+
+    /**
+     * check if this worker is instantiate is one of the fix threads of a pool. fix threads are not
+     * automatically scales down, so they are candidate for down scaling when minWorker/maxWorker
+     * size of a model changes.
+     *
+     * @return the fixPoolThread
+     */
+    public boolean isFixPoolThread() {
+        return fixPoolThread;
     }
 }

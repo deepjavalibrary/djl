@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,15 +139,13 @@ class WorkLoadManager {
         int numWorking = 0;
         WorkerPool pool = workerPools.get(modelName);
         if (pool != null) {
+            pool.cleanup();
             List<WorkerThread> threads = pool.getWorkers();
-            if (threads != null) {
-                threads.removeIf(t -> t.getState() == WorkerState.WORKER_STOPPED);
-                for (WorkerThread thread : threads) {
-                    if ((thread.getState() != WorkerState.WORKER_STOPPED)
-                            && (thread.getState() != WorkerState.WORKER_ERROR)
-                            && (thread.getState() != WorkerState.WORKER_SCALED_DOWN)) {
-                        ++numWorking;
-                    }
+            for (WorkerThread thread : threads) {
+                if ((thread.getState() != WorkerState.WORKER_STOPPED)
+                        && (thread.getState() != WorkerState.WORKER_ERROR)
+                        && (thread.getState() != WorkerState.WORKER_SCALED_DOWN)) {
+                    ++numWorking;
                 }
             }
         }
@@ -161,26 +160,38 @@ class WorkLoadManager {
     public void modelChanged(ModelInfo modelInfo) {
         synchronized (modelInfo.getModelName()) {
             int minWorker = modelInfo.getMinWorkers();
-            int maxWorker = modelInfo.getMaxWorkers();
-            List<WorkerThread> threads;
-            if (minWorker == 0) {
-                WorkerPool removedPool = workerPools.remove(modelInfo.getModelName());
-                if (removedPool == null || removedPool.getWorkers() == null) {
-                    return;
-                }
-                threads = removedPool.getWorkers();
-            } else {
-                threads = getWorkerPoolForModel(modelInfo).getWorkers();
-            }
 
-            int currentWorkers = threads.size();
-            if (currentWorkers < minWorker) {
-                addThreads(threads, modelInfo, minWorker - currentWorkers, true);
-            } else {
-                for (int i = currentWorkers - 1; i >= maxWorker; --i) {
-                    WorkerThread thread = threads.remove(i);
-                    thread.shutdown(WorkerState.WORKER_SCALED_DOWN);
+            WorkerPool pool = getWorkerPoolForModel(modelInfo);
+            if (pool != null) {
+                pool.cleanup();
+
+                List<WorkerThread> threads;
+                if (minWorker == 0) {
+                    workerPools.remove(modelInfo.getModelName());
                 }
+
+                threads = pool.getWorkers();
+                List<WorkerThread> fixedPoolThread =
+                        threads.stream()
+                                .filter(t -> t.isFixPoolThread())
+                                .collect(Collectors.toList());
+
+                int numberOfCurrentFixedWorkers = fixedPoolThread.size();
+
+                if (numberOfCurrentFixedWorkers < minWorker) {
+                    // scale up the fixed pool
+                    addThreads(threads, modelInfo, minWorker - numberOfCurrentFixedWorkers, true);
+                } else {
+                    // scale down the fixed pool
+                    fixedPoolThread
+                            .subList(minWorker, numberOfCurrentFixedWorkers)
+                            .forEach(
+                                    t -> {
+                                        threads.remove(t);
+                                        t.shutdown(WorkerState.WORKER_SCALED_DOWN);
+                                    });
+                }
+                pool.log();
             }
         }
     }
@@ -209,7 +220,7 @@ class WorkLoadManager {
                         new TemporaryBatchAggregator(
                                 model, workerPools.get(model.getModelName()).getJobQueue());
             }
-            WorkerThread thread = new WorkerThread(gpuId, model, aggregator);
+            WorkerThread thread = new WorkerThread(gpuId, model, aggregator, permanent);
 
             threads.add(thread);
             threadPool.submit(thread);
@@ -224,6 +235,7 @@ class WorkLoadManager {
     private class WorkerPool {
         private List<WorkerThread> workers;
         private LinkedBlockingDeque<Job> jobQueue;
+        private String modelName;
 
         /**
          * construct and initial data structure.
@@ -233,6 +245,7 @@ class WorkLoadManager {
         public WorkerPool(ModelInfo model) {
             workers = Collections.synchronizedList(new ArrayList<>());
             jobQueue = new LinkedBlockingDeque<>(model.getQueueSize());
+            modelName = model.getModelName();
         }
 
         /**
@@ -251,6 +264,34 @@ class WorkLoadManager {
          */
         public LinkedBlockingDeque<Job> getJobQueue() {
             return jobQueue;
+        }
+
+        /**
+         * logs the current state of this WorkerPool when level "Debug" is enabled. logs all
+         * thread-ids in the pool.
+         */
+        public void log() {
+            if (logger.isDebugEnabled()) {
+                StringBuffer buf = new StringBuffer();
+                workers.forEach(
+                        w -> {
+                            buf.append(w.getWorkerId());
+                            if (w.isFixPoolThread()) {
+                                buf.append("-fixedPool\n");
+                            } else {
+                                buf.append("-tmpPool\n");
+                            }
+                        });
+                logger.debug("worker pool for model {}:\n {}", modelName, buf.toString());
+            }
+        }
+
+        /** removes all stopped workers and workers in state error from the pool. */
+        public void cleanup() {
+            workers.removeIf(
+                    t ->
+                            t.getState() == WorkerState.WORKER_STOPPED
+                                    || t.getState() == WorkerState.WORKER_ERROR);
         }
     }
 }
