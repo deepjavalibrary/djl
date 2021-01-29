@@ -34,7 +34,11 @@ task startDevServer(type: NodeTask, dependsOn: 'buildReactApp') {
     script = project.file('./node_modules/webpack-dev-server/bin/webpack-dev-server.js')
 }
 
-processResources.dependsOn 'buildReactApp'
+// disable central build for global build tasks
+if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
+    processResources.dependsOn 'buildReactApp'
+}
+
 clean.delete << file('node_modules')
 clean.delete << file('src/main/resources/static/dist')
 

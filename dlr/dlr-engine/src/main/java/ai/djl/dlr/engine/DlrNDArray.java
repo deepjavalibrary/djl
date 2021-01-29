@@ -702,6 +702,12 @@ public class DlrNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray rotate90(int times, int[] axes) {
+        throw new UnsupportedOperationException("Not supported for DLR");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray trace(int offset, int axis1, int axis2) {
         throw new UnsupportedOperationException("Not supported for DLR");
     }

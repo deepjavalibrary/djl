@@ -2665,6 +2665,17 @@ public interface NDArray extends AutoCloseable {
     NDArray mean(int[] axes, boolean keepDims);
 
     /**
+     * Rotates an array by 90 degrees in the plane specified by axes.
+     *
+     * <p>Rotation direction is from the first towards the second axis.
+     *
+     * @param times Number of times the array is rotated by 90 degrees.
+     * @param axes The array is rotated in the plane defined by the axes. Axes must be different.
+     * @return the rotated NDArray
+     */
+    NDArray rotate90(int times, int[] axes);
+
+    /**
      * Returns the sum along diagonals of this {@code NDArray}.
      *
      * <p>If this {@code NDArray} is 2-D, the sum along its diagonal is returned. If the {@link

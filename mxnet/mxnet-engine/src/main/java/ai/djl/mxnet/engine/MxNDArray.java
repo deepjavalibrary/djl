@@ -1032,6 +1032,18 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray rotate90(int times, int[] axes) {
+        if (axes.length != 2) {
+            throw new IllegalArgumentException("Axes must be 2");
+        }
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axes", axes);
+        params.addParam("k", times);
+        return manager.invoke("_npi_rot90", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray trace(int offset, int axis1, int axis2) {
         MxOpParams params = new MxOpParams();
         params.addParam("offset", offset);

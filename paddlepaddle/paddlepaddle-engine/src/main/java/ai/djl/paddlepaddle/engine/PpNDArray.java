@@ -725,6 +725,12 @@ public class PpNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray rotate90(int times, int[] axes) {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray trace(int offset, int axis1, int axis2) {
         throw new UnsupportedOperationException("Not supported");
     }

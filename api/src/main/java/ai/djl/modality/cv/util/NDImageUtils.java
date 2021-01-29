@@ -12,6 +12,7 @@
  */
 package ai.djl.modality.cv.util;
 
+import ai.djl.engine.Engine;
 import ai.djl.modality.cv.Image;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.Shape;
@@ -63,8 +64,25 @@ public final class NDImageUtils {
     }
 
     /**
+     * Rotate an image NDArray counter-clockwise 90 degree.
+     *
+     * @param image the image to rotate
+     * @param times the image to rotate
+     * @return the rotated Image
+     */
+    public static NDArray rotate90(NDArray image, int times) {
+        Shape shape = image.getShape();
+        int batchDim = shape.dimension() == 4 ? 1 : 0;
+        if (isCHW(shape)) {
+            return image.rotate90(times, new int[] {1 + batchDim, 2 + batchDim});
+        } else {
+            return image.rotate90(times, new int[] {batchDim, 1 + batchDim});
+        }
+    }
+
+    /**
      * Normalizes an image NDArray of shape CHW or NCHW with a single mean and standard deviation to
-     * apply to all channels.
+     * apply to all channels. TensorFlow enforce HWC instead.
      *
      * @param input the image to normalize
      * @param mean the mean to normalize with (for all channels)
@@ -77,7 +95,8 @@ public final class NDImageUtils {
     }
 
     /**
-     * Normalizes an image NDArray of shape CHW or NCHW with mean and standard deviation.
+     * Normalizes an image NDArray of shape CHW or NCHW with mean and standard deviation. TensorFlow
+     * enforce HWC instead.
      *
      * <p>Given mean {@code (m1, ..., mn)} and standard deviation {@code (s1, ..., sn} for {@code n}
      * channels, this transform normalizes each channel of the input tensor with: {@code output[i] =
@@ -89,6 +108,12 @@ public final class NDImageUtils {
      * @return the normalized NDArray
      */
     public static NDArray normalize(NDArray input, float[] mean, float[] std) {
+        boolean chw = isCHW(input.getShape());
+        boolean tf = "TensorFlow".equals(Engine.getInstance().getEngineName());
+        if ((chw && tf) || (!chw && !tf)) {
+            throw new IllegalArgumentException(
+                    "normalize requires CHW format. TensorFlow requires HWC");
+        }
         return input.getNDArrayInternal().normalize(mean, std);
     }
 
@@ -139,6 +164,9 @@ public final class NDImageUtils {
      */
     public static NDArray centerCrop(NDArray image, int width, int height) {
         Shape shape = image.getShape();
+        if (isCHW(image.getShape()) || shape.dimension() == 4) {
+            throw new IllegalArgumentException("CenterCrop only support for HWC image format");
+        }
         int w = (int) shape.get(1);
         int h = (int) shape.get(0);
 
@@ -217,7 +245,10 @@ public final class NDImageUtils {
             double minAspectRatio,
             double maxAspectRatio) {
         Shape shape = image.getShape();
-        // assume HWC
+        if (isCHW(image.getShape()) || shape.dimension() == 4) {
+            throw new IllegalArgumentException(
+                    "randomResizedCrop only support for HWC image format");
+        }
         int h = (int) shape.get(0);
         int w = (int) shape.get(1);
         int srcArea = h * w;
@@ -283,5 +314,21 @@ public final class NDImageUtils {
     public static NDArray randomColorJitter(
             NDArray image, float brightness, float contrast, float saturation, float hue) {
         return image.getNDArrayInternal().randomColorJitter(brightness, contrast, saturation, hue);
+    }
+
+    private static boolean isCHW(Shape shape) {
+        if (shape.dimension() < 3) {
+            throw new IllegalArgumentException(
+                    "Not a valid image shape, require at least three dimensions");
+        }
+        if (shape.dimension() == 4) {
+            shape = shape.slice(1);
+        }
+        if (shape.get(0) == 1 || shape.get(0) == 3) {
+            return true;
+        } else if (shape.get(2) == 1 || shape.get(2) == 3) {
+            return false;
+        }
+        throw new IllegalArgumentException("Image is not CHW or HWC");
     }
 }
