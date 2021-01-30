@@ -41,9 +41,7 @@ public class ConfigManagerTest {
     public void testSsl()
             throws IOException, GeneralSecurityException, ParseException,
                     ReflectiveOperationException {
-        String[] args = new String[0];
-        Arguments arguments = parseArguments(args);
-        ConfigManager.init(arguments);
+        ConfigManager.init(parseArguments(new String[0]));
         ConfigManager config = ConfigManager.getInstance();
         Assert.assertNotNull(config.getSslContext());
         Assert.assertNotNull(config.getModelServerHome());

@@ -22,7 +22,6 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.serving.http.BadRequestException;
 import ai.djl.serving.http.DescribeModelResponse;
 import ai.djl.serving.util.ConfigManager;
-import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -186,7 +185,7 @@ public final class ModelManager {
     }
 
     /**
-     * Adds an inference job to the job queue. assign to job to the next free worker.
+     * Adds an inference job to the job queue. Assign the job to the next free worker.
      *
      * @param job an inference job to be executed
      * @return {@code true} if submit success
@@ -241,10 +240,9 @@ public final class ModelManager {
     /**
      * Sends model server health status to client.
      *
-     * @param ctx the client connection channel context
-     * @return completableFuture with eventuelly result in the future after async execution
+     * @return completableFuture with eventually result in the future after async execution
      */
-    public CompletableFuture<String> workerStatus(final ChannelHandlerContext ctx) {
+    public CompletableFuture<String> workerStatus() {
         return CompletableFuture.supplyAsync(
                 () -> {
                     String response = "Healthy";

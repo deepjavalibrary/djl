@@ -25,7 +25,9 @@ import org.slf4j.LoggerFactory;
  * @author erik.bamberg@web.de
  */
 public class TemporaryBatchAggregator extends BatchAggregator {
+
     private static final Logger logger = LoggerFactory.getLogger(TemporaryBatchAggregator.class);
+
     private long idleSince;
     private long maxIdleTime;
 
@@ -41,12 +43,7 @@ public class TemporaryBatchAggregator extends BatchAggregator {
         this.maxIdleTime = model.getMaxIdleTime();
     }
 
-    /**
-     * Fills in the list with a batch of jobs.
-     *
-     * @return a list of jobs read by this batch interation.
-     * @throws InterruptedException if interrupted
-     */
+    /** {@inheritDoc} */
     @Override
     protected List<Job> pollBatch() throws InterruptedException {
         List<Job> list = new ArrayList<>(model.getBatchSize());
@@ -60,13 +57,7 @@ public class TemporaryBatchAggregator extends BatchAggregator {
         return list;
     }
 
-    /**
-     * checks if this batchaggregator and the thread can be shutdown or if this aggregator waits for
-     * more data.
-     *
-     * @return true/false. true if we can shutdown the thread. for example when max idle time
-     *     exceeded in temporary batch aggregator.
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean isFinished() {
         logger.trace(

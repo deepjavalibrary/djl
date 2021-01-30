@@ -32,7 +32,7 @@ abstract class BatchAggregator {
     protected LinkedBlockingDeque<Job> jobQueue;
 
     /**
-     * constructs a batch aggregator.
+     * Constructs a new {@code BbatchAggregator} instance.
      *
      * @param model the model to use.
      * @param jobQueue the job queue for polling data from.
@@ -44,7 +44,7 @@ abstract class BatchAggregator {
     }
 
     /**
-     * poll the queue and return a list of Input Objects for the model.
+     * Poll the queue and return a list of Input Objects for the model.
      *
      * @return list of input objects to pass to the model.
      * @throws InterruptedException if thread gets interrupted while waiting for new data in the
@@ -61,7 +61,7 @@ abstract class BatchAggregator {
     }
 
     /**
-     * sends to response to all waiting clients.
+     * Sends to response to all waiting clients.
      *
      * @param outputs list of model-outputs in same order as the input objects.
      */
@@ -82,7 +82,7 @@ abstract class BatchAggregator {
         jobs.clear();
     }
 
-    /** sends an internal server error. */
+    /** Sends an internal server error. */
     public void sendError() {
         for (Job job : jobs) {
             job.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal server error");
@@ -99,11 +99,11 @@ abstract class BatchAggregator {
     protected abstract List<Job> pollBatch() throws InterruptedException;
 
     /**
-     * checks if this batchaggregator and the thread can be shutdown or if this aggregator waits for
-     * more data.
+     * Checks if this {@code BatchAggregator} and the thread can be shutdown or if this aggregator
+     * waits for more data.
      *
-     * @return true/false. true if we can shutdown the thread. for example when max idle time
-     *     exceeded in temporary batch aggregator.
+     * @return true if we can shutdown the thread. for example when max idle time exceeded in
+     *     temporary batch aggregator.
      */
     public abstract boolean isFinished();
 }

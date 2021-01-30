@@ -12,23 +12,19 @@
  */
 package ai.djl.serving.wlm;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
- * class to generate an unique worker id.
+ * testing the WorkerIDGenerator.
  *
  * @author erik.bamberg@web.de
  */
-public class WorkerIDGenerator {
+public class WorkerIdGeneratorTest {
 
-    private static final AtomicInteger WORKER_COUNTER = new AtomicInteger(1);
-
-    /**
-     * generate a new worker id.
-     *
-     * @return returns a new id.
-     */
-    public int generate() {
-        return WORKER_COUNTER.getAndIncrement();
+    @Test
+    public void testGeneration() {
+        WorkerIdGenerator generator = new WorkerIdGenerator();
+        Assert.assertNotEquals(generator.generate(), generator.generate());
     }
 }

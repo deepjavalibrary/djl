@@ -25,10 +25,11 @@ import org.slf4j.LoggerFactory;
  * @author erik.bamberg@web.de
  */
 public class PermanentBatchAggregator extends BatchAggregator {
+
     private static final Logger logger = LoggerFactory.getLogger(TemporaryBatchAggregator.class);
 
     /**
-     * constructs a batch aggregator.
+     * Constructs a {@code PermanentBatchAggregator} instance.
      *
      * @param model the model to use.
      * @param jobQueue the job queue for polling data from.
@@ -37,31 +38,18 @@ public class PermanentBatchAggregator extends BatchAggregator {
         super(model, jobQueue);
     }
 
-    /**
-     * Fills in the list with a batch of jobs.
-     *
-     * @return a list of jobs read by this batch interation.
-     * @throws InterruptedException if interrupted
-     */
+    /** {@inheritDoc} */
     @Override
     protected List<Job> pollBatch() throws InterruptedException {
         List<Job> list = new ArrayList<>(model.getBatchSize());
         Job job = jobQueue.take();
-        if (job != null) {
-            list.add(job);
-            jobQueue.drainTo(list, model.getBatchSize() - 1);
-            logger.trace("sending jobs, size: {}", list.size());
-        }
+        list.add(job);
+        jobQueue.drainTo(list, model.getBatchSize() - 1);
+        logger.trace("sending jobs, size: {}", list.size());
         return list;
     }
 
-    /**
-     * checks if this batchaggregator and the thread can be shutdown or if this aggregator waits for
-     * more data.
-     *
-     * @return true/false. true if we can shutdown the thread. for example when max idle time
-     *     exceeded in temporary batch aggregator.
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean isFinished() {
         return false;

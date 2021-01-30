@@ -39,14 +39,12 @@ class WorkerThread implements Runnable {
     private long startTime;
     private boolean fixPoolThread;
 
-    private WorkerIDGenerator workerIDGenerator = new WorkerIDGenerator();
-
     public WorkerThread(
             int gpuId, ModelInfo model, BatchAggregator aggregator, boolean fixPoolThread) {
         this.model = model;
         this.aggregator = aggregator;
         this.gpuId = gpuId;
-        this.workerId = workerIDGenerator.generate();
+        this.workerId = new WorkerIdGenerator().generate();
         this.startTime = System.currentTimeMillis();
         predictor = model.getModel().newPredictor();
         this.fixPoolThread = fixPoolThread;

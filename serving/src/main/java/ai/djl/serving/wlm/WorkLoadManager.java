@@ -12,7 +12,6 @@
  */
 package ai.djl.serving.wlm;
 
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.serving.util.ConfigManager;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,7 +80,6 @@ class WorkLoadManager {
      * @param modelInfo the model to use.
      * @param job an inference job to be executed.
      * @return {@code true} if submit success, false otherwise.
-     * @throws ModelNotFoundException if the model is not registered.
      */
     public boolean addJob(ModelInfo modelInfo, Job job) {
         boolean accepted = false;
@@ -173,7 +171,7 @@ class WorkLoadManager {
                 threads = pool.getWorkers();
                 List<WorkerThread> fixedPoolThread =
                         threads.stream()
-                                .filter(t -> t.isFixPoolThread())
+                                .filter(WorkerThread::isFixPoolThread)
                                 .collect(Collectors.toList());
 
                 int numberOfCurrentFixedWorkers = fixedPoolThread.size();
@@ -228,17 +226,18 @@ class WorkLoadManager {
     }
 
     /**
-     * worker pools holds information per model.
+     * Worker pools holds information per model.
      *
      * @author erik.bamberg@web.de
      */
-    private class WorkerPool {
+    private static final class WorkerPool {
+
         private List<WorkerThread> workers;
         private LinkedBlockingDeque<Job> jobQueue;
         private String modelName;
 
         /**
-         * construct and initial data structure.
+         * Construct and initial data structure.
          *
          * @param model the model this WorkerPool belongs to.
          */
@@ -249,7 +248,7 @@ class WorkLoadManager {
         }
 
         /**
-         * returns a list of worker thread.
+         * Returns a list of worker thread.
          *
          * @return the workers
          */
@@ -258,7 +257,7 @@ class WorkLoadManager {
         }
 
         /**
-         * return the JobQueue for this model.
+         * Returns the {@code JobQueue} for this model.
          *
          * @return the jobQueue
          */
@@ -267,8 +266,9 @@ class WorkLoadManager {
         }
 
         /**
-         * logs the current state of this WorkerPool when level "Debug" is enabled. logs all
-         * thread-ids in the pool.
+         * Logs the current state of this {@code WorkerPool} when level "Debug" is enabled.
+         *
+         * <p>Logs all thread-ids in the pool.
          */
         public void log() {
             if (logger.isDebugEnabled()) {

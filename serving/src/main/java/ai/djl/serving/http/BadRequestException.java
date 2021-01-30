@@ -26,14 +26,15 @@ public class BadRequestException extends IllegalArgumentException {
     public BadRequestException(String message) {
         super(message);
     }
+
     /**
      * Constructs an {@code BadRequestException} with the specified detail message and a root cause.
      *
      * @param message The detail message (which is saved for later retrieval by the {@link
      *     #getMessage()} method)
-     * @param ex root cause
+     * @param cause root cause
      */
-    public BadRequestException(String message, NumberFormatException ex) {
-        super(message, ex);
+    public BadRequestException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
