@@ -7,7 +7,7 @@
 set FILEPATH="paddle"
 
 if "%1" == "cpu" (
-  set DOWNLOAD_URL="https://paddle-wheel.bj.bcebos.com/2.0.0-rc0/win-infer/mkl/cpu/paddle_inference_install_dir.zip"
+  set DOWNLOAD_URL="https://paddle-wheel.bj.bcebos.com/2.0.0/win-infer/open/cpu/paddle_inference_install_dir.zip"
 )
 
 if exist %FILEPATH% (

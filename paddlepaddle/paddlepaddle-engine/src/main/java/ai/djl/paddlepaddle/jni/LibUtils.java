@@ -22,7 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
@@ -106,7 +106,7 @@ public final class LibUtils {
 
     public static void loadWindowsDependencies(String libName) {
         Path libDir = Paths.get(libName).getParent();
-        List<String> names = Arrays.asList("libiomp5md.dll", "mklml.dll", "mkldnn.dll");
+        List<String> names = Collections.singletonList("openblas.dll");
         names.forEach(
                 name -> {
                     String lib = libDir.resolve(name).toAbsolutePath().toString();
