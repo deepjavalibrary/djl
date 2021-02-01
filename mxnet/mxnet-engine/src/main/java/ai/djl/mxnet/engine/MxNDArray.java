@@ -1487,7 +1487,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     @Override
     public NDArray norm(int[] axes) {
         MxOpParams params = new MxOpParams();
-        params.addTupleParam("axes", axes);
+        params.addTupleParam("axis", axes);
         return manager.invoke("_npi_norm", this, params);
     }
 
