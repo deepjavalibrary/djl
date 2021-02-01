@@ -32,7 +32,7 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.initializer.XavierInitializer;
-import ai.djl.training.listener.CheckpointsTrainingListener;
+import ai.djl.training.listener.SaveModelTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
@@ -102,7 +102,7 @@ public final class TrainMnistWithLSTM {
 
     public static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         String outputDir = arguments.getOutputDir();
-        CheckpointsTrainingListener listener = new CheckpointsTrainingListener(outputDir);
+        SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir);
         listener.setSaveModelCallback(
                 trainer -> {
                     TrainingResult result = trainer.getTrainingResult();
