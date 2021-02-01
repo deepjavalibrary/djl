@@ -1989,4 +1989,100 @@ public final class NDArrays {
     public static NDArray erfinv(NDArray input) {
         return input.erfinv();
     }
+
+    /**
+     * Returns the norm of the input {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {-3f, -4f});
+     * jshell&gt; NDArrays.norm(input);
+     * ND: () cpu() float32
+     * 5.
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.4472
+     * </pre>
+     *
+     * @param input The input {@code NDArray}
+     * @return the norm of this {@code NDArray}
+     */
+    public static NDArray norm(NDArray input) {
+        return input.norm();
+    }
+
+    /**
+     * Returns the norm of the input {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {-3f, -4f});
+     * jshell&gt; NDArrays.norm(input);
+     * ND: () cpu() float32
+     * 5.
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.4472
+     * </pre>
+     *
+     * @param input The input {@code NDArray}
+     * @param axes TODO
+     * @return the norm of this {@code NDArray}
+     */
+    public static NDArray norm(NDArray input, int[] axes) {
+        return input.norm(axes);
+    }
+
+    /**
+     * Returns the norm of the input {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {-3f, -4f});
+     * jshell&gt; NDArrays.norm(input);
+     * ND: () cpu() float32
+     * 5.
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.4472
+     * </pre>
+     *
+     * @param input The input {@code NDArray}
+     * @param keepDims TODO
+     * @return the norm of this {@code NDArray}
+     */
+    public static NDArray norm(NDArray input, boolean keepDims) {
+        return input.norm(keepDims);
+    }
+
+    /**
+     * Returns the norm of the input {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {-3f, -4f});
+     * jshell&gt; NDArrays.norm(input);
+     * ND: () cpu() float32
+     * 5.
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.4472
+     * </pre>
+     *
+     * @param input The input {@code NDArray}
+     * @param axes TODO
+     * @param keepDims TODO
+     * @return the norm of this {@code NDArray}
+     */
+    public static NDArray norm(NDArray input, int[] axes, boolean keepDims) {
+        return input.norm(axes, keepDims);
+    }
 }

@@ -1479,6 +1479,37 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray norm() {
+        return manager.invoke("_npi_norm", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray norm(int[] axes) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axes", axes);
+        return manager.invoke("_npi_norm", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray norm(boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("keepdims", keepDims);
+        return manager.invoke("_npi_norm", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray norm(int[] axes, boolean keepDims) {
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axis", axes);
+        params.addParam("keepdims", keepDims);
+        return manager.invoke("_npi_norm", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArrayEx getNDArrayInternal() {
         return mxNDArrayEx;
     }

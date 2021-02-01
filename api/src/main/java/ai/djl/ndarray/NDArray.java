@@ -4415,4 +4415,88 @@ public interface NDArray extends AutoCloseable {
     /** {@inheritDoc} */
     @Override
     void close();
+
+    /**
+     * Returns the norm of this {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {-3f, -4f});
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.4472
+     * </pre>
+     *
+     * @return the norm of this {@code NDArray}
+     */
+    NDArray norm();
+
+    /**
+     * Returns the norm of this {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {-3f, -4f});
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.4472
+     * </pre>
+     *
+     * @param axes TODO
+     * @return the norm of this {@code NDArray}
+     */
+    NDArray norm(int[] axes);
+
+    /**
+     * Returns the norm of this {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {-3f, -4f});
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.4472
+     * </pre>
+     *
+     * @param keepDims TODO
+     * @return the norm of this {@code NDArray}
+     */
+    NDArray norm(boolean keepDims);
+
+    /**
+     * Returns the norm of this {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {-3f, -4f});
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.4472
+     * </pre>
+     *
+     * @param axes TODO
+     * @param keepDims TODO
+     * @return the norm of this {@code NDArray}
+     */
+    NDArray norm(int[] axes, boolean keepDims);
 }

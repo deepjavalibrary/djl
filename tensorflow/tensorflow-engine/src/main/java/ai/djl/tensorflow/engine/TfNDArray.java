@@ -43,6 +43,7 @@ import org.tensorflow.op.core.Min;
 import org.tensorflow.op.core.Prod;
 import org.tensorflow.op.core.Squeeze;
 import org.tensorflow.op.core.Sum;
+import org.tensorflow.op.linalg.EuclideanNorm;
 import org.tensorflow.op.math.Mean;
 import org.tensorflow.op.nn.TopK;
 import org.tensorflow.types.TBool;
@@ -525,6 +526,51 @@ public class TfNDArray implements NDArray {
     @Override
     public NDArray erfinv() {
         try (Tensor<?> tensor = tf.math.erfinv(getOperand()).asTensor()) {
+            return new TfNDArray(manager, tensor);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray norm() {
+        // We have to flatten first to be able to simulate "numpy.linalg.norm" whenever axis isn't
+        // specified
+        TfNDArray flattenTensor = (TfNDArray) flatten();
+        try (Tensor<?> tensor =
+                tf.linalg.euclideanNorm(flattenTensor.getOperand(), tf.constant(0)).asTensor()) {
+            return new TfNDArray(manager, tensor);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray norm(int[] axes) {
+        try (Tensor<?> tensor =
+                tf.linalg.euclideanNorm(getOperand(), tf.constant(axes)).asTensor()) {
+            return new TfNDArray(manager, tensor);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray norm(boolean keepDims) {
+        try (Tensor<?> tensor =
+                tf.linalg
+                        .euclideanNorm(
+                                getOperand(), tf.constant(0), EuclideanNorm.keepDims(keepDims))
+                        .asTensor()) {
+            return new TfNDArray(manager, tensor);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray norm(int[] axes, boolean keepDims) {
+        try (Tensor<?> tensor =
+                tf.linalg
+                        .euclideanNorm(
+                                getOperand(), tf.constant(axes), EuclideanNorm.keepDims(keepDims))
+                        .asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
