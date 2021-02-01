@@ -55,6 +55,16 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUnsqueeze(
   API_END_RETURN()
 }
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRot90
+        (JNIEnv* env, jobject jthis, jlong jhandle, jlong jk, jlongArray jdims) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  auto vec = djl::utils::jni::GetVecFromJLongArray(env, jdims);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->rot90(jk, vec));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchExpand(
     JNIEnv* env, jobject jthis, jlong jhandle, jlongArray jshape) {
   API_BEGIN()

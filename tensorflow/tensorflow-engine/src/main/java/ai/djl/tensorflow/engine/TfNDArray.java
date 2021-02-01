@@ -187,6 +187,10 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public double[] toDoubleArray() {
+        if (getDataType() != DataType.FLOAT64) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required double" + " Actual " + getDataType());
+        }
         double[] result = new double[(int) getShape().size()];
         try (Tensor<?> tensor = operand.asTensor()) {
             tensor.rawData().asDoubles().read(result);
@@ -197,6 +201,10 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public float[] toFloatArray() {
+        if (getDataType() != DataType.FLOAT32) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required float, Actual " + getDataType());
+        }
         float[] result = new float[(int) getShape().size()];
         try (Tensor<?> tensor = operand.asTensor()) {
             tensor.rawData().asFloats().read(result);
@@ -207,6 +215,10 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public int[] toIntArray() {
+        if (getDataType() != DataType.INT32) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required int" + " Actual " + getDataType());
+        }
         int[] result = new int[(int) getShape().size()];
         try (Tensor<?> tensor = operand.asTensor()) {
             tensor.rawData().asInts().read(result);
@@ -217,6 +229,10 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public long[] toLongArray() {
+        if (getDataType() != DataType.INT64) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required long" + " Actual " + getDataType());
+        }
         long[] result = new long[(int) getShape().size()];
         try (Tensor<?> tensor = operand.asTensor()) {
             tensor.rawData().asLongs().read(result);
@@ -227,6 +243,10 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public boolean[] toBooleanArray() {
+        if (getDataType() != DataType.BOOLEAN) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required boolean" + " Actual " + getDataType());
+        }
         boolean[] result = new boolean[(int) getShape().size()];
         try (Tensor<?> tensor = operand.asTensor()) {
             tensor.rawData().asBooleans().read(result);
@@ -1114,6 +1134,12 @@ public class TfNDArray implements NDArray {
                 tf.math.mean(getOperand(), tf.constant(axes), Mean.keepDims(keepDims)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray rotate90(int times, int[] axes) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */

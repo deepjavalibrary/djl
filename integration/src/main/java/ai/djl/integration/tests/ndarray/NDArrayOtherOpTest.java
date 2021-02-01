@@ -654,6 +654,28 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
+    public void testRot90() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+            NDArray rotated = original.rotate90(1, new int[] {0, 1});
+            NDArray expected = manager.create(new float[] {2, 4, 1, 3}, new Shape(2, 2));
+            Assert.assertEquals(rotated, expected, "Incorrect rotation");
+            rotated = original.rotate90(2, new int[] {0, 1});
+            expected = manager.create(new float[] {4, 3, 2, 1}, new Shape(2, 2));
+            Assert.assertEquals(rotated, expected, "Incorrect rotation");
+            rotated = original.rotate90(2, new int[] {1, 0});
+            Assert.assertEquals(rotated, expected, "Incorrect rotation");
+
+            // fake image test CHW
+            original = manager.arange(0, 18).reshape(3, 2, 3);
+            rotated = original.rotate90(1, new int[] {1, 2});
+            NDArray expectedR =
+                    manager.create(new int[] {2, 5, 1, 4, 0, 3}).reshape(new Shape(3, 2));
+            Assert.assertEquals(rotated.get(0), expectedR, "Incorrect rotation Red channel");
+        }
+    }
+
+    @Test
     public void testBroadcast() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {1, 2});

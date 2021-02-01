@@ -929,6 +929,15 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public PtNDArray rotate90(int times, int[] axes) {
+        if (axes.length != 2) {
+            throw new IllegalArgumentException("Axes must be 2");
+        }
+        return JniUtils.rot90(this, times, axes);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray trace(int offset, int axis1, int axis2) {
         throw new UnsupportedOperationException("Not implemented");
     }

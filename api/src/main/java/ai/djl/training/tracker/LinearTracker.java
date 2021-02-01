@@ -12,6 +12,7 @@
  */
 package ai.djl.training.tracker;
 
+import ai.djl.training.tracker.WarmUpTracker.Builder;
 import ai.djl.util.Preconditions;
 
 /**
@@ -35,6 +36,15 @@ public class LinearTracker implements Tracker {
         this.maxUpdates = builder.maxUpdates;
     }
 
+    /**
+     * Creates a new builder.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** {@inheritDoc} */
     @Override
     public float getNewValue(int numUpdate) {
@@ -52,6 +62,8 @@ public class LinearTracker implements Tracker {
         Float min;
         Float max;
         Integer maxUpdates;
+
+        private Builder() {}
 
         /**
          * Sets the initial value after no steps.

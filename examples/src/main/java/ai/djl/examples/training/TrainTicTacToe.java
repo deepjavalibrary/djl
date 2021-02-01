@@ -91,7 +91,7 @@ public final class TrainTicTacToe {
                 // Constructs the agent to train and play with
                 RlAgent agent = new QAgent(trainer, rewardDiscount);
                 Tracker exploreRate =
-                        new LinearTracker.Builder()
+                        LinearTracker.builder()
                                 .setBaseValue(0.9f)
                                 .optSlope(-.9f / (epoch * gamesPerEpoch * 7))
                                 .optMinValue(0.01f)

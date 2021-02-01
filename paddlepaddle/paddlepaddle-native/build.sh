@@ -18,7 +18,7 @@ if [[ ! -d "paddle" ]]; then
   echo "Folder not found. Downloading C++ package..."
   if [[ $PLATFORM == 'linux' ]]; then
     if [[ $1 == "cpu" ]]; then
-      curl -s https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-2.0-rc1-gcc54.tgz -o paddle.tgz
+      curl -s https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-gcc54-2.0-openblas.tgz -o paddle.tgz
     else
       echo "$1 is not supported."
       exit 1

@@ -12,6 +12,7 @@
  */
 package ai.djl.training.tracker;
 
+import ai.djl.training.tracker.WarmUpTracker.Builder;
 import ai.djl.util.Preconditions;
 
 /**
@@ -35,6 +36,15 @@ public class CosineTracker implements Tracker {
         this.maxUpdates = builder.maxUpdates;
     }
 
+    /**
+     * Creates a new builder.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** {@inheritDoc} */
     @Override
     public float getNewValue(int numUpdate) {
@@ -55,6 +65,8 @@ public class CosineTracker implements Tracker {
         private float baseValue;
         private float finalValue = 0.01f;
         int maxUpdates;
+
+        private Builder() {}
 
         /**
          * Sets the initial value after no steps.

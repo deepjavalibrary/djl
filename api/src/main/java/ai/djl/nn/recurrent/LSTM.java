@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -128,27 +129,28 @@ public class LSTM extends RecurrentBlock {
         validateInputSize(inputs);
         long batchSize = inputs.head().getShape().get(0);
         inputs = updateInputLayoutToTNC(inputs);
-        NDArray head = inputs.singletonOrThrow();
+        NDArray head = inputs.head();
+        NDManager manager = head.getManager();
         Device device = head.getDevice();
 
         NDList result = new NDList(head);
         try (NDList parameterList = new NDList()) {
             for (Parameter parameter : parameters.values()) {
-                NDArray array = parameterStore.getValue(parameter, device, training);
-                parameterList.add(array.flatten());
+                NDArray array = parameterStore.getValue(parameter, device, training).flatten();
+                array.attach(manager);
+                parameterList.add(array);
             }
             NDArray array = NDArrays.concat(parameterList);
             result.add(array);
         }
-        // Adding state and stateCell
-        Shape stateShape = new Shape(numStackedLayers * numDirections, batchSize, stateSize);
+        Shape stateShape = new Shape((long) numStackedLayers * numDirections, batchSize, stateSize);
         if (beginState != null) {
             result.add(beginState);
             result.add(beginStateCell);
         } else {
             // TODO manager creates the NDArray with the wrong device
-            result.add(head.getManager().zeros(stateShape, DataType.FLOAT32, device));
-            result.add(head.getManager().zeros(stateShape, DataType.FLOAT32, device));
+            result.add(manager.zeros(stateShape, DataType.FLOAT32, device));
+            result.add(manager.zeros(stateShape, DataType.FLOAT32, device));
         }
         if (useSequenceLength) {
             result.add(inputs.get(1));
