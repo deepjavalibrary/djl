@@ -554,12 +554,27 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray norm(boolean keepDims) {
+        // We have to flatten first to be able to simulate "numpy.linalg.norm" whenever axis isn't
+        // specified
+        TfNDArray flattenTensor = (TfNDArray) flatten();
         try (Tensor<?> tensor =
                 tf.linalg
                         .euclideanNorm(
-                                getOperand(), tf.constant(0), EuclideanNorm.keepDims(keepDims))
+                                flattenTensor.getOperand(),
+                                tf.constant(0),
+                                EuclideanNorm.keepDims(keepDims))
                         .asTensor()) {
-            return new TfNDArray(manager, tensor);
+            // Keeping dimensions but with shape 1
+            List<Long> shapes = new ArrayList<>();
+            for (int i = 0; i < shape.dimension(); i++) {
+                shapes.add(1L);
+            }
+            TfNDArray dimensionTensor =
+                    (TfNDArray)
+                            this.manager.create(
+                                    new float[] {tensor.rawData().asFloats().getFloat(0)},
+                                    new Shape(shapes));
+            return new TfNDArray(manager, dimensionTensor.getTensor());
         }
     }
 
