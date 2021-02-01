@@ -351,7 +351,9 @@ public class ModelServerTest {
         latch.await();
 
         StatusResponse resp = JsonUtils.GSON.fromJson(result, StatusResponse.class);
-        Assert.assertEquals(resp.getStatus(), "Model \"mlp_2\" worker scaled.");
+        Assert.assertEquals(
+                resp.getStatus(),
+                "Model \"mlp_2\" worker scaled. New Worker configuration min workers:2 max workers:2");
     }
 
     private void testDescribeModel(Channel channel) throws InterruptedException {

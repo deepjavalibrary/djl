@@ -68,7 +68,7 @@ public class InferenceRequestHandler extends HttpRequestHandler {
                 // TODO: Check if its OK to send other 2xx errors to ALB for "Partial Healthy"
                 // and "Unhealthy"
                 ModelManager.getInstance()
-                        .workerStatus(ctx)
+                        .workerStatus()
                         .thenAccept(
                                 response ->
                                         NettyUtils.sendJsonResponse(
@@ -155,7 +155,11 @@ public class InferenceRequestHandler extends HttpRequestHandler {
                     .thenAccept(
                             p -> {
                                 try {
-                                    modelManager.addJob(new Job(ctx, modelName, input));
+                                    if (!modelManager.addJob(new Job(ctx, modelName, input))) {
+                                        throw new ServiceUnavailableException(
+                                                "No worker is available to serve request: "
+                                                        + modelName);
+                                    }
                                 } catch (ModelNotFoundException e) {
                                     logger.warn("Unexpected error", e);
                                     NettyUtils.sendError(ctx, e);
