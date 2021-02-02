@@ -9,7 +9,7 @@ You can get involved and engage with us by joining our [Slack channel](deepjaval
 |-------|----------------|---------|------------| ----------- |
 | ![](website/img/community_leader/christoph.png) <br>Christoph | ![](website/img/community_leader/erik.png) <br>Erik| ![](website/img/community_leader/frank.png) <br>Frank | ![](website/img/community_leader/jake.jpg) <br>Jake | ![](website/img/community_leader/kimi.png) <br>Kimi |
 | ![](website/img/community_leader/lai.jpg) <br>Lai | ![](website/img/community_leader/lu.png) <br>Lu | ![](website/img/community_leader/marat.png) <br>Marat | ![](website/img/community_leader/marcos.png) <br>Marcos | ![](website/img/community_leader/qing.jpeg) <br>Qing | 
-| ![](website/img/community_leader/stanislav.png) <br>Stanislav | ![](website/img/community_leader/wei.png) <br>Wei | ![](website/img/community_leader/zach.jpeg) <br>Zach | ![](website/img/community_leader/anthony.jpeg) <br>Anthony |
+| ![](website/img/community_leader/stanislav.png) <br>Stanislav | ![](website/img/community_leader/wei.jpg) <br>Wei | ![](website/img/community_leader/zach.jpeg) <br>Zach | ![](website/img/community_leader/anthony.jpeg) <br>Anthony |
 
 #### Christoph Henkelmann
 twitter: @chenkelmann
