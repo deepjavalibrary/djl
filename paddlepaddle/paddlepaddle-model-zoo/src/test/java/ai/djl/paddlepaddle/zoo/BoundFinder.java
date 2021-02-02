@@ -68,7 +68,7 @@ public class BoundFinder {
                                     minMax[3] - minMax[1],
                                     minMax[2] - minMax[0]);
                         })
-                .filter(rect -> rect.getWidth() != 0.0 && rect.getHeight() != 0)
+                .filter(rect -> rect.getWidth() * width > 5.0 && rect.getHeight() * height > 5.0)
                 .collect(Collectors.toList());
     }
 

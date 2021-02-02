@@ -13,7 +13,6 @@
 
 package ai.djl.paddlepaddle.zoo;
 
-import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ModelException;
@@ -39,6 +38,9 @@ import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.testng.annotations.Test;
@@ -47,8 +49,7 @@ public class OCRTest {
 
     @Test
     public void testOCR() throws IOException, ModelException, TranslateException {
-        String url =
-                "https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/dygraph/doc/imgs/11.jpg";
+        String url = "https://resources.djl.ai/images/flight_ticket.jpg";
         Image img = ImageFactory.getInstance().fromUrl(url);
         List<BoundingBox> boxes = detectWords(img);
 
@@ -57,10 +58,20 @@ public class OCRTest {
         Predictor<Image, Image> rotator = getRotateClassifer();
         for (int i = 0; i < boxes.size(); i++) {
             Image subImg = getSubImage(img, boxes.get(i));
+            saveImage(subImg, Integer.toString(i));
             subImg = rotator.predict(subImg);
             String name = recognizer.predict(subImg);
             System.out.println(name);
         }
+    }
+
+    private static void saveImage(Image img, String prefix) throws IOException {
+        Path outputDir = Paths.get("build/output");
+        Files.createDirectories(outputDir);
+
+        Path imagePath = outputDir.resolve(prefix + ".png");
+        // OpenJDK can't save jpg with alpha channel
+        img.save(Files.newOutputStream(imagePath), "png");
     }
 
     @SuppressWarnings("unchecked")
@@ -69,11 +80,10 @@ public class OCRTest {
         Class<List<BoundingBox>> clazz = (Class) List.class;
         Criteria<Image, List<BoundingBox>> criteria =
                 Criteria.builder()
-                        .optApplication(Application.CV.OBJECT_DETECTION)
                         .optEngine("PaddlePaddle")
                         .setTypes(Image.class, clazz)
                         .optModelUrls(
-                                "https://alpha-djl-demos.s3.amazonaws.com/model/paddleOCR/mobile/det_db.zip")
+                                "https://resources.djl.ai/test-models/paddleOCR/mobile/det_db.zip")
                         .optTranslator(new WordsTranslator(960))
                         .build();
 
@@ -90,7 +100,7 @@ public class OCRTest {
                         .optEngine("PaddlePaddle")
                         .setTypes(Image.class, String.class)
                         .optModelUrls(
-                                "https://alpha-djl-demos.s3.amazonaws.com/model/paddleOCR/mobile/rec_crnn.zip")
+                                "https://resources.djl.ai/test-models/paddleOCR/mobile/rec_crnn.zip")
                         .optTranslator(new CharacterRecognitionTranslator())
                         .build();
 
@@ -105,7 +115,7 @@ public class OCRTest {
                         .optEngine("PaddlePaddle")
                         .setTypes(Image.class, Image.class)
                         .optModelUrls(
-                                "https://alpha-djl-demos.s3.amazonaws.com/model/paddleOCR/mobile/cls.zip")
+                                "https://resources.djl.ai/test-models/paddleOCR/mobile/cls.zip")
                         .optTranslator(new RotateTranslator())
                         .build();
 
@@ -131,11 +141,11 @@ public class OCRTest {
         double centerx = xmin + width / 2;
         double centery = ymin + height / 2;
         if (width > height) {
-            width += height * 2.5;
-            height *= 3.5;
+            width += height * 2.0;
+            height *= 3.0;
         } else {
-            height += width * 2.5;
-            width *= 3.5;
+            height += width * 2.0;
+            width *= 3.0;
         }
         double newX = centerx - width / 2 < 0 ? 0 : centerx - width / 2;
         double newY = centery - height / 2 < 0 ? 0 : centery - height / 2;
@@ -151,8 +161,17 @@ public class OCRTest {
             scale = max * 1.0f / localMax;
         }
         // paddle model only take 32-based size
-        int h32 = (int) (h * scale) / 32;
-        int w32 = (int) (w * scale) / 32;
+        return resize32(h * scale, w * scale);
+    }
+
+    private static int[] resize32(double h, double w) {
+        double min = Math.min(h, w);
+        if (min < 32) {
+            h = 32.0 / min * h;
+            w = 32.0 / min * w;
+        }
+        int h32 = (int) h / 32;
+        int w32 = (int) w / 32;
         return new int[] {h32 * 32, w32 * 32};
     }
 
@@ -213,6 +232,8 @@ public class OCRTest {
         public void prepare(NDManager manager, Model model) throws IOException {
             try (InputStream is = model.getArtifact("rec_crnn/ppocr_keys_v1.txt").openStream()) {
                 table = Utils.readLines(is, true);
+                table.add(0, "blank");
+                table.add("");
             }
         }
 
@@ -224,7 +245,7 @@ public class OCRTest {
             int lastIdx = 0;
             for (int i = 0; i < indices.length; i++) {
                 if (indices[i] > 0 && !(i > 0 && indices[i] == lastIdx)) {
-                    sb.append(table.get((int) indices[i] - 1));
+                    sb.append(table.get((int) indices[i]));
                 }
             }
             return sb.toString();
@@ -233,6 +254,8 @@ public class OCRTest {
         @Override
         public NDList processInput(TranslatorContext ctx, Image input) {
             NDArray img = input.toNDArray(ctx.getNDManager());
+            int[] hw = resize32(input.getHeight(), input.getWidth());
+            img = NDImageUtils.resize(img, hw[1], hw[0]);
             img = NDImageUtils.toTensor(img).sub(0.5f).div(0.5f);
             img = img.expandDims(0);
             return new NDList(img);
@@ -263,6 +286,8 @@ public class OCRTest {
                 img = NDImageUtils.rotate90(img, 1);
             }
             ctx.setAttachment("img", img);
+            int[] hw = resize32(input.getHeight(), input.getWidth());
+            img = NDImageUtils.resize(img, hw[1], hw[0]);
             img = NDImageUtils.toTensor(img).sub(0.5f).div(0.5f);
             img = img.expandDims(0);
             return new NDList(img);

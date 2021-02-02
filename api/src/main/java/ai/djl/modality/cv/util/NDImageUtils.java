@@ -317,7 +317,7 @@ public final class NDImageUtils {
     }
 
     /**
-     * Check the shape of the image follows CHW/NCHW.
+     * Check if the shape of the image follows CHW/NCHW.
      *
      * @param shape the shape of the image
      * @return true for (N)CHW, false for (N)HWC
