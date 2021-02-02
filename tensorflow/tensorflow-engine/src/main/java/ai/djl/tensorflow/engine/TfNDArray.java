@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import org.tensorflow.Operand;
 import org.tensorflow.Tensor;
 import org.tensorflow.ndarray.buffer.ByteDataBuffer;
@@ -532,18 +533,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray norm() {
-        // We have to flatten first to be able to simulate "numpy.linalg.norm" whenever axis isn't
-        // specified
-        TfNDArray flattenTensor = (TfNDArray) flatten();
-        try (Tensor<?> tensor =
-                tf.linalg.euclideanNorm(flattenTensor.getOperand(), tf.constant(0)).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray norm(int[] axes) {
         try (Tensor<?> tensor =
                 tf.linalg.euclideanNorm(getOperand(), tf.constant(axes)).asTensor()) {
@@ -556,25 +545,22 @@ public class TfNDArray implements NDArray {
     public NDArray norm(boolean keepDims) {
         // We have to flatten first to be able to simulate "numpy.linalg.norm" whenever axis isn't
         // specified
+        if (dataType == DataType.FLOAT64) {
+            throw new UnsupportedOperationException("float64 is not supported");
+        }
         TfNDArray flattenTensor = (TfNDArray) flatten();
         try (Tensor<?> tensor =
-                tf.linalg
-                        .euclideanNorm(
-                                flattenTensor.getOperand(),
-                                tf.constant(0),
-                                EuclideanNorm.keepDims(keepDims))
-                        .asTensor()) {
-            // Keeping dimensions but with shape 1
-            List<Long> shapes = new ArrayList<>();
-            for (int i = 0; i < shape.dimension(); i++) {
-                shapes.add(1L);
+                tf.linalg.euclideanNorm(flattenTensor.getOperand(), tf.constant(0)).asTensor()) {
+            // close the temp NDArray
+            flattenTensor.close();
+            if (!keepDims) {
+                return new TfNDArray(manager, tensor);
+            } else {
+                float number = tensor.rawData().asFloats().getFloat(0);
+                // Keeping dimensions but with shape 1
+                long[] shapes = LongStream.generate(() -> 1).limit(shape.dimension()).toArray();
+                return manager.create(new float[] {number}, new Shape(shapes));
             }
-            TfNDArray dimensionTensor =
-                    (TfNDArray)
-                            this.manager.create(
-                                    new float[] {tensor.rawData().asFloats().getFloat(0)},
-                                    new Shape(shapes));
-            return new TfNDArray(manager, dimensionTensor.getTensor());
         }
     }
 

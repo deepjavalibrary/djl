@@ -1372,12 +1372,6 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray norm() {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray norm(int[] axes) {
         throw new UnsupportedOperationException("Not implemented");
     }

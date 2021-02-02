@@ -4434,7 +4434,9 @@ public interface NDArray extends AutoCloseable {
      *
      * @return the norm of this {@code NDArray}
      */
-    NDArray norm();
+    default NDArray norm() {
+        return norm(false);
+    }
 
     /**
      * Returns the norm of this {@code NDArray}.
