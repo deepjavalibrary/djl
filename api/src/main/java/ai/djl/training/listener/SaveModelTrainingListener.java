@@ -20,47 +20,46 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** A {@link TrainingListener} that saves a model checkpoint after each epoch. */
-public class CheckpointsTrainingListener extends TrainingListenerAdapter {
+/** A {@link TrainingListener} that saves a model and can save checkpoints. */
+public class SaveModelTrainingListener extends TrainingListenerAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(CheckpointsTrainingListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(SaveModelTrainingListener.class);
 
     private String outputDir;
     private String overrideModelName;
     private Consumer<Trainer> onSaveModel;
-    private int step;
+    private int checkpoint;
     private int epoch;
 
     /**
-     * Constructs a {@link CheckpointsTrainingListener} using the model's name.
+     * Constructs a {@link SaveModelTrainingListener} using the model's name.
      *
      * @param outputDir the directory to output the checkpointed models in
      */
-    public CheckpointsTrainingListener(String outputDir) {
+    public SaveModelTrainingListener(String outputDir) {
         this(outputDir, null, -1);
     }
 
     /**
-     * Constructs a {@link CheckpointsTrainingListener}.
+     * Constructs a {@link SaveModelTrainingListener}.
      *
      * @param overrideModelName an override model name to save checkpoints with
      * @param outputDir the directory to output the checkpointed models in
      */
-    public CheckpointsTrainingListener(String outputDir, String overrideModelName) {
+    public SaveModelTrainingListener(String outputDir, String overrideModelName) {
         this(outputDir, overrideModelName, -1);
     }
 
     /**
-     * Constructs a {@link CheckpointsTrainingListener}.
+     * Constructs a {@link SaveModelTrainingListener}.
      *
      * @param overrideModelName an override model name to save checkpoints with
      * @param outputDir the directory to output the checkpointed models in
-     * @param step the spacing between each checkpoint, use -1 to only save model at the end of
-     *     training
+     * @param checkpoint adds a checkpoint every n epochs
      */
-    public CheckpointsTrainingListener(String outputDir, String overrideModelName, int step) {
+    public SaveModelTrainingListener(String outputDir, String overrideModelName, int checkpoint) {
         this.outputDir = outputDir;
-        this.step = step;
+        this.checkpoint = checkpoint;
         if (outputDir == null) {
             throw new IllegalArgumentException(
                     "Can not save checkpoint without specifying an output directory");
@@ -76,7 +75,7 @@ public class CheckpointsTrainingListener extends TrainingListenerAdapter {
             return;
         }
 
-        if (step > 0 && epoch % step == 0) {
+        if (checkpoint > 0 && epoch % checkpoint == 0) {
             // save model at end of each epoch
             saveModel(trainer);
         }
@@ -85,7 +84,7 @@ public class CheckpointsTrainingListener extends TrainingListenerAdapter {
     /** {@inheritDoc} */
     @Override
     public void onTrainingEnd(Trainer trainer) {
-        if (step == -1 || epoch % step != 0) {
+        if (checkpoint == -1 || epoch % checkpoint != 0) {
             saveModel(trainer);
         }
     }
@@ -106,6 +105,24 @@ public class CheckpointsTrainingListener extends TrainingListenerAdapter {
      */
     public void setOverrideModelName(String overrideModelName) {
         this.overrideModelName = overrideModelName;
+    }
+
+    /**
+     * Returns the checkpoint frequency (or -1 for no checkpointing).
+     *
+     * @return the checkpoint frequency (or -1 for no checkpointing)
+     */
+    public int getCheckpoint() {
+        return checkpoint;
+    }
+
+    /**
+     * Sets the checkpoint frequency.
+     *
+     * @param checkpoint how many epochs between checkpoints (or -1 for no checkpoints)
+     */
+    public void setCheckpoint(int checkpoint) {
+        this.checkpoint = checkpoint;
     }
 
     /**

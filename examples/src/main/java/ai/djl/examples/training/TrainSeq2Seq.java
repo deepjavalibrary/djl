@@ -43,7 +43,7 @@ import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.evaluator.Accuracy;
-import ai.djl.training.listener.CheckpointsTrainingListener;
+import ai.djl.training.listener.SaveModelTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.MaskedSoftmaxCrossEntropyLoss;
 import ai.djl.training.util.ProgressBar;
@@ -122,16 +122,20 @@ public final class TrainSeq2Seq {
                         sourceEmbedding,
                         new LSTM.Builder()
                                 .setStateSize(32)
-                                .setNumStackedLayers(2)
+                                .setNumLayers(2)
                                 .optDropRate(0)
+                                .optBatchFirst(true)
+                                .optReturnState(true)
                                 .build());
         SimpleTextDecoder simpleTextDecoder =
                 new SimpleTextDecoder(
                         targetEmbedding,
                         new LSTM.Builder()
                                 .setStateSize(32)
-                                .setNumStackedLayers(2)
+                                .setNumLayers(2)
                                 .optDropRate(0)
+                                .optBatchFirst(true)
+                                .optReturnState(false)
                                 .build(),
                         vocabSize);
         return new EncoderDecoder(simpleTextEncoder, simpleTextDecoder);
@@ -139,7 +143,7 @@ public final class TrainSeq2Seq {
 
     public static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         String outputDir = arguments.getOutputDir();
-        CheckpointsTrainingListener listener = new CheckpointsTrainingListener(outputDir);
+        SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir);
         listener.setSaveModelCallback(
                 trainer -> {
                     TrainingResult result = trainer.getTrainingResult();

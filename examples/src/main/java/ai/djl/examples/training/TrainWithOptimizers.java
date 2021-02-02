@@ -40,7 +40,7 @@ import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
-import ai.djl.training.listener.CheckpointsTrainingListener;
+import ai.djl.training.listener.SaveModelTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
@@ -165,8 +165,7 @@ public final class TrainWithOptimizers {
 
     private static DefaultTrainingConfig setupTrainingConfig(OptimizerArguments arguments) {
         String outputDir = arguments.getOutputDir();
-        CheckpointsTrainingListener listener =
-                new CheckpointsTrainingListener(outputDir, "resnetv1");
+        SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir, "resnetv1");
         listener.setSaveModelCallback(
                 trainer -> {
                     TrainingResult result = trainer.getTrainingResult();

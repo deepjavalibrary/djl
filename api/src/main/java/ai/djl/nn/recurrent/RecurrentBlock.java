@@ -12,21 +12,14 @@
  */
 package ai.djl.nn.recurrent;
 
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDArrays;
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterType;
-import ai.djl.training.ParameterStore;
-import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.IOException;
 
@@ -52,13 +45,12 @@ public abstract class RecurrentBlock extends AbstractBlock {
 
     protected long stateSize;
     protected float dropRate;
-    protected int numStackedLayers;
-    protected String mode;
-    protected boolean useSequenceLength;
-    protected int numDirections = 1;
+    protected int numLayers;
     protected int gates;
-    protected boolean stateOutputs;
-    protected NDArray beginState;
+    protected boolean batchFirst;
+    protected boolean hasBiases;
+    protected boolean bidirectional;
+    protected boolean returnState;
 
     /**
      * Creates a {@code RecurrentBlock} object.
@@ -69,22 +61,21 @@ public abstract class RecurrentBlock extends AbstractBlock {
         super(VERSION);
         stateSize = builder.stateSize;
         dropRate = builder.dropRate;
-        numStackedLayers = builder.numStackedLayers;
-        useSequenceLength = builder.useSequenceLength;
-        stateOutputs = builder.stateOutputs;
-        if (builder.useBidirectional) {
-            numDirections = 2;
-        }
+        numLayers = builder.numLayers;
+        batchFirst = builder.batchFirst;
+        hasBiases = builder.hasBiases;
+        bidirectional = builder.bidirectional;
+        returnState = builder.returnState;
 
         ParameterType[] parameterTypes = {ParameterType.WEIGHT, ParameterType.BIAS};
         String[] directions = {"l"};
-        if (builder.useBidirectional) {
+        if (builder.bidirectional) {
             directions = new String[] {"l", "r"};
         }
         String[] gateStrings = {"i2h", "h2h"};
 
         for (ParameterType parameterType : parameterTypes) {
-            for (int i = 0; i < numStackedLayers; i++) {
+            for (int i = 0; i < numLayers; i++) {
                 for (String direction : directions) {
                     for (String gateString : gateStrings) {
                         String name =
@@ -96,86 +87,24 @@ public abstract class RecurrentBlock extends AbstractBlock {
         }
     }
 
-    protected void validateInputSize(NDList inputs) {
-        int numberofInputsRequired = 1;
-        if (useSequenceLength) {
-            numberofInputsRequired = 2;
-        }
-        if (inputs.size() != numberofInputsRequired) {
-            throw new IllegalArgumentException(
-                    "Invalid number of inputs for RNN. Size of input NDList must be "
-                            + numberofInputsRequired
-                            + " when useSequenceLength is "
-                            + useSequenceLength);
-        }
-    }
-
-    /**
-     * Sets the parameter that indicates whether the output must include the hidden states.
-     *
-     * @param stateOutputs whether the output must include the hidden states.
-     */
-    public final void setStateOutputs(boolean stateOutputs) {
-        this.stateOutputs = stateOutputs;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected NDList forwardInternal(
-            ParameterStore parameterStore,
-            NDList inputs,
-            boolean training,
-            PairList<String, Object> params) {
-        inputs = opInputs(parameterStore, inputs, training);
-        NDArrayEx ex = inputs.head().getNDArrayInternal();
-        NDList output =
-                ex.rnn(
-                        inputs,
-                        mode,
-                        stateSize,
-                        dropRate,
-                        numStackedLayers,
-                        useSequenceLength,
-                        isBidirectional(),
-                        true,
-                        params);
-
-        NDList result = new NDList(output.head().transpose(1, 0, 2));
-        if (stateOutputs) {
-            result.add(output.get(1));
-        }
-        resetBeginStates();
-        return result;
-    }
-
-    /**
-     * Sets the initial {@link NDArray} value for the hidden states.
-     *
-     * @param beginStates the {@link NDArray} value for the hidden states
-     */
-    public void setBeginStates(NDList beginStates) {
-        this.beginState = beginStates.get(0);
-    }
-
-    protected void resetBeginStates() {
-        beginState = null;
-    }
-
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
-        // Input shape at this point is NTC. Output Shape should be NTS
         Shape inputShape = inputs[0];
-        long nShape = inputShape.get(0);
-        long tShape = inputShape.get(1);
-        Shape nonStateOutputShape = new Shape(nShape, tShape, stateSize * numDirections);
-        if (stateOutputs) {
+        Shape outputShape =
+                new Shape(inputShape.get(0), inputShape.get(1), stateSize * getNumDirections());
+        if (!returnState) {
             return new Shape[] {
-                nonStateOutputShape,
-                new Shape((long) numStackedLayers * numDirections, nShape, stateSize)
+                outputShape,
             };
         }
-        return new Shape[] {nonStateOutputShape};
+        return new Shape[] {
+            outputShape,
+            new Shape(
+                    (long) numLayers * getNumDirections(),
+                    inputShape.get((batchFirst) ? 0 : 1),
+                    stateSize)
+        };
     }
 
     /** {@inheritDoc} */
@@ -193,7 +122,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
         Shape shape = inputShapes[0];
         long inputs = shape.get(2);
         if (layer > 0) {
-            inputs = stateSize * numDirections;
+            inputs = stateSize * getNumDirections();
         }
         if (name.contains("BIAS")) {
             return new Shape(gates * stateSize);
@@ -218,42 +147,8 @@ public abstract class RecurrentBlock extends AbstractBlock {
         }
     }
 
-    protected boolean isBidirectional() {
-        return numDirections == 2;
-    }
-
-    protected NDList opInputs(ParameterStore parameterStore, NDList inputs, boolean training) {
-        validateInputSize(inputs);
-        long batchSize = inputs.head().getShape().get(0);
-        inputs = updateInputLayoutToTNC(inputs);
-        NDArray head = inputs.head();
-        NDManager manager = head.getManager();
-        Device device = head.getDevice();
-
-        NDList result = new NDList(head);
-        try (NDList parameterList = new NDList()) {
-            for (Parameter parameter : parameters.values()) {
-                NDArray array = parameterStore.getValue(parameter, device, training).flatten();
-                array.attach(manager);
-                parameterList.add(array);
-            }
-            NDArray array = NDArrays.concat(parameterList);
-            result.add(array);
-        }
-        Shape stateShape = new Shape((long) numStackedLayers * numDirections, batchSize, stateSize);
-        if (beginState != null) {
-            result.add(beginState);
-        } else {
-            result.add(manager.zeros(stateShape));
-        }
-        if (useSequenceLength) {
-            result.add(inputs.get(1));
-        }
-        return result;
-    }
-
-    protected NDList updateInputLayoutToTNC(NDList inputs) {
-        return new NDList(inputs.singletonOrThrow().transpose(1, 0, 2));
+    protected int getNumDirections() {
+        return bidirectional ? 2 : 1;
     }
 
     /** The Builder to construct a {@link RecurrentBlock} type of {@link ai.djl.nn.Block}. */
@@ -262,13 +157,12 @@ public abstract class RecurrentBlock extends AbstractBlock {
 
         protected float dropRate;
         protected long stateSize;
-        protected int numStackedLayers;
-        protected double lstmStateClipMin;
-        protected double lstmStateClipMax;
-        protected boolean clipLstmState;
-        protected boolean useSequenceLength;
-        protected boolean useBidirectional;
-        protected boolean stateOutputs;
+        protected int numLayers;
+        // set it true by default for usability
+        protected boolean batchFirst = true;
+        protected boolean hasBiases = true;
+        protected boolean bidirectional;
+        protected boolean returnState;
         protected RNN.Activation activation;
 
         /**
@@ -297,23 +191,11 @@ public abstract class RecurrentBlock extends AbstractBlock {
         /**
          * Sets the <b>Required</b> number of stacked layers.
          *
-         * @param numStackedLayers the number of stacked layers
+         * @param numLayers the number of stacked layers
          * @return this Builder
          */
-        public T setNumStackedLayers(int numStackedLayers) {
-            this.numStackedLayers = numStackedLayers;
-            return self();
-        }
-
-        /**
-         * Sets the optional parameter that indicates whether to include an extra input parameter
-         * sequence_length to specify variable length sequence.
-         *
-         * @param useSequenceLength whether to use sequence length
-         * @return this Builder
-         */
-        public T setSequenceLength(boolean useSequenceLength) {
-            this.useSequenceLength = useSequenceLength;
+        public T setNumLayers(int numLayers) {
+            this.numLayers = numLayers;
             return self();
         }
 
@@ -323,19 +205,43 @@ public abstract class RecurrentBlock extends AbstractBlock {
          * @param useBidirectional whether to use bidirectional recurrent layers
          * @return this Builder
          */
-        public T optBidrectional(boolean useBidirectional) {
-            this.useBidirectional = useBidirectional;
+        public T optBidirectional(boolean useBidirectional) {
+            this.bidirectional = useBidirectional;
             return self();
         }
 
         /**
-         * Sets the optional parameter that indicates whether to have the states as symbol outputs.
+         * Sets the optional batchFirst flag that indicates whether the input is batch major or not.
+         * The default value is true.
          *
-         * @param stateOutputs whether to have the states as symbol output
+         * @param batchFirst whether the input is batch major or not
          * @return this Builder
          */
-        public T optStateOutput(boolean stateOutputs) {
-            this.stateOutputs = stateOutputs;
+        public T optBatchFirst(boolean batchFirst) {
+            this.batchFirst = batchFirst;
+            return self();
+        }
+
+        /**
+         * Sets the optional biases flag that indicates whether to use biases or not.
+         *
+         * @param hasBiases whether to use biases or not
+         * @return this Builder
+         */
+        public T optHasBiases(boolean hasBiases) {
+            this.hasBiases = hasBiases;
+            return self();
+        }
+
+        /**
+         * Sets the optional flag that indicates whether to return state or not. This is typically
+         * useful when you use RecurrentBlock in Sequential block. The default value is false.
+         *
+         * @param returnState whether to return state or not
+         * @return this Builder
+         */
+        public T optReturnState(boolean returnState) {
+            this.returnState = returnState;
             return self();
         }
 

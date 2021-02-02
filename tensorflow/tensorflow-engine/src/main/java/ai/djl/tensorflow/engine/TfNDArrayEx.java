@@ -20,6 +20,7 @@ import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.recurrent.RNN;
 import ai.djl.util.PairList;
 import java.util.ArrayList;
 import java.util.List;
@@ -402,31 +403,46 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDList rnn(
-            NDList inputs,
-            String mode,
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs,
-            PairList<String, Object> additional) {
+            NDArray input,
+            NDArray state,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            RNN.Activation activation,
+            double dropRate,
+            boolean train,
+            boolean bidirectional,
+            boolean batchFirst) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList gru(
+            NDArray input,
+            NDArray state,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList lstm(
-            NDList inputs,
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs,
-            double lstmStateClipMin,
-            double lstmStateClipMax,
-            PairList<String, Object> additional) {
+            NDArray input,
+            NDList states,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

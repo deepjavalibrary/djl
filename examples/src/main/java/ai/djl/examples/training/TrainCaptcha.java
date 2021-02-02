@@ -31,7 +31,7 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.Dataset.Usage;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
-import ai.djl.training.listener.CheckpointsTrainingListener;
+import ai.djl.training.listener.SaveModelTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.SimpleCompositeLoss;
 import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
@@ -88,7 +88,7 @@ public final class TrainCaptcha {
 
     private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         String outputDir = arguments.getOutputDir();
-        CheckpointsTrainingListener listener = new CheckpointsTrainingListener(outputDir);
+        SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir);
         listener.setSaveModelCallback(
                 trainer -> {
                     TrainingResult result = trainer.getTrainingResult();

@@ -14,11 +14,8 @@ package ai.djl.nn.recurrent;
 
 import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
@@ -43,11 +40,6 @@ import ai.djl.util.Preconditions;
  */
 public class LSTM extends RecurrentBlock {
 
-    private boolean clipLstmState;
-    private double lstmStateClipMin;
-    private double lstmStateClipMax;
-    private NDArray beginStateCell;
-
     /**
      * Creates an LSTM block.
      *
@@ -55,11 +47,7 @@ public class LSTM extends RecurrentBlock {
      */
     LSTM(Builder builder) {
         super(builder);
-        mode = "lstm";
         gates = 4;
-        clipLstmState = builder.clipLstmState;
-        lstmStateClipMin = builder.lstmStateClipMin;
-        lstmStateClipMax = builder.lstmStateClipMax;
     }
 
     /** {@inheritDoc} */
@@ -69,93 +57,42 @@ public class LSTM extends RecurrentBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        inputs = opInputs(parameterStore, inputs, training);
         NDArrayEx ex = inputs.head().getNDArrayInternal();
-
-        NDList output;
-        if (clipLstmState) {
-            output =
-                    ex.lstm(
-                            inputs,
-                            stateSize,
-                            dropRate,
-                            numStackedLayers,
-                            useSequenceLength,
-                            isBidirectional(),
-                            true,
-                            lstmStateClipMin,
-                            lstmStateClipMax,
-                            params);
-        } else {
-            output =
-                    ex.rnn(
-                            inputs,
-                            mode,
-                            stateSize,
-                            dropRate,
-                            numStackedLayers,
-                            useSequenceLength,
-                            isBidirectional(),
-                            true,
-                            params);
+        Device device = inputs.head().getDevice();
+        NDList rnnParams = new NDList();
+        for (Parameter parameter : parameters.values()) {
+            rnnParams.add(parameterStore.getValue(parameter, device, training));
         }
 
-        NDList result = new NDList(output.head().transpose(1, 0, 2));
-        if (stateOutputs) {
-            result.add(output.get(1));
-            result.add(output.get(2));
+        NDArray input = inputs.head();
+        if (inputs.size() == 1) {
+            int batchIndex = batchFirst ? 0 : 1;
+            Shape stateShape =
+                    new Shape(
+                            (long) numLayers * getNumDirections(),
+                            input.size(batchIndex),
+                            stateSize);
+            // hidden state
+            inputs.add(input.getManager().zeros(stateShape));
+            // cell
+            inputs.add(input.getManager().zeros(stateShape));
         }
-        resetBeginStates();
-        return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setBeginStates(NDList beginStates) {
-        this.beginState = beginStates.get(0);
-        this.beginStateCell = beginStates.get(1);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void resetBeginStates() {
-        beginState = null;
-        beginStateCell = null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected NDList opInputs(ParameterStore parameterStore, NDList inputs, boolean training) {
-        validateInputSize(inputs);
-        long batchSize = inputs.head().getShape().get(0);
-        inputs = updateInputLayoutToTNC(inputs);
-        NDArray head = inputs.head();
-        NDManager manager = head.getManager();
-        Device device = head.getDevice();
-
-        NDList result = new NDList(head);
-        try (NDList parameterList = new NDList()) {
-            for (Parameter parameter : parameters.values()) {
-                NDArray array = parameterStore.getValue(parameter, device, training).flatten();
-                array.attach(manager);
-                parameterList.add(array);
-            }
-            NDArray array = NDArrays.concat(parameterList);
-            result.add(array);
+        NDList outputs =
+                ex.lstm(
+                        input,
+                        new NDList(inputs.get(1), inputs.get(2)),
+                        rnnParams,
+                        hasBiases,
+                        numLayers,
+                        dropRate,
+                        training,
+                        bidirectional,
+                        batchFirst);
+        if (returnState) {
+            return outputs;
         }
-        Shape stateShape = new Shape((long) numStackedLayers * numDirections, batchSize, stateSize);
-        if (beginState != null) {
-            result.add(beginState);
-            result.add(beginStateCell);
-        } else {
-            // TODO manager creates the NDArray with the wrong device
-            result.add(manager.zeros(stateShape, DataType.FLOAT32, device));
-            result.add(manager.zeros(stateShape, DataType.FLOAT32, device));
-        }
-        if (useSequenceLength) {
-            result.add(inputs.get(1));
-        }
-        return result;
+        outputs.stream().skip(1).forEach(NDArray::close);
+        return new NDList(outputs.get(0));
     }
 
     /**
@@ -177,28 +114,13 @@ public class LSTM extends RecurrentBlock {
         }
 
         /**
-         * Sets the minimum and maximum clip value of LSTM states.
-         *
-         * @param lstmStateClipMin the minimum clip value of LSTM states
-         * @param lstmStateClipMax the maximum clip value of LSTM states
-         * @return this Builder
-         */
-        public Builder optLstmStateClipMin(float lstmStateClipMin, float lstmStateClipMax) {
-            this.lstmStateClipMin = lstmStateClipMin;
-            this.lstmStateClipMax = lstmStateClipMax;
-            this.clipLstmState = true;
-            return self();
-        }
-
-        /**
          * Builds a {@link LSTM} block.
          *
          * @return the {@link LSTM} block
          */
         public LSTM build() {
             Preconditions.checkArgument(
-                    stateSize > 0 && numStackedLayers > 0,
-                    "Must set stateSize and numStackedLayers");
+                    stateSize > 0 && numLayers > 0, "Must set stateSize and numStackedLayers");
             return new LSTM(this);
         }
     }

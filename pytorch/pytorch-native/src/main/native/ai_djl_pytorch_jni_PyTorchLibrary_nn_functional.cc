@@ -143,6 +143,83 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNDropout(
   API_END_RETURN()
 }
 
+JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRnn(JNIEnv* env, jobject jthis,
+  jlong jinput, jlong jhx, jlongArray jparams, jboolean jhas_biases, jint jnum_layers, jint jactivation,
+  jdouble jdrop_rate, jboolean jtraining, jboolean jbidirectional, jboolean jbatch_first) {
+  API_BEGIN()
+  const auto* input_ptr = reinterpret_cast<torch::Tensor*>(jinput);
+  const auto* hx_ptr = reinterpret_cast<torch::Tensor*>(jhx);
+  const std::vector<torch::Tensor> params = djl::utils::jni::GetObjectVecFromJHandles<torch::Tensor>(env, jparams);
+
+  std::tuple<torch::Tensor, torch::Tensor> outputs;
+  if (jactivation == 0) {
+    outputs = torch::rnn_relu(*input_ptr, *hx_ptr, torch::TensorList(params), jhas_biases, jnum_layers,
+                                              jdrop_rate, jtraining, jbidirectional, jbatch_first);
+  } else if (jactivation == 1) {
+    outputs = torch::rnn_tanh(*input_ptr, *hx_ptr, torch::TensorList(params), jhas_biases, jnum_layers,
+                                              jdrop_rate, jtraining, jbidirectional, jbatch_first);
+  } else {
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, "can't find activation");
+  }
+
+  // process output
+  jlongArray jarray = env->NewLongArray(2);
+  std::vector<jlong> jptrs;
+  jptrs.reserve(2);
+  jptrs[0] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<0>(outputs)));
+  jptrs[1] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<1>(outputs)));
+  env->SetLongArrayRegion(jarray, 0, 2, jptrs.data());
+  return jarray;
+  API_END_RETURN()
+}
+
+JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNGru(JNIEnv* env, jobject jthis,
+  jlong jinput, jlong jhx, jlongArray jparams, jboolean jhas_biases, jint jnum_layers, jdouble jdrop_rate,
+  jboolean jtraining, jboolean jbidirectional, jboolean jbatch_first) {
+  API_BEGIN()
+  const auto* input_ptr = reinterpret_cast<torch::Tensor*>(jinput);
+  const auto* hx_ptr = reinterpret_cast<torch::Tensor*>(jhx);
+  const std::vector<torch::Tensor> params = djl::utils::jni::GetObjectVecFromJHandles<torch::Tensor>(env, jparams);
+
+  std::tuple<torch::Tensor, torch::Tensor> outputs =
+          torch::gru(*input_ptr, *hx_ptr, torch::TensorList(params), jhas_biases, jnum_layers,
+                     jdrop_rate, jtraining, jbidirectional, jbatch_first);
+
+  // process output
+  jlongArray jarray = env->NewLongArray(2);
+  std::vector<jlong> jptrs;
+  jptrs.reserve(2);
+  jptrs[0] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<0>(outputs)));
+  jptrs[1] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<1>(outputs)));
+  env->SetLongArrayRegion(jarray, 0, 2, jptrs.data());
+  return jarray;
+  API_END_RETURN()
+}
+
+JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLstm(JNIEnv* env, jobject jthis,
+  jlong jinput, jlongArray jhx, jlongArray jparams, jboolean jhas_biases, jint jnum_layers, jdouble jdrop_rate,
+  jboolean jtraining, jboolean jbidirectional, jboolean jbatch_first) {
+  API_BEGIN()
+  const auto* input_ptr = reinterpret_cast<torch::Tensor*>(jinput);
+  const std::vector<torch::Tensor> hx = djl::utils::jni::GetObjectVecFromJHandles<torch::Tensor>(env, jhx);
+  const std::vector<torch::Tensor> params = djl::utils::jni::GetObjectVecFromJHandles<torch::Tensor>(env, jparams);
+
+  std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> outputs =
+            torch::lstm(*input_ptr, torch::TensorList(hx), torch::TensorList(params), jhas_biases, jnum_layers,
+                       jdrop_rate, jtraining, jbidirectional, jbatch_first);
+
+  // process output
+  jlongArray jarray = env->NewLongArray(3);
+  std::vector<jlong> jptrs;
+  jptrs.reserve(3);
+  jptrs[0] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<0>(outputs)));
+  jptrs[1] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<1>(outputs)));
+  jptrs[2] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<2>(outputs)));
+  env->SetLongArrayRegion(jarray, 0, 3, jptrs.data());
+  return jarray;
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRelu(JNIEnv* env, jobject jthis, jlong jinput) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
