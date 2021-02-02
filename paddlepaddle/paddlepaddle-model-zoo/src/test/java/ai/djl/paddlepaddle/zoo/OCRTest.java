@@ -15,6 +15,7 @@ package ai.djl.paddlepaddle.zoo;
 
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
+import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
@@ -24,6 +25,7 @@ import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
@@ -34,10 +36,9 @@ import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.Utils;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.testng.annotations.Test;
@@ -52,21 +53,14 @@ public class OCRTest {
         List<BoundingBox> boxes = detectWords(img);
 
         // load Character model
-        // Predictor<Image, String> recognizer = getRecognizer();
+        Predictor<Image, String> recognizer = getRecognizer();
+        Predictor<Image, Image> rotator = getRotateClassifer();
         for (int i = 0; i < boxes.size(); i++) {
             Image subImg = getSubImage(img, boxes.get(i));
-            saveImage(subImg, Integer.toString(i));
-            // String name = recognizer.predict(subImg);
+            subImg = rotator.predict(subImg);
+            String name = recognizer.predict(subImg);
+            System.out.println(name);
         }
-    }
-
-    private static void saveImage(Image img, String prefix) throws IOException {
-        Path outputDir = Paths.get("build/output");
-        Files.createDirectories(outputDir);
-
-        Path imagePath = outputDir.resolve(prefix + ".png");
-        // OpenJDK can't save jpg with alpha channel
-        img.save(Files.newOutputStream(imagePath), "png");
     }
 
     @SuppressWarnings("unchecked")
@@ -104,6 +98,21 @@ public class OCRTest {
         return model.newPredictor();
     }
 
+    private static Predictor<Image, Image> getRotateClassifer()
+            throws MalformedModelException, ModelNotFoundException, IOException {
+        Criteria<Image, Image> criteria =
+                Criteria.builder()
+                        .optEngine("PaddlePaddle")
+                        .setTypes(Image.class, Image.class)
+                        .optModelUrls(
+                                "https://alpha-djl-demos.s3.amazonaws.com/model/paddleOCR/mobile/cls.zip")
+                        .optTranslator(new RotateTranslator())
+                        .build();
+
+        ZooModel<Image, Image> model = ModelZoo.loadModel(criteria);
+        return model.newPredictor();
+    }
+
     private static Image getSubImage(Image img, BoundingBox box) {
         Rectangle rect = box.getBounds();
         double[] extended = extendRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
@@ -122,13 +131,12 @@ public class OCRTest {
         double centerx = xmin + width / 2;
         double centery = ymin + height / 2;
         if (width > height) {
-            width += height * 1.9;
-            height *= 2.9;
+            width += height * 2.5;
+            height *= 3.5;
         } else {
-            height += width * 1.9;
-            width *= 2.9;
+            height += width * 2.5;
+            width *= 3.5;
         }
-
         double newX = centerx - width / 2 < 0 ? 0 : centerx - width / 2;
         double newY = centery - height / 2 < 0 ? 0 : centery - height / 2;
         double newWidth = newX + width > 1 ? 1 - newX : width;
@@ -198,19 +206,64 @@ public class OCRTest {
 
     static class CharacterRecognitionTranslator implements Translator<Image, String> {
 
+        private List<String> table;
+
+        /** {@inheritDoc} */
         @Override
-        public String processOutput(TranslatorContext ctx, NDList list) {
-            return null;
+        public void prepare(NDManager manager, Model model) throws IOException {
+            try (InputStream is = model.getArtifact("rec_crnn/ppocr_keys_v1.txt").openStream()) {
+                table = Utils.readLines(is, true);
+            }
+        }
+
+        @Override
+        public String processOutput(TranslatorContext ctx, NDList list) throws IOException {
+            StringBuilder sb = new StringBuilder();
+            NDArray tokens = list.singletonOrThrow();
+            long[] indices = tokens.get(0).argMax(1).toLongArray();
+            int lastIdx = 0;
+            for (int i = 0; i < indices.length; i++) {
+                if (indices[i] > 0 && !(i > 0 && indices[i] == lastIdx)) {
+                    sb.append(table.get((int) indices[i] - 1));
+                }
+            }
+            return sb.toString();
         }
 
         @Override
         public NDList processInput(TranslatorContext ctx, Image input) {
             NDArray img = input.toNDArray(ctx.getNDManager());
-            int h = input.getHeight();
-            int w = input.getWidth();
-            int[] hw = scale(h, w, Math.max(h, w));
-            img = NDImageUtils.resize(img, hw[1], hw[0]);
-            img = NDImageUtils.toTensor(img).sub(-0.5f).div(0.5f);
+            img = NDImageUtils.toTensor(img).sub(0.5f).div(0.5f);
+            img = img.expandDims(0);
+            return new NDList(img);
+        }
+
+        @Override
+        public Batchifier getBatchifier() {
+            return null;
+        }
+    }
+
+    static class RotateTranslator implements Translator<Image, Image> {
+
+        @Override
+        public Image processOutput(TranslatorContext ctx, NDList list) throws Exception {
+            NDArray img = (NDArray) ctx.getAttachment("img");
+            float[] prob = list.singletonOrThrow().toFloatArray();
+            if (prob[1] > prob[0] && prob[1] > 0.8f) {
+                img = NDImageUtils.rotate90(img, 1);
+            }
+            return ImageFactory.getInstance().fromNDArray(img);
+        }
+
+        @Override
+        public NDList processInput(TranslatorContext ctx, Image input) throws Exception {
+            NDArray img = input.toNDArray(ctx.getNDManager());
+            if (input.getHeight() * 1.0 / input.getWidth() > 1.5) {
+                img = NDImageUtils.rotate90(img, 1);
+            }
+            ctx.setAttachment("img", img);
+            img = NDImageUtils.toTensor(img).sub(0.5f).div(0.5f);
             img = img.expandDims(0);
             return new NDList(img);
         }
