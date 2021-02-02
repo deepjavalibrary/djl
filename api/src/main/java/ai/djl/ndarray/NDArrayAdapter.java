@@ -959,6 +959,30 @@ public interface NDArrayAdapter extends NDArray {
 
     /** {@inheritDoc} */
     @Override
+    default NDArray norm() {
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    default NDArray norm(int[] axes) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    default NDArray norm(boolean keepDims) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    default NDArray norm(int[] axes, boolean keepDims) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     default NDArrayEx getNDArrayInternal() {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
