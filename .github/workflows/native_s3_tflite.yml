@@ -28,7 +28,7 @@ jobs:
       - name: build package
         run: |
           cd tensorflow
-          bazel build -c opt //tensorflow/lite/java:tensorflowlitelib tensorflow/lite/delegates/flex:delegate
+          bazel build -c opt //tensorflow/lite/java:tensorflowlitelib  //tensorflow/lite/delegates/flex:delegate
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
