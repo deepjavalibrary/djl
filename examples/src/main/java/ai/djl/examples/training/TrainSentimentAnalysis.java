@@ -147,10 +147,9 @@ public final class TrainSentimentAnalysis {
         return new SequentialBlock()
                 .add(
                         LSTM.builder()
-                                .setNumStackedLayers(2)
+                                .setNumLayers(2)
                                 .setStateSize(100)
-                                .setSequenceLength(false)
-                                .optBidrectional(true)
+                                .optBidirectional(true)
                                 .build())
                 .add(
                         x -> {

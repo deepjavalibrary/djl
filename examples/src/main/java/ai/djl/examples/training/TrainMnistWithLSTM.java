@@ -93,7 +93,12 @@ public final class TrainMnistWithLSTM {
                     return input.reshape(new Shape(batchSize, time, channel));
                 });
         block.add(
-                new LSTM.Builder().setStateSize(64).setNumStackedLayers(1).optDropRate(0).build());
+                new LSTM.Builder()
+                        .setStateSize(64)
+                        .setNumLayers(1)
+                        .optDropRate(0)
+                        .optReturnState(false)
+                        .build());
         block.add(BatchNorm.builder().optEpsilon(1e-5f).optMomentum(0.9f).build());
         block.add(Blocks.batchFlattenBlock());
         block.add(Linear.builder().setUnits(10).build());

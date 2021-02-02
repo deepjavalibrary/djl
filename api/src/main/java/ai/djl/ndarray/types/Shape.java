@@ -304,6 +304,20 @@ public class Shape {
     }
 
     /**
+     * Returns the tail index of the shape.
+     *
+     * @return the tail index of the shape
+     * @throws IndexOutOfBoundsException Thrown if the shape is empty
+     */
+    public long tail() {
+        // scalar case
+        if (shape.length == 0) {
+            throw new IndexOutOfBoundsException("can't get value from scalar shape.");
+        }
+        return shape[shape.length - 1];
+    }
+
+    /**
      * Returns the number of trailing ones in the array shape.
      *
      * <p>For example, a rank 3 array with shape [10, 1, 1] would return 2 for this method

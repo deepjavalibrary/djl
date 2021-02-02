@@ -89,7 +89,8 @@ public class EncoderDecoder extends AbstractBlock {
             NDList labels,
             PairList<String, Object> params) {
         NDList encoderOutputs = encoder.forward(parameterStore, data, true, params);
-        decoder.initState(encoder.getStates(encoderOutputs));
+        // add hidden states & cell states to decoder inputs
+        labels.addAll(encoder.getStates(encoderOutputs));
         return decoder.forward(parameterStore, labels, true, params);
     }
 

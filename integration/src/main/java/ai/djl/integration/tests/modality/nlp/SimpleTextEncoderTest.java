@@ -44,9 +44,10 @@ public class SimpleTextEncoderTest {
                 new SimpleTextEncoder(
                         trainableTextEmbedding,
                         LSTM.builder()
-                                .setNumStackedLayers(2)
-                                .setSequenceLength(false)
+                                .setNumLayers(2)
                                 .setStateSize(16)
+                                .optBatchFirst(true)
+                                .optReturnState(true)
                                 .build());
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getDevices()[0])) {
             encoder.setInitializer(new XavierInitializer());
@@ -55,7 +56,7 @@ public class SimpleTextEncoderTest {
                     encoder.forward(
                             new ParameterStore(manager, false),
                             new NDList(manager.zeros(new Shape(4, 7))),
-                            true);
+                            false);
             Assert.assertEquals(output.head().getShape(), new Shape(4, 7, 16));
             Assert.assertEquals(output.size(), 3);
             Assert.assertEquals(output.get(1).getShape(), new Shape(2, 4, 16));

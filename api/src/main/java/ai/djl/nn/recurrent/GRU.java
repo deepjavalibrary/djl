@@ -12,7 +12,15 @@
  */
 package ai.djl.nn.recurrent;
 
+import ai.djl.Device;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.internal.NDArrayEx;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.Parameter;
+import ai.djl.training.ParameterStore;
+import ai.djl.util.PairList;
 import ai.djl.util.Preconditions;
 
 /**
@@ -33,8 +41,50 @@ public class GRU extends RecurrentBlock {
 
     GRU(Builder builder) {
         super(builder);
-        mode = "gru";
         gates = 3;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected NDList forwardInternal(
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
+        NDArrayEx ex = inputs.head().getNDArrayInternal();
+        Device device = inputs.head().getDevice();
+        NDList gruParams = new NDList();
+        for (Parameter parameter : parameters.values()) {
+            gruParams.add(parameterStore.getValue(parameter, device, training));
+        }
+
+        NDArray input = inputs.head();
+        if (inputs.size() == 1) {
+            int batchIndex = batchFirst ? 0 : 1;
+            inputs.add(
+                    input.getManager()
+                            .zeros(
+                                    new Shape(
+                                            (long) numLayers * getNumDirections(),
+                                            input.size(batchIndex),
+                                            stateSize)));
+        }
+        NDList outputs =
+                ex.gru(
+                        input,
+                        inputs.get(1),
+                        gruParams,
+                        hasBiases,
+                        numLayers,
+                        dropRate,
+                        training,
+                        bidirectional,
+                        batchFirst);
+        if (returnState) {
+            return outputs;
+        }
+        outputs.stream().skip(1).forEach(NDArray::close);
+        return new NDList(outputs.get(0));
     }
 
     /**
@@ -62,8 +112,7 @@ public class GRU extends RecurrentBlock {
          */
         public GRU build() {
             Preconditions.checkArgument(
-                    stateSize > 0 && numStackedLayers > 0,
-                    "Must set stateSize and numStackedLayers");
+                    stateSize > 0 && numLayers > 0, "Must set stateSize and numStackedLayers");
             return new GRU(this);
         }
     }
