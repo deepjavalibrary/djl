@@ -72,3 +72,12 @@ cd jupyter
 docker build -t deepjavalibrary/jupyter .
 ```
 
+### Run docker compose
+
+```
+cd jupyter
+docker-compose build
+docker-compose up -d
+```
+
+You can open the `http://localhost:8888` to see the hosted instance on docker compose.

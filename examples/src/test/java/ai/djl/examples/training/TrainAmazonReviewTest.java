@@ -13,11 +13,11 @@
 package ai.djl.examples.training;
 
 import ai.djl.Device;
-import ai.djl.MalformedModelException;
+import ai.djl.ModelException;
 import ai.djl.examples.training.transferlearning.TrainAmazonReviewRanking;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
@@ -25,8 +25,7 @@ public class TrainAmazonReviewTest {
 
     @Test
     public void testRankTraining()
-            throws MalformedModelException, ModelNotFoundException, TranslateException,
-                    IOException {
+            throws ModelException, TranslateException, IOException, URISyntaxException {
         // this is nightly test
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");

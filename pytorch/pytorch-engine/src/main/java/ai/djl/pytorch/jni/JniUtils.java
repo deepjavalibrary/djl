@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.nn.recurrent.RNN;
 import ai.djl.pytorch.engine.PtDeviceType;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
@@ -124,19 +125,25 @@ public final class JniUtils {
             DataType dType,
             SparseFormat fmt,
             Device device) {
-        int layoutVal = layoutMapper(fmt, device);
-        return new PtNDArray(
-                manager,
+        int layout = layoutMapper(fmt, device);
+        long handle =
                 PyTorchLibrary.LIB.torchFromBlob(
                         data,
                         shape.getShape(),
                         dType.ordinal(),
-                        layoutVal,
+                        layout,
                         new int[] {
                             PtDeviceType.toDeviceType(device),
                             device.equals(Device.cpu()) ? -1 : device.getDeviceId()
                         },
-                        false));
+                        false);
+
+        if (layout == 1 || layout == 2 || Device.Type.GPU.equals(device.getDeviceType())) {
+            // MKLDNN & COO & GPU device will explicitly make a copy in native code
+            // so we don't want to hold a reference on Java side
+            return new PtNDArray(manager, handle);
+        }
+        return new PtNDArray(manager, handle, data);
     }
 
     public static PtNDArray createEmptyNdArray(
@@ -355,8 +362,9 @@ public final class JniUtils {
                 ndArray.getHandle(), value.getHandle(), minIndices, maxIndices, stepIndices);
     }
 
-    public static void set(PtNDArray self, PtNDArray other) {
-        PyTorchLibrary.LIB.torchSet(self.getHandle(), other.getHandle());
+    public static void set(PtNDArray self, ByteBuffer data) {
+        // Note the ByteBuffer here is directByteBuffer
+        PyTorchLibrary.LIB.torchSet(self.getHandle(), data);
     }
 
     public static PtNDArray pick(PtNDArray ndArray, PtNDArray index, long dim) {
@@ -657,6 +665,13 @@ public final class JniUtils {
         return new PtNDArray(
                 ndArray.getManager(),
                 PyTorchLibrary.LIB.torchMean(ndArray.getHandle(), dim, keepDim));
+    }
+
+    public static PtNDArray rot90(PtNDArray ndArray, int times, int[] axes) {
+        long[] longaxes = Arrays.stream(axes).mapToLong(i -> i).toArray();
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchRot90(ndArray.getHandle(), times, longaxes));
     }
 
     public static PtNDArray sum(PtNDArray ndArray) {
@@ -1092,6 +1107,103 @@ public final class JniUtils {
         return new PtNDArray(
                 ndArray.getManager(),
                 PyTorchLibrary.LIB.torchNNDropout(ndArray.getHandle(), prob, training));
+    }
+
+    public static NDList rnn(
+            PtNDArray input,
+            PtNDArray hx,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            RNN.Activation activation,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst) {
+        PtNDManager manager = input.getManager();
+        long[] paramHandles =
+                params.stream().mapToLong(array -> ((PtNDArray) array).getHandle()).toArray();
+        long[] outputs =
+                PyTorchLibrary.LIB.torchNNRnn(
+                        input.getHandle(),
+                        hx.getHandle(),
+                        paramHandles,
+                        hasBiases,
+                        numLayers,
+                        activation.ordinal(),
+                        dropRate,
+                        training,
+                        bidirectional,
+                        batchFirst);
+        NDList res = new NDList();
+        for (long output : outputs) {
+            res.add(new PtNDArray(manager, output));
+        }
+        return res;
+    }
+
+    public static NDList gru(
+            PtNDArray input,
+            PtNDArray hx,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst) {
+        PtNDManager manager = input.getManager();
+        long[] paramHandles =
+                params.stream().mapToLong(array -> ((PtNDArray) array).getHandle()).toArray();
+        long[] outputs =
+                PyTorchLibrary.LIB.torchNNGru(
+                        input.getHandle(),
+                        hx.getHandle(),
+                        paramHandles,
+                        hasBiases,
+                        numLayers,
+                        dropRate,
+                        training,
+                        bidirectional,
+                        batchFirst);
+        NDList res = new NDList();
+        for (long output : outputs) {
+            res.add(new PtNDArray(manager, output));
+        }
+        return res;
+    }
+
+    public static NDList lstm(
+            PtNDArray input,
+            NDList hx,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst) {
+        PtNDManager manager = input.getManager();
+        long[] hxHandles =
+                hx.stream().mapToLong(array -> ((PtNDArray) array).getHandle()).toArray();
+        long[] paramHandles =
+                params.stream().mapToLong(array -> ((PtNDArray) array).getHandle()).toArray();
+        long[] outputs =
+                PyTorchLibrary.LIB.torchNNLstm(
+                        input.getHandle(),
+                        hxHandles,
+                        paramHandles,
+                        hasBiases,
+                        numLayers,
+                        dropRate,
+                        training,
+                        bidirectional,
+                        batchFirst);
+        NDList res = new NDList();
+        for (long output : outputs) {
+            res.add(new PtNDArray(manager, output));
+        }
+        return res;
     }
 
     public static PtNDArray avgPool(

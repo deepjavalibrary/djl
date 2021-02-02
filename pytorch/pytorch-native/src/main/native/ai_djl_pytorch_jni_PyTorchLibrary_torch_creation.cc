@@ -10,24 +10,26 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+#include <djl/utils.h>
+
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_exception.h"
-#include "djl_pytorch_jni_utils.h"
+#include "djl_pytorch_utils.h"
 
 // The file is the implementation for PyTorch tensor creation ops
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(JNIEnv* env, jobject jthis,
     jobject jbuffer, jlongArray jshape, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
   API_BEGIN()
-  const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
+  const auto shape_vec = djl::utils::jni::GetVecFromJLongArray(env, jshape);
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
   auto options = torch::TensorOptions().requires_grad(JNI_TRUE == jrequired_grad);
   // DJL's UNKNOWN type
   if (jdtype != 8) {
     options = options.dtype(utils::GetScalarTypeFromDType(jdtype));
   }
-  // call the clone() to let tensor own the memory
-  torch::Tensor result = torch::from_blob(env->GetDirectBufferAddress(jbuffer), shape_vec, options).clone();
+  // the java side hold the reference for the directByteBuffer
+  torch::Tensor result = torch::from_blob(env->GetDirectBufferAddress(jbuffer), shape_vec, options);
   // from_blob doesn't support torch::kSparse and torch::kMkldnn, so explicit cast the type here
   if (jlayout == 1) {
     result = result.to_sparse();
@@ -46,7 +48,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(JNI
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchEmpty(JNIEnv* env, jobject jthis, jlongArray jshape,
     jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
   API_BEGIN()
-  const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
+  const auto shape_vec = djl::utils::jni::GetVecFromJLongArray(env, jshape);
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const torch::Tensor* tensor_ptr = new torch::Tensor(
       (jlayout == 2) ? torch::empty(shape_vec, options).to_mkldnn() : torch::empty(shape_vec, options));
@@ -57,7 +59,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchEmpty(JNIEnv
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchZeros(JNIEnv* env, jobject jthis, jlongArray jshape,
     jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
   API_BEGIN()
-  const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
+  const auto shape_vec = djl::utils::jni::GetVecFromJLongArray(env, jshape);
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const torch::Tensor* tensor_ptr = new torch::Tensor(
       (jlayout == 2) ? torch::zeros(shape_vec, options).to_mkldnn() : torch::zeros(shape_vec, options));
@@ -68,7 +70,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchZeros(JNIEnv
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchOnes(JNIEnv* env, jobject jthis, jlongArray jshape,
     jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
   API_BEGIN()
-  const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
+  const auto shape_vec = djl::utils::jni::GetVecFromJLongArray(env, jshape);
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const torch::Tensor* tensor_ptr =
       new torch::Tensor((jlayout == 2) ? torch::ones(shape_vec, options).to_mkldnn() : torch::ones(shape_vec, options));
@@ -79,7 +81,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchOnes(JNIEnv*
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFull(JNIEnv* env, jobject jthis, jlongArray jshape,
     jdouble jfill_value, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
   API_BEGIN()
-  const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
+  const auto shape_vec = djl::utils::jni::GetVecFromJLongArray(env, jshape);
   const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequired_grad);
   const torch::Tensor* tensor_ptr =
       new torch::Tensor((jlayout == 2) ? torch::full(shape_vec, jfill_value, options).to_mkldnn()
@@ -147,7 +149,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSparseCoo(
   API_BEGIN()
   const auto* indices_ptr = reinterpret_cast<torch::Tensor*>(jindices);
   const auto* val_ptr = reinterpret_cast<torch::Tensor*>(jvalue);
-  const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
+  const auto shape_vec = djl::utils::jni::GetVecFromJLongArray(env, jshape);
   const auto options = torch::TensorOptions()
                            .device(val_ptr->device())
                            .layout(torch::kSparse)

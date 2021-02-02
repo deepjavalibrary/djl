@@ -22,12 +22,16 @@ import ai.djl.util.PairList;
 public interface SymbolBlock extends Block {
 
     /** Removes the last block in the symbolic graph. */
-    void removeLastBlock();
+    default void removeLastBlock() {
+        throw new UnsupportedOperationException("not supported");
+    }
 
     /**
      * Returns a {@link PairList} of output names and shapes stored in model file.
      *
      * @return the {@link PairList} of output names, and shapes
      */
-    PairList<String, Shape> describeOutput();
+    default PairList<String, Shape> describeOutput() {
+        throw new UnsupportedOperationException("not supported");
+    }
 }

@@ -187,6 +187,9 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
         }
 
         protected void configPreProcess(Map<String, ?> arguments) {
+            if (pipeline == null) {
+                pipeline = new Pipeline();
+            }
             width = getIntValue(arguments, "width", 224);
             height = getIntValue(arguments, "height", 224);
             if (arguments.containsKey("flag")) {
@@ -226,6 +229,9 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
                 addTransform(a -> a.div(255f));
             } else if ("-1,1".equals(range)) {
                 addTransform(a -> a.div(128f).sub(1));
+            }
+            if (arguments.containsKey("batchifier")) {
+                batchifier = Batchifier.fromString((String) arguments.get("batchifier"));
             }
         }
 

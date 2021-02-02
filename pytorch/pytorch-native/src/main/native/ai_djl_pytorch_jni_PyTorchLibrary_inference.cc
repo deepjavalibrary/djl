@@ -14,7 +14,7 @@
 
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_exception.h"
-#include "djl_pytorch_jni_utils.h"
+#include "djl_pytorch_utils.h"
 
 // The file is the implementation for PyTorch inference operations
 
@@ -26,20 +26,20 @@ struct JITCallGuard {
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad(
     JNIEnv* env, jobject jthis, jstring jpath, jintArray jarray, jobjectArray jefnames, jobjectArray jefvalues) {
   API_BEGIN()
-  const std::string path = utils::GetStringFromJString(env, jpath);
+  const std::string path = djl::utils::jni::GetStringFromJString(env, jpath);
   const torch::Device device = utils::GetDeviceFromJDevice(env, jarray);
   std::unordered_map<std::string, std::string> map;
   size_t len = static_cast<size_t>(env->GetArrayLength(jefnames));
   for (size_t i = 0; i < len; ++i) {
     auto jname = (jstring)env->GetObjectArrayElement(jefnames, i);
-    auto name = utils::GetStringFromJString(env, jname);
+    auto name = djl::utils::jni::GetStringFromJString(env, jname);
     map[name] = "";
   }
   const torch::jit::script::Module module = torch::jit::load(path, device, map);
   const auto* module_ptr = new torch::jit::script::Module(module);
   for (size_t i = 0; i < len; ++i) {
     auto jname = (jstring)env->GetObjectArrayElement(jefnames, i);
-    auto name = utils::GetStringFromJString(env, jname);
+    auto name = djl::utils::jni::GetStringFromJString(env, jname);
     env->SetObjectArrayElement(jefvalues, i, env->NewStringUTF(map[name].c_str()));
   }
   return reinterpret_cast<uintptr_t>(module_ptr);
@@ -86,7 +86,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
   for (auto i = 0; i < len; ++i) {
     delete reinterpret_cast<torch::IValue*>(jptrs[i]);
   }
-  env->ReleaseLongArrayElements(jivalue_ptrs, jptrs, utils::RELEASE_MODE);
+  env->ReleaseLongArrayElements(jivalue_ptrs, jptrs, djl::utils::jni::RELEASE_MODE);
   const auto* result_ptr = new torch::IValue(output);
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()

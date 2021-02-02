@@ -27,7 +27,7 @@ You can pull the MXNet engine from the central Maven repository by including the
 <dependency>
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-model-zoo</artifactId>
-    <version>0.8.0</version>
+    <version>0.9.0</version>
 </dependency>
 ```
 
@@ -62,8 +62,8 @@ The following is an example of the criteria to find a Resnet50-v1 model that has
     criteria.put("flavor", "v1");
     criteria.put("dataset", "imagenet");
 
-    ZooModel<Image, Classification> model = MxModelZoo.RESNET.loadModel(criteria, device);
-``` 
+    ZooModel<Image, Classifications> model = MxModelZoo.RESNET.loadModel(criteria, device);
+```
 
 ### List of search criteria for each model
 

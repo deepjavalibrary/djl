@@ -119,6 +119,8 @@ final class PyTorchLibrary {
 
     native void torchRemainderi(long self, long other);
 
+    native long torchRot90(long self, long k, long[] axes);
+
     native long torchPow(long self, long exponent);
 
     native void torchPowi(long self, long exponent);
@@ -182,7 +184,7 @@ final class PyTorchLibrary {
             long[] maxIndices,
             long[] stepIndices);
 
-    native void torchSet(long selfHandle, long otherHandle);
+    native void torchSet(long handle, ByteBuffer data);
 
     native long torchSlice(long handle, long dim, long start, long end, long step);
 
@@ -385,6 +387,40 @@ final class PyTorchLibrary {
             boolean training,
             double momentum,
             double eps);
+
+    native long[] torchNNRnn(
+            long inputHandle,
+            long hxHandle,
+            long[] paramHandles,
+            boolean hasBiases,
+            int numLayers,
+            int activation,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst);
+
+    native long[] torchNNGru(
+            long inputHandle,
+            long hxHandle,
+            long[] paramHandles,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst);
+
+    native long[] torchNNLstm(
+            long inputHandle,
+            long[] hxHandles,
+            long[] paramHandles,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst);
 
     native long torchNNAvgPool(
             long inputHandle,

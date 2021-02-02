@@ -24,6 +24,10 @@ import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.util.NativeResource;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -50,8 +54,13 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     private PtNDManager manager;
     private PtNDArrayEx ptNDArrayEx;
 
+    // keep a reference to direct buffer to avoid GC release the memory
+    @SuppressWarnings("PMD.UnusedPrivateField")
+    private ByteBuffer dataRef;
+
     /**
-     * Constructs an PyTorch from a native handle (internal. Use {@link NDManager} instead).
+     * Constructs a PyTorch {@code NDArray} from a native handle (internal. Use {@link NDManager}
+     * instead).
      *
      * @param manager the manager to attach the new array to
      * @param handle the pointer to the native PyTorch memory
@@ -61,6 +70,22 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
         manager.attach(getUid(), this);
+    }
+
+    /**
+     * Constructs a PyTorch {@code NDArray} from a native handle (internal. Use {@link NDManager}
+     * instead) with the data that is hold on Java side.
+     *
+     * @param manager the manager to attach the new array to
+     * @param handle the pointer to the native PyTorch memory
+     * @param data the direct buffer of the data
+     */
+    public PtNDArray(PtNDManager manager, long handle, ByteBuffer data) {
+        super(handle);
+        this.manager = manager;
+        this.ptNDArrayEx = new PtNDArrayEx(this);
+        manager.attach(getUid(), this);
+        dataRef = data;
     }
 
     /** {@inheritDoc} */
@@ -176,6 +201,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray stopGradient() {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public ByteBuffer toByteBuffer() {
         return JniUtils.getByteBuffer(this);
     }
@@ -183,9 +214,55 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
-        PtNDArray other = getManager().create(data, getShape(), getDataType());
-        JniUtils.set(this, other);
-        other.close();
+        int size = data.remaining();
+        if (size != size()) {
+            throw new IllegalArgumentException(
+                    "size mismatch! the NDArray has size " + size() + " but set with size " + size);
+        }
+        // TODO how do we handle the exception happened in the middle
+        dataRef = null;
+        if (data.isDirect() && data instanceof ByteBuffer) {
+            // If NDArray is on the GPU, it is native code responsibility to control the data life
+            // cycle
+            if (!Device.Type.GPU.equals(getDevice().getDeviceType())) {
+                dataRef = (ByteBuffer) data;
+            }
+            JniUtils.set(this, (ByteBuffer) data);
+            return;
+        }
+        // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
+        DataType inputType = DataType.fromBuffer(data);
+
+        int numOfBytes = inputType.getNumOfBytes();
+        ByteBuffer buf = manager.allocateDirect(size * numOfBytes);
+        switch (inputType) {
+            case FLOAT32:
+                buf.asFloatBuffer().put((FloatBuffer) data);
+                break;
+            case FLOAT64:
+                buf.asDoubleBuffer().put((DoubleBuffer) data);
+                break;
+            case UINT8:
+            case INT8:
+            case BOOLEAN:
+                buf.put((ByteBuffer) data);
+                break;
+            case INT32:
+                buf.asIntBuffer().put((IntBuffer) data);
+                break;
+            case INT64:
+                buf.asLongBuffer().put((LongBuffer) data);
+                break;
+            case FLOAT16:
+            default:
+                throw new UnsupportedOperationException("data type is not supported!");
+        }
+        buf.rewind();
+        // If NDArray is on the GPU, it is native code responsibility to control the data life cycle
+        if (!Device.Type.GPU.equals(getDevice().getDeviceType())) {
+            dataRef = buf;
+        }
+        JniUtils.set(this, buf);
     }
 
     /** {@inheritDoc} */
@@ -852,6 +929,15 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public PtNDArray rotate90(int times, int[] axes) {
+        if (axes.length != 2) {
+            throw new IllegalArgumentException("Axes must be 2");
+        }
+        return JniUtils.rot90(this, times, axes);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray trace(int offset, int axis1, int axis2) {
         throw new UnsupportedOperationException("Not implemented");
     }
@@ -1094,7 +1180,28 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray repeat(Shape desiredShape) {
-        throw new UnsupportedOperationException("Not implemented");
+        return repeat(repeatsToMatchShape(desiredShape));
+    }
+
+    private long[] repeatsToMatchShape(Shape desiredShape) {
+        Shape curShape = getShape();
+        int dimension = curShape.dimension();
+        if (desiredShape.dimension() > dimension) {
+            throw new IllegalArgumentException("The desired shape has too many dimensions");
+        }
+        if (desiredShape.dimension() < dimension) {
+            int additionalDimensions = dimension - desiredShape.dimension();
+            desiredShape = curShape.slice(0, additionalDimensions).addAll(desiredShape);
+        }
+        long[] repeats = new long[dimension];
+        for (int i = 0; i < dimension; i++) {
+            if (curShape.get(i) == 0 || desiredShape.get(i) % curShape.get(i) != 0) {
+                throw new IllegalArgumentException(
+                        "The desired shape is not a multiple of the original shape");
+            }
+            repeats[i] = Math.round(Math.ceil((double) desiredShape.get(i) / curShape.get(i)));
+        }
+        return repeats;
     }
 
     /** {@inheritDoc} */
@@ -1109,6 +1216,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         return JniUtils.dot(this, (PtNDArray) other);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray matMul(NDArray other) {
         if (isScalar() || other.isScalar()) {
@@ -1129,6 +1237,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         return JniUtils.transpose(this, axis1, axis2);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray flip(int... axes) {
         return JniUtils.flip(this, Arrays.stream(axes).mapToLong(ele -> (long) ele).toArray());
@@ -1305,6 +1414,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             JniUtils.deleteNDArray(pointer);
             manager.detach(getUid());
             manager = null;
+            dataRef = null;
         }
     }
 }

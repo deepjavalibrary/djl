@@ -49,6 +49,7 @@ public class EncoderDecoder extends AbstractBlock {
         super(VERSION);
         this.encoder = addChildBlock("Encoder", encoder);
         this.decoder = addChildBlock("Decoder", decoder);
+        inputNames = Arrays.asList("encoderInput", "decoderInput");
     }
 
     /** {@inheritDoc} */
@@ -57,19 +58,12 @@ public class EncoderDecoder extends AbstractBlock {
         if (!isInitialized()) {
             throw new IllegalStateException("Parameter of this block are not initialised");
         }
-        inputNames = Arrays.asList("encoderInput", "decoderInput");
         return new PairList<>(inputNames, Arrays.asList(inputShapes));
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(ParameterStore parameterStore, NDList inputs, boolean training) {
-        return forward(parameterStore, inputs, training, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,
@@ -83,13 +77,20 @@ public class EncoderDecoder extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
+    public NDList forward(ParameterStore parameterStore, NDList inputs, boolean training) {
+        return forward(parameterStore, inputs, training, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDList forward(
             ParameterStore parameterStore,
             NDList data,
             NDList labels,
             PairList<String, Object> params) {
         NDList encoderOutputs = encoder.forward(parameterStore, data, true, params);
-        decoder.initState(encoder.getStates(encoderOutputs));
+        // add hidden states & cell states to decoder inputs
+        labels.addAll(encoder.getStates(encoderOutputs));
         return decoder.forward(parameterStore, labels, true, params);
     }
 

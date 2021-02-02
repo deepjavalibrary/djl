@@ -157,7 +157,7 @@ public final class NDIndexFullSlice {
             long rawMax = Optional.ofNullable(slice.getMax()).orElse(target.size(i));
             max[i] = rawMax < 0 ? Math.floorMod(rawMax, target.get(i)) : rawMax;
             step[i] = Optional.ofNullable(slice.getStep()).orElse(1L);
-            shape[i] = (max[i] - min[i]) / step[i];
+            shape[i] = (long) Math.ceil(((double) (max[i] - min[i])) / step[i]);
             squeezedShape.add(shape[i]);
         } else if (ie instanceof NDIndexAll) {
             padIndexAll(i, target, min, max, step, shape, squeezedShape);

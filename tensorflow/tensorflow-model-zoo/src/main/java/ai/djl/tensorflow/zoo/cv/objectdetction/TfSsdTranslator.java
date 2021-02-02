@@ -22,6 +22,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ import java.util.Map;
 public class TfSsdTranslator extends ObjectDetectionTranslator {
 
     private int maxBoxes;
+    private String numDetectionsOutputName;
     private String boundingBoxOutputName;
     private String scoresOutputName;
     private String classLabelOutputName;
@@ -45,6 +47,7 @@ public class TfSsdTranslator extends ObjectDetectionTranslator {
     protected TfSsdTranslator(Builder builder) {
         super(builder);
         this.maxBoxes = builder.maxBoxes;
+        this.numDetectionsOutputName = builder.numDetectionsOutputName;
         this.boundingBoxOutputName = builder.boundingBoxOutputName;
         this.scoresOutputName = builder.scoresOutputName;
         this.classLabelOutputName = builder.classLabelOutputName;
@@ -70,6 +73,12 @@ public class TfSsdTranslator extends ObjectDetectionTranslator {
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
         int len = (int) list.get(0).getShape().get(0);
+        for (NDArray array : list) {
+            if (numDetectionsOutputName.equals(array.getName())) {
+                len = array.toArray()[0].intValue();
+                break;
+            }
+        }
         float[] scores = new float[len];
         long[] classIds = new long[len];
 
@@ -80,9 +89,7 @@ public class TfSsdTranslator extends ObjectDetectionTranslator {
             } else if (boundingBoxOutputName.equals(array.getName())) {
                 boundingBoxes = array;
             } else if (classLabelOutputName.equals(array.getName())) {
-                classIds = array.toLongArray();
-            } else {
-                throw new IllegalStateException("Unexpected result NDArray:" + array.getName());
+                classIds = Arrays.stream(array.toArray()).mapToLong(Number::longValue).toArray();
             }
         }
         List<String> retNames = new ArrayList<>();
@@ -142,10 +149,25 @@ public class TfSsdTranslator extends ObjectDetectionTranslator {
     /** The builder for TensorFlow SSD translator. */
     public static class Builder extends ObjectDetectionBuilder<Builder> {
 
-        private int maxBoxes = 10;
-        private String boundingBoxOutputName = "detection_boxes";
-        private String scoresOutputName = "detection_scores";
-        private String classLabelOutputName = "detection_class_labels";
+        int maxBoxes = 10;
+        String numDetectionsOutputName = "num_detections";
+        String boundingBoxOutputName = "detection_boxes";
+        String scoresOutputName = "detection_scores";
+        String classLabelOutputName = "detection_class_labels";
+
+        /**
+         * Set the output name used for number of detections.
+         *
+         * <p>You can find the output names of TensorFlow models by calling `model.describeOutput()`
+         * after loading it.
+         *
+         * @param numDetectionsOutputName output name for number of detections
+         * @return this builder
+         */
+        public Builder optNumDetectionsOutputName(String numDetectionsOutputName) {
+            this.numDetectionsOutputName = numDetectionsOutputName;
+            return this;
+        }
 
         /**
          * Set the output name used for bounding boxes. You can find the output names of TensorFlow
@@ -212,6 +234,8 @@ public class TfSsdTranslator extends ObjectDetectionTranslator {
             super.configPostProcess(arguments);
             maxBoxes = getIntValue(arguments, "maxBoxes", 10);
             threshold = getFloatValue(arguments, "threshold", 0.4f);
+            numDetectionsOutputName =
+                    getStringValue(arguments, "numDetectionsOutputName", "num_detections");
             boundingBoxOutputName =
                     getStringValue(arguments, "boundingBoxOutputName", "detection_boxes");
             scoresOutputName = getStringValue(arguments, "scoresOutputName", "detection_scores");

@@ -13,6 +13,7 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Model;
+import ai.djl.basicdataset.cv.classification.ImageFolder;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -86,7 +87,7 @@ public class ImageFolderTest {
                         catBatch.getData().singletonOrThrow(),
                         NDImageUtils.toTensor(NDImageUtils.resize(cat, 100, 100)).expandDims(0));
                 Assert.assertEquals(
-                        catBatch.getLabels().singletonOrThrow(), manager.create(new int[] {0}));
+                        catBatch.getLabels().singletonOrThrow(), manager.create(new long[] {0}));
                 catBatch.close();
 
                 Batch dogBatch = ds.next();
@@ -94,7 +95,7 @@ public class ImageFolderTest {
                         dogBatch.getData().singletonOrThrow(),
                         NDImageUtils.toTensor(NDImageUtils.resize(dog, 100, 100)).expandDims(0));
                 Assert.assertEquals(
-                        dogBatch.getLabels().singletonOrThrow(), manager.create(new int[] {1}));
+                        dogBatch.getLabels().singletonOrThrow(), manager.create(new long[] {1}));
                 dogBatch.close();
 
                 Batch pikachuBatch = ds.next();
@@ -103,7 +104,8 @@ public class ImageFolderTest {
                         NDImageUtils.toTensor(NDImageUtils.resize(pikachu, 100, 100))
                                 .expandDims(0));
                 Assert.assertEquals(
-                        pikachuBatch.getLabels().singletonOrThrow(), manager.create(new int[] {2}));
+                        pikachuBatch.getLabels().singletonOrThrow(),
+                        manager.create(new long[] {2}));
                 pikachuBatch.close();
             }
         }

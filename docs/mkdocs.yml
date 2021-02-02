@@ -16,6 +16,7 @@ theme:
   palette:
     primary: light-blue
     accent: light-blue
+  edit_uri: ''
 google_analytics:
   - UA-159559852-2
   - auto
@@ -36,6 +37,8 @@ plugins:
   - exclude:
       regex:
         - '.*\.(symbol|params|pt|jar|gz|zip|txt|json|sh|bat|cmd|puml|g4|java|py|cc|h|pro|properties|xml|gradlew|gradle|Dockerfile|RepositoryFactory|EngineProvider|ZooProvider)$|(docker|integration|testing|tools)/.*$'
+
+
 nav:
   - Home:
       - Main: 'README.md'
@@ -43,6 +46,7 @@ nav:
       - 'docs/README.md'
       - 'examples/README.md'
       - 'docs/interactive_tool.md'
+      - Community Leaders: 'leaders.md'
       - Contributor Documentation:
           - Main: 'docs/development/README.md'
           - 'docs/development/setup.md'
@@ -63,6 +67,7 @@ nav:
       - 'docs/development/cache_management.md'
       - 'docs/development/memory_management.md'
       - 'docs/development/inference_performance_optimization.md'
+      - 'docs/development/benchmark_with_djl.md'
   - Apache MXNet:
       - Overview: 'mxnet/README.md'
       - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
@@ -72,7 +77,7 @@ nav:
         - MXNet Model Zoo: 'mxnet/mxnet-model-zoo/README.md'
         - MXNet native library: 'mxnet/native/README.md'
   - ONNX Runtime:
-      - ONNX runtime Hybrid Engine: 'docs/onnxruntime/hybrid_engine.md'
+      - ONNX runtime Hybrid Engine: 'docs/hybrid_engine.md'
       - Load a ONNX Model: 'jupyter/onnxruntime/machine_learning_with_ONNXRuntime.ipynb'
       - Module: 'onnxruntime/onnxruntime-engine/README.md'
   - PyTorch:
@@ -91,7 +96,44 @@ nav:
       - Modules:
         - TensorFlow Engine: 'tensorflow/tensorflow-engine/README.md'
         - TensorFlow Model Zoo: 'tensorflow/tensorflow-model-zoo/README.md'
+  - PaddlePaddle:
+      - Overview: 'paddlepaddle/README.md'
+      - Load a PaddlePaddle Model: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
+      - Modules:
+          - PaddlePaddle Engine: 'paddlepaddle/paddlepaddle-engine/README.md'
+          - TensorFlow Model Zoo: 'paddlepaddle/paddlepaddle-model-zoo/README.md'
   - Extensions:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'
       - Hadoop support: 'extensions/hadoop/README.md'
+  - Demos:
+    - Demos: 'docs/demos/README.md'
+    - AWS:
+        - AWS-kinesis-video-streams: 'docs/demos/aws/aws-kinesis-video-streams/README.md'
+        - Model Serving on AWS BeanStalk EC2: 'docs/demos/aws/beanstalk-model-serving/README.md'
+        - Serverless Model Serving with DJL: 'docs/demos/aws/lambda-model-serving/README.md'
+        - Distributed inference with AWS EMR: 'docs/demos/aws/emr-distributed-inference/dataprocess/README.md'
+        - Start with SageMaker Notebook: 'docs/demos/aws/sagemaker-notebook/README.md'
+    - Android:
+        - Doodledraw Applications with Android: 'docs/demos/android/README.md'
+    - EcoSystem:
+        - Java Integrations:
+            - DJL Component in Apache Camel: 'docs/demos/camel-djl/README.md'
+            - Run TensorFlow model on GraalVM: 'docs/demos/graalvm/README.md'
+            - Spark Image Classification: 'docs/demos/spark/image-classification/README.md'
+            - Apache Beam: 'docs/demos/apache-beam/ctr-prediction/README.md'
+            - Apache Flink: 'docs/demos/flink/sentiment-analysis/README.md'
+            - Quarkus + DJL Demo: 'docs/demos/quarkus/example/README.md'
+    - Applications:
+        - Footwear Classification: 'docs/demos/footwear_classification/README.md'
+        - Live Object Detection: 'docs/demos/live-object-detection/README.md'
+        - Pneumonia Detection: 'docs/demos/pneumonia-detection/README.md'
+        - MultiEngine on DJL: 'docs/demos/multi-engine/README.md'
+        - Visualizing Training with DJL: 'docs/demos/visualization/README.md'
+        - Interactive JShell and Block Runner for DJL: 'docs/demos/web-demo/interactive-console/README.md'
+        - Malicious URL Detection: 'docs/demos/malicious-url-detector/README.md'
+    - Extensions:
+        - Visualizing Training with DJL: 'docs/demos/visualization/README.md'
+        - Interactive JShell and Block Runner for DJL: 'docs/demos/web-demo/interactive-console/README.md'
+
+

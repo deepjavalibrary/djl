@@ -14,6 +14,9 @@ allprojects {
             url "https://mlrepo.djl.ai/maven/"
         }
         jcenter()
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
     }
 
     apply plugin: 'idea'
@@ -38,6 +41,20 @@ configure(javaProjects()) {
     compileTestJava.options.encoding = "UTF-8"
     if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
         compileJava.options.compilerArgs.addAll(["--release", "8"])
+    }
+
+    apply plugin: 'eclipse'
+
+    eclipse {
+        jdt.file.withProperties { props ->
+            props.setProperty "org.eclipse.jdt.core.circularClasspath", "warning"
+        }
+        classpath {
+            sourceSets.test.java {
+                srcDirs = ["src/test/java"]
+                exclude "**/package-info.java"
+            }
+        }
     }
 
     apply from: file("${rootProject.projectDir}/tools/gradle/java-formatter.gradle")
@@ -94,3 +111,4 @@ configure(javaProjects()) {
 apply from: file("${rootProject.projectDir}/tools/gradle/publish.gradle")
 apply from: file("${rootProject.projectDir}/tools/gradle/jacoco.gradle")
 apply from: file("${rootProject.projectDir}/tools/gradle/release.gradle")
+apply from: file("${rootProject.projectDir}/tools/gradle/stats.gradle")

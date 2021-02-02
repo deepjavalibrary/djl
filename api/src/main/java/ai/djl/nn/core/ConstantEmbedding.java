@@ -41,8 +41,9 @@ public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedE
         this.embedding = embedding;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,
@@ -54,41 +55,49 @@ public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedE
         return new NDList(base.repeat(shape));
     }
 
+    /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return new Shape[] {inputShapes[0].addAll(embedding.getShape())};
     }
 
+    /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) {
         // Nothing to save
     }
 
+    /** {@inheritDoc} */
     @Override
     public void loadParameters(NDManager manager, DataInputStream is) {
         // Nothing to load
     }
 
+    /** {@inheritDoc} */
     @Override
     public Optional<?> unembed(long index) {
         return Optional.empty();
     }
 
+    /** {@inheritDoc} */
     @Override
     public byte[] encode(Object input) {
         return new byte[0];
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object decode(byte[] byteArray) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public long embed(Object item) {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray embed(NDManager manager, Object[] items) {
         NDArray base = manager.create(embedding.getShape());
@@ -97,6 +106,7 @@ public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedE
         return base.repeat(shape);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean hasItem(Object item) {
         return true;

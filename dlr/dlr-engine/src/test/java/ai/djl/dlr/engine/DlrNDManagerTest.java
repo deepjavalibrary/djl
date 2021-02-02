@@ -16,12 +16,16 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class DlrNDManagerTest {
 
     @Test
     public void testNDArray() {
+        if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+            throw new SkipException("test only work on mac and Linux");
+        }
         try (NDManager manager = DlrNDManager.getSystemManager().newSubManager()) {
             NDArray zeros = manager.zeros(new Shape(1, 2));
             float[] data = zeros.toFloatArray();
@@ -30,6 +34,10 @@ public class DlrNDManagerTest {
             NDArray ones = manager.ones(new Shape(1, 2));
             data = ones.toFloatArray();
             Assert.assertEquals(data[0], 1);
+
+            NDArray array = manager.create(new float[] {0f, 1f, 2f, 3f});
+            float[] expected = new float[] {0f, 1f, 2f, 3f};
+            Assert.assertEquals(array.toFloatArray(), expected);
         }
     }
 }

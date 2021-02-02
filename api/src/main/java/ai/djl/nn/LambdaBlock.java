@@ -60,7 +60,7 @@ public class LambdaBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,
@@ -74,7 +74,7 @@ public class LambdaBlock extends AbstractBlock {
         try (NDManager subManager = manager.newSubManager()) {
             NDList input = new NDList(inputShapes.length);
             for (Shape shape : inputShapes) {
-                input.add(subManager.create(shape));
+                input.add(subManager.zeros(shape));
             }
             NDList output = lambda.apply(input);
             Shape[] outputShapes = new Shape[output.size()];

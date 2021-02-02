@@ -83,7 +83,7 @@ public final class DlrEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public Model newModel(String name, Device device) {
-        return new DlrModel(name, newBaseManager(device));
+        return new DlrModel(name, newBaseManager(device), Device.defaultIfNull(device, this));
     }
 
     /** {@inheritDoc} */

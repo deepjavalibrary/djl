@@ -52,7 +52,7 @@ public class PtDistilBertTranslator implements Translator<String, Classification
         vocabulary =
                 SimpleVocabulary.builder()
                         .optMinFrequency(1)
-                        .addFromTextFile(url.getPath())
+                        .addFromTextFile(url)
                         .optUnknownToken("[UNK]")
                         .build();
         tokenizer = new BertTokenizer();

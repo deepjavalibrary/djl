@@ -15,9 +15,10 @@ package ai.djl.dlr.engine;
 import ai.djl.BaseModel;
 import ai.djl.Device;
 import ai.djl.Model;
-import ai.djl.dlr.jni.JniUtils;
+import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.translate.Translator;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,18 +33,22 @@ import java.util.Map;
  */
 public class DlrModel extends BaseModel {
 
+    private Device predictorDevice;
+
     /**
      * Constructs a new Model on a given device.
      *
      * @param name the model name
      * @param manager the {@link NDManager} to holds the NDArray
+     * @param device the {@link Device} to create DlrModel on
      */
-    DlrModel(String name, NDManager manager) {
+    DlrModel(String name, NDManager manager, Device device) {
         super(name);
         this.manager = manager;
         this.manager.setName("dlrModel");
         // DLR only support float32
         dataType = DataType.FLOAT32;
+        this.predictorDevice = device;
     }
 
     /** {@inheritDoc} */
@@ -57,9 +62,12 @@ public class DlrModel extends BaseModel {
             throw new UnsupportedOperationException("DLR does not support dynamic blocks");
         }
         checkModelFiles(prefix);
-        Device device = manager.getDevice();
-        long modelHandle = JniUtils.createDlrModel(modelDir.toString(), device);
-        block = new DlrSymbolBlock(modelHandle);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
+        return new DlrPredictor<>(this, modelDir.toString(), predictorDevice, translator);
     }
 
     private void checkModelFiles(String prefix) throws IOException {

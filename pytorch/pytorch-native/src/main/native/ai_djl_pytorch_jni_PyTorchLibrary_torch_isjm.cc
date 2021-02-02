@@ -10,16 +10,18 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+#include <djl/utils.h>
+
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_exception.h"
-#include "djl_pytorch_jni_utils.h"
+#include "djl_pytorch_utils.h"
 
 // The file is the implementation for PyTorch tensor indexing, slicing, joining, mutating ops
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchReshape(
     JNIEnv* env, jobject jthis, jlong jhandle, jlongArray jshape) {
   API_BEGIN()
-  const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
+  const auto shape_vec = djl::utils::jni::GetVecFromJLongArray(env, jshape);
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->reshape(shape_vec));
   return reinterpret_cast<uintptr_t>(result_ptr);
@@ -53,10 +55,20 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUnsqueeze(
   API_END_RETURN()
 }
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRot90
+        (JNIEnv* env, jobject jthis, jlong jhandle, jlong jk, jlongArray jdims) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  auto vec = djl::utils::jni::GetVecFromJLongArray(env, jdims);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->rot90(jk, vec));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchExpand(
     JNIEnv* env, jobject jthis, jlong jhandle, jlongArray jshape) {
   API_BEGIN()
-  const auto shape_vec = utils::GetVecFromJLongArray(env, jshape);
+  const auto shape_vec = djl::utils::jni::GetVecFromJLongArray(env, jshape);
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->expand(shape_vec));
   return reinterpret_cast<uintptr_t>(result_ptr);
@@ -66,7 +78,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchExpand(
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStack(
     JNIEnv* env, jobject jthis, jlongArray jhandles, jlong jdim) {
   API_BEGIN()
-  const std::vector<torch::Tensor> tensor_vec = utils::GetObjectVecFromJHandles<torch::Tensor>(env, jhandles);
+  const std::vector<torch::Tensor> tensor_vec = djl::utils::jni::GetObjectVecFromJHandles<torch::Tensor>(env, jhandles);
   const torch::Tensor* result_ptr = new torch::Tensor(torch::stack(tensor_vec, jdim));
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
@@ -75,7 +87,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStack(
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchCat(
     JNIEnv* env, jobject jthis, jlongArray jhandles, jlong jdim) {
   API_BEGIN()
-  const std::vector<torch::Tensor> tensor_vec = utils::GetObjectVecFromJHandles<torch::Tensor>(env, jhandles);
+  const std::vector<torch::Tensor> tensor_vec = djl::utils::jni::GetObjectVecFromJHandles<torch::Tensor>(env, jhandles);
   const torch::Tensor* result_ptr = new torch::Tensor(torch::cat(tensor_vec, jdim));
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
@@ -86,7 +98,7 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit__
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   std::vector<torch::Tensor> tensors = tensor_ptr->split(jsize, jdim);
-  return utils::GetPtrArrayFromContainer<std::vector<torch::Tensor>, torch::Tensor>(env, tensors);
+  return djl::utils::jni::GetPtrArrayFromContainer<std::vector<torch::Tensor>, torch::Tensor>(env, tensors);
   API_END_RETURN()
 }
 
@@ -94,9 +106,9 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSplit__
     JNIEnv* env, jobject jthis, jlong jhandle, jlongArray jindices, jlong jdim) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  const std::vector<int64_t> indices = utils::GetVecFromJLongArray(env, jindices);
+  const std::vector<int64_t> indices = djl::utils::jni::GetVecFromJLongArray(env, jindices);
   std::vector<torch::Tensor> tensors = tensor_ptr->split_with_sizes(indices, jdim);
-  return utils::GetPtrArrayFromContainer<std::vector<torch::Tensor>, torch::Tensor>(env, tensors);
+  return djl::utils::jni::GetPtrArrayFromContainer<std::vector<torch::Tensor>, torch::Tensor>(env, tensors);
   API_END_RETURN()
 }
 
@@ -104,7 +116,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchPermute(
     JNIEnv* env, jobject jthis, jlong jhandle, jlongArray jdims) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  const std::vector<int64_t> dims = utils::GetVecFromJLongArray(env, jdims);
+  const std::vector<int64_t> dims = djl::utils::jni::GetVecFromJLongArray(env, jdims);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->permute(dims));
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
@@ -114,7 +126,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFlip(
     JNIEnv* env, jobject jthis, jlong jhandle, jlongArray jdims) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  const std::vector<int64_t> dims = utils::GetVecFromJLongArray(env, jdims);
+  const std::vector<int64_t> dims = djl::utils::jni::GetVecFromJLongArray(env, jdims);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->flip(dims));
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
@@ -133,7 +145,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRepeat(
     JNIEnv* env, jobject jthis, jlong jhandle, jlongArray jrepeats) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  const std::vector<int64_t> repeats = utils::GetVecFromJLongArray(env, jrepeats);
+  const std::vector<int64_t> repeats = djl::utils::jni::GetVecFromJLongArray(env, jrepeats);
   const torch::Tensor* result_ptr = new torch::Tensor(tensor_ptr->repeat(repeats));
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()

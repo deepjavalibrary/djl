@@ -57,7 +57,7 @@ public interface Model extends AutoCloseable {
      * @return a new Model instance
      */
     static Model newInstance(String name) {
-        return newInstance(name, Device.defaultDevice());
+        return newInstance(name, (Device) null);
     }
 
     /**
@@ -79,7 +79,8 @@ public interface Model extends AutoCloseable {
      * @return a new model instance
      */
     static Model newInstance(String name, String engineName) {
-        return Engine.getEngine(engineName).newModel(name, Device.defaultDevice());
+        Engine engine = Engine.getEngine(engineName);
+        return engine.newModel(name, null);
     }
 
     /**
@@ -194,7 +195,6 @@ public interface Model extends AutoCloseable {
      * @return the {@link NDManager}
      */
     NDManager getNDManager();
-
     /**
      * Creates a new {@link Trainer} instance for a Model.
      *

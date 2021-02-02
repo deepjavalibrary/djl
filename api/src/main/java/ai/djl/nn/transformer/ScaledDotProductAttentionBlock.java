@@ -193,7 +193,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,
@@ -251,21 +251,35 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
                 attentionScores.mul(attentionScores.getManager().create(1f / (float) Math.sqrt(H)));
         // Apply masking if requested, mask has shape (B, T, F)
         if (attentionMask != null) {
-            // expand mask to be used on all heads at once
-            NDArray expandedMask = attentionMask.reshape(B, 1, T, F);
-            // we turn the mask from ints into floats and turn all 1s into 0s and all
-            // 0s int o a value of -10000. Adding this to the scores will push all unwanted
-            // values towards -inf and keep the unmasked values unchanged
-            NDArray maskOffset =
-                    expandedMask
-                            .toType(DataType.FLOAT32, false)
-                            .mul(expandedMask.getManager().create(-1f)) // turn 1 into -1
-                            .add(expandedMask.getManager().create(1f)) // turn 0s to 1s, -1s to 0s
-                            .mul(
-                                    expandedMask
-                                            .getManager()
-                                            .create(-100000f)); // turn 1s (original 0s) into
-            // -100000
+            final NDArray maskOffset;
+
+            // The input mask is initially given as a list of integers with a 1 for each existing
+            // token. In order to apply it to the attention result, it needs to be expanded and the
+            // values turned into offsets for the softmax calculation. For stacked models, this
+            // can be done once and reused - hence we check for the number of dimensions if we
+            // have to do this locally or whether it was done for us.
+            if (attentionMask.getShape().dimension() != 4) {
+                // expand mask to be used on all heads at once
+                NDArray expandedMask = attentionMask.reshape(B, 1, T, F);
+                // we turn the mask from ints into floats and turn all 1s into 0s and all
+                // 0s int o a value of -10000. Adding this to the scores will push all unwanted
+                // values towards -inf and keep the unmasked values unchanged
+                maskOffset =
+                        expandedMask
+                                .toType(DataType.FLOAT32, false)
+                                .mul(expandedMask.getManager().create(-1f)) // turn 1 into -1
+                                .add(
+                                        expandedMask
+                                                .getManager()
+                                                .create(1f)) // turn 0s to 1s, -1s to 0s
+                                .mul(
+                                        expandedMask
+                                                .getManager()
+                                                .create(-100000f)); // turn 1s (original 0s) into
+                // -100000
+            } else {
+                maskOffset = attentionMask;
+            }
             // adding the mask to the scores removes the scores of unwanted positions
             normalizedAttentionScores = normalizedAttentionScores.add(maskOffset);
         }

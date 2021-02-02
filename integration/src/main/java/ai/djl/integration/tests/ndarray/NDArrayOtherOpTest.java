@@ -22,6 +22,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
 import ai.djl.util.Hex;
+import java.nio.FloatBuffer;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -242,6 +243,35 @@ public class NDArrayOtherOpTest {
             expected = manager.create(new Shape(0, 0));
             Assert.assertEquals(array.booleanMask(index), expected);
             Assert.assertEquals(NDArrays.booleanMask(array, index), expected);
+        }
+    }
+
+    @Test
+    public void testSet() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            // test float
+            NDArray array = manager.create(1f);
+            float[] data = {-1};
+            array.set(FloatBuffer.wrap(data));
+            NDArray expected = manager.create(-1f);
+            Assert.assertEquals(array, expected);
+            array = manager.zeros(new Shape(2, 3));
+            data = new float[] {0, 1, 2, 3, 4, 5};
+            array.set(FloatBuffer.wrap(data));
+            expected = manager.arange(6f).reshape(2, 3);
+            Assert.assertEquals(array, expected);
+            array = manager.create(new float[] {1.2f, 3.4f, 2.7f, 8.9999f}, new Shape(2, 1, 1, 2));
+            data = new float[] {7.9f, 3.4f, 2.2f, 5.6f};
+            array.set(FloatBuffer.wrap(data));
+            expected = manager.create(data, new Shape(2, 1, 1, 2));
+            Assert.assertEquals(array, expected);
+
+            Assert.assertThrows(
+                    IllegalArgumentException.class,
+                    () -> {
+                        NDArray ndArray = manager.create(1f);
+                        ndArray.set(FloatBuffer.wrap(new float[] {-1, 1}));
+                    });
         }
     }
 
@@ -620,6 +650,28 @@ public class NDArrayOtherOpTest {
             Assert.assertEquals(original.transpose(), expected);
             expected = manager.create(new Shape(2, 1, 0));
             Assert.assertEquals(original.transpose(0, 2, 1), expected);
+        }
+    }
+
+    @Test
+    public void testRot90() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+            NDArray rotated = original.rotate90(1, new int[] {0, 1});
+            NDArray expected = manager.create(new float[] {2, 4, 1, 3}, new Shape(2, 2));
+            Assert.assertEquals(rotated, expected, "Incorrect rotation");
+            rotated = original.rotate90(2, new int[] {0, 1});
+            expected = manager.create(new float[] {4, 3, 2, 1}, new Shape(2, 2));
+            Assert.assertEquals(rotated, expected, "Incorrect rotation");
+            rotated = original.rotate90(2, new int[] {1, 0});
+            Assert.assertEquals(rotated, expected, "Incorrect rotation");
+
+            // fake image test CHW
+            original = manager.arange(0, 18).reshape(3, 2, 3);
+            rotated = original.rotate90(1, new int[] {1, 2});
+            NDArray expectedR =
+                    manager.create(new int[] {2, 5, 1, 4, 0, 3}).reshape(new Shape(3, 2));
+            Assert.assertEquals(rotated.get(0), expectedR, "Incorrect rotation Red channel");
         }
     }
 

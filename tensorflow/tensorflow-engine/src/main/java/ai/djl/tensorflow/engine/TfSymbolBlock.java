@@ -18,14 +18,9 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.BlockList;
-import ai.djl.nn.ParameterList;
-import ai.djl.nn.SymbolBlock;
+import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.training.ParameterStore;
-import ai.djl.training.initializer.Initializer;
 import ai.djl.util.PairList;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,9 +37,11 @@ import org.tensorflow.proto.framework.SignatureDef;
 import org.tensorflow.proto.framework.TensorInfo;
 import org.tensorflow.proto.framework.TensorShapeProto;
 
-public class TfSymbolBlock implements SymbolBlock {
+public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(TfSymbolBlock.class);
+
+    private static final byte VERSION = 1;
 
     private SavedModelBundle bundle;
     private Session session;
@@ -55,6 +52,7 @@ public class TfSymbolBlock implements SymbolBlock {
     private ConcurrentHashMap<String, String> inputOutputNames = new ConcurrentHashMap<>();
 
     public TfSymbolBlock(SavedModelBundle bundle, String signatureDefKey) {
+        super(VERSION);
         this.bundle = bundle;
         session = bundle.session();
         MetaGraphDef metaGraphDef = bundle.metaGraphDef();
@@ -87,7 +85,7 @@ public class TfSymbolBlock implements SymbolBlock {
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,
@@ -133,18 +131,6 @@ public class TfSymbolBlock implements SymbolBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void setInitializer(Initializer initializer) {
-        throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setInitializer(Initializer initializer, String paramName) {
-        throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
         return new Shape[0];
     }
@@ -153,23 +139,6 @@ public class TfSymbolBlock implements SymbolBlock {
     @Override
     public boolean isInitialized() {
         return bundle != null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void cast(DataType dataType) {
-        throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void clear() {
-        if (session != null) {
-            session.close();
-        }
-        if (bundle != null) {
-            bundle.close();
-        }
     }
 
     /** {@inheritDoc} */
@@ -228,43 +197,18 @@ public class TfSymbolBlock implements SymbolBlock {
 
     /** {@inheritDoc} */
     @Override
-    public BlockList getChildren() {
-        throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ParameterList getDirectParameters() {
-        throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ParameterList getParameters() {
-        throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return new Shape[0];
     }
 
     /** {@inheritDoc} */
     @Override
-    public void saveParameters(DataOutputStream os) {
-        throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void loadParameters(NDManager manager, DataInputStream is) {
-        throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
+    public void close() {
+        if (session != null) {
+            session.close();
+        }
+        if (bundle != null) {
+            bundle.close();
+        }
     }
 }

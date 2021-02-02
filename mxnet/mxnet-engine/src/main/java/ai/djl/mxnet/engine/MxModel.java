@@ -56,7 +56,6 @@ public class MxModel extends BaseModel {
      */
     MxModel(String name, Device device) {
         super(name);
-        device = Device.defaultIfNull(device);
         dataType = DataType.FLOAT32;
         properties = new ConcurrentHashMap<>();
         manager = MxNDManager.getSystemManager().newSubManager(device);
@@ -93,7 +92,8 @@ public class MxModel extends BaseModel {
             prefix = modelDir.toFile().getName();
             paramFile = paramPathResolver(prefix, options);
             if (paramFile == null) {
-                throw new IOException("Parameter file not found in: " + modelDir);
+                throw new FileNotFoundException(
+                        "Parameter file with prefix: " + prefix + " not found in: " + modelDir);
             }
         }
 
@@ -113,6 +113,10 @@ public class MxModel extends BaseModel {
         }
         loadParameters(paramFile, options);
         // TODO: Check if Symbol has all names that params file have
+        if (options != null && options.containsKey("MxOptimizeFor")) {
+            String optimization = (String) options.get("MxOptimizeFor");
+            ((MxSymbolBlock) block).optimizeFor(optimization);
+        }
     }
 
     /** {@inheritDoc} */

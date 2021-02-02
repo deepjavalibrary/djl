@@ -8,13 +8,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SPM_ENABLE_TCMALLOC OFF CACHE BOOL "Build sentencepiece static library")
 # disable shared library as we only link static library
 set(SPM_ENABLE_SHARED OFF CACHE BOOL "Build sentencepiece static library")
+
 find_package(JNI REQUIRED)
+find_path(UTILS_INCLUDE_DIR NAMES djl/utils.h PATHS ${PROJECT_SOURCE_DIR}/../../api/src/main/native REQUIRED)
 
 add_subdirectory(sentencepiece)
 
 add_library(sentencepiece_native SHARED src/main/native/ai_djl_sentencepiece_jni_SentencePieceLibrary.cc)
 target_include_directories(sentencepiece_native PUBLIC
     ${JNI_INCLUDE_DIRS}
+    ${UTILS_INCLUDE_DIR}
     sentencepiece/src
     build/include)
 target_link_libraries(sentencepiece_native sentencepiece-static)

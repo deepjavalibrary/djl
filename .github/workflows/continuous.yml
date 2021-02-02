@@ -41,7 +41,8 @@ jobs:
       - name: check disk space
         run: df -h
       - name: Workaround for startup run
-        run: ./gradlew :pytorch:pytorch-engine:jar clean
+        run: |
+          ./gradlew :pytorch:pytorch-engine:jar :paddlepaddle:paddlepaddle-engine:jar clean
       # If there are code change on JNI, we need to rebuild to pass tests under pytorch folder
       - name: Compile PyTorch JNI
         run: ./gradlew :pytorch:pytorch-native:compileJNI
@@ -49,6 +50,8 @@ jobs:
         run: ./gradlew :extension:sentencepiece:compileJNI
       - name: Compile fastText JNI
         run: ./gradlew :extension:fasttext:compileJNI
+      - name: Compile PaddlePaddle JNI
+        run: ./gradlew :paddlepaddle:paddlepaddle-native:compileJNI
       - name: Build with Gradle
         run: ./gradlew build jRR
       - name: API test results
@@ -117,3 +120,31 @@ jobs:
         with:
           name: tensorflow-model-zoo
           path: tensorflow/tensorflow-model-zoo/build/reports
+
+  # Windows platform for testing hybrid engines
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      # Enable gradle cache: https://github.com/actions/cache/blob/master/examples.md#java---gradle
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Workaround for startup run
+        run: |
+          ./gradlew :pytorch:pytorch-engine:jar :paddlepaddle:paddlepaddle-engine:jar clean
+      - name: Compile PyTorch JNI
+        run: ./gradlew :pytorch:pytorch-native:compileJNI
+      - name: Compile PaddlePaddle JNI
+        run: ./gradlew :paddlepaddle:paddlepaddle-native:compileJNI
+      - name: Integration tests
+        run: |
+          ./gradlew :paddlepaddle:paddlepaddle-engine:test :paddlepaddle:paddlepaddle-model-zoo:test
+          ./gradlew :onnxruntime:onnxruntime-engine:test

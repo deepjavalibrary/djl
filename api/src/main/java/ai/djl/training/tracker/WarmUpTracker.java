@@ -15,7 +15,7 @@ package ai.djl.training.tracker;
 import ai.djl.TrainingDivergedException;
 
 /** A {@code WarmUpTracker} applies a simple warm-up before executing a main {@link Tracker}. */
-public class WarmUpTracker implements Tracker {
+public final class WarmUpTracker implements Tracker {
 
     Tracker mainTracker;
     int warmUpSteps;
@@ -34,6 +34,15 @@ public class WarmUpTracker implements Tracker {
         this.warmUpBeginValue = builder.warmUpBeginValue;
         this.warmUpMode = builder.warmUpMode;
         this.warmUpFinalValue = mainTracker.getNewValue(0);
+    }
+
+    /**
+     * Creates a new builder.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
     }
 
     float getWarmUpValue(int numUpdate) {
@@ -65,12 +74,14 @@ public class WarmUpTracker implements Tracker {
 
     /** The Builder to construct a {@link WarmUpTracker}. */
     @SuppressWarnings("rawtypes")
-    public static class Builder {
+    public static final class Builder {
 
         Tracker mainTracker;
         int warmUpSteps;
         float warmUpBeginValue;
         Mode warmUpMode = Mode.LINEAR;
+
+        private Builder() {}
 
         /**
          * Sets the base value.

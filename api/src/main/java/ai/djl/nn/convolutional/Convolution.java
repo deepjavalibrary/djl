@@ -132,7 +132,7 @@ public abstract class Convolution extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,
@@ -147,7 +147,7 @@ public abstract class Convolution extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     protected void beforeInitialize(Shape[] inputs) {
-        this.inputShapes = inputs;
+        super.beforeInitialize(inputs);
         Shape inputShape = inputs[0];
         Block.validateLayout(getExpectedLayout(), inputShape.getLayout());
     }
@@ -162,9 +162,9 @@ public abstract class Convolution extends AbstractBlock {
             shape[2 + i] =
                     (inputs[0].get(2 + i)
                                             + 2 * padding.get(i)
-                                            - dilation.get(0) * (kernelShape.get(i) - 1)
+                                            - dilation.get(i) * (kernelShape.get(i) - 1)
                                             - 1)
-                                    / stride.get(0)
+                                    / stride.get(i)
                             + 1;
         }
         return new Shape[] {new Shape(shape)};

@@ -14,7 +14,7 @@ package ai.djl.examples.training;
 
 import ai.djl.Device;
 import ai.djl.Model;
-import ai.djl.basicdataset.Mnist;
+import ai.djl.basicdataset.cv.classification.Mnist;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.types.Shape;
@@ -32,7 +32,7 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.initializer.XavierInitializer;
-import ai.djl.training.listener.CheckpointsTrainingListener;
+import ai.djl.training.listener.SaveModelTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
@@ -93,7 +93,12 @@ public final class TrainMnistWithLSTM {
                     return input.reshape(new Shape(batchSize, time, channel));
                 });
         block.add(
-                new LSTM.Builder().setStateSize(64).setNumStackedLayers(1).optDropRate(0).build());
+                new LSTM.Builder()
+                        .setStateSize(64)
+                        .setNumLayers(1)
+                        .optDropRate(0)
+                        .optReturnState(false)
+                        .build());
         block.add(BatchNorm.builder().optEpsilon(1e-5f).optMomentum(0.9f).build());
         block.add(Blocks.batchFlattenBlock());
         block.add(Linear.builder().setUnits(10).build());
@@ -102,7 +107,7 @@ public final class TrainMnistWithLSTM {
 
     public static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         String outputDir = arguments.getOutputDir();
-        CheckpointsTrainingListener listener = new CheckpointsTrainingListener(outputDir);
+        SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir);
         listener.setSaveModelCallback(
                 trainer -> {
                     TrainingResult result = trainer.getTrainingResult();

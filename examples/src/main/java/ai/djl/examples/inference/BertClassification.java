@@ -34,6 +34,7 @@ import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -102,22 +103,25 @@ public final class BertClassification {
             this.vocabularyPath = vocabularyPath;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Batchifier getBatchifier() {
             return null;
         }
 
+        /** {@inheritDoc} */
         @Override
-        public void prepare(NDManager manager, Model model) {
+        public void prepare(NDManager manager, Model model) throws IOException {
             SimpleVocabulary vocabulary =
                     SimpleVocabulary.builder()
                             .optMinFrequency(1)
-                            .addFromTextFile(vocabularyPath)
+                            .addFromTextFile(Paths.get(vocabularyPath))
                             .optUnknownToken("[UNK]")
                             .build();
             tokenizer = new BertFullTokenizer(vocabulary, true);
         }
 
+        /** {@inheritDoc} */
         @Override
         public NDList processInput(TranslatorContext ctx, String[] inputs) {
             NDManager inputManager = ctx.getNDManager();
@@ -187,6 +191,7 @@ public final class BertClassification {
             return outputList;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Classifications[] processOutput(TranslatorContext ctx, NDList list) {
             NDArray batchOutput = list.singletonOrThrow();

@@ -82,7 +82,7 @@ public class BaseModelLoader implements ModelLoader {
             throws IOException, ModelNotFoundException, MalformedModelException {
         Artifact artifact = resource.match(criteria.getFilters());
         if (artifact == null) {
-            throw new ModelNotFoundException("Model not found.");
+            throw new ModelNotFoundException("No matching filter found");
         }
 
         Progress progress = criteria.getProgress();
@@ -94,7 +94,7 @@ public class BaseModelLoader implements ModelLoader {
             if (factory == null) {
                 factory = getTranslatorFactory(criteria);
                 if (factory == null) {
-                    throw new ModelNotFoundException("No matching default translator found.");
+                    throw new ModelNotFoundException("No matching default translator found");
                 }
             }
 
@@ -127,7 +127,7 @@ public class BaseModelLoader implements ModelLoader {
                 }
             }
             if (engine != null && !Engine.hasEngine(engine)) {
-                throw new ModelNotFoundException(engine + " is not supported.");
+                throw new ModelNotFoundException(engine + " is not supported");
             }
 
             String modelName = criteria.getModelName();
@@ -147,7 +147,7 @@ public class BaseModelLoader implements ModelLoader {
             Translator<I, O> translator = factory.newInstance(model, arguments);
             return new ZooModel<>(model, translator);
         } catch (TranslateException e) {
-            throw new ModelNotFoundException("No matching translator found.", e);
+            throw new ModelNotFoundException("No matching translator found", e);
         } finally {
             if (progress != null) {
                 progress.end();
@@ -179,11 +179,11 @@ public class BaseModelLoader implements ModelLoader {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
-        sb.append(resource.getRepository().getName())
-                .append(':')
-                .append(resource.getMrl().getGroupId())
+        sb.append(resource.getMrl().getGroupId())
                 .append(':')
                 .append(resource.getMrl().getArtifactId())
+                .append(' ')
+                .append(getApplication())
                 .append(" [\n");
         try {
             for (Artifact artifact : listModels()) {
@@ -192,7 +192,7 @@ public class BaseModelLoader implements ModelLoader {
         } catch (IOException e) {
             sb.append("\tFailed load metadata.");
         }
-        sb.append("\n]");
+        sb.append("]");
         return sb.toString();
     }
 

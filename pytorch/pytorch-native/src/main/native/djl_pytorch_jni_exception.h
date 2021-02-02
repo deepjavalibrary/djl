@@ -33,10 +33,10 @@
   catch (const c10::Error& e) {                                          \
     Log log(env);                                                        \
     log.debug(e.what());                                                 \
-    env->ThrowNew(ENGINE_EXCEPTION_CLASS, e.what_without_backtrace());               \
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, e.what_without_backtrace());   \
   }                                                                      \
   catch (const std::exception& e_) {                                     \
-    env->ThrowNew(ENGINE_EXCEPTION_CLASS, e_.what());                                \
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, e_.what());                    \
   }
 
 // TODO refactor all jni functions to c style function which mean

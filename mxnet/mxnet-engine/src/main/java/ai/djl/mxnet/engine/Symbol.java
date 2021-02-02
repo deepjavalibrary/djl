@@ -12,6 +12,7 @@
  */
 package ai.djl.mxnet.engine;
 
+import ai.djl.Device;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.NativeResource;
@@ -225,6 +226,19 @@ public class Symbol extends NativeResource<Pointer> {
             shapesMap.put(outputNames[i], outputShapes.get(i));
         }
         return shapesMap;
+    }
+
+    /**
+     * [Experimental] Add customized optimization on the Symbol.
+     *
+     * <p>This method can be used with EIA or TensorRT for model acceleration
+     *
+     * @param backend backend name
+     * @param device the device assigned
+     * @return optimized Symbol
+     */
+    public Symbol optimizeFor(String backend, Device device) {
+        return new Symbol(manager, JnaUtils.optimizeFor(this, backend, device));
     }
 
     /*

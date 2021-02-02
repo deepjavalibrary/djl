@@ -351,7 +351,9 @@ public class ModelServerTest {
         latch.await();
 
         StatusResponse resp = JsonUtils.GSON.fromJson(result, StatusResponse.class);
-        Assert.assertEquals(resp.getStatus(), "Model \"mlp_2\" worker scaled.");
+        Assert.assertEquals(
+                resp.getStatus(),
+                "Model \"mlp_2\" worker scaled. New Worker configuration min workers:2 max workers:2");
     }
 
     private void testDescribeModel(Channel channel) throws InterruptedException {
@@ -701,6 +703,7 @@ public class ModelServerTest {
                     .handler(
                             new ChannelInitializer<Channel>() {
 
+                                /** {@inheritDoc} */
                                 @Override
                                 public void initChannel(Channel ch) {
                                     ChannelPipeline p = ch.pipeline();
@@ -726,6 +729,7 @@ public class ModelServerTest {
     @ChannelHandler.Sharable
     private class TestHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
 
+        /** {@inheritDoc} */
         @Override
         public void channelRead0(ChannelHandlerContext ctx, FullHttpResponse msg) {
             httpStatus = msg.status();
@@ -734,6 +738,7 @@ public class ModelServerTest {
             latch.countDown();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             Logger logger = LoggerFactory.getLogger(TestHandler.class);

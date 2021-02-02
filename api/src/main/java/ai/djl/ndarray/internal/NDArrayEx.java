@@ -19,6 +19,7 @@ import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Activation;
+import ai.djl.nn.recurrent.RNN;
 import ai.djl.util.PairList;
 import java.util.List;
 
@@ -313,67 +314,90 @@ public interface NDArrayEx {
             boolean training);
 
     /**
-     * Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are implemented,
-     * with both multi-layer and bidirectional support.
+     * Applies RNN operation to input data.
      *
-     * @param inputs the inputs to the recurrent operation. Must include input data, parameter
-     *     vector of all trainable parameters concatenated, initial hidden state of the RNN. For
-     *     LSTM, it must include initial cell state. If useSequenceLength is true, it must also
-     *     include vector of valid sequence lengths for each element in the batch
-     * @param mode the type of RNN to compute
-     * @param stateSize the sizes of the state for each layer
-     * @param dropRate the drop rate of the dropout on the outputs of each RNN layer, except the
-     *     last layer
-     * @param numStackedLayers the number of stacked layers
-     * @param useSequenceLength if set to true, this layer takes in an extra input parameter
-     *     sequence_length to specify variable length sequence.
-     * @param useBidirectional whether to use bidirectional recurrent layers
-     * @param stateOutputs whether to include the state in the output
-     * @param additional additional parameters
+     * @param input the inputs to the recurrent operation.
+     * @param state the hidden state to the recurrent operation.
+     * @param params all params (weights and biases) for the recurrent operation
+     * @param hasBiases If false, then the recurrent operation does not use bias weights b_ih and
+     *     b_hh
+     * @param numLayers the number of recurrent layers.
+     * @param activation the activation function to use
+     * @param dropRate If non-zero, introduces a Dropout layer on the outputs of each RNN layer
+     *     except the last layer, with dropout probability equal to dropout
+     * @param training apply dropout if is true
+     * @param bidirectional If true, becomes a bidirectional RNN
+     * @param batchFirst If true, then the input and output NDArray are provided as (batch, seq,
+     *     feature)
      * @return the output of the operation
      */
     NDList rnn(
-            NDList inputs,
-            String mode,
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs,
-            PairList<String, Object> additional);
+            NDArray input,
+            NDArray state,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            RNN.Activation activation,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst);
 
     /**
-     * Applies LSTM recurrent layers to input data.
+     * Applies GRU operation to input data.
      *
-     * @param inputs the inputs to the recurrent operation. Must include input data, parameter
-     *     vector of all trainable parameters concatenated, initial hidden state of the RNN and
-     *     initial cell state. If useSequenceLength is true, it must also include vector of valid
-     *     sequence lengths for each element in the batch
-     * @param stateSize the sizes of the state for each layer
-     * @param dropRate the drop rate of the dropout on the outputs of each RNN layer, except the
-     *     last layer
-     * @param numStackedLayers the number of stacked layers
-     * @param useSequenceLength if set to true, this layer takes in an extra input parameter
-     *     sequence_length to specify variable length sequence.
-     * @param useBidirectional whether to use bidirectional recurrent layers
-     * @param stateOutputs whether to include the state in the output
-     * @param lstmStateClipMin the minimum clip value of LSTM states
-     * @param lstmStateClipMax the maximum clip value of LSTM states
-     * @param additional additional parameters
+     * @param input the inputs to the GRU operation.
+     * @param state the hidden state to the GRU operation.
+     * @param params all params (weights and biases) for the GRU operation
+     * @param hasBiases If false, then the recurrent operation does not use bias weights b_ih and
+     *     b_hh
+     * @param numLayers the number of recurrent layers.
+     * @param dropRate If non-zero, introduces a Dropout layer on the outputs of each GRU layer
+     *     except the last layer, with dropout probability equal to dropout
+     * @param training apply dropout if is true
+     * @param bidirectional If true, becomes a bidirectional GRU
+     * @param batchFirst If true, then the input and output NDArray are provided as (batch, seq,
+     *     feature)
+     * @return the output of the operation
+     */
+    NDList gru(
+            NDArray input,
+            NDArray state,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst);
+
+    /**
+     * Applies LSTM operation to input data.
+     *
+     * @param input the inputs to the LSTM operation.
+     * @param states the hidden state and cell state to the LSTM operation.
+     * @param params all params (weights and biases) for the LSTM operation
+     * @param hasBiases If false, then the recurrent operation does not use bias weights b_ih and
+     *     b_hh
+     * @param numLayers the number of recurrent layers.
+     * @param dropRate If non-zero, introduces a Dropout layer on the outputs of each LSTM layer
+     *     except the last layer, with dropout probability equal to dropout
+     * @param training apply dropout if is true
+     * @param bidirectional If true, becomes a bidirectional LSTM
+     * @param batchFirst If true, then the input and output NDArray are provided as (batch, seq,
+     *     feature)
      * @return the output of the operation
      */
     NDList lstm(
-            NDList inputs,
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs,
-            double lstmStateClipMin,
-            double lstmStateClipMax,
-            PairList<String, Object> additional);
+            NDArray input,
+            NDList states,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst);
 
     ////////////////////////////////////////
     // Image and CV

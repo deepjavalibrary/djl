@@ -82,8 +82,8 @@ public class Predictor<I, O> implements AutoCloseable {
     private Model model;
     private NDManager manager;
     Metrics metrics;
-    private Block block;
-    private ParameterStore parameterStore;
+    protected Block block;
+    protected ParameterStore parameterStore;
 
     /**
      * Creates a new instance of {@code BasePredictor} with the given {@link Model} and {@link

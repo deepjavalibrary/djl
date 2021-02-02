@@ -50,6 +50,8 @@ public abstract class Engine {
 
     private static EngineException exception;
 
+    private Device defaultDevice;
+
     private static synchronized String initEngine() {
         ServiceLoader<EngineProvider> loaders = ServiceLoader.load(EngineProvider.class);
         for (EngineProvider provider : loaders) {
@@ -170,6 +172,22 @@ public abstract class Engine {
      * @return {@code true} if the engine has the specified capability
      */
     public abstract boolean hasCapability(String capability);
+
+    /**
+     * Returns the engine's default {@link Device}.
+     *
+     * @return the engine's default {@link Device}
+     */
+    public Device defaultDevice() {
+        if (defaultDevice == null) {
+            if (hasCapability(StandardCapabilities.CUDA) && CudaUtils.getGpuCount() > 0) {
+                defaultDevice = Device.gpu();
+            } else {
+                defaultDevice = Device.cpu();
+            }
+        }
+        return defaultDevice;
+    }
 
     /**
      * Constructs a new model.

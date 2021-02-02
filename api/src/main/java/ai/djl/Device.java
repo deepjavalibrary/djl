@@ -144,12 +144,24 @@ public final class Device {
     }
 
     /**
+     * Returns an array of devices.
+     *
+     * <p>If GPUs are available, it will return an array of {@code Device} of size
+     * \(min(numAvailable, maxGpus)\). Else, it will return an array with a single CPU device.
+     *
+     * @return an array of devices
+     */
+    public static Device[] getDevices() {
+        return getDevices(Integer.MAX_VALUE);
+    }
+
+    /**
      * Returns an array of devices given the maximum number of GPUs to use.
      *
      * <p>If GPUs are available, it will return an array of {@code Device} of size
      * \(min(numAvailable, maxGpus)\). Else, it will return an array with a single CPU device.
      *
-     * @param maxGpus the max number of GPUs to use
+     * @param maxGpus the max number of GPUs to use. Use 0 for no GPUs.
      * @return an array of devices
      */
     public static Device[] getDevices(int maxGpus) {
@@ -157,6 +169,7 @@ public final class Device {
         if (maxGpus <= 0 || count <= 0) {
             return new Device[] {CPU};
         }
+
         count = Math.min(maxGpus, count);
 
         Device[] devices = new Device[count];
@@ -179,19 +192,6 @@ public final class Device {
     }
 
     /**
-     * Returns the number of GPUs available with specified engine.
-     *
-     * @param engineName the name of engine to retrieve
-     * @return the number of GPUs available in the system
-     */
-    public static int getGpuCount(String engineName) {
-        if (Engine.getEngine(engineName).hasCapability(StandardCapabilities.CUDA)) {
-            return CudaUtils.getGpuCount();
-        }
-        return 0;
-    }
-
-    /**
      * Returns the default context used in Engine.
      *
      * <p>The default type is defined by whether the deep learning engine is recognizing GPUs
@@ -200,37 +200,34 @@ public final class Device {
      * @return a {@link Device}
      */
     public static Device defaultDevice() {
-        if (getGpuCount() > 0) {
-            return GPU;
-        }
-        return CPU;
+        return defaultDevice(Engine.getInstance());
+    }
+
+    /**
+     * Returns the default context used in Engine.
+     *
+     * <p>The default type is defined by whether the deep learning engine is recognizing GPUs
+     * available on your machine. If there is no GPU available, CPU will be used.
+     *
+     * @param engine the engine to retrieve
+     * @return a {@link Device}
+     */
+    public static Device defaultDevice(Engine engine) {
+        return engine.defaultDevice();
     }
 
     /**
      * Returns the given device or the default if it is null.
      *
      * @param device the device to try to return
+     * @param engine the engine to retrieve
      * @return the given device or the default if it is null
      */
-    public static Device defaultIfNull(Device device) {
+    public static Device defaultIfNull(Device device, Engine engine) {
         if (device != null) {
             return device;
         }
-        return defaultDevice();
-    }
-
-    /**
-     * Returns the given device or the passed in default if it is null.
-     *
-     * @param device the device to try to return
-     * @param def the default device to return if device is null
-     * @return the given device or the passed in default if it is null
-     */
-    public static Device defaultIfNull(Device device, Device def) {
-        if (device != null) {
-            return device;
-        }
-        return defaultIfNull(def);
+        return defaultDevice(engine);
     }
 
     /** Contains device type string constants. */

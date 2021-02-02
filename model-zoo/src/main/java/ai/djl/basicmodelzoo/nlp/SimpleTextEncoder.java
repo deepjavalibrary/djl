@@ -35,7 +35,6 @@ public class SimpleTextEncoder extends Encoder {
      */
     public SimpleTextEncoder(RecurrentBlock recurrentBlock) {
         super(VERSION, recurrentBlock);
-        recurrentBlock.setStateOutputs(true);
     }
 
     /**
@@ -49,7 +48,6 @@ public class SimpleTextEncoder extends Encoder {
     public SimpleTextEncoder(
             TrainableTextEmbedding trainableTextEmbedding, RecurrentBlock recurrentBlock) {
         super(VERSION, new SequentialBlock().add(trainableTextEmbedding).add(recurrentBlock));
-        recurrentBlock.setStateOutputs(true);
     }
 
     /** {@inheritDoc} */

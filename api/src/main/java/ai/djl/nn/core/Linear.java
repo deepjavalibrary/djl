@@ -72,7 +72,7 @@ public class Linear extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,
@@ -100,7 +100,7 @@ public class Linear extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public void beforeInitialize(Shape[] inputShapes) {
-        this.inputShapes = inputShapes;
+        super.beforeInitialize(inputShapes);
         Shape input = inputShapes[0];
         inputFeatures = input.get(input.dimension() - 1);
         inputShape = input.slice(0, input.dimension() - 1);

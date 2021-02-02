@@ -19,7 +19,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.AbstractBlock;
+import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.ParameterType;
 import ai.djl.nn.SymbolBlock;
@@ -43,11 +43,12 @@ import org.slf4j.LoggerFactory;
  * <p>You can create a {@code MxSymbolBlock} using {@link ai.djl.Model#load(java.nio.file.Path,
  * String)}.
  */
-public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
+public class MxSymbolBlock extends AbstractSymbolBlock {
+
+    private static final Logger logger = LoggerFactory.getLogger(MxSymbolBlock.class);
 
     private static final byte VERSION = 2;
 
-    private static final Logger logger = LoggerFactory.getLogger(MxSymbolBlock.class);
     private NDManager manager;
     private CachedOp op;
     private Symbol symbol;
@@ -129,6 +130,17 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
         return symbol;
     }
 
+    /**
+     * Applies Optimization algorithm for the model.
+     *
+     * @param optimization the name of the optimization
+     */
+    public void optimizeFor(String optimization) {
+        Symbol newSymbol = symbol.optimizeFor(optimization, manager.getDevice());
+        symbol.close();
+        symbol = newSymbol;
+    }
+
     /** {@inheritDoc} */
     @Override
     public PairList<String, Shape> describeInput() {
@@ -159,7 +171,7 @@ public class MxSymbolBlock extends AbstractBlock implements SymbolBlock {
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(
+    protected NDList forwardInternal(
             ParameterStore parameterStore,
             NDList inputs,
             boolean training,

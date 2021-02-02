@@ -6,7 +6,7 @@ plugins {
 group = "ai.djl.pytorch"
 apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
-def VERSION = "1.7.0"
+def VERSION = "1.7.1"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 boolean isPrecxx11 = project.hasProperty("precxx11")
 version = VERSION + (isRelease ? "" : "-SNAPSHOT")
@@ -141,7 +141,7 @@ jar {
     doFirst {
         def versionName = project.version
         if (!isRelease) {
-            version += String.format("-%s", new Date().format('yyyyMMdd'))
+            versionName += String.format("-%s", new Date().format('yyyyMMdd'))
         }
         def dir = file("${placeholder}/native/lib")
         dir.mkdirs()

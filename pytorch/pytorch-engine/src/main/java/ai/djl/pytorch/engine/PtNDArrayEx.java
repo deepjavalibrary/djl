@@ -20,6 +20,7 @@ import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.recurrent.RNN;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.util.PairList;
 import java.util.List;
@@ -462,32 +463,75 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDList rnn(
-            NDList inputs,
-            String mode,
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs,
-            PairList<String, Object> additional) {
-        throw new UnsupportedOperationException("Not implemented");
+            NDArray input,
+            NDArray state,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            RNN.Activation activation,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst) {
+        return JniUtils.rnn(
+                (PtNDArray) input,
+                (PtNDArray) state,
+                params,
+                hasBiases,
+                numLayers,
+                activation,
+                dropRate,
+                training,
+                bidirectional,
+                batchFirst);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList gru(
+            NDArray input,
+            NDArray state,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst) {
+        return JniUtils.gru(
+                (PtNDArray) input,
+                (PtNDArray) state,
+                params,
+                hasBiases,
+                numLayers,
+                dropRate,
+                training,
+                bidirectional,
+                batchFirst);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList lstm(
-            NDList inputs,
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs,
-            double lstmStateClipMin,
-            double lstmStateClipMax,
-            PairList<String, Object> additional) {
-        throw new UnsupportedOperationException("Not implemented");
+            NDArray input,
+            NDList states,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst) {
+        return JniUtils.lstm(
+                (PtNDArray) input,
+                states,
+                params,
+                hasBiases,
+                numLayers,
+                dropRate,
+                training,
+                bidirectional,
+                batchFirst);
     }
 
     /** {@inheritDoc} */
@@ -524,26 +568,31 @@ public class PtNDArrayEx implements NDArrayEx {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomFlipLeftRight() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomFlipTopBottom() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomBrightness(float brightness) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomHue(float hue) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomColorJitter(
             float brightness, float contrast, float saturation, float hue) {

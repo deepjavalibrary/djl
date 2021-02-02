@@ -3,12 +3,6 @@ plugins {
     id 'jacoco'
 }
 
-repositories {
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-}
-
 dependencies {
     api "commons-cli:commons-cli:${commons_cli_version}"
     api "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"

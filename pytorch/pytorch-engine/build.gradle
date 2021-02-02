@@ -1,11 +1,5 @@
 group "ai.djl.pytorch"
 
-repositories {
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-}
-
 dependencies {
     api project(":api")
 
@@ -20,18 +14,18 @@ dependencies {
 processResources {
     outputs.dir file("${project.buildDir}/jnilib")
     doLast {
-        def url = "https://publish.djl.ai/pytorch-${pytorch_version}/jnilib/${djl_version}"
+        def url = "https://publish.djl.ai/pytorch-${pytorch_version}/jnilib"
         def files = [
-                "linux-x86_64/cpu/libdjl_torch.so"         : "linux-x86_64/cpu/libdjl_torch.so",
-                "linux-x86_64/cu101/libdjl_torch.so"       : "linux-x86_64/cu101/libdjl_torch.so",
-                "linux-x86_64/cu102/libdjl_torch.so"       : "linux-x86_64/cu102/libdjl_torch.so",
-                "linux-x86_64/cu110/libdjl_torch.so"       : "linux-x86_64/cu110/libdjl_torch.so",
-                "precxx11/linux-x86_64/cpu/libdjl_torch.so": "linux-x86_64/cpu-precxx11/libdjl_torch.so",
-                "osx-x86_64/cpu/libdjl_torch.dylib"        : "osx-x86_64/cpu/libdjl_torch.dylib",
-                "win-x86_64/cpu/djl_torch.dll"             : "win-x86_64/cpu/djl_torch.dll",
-                "win-x86_64/cu101/djl_torch.dll"           : "win-x86_64/cu101/djl_torch.dll",
-                "win-x86_64/cu102/djl_torch.dll"           : "win-x86_64/cu102/djl_torch.dll",
-                "win-x86_64/cu110/djl_torch.dll"           : "win-x86_64/cu110/djl_torch.dll"
+                "${djl_version}/linux-x86_64/cpu/libdjl_torch.so"         : "linux-x86_64/cpu/libdjl_torch.so",
+                "${djl_version}/linux-x86_64/cu101/libdjl_torch.so"       : "linux-x86_64/cu101/libdjl_torch.so",
+                "${djl_version}/linux-x86_64/cu102/libdjl_torch.so"       : "linux-x86_64/cu102/libdjl_torch.so",
+                "${djl_version}/linux-x86_64/cu110/libdjl_torch.so"       : "linux-x86_64/cu110/libdjl_torch.so",
+                "precxx11/${djl_version}/linux-x86_64/cpu/libdjl_torch.so": "linux-x86_64/cpu-precxx11/libdjl_torch.so",
+                "${djl_version}/osx-x86_64/cpu/libdjl_torch.dylib"        : "osx-x86_64/cpu/libdjl_torch.dylib",
+                "${djl_version}/win-x86_64/cpu/djl_torch.dll"             : "win-x86_64/cpu/djl_torch.dll",
+                "${djl_version}/win-x86_64/cu101/djl_torch.dll"           : "win-x86_64/cu101/djl_torch.dll",
+                "${djl_version}/win-x86_64/cu102/djl_torch.dll"           : "win-x86_64/cu102/djl_torch.dll",
+                "${djl_version}/win-x86_64/cu110/djl_torch.dll"           : "win-x86_64/cu110/djl_torch.dll"
         ]
         def classesDir = "${project.buildDir}/jnilib"
         files.each { entry ->

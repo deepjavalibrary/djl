@@ -13,7 +13,7 @@
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "ai_djl_pytorch_jni_cache.h"
 #include "djl_pytorch_jni_exception.h"
-#include "djl_pytorch_jni_utils.h"
+#include "djl_pytorch_utils.h"
 
 // The file is the implementation for PyTorch tensor core functionality operation
 
@@ -108,11 +108,28 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexPut(JNIE
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSet(
-    JNIEnv* env, jobject jthis, jlong jself, jlong jreplace) {
+    JNIEnv* env, jobject jthis, jlong jhandle, jobject jbuffer) {
   API_BEGIN()
-  const auto* self_ptr = reinterpret_cast<torch::Tensor*>(jself);
-  const auto* replace_ptr = reinterpret_cast<torch::Tensor*>(jreplace);
-  self_ptr->set_(*replace_ptr);
+  torch::AutoNonVariableTypeMode guard;
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  torch::ArrayRef<int64_t> sizes = tensor_ptr->sizes();
+  // the jbuffer is on the CPU. Although storage can specify GPU device,
+  // it still doesn't move the data to GPU for us. So we
+  // handle the gpu case explicitly here
+  if (tensor_ptr->device().is_cuda()) {
+    auto options = torch::TensorOptions().dtype(tensor_ptr->dtype()).requires_grad(false);
+    torch::Tensor temp = torch::from_blob(env->GetDirectBufferAddress(jbuffer), sizes, options);
+    temp = temp.to(tensor_ptr->device());
+    tensor_ptr->set_(temp);
+    return;
+  }
+  std::vector<int64_t> strides = at::detail::defaultStrides(sizes);
+  torch::Storage storage(torch::Storage::use_byte_size_t(),
+      at::detail::computeStorageNbytes(sizes, strides, tensor_ptr->dtype().itemsize()),
+      torch::DataPtr(env->GetDirectBufferAddress(jbuffer), tensor_ptr->device()),
+      /*allocator=*/nullptr,
+      /*resizable=*/false);
+  tensor_ptr->set_(storage, 0, sizes, strides);
   API_END()
 }
 
@@ -224,7 +241,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGrad(JNIEnv*
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->grad());
   if (!tensor_ptr->grad().defined()) {
-    return utils::NULL_PTR;
+    return djl::utils::jni::NULL_PTR;
   }
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()

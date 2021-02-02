@@ -1,11 +1,5 @@
 group 'ai.djl.mxnet'
 
-repositories {
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-}
-
 dependencies {
     api project(":api")
     api project(":mxnet:mxnet-engine")

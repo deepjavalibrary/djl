@@ -14,6 +14,7 @@ package ai.djl.mxnet.jna;
 
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
+import com.sun.jna.Library;
 import com.sun.jna.Native;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +28,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -61,6 +64,13 @@ public final class LibUtils {
     public static MxnetLibrary loadLibrary() {
         String libName = getLibName();
         logger.debug("Loading mxnet library from: {}", libName);
+
+        if (System.getProperty("os.name").startsWith("Linux")) {
+            Map<String, Integer> options = new ConcurrentHashMap<>();
+            int rtld = 1; // Linux RTLD lazy + local
+            options.put(Library.OPTION_OPEN_FLAGS, rtld);
+            return Native.load(libName, MxnetLibrary.class, options);
+        }
 
         return Native.load(libName, MxnetLibrary.class);
     }
@@ -228,12 +238,13 @@ public final class LibUtils {
         }
 
         Files.createDirectories(cacheFolder);
-        Path tmp = Files.createTempDirectory(cacheFolder, "tmp");
 
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Unexpected version: " + version);
         }
+
+        Path tmp = Files.createTempDirectory(cacheFolder, "tmp");
         String link = "https://publish.djl.ai/mxnet-" + matcher.group(1);
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
@@ -297,9 +308,7 @@ public final class LibUtils {
             Utils.moveQuietly(tmp, dir);
             return path.toAbsolutePath().toString();
         } finally {
-            if (tmp != null) {
-                Utils.deleteQuietly(tmp);
-            }
+            Utils.deleteQuietly(tmp);
         }
     }
 

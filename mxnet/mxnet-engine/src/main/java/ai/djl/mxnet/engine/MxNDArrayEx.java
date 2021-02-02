@@ -15,6 +15,7 @@ package ai.djl.mxnet.engine;
 import ai.djl.Device;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.NDUtils;
@@ -22,7 +23,9 @@ import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.recurrent.RNN;
 import ai.djl.util.PairList;
+import ai.djl.util.Preconditions;
 import java.util.Arrays;
 import java.util.List;
 
@@ -675,54 +678,184 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDList rnn(
-            NDList inputs,
-            String mode,
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs,
-            PairList<String, Object> additional) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("p", dropRate);
-        params.addParam("state_size", stateSize);
-        params.addParam("num_layers", numStackedLayers);
-        params.addParam("use_sequence_length", useSequenceLength);
-        params.addParam("bidirectional", useBidirectional);
-        params.addParam("state_outputs", stateOutputs);
-        params.addParam("mode", mode);
-        params.addAll(additional);
-        return getManager().invoke("_npx_rnn", inputs, params);
+            NDArray input,
+            NDArray state,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            RNN.Activation activation,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst) {
+        int numParams = numLayers * ((hasBiases) ? 4 : 2);
+        Preconditions.checkArgument(
+                params.size() == numParams,
+                "The size of Params is incorrect expect "
+                        + numParams
+                        + " parameters but got "
+                        + params.size());
+
+        if (training != JnaUtils.autogradIsTraining()) {
+            throw new IllegalArgumentException(
+                    "the mode of rnn in MXNet should align with the mode of GradientCollector");
+        }
+
+        if (batchFirst) {
+            input = input.swapAxes(0, 1);
+        }
+
+        MxOpParams opParams = new MxOpParams();
+        opParams.addParam("p", dropRate);
+        opParams.addParam("state_size", state.getShape().tail());
+        opParams.addParam("num_layers", numLayers);
+        opParams.addParam("bidirectional", bidirectional);
+        opParams.addParam("state_outputs", true);
+        opParams.addParam("mode", activation == RNN.Activation.TANH ? "rnn_tanh" : "rnn_relu");
+
+        NDList inputs = new NDList();
+        inputs.add(input);
+
+        try (NDList temp = new NDList()) {
+            for (NDArray param : params) {
+                temp.add(param.flatten());
+            }
+            NDArray tempParam = NDArrays.concat(temp);
+            tempParam.attach(input.getManager());
+            inputs.add(tempParam);
+        }
+
+        inputs.add(state);
+
+        if (!batchFirst) {
+            return getManager().invoke("_npx_rnn", inputs, opParams);
+        }
+
+        NDList result = getManager().invoke("_npx_rnn", inputs, opParams);
+        try (NDArray temp = result.head()) {
+            return new NDList(temp.swapAxes(0, 1), result.get(1));
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList gru(
+            NDArray input,
+            NDArray state,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst) {
+        int numParams = numLayers * ((hasBiases) ? 4 : 2);
+        Preconditions.checkArgument(
+                params.size() == numParams,
+                "The size of Params is incorrect expect "
+                        + numParams
+                        + " parameters but got "
+                        + params.size());
+
+        if (training != JnaUtils.autogradIsTraining()) {
+            throw new IllegalArgumentException(
+                    "the mode of gru in MXNet should align with the mode of GradientCollector");
+        }
+
+        if (batchFirst) {
+            input = input.swapAxes(0, 1);
+        }
+
+        MxOpParams opParams = new MxOpParams();
+        opParams.addParam("p", dropRate);
+        opParams.addParam("state_size", state.getShape().tail());
+        opParams.addParam("num_layers", numLayers);
+        opParams.addParam("bidirectional", bidirectional);
+        opParams.addParam("state_outputs", true);
+        opParams.addParam("mode", "gru");
+
+        NDList inputs = new NDList();
+        inputs.add(input);
+
+        try (NDList temp = new NDList()) {
+            for (NDArray param : params) {
+                temp.add(param.flatten());
+            }
+            NDArray tempParam = NDArrays.concat(temp);
+            tempParam.attach(input.getManager());
+            inputs.add(tempParam);
+        }
+
+        inputs.add(state);
+
+        if (!batchFirst) {
+            return getManager().invoke("_npx_rnn", inputs, opParams);
+        }
+
+        NDList result = getManager().invoke("_npx_rnn", inputs, opParams);
+        try (NDArray temp = result.head()) {
+            return new NDList(temp.swapAxes(0, 1), result.get(1));
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList lstm(
-            NDList inputs,
-            long stateSize,
-            float dropRate,
-            int numStackedLayers,
-            boolean useSequenceLength,
-            boolean useBidirectional,
-            boolean stateOutputs,
-            double lstmStateClipMin,
-            double lstmStateClipMax,
-            PairList<String, Object> additional) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("mode", "lstm");
-        params.addParam("p", dropRate);
-        params.addParam("state_size", stateSize);
-        params.addParam("num_layers", numStackedLayers);
-        params.addParam("use_sequence_length", useSequenceLength);
-        params.addParam("bidirectional", useBidirectional);
-        params.addParam("state_outputs", stateOutputs);
-        params.addParam("lstm_state_clip_nan", true);
-        params.addParam("lstm_state_clip_min", lstmStateClipMin);
-        params.addParam("lstm_state_clip_max", lstmStateClipMax);
-        params.addAll(additional);
+            NDArray input,
+            NDList states,
+            NDList params,
+            boolean hasBiases,
+            int numLayers,
+            double dropRate,
+            boolean training,
+            boolean bidirectional,
+            boolean batchFirst) {
+        int numParams = numLayers * ((hasBiases) ? 4 : 2);
+        Preconditions.checkArgument(
+                params.size() == numParams,
+                "The size of Params is incorrect expect "
+                        + numParams
+                        + " parameters but got "
+                        + params.size());
 
-        return getManager().invoke("_npx_rnn", inputs, params);
+        if (training != JnaUtils.autogradIsTraining()) {
+            throw new IllegalArgumentException(
+                    "the mode of lstm in MXNet should align with the mode of GradientCollector");
+        }
+
+        if (batchFirst) {
+            input = input.swapAxes(0, 1);
+        }
+
+        MxOpParams opParams = new MxOpParams();
+        opParams.addParam("mode", "lstm");
+        opParams.addParam("p", dropRate);
+        opParams.addParam("state_size", states.head().getShape().tail());
+        opParams.addParam("state_outputs", true);
+        opParams.addParam("num_layers", numLayers);
+        opParams.addParam("bidirectional", bidirectional);
+        opParams.addParam("lstm_state_clip_nan", true);
+
+        NDList inputs = new NDList();
+        inputs.add(input);
+        try (NDList temp = new NDList()) {
+            for (NDArray param : params) {
+                temp.add(param.flatten());
+            }
+            NDArray tempParam = NDArrays.concat(temp);
+            tempParam.attach(input.getManager());
+            inputs.add(tempParam);
+        }
+        inputs.addAll(states);
+
+        if (!batchFirst) {
+            return getManager().invoke("_npx_rnn", inputs, opParams);
+        }
+
+        NDList result = getManager().invoke("_npx_rnn", inputs, opParams);
+        try (NDArray temp = result.head()) {
+            return new NDList(temp.swapAxes(0, 1), result.get(1), result.get(2));
+        }
     }
 
     ////////////////////////////////////////
@@ -776,6 +909,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("_npx__image_random_flip_left_right", array, null);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomFlipTopBottom() {
         if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
@@ -784,6 +918,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("_npx__image_random_flip_top_bottom", array, null);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomBrightness(float brightness) {
         if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
@@ -797,6 +932,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("_npx__image_random_brightness", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomHue(float hue) {
         if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
@@ -810,6 +946,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("_npx__image_random_hue", array, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray randomColorJitter(
             float brightness, float contrast, float saturation, float hue) {

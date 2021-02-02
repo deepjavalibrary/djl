@@ -1,0 +1,7 @@
+{
+  "resources": [
+    {
+      "pattern": "META-INF/services/ai.djl.engine.EngineProvider"
+    }
+  ]
+}

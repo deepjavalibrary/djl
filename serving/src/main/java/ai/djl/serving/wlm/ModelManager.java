@@ -21,11 +21,7 @@ import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.serving.http.BadRequestException;
 import ai.djl.serving.http.DescribeModelResponse;
-import ai.djl.serving.http.StatusResponse;
 import ai.djl.serving.util.ConfigManager;
-import ai.djl.serving.util.NettyUtils;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -113,6 +109,7 @@ public final class ModelManager {
                                         configManager.getJobQueueSize());
                         modelInfo.setBatchSize(batchSize);
                         modelInfo.setMaxBatchDelay(maxBatchDelay);
+
                         ModelInfo existingModel = models.putIfAbsent(actualModelName, modelInfo);
                         if (existingModel != null) {
                             // model already exists
@@ -188,7 +185,7 @@ public final class ModelManager {
     }
 
     /**
-     * Adds an inference job to the job queue.
+     * Adds an inference job to the job queue. Assign the job to the next free worker.
      *
      * @param job an inference job to be executed
      * @return {@code true} if submit success
@@ -200,11 +197,7 @@ public final class ModelManager {
         if (model == null) {
             throw new ModelNotFoundException("Model not found: " + modelName);
         }
-
-        if (wlm.hasWorker(modelName)) {
-            return model.addJob(job);
-        }
-        return false;
+        return wlm.addJob(model, job);
     }
 
     /**
@@ -247,13 +240,14 @@ public final class ModelManager {
     /**
      * Sends model server health status to client.
      *
-     * @param ctx the client connection channel context
+     * @return completableFuture with eventually result in the future after async execution
      */
-    public void workerStatus(final ChannelHandlerContext ctx) {
-        Runnable r =
+    public CompletableFuture<String> workerStatus() {
+        return CompletableFuture.supplyAsync(
                 () -> {
                     String response = "Healthy";
                     int numWorking = 0;
+
                     int numScaled = 0;
                     for (Map.Entry<String, ModelInfo> m : models.entrySet()) {
                         numScaled += m.getValue().getMinWorkers();
@@ -266,11 +260,7 @@ public final class ModelManager {
                         response = "Unhealthy";
                     }
 
-                    // TODO: Check if its OK to send other 2xx errors to ALB for "Partial Healthy"
-                    // and "Unhealthy"
-                    NettyUtils.sendJsonResponse(
-                            ctx, new StatusResponse(response), HttpResponseStatus.OK);
-                };
-        wlm.scheduleAsync(r);
+                    return response;
+                });
     }
 }

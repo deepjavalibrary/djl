@@ -95,6 +95,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
                                             f.endsWith("metadata.json")
                                                     && Files.isRegularFile(f)
                                                     && !f.getParent().equals(path))) {
+                        logger.debug("Found local repository: {}", path);
                         return new LocalRepository(name, path);
                     }
                 } catch (IOException e) {
@@ -102,15 +103,13 @@ class RepositoryFactoryImpl implements RepositoryFactory {
                 }
             }
             return new SimpleRepository(name, path, names[0], names[1]);
-        } else if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
-            if (FilenameUtils.isArchiveFile(fileName)) {
-                return new SimpleUrlRepository(name, uri, names[0], names[1]);
-            }
         } else if ("jar".equals(scheme)) {
             if (!FilenameUtils.isArchiveFile(fileName)) {
                 throw new IllegalArgumentException("Only archive file is supported for res URL.");
             }
             return new JarRepository(name, uri, names[0], names[1]);
+        } else if (FilenameUtils.isArchiveFile(fileName)) {
+            return new SimpleUrlRepository(name, uri, names[0], names[1]);
         }
         return new RemoteRepository(name, uri);
     }

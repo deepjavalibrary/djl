@@ -16,7 +16,7 @@ import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.basicdataset.StanfordMovieReview;
+import ai.djl.basicdataset.nlp.StanfordMovieReview;
 import ai.djl.basicdataset.utils.FixedBucketSampler;
 import ai.djl.basicdataset.utils.TextData;
 import ai.djl.examples.training.util.Arguments;
@@ -50,7 +50,7 @@ import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.evaluator.Accuracy;
-import ai.djl.training.listener.CheckpointsTrainingListener;
+import ai.djl.training.listener.SaveModelTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
 import ai.djl.training.util.ProgressBar;
@@ -147,10 +147,9 @@ public final class TrainSentimentAnalysis {
         return new SequentialBlock()
                 .add(
                         LSTM.builder()
-                                .setNumStackedLayers(2)
+                                .setNumLayers(2)
                                 .setStateSize(100)
-                                .setSequenceLength(false)
-                                .optBidrectional(true)
+                                .optBidirectional(true)
                                 .build())
                 .add(
                         x -> {
@@ -167,7 +166,7 @@ public final class TrainSentimentAnalysis {
     public static DefaultTrainingConfig setupTrainingConfig(
             Arguments arguments, ModelZooTextEmbedding embedding) {
         String outputDir = arguments.getOutputDir();
-        CheckpointsTrainingListener listener = new CheckpointsTrainingListener(outputDir);
+        SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir);
         listener.setSaveModelCallback(
                 trainer -> {
                     TrainingResult result = trainer.getTrainingResult();

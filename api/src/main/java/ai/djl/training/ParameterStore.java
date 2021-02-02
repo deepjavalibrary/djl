@@ -134,6 +134,15 @@ public class ParameterStore {
         return data.get(index);
     }
 
+    /**
+     * Get the {@link NDManager} associated with {@code ParameterStore}.
+     *
+     * @return the {@link NDManager}
+     */
+    public NDManager getManager() {
+        return manager;
+    }
+
     /** Synchronizes the values on all mirrors with the main parameter. */
     public void sync() {
         for (ParameterData data : parameterMap.values()) {

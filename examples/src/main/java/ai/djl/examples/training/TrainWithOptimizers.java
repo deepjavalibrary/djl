@@ -15,7 +15,7 @@ package ai.djl.examples.training;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.basicdataset.Cifar10;
+import ai.djl.basicdataset.cv.classification.Cifar10;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.examples.training.util.Arguments;
@@ -40,7 +40,7 @@ import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
-import ai.djl.training.listener.CheckpointsTrainingListener;
+import ai.djl.training.listener.SaveModelTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
@@ -165,8 +165,7 @@ public final class TrainWithOptimizers {
 
     private static DefaultTrainingConfig setupTrainingConfig(OptimizerArguments arguments) {
         String outputDir = arguments.getOutputDir();
-        CheckpointsTrainingListener listener =
-                new CheckpointsTrainingListener(outputDir, "resnetv1");
+        SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir, "resnetv1");
         listener.setSaveModelCallback(
                 trainer -> {
                     TrainingResult result = trainer.getTrainingResult();

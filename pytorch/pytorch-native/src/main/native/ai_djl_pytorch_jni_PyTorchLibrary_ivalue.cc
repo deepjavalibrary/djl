@@ -12,10 +12,11 @@
  */
 
 #include <torch/script.h>
+#include <djl/utils.h>
 
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_exception.h"
-#include "djl_pytorch_jni_utils.h"
+#include "djl_pytorch_utils.h"
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromTensor(
     JNIEnv* env, jobject jthis, jlong jhandle) {
@@ -47,7 +48,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromDict(
   dict.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     auto jname = (jstring)env->GetObjectArrayElement(jnames, i);
-    std::string name = utils::GetStringFromJString(env, jname);
+    std::string name = djl::utils::jni::GetStringFromJString(env, jname);
     dict.insert(name, *reinterpret_cast<torch::Tensor*>(jptrs[i]));
   }
   env->ReleaseLongArrayElements(jtensor_ptrs, jptrs, JNI_ABORT);
@@ -69,7 +70,7 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToList
   API_BEGIN()
   auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
   std::vector<torch::IValue> ivalue_vec = ivalue_ptr->toTuple()->elements();
-  return utils::GetPtrArrayFromContainer<std::vector<torch::IValue>, torch::IValue>(env, ivalue_vec);
+  return djl::utils::jni::GetPtrArrayFromContainer<std::vector<torch::IValue>, torch::IValue>(env, ivalue_vec);
   API_END_RETURN()
 }
 
@@ -78,7 +79,7 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToTens
   API_BEGIN()
   auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
   torch::List<torch::Tensor> tensor_list = ivalue_ptr->toTensorList();
-  return utils::GetPtrArrayFromContainer<torch::List<torch::Tensor>, torch::Tensor>(env, tensor_list);
+  return djl::utils::jni::GetPtrArrayFromContainer<torch::List<torch::Tensor>, torch::Tensor>(env, tensor_list);
   API_END_RETURN()
 }
 
@@ -87,7 +88,7 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToList
   API_BEGIN()
   auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
   torch::List<torch::IValue> ivalue_list = ivalue_ptr->toList();
-  return utils::GetPtrArrayFromContainer<torch::List<torch::IValue>, torch::IValue>(env, ivalue_list);
+  return djl::utils::jni::GetPtrArrayFromContainer<torch::List<torch::IValue>, torch::IValue>(env, ivalue_list);
   API_END_RETURN()
 }
 

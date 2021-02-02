@@ -14,13 +14,14 @@ package ai.djl.examples.training;
 
 import ai.djl.engine.Engine;
 import ai.djl.training.TrainingResult;
+import java.io.IOException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TrainTicTacToeTest {
 
     @Test
-    public void testTrainTicTacToe() {
+    public void testTrainTicTacToe() throws IOException {
         if (Boolean.getBoolean("nightly")) {
             String[] args = new String[] {"-g", "1", "-e", "6"};
             Engine.getInstance().setRandomSeed(1234);

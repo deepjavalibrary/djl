@@ -18,7 +18,6 @@ import ai.djl.modality.Output;
 import ai.djl.translate.TranslateException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +25,6 @@ import org.slf4j.LoggerFactory;
 class WorkerThread implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkerThread.class);
-
-    private static final AtomicInteger WORKER_COUNTER = new AtomicInteger(1);
 
     private ModelInfo model;
     private Predictor<Input, Output> predictor;
@@ -40,39 +37,48 @@ class WorkerThread implements Runnable {
     private WorkerState state;
     private int workerId;
     private long startTime;
+    private boolean fixPoolThread;
 
-    public WorkerThread(int gpuId, ModelInfo model, BatchAggregator aggregator) {
+    public WorkerThread(
+            int gpuId, ModelInfo model, BatchAggregator aggregator, boolean fixPoolThread) {
         this.model = model;
         this.aggregator = aggregator;
         this.gpuId = gpuId;
-        this.workerId = WORKER_COUNTER.getAndIncrement();
+        this.workerId = new WorkerIdGenerator().generate();
         this.startTime = System.currentTimeMillis();
         predictor = model.getModel().newPredictor();
+        this.fixPoolThread = fixPoolThread;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void run() {
         Thread thread = Thread.currentThread();
         thread.setName(getWorkerName());
         currentThread.set(thread);
+        this.state = WorkerState.WORKER_STARTED;
         List<Input> req = null;
         try {
-            while (isRunning()) {
+            while (isRunning() && !aggregator.isFinished()) {
                 req = aggregator.getRequest();
-                try {
-                    List<Output> reply = predictor.batchPredict(req);
-                    aggregator.sendResponse(reply);
-                } catch (TranslateException e) {
-                    logger.warn("Failed to predict", e);
-                    aggregator.sendError();
+                if (req != null && !req.isEmpty()) {
+                    try {
+                        List<Output> reply = predictor.batchPredict(req);
+                        aggregator.sendResponse(reply);
+                    } catch (TranslateException e) {
+                        logger.warn("Failed to predict", e);
+                        aggregator.sendError();
+                    }
                 }
                 req = null;
             }
+
         } catch (InterruptedException e) {
             logger.debug("Shutting down the thread .. Scaling down.");
         } catch (Throwable t) {
             logger.error("Server error", t);
         } finally {
+            logger.debug("Shutting down worker thread .. {}", currentThread.get().getName());
             currentThread.set(null);
             shutdown(WorkerState.WORKER_STOPPED);
             if (req != null) {
@@ -126,5 +132,16 @@ class WorkerThread implements Runnable {
             // Don't update the state if it was terminated on purpose.. Scaling in..
             this.state = newState;
         }
+    }
+
+    /**
+     * check if this worker is instantiate is one of the fix threads of a pool. fix threads are not
+     * automatically scales down, so they are candidate for down scaling when minWorker/maxWorker
+     * size of a model changes.
+     *
+     * @return the fixPoolThread
+     */
+    public boolean isFixPoolThread() {
+        return fixPoolThread;
     }
 }

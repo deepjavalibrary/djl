@@ -13,7 +13,7 @@
 
 package ai.djl.training.tracker;
 
-import ai.djl.training.tracker.LinearTracker.Builder;
+import ai.djl.training.tracker.WarmUpTracker.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +41,15 @@ public class MultiFactorTracker implements Tracker {
         this.factor = builder.factor;
     }
 
+    /**
+     * Creates a new builder.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** {@inheritDoc} */
     @Override
     public float getNewValue(int numUpdate) {
@@ -65,6 +74,8 @@ public class MultiFactorTracker implements Tracker {
         float baseValue;
         int[] steps;
         float factor = 1;
+
+        private Builder() {}
 
         /**
          * Sets the initial value after no steps.

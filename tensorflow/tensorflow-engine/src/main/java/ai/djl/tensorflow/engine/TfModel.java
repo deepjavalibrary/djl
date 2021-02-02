@@ -43,7 +43,6 @@ public class TfModel extends BaseModel {
      */
     TfModel(String name, Device device) {
         super(name);
-        device = Device.defaultIfNull(device);
         properties = new ConcurrentHashMap<>();
         manager = TfNDManager.getSystemManager().newSubManager(device);
         manager.setName("tfModel");
@@ -101,7 +100,9 @@ public class TfModel extends BaseModel {
                     throw new MalformedModelException("Invalid RunOptions: " + run, e);
                 }
             }
-            signatureDefKey = (String) options.get("SignatureDefKey");
+            if (options.containsKey("SignatureDefKey")) {
+                signatureDefKey = (String) options.get("SignatureDefKey");
+            }
         }
         if (tags == null) {
             tags = new String[] {"serve"};
@@ -196,9 +197,7 @@ public class TfModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public void close() {
+        ((TfSymbolBlock) block).close();
         super.close();
-        if (block != null) {
-            block.clear();
-        }
     }
 }

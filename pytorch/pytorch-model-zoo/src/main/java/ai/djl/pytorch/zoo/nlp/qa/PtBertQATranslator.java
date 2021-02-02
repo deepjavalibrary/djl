@@ -47,7 +47,7 @@ public class PtBertQATranslator extends QATranslator {
         vocabulary =
                 SimpleVocabulary.builder()
                         .optMinFrequency(1)
-                        .addFromTextFile(model.getArtifact("bert-base-uncased-vocab.txt").getPath())
+                        .addFromTextFile(model.getArtifact("bert-base-uncased-vocab.txt"))
                         .optUnknownToken("[UNK]")
                         .build();
         tokenizer = new BertTokenizer();

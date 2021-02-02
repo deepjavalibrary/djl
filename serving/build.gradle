@@ -30,6 +30,10 @@ jar {
     exclude "META-INF/MANIFEST*"
 }
 
+test {
+    maxParallelForks = 1
+}
+
 application {
     mainClassName = System.getProperty("main", "ai.djl.serving.ModelServer")
 }

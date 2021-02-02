@@ -13,6 +13,7 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Model;
+import ai.djl.basicdataset.cv.PikachuDetection;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Blocks;
 import ai.djl.training.DefaultTrainingConfig;

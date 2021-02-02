@@ -268,6 +268,11 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         return hasGradient;
     }
 
+    @Override
+    public NDArray stopGradient() {
+        return manager.invoke("stop_gradient", this, null);
+    }
+
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
@@ -284,15 +289,17 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
+
+        if (data.isDirect()) {
+            int size = Math.toIntExact(getShape().size());
+            JnaUtils.syncCopyFromCPU(getHandle(), data, size);
+            return;
+        }
+
         int size = data.remaining();
         // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
         DataType inputType = DataType.fromBuffer(data);
         validate(inputType, size);
-
-        if (data.isDirect()) {
-            JnaUtils.syncCopyFromCPU(getHandle(), data, size);
-            return;
-        }
 
         int numOfBytes = inputType.getNumOfBytes();
         ByteBuffer buf = manager.allocateDirect(size * numOfBytes);
@@ -317,8 +324,9 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
                 break;
             case FLOAT16:
             default:
-                throw new AssertionError("Show never happen");
+                throw new UnsupportedOperationException("data type is not supported!");
         }
+        buf.rewind();
         JnaUtils.syncCopyFromCPU(getHandle(), buf, size);
     }
 
@@ -1024,6 +1032,18 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray rotate90(int times, int[] axes) {
+        if (axes.length != 2) {
+            throw new IllegalArgumentException("Axes must be 2");
+        }
+        MxOpParams params = new MxOpParams();
+        params.addTupleParam("axes", axes);
+        params.addParam("k", times);
+        return manager.invoke("_npi_rot90", this, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray trace(int offset, int axis1, int axis2) {
         MxOpParams params = new MxOpParams();
         params.addParam("offset", offset);
@@ -1344,6 +1364,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         return manager.invoke("_npi_swapaxes", this, params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray flip(int... axes) {
         MxOpParams params = new MxOpParams();
