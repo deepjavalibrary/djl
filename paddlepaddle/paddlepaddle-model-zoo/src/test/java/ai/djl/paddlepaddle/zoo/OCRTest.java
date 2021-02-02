@@ -38,9 +38,6 @@ import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.testng.annotations.Test;
@@ -58,20 +55,10 @@ public class OCRTest {
         Predictor<Image, Image> rotator = getRotateClassifer();
         for (int i = 0; i < boxes.size(); i++) {
             Image subImg = getSubImage(img, boxes.get(i));
-            saveImage(subImg, Integer.toString(i));
             subImg = rotator.predict(subImg);
             String name = recognizer.predict(subImg);
             System.out.println(name);
         }
-    }
-
-    private static void saveImage(Image img, String prefix) throws IOException {
-        Path outputDir = Paths.get("build/output");
-        Files.createDirectories(outputDir);
-
-        Path imagePath = outputDir.resolve(prefix + ".png");
-        // OpenJDK can't save jpg with alpha channel
-        img.save(Files.newOutputStream(imagePath), "png");
     }
 
     @SuppressWarnings("unchecked")
