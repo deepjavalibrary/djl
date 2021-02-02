@@ -9,6 +9,7 @@ apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 def VERSION = "1.7.1"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 boolean isPrecxx11 = project.hasProperty("precxx11")
+boolean isGPU = project.hasProperty("gpu")
 version = VERSION + (isRelease ? "" : "-SNAPSHOT")
 def BINARY_ROOT = "${project.buildDir}/download"
 
@@ -76,22 +77,25 @@ task releaseJNI {
     doFirst {
         // You have to use an environment with CUDA persets for Linux and Windows
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
-            downloadBuild("win", "cpu")
-            cleanBuild()
-            downloadBuild("win", "cu101")
-            cleanBuild()
-            downloadBuild("win", "cu102")
-            cleanBuild()
-            downloadBuild("win", "cu110")
-            cleanBuild()
-        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
+            if (!isGPU) {
+                downloadBuild("win", "cpu")
+                cleanBuild()
+            } else {
+                downloadBuild("win", "cu101")
+                cleanBuild()
+                downloadBuild("win", "cu102")
+                cleanBuild()
+                downloadBuild("win", "cu110")
+                cleanBuild()
+            }
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac") && !isGPU) {
             downloadBuild("osx", "cpu")
             cleanBuild()
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
-            downloadBuild("linux", "cpu", isPrecxx11)
-            cleanBuild()
-            // centos only support CPU for now
-            if (!isPrecxx11) {
+            if (!isGPU) {
+                downloadBuild("linux", "cpu", isPrecxx11)
+                cleanBuild()
+            } else {
                 downloadBuild("linux", "cu101", isPrecxx11)
                 cleanBuild()
                 downloadBuild("linux", "cu102", isPrecxx11)
@@ -100,7 +104,7 @@ task releaseJNI {
                 cleanBuild()
             }
         } else {
-            throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
+            throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'] + (isGPU) ? " GPU" : " CPU")
         }
     }
 }
