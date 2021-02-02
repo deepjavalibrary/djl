@@ -46,6 +46,7 @@ nav:
       - 'docs/README.md'
       - 'examples/README.md'
       - 'docs/interactive_tool.md'
+      - Community Leaders: 'leaders.md'
       - Contributor Documentation:
           - Main: 'docs/development/README.md'
           - 'docs/development/setup.md'
