@@ -273,33 +273,6 @@ publishing.repositories {
     }
 }
 
-
-import java.util.zip.GZIPInputStream
-
-task downloadPaddlePaddleNativeLib() {
-    doLast {
-        def url = "https://publish.djl.ai/paddlepaddle-${paddlepaddle_version}"
-        def files = [
-                "osx/cpu/libpaddle_fluid_c.dylib.gz": "cpu/osx/native/lib/libpaddle_fluid_c.dylib",
-                "win/cpu/paddle_fluid_c.dll.gz"     : "cpu/win/native/lib/paddle_fluid_c.dll",
-                "win/cpu/mklml.dll.gz"              : "cpu/win/native/lib/mklml.dll",
-                "win/cpu/mkldnn.dll.gz"             : "cpu/win/native/lib/mkldnn.dll",
-                "win/cpu/libiomp5md.dll.gz"         : "cpu/win/native/lib/libiomp5md.dll",
-                "win/cpu/openblas.dll.gz"           : "cpu/win/native/lib/openblas.dll",
-                "linux/cpu/libpaddle_fluid_c.so.gz" : "cpu/linux/native/lib/libpaddle_fluid_c.so",
-        ]
-
-        files.each { entry ->
-            project.logger.lifecycle("Downloading ${url}/${entry.key}")
-            def file = new File("${BINARY_ROOT}/${entry.value}")
-            file.getParentFile().mkdirs()
-            new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << new GZIPInputStream(i) } }
-        }
-
-        new File("${BINARY_ROOT}/auto").mkdirs()
-    }
-}
-
 if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
     tasks.getByName("spotbugsMain").enabled = false
 }
