@@ -65,7 +65,13 @@ jobs:
       - name: Install Environment
         run: |
           apt update
-          apt-get install -y cmake curl
+          apt install -y cmake curl unzip software-properties-common
+          add-apt-repository -y ppa:deadsnakes/ppa
+          apt update
+          apt install -y python3.6
+          curl -O https://bootstrap.pypa.io/get-pip.py
+          python3.6 get-pip.py
+          pip3 install awscli --upgrade
       - name: Release JNI prep
         run: ./gradlew :pytorch:pytorch-native:releaseJNI -Pgpu
       - name: Configure AWS Credentials
@@ -101,6 +107,7 @@ jobs:
           yum -y install centos-release-scl-rh epel-release
           yum -y install java-1.8.0-openjdk-devel devtoolset-7 rh-git218 patch cmake3
           ln -s /usr/bin/cmake3 /usr/bin/cmake
+          pip3 install awscli --upgrade
       - name: Release JNI prep
         run: |
           source scl_source enable devtoolset-7 rh-git218 || true
