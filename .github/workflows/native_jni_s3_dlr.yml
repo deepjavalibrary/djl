@@ -31,6 +31,12 @@ jobs:
         run: ./gradlew :dlr:dlr-native:compileJNI
       - name: Run test
         run: ./gradlew :dlr:dlr-engine:test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
           DLR_VERSION="$(cat gradle.properties | awk -F '=' '/dlr_version/ {print $2}')"

@@ -35,6 +35,12 @@ jobs:
         run: ./gradlew :pytorch:pytorch-native:compileJNI
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
           aws s3 cp pytorch/pytorch-native/build/*djl_torch.* s3://djl-ai/publish/pytorch-1.7.1/jnilib/0.10.0/${{ matrix.os }}-x86_64/cpu/
@@ -62,6 +68,12 @@ jobs:
           apt-get install -y cmake curl
       - name: Release JNI prep
         run: ./gradlew :pytorch:pytorch-native:releaseJNI -Pgpu
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
           aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-1.7.1/jnilib
@@ -93,6 +105,12 @@ jobs:
         run: |
           source scl_source enable devtoolset-7 rh-git218 || true
           ./gradlew :pytorch:pytorch-native:releaseJNI -Pprecxx11
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
           aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-1.7.1/jnilib
@@ -144,6 +162,12 @@ jobs:
           set "CUDA_PATH_V11_0=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.0"
           set "PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.1\bin;%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.1\libnvvp;%PATH%"
           gradlew :pytorch:pytorch-native:releaseJNI -Pgpu
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
           aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-1.7.1/jnilib
