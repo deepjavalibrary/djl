@@ -832,4 +832,34 @@ public class NDArrayOtherOpTest {
             Assertions.assertAlmostEquals(array.erfinv(), array);
         }
     }
+
+    @Test
+    public void testNorm() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            // test 1-D
+            NDArray array = manager.create(new float[] {1f, 0.5f, -1f});
+            Assert.assertEquals(array.norm().getFloat(), 1.5f);
+            // test 2-D
+            array = manager.create(new float[][] {{1f, 0.5f}, {-1f, 2f}});
+            Assert.assertEquals(array.norm().getFloat(), 2.5f);
+            // test scalar
+            array = manager.create(new float[] {5f});
+            Assert.assertEquals(array.norm().getFloat(), 5f);
+            // test zero-dim
+            array = manager.create(new float[] {});
+            Assert.assertEquals(array.norm().getFloat(), 0f);
+            // test 2-D with axis
+            array = manager.create(new float[][] {{1f, 0.5f}, {-1f, 2f}});
+            NDArray expected = manager.create(new float[] {1.4142f, 2.0616f});
+            Assertions.assertAlmostEquals(array.norm(new int[] {0}), expected);
+            // test 2-D with keepDims
+            array = manager.create(new float[][] {{1f, 0.5f}, {-1f, 2f}});
+            expected = manager.create(new float[][] {{2.5f}});
+            Assertions.assertAlmostEquals(array.norm(true), expected);
+            // test 2-D with axis and keepDims
+            array = manager.create(new float[][] {{1f, 0.5f}, {-1f, 2f}});
+            expected = manager.create(new float[][] {{1.4142f, 2.0616f}});
+            Assertions.assertAlmostEquals(array.norm(new int[] {0}, true), expected);
+        }
+    }
 }
