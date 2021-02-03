@@ -533,15 +533,6 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray norm(int[] axes) {
-        try (Tensor<?> tensor =
-                tf.linalg.euclideanNorm(getOperand(), tf.constant(axes)).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray norm(boolean keepDims) {
         // We have to flatten first to be able to simulate "numpy.linalg.norm" whenever axis isn't
         // specified
@@ -566,7 +557,10 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray norm(int[] axes, boolean keepDims) {
+    public NDArray norm(int ord, int[] axes, boolean keepDims) {
+        if (ord != 2) {
+            throw new UnsupportedOperationException("Only ord=2 is supported");
+        }
         try (Tensor<?> tensor =
                 tf.linalg
                         .euclideanNorm(
