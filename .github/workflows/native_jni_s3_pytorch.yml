@@ -12,7 +12,13 @@ jobs:
     strategy:
       matrix:
         operating-system: [macos-latest, ubuntu-16.04, windows-latest]
-
+        include:
+          - operating-system: macos-latest
+            os: osx
+          - operating-system: ubuntu-16.04
+            os: linux
+          - operating-system: windows-latest
+            os: win
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK 1.8
@@ -27,12 +33,12 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: ./gradlew :pytorch:pytorch-native:compileJNI
-      - name: Upload compiled jni library
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: jnilib-${{ runner.os }}
-          path: pytorch/pytorch-native/jnilib
+      - name: Test with Gradle
+        run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
+      - name: Copy files to S3 with the AWS CLI
+        run: |
+          aws s3 cp pytorch/pytorch-native/build/*djl_torch.* s3://djl-ai/publish/pytorch-1.7.1/jnilib/0.10.0/${{ matrix.os }}-x86_64/cpu/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths /pytorch-1.7.1/jnilib/
 
   build-pytorch-jni-linux-gpu:
     if: github.repository == 'awslabs/djl'
@@ -55,13 +61,11 @@ jobs:
           apt update
           apt-get install -y cmake curl
       - name: Release JNI prep
-        run: ./gradlew :pytorch:pytorch-native:releaseJNI
-      - name: Upload compiled jni library
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: jnilib-${{ runner.os }}-GPU
-          path: pytorch/pytorch-native/jnilib
+        run: ./gradlew :pytorch:pytorch-native:releaseJNI -Pgpu
+      - name: Copy files to S3 with the AWS CLI
+        run: |
+          aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-1.7.1/jnilib
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths /pytorch-1.7.1/jnilib/
 
   build-pytorch-jni-precxx11:
     if: github.repository == 'awslabs/djl'
@@ -89,12 +93,10 @@ jobs:
         run: |
           source scl_source enable devtoolset-7 rh-git218 || true
           ./gradlew :pytorch:pytorch-native:releaseJNI -Pprecxx11
-      - name: Upload compiled jni library
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: jnilib-${{ runner.os }}-precxx11
-          path: pytorch/pytorch-native/jnilib
+      - name: Copy files to S3 with the AWS CLI
+        run: |
+          aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-1.7.1/jnilib
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths /pytorch-1.7.1/jnilib/
 
   build-pytorch-jni-windows-gpu:
     if: github.repository == 'awslabs/djl'
@@ -141,58 +143,8 @@ jobs:
           set "CUDA_PATH_V10_1=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.1"
           set "CUDA_PATH_V11_0=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.0"
           set "PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.1\bin;%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.1\libnvvp;%PATH%"
-          gradlew :pytorch:pytorch-native:releaseJNI
-      - name: Upload compiled jni library
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: jnilib-${{ runner.os }}-GPU
-          path: pytorch/pytorch-native/jnilib
-
-  publish:
-    if: github.repository == 'awslabs/djl'
-    runs-on: ubuntu-18.04
-    needs: [build-pytorch-jni-cpu, build-pytorch-jni-linux-gpu, build-pytorch-jni-windows-gpu, build-pytorch-jni-precxx11]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Download compiledJNI Mac
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-macOS
-          path: jnilib
-      - name: Download releaseJNI Windows GPU
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-Windows-GPU
-          path: jnilib
-      - name: Download compiledJNI Windows
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-Windows
-          path: jnilib
-      - name: Download releaseJNI Linux GPU
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-Linux-GPU
-          path: jnilib
-      - name: Download compiledJNI Linux CPU
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-Linux
-          path: jnilib
-      - name: Download compiledJNI Precxx11 CPU/GPU
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-Linux-precxx11
-          path: jnilib/precxx11
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
+          gradlew :pytorch:pytorch-native:releaseJNI -Pgpu
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.7.1/jnilib
-      - name: Test with Gradle
-        run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
+          aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-1.7.1/jnilib
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths /pytorch-1.7.1/jnilib/

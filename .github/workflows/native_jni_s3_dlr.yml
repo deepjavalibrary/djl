@@ -9,6 +9,11 @@ jobs:
     strategy:
       matrix:
         operating-system: [macos-10.15, ubuntu-16.04]
+        include:
+        - operating-system: macos-10.15
+          os: osx
+        - operating-system: ubuntu-16.04
+          os: linux
 
     steps:
       - uses: actions/checkout@v2
@@ -24,38 +29,10 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: ./gradlew :dlr:dlr-native:compileJNI
-      - name: Upload compiled JNI library
-        uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: jnilib-${{ runner.os }}
-          path: dlr/dlr-native/jnilib
-
-  publish:
-    runs-on: ubuntu-18.04
-    needs: [ build-dlr-jni-cpu ]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Download compiledJNI Mac
-        uses: actions/download-artifact@v2
-        with:
-          name: jnilib-macOS
-          path: jnilib
-      - name: Download compiledJNI Linux CPU
-        uses: actions/download-artifact@v2
-        with:
-          name: jnilib-Linux
-          path: jnilib
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
+      - name: Run test
+        run: ./gradlew :dlr:dlr-engine:test
       - name: Copy files to S3 with the AWS CLI
         run: |
           DLR_VERSION="$(cat gradle.properties | awk -F '=' '/dlr_version/ {print $2}')"
-          aws s3 sync jnilib s3://djl-ai/publish/dlr-${DLR_VERSION}/jnilib
-      - name: Run test
-        run: |
-          ./gradlew :dlr:dlr-engine:test
+          aws s3 cp dlr/dlr-native/build/*djl_dlr* s3://djl-ai/publish/dlr-${DLR_VERSION}/jnilib/0.10.0/${{ matrix.os }}-x86_64/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths /dlr-${DLR_VERSION}/jnilib/
