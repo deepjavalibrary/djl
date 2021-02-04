@@ -148,6 +148,12 @@ export default function ModelView(props) {
 
 	console.log(props.model);
 
+	let noParameters = {
+		uri: "N/A",
+		sha1Hash: "N/A",
+		size: 0
+	};
+
 	let noSynset = {
 		name: "N/A",
 		Hash: "N/A",
@@ -214,9 +220,11 @@ export default function ModelView(props) {
 						<DynForm data={props.model.arguments} />
 					</TabPanel>
 					<TabPanel value={index} index={3}>
-						<DynForm data={props.model.files.parameters} />
+						{data = props.model.files.parameters
+							? <DynForm data={props.model.files.parameters}/>
+							: <DynForm data={noParameters}/>
+						}
 					</TabPanel>
-
 					<TabPanel value={index} index={4}>
 						{data = props.model.files.synset
 							? <DynForm data={props.model.files.synset}/>
