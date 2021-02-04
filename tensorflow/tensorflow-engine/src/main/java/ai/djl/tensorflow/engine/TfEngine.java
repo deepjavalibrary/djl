@@ -64,6 +64,12 @@ public final class TfEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
+    public int getRank() {
+        return 3;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getVersion() {
         return TensorFlow.version();
     }

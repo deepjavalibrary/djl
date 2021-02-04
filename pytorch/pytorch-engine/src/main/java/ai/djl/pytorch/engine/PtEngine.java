@@ -65,6 +65,12 @@ public final class PtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
+    public int getRank() {
+        return 2;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getVersion() {
         return "1.7.1";
     }
