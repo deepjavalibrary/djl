@@ -56,10 +56,8 @@ task prepareNativeLibs() {
         delete "${buildDir}/native"
 
         def files = [
-                // "linux/cu101": "",
                 "linux/cpu" : "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-openblas-2.0.0-gcc54.tgz",
                 "osx/cpu": "https://paddle-inference-lib.bj.bcebos.com/mac/2.0.0/cpu_avx_openblas/paddle_inference.tgz",
-                // "win/cu101"  : "",
                 "win/cpu": "https://paddle-wheel.bj.bcebos.com/2.0.0/win-infer/open/cpu/paddle_inference_install_dir.zip"
         ]
 
@@ -127,6 +125,11 @@ task prepareNativeLibs() {
             }
         }
 
+    }
+}
+
+task uploadS3 {
+    doLast {
         exec {
             commandLine "aws", "s3", "sync", "${buildDir}/native/", "s3://djl-ai/publish/paddlepaddle-${paddlepaddle_version}/"
         }
