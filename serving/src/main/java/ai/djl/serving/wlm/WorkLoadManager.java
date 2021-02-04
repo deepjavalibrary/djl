@@ -36,7 +36,7 @@ class WorkLoadManager {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkLoadManager.class);
     private ConfigManager configManager;
-    private AtomicInteger gpuCounter;
+    private GpuAssignmentStrategy gpuAssignmentStrategy;
     private ExecutorService threadPool;
 
     private ConcurrentHashMap<String, WorkerPool> workerPools;
@@ -48,7 +48,7 @@ class WorkLoadManager {
      */
     public WorkLoadManager(ConfigManager configManager) {
         this.configManager = configManager;
-        this.gpuCounter = new AtomicInteger(0);
+        this.gpuAssignmentStrategy = new RoundRobinGpuAssignmentStrategy(configManager);
         threadPool = Executors.newCachedThreadPool();
         workerPools = new ConcurrentHashMap<>();
     }
@@ -201,24 +201,16 @@ class WorkLoadManager {
 
     private void addThreads(
             List<WorkerThread> threads, ModelInfo model, int count, boolean permanent) {
-        int maxGpu = configManager.getNumberOfGpu();
+ 
         for (int i = 0; i < count; ++i) {
-            int gpuId = -1;
+ 
 
-            if (maxGpu > 0) {
-                gpuId = gpuCounter.accumulateAndGet(maxGpu, (prev, maxGpuId) -> ++prev % maxGpuId);
-            }
-            BatchAggregator aggregator;
-            if (permanent) {
-                aggregator =
-                        new PermanentBatchAggregator(
-                                model, workerPools.get(model.getModelName()).getJobQueue());
-            } else {
-                aggregator =
-                        new TemporaryBatchAggregator(
-                                model, workerPools.get(model.getModelName()).getJobQueue());
-            }
-            WorkerThread thread = new WorkerThread(gpuId, model, aggregator, permanent);
+            WorkerThread thread = WorkerThread.builder()
+        	    			.setModel(model)
+        	    			.setJobQueue(getWorkerPoolForModel(model).getJobQueue())
+        	    			.optGpuAssignmentStrategy(gpuAssignmentStrategy)
+        	    			.optFixPoolThread(permanent)
+        	    			.build();
 
             threads.add(thread);
             threadPool.submit(thread);
