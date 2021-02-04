@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 plugins {
     id 'maven-publish'
     id 'signing'
@@ -56,9 +58,9 @@ task prepareNativeLibs() {
         delete "${buildDir}/native"
 
         def files = [
-                "linux/cpu" : "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-openblas-2.0.0-gcc54.tgz",
-                "osx/cpu": "https://paddle-inference-lib.bj.bcebos.com/mac/2.0.0/cpu_avx_openblas/paddle_inference.tgz",
-                "win/cpu": "https://paddle-wheel.bj.bcebos.com/2.0.0/win-infer/open/cpu/paddle_inference_install_dir.zip"
+                "cpu/linux" : "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-openblas-2.0.0-gcc54.tgz",
+                "cpu/osx": "https://paddle-inference-lib.bj.bcebos.com/mac/2.0.0/cpu_avx_openblas/paddle_inference.tgz",
+                "cpu/win": "https://paddle-wheel.bj.bcebos.com/2.0.0/win-infer/open/cpu/paddle_inference_install_dir.zip"
         ]
 
         def downloadDir = file("${buildDir}/download")
@@ -82,7 +84,7 @@ task prepareNativeLibs() {
                     eachFile {
                         path = name
                     }
-                    into "${buildDir}/native/${entry.key}"
+                    into "${buildDir}/native/${entry.key}/native/lib"
                 }
             } else if (fileName.endsWith(".tgz")) {
                 File tmpDir = new File("${buildDir}/native/tmp")
@@ -99,7 +101,7 @@ task prepareNativeLibs() {
                     eachFile {
                         path = name
                     }
-                    into "${buildDir}/native/${entry.key}"
+                    into "${buildDir}/native/${entry.key}/native/lib"
                 }
                 delete "${buildDir}/native/tmp"
             }
@@ -107,15 +109,14 @@ task prepareNativeLibs() {
 
         exec {
             commandLine "sh", "-c", "find ${buildDir}/native -type f | xargs gzip"
+            commandLine "sh", "-c", "find ${buildDir}/native -type d -empty -delete"
         }
 
         def f = new File("${buildDir}/native/files.txt")
         def uploadDirs = [
-                "${buildDir}/native/linux/cpu/",
-                // "${buildDir}/native/linux/cu101/",
-                "${buildDir}/native/osx/cpu/",
-                "${buildDir}/native/win/cpu/"
-                // "${buildDir}/native/win/cu101/"
+                "${buildDir}/native/cpu/linux/native/lib/",
+                "${buildDir}/native/cpu/osx/native/lib/",
+                "${buildDir}/native/cpu/win/native/lib/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
@@ -124,7 +125,7 @@ task prepareNativeLibs() {
                 f << "\n"
             }
         }
-
+        new File("${buildDir}/native/auto").mkdirs()
     }
 }
 
@@ -171,11 +172,16 @@ signing {
 }
 
 def BINARY_ROOT = "${project.buildDir}/native"
-def flavorNames = file(BINARY_ROOT).list() ?: []
+def flavorNames = file(BINARY_ROOT).list(new FilenameFilter() {
+    @Override
+    boolean accept(File dir, String name) {
+        return new File(dir, name).isDirectory()
+    }
+}) ?: []
+
 flavorNames.each { flavor ->
 
     def platformNames = file("${BINARY_ROOT}/${flavor}").list() ?: []
-
     def artifactsNames = []
 
     platformNames.each { osName ->
