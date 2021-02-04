@@ -110,14 +110,10 @@ jobs:
           yum -y install java-1.8.0-openjdk-devel devtoolset-7 rh-git218 patch cmake3
           ln -s /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
-      - name: Workaround for startup run
-        run: ./gradlew jar clean
       - name: Release JNI prep
         run: |
           source scl_source enable devtoolset-7 rh-git218 || true
           ./gradlew :pytorch:pytorch-native:releaseJNI -Pprecxx11
-      - name: Test with Gradle
-        run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
