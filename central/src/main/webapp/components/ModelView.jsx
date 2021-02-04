@@ -148,6 +148,14 @@ export default function ModelView(props) {
 
 	console.log(props.model);
 
+	let noSynset = {
+		name: "N/A",
+		Hash: "N/A",
+		size: 0,
+		uri: "N/A",
+	};
+
+	let data;
 	return (
 
 		<div className={classes.model_view_root}>
@@ -210,7 +218,10 @@ export default function ModelView(props) {
 					</TabPanel>
 
 					<TabPanel value={index} index={4}>
-						<DynForm data={props.model.files.synset} />
+						{data = props.model.files.synset
+							? <DynForm data={props.model.files.synset}/>
+							: <DynForm data={noSynset}/>
+						}
 					</TabPanel>
 				</div>
 
