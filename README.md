@@ -1,10 +1,11 @@
 
 ![DeepJavaLibrary](website/img/deepjavalibrary.png?raw=true "Deep Java Library")
 
-![](https://github.com/awslabs/djl/workflows/nightly%20build/badge.svg)
+![Continuous](https://github.com/awslabs/djl/workflows/Continuous/badge.svg)
 ![Continuous PyTorch](https://github.com/awslabs/djl/workflows/Continous%20PyTorch/badge.svg)
 ![Continuous Tensorflow](https://github.com/awslabs/djl/workflows/Continuous%20Tensorflow/badge.svg)
 ![Docs](https://github.com/awslabs/djl/workflows/Docs/badge.svg)
+![Nightly Publish](https://github.com/awslabs/djl/workflows/Nightly%20Publish/badge.svg)
 
 # Deep Java Library (DJL)
 
