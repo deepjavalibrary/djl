@@ -6,8 +6,8 @@ You can get involved and engage with us by joining our [Slack channel](deepjaval
 | | | | | |
 |-------|----------------|---------|------------| ----------- |
 | ![](website/img/community_leader/anthony.jpeg) <br>Anthony | ![](website/img/community_leader/christoph.png) <br>Christoph | ![](website/img/community_leader/erik.png) <br>Erik | ![](website/img/community_leader/frank.png) <br>Frank | ![](website/img/community_leader/jake.jpg) <br>Jake |
-| ![](website/img/community_leader/kimi.png) <br>Kimi | ![](website/img/community_leader/lai.jpg) <br>Lai | ![](website/img/community_leader/lu.png) <br>Lu | ![](website/img/community_leader/marat.png) <br>Marat | ![](website/img/community_leader/marcos.png) <br>Marcos |
-| ![](website/img/community_leader/qing.jpeg) <br>Qing | ![](website/img/community_leader/stanislav.png) <br>Stanislav | ![](website/img/community_leader/wei.jpg) <br>Wei | ![](website/img/community_leader/zach.jpeg) <br>Zach |
+| ![](website/img/community_leader/keerthan.jpg) <br>Keerthan | ![](website/img/community_leader/kimi.png) <br>Kimi | ![](website/img/community_leader/lai.jpg) <br>Lai | ![](website/img/community_leader/lu.png) <br>Lu | ![](website/img/community_leader/marat.png) <br>Marat |
+| ![](website/img/community_leader/marcos.png) <br>Marcos | ![](website/img/community_leader/qing.jpeg) <br>Qing | ![](website/img/community_leader/stanislav.png) <br>Stanislav | ![](website/img/community_leader/wei.jpg) <br>Wei | ![](website/img/community_leader/zach.jpeg) <br>Zach |
 
 #### Anthony Feenster
 
@@ -40,9 +40,11 @@ Frank Liu is a Software Engineer for AWS Deep Learning. He focuses on building i
 
 Jake is one of core developers in the AWS DJL team. He graduated from CMU with MS degree in Software Engineering. He loves to learn things about Deep Learning in particular Deep Learning System. Outside of work, Jake enjoys watching movie, TV series, and anime.
 
-#### Kimi Ma
+#### Keerthan Vasist | [github](https://github.com/keerthanvasist)
 
-[github](https://github.com/kimim)
+Keerthan is a software engineer in AWS Deep Engines Org. His current work focuses on explainability and bias in machine learning. Outside of work, he enjoys playing Ultimate Frisbee, and badminton.
+
+#### Kimi Ma | [github](https://github.com/kimim)
 
 Kimi Ma is Industrial Internet director of Wanxiang Group, responsible for Wanxiang industrial digital platform development, business model innovation, and global partnerships. His primary interests in 2021 include energy internet, distributed intelligence and smart city. Before joining Wanxiang, Kimi was the R&D Manager of ABB control technology platform and Nokia Siemens Network.
 Meantime, he is a board member in the Alliance of Industrial Internet and contributes to Clojure DJL: [clj-djl](https://github.com/kimim/clj-djl).
@@ -92,3 +94,4 @@ Wei is a Java full stack Development Engineer in Shanghai international human ph
 [github](https://github.com/zachgk) [twitter](https://twitter.com/zachkimberg)
 
 Zach is one of the core developers at DJL. He is a committer on the Apache MXNet deep learning framework who worked on the Java/Scala frontend before joining DJL to create a framework that is designed for Java first. He focuses on training and making a deep learning system that is as easy to use as possible. Outside of DJL, he is interested in the design of programming languages, decentralized systems, and general AI.
+
