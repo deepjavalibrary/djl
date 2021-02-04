@@ -73,7 +73,8 @@ if exist %CLASSPATH% (
 ) else (
     echo Couldn't find %CLASSPATH%, downloading it ...
 	echo Downloading from: %DOWNLOAD_URL%
-    powershell -Command "(New-Object Net.WebClient).DownloadFile('%DOWNLOAD_URL%', '%CLASSPATH%')"
+    powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (New-Object Net.WebClient).DownloadFile('%DOWNLOAD_URL%', '%CLASSPATH%')"
+
     echo Finished downloading %CLASSPATH%
 )
 @rem End of extension
