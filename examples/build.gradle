@@ -8,24 +8,21 @@ dependencies {
     implementation project(":basicdataset")
     implementation project(":model-zoo")
 
-    if (System.getProperty("ai.djl.default_engine") == "PyTorch") {
-        runtimeOnly project(":pytorch:pytorch-model-zoo")
-        runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
-    } else if (System.getProperty("ai.djl.default_engine") == "TensorFlow") {
-        runtimeOnly project(":tensorflow:tensorflow-model-zoo")
-        runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
-    } else if (System.getProperty("ai.djl.default_engine") == "OnnxRuntime") {
-        runtimeOnly project(":onnxruntime:onnxruntime-engine")
-    } else if (System.getProperty("ai.djl.default_engine") == "DLR") {
+    runtimeOnly project(":mxnet:mxnet-model-zoo")
+    runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
+    runtimeOnly project(":pytorch:pytorch-model-zoo")
+    runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
+    runtimeOnly project(":tensorflow:tensorflow-model-zoo")
+    runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
+    runtimeOnly project(":onnxruntime:onnxruntime-engine")
+
+    // DLR and tflite are only used for benchmark
+    if (System.getProperty("ai.djl.default_engine") == "DLR") {
         runtimeOnly project(":dlr:dlr-engine")
         runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
     } else if (System.getProperty("ai.djl.default_engine") == "TFLite") {
         runtimeOnly project(":tflite:tflite-engine")
         runtimeOnly project(":tflite:tflite-native")
-    }
-    else {
-        runtimeOnly project(":mxnet:mxnet-model-zoo")
-        runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
     }
 
     testImplementation("org.testng:testng:${testng_version}") {
