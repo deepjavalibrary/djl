@@ -170,7 +170,7 @@ signing {
     sign publishing.publications
 }
 
-def BINARY_ROOT = "${project.buildDir}/download"
+def BINARY_ROOT = "${project.buildDir}/native"
 def flavorNames = file(BINARY_ROOT).list() ?: []
 flavorNames.each { flavor ->
 
