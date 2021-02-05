@@ -151,7 +151,7 @@ public class InferenceRequestHandler extends HttpRequestHandler {
 
             modelManager
                     .registerModel(modelName, modelUrl, 1, 0)
-                    .thenAccept(m -> modelManager.updateModel(modelName, 1, 1))
+                    .thenAccept(m -> modelManager.triggerModelUpdated(model.scaleWorkers(1, 1)))
                     .thenAccept(
                             p -> {
                                 try {

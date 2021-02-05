@@ -21,7 +21,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,6 @@ import org.slf4j.LoggerFactory;
 class WorkLoadManager {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkLoadManager.class);
-    private ConfigManager configManager;
     private GpuAssignmentStrategy gpuAssignmentStrategy;
     private ExecutorService threadPool;
 
@@ -47,7 +45,6 @@ class WorkLoadManager {
      * @param configManager configuration manager to get configuration parameter.
      */
     public WorkLoadManager(ConfigManager configManager) {
-        this.configManager = configManager;
         this.gpuAssignmentStrategy = new RoundRobinGpuAssignmentStrategy(configManager);
         threadPool = Executors.newCachedThreadPool();
         workerPools = new ConcurrentHashMap<>();
@@ -201,16 +198,16 @@ class WorkLoadManager {
 
     private void addThreads(
             List<WorkerThread> threads, ModelInfo model, int count, boolean permanent) {
- 
-        for (int i = 0; i < count; ++i) {
- 
 
-            WorkerThread thread = WorkerThread.builder()
-        	    			.setModel(model)
-        	    			.setJobQueue(getWorkerPoolForModel(model).getJobQueue())
-        	    			.optGpuAssignmentStrategy(gpuAssignmentStrategy)
-        	    			.optFixPoolThread(permanent)
-        	    			.build();
+        for (int i = 0; i < count; ++i) {
+
+            WorkerThread thread =
+                    WorkerThread.builder()
+                            .setModel(model)
+                            .setJobQueue(getWorkerPoolForModel(model).getJobQueue())
+                            .optGpuAssignmentStrategy(gpuAssignmentStrategy)
+                            .optFixPoolThread(permanent)
+                            .build();
 
             threads.add(thread);
             threadPool.submit(thread);

@@ -14,17 +14,15 @@ package ai.djl.serving.wlm;
 
 /**
  * Strategies to find next available GpuID.
- * 
- * @author erik.bamberg@web.de
  *
+ * @author erik.bamberg@web.de
  */
 public interface GpuAssignmentStrategy {
 
     /**
      * Returns next gpuId.
-     * 
+     *
      * @return gpuId or -1 if no gpu is avaiable
      */
     int nextGpuId();
-
 }

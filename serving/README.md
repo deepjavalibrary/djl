@@ -205,17 +205,19 @@ json
 
 
 #### models - scale model worker instances
-url:	/models/{modelName}?{min_worker}={integer}&{max_worker}={integer}
+url:	/models/{modelName}?{min_worker}={integer}&{max_worker}={integer}&{max_idle_time}={time in seconds}&{max_batch_delay}={time in ms}
 
-min_worker is optional
-max_worker is optional
+- min_worker is optional
+- max_worker is optional
+- max_idle_time is optional. time is in seconds. the new set max_idle_time is only used by new created worker. Already created workers waiting for data during there idle time are not affected by a parameter change
+- max_batch_delay is optional the max time in milliseconds to wait after automatically scaling up workers to offer the job before giving up.
 
 method: PUT
 
 example:
 
 ```sh
-curl -X PUT "http://localhost:8080/models/mlp?min_worker=4&max_worker=12"
+curl -X PUT "http://localhost:8080/models/mlp?min_worker=4&max_worker=12&max_idle_time=60&max_batch_delay=500"
 ```
 
 returns
@@ -227,7 +229,35 @@ json
 }
 ```
 
+#### models - register model
+url:	/models/?{modelName}=modelName&{min_worker}={integer}&{max_worker}={integer}&{max_idle_time}={int.seconds}
 
+
+
+model_name	the name for the model
+batchSize batchsize
+max_batch_delay in milliseconds
+min_worker is optional
+max_worker is optional
+max_idle_time is optional. time is in seconds
+synchronous true/false
+
+method: PUT
+
+example:
+
+```sh
+curl -X PPOSTUT "http://localhost:8080/models?modelName=mlp?min_worker=4&max_worker=12&max_idle_time=60&max_batch_delay=100"
+```
+
+returns
+json 
+
+```sh
+{
+  
+}
+```
 
 
 #### prediction - run a prediction using a loaded model

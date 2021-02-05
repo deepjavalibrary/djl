@@ -35,6 +35,25 @@ import java.util.regex.Pattern;
  */
 public class ManagementRequestHandler extends HttpRequestHandler {
 
+    /** HTTP Paramater "synchronous". */
+    private static final String SYNCHRONOUS_PARAMETER = "synchronous";
+    /** HTTP Paramater "initial_workers". */
+    private static final String INITIAL_WORKERS_PARAMETER = "initial_workers";
+    /** HTTP Paramater "url". */
+    private static final String URL_PARAMETER = "url";
+    /** HTTP Paramater "batch_size". */
+    private static final String BATCH_SIZE_PARAMETER = "batch_size";
+    /** HTTP Paramater "model_name". */
+    private static final String MODEL_NAME_PARAMETER = "model_name";
+    /** HTTP Paramater "max_batch_delay". */
+    private static final String MAX_BATCH_DELAY_PARAMETER = "max_batch_delay";
+    /** HTTP Paramater "max_idle_time". */
+    private static final String MAX_IDLE_TIME__PARAMETER = "max_idle_time";
+    /** HTTP Paramater "max_worker". */
+    private static final String MAX_WORKER_PARAMETER = "max_worker";
+    /** HTTP Paramater "min_worker". */
+    private static final String MIN_WORKER_PARAMETER = "min_worker";
+
     private static final Pattern PATTERN = Pattern.compile("^/models([/?].*)?");
 
     /** {@inheritDoc} */
@@ -119,24 +138,32 @@ public class ManagementRequestHandler extends HttpRequestHandler {
     }
 
     private void handleRegisterModel(final ChannelHandlerContext ctx, QueryStringDecoder decoder) {
-        String modelUrl = NettyUtils.getParameter(decoder, "url", null);
+        String modelUrl = NettyUtils.getParameter(decoder, URL_PARAMETER, null);
         if (modelUrl == null) {
             throw new BadRequestException("Parameter url is required.");
         }
 
-        final String modelName = NettyUtils.getParameter(decoder, "model_name", null);
-        int batchSize = NettyUtils.getIntParameter(decoder, "batch_size", 1);
-        int maxBatchDelay = NettyUtils.getIntParameter(decoder, "max_batch_delay", 100);
-        final int initialWorkers = NettyUtils.getIntParameter(decoder, "initial_workers", 1);
+        final String modelName = NettyUtils.getParameter(decoder, MODEL_NAME_PARAMETER, null);
+        int batchSize = NettyUtils.getIntParameter(decoder, BATCH_SIZE_PARAMETER, 1);
+        int maxBatchDelay = NettyUtils.getIntParameter(decoder, MAX_BATCH_DELAY_PARAMETER, 100);
+        int maxIdleTime = NettyUtils.getIntParameter(decoder, MAX_IDLE_TIME__PARAMETER, 60);
+        final int initialWorkers =
+                NettyUtils.getIntParameter(decoder, INITIAL_WORKERS_PARAMETER, 1);
         boolean synchronous =
-                Boolean.parseBoolean(NettyUtils.getParameter(decoder, "synchronous", "true"));
+                Boolean.parseBoolean(
+                        NettyUtils.getParameter(decoder, SYNCHRONOUS_PARAMETER, "true"));
 
         final ModelManager modelManager = ModelManager.getInstance();
         CompletableFuture<ModelInfo> future =
                 modelManager.registerModel(modelName, modelUrl, batchSize, maxBatchDelay);
         CompletableFuture<Void> f =
                 future.thenAccept(
-                        m -> modelManager.updateModel(modelName, initialWorkers, initialWorkers));
+                        modelInfo ->
+                                modelManager.triggerModelUpdated(
+                                        modelInfo
+                                                .scaleWorkers(initialWorkers, initialWorkers)
+                                                .configurePool(maxIdleTime, maxBatchDelay)
+                                                .configureModelBatch(batchSize)));
 
         if (synchronous) {
             final String msg = "Model \"" + modelName + "\" registered.";
@@ -167,17 +194,35 @@ public class ManagementRequestHandler extends HttpRequestHandler {
             ChannelHandlerContext ctx, QueryStringDecoder decoder, String modelName)
             throws ModelNotFoundException {
         try {
-            int minWorkers = NettyUtils.getIntParameter(decoder, "min_worker", 1);
-            int maxWorkers = NettyUtils.getIntParameter(decoder, "max_worker", minWorkers);
-            if (maxWorkers < minWorkers) {
-                throw new BadRequestException("max_worker cannot be less than min_worker.");
-            }
+
             ModelManager modelManager = ModelManager.getInstance();
             ModelInfo modelInfo = modelManager.getModels().get(modelName);
             if (modelInfo == null) {
                 throw new ModelNotFoundException("Model not found: " + modelName);
             }
-            modelManager.updateModel(modelName, minWorkers, maxWorkers);
+            int minWorkers =
+                    NettyUtils.getIntParameter(
+                            decoder, MIN_WORKER_PARAMETER, modelInfo.getMinWorkers());
+            int maxWorkers =
+                    NettyUtils.getIntParameter(
+                            decoder, MAX_WORKER_PARAMETER, modelInfo.getMaxWorkers());
+            if (maxWorkers < minWorkers) {
+                throw new BadRequestException("max_worker cannot be less than min_worker.");
+            }
+
+            int maxIdleTime =
+                    NettyUtils.getIntParameter(
+                            decoder, MAX_IDLE_TIME__PARAMETER, modelInfo.getMaxIdleTime());
+            int maxBatchDelay =
+                    NettyUtils.getIntParameter(
+                            decoder, MAX_BATCH_DELAY_PARAMETER, modelInfo.getMaxBatchDelay());
+
+            modelInfo =
+                    modelInfo
+                            .scaleWorkers(minWorkers, maxWorkers)
+                            .configurePool(maxIdleTime, maxBatchDelay);
+            modelManager.triggerModelUpdated(modelInfo);
+
             String msg =
                     "Model \""
                             + modelName

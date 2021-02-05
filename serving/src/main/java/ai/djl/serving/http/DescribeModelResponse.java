@@ -25,6 +25,7 @@ public class DescribeModelResponse {
     private int maxWorkers;
     private int batchSize;
     private int maxBatchDelay;
+    private int maxIdleTime;
     private String status;
     private boolean loadedAtStartup;
 
@@ -177,6 +178,24 @@ public class DescribeModelResponse {
      */
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    /**
+     * Sets the max idle time for worker threads.
+     *
+     * @param maxIdleTime the time a worker thread can be idle before scaling down.
+     */
+    public void setMaxIdleTime(int maxIdleTime) {
+        this.maxIdleTime = maxIdleTime;
+    }
+
+    /**
+     * Gets the maximum idle time for worker threads.
+     *
+     * @return the maxIdleTime
+     */
+    public int getMaxIdleTime() {
+        return maxIdleTime;
     }
 
     /**

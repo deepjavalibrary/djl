@@ -299,10 +299,9 @@ public class ModelServer {
             logger.info("Initializing model: {}", url);
             int workers = configManager.getDefaultWorkers();
             CompletableFuture<ModelInfo> future = modelManager.registerModel(null, url, 1, 100);
-            ModelInfo info = future.join();
-            String modelName = info.getModelName();
-            modelManager.updateModel(modelName, workers, workers);
-            startupModels.add(modelName);
+            ModelInfo modelInfo = future.join();
+            modelManager.triggerModelUpdated(modelInfo.scaleWorkers(workers, workers));
+            startupModels.add(modelInfo.getModelName());
         }
     }
 

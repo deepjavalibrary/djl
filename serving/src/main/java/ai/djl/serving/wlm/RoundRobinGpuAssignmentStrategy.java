@@ -17,29 +17,27 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Assign next gpu using round robin to get the next gpuID.
- * 
- * @author erik.bamberg@web.de
  *
+ * @author erik.bamberg@web.de
  */
 public class RoundRobinGpuAssignmentStrategy implements GpuAssignmentStrategy {
 
-    private static AtomicInteger gpuCounter=new AtomicInteger(0);
+    private static AtomicInteger gpuCounter = new AtomicInteger(0);
 
     private ConfigManager configManager;
-    
+
     /**
      * Construct a round robin gpu assignment strategy.
-     * 
+     *
      * @param configManager use this configuration manager.
-     * 
      */
     public RoundRobinGpuAssignmentStrategy(ConfigManager configManager) {
-	this.configManager=configManager;
+        this.configManager = configManager;
     }
-    
+
     /**
      * Returns next gpuId.
-     * 
+     *
      * @return gpuId or -1 if no gpu is avaiable
      */
     @Override
@@ -51,5 +49,4 @@ public class RoundRobinGpuAssignmentStrategy implements GpuAssignmentStrategy {
         }
         return gpuId;
     }
-
 }
