@@ -46,7 +46,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           aws s3 cp pytorch/pytorch-native/build/*djl_torch.* s3://djl-ai/publish/pytorch-1.7.1/jnilib/0.10.0/${{ matrix.os }}-x86_64/cpu/
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths /pytorch-1.7.1/jnilib/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-1.7.1/jnilib*"
 
   build-pytorch-jni-linux-gpu:
     if: github.repository == 'awslabs/djl'
@@ -85,7 +85,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-1.7.1/jnilib
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths /pytorch-1.7.1/jnilib/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-1.7.1/jnilib*"
 
   build-pytorch-jni-precxx11:
     if: github.repository == 'awslabs/djl'
@@ -123,7 +123,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-1.7.1/jnilib/precxx11
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths /pytorch-1.7.1/jnilib/precxx11/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-1.7.1/jnilib/precxx11*"
 
   build-pytorch-jni-windows-gpu:
     if: github.repository == 'awslabs/djl'
@@ -180,4 +180,4 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-1.7.1/jnilib
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths /pytorch-1.7.1/jnilib/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-1.7.1/jnilib*"
