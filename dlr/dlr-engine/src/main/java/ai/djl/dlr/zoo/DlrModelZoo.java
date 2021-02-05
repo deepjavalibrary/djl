@@ -13,11 +13,10 @@
 package ai.djl.dlr.zoo;
 
 import ai.djl.dlr.engine.DlrEngine;
-import ai.djl.engine.Engine;
 import ai.djl.modality.cv.zoo.ImageClassificationModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 
 /** DlrModelZoo is a repository that contains all dlr models for DJL. */
@@ -40,9 +39,6 @@ public class DlrModelZoo implements ModelZoo {
     /** {@inheritDoc} */
     @Override
     public Set<String> getSupportedEngines() {
-        Set<String> set = new HashSet<>();
-        set.add(Engine.getInstance().getEngineName());
-        set.add(DlrEngine.ENGINE_NAME);
-        return set;
+        return Collections.singleton(DlrEngine.ENGINE_NAME);
     }
 }
