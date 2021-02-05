@@ -321,7 +321,7 @@ public final class LibUtils {
 
             tmp = Files.createTempDirectory(cacheDir, "tmp");
             for (String line : lines) {
-                if (line.startsWith(os + '/' + flavor + '/')) {
+                if (line.startsWith(flavor + '/' + os + '/')) {
                     URL url = new URL(link + '/' + line);
                     String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
                     logger.info("Downloading {} ...", url);

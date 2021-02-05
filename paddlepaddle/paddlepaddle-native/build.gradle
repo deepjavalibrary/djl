@@ -106,12 +106,18 @@ task prepareNativeLibs() {
                 delete "${buildDir}/native/tmp"
             }
         }
-
         exec {
-            commandLine "sh", "-c", "find ${buildDir}/native -type f | xargs gzip"
             commandLine "sh", "-c", "find ${buildDir}/native -type d -empty -delete"
         }
+        new File("${buildDir}/native/auto").mkdirs()
+    }
+}
 
+task uploadS3 {
+    doLast {
+        exec {
+            commandLine "sh", "-c", "find ${buildDir}/native -type f | xargs gzip"
+        }
         def f = new File("${buildDir}/native/files.txt")
         def uploadDirs = [
                 "${buildDir}/native/cpu/linux/native/lib/",
@@ -125,12 +131,6 @@ task prepareNativeLibs() {
                 f << "\n"
             }
         }
-        new File("${buildDir}/native/auto").mkdirs()
-    }
-}
-
-task uploadS3 {
-    doLast {
         exec {
             commandLine "aws", "s3", "sync", "${buildDir}/native/", "s3://djl-ai/publish/paddlepaddle-${paddlepaddle_version}/"
         }
