@@ -77,13 +77,15 @@ public final class ModelManager {
      * @param modelUrl the model url
      * @param batchSize the batch size
      * @param maxBatchDelay the maximum delay for batching
+     * @param maxIdleTime the maximum idle time of the worker threads before scaling down.
      * @return a {@code CompletableFuture} instance
      */
     public CompletableFuture<ModelInfo> registerModel(
             final String modelName,
             final String modelUrl,
             final int batchSize,
-            final int maxBatchDelay) {
+            final int maxBatchDelay,
+            final int maxIdleTime) {
         return CompletableFuture.supplyAsync(
                 () -> {
                     try {
@@ -106,11 +108,10 @@ public final class ModelManager {
                                         actualModelName,
                                         modelUrl,
                                         model,
-                                        configManager.getJobQueueSize());
-                        modelInfo =
-                                modelInfo
-                                        .configureModelBatch(batchSize)
-                                        .configurePool(60, maxBatchDelay);
+                                        configManager.getJobQueueSize(),
+                                        maxIdleTime,
+                                        maxBatchDelay,
+                                        batchSize);
 
                         ModelInfo existingModel = models.putIfAbsent(actualModelName, modelInfo);
                         if (existingModel != null) {

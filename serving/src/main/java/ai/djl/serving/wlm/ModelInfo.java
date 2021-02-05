@@ -43,16 +43,25 @@ public final class ModelInfo implements AutoCloseable, Cloneable {
      * @param modelUrl the model url
      * @param model the {@link ZooModel}
      * @param queueSize the maximum request queue size
+     * @param maxIdleTime the initial maximum idle time for workers.
+     * @param maxBatchDelay the initial maximum delay when scaling up before giving up.
+     * @param batchSize the batch size for this model.
      */
     public ModelInfo(
-            String modelName, String modelUrl, ZooModel<Input, Output> model, int queueSize) {
+            String modelName,
+            String modelUrl,
+            ZooModel<Input, Output> model,
+            int queueSize,
+            int maxIdleTime,
+            int maxBatchDelay,
+            int batchSize) {
         this.modelName = modelName;
         this.modelUrl = modelUrl;
         this.model = model;
-        this.batchSize = 1;
-        this.maxBatchDelay = 100;
-        this.maxIdleTime = 60; // default max idle time 60s
+        this.maxBatchDelay = maxBatchDelay;
+        this.maxIdleTime = maxIdleTime; // default max idle time 60s
         this.queueSize = queueSize;
+        this.batchSize = batchSize;
     }
 
     /**

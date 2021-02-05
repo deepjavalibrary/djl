@@ -298,7 +298,13 @@ public class ModelServer {
         for (String url : urls) {
             logger.info("Initializing model: {}", url);
             int workers = configManager.getDefaultWorkers();
-            CompletableFuture<ModelInfo> future = modelManager.registerModel(null, url, 1, 100);
+            CompletableFuture<ModelInfo> future =
+                    modelManager.registerModel(
+                            null,
+                            url,
+                            configManager.getBatchSize(),
+                            configManager.getMaxBatchDelay(),
+                            configManager.getMaxIdleTime());
             ModelInfo modelInfo = future.join();
             modelManager.triggerModelUpdated(modelInfo.scaleWorkers(workers, workers));
             startupModels.add(modelInfo.getModelName());

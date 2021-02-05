@@ -155,7 +155,8 @@ public class ManagementRequestHandler extends HttpRequestHandler {
 
         final ModelManager modelManager = ModelManager.getInstance();
         CompletableFuture<ModelInfo> future =
-                modelManager.registerModel(modelName, modelUrl, batchSize, maxBatchDelay);
+                modelManager.registerModel(
+                        modelName, modelUrl, batchSize, maxBatchDelay, maxIdleTime);
         CompletableFuture<Void> f =
                 future.thenAccept(
                         modelInfo ->

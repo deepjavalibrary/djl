@@ -98,9 +98,6 @@ class WorkLoadManager {
                     }
                 }
 
-            } catch (ScaleCapacityExceededException e) {
-                logger.error(e.getMessage(), e);
-                accepted = false;
             } catch (InterruptedException e) {
                 logger.info(
                         "Worker Queue Capacity Exceeded. cannot add to worker queue in appropriate time. You can configure max batch delay time for this model.");
@@ -109,17 +106,15 @@ class WorkLoadManager {
         return accepted;
     }
 
-    private void scaleUpWorkers(ModelInfo modelInfo, WorkerPool pool)
-            throws ScaleCapacityExceededException {
+    private void scaleUpWorkers(ModelInfo modelInfo, WorkerPool pool) {
         int currentWorkers = getNumRunningWorkers(modelInfo.getModelName());
         if (currentWorkers < modelInfo.getMaxWorkers()) {
             logger.debug("scaling up workers for model {} to {} ", modelInfo, currentWorkers + 1);
             addThreads(pool.getWorkers(), modelInfo, 1, false);
         } else {
-            throw new ScaleCapacityExceededException(
-                    "scale up capacity of "
-                            + modelInfo.getMaxWorkers()
-                            + " workers reached. Unable to scale up worker pool.");
+            logger.warn(
+                    "scale up capacity of {} workers reached. Unable to scale up worker pool.",
+                    modelInfo.getMaxWorkers());
         }
     }
 
