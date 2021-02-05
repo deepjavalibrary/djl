@@ -12,12 +12,11 @@
  */
 package ai.djl.tflite.zoo;
 
-import ai.djl.engine.Engine;
 import ai.djl.modality.cv.zoo.ImageClassificationModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.tflite.engine.TfLiteEngine;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 
 /** TfLiteModelZoo is a repository that contains all TFLite models for DJL. */
@@ -40,9 +39,6 @@ public class TfLiteModelZoo implements ModelZoo {
     /** {@inheritDoc} */
     @Override
     public Set<String> getSupportedEngines() {
-        Set<String> set = new HashSet<>();
-        set.add(Engine.getInstance().getEngineName());
-        set.add(TfLiteEngine.ENGINE_NAME);
-        return set;
+        return Collections.singleton(TfLiteEngine.ENGINE_NAME);
     }
 }
