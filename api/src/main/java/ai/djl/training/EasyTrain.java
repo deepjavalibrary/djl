@@ -40,13 +40,29 @@ public final class EasyTrain {
     public static void fit(
             Trainer trainer, int numEpoch, Dataset trainingDataset, Dataset validateDataset)
             throws IOException, TranslateException {
+
+        // Deep learning is typically trained in epochs where each epoch trains the model on each
+        // item in the dataset once
         for (int epoch = 0; epoch < numEpoch; epoch++) {
+
+            // We iterate through the dataset once during each epoch
             for (Batch batch : trainer.iterateDataset(trainingDataset)) {
+
+                // During trainBatch, we update the loss and evaluators with the results for the
+                // training batch
                 trainBatch(trainer, batch);
+
+                // Now, we update the model parameters based on the results of the latest trainBatch
                 trainer.step();
+
+                // We must make sure to close the batch to ensure all the memory associated with the
+                // batch is cleared.
+                // If the memory isn't closed after each batch, you will very quickly run out of
+                // memory on your GPU
                 batch.close();
             }
 
+            // After each epoch, test against the validation dataset if we have one
             if (validateDataset != null) {
                 for (Batch batch : trainer.iterateDataset(validateDataset)) {
                     validateBatch(trainer, batch);
