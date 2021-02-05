@@ -43,4 +43,4 @@ jobs:
         run: |
           DLR_VERSION="$(cat gradle.properties | awk -F '=' '/dlr_version/ {print $2}')"
           aws s3 cp dlr/dlr-native/build/*djl_dlr* s3://djl-ai/publish/dlr-${DLR_VERSION}/jnilib/0.10.0/${{ matrix.os }}-x86_64/
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths /dlr-${DLR_VERSION}/jnilib/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/dlr-${DLR_VERSION}/jnilib*"
