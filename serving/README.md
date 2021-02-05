@@ -247,7 +247,7 @@ method: PUT
 example:
 
 ```sh
-curl -X PPOSTUT "http://localhost:8080/models?modelName=mlp?min_worker=4&max_worker=12&max_idle_time=60&max_batch_delay=100"
+curl -X PUT "http://localhost:8080/models?modelName=mlp?min_worker=4&max_worker=12&max_idle_time=60&max_batch_delay=100"
 ```
 
 returns
