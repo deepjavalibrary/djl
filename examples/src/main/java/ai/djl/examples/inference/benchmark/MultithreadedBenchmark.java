@@ -100,7 +100,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
 
         model.close();
         if (successThreads != numOfThreads + 1) {
-            logger.error("Only {}/{} threads finished.", successThreads, numOfThreads);
+            logger.error("Only {}/{} threads finished.", successThreads - 1, numOfThreads);
             return null;
         }
 
