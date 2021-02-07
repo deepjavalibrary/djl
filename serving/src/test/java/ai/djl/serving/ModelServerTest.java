@@ -346,14 +346,16 @@ public class ModelServerTest {
         latch = new CountDownLatch(1);
         HttpRequest req =
                 new DefaultFullHttpRequest(
-                        HttpVersion.HTTP_1_1, HttpMethod.PUT, "/models/mlp_2?min_worker=2");
+                        HttpVersion.HTTP_1_1,
+                        HttpMethod.PUT,
+                        "/models/mlp_2?min_worker=2&max_worker=4");
         channel.writeAndFlush(req);
         latch.await();
 
         StatusResponse resp = JsonUtils.GSON.fromJson(result, StatusResponse.class);
         Assert.assertEquals(
                 resp.getStatus(),
-                "Model \"mlp_2\" worker scaled. New Worker configuration min workers:2 max workers:2");
+                "Model \"mlp_2\" worker scaled. New Worker configuration min workers:2 max workers:4");
     }
 
     private void testDescribeModel(Channel channel) throws InterruptedException {
@@ -370,7 +372,7 @@ public class ModelServerTest {
         Assert.assertEquals(resp.getModelName(), "mlp_2");
         Assert.assertNotNull(resp.getModelUrl());
         Assert.assertEquals(resp.getMinWorkers(), 2);
-        Assert.assertEquals(resp.getMaxWorkers(), 2);
+        Assert.assertEquals(resp.getMaxWorkers(), 4);
         Assert.assertEquals(resp.getBatchSize(), 1);
         Assert.assertEquals(resp.getMaxBatchDelay(), 100);
         Assert.assertEquals(resp.getStatus(), "Healthy");

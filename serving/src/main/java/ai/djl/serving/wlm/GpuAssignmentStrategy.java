@@ -12,14 +12,17 @@
  */
 package ai.djl.serving.wlm;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+/**
+ * Strategies to find next available GpuID.
+ *
+ * @author erik.bamberg@web.de
+ */
+public interface GpuAssignmentStrategy {
 
-public class ModelInfoTest {
-
-    @Test
-    public void testQueueSizeIsSet() {
-        ModelInfo modelInfo = new ModelInfo("", "", null, 4711, 1, 300, 1);
-        Assert.assertEquals(4711, modelInfo.getQueueSize());
-    }
+    /**
+     * Returns next gpuId.
+     *
+     * @return gpuId or -1 if no gpu is avaiable
+     */
+    int nextGpuId();
 }

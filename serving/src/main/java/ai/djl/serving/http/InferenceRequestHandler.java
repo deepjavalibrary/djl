@@ -150,8 +150,13 @@ public class InferenceRequestHandler extends HttpRequestHandler {
             logger.info("Loading model {} from: {}", modelName, modelUrl);
 
             modelManager
-                    .registerModel(modelName, modelUrl, 1, 0)
-                    .thenAccept(m -> modelManager.updateModel(modelName, 1, 1))
+                    .registerModel(
+                            modelName,
+                            modelUrl,
+                            ConfigManager.getInstance().getBatchSize(),
+                            ConfigManager.getInstance().getMaxBatchDelay(),
+                            ConfigManager.getInstance().getMaxIdleTime())
+                    .thenAccept(m -> modelManager.triggerModelUpdated(m.scaleWorkers(1, 1)))
                     .thenAccept(
                             p -> {
                                 try {
@@ -181,6 +186,7 @@ public class InferenceRequestHandler extends HttpRequestHandler {
 
         Job job = new Job(ctx, modelName, input);
         if (!ModelManager.getInstance().addJob(job)) {
+            logger.error("unable to process prediction. no free worker available.");
             throw new ServiceUnavailableException(
                     "No worker is available to serve request: " + modelName);
         }
