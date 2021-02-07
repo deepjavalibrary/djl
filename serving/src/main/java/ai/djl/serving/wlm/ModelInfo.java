@@ -77,8 +77,8 @@ public final class ModelInfo implements AutoCloseable, Cloneable {
             clone = (ModelInfo) this.clone();
             clone.batchSize = batchSize;
         } catch (CloneNotSupportedException e) {
-            // ..ignore cause we know we are cloneable.
-            clone = this; // for the compiler
+            // this should never happen, cause we know we are cloneable.
+            throw new AssertionError(e);
         }
         return clone;
     }
@@ -98,8 +98,8 @@ public final class ModelInfo implements AutoCloseable, Cloneable {
             clone.minWorkers = minWorkers;
             clone.maxWorkers = maxWorkers;
         } catch (CloneNotSupportedException e) {
-            // ..ignore cause we know we are cloneable.
-            clone = this; // for the compiler
+            // this should never happen, cause we know we are cloneable.
+            throw new AssertionError(e);
         }
         return clone;
     }

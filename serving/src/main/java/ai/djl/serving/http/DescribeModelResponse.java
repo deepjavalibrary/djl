@@ -190,7 +190,7 @@ public class DescribeModelResponse {
     }
 
     /**
-     * Gets the maximum idle time for worker threads.
+     * Returns the maximum idle time for worker threads.
      *
      * @return the maxIdleTime
      */
