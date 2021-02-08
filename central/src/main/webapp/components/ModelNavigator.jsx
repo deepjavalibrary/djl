@@ -7,6 +7,7 @@ import TreeItem from '@material-ui/lab/TreeItem';
 import ModelView from './ModelView';
 
 import axios from 'axios'
+import DynForm from "./DynForm";
 
 const useStyles = makeStyles({
 	view_root: {

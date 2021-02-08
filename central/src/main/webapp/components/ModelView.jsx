@@ -148,6 +148,12 @@ export default function ModelView(props) {
 
 	console.log(props.model);
 
+	let noArguments = {
+		width: 0,
+		height: 0,
+		resize: null,
+	};
+
 	let noParameters = {
 		uri: "N/A",
 		sha1Hash: "N/A",
@@ -217,7 +223,10 @@ export default function ModelView(props) {
 						<DynForm data={props.model.properties} />
 					</TabPanel>
 					<TabPanel value={index} index={2}>
-						<DynForm data={props.model.arguments} />
+						{data = props.model.arguments
+							? <DynForm data={props.model.arguments} />
+							: <DynForm data={noArguments}/>
+						}
 					</TabPanel>
 					<TabPanel value={index} index={3}>
 						{data = props.model.files.parameters
