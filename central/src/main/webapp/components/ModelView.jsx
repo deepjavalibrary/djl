@@ -223,19 +223,19 @@ export default function ModelView(props) {
 						<DynForm data={props.model.properties} />
 					</TabPanel>
 					<TabPanel value={index} index={2}>
-						{data = props.model.arguments
+						{props.model.arguments
 							? <DynForm data={props.model.arguments} />
 							: <DynForm data={noArguments}/>
 						}
 					</TabPanel>
 					<TabPanel value={index} index={3}>
-						{data = props.model.files.parameters
+						{props.model.files.parameters
 							? <DynForm data={props.model.files.parameters}/>
 							: <DynForm data={noParameters}/>
 						}
 					</TabPanel>
 					<TabPanel value={index} index={4}>
-						{data = props.model.files.synset
+						{props.model.files.synset
 							? <DynForm data={props.model.files.synset}/>
 							: <DynForm data={noSynset}/>
 						}
