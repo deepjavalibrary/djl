@@ -2,13 +2,13 @@ name: Nightly Publish
 
 on:
   schedule:
-    - cron:  '0 10 * * *'
+    - cron: '0 10 * * *'
   workflow_dispatch:
     inputs:
-        mode:
-          description: 'staging/snapshot, default is snapshot'
-          required: true
-          default: 'snapshot'
+      mode:
+        description: 'staging/snapshot, default is snapshot'
+        required: true
+        default: 'snapshot'
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [macos-latest, ubuntu-18.04]
+        operating-system: [ macos-latest, ubuntu-18.04 ]
 
     steps:
       - uses: actions/checkout@v1
@@ -83,7 +83,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [macos-latest, ubuntu-18.04, windows-latest]
+        operating-system: [ macos-latest, ubuntu-18.04, windows-latest ]
 
     steps:
       - uses: actions/checkout@v1
@@ -106,7 +106,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [macos-latest, ubuntu-18.04, windows-latest]
+        operating-system: [ macos-latest, ubuntu-18.04, windows-latest ]
 
     steps:
       - uses: actions/checkout@v1
@@ -127,7 +127,7 @@ jobs:
   publish:
     if: github.repository == 'awslabs/djl'
     runs-on: ubuntu-18.04
-    needs: [build, test-pytorch, test-tensorflow]
+    needs: [ build, test-pytorch, test-tensorflow ]
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK 1.8
@@ -143,9 +143,15 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Publish to snapshot repository
         run: |
-          ./gradlew publish -P${{ github.event.inputs.mode }}
-          cd bom
-          ./gradlew publish -P${{ github.event.inputs.mode }}
+          if [${{ github.event.inputs.mode }} == ""]; then
+            ./gradlew publish -Psnapshot
+            cd bom
+            ./gradlew publish -Psnapshot
+          else
+            ./gradlew publish -P${{ github.event.inputs.mode }}
+            cd bom
+            ./gradlew publish -P${{ github.event.inputs.mode }}
+          fi
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
