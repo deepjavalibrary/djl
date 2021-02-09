@@ -302,7 +302,7 @@ flavorNames.each { flavor ->
             archiveClassifier = "${osName}-x86_64"
 
             manifest {
-                attributes("Automatic-Module-Name": "ai.djl.${project.name}")
+                attributes("Automatic-Module-Name": "ai.djl.pytorch_native_${flavor}_${osName}")
             }
         }
         artifactsNames.add(tasks["${flavor}-${osName}Jar"])

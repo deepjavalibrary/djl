@@ -56,9 +56,9 @@ task prepareNativeLibs() {
         delete "${buildDir}/native"
 
         def files = [
-                "cpu/linux" : "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-openblas-2.0.0-gcc54.tgz",
-                "cpu/osx": "https://paddle-inference-lib.bj.bcebos.com/mac/2.0.0/cpu_avx_openblas/paddle_inference.tgz",
-                "cpu/win": "https://paddle-wheel.bj.bcebos.com/2.0.0/win-infer/open/cpu/paddle_inference_install_dir.zip"
+                "cpu/linux": "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-openblas-2.0.0-gcc54.tgz",
+                "cpu/osx"  : "https://paddle-inference-lib.bj.bcebos.com/mac/2.0.0/cpu_avx_openblas/paddle_inference.tgz",
+                "cpu/win"  : "https://paddle-wheel.bj.bcebos.com/2.0.0/win-infer/open/cpu/paddle_inference_install_dir.zip"
         ]
 
         def downloadDir = file("${buildDir}/download")
@@ -211,7 +211,7 @@ flavorNames.each { flavor ->
             archiveClassifier = "${osName}-x86_64"
 
             manifest {
-                attributes("Automatic-Module-Name": "ai.djl.${project.name}")
+                attributes("Automatic-Module-Name": "ai.djl.paddlepaddle_native_${flavor}_${osName}")
             }
         }
         artifactsNames.add(tasks["${flavor}-${osName}Jar"])
