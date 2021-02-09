@@ -53,6 +53,46 @@ It will automatically determine the appropriate jars for your system based on th
 </dependency>
 ```
 
-### Mac/Windows/Linux standalone native jarss
+### macOS
+For macOS, you can use the following library:
 
-Coming soon...
+- ai.djl.paddlepaddle:paddlepaddle-native-cpu:2.0.0-SNAPSHOT:osx-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.paddlepaddle</groupId>
+    <artifactId>paddlepaddle-native-cpu</artifactId>
+    <classifier>osx-x86_64</classifier>
+    <version>2.0.0-SNAPSHOT</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+### Linux
+
+- ai.djl.paddlepaddle:paddlepaddle-native-cpu:2.0.0-SNAPSHOT:linux-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.paddlepaddle</groupId>
+    <artifactId>paddlepaddle-native-cpu</artifactId>
+    <classifier>linux-x86_64</classifier>
+    <version>2.0.0-SNAPSHOT</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+
+### Windows
+
+- ai.djl.paddlepaddle:paddlepaddle-native-cpu:2.0.0-SNAPSHOT:win-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.paddlepaddle</groupId>
+    <artifactId>paddlepaddle-native-cpu</artifactId>
+    <classifier>win-x86_64</classifier>
+    <version>2.0.0-SNAPSHOT</version>
+    <scope>runtime</scope>
+</dependency>
+```
