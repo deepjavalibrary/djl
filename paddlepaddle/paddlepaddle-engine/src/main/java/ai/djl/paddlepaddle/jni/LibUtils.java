@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -57,8 +58,9 @@ public final class LibUtils {
 
     public static void loadLibrary() {
         String libName = LibUtils.findOverrideLibrary();
+        AtomicBoolean fallback = new AtomicBoolean(false);
         if (libName == null) {
-            libName = LibUtils.findLibraryInClasspath();
+            libName = LibUtils.findLibraryInClasspath(fallback);
             if (libName == null) {
                 throw new IllegalStateException("Native library not found");
             }
@@ -76,7 +78,7 @@ public final class LibUtils {
         if (nativeLibDir == null || !nativeLibDir.toFile().isDirectory()) {
             throw new IllegalStateException("Native folder cannot be found");
         }
-        libName = copyJniLibraryFromClasspath(nativeLibDir);
+        libName = copyJniLibraryFromClasspath(nativeLibDir, fallback.get());
         logger.debug("Loading paddle library from: {}", libName);
         System.load(libName); // NOPMD
 
@@ -131,12 +133,12 @@ public final class LibUtils {
         return null;
     }
 
-    private static String copyJniLibraryFromClasspath(Path nativeDir) {
+    private static String copyJniLibraryFromClasspath(Path nativeDir, boolean fallback) {
         String name = System.mapLibraryName(LIB_NAME);
         Platform platform = Platform.fromSystem();
         String classifier = platform.getClassifier();
         String flavor = platform.getFlavor();
-        if (flavor.isEmpty()) {
+        if (fallback || flavor.isEmpty()) {
             flavor = "cpu";
         }
         Properties prop = new Properties();
@@ -169,7 +171,7 @@ public final class LibUtils {
         }
     }
 
-    private static synchronized String findLibraryInClasspath() {
+    private static synchronized String findLibraryInClasspath(AtomicBoolean fallback) {
         Enumeration<URL> urls;
         try {
             urls =
@@ -208,7 +210,7 @@ public final class LibUtils {
 
             if (placeholder != null) {
                 try {
-                    return downloadLibrary(placeholder);
+                    return downloadLibrary(placeholder, fallback);
                 } catch (IOException e) {
                     throw new IllegalStateException(
                             "Failed to download PaddlePaddle native library", e);
@@ -277,7 +279,8 @@ public final class LibUtils {
         return null;
     }
 
-    private static String downloadLibrary(Platform platform) throws IOException {
+    private static String downloadLibrary(Platform platform, AtomicBoolean fallback)
+            throws IOException {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
         if (flavor.isEmpty()) {
@@ -310,12 +313,12 @@ public final class LibUtils {
                 logger.warn("No matching cuda flavor for {} found: {}.", os, flavor);
                 // fallback to CPU
                 flavor = "cpu";
-
+                fallback.set(true);
                 // check again
                 dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
                 path = dir.resolve(libName);
                 if (Files.exists(path)) {
-                    return cacheDir.toAbsolutePath().toString();
+                    return path.toAbsolutePath().toString();
                 }
             }
 
