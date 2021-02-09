@@ -30,7 +30,7 @@ allprojects {
 }
 
 def javaProjects() {
-    return subprojects.findAll();
+    return subprojects.findAll { new File(it.projectDir, "src/main").exists() }
 }
 
 configure(javaProjects()) {
@@ -105,6 +105,12 @@ configure(javaProjects()) {
 
     compileTestJava {
         options.compilerArgs << "-proc:none" << "-Xlint:all,-options,-static" << "-Werror"
+    }
+
+    jar {
+        manifest {
+            attributes("Automatic-Module-Name": "ai.djl.${project.name}")
+        }
     }
 }
 

@@ -125,6 +125,10 @@ flavorNames.each { flavor ->
             from file("src/main/resources")
             from file("${project.buildDir}/classes/java/main")
             archiveClassifier = "${osName}-x86_64"
+
+            manifest {
+                attributes("Automatic-Module-Name": "ai.djl.${project.name}")
+            }
         }
         artifactsNames.add(tasks["${flavor}-${osName}Jar"])
     }

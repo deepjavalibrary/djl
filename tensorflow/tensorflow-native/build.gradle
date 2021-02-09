@@ -100,13 +100,13 @@ jar {
     outputs.dir file("build/libs")
     doFirst {
         def dir = file("${project.buildDir}/classes/java/main/native/lib")
-        dir.mkdirs();
+        dir.mkdirs()
         def propFile = new File(dir, "tensorflow.properties")
         def versionName = project.version
         if (!isRelease) {
             versionName += String.format("-%s", new Date().format('yyyyMMdd'))
         }
-        propFile.text = "placeholder=true\nversion=${project.version}\n"
+        propFile.text = "placeholder=true\nversion=${versionName}\n"
     }
 }
 
@@ -150,7 +150,7 @@ flavorNames.each { flavor ->
                 def first = true
                 for (String name : dir.list().sort()) {
                     if (first) {
-                        first = false;
+                        first = false
                     } else {
                         sb.append(',')
                     }
@@ -162,6 +162,10 @@ flavorNames.each { flavor ->
             }
             from file("${BINARY_ROOT}/${flavor}/${osName}")
             archiveClassifier = "${osName}-x86_64"
+
+            manifest {
+                attributes("Automatic-Module-Name": "ai.djl.${project.name}")
+            }
         }
         artifactsNames.add(tasks["${flavor}-${osName}Jar"])
     }
