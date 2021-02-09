@@ -36,7 +36,6 @@ import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -95,7 +94,8 @@ public class BaseModelLoader implements ModelLoader {
             if (factory == null) {
                 factory = getTranslatorFactory(criteria);
                 if (factory == null) {
-                    throw new ModelNotFoundException("No matching default translator found\n" + printTranslatorFactories());
+                    throw new ModelNotFoundException(
+                            "No matching default translator found\n" + printTranslatorFactories());
                 }
             }
 
@@ -200,10 +200,12 @@ public class BaseModelLoader implements ModelLoader {
     @SuppressWarnings("unchecked")
     private <I, O> TranslatorFactory<I, O> getTranslatorFactory(Criteria<I, O> criteria) {
         if (criteria.getInputClass() == null) {
-            throw new IllegalArgumentException("The criteria must set an input class.\n" + printTranslatorFactories());
+            throw new IllegalArgumentException(
+                    "The criteria must set an input class.\n" + printTranslatorFactories());
         }
         if (criteria.getOutputClass() == null) {
-            throw new IllegalArgumentException("The criteria must set an output class\n" + printTranslatorFactories());
+            throw new IllegalArgumentException(
+                    "The criteria must set an output class\n" + printTranslatorFactories());
         }
         return (TranslatorFactory<I, O>)
                 factories.get(new Pair<>(criteria.getInputClass(), criteria.getOutputClass()));
@@ -212,8 +214,9 @@ public class BaseModelLoader implements ModelLoader {
     private String printTranslatorFactories() {
         StringBuilder sb = new StringBuilder();
         sb.append("The valid input and output classes are: \n");
-        for(Pair<Type, Type> io : factories.keySet()) {
-            sb.append("\t(" + io.getKey().getTypeName() + ", " + io.getValue().getTypeName() + ")\n");
+        for (Pair<Type, Type> io : factories.keySet()) {
+            sb.append(
+                    "\t(" + io.getKey().getTypeName() + ", " + io.getValue().getTypeName() + ")\n");
         }
         return sb.toString();
     }
