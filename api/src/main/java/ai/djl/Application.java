@@ -56,6 +56,8 @@ public class Application {
                 return CV.POSE_ESTIMATION;
             case "cv/action_recognition":
                 return CV.ACTION_RECOGNITION;
+            case "cv/word_recognition":
+                return CV.WORD_RECOGNITION;
             case "nlp":
                 return NLP.ANY;
             case "nlp/question_answer":
@@ -123,6 +125,7 @@ public class Application {
         Application INSTANCE_SEGMENTATION = new Application("cv/instance_segmentation");
         Application POSE_ESTIMATION = new Application("cv/pose_estimation");
         Application ACTION_RECOGNITION = new Application("cv/action_recognition");
+        Application WORD_RECOGNITION = new Application("cv/word_recognition");
     }
 
     /** The common set of applications for natural language processing. */

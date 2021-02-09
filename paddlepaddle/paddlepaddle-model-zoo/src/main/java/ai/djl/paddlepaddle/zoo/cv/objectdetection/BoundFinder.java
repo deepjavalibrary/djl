@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.paddlepaddle.zoo;
+package ai.djl.paddlepaddle.zoo.cv.objectdetection;
 
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.Point;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
+/** Compute the bound of single colored region. */
 public class BoundFinder {
 
     private final int[] deltaX = {0, 1, -1, 0};
@@ -29,6 +30,11 @@ public class BoundFinder {
     private int width;
     private int height;
 
+    /**
+     * Compute the bound based on the boolean mask.
+     *
+     * @param grid the 2D boolean mask that defines the region
+     */
     public BoundFinder(boolean[][] grid) {
         pointsCollection = new ArrayList<>();
         width = grid.length;
@@ -44,10 +50,20 @@ public class BoundFinder {
         }
     }
 
+    /**
+     * Gets all points from the region.
+     *
+     * @return all connected points
+     */
     public List<List<Point>> getPoints() {
         return pointsCollection;
     }
 
+    /**
+     * Compute rectangle bounding boxes.
+     *
+     * @return the region defined by boxes
+     */
     public List<BoundingBox> getBoxes() {
         return pointsCollection
                 .stream()
