@@ -318,7 +318,7 @@ public final class LibUtils {
                 dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
                 path = dir.resolve(libName);
                 if (Files.exists(path)) {
-                    return cacheDir.toAbsolutePath().toString();
+                    return path.toAbsolutePath().toString();
                 }
             }
 
