@@ -12,7 +12,6 @@
  */
 package ai.djl.paddlepaddle.zoo;
 
-import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
@@ -22,29 +21,18 @@ import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
-import ai.djl.modality.cv.transform.Normalize;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.translator.ImageClassificationTranslator;
-import ai.djl.modality.cv.util.NDImageUtils;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.types.Shape;
-import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.translate.Batchifier;
+import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import ai.djl.translate.Translator;
-import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -99,46 +87,6 @@ public class MaskDetectionTest {
         };
     }
 
-    private static Predictor<Image, Classifications> getClassifier()
-            throws MalformedModelException, ModelNotFoundException, IOException {
-        Criteria<Image, Classifications> criteria =
-                Criteria.builder()
-                        .optApplication(Application.CV.IMAGE_CLASSIFICATION)
-                        .setTypes(Image.class, Classifications.class)
-                        .optTranslator(
-                                ImageClassificationTranslator.builder()
-                                        .addTransform(new Resize(128, 128))
-                                        .addTransform(new ToTensor())
-                                        .addTransform(
-                                                new Normalize(
-                                                        new float[] {0.5f, 0.5f, 0.5f},
-                                                        new float[] {1.0f, 1.0f, 1.0f}))
-                                        .addTransform(nd -> nd.flip(0)) // RGB -> GBR
-                                        .build())
-                        .optArtifactId("mask_classification")
-                        .optFilter("flavor", "server")
-                        .build();
-        ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
-        return model.newPredictor();
-    }
-
-    private static DetectedObjects detectFaces(Image img)
-            throws ModelException, IOException, TranslateException {
-        Criteria<Image, DetectedObjects> criteria =
-                Criteria.builder()
-                        .optApplication(Application.CV.OBJECT_DETECTION)
-                        .setTypes(Image.class, DetectedObjects.class)
-                        .optArtifactId("face_detection")
-                        .optTranslator(new FaceTranslator(0.5f, 0.7f))
-                        .optFilter("flavor", "server")
-                        .build();
-
-        try (ZooModel<Image, DetectedObjects> model = ModelZoo.loadModel(criteria);
-                Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
-            return predictor.predict(img);
-        }
-    }
-
     private static void saveBoundingBoxImage(Image img, DetectedObjects detection)
             throws IOException {
         Path outputDir = Paths.get("build/output");
@@ -153,59 +101,27 @@ public class MaskDetectionTest {
         newImage.save(Files.newOutputStream(imagePath), "png");
     }
 
-    static class FaceTranslator implements Translator<Image, DetectedObjects> {
+    private static Predictor<Image, Classifications> getClassifier()
+            throws MalformedModelException, ModelNotFoundException, IOException {
 
-        private float shrink;
-        private float threshold;
-        private List<String> className;
+        Map<String, String> filter = new ConcurrentHashMap<>();
+        filter.put("flavor", "server");
 
-        FaceTranslator(float shrink, float threshold) {
-            this.shrink = shrink;
-            this.threshold = threshold;
-            className = Arrays.asList("Not Face", "Face");
-        }
+        ZooModel<Image, Classifications> model =
+                PpModelZoo.MASK_DETECTION.loadModel(filter, null, new ProgressBar());
+        return model.newPredictor();
+    }
 
-        /** {@inheritDoc} */
-        @Override
-        public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
-            NDArray result = list.singletonOrThrow();
-            float[] probabilities = result.get(":,1").toFloatArray();
-            List<String> names = new ArrayList<>();
-            List<Double> prob = new ArrayList<>();
-            List<BoundingBox> boxes = new ArrayList<>();
-            for (int i = 0; i < probabilities.length; i++) {
-                if (probabilities[i] >= threshold) {
-                    float[] array = result.get(i).toFloatArray();
-                    names.add(className.get((int) array[0]));
-                    prob.add((double) probabilities[i]);
-                    boxes.add(
-                            new Rectangle(
-                                    array[2], array[3], array[4] - array[2], array[5] - array[3]));
-                }
-            }
-            return new DetectedObjects(names, prob, boxes);
-        }
+    private static DetectedObjects detectFaces(Image img)
+            throws ModelException, IOException, TranslateException {
 
-        /** {@inheritDoc} */
-        @Override
-        public NDList processInput(TranslatorContext ctx, Image input) {
-            NDArray array = input.toNDArray(ctx.getNDManager());
-            Shape shape = array.getShape();
-            array =
-                    NDImageUtils.resize(
-                            array, (int) (shape.get(1) * shrink), (int) (shape.get(0) * shrink));
-            array = array.transpose(2, 0, 1).flip(0); // HWC -> CHW
-            NDArray mean =
-                    ctx.getNDManager().create(new float[] {104f, 117f, 123f}, new Shape(3, 1, 1));
-            array = array.sub(mean).mul(0.007843f); // normalization
-            array = array.expandDims(0); // make batch dimension
-            return new NDList(array);
-        }
+        Map<String, String> filter = new ConcurrentHashMap<>();
+        filter.put("flavor", "server");
 
-        /** {@inheritDoc} */
-        @Override
-        public Batchifier getBatchifier() {
-            return null;
+        try (ZooModel<Image, DetectedObjects> model =
+                        PpModelZoo.FACE_DETECTION.loadModel(filter, null, new ProgressBar());
+                Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
+            return predictor.predict(img);
         }
     }
 }

@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.paddlepaddle.zoo;
+package ai.djl.paddlepaddle.zoo.cv.objectdetection;
 
 import ai.djl.Model;
 import ai.djl.modality.cv.Image;
@@ -52,7 +52,7 @@ public class PpFaceDetection extends ObjectDetectionModelLoader {
         @Override
         public Translator<Image, DetectedObjects> newInstance(
                 Model model, Map<String, ?> arguments) {
-            return PpFaceDetectionTranslator.builder(arguments).build();
+            return new PpFaceDetectionTranslator(arguments);
         }
     }
 }

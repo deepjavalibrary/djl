@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,12 +10,11 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.paddlepaddle.zoo;
+package ai.djl.paddlepaddle.zoo.cv.imageclassification;
 
 import ai.djl.Model;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.zoo.ImageClassificationModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
@@ -24,8 +23,8 @@ import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
 import java.util.Map;
 
-/** Model loader for Mask Detection models. */
-public class PpMaskClassification extends ImageClassificationModelLoader {
+/** Model loader for Word Rotate models. */
+public class PpWordRotateClassifier extends ImageClassificationModelLoader {
 
     /**
      * Creates the Model loader from the given repository.
@@ -36,7 +35,7 @@ public class PpMaskClassification extends ImageClassificationModelLoader {
      * @param version the version number of the model
      * @param modelZoo the modelZoo type that is being used to get supported engine types
      */
-    public PpMaskClassification(
+    public PpWordRotateClassifier(
             Repository repository,
             String groupId,
             String artifactId,
@@ -53,7 +52,7 @@ public class PpMaskClassification extends ImageClassificationModelLoader {
         @Override
         public Translator<Image, Classifications> newInstance(
                 Model model, Map<String, ?> arguments) {
-            return ImageClassificationTranslator.builder(arguments).build();
+            return new PpWordRotateTranslator();
         }
     }
 }
