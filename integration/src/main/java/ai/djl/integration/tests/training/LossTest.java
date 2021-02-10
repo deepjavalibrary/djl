@@ -46,11 +46,31 @@ public class LossTest {
     @Test
     public void softmaxCrossEntropyTest() {
         try (NDManager manager = NDManager.newBaseManager()) {
+            // test fromLogits=true, sparseLabel=true
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(1));
             Assertions.assertAlmostEquals(
-                    Loss.softmaxCrossEntropyLoss().evaluate(new NDList(label), new NDList(pred)),
+                    Loss.softmaxCrossEntropyLoss("loss", 1, -1, true, true)
+                            .evaluate(new NDList(label), new NDList(pred)),
                     manager.create(3.45191431f));
+
+            // test fromLogits=false, sparseLabel=true
+            pred =
+                    manager.create(
+                            new float[] {4.0f, 2.0f, 1.0f, 0.0f, 5.0f, 1.0f}, new Shape(2, 3));
+            label = manager.create(new float[] {0, 1}, new Shape(2));
+            NDArray nonSparseLabel =
+                    manager.create(new float[] {1f, 0f, 0f, 0f, 1f, 0f}, new Shape(2, 3));
+            NDArray sparseOutput =
+                    Loss.softmaxCrossEntropyLoss()
+                            .evaluate(new NDList(label), new NDList(pred.logSoftmax(-1)));
+            // test fromLogits=false, sparseLabel=false
+            NDArray nonSparseOutput =
+                    Loss.softmaxCrossEntropyLoss("loss", 1, -1, false, false)
+                            .evaluate(new NDList(nonSparseLabel), new NDList(pred.logSoftmax(-1)));
+
+            Assertions.assertAlmostEquals(sparseOutput, nonSparseOutput);
+            Assertions.assertAlmostEquals(sparseOutput, manager.create(0.09729549f));
         }
     }
 
