@@ -12,12 +12,11 @@
  */
 package ai.djl.onnxruntime.zoo;
 
-import ai.djl.engine.Engine;
 import ai.djl.onnxruntime.engine.OrtEngine;
 import ai.djl.onnxruntime.zoo.tabular.randomforest.IrisClassificationModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 
 /** OrtModelZoo is a repository that contains all Onnx models for DJL. */
@@ -39,9 +38,6 @@ public class OrtModelZoo implements ModelZoo {
     /** {@inheritDoc} */
     @Override
     public Set<String> getSupportedEngines() {
-        Set<String> set = new HashSet<>();
-        set.add(Engine.getInstance().getEngineName());
-        set.add(OrtEngine.ENGINE_NAME);
-        return set;
+        return Collections.singleton(OrtEngine.ENGINE_NAME);
     }
 }

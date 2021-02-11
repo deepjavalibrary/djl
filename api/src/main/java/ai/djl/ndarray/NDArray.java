@@ -4415,4 +4415,132 @@ public interface NDArray extends AutoCloseable {
     /** {@inheritDoc} */
     @Override
     void close();
+
+    /**
+     * Returns the norm of this {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {-3f, -4f});
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm();
+     * ND: () cpu() float32
+     * 5.4472
+     * </pre>
+     *
+     * @return the norm of this {@code NDArray}
+     */
+    default NDArray norm() {
+        return norm(false);
+    }
+
+    /**
+     * Returns the norm of this {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {-3f, -4f});
+     * jshell&gt; array.norm(new int[] {0});
+     * ND: () cpu() float32
+     * 5.
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm(new int[] {0});
+     * ND: (2) cpu() float32
+     * [3.1623, 4.4721]
+     * </pre>
+     *
+     * @param axes If axes contains an integer, it specifies the axis of x along which to compute
+     *     the vector norms. If axis contains 2 integers, it specifies the axes that hold 2-D
+     *     matrices, and the matrix norms of these matrices are computed.
+     * @return the norm of this {@code NDArray}
+     */
+    default NDArray norm(int[] axes) {
+        return norm(axes, false);
+    }
+
+    /**
+     * Returns the norm of this {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {-3f, -4f});
+     * jshell&gt; array.norm(true);
+     * ND: () cpu() float32
+     * 5.
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm(true);
+     * ND: () cpu() float32
+     * [[5.4772],
+     * ]
+     * </pre>
+     *
+     * @param keepDims If this is set to True, the axes which are normed over are left in the result
+     *     as dimensions with size one. With this option the result will broadcast correctly against
+     *     the original x.
+     * @return the norm of this {@code NDArray}
+     */
+    NDArray norm(boolean keepDims);
+
+    /**
+     * Returns the norm of this {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm(new int[] {0}, true);
+     * ND: (1, 2) cpu() float32
+     * [[3.1623, 4.4721],
+     * ]
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm(new int[] {0}, false);
+     * ND: (2) cpu() float32
+     * [3.1623, 4.4721]
+     * </pre>
+     *
+     * @param axes If axes contains an integer, it specifies the axis of x along which to compute
+     *     the vector norms. If axis contains 2 integers, it specifies the axes that hold 2-D
+     *     matrices, and the matrix norms of these matrices are computed.
+     * @param keepDims keepDims If this is set to True, the axes which are normed over are left in
+     *     the result as dimensions with size one. With this option the result will broadcast
+     *     correctly against the original x.
+     * @return the norm of this {@code NDArray}
+     */
+    default NDArray norm(int[] axes, boolean keepDims) {
+        return norm(2, axes, keepDims);
+    }
+
+    /**
+     * Returns the norm of this {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm(2, new int[] {0}, true);
+     * ND: (1, 2) cpu() float32
+     * [[3.1623, 4.4721],
+     * ]
+     * jshell&gt; NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
+     * jshell&gt; array.norm(2, new int[] {0}, false);
+     * ND: (2) cpu() float32
+     * [3.1623, 4.4721]
+     * </pre>
+     *
+     * @param ord Order of the norm.
+     * @param axes If axes contains an integer, it specifies the axis of x along which to compute
+     *     the vector norms. If axis contains 2 integers, it specifies the axes that hold 2-D
+     *     matrices, and the matrix norms of these matrices are computed.
+     * @param keepDims keepDims If this is set to True, the axes which are normed over are left in
+     *     the result as dimensions with size one. With this option the result will broadcast
+     *     correctly against the original x.
+     * @return the norm of this {@code NDArray}
+     */
+    NDArray norm(int ord, int[] axes, boolean keepDims);
 }

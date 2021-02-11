@@ -56,20 +56,18 @@ task prepareNativeLibs() {
         delete "${buildDir}/native"
 
         def files = [
-                // "linux/cu101": "",
-                "linux/cpu" : "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-openblas-2.0.0-gcc54.tgz",
-                "osx/cpu": "https://paddle-inference-lib.bj.bcebos.com/mac/2.0.0/cpu_avx_openblas/paddle_inference.tgz",
-                // "win/cu101"  : "",
-                "win/cpu": "https://paddle-wheel.bj.bcebos.com/2.0.0/win-infer/open/cpu/paddle_inference_install_dir.zip"
+                "cpu/linux": "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-openblas-2.0.0-gcc54.tgz",
+                "cpu/osx"  : "https://paddle-inference-lib.bj.bcebos.com/mac/2.0.0/cpu_avx_openblas/paddle_inference.tgz",
+                "cpu/win"  : "https://paddle-wheel.bj.bcebos.com/2.0.0/win-infer/open/cpu/paddle_inference_install_dir.zip"
         ]
 
         def downloadDir = file("${buildDir}/download")
-        downloadDir.mkdirs();
+        downloadDir.mkdirs()
 
         files.each { entry ->
-            String url = entry.value;
-            String fileName = url.substring(url.lastIndexOf('/') + 1);
-            File file = new File(downloadDir, fileName);
+            String url = entry.value
+            String fileName = url.substring(url.lastIndexOf('/') + 1)
+            File file = new File(downloadDir, fileName)
             if (!file.exists()) {
                 project.logger.lifecycle("Downloading ${entry.key} -> ${url}")
                 new URL(url).withInputStream { i -> file.withOutputStream { it << i } }
@@ -84,7 +82,7 @@ task prepareNativeLibs() {
                     eachFile {
                         path = name
                     }
-                    into "${buildDir}/native/${entry.key}"
+                    into "${buildDir}/native/${entry.key}/native/lib"
                 }
             } else if (fileName.endsWith(".tgz")) {
                 File tmpDir = new File("${buildDir}/native/tmp")
@@ -101,23 +99,28 @@ task prepareNativeLibs() {
                     eachFile {
                         path = name
                     }
-                    into "${buildDir}/native/${entry.key}"
+                    into "${buildDir}/native/${entry.key}/native/lib"
                 }
                 delete "${buildDir}/native/tmp"
             }
         }
+        exec {
+            commandLine "sh", "-c", "find ${buildDir}/native -type d -empty -delete"
+        }
+        new File("${buildDir}/native/auto").mkdirs()
+    }
+}
 
+task uploadS3 {
+    doLast {
         exec {
             commandLine "sh", "-c", "find ${buildDir}/native -type f | xargs gzip"
         }
-
         def f = new File("${buildDir}/native/files.txt")
         def uploadDirs = [
-                "${buildDir}/native/linux/cpu/",
-                // "${buildDir}/native/linux/cu101/",
-                "${buildDir}/native/osx/cpu/",
-                "${buildDir}/native/win/cpu/"
-                // "${buildDir}/native/win/cu101/"
+                "${buildDir}/native/cpu/linux/native/lib/",
+                "${buildDir}/native/cpu/osx/native/lib/",
+                "${buildDir}/native/cpu/win/native/lib/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
@@ -126,7 +129,6 @@ task prepareNativeLibs() {
                 f << "\n"
             }
         }
-
         exec {
             commandLine "aws", "s3", "sync", "${buildDir}/native/", "s3://djl-ai/publish/paddlepaddle-${paddlepaddle_version}/"
         }
@@ -140,7 +142,7 @@ jar {
     outputs.dir file("build/libs")
     doFirst {
         def dir = file("${project.buildDir}/classes/java/main/native/lib")
-        dir.mkdirs();
+        dir.mkdirs()
         def propFile = new File(dir, "paddlepaddle.properties")
         def versionName = project.version
         if (!isRelease) {
@@ -167,12 +169,17 @@ signing {
     sign publishing.publications
 }
 
-def BINARY_ROOT = "${project.buildDir}/download"
-def flavorNames = file(BINARY_ROOT).list() ?: []
+def BINARY_ROOT = "${project.buildDir}/native"
+def flavorNames = file(BINARY_ROOT).list(new FilenameFilter() {
+    @Override
+    boolean accept(File dir, String name) {
+        return new File(dir, name).isDirectory()
+    }
+}) ?: []
+
 flavorNames.each { flavor ->
 
     def platformNames = file("${BINARY_ROOT}/${flavor}").list() ?: []
-
     def artifactsNames = []
 
     platformNames.each { osName ->
@@ -190,7 +197,7 @@ flavorNames.each { flavor ->
                 def first = true
                 for (String name : dir.list().sort()) {
                     if (first) {
-                        first = false;
+                        first = false
                     } else {
                         sb.append(',')
                     }
@@ -202,6 +209,10 @@ flavorNames.each { flavor ->
             }
             from file("${BINARY_ROOT}/${flavor}/${osName}")
             archiveClassifier = "${osName}-x86_64"
+
+            manifest {
+                attributes("Automatic-Module-Name": "ai.djl.paddlepaddle_native_${flavor}_${osName}")
+            }
         }
         artifactsNames.add(tasks["${flavor}-${osName}Jar"])
     }
@@ -270,33 +281,6 @@ publishing.repositories {
             name = "local"
             url = "build/repo"
         }
-    }
-}
-
-
-import java.util.zip.GZIPInputStream
-
-task downloadPaddlePaddleNativeLib() {
-    doLast {
-        def url = "https://publish.djl.ai/paddlepaddle-${paddlepaddle_version}"
-        def files = [
-                "osx/cpu/libpaddle_fluid_c.dylib.gz": "cpu/osx/native/lib/libpaddle_fluid_c.dylib",
-                "win/cpu/paddle_fluid_c.dll.gz"     : "cpu/win/native/lib/paddle_fluid_c.dll",
-                "win/cpu/mklml.dll.gz"              : "cpu/win/native/lib/mklml.dll",
-                "win/cpu/mkldnn.dll.gz"             : "cpu/win/native/lib/mkldnn.dll",
-                "win/cpu/libiomp5md.dll.gz"         : "cpu/win/native/lib/libiomp5md.dll",
-                "win/cpu/openblas.dll.gz"           : "cpu/win/native/lib/openblas.dll",
-                "linux/cpu/libpaddle_fluid_c.so.gz" : "cpu/linux/native/lib/libpaddle_fluid_c.so",
-        ]
-
-        files.each { entry ->
-            project.logger.lifecycle("Downloading ${url}/${entry.key}")
-            def file = new File("${BINARY_ROOT}/${entry.value}")
-            file.getParentFile().mkdirs()
-            new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << new GZIPInputStream(i) } }
-        }
-
-        new File("${BINARY_ROOT}/auto").mkdirs()
     }
 }
 

@@ -47,8 +47,11 @@ export default function DynForm(props) {
 						<TextField
 							id={key}
 							label={key}
+							key={props.data[key]}
 							defaultValue={props.data[key]}
-							readOnly={true}
+							InputProps={{
+								readOnly: true,
+							}}
 
 							className={classes.textfield}
 						/>

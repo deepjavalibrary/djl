@@ -1,7 +1,12 @@
-name: Native Snapshot PyTorch
+name: Native Publish PyTorch
 
 on:
   workflow_dispatch:
+    inputs:
+        mode:
+          description: 'staging/snapshot, default is snapshot'
+          required: true
+          default: 'snapshot'
 
 jobs:
   build:
@@ -22,9 +27,9 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Download native binaries
         run: ./gradlew :pytorch:pytorch-native:dPTNL
-      - name: Publish to snapshot repository
+      - name: Publish to snapshot/staging repository
         working-directory: pytorch/pytorch-native
-        run: ./gradlew publish -Psnapshot
+        run: ./gradlew publish -P${{ github.event.inputs.mode }}
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
@@ -32,9 +37,9 @@ jobs:
           ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
       - name: Download native binaries precxx11
         run: ./gradlew clean :pytorch:pytorch-native:dPTNL -Pprecxx11
-      - name: Publish to precxx11 snapshot repository
+      - name: Publish to precxx11 snapshot/staging repository
         working-directory: pytorch/pytorch-native
-        run: ./gradlew publish -Psnapshot -Pprecxx11
+        run: ./gradlew publish -P${{ github.event.inputs.mode }} -Pprecxx11
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}

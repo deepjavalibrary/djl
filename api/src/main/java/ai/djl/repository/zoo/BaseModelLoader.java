@@ -94,7 +94,8 @@ public class BaseModelLoader implements ModelLoader {
             if (factory == null) {
                 factory = getTranslatorFactory(criteria);
                 if (factory == null) {
-                    throw new ModelNotFoundException("No matching default translator found");
+                    throw new ModelNotFoundException(
+                            getFactoryLookupErrorMessage("No matching default translator found"));
                 }
             }
 
@@ -199,12 +200,25 @@ public class BaseModelLoader implements ModelLoader {
     @SuppressWarnings("unchecked")
     private <I, O> TranslatorFactory<I, O> getTranslatorFactory(Criteria<I, O> criteria) {
         if (criteria.getInputClass() == null) {
-            throw new IllegalArgumentException("The criteria must set an input class");
+            throw new IllegalArgumentException(
+                    getFactoryLookupErrorMessage("The criteria must set an input class."));
         }
         if (criteria.getOutputClass() == null) {
-            throw new IllegalArgumentException("The criteria must set an output class");
+            throw new IllegalArgumentException(
+                    getFactoryLookupErrorMessage("The criteria must set an output class."));
         }
         return (TranslatorFactory<I, O>)
                 factories.get(new Pair<>(criteria.getInputClass(), criteria.getOutputClass()));
+    }
+
+    private String getFactoryLookupErrorMessage(String msg) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(msg);
+        sb.append("The valid input and output classes are: \n");
+        for (Pair<Type, Type> io : factories.keySet()) {
+            sb.append(
+                    "\t(" + io.getKey().getTypeName() + ", " + io.getValue().getTypeName() + ")\n");
+        }
+        return sb.toString();
     }
 }

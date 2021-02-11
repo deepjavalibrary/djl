@@ -148,6 +148,26 @@ export default function ModelView(props) {
 
 	console.log(props.model);
 
+	let noArguments = {
+		width: 0,
+		height: 0,
+		resize: null,
+	};
+
+	let noParameters = {
+		uri: "N/A",
+		sha1Hash: "N/A",
+		size: 0
+	};
+
+	let noSynset = {
+		name: "N/A",
+		Hash: "N/A",
+		size: 0,
+		uri: "N/A",
+	};
+
+	let data;
 	return (
 
 		<div className={classes.model_view_root}>
@@ -178,8 +198,11 @@ export default function ModelView(props) {
 									<TextField
 										id={key}
 										label={key}
+										key={props.model[key]}
 										defaultValue={props.model[key]}
-										readOnly={true}
+										InputProps={{
+											readOnly: true,
+										}}
 
 										className={classes.textfield}
 									/>
@@ -190,8 +213,11 @@ export default function ModelView(props) {
 								<TextField
 									id={'dataset1'}
 									label={'dataset'}
+									key={props.model.properties.dataset}
 									defaultValue={props.model.properties.dataset}
-									readOnly={true}
+									InputProps={{
+										readOnly: true,
+									}}
 
 									className={classes.textfield}
 								/>
@@ -203,14 +229,22 @@ export default function ModelView(props) {
 						<DynForm data={props.model.properties} />
 					</TabPanel>
 					<TabPanel value={index} index={2}>
-						<DynForm data={props.model.arguments} />
+						{props.model.arguments
+							? <DynForm data={props.model.arguments} />
+							: <DynForm data={noArguments}/>
+						}
 					</TabPanel>
 					<TabPanel value={index} index={3}>
-						<DynForm data={props.model.files.parameters} />
+						{props.model.files.parameters
+							? <DynForm data={props.model.files.parameters}/>
+							: <DynForm data={noParameters}/>
+						}
 					</TabPanel>
-
 					<TabPanel value={index} index={4}>
-						<DynForm data={props.model.files.synset} />
+						{props.model.files.synset
+							? <DynForm data={props.model.files.synset}/>
+							: <DynForm data={noSynset}/>
+						}
 					</TabPanel>
 				</div>
 

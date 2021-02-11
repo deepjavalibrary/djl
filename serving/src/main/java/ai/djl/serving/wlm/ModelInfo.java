@@ -16,9 +16,13 @@ import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.repository.zoo.ZooModel;
 import java.nio.file.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A class represent a loaded model and it's metadata. */
-public class ModelInfo implements AutoCloseable {
+public final class ModelInfo implements AutoCloseable, Cloneable {
+
+    private static final Logger logger = LoggerFactory.getLogger(ModelInfo.class);
 
     private String modelName;
     private String modelUrl;
@@ -28,7 +32,7 @@ public class ModelInfo implements AutoCloseable {
     private int queueSize;
     private int batchSize;
     private int maxBatchDelay;
-    private long maxIdleTime;
+    private int maxIdleTime;
 
     private ZooModel<Input, Output> model;
 
@@ -39,17 +43,88 @@ public class ModelInfo implements AutoCloseable {
      * @param modelUrl the model url
      * @param model the {@link ZooModel}
      * @param queueSize the maximum request queue size
+     * @param maxIdleTime the initial maximum idle time for workers.
+     * @param maxBatchDelay the initial maximum delay when scaling up before giving up.
+     * @param batchSize the batch size for this model.
      */
     public ModelInfo(
-            String modelName, String modelUrl, ZooModel<Input, Output> model, int queueSize) {
+            String modelName,
+            String modelUrl,
+            ZooModel<Input, Output> model,
+            int queueSize,
+            int maxIdleTime,
+            int maxBatchDelay,
+            int batchSize) {
         this.modelName = modelName;
         this.modelUrl = modelUrl;
         this.model = model;
-        batchSize = 1;
-        maxBatchDelay = 100;
-        // TODO make this configurable
-        this.maxIdleTime = 60; // default max idle time 60s
+        this.maxBatchDelay = maxBatchDelay;
+        this.maxIdleTime = maxIdleTime; // default max idle time 60s
         this.queueSize = queueSize;
+        this.batchSize = batchSize;
+    }
+
+    /**
+     * Sets a new batchSize and returns a new configured ModelInfo object. You have to
+     * triggerUpdates in the {@code ModelManager} using this new model.
+     *
+     * @param batchSize the batchSize to set
+     * @return new configured ModelInfo.
+     */
+    public ModelInfo configureModelBatch(int batchSize) {
+        ModelInfo clone;
+        try {
+            clone = (ModelInfo) this.clone();
+            clone.batchSize = batchSize;
+        } catch (CloneNotSupportedException e) {
+            // this should never happen, cause we know we are cloneable.
+            throw new AssertionError(e);
+        }
+        return clone;
+    }
+
+    /**
+     * Sets new workers capcities for this model and returns a new configured ModelInfo object. You
+     * have to triggerUpdates in the {@code ModelManager} using this new model.
+     *
+     * @param minWorkers minimum amount of workers.
+     * @param maxWorkers maximum amount of workers.
+     * @return new configured ModelInfo.
+     */
+    public ModelInfo scaleWorkers(int minWorkers, int maxWorkers) {
+        ModelInfo clone;
+        try {
+            clone = (ModelInfo) this.clone();
+            clone.minWorkers = minWorkers;
+            clone.maxWorkers = maxWorkers;
+        } catch (CloneNotSupportedException e) {
+            // this should never happen, cause we know we are cloneable.
+            throw new AssertionError(e);
+        }
+        return clone;
+    }
+
+    /**
+     * Sets new configuration for the workerPool backing this model and returns a new configured
+     * ModelInfo object. You have to triggerUpdates in the {@code ModelManager} using this new
+     * model.
+     *
+     * @param maxIdleTime time a WorkerThread can be idle before scaling down this worker.
+     * @param maxBatchDelay maximum time to wait for a free space in worker queue after scaling up
+     *     workers before giving up to offer the job to the queue.
+     * @return new configured ModelInfo.
+     */
+    public ModelInfo configurePool(int maxIdleTime, int maxBatchDelay) {
+        ModelInfo clone;
+        try {
+            clone = (ModelInfo) this.clone();
+            clone.maxIdleTime = maxIdleTime;
+            clone.maxBatchDelay = maxBatchDelay;
+        } catch (CloneNotSupportedException e) {
+            // ..ignore cause we know we are cloneable.
+            clone = this; // for the compiler
+        }
+        return clone;
     }
 
     /**
@@ -93,17 +168,8 @@ public class ModelInfo implements AutoCloseable {
      *
      * @return the maxIdleTime
      */
-    public long getMaxIdleTime() {
+    public int getMaxIdleTime() {
         return maxIdleTime;
-    }
-
-    /**
-     * set the configured maxIdleTime of workers.
-     *
-     * @param maxIdleTime the maxIdleTime to set
-     */
-    public void setMaxIdleTime(long maxIdleTime) {
-        this.maxIdleTime = maxIdleTime;
     }
 
     /**
@@ -116,30 +182,12 @@ public class ModelInfo implements AutoCloseable {
     }
 
     /**
-     * Sets the minimum number of workers.
-     *
-     * @param minWorkers the minimum number of workers
-     */
-    public void setMinWorkers(int minWorkers) {
-        this.minWorkers = minWorkers;
-    }
-
-    /**
      * Returns the configured maximum number of workers.
      *
      * @return the configured maximum number of workers
      */
     public int getMaxWorkers() {
         return maxWorkers;
-    }
-
-    /**
-     * Sets the maximum number of workers.
-     *
-     * @param maxWorkers the maximum number of workers
-     */
-    public void setMaxWorkers(int maxWorkers) {
-        this.maxWorkers = maxWorkers;
     }
 
     /**
@@ -152,30 +200,12 @@ public class ModelInfo implements AutoCloseable {
     }
 
     /**
-     * Sets the batch size.
-     *
-     * @param batchSize the batch size
-     */
-    public void setBatchSize(int batchSize) {
-        this.batchSize = batchSize;
-    }
-
-    /**
      * Returns the maximum delay in milliseconds to aggregate a batch.
      *
      * @return the maximum delay in milliseconds to aggregate a batch
      */
     public int getMaxBatchDelay() {
         return maxBatchDelay;
-    }
-
-    /**
-     * Sets the maximum delay in milliseconds to aggregate a batch.
-     *
-     * @param maxBatchDelay the maximum delay in milliseconds to aggregate a batch
-     */
-    public void setMaxBatchDelay(int maxBatchDelay) {
-        this.maxBatchDelay = maxBatchDelay;
     }
 
     /**
@@ -191,6 +221,7 @@ public class ModelInfo implements AutoCloseable {
     @Override
     public void close() {
         if (model != null) {
+            logger.debug("closing model {}", modelName);
             model.close();
         }
     }

@@ -13,6 +13,11 @@
 package ai.djl.paddlepaddle.zoo;
 
 import ai.djl.paddlepaddle.engine.PpEngine;
+import ai.djl.paddlepaddle.zoo.cv.imageclassification.PpMaskClassification;
+import ai.djl.paddlepaddle.zoo.cv.imageclassification.PpWordRotateClassifier;
+import ai.djl.paddlepaddle.zoo.cv.objectdetection.PpFaceDetection;
+import ai.djl.paddlepaddle.zoo.cv.objectdetection.PpWordDetection;
+import ai.djl.paddlepaddle.zoo.cv.wordrecognition.PpWordRecognition;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 import java.util.Collections;
@@ -28,6 +33,15 @@ public class PpModelZoo implements ModelZoo {
 
     public static final PpFaceDetection FACE_DETECTION =
             new PpFaceDetection(REPOSITORY, GROUP_ID, "face_detection", "0.0.1", ZOO);
+
+    public static final PpWordDetection WORD_DETECTION =
+            new PpWordDetection(REPOSITORY, GROUP_ID, "word_detection", "0.0.1", ZOO);
+
+    public static final PpWordRotateClassifier WORD_ROTATE =
+            new PpWordRotateClassifier(REPOSITORY, GROUP_ID, "word_rotation", "0.0.1", ZOO);
+
+    public static final PpWordRecognition WORD_RECOGNITION =
+            new PpWordRecognition(REPOSITORY, GROUP_ID, "word_recognition", "0.0.1", ZOO);
 
     public static final PpMaskClassification MASK_DETECTION =
             new PpMaskClassification(REPOSITORY, GROUP_ID, "mask_classification", "0.0.1", ZOO);

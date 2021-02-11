@@ -1,7 +1,12 @@
-name: Native Release Tensorflow
+name: Native publish MXNet
 
 on:
   workflow_dispatch:
+    inputs:
+        mode:
+          description: 'staging/snapshot, default is snapshot'
+          required: true
+          default: 'snapshot'
 
 jobs:
   build:
@@ -20,11 +25,11 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Publish to staging repository
-        working-directory: tensorflow/tensorflow-native
-        run: |
-          ./gradlew dTNL
-          ./gradlew publish -Pstaging
+      - name: Download native binaries
+        run: ./gradlew :mxnet:native:dMNL
+      - name: Publish to snapshot/staging repository
+        working-directory: mxnet/native
+        run: ./gradlew publish -P${{ github.event.inputs.mode }}
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}

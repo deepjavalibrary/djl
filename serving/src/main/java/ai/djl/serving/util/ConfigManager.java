@@ -51,7 +51,10 @@ public final class ConfigManager {
     private static final String NUMBER_OF_NETTY_THREADS = "number_of_netty_threads";
     private static final String NETTY_CLIENT_THREADS = "netty_client_threads";
     private static final String JOB_QUEUE_SIZE = "job_queue_size";
+    private static final String MAX_IDLE_TIME = "max_idle_time";
     private static final String NUMBER_OF_GPU = "number_of_gpu";
+    private static final String BATCH_SIZE = "batch_size";
+    private static final String MAX_BATCH_DELAY = "max_batch_delay";
     private static final String CORS_ALLOWED_ORIGIN = "cors_allowed_origin";
     private static final String CORS_ALLOWED_METHODS = "cors_allowed_methods";
     private static final String CORS_ALLOWED_HEADERS = "cors_allowed_headers";
@@ -170,6 +173,33 @@ public final class ConfigManager {
      */
     public int getJobQueueSize() {
         return getIntProperty(JOB_QUEUE_SIZE, 100);
+    }
+
+    /**
+     * Returns the default max idle time for workers.
+     *
+     * @return the default max idle time
+     */
+    public int getMaxIdleTime() {
+        return getIntProperty(MAX_IDLE_TIME, 60);
+    }
+
+    /**
+     * Returns the default batchSize for workers.
+     *
+     * @return the default max idle time
+     */
+    public int getBatchSize() {
+        return getIntProperty(BATCH_SIZE, 1);
+    }
+
+    /**
+     * Returns the default maxBatchDelay for the working queue.
+     *
+     * @return the default max batch delay
+     */
+    public int getMaxBatchDelay() {
+        return getIntProperty(MAX_BATCH_DELAY, 300);
     }
 
     /**

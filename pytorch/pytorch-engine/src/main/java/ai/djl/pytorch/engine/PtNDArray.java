@@ -267,6 +267,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray get(long... indices) {
+        return JniUtils.getItem(this, indices);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void copyTo(NDArray array) {
         throw new UnsupportedOperationException("Not implemented");
     }
@@ -1368,6 +1374,18 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public PtNDArray erfinv() {
         return JniUtils.erfinv(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray norm(boolean keepDims) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray norm(int order, int[] axes, boolean keepDims) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
