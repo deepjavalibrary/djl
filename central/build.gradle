@@ -14,6 +14,8 @@ node {
 dependencies {
     implementation "io.netty:netty-all:${netty_version}"
     implementation "com.google.code.gson:gson:${gson_version}"
+    implementation "org.slf4j:slf4j-api:${slf4j_version}"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
     implementation project(':model-zoo')
     implementation project(':mxnet:mxnet-model-zoo')
     implementation project(':tensorflow:tensorflow-model-zoo')

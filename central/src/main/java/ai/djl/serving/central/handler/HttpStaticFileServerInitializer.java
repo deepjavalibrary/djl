@@ -10,10 +10,8 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.serving.central;
+package ai.djl.serving.central.handler;
 
-import ai.djl.serving.central.handler.HttpStaticFileServerHandler;
-import ai.djl.serving.central.handler.ModelMetaDataHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -55,6 +53,7 @@ public class HttpStaticFileServerInitializer extends ChannelInitializer<SocketCh
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new ChunkedWriteHandler());
         pipeline.addLast(new ModelMetaDataHandler());
+        pipeline.addLast(new FunctionalRestEndpointHandler(ModelDeploymentEndpoint.function,ModelDeploymentEndpoint.pattern));
         pipeline.addLast(new HttpStaticFileServerHandler());
     }
 }

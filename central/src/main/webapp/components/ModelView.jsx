@@ -19,6 +19,7 @@ import Chip from '@material-ui/core/Chip';
 import Divider from '@material-ui/core/Divider';
 
 import DynForm from './DynForm';
+import ModelViewActions from './ModelViewActions';
 
 import axios from 'axios'
 
@@ -151,7 +152,9 @@ export default function ModelView(props) {
 	return (
 
 		<div className={classes.model_view_root}>
+			
 			<Paper ref={myRef} elevation={3} className={classes.model_view_paper} >
+				<ModelViewActions/>
 				<h2>{props.model.name}</h2>
 				<Chip size="small" label={props.model.properties.dataset} />
 				<Chip size="small" label={props.model.version} />
@@ -212,8 +215,9 @@ export default function ModelView(props) {
 					<TabPanel value={index} index={4}>
 						<DynForm data={props.model.files.synset} />
 					</TabPanel>
+					
 				</div>
-
+				
 			</Paper>
 		</div>
 

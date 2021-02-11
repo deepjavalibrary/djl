@@ -242,5 +242,27 @@ you can set the logging level on the command-line adding a parameter for the JVM
 -Dai.djl.logging.level={FATAL|ERROR|WARN|INFO|DEBUG|TRACE}
 ```
 
+## Configuration
+
+
+The service can be configured by providing a configuration file.
+
+The service looks during startup for a property file *config.properties* in the current work-directory.
+
+You an override the location with the JVM parameter *ai.djl.conf*
+
+example:
+
+```sh
+-Dai.djl.conf=~/modelserver-config.properties
+```
+
+example configuration file:
+
+```sh
+inference_address=http://127.0.0.1:5000
+management_address=http://127.0.0.1:5000
+```
+
 
 

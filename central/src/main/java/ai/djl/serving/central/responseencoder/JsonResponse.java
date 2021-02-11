@@ -52,6 +52,22 @@ public class JsonResponse {
 
         this.sendAndCleanupConnection(ctx, request, response);
     }
+    
+    /**
+     * send a response to the client.
+     *
+     * @param ctx channel context
+     * @param request full request
+     * @param entity the response
+     */
+    public void forward(ChannelHandlerContext ctx, FullHttpRequest request, ByteBuf buffer) {
+
+        FullHttpResponse response =
+                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buffer);
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
+
+        this.sendAndCleanupConnection(ctx, request, response);
+    }
 
     /**
      * If Keep-Alive is disabled, attaches "Connection: close" header to the response and closes the

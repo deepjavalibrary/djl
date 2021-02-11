@@ -12,6 +12,7 @@
  */
 package ai.djl.serving.central;
 
+import ai.djl.serving.central.handler.HttpStaticFileServerInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
