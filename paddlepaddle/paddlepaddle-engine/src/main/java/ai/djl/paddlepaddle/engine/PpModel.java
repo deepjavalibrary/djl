@@ -75,28 +75,23 @@ public class PpModel extends BaseModel {
 
     private String[] findModelFile(Path dir) {
         String[] paths = new String[2];
-        Path modelFile = dir.resolve("model");
-        if (Files.isRegularFile(modelFile)) {
-            paths[0] = modelFile.toString();
-            Path paramFile = dir.resolve("params");
-            if (Files.isRegularFile(paramFile)) {
-                paths[1] = paramFile.toString();
-            } else {
-                paths[0] = dir.toString();
+        String[][] patterns = {
+            {"model", "params"},
+            {"__model__", "__params__"},
+            {"inference.pdmodel", "inference.pdiparams"}
+        };
+        for (String[] pattern : patterns) {
+            Path modelFile = dir.resolve(pattern[0]);
+            if (Files.isRegularFile(modelFile)) {
+                paths[0] = modelFile.toString();
+                Path paramFile = dir.resolve(pattern[1]);
+                if (Files.isRegularFile(paramFile)) {
+                    paths[1] = paramFile.toString();
+                } else {
+                    paths[0] = dir.toString();
+                }
+                return paths;
             }
-            return paths;
-        }
-
-        modelFile = dir.resolve("__model__");
-        if (Files.isRegularFile(modelFile)) {
-            paths[0] = modelFile.toString();
-            Path paramFile = dir.resolve("__params__");
-            if (Files.isRegularFile(paramFile)) {
-                paths[1] = paramFile.toString();
-            } else {
-                paths[0] = dir.toString();
-            }
-            return paths;
         }
         return null;
     }

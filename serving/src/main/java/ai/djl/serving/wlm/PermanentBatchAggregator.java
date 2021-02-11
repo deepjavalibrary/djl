@@ -41,10 +41,10 @@ public class PermanentBatchAggregator extends BatchAggregator {
     /** {@inheritDoc} */
     @Override
     protected List<Job> pollBatch() throws InterruptedException {
-        List<Job> list = new ArrayList<>(model.getBatchSize());
+        List<Job> list = new ArrayList<>(batchSize);
         Job job = jobQueue.take();
         list.add(job);
-        jobQueue.drainTo(list, model.getBatchSize() - 1);
+        jobQueue.drainTo(list, batchSize - 1);
         logger.trace("sending jobs, size: {}", list.size());
         return list;
     }

@@ -46,7 +46,6 @@ nav:
       - 'docs/README.md'
       - 'examples/README.md'
       - 'docs/interactive_tool.md'
-      - Community Leaders: 'leaders.md'
       - Contributor Documentation:
           - Main: 'docs/development/README.md'
           - 'docs/development/setup.md'
@@ -55,7 +54,15 @@ nav:
           - 'docs/development/add_model_to_model-zoo.md'
       - 'docs/roadmap.md'
       - 'docs/faq.md'
-  - User Manual:
+  - Tutorials:
+    - Beginner Tutorial:
+        - 'jupyter/01_create_your_first_network.ipynb'
+        - 'jupyter/02_train_your_first_model.ipynb'
+        - 'jupyter/03_image_classification_with_your_model.ipynb'
+    - 'docs/d2l.md'
+    - 'jupyter/rank_classification_using_BERT_on_Amazon_Review.ipynb'
+    - 'jupyter/transfer_learning_on_cifar10.ipynb'
+  - Guides:
       - Models:
           - 'docs/load_model.md'
           - 'docs/model-zoo.md'
@@ -68,6 +75,8 @@ nav:
       - 'docs/development/memory_management.md'
       - 'docs/development/inference_performance_optimization.md'
       - 'docs/development/benchmark_with_djl.md'
+  - DJL Community:
+      - Overview: 'leaders.md'
   - Apache MXNet:
       - Overview: 'mxnet/README.md'
       - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
@@ -101,7 +110,7 @@ nav:
       - Load a PaddlePaddle Model: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
       - Modules:
           - PaddlePaddle Engine: 'paddlepaddle/paddlepaddle-engine/README.md'
-          - TensorFlow Model Zoo: 'paddlepaddle/paddlepaddle-model-zoo/README.md'
+          - PaddlePaddle Model Zoo: 'paddlepaddle/paddlepaddle-model-zoo/README.md'
   - Extensions:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'

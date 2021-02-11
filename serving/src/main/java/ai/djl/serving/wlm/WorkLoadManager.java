@@ -21,7 +21,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +34,7 @@ import org.slf4j.LoggerFactory;
 class WorkLoadManager {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkLoadManager.class);
-    private ConfigManager configManager;
-    private AtomicInteger gpuCounter;
+    private GpuAssignmentStrategy gpuAssignmentStrategy;
     private ExecutorService threadPool;
 
     private ConcurrentHashMap<String, WorkerPool> workerPools;
@@ -47,8 +45,7 @@ class WorkLoadManager {
      * @param configManager configuration manager to get configuration parameter.
      */
     public WorkLoadManager(ConfigManager configManager) {
-        this.configManager = configManager;
-        this.gpuCounter = new AtomicInteger(0);
+        this.gpuAssignmentStrategy = new RoundRobinGpuAssignmentStrategy(configManager);
         threadPool = Executors.newCachedThreadPool();
         workerPools = new ConcurrentHashMap<>();
     }
@@ -101,9 +98,6 @@ class WorkLoadManager {
                     }
                 }
 
-            } catch (ScaleCapacityExceededException e) {
-                logger.error(e.getMessage(), e);
-                accepted = false;
             } catch (InterruptedException e) {
                 logger.info(
                         "Worker Queue Capacity Exceeded. cannot add to worker queue in appropriate time. You can configure max batch delay time for this model.");
@@ -112,17 +106,15 @@ class WorkLoadManager {
         return accepted;
     }
 
-    private void scaleUpWorkers(ModelInfo modelInfo, WorkerPool pool)
-            throws ScaleCapacityExceededException {
+    private void scaleUpWorkers(ModelInfo modelInfo, WorkerPool pool) {
         int currentWorkers = getNumRunningWorkers(modelInfo.getModelName());
         if (currentWorkers < modelInfo.getMaxWorkers()) {
             logger.debug("scaling up workers for model {} to {} ", modelInfo, currentWorkers + 1);
             addThreads(pool.getWorkers(), modelInfo, 1, false);
         } else {
-            throw new ScaleCapacityExceededException(
-                    "scale up capacity of "
-                            + modelInfo.getMaxWorkers()
-                            + " workers reached. Unable to scale up worker pool.");
+            logger.warn(
+                    "scale up capacity of {} workers reached. Unable to scale up worker pool.",
+                    modelInfo.getMaxWorkers());
         }
     }
 
@@ -201,24 +193,16 @@ class WorkLoadManager {
 
     private void addThreads(
             List<WorkerThread> threads, ModelInfo model, int count, boolean permanent) {
-        int maxGpu = configManager.getNumberOfGpu();
-        for (int i = 0; i < count; ++i) {
-            int gpuId = -1;
 
-            if (maxGpu > 0) {
-                gpuId = gpuCounter.accumulateAndGet(maxGpu, (prev, maxGpuId) -> ++prev % maxGpuId);
-            }
-            BatchAggregator aggregator;
-            if (permanent) {
-                aggregator =
-                        new PermanentBatchAggregator(
-                                model, workerPools.get(model.getModelName()).getJobQueue());
-            } else {
-                aggregator =
-                        new TemporaryBatchAggregator(
-                                model, workerPools.get(model.getModelName()).getJobQueue());
-            }
-            WorkerThread thread = new WorkerThread(gpuId, model, aggregator, permanent);
+        for (int i = 0; i < count; ++i) {
+
+            WorkerThread thread =
+                    WorkerThread.builder()
+                            .setModel(model)
+                            .setJobQueue(getWorkerPoolForModel(model).getJobQueue())
+                            .optGpuAssignmentStrategy(gpuAssignmentStrategy)
+                            .optFixPoolThread(permanent)
+                            .build();
 
             threads.add(thread);
             threadPool.submit(thread);

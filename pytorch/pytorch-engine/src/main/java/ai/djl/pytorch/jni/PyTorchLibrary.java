@@ -50,6 +50,10 @@ final class PyTorchLibrary {
 
     native long torchTo(long handle, int dType, int[] device, boolean copy);
 
+    native long torchGetItem(long handle, long index);
+
+    native long torchGetItem(long handle, long[] indices);
+
     native long torchToSparse(long handle);
 
     native long torchToDense(long handle);

@@ -80,6 +80,12 @@ public final class MxEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
+    public int getRank() {
+        return 1;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getVersion() {
         int version = JnaUtils.getVersion();
         int major = version / 10000;

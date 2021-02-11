@@ -55,5 +55,4 @@ It will automatically determine the appropriate jars for your system based on th
 
 ### Mac/Windows/Linux standalone native jarss
 
-Currently, PaddlePaddle 2.0.0 is still under development, we will update here once it is released. You may use the auto jar
-to have 2.0.0-rc1 releases for testing.
+Coming soon...

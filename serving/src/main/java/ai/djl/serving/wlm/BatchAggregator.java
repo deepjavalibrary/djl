@@ -27,7 +27,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 abstract class BatchAggregator {
 
-    protected ModelInfo model;
+    protected int batchSize;
     protected List<Job> jobs;
     protected LinkedBlockingDeque<Job> jobQueue;
 
@@ -38,7 +38,7 @@ abstract class BatchAggregator {
      * @param jobQueue the job queue for polling data from.
      */
     public BatchAggregator(ModelInfo model, LinkedBlockingDeque<Job> jobQueue) {
-        this.model = model;
+        this.batchSize = model.getBatchSize();
         this.jobQueue = jobQueue;
         jobs = new ArrayList<>();
     }

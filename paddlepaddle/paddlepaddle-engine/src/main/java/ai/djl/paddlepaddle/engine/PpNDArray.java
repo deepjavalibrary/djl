@@ -29,8 +29,6 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
     private PpNDManager manager;
     private Shape shape;
     private DataType dataType;
-    // TODO: we cannot close the inference NDArray, should remove after JNI
-    private boolean notClose;
 
     /**
      * Constructs an PpNDArray from a native handle (internal. Use {@link NDManager} instead).
@@ -42,18 +40,6 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
         super(handle);
         this.manager = manager;
         manager.attach(getUid(), this);
-    }
-
-    /**
-     * Constructs an PpNDArray from a native handle (internal. Use {@link NDManager} instead).
-     *
-     * @param manager the manager to attach the new array to
-     * @param handle the pointer to the native MxNDArray memory
-     * @param notClose not close the NDArray (inference use only)
-     */
-    public PpNDArray(PpNDManager manager, long handle, boolean notClose) {
-        this(manager, handle);
-        this.notClose = notClose;
     }
 
     /**
@@ -157,9 +143,6 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        if (notClose) {
-            return;
-        }
         Long pointer = handle.getAndSet(null);
         if (pointer != null) {
             JniUtils.deleteNd(pointer);

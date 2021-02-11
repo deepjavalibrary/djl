@@ -316,7 +316,13 @@ public final class NDImageUtils {
         return image.getNDArrayInternal().randomColorJitter(brightness, contrast, saturation, hue);
     }
 
-    private static boolean isCHW(Shape shape) {
+    /**
+     * Check if the shape of the image follows CHW/NCHW.
+     *
+     * @param shape the shape of the image
+     * @return true for (N)CHW, false for (N)HWC
+     */
+    public static boolean isCHW(Shape shape) {
         if (shape.dimension() < 3) {
             throw new IllegalArgumentException(
                     "Not a valid image shape, require at least three dimensions");

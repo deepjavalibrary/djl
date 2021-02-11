@@ -102,9 +102,7 @@ public abstract class Engine {
      *
      * @return the rank of the engine
      */
-    public int getRank() {
-        return 1;
-    }
+    public abstract int getRank();
 
     /**
      * Returns the default Engine.

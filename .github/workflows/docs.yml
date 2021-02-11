@@ -52,4 +52,4 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           aws s3 sync site s3://djl-ai/documentation/nightly --delete
-          aws cloudfront create-invalidation --distribution-id E733IIDCG0G5U --paths /
+          aws cloudfront create-invalidation --distribution-id E733IIDCG0G5U --paths "/*"

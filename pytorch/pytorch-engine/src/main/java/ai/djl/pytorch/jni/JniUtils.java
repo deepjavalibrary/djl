@@ -416,6 +416,20 @@ public final class JniUtils {
                 ndArray.getHandle(), value.getHandle(), indicesNd.getHandle());
     }
 
+    public static PtNDArray getItem(PtNDArray ndArray, long[] indices) {
+        // use a specialized API here
+        // due to significant performance gain
+        // for commonly used data loading call
+        if (indices.length == 1) {
+            return new PtNDArray(
+                    ndArray.getManager(),
+                    PyTorchLibrary.LIB.torchGetItem(ndArray.getHandle(), indices[0]));
+        }
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchGetItem(ndArray.getHandle(), indices));
+    }
+
     public static PtNDArray clone(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.tensorClone(ndArray.getHandle()));

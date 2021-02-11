@@ -77,13 +77,15 @@ public final class ModelManager {
      * @param modelUrl the model url
      * @param batchSize the batch size
      * @param maxBatchDelay the maximum delay for batching
+     * @param maxIdleTime the maximum idle time of the worker threads before scaling down.
      * @return a {@code CompletableFuture} instance
      */
     public CompletableFuture<ModelInfo> registerModel(
             final String modelName,
             final String modelUrl,
             final int batchSize,
-            final int maxBatchDelay) {
+            final int maxBatchDelay,
+            final int maxIdleTime) {
         return CompletableFuture.supplyAsync(
                 () -> {
                     try {
@@ -106,9 +108,10 @@ public final class ModelManager {
                                         actualModelName,
                                         modelUrl,
                                         model,
-                                        configManager.getJobQueueSize());
-                        modelInfo.setBatchSize(batchSize);
-                        modelInfo.setMaxBatchDelay(maxBatchDelay);
+                                        configManager.getJobQueueSize(),
+                                        maxIdleTime,
+                                        maxBatchDelay,
+                                        batchSize);
 
                         ModelInfo existingModel = models.putIfAbsent(actualModelName, modelInfo);
                         if (existingModel != null) {
@@ -138,9 +141,7 @@ public final class ModelManager {
             logger.warn("Model not found: " + modelName);
             return false;
         }
-
-        model.setMinWorkers(0);
-        model.setMaxWorkers(0);
+        model = model.scaleWorkers(0, 0);
         wlm.modelChanged(model);
         startupModels.remove(modelName);
         model.close();
@@ -149,21 +150,18 @@ public final class ModelManager {
     }
 
     /**
-     * Update model workers.
+     * trigger that a ModelInfo has been updated. Updates model workers for this model and scales
+     * up/down all workers to match the parameters for the model.
      *
-     * @param modelName the model name to be updated
-     * @param minWorkers the minimum number of workers
-     * @param maxWorkers the maximum number of workers
+     * @param modelInfo the model that has been updated
      */
-    public void updateModel(String modelName, int minWorkers, int maxWorkers) {
-        ModelInfo model = models.get(modelName);
-        if (model == null) {
-            throw new AssertionError("Model not found: " + modelName);
+    public void triggerModelUpdated(ModelInfo modelInfo) {
+        if (!models.containsKey(modelInfo.getModelName())) {
+            throw new AssertionError("Model not found: " + modelInfo.getModelName());
         }
-        model.setMinWorkers(minWorkers);
-        model.setMaxWorkers(maxWorkers);
-        logger.debug("updateModel: {}, count: {}", modelName, minWorkers);
-        wlm.modelChanged(model);
+        logger.debug("updateModel: {}", modelInfo.getModelName());
+        models.put(modelInfo.getModelName(), modelInfo);
+        wlm.modelChanged(modelInfo);
     }
 
     /**
@@ -220,6 +218,7 @@ public final class ModelManager {
         resp.setMaxBatchDelay(model.getMaxBatchDelay());
         resp.setMaxWorkers(model.getMaxWorkers());
         resp.setMinWorkers(model.getMinWorkers());
+        resp.setMaxIdleTime(model.getMaxIdleTime());
         resp.setLoadedAtStartup(startupModels.contains(modelName));
 
         int activeWorker = wlm.getNumRunningWorkers(modelName);

@@ -103,13 +103,13 @@ public final class PpEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public GradientCollector newGradientCollector() {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+        throw new UnsupportedOperationException("Not supported for PaddlePaddle");
     }
 
     /** {@inheritDoc} */
     @Override
     public void setRandomSeed(int seed) {
-        throw new UnsupportedOperationException("Not supported for ONNX Runtime");
+        throw new UnsupportedOperationException("Not supported for PaddlePaddle");
     }
 
     /** {@inheritDoc} */

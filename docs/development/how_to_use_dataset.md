@@ -5,10 +5,7 @@ RandomAccessDataset implements the Dataset interface and provides comprehensive 
 RandomAccessDataset is also a basic dataset that supports random access of data using indices.
 You can easily customize your own dataset by extending RandomAccessDataset.
 
-We provide several well-known datasets that you can use.
-
-[MNIST](http://yann.lecun.com/exdb/mnist) - a handwritten digits dataset
-[CIFAR10](https://www.cs.toronto.edu/~kriz/cifar.html) - an image classification dataset
+We provide several well-known datasets that you can use in our [Basic Datasets module](https://javadoc.io/doc/ai.djl/basicdataset/latest/index.html).
 
 We also provide several built-in datasets that you can easily wrap around existing NDArrays and images.
 

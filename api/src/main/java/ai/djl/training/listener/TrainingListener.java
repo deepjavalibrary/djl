@@ -19,14 +19,18 @@ import ai.djl.training.dataset.Batch;
 import java.util.Map;
 
 /**
- * {@code TrainingListener} offers an interface that allows performing some actions when certain
- * events have occurred in the {@link Trainer}.
+ * {@code TrainingListener} offers an interface that performs some actions when certain events have
+ * occurred in the {@link Trainer}.
  *
  * <p>The methods {@link #onEpoch(Trainer) onEpoch}, {@link #onTrainingBatch(Trainer, BatchData)
  * onTrainingBatch}, {@link #onValidationBatch(Trainer, BatchData) onValidationBatch} are called
- * during training. Adding an implementation of the listener to the {@link Trainer} allows
- * performing any desired actions at those junctures. These could be used for collection metrics, or
- * logging, or any other purpose.
+ * during training. Adding an implementation of the listener to the {@link Trainer} will perform any
+ * desired action at those junctures. These could be used for collection metrics, or logging, or any
+ * other purpose to enhance the training process.
+ *
+ * <p>There are many listeners that contain different functionality, and it is often best to combine
+ * a number of listeners. We recommend starting with one of our sets of {@link
+ * TrainingListener.Defaults}. Then, more listeners can be added afterwards.
  */
 public interface TrainingListener {
 
@@ -73,6 +77,14 @@ public interface TrainingListener {
         /**
          * A basic {@link TrainingListener} set with minimal recommended functionality.
          *
+         * <p>This contains:
+         *
+         * <ul>
+         *   <li>{@link EpochTrainingListener}
+         *   <li>{@link EvaluatorTrainingListener}
+         *   <li>{@link DivergenceCheckTrainingListener}
+         * </ul>
+         *
          * @return the new set of listeners
          */
         static TrainingListener[] basic() {
@@ -85,6 +97,13 @@ public interface TrainingListener {
 
         /**
          * A default {@link TrainingListener} set including batch output logging.
+         *
+         * <p>This contains:
+         *
+         * <ul>
+         *   <li>Everything from {@link Defaults#basic()}
+         *   <li>{@link LoggingTrainingListener}
+         * </ul>
          *
          * @return the new set of listeners
          */
@@ -99,6 +118,9 @@ public interface TrainingListener {
 
         /**
          * A default {@link TrainingListener} set including batch output logging.
+         *
+         * <p>This has the same listeners as {@link Defaults#logging()}, but reduces the logging
+         * frequency.
          *
          * @param frequency the frequency of epoch to print out
          * @return the new set of listeners
@@ -115,6 +137,14 @@ public interface TrainingListener {
         /**
          * A default {@link TrainingListener} set including batch output logging and output
          * directory.
+         *
+         * <p>This contains:
+         *
+         * <ul>
+         *   <li>Everything from {@link Defaults#logging()}
+         *   <li>{@link MemoryTrainingListener}
+         *   <li>{@link TimeMeasureTrainingListener}
+         * </ul>
          *
          * @param outputDir the output directory to store created log files. Can't be null
          * @return the new set of listeners
