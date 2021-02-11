@@ -77,6 +77,7 @@ nav:
       - 'docs/development/benchmark_with_djl.md'
   - DJL Community:
       - Overview: 'leaders.md'
+      - Development: 'https://github.com/awslabs/djl/discussions/categories/development'
   - Apache MXNet:
       - Overview: 'mxnet/README.md'
       - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
