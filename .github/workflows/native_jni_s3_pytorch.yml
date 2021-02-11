@@ -12,16 +12,7 @@ jobs:
     strategy:
       matrix:
         operating-system: [macos-latest, ubuntu-16.04, windows-latest]
-        include:
-          - operating-system: macos-latest
-            os: osx
-            lib: libdjl_torch.dylib
-          - operating-system: ubuntu-16.04
-            os: linux
-            lib: libdjl_torch.so
-          - operating-system: windows-latest
-            os: win
-            lib: djl_torch.dll
+
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK 1.8
@@ -37,7 +28,7 @@ jobs:
       - name: Workaround for startup run
         run: ./gradlew jar clean
       - name: Release JNI prep
-        run: ./gradlew :pytorch:pytorch-native:compileJNI
+        run: ./gradlew :pytorch:pytorch-native:releaseJNI
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Configure AWS Credentials
@@ -48,7 +39,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 cp pytorch/pytorch-native/build/${{ matrix.lib }} s3://djl-ai/publish/pytorch-1.7.1/jnilib/0.10.0/${{ matrix.os }}-x86_64/cpu/
+          aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-1.7.1/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-1.7.1/jnilib*"
 
   build-pytorch-jni-linux-gpu:
