@@ -14,11 +14,13 @@ package ai.djl.serving.central.handler;
 
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
-import ai.djl.serving.central.responseencoder.JsonResponse;
+import ai.djl.serving.central.responseencoder.HttpRequestResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpMethod;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
@@ -38,6 +40,7 @@ public class FunctionalRestEndpointHandler extends SimpleChannelInboundHandler<F
    
     private BiConsumer<ChannelHandlerContext,FullHttpRequest> consumer;
     private Pattern pattern;
+    private HttpMethod method;
     
     /**
      * Constructs a endpoint handler with a supplier and a url-regex-pattern.
@@ -45,9 +48,10 @@ public class FunctionalRestEndpointHandler extends SimpleChannelInboundHandler<F
      * @param pattern this handler is used when the requested url matches this regex. 
      * 
      */
-    public FunctionalRestEndpointHandler(BiConsumer<ChannelHandlerContext,FullHttpRequest> consumer, Pattern pattern) {
+    public FunctionalRestEndpointHandler(BiConsumer<ChannelHandlerContext,FullHttpRequest> consumer, Pattern pattern, HttpMethod method) {
 	 this.consumer=consumer;
 	 this.pattern=pattern;
+	 this.method=method;
     }
     
     /**
@@ -66,7 +70,8 @@ public class FunctionalRestEndpointHandler extends SimpleChannelInboundHandler<F
     public boolean acceptInboundMessage(Object msg) throws Exception {
         if (super.acceptInboundMessage(msg)) {
             FullHttpRequest req = (FullHttpRequest) msg;
-            return pattern.matcher(req.uri()).matches();
+            URI uri=new URI(req.uri());
+            return this.method.equals(req.method()) && pattern.matcher(uri.getPath()).matches();
         }
         return false;
     }

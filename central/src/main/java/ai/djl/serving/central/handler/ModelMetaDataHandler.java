@@ -14,7 +14,7 @@ package ai.djl.serving.central.handler;
 
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
-import ai.djl.serving.central.responseencoder.JsonResponse;
+import ai.djl.serving.central.responseencoder.HttpRequestResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -29,11 +29,11 @@ import java.util.concurrent.CompletableFuture;
  */
 public class ModelMetaDataHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-    private JsonResponse jsonResponse;
+    private HttpRequestResponse jsonResponse;
 
     /** construct handler. */
     public ModelMetaDataHandler() {
-        jsonResponse = new JsonResponse();
+        jsonResponse = new HttpRequestResponse();
     }
 
     /**
@@ -67,6 +67,6 @@ public class ModelMetaDataHandler extends SimpleChannelInboundHandler<FullHttpRe
                             }
                         })
                 .exceptionally((ex) -> Collections.emptyMap())
-                .thenAccept(modelMap -> jsonResponse.send(ctx, request, modelMap));
+                .thenAccept(modelMap -> jsonResponse.sendAsJson(ctx, request, modelMap));
     }
 }

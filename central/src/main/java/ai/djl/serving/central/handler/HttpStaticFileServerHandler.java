@@ -116,8 +116,8 @@ public class HttpStaticFileServerHandler extends SimpleChannelInboundHandler<Ful
         if (uri.startsWith("/modelzoo-frontend.js")) {
             uri = "/src/main/resources/static/dist/" + uri;
         }
-        if (uri.endsWith("/favicon.ico")) {
-            uri = "/src/main/resources/static/favicon.ico";
+        if (uri.endsWith("/favicon.png")) {
+            uri = "/src/main/resources/static/favicon.png";
         }
         String path = sanitizeUri(uri);
         if (path == null) {

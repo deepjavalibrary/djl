@@ -28,20 +28,20 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
 
 /**
- * serialize to json and send the response to the client.
+ * Send the response to the client.
  *
  * @author erik.bamberg@web.de
  */
-public class JsonResponse {
+public class HttpRequestResponse {
 
     /**
-     * send a response to the client.
+     * send a response as JSON to the client.
      *
      * @param ctx channel context
      * @param request full request
      * @param entity the response
      */
-    public void send(ChannelHandlerContext ctx, FullHttpRequest request, Object entity) {
+    public void sendAsJson(ChannelHandlerContext ctx, FullHttpRequest request, Object entity) {
         String serialized = JsonUtils.GSON_PRETTY.toJson(entity);
         ByteBuf buffer = ctx.alloc().buffer(serialized.length());
         buffer.writeCharSequence(serialized, CharsetUtil.UTF_8);
@@ -49,24 +49,24 @@ public class JsonResponse {
         FullHttpResponse response =
                 new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buffer);
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
-
-        this.sendAndCleanupConnection(ctx, request, response);
+        boolean keepAlive = HttpUtil.isKeepAlive(request);
+        this.sendAndCleanupConnection(ctx, response, keepAlive);
     }
     
     /**
-     * send a response to the client.
+     * send content of a ByteBuffer as
+     *  response to the client.
      *
      * @param ctx channel context
      * @param request full request
      * @param entity the response
      */
-    public void forward(ChannelHandlerContext ctx, FullHttpRequest request, ByteBuf buffer) {
+    public void sendByteBuffer(ChannelHandlerContext ctx, ByteBuf buffer) {
 
         FullHttpResponse response =
                 new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buffer);
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
-
-        this.sendAndCleanupConnection(ctx, request, response);
+        this.sendAndCleanupConnection(ctx, response, false);
     }
 
     /**
@@ -78,16 +78,13 @@ public class JsonResponse {
      * @param response full response
      */
     private void sendAndCleanupConnection(
-            ChannelHandlerContext ctx, FullHttpRequest request, FullHttpResponse response) {
-        boolean keepAlive = HttpUtil.isKeepAlive(request);
+            ChannelHandlerContext ctx, FullHttpResponse response, boolean keepAlive ) {
         HttpUtil.setContentLength(response, response.content().readableBytes());
         if (!keepAlive) {
             // We're going to close the connection as soon as the response is sent,
             // so we should also make it clear for the client.
             response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
-        } else if (request.protocolVersion().equals(HttpVersion.HTTP_1_0)) {
-            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-        }
+        } 
 
         ChannelFuture flushPromise = ctx.writeAndFlush(response);
 

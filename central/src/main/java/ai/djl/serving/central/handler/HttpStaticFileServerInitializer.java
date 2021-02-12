@@ -15,6 +15,7 @@ package ai.djl.serving.central.handler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.ssl.SslContext;
@@ -52,8 +53,8 @@ public class HttpStaticFileServerInitializer extends ChannelInitializer<SocketCh
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new ChunkedWriteHandler());
+        pipeline.addLast(new FunctionalRestEndpointHandler(ModelDeploymentEndpoint.registerModel,ModelDeploymentEndpoint.registerModelPattern,HttpMethod.POST));
         pipeline.addLast(new ModelMetaDataHandler());
-        pipeline.addLast(new FunctionalRestEndpointHandler(ModelDeploymentEndpoint.function,ModelDeploymentEndpoint.pattern));
         pipeline.addLast(new HttpStaticFileServerHandler());
     }
 }

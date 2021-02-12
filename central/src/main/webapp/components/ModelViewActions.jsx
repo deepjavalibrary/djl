@@ -8,10 +8,8 @@ import ShareIcon from '@material-ui/icons/Share';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { theme } from '../css/useStyles'
+import axios from 'axios'
 
-const actions = [
-	{ icon: <ShareIcon />, name: 'Deploy' }
-];
 
 const useStyles = makeStyles((theme) => ({
 	modelviewactions_root: {
@@ -46,6 +44,20 @@ export default function ModelViewActions(props) {
 	const handleOpen = () => {
 		setOpen(true);
 	};
+	
+	const deploy = () => {
+			axios.post("http://localhost:8080/serving/models?modelName="+props.modelName)
+				.then(function(response) {
+					console.log(response.data.message);
+					alert(response.data.message)
+				})
+				.catch(function(error) {
+					console.log(error);
+				})
+				.then(function() {
+					// always executed
+				});
+			};
 
 	return (
 		<div className={classes.modelviewactions_root}>
@@ -59,14 +71,14 @@ export default function ModelViewActions(props) {
 				open={open}
 				direction={'down'}
 			>
-				{actions.map((action) => (
+
 					<SpeedDialAction
-						key={action.name}
-						icon={action.icon}
-						tooltipTitle={action.name}
-					//    onClick={handleClose}
+						key={'Deploy'}
+						icon={<ShareIcon />}
+						tooltipTitle={'deploy'}
+						onClick={deploy}
+				
 					/>
-				))}
 			</SpeedDial>
 		</div>
 	);

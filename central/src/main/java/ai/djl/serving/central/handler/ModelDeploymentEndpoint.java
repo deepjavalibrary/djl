@@ -13,13 +13,12 @@
 package ai.djl.serving.central.handler;
 
 import ai.djl.serving.central.client.RestCall;
-import ai.djl.serving.central.responseencoder.JsonResponse;
+import ai.djl.serving.central.utils.NettyUtils;
+import ai.djl.serving.http.BadRequestException;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.util.CharsetUtil;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 /**
@@ -28,16 +27,18 @@ import java.util.regex.Pattern;
  */
 public class ModelDeploymentEndpoint  {
 
-  
-    
-    static final Pattern pattern=Pattern.compile("^/serving[/?]models/(.*)?");
-    
-    static final BiConsumer<ChannelHandlerContext,FullHttpRequest> function=(ctx, req)->{ 
-	JsonResponse jsonResponse = new JsonResponse();
-	RestCall webClient=new RestCall( (response) -> {
-	    jsonResponse.forward(ctx, req, response.content().copy() );
-	} );
-	webClient.send("http://localhost:8080/models/mlp");
+    /**
+     * curl -X PUT "http://localhost:8080/models?modelName=mlp?min_worker=4&max_worker=12&max_idle_time=60&max_batch_delay=100"
+     */
+    static final Pattern registerModelPattern=Pattern.compile("^/serving[/?]models$"); // POST
+    static final BiConsumer<ChannelHandlerContext,FullHttpRequest> registerModel=(ctx, req)->{ 
+        QueryStringDecoder decoder = new QueryStringDecoder(req.uri());
+        String modelName=NettyUtils.getParameter(decoder, "modelName", null);
+        if (modelName!=null) {
+            new RestCall().put("http://localhost:5000/models/modelName=",ctx);
+        } else {
+            throw new BadRequestException("no modelName found.");
+        }
     };
 
 }
