@@ -1,7 +1,8 @@
 # Community Leaders
 
-DJL’s success is largely attributed to community contributions.
-You can get involved and engage with us by joining our [Slack channel](deepjavalibrary.slack.com), [Wechat](https://zhuanlan.zhihu.com/p/336323550), or [Github](https://github.com/awslabs/djl) discussions. Kudos to our community leaders for helping evangelizing DJL and contributing to our Github!
+DJL is a community project. It is led by AWS and the many other contributors from a variety of backgrounds, both corporate and academic, who bring their unique perspectives to help make DJL and the Java deep learning ecosystem the best it can be. To recognize the great people helping us build this community, we created the **DJL Community Leaders** to help steer the project.
+
+The community leaders are those who are the most active members of our community. They help give back to it by sharing projects, writing blog posts, giving talks, answering questions, contributing ideas, reviewing pull requests, and writing code in DJL. Like the project itself, the community leaders are a growing group and we are always looking to invite more people who show passion, dedication, and commitment to join.
 
 | | | | | |
 |-------|----------------|---------|------------| ----------- |
