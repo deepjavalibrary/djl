@@ -41,11 +41,15 @@ Frank Liu is a Software Engineer for AWS Deep Learning. He focuses on building i
 
 Jake is one of core developers in the AWS DJL team. He graduated from CMU with MS degree in Software Engineering. He loves to learn things about Deep Learning in particular Deep Learning System. Outside of work, Jake enjoys watching movie, TV series, and anime.
 
-#### Keerthan Vasist | [github](https://github.com/keerthanvasist)
+#### Keerthan Vasist
+
+[github](https://github.com/keerthanvasist)
 
 Keerthan is a software engineer in AWS Deep Engines Org. His current work focuses on explainability and bias in machine learning. Outside of work, he enjoys playing Ultimate Frisbee, and badminton.
 
-#### Kimi Ma | [github](https://github.com/kimim)
+#### Kimi Ma
+
+[github](https://github.com/kimim)
 
 Kimi Ma is Industrial Internet director of Wanxiang Group, responsible for Wanxiang industrial digital platform development, business model innovation, and global partnerships. His primary interests in 2021 include energy internet, distributed intelligence and smart city. Before joining Wanxiang, Kimi was the R&D Manager of ABB control technology platform and Nokia Siemens Network.
 Meantime, he is a board member in the Alliance of Industrial Internet and contributes to Clojure DJL: [clj-djl](https://github.com/kimim/clj-djl).
