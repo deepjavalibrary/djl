@@ -16,6 +16,7 @@ import ai.djl.ModelException;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.Criteria.Builder;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
@@ -80,21 +81,33 @@ public final class ModelManager {
      * @param maxIdleTime the maximum idle time of the worker threads before scaling down.
      * @return a {@code CompletableFuture} instance
      */
-    public CompletableFuture<ModelInfo> registerModel(
+    public <T,U> CompletableFuture<ModelInfo> registerModel(
             final String modelName,
+            Class<T> inputType,
+            Class<U> outputType,
             final String modelUrl,
             final int batchSize,
             final int maxBatchDelay,
             final int maxIdleTime) {
+	
+	Builder<T,U> criteriaBuilder=Criteria.builder()
+                .setTypes(inputType, outputType);
+	if (modelUrl!=null) {
+	    criteriaBuilder.optModelUrls(modelUrl);
+	}
+	
+        Criteria<T, U> criteria = criteriaBuilder.build();
+      //          Criteria.builder()
+      //                  .setTypes(Input.class, Output.class)
+      //                  .optModelUrls(modelUrl)
+      //                  .build();	
+	
+	
         return CompletableFuture.supplyAsync(
                 () -> {
                     try {
-                        Criteria<Input, Output> criteria =
-                                Criteria.builder()
-                                        .setTypes(Input.class, Output.class)
-                                        .optModelUrls(modelUrl)
-                                        .build();
-                        ZooModel<Input, Output> model = ModelZoo.loadModel(criteria);
+ 
+                        ZooModel<T, U> model = ModelZoo.loadModel(criteria);
                         String actualModelName;
                         if (modelName == null || modelName.isEmpty()) {
                             actualModelName = model.getName();
@@ -106,6 +119,8 @@ public final class ModelManager {
                         ModelInfo modelInfo =
                                 new ModelInfo(
                                         actualModelName,
+                                        inputType,
+                                        outputType,
                                         modelUrl,
                                         model,
                                         configManager.getJobQueueSize(),

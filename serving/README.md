@@ -235,6 +235,9 @@ url:	/models/?{modelName}=modelName&{min_worker}={integer}&{max_worker}={integer
 
 
 model_name	the name for the model
+model_url	optional url to the model
+input_type	full qualified java type
+output_type full qualified java type
 batchSize batchsize
 max_batch_delay in milliseconds
 min_worker is optional
@@ -242,12 +245,12 @@ max_worker is optional
 max_idle_time is optional. time is in seconds
 synchronous true/false
 
-method: PUT
+method: POST
 
 example:
 
 ```sh
-curl -X PUT "http://localhost:8080/models?modelName=mlp?min_worker=4&max_worker=12&max_idle_time=60&max_batch_delay=100"
+curl -X POST "http://localhost:8080/models?modelName=mlp?min_worker=4&max_worker=12&max_idle_time=60&max_batch_delay=100"
 ```
 
 returns

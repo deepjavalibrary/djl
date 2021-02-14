@@ -334,4 +334,20 @@ public final class NettyUtils {
             throw new AssertionError(e);
         }
     }
+
+    /**
+     * Read a parameter from the HTTP-request and interpret it as a Class.
+     * @param decoder
+     * @param inputTypeParameter
+     * @param object
+     * @return the class with the full qualified class-name.
+     * @throws ClassNotFoundException 
+     */
+    public static Class<?> getClassParameter(QueryStringDecoder decoder, String inputTypeParameter, Class<?> def) throws ClassNotFoundException {
+        String value = getParameter(decoder, inputTypeParameter, null);
+        if (value == null || value.isEmpty()) {
+            return def;
+        }
+        return Class.forName(value);
+    }
 }

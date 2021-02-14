@@ -14,6 +14,7 @@ package ai.djl.serving.http;
 
 import ai.djl.ModelException;
 import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.serving.util.ConfigManager;
 import ai.djl.serving.util.NettyUtils;
@@ -148,10 +149,12 @@ public class InferenceRequestHandler extends HttpRequestHandler {
             }
 
             logger.info("Loading model {} from: {}", modelName, modelUrl);
-
+            //TODO check if this auto registration still makes sense, cause we don't know the Input/Output Types nor if which application we expect 
             modelManager
                     .registerModel(
                             modelName,
+                            Input.class,
+                            Output.class,
                             modelUrl,
                             ConfigManager.getInstance().getBatchSize(),
                             ConfigManager.getInstance().getMaxBatchDelay(),

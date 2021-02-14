@@ -45,6 +45,10 @@ public class ManagementRequestHandler extends HttpRequestHandler {
     private static final String BATCH_SIZE_PARAMETER = "batch_size";
     /** HTTP Paramater "model_name". */
     private static final String MODEL_NAME_PARAMETER = "model_name";
+    /** HTTP Parameter "input_type". */
+    private static final String INPUT_TYPE__PARAMETER = "input_type";
+    /** HTTP Parameter "output_type". */
+    private static final String OUTPUT_TYPE_PARAMETER = "output_type";
     /** HTTP Paramater "max_batch_delay". */
     private static final String MAX_BATCH_DELAY_PARAMETER = "max_batch_delay";
     /** HTTP Paramater "max_idle_time". */
@@ -138,25 +142,40 @@ public class ManagementRequestHandler extends HttpRequestHandler {
     }
 
     private void handleRegisterModel(final ChannelHandlerContext ctx, QueryStringDecoder decoder) {
-        String modelUrl = NettyUtils.getParameter(decoder, URL_PARAMETER, null);
-        if (modelUrl == null) {
-            throw new BadRequestException("Parameter url is required.");
-        }
+	
+	String modelUrl;
+	String modelName;
+	int batchSize;
+	int maxBatchDelay;
+	int maxIdleTime;
+	int initialWorkers;
+	boolean synchronous;
+	Class<?> inputType;
+	Class<?> outputType;
+	try {
+	    inputType=NettyUtils.getClassParameter(decoder, INPUT_TYPE__PARAMETER, null);
+	    outputType=NettyUtils.getClassParameter(decoder, OUTPUT_TYPE_PARAMETER, null);
+	    
+	    modelUrl = NettyUtils.getParameter(decoder, URL_PARAMETER, null);
 
-        final String modelName = NettyUtils.getParameter(decoder, MODEL_NAME_PARAMETER, null);
-        int batchSize = NettyUtils.getIntParameter(decoder, BATCH_SIZE_PARAMETER, 1);
-        int maxBatchDelay = NettyUtils.getIntParameter(decoder, MAX_BATCH_DELAY_PARAMETER, 100);
-        int maxIdleTime = NettyUtils.getIntParameter(decoder, MAX_IDLE_TIME__PARAMETER, 60);
-        final int initialWorkers =
-                NettyUtils.getIntParameter(decoder, INITIAL_WORKERS_PARAMETER, 1);
-        boolean synchronous =
-                Boolean.parseBoolean(
-                        NettyUtils.getParameter(decoder, SYNCHRONOUS_PARAMETER, "true"));
+	    modelName = NettyUtils.getParameter(decoder, MODEL_NAME_PARAMETER, null);
+	    batchSize = NettyUtils.getIntParameter(decoder, BATCH_SIZE_PARAMETER, 1);
+	    maxBatchDelay = NettyUtils.getIntParameter(decoder, MAX_BATCH_DELAY_PARAMETER, 100);
+	    maxIdleTime = NettyUtils.getIntParameter(decoder, MAX_IDLE_TIME__PARAMETER, 60);
+	    initialWorkers = NettyUtils.getIntParameter(decoder, INITIAL_WORKERS_PARAMETER, 1);
+	    synchronous = Boolean.parseBoolean(
+	            NettyUtils.getParameter(decoder, SYNCHRONOUS_PARAMETER, "true"));
+	    if (modelName==null) {
+		throw new BadRequestException("parameter "+MODEL_NAME_PARAMETER+" is mandatory but empty in request");
+	    }
+	} catch (ClassNotFoundException e) {
+	    throw new BadRequestException("input or output type. no class with this classname found", e);
+	}
 
         final ModelManager modelManager = ModelManager.getInstance();
         CompletableFuture<ModelInfo> future =
                 modelManager.registerModel(
-                        modelName, modelUrl, batchSize, maxBatchDelay, maxIdleTime);
+                        modelName,inputType ,outputType, modelUrl, batchSize, maxBatchDelay, maxIdleTime);
         CompletableFuture<Void> f =
                 future.thenAccept(
                         modelInfo ->

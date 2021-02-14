@@ -12,6 +12,8 @@
  */
 package ai.djl.serving;
 
+import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.repository.FilenameUtils;
 import ai.djl.serving.util.ConfigManager;
 import ai.djl.serving.util.Connector;
@@ -301,6 +303,8 @@ public class ModelServer {
             CompletableFuture<ModelInfo> future =
                     modelManager.registerModel(
                             null,
+                            Input.class,
+                            Output.class,
                             url,
                             configManager.getBatchSize(),
                             configManager.getMaxBatchDelay(),
