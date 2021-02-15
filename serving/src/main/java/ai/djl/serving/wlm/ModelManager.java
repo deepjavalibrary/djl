@@ -12,6 +12,7 @@
  */
 package ai.djl.serving.wlm;
 
+import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
@@ -85,6 +86,8 @@ public final class ModelManager {
             final String modelName,
             Class<T> inputType,
             Class<U> outputType,
+            String application,
+            Map<String,String> filters,
             final String modelUrl,
             final int batchSize,
             final int maxBatchDelay,
@@ -94,6 +97,12 @@ public final class ModelManager {
                 .setTypes(inputType, outputType);
 	if (modelUrl!=null) {
 	    criteriaBuilder.optModelUrls(modelUrl);
+	}
+	if (application!=null && !application.isEmpty()) {
+	    criteriaBuilder.optApplication(Application.of(application));
+	}
+	if (filters!=null && !filters.isEmpty()) {
+	    criteriaBuilder.optFilters(filters);
 	}
 	
         Criteria<T, U> criteria = criteriaBuilder.build();
@@ -170,13 +179,14 @@ public final class ModelManager {
      *
      * @param modelInfo the model that has been updated
      */
-    public void triggerModelUpdated(ModelInfo modelInfo) {
+    public ModelInfo triggerModelUpdated(ModelInfo modelInfo) {
         if (!models.containsKey(modelInfo.getModelName())) {
             throw new AssertionError("Model not found: " + modelInfo.getModelName());
         }
         logger.debug("updateModel: {}", modelInfo.getModelName());
         models.put(modelInfo.getModelName(), modelInfo);
         wlm.modelChanged(modelInfo);
+        return modelInfo;
     }
 
     /**

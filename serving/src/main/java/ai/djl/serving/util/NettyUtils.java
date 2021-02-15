@@ -46,7 +46,9 @@ import io.netty.util.CharsetUtil;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -349,5 +351,25 @@ public final class NettyUtils {
             return def;
         }
         return Class.forName(value);
+    }
+
+    /**
+     * @param decoder
+     * @param filterParameter
+     * @param object
+     * @return
+     */
+    public static Map<String, String> getMapParameter(QueryStringDecoder decoder, String filterParameter,
+	    Map<String,String> def) {
+        List<String> param = decoder.parameters().get(filterParameter);
+        if (param != null && !param.isEmpty()) {
+            Map<String,String> filters=new HashMap<>();
+            param.forEach( value -> {
+        	String[] keyValuePair=value.split("\\s*:\\s*",2);
+        	filters.put(keyValuePair[0], keyValuePair[1]);
+            });
+            return filters;
+        }
+        return def;
     }
 }

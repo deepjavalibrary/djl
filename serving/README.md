@@ -238,6 +238,8 @@ model_name	the name for the model
 model_url	optional url to the model
 input_type	full qualified java type
 output_type full qualified java type
+application	the application example: cv/object_detection
+filter		additional filters example:  "backbone:resnet50"
 batchSize batchsize
 max_batch_delay in milliseconds
 min_worker is optional
@@ -250,7 +252,7 @@ method: POST
 example:
 
 ```sh
-curl -X POST "http://localhost:8080/models?modelName=mlp?min_worker=4&max_worker=12&max_idle_time=60&max_batch_delay=100"
+curl -X POST "http://localhost:8080/models?model_name=mlp?min_worker=4&max_worker=12&max_idle_time=60&max_batch_delay=100"
 ```
 
 returns
@@ -276,4 +278,12 @@ you can set the logging level on the command-line adding a parameter for the JVM
 ```
 
 
+## Usage example
+### Object detecting
+
+registering a model that accepts an image as input class and produces a Detection output
+
+```sh
+curl -X POST "http://localhost:5000/models?model_name=detect&application=cv/object_detection&filter=backbone:resnet50&input_type=ai.djl.modality.cv.Image&output_type=ai.djl.modality.cv.output.DetectedObjects"
+```
 

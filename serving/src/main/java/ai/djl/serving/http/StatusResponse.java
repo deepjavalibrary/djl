@@ -16,6 +16,7 @@ package ai.djl.serving.http;
 public class StatusResponse {
 
     private String status;
+    private Object details;
 
     /** Constructs a new {@code StatusResponse} instance. */
     public StatusResponse() {}
@@ -27,8 +28,20 @@ public class StatusResponse {
      */
     public StatusResponse(String status) {
         this.status = status;
+        this.details = null;
     }
 
+    /**
+     * Constructs a new {@code StatusResponse} instance with status line.
+     *
+     * @param status the status line
+     * @param details the details line
+     */
+    public StatusResponse(String status,Object details) {
+        this.status = status;
+        this.details = details;
+    }
+    
     /**
      * Returns the status.
      *
@@ -36,5 +49,12 @@ public class StatusResponse {
      */
     public String getStatus() {
         return status;
+    }
+
+    /**
+     * @return the details
+     */
+    public Object getDetails() {
+        return details;
     }
 }

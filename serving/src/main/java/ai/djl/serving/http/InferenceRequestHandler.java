@@ -155,6 +155,8 @@ public class InferenceRequestHandler extends HttpRequestHandler {
                             modelName,
                             Input.class,
                             Output.class,
+                            null,
+                            null,
                             modelUrl,
                             ConfigManager.getInstance().getBatchSize(),
                             ConfigManager.getInstance().getMaxBatchDelay(),

@@ -305,6 +305,8 @@ public class ModelServer {
                             null,
                             Input.class,
                             Output.class,
+                            null,
+                            null,
                             url,
                             configManager.getBatchSize(),
                             configManager.getMaxBatchDelay(),
