@@ -26,14 +26,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A class represents an inference job. */
-public class Job {
+public class Job<T,U> {
 
     private static final Logger logger = LoggerFactory.getLogger(Job.class);
 
     private ChannelHandlerContext ctx;
 
     private String modelName;
-    private Input input;
+    private T input;
     private long begin;
     private long scheduled;
 
@@ -44,7 +44,7 @@ public class Job {
      * @param modelName the model name
      * @param input the input data
      */
-    public Job(ChannelHandlerContext ctx, String modelName, Input input) {
+    public Job(ChannelHandlerContext ctx, String modelName, T input) {
         this.ctx = ctx;
         this.modelName = modelName;
         this.input = input;
@@ -53,14 +53,6 @@ public class Job {
         scheduled = begin;
     }
 
-    /**
-     * Returns the request id.
-     *
-     * @return the request id
-     */
-    public String getRequestId() {
-        return input.getRequestId();
-    }
 
     /**
      * Returns the model name that associated with this job.
@@ -76,7 +68,7 @@ public class Job {
      *
      * @return the input data
      */
-    public Input getInput() {
+    public T getInput() {
         return input;
     }
 
@@ -90,13 +82,19 @@ public class Job {
      *
      * @param output the output
      */
-    public void sendOutput(Output output) {
+    public void sendOutput(U output) {
         FullHttpResponse resp =
                 new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, false);
-        for (Map.Entry<String, String> entry : output.getProperties().entrySet()) {
-            resp.headers().set(entry.getKey(), entry.getValue());
+        
+        if (output instanceof Output) {
+            Output out=(Output)output;
+            for (Map.Entry<String, String> entry : out.getProperties().entrySet()) {
+                resp.headers().set(entry.getKey(), entry.getValue());
+            }
+            resp.content().writeBytes(out.getContent());
+        } else {
+          //  resp.content().writeBytes(null);
         }
-        resp.content().writeBytes(output.getContent());
 
         /*
          * We can load the models based on the configuration file.Since this Job is

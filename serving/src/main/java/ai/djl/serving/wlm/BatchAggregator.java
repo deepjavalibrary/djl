@@ -28,7 +28,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 abstract class BatchAggregator {
 
     protected int batchSize;
-    protected List<Job> jobs;
     protected LinkedBlockingDeque<Job> jobQueue;
 
     /**
@@ -40,7 +39,6 @@ abstract class BatchAggregator {
     public BatchAggregator(ModelInfo model, LinkedBlockingDeque<Job> jobQueue) {
         this.batchSize = model.getBatchSize();
         this.jobQueue = jobQueue;
-        jobs = new ArrayList<>();
     }
 
     /**
@@ -50,40 +48,20 @@ abstract class BatchAggregator {
      * @throws InterruptedException if thread gets interrupted while waiting for new data in the
      *     queue.
      */
-    public List<Input> getRequest() throws InterruptedException {
-        jobs = pollBatch();
-        List<Input> list = new ArrayList<>(jobs.size());
+    public List<Job> getRequest() throws InterruptedException {
+	List<Job> jobs = pollBatch();
+        List<Job> list = new ArrayList<>(jobs.size());
         for (Job job : jobs) {
             job.setScheduled();
-            list.add(job.getInput());
+            list.add(job);
         }
         return list;
     }
 
-    /**
-     * Sends to response to all waiting clients.
-     *
-     * @param outputs list of model-outputs in same order as the input objects.
-     */
-    public void sendResponse(List<Output> outputs) {
-        if (jobs.size() != outputs.size()) {
-            throw new IllegalStateException("Not all jobs get response.");
-        }
 
-        int i = 0;
-        for (Output output : outputs) {
-            String requestId = output.getRequestId();
-            Job job = jobs.get(i++);
-            if (!job.getRequestId().equals(requestId)) {
-                throw new IllegalStateException("Request response mismatched.");
-            }
-            job.sendOutput(output);
-        }
-        jobs.clear();
-    }
 
     /** Sends an internal server error. */
-    public void sendError() {
+    public void sendError(List<Job> jobs) {
         for (Job job : jobs) {
             job.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal server error");
         }

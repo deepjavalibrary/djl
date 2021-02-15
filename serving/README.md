@@ -287,3 +287,8 @@ registering a model that accepts an image as input class and produces a Detectio
 curl -X POST "http://localhost:5000/models?model_name=detect&application=cv/object_detection&filter=backbone:resnet50&input_type=ai.djl.modality.cv.Image&output_type=ai.djl.modality.cv.output.DetectedObjects"
 ```
 
+
+```sh
+curl -X POST http://127.0.0.1:5000/predictions/detect -F "data=@../examples/src/test/resources/dog_bike_car.jpg"
+```
+
