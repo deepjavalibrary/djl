@@ -76,8 +76,8 @@ nav:
       - 'docs/development/inference_performance_optimization.md'
       - 'docs/development/benchmark_with_djl.md'
   - DJL Community:
-      - Overview: 'leaders.md'
-      - Development: 'https://github.com/awslabs/djl/discussions/categories/development'
+      - 'docs/forums.md'
+      - 'leaders.md'
   - Apache MXNet:
       - Overview: 'mxnet/README.md'
       - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'

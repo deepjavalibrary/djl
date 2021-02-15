@@ -144,7 +144,9 @@ file->import->gradle->existing gradle project
 
 ## Community
 
-Join our [<img src='https://cdn3.iconfinder.com/data/icons/social-media-2169/24/social_media_social_media_logo_slack-512.png' width='20px' /> slack channel](https://join.slack.com/t/deepjavalibrary/shared_invite/zt-ar91gjkz-qbXhr1l~LFGEIEeGBibT7w) to get in touch with the development team, for questions and discussions.
+You can read our guide to [community forums, following DJL, issues, discussions, and RFCs](docs/forums.md) to figure out the best way to share and find content from the DJL community.
+
+Join our [<img src='https://cdn3.iconfinder.com/data/icons/social-media-2169/24/social_media_social_media_logo_slack-512.png' width='20px' /> slack channel](http://tiny.cc/djl_slack) to get in touch with the development team, for questions and discussions.
 
 Follow our [<img src='https://cdn2.iconfinder.com/data/icons/social-media-2285/512/1_Twitter_colored_svg-512.png' width='20px' /> twitter](https://twitter.com/deepjavalibrary) to see updates about new content, features, and releases.
 
