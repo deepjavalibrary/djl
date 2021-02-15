@@ -22,11 +22,17 @@ import ai.djl.serving.wlm.Job;
 import ai.djl.serving.wlm.ModelInfo;
 import ai.djl.serving.wlm.ModelManager;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,6 +132,7 @@ public class InferenceRequestHandler extends HttpRequestHandler {
         predict(ctx, req, input, modelName);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private void predict(
             ChannelHandlerContext ctx, FullHttpRequest req, Input input, String modelName)
             throws ModelNotFoundException {
@@ -165,7 +172,7 @@ public class InferenceRequestHandler extends HttpRequestHandler {
                     .thenAccept(
                             p -> {
                                 try {
-                                    if (!modelManager.addJob(new Job(ctx, modelName, input))) {
+                                    if (!modelManager.addJob(new Job(modelName, input,defaultJobCallback(ctx),defaultJobErrorCallback(ctx)))) {
                                         throw new ServiceUnavailableException(
                                                 "No worker is available to serve request: "
                                                         + modelName);
@@ -189,11 +196,43 @@ public class InferenceRequestHandler extends HttpRequestHandler {
             return;
         }
 
-        Job job = new Job(ctx, modelName, input);
+        @SuppressWarnings("unchecked")
+	Job<?,?> job = new Job(modelName, input,defaultJobCallback(ctx),defaultJobErrorCallback(ctx));
         if (!ModelManager.getInstance().addJob(job)) {
             logger.error("unable to process prediction. no free worker available.");
             throw new ServiceUnavailableException(
                     "No worker is available to serve request: " + modelName);
         }
     }
+    
+    private Consumer<?> defaultJobCallback(ChannelHandlerContext ctx) {
+	return (output) -> {
+	           FullHttpResponse resp =
+	                   new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, false);
+	           
+	           if (output instanceof Output) {
+	               Output out=(Output)output;
+	               for (Map.Entry<String, String> entry : out.getProperties().entrySet()) {
+	                   resp.headers().set(entry.getKey(), entry.getValue());
+	               }
+	               resp.content().writeBytes(out.getContent());
+	           } else {
+	    //           resp.content().writeBytes(null);
+	           }
+
+	           if (ctx != null) {
+	               NettyUtils.sendHttpResponse(ctx, resp, true);
+	           }
+	    
+	};
+    }
+    
+    private BiConsumer<HttpResponseStatus,String> defaultJobErrorCallback(ChannelHandlerContext ctx) {
+	return (status,error) -> {
+            if (ctx != null) {
+                NettyUtils.sendError(ctx, status, new InternalServerException(error));
+            }
+	};
+    }
+    
 }

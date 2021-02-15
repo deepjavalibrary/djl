@@ -12,16 +12,9 @@
  */
 package ai.djl.serving.wlm;
 
-import ai.djl.modality.Input;
-import ai.djl.modality.Output;
-import ai.djl.serving.http.InternalServerException;
-import ai.djl.serving.util.NettyUtils;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +23,8 @@ public class Job<T,U> {
 
     private static final Logger logger = LoggerFactory.getLogger(Job.class);
 
-    private ChannelHandlerContext ctx;
-
+    private Consumer<U> callback;
+    private BiConsumer<HttpResponseStatus,String> onError;
     private String modelName;
     private T input;
     private long begin;
@@ -43,9 +36,11 @@ public class Job<T,U> {
      * @param ctx the {@code ChannelHandlerContext}
      * @param modelName the model name
      * @param input the input data
+     * @param callback a callback function which is called after the output response is available
      */
-    public Job(ChannelHandlerContext ctx, String modelName, T input) {
-        this.ctx = ctx;
+    public Job(String modelName, T input,Consumer<U> callback, BiConsumer<HttpResponseStatus,String> onError) {
+        this.callback = callback;
+        this.onError = onError;
         this.modelName = modelName;
         this.input = input;
 
@@ -83,28 +78,11 @@ public class Job<T,U> {
      * @param output the output
      */
     public void sendOutput(U output) {
-        FullHttpResponse resp =
-                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, false);
-        
-        if (output instanceof Output) {
-            Output out=(Output)output;
-            for (Map.Entry<String, String> entry : out.getProperties().entrySet()) {
-                resp.headers().set(entry.getKey(), entry.getValue());
-            }
-            resp.content().writeBytes(out.getContent());
-        } else {
-          //  resp.content().writeBytes(null);
-        }
-
-        /*
-         * We can load the models based on the configuration file.Since this Job is
-         * not driven by the external connections, we could have a empty context for
-         * this job. We shouldn't try to send a response to ctx if this is not triggered
-         * by external clients.
-         */
-        if (ctx != null) {
-            NettyUtils.sendHttpResponse(ctx, resp, true);
-        }
+	
+	if (callback!=null) {
+	    callback.accept(output);
+	}
+	
 
         logger.debug(
                 "Waiting time: {}, Backend time: {}",
@@ -119,16 +97,12 @@ public class Job<T,U> {
      * @param error the error message
      */
     public void sendError(HttpResponseStatus status, String error) {
-        /*
-         * We can load the models based on the configuration file.Since this Job is
-         * not driven by the external connections, we could have a empty context for
-         * this job. We shouldn't try to send a response to ctx if this is not triggered
-         * by external clients.
-         */
-        if (ctx != null) {
-            NettyUtils.sendError(ctx, status, new InternalServerException(error));
-        }
-
+	if (onError!=null) {
+	    onError.accept(status,error);
+	} else {
+	    logger.error(error);
+	}
+	
         logger.debug(
                 "Waiting time: {}, Inference time: {}",
                 scheduled - begin,
