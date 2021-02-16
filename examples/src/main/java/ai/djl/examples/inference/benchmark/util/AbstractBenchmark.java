@@ -239,7 +239,7 @@ public abstract class AbstractBenchmark {
                         logger.info(String.format("nonHeap P90: %.3f MB", nonHeap / mb));
                         logger.info(String.format("rss (base): %.3f MB", rssBeforeModel / mb));
                         logger.info(String.format("rss (model): %.3f MB", rssBeforeInference / mb));
-                        logger.info(String.format("rss P90: %.3f MB", rss));
+                        logger.info(String.format("rss P90: %.3f MB", rss / mb));
                     }
                 }
                 MemoryTrainingListener.dumpMemoryInfo(metrics, arguments.getOutputDir());
