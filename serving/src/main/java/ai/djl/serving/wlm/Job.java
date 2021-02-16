@@ -83,7 +83,6 @@ public class Job<T,U> {
 	    callback.accept(output);
 	}
 	
-
         logger.debug(
                 "Waiting time: {}, Backend time: {}",
                 scheduled - begin,

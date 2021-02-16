@@ -106,10 +106,6 @@ public final class ModelManager {
 	}
 	
         Criteria<T, U> criteria = criteriaBuilder.build();
-      //          Criteria.builder()
-      //                  .setTypes(Input.class, Output.class)
-      //                  .optModelUrls(modelUrl)
-      //                  .build();	
 	
 	
         return CompletableFuture.supplyAsync(

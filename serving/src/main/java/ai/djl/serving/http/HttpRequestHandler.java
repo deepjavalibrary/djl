@@ -65,7 +65,7 @@ public abstract class HttpRequestHandler extends SimpleChannelInboundHandler<Ful
             FullHttpRequest req,
             QueryStringDecoder decoder,
             String[] segments)
-            throws ModelException;
+            throws Exception;
 
     private void handleApiDescription(ChannelHandlerContext ctx) {
         NettyUtils.sendJsonResponse(ctx, "{}");

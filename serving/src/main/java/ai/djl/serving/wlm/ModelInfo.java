@@ -68,6 +68,8 @@ public final class ModelInfo<T,U> implements AutoCloseable, Cloneable {
         this.maxIdleTime = maxIdleTime; // default max idle time 60s
         this.queueSize = queueSize;
         this.batchSize = batchSize;
+        this.inputType = inputType;
+        this.outputType = outputType;
     }
 
     /**
