@@ -14,52 +14,59 @@ package ai.djl.serving.modality;
 
 /**
  * Exception is throw when a type-conversion fails.
- * @author erik.bamberg@web.de
  *
+ * @author erik.bamberg@web.de
  */
 public class ConversionException extends Exception {
 
-    /**
-     * default constructor.
-     */
-    public ConversionException() {
-    }
+    /** the serialVersionUID. */
+    private static final long serialVersionUID = -4408856133870325345L;
+
+    /** default constructor. */
+    public ConversionException() {}
 
     /**
      * construct with a Message.
-     * @param message
+     *
+     * @param message error cause.
      */
     public ConversionException(String message) {
-	super(message);
-	// TODO Auto-generated constructor stub
+        super(message);
+        // TODO Auto-generated constructor stub
     }
 
     /**
      * construct with a cause.
-     * @param cause
+     *
+     * @param cause error cause.
      */
     public ConversionException(Throwable cause) {
-	super(cause);
+        super(cause);
     }
 
     /**
      * construct with a Message and cause.
-     * @param message
-     * @param cause
+     *
+     * @param message error cause.
+     * @param cause error cause.
      */
     public ConversionException(String message, Throwable cause) {
-	super(message, cause);
+        super(message, cause);
     }
 
     /**
      * full construct with a Message and cause.
-     * @param message
-     * @param cause
-     * @param enableSuppression
-     * @param writableStackTrace
+     *
+     * @param message error cause.
+     * @param cause error cause.
+     * @param enableSuppression error cause.
+     * @param writableStackTrace error cause.
      */
-    public ConversionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-	super(message, cause, enableSuppression, writableStackTrace);
+    public ConversionException(
+            String message,
+            Throwable cause,
+            boolean enableSuppression,
+            boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
-
 }

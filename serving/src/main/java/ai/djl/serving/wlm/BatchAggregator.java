@@ -12,8 +12,6 @@
  */
 package ai.djl.serving.wlm;
 
-import ai.djl.modality.Input;
-import ai.djl.modality.Output;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +47,7 @@ abstract class BatchAggregator {
      *     queue.
      */
     public List<Job> getRequest() throws InterruptedException {
-	List<Job> jobs = pollBatch();
+        List<Job> jobs = pollBatch();
         List<Job> list = new ArrayList<>(jobs.size());
         for (Job job : jobs) {
             job.setScheduled();
@@ -58,14 +56,15 @@ abstract class BatchAggregator {
         return list;
     }
 
-
-
-    /** Sends an internal server error. */
+    /**
+     * Sends an internal server error to all jobs that are processed by this batch.
+     *
+     * @param jobs to send error.
+     */
     public void sendError(List<Job> jobs) {
         for (Job job : jobs) {
             job.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal server error");
         }
-        jobs.clear();
     }
 
     /**

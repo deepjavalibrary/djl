@@ -13,24 +13,21 @@
 package ai.djl.serving.wlm;
 
 import ai.djl.inference.Predictor;
-import ai.djl.modality.Input;
-import ai.djl.modality.Output;
 import ai.djl.translate.TranslateException;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class WorkerThread<T,U> implements Runnable {
+final class WorkerThread implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkerThread.class);
 
     private String workerName;
-    private Predictor<T, U> predictor;
+    private Predictor<Object, Object> predictor;
 
     private AtomicBoolean running = new AtomicBoolean(true);
 
@@ -54,7 +51,7 @@ final class WorkerThread<T,U> implements Runnable {
         this.gpuId = builder.gpuId;
         this.workerId = new WorkerIdGenerator().generate();
         this.startTime = System.currentTimeMillis();
-        predictor = builder.model.getModel().newPredictor();
+        predictor = (Predictor<Object, Object>) builder.model.getModel().newPredictor();
         this.fixPoolThread = builder.fixPoolThread;
     }
 
@@ -68,12 +65,13 @@ final class WorkerThread<T,U> implements Runnable {
         List<Job> jobs = null;
         try {
             while (isRunning() && !aggregator.isFinished()) {
-        	jobs = aggregator.getRequest();
+                jobs = aggregator.getRequest();
                 if (jobs != null && !jobs.isEmpty()) {
                     try {
-                	List<T> inputs=jobs.stream().map(j->(T)j.getInput()).collect(Collectors.toList());
-                        List<U> reply = predictor.batchPredict(inputs);
-                        sendResponse(jobs,reply);
+                        List<Object> inputs =
+                                jobs.stream().map(j -> j.getInput()).collect(Collectors.toList());
+                        List<Object> reply = predictor.batchPredict(inputs);
+                        sendResponse(jobs, reply);
                     } catch (TranslateException e) {
                         logger.warn("Failed to predict", e);
                         aggregator.sendError(jobs);
@@ -97,21 +95,22 @@ final class WorkerThread<T,U> implements Runnable {
     }
 
     /**
-     * Sends to response to all waiting clients.
+     * Sends to response to all waiting clients. the order of jobs and outputs have to be the same
      *
+     * @param jobs list of client-jobs to send a repsone to
      * @param outputs list of model-outputs in same order as the input objects.
      */
-    public void sendResponse(List<Job> jobs,List<U> outputs) {
+    public void sendResponse(List<Job> jobs, List<Object> outputs) {
         if (jobs.size() != outputs.size()) {
             throw new IllegalStateException("Not all jobs get response.");
         }
 
         int i = 0;
-        for (U output : outputs) {
+        for (Object output : outputs) {
             jobs.get(i++).sendOutput(output);
         }
     }
-    
+
     public int getWorkerId() {
         return workerId;
     }

@@ -19,26 +19,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A class represents an inference job. */
-public class Job<T,U> {
+public class Job {
 
     private static final Logger logger = LoggerFactory.getLogger(Job.class);
 
-    private Consumer<U> callback;
-    private BiConsumer<HttpResponseStatus,String> onError;
+    private Consumer<Object> callback;
+    private BiConsumer<HttpResponseStatus, String> onError;
     private String modelName;
-    private T input;
+    private Object input;
     private long begin;
     private long scheduled;
 
     /**
      * Constructs an new {@code Job} instance.
      *
-     * @param ctx the {@code ChannelHandlerContext}
      * @param modelName the model name
      * @param input the input data
      * @param callback a callback function which is called after the output response is available
+     * @param onError callback function which is called when an execution fails.
      */
-    public Job(String modelName, T input,Consumer<U> callback, BiConsumer<HttpResponseStatus,String> onError) {
+    public Job(
+            String modelName,
+            Object input,
+            Consumer<Object> callback,
+            BiConsumer<HttpResponseStatus, String> onError) {
         this.callback = callback;
         this.onError = onError;
         this.modelName = modelName;
@@ -47,7 +51,6 @@ public class Job<T,U> {
         begin = System.currentTimeMillis();
         scheduled = begin;
     }
-
 
     /**
      * Returns the model name that associated with this job.
@@ -63,7 +66,7 @@ public class Job<T,U> {
      *
      * @return the input data
      */
-    public T getInput() {
+    public Object getInput() {
         return input;
     }
 
@@ -77,12 +80,12 @@ public class Job<T,U> {
      *
      * @param output the output
      */
-    public void sendOutput(U output) {
-	
-	if (callback!=null) {
-	    callback.accept(output);
-	}
-	
+    public void sendOutput(Object output) {
+
+        if (callback != null) {
+            callback.accept(output);
+        }
+
         logger.debug(
                 "Waiting time: {}, Backend time: {}",
                 scheduled - begin,
@@ -96,12 +99,12 @@ public class Job<T,U> {
      * @param error the error message
      */
     public void sendError(HttpResponseStatus status, String error) {
-	if (onError!=null) {
-	    onError.accept(status,error);
-	} else {
-	    logger.error(error);
-	}
-	
+        if (onError != null) {
+            onError.accept(status, error);
+        } else {
+            logger.error(error);
+        }
+
         logger.debug(
                 "Waiting time: {}, Inference time: {}",
                 scheduled - begin,

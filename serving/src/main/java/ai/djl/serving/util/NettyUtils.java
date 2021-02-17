@@ -46,6 +46,7 @@ import io.netty.util.CharsetUtil;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -339,13 +340,16 @@ public final class NettyUtils {
 
     /**
      * Read a parameter from the HTTP-request and interpret it as a Class.
-     * @param decoder
-     * @param inputTypeParameter
-     * @param object
+     *
+     * @param decoder the decoder to decode a query string
+     * @param inputTypeParameter the name of the http url parameter
+     * @param def default value is parameter is not present
      * @return the class with the full qualified class-name.
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException when no class with this name is found in the classpath.
      */
-    public static Class<?> getClassParameter(QueryStringDecoder decoder, String inputTypeParameter, Class<?> def) throws ClassNotFoundException {
+    public static Class<?> getClassParameter(
+            QueryStringDecoder decoder, String inputTypeParameter, Class<?> def)
+            throws ClassNotFoundException {
         String value = getParameter(decoder, inputTypeParameter, null);
         if (value == null || value.isEmpty()) {
             return def;
@@ -354,21 +358,27 @@ public final class NettyUtils {
     }
 
     /**
-     * @param decoder
-     * @param filterParameter
-     * @param object
-     * @return
+     * parses multiple http parameters with the same name into a map. The values are expected to be
+     * splitted by a ':'
+     *
+     * <p>example: {@code query=key:value&query=key2:value2}
+     *
+     * @param decoder the decoder to decode a query string
+     * @param filterParameter name of the url-parameter.
+     * @param def default-map if filter is not found.
+     * @return the extracted map
      */
-    public static Map<String, String> getMapParameter(QueryStringDecoder decoder, String filterParameter,
-	    Map<String,String> def) {
+    @SuppressWarnings("PMD.UseConcurrentHashMap")
+    public static Map<String, String> getMapParameter(
+            QueryStringDecoder decoder, String filterParameter, Map<String, String> def) {
         List<String> param = decoder.parameters().get(filterParameter);
         if (param != null && !param.isEmpty()) {
-            Map<String,String> filters=new HashMap<>();
-            param.forEach( value -> {
-        	String[] keyValuePair=value.split("\\s*:\\s*",2);
-        	filters.put(keyValuePair[0], keyValuePair[1]);
-            });
-            return filters;
+            Map<String, String> filters = new HashMap<>();
+            for (String value : param) {
+                String[] keyValuePair = value.split("\\s*:\\s*", 2);
+                filters.put(keyValuePair[0], keyValuePair[1]);
+            }
+            return Collections.unmodifiableMap(filters);
         }
         return def;
     }

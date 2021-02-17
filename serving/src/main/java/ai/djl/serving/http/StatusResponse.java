@@ -37,11 +37,11 @@ public class StatusResponse {
      * @param status the status line
      * @param details the details line
      */
-    public StatusResponse(String status,Object details) {
+    public StatusResponse(String status, Object details) {
         this.status = status;
         this.details = details;
     }
-    
+
     /**
      * Returns the status.
      *
@@ -52,6 +52,8 @@ public class StatusResponse {
     }
 
     /**
+     * get the content of the response.
+     *
      * @return the details
      */
     public Object getDetails() {

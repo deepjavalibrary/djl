@@ -181,7 +181,7 @@ public class ModelServerTest {
         testUnregisterModelNotFound();
         testInvalidScaleModel();
         testScaleModelNotFound();
-        testRegisterModelMissingUrl();
+        testRegisterModelMissingModelName();
         testRegisterModelNotFound();
         testRegisterModelConflict();
         testServiceUnavailable();
@@ -374,7 +374,7 @@ public class ModelServerTest {
         Assert.assertEquals(resp.getMinWorkers(), 2);
         Assert.assertEquals(resp.getMaxWorkers(), 4);
         Assert.assertEquals(resp.getBatchSize(), 1);
-        Assert.assertEquals(resp.getMaxBatchDelay(), 100);
+        Assert.assertEquals(resp.getMaxBatchDelay(), 300);
         Assert.assertEquals(resp.getStatus(), "Healthy");
         DescribeModelResponse.Worker worker = resp.getWorkers().get(0);
         Assert.assertTrue(worker.getId() > 0);
@@ -560,7 +560,7 @@ public class ModelServerTest {
         Assert.assertEquals(resp.getMessage(), "Model not found: InvalidModel");
     }
 
-    private void testRegisterModelMissingUrl() throws InterruptedException {
+    private void testRegisterModelMissingModelName() throws InterruptedException {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
@@ -572,7 +572,8 @@ public class ModelServerTest {
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
         Assert.assertEquals(resp.getCode(), HttpResponseStatus.BAD_REQUEST.code());
-        Assert.assertEquals(resp.getMessage(), "Parameter url is required.");
+        Assert.assertEquals(
+                resp.getMessage(), "parameter model_name is mandatory but empty in request.");
     }
 
     private void testRegisterModelNotFound() throws InterruptedException {
@@ -581,7 +582,9 @@ public class ModelServerTest {
 
         HttpRequest req =
                 new DefaultFullHttpRequest(
-                        HttpVersion.HTTP_1_1, HttpMethod.POST, "/models?url=InvalidUrl");
+                        HttpVersion.HTTP_1_1,
+                        HttpMethod.POST,
+                        "/models?model_name=testRegisterModelNotFound&url=InvalidUrl");
         channel.writeAndFlush(req).sync();
         channel.closeFuture().sync();
 

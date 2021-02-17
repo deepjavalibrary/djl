@@ -20,32 +20,38 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
- * converts any byte-array into to required InputType
- * @author erik.bamberg@web.de
+ * converts any byte-array into to required InputType.
  *
+ * @author erik.bamberg@web.de
  */
 public class InputTypeConverter {
 
-
     /**
      * convert to ByteArray from the request-input to the type expected by the model.
-     * @param model
-     * @param input
-     * @return input-object in the correct Type
-     * @throws IOException 
+     *
+     * @param model to model to convert for.
+     * @param input The original input.
+     * @return input-object in the correct Type.
+     * @throws ConversionException exception when conversion fails.
      */
-    public Object convertToInputData(ModelInfo<?,?> model, Input input) throws ConversionException {
-	try {
-	    if (model.getInputType()!=null) {
-        	    if ( Image.class.isAssignableFrom(model.getInputType()) ) {
-        	        return ImageFactory.getInstance().fromInputStream(new ByteArrayInputStream(input.getContent().get("data")));
-        	    }
-	    }
-	} catch (IOException e) {
-	    throw new ConversionException("unable to convert "+input.getClass().getName()+ " to "+model.getInputType().getName(),e);
-	}
-	
-	return input;
+    public Object convertToInputData(ModelInfo model, Input input) throws ConversionException {
+        try {
+            if (model.getInputType() != null) {
+                if (Image.class.isAssignableFrom(model.getInputType())) {
+                    return ImageFactory.getInstance()
+                            .fromInputStream(
+                                    new ByteArrayInputStream(input.getContent().get("data")));
+                }
+            }
+        } catch (IOException e) {
+            throw new ConversionException(
+                    "unable to convert "
+                            + input.getClass().getName()
+                            + " to "
+                            + model.getInputType().getName(),
+                    e);
+        }
+
+        return input;
     }
-    
 }

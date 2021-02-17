@@ -278,17 +278,88 @@ you can set the logging level on the command-line adding a parameter for the JVM
 ```
 
 
-## Usage example
+## Real World Usage example
 ### Object detecting
+
+Use the following command to start model server locally:
+
+```sh
+cd serving
+
+# for Linux/macOS:
+./gradlew run
+
+# for Windows:
+..\..\gradlew run
+```
+
+The model server will be listening on port 8080.
 
 registering a model that accepts an image as input class and produces a Detection output
 
 ```sh
-curl -X POST "http://localhost:5000/models?model_name=detect&application=cv/object_detection&filter=backbone:resnet50&input_type=ai.djl.modality.cv.Image&output_type=ai.djl.modality.cv.output.DetectedObjects"
+curl -X POST "http://localhost:8080/models?model_name=detect&application=cv/object_detection&filter=backbone:resnet50&input_type=ai.djl.modality.cv.Image&output_type=ai.djl.modality.cv.output.DetectedObjects"
 ```
 
+model_name is an unique identifier we use to identify this loaded model later on for predictions, scaling or unregistering.
+The other parameters defines filtercriteria used to find a suitable model in modelZoo.
+In this case we are looking for a model that accepts images as input and creates a DetectedObjects-object containing the information about objects detected in the input-image.
+
+The server confirms loading and registering of the model with a josn response.
+The response should look similar to:
 
 ```sh
-curl -X POST http://127.0.0.1:5000/predictions/detect -F "data=@../examples/src/test/resources/dog_bike_car.jpg"
+{
+  "status": "Model \"detect\" registered."
+}
 ```
 
+Now we are ready to detect objects in images. We can send a image to this loaded model using the server REST-API.
+Notice that we used previous declared name "detect" in our url to send an image to our registered model.
+
+```sh
+curl -X POST http://127.0.0.1:8080/predictions/detect -F "data=@../examples/src/test/resources/dog_bike_car.jpg"
+```
+
+The response of the server should contain all objects detected in the image.
+
+```sh
+[
+  {
+    "boundingBox": {
+      "point": {
+        "x": 0.6112044453620911,
+        "y": 0.1371188461780548
+      },
+      "width": 0.2932223081588745,
+      "height": 0.15997856855392456
+    },
+    "className": "car",
+    "probability": 0.9999103546142578
+  },
+  {
+    "boundingBox": {
+      "point": {
+        "x": 0.16190487146377563,
+        "y": 0.2074691653251648
+      },
+      "width": 0.5943371057510376,
+      "height": 0.588262677192688
+    },
+    "className": "bicycle",
+    "probability": 0.9538522958755493
+  },
+  {
+    "boundingBox": {
+      "point": {
+        "x": 0.16793058812618256,
+        "y": 0.3503454327583313
+      },
+      "width": 0.274113729596138,
+      "height": 0.593341588973999
+    },
+    "className": "dog",
+    "probability": 0.9375211000442505
+  }
+]
+```

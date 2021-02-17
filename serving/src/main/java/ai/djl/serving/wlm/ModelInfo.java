@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A class represent a loaded model and it's metadata. */
-public final class ModelInfo<T,U> implements AutoCloseable, Cloneable {
+public final class ModelInfo implements AutoCloseable, Cloneable {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelInfo.class);
 
@@ -31,19 +31,18 @@ public final class ModelInfo<T,U> implements AutoCloseable, Cloneable {
     private int batchSize;
     private int maxBatchDelay;
     private int maxIdleTime;
-    
-    private Class<T> inputType;
-    private Class<U> outputType;
-    
 
-    private ZooModel<T,U> model;
+    private Class<?> inputType;
+    private Class<?> outputType;
+
+    private ZooModel<?, ?> model;
 
     /**
      * Constructs a new {@code ModelInfo} instance.
      *
      * @param modelName the name of the model that will be used as HTTP endpoint
-     * @param inputType type of the expected input.  
-     * @param outputType type of the produced output.  
+     * @param inputType type of the expected input.
+     * @param outputType type of the produced output.
      * @param modelUrl the model url
      * @param model the {@link ZooModel}
      * @param queueSize the maximum request queue size
@@ -53,10 +52,10 @@ public final class ModelInfo<T,U> implements AutoCloseable, Cloneable {
      */
     public ModelInfo(
             String modelName,
-            Class<T> inputType,
-            Class<U> outputType,
+            Class<?> inputType,
+            Class<?> outputType,
             String modelUrl,
-            ZooModel<T, U> model,
+            ZooModel<?, ?> model,
             int queueSize,
             int maxIdleTime,
             int maxBatchDelay,
@@ -79,11 +78,10 @@ public final class ModelInfo<T,U> implements AutoCloseable, Cloneable {
      * @param batchSize the batchSize to set
      * @return new configured ModelInfo.
      */
-    @SuppressWarnings("unchecked")
-    public ModelInfo<T,U> configureModelBatch(int batchSize) {
-        ModelInfo<T,U> clone;
+    public ModelInfo configureModelBatch(int batchSize) {
+        ModelInfo clone;
         try {
-            clone = (ModelInfo<T,U>) this.clone();
+            clone = (ModelInfo) this.clone();
             clone.batchSize = batchSize;
         } catch (CloneNotSupportedException e) {
             // this should never happen, cause we know we are cloneable.
@@ -100,11 +98,10 @@ public final class ModelInfo<T,U> implements AutoCloseable, Cloneable {
      * @param maxWorkers maximum amount of workers.
      * @return new configured ModelInfo.
      */
-    @SuppressWarnings("unchecked")
-    public ModelInfo<T,U> scaleWorkers(int minWorkers, int maxWorkers) {
-        ModelInfo<T,U> clone;
+    public ModelInfo scaleWorkers(int minWorkers, int maxWorkers) {
+        ModelInfo clone;
         try {
-            clone = (ModelInfo<T,U>) this.clone();
+            clone = (ModelInfo) this.clone();
             clone.minWorkers = minWorkers;
             clone.maxWorkers = maxWorkers;
         } catch (CloneNotSupportedException e) {
@@ -124,11 +121,10 @@ public final class ModelInfo<T,U> implements AutoCloseable, Cloneable {
      *     workers before giving up to offer the job to the queue.
      * @return new configured ModelInfo.
      */
-    @SuppressWarnings("unchecked")
-    public ModelInfo<T,U> configurePool(int maxIdleTime, int maxBatchDelay) {
-        ModelInfo<T,U> clone;
+    public ModelInfo configurePool(int maxIdleTime, int maxBatchDelay) {
+        ModelInfo clone;
         try {
-            clone = (ModelInfo<T,U>) this.clone();
+            clone = (ModelInfo) this.clone();
             clone.maxIdleTime = maxIdleTime;
             clone.maxBatchDelay = maxBatchDelay;
         } catch (CloneNotSupportedException e) {
@@ -143,24 +139,26 @@ public final class ModelInfo<T,U> implements AutoCloseable, Cloneable {
      *
      * @return the loaded {@link ZooModel}
      */
-    public ZooModel<T,U> getModel() {
+    public ZooModel<?, ?> getModel() {
         return model;
     }
 
     /**
      * Returns input type for this model.
+     *
      * @return the inputType expected by this model.
      */
-    public Class<T> getInputType() {
-	return inputType;
+    public Class<?> getInputType() {
+        return inputType;
     }
 
     /**
      * Returns output type for this model.
+     *
      * @return the outputType produced by this model.
      */
-    public Class<U> getOutputType() {
-	return outputType;
+    public Class<?> getOutputType() {
+        return outputType;
     }
 
     /**

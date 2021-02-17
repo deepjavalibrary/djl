@@ -14,8 +14,6 @@ package ai.djl.serving.wlm;
 
 import ai.djl.Application;
 import ai.djl.ModelException;
-import ai.djl.modality.Input;
-import ai.djl.modality.Output;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.Criteria.Builder;
 import ai.djl.repository.zoo.ModelNotFoundException;
@@ -76,43 +74,45 @@ public final class ModelManager {
      * Registers and loads a model.
      *
      * @param modelName the name of the model for HTTP endpoint
+     * @param inputType java-type of the expected input data.
+     * @param outputType java-type of produced output
+     * @param application optional application
+     * @param filters map with additional filter-criteria
      * @param modelUrl the model url
      * @param batchSize the batch size
      * @param maxBatchDelay the maximum delay for batching
      * @param maxIdleTime the maximum idle time of the worker threads before scaling down.
      * @return a {@code CompletableFuture} instance
      */
-    public <T,U> CompletableFuture<ModelInfo> registerModel(
+    public CompletableFuture<ModelInfo> registerModel(
             final String modelName,
-            Class<T> inputType,
-            Class<U> outputType,
+            Class<?> inputType,
+            Class<?> outputType,
             String application,
-            Map<String,String> filters,
+            Map<String, String> filters,
             final String modelUrl,
             final int batchSize,
             final int maxBatchDelay,
             final int maxIdleTime) {
-	
-	Builder<T,U> criteriaBuilder=Criteria.builder()
-                .setTypes(inputType, outputType);
-	if (modelUrl!=null) {
-	    criteriaBuilder.optModelUrls(modelUrl);
-	}
-	if (application!=null && !application.isEmpty()) {
-	    criteriaBuilder.optApplication(Application.of(application));
-	}
-	if (filters!=null && !filters.isEmpty()) {
-	    criteriaBuilder.optFilters(filters);
-	}
-	
-        Criteria<T, U> criteria = criteriaBuilder.build();
-	
-	
+
+        Builder<?, ?> criteriaBuilder = Criteria.builder().setTypes(inputType, outputType);
+        if (modelUrl != null) {
+            criteriaBuilder.optModelUrls(modelUrl);
+        }
+        if (application != null && !application.isEmpty()) {
+            criteriaBuilder.optApplication(Application.of(application));
+        }
+        if (filters != null && !filters.isEmpty()) {
+            criteriaBuilder.optFilters(filters);
+        }
+
+        Criteria<?, ?> criteria = criteriaBuilder.build();
+
         return CompletableFuture.supplyAsync(
                 () -> {
                     try {
- 
-                        ZooModel<T, U> model = ModelZoo.loadModel(criteria);
+
+                        ZooModel<?, ?> model = ModelZoo.loadModel(criteria);
                         String actualModelName;
                         if (modelName == null || modelName.isEmpty()) {
                             actualModelName = model.getName();
@@ -174,6 +174,7 @@ public final class ModelManager {
      * up/down all workers to match the parameters for the model.
      *
      * @param modelInfo the model that has been updated
+     * @return the modelInfo itself - for fluent api when used in completable futures
      */
     public ModelInfo triggerModelUpdated(ModelInfo modelInfo) {
         if (!models.containsKey(modelInfo.getModelName())) {

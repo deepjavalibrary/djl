@@ -12,7 +12,8 @@
  */
 package ai.djl.serving.http;
 
-import ai.djl.ModelException;
+import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.serving.modality.ConversionException;
 import ai.djl.serving.util.NettyUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -65,7 +66,7 @@ public abstract class HttpRequestHandler extends SimpleChannelInboundHandler<Ful
             FullHttpRequest req,
             QueryStringDecoder decoder,
             String[] segments)
-            throws Exception;
+            throws ModelNotFoundException, ConversionException;
 
     private void handleApiDescription(ChannelHandlerContext ctx) {
         NettyUtils.sendJsonResponse(ctx, "{}");

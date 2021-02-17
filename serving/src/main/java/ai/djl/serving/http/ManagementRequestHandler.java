@@ -12,7 +12,8 @@
  */
 package ai.djl.serving.http;
 
-import ai.djl.ModelException;
+import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.serving.util.ConfigManager;
 import ai.djl.serving.util.NettyUtils;
@@ -50,9 +51,9 @@ public class ManagementRequestHandler extends HttpRequestHandler {
     private static final String INPUT_TYPE__PARAMETER = "input_type";
     /** HTTP Parameter "output_type". */
     private static final String OUTPUT_TYPE_PARAMETER = "output_type";
-    /**HTTP Parameter "application". */
+    /** HTTP Parameter "application". */
     private static final String APPLICATION_PARAMETER = "application";
-    /**HTTP Parameter "filter". */
+    /** HTTP Parameter "filter". */
     private static final String FILTER_PARAMETER = "filter";
     /** HTTP Paramater "max_batch_delay". */
     private static final String MAX_BATCH_DELAY_PARAMETER = "max_batch_delay";
@@ -82,7 +83,7 @@ public class ManagementRequestHandler extends HttpRequestHandler {
             FullHttpRequest req,
             QueryStringDecoder decoder,
             String[] segments)
-            throws ModelException {
+            throws ModelNotFoundException {
         HttpMethod method = req.method();
         if (segments.length < 3) {
             if (HttpMethod.GET.equals(method)) {
@@ -147,44 +148,65 @@ public class ManagementRequestHandler extends HttpRequestHandler {
     }
 
     private void handleRegisterModel(final ChannelHandlerContext ctx, QueryStringDecoder decoder) {
-	
-	String modelUrl;
-	String modelName;
-	String application;
-	Map<String,String> filter;
-	int batchSize;
-	int maxBatchDelay;
-	int maxIdleTime;
-	int initialWorkers;
-	boolean synchronous;
-	Class<?> inputType;
-	Class<?> outputType;
-	try {
-	    ConfigManager configManager=ConfigManager.getInstance();
-	    inputType=NettyUtils.getClassParameter(decoder, INPUT_TYPE__PARAMETER, null);
-	    outputType=NettyUtils.getClassParameter(decoder, OUTPUT_TYPE_PARAMETER, null);
-	    application=NettyUtils.getParameter(decoder, APPLICATION_PARAMETER, null);
-	    filter=NettyUtils.getMapParameter(decoder, FILTER_PARAMETER, null);
-	    modelUrl = NettyUtils.getParameter(decoder, URL_PARAMETER, null);
 
-	    modelName = NettyUtils.getParameter(decoder, MODEL_NAME_PARAMETER, null);
-	    batchSize = NettyUtils.getIntParameter(decoder, BATCH_SIZE_PARAMETER, configManager.getBatchSize());
-	    maxBatchDelay = NettyUtils.getIntParameter(decoder, MAX_BATCH_DELAY_PARAMETER, configManager.getMaxBatchDelay());
-	    maxIdleTime = NettyUtils.getIntParameter(decoder, MAX_IDLE_TIME__PARAMETER, configManager.getMaxIdleTime());
-	    initialWorkers = NettyUtils.getIntParameter(decoder, INITIAL_WORKERS_PARAMETER, configManager.getDefaultWorkers());
-	    synchronous = Boolean.parseBoolean(
-	            NettyUtils.getParameter(decoder, SYNCHRONOUS_PARAMETER, "true"));
-	    if (modelName==null) {
-		throw new BadRequestException("parameter "+MODEL_NAME_PARAMETER+" is mandatory but empty in request");
-	    }
-	} catch (ClassNotFoundException e) {
-	    throw new BadRequestException("input or output type. no class with this classname found", e);
-	}
+        String modelUrl;
+        String modelName;
+        String application;
+        Map<String, String> filter;
+        int batchSize;
+        int maxBatchDelay;
+        int maxIdleTime;
+        int initialWorkers;
+        boolean synchronous;
+        Class<?> inputType;
+        Class<?> outputType;
+        try {
+            ConfigManager configManager = ConfigManager.getInstance();
+            inputType = NettyUtils.getClassParameter(decoder, INPUT_TYPE__PARAMETER, Input.class);
+            outputType = NettyUtils.getClassParameter(decoder, OUTPUT_TYPE_PARAMETER, Output.class);
+            application = NettyUtils.getParameter(decoder, APPLICATION_PARAMETER, null);
+            filter = NettyUtils.getMapParameter(decoder, FILTER_PARAMETER, null);
+            modelUrl = NettyUtils.getParameter(decoder, URL_PARAMETER, null);
+
+            modelName = NettyUtils.getParameter(decoder, MODEL_NAME_PARAMETER, null);
+            batchSize =
+                    NettyUtils.getIntParameter(
+                            decoder, BATCH_SIZE_PARAMETER, configManager.getBatchSize());
+            maxBatchDelay =
+                    NettyUtils.getIntParameter(
+                            decoder, MAX_BATCH_DELAY_PARAMETER, configManager.getMaxBatchDelay());
+            maxIdleTime =
+                    NettyUtils.getIntParameter(
+                            decoder, MAX_IDLE_TIME__PARAMETER, configManager.getMaxIdleTime());
+            initialWorkers =
+                    NettyUtils.getIntParameter(
+                            decoder, INITIAL_WORKERS_PARAMETER, configManager.getDefaultWorkers());
+            synchronous =
+                    Boolean.parseBoolean(
+                            NettyUtils.getParameter(decoder, SYNCHRONOUS_PARAMETER, "true"));
+            if (modelName == null) {
+                throw new BadRequestException(
+                        "parameter "
+                                + MODEL_NAME_PARAMETER
+                                + " is mandatory but empty in request.");
+            }
+        } catch (ClassNotFoundException e) {
+            throw new BadRequestException(
+                    "input or output type. no class with this classname found", e);
+        }
 
         final ModelManager modelManager = ModelManager.getInstance();
         CompletableFuture<ModelInfo> future =
                 modelManager.registerModel(
-                        modelName,inputType ,outputType, application,filter, modelUrl, batchSize, maxBatchDelay, maxIdleTime);
+                        modelName,
+                        inputType,
+                        outputType,
+                        application,
+                        filter,
+                        modelUrl,
+                        batchSize,
+                        maxBatchDelay,
+                        maxIdleTime);
         CompletableFuture<Void> f =
                 future.thenAccept(
                         modelInfo ->
@@ -193,11 +215,9 @@ public class ManagementRequestHandler extends HttpRequestHandler {
                                                 .scaleWorkers(initialWorkers, initialWorkers)
                                                 .configurePool(maxIdleTime, maxBatchDelay)
                                                 .configureModelBatch(batchSize)));
-        		
-               
 
         if (synchronous) {
-            
+
             final String msg = "Model \"" + modelName + "\" registered.";
             f = f.thenAccept(m -> NettyUtils.sendJsonResponse(ctx, new StatusResponse(msg)));
         } else {

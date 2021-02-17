@@ -12,11 +12,8 @@
  */
 package ai.djl.serving.http;
 
-import ai.djl.ModelException;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
-import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.ImageFactory;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.serving.modality.ConversionException;
 import ai.djl.serving.modality.InputTypeConverter;
@@ -26,7 +23,6 @@ import ai.djl.serving.wlm.Job;
 import ai.djl.serving.wlm.ModelInfo;
 import ai.djl.serving.wlm.ModelManager;
 import ai.djl.util.JsonUtils;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -37,8 +33,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -53,7 +47,7 @@ public class InferenceRequestHandler extends HttpRequestHandler {
     private static final Logger logger = LoggerFactory.getLogger(InferenceRequestHandler.class);
 
     private RequestParser requestParser;
-    
+
     private InputTypeConverter inputTypeConverter;
 
     private static final Pattern PATTERN =
@@ -62,7 +56,7 @@ public class InferenceRequestHandler extends HttpRequestHandler {
     /** default constructor. */
     public InferenceRequestHandler() {
         this.requestParser = new RequestParser();
-        this.inputTypeConverter =  new InputTypeConverter();
+        this.inputTypeConverter = new InputTypeConverter();
     }
 
     /** {@inheritDoc} */
@@ -75,15 +69,14 @@ public class InferenceRequestHandler extends HttpRequestHandler {
         return false;
     }
 
-    /** {@inheritDoc} 
-     *  */
+    /** {@inheritDoc} */
     @Override
     protected void handleRequest(
             ChannelHandlerContext ctx,
             FullHttpRequest req,
             QueryStringDecoder decoder,
             String[] segments)
-            throws Exception {
+            throws ModelNotFoundException, ConversionException {
         switch (segments[1]) {
             case "ping":
                 // TODO: Check if its OK to send other 2xx errors to ALB for "Partial Healthy"
@@ -146,7 +139,6 @@ public class InferenceRequestHandler extends HttpRequestHandler {
         predict(ctx, req, input, modelName);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     private void predict(
             ChannelHandlerContext ctx, FullHttpRequest req, Input input, String modelName)
             throws ModelNotFoundException, ConversionException {
@@ -170,7 +162,8 @@ public class InferenceRequestHandler extends HttpRequestHandler {
             }
 
             logger.info("Loading model {} from: {}", modelName, modelUrl);
-            //TODO check if this auto registration still makes sense, cause we don't know the Input/Output Types nor if which application we expect 
+            // TODO check if this auto registration still makes sense, cause we don't know the
+            // Input/Output Types nor if which application we expect
             modelManager
                     .registerModel(
                             modelName,
@@ -186,7 +179,12 @@ public class InferenceRequestHandler extends HttpRequestHandler {
                     .thenAccept(
                             p -> {
                                 try {
-                                    if (!modelManager.addJob(new Job(modelName, input,defaultJobCallback(ctx),defaultJobErrorCallback(ctx)))) {
+                                    if (!modelManager.addJob(
+                                            new Job(
+                                                    modelName,
+                                                    input,
+                                                    defaultJobCallback(ctx),
+                                                    defaultJobErrorCallback(ctx)))) {
                                         throw new ServiceUnavailableException(
                                                 "No worker is available to serve request: "
                                                         + modelName);
@@ -210,50 +208,51 @@ public class InferenceRequestHandler extends HttpRequestHandler {
             return;
         }
 
-        
-        Object inputData=inputTypeConverter.convertToInputData(model,input);
-        @SuppressWarnings("unchecked")
-	Job<?,?> job = new Job(modelName, inputData,defaultJobCallback(ctx),defaultJobErrorCallback(ctx));
+        Object inputData = inputTypeConverter.convertToInputData(model, input);
+        Job job =
+                new Job(
+                        modelName,
+                        inputData,
+                        defaultJobCallback(ctx),
+                        defaultJobErrorCallback(ctx));
         if (!ModelManager.getInstance().addJob(job)) {
             logger.error("unable to process prediction. no free worker available.");
             throw new ServiceUnavailableException(
                     "No worker is available to serve request: " + modelName);
         }
     }
-    
 
+    private Consumer<Object> defaultJobCallback(ChannelHandlerContext ctx) {
+        return (output) -> {
+            FullHttpResponse response =
+                    new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, false);
 
-    private Consumer<?> defaultJobCallback(ChannelHandlerContext ctx) {
-	return (output) -> {
-	           FullHttpResponse response =
-	                   new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, false);
-	           
-	           if (output instanceof Output) {
-	               Output out=(Output)output;
-	               for (Map.Entry<String, String> entry : out.getProperties().entrySet()) {
-	        	   response.headers().set(entry.getKey(), entry.getValue());
-	               }
-	               response.content().writeBytes(out.getContent());
-	           } else {
-	               String serialized = JsonUtils.GSON_PRETTY.toJson(output);
-	               response.content().writeCharSequence(serialized, CharsetUtil.UTF_8);
+            if (output instanceof Output) {
+                Output out = (Output) output;
+                for (Map.Entry<String, String> entry : out.getProperties().entrySet()) {
+                    response.headers().set(entry.getKey(), entry.getValue());
+                }
+                response.content().writeBytes(out.getContent());
+            } else {
+                String serialized = JsonUtils.GSON_PRETTY.toJson(output);
+                response.content().writeCharSequence(serialized, CharsetUtil.UTF_8);
 
-	               response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
-	           }
+                response.headers()
+                        .set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
+            }
 
-	           if (ctx != null) {
-	               NettyUtils.sendHttpResponse(ctx, response, true);
-	           }
-	    
-	};
+            if (ctx != null) {
+                NettyUtils.sendHttpResponse(ctx, response, true);
+            }
+        };
     }
-    
-    private BiConsumer<HttpResponseStatus,String> defaultJobErrorCallback(ChannelHandlerContext ctx) {
-	return (status,error) -> {
+
+    private BiConsumer<HttpResponseStatus, String> defaultJobErrorCallback(
+            ChannelHandlerContext ctx) {
+        return (status, error) -> {
             if (ctx != null) {
                 NettyUtils.sendError(ctx, status, new InternalServerException(error));
             }
-	};
+        };
     }
-    
 }
