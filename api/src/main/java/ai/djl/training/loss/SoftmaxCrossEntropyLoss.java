@@ -43,7 +43,7 @@ public class SoftmaxCrossEntropyLoss extends Loss {
      * @param name the name of the loss
      */
     public SoftmaxCrossEntropyLoss(String name) {
-        this(name, 1, -1, true, false);
+        this(name, 1, -1, true, true);
     }
 
     /**
