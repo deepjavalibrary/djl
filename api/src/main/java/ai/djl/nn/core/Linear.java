@@ -21,7 +21,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import ai.djl.util.Preconditions;
@@ -63,10 +62,21 @@ public class Linear extends AbstractBlock {
         // a callback, even if we do not used the callback parameter
         weight =
                 addParameter(
-                        new Parameter("weight", this, ParameterType.WEIGHT),
+                        Parameter.builder()
+                                .setName("weight")
+                                .setBlock(this)
+                                .setType(Parameter.Type.WEIGHT)
+                                .build(),
                         inputShapes -> new Shape(units, inputFeatures));
         if (builder.bias) {
-            bias = addParameter(new Parameter("bias", this, ParameterType.BIAS), new Shape(units));
+            bias =
+                    addParameter(
+                            Parameter.builder()
+                                    .setName("bias")
+                                    .setBlock(this)
+                                    .setType(Parameter.Type.BIAS)
+                                    .build(),
+                            new Shape(units));
         }
     }
 

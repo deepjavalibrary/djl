@@ -19,7 +19,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import java.io.DataInputStream;
 import java.io.IOException;
 
@@ -67,7 +66,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
         bidirectional = builder.bidirectional;
         returnState = builder.returnState;
 
-        ParameterType[] parameterTypes = {ParameterType.WEIGHT, ParameterType.BIAS};
+        Parameter.Type[] parameterTypes = {Parameter.Type.WEIGHT, Parameter.Type.BIAS};
         String[] directions = {"l"};
         if (builder.bidirectional) {
             directions = new String[] {"l", "r"};
@@ -75,12 +74,17 @@ public abstract class RecurrentBlock extends AbstractBlock {
         String[] gateStrings = {"i2h", "h2h"};
 
         for (int i = 0; i < numLayers; i++) {
-            for (ParameterType parameterType : parameterTypes) {
+            for (Parameter.Type parameterType : parameterTypes) {
                 for (String direction : directions) {
                     for (String gateString : gateStrings) {
                         String name =
                                 direction + '_' + i + '_' + gateString + '_' + parameterType.name();
-                        addParameter(new Parameter(name, this, parameterType));
+                        addParameter(
+                                Parameter.builder()
+                                        .setName(name)
+                                        .setBlock(this)
+                                        .setType(parameterType)
+                                        .build());
                     }
                 }
             }

@@ -20,7 +20,6 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
@@ -44,7 +43,14 @@ public class Prelu extends AbstractBlock {
     /** Creates a Parametric ReLU Block. */
     public Prelu() {
         super(VERSION);
-        alpha = addParameter(new Parameter("alpha", this, ParameterType.OTHER), new Shape());
+        alpha =
+                addParameter(
+                        Parameter.builder()
+                                .setName("alpha")
+                                .setBlock(this)
+                                .setType(Parameter.Type.OTHER)
+                                .build(),
+                        new Shape());
     }
 
     /** {@inheritDoc} */

@@ -21,7 +21,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
@@ -314,25 +313,31 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
 
         Set<String> auxNameSet = new HashSet<>(Arrays.asList(symbol.getAuxNames()));
         for (String name : allNames) {
-            ParameterType type = inferType(name);
+            Parameter.Type type = inferType(name);
             boolean requireGrad = !auxNameSet.contains(name);
-            mxNetParams.add(new Parameter(name, this, type, requireGrad));
+            mxNetParams.add(
+                    Parameter.builder()
+                            .setName(name)
+                            .setBlock(this)
+                            .setType(type)
+                            .optRequiresGrad(requireGrad)
+                            .build());
         }
         first = true;
     }
 
-    private static ParameterType inferType(String name) {
+    private static Parameter.Type inferType(String name) {
         if (name.endsWith("bias")) {
-            return ParameterType.BIAS;
+            return Parameter.Type.BIAS;
         } else if (name.endsWith("gamma")) {
-            return ParameterType.GAMMA;
+            return Parameter.Type.GAMMA;
         } else if (name.endsWith("beta")) {
-            return ParameterType.BETA;
+            return Parameter.Type.BETA;
         } else if (name.endsWith("moving_mean") || name.endsWith("running_mean")) {
-            return ParameterType.RUNNING_MEAN;
+            return Parameter.Type.RUNNING_MEAN;
         } else if (name.endsWith("moving_var") || name.endsWith("running_var")) {
-            return ParameterType.RUNNING_VAR;
+            return Parameter.Type.RUNNING_VAR;
         }
-        return ParameterType.OTHER;
+        return Parameter.Type.OTHER;
     }
 }

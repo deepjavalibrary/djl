@@ -21,7 +21,6 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
@@ -91,20 +90,40 @@ public class BatchNorm extends AbstractBlock {
         // make gamma trainable if scale
         gamma =
                 addParameter(
-                        new Parameter("gamma", this, ParameterType.GAMMA, scale),
+                        Parameter.builder()
+                                .setName("gamma")
+                                .setBlock(this)
+                                .setType(Parameter.Type.GAMMA)
+                                .optRequiresGrad(scale)
+                                .build(),
                         (inputShapes) -> new Shape(inChannels));
         // make beta trainable if center
         beta =
                 addParameter(
-                        new Parameter("beta", this, ParameterType.BETA, center),
+                        Parameter.builder()
+                                .setName("beta")
+                                .setBlock(this)
+                                .setType(Parameter.Type.BETA)
+                                .optRequiresGrad(center)
+                                .build(),
                         (inputShapes) -> new Shape(inChannels));
         runningMean =
                 addParameter(
-                        new Parameter("runningMean", this, ParameterType.RUNNING_MEAN, false),
+                        Parameter.builder()
+                                .setName("runningMean")
+                                .setBlock(this)
+                                .setType(Parameter.Type.RUNNING_MEAN)
+                                .optRequiresGrad(false)
+                                .build(),
                         (inputShapes) -> new Shape(inChannels));
         runningVar =
                 addParameter(
-                        new Parameter("runningVar", this, ParameterType.RUNNING_VAR, false),
+                        Parameter.builder()
+                                .setName("runningVar")
+                                .setBlock(this)
+                                .setType(Parameter.Type.RUNNING_VAR)
+                                .optRequiresGrad(false)
+                                .build(),
                         (inputShapes) -> new Shape(inChannels));
     }
 

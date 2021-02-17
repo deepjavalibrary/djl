@@ -23,7 +23,6 @@ import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
@@ -56,7 +55,13 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
         sparseFormat = baseBuilder.sparseFormat;
         embedding =
                 addParameter(
-                        new Parameter("embedding", this, ParameterType.WEIGHT, true, sparseFormat),
+                        Parameter.builder()
+                                .setName("embedding")
+                                .setBlock(this)
+                                .setType(Parameter.Type.WEIGHT)
+                                .optRequiresGrad(true)
+                                .optGradientFormat(sparseFormat)
+                                .build(),
                         (inputShapes) -> new Shape(numEmbeddings, embeddingSize));
         if (baseBuilder.fallthrough != null && baseBuilder.defaultItem != null) {
             throw new IllegalArgumentException(
@@ -93,7 +98,13 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
         this.sparseFormat = format;
         this.embedding =
                 addParameter(
-                        new Parameter("embedding", this, ParameterType.WEIGHT, true, sparseFormat),
+                        Parameter.builder()
+                                .setName("embedding")
+                                .setBlock(this)
+                                .setType(Parameter.Type.WEIGHT)
+                                .optRequiresGrad(true)
+                                .optGradientFormat(sparseFormat)
+                                .build(),
                         (inputShapes) -> new Shape(numEmbeddings, embeddingSize));
         this.embedding.setArray(embedding);
         inputShapes = new Shape[] {new Shape(-1)};

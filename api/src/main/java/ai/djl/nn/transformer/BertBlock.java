@@ -22,7 +22,6 @@ import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.norm.Dropout;
@@ -77,7 +76,11 @@ public final class BertBlock extends AbstractBlock {
         // embedding for the position
         this.positionEmebdding =
                 addParameter(
-                        new Parameter(PARAM_POSITION_EMBEDDING, this, ParameterType.WEIGHT),
+                        Parameter.builder()
+                                .setName(PARAM_POSITION_EMBEDDING)
+                                .setBlock(this)
+                                .setType(Parameter.Type.WEIGHT)
+                                .build(),
                         new Shape(builder.maxSequenceLength, builder.embeddingSize));
         // embedding for the input types
         this.typeEmbedding =
