@@ -25,7 +25,6 @@ import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
@@ -60,12 +59,14 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
         dataType = baseBuilder.dataType;
         embedding =
                 addParameter(
-                        new Parameter(
-                                "embedding",
-                                this,
-                                ParameterType.WEIGHT,
-                                true,
-                                sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE),
+                        Parameter.builder()
+                                .setName("embedding")
+                                .setBlock(this)
+                                .setType(Parameter.Type.WEIGHT)
+                                .optRequiresGrad(true)
+                                .optGradientFormat(
+                                        sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE)
+                                .build(),
                         (inputShapes) -> new Shape(numItems, embeddingSize));
         if (baseBuilder.fallthrough != null && baseBuilder.defaultItem != null) {
             throw new IllegalArgumentException(
@@ -103,12 +104,14 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
         dataType = embedding.getDataType();
         this.embedding =
                 addParameter(
-                        new Parameter(
-                                "embedding",
-                                this,
-                                ParameterType.WEIGHT,
-                                true,
-                                sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE),
+                        Parameter.builder()
+                                .setName("embedding")
+                                .setBlock(this)
+                                .setType(Parameter.Type.WEIGHT)
+                                .optRequiresGrad(true)
+                                .optGradientFormat(
+                                        sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE)
+                                .build(),
                         (inputShapes) -> new Shape(numItems, embeddingSize));
         this.embedding.setArray(embedding);
         numItems = Math.toIntExact(embedding.getShape().size(0));

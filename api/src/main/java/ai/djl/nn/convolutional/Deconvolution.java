@@ -22,7 +22,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
@@ -78,13 +77,22 @@ public abstract class Deconvolution extends AbstractBlock {
 
         weight =
                 addParameter(
-                        new Parameter("weight", this, ParameterType.WEIGHT),
+                        Parameter.builder()
+                                .setName("weight")
+                                .setBlock(this)
+                                .setType(Parameter.Type.WEIGHT)
+                                .build(),
                         (inputShapes) ->
                                 new Shape(filters, inputShapes[0].get(1)).addAll(kernelShape));
         if (includeBias) {
             bias =
                     addParameter(
-                            new Parameter("bias", this, ParameterType.BIAS), new Shape(filters));
+                            Parameter.builder()
+                                    .setName("bias")
+                                    .setBlock(this)
+                                    .setType(Parameter.Type.BIAS)
+                                    .build(),
+                            new Shape(filters));
         }
     }
 
