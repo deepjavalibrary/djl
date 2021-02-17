@@ -473,7 +473,7 @@ public class BlockCoreTest {
                     Assertions.assertAlmostEquals(result.size(), 2);
                     NDArray lossValue =
                             loss.evaluate(new NDList(labels), new NDList(result.head()));
-                    Assertions.assertAlmostEquals(lossValue.getFloat(), -18);
+                    Assertions.assertAlmostEquals(lossValue.getFloat(), 24.9533);
                     testEncode(manager, block);
                 }
             }
@@ -521,7 +521,9 @@ public class BlockCoreTest {
                     Assertions.assertAlmostEquals(result.size(), 2);
                     NDArray lossValue =
                             loss.evaluate(new NDList(labels), new NDList(result.head()));
-                    Assertions.assertAlmostEquals(lossValue.getFloat(), -908);
+                    // loss should be the same as testRNNTanh because outputs are equal for each
+                    // class
+                    Assertions.assertAlmostEquals(lossValue.getFloat(), 24.9533);
                     testEncode(manager, block);
                 }
             }
@@ -571,7 +573,7 @@ public class BlockCoreTest {
                     Assertions.assertAlmostEquals(result.size(), 3);
                     NDArray lossValue =
                             loss.evaluate(new NDList(labels), new NDList(result.head()));
-                    Assertions.assertAlmostEquals(lossValue.getFloat(), -16.340019);
+                    Assertions.assertAlmostEquals(lossValue.getFloat(), 24.9533);
                     testEncode(manager, block);
                 }
             }
@@ -628,7 +630,7 @@ public class BlockCoreTest {
                     Assertions.assertAlmostEquals(result.size(), 1);
                     NDArray lossValue =
                             loss.evaluate(new NDList(labels), new NDList(result.head()));
-                    Assertions.assertAlmostEquals(lossValue.getFloat(), -8.17537307E-4);
+                    Assertions.assertAlmostEquals(lossValue.getFloat(), 24.9533);
                     testEncode(manager, block);
                 }
             }
