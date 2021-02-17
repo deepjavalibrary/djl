@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
  * contain methods to detect information about the usable machine hardware and to create a new
  * {@link NDManager} and {@link Model}.
  *
+ * @see <a href="http://docs.djl.ai/docs/engine.html">Engine Guide</a>
  * @see EngineProvider
  */
 public abstract class Engine {

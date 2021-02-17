@@ -63,6 +63,7 @@ nav:
     - 'jupyter/rank_classification_using_BERT_on_Amazon_Review.ipynb'
     - 'jupyter/transfer_learning_on_cifar10.ipynb'
   - Guides:
+      - 'docs/engine.md'
       - Models:
           - 'docs/load_model.md'
           - 'docs/model-zoo.md'
