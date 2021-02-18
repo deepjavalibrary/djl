@@ -44,15 +44,21 @@ public abstract class ModelCriteriaParser<T> {
     public Criteria<?, ?> of(T input) {
         Parameters params = parseInput(input);
         Builder<?, ?> criteriaBuilder =
-                Criteria.builder().setTypes(params.inputType, params.outputType);
-        if (params.modelUrl != null) {
-            criteriaBuilder.optModelUrls(params.modelUrl);
+                Criteria.builder().setTypes(params.getInputType(), params.getOutputType());
+        if (params.getModelUrl() != null) {
+            criteriaBuilder.optModelUrls(params.getModelUrl());
         }
-        if (params.application != null) {
-            criteriaBuilder.optApplication(params.application);
+        if (params.getApplication() != null) {
+            criteriaBuilder.optApplication(params.getApplication());
         }
-        if (params.filters != null && !params.filters.isEmpty()) {
-            criteriaBuilder.optFilters(params.filters);
+        if (params.getFilters() != null && !params.getFilters().isEmpty()) {
+            criteriaBuilder.optFilters(params.getFilters());
+        }
+        if (params.getArtifactId() != null) {
+            criteriaBuilder.optArtifactId(params.getArtifactId());
+        }
+        if (params.getGroupId() != null) {
+            criteriaBuilder.optGroupId(params.getGroupId());
         }
 
         return criteriaBuilder.build();
@@ -65,6 +71,8 @@ public abstract class ModelCriteriaParser<T> {
         protected Application application;
         protected Map<String, String> filters;
         protected String modelUrl;
+        protected String artifactId;
+        protected String groupId;
 
         /** constructs parameters object. */
         public Parameters() {}
@@ -153,6 +161,38 @@ public abstract class ModelCriteriaParser<T> {
          */
         public void setModelUrl(String modelUrl) {
             this.modelUrl = modelUrl;
+        }
+        /**
+         * gets the value of artifactId.
+         *
+         * @return the artifactId value.
+         */
+        public String getArtifactId() {
+            return artifactId;
+        }
+        /**
+         * set the value of artifactId.
+         *
+         * @param artifactId the artifactId to set
+         */
+        public void setArtifactId(String artifactId) {
+            this.artifactId = artifactId;
+        }
+        /**
+         * gets the value of groupId.
+         *
+         * @return the groupId value.
+         */
+        public String getGroupId() {
+            return groupId;
+        }
+        /**
+         * set the value of groupId.
+         *
+         * @param groupId the groupId to set
+         */
+        public void setGroupId(String groupId) {
+            this.groupId = groupId;
         }
     }
 }
