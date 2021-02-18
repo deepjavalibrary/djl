@@ -124,6 +124,7 @@ public class DlrNDArray implements NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
+        data.rewind();
         return data;
     }
 

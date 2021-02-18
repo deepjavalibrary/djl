@@ -165,6 +165,7 @@ public class TfLiteNDArray implements NDArrayAdapter {
         if (data == null) {
             data = tensor.buffer();
         }
+        data.rewind();
         return data;
     }
 
