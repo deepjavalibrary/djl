@@ -22,6 +22,8 @@ import ai.djl.pytorch.engine.PtDeviceType;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.pytorch.engine.PtSymbolBlock;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
@@ -43,6 +45,8 @@ public final class JniUtils {
     private static Set<String> configs;
 
     private static final int NULL_PTR = 0;
+
+    private static final byte[] BUFFER = new byte[4194304]; // preserved buffer
 
     private JniUtils() {}
 
@@ -1372,6 +1376,34 @@ public final class JniUtils {
                         extraFileKeys,
                         extraFileValues);
         return new PtSymbolBlock(manager, handle);
+    }
+
+    public static PtSymbolBlock loadModule(PtNDManager manager, InputStream is, Device device) {
+        long handle =
+                PyTorchLibrary.LIB.moduleLoad(
+                        is,
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
+                        BUFFER);
+        return new PtSymbolBlock(manager, handle);
+    }
+
+    public static void writeModule(PtSymbolBlock block, OutputStream os) {
+        PyTorchLibrary.LIB.moduleWrite(block.getHandle(), os, BUFFER);
+    }
+
+    public static NDList moduleGetParams(PtSymbolBlock block, PtNDManager manager) {
+        long[] handles = PyTorchLibrary.LIB.moduleGetParams(block.getHandle());
+        String[] names = PyTorchLibrary.LIB.moduleGetParamNames(block.getHandle());
+        NDList list = new NDList(handles.length);
+        for (int i = 0; i < handles.length; i++) {
+            PtNDArray array = new PtNDArray(manager, handles[i]);
+            array.setName(names[i]);
+            list.add(array);
+        }
+        return list;
     }
 
     public static void enableInferenceMode(PtSymbolBlock block) {
