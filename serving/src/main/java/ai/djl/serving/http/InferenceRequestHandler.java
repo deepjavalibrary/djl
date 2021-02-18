@@ -14,7 +14,9 @@ package ai.djl.serving.http;
 
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.serving.loading.URLOnlyModelCriteriaParser;
 import ai.djl.serving.modality.ConversionException;
 import ai.djl.serving.modality.InputTypeConverter;
 import ai.djl.serving.util.ConfigManager;
@@ -164,14 +166,13 @@ public class InferenceRequestHandler extends HttpRequestHandler {
             logger.info("Loading model {} from: {}", modelName, modelUrl);
             // TODO check if this auto registration still makes sense, cause we don't know the
             // Input/Output Types nor if which application we expect
+            URLOnlyModelCriteriaParser criteriaParser = new URLOnlyModelCriteriaParser();
+            Criteria<?, ?> criteria = criteriaParser.of(modelUrl);
+
             modelManager
                     .registerModel(
                             modelName,
-                            Input.class,
-                            Output.class,
-                            null,
-                            null,
-                            modelUrl,
+                            criteria,
                             ConfigManager.getInstance().getBatchSize(),
                             ConfigManager.getInstance().getMaxBatchDelay(),
                             ConfigManager.getInstance().getMaxIdleTime())

@@ -10,16 +10,5 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.serving.wlm;
-
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
-public class ModelInfoTest {
-
-    @Test
-    public void testQueueSizeIsSet() {
-        ModelInfo modelInfo = new ModelInfo("", Object.class, Object.class, null, 4711, 1, 300, 1);
-        Assert.assertEquals(4711, modelInfo.getQueueSize());
-    }
-}
+/** Contains model loading related implementations for a model server implementation. */
+package ai.djl.serving.loading;

@@ -31,9 +31,8 @@ public class InputTypeConverterTest {
             throws ConversionException, IOException, URISyntaxException {
 
         InputTypeConverter converter = new InputTypeConverter();
-
         ModelInfo modelInfo =
-                new ModelInfo("testModel", Image.class, Object.class, null, null, 0, 0, 0, 0);
+                new ModelInfo("testModel", Image.class, Object.class, null, 0, 0, 0, 0);
         Input input = new Input("unittest-testInputToImageConversion");
         Path path = Paths.get(ClassLoader.getSystemResource("0.png").toURI());
         byte[] raw = java.nio.file.Files.readAllBytes(path);
@@ -50,8 +49,7 @@ public class InputTypeConverterTest {
 
         InputTypeConverter converter = new InputTypeConverter();
 
-        ModelInfo modelInfo =
-                new ModelInfo("testModel", null, Object.class, null, null, 0, 0, 0, 0);
+        ModelInfo modelInfo = new ModelInfo("testModel", null, Object.class, null, 0, 0, 0, 0);
         Input input = new Input("unittest-testInputToImageConversion");
 
         Input out = (Input) converter.convertToInputData(modelInfo, input);

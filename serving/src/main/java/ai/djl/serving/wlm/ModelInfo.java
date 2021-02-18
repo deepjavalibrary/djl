@@ -23,7 +23,6 @@ public final class ModelInfo implements AutoCloseable, Cloneable {
     private static final Logger logger = LoggerFactory.getLogger(ModelInfo.class);
 
     private String modelName;
-    private String modelUrl;
 
     private int minWorkers;
     private int maxWorkers;
@@ -43,7 +42,6 @@ public final class ModelInfo implements AutoCloseable, Cloneable {
      * @param modelName the name of the model that will be used as HTTP endpoint
      * @param inputType type of the expected input.
      * @param outputType type of the produced output.
-     * @param modelUrl the model url
      * @param model the {@link ZooModel}
      * @param queueSize the maximum request queue size
      * @param maxIdleTime the initial maximum idle time for workers.
@@ -54,14 +52,12 @@ public final class ModelInfo implements AutoCloseable, Cloneable {
             String modelName,
             Class<?> inputType,
             Class<?> outputType,
-            String modelUrl,
             ZooModel<?, ?> model,
             int queueSize,
             int maxIdleTime,
             int maxBatchDelay,
             int batchSize) {
         this.modelName = modelName;
-        this.modelUrl = modelUrl;
         this.model = model;
         this.maxBatchDelay = maxBatchDelay;
         this.maxIdleTime = maxIdleTime; // default max idle time 60s
@@ -176,7 +172,7 @@ public final class ModelInfo implements AutoCloseable, Cloneable {
      * @return the model url
      */
     public String getModelUrl() {
-        return modelUrl;
+        return model.getModelPath().toString();
     }
 
     /**

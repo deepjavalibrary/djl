@@ -12,9 +12,9 @@
  */
 package ai.djl.serving;
 
-import ai.djl.modality.Input;
-import ai.djl.modality.Output;
 import ai.djl.repository.FilenameUtils;
+import ai.djl.repository.zoo.Criteria;
+import ai.djl.serving.loading.URLOnlyModelCriteriaParser;
 import ai.djl.serving.util.ConfigManager;
 import ai.djl.serving.util.Connector;
 import ai.djl.serving.util.ServerGroups;
@@ -300,14 +300,12 @@ public class ModelServer {
         for (String url : urls) {
             logger.info("Initializing model: {}", url);
             int workers = configManager.getDefaultWorkers();
+            URLOnlyModelCriteriaParser criteriaParser = new URLOnlyModelCriteriaParser();
+            Criteria<?, ?> criteria = criteriaParser.of(url);
             CompletableFuture<ModelInfo> future =
                     modelManager.registerModel(
                             null,
-                            Input.class,
-                            Output.class,
-                            null,
-                            null,
-                            url,
+                            criteria,
                             configManager.getBatchSize(),
                             configManager.getMaxBatchDelay(),
                             configManager.getMaxIdleTime());

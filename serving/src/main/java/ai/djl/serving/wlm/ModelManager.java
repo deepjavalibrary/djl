@@ -12,10 +12,8 @@
  */
 package ai.djl.serving.wlm;
 
-import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.Criteria.Builder;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
@@ -74,11 +72,7 @@ public final class ModelManager {
      * Registers and loads a model.
      *
      * @param modelName the name of the model for HTTP endpoint
-     * @param inputType java-type of the expected input data.
-     * @param outputType java-type of produced output
-     * @param application optional application
-     * @param filters map with additional filter-criteria
-     * @param modelUrl the model url
+     * @param criteria modelzoo criteria to lookup the model.
      * @param batchSize the batch size
      * @param maxBatchDelay the maximum delay for batching
      * @param maxIdleTime the maximum idle time of the worker threads before scaling down.
@@ -86,27 +80,10 @@ public final class ModelManager {
      */
     public CompletableFuture<ModelInfo> registerModel(
             final String modelName,
-            Class<?> inputType,
-            Class<?> outputType,
-            String application,
-            Map<String, String> filters,
-            final String modelUrl,
+            Criteria<?, ?> criteria,
             final int batchSize,
             final int maxBatchDelay,
             final int maxIdleTime) {
-
-        Builder<?, ?> criteriaBuilder = Criteria.builder().setTypes(inputType, outputType);
-        if (modelUrl != null) {
-            criteriaBuilder.optModelUrls(modelUrl);
-        }
-        if (application != null && !application.isEmpty()) {
-            criteriaBuilder.optApplication(Application.of(application));
-        }
-        if (filters != null && !filters.isEmpty()) {
-            criteriaBuilder.optFilters(filters);
-        }
-
-        Criteria<?, ?> criteria = criteriaBuilder.build();
 
         return CompletableFuture.supplyAsync(
                 () -> {
@@ -124,9 +101,8 @@ public final class ModelManager {
                         ModelInfo modelInfo =
                                 new ModelInfo(
                                         actualModelName,
-                                        inputType,
-                                        outputType,
-                                        modelUrl,
+                                        criteria.getInputClass(),
+                                        criteria.getOutputClass(),
                                         model,
                                         configManager.getJobQueueSize(),
                                         maxIdleTime,
