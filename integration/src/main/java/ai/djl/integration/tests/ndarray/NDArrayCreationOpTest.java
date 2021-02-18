@@ -114,15 +114,20 @@ public class NDArrayCreationOpTest {
     public void testCreateNDArrayAndConvertToSparse() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray nd = manager.ones(new Shape(3, 5));
-            NDArray sparse;
-            if ("MXNet".equals(Engine.getInstance().getEngineName())) {
-                sparse = nd.toSparse(SparseFormat.CSR);
+            try {
+                // Only MXNet support CSR
+                NDArray sparse = nd.toSparse(SparseFormat.CSR);
                 Assert.assertSame(sparse.getSparseFormat(), SparseFormat.CSR);
-            } else if ("PyTorch".equals(Engine.getInstance().getEngineName())) {
-                sparse = nd.toSparse(SparseFormat.COO);
-                Assert.assertSame(sparse.getSparseFormat(), SparseFormat.COO);
+            } catch (UnsupportedOperationException ignore) {
+                // ignore
             }
-            throw new UnsupportedOperationException("Engine not supported");
+            try {
+                // Only PyTorch support COO
+                NDArray sparse = nd.toSparse(SparseFormat.COO);
+                Assert.assertSame(sparse.getSparseFormat(), SparseFormat.COO);
+            } catch (UnsupportedOperationException ignore) {
+                // ignore
+            }
         }
     }
 

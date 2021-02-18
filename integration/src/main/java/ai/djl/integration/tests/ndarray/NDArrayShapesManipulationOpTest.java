@@ -12,7 +12,6 @@
  */
 package ai.djl.integration.tests.ndarray;
 
-import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -80,22 +79,22 @@ public class NDArrayShapesManipulationOpTest {
             NDArray expected =
                     manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(2, 1, 1, 3));
             Assertions.assertAlmostEquals(array.reshape(2, 1, 1, 3), expected);
-            // only MXNet, PyTorch and TensorFlow support -1
-            if (TestUtils.isEngine("MXNet")
-                    && TestUtils.isEngine("PyTorch")
-                    && TestUtils.isEngine("TensorFlow")) {
+            try {
+                // only MXNet, PyTorch and TensorFlow support -1
                 Assertions.assertAlmostEquals(array.reshape(-1, 1, 1, 3), expected);
+            } catch (UnsupportedOperationException ignore) {
+                // ignore
             }
 
             // multi-dim
             array = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(3, 2));
             expected = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(2, 3));
             Assertions.assertAlmostEquals(array.reshape(new Shape(2, 3)), expected);
-            // only MXNet, PyTorch and TensorFlow support -1
-            if (TestUtils.isEngine("MXNet")
-                    && TestUtils.isEngine("PyTorch")
-                    && TestUtils.isEngine("TensorFlow")) {
+            try {
+                // only MXNet, PyTorch and TensorFlow support -1
                 Assertions.assertAlmostEquals(array.reshape(new Shape(2, -1)), expected);
+            } catch (UnsupportedOperationException ignore) {
+                // ignore
             }
 
             // scalar
@@ -103,12 +102,13 @@ public class NDArrayShapesManipulationOpTest {
             expected = manager.create(new float[] {5f});
             Assertions.assertAlmostEquals(array.reshape(1), expected);
             expected = manager.create(new float[] {5f}, new Shape(1, 1, 1));
-            // only MXNet, PyTorch and TensorFlow support -1
-            if (TestUtils.isEngine("MXNet")
-                    && TestUtils.isEngine("PyTorch")
-                    && TestUtils.isEngine("TensorFlow")) {
+            try {
+                // only MXNet, PyTorch and TensorFlow support -1
                 Assertions.assertAlmostEquals(array.reshape(1, -1, 1), expected);
+            } catch (UnsupportedOperationException ignore) {
+                // ignore
             }
+
             // zero-dim
             array = manager.create(new Shape(1, 0));
             expected = manager.create(new Shape(2, 3, 0, 1));
