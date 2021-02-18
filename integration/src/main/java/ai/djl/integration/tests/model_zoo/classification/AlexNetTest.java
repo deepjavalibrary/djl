@@ -159,7 +159,7 @@ public class AlexNetTest {
         Shape currentShape = x.getShape();
 
         Block alexNet = AlexNet.builder().build();
-        alexNet.setInitializer(Initializer.ONES);
+        alexNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         alexNet.initialize(manager, DataType.FLOAT32, currentShape);
 
         Map<String, Shape> shapeMap = new ConcurrentHashMap<>();
@@ -188,7 +188,7 @@ public class AlexNetTest {
         Block alexNet = AlexNet.builder().build();
         int batchSize = 1;
         NDArray x = manager.ones(new Shape(batchSize, 1, 224, 224));
-        alexNet.setInitializer(Initializer.ONES);
+        alexNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         alexNet.initialize(manager, DataType.FLOAT32, x.getShape());
         NDArray xHat =
                 alexNet.forward(new ParameterStore(manager, true), new NDList(x), false)

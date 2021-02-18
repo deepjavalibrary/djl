@@ -20,7 +20,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.training.ParameterStore;
-import ai.djl.training.initializer.XavierInitializer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -97,7 +96,6 @@ public class SingleShotDetectionTest {
                             .setSizes(sizes)
                             .setBaseNetwork(block)
                             .build();
-            ssd.setInitializer(new XavierInitializer());
             ssd.initialize(manager, DataType.FLOAT32, new Shape(32, 3, 256, 256));
             ParameterStore ps = new ParameterStore(manager, false);
             NDList output =

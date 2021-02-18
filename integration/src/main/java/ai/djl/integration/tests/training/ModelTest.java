@@ -21,7 +21,6 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.testing.Assertions;
-import ai.djl.training.initializer.XavierInitializer;
 import java.io.IOException;
 import java.nio.file.Paths;
 import org.testng.Assert;
@@ -36,7 +35,6 @@ public class ModelTest {
         block.add(BatchNorm.builder().build());
         try (Model saveModel = Model.newInstance("saveModel");
                 Model loadModel = Model.newInstance("loadModel")) {
-            block.setInitializer(new XavierInitializer());
             block.initialize(saveModel.getNDManager(), DataType.FLOAT32, new Shape(1, 3, 32, 32));
             ParameterList savedParameters = block.getParameters();
             saveModel.setBlock(block);

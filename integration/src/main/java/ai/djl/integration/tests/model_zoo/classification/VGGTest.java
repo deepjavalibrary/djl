@@ -107,7 +107,7 @@ public class VGGTest {
         Shape currentShape = x.getShape();
 
         Block vgg = VGG.builder().build();
-        vgg.setInitializer(Initializer.ONES);
+        vgg.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         vgg.initialize(manager, DataType.FLOAT32, currentShape);
 
         Map<String, Shape> shapeMap = new ConcurrentHashMap<>();
@@ -137,8 +137,9 @@ public class VGGTest {
         Block vgg = VGG.builder().build();
         int batchSize = 1;
         NDArray x = manager.ones(new Shape(batchSize, 1, 224, 224));
-        vgg.setInitializer(Initializer.ONES);
+        vgg.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         vgg.initialize(manager, DataType.FLOAT32, x.getShape());
+
         NDArray xHat =
                 vgg.forward(new ParameterStore(manager, true), new NDList(x), false)
                         .singletonOrThrow();

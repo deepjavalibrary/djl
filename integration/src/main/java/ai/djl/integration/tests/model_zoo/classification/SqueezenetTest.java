@@ -40,7 +40,7 @@ public class SqueezenetTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optDevices(Device.getDevices(2))
-                        .optInitializer(Initializer.ONES);
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         Block squeezeNet = SqueezeNet.squeezenet(10);
         try (Model model = Model.newInstance("squeezenet")) {
             model.setBlock(squeezeNet);
