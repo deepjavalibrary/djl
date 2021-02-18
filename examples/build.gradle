@@ -25,10 +25,10 @@ dependencies {
         runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
     } else if (System.getProperty("ai.djl.default_engine") == "TFLite") {
         runtimeOnly project(":tflite:tflite-engine")
-        runtimeOnly project(":tflite:tflite-native")
+        runtimeOnly "ai.djl.tflite:tflite:tflite-native:${tflite_version}"
     } else if (System.getProperty("ai.djl.default_engine") == "PaddlePaddle") {
-        runtimeOnly project(":tflite:tflite-engine")
-        runtimeOnly project(":tflite:tflite-native")
+        runtimeOnly project(":paddlepaddle:paddlepaddle-model-zoo")
+        runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
     } else if (System.getProperty("ai.djl.default_engine") == "OnnxRuntime") {
         // onnxruntime requires user install libgomp.so.1 manually, exclude from default dependency
         runtimeOnly project(":onnxruntime:onnxruntime-engine")
