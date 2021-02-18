@@ -32,7 +32,7 @@ You can pull the fastText engine from the central Maven repository by including 
 <dependency>
     <groupId>ai.djl.fasttext</groupId>
     <artifactId>fasttext-engine</artifactId>
-    <version>0.9.0</version>
+    <version>0.10.0</version>
 </dependency>
 ```
 
