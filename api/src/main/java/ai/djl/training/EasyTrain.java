@@ -63,12 +63,8 @@ public final class EasyTrain {
             }
 
             // After each epoch, test against the validation dataset if we have one
-            if (validateDataset != null) {
-                for (Batch batch : trainer.iterateDataset(validateDataset)) {
-                    validateBatch(trainer, batch);
-                    batch.close();
-                }
-            }
+            evaluateDataset(trainer, validateDataset);
+
             // reset training and validation evaluators at end of epoch
             trainer.notifyListeners(listener -> listener.onEpoch(trainer));
         }
@@ -125,6 +121,7 @@ public final class EasyTrain {
         Batch[] splits = batch.split(trainer.getDevices(), false);
         BatchData batchData =
                 new BatchData(batch, new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
+
         for (Batch split : splits) {
             NDList data = trainer.getDataManager().getData(split);
             NDList labels = trainer.getDataManager().getLabels(split);
@@ -134,5 +131,24 @@ public final class EasyTrain {
         }
 
         trainer.notifyListeners(listener -> listener.onValidationBatch(trainer, batchData));
+    }
+
+    /**
+     * Evaluates the test dataset.
+     *
+     * @param trainer the trainer to evaluate on
+     * @param testDataset the test dataset to evaluate
+     * @throws IOException for various exceptions depending on the dataset
+     * @throws TranslateException if there is an error while processing input
+     */
+    public static void evaluateDataset(Trainer trainer, Dataset testDataset)
+            throws IOException, TranslateException {
+
+        if (testDataset != null) {
+            for (Batch batch : trainer.iterateDataset(testDataset)) {
+                validateBatch(trainer, batch);
+                batch.close();
+            }
+        }
     }
 }
