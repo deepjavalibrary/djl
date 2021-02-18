@@ -23,7 +23,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ubuntu-18.04, macos-latest]
+        operating-system: [ ubuntu-18.04, macos-latest ]
 
     steps:
       - uses: actions/checkout@v1
@@ -145,6 +145,7 @@ jobs:
       - name: Compile PaddlePaddle JNI
         run: ./gradlew :paddlepaddle:paddlepaddle-native:compileJNI
       - name: Integration tests
+        # MXNet integration test on Github Action fail due to memory limitation on Windows
         run: |
-          ./gradlew :paddlepaddle:paddlepaddle-engine:test :paddlepaddle:paddlepaddle-model-zoo:test
-          ./gradlew :onnxruntime:onnxruntime-engine:test
+          ./gradlew "-Dai.djl.default_engine=PyTorch" test -x examples:test
+          ./gradlew --rerun-tasks "-Dai.djl.default_engine=TensorFlow" test -x examples:test
