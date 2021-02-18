@@ -164,22 +164,22 @@ public class NDArrayCreationOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.zeros(new Shape(5));
             NDArray expected = manager.create(new float[] {0f, 0f, 0f, 0f, 0f});
-            Assert.assertEquals(array, expected);
+            Assertions.assertAlmostEquals(array, expected);
 
             // test multi-dim
             array = manager.zeros(new Shape(2, 3));
             expected = manager.create(new float[] {0f, 0f, 0f, 0f, 0f, 0f}, new Shape(2, 3));
-            Assert.assertEquals(array, expected);
+            Assertions.assertAlmostEquals(array, expected);
 
             // test scalar
             array = manager.zeros(new Shape());
             expected = manager.create(0f);
-            Assert.assertEquals(array, expected);
+            Assertions.assertAlmostEquals(array, expected);
 
             // test zero-dim
             array = manager.zeros(new Shape(0, 1));
             expected = manager.create(new Shape(0, 1));
-            Assert.assertEquals(array, expected);
+            Assertions.assertAlmostEquals(array, expected);
         }
     }
 
@@ -188,22 +188,22 @@ public class NDArrayCreationOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.ones(new Shape(5));
             NDArray expected = manager.create(new float[] {1f, 1f, 1f, 1f, 1f});
-            Assert.assertEquals(array, expected);
+            Assertions.assertAlmostEquals(array, expected);
 
             // test multi-dim
             array = manager.ones(new Shape(2, 3));
             expected = manager.create(new float[] {1f, 1f, 1f, 1f, 1f, 1f}, new Shape(2, 3));
-            Assert.assertEquals(array, expected);
+            Assertions.assertAlmostEquals(array, expected);
 
             // test scalar
             array = manager.ones(new Shape());
             expected = manager.create(1f);
-            Assert.assertEquals(array, expected);
+            Assertions.assertAlmostEquals(array, expected);
 
             // test zero-dim
             array = manager.ones(new Shape(0, 1));
             expected = manager.create(new Shape(0, 1));
-            Assert.assertEquals(array, expected);
+            Assertions.assertAlmostEquals(array, expected);
         }
     }
 
