@@ -13,6 +13,8 @@
 package ai.djl.serving.loading;
 
 import ai.djl.Application;
+import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.Criteria.Builder;
 import java.util.Map;
@@ -72,6 +74,9 @@ public abstract class ModelCriteriaParser<T> {
          * @return the inputType value.
          */
         public Class<?> getInputType() {
+            if (inputType == null) {
+                return Input.class;
+            }
             return inputType;
         }
         /**
@@ -88,6 +93,9 @@ public abstract class ModelCriteriaParser<T> {
          * @return the outputType value.
          */
         public Class<?> getOutputType() {
+            if (outputType == null) {
+                return Output.class;
+            }
             return outputType;
         }
         /**
