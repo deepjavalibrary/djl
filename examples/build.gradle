@@ -8,21 +8,30 @@ dependencies {
     implementation project(":basicdataset")
     implementation project(":model-zoo")
 
-    runtimeOnly project(":mxnet:mxnet-model-zoo")
-    runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
-    runtimeOnly project(":pytorch:pytorch-model-zoo")
-    runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
-    runtimeOnly project(":tensorflow:tensorflow-model-zoo")
-    runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
-    runtimeOnly project(":onnxruntime:onnxruntime-engine")
+    if (System.getProperty("ai.djl.default_engine") == "PyTorch") {
+        runtimeOnly project(":pytorch:pytorch-model-zoo")
+        runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
+    } else if (System.getProperty("ai.djl.default_engine") == "TensorFlow") {
+        runtimeOnly project(":tensorflow:tensorflow-model-zoo")
+        runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
+    } else {
+        runtimeOnly project(":mxnet:mxnet-model-zoo")
+        runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
+    }
 
-    // DLR and tflite are only used for benchmark
+    // DLR, tflite, PaddlePaddle and OnnxRuntime are only used for benchmark
     if (System.getProperty("ai.djl.default_engine") == "DLR") {
         runtimeOnly project(":dlr:dlr-engine")
         runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
     } else if (System.getProperty("ai.djl.default_engine") == "TFLite") {
         runtimeOnly project(":tflite:tflite-engine")
         runtimeOnly project(":tflite:tflite-native")
+    } else if (System.getProperty("ai.djl.default_engine") == "PaddlePaddle") {
+        runtimeOnly project(":tflite:tflite-engine")
+        runtimeOnly project(":tflite:tflite-native")
+    } else if (System.getProperty("ai.djl.default_engine") == "OnnxRuntime") {
+        // onnxruntime requires user install libgomp.so.1 manually, exclude from default dependency
+        runtimeOnly project(":onnxruntime:onnxruntime-engine")
     }
 
     testImplementation("org.testng:testng:${testng_version}") {
