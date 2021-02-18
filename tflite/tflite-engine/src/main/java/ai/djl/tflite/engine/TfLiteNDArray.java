@@ -165,6 +165,7 @@ public class TfLiteNDArray implements NDArrayAdapter {
         if (data == null) {
             data = tensor.buffer();
         }
+        data.rewind();
         return data;
     }
 
@@ -174,6 +175,10 @@ public class TfLiteNDArray implements NDArrayAdapter {
         if (tensor != null) {
             throw new UnsupportedOperationException("Not supported for TFLite");
         } else {
+            if (Arrays.stream(shape.getShape()).anyMatch(n -> n < 0)) {
+                throw new UnsupportedOperationException(
+                        "Negative shape is not supported for TFLite");
+            }
             return new TfLiteNDArray(manager, data, shape, dataType);
         }
     }

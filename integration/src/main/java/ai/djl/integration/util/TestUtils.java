@@ -34,6 +34,11 @@ public final class TestUtils {
         return "MXNet".equals(engine.getEngineName());
     }
 
+    public static boolean isEngine(String name) {
+        Engine engine = Engine.getInstance();
+        return name.equals(engine.getEngineName());
+    }
+
     public static void verifyNDArrayValues(
             NDArray array, Shape expectedShape, float sum, float mean, float max, float min) {
         if (array.isNaN().any().getBoolean()) {
