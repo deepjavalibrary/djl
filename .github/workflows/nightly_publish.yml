@@ -34,7 +34,7 @@ jobs:
       - name: check disk space
         run: df -h
       - name: Build with Gradle
-        run: ./gradlew -Dnightly=true build jRR
+        run: ./gradlew -Dnightly=true build jRR jRV
       - name: API test results
         uses: actions/upload-artifact@v1
         if: always()

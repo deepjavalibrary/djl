@@ -53,7 +53,7 @@ jobs:
       - name: Compile PaddlePaddle JNI
         run: ./gradlew :paddlepaddle:paddlepaddle-native:compileJNI
       - name: Build with Gradle
-        run: ./gradlew build jRR
+        run: ./gradlew build jRR jRV
       - name: API test results
         uses: actions/upload-artifact@v1
         if: always()
