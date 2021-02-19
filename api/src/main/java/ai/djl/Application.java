@@ -144,7 +144,8 @@ public class Application {
          * <p>The typical signature is Model&lt;{@link ai.djl.modality.cv.Image}, {@link
          * ai.djl.modality.cv.output.DetectedObjects}&gt;.
          *
-         * @see <a href="https://d2l.djl.ai/chapter_computer-vision/bounding-box.html">The D2L chapter on object detection</a>
+         * @see <a href="https://d2l.djl.ai/chapter_computer-vision/bounding-box.html">The D2L
+         *     chapter on object detection</a>
          */
         Application OBJECT_DETECTION = new Application("cv/object_detection");
 

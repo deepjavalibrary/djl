@@ -98,9 +98,9 @@ import java.io.IOException;
  * javadoc at {@link ai.djl.training.Trainer}. At the end of training, a block represents a
  * fully-trained model.
  *
- * @see this tutorial on <a
- *     href="https://github.com/awslabs/djl/blob/master/jupyter/tutorial/01_create_your_first_network.ipynb">creating
- *     your first network</a>
+ * @see <a
+ *     href="https://github.com/awslabs/djl/blob/master/jupyter/tutorial/01_create_your_first_network.ipynb">this
+ *     tutorial on creating your first network</a>
  * @see <a href="https://d2l.djl.ai/chapter_deep-learning-computation/model-construction.html">The
  *     D2L chapter on blocks</a> and <a
  *     href="https://d2l.djl.ai/chapter_deep-learning-computation/custom-layer.html">blocks with
