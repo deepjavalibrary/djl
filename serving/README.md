@@ -239,6 +239,8 @@ model_url	optional url to the model
 input_type	full qualified java type
 output_type full qualified java type
 application	the application example: cv/object_detection
+artifact	the artifact id of the model. can be fully qualified
+group		the group id of the model.
 filter		additional filters example:  "backbone:resnet50"
 batchSize batchsize
 max_batch_delay in milliseconds
@@ -251,9 +253,17 @@ method: POST
 
 example:
 
+-
 ```sh
 curl -X POST "http://localhost:8080/models?model_name=mlp?min_worker=4&max_worker=12&max_idle_time=60&max_batch_delay=100"
 ```
+
+
+-
+```sh
+curl -X POST "http://localhost:8080/models?model_name=yolodetection&artifact=ai.djl.mxnet:yolo&min_worker=4&max_worker=12&max_idle_time=60&max_batch_delay=100"
+```
+
 
 returns
 json 

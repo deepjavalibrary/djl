@@ -36,6 +36,10 @@ public interface HttpRequestParameters {
     public static final String OUTPUT_TYPE_PARAMETER = "output_type";
     /** HTTP Parameter "application". */
     public static final String APPLICATION_PARAMETER = "application";
+    /** HTTP Parameter "group". */
+    public static final String GROUP_PARAMETER = "group";
+    /** HTTP Parameter "artifact". */
+    public static final String ARTIFACT_PARAMETER = "artifact";
     /** HTTP Parameter "filter". */
     public static final String FILTER_PARAMETER = "filter";
     /** HTTP Paramater "max_batch_delay". */

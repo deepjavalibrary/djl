@@ -39,10 +39,15 @@ public class HttpModelCriteriaParser extends ModelCriteriaParser<QueryStringDeco
             param.setOutputType(
                     NettyUtils.getClassParameter(
                             decoder, HttpRequestParameters.OUTPUT_TYPE_PARAMETER, Output.class));
+            param.setArtifactId(
+                    NettyUtils.getParameter(
+                            decoder, HttpRequestParameters.ARTIFACT_PARAMETER, null));
+            param.setGroupId(
+                    NettyUtils.getParameter(decoder, HttpRequestParameters.GROUP_PARAMETER, null));
+
             String applicationString =
                     NettyUtils.getParameter(
                             decoder, HttpRequestParameters.APPLICATION_PARAMETER, null);
-
             if (applicationString != null && !applicationString.isEmpty()) {
                 param.setApplication(Application.of(applicationString));
             }
