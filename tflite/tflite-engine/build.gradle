@@ -2,7 +2,7 @@ group "ai.djl.tflite"
 
 dependencies {
     api project(":api")
-    api "ai.djl.tflite:tflite-native-auto:${tflite_version}-SNAPSHOT"
+    api "ai.djl.tflite:tflite-native-auto:${tflite_version}"
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
