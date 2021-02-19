@@ -225,7 +225,9 @@ export default function ModelView(props) {
 						</>
 					</TabPanel>
 					<TabPanel value={index} index={1} className={classes.tabpanel}>
-						<DynForm data={props.model.metadata}/>
+						<DynForm data={props.model.metadata} />
+						<h4>Licenses</h4>
+						<DynForm data={props.model.metadata.licenses}/>
 					</TabPanel>
 					<TabPanel value={index} index={2} className={classes.tabpanel}>
 						<DynForm data={props.model.properties} />
