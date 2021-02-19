@@ -137,7 +137,7 @@ public class LeNetTest {
         Shape currentShape = x.getShape();
 
         Block leNet = LeNet.builder().build();
-        leNet.setInitializer(Initializer.ONES);
+        leNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         leNet.initialize(manager, DataType.FLOAT32, currentShape);
 
         Map<String, Shape> shapeMap = new ConcurrentHashMap<>();
@@ -165,7 +165,7 @@ public class LeNetTest {
         Block leNet = LeNet.builder().build();
         int batchSize = 1;
         NDArray x = manager.ones(new Shape(batchSize, 1, 28, 28));
-        leNet.setInitializer(Initializer.ONES);
+        leNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         leNet.initialize(manager, DataType.FLOAT32, x.getShape());
         NDArray xHat =
                 leNet.forward(new ParameterStore(manager, true), new NDList(x), true)

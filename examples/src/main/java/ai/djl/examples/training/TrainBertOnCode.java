@@ -20,6 +20,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Parameter;
 import ai.djl.nn.transformer.BertBlock;
 import ai.djl.nn.transformer.BertPretrainingBlock;
 import ai.djl.nn.transformer.BertPretrainingLoss;
@@ -135,7 +136,8 @@ public final class TrainBertOnCode {
         model.setBlock(
                 new BertPretrainingBlock(
                         BERT_BUILDER.setTokenDictionarySize(dictionary.tokens.size())));
-        model.getBlock().setInitializer(new TruncatedNormalInitializer(0.02f));
+        model.getBlock()
+                .setInitializer(new TruncatedNormalInitializer(0.02f), Parameter.Type.WEIGHT);
         return model;
     }
 

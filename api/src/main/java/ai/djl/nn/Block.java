@@ -25,6 +25,7 @@ import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.function.Predicate;
 
 /**
  * A {@code Block} is a composable function that forms a neural network.
@@ -158,11 +159,12 @@ public interface Block {
     }
 
     /**
-     * Sets an {@link Initializer} to the block.
+     * Sets an {@link Initializer} to all the parameters that match parameter type in the block.
      *
      * @param initializer the initializer to set
+     * @param type the Parameter Type we want to setInitializer
      */
-    void setInitializer(Initializer initializer);
+    void setInitializer(Initializer initializer, Parameter.Type type);
 
     /**
      * Sets an {@link Initializer} to the specified direct parameter of the block, overriding the
@@ -172,6 +174,14 @@ public interface Block {
      * @param paramName the name of the parameter
      */
     void setInitializer(Initializer initializer, String paramName);
+
+    /**
+     * Sets an {@link Initializer} to all the parameters that match Predicate in the block.
+     *
+     * @param initializer the initializer to be set
+     * @param predicate predicate function to indicate parameters you want to set
+     */
+    void setInitializer(Initializer initializer, Predicate<Parameter> predicate);
 
     /**
      * Initializes the parameters of the block. This method must be called before calling `forward`.

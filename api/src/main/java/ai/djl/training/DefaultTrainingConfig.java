@@ -13,23 +13,23 @@
 package ai.djl.training;
 
 import ai.djl.Device;
+import ai.djl.nn.Parameter;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.initializer.Initializer;
-import ai.djl.training.initializer.XavierInitializer;
-import ai.djl.training.initializer.XavierInitializer.FactorType;
-import ai.djl.training.initializer.XavierInitializer.RandomType;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Adam;
 import ai.djl.training.optimizer.Optimizer;
+import ai.djl.util.PairList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 /** {@code DefaultTrainingConfig} is an implementation of the {@link TrainingConfig} interface. */
 public class DefaultTrainingConfig implements TrainingConfig {
 
-    private Initializer initializer;
+    private PairList<Initializer, Predicate<Parameter>> initializers = new PairList<>();
     private Optimizer optimizer;
     private Device[] devices;
     private Loss loss;
@@ -38,15 +38,12 @@ public class DefaultTrainingConfig implements TrainingConfig {
 
     /**
      * Creates an instance of {@code DefaultTrainingConfig} with the given {@link Loss}. {@code
-     * DefaultTrainingConfig} creates a default {@link TrainingConfig} with the {@link
-     * XavierInitializer} as initialiser, {@link Adam} as optimiser, and the given {@link Loss}. The
-     * evaluators and listeners are left to the user's discretion.
+     * DefaultTrainingConfig} creates a default {@link TrainingConfig}, {@link Adam} as optimiser,
+     * and the given {@link Loss}. The evaluators and listeners are left to the user's discretion.
      *
      * @param loss the loss to use for training
      */
     public DefaultTrainingConfig(Loss loss) {
-        // Defaults to initializer defined in https://arxiv.org/abs/1502.01852
-        this.initializer = new XavierInitializer(RandomType.GAUSSIAN, FactorType.IN, 2);
         optimizer = Adam.builder().build();
         this.loss = loss;
         evaluators = new ArrayList<>();
@@ -58,10 +55,38 @@ public class DefaultTrainingConfig implements TrainingConfig {
      * href="https://arxiv.org/abs/1502.01852">paper</a>).
      *
      * @param initializer the initialer to use for the parameters
+     * @param type the {@link Parameter.Type} of the parameters
      * @return this {@code DefaultTrainingConfig}
      */
-    public DefaultTrainingConfig optInitializer(Initializer initializer) {
-        this.initializer = initializer;
+    public DefaultTrainingConfig optInitializer(Initializer initializer, Parameter.Type type) {
+        initializers.add(initializer, parameter -> parameter.getType().equals(type));
+        return this;
+    }
+
+    /**
+     * Sets the {@link Initializer} to use for the parameters (default from <a
+     * href="https://arxiv.org/abs/1502.01852">paper</a>).
+     *
+     * @param initializer the initialer to use for the parameters
+     * @param name the name of the parameter
+     * @return this {@code DefaultTrainingConfig}
+     */
+    public DefaultTrainingConfig optInitializer(Initializer initializer, String name) {
+        initializers.add(initializer, parameter -> parameter.getName().equals(name));
+        return this;
+    }
+
+    /**
+     * Sets the {@link Initializer} to use for the parameters (default from <a
+     * href="https://arxiv.org/abs/1502.01852">paper</a>).
+     *
+     * @param initializer the initialer to use for the parameters
+     * @param predicate the predicate to identify parameter
+     * @return this {@code DefaultTrainingConfig}
+     */
+    public DefaultTrainingConfig optInitializer(
+            Initializer initializer, Predicate<Parameter> predicate) {
+        initializers.add(initializer, predicate);
         return this;
     }
 
@@ -120,8 +145,8 @@ public class DefaultTrainingConfig implements TrainingConfig {
 
     /** {@inheritDoc} */
     @Override
-    public Initializer getInitializer() {
-        return initializer;
+    public PairList<Initializer, Predicate<Parameter>> getInitializers() {
+        return initializers;
     }
 
     /** {@inheritDoc} */

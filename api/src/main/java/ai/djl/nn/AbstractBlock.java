@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * {@code AbstractBlock} is an abstract implementation of {@link Block}.
@@ -285,13 +286,9 @@ public abstract class AbstractBlock implements Block {
 
     /** {@inheritDoc} */
     @Override
-    public void setInitializer(Initializer initializer) {
-        for (Parameter parameter : parameters.values()) {
-            parameter.setInitializer(initializer, false);
-        }
-        for (Block child : children.values()) {
-            child.setInitializer(initializer);
-        }
+    public void setInitializer(Initializer initializer, Parameter.Type params) {
+        Predicate<Parameter> predicate = parameter -> parameter.getType().equals(params);
+        setInitializer(initializer, predicate);
     }
 
     /** {@inheritDoc} */
@@ -301,7 +298,18 @@ public abstract class AbstractBlock implements Block {
         if (parameter == null) {
             throw new IllegalArgumentException("Could not find parameter " + paramName);
         }
-        parameter.setInitializer(initializer, true);
+        parameter.setInitializer(initializer);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setInitializer(Initializer initializer, Predicate<Parameter> predicate) {
+        List<Parameter> params = getParameters().values();
+        for (Parameter param : params) {
+            if (predicate.test(param)) {
+                param.setInitializer(initializer);
+            }
+        }
     }
 
     /** {@inheritDoc} */

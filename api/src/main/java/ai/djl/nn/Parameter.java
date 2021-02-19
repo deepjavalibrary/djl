@@ -19,10 +19,10 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.training.initializer.XavierInitializer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -133,12 +133,9 @@ public class Parameter implements AutoCloseable {
      * flag is true, sets the initializer regardless.
      *
      * @param initializer the initializer to be set
-     * @param overwrite if true, set the initializer regardless of whether its already set or not
      */
-    public void setInitializer(Initializer initializer, boolean overwrite) {
-        if (overwrite || this.initializer == null) {
-            this.initializer = initializer;
-        }
+    public void setInitializer(Initializer initializer) {
+        this.initializer = initializer;
     }
 
     /**
@@ -150,7 +147,6 @@ public class Parameter implements AutoCloseable {
      * @param inputShapes the expected input shapes
      */
     public void initialize(NDManager manager, DataType dataType, Shape[] inputShapes) {
-        Objects.requireNonNull(initializer, "No initializer has been set");
         if (!isInitialized()) {
             Shape shape = block.getParameterShape(name, inputShapes);
             array = initializer.initialize(manager, shape, dataType);
@@ -239,7 +235,9 @@ public class Parameter implements AutoCloseable {
 
     /** Enumerates the types of {@link Parameter}. */
     public enum Type {
-        WEIGHT(null),
+        WEIGHT(
+                new XavierInitializer(
+                        XavierInitializer.RandomType.GAUSSIAN, XavierInitializer.FactorType.IN, 2)),
         BIAS(Initializer.ZEROS),
         GAMMA(Initializer.ONES),
         BETA(Initializer.ZEROS),

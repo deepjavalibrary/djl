@@ -337,6 +337,8 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
             return Parameter.Type.RUNNING_MEAN;
         } else if (name.endsWith("moving_var") || name.endsWith("running_var")) {
             return Parameter.Type.RUNNING_VAR;
+        } else if (name.endsWith("weight")) {
+            return Parameter.Type.WEIGHT;
         }
         return Parameter.Type.OTHER;
     }

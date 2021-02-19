@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Blocks;
+import ai.djl.nn.Parameter;
 import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.GradientCollector;
@@ -38,7 +39,7 @@ public class MxGradientCollectorIntegrationTest {
             try (Trainer trainer =
                     model.newTrainer(
                             new DefaultTrainingConfig(Loss.l2Loss())
-                                    .optInitializer(Initializer.ONES))) {
+                                    .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT))) {
                 try (GradientCollector gradCol = trainer.newGradientCollector()) {
                     NDArray lhs =
                             manager.create(new float[] {6, -9, -12, 15, 0, 4}, new Shape(2, 3));

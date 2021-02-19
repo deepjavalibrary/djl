@@ -17,10 +17,13 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.nn.Parameter;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.util.Pair;
+import ai.djl.util.PairList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,6 +31,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -125,12 +129,16 @@ public class PtModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
-        Initializer initializer = trainingConfig.getInitializer();
+        PairList<Initializer, Predicate<Parameter>> initializer = trainingConfig.getInitializers();
         if (block == null) {
             throw new IllegalStateException(
                     "You must set a block for the model before creating a new trainer");
         }
-        block.setInitializer(initializer);
+        for (Pair<Initializer, Predicate<Parameter>> pair : initializer) {
+            if (pair.getKey() != null && pair.getValue() != null) {
+                block.setInitializer(pair.getKey(), pair.getValue());
+            }
+        }
 
         return new Trainer(this, trainingConfig);
     }

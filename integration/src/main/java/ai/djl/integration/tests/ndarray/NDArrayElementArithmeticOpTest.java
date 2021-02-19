@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Blocks;
+import ai.djl.nn.Parameter;
 import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.GradientCollector;
@@ -139,7 +140,7 @@ public class NDArrayElementArithmeticOpTest {
             try (Trainer trainer =
                     model.newTrainer(
                             new DefaultTrainingConfig(Loss.l2Loss())
-                                    .optInitializer(Initializer.ONES))) {
+                                    .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT))) {
                 try (GradientCollector gradCol = trainer.newGradientCollector()) {
                     lhs.attachGradient();
                     result = NDArrays.add(lhs, 2);
@@ -360,7 +361,7 @@ public class NDArrayElementArithmeticOpTest {
             try (Trainer trainer =
                     model.newTrainer(
                             new DefaultTrainingConfig(Loss.l2Loss())
-                                    .optInitializer(Initializer.ONES))) {
+                                    .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT))) {
                 try (GradientCollector gradCol = trainer.newGradientCollector()) {
                     lhs.attachGradient();
                     result = NDArrays.dot(lhs, rhs);

@@ -13,15 +13,18 @@
 package ai.djl.fasttext;
 
 import ai.djl.Device;
+import ai.djl.nn.Parameter;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
+import ai.djl.util.PairList;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /** An interface that is responsible for holding the configuration required by fastText training. */
 public class FtTrainingConfig implements TrainingConfig {
@@ -247,7 +250,7 @@ public class FtTrainingConfig implements TrainingConfig {
 
     /** {@inheritDoc} */
     @Override
-    public Initializer getInitializer() {
+    public PairList<Initializer, Predicate<Parameter>> getInitializers() {
         return null;
     }
 
