@@ -13,12 +13,15 @@
 package ai.djl.training;
 
 import ai.djl.Device;
+import ai.djl.nn.Parameter;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
+import ai.djl.util.PairList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * An interface that is responsible for holding the configuration required by {@link Trainer}.
@@ -64,11 +67,11 @@ public interface TrainingConfig {
     Device[] getDevices();
 
     /**
-     * Gets the {@link Initializer} to initialize the parameters of the model.
+     * Gets a list of {@link Initializer} and Predicate to initialize the parameters of the model.
      *
      * @return an {@link Initializer}
      */
-    Initializer getInitializer();
+    PairList<Initializer, Predicate<Parameter>> getInitializers();
 
     /**
      * Gets the {@link Optimizer} to use during training.

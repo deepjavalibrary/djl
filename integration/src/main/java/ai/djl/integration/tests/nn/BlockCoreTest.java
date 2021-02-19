@@ -63,7 +63,8 @@ public class BlockCoreTest {
     @Test
     public void testLinear() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         long outSize = 3;
         Block block = Linear.builder().setUnits(outSize).build();
@@ -125,7 +126,8 @@ public class BlockCoreTest {
     @Test
     public void testLinearWithDefinedLayout() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         long outSize = 3;
         Block block = Linear.builder().setUnits(outSize).build();
@@ -177,7 +179,8 @@ public class BlockCoreTest {
     @Test
     public void testBatchNorm() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block = BatchNorm.builder().build();
         try (Model model = Model.newInstance("model")) {
@@ -204,7 +207,8 @@ public class BlockCoreTest {
     @Test
     public void testDropout() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block = Dropout.builder().optRate(.5f).build();
         try (Model model = Model.newInstance("model")) {
@@ -230,7 +234,8 @@ public class BlockCoreTest {
     @Test
     public void testEmbedding() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         TrainableWordEmbedding block =
                 TrainableWordEmbedding.builder()
@@ -264,7 +269,8 @@ public class BlockCoreTest {
     @Test
     public void testConv1d() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block =
                 Conv1d.builder().setKernelShape(new Shape(2)).setFilters(1).optBias(false).build();
@@ -296,7 +302,8 @@ public class BlockCoreTest {
     @Test
     public void testConv1dTranspose() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block =
                 Conv1dTranspose.builder()
@@ -330,7 +337,8 @@ public class BlockCoreTest {
     @Test
     public void testConv2d() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block = Conv2d.builder().setKernelShape(new Shape(2, 2)).setFilters(1).build();
         try (Model model = Model.newInstance("model")) {
@@ -361,7 +369,8 @@ public class BlockCoreTest {
     @Test
     public void testConv2dTranspose() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block =
                 Conv2dTranspose.builder().setKernelShape(new Shape(2, 2)).setFilters(1).build();
@@ -398,7 +407,8 @@ public class BlockCoreTest {
     @Test
     public void testConv3d() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block = Conv3d.builder().setKernelShape(new Shape(2, 2, 2)).setFilters(1).build();
         try (Model model = Model.newInstance("model")) {
@@ -439,7 +449,7 @@ public class BlockCoreTest {
         Loss loss = new SoftmaxCrossEntropyLoss("SmCeLoss", 1, -1, false, true);
         TrainingConfig config =
                 new DefaultTrainingConfig(loss)
-                        .optInitializer(Initializer.ONES)
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optDevices(TestUtils.getDevices());
         Block block =
                 RNN.builder()
@@ -486,7 +496,7 @@ public class BlockCoreTest {
         Loss loss = new SoftmaxCrossEntropyLoss("SmCeLoss", 1, -1, false, true);
         TrainingConfig config =
                 new DefaultTrainingConfig(loss)
-                        .optInitializer(Initializer.ONES)
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optDevices(TestUtils.getDevices());
         Block block =
                 RNN.builder()
@@ -534,7 +544,7 @@ public class BlockCoreTest {
         Loss loss = new SoftmaxCrossEntropyLoss("SmCeLoss", 1, -1, false, true);
         TrainingConfig config =
                 new DefaultTrainingConfig(loss)
-                        .optInitializer(Initializer.ONES)
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optDevices(TestUtils.getDevices());
         Block block =
                 LSTM.builder()
@@ -585,7 +595,7 @@ public class BlockCoreTest {
         Loss loss = new SoftmaxCrossEntropyLoss("SmCeLoss", 1, -1, false, true);
         TrainingConfig config =
                 new DefaultTrainingConfig(loss)
-                        .optInitializer(Initializer.ONES)
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optDevices(TestUtils.getDevices());
         GRU block =
                 GRU.builder()
@@ -638,7 +648,8 @@ public class BlockCoreTest {
     @Test
     public void testSequentialBlock() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         SequentialBlock block = new SequentialBlock();
         block.addSingleton(x -> x.mul(6.5f));
         block.add(Linear.builder().setUnits(10).build());
@@ -678,7 +689,8 @@ public class BlockCoreTest {
     @Test
     public void testParallelBlock() throws IOException, MalformedModelException {
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         ParallelBlock block =
                 new ParallelBlock(
                         list ->

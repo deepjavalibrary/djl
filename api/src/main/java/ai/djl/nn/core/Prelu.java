@@ -48,7 +48,7 @@ public class Prelu extends AbstractBlock {
                         Parameter.builder()
                                 .setName("alpha")
                                 .setBlock(this)
-                                .setType(Parameter.Type.OTHER)
+                                .setType(Parameter.Type.WEIGHT)
                                 .build(),
                         new Shape());
     }

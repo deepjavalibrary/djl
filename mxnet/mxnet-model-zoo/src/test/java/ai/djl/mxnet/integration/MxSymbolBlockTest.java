@@ -25,6 +25,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.Parameter;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
@@ -85,7 +86,7 @@ public class MxSymbolBlockTest {
             throws IOException, ModelNotFoundException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optInitializer(Initializer.ONES);
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         try (Model model = MxModelZoo.MLP.loadModel()) {
             model.getBlock().clear();
             try (Trainer trainer = model.newTrainer(config)) {
@@ -113,7 +114,7 @@ public class MxSymbolBlockTest {
             throws IOException, ModelNotFoundException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optInitializer(Initializer.ONES);
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         try (Model model = MxModelZoo.MLP.loadModel()) {
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
@@ -140,7 +141,7 @@ public class MxSymbolBlockTest {
             throws IOException, ModelNotFoundException, MalformedModelException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optInitializer(Initializer.ONES);
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         try (Model model = MxModelZoo.MLP.loadModel()) {
             NDManager manager = model.getNDManager();
             SymbolBlock mlp = (SymbolBlock) model.getBlock();
@@ -149,7 +150,6 @@ public class MxSymbolBlockTest {
             newMlp.add(mlp);
             Linear linear = Linear.builder().setUnits(10).build();
 
-            linear.setInitializer(Initializer.ONES);
             newMlp.add(linear);
 
             model.setBlock(newMlp);
