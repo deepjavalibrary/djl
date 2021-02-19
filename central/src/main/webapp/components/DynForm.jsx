@@ -48,6 +48,7 @@ export default function DynForm(props) {
 							id={key}
 							label={key}
 							key={props.data[key]}
+							fullWidth={true}
 							defaultValue={props.data[key]}
 							InputProps={{
 								readOnly: true,
