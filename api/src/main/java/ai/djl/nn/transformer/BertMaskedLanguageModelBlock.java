@@ -60,10 +60,9 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
                 addParameter(
                         Parameter.builder()
                                 .setName("dictionaryBias")
-                                .setBlock(this)
                                 .setType(Parameter.Type.BIAS)
-                                .build(),
-                        new Shape(bertBlock.getTokenDictionarySize()));
+                                .optShape(new Shape(bertBlock.getTokenDictionarySize()))
+                                .build());
         this.hiddenActivation = hiddenActivation;
     }
 

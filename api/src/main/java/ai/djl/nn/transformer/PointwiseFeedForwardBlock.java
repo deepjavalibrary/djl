@@ -82,7 +82,8 @@ public class PointwiseFeedForwardBlock extends AbstractBlock {
         }
         Shape lastShape = inputShape;
         for (final Block child : children.values()) {
-            lastShape = child.initialize(manager, dataType, lastShape)[0];
+            child.initialize(manager, dataType, lastShape);
+            lastShape = getOutputShapes(manager, new Shape[] {lastShape})[0];
         }
         outputShape = lastShape;
     }

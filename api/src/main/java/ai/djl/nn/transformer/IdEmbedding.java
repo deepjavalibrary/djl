@@ -48,10 +48,9 @@ public final class IdEmbedding extends AbstractBlock {
                 addParameter(
                         Parameter.builder()
                                 .setName(EMBEDDING_PARAM_NAME)
-                                .setBlock(this)
                                 .setType(Parameter.Type.WEIGHT)
-                                .build(),
-                        new Shape(dictionarySize, embeddingSize));
+                                .optShape(new Shape(dictionarySize, embeddingSize))
+                                .build());
     }
 
     /** {@inheritDoc} */

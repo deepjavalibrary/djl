@@ -79,20 +79,15 @@ public abstract class Deconvolution extends AbstractBlock {
                 addParameter(
                         Parameter.builder()
                                 .setName("weight")
-                                .setBlock(this)
                                 .setType(Parameter.Type.WEIGHT)
-                                .build(),
-                        (inputShapes) ->
-                                new Shape(filters, inputShapes[0].get(1)).addAll(kernelShape));
+                                .build());
         if (includeBias) {
             bias =
                     addParameter(
                             Parameter.builder()
                                     .setName("bias")
-                                    .setBlock(this)
                                     .setType(Parameter.Type.BIAS)
-                                    .build(),
-                            new Shape(filters));
+                                    .build());
         }
     }
 
@@ -134,10 +129,19 @@ public abstract class Deconvolution extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    protected void beforeInitialize(Shape[] inputs) {
-        super.beforeInitialize(inputs);
-        Shape inputShape = inputs[0];
-        Block.validateLayout(getExpectedLayout(), inputShape.getLayout());
+    protected void beforeInitialize(Shape... inputShapes) {
+        super.beforeInitialize(inputShapes);
+        Block.validateLayout(getExpectedLayout(), inputShapes[0].getLayout());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void prepare(Shape[] inputs) {
+        long inputChannel = inputs[0].get(1);
+        weight.setShape(new Shape(filters, inputChannel / groups).addAll(kernelShape));
+        if (bias != null) {
+            bias.setShape(new Shape(filters));
+        }
     }
 
     /** {@inheritDoc} */

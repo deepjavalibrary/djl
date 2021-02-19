@@ -61,13 +61,10 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
                 addParameter(
                         Parameter.builder()
                                 .setName("embedding")
-                                .setBlock(this)
                                 .setType(Parameter.Type.WEIGHT)
-                                .optRequiresGrad(true)
                                 .optGradientFormat(
                                         sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE)
-                                .build(),
-                        (inputShapes) -> new Shape(numItems, embeddingSize));
+                                .build());
         if (baseBuilder.fallthrough != null && baseBuilder.defaultItem != null) {
             throw new IllegalArgumentException(
                     "You can not specify both a fallthrough and a defaultItem");
@@ -106,16 +103,20 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
                 addParameter(
                         Parameter.builder()
                                 .setName("embedding")
-                                .setBlock(this)
                                 .setType(Parameter.Type.WEIGHT)
-                                .optRequiresGrad(true)
                                 .optGradientFormat(
                                         sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE)
-                                .build(),
-                        (inputShapes) -> new Shape(numItems, embeddingSize));
+                                .build());
         this.embedding.setArray(embedding);
         numItems = Math.toIntExact(embedding.getShape().size(0));
         inputShapes = new Shape[] {new Shape(-1)};
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void prepare(Shape[] inputShapes) {
+        // numItems will be adjusted by embedding array or fallthroughEmbedding
+        embedding.setShape(new Shape(numItems, embeddingSize));
     }
 
     /** {@inheritDoc} */

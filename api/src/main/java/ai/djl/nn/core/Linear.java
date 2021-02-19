@@ -58,25 +58,19 @@ public class Linear extends AbstractBlock {
     Linear(Builder builder) {
         super(VERSION);
         units = builder.units;
-        // "inputFeatures" is only known after "beforeInitialize" is called, hence we need
-        // a callback, even if we do not used the callback parameter
         weight =
                 addParameter(
                         Parameter.builder()
                                 .setName("weight")
-                                .setBlock(this)
                                 .setType(Parameter.Type.WEIGHT)
-                                .build(),
-                        inputShapes -> new Shape(units, inputFeatures));
+                                .build());
         if (builder.bias) {
             bias =
                     addParameter(
                             Parameter.builder()
                                     .setName("bias")
-                                    .setBlock(this)
                                     .setType(Parameter.Type.BIAS)
-                                    .build(),
-                            new Shape(units));
+                                    .build());
         }
     }
 
@@ -97,7 +91,7 @@ public class Linear extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
-        return new Shape[] {inputShape.addAll(new Shape(units))};
+        return new Shape[] {inputs[0].slice(0, inputs[0].dimension() - 1).add(units)};
     }
 
     /** {@inheritDoc} */
@@ -109,11 +103,22 @@ public class Linear extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void beforeInitialize(Shape[] inputShapes) {
+    protected void beforeInitialize(Shape... inputShapes) {
         super.beforeInitialize(inputShapes);
+        Preconditions.checkArgument(inputShapes.length == 1, "Linear block only support 1 input");
         Shape input = inputShapes[0];
         inputFeatures = input.get(input.dimension() - 1);
         inputShape = input.slice(0, input.dimension() - 1);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void prepare(Shape[] inputShapes) {
+        Shape input = inputShapes[0];
+        weight.setShape(new Shape(units, input.get(input.dimension() - 1)));
+        if (bias != null) {
+            bias.setShape(new Shape(units));
+        }
     }
 
     /** {@inheritDoc} */
