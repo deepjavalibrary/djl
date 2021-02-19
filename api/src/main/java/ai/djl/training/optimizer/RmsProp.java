@@ -48,6 +48,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * <br>
  * Grad represents the gradient, mean and var are the 1st and 2nd order moment estimates (mean and
  * variance), and mom is the momentum.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_optimization/rmsprop.html">The D2L chapter on
+ *     RMSProp</a>
  */
 public class RmsProp extends Optimizer {
 

@@ -32,6 +32,9 @@ import java.util.UUID;
  * function depends on the values in the {@code Parameter}. During training, the values in the
  * {@code Parameter} are updated to reflect the training data. This process forms the crux of
  * learning.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_deep-learning-computation/parameters.html">The D2L
+ *     chapter on parameter management</a>
  */
 public class Parameter implements AutoCloseable {
 

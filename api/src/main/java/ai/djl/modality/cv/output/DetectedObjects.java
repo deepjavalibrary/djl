@@ -16,7 +16,8 @@ import ai.djl.modality.Classifications;
 import java.util.List;
 
 /**
- * A class representing the detected objects results for a single image in an object detection case.
+ * A class representing the detected objects results for a single image in an {@link
+ * ai.djl.Application.CV#OBJECT_DETECTION} case.
  */
 public class DetectedObjects extends Classifications {
 

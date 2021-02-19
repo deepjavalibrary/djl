@@ -56,9 +56,9 @@ nav:
       - 'docs/faq.md'
   - Tutorials:
     - Beginner Tutorial:
-        - 'jupyter/01_create_your_first_network.ipynb'
-        - 'jupyter/02_train_your_first_model.ipynb'
-        - 'jupyter/03_image_classification_with_your_model.ipynb'
+        - 'jupyter/tutorial/01_create_your_first_network.ipynb'
+        - 'jupyter/tutorial/02_train_your_first_model.ipynb'
+        - 'jupyter/tutorial/03_image_classification_with_your_model.ipynb'
     - 'docs/d2l.md'
     - 'jupyter/rank_classification_using_BERT_on_Amazon_Review.ipynb'
     - 'jupyter/transfer_learning_on_cifar10.ipynb'

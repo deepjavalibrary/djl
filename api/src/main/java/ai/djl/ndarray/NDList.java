@@ -31,6 +31,8 @@ import java.util.stream.IntStream;
  *
  * <p>Each {@link NDArray} in this list can optionally have a name. You can use the name to look up
  * an NDArray in the NDList.
+ *
+ * @see NDArray
  */
 public class NDList extends ArrayList<NDArray> implements AutoCloseable {
 

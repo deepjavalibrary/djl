@@ -64,13 +64,17 @@ import org.slf4j.LoggerFactory;
  *       with an MXNet model</a>
  * </ul>
  *
- * <p>For information about running multi-threaded inference, see <a
- * href="https://github.com/awslabs/djl/blob/master/examples/docs/multithread_inference.md">here</a>.
- *
  * @param <I> the input type
  * @param <O> the output type
  * @see Model
  * @see Translator
+ * @see <a href="http://docs.djl.ai/docs/development/memory_management.html">The guide on memory
+ *     management</a>
+ * @see <a
+ *     href="https://github.com/awslabs/djl/blob/master/examples/docs/multithread_inference.md">The
+ *     guide on running multi-threaded inference</a>
+ * @see <a href="http://docs.djl.ai/docs/development/inference_performance_optimization.html">The
+ *     guide on inference performance optimization</a>
  */
 public class Predictor<I, O> implements AutoCloseable {
 

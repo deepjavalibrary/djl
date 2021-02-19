@@ -49,6 +49,9 @@ import java.io.IOException;
  * and limited size of the dataset, and it is reported that dropout layer increases training time by
  * 2-3 times since different simulated multiple networks are trained for each iteration, thus
  * resulting in noisy parameter updates.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_multilayer-perceptrons/dropout.html">The D2L chapter on
+ *     dropout</a>
  */
 public class Dropout extends AbstractBlock {
 

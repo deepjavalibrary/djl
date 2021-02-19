@@ -14,7 +14,12 @@ package ai.djl.training.tracker;
 
 import ai.djl.TrainingDivergedException;
 
-/** A {@code WarmUpTracker} applies a simple warm-up before executing a main {@link Tracker}. */
+/**
+ * A {@code WarmUpTracker} applies a simple warm-up before executing a main {@link Tracker}.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_optimization/lr-scheduler.html#warmup">For tracking
+ *     learning rates, this section in the D2L chapter on learning rate scheduling</a>
+ */
 public final class WarmUpTracker implements Tracker {
 
     Tracker mainTracker;

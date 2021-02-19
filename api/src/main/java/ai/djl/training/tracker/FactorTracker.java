@@ -12,12 +12,14 @@
  */
 package ai.djl.training.tracker;
 
-import ai.djl.training.tracker.WarmUpTracker.Builder;
 import ai.djl.util.Preconditions;
 
 /**
  * {@code FactorTracker} is an implementation of {@link Tracker} which is updated by a
  * multiplicative factor.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_optimization/lr-scheduler.html#factor-tracker">For
+ *     tracking learning rates, this section in the D2L chapter on learning rate scheduling</a>
  */
 public class FactorTracker implements Tracker {
 

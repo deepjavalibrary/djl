@@ -15,6 +15,9 @@ package ai.djl.training.tracker;
 /**
  * A {@code Tracker} represents a hyper-parameter that changes gradually through the training
  * process.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_optimization/lr-scheduler.html">For tracking learning
+ *     rates, the D2L chapter on learning rate scheduling</a>
  */
 public interface Tracker {
 

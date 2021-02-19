@@ -21,6 +21,9 @@ import java.util.function.Function;
 /**
  * An {@code Optimizer} updates the weight parameters to minimize the loss function. {@code
  * Optimizer} is an abstract class that provides the base implementation for optimizers.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_optimization/index.html">The D2L chapters on
+ *     optimization algorithms</a>
  */
 public abstract class Optimizer {
 
