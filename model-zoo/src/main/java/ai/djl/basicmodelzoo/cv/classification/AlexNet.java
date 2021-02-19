@@ -28,6 +28,9 @@ import ai.djl.nn.pooling.Pool;
  * implmentation](https://github.com/pytorch/vision/blob/master/torchvision/models/alexnet.py)
  *
  * <p>AlexNet model from the "One weird trick..." https://arxiv.org/abs/1404.5997 paper.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_convolutional-modern/alexnet.html">The D2L chapter on
+ *     AlexNet</a>
  */
 public final class AlexNet {
 

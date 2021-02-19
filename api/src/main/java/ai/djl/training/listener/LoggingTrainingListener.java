@@ -26,6 +26,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * {@link TrainingListener} that outputs the progress of training each batch and epoch into logs.
+ *
+ * @see <a href="http://docs.djl.ai/docs/development/configure_logging.html">The guide on DJL
+ *     logging</a>
  */
 public class LoggingTrainingListener implements TrainingListener {
 

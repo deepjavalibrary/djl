@@ -12,7 +12,11 @@
  */
 package ai.djl.training.tracker;
 
-/** {@link FixedTracker} is an implementation of {@link Tracker} which returns a fixed value. */
+/**
+ * {@link FixedTracker} is an implementation of {@link Tracker} which returns a fixed value.
+ *
+ * @see Tracker
+ */
 class FixedTracker implements Tracker {
 
     private float value;

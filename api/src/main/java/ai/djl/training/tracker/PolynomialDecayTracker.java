@@ -12,7 +12,11 @@
  */
 package ai.djl.training.tracker;
 
-/** Polynomial decay {@link Tracker}. */
+/**
+ * Polynomial decay {@link Tracker}.
+ *
+ * @see Tracker
+ */
 public class PolynomialDecayTracker implements Tracker {
 
     private float baseValue;

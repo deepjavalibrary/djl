@@ -6,7 +6,7 @@ The implementations of these interfaces are provided by the various engines usin
 
 In addition, the engines are very useful for production systems. Models trained in those engines in python can often be imported and run in Java through DJL. This makes it much easier to integrate into existing Java servers or any of the powerful Java production ecosystem. Because they are run with the same engine they are trained in, there shouldn't be any loss in performance or accuracy either.
 
-For training in DJL, the choice of engine is less important. Any engine that fully implements the DJL specification would have similar results and the performance does not differ too much. As you are encouraged to write engine agnostic code, you can even switch between the engines as easily as switching dependencies. In general, you should use the recommended engine (below) unless you have a good reason to use a different one.
+For training in DJL, the choice of engine is less important. Any engine that fully implements the DJL specification would have similar results. As you are encouraged to write engine agnostic code, you can even switch between the engines as easily as switching dependencies. In general, you should use the recommended engine (below) unless you have a good reason to use a different one.
 
 ## Supported Engines
 

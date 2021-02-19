@@ -32,6 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * <br>
  * where g represents the gradient, and m/v are 1st and 2nd order moment estimates (mean and
  * variance).
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_optimization/adam.html">The D2L chapter on Adam</a>
  */
 public class Adam extends Optimizer {
 

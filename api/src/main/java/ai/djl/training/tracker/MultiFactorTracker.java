@@ -13,7 +13,6 @@
 
 package ai.djl.training.tracker;
 
-import ai.djl.training.tracker.WarmUpTracker.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +20,10 @@ import org.slf4j.LoggerFactory;
  * {@code MultiFactorTracker} is an implementation of {@link Tracker} which returns piecewise
  * constant values for fixed numbers of steps. multiplicative factor, at an uneven interval of
  * steps, until it reaches a specified stop value.
+ *
+ * @see <a
+ *     href="https://d2l.djl.ai/chapter_optimization/lr-scheduler.html#multi-factor-scheduler">For
+ *     tracking learning rates, this section in the D2L chapter on learning rate scheduling</a>
  */
 public class MultiFactorTracker implements Tracker {
     private static final Logger logger = LoggerFactory.getLogger(FactorTracker.class);

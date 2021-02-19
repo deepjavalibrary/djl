@@ -40,6 +40,8 @@ import org.slf4j.LoggerFactory;
  *
  * @see <a href="http://docs.djl.ai/docs/engine.html">Engine Guide</a>
  * @see EngineProvider
+ * @see <a href="http://docs.djl.ai/docs/development/cache_management.html">The guide on resource
+ *     and engine caching</a>
  */
 public abstract class Engine {
 

@@ -14,7 +14,7 @@ package ai.djl.modality.cv.output;
 
 import java.io.Serializable;
 
-/** An interface representing a bounding box for the detected object. */
+/** An interface representing a bounding box around an object inside an image. */
 public interface BoundingBox extends Serializable {
 
     /**
