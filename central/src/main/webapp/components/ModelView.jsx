@@ -31,7 +31,6 @@ import { theme } from '../css/useStyles'
 const useStyles = makeStyles((theme) => ({
 	model_view_root: {
 
-		display: 'flex',
 		flexWrap: 'wrap',
 		justifyContent: 'space-around',
 		overflow: 'hidden',
@@ -39,23 +38,15 @@ const useStyles = makeStyles((theme) => ({
 		order: 3,
 		flex: '2 1 auto',
 		alignSelf: 'stretch',
-		height: "95%",
-		maxHeight: '30em',
 
 	},
 	model_view_paper: {
-		minWidth: "60%",
-		height: "100%",
-		minHeight: '80%',
-		
+		minHeight: '600px',
 		padding: '20px',
 		overflowY: "auto",
-		marginTop: '2em',
 		marginRight: 'auto',
 		marginLeft: '2em',
-
 		marginBottom: '5vh',
-
 	},
 
 
@@ -90,11 +81,15 @@ const useStyles = makeStyles((theme) => ({
 	},
 	tabbar: {
 		flexGrow: 1,
-		backgroundColor: theme.palette.background.paper,
+
 		display: 'flex',
-		height: "100%",
 	},
+	tabpanel: {
+		flex: '2 1 auto',
+		alignSelf: 'stretch',
+	}, 
 	dynform: {
+		width: '100%',
 		marginLeft: "2em",
 	},
 }));
@@ -173,6 +168,7 @@ export default function ModelView(props) {
 		<div className={classes.model_view_root}>
 			<Paper ref={myRef} elevation={3} className={classes.model_view_paper} >
 				<h2>{props.model.name}</h2>
+				<h3>{props.model.metadata.groupId}:{props.model.metadata.artifactId}:{props.model.version}</h3>
 				<Chip size="small" label={props.model.properties.dataset} />
 				<Chip size="small" label={props.model.version} />
 				<div className={classes.tabbar}>
@@ -185,13 +181,14 @@ export default function ModelView(props) {
 						aria-label="{props.model.name}">
 
 						<Tab label="General" {...a11yProps(0)} />
-						<Tab label="Properties" {...a11yProps(1)} />
-						<Tab label="Arguments" {...a11yProps(2)} />
-						<Tab label="Parameters" {...a11yProps(3)} />
-						<Tab label="Synset" {...a11yProps(4)} />
+						<Tab label="Metadata" {...a11yProps(1)} />
+						<Tab label="Properties" {...a11yProps(2)} />
+						<Tab label="Arguments" {...a11yProps(3)} />
+						<Tab label="Parameters" {...a11yProps(4)} />
+						<Tab label="Synset" {...a11yProps(5)} />
 					</Tabs>
 
-					<TabPanel value={index} index={0} >
+					<TabPanel value={index} index={0} className={classes.tabpanel}>
 						<>
 							{Object.keys(props.model).filter((key) => !(typeof props.model[key] === 'object')).map((key) => (
 								<div >
@@ -226,21 +223,24 @@ export default function ModelView(props) {
 						</>
 					</TabPanel>
 					<TabPanel value={index} index={1}>
-						<DynForm data={props.model.properties} />
+						<DynForm data={props.model.metadata} className={classes.dynform}/>
 					</TabPanel>
 					<TabPanel value={index} index={2}>
+						<DynForm data={props.model.properties} />
+					</TabPanel>
+					<TabPanel value={index} index={3}>
 						{props.model.arguments
 							? <DynForm data={props.model.arguments} />
 							: <DynForm data={noArguments}/>
 						}
 					</TabPanel>
-					<TabPanel value={index} index={3}>
+					<TabPanel value={index} index={4}>
 						{props.model.files.parameters
 							? <DynForm data={props.model.files.parameters}/>
 							: <DynForm data={noParameters}/>
 						}
 					</TabPanel>
-					<TabPanel value={index} index={4}>
+					<TabPanel value={index} index={5}>
 						{props.model.files.synset
 							? <DynForm data={props.model.files.synset}/>
 							: <DynForm data={noSynset}/>
