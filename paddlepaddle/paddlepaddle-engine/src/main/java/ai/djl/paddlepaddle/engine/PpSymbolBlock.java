@@ -15,7 +15,6 @@ package ai.djl.paddlepaddle.engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.SymbolBlock;
@@ -87,7 +86,9 @@ public class PpSymbolBlock extends AbstractSymbolBlock {
             if (foreignEngine) {
                 list.add(
                         inputManager.create(
-                                output.getDataType().asDataType(output.toByteBuffer()), output.getShape(), output.getDataType()));
+                                output.getDataType().asDataType(output.toByteBuffer()),
+                                output.getShape(),
+                                output.getDataType()));
             } else {
                 list.add(output);
             }
