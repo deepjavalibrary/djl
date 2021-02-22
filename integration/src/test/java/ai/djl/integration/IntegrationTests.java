@@ -12,6 +12,7 @@
  */
 package ai.djl.integration;
 
+import ai.djl.util.cuda.CudaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -37,6 +38,12 @@ public class IntegrationTests {
             System.setProperty("ai.djl.default_engine", engine);
             logger.info("Testing engine: {} ...", engine);
             Assert.assertTrue(new IntegrationTest(IntegrationTest.class).runTests(args));
+            // currently each engine will reserve a certain amount of memory and hold it until
+            // process terminate so running 3 different engines sequentially without
+            // calling System.exit() causes OOM issue. For GPU env, only defaultEngine is run
+            if (CudaUtils.hasCuda()) {
+                break;
+            }
         }
     }
 }
