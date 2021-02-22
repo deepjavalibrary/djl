@@ -4543,4 +4543,25 @@ public interface NDArray extends AutoCloseable {
      * @return the norm of this {@code NDArray}
      */
     NDArray norm(int ord, int[] axes, boolean keepDims);
+
+    /**
+     * Returns a one-hot {@code NDArray}.
+     *
+     * @param depth Depth
+     * @param onValue onValue
+     * @param offValue offValue
+     * @param dataType dataType
+     * @return one-hot encoding of this {@code NDArray}
+     */
+    NDArray oneHot(int depth, float onValue, float offValue, DataType dataType);
+
+    /**
+     * Returns a one-hot {@code NDArray}.
+     *
+     * @param depth Depth
+     * @return one-hot encoding of this {@code NDArray}
+     */
+    default NDArray oneHot(int depth) {
+        return oneHot(depth, 1f, 0f, getDataType());
+    }
 }
