@@ -14,8 +14,6 @@ package ai.djl.nn.transformer;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.types.DataType;
-import ai.djl.util.PairList;
 
 /** Operators missing from NDArray that are necessary to implement Bert pretraining. */
 public final class MissingOps {
@@ -31,21 +29,5 @@ public final class MissingOps {
      */
     public static NDArray gatherNd(NDArray lookup, NDArray indices) {
         return indices.getManager().invoke("gather_nd", new NDList(lookup, indices), null).head();
-    }
-
-    /**
-     * Creates a one-hot-encoding from the given data.
-     *
-     * @param depth size of each one hot encoding (=size of a dictionary)
-     * @param data the data to encode
-     * @return the one hot encoding
-     */
-    public static NDArray oneHot(int depth, NDArray data) {
-        PairList<String, Object> params = new PairList<>();
-        params.add("depth", depth);
-        params.add("on_value", 1f);
-        params.add("off_value", 0f);
-        params.add("dtype", DataType.FLOAT32);
-        return data.getManager().invoke("_npx_one_hot", new NDList(data), params).head();
     }
 }
