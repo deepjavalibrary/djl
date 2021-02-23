@@ -29,7 +29,13 @@ public class IntegrationTests {
         String[] engines;
         String defaultEngine = System.getProperty("ai.djl.default_engine");
         if (defaultEngine == null) {
-            engines = new String[] {"MXNet", "PyTorch", "TensorFlow"};
+            // TODO: windows CPU build is having OOM issue if 3 engines are loaded and running tests
+            // together
+            if (System.getProperty("os.name").startsWith("Win")) {
+                engines = new String[] {"MXNet"};
+            } else {
+                engines = new String[] {"MXNet", "PyTorch", "TensorFlow"};
+            }
         } else {
             engines = new String[] {defaultEngine};
         }
