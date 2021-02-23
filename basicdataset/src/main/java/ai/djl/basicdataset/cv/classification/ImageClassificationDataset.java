@@ -12,13 +12,12 @@
  */
 package ai.djl.basicdataset.cv.classification;
 
+import ai.djl.basicdataset.cv.ImageDataset;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
-import ai.djl.modality.cv.util.NDImageUtils;
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.RandomAccessDataset;
@@ -33,9 +32,7 @@ import java.util.Optional;
  * A helper to create {@link ai.djl.training.dataset.Dataset}s for {@link
  * ai.djl.Application.CV#IMAGE_CLASSIFICATION}.
  */
-public abstract class ImageClassificationDataset extends RandomAccessDataset {
-
-    Image.Flag flag;
+public abstract class ImageClassificationDataset extends ImageDataset {
 
     /**
      * Creates a new instance of {@link RandomAccessDataset} with the given necessary
@@ -43,19 +40,9 @@ public abstract class ImageClassificationDataset extends RandomAccessDataset {
      *
      * @param builder a builder with the necessary configurations
      */
-    public ImageClassificationDataset(BaseBuilder<?> builder) {
+    public ImageClassificationDataset(ImageDataset.BaseBuilder<?> builder) {
         super(builder);
-        this.flag = builder.flag;
     }
-
-    /**
-     * Returns the image at the given index in the dataset.
-     *
-     * @param index the index (if the dataset is a list of data items)
-     * @return the image
-     * @throws IOException if the image could not be loaded
-     */
-    protected abstract Image getImage(long index) throws IOException;
 
     /**
      * Returns the class of the data item at the given index.
@@ -69,16 +56,7 @@ public abstract class ImageClassificationDataset extends RandomAccessDataset {
     /** {@inheritDoc} */
     @Override
     public Record get(NDManager manager, long index) throws IOException {
-        NDArray image = getImage(index).toNDArray(manager, flag);
-
-        // Resize the image if the image size is fixed
-        Optional<Integer> width = getImageWidth();
-        Optional<Integer> height = getImageHeight();
-        if (width.isPresent() && height.isPresent()) {
-            image = NDImageUtils.resize(image, width.get(), height.get());
-        }
-
-        NDList data = new NDList(image);
+        NDList data = new NDList(getRecordImage(manager, index));
         NDList label = new NDList(manager.create(getClassNumber(index)));
         return new Record(data, label);
     }
@@ -106,61 +84,9 @@ public abstract class ImageClassificationDataset extends RandomAccessDataset {
     }
 
     /**
-     * Returns the number of channels in the images in the dataset.
-     *
-     * <p>For example, RGB would be 3 channels while grayscale only uses 1 channel.
-     *
-     * @return the number of channels in the images in the dataset
-     */
-    public int getImageChannels() {
-        return flag.numChannels();
-    }
-
-    /**
-     * Returns the width of the images in the dataset.
-     *
-     * @return the width of the images in the dataset
-     */
-    public abstract Optional<Integer> getImageWidth();
-
-    /**
-     * Returns the height of the images in the dataset.
-     *
-     * @return the height of the images in the dataset
-     */
-    public abstract Optional<Integer> getImageHeight();
-
-    /**
      * Returns the classes that the images in the dataset are classified into.
      *
      * @return the classes that the images in the dataset are classified into
      */
     public abstract List<String> getClasses();
-
-    /**
-     * Used to build an {@link ImageClassificationDataset}.
-     *
-     * @param <T> the builder type
-     */
-    @SuppressWarnings("rawtypes")
-    public abstract static class BaseBuilder<T extends BaseBuilder<T>>
-            extends RandomAccessDataset.BaseBuilder<T> {
-
-        Image.Flag flag;
-
-        protected BaseBuilder() {
-            flag = Image.Flag.COLOR;
-        }
-
-        /**
-         * Sets the optional color mode flag.
-         *
-         * @param flag the color mode flag
-         * @return this builder
-         */
-        public T optFlag(Image.Flag flag) {
-            this.flag = flag;
-            return self();
-        }
-    }
 }
