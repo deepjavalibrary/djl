@@ -78,6 +78,13 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [tensorflow-native-cpu(win-x86_64)](../../tensorflow/README.md#windows-cpu) | Contains TensorFlow native library for Windows |
 | | [tensorflow-native-cu101(linux-x86_84)](../../tensorflow/README.md#linux-gpu) | Contains TensorFlow native library for Linux with CUDA 10.1 |
 | | | |
+| [ai.djl.paddlepaddle](https://search.maven.org/search?q=g:ai.djl.paddlepaddle) | [paddlepaddle-engine](../../paddlepaddle/paddlepaddle-engine/README.md#installation) | PaddlePaddle engine adapter |
+| | [paddlepaddle-model-zoo](../../paddlepaddle/paddlepaddle-model-zoo/README.md#installation) | Contains state of the art PaddlePaddle models |
+| | [paddlepaddle-native-auto](../../paddlepaddle/paddlepaddle-engine/README.md#automatic-recommended) | A placeholder package to automatically download native libraries for your platform |
+| | [paddlepaddle-native-cpu(osx-x86_64)](../../paddlepaddle/paddlepaddle-engine/README.md#macos) | Contains PaddlePaddle native library for macOS |
+| | [paddlepaddle-native-cpu(linux-x86_64)](../../paddlepaddle/paddlepaddle-engine/README.md#linux) | Contains PaddlePaddle native library for Linux |
+| | [paddlepaddle-native-cpu(win-x86_64)](../../paddlepaddle/paddlepaddle-engine/README.md#windows) | Contains PaddlePaddle native library for Windows |
+| | | |
 | [ai.djl.onnxruntime](https://search.maven.org/search?q=g:ai.djl.onnxruntime) | [onnxruntime-engine](../../onnxruntime/onnxruntime-engine/README.md#installation) | ONNX Runtime engine adapter |
 | | onnxruntime-api(deprecated) | Please use com.microsoft.onnxruntime:onnxruntime instead |
 | | onnxruntime-native-auto(deprecated) | Please use com.microsoft.onnxruntime:onnxruntime instead |
@@ -87,6 +94,11 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [dlr-native-auto](../../dlr/dlr-engine/README.md#automatic-recommended) | A placeholder package to automatically download native libraries for your platform |
 | | [dlr-native-cpu(osx-x86_64)](../../dlr/dlr-engine/README.md#macos) | Contains Neo LR native library for macOS |
 | | [dlr-native-cpu(linux-x86_64)](../../dlr/dlr-engine/README.md#linux) | Contains Neo DLR native library for Linux |
+| | | |
+| [ai.djl.tflite](https://search.maven.org/search?q=g:ai.djl.tflite) | [tflite-engine](../../tflite/tflite-engine/README.md#installation) | TensorFlow Lite engine adapter |
+| | [tflite-native-auto](../../tflite/tflite-engine/README.md#automatic-recommended) | A placeholder package to automatically download native libraries for your platform |
+| | [tflite-native-cpu(osx-x86_64)](../../tflite/tflite-engine/README.md#macos) | Contains TensorFlow Lite native library for macOS |
+| | [tflite-native-cpu(linux-x86_64)](../../tflite/tflite-engine/README.md#linux) | Contains TensorFlow Lite native library for Linux |
 | | | |
 | [ai.djl.android](https://search.maven.org/search?q=g:ai.djl.android) | [core](../../android/README.md#installation) | Contains Android specific utilities (e.g. ImageFactory) for DJL |
 | | [pytorch-native](../../android/README.md#installation) | Contains DJL PyTorch Android native package |

@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.Assertions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -77,26 +78,41 @@ public class NDArrayShapesManipulationOpTest {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f});
             NDArray expected =
                     manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(2, 1, 1, 3));
-            Assert.assertEquals(array.reshape(2, 1, 1, 3), expected);
-            Assert.assertEquals(array.reshape(-1, 1, 1, 3), expected);
+            Assertions.assertAlmostEquals(array.reshape(2, 1, 1, 3), expected);
+            try {
+                // only MXNet, PyTorch and TensorFlow support -1
+                Assertions.assertAlmostEquals(array.reshape(-1, 1, 1, 3), expected);
+            } catch (UnsupportedOperationException ignore) {
+                // ignore
+            }
 
             // multi-dim
             array = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(3, 2));
             expected = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(2, 3));
-            Assert.assertEquals(array.reshape(new Shape(2, 3)), expected);
-            Assert.assertEquals(array.reshape(new Shape(2, -1)), expected);
+            Assertions.assertAlmostEquals(array.reshape(new Shape(2, 3)), expected);
+            try {
+                // only MXNet, PyTorch and TensorFlow support -1
+                Assertions.assertAlmostEquals(array.reshape(new Shape(2, -1)), expected);
+            } catch (UnsupportedOperationException ignore) {
+                // ignore
+            }
 
             // scalar
             array = manager.create(5f);
             expected = manager.create(new float[] {5f});
-            Assert.assertEquals(array.reshape(1), expected);
+            Assertions.assertAlmostEquals(array.reshape(1), expected);
             expected = manager.create(new float[] {5f}, new Shape(1, 1, 1));
-            Assert.assertEquals(array.reshape(1, -1, 1), expected);
+            try {
+                // only MXNet, PyTorch and TensorFlow support -1
+                Assertions.assertAlmostEquals(array.reshape(1, -1, 1), expected);
+            } catch (UnsupportedOperationException ignore) {
+                // ignore
+            }
 
             // zero-dim
             array = manager.create(new Shape(1, 0));
             expected = manager.create(new Shape(2, 3, 0, 1));
-            Assert.assertEquals(array.reshape(2, 3, 0, 1), expected);
+            Assertions.assertAlmostEquals(array.reshape(2, 3, 0, 1), expected);
         }
     }
 

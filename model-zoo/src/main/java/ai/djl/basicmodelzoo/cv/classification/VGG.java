@@ -26,6 +26,9 @@ import ai.djl.nn.pooling.Pool;
 /**
  * VGG model from the "Very Deep Convolutional Networks for Large-Scale Image Recognition"
  * https://arxiv.org/abs/1409.1556 paper.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_convolutional-modern/vgg.html">The D2L chapter on
+ *     VGG</a>
  */
 public final class VGG {
 

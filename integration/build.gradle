@@ -19,7 +19,20 @@ dependencies {
     runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
     runtimeOnly project(":tensorflow:tensorflow-model-zoo")
     runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
-    runtimeOnly project(":onnxruntime:onnxruntime-engine")
+
+    if (System.getProperty("ai.djl.default_engine") == "OnnxRuntime") {
+        // onnxruntime requires user install libgomp.so.1 manually, exclude from default dependency
+        runtimeOnly project(":onnxruntime:onnxruntime-engine")
+    } else if (System.getProperty("ai.djl.default_engine") == "TFLite") {
+        runtimeOnly project(":tflite:tflite-engine")
+        runtimeOnly "ai.djl.tflite:tflite-native-auto:${tflite_version}"
+    } else if (System.getProperty("ai.djl.default_engine") == "DLR") {
+        runtimeOnly project(":dlr:dlr-engine")
+        runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
+    } else if (System.getProperty("ai.djl.default_engine") == "PaddlePaddle") {
+        runtimeOnly project(":paddlepaddle:paddlepaddle-model-zoo")
+        runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
+    }
 }
 
 task copyDependencies(type: Copy) {
@@ -41,14 +54,18 @@ run {
 
 jacocoTestReport {
     group = "Reporting"
-    getSourceDirectories().from(files())
-    getClassDirectories().from(files())
 
-    javaProjects().findAll { p ->
-        ![":mxnet:jnarator", ":tensorflow:engine", ":examples"].contains(p.getPath())
-    }.each { p ->
-        additionalSourceDirs files((Set<File>) p.sourceSets.main.allJava.srcDirs)
-        additionalClassDirs((FileCollection) p.sourceSets.main.output)
+    javaProjects().each { p ->
+        if ([":api", ":basicdataset"].contains(p.getPath())) {
+            additionalSourceDirs files((Set<File>) p.sourceSets.main.allJava.srcDirs)
+            additionalClassDirs((FileCollection) p.sourceSets.main.output)
+        }
+    }
+
+    afterEvaluate {
+        getClassDirectories().setFrom(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ["**/ai/djl/integration/**"])
+        })
     }
 
     reports {
@@ -74,13 +91,28 @@ tasks.distTar.enabled = false
 test.finalizedBy project.tasks.jacocoTestReport, project.tasks.jacocoTestCoverageVerification
 
 jacocoTestCoverageVerification {
+    javaProjects().each { p ->
+        if ([":api", ":basicdataset"].contains(p.getPath())) {
+            additionalSourceDirs files((Set<File>) p.sourceSets.main.allJava.srcDirs)
+            additionalClassDirs((FileCollection) p.sourceSets.main.output)
+        }
+    }
+
+    afterEvaluate {
+        getClassDirectories().setFrom(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ["**/ai/djl/integration/**"])
+        })
+    }
+
     violationRules {
         rule {
             limit {
-                if (["PyTorch", "TensorFlow"].contains(System.getProperty("ai.djl.default_engine"))) {
-                    minimum = 0.6
+                if (System.getProperty("ai.djl.default_engine") == "PyTorch") {
+                    minimum = 0.4
+                } else if (System.getProperty("ai.djl.default_engine") == "TensorFlow") {
+                    minimum = 0.29
                 } else {
-                    minimum = 0.7
+                    minimum = 0.45
                 }
             }
         }

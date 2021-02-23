@@ -42,12 +42,13 @@ export default function DynForm(props) {
 	
 	return (
 		<>
-			{Object.keys(props.data).map((key) => (
+			{Object.keys(props.data).filter(key=>key!=='licenses').map((key) => (
 					<div >
 						<TextField
 							id={key}
 							label={key}
 							key={props.data[key]}
+							fullWidth={true}
 							defaultValue={props.data[key]}
 							InputProps={{
 								readOnly: true,

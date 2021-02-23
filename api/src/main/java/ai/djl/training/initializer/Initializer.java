@@ -22,6 +22,10 @@ import ai.djl.nn.Block;
  * An interface representing an initialization method.
  *
  * <p>Used to initialize the {@link NDArray} parameters stored within a {@link Block}.
+ *
+ * @see <a
+ *     href="https://d2l.djl.ai/chapter_multilayer-perceptrons/numerical-stability-and-init.html">The
+ *     D2L chapter on numerical stability and initialization</a>
  */
 public interface Initializer {
 

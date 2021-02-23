@@ -30,6 +30,9 @@ import java.util.function.Function;
  * <p>MLP is widely used for solving problems that require supervised learning as well as research
  * into computational neuroscience and parallel distributed processing. Applications include speech
  * recognition, image recognition and machine translation.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_multilayer-perceptrons/mlp.html">The D2L chapters on
+ *     MLPs</a>
  */
 public class Mlp extends SequentialBlock {
 

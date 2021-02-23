@@ -12,14 +12,38 @@
  */
 package ai.djl.integration;
 
+import ai.djl.util.cuda.CudaUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class IntegrationTests {
 
+    private static final Logger logger = LoggerFactory.getLogger(IntegrationTests.class);
+
     @Test
     public void runIntegrationTests() {
         String[] args = {};
-        Assert.assertTrue(new IntegrationTest(IntegrationTest.class).runTests(args));
+
+        String[] engines;
+        String defaultEngine = System.getProperty("ai.djl.default_engine");
+        if (defaultEngine == null) {
+            engines = new String[] {"MXNet", "PyTorch", "TensorFlow"};
+        } else {
+            engines = new String[] {defaultEngine};
+        }
+
+        for (String engine : engines) {
+            System.setProperty("ai.djl.default_engine", engine);
+            logger.info("Testing engine: {} ...", engine);
+            Assert.assertTrue(new IntegrationTest(IntegrationTest.class).runTests(args));
+            // currently each engine will reserve a certain amount of memory and hold it until
+            // process terminate so running 3 different engines sequentially without
+            // calling System.exit() causes OOM issue. For GPU env, only defaultEngine is run
+            if (CudaUtils.hasCuda()) {
+                break;
+            }
+        }
     }
 }

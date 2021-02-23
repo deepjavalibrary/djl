@@ -1,7 +1,8 @@
 # Community Leaders
 
-DJL’s success is largely attributed to community contributions.
-You can get involved and engage with us by joining our [Slack channel](deepjavalibrary.slack.com), [Wechat](https://zhuanlan.zhihu.com/p/336323550), or [Github](https://github.com/awslabs/djl) discussions. Kudos to our community leaders for helping evangelizing DJL and contributing to our Github!
+DJL is a community project. It is led by AWS and the many other contributors from a variety of backgrounds, both corporate and academic, who bring their unique perspectives to help make DJL and the Java deep learning ecosystem the best it can be. To recognize the great people helping us build this community, we created the **DJL Community Leaders** to help steer the project.
+
+The community leaders are those who are the most active members of our community. They help give back to it by sharing projects, writing blog posts, giving talks, answering questions, contributing ideas, reviewing pull requests, and writing code in DJL. Like the project itself, the community leaders are a growing group and we are always looking to invite more people who show passion, dedication, and commitment to join.
 
 | | | | | |
 |-------|----------------|---------|------------| ----------- |
@@ -40,11 +41,15 @@ Frank Liu is a Software Engineer for AWS Deep Learning. He focuses on building i
 
 Jake is one of core developers in the AWS DJL team. He graduated from CMU with MS degree in Software Engineering. He loves to learn things about Deep Learning in particular Deep Learning System. Outside of work, Jake enjoys watching movie, TV series, and anime.
 
-#### Keerthan Vasist | [github](https://github.com/keerthanvasist)
+#### Keerthan Vasist
+
+[github](https://github.com/keerthanvasist)
 
 Keerthan is a software engineer in AWS Deep Engines Org. His current work focuses on explainability and bias in machine learning. Outside of work, he enjoys playing Ultimate Frisbee, and badminton.
 
-#### Kimi Ma | [github](https://github.com/kimim)
+#### Kimi Ma
+
+[github](https://github.com/kimim)
 
 Kimi Ma is Industrial Internet director of Wanxiang Group, responsible for Wanxiang industrial digital platform development, business model innovation, and global partnerships. His primary interests in 2021 include energy internet, distributed intelligence and smart city. Before joining Wanxiang, Kimi was the R&D Manager of ABB control technology platform and Nokia Siemens Network.
 Meantime, he is a board member in the Alliance of Industrial Internet and contributes to Clojure DJL: [clj-djl](https://github.com/kimim/clj-djl).

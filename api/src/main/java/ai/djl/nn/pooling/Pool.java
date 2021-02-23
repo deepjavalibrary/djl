@@ -19,7 +19,12 @@ import ai.djl.nn.LambdaBlock;
 import ai.djl.util.Preconditions;
 import java.util.Objects;
 
-/** Utility class that provides {@code Block} and methods for different pooling functions. */
+/**
+ * Utility class that provides {@code Block} and methods for different pooling functions.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_convolutional-neural-networks/pooling.html">The D2L
+ *     chapter on pooling</a>
+ */
 public final class Pool {
 
     private Pool() {}

@@ -12,12 +12,14 @@
  */
 package ai.djl.training.tracker;
 
-import ai.djl.training.tracker.WarmUpTracker.Builder;
 import ai.djl.util.Preconditions;
 
 /**
  * {@code CosineTracker} is an implementation of {@link Tracker} which is updated by taking sections
  * of a cosine curve to smoothly reduce learning rate until a specified step and base learning rate.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_optimization/lr-scheduler.html#cosine-tracker">For
+ *     tracking learning rates, this section in the D2L chapter on learning rate scheduling</a>
  */
 public class CosineTracker implements Tracker {
 

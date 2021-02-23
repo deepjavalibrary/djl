@@ -18,6 +18,8 @@ import ai.djl.util.Preconditions;
 /**
  * {@code FactorTracker} is an implementation of {@link Tracker} which is updated by a constant
  * factor.
+ *
+ * @see Tracker
  */
 public class LinearTracker implements Tracker {
 

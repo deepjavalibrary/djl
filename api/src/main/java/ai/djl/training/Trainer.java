@@ -56,6 +56,9 @@ import org.slf4j.LoggerFactory;
  *       href="https://github.com/awslabs/djl/blob/master/jupyter/load_mxnet_model.ipynb">Inference
  *       with an MXNet model</a>
  * </ul>
+ *
+ * @see <a href="http://docs.djl.ai/docs/development/memory_management.html">The guide on memory
+ *     management</a>
  */
 public class Trainer implements AutoCloseable {
 

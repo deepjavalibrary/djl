@@ -783,7 +783,7 @@ public class NDArrayOtherOpTest {
             NDArray array = manager.create(new byte[] {0, 3}, new Shape(2));
             byte[] bytes = array.encode();
             NDArray recovered = NDArray.decode(manager, bytes);
-            Assert.assertEquals(recovered, array);
+            Assertions.assertAlmostEquals(recovered, array);
 
             array.setName("data");
             bytes = array.encode();
@@ -795,7 +795,7 @@ public class NDArrayOtherOpTest {
                     "00044e44415200000001000544454e53450004494e543800000001000000000000000200000001003f000000020003";
             bytes = Hex.toByteArray(s);
             recovered = NDArray.decode(manager, bytes);
-            Assert.assertEquals(recovered, array);
+            Assertions.assertAlmostEquals(recovered, array);
         }
     }
 

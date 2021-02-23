@@ -54,16 +54,16 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
 
         int numOfThreads = arguments.getThreads();
         int delay = arguments.getDelay();
-        AtomicInteger counter = new AtomicInteger(iteration + 1);
+        AtomicInteger counter = new AtomicInteger(iteration);
         logger.info("Multithreaded inference with {} threads.", numOfThreads);
 
-        List<PredictorCallable> callables = new ArrayList<>(numOfThreads + 1);
-        for (int i = 0; i < numOfThreads + 1; ++i) {
+        List<PredictorCallable> callables = new ArrayList<>(numOfThreads);
+        for (int i = 0; i < numOfThreads; ++i) {
             callables.add(new PredictorCallable(model, inputData, metrics, counter, i, i == 0));
         }
 
         Object classification = null;
-        ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads + 1);
+        ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
 
         MemoryTrainingListener.collectMemoryInfo(metrics); // Measure memory before worker kickoff
 
@@ -99,8 +99,8 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         }
 
         model.close();
-        if (successThreads != numOfThreads + 1) {
-            logger.error("Only {}/{} threads finished.", successThreads - 1, numOfThreads);
+        if (successThreads != numOfThreads) {
+            logger.error("Only {}/{} threads finished.", successThreads, numOfThreads);
             return null;
         }
 
@@ -149,25 +149,21 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
             Object result = null;
             int count = 0;
             int remaining;
-            if (collectMemory) {
-                result = "MemoryCollector";
-                while (counter.get() > 0) {
+            while ((remaining = counter.decrementAndGet()) > 0 || result == null) {
+                try {
+                    result = predictor.predict(inputData);
+                } catch (Exception e) {
+                    // stop immediately when we find any exception
+                    counter.set(0);
+                    throw e;
+                }
+                if (collectMemory) {
                     MemoryTrainingListener.collectMemoryInfo(metrics);
                 }
-            } else {
-                while ((remaining = counter.decrementAndGet()) > 0 || result == null) {
-                    try {
-                        result = predictor.predict(inputData);
-                    } catch (Exception e) {
-                        // stop immediately when we find any exception
-                        counter.set(0);
-                        throw e;
-                    }
-                    int processed = total - remaining + 1;
-                    logger.trace("Worker-{}: {} iteration finished.", workerId, ++count);
-                    if (processed % steps == 0 || processed == total) {
-                        logger.info("Completed {} requests", processed);
-                    }
+                int processed = total - remaining + 1;
+                logger.trace("Worker-{}: {} iteration finished.", workerId, ++count);
+                if (processed % steps == 0 || processed == total) {
+                    logger.info("Completed {} requests", processed);
                 }
             }
             logger.debug("Worker-{}: finished.", workerId);

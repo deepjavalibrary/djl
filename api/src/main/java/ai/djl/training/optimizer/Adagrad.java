@@ -33,6 +33,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * \( weight -= lr * grad / (sqrt(history) + epsilon) \)<br>
  * <br>
  * where grad represents the gradient, wd represents weight decay, and lr represents learning rate.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_optimization/adagrad.html">The D2L chapter on
+ *     Adagrad</a>
  */
 public class Adagrad extends Optimizer {
 

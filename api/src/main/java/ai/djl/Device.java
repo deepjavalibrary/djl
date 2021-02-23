@@ -25,6 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Users can use this to specify whether to load/compute the {@code NDArray} on CPU/GPU with
  * deviceType and deviceId provided.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_deep-learning-computation/use-gpu.html">The D2L chapter
+ *     on GPU devices</a>
  */
 public final class Device {
 

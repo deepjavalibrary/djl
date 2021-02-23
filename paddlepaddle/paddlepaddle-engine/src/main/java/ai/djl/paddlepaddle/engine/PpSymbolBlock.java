@@ -82,10 +82,13 @@ public class PpSymbolBlock extends AbstractSymbolBlock {
     private NDList getOutputs(PpNDArray[] outputs, boolean foreignEngine, NDManager inputManager) {
         NDList list = new NDList(outputs.length);
         for (PpNDArray output : outputs) {
+
             if (foreignEngine) {
                 list.add(
                         inputManager.create(
-                                output.toByteBuffer(), output.getShape(), output.getDataType()));
+                                output.getDataType().asDataType(output.toByteBuffer()),
+                                output.getShape(),
+                                output.getDataType()));
             } else {
                 list.add(output);
             }

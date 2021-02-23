@@ -19,7 +19,12 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** {@code Adadelta} is an Adadelta {@code Optimizer}. */
+/**
+ * {@code Adadelta} is an Adadelta {@code Optimizer}.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_optimization/adadelta.html">The D2L chapter on
+ *     Adadelta</a>
+ */
 public class Adadelta extends Optimizer {
 
     private float rho;

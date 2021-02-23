@@ -32,6 +32,9 @@ import java.util.Arrays;
  *
  * <p>Implementing the original resnet ILSVRC 2015 winning network from Kaiming He, Xiangyu Zhang,
  * Shaoqing Ren, Jian Sun. "Deep Residual Learning for Image Recognition"
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_convolutional-modern/resnet.html">The D2L chapter on
+ *     ResNet</a>
  */
 public final class ResNetV1 {
 

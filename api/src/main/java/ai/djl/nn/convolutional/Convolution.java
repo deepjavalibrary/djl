@@ -66,6 +66,9 @@ import java.io.IOException;
  * share the same core principal as a {@code Convolution} layer does, with the difference being the
  * number of input dimension each operates on as denoted by {@code ConvXD} for {@code X}
  * dimension(s).
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_convolutional-neural-networks/why-conv.html">The D2L
+ *     chapters on convolution</a>
  */
 public abstract class Convolution extends AbstractBlock {
 

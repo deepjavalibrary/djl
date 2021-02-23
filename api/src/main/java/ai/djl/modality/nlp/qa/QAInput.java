@@ -12,7 +12,7 @@
  */
 package ai.djl.modality.nlp.qa;
 
-/** The input container for BERT QA model. */
+/** The input container for a {@link ai.djl.Application.NLP#QUESTION_ANSWER} model. */
 public class QAInput {
 
     private String question;

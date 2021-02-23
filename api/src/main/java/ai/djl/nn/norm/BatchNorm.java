@@ -59,6 +59,9 @@ import java.io.IOException;
  * stability. The scale and shift operation can be formally defined as follows: <br>
  * \(y \:=\: \gamma\hat{x} \:+\: \beta\), <br>
  * where \(\gamma\) is the scale factor and \(\beta\) is the shift factor.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_convolutional-modern/batch-norm.html">The D2L chapter on
+ *     batch normalization</a>
  */
 public class BatchNorm extends AbstractBlock {
 
