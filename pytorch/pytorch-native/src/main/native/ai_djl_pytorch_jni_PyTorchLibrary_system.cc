@@ -81,10 +81,12 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchShowConfig(
   jclass set_class = env->GetObjectClass(jset);
   if (set_class == nullptr) {
     env->ThrowNew(NULL_PTR_EXCEPTION_CLASS, "Java Set class is not found");
+    return;
   }
   jmethodID add_method_id = env->GetMethodID(set_class, "add", "(Ljava/lang/Object;)Z");
   if (add_method_id == nullptr) {
     env->ThrowNew(NULL_PTR_EXCEPTION_CLASS, "The add method in Set is not found");
+    return;
   }
   std::string feature;
   jstring jfeature;
@@ -253,6 +255,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStartProfile(
   API_BEGIN()
   if (profilerEnabled()) {
     env->ThrowNew(ENGINE_EXCEPTION_CLASS, "please call stopProfile before you start a new section");
+    return;
   }
   enableProfiler(ProfilerConfig(juse_cuda ? ProfilerState::CUDA : ProfilerState::CPU,
       /* report_input_shapes */ jrecord_shape,
@@ -265,6 +268,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStopProfile(
   API_BEGIN()
   if (!profilerEnabled()) {
     env->ThrowNew(ENGINE_EXCEPTION_CLASS, "please call startProfiler() before you use stopProfile!");
+    return;
   }
   std::string output_file = djl::utils::jni::GetStringFromJString(env, joutput_file);
   std::ofstream file(output_file);

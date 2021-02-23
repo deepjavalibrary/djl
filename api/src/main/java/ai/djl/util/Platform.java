@@ -161,16 +161,17 @@ public final class Platform {
     /**
      * Returns true the platforms match (os and flavor).
      *
-     * @param other the platform to compare it to
+     * @param system the platform to compare it to
      * @return true if the platforms match
      */
-    public boolean matches(Platform other) {
-        if (!osPrefix.equals(other.osPrefix)) {
+    public boolean matches(Platform system) {
+        if (!osPrefix.equals(system.osPrefix)) {
             return false;
         }
-        if (flavor.startsWith("cu") != other.flavor.startsWith("cu")) {
-            return false;
+        // if system Machine is GPU
+        if (system.flavor.startsWith("cu")) {
+            return "".equals(flavor) || "cpu".equals(flavor) || flavor.equals(system.flavor);
         }
-        return flavor.startsWith(other.flavor) || other.flavor.startsWith(flavor);
+        return "".equals(flavor) || "cpu".equals(flavor);
     }
 }

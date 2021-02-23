@@ -22,6 +22,8 @@ import ai.djl.pytorch.engine.PtDeviceType;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.pytorch.engine.PtSymbolBlock;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
@@ -43,6 +45,8 @@ public final class JniUtils {
     private static Set<String> configs;
 
     private static final int NULL_PTR = 0;
+
+    private static final int BYTE_LENGTH = 4194304;
 
     private JniUtils() {}
 
@@ -1372,6 +1376,36 @@ public final class JniUtils {
                         extraFileKeys,
                         extraFileValues);
         return new PtSymbolBlock(manager, handle);
+    }
+
+    public static PtSymbolBlock loadModule(PtNDManager manager, InputStream is, Device device) {
+        byte[] buf = new byte[BYTE_LENGTH];
+        long handle =
+                PyTorchLibrary.LIB.moduleLoad(
+                        is,
+                        new int[] {
+                            PtDeviceType.toDeviceType(device),
+                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                        },
+                        buf);
+        return new PtSymbolBlock(manager, handle);
+    }
+
+    public static void writeModule(PtSymbolBlock block, OutputStream os) {
+        byte[] buf = new byte[BYTE_LENGTH];
+        PyTorchLibrary.LIB.moduleWrite(block.getHandle(), os, buf);
+    }
+
+    public static NDList moduleGetParams(PtSymbolBlock block, PtNDManager manager) {
+        long[] handles = PyTorchLibrary.LIB.moduleGetParams(block.getHandle());
+        String[] names = PyTorchLibrary.LIB.moduleGetParamNames(block.getHandle());
+        NDList list = new NDList(handles.length);
+        for (int i = 0; i < handles.length; i++) {
+            PtNDArray array = new PtNDArray(manager, handles[i]);
+            array.setName(names[i]);
+            list.add(array);
+        }
+        return list;
     }
 
     public static void enableInferenceMode(PtSymbolBlock block) {

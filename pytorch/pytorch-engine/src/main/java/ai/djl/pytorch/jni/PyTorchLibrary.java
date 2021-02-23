@@ -12,6 +12,8 @@
  */
 package ai.djl.pytorch.jni;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.Set;
 
@@ -460,11 +462,19 @@ final class PyTorchLibrary {
     native long moduleLoad(
             String path, int[] device, String[] extraFileNames, String[] extraFileValues);
 
+    native long moduleLoad(InputStream is, int[] device, byte[] buffer);
+
     native void moduleEval(long handle);
 
     native void moduleTrain(long handle);
 
     native long moduleForward(long moduleHandle, long[] iValueHandles, boolean isTrain);
+
+    native void moduleWrite(long moduleHandle, OutputStream os, byte[] buffer);
+
+    native long[] moduleGetParams(long moduleHandle);
+
+    native String[] moduleGetParamNames(long moduleHandle);
 
     native long iValueFromTensor(long tensorHandle);
 
