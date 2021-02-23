@@ -11,8 +11,8 @@
  * and limitations under the License.
  */
 
-#include <torch/script.h>
 #include <djl/utils.h>
+#include <torch/script.h>
 
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_exception.h"

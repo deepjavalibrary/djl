@@ -12,9 +12,9 @@
  */
 #include "ai_djl_fasttext_jni_FastTextLibrary.h"
 
-#include <numeric>
-
 #include <djl/utils.h>
+
+#include <numeric>
 
 #include "args.h"
 #include "dictionary.h"
