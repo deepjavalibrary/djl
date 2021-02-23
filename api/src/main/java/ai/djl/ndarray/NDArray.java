@@ -4547,10 +4547,10 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns a one-hot {@code NDArray}.
      *
-     * @param depth Depth
-     * @param onValue onValue
-     * @param offValue offValue
-     * @param dataType dataType
+     * @param depth Depth of the one hot dimension.
+     * @param onValue The value assigned to the locations represented by indices.
+     * @param offValue The value assigned to the locations not represented by indices.
+     * @param dataType dataType of the output.
      * @return one-hot encoding of this {@code NDArray}
      */
     NDArray oneHot(int depth, float onValue, float offValue, DataType dataType);
@@ -4558,10 +4558,10 @@ public interface NDArray extends AutoCloseable {
     /**
      * Returns a one-hot {@code NDArray}.
      *
-     * @param depth Depth
+     * @param depth Depth of the one hot dimension.
      * @return one-hot encoding of this {@code NDArray}
      */
     default NDArray oneHot(int depth) {
-        return oneHot(depth, 1f, 0f, getDataType());
+        return oneHot(depth, 1f, 0f, DataType.FLOAT32);
     }
 }

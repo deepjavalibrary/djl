@@ -582,7 +582,7 @@ public class TfNDArray implements NDArray {
                                 tf.constant(offValue),
                                 OneHot.axis(-1L))
                         .asTensor()) {
-            return new TfNDArray(manager, tensor);
+            return new TfNDArray(manager, tensor).toType(dataType, false);
         }
     }
 

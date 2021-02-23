@@ -1504,7 +1504,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         params.add("on_value", onValue);
         params.add("off_value", offValue);
         params.add("dtype", dataType);
-        return manager.invoke("_npx_one_hot", this, params);
+        return manager.invoke("_npx_one_hot", this, params).toType(dataType, false);
     }
 
     /** {@inheritDoc} */

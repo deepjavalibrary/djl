@@ -862,4 +862,30 @@ public class NDArrayOtherOpTest {
             Assertions.assertAlmostEquals(array.norm(new int[] {0}, true), expected);
         }
     }
+
+    @Test
+    public void testOneHot() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            // test basic
+            NDArray array = manager.create(new int[] {1, 0, 2, 0});
+            NDArray expected =
+                    manager.create(
+                            new float[][] {{0f, 1f, 0f}, {1f, 0f, 0f}, {0f, 0f, 1f}, {1f, 0f, 0f}});
+            Assert.assertEquals(array.oneHot(3), expected);
+            // test with all parameters
+            array = manager.create(new int[] {1, 0, 2, 0});
+            expected = manager.create(new int[][] {{1, 8, 1}, {8, 1, 1}, {1, 1, 8}, {8, 1, 1}});
+            Assert.assertEquals(array.oneHot(3, 8f, 1f, array.getDataType()), expected);
+            // test basic 2-D
+            array = manager.create(new int[][] {{1, 0}, {1, 0}, {2, 0}});
+            expected =
+                    manager.create(
+                                    new float[] {
+                                        0f, 1f, 0f, 1f, 0f, 0f, 0f, 1f, 0f, 1f, 0f, 0f, 0f, 0f, 1f,
+                                        1f, 0f, 0f
+                                    })
+                            .reshape(new Shape(3, 2, 3));
+            Assert.assertEquals(array.oneHot(3), expected);
+        }
+    }
 }
