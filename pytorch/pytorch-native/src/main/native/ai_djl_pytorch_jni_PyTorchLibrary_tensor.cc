@@ -79,7 +79,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTo(
 }
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGetItem__JJ(
-        JNIEnv* env, jobject jthis, jlong jhandle, jlong jindex) {
+    JNIEnv* env, jobject jthis, jlong jhandle, jlong jindex) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->index({static_cast<int64_t>(jindex)}));
@@ -94,9 +94,8 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGetItem__J_3
   std::vector<int64_t> vec = djl::utils::jni::GetVecFromJLongArray(env, jindices);
   std::vector<torch::indexing::TensorIndex> indices;
   indices.reserve(vec.size());
-  std::transform(vec.begin(), vec.end(), std::back_inserter(indices), [](int64_t index) {
-    return torch::indexing::TensorIndex{index};
-  });
+  std::transform(vec.begin(), vec.end(), std::back_inserter(indices),
+      [](int64_t index) { return torch::indexing::TensorIndex{index}; });
   const auto* result_ptr = new torch::Tensor(tensor_ptr->index(indices));
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()

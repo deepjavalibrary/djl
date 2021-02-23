@@ -14,6 +14,7 @@
 #include "ai_djl_sentencepiece_jni_SentencePieceLibrary.h"
 
 #include <djl/utils.h>
+
 #include "sentencepiece_processor.h"
 
 inline void CheckStatus(JNIEnv* env, const sentencepiece::util::Status& status) {

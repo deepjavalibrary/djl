@@ -10,8 +10,8 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-#include <torch/torch.h>
 #include <djl/utils.h>
+#include <torch/torch.h>
 
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_exception.h"
@@ -143,9 +143,9 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNDropout(
   API_END_RETURN()
 }
 
-JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRnn(JNIEnv* env, jobject jthis,
-  jlong jinput, jlong jhx, jlongArray jparams, jboolean jhas_biases, jint jnum_layers, jint jactivation,
-  jdouble jdrop_rate, jboolean jtraining, jboolean jbidirectional, jboolean jbatch_first) {
+JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRnn(JNIEnv* env, jobject jthis, jlong jinput,
+    jlong jhx, jlongArray jparams, jboolean jhas_biases, jint jnum_layers, jint jactivation, jdouble jdrop_rate,
+    jboolean jtraining, jboolean jbidirectional, jboolean jbatch_first) {
   API_BEGIN()
   const auto* input_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   const auto* hx_ptr = reinterpret_cast<torch::Tensor*>(jhx);
@@ -153,11 +153,11 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRnn(J
 
   std::tuple<torch::Tensor, torch::Tensor> outputs;
   if (jactivation == 0) {
-    outputs = torch::rnn_relu(*input_ptr, *hx_ptr, torch::TensorList(params), jhas_biases, jnum_layers,
-                                              jdrop_rate, jtraining, jbidirectional, jbatch_first);
+    outputs = torch::rnn_relu(*input_ptr, *hx_ptr, torch::TensorList(params), jhas_biases, jnum_layers, jdrop_rate,
+        jtraining, jbidirectional, jbatch_first);
   } else if (jactivation == 1) {
-    outputs = torch::rnn_tanh(*input_ptr, *hx_ptr, torch::TensorList(params), jhas_biases, jnum_layers,
-                                              jdrop_rate, jtraining, jbidirectional, jbatch_first);
+    outputs = torch::rnn_tanh(*input_ptr, *hx_ptr, torch::TensorList(params), jhas_biases, jnum_layers, jdrop_rate,
+        jtraining, jbidirectional, jbatch_first);
   } else {
     env->ThrowNew(ENGINE_EXCEPTION_CLASS, "can't find activation");
   }
@@ -173,17 +173,16 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRnn(J
   API_END_RETURN()
 }
 
-JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNGru(JNIEnv* env, jobject jthis,
-  jlong jinput, jlong jhx, jlongArray jparams, jboolean jhas_biases, jint jnum_layers, jdouble jdrop_rate,
-  jboolean jtraining, jboolean jbidirectional, jboolean jbatch_first) {
+JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNGru(JNIEnv* env, jobject jthis, jlong jinput,
+    jlong jhx, jlongArray jparams, jboolean jhas_biases, jint jnum_layers, jdouble jdrop_rate, jboolean jtraining,
+    jboolean jbidirectional, jboolean jbatch_first) {
   API_BEGIN()
   const auto* input_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   const auto* hx_ptr = reinterpret_cast<torch::Tensor*>(jhx);
   const std::vector<torch::Tensor> params = djl::utils::jni::GetObjectVecFromJHandles<torch::Tensor>(env, jparams);
 
-  std::tuple<torch::Tensor, torch::Tensor> outputs =
-          torch::gru(*input_ptr, *hx_ptr, torch::TensorList(params), jhas_biases, jnum_layers,
-                     jdrop_rate, jtraining, jbidirectional, jbatch_first);
+  std::tuple<torch::Tensor, torch::Tensor> outputs = torch::gru(*input_ptr, *hx_ptr, torch::TensorList(params),
+      jhas_biases, jnum_layers, jdrop_rate, jtraining, jbidirectional, jbatch_first);
 
   // process output
   jlongArray jarray = env->NewLongArray(2);
@@ -197,16 +196,15 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNGru(J
 }
 
 JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLstm(JNIEnv* env, jobject jthis,
-  jlong jinput, jlongArray jhx, jlongArray jparams, jboolean jhas_biases, jint jnum_layers, jdouble jdrop_rate,
-  jboolean jtraining, jboolean jbidirectional, jboolean jbatch_first) {
+    jlong jinput, jlongArray jhx, jlongArray jparams, jboolean jhas_biases, jint jnum_layers, jdouble jdrop_rate,
+    jboolean jtraining, jboolean jbidirectional, jboolean jbatch_first) {
   API_BEGIN()
   const auto* input_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   const std::vector<torch::Tensor> hx = djl::utils::jni::GetObjectVecFromJHandles<torch::Tensor>(env, jhx);
   const std::vector<torch::Tensor> params = djl::utils::jni::GetObjectVecFromJHandles<torch::Tensor>(env, jparams);
 
-  std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> outputs =
-            torch::lstm(*input_ptr, torch::TensorList(hx), torch::TensorList(params), jhas_biases, jnum_layers,
-                       jdrop_rate, jtraining, jbidirectional, jbatch_first);
+  std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> outputs = torch::lstm(*input_ptr, torch::TensorList(hx),
+      torch::TensorList(params), jhas_biases, jnum_layers, jdrop_rate, jtraining, jbidirectional, jbatch_first);
 
   // process output
   jlongArray jarray = env->NewLongArray(3);
