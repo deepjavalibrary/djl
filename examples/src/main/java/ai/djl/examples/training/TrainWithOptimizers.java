@@ -52,7 +52,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -71,10 +70,8 @@ public final class TrainWithOptimizers {
     public static TrainingResult runExample(String[] args)
             throws IOException, ParseException, ModelNotFoundException, MalformedModelException,
                     TranslateException {
-        Options options = OptimizerArguments.getOptions();
-        DefaultParser parser = new DefaultParser();
-        CommandLine cmd = parser.parse(options, args, null, false);
-        OptimizerArguments arguments = new OptimizerArguments(cmd);
+        OptimizerArguments arguments =
+                (OptimizerArguments) new OptimizerArguments().parseArgs(args);
 
         try (Model model = getModel(arguments)) {
             // get training dataset
@@ -240,9 +237,11 @@ public final class TrainWithOptimizers {
 
         private String optimizer;
 
-        public OptimizerArguments(CommandLine cmd) {
-            super(cmd);
+        public OptimizerArguments() {}
 
+        @Override
+        protected void setCmd(CommandLine cmd) {
+            super.setCmd(cmd);
             if (cmd.hasOption("optimizer")) {
                 optimizer = cmd.getOptionValue("optimizer");
             } else {
@@ -250,8 +249,9 @@ public final class TrainWithOptimizers {
             }
         }
 
-        public static Options getOptions() {
-            Options options = Arguments.getOptions();
+        @Override
+        public Options getOptions() {
+            Options options = super.getOptions();
             options.addOption(
                     Option.builder("z")
                             .longOpt("optimizer")

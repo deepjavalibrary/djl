@@ -26,23 +26,28 @@ import org.apache.commons.cli.ParseException;
 
 public class Arguments {
 
-    private int epoch;
-    private int batchSize;
-    private int maxGpus;
-    private boolean isSymbolic;
-    private boolean preTrained;
-    private String outputDir;
-    private long limit;
-    private String modelDir;
-    private Map<String, String> criteria;
+    protected int epoch;
+    protected int batchSize;
+    protected int maxGpus;
+    protected boolean isSymbolic;
+    protected boolean preTrained;
+    protected String outputDir;
+    protected long limit;
+    protected String modelDir;
+    protected Map<String, String> criteria;
 
-    public Arguments(CommandLine cmd) {
+    protected void initialize() {
+        epoch = 2;
+        maxGpus = Device.getGpuCount();
+        outputDir = "build/model";
+        limit = Long.MAX_VALUE;
+        modelDir = null;
+    }
+
+    protected void setCmd(CommandLine cmd) {
         if (cmd.hasOption("epoch")) {
             epoch = Integer.parseInt(cmd.getOptionValue("epoch"));
-        } else {
-            epoch = 2;
         }
-        maxGpus = Device.getGpuCount();
         if (cmd.hasOption("max-gpus")) {
             maxGpus = Math.min(Integer.parseInt(cmd.getOptionValue("max-gpus")), maxGpus);
         }
@@ -56,18 +61,12 @@ public class Arguments {
 
         if (cmd.hasOption("output-dir")) {
             outputDir = cmd.getOptionValue("output-dir");
-        } else {
-            outputDir = "build/model";
         }
         if (cmd.hasOption("max-batches")) {
             limit = Long.parseLong(cmd.getOptionValue("max-batches")) * batchSize;
-        } else {
-            limit = Long.MAX_VALUE;
         }
         if (cmd.hasOption("model-dir")) {
             modelDir = cmd.getOptionValue("model-dir");
-        } else {
-            modelDir = null;
         }
         if (cmd.hasOption("criteria")) {
             Type type = new TypeToken<Map<String, Object>>() {}.getType();
@@ -75,8 +74,9 @@ public class Arguments {
         }
     }
 
-    public static Arguments parseArgs(String[] args) {
-        Options options = Arguments.getOptions();
+    public Arguments parseArgs(String[] args) {
+        initialize();
+        Options options = getOptions();
         try {
             DefaultParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(options, args, null, false);
@@ -84,14 +84,15 @@ public class Arguments {
                 printHelp("./gradlew run --args='[OPTIONS]'", options);
                 return null;
             }
-            return new Arguments(cmd);
+            setCmd(cmd);
+            return this;
         } catch (ParseException e) {
             printHelp("./gradlew run --args='[OPTIONS]'", options);
         }
         return null;
     }
 
-    public static Options getOptions() {
+    public Options getOptions() {
         Options options = new Options();
         options.addOption(
                 Option.builder("h").longOpt("help").hasArg(false).desc("Print this help.").build());
@@ -196,7 +197,7 @@ public class Arguments {
         return criteria;
     }
 
-    private static void printHelp(String msg, Options options) {
+    private void printHelp(String msg, Options options) {
         HelpFormatter formatter = new HelpFormatter();
         formatter.setLeftPadding(1);
         formatter.setWidth(120);

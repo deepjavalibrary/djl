@@ -12,7 +12,9 @@
  */
 package ai.djl.examples.training;
 
+import ai.djl.Device;
 import ai.djl.Model;
+import ai.djl.examples.training.util.Arguments;
 import ai.djl.modality.nlp.preprocess.UnicodeNormalizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -25,6 +27,7 @@ import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.ParallelTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
+import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.TruncatedNormalInitializer;
 import ai.djl.training.listener.TrainingListener.Defaults;
@@ -78,6 +81,11 @@ public final class TrainBertOnCode {
     private TrainBertOnCode() {}
 
     public static void main(String[] args) {
+        TrainBertOnCode.runExample(args);
+    }
+
+    public static TrainingResult runExample(String[] args) {
+        BertArguments arguments = (BertArguments) new BertArguments().parseArgs(args);
         Random rand = new Random(89724308);
         // get all applicable files
         List<Path> files = listSourceFiles(new File(".").toPath());
@@ -89,25 +97,35 @@ public final class TrainBertOnCode {
         Dictionary dictionary = buildDictionary(countedTokens, 35000);
 
         // Create model & trainer
-        Model model = createBertPretrainingModel(dictionary);
-        Trainer trainer = createBertPretrainingTrainer(model);
+        try (Model model = createBertPretrainingModel(dictionary)) {
 
-        // Initialize training
-        Shape inputShape = new Shape(MAX_SEQUENCE_LENGTH, 512);
-        trainer.initialize(inputShape, inputShape, inputShape, inputShape);
-        ParallelTrain parallelTrain = new ParallelTrain(trainer.getDevices());
+            try (Trainer trainer = createBertPretrainingTrainer(model, arguments)) {
 
-        for (int epoch = 0; epoch < EPOCHS; ++epoch) {
-            List<MaskedInstance> maskedInstances = createEpochData(rand, dictionary, parsedFiles);
-            for (int idx = BATCH_SIZE; idx < maskedInstances.size(); ++idx) {
-                try (NDManager ndManager = trainer.getManager().newSubManager()) {
-                    List<MaskedInstance> batchData = maskedInstances.subList(idx - BATCH_SIZE, idx);
-                    Batch batch = createBatch(ndManager, batchData);
-                    // the following uses the GPUs alternating
-                    // EasyTrain.trainBatch(trainer, batch);
-                    // this actually uses both GPUs at once
-                    parallelTrain.trainBatch(trainer, batch);
+                // Initialize training
+                Shape inputShape = new Shape(MAX_SEQUENCE_LENGTH, 512);
+                trainer.initialize(inputShape, inputShape, inputShape, inputShape);
+                ParallelTrain parallelTrain = new ParallelTrain(trainer.getDevices());
+
+                trainer.notifyListeners(listener -> listener.onTrainingBegin(trainer));
+                for (int epoch = 0; epoch < arguments.getEpoch(); ++epoch) {
+                    List<MaskedInstance> maskedInstances =
+                            createEpochData(rand, dictionary, parsedFiles, arguments);
+                    for (int idx = BATCH_SIZE; idx < maskedInstances.size(); ++idx) {
+                        try (NDManager ndManager = trainer.getManager().newSubManager()) {
+                            List<MaskedInstance> batchData =
+                                    maskedInstances.subList(idx - BATCH_SIZE, idx);
+                            Batch batch =
+                                    createBatch(ndManager, batchData, idx, maskedInstances.size());
+                            // the following uses the GPUs alternating
+                            // EasyTrain.trainBatch(trainer, batch);
+                            // this actually uses both GPUs at once
+                            parallelTrain.trainBatch(trainer, batch);
+                        }
+                    }
+                    trainer.notifyListeners(listener -> listener.onEpoch(trainer));
                 }
+                trainer.notifyListeners(listener -> listener.onTrainingEnd(trainer));
+                return trainer.getTrainingResult();
             }
         }
     }
@@ -121,7 +139,7 @@ public final class TrainBertOnCode {
         return model;
     }
 
-    private static Trainer createBertPretrainingTrainer(Model model) {
+    private static Trainer createBertPretrainingTrainer(Model model, BertArguments arguments) {
         Tracker learningRateTracker =
                 WarmUpTracker.builder()
                         .optWarmUpBeginValue(0f)
@@ -143,13 +161,16 @@ public final class TrainBertOnCode {
         TrainingConfig trainingConfig =
                 new DefaultTrainingConfig(new BertPretrainingLoss())
                         .optOptimizer(optimizer)
-                        // TODO: why does this not log *anything*?
+                        .optDevices(Device.getDevices(arguments.getMaxGpus()))
                         .addTrainingListeners(Defaults.logging());
         return model.newTrainer(trainingConfig);
     }
 
     private static List<MaskedInstance> createEpochData(
-            Random rand, Dictionary dictionary, List<ParsedFile> parsedFiles) {
+            Random rand,
+            Dictionary dictionary,
+            List<ParsedFile> parsedFiles,
+            BertArguments arguments) {
         // turn data into sentence pairs containing consecutive lines
         List<SentencePair> sentencePairs = new ArrayList<>();
         parsedFiles.forEach(parsedFile -> parsedFile.addToSentencePairs(sentencePairs));
@@ -161,6 +182,7 @@ public final class TrainBertOnCode {
         // Create masked instances for training
         return sentencePairs
                 .stream()
+                .limit(arguments.getLimit())
                 .map(
                         sentencePair ->
                                 new MaskedInstance(
@@ -172,7 +194,8 @@ public final class TrainBertOnCode {
                 .collect(Collectors.toList());
     }
 
-    private static Batch createBatch(NDManager ndManager, List<MaskedInstance> instances) {
+    private static Batch createBatch(
+            NDManager ndManager, List<MaskedInstance> instances, int idx, int dataSize) {
         NDList inputs =
                 new NDList(
                         batchFromList(ndManager, instances, MaskedInstance::getTokenIds),
@@ -184,7 +207,6 @@ public final class TrainBertOnCode {
                         nextSentenceLabelsFromList(ndManager, instances),
                         batchFromList(ndManager, instances, MaskedInstance::getMaskedIds),
                         batchFromList(ndManager, instances, MaskedInstance::getLabelMask));
-        // TODO: Use batch progress
         return new Batch(
                 ndManager,
                 inputs,
@@ -192,8 +214,8 @@ public final class TrainBertOnCode {
                 instances.size(),
                 Batchifier.STACK,
                 Batchifier.STACK,
-                0,
-                0);
+                idx,
+                dataSize);
     }
 
     private static NDArray batchFromList(NDManager ndManager, List<int[]> batchData) {
@@ -580,6 +602,16 @@ public final class TrainBertOnCode {
 
         public String getRandomToken(Random rand) {
             return tokens.get(rand.nextInt(tokens.size()));
+        }
+    }
+
+    private static class BertArguments extends Arguments {
+
+        @Override
+        protected void initialize() {
+            super.initialize();
+            epoch = EPOCHS;
+            batchSize = BATCH_SIZE;
         }
     }
 }

@@ -48,7 +48,7 @@ public final class TrainMnistWithLSTM {
     }
 
     public static TrainingResult runExample(String[] args) throws IOException, TranslateException {
-        Arguments arguments = Arguments.parseArgs(args);
+        Arguments arguments = new Arguments().parseArgs(args);
         if (arguments == null) {
             return null;
         }
