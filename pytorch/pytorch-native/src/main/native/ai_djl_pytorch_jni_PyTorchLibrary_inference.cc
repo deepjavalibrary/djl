@@ -63,11 +63,11 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava
   std::ostringstream os;
   int len = env->GetArrayLength(arr);
   int available = 0;
-  bool isCopy;
+  jbyte* data;
   while (available != -1) {
     available = env->CallIntMethod(jis, method_id, arr, 0, len);
     if (available != -1) {
-      jbyte* data = env->GetByteArrayElements(arr, reinterpret_cast<jboolean*>(&isCopy));
+      data = env->GetByteArrayElements(arr, JNI_FALSE);
       os.write(reinterpret_cast<char*>(data), available);
       env->ReleaseByteArrayElements(arr, data, JNI_ABORT);
     }
@@ -101,13 +101,13 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleWrite(
   int i = 0;
   for (; i + len < str.length(); i += len) {
     auto substr = str.substr(i, i + len);
-    env->SetByteArrayRegion(arr, 0, len, (jbyte*) substr.c_str());
+    env->SetByteArrayRegion(arr, 0, len, (jbyte*)substr.c_str());
     env->CallVoidMethod(jos, method_id, arr, 0, len);
   }
   auto last_len = str.length() - i;
   if (last_len > 0) {
     auto substr = str.substr(i, last_len);
-    env->SetByteArrayRegion(arr, 0, last_len, (jbyte*) substr.c_str());
+    env->SetByteArrayRegion(arr, 0, last_len, (jbyte*)substr.c_str());
     env->CallVoidMethod(jos, method_id, arr, 0, last_len);
   }
   API_END()
