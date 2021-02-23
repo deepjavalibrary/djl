@@ -31,7 +31,11 @@ public class IntegrationTests {
         if (defaultEngine == null) {
             // TODO: windows CPU build is having OOM issue if 3 engines are loaded and running tests
             // together
-            engines = new String[] {"MXNet"};
+            if (System.getProperty("os.name").startsWith("Win")) {
+                engines = new String[] {"MXNet"};
+            } else {
+                engines = new String[] {"MXNet", "PyTorch", "TensorFlow"};
+            }
         } else {
             engines = new String[] {defaultEngine};
         }
