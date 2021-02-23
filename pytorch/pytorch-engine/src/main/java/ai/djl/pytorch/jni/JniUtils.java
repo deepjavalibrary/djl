@@ -46,7 +46,7 @@ public final class JniUtils {
 
     private static final int NULL_PTR = 0;
 
-    private static final byte[] BUFFER = new byte[4194304]; // preserved buffer
+    private static final int BYTE_LENGTH = 4194304;
 
     private JniUtils() {}
 
@@ -1379,6 +1379,7 @@ public final class JniUtils {
     }
 
     public static PtSymbolBlock loadModule(PtNDManager manager, InputStream is, Device device) {
+        byte[] buf = new byte[BYTE_LENGTH];
         long handle =
                 PyTorchLibrary.LIB.moduleLoad(
                         is,
@@ -1386,12 +1387,13 @@ public final class JniUtils {
                             PtDeviceType.toDeviceType(device),
                             device.equals(Device.cpu()) ? -1 : device.getDeviceId()
                         },
-                        BUFFER);
+                        buf);
         return new PtSymbolBlock(manager, handle);
     }
 
     public static void writeModule(PtSymbolBlock block, OutputStream os) {
-        PyTorchLibrary.LIB.moduleWrite(block.getHandle(), os, BUFFER);
+        byte[] buf = new byte[BYTE_LENGTH];
+        PyTorchLibrary.LIB.moduleWrite(block.getHandle(), os, buf);
     }
 
     public static NDList moduleGetParams(PtSymbolBlock block, PtNDManager manager) {
