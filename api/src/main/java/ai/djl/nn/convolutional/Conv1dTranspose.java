@@ -39,6 +39,8 @@ import ai.djl.util.Preconditions;
  * </ul>
  *
  * <p>Both {@code weight} and {@code bias} are learn-able parameters.
+ *
+ * @see Deconvolution
  */
 public class Conv1dTranspose extends Deconvolution {
 

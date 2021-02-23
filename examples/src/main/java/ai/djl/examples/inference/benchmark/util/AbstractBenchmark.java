@@ -223,37 +223,23 @@ public abstract class AbstractBenchmark {
                                 metrics.getMetric("Heap").get(1).getValue().longValue();
                         float heap = metrics.percentile("Heap", 90).getValue().longValue();
                         float nonHeap = metrics.percentile("NonHeap", 90).getValue().longValue();
-                        float cpu = metrics.percentile("cpu", 90).getValue().longValue();
                         float rssBeforeModel =
                                 metrics.getMetric("rss").get(0).getValue().longValue();
                         float rssBeforeInference =
                                 metrics.getMetric("rss").get(1).getValue().longValue();
                         float rss = metrics.percentile("rss", 90).getValue().longValue();
+                        float cpu = metrics.percentile("cpu", 90).getValue().longValue();
+                        int mb = 1024 * 1024;
 
-                        logger.info(
-                                String.format(
-                                        "heap (base): %.3f MB", heapBeforeModel / (1024 * 1024)));
-                        logger.info(
-                                String.format(
-                                        "heap (model): %.3f MB",
-                                        (heapBeforeInference - heapBeforeModel) / (1024 * 1024)));
-                        logger.info(
-                                String.format(
-                                        "heap (inference) P90: %.3f MB",
-                                        (heap - heapBeforeInference) / (1024 * 1024)));
-                        logger.info(String.format("nonHeap P90: %.3f MB", nonHeap / (1024 * 1024)));
                         logger.info(String.format("cpu P90: %.3f %%", cpu));
+                        logger.info(String.format("heap (base): %.3f MB", heapBeforeModel / mb));
                         logger.info(
-                                String.format(
-                                        "rss (base): %.3f MB", rssBeforeModel / (1024 * 1024)));
-                        logger.info(
-                                String.format(
-                                        "rss (model): %.3f MB",
-                                        (rssBeforeInference - rssBeforeModel) / (1024 * 1024)));
-                        logger.info(
-                                String.format(
-                                        "rss (inference) P90: %.3f MB",
-                                        (rss - rssBeforeInference) / (1024 * 1024)));
+                                String.format("heap (model): %.3f MB", heapBeforeInference / mb));
+                        logger.info(String.format("heap P90: %.3f MB", heap / mb));
+                        logger.info(String.format("nonHeap P90: %.3f MB", nonHeap / mb));
+                        logger.info(String.format("rss (base): %.3f MB", rssBeforeModel / mb));
+                        logger.info(String.format("rss (model): %.3f MB", rssBeforeInference / mb));
+                        logger.info(String.format("rss P90: %.3f MB", rss / mb));
                     }
                 }
                 MemoryTrainingListener.dumpMemoryInfo(metrics, arguments.getOutputDir());

@@ -14,7 +14,7 @@ import axios from 'axios'
 const useStyles = makeStyles((theme) => ({
 	modelviewactions_root: {
 	    position: 'absolute',
-	    marginTop: theme.spacing(3),
+		right: '2em',
 	   
   	},
 	speedDial: {

@@ -17,7 +17,11 @@ import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
 import java.io.IOException;
 
-/** An interface to represent a set of sample data/label pairs to train a model. */
+/**
+ * An interface to represent a set of sample data/label pairs to train a model.
+ *
+ * @see <a href="http://docs.djl.ai/docs/dataset.html">The guide on datasets</a>
+ */
 public interface Dataset {
 
     /**

@@ -12,7 +12,14 @@
  */
 package ai.djl.serving.central.responseencoder;
 
-import ai.djl.util.JsonUtils;
+import ai.djl.modality.Classifications;
+import ai.djl.modality.Classifications.ClassificationsSerializer;
+import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.repository.Metadata;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -26,23 +33,45 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
+import java.lang.reflect.Modifier;
 
 /**
- * Send the response to the client.
+ * serialize to json and send the response to the client.
  *
  * @author erik.bamberg@web.de
  */
-public class HttpRequestResponse {
+public class JsonResponse {
+
+    private static final Gson GSON_WITH_TRANSIENT_FIELDS =
+            new GsonBuilder()
+                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                    .setPrettyPrinting()
+                    .excludeFieldsWithModifiers(Modifier.STATIC)
+                    .registerTypeAdapter(Classifications.class, new ClassificationsSerializer())
+                    .registerTypeAdapter(DetectedObjects.class, new ClassificationsSerializer())
+                    .registerTypeAdapter(Metadata.class, new MetaDataSerializer())
+                    .registerTypeAdapter(
+                            Double.class,
+                            (JsonSerializer<Double>)
+                                    (src, t, ctx) -> {
+                                        long v = src.longValue();
+                                        if (src.equals(Double.valueOf(String.valueOf(v)))) {
+                                            return new JsonPrimitive(v);
+                                        }
+                                        return new JsonPrimitive(src);
+                                    })
+                    .create();
 
     /**
-     * send a response as JSON to the client.
+     * send a response to the client.
      *
      * @param ctx channel context
      * @param request full request
      * @param entity the response
      */
     public void sendAsJson(ChannelHandlerContext ctx, FullHttpRequest request, Object entity) {
-        String serialized = JsonUtils.GSON_PRETTY.toJson(entity);
+
+        String serialized = GSON_WITH_TRANSIENT_FIELDS.toJson(entity);
         ByteBuf buffer = ctx.alloc().buffer(serialized.length());
         buffer.writeCharSequence(serialized, CharsetUtil.UTF_8);
 

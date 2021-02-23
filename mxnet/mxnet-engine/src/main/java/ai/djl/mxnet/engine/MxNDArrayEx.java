@@ -688,7 +688,7 @@ class MxNDArrayEx implements NDArrayEx {
             boolean training,
             boolean bidirectional,
             boolean batchFirst) {
-        int numParams = numLayers * ((hasBiases) ? 4 : 2);
+        int numParams = numLayers * ((hasBiases) ? 4 : 2) * ((bidirectional) ? 2 : 1);
         Preconditions.checkArgument(
                 params.size() == numParams,
                 "The size of Params is incorrect expect "
@@ -749,7 +749,7 @@ class MxNDArrayEx implements NDArrayEx {
             boolean training,
             boolean bidirectional,
             boolean batchFirst) {
-        int numParams = numLayers * ((hasBiases) ? 4 : 2);
+        int numParams = numLayers * ((hasBiases) ? 4 : 2) * ((bidirectional) ? 2 : 1);
         Preconditions.checkArgument(
                 params.size() == numParams,
                 "The size of Params is incorrect expect "
@@ -810,7 +810,7 @@ class MxNDArrayEx implements NDArrayEx {
             boolean training,
             boolean bidirectional,
             boolean batchFirst) {
-        int numParams = numLayers * ((hasBiases) ? 4 : 2);
+        int numParams = numLayers * ((hasBiases) ? 4 : 2) * ((bidirectional) ? 2 : 1);
         Preconditions.checkArgument(
                 params.size() == numParams,
                 "The size of Params is incorrect expect "

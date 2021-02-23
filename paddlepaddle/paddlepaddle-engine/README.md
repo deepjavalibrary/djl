@@ -44,15 +44,57 @@ Choose a native library based on your platform and needs:
 We offer an automatic option that will download the native libraries into [cache folder](../../docs/development/cache_management.md) the first time you run DJL.
 It will automatically determine the appropriate jars for your system based on the platform and GPU support.
 
+- ai.djl.paddlepaddle:paddlepaddle-native-auto:2.0.0
+
 ```xml
 <dependency>
     <groupId>ai.djl.paddlepaddle</groupId>
     <artifactId>paddlepaddle-native-auto</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.0.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
 
-### Mac/Windows/Linux standalone native jarss
+### macOS
+For macOS, you can use the following library:
 
-Coming soon...
+- ai.djl.paddlepaddle:paddlepaddle-native-cpu:2.0.0:osx-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.paddlepaddle</groupId>
+    <artifactId>paddlepaddle-native-cpu</artifactId>
+    <classifier>osx-x86_64</classifier>
+    <version>2.0.0</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+### Linux
+
+- ai.djl.paddlepaddle:paddlepaddle-native-cpu:2.0.0:linux-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.paddlepaddle</groupId>
+    <artifactId>paddlepaddle-native-cpu</artifactId>
+    <classifier>linux-x86_64</classifier>
+    <version>2.0.0</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+
+### Windows
+
+- ai.djl.paddlepaddle:paddlepaddle-native-cpu:2.0.0:win-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.paddlepaddle</groupId>
+    <artifactId>paddlepaddle-native-cpu</artifactId>
+    <classifier>win-x86_64</classifier>
+    <version>2.0.0</version>
+    <scope>runtime</scope>
+</dependency>
+```

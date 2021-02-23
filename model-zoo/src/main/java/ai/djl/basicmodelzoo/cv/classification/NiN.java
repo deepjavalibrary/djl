@@ -31,6 +31,9 @@ import ai.djl.nn.pooling.Pool;
  * function to scan the input.
  *
  * <p>NiN model from the "Network In Network" http://arxiv.org/abs/1312.4400 paper.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_convolutional-modern/nin.html">The D2L chapter on
+ *     NiN</a>
  */
 public final class NiN {
 

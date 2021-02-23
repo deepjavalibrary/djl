@@ -32,7 +32,6 @@ import { theme } from '../css/useStyles'
 const useStyles = makeStyles((theme) => ({
 	model_view_root: {
 
-		display: 'flex',
 		flexWrap: 'wrap',
 		justifyContent: 'space-around',
 		overflow: 'hidden',
@@ -40,23 +39,15 @@ const useStyles = makeStyles((theme) => ({
 		order: 3,
 		flex: '2 1 auto',
 		alignSelf: 'stretch',
-		height: "95%",
-		maxHeight: '30em',
 
 	},
 	model_view_paper: {
-		minWidth: "60%",
-		height: "100%",
-		minHeight: '80%',
-		
+		minHeight: '600px',
 		padding: '20px',
 		overflowY: "auto",
-		marginTop: '2em',
 		marginRight: 'auto',
 		marginLeft: '2em',
-
 		marginBottom: '5vh',
-
 	},
 
 
@@ -91,11 +82,15 @@ const useStyles = makeStyles((theme) => ({
 	},
 	tabbar: {
 		flexGrow: 1,
-		backgroundColor: theme.palette.background.paper,
+
 		display: 'flex',
-		height: "100%",
 	},
+	tabpanel: {
+		flex: '2 1 auto',
+		alignSelf: 'stretch',
+	}, 
 	dynform: {
+		width: '100%',
 		marginLeft: "2em",
 	},
 }));
@@ -176,6 +171,7 @@ export default function ModelView(props) {
 			<Paper ref={myRef} elevation={3} className={classes.model_view_paper} >
 				<ModelViewActions modelName={props.model.name}/>
 				<h2>{props.model.name}</h2>
+				<h3>{props.model.metadata.groupId}:{props.model.metadata.artifactId}:{props.model.version}</h3>
 				<Chip size="small" label={props.model.properties.dataset} />
 				<Chip size="small" label={props.model.version} />
 				<div className={classes.tabbar}>
@@ -188,13 +184,14 @@ export default function ModelView(props) {
 						aria-label="{props.model.name}">
 
 						<Tab label="General" {...a11yProps(0)} />
-						<Tab label="Properties" {...a11yProps(1)} />
-						<Tab label="Arguments" {...a11yProps(2)} />
-						<Tab label="Parameters" {...a11yProps(3)} />
-						<Tab label="Synset" {...a11yProps(4)} />
+						<Tab label="Metadata" {...a11yProps(1)} />
+						<Tab label="Properties" {...a11yProps(2)} />
+						<Tab label="Arguments" {...a11yProps(3)} />
+						<Tab label="Parameters" {...a11yProps(4)} />
+						<Tab label="Synset" {...a11yProps(5)} />
 					</Tabs>
 
-					<TabPanel value={index} index={0} >
+					<TabPanel value={index} index={0} className={classes.tabpanel}>
 						<>
 							{Object.keys(props.model).filter((key) => !(typeof props.model[key] === 'object')).map((key) => (
 								<div >
@@ -202,6 +199,7 @@ export default function ModelView(props) {
 										id={key}
 										label={key}
 										key={props.model[key]}
+										fullWidth={true}
 										defaultValue={props.model[key]}
 										InputProps={{
 											readOnly: true,
@@ -217,6 +215,7 @@ export default function ModelView(props) {
 									id={'dataset1'}
 									label={'dataset'}
 									key={props.model.properties.dataset}
+									fullWidth={true}
 									defaultValue={props.model.properties.dataset}
 									InputProps={{
 										readOnly: true,
@@ -228,22 +227,27 @@ export default function ModelView(props) {
 
 						</>
 					</TabPanel>
-					<TabPanel value={index} index={1}>
+					<TabPanel value={index} index={1} className={classes.tabpanel}>
+						<DynForm data={props.model.metadata} />
+						<h4>Licenses</h4>
+						<DynForm data={props.model.metadata.licenses}/>
+					</TabPanel>
+					<TabPanel value={index} index={2} className={classes.tabpanel}>
 						<DynForm data={props.model.properties} />
 					</TabPanel>
-					<TabPanel value={index} index={2}>
+					<TabPanel value={index} index={3} className={classes.tabpanel}>
 						{props.model.arguments
 							? <DynForm data={props.model.arguments} />
 							: <DynForm data={noArguments}/>
 						}
 					</TabPanel>
-					<TabPanel value={index} index={3}>
+					<TabPanel value={index} index={4} className={classes.tabpanel}>
 						{props.model.files.parameters
 							? <DynForm data={props.model.files.parameters}/>
 							: <DynForm data={noParameters}/>
 						}
 					</TabPanel>
-					<TabPanel value={index} index={4}>
+					<TabPanel value={index} index={5} className={classes.tabpanel}>
 						{props.model.files.synset
 							? <DynForm data={props.model.files.synset}/>
 							: <DynForm data={noSynset}/>

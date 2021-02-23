@@ -31,6 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * \( state = momentum * state + learning_rate * gradient \)<br>
  * \( weight -= state \)<br>
  * Momentum update has better convergence rates on neural networks.
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_optimization/sgd.html">The D2L chapter on SGD</a>
  */
 public class Sgd extends Optimizer {
 

@@ -37,6 +37,9 @@ import java.util.stream.Collectors;
  * <p>GoogLeNet paper from Christian Szegedy, Wei Liu, Yangqing Jia, Pierre Sermanet, Scott Reed,
  * Dragomir Anguelov, Dumitru Erhan, Vincent Vanhoucke, Andrew Rabinovich “Going Deeper with
  * Convolutions” https://arxiv.org/abs/1409.4842
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_convolutional-modern/googlenet.html">The D2L chapter on
+ *     GoogLeNet</a>
  */
 public final class GoogLeNet {
 

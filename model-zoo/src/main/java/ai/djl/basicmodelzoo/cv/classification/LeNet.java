@@ -25,6 +25,9 @@ import ai.djl.nn.pooling.Pool;
 /**
  * The model was introduced (and named for) Yann Lecun, for the purpose of recognizing handwritten
  * digits in images [LeNet5](http://yann.lecun.com/exdb/lenet/).
+ *
+ * @see <a href="https://d2l.djl.ai/chapter_convolutional-neural-networks/lenet.html">The D2L
+ *     chapter on LeNet</a>
  */
 public final class LeNet {
 

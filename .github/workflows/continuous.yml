@@ -23,7 +23,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ubuntu-18.04, macos-latest]
+        operating-system: [ ubuntu-18.04, macos-latest ]
 
     steps:
       - uses: actions/checkout@v1
@@ -53,7 +53,7 @@ jobs:
       - name: Compile PaddlePaddle JNI
         run: ./gradlew :paddlepaddle:paddlepaddle-native:compileJNI
       - name: Build with Gradle
-        run: ./gradlew build jRR
+        run: ./gradlew build jRR jRV
       - name: API test results
         uses: actions/upload-artifact@v1
         if: always()
@@ -120,6 +120,14 @@ jobs:
         with:
           name: tensorflow-model-zoo
           path: tensorflow/tensorflow-model-zoo/build/reports
+      - name: upload to codecov
+        uses: codecov/codecov-action@v1
+        with:
+          files: ./build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml
+          name: codecov-umbrella
+          fail_ci_if_error: true
+          path_to_write_report: ./codecov_report.txt
+          verbose: true
 
   # Windows platform for testing hybrid engines
   build-windows:
@@ -145,6 +153,7 @@ jobs:
       - name: Compile PaddlePaddle JNI
         run: ./gradlew :paddlepaddle:paddlepaddle-native:compileJNI
       - name: Integration tests
+        # MXNet integration test on Github Action fail due to memory limitation on Windows
         run: |
-          ./gradlew :paddlepaddle:paddlepaddle-engine:test :paddlepaddle:paddlepaddle-model-zoo:test
-          ./gradlew :onnxruntime:onnxruntime-engine:test
+          ./gradlew "-Dai.djl.default_engine=PyTorch" test -x examples:test
+          ./gradlew --rerun-tasks "-Dai.djl.default_engine=TensorFlow" test -x examples:test
