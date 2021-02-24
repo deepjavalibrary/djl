@@ -77,7 +77,7 @@ public final class TrainResnetWithCifar10 {
 
     public static TrainingResult runExample(String[] args)
             throws IOException, ModelException, TranslateException {
-        Arguments arguments = Arguments.parseArgs(args);
+        Arguments arguments = new Arguments().parseArgs(args);
         if (arguments == null) {
             return null;
         }

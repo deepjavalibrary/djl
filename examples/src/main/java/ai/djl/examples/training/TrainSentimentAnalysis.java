@@ -86,7 +86,7 @@ public final class TrainSentimentAnalysis {
     public static TrainingResult runExample(String[] args)
             throws IOException, ModelNotFoundException, MalformedModelException,
                     TranslateException {
-        Arguments arguments = Arguments.parseArgs(args);
+        Arguments arguments = new Arguments().parseArgs(args);
         if (arguments == null) {
             return null;
         }
