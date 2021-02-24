@@ -1043,6 +1043,12 @@ public final class JniUtils {
                         bias == null ? NULL_PTR : bias.getHandle()));
     }
 
+    public static PtNDArray embedding(PtNDArray input, PtNDArray weight, boolean sparse) {
+        return new PtNDArray(
+                input.getManager(),
+                PyTorchLibrary.LIB.torchNNEmbedding(input.getHandle(), weight.getHandle(), sparse));
+    }
+
     public static PtNDArray relu(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchNNRelu(ndArray.getHandle()));

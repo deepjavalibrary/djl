@@ -21,7 +21,6 @@ import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -239,7 +238,6 @@ public class BlockCoreTest {
                         .build();
         try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
-            model.setDataType(DataType.INT32);
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Shape inputShape = new Shape(2);
@@ -250,12 +248,12 @@ public class BlockCoreTest {
                 Assert.assertEquals(
                         trainer.forward(new NDList(manager.create(block.embed("x"))))
                                 .singletonOrThrow(),
-                        manager.create(new int[] {1, 1}));
+                        manager.create(new float[] {1, 1}));
 
                 Assert.assertEquals(
-                        trainer.forward(new NDList(block.embed(manager, new String[] {"a", "b"})))
+                        trainer.forward(new NDList(block.embed(manager, new String[] {"x", "y"})))
                                 .singletonOrThrow(),
-                        manager.create(new int[] {1, 1, 1, 1}, new Shape(2, 2)));
+                        manager.create(new float[] {1, 1, 1, 1}, new Shape(2, 2)));
                 testEncode(manager, block);
             }
         }

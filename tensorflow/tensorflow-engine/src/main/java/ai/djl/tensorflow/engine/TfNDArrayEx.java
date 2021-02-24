@@ -20,8 +20,8 @@ import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.recurrent.RNN;
-import ai.djl.util.PairList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -363,13 +363,7 @@ public class TfNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDList embedding(
-            NDList inputs,
-            int numItems,
-            int embeddingSize,
-            boolean sparseGrad,
-            DataType dataType,
-            PairList<String, Object> additional) {
+    public NDList embedding(NDArray input, NDArray weight, SparseFormat sparse) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
