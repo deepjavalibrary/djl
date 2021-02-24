@@ -62,6 +62,15 @@ public abstract class Encoder extends AbstractBlock {
         return block.forward(parameterStore, inputs, training, params);
     }
 
+    @Override
+    protected NDList forwardInternal(
+            ParameterStore parameterStore,
+            NDList data,
+            NDList labels,
+            PairList<String, Object> params) {
+        return super.forwardInternal(parameterStore, data, labels, params);
+    }
+
     /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {

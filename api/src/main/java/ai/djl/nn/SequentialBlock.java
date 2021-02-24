@@ -137,6 +137,20 @@ public class SequentialBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
+    protected NDList forwardInternal(
+            ParameterStore parameterStore,
+            NDList data,
+            NDList labels,
+            PairList<String, Object> params) {
+        NDList current = data;
+        for (Block block : children.values()) {
+            current = block.forward(parameterStore, current, labels, params);
+        }
+        return current;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         Shape[] shapes = inputShapes;
         for (Block child : getChildren().values()) {

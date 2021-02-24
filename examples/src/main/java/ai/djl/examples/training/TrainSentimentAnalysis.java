@@ -42,12 +42,10 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.training.DataManager;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
-import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.listener.SaveModelTrainingListener;
@@ -111,13 +109,13 @@ public final class TrainSentimentAnalysis {
                     getDataset(Dataset.Usage.TRAIN, executorService, arguments);
             StanfordMovieReview validateSet =
                     getDataset(Dataset.Usage.TEST, executorService, arguments);
-            model.setBlock(getModel());
+            model.setBlock(getModel(modelZooTextEmbedding));
 
             // setup training configuration
-            DefaultTrainingConfig config = setupTrainingConfig(arguments, modelZooTextEmbedding);
+            DefaultTrainingConfig config = setupTrainingConfig(arguments);
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
-                Shape encoderInputShape = new Shape(arguments.getBatchSize(), 10, 50);
+                Shape encoderInputShape = new Shape(arguments.getBatchSize(), 10);
 
                 // initialize trainer with proper input shape
                 trainer.initialize(encoderInputShape);
@@ -143,8 +141,16 @@ public final class TrainSentimentAnalysis {
         }
     }
 
-    private static Block getModel() {
+    private static Block getModel(ModelZooTextEmbedding embedding) {
         return new SequentialBlock()
+                .addSingleton(
+                        a -> {
+                            try {
+                                return embedding.embedText(a);
+                            } catch (EmbeddingException e) {
+                                throw new IllegalStateException(e);
+                            }
+                        })
                 .add(
                         LSTM.builder()
                                 .setNumLayers(2)
@@ -163,8 +169,7 @@ public final class TrainSentimentAnalysis {
                 .add(Linear.builder().setUnits(2).build());
     }
 
-    public static DefaultTrainingConfig setupTrainingConfig(
-            Arguments arguments, ModelZooTextEmbedding embedding) {
+    public static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         String outputDir = arguments.getOutputDir();
         SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir);
         listener.setSaveModelCallback(
@@ -177,7 +182,6 @@ public final class TrainSentimentAnalysis {
                 });
 
         return new DefaultTrainingConfig(new SoftmaxCrossEntropyLoss())
-                .optDataManager(new EmbeddingDataManager(embedding))
                 .addEvaluator(new Accuracy())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
@@ -241,24 +245,6 @@ public final class TrainSentimentAnalysis {
                     .optIncludeValidLengths(false)
                     .addPad(0, 0, m -> m.ones(new Shape(1, 50)).mul(paddingTokenValue))
                     .build();
-        }
-    }
-
-    private static final class EmbeddingDataManager extends DataManager {
-
-        private ModelZooTextEmbedding embedding;
-
-        public EmbeddingDataManager(ModelZooTextEmbedding embedding) {
-            this.embedding = embedding;
-        }
-
-        @Override
-        public NDList getData(Batch batch) {
-            try {
-                return new NDList(embedding.embedText(batch.getData().head()));
-            } catch (EmbeddingException e) {
-                throw new IllegalArgumentException(e.getMessage(), e);
-            }
         }
     }
 }
