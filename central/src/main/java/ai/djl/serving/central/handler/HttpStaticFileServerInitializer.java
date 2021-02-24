@@ -53,7 +53,7 @@ public class HttpStaticFileServerInitializer extends ChannelInitializer<SocketCh
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new ChunkedWriteHandler());
-        pipeline.addLast(new FunctionalRestEndpointHandler(ModelDeploymentEndpoint.registerModel,ModelDeploymentEndpoint.registerModelPattern,HttpMethod.POST));
+        pipeline.addLast(new ModelDeploymentHandler("http://localhost:5000/"));
         pipeline.addLast(new ModelMetaDataHandler());
         pipeline.addLast(new HttpStaticFileServerHandler());
     }

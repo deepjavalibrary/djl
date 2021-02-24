@@ -12,68 +12,63 @@
  */
 package ai.djl.serving.central.handler;
 
-import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
-import ai.djl.serving.central.responseencoder.HttpRequestResponse;
+import ai.djl.serving.central.client.RestCall;
+import ai.djl.serving.central.utils.NettyUtils;
+import ai.djl.serving.http.BadRequestException;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
-import java.io.IOException;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import java.net.URI;
-import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 /**
- * 
- * A Generic Http Request Handler which passes the work to a {@code java.function.Supplier} and response with a json object.
- * 
+ * A handler to handle deployment requests from the UI/
  * @author erik.bamberg@web.de
  *
  */
-public class FunctionalRestEndpointHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class ModelDeploymentHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-   
-    private BiConsumer<ChannelHandlerContext,FullHttpRequest> consumer;
-    private Pattern pattern;
-    private HttpMethod method;
-    
+    private static final Pattern PATTERN=Pattern.compile("^/serving[/?]models$");
+    private static final HttpMethod METHOD=HttpMethod.POST;
+    private String servingInstanceURL;
     /**
-     * Constructs a endpoint handler with a supplier and a url-regex-pattern.
-     * @param supplier this function is called.
-     * @param pattern this handler is used when the requested url matches this regex. 
-     * 
+     * constructing a ModelDeploymentHandler
      */
-    public FunctionalRestEndpointHandler(BiConsumer<ChannelHandlerContext,FullHttpRequest> consumer, Pattern pattern, HttpMethod method) {
-	 this.consumer=consumer;
-	 this.pattern=pattern;
-	 this.method=method;
+    public ModelDeploymentHandler(String servingInstanceURL) {
+	this.servingInstanceURL=servingInstanceURL;
     }
+
     
     /**
-     * handle get Model meta data requests.
+     * handle the deployment request by forwarding the request to the serving-instance.
      *
      * @param ctx the context
      * @param request the full request
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {	
-        consumer.accept(ctx, request);
+        QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
+        String modelName=NettyUtils.getParameter(decoder, "modelName", null);
+        String url=NettyUtils.getParameter(decoder, "url", null);
+        if (modelName!=null && url!=null) {
+            new RestCall().post(servingInstanceURL+"models?modelName="+modelName+"&url="+RestCall.encodeValue(url),ctx);
+        } else {
+            throw new BadRequestException("modelName and url is mandatory.");
+        }
     }
-
+    
+    
     /** {@inheritDoc} */
     @Override
     public boolean acceptInboundMessage(Object msg) throws Exception {
         if (super.acceptInboundMessage(msg)) {
             FullHttpRequest req = (FullHttpRequest) msg;
             URI uri=new URI(req.uri());
-            return this.method.equals(req.method()) && pattern.matcher(uri.getPath()).matches();
+            return METHOD.equals(req.method()) && PATTERN.matcher(uri.getPath()).matches();
         }
         return false;
     }
-
+    
 }

@@ -46,7 +46,7 @@ export default function ModelViewActions(props) {
 	};
 	
 	const deploy = () => {
-			axios.post("http://localhost:8080/serving/models?modelName="+props.modelName)
+			axios.post("http://"+window.location.host+"/serving/models?modelName="+props.modelName+"&url="+encodeURIComponent(props.modelUri))
 				.then(function(response) {
 					console.log(response.data.message);
 					alert(response.data.message)

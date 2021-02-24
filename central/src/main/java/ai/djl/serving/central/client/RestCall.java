@@ -37,8 +37,11 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
@@ -141,6 +144,7 @@ public class RestCall  {
 	    
 	    execute(uri, request, (response) -> {
 		    responder.sendByteBuffer(responseCtx, response.content().copy() );
+		    responseCtx.close();
 		} );	    
 	    
 	} catch (URISyntaxException e) {
@@ -162,12 +166,29 @@ public class RestCall  {
 	    
 	    execute(uri, request, (response) -> {
 		    responder.sendByteBuffer(responseCtx, response.content().copy() );
+		    responseCtx.close();
 		} );	    
 	    
 	} catch (URISyntaxException e) {
 	    logger.error(e.getMessage(), e);
 	} 
     }
+    
+    /**
+     * helper function to encode uri query parameters.
+     * 
+     * @param value to encode
+     * @return the encoded string
+     */
+    public static String encodeValue(String value) {
+	    try {
+		return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+	    } catch (UnsupportedEncodingException e) {
+		// we expect that utf-8 is well known to the system.
+		logger.error(e.getMessage(),e);
+		return value;
+	    }
+	}
     
     /**
      * sends a GET returning the response.
@@ -200,10 +221,10 @@ public class RestCall  {
 	ChannelFuture f = buildBootstrap(callback).connect(host, port).addListener( (future)-> {
 	if (future.isSuccess()) {
 	    ((ChannelFuture) future).channel()
-	    	.writeAndFlush(request)
-	    	.addListener( (fut2)-> {
-	    	    			  ((ChannelFuture) fut2).channel().closeFuture();
-	    	    		       });
+	    	.writeAndFlush(request);
+	  //  	.addListener( (fut2)-> {
+	  //  	    			  ((ChannelFuture) fut2).channel().closeFuture();
+	  //  	    		       });
 	} else {
 	    logger.error("cannot establish connection to server",future.cause());
 	}
@@ -219,7 +240,7 @@ public class RestCall  {
      */
     private HttpRequest prepareHttpRequest(URI uri,HttpMethod method) {
 	// Prepare the HTTP request.
-	HttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri.getRawPath(),
+	HttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri.getRawPath()+ "?" + uri.getRawQuery(),
 		Unpooled.EMPTY_BUFFER);
 	request.headers().set(HttpHeaderNames.HOST, parseHost(uri));
 	request.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);

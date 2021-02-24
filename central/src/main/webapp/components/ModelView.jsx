@@ -169,7 +169,7 @@ export default function ModelView(props) {
 		<div className={classes.model_view_root}>
 			
 			<Paper ref={myRef} elevation={3} className={classes.model_view_paper} >
-				<ModelViewActions modelName={props.model.name}/>
+				<ModelViewActions modelName={props.model.name} modelUri={props.model.files.parameters.uri}/>
 				<h2>{props.model.name}</h2>
 				<h3>{props.model.metadata.groupId}:{props.model.metadata.artifactId}:{props.model.version}</h3>
 				<Chip size="small" label={props.model.properties.dataset} />

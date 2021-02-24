@@ -40,7 +40,7 @@ import java.lang.reflect.Modifier;
  *
  * @author erik.bamberg@web.de
  */
-public class JsonResponse {
+public class HttpRequestResponse {
 
     private static final Gson GSON_WITH_TRANSIENT_FIELDS =
             new GsonBuilder()
