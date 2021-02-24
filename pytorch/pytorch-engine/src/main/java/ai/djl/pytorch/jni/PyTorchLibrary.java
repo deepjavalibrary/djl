@@ -462,7 +462,7 @@ final class PyTorchLibrary {
     native long moduleLoad(
             String path, int[] device, String[] extraFileNames, String[] extraFileValues);
 
-    native long moduleLoad(InputStream is, int[] device, byte[] buffer);
+    native long moduleLoad(InputStream is, int[] device, byte[] buffer, long size);
 
     native void moduleEval(long handle);
 
@@ -470,7 +470,7 @@ final class PyTorchLibrary {
 
     native long moduleForward(long moduleHandle, long[] iValueHandles, boolean isTrain);
 
-    native void moduleWrite(long moduleHandle, OutputStream os, byte[] buffer);
+    native void moduleWrite(long moduleHandle, OutputStream os, byte[] buffer, boolean writeSize);
 
     native long[] moduleGetParams(long moduleHandle);
 

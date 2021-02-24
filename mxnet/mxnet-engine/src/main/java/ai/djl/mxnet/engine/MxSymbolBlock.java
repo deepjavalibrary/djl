@@ -28,6 +28,7 @@ import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -47,7 +48,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
 
     private static final Logger logger = LoggerFactory.getLogger(MxSymbolBlock.class);
 
-    private static final byte VERSION = 2;
+    private static final byte VERSION = 3;
 
     private NDManager manager;
     private CachedOp op;
@@ -72,18 +73,17 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
         super(VERSION);
         this.manager = manager;
         this.symbol = symbol;
-        inputNames = new ArrayList<>();
+        initBlock();
+    }
 
-        String[] allNames = symbol.getAllNames();
-        mxNetParams = new ArrayList<>(allNames.length);
-
-        Set<String> auxNameSet = new HashSet<>(Arrays.asList(symbol.getAuxNames()));
-        for (String name : allNames) {
-            ParameterType type = inferType(name);
-            boolean requireGrad = !auxNameSet.contains(name);
-            mxNetParams.add(new Parameter(name, this, type, requireGrad));
-        }
-        first = true;
+    /**
+     * Constructs an empty {@code MxSymbolBlock}.
+     *
+     * @param manager the manager to use for the block
+     */
+    public MxSymbolBlock(NDManager manager) {
+        super(VERSION);
+        this.manager = manager;
     }
 
     /**
@@ -253,6 +253,10 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
+        String json = symbol.toJsonString();
+        byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
+        os.writeInt(bytes.length);
+        os.write(bytes);
         int size = inputNames.size();
         os.writeInt(size);
         for (String name : inputNames) {
@@ -270,8 +274,26 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
         byte version = is.readByte();
-        if (version != VERSION) {
+        if (version > VERSION) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
+        }
+        if (version < VERSION && symbol == null) {
+            throw new IllegalStateException(
+                    "Symbol is required for version 2, please use Model to load");
+        }
+        if (version == VERSION) {
+            int len = is.readInt();
+            byte[] bytes = new byte[len];
+            if (is.read(bytes) == -1) {
+                throw new MalformedModelException("InputStream ends at symbol loading!");
+            }
+            // init block only if it is not set
+            if (symbol == null) {
+                symbol =
+                        Symbol.loadJson(
+                                (MxNDManager) manager, new String(bytes, StandardCharsets.UTF_8));
+                initBlock();
+            }
         }
         int size = is.readInt();
         for (int i = 0; i < size; ++i) {
@@ -281,6 +303,21 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
         for (Parameter parameter : parameters.values()) {
             parameter.load(this.manager, is);
         }
+    }
+
+    private void initBlock() {
+        inputNames = new ArrayList<>();
+
+        String[] allNames = symbol.getAllNames();
+        mxNetParams = new ArrayList<>(allNames.length);
+
+        Set<String> auxNameSet = new HashSet<>(Arrays.asList(symbol.getAuxNames()));
+        for (String name : allNames) {
+            ParameterType type = inferType(name);
+            boolean requireGrad = !auxNameSet.contains(name);
+            mxNetParams.add(new Parameter(name, this, type, requireGrad));
+        }
+        first = true;
     }
 
     private static ParameterType inferType(String name) {

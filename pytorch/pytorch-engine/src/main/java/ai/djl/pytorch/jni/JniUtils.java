@@ -22,6 +22,8 @@ import ai.djl.pytorch.engine.PtDeviceType;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.pytorch.engine.PtSymbolBlock;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -1378,22 +1380,33 @@ public final class JniUtils {
         return new PtSymbolBlock(manager, handle);
     }
 
-    public static PtSymbolBlock loadModule(PtNDManager manager, InputStream is, Device device) {
-        byte[] buf = new byte[BYTE_LENGTH];
-        long handle =
-                PyTorchLibrary.LIB.moduleLoad(
-                        is,
-                        new int[] {
-                            PtDeviceType.toDeviceType(device),
-                            device.equals(Device.cpu()) ? -1 : device.getDeviceId()
-                        },
-                        buf);
+    public static PtSymbolBlock loadModule(
+            PtNDManager manager, InputStream is, Device device, boolean hasSize)
+            throws IOException {
+        long handle = loadModuleHandle(is, device, hasSize);
         return new PtSymbolBlock(manager, handle);
     }
 
-    public static void writeModule(PtSymbolBlock block, OutputStream os) {
+    public static long loadModuleHandle(InputStream is, Device device, boolean hasSize)
+            throws IOException {
         byte[] buf = new byte[BYTE_LENGTH];
-        PyTorchLibrary.LIB.moduleWrite(block.getHandle(), os, buf);
+        long size = -1;
+        if (hasSize) {
+            size = new DataInputStream(is).readLong();
+        }
+        return PyTorchLibrary.LIB.moduleLoad(
+                is,
+                new int[] {
+                    PtDeviceType.toDeviceType(device),
+                    device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                },
+                buf,
+                size);
+    }
+
+    public static void writeModule(PtSymbolBlock block, OutputStream os, boolean writeSize) {
+        byte[] buf = new byte[BYTE_LENGTH];
+        PyTorchLibrary.LIB.moduleWrite(block.getHandle(), os, buf, writeSize);
     }
 
     public static NDList moduleGetParams(PtSymbolBlock block, PtNDManager manager) {

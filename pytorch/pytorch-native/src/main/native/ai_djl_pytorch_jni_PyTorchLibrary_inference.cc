@@ -47,8 +47,8 @@ Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3I_3Ljava
   API_END_RETURN()
 }
 
-JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_io_InputStream_2_3I_3B(
-    JNIEnv* env, jobject jthis, jobject jis, jintArray jarray, jbyteArray arr) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_io_InputStream_2_3I_3BJ(
+    JNIEnv* env, jobject jthis, jobject jis, jintArray jarray, jbyteArray arr, jlong size) {
   API_BEGIN()
   jclass is_class = env->GetObjectClass(jis);
   if (is_class == nullptr) {
@@ -62,16 +62,29 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava
   }
   std::ostringstream os;
   int len = env->GetArrayLength(arr);
-  int available = 0;
   jbyte* data;
-  while (available != -1) {
-    available = env->CallIntMethod(jis, method_id, arr, 0, len);
-    if (available != -1) {
+  if (size != -1) {
+    for (; size > 0; size -= len) {
+      if (size < len) {
+        len = size;
+      }
+      env->CallIntMethod(jis, method_id, arr, 0, len);
       data = env->GetByteArrayElements(arr, JNI_FALSE);
-      os.write(reinterpret_cast<char*>(data), available);
+      os.write(reinterpret_cast<char*>(data), len);
       env->ReleaseByteArrayElements(arr, data, JNI_ABORT);
     }
+  } else {
+    int available = 0;
+    while (available != -1) {
+      available = env->CallIntMethod(jis, method_id, arr, 0, len);
+      if (available != -1) {
+        data = env->GetByteArrayElements(arr, JNI_FALSE);
+        os.write(reinterpret_cast<char*>(data), available);
+        env->ReleaseByteArrayElements(arr, data, JNI_ABORT);
+      }
+    }
   }
+
   std::istringstream in(os.str());
   const torch::Device device = utils::GetDeviceFromJDevice(env, jarray);
   const torch::jit::script::Module module = torch::jit::load(in, device);
@@ -81,7 +94,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleWrite(
-    JNIEnv* env, jobject jthis, jlong module_handle, jobject jos, jbyteArray arr) {
+    JNIEnv* env, jobject jthis, jlong module_handle, jobject jos, jbyteArray arr, jboolean jwrite_size) {
   API_BEGIN()
   auto* module_ptr = reinterpret_cast<torch::jit::script::Module*>(module_handle);
   std::ostringstream stream;
@@ -96,6 +109,16 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleWrite(
   if (method_id == nullptr) {
     env->ThrowNew(ENGINE_EXCEPTION_CLASS, "The write method in OutputStream is not found");
     return;
+  }
+  if (jwrite_size) {
+    auto jbytes = env->NewByteArray(8);
+    int64_t length = str.size();
+    char bytes[8];
+    for (int i = 0; i < 8; i++) {
+      bytes[i] = static_cast<int>(length >> (56 - 8 * i) & 0XFF);
+    }
+    env->SetByteArrayRegion(jbytes, 0, 8, (jbyte*)bytes);
+    env->CallVoidMethod(jos, method_id, jbytes, 0, 8);
   }
   int len = env->GetArrayLength(arr);
   int i = 0;

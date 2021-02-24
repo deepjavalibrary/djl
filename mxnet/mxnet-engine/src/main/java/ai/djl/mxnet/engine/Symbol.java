@@ -70,6 +70,18 @@ public class Symbol extends NativeResource<Pointer> {
     }
 
     /**
+     * Loads a symbol from a json string.
+     *
+     * @param manager the manager to load the symbol to
+     * @param json the json string of the symbol.
+     * @return the new symbol
+     */
+    public static Symbol loadJson(MxNDManager manager, String json) {
+        Pointer pointer = JnaUtils.createSymbolFromString(json);
+        return new Symbol(manager, pointer);
+    }
+
+    /**
      * Returns the symbol argument names.
      *
      * @return the symbol argument names
@@ -278,6 +290,15 @@ public class Symbol extends NativeResource<Pointer> {
     }
 
      */
+
+    /**
+     * Converts Symbol to json string for saving purpose.
+     *
+     * @return the json string
+     */
+    public String toJsonString() {
+        return JnaUtils.getSymbolString(getHandle());
+    }
 
     /** {@inheritDoc} */
     @Override
