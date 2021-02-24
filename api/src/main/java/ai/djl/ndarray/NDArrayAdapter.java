@@ -971,6 +971,12 @@ public interface NDArrayAdapter extends NDArray {
 
     /** {@inheritDoc} */
     @Override
+    default NDArray oneHot(int depth, float onValue, float offValue, DataType dataType) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     default NDArrayEx getNDArrayInternal() {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }

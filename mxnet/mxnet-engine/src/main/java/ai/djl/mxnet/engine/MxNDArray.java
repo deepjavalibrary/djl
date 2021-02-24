@@ -1498,6 +1498,17 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray oneHot(int depth, float onValue, float offValue, DataType dataType) {
+        MxOpParams params = new MxOpParams();
+        params.add("depth", depth);
+        params.add("on_value", onValue);
+        params.add("off_value", offValue);
+        params.add("dtype", dataType);
+        return manager.invoke("_npx_one_hot", this, params).toType(dataType, false);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArrayEx getNDArrayInternal() {
         return mxNDArrayEx;
     }

@@ -41,6 +41,7 @@ import org.tensorflow.op.Ops;
 import org.tensorflow.op.core.Constant;
 import org.tensorflow.op.core.Max;
 import org.tensorflow.op.core.Min;
+import org.tensorflow.op.core.OneHot;
 import org.tensorflow.op.core.Prod;
 import org.tensorflow.op.core.Squeeze;
 import org.tensorflow.op.core.Sum;
@@ -567,6 +568,21 @@ public class TfNDArray implements NDArray {
                                 getOperand(), tf.constant(axes), EuclideanNorm.keepDims(keepDims))
                         .asTensor()) {
             return new TfNDArray(manager, tensor);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray oneHot(int depth, float onValue, float offValue, DataType dataType) {
+        try (Tensor<?> tensor =
+                tf.oneHot(
+                                getOperand(),
+                                tf.constant(depth),
+                                tf.constant(onValue),
+                                tf.constant(offValue),
+                                OneHot.axis(-1L))
+                        .asTensor()) {
+            return new TfNDArray(manager, tensor).toType(dataType, false);
         }
     }
 

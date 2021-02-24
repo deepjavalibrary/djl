@@ -42,7 +42,7 @@ public class BertNextSentenceLoss extends Loss {
         NDArray label = labels.get(labelIdx).toType(DataType.FLOAT32, false);
         // predictions are log(softmax)
         NDArray logPredictions = predictions.get(nextSentencePredictionIdx);
-        NDArray oneHotLabels = MissingOps.oneHot(2, label).toType(DataType.FLOAT32, false);
+        NDArray oneHotLabels = label.oneHot(2);
         // we use negative log likelihood as loss: log(softmax) turns high confidence into
         // negative values near one, low confidence into negative values near -inf,
         // negating gives almost 0 for high confidence and near +inf for very low confidence
