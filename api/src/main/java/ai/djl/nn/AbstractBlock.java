@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -44,8 +43,7 @@ import java.util.function.Predicate;
  * <ul>
  *   <li>Define a version for serializing parameter and metadata and pass it to the parent
  *       constructor
- *   <li>Use {@link AbstractBlock#addParameter(Parameter, Shape)} or {@link
- *       AbstractBlock#addParameter(Parameter, Function)} to add parameters to your block in the
+ *   <li>Use {@link AbstractBlock#addParameter(Parameter)} to add parameters to your block in the
  *       constructor if necessary.
  *   <li>Use {@link AbstractBlock#addChildBlock(String, Block)} to add child blocks if necessary.
  *   <li>Override {@link AbstractBlock#getOutputShapes(NDManager, Shape[])} to determine the shape
@@ -62,9 +60,9 @@ import java.util.function.Predicate;
  * </ul>
  *
  * <p>If you use {@link AbstractBlock#addParameter(Parameter)} to add parameters, you have to take
- * care of parameter initialization yourself. In this case, you need to override {@link
- * AbstractBlock#getParameterShape(String, Shape[])} to determine the shape of your parameters. If
- * you use the other variants of {@code addParameter} this is done for you.
+ * care of parameter initialization yourself. In this case, you need to setShape to your parameters
+ * if you know the shape of Parameter or you can implement prepare to setShape when you see the
+ * input shape.
  */
 // Using LinkedHashMap instead of Map is intentional: we want to make sure that consumers
 // of this API know the children and parameters are always iterated over in insertion order.
@@ -99,14 +97,6 @@ public abstract class AbstractBlock implements Block {
      * parameters in this map are automatically loaded / saved.
      */
     protected LinkedHashMap<String, Parameter> parameters = new LinkedHashMap<>();
-
-    /**
-     * Callbacks to determine the shape of a parameter. Values may be null in which case extending
-     * classes need to override {@link Block#getParameterShape(String, Shape[])} and implement
-     * parameter shape resolution manually.
-     */
-    protected LinkedHashMap<String, Function<Shape[], Shape>> parameterShapeCallbacks =
-            new LinkedHashMap<>();
 
     /**
      * Builds an empty block with the given version for parameter serialization.
@@ -197,70 +187,17 @@ public abstract class AbstractBlock implements Block {
     }
 
     /**
-     * Adds a parameter to this block. If parameters are added with this method, subclasses need to
-     * override {@link Block#getParameterShape(String, Shape[])} and return the shapes of parameters
-     * themselves.
-     *
-     * @param parameter the parameter to add, not null
-     * @param <P> the specific parameter subclass
-     * @return the parameter passed as arguments to make it easier to create and assign paramters in
-     *     one line
-     */
-    protected final <P extends Parameter> P addParameter(P parameter) {
-        return addParameter(parameter, (Function<Shape[], Shape>) null);
-    }
-
-    /**
      * Adds a parameter to this block. If parameters are added with this method, intialization of
      * the parameter works out of the box
      *
-     * @param parameter the parameter to add, not null
-     * @param shape the shape of the parameter
      * @param <P> the specific parameter subclass
-     * @return the parameter passed as arguments to make it easier to create and assign paramters in
-     *     one line
-     */
-    protected final <P extends Parameter> P addParameter(P parameter, Shape shape) {
-        return addParameter(parameter, (inputShapes) -> shape);
-    }
-
-    /**
-     * Adds a parameter to this block. If parameters are added with this method, intialization of
-     * the parameter works out of the box
-     *
      * @param parameter the parameter to add, not null
-     * @param shapeCallback the method to call once the input shape of this block is known to
-     *     determine the shape of the given parameter
-     * @param <P> the specific parameter subclass
      * @return the parameter passed as arguments to make it easier to create and assign parameters
      *     in one line
      */
-    protected final <P extends Parameter> P addParameter(
-            P parameter, Function<Shape[], Shape> shapeCallback) {
+    protected final <P extends Parameter> P addParameter(P parameter) {
         parameters.put(parameter.getName(), parameter);
-        parameterShapeCallbacks.put(parameter.getName(), shapeCallback);
         return parameter;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        Function<Shape[], Shape> callback = parameterShapeCallbacks.get(name);
-        if (callback == null) {
-            Parameter parameter = parameters.get(name);
-            if (parameter == null) {
-                throw new IllegalArgumentException(
-                        "No parameter named " + name + " found in this block.");
-            } else {
-                throw new IllegalStateException(
-                        "No shape initializer for parameter "
-                                + name
-                                + "found. "
-                                + "Either pass an initializer for the shape when adding the "
-                                + "parameter or override getParameterShape in the subclass.");
-            }
-        }
-        return callback.apply(inputShapes);
     }
 
     /** {@inheritDoc} */
@@ -314,13 +251,34 @@ public abstract class AbstractBlock implements Block {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
+    public void initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
         beforeInitialize(inputShapes);
+        // if parameters are initialized, skip it
+        if (!isInitialized()) {
+            // setShape for all params
+            prepare(inputShapes);
+        }
         for (Parameter parameter : parameters.values()) {
-            parameter.initialize(manager, dataType, inputShapes);
+            parameter.initialize(manager, dataType);
         }
         initializeChildBlocks(manager, dataType, inputShapes);
-        return getOutputShapes(manager, inputShapes);
+    }
+
+    /**
+     * Performs any action necessary before initialization. For example, keep the input information
+     * or verify the layout.
+     *
+     * @param inputShapes the expected shapes of the input
+     */
+    protected void beforeInitialize(Shape... inputShapes) {
+        if (inputNames.isEmpty()) {
+            // automatically assign input names
+            inputNames = new ArrayList<>();
+            for (int i = 0; i < inputShapes.length; ++i) {
+                inputNames.add("data" + i);
+            }
+        }
+        this.inputShapes = inputShapes;
     }
 
     /**
@@ -363,20 +321,11 @@ public abstract class AbstractBlock implements Block {
     }
 
     /**
-     * Performs any action necessary before initialization.
+     * Sets the shape of {@link Parameter}s.
      *
-     * @param inputShapes the expected shapes of the input
+     * @param inputShapes the shapes of inputs
      */
-    protected void beforeInitialize(Shape[] inputShapes) {
-        if (inputNames.isEmpty()) {
-            // automatically assign input names
-            inputNames = new ArrayList<>();
-            for (int i = 0; i < inputShapes.length; ++i) {
-                inputNames.add("data" + i);
-            }
-        }
-        this.inputShapes = inputShapes;
-    }
+    protected void prepare(Shape[] inputShapes) {}
 
     /** {@inheritDoc} */
     @Override

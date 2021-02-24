@@ -78,10 +78,10 @@ public final class BertBlock extends AbstractBlock {
                 addParameter(
                         Parameter.builder()
                                 .setName(PARAM_POSITION_EMBEDDING)
-                                .setBlock(this)
                                 .setType(Parameter.Type.WEIGHT)
-                                .build(),
-                        new Shape(builder.maxSequenceLength, builder.embeddingSize));
+                                .optShape(
+                                        new Shape(builder.maxSequenceLength, builder.embeddingSize))
+                                .build());
         // embedding for the input types
         this.typeEmbedding =
                 addChildBlock(
@@ -167,11 +167,12 @@ public final class BertBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
-        beforeInitialize(inputShapes);
+        super.beforeInitialize(inputShapes);
         inputNames = Arrays.asList("tokenIds", "typeIds", "masks");
         Shape[] tokenShape = {inputShapes[0]};
         Shape[] typeShape = {inputShapes[1]};
-        Shape[] embeddingOutput = this.tokenEmbedding.initialize(manager, dataType, tokenShape);
+        this.tokenEmbedding.initialize(manager, dataType, tokenShape);
+        Shape[] embeddingOutput = this.tokenEmbedding.getOutputShapes(manager, tokenShape);
         this.typeEmbedding.initialize(manager, dataType, typeShape);
         this.embeddingNorm.initialize(manager, dataType, embeddingOutput);
         this.embeddingDropout.initialize(manager, dataType, embeddingOutput);

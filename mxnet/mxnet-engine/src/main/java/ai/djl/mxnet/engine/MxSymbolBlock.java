@@ -231,9 +231,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
         }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
+    private Shape getParameterShape(String name, Shape[] inputShapes) {
         if (paramShapes == null) {
             PairList<String, Shape> pairs = new PairList<>();
             for (int i = 0; i < inputNames.size(); i++) {
@@ -318,7 +316,6 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
             mxNetParams.add(
                     Parameter.builder()
                             .setName(name)
-                            .setBlock(this)
                             .setType(type)
                             .optRequiresGrad(requireGrad)
                             .build());

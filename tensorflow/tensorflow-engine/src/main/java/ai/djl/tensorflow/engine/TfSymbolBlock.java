@@ -131,8 +131,8 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
-        return new Shape[0];
+    public void initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
+        throw new IllegalStateException("TfSymbolBlock can't be initialized");
     }
 
     /** {@inheritDoc} */

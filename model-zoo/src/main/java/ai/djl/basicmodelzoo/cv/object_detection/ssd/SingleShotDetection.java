@@ -177,15 +177,22 @@ public final class SingleShotDetection extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
+    public void initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
         beforeInitialize(inputShapes);
-        Shape[] shapes = inputShapes;
-        for (int i = 0; i < features.size(); i++) {
-            shapes = features.get(i).initialize(manager, dataType, shapes);
-            classPredictionBlocks.get(i).initialize(manager, dataType, shapes);
-            anchorPredictionBlocks.get(i).initialize(manager, dataType, shapes);
+        Shape outputShape;
+        try (NDManager tempManager = manager.newSubManager()) {
+            ParameterStore store = new ParameterStore(tempManager, false);
+            NDArray array = tempManager.create(inputShapes[0]);
+            for (int i = 0; i < features.size(); i++) {
+                features.get(i).initialize(manager, dataType, array.getShape());
+                // the getOutputShapes is wrong
+                // so manually call forward here
+                array = features.get(i).forward(store, new NDList(array), false).singletonOrThrow();
+                outputShape = array.getShape();
+                classPredictionBlocks.get(i).initialize(manager, dataType, outputShape);
+                anchorPredictionBlocks.get(i).initialize(manager, dataType, outputShape);
+            }
         }
-        return getOutputShapes(manager, inputShapes);
     }
 
     /** {@inheritDoc} */

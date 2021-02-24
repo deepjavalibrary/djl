@@ -57,12 +57,9 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
                 addParameter(
                         Parameter.builder()
                                 .setName("embedding")
-                                .setBlock(this)
                                 .setType(Parameter.Type.WEIGHT)
-                                .optRequiresGrad(true)
                                 .optGradientFormat(sparseFormat)
-                                .build(),
-                        (inputShapes) -> new Shape(numEmbeddings, embeddingSize));
+                                .build());
         if (baseBuilder.fallthrough != null && baseBuilder.defaultItem != null) {
             throw new IllegalArgumentException(
                     "You can not specify both a fallthrough and a defaultItem");
@@ -100,14 +97,18 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
                 addParameter(
                         Parameter.builder()
                                 .setName("embedding")
-                                .setBlock(this)
                                 .setType(Parameter.Type.WEIGHT)
-                                .optRequiresGrad(true)
                                 .optGradientFormat(sparseFormat)
-                                .build(),
-                        (inputShapes) -> new Shape(numEmbeddings, embeddingSize));
+                                .build());
         this.embedding.setArray(embedding);
         inputShapes = new Shape[] {new Shape(-1)};
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void prepare(Shape[] inputShapes) {
+        // numItems will be adjusted by embedding array or fallthroughEmbedding
+        embedding.setShape(new Shape(numEmbeddings, embeddingSize));
     }
 
     /** {@inheritDoc} */

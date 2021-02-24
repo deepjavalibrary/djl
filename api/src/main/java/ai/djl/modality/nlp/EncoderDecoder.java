@@ -97,13 +97,12 @@ public class EncoderDecoder extends AbstractBlock {
      * @param manager the NDManager to initialize the parameters
      * @param dataType the datatype of the parameters
      * @param inputShapes the shapes of the inputs to the block
-     * @return the shapes of the outputs of the block
      */
     @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
+    public void initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
         beforeInitialize(inputShapes);
         encoder.initialize(manager, dataType, inputShapes[0]);
-        return decoder.initialize(manager, dataType, inputShapes[1]);
+        decoder.initialize(manager, dataType, inputShapes[1]);
     }
 
     /** {@inheritDoc} */

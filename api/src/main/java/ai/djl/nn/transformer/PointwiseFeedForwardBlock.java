@@ -32,8 +32,6 @@ public class PointwiseFeedForwardBlock extends AbstractBlock {
 
     private static final byte VERSION = 1;
 
-    private Shape outputShape;
-
     /**
      * Creates a pointwise feed-forward block.
      *
@@ -49,7 +47,7 @@ public class PointwiseFeedForwardBlock extends AbstractBlock {
         super(VERSION);
         // add hidden layers with activation
         int count = 0;
-        for (final int hiddenSize : hiddenSizes) {
+        for (int hiddenSize : hiddenSizes) {
             addChildBlock(
                     "linear_" + count, Linear.builder().optBias(true).setUnits(hiddenSize).build());
             addChildBlock("activation_" + count, new LambdaBlock(activationFunction));
@@ -62,7 +60,10 @@ public class PointwiseFeedForwardBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
-        return new Shape[] {outputShape};
+        for (Block child : children.values()) {
+            inputShapes = child.getOutputShapes(manager, inputShapes);
+        }
+        return inputShapes;
     }
 
     /** {@inheritDoc} */
@@ -75,16 +76,16 @@ public class PointwiseFeedForwardBlock extends AbstractBlock {
         }
         // Now that we know the input shape, we can determine the reshape necessary
         // to shape the input and re-shape the output
-        final Shape inputShape = inputShapes[0];
+        Shape inputShape = inputShapes[0];
         if (inputShape.dimension() < 2) {
             throw new IllegalArgumentException(
                     "Pointwise feed forward blocks need an input of at least dimension 2.");
         }
         Shape lastShape = inputShape;
         for (Block child : children.values()) {
-            lastShape = child.initialize(manager, dataType, lastShape)[0];
+            child.initialize(manager, dataType, lastShape);
+            lastShape = getOutputShapes(manager, new Shape[] {lastShape})[0];
         }
-        outputShape = lastShape;
     }
 
     /** {@inheritDoc} */

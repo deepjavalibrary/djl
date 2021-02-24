@@ -85,46 +85,37 @@ public class BatchNorm extends AbstractBlock {
         momentum = builder.momentum;
         center = builder.center;
         scale = builder.scale;
-        // When creating parameters we use a callback as "inChannels" is set before initialization,
-        // it is not known yet.
+
         // make gamma trainable if scale
         gamma =
                 addParameter(
                         Parameter.builder()
                                 .setName("gamma")
-                                .setBlock(this)
                                 .setType(Parameter.Type.GAMMA)
                                 .optRequiresGrad(scale)
-                                .build(),
-                        (inputShapes) -> new Shape(inChannels));
+                                .build());
         // make beta trainable if center
         beta =
                 addParameter(
                         Parameter.builder()
                                 .setName("beta")
-                                .setBlock(this)
                                 .setType(Parameter.Type.BETA)
                                 .optRequiresGrad(center)
-                                .build(),
-                        (inputShapes) -> new Shape(inChannels));
+                                .build());
         runningMean =
                 addParameter(
                         Parameter.builder()
                                 .setName("runningMean")
-                                .setBlock(this)
                                 .setType(Parameter.Type.RUNNING_MEAN)
                                 .optRequiresGrad(false)
-                                .build(),
-                        (inputShapes) -> new Shape(inChannels));
+                                .build());
         runningVar =
                 addParameter(
                         Parameter.builder()
                                 .setName("runningVar")
-                                .setBlock(this)
                                 .setType(Parameter.Type.RUNNING_VAR)
                                 .optRequiresGrad(false)
-                                .build(),
-                        (inputShapes) -> new Shape(inChannels));
+                                .build());
     }
 
     /** {@inheritDoc} */
@@ -160,9 +151,18 @@ public class BatchNorm extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void beforeInitialize(Shape[] inputShapes) {
+    protected void beforeInitialize(Shape... inputShapes) {
         super.beforeInitialize(inputShapes);
         inChannels = inputShapes[0].size(axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void prepare(Shape[] inputShapes) {
+        gamma.setShape(new Shape(inChannels));
+        beta.setShape(new Shape(inChannels));
+        runningMean.setShape(new Shape(inChannels));
+        runningVar.setShape(new Shape(inChannels));
     }
 
     /** {@inheritDoc} */

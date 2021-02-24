@@ -23,6 +23,7 @@ import ai.djl.training.initializer.XavierInitializer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -42,7 +43,7 @@ public class Parameter implements AutoCloseable {
 
     private String id;
     private String name;
-    private Block block;
+    private Shape shape;
     private Type type;
     private Initializer initializer;
     private NDArray array;
@@ -52,7 +53,7 @@ public class Parameter implements AutoCloseable {
     Parameter(Builder builder) {
         this.id = UUID.randomUUID().toString();
         this.name = builder.name;
-        this.block = builder.block;
+        this.shape = builder.shape;
         this.type = builder.type;
         this.array = builder.array;
         this.requiresGrad = builder.requiresGrad;
@@ -94,8 +95,24 @@ public class Parameter implements AutoCloseable {
      * @param array the {@link NDArray} that contains values of this {@code Parameter}
      */
     public void setArray(NDArray array) {
+        if (shape != null) {
+            throw new IllegalStateException("array has been set! Use either setArray or setShape");
+        }
         this.array = array;
+        shape = array.getShape();
         array.setName(name);
+    }
+
+    /**
+     * Sets the shape of this {@code Parameter}.
+     *
+     * @param shape the shape of this {@code Parameter}
+     */
+    public void setShape(Shape shape) {
+        if (array != null) {
+            throw new IllegalStateException("array has been set! Use either setArray or setShape");
+        }
+        this.shape = shape;
     }
 
     /**
@@ -144,11 +161,11 @@ public class Parameter implements AutoCloseable {
      *
      * @param manager an NDManager to create the arrays
      * @param dataType the datatype of the {@code Parameter}
-     * @param inputShapes the expected input shapes
      */
-    public void initialize(NDManager manager, DataType dataType, Shape[] inputShapes) {
+    public void initialize(NDManager manager, DataType dataType) {
+        Objects.requireNonNull(initializer, "No initializer has been set");
+        Objects.requireNonNull(shape, "No parameter shape has been set");
         if (!isInitialized()) {
-            Shape shape = block.getParameterShape(name, inputShapes);
             array = initializer.initialize(manager, shape, dataType);
             array.setName(name);
         }
@@ -210,6 +227,8 @@ public class Parameter implements AutoCloseable {
         }
 
         array = manager.decode(dis);
+        // set the shape of the parameter and prepare() can be skipped
+        shape = array.getShape();
     }
 
     /** {@inheritDoc} */
@@ -264,7 +283,7 @@ public class Parameter implements AutoCloseable {
     /** A Builder to construct a {@code Parameter}. */
     public static final class Builder {
         String name;
-        Block block;
+        Shape shape;
         Type type;
         Initializer initializer;
         NDArray array;
@@ -283,17 +302,6 @@ public class Parameter implements AutoCloseable {
         }
 
         /**
-         * Sets the block of the {@code Parameter}.
-         *
-         * @param block the block of the {@code Parameter}
-         * @return this {@code Parameter}
-         */
-        public Builder setBlock(Block block) {
-            this.block = block;
-            return this;
-        }
-
-        /**
          * Sets the {@code Type} of the {@code Parameter}.
          *
          * @param type the {@code Type} of the {@code Parameter}
@@ -301,6 +309,17 @@ public class Parameter implements AutoCloseable {
          */
         public Builder setType(Type type) {
             this.type = type;
+            return this;
+        }
+
+        /**
+         * Sets the shape of the {@code Parameter}.
+         *
+         * @param shape the shape of the {@code Parameter}
+         * @return this {@code Parameter}
+         */
+        public Builder optShape(Shape shape) {
+            this.shape = shape;
             return this;
         }
 

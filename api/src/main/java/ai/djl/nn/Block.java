@@ -189,9 +189,8 @@ public interface Block {
      * @param manager the NDManager to initialize the parameters
      * @param dataType the datatype of the parameters
      * @param inputShapes the shapes of the inputs to the block
-     * @return the shapes of the outputs of the block
      */
-    Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes);
+    void initialize(NDManager manager, DataType dataType, Shape... inputShapes);
 
     /**
      * Returns a boolean whether the block is initialized.
@@ -241,17 +240,6 @@ public interface Block {
      * @return the list of all parameters of the block
      */
     ParameterList getParameters();
-
-    /**
-     * Returns the shape of the specified direct parameter of this block given the shapes of the
-     * input to the block.
-     *
-     * @param name the name of the parameter
-     * @param inputShapes the shapes of the input to the block
-     * @return the shape of the parameter specified
-     * @throws IllegalArgumentException if the parameter name specified is invalid
-     */
-    Shape getParameterShape(String name, Shape[] inputShapes);
 
     /**
      * Returns the expected output shapes of the block for the specified input shapes.
