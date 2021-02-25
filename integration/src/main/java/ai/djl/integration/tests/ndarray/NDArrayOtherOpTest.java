@@ -838,13 +838,13 @@ public class NDArrayOtherOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             // test 1-D
             NDArray array = manager.create(new float[] {1f, 0.5f, -1f});
-            Assert.assertEquals(array.norm().getFloat(), 1.5f);
+            Assert.assertEquals(array.norm(), manager.create(1.5f));
             // test 2-D
             array = manager.create(new float[][] {{1f, 0.5f}, {-1f, 2f}});
-            Assert.assertEquals(array.norm().getFloat(), 2.5f);
+            Assert.assertEquals(array.norm(), manager.create(2.5f));
             // test scalar
             array = manager.create(new float[] {5f});
-            Assert.assertEquals(array.norm().getFloat(), 5f);
+            Assert.assertEquals(array.norm(), manager.create(5f));
             // test zero-dim
             array = manager.create(new float[] {});
             Assert.assertEquals(array.norm().getFloat(), 0f);
