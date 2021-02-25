@@ -254,6 +254,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
         String json = symbol.toJsonString();
+        // symbol size may go beyond os.writeUTF() size (65535)
         byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
         os.writeInt(bytes.length);
         os.write(bytes);
