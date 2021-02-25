@@ -17,13 +17,13 @@ Refer to [How to import TensorFlow models](https://docs.djl.ai/docs/tensorflow/h
 ## Installation
 You can pull the TensorFlow engine from the central Maven repository by including the following dependency:
 
-- ai.djl.tensorflow:tensorflow-engine:0.9.0
+- ai.djl.tensorflow:tensorflow-engine:0.10.0
 
 ```xml
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-engine</artifactId>
-    <version>0.9.0</version>
+    <version>0.10.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
