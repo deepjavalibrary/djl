@@ -530,4 +530,6 @@ final class PyTorchLibrary {
             float rescaleGrad,
             float clipGrad,
             float momentum);
+
+    native long torchNorm(long handle, int ord, long [] axis, boolean keepDims);
 }

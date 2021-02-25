@@ -157,3 +157,14 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchCumSum(
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNorm(
+    JNIEnv* env, jobject jthis, jlong jhandle, jint jord, jlongArray jaxes, jboolean jkeep_dims) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const std::vector<int64_t> axes = djl::utils::jni::GetVecFromJLongArray(env, jaxes);
+  const auto* result_ptr =
+      new torch::Tensor(tensor_ptr->norm(c10::optional<c10::Scalar>{jord}, axes, jkeep_dims == JNI_TRUE));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}

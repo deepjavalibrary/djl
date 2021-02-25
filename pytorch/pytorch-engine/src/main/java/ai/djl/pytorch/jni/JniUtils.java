@@ -1470,4 +1470,11 @@ public final class JniUtils {
     public static int getLayout(PtNDArray array) {
         return PyTorchLibrary.LIB.torchLayout(array.getHandle());
     }
+
+    public static PtNDArray norm(PtNDArray ndArray, int ord, int[] axes, boolean keepDims) {
+        long[] longAxes = Arrays.stream(axes).mapToLong(i -> i).toArray();
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchNorm(ndArray.getHandle(), ord, longAxes, keepDims));
+    }
 }
