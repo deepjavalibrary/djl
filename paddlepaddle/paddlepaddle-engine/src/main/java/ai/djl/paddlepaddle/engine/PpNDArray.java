@@ -39,7 +39,7 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
     public PpNDArray(PpNDManager manager, long handle) {
         super(handle);
         this.manager = manager;
-        manager.attach(getUid(), this);
+        manager.attachInternal(getUid(), this);
     }
 
     /** {@inheritDoc} */
@@ -86,18 +86,25 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager attach(NDManager manager) {
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (PpNDManager) manager;
+        manager.attachInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
         detach();
         NDManager original = this.manager;
         this.manager = (PpNDManager) manager;
-        manager.attach(getUid(), this);
-        return original;
+        manager.tempAttachInternal(original, getUid(), this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void detach() {
-        manager.detach(getUid());
+        manager.detachInternal(getUid());
         manager = PpNDManager.getSystemManager();
     }
 

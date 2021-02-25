@@ -39,7 +39,7 @@ public class TfLiteNDArray implements NDArrayAdapter {
     TfLiteNDArray(TfLiteNDManager manager, Tensor tensor) {
         this.manager = manager;
         uid = UUID.randomUUID().toString();
-        manager.attach(uid, this);
+        manager.attachInternal(uid, this);
         this.tensor = tensor;
         shape = new Shape(Arrays.stream(tensor.shape()).mapToLong(i -> i).toArray());
         dataType = TfLiteDataType.fromTf(tensor.dataType());
@@ -103,18 +103,25 @@ public class TfLiteNDArray implements NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager attach(NDManager manager) {
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (TfLiteNDManager) manager;
+        manager.attachInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
         detach();
         NDManager original = this.manager;
         this.manager = (TfLiteNDManager) manager;
-        manager.attach(getUid(), this);
-        return original;
+        manager.tempAttachInternal(original, getUid(), this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void detach() {
-        manager.detach(getUid());
+        manager.detachInternal(getUid());
         manager = TfLiteNDManager.getSystemManager();
     }
 

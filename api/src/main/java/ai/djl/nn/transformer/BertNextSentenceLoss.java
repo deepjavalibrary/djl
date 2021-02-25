@@ -14,6 +14,7 @@ package ai.djl.nn.transformer;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.training.loss.Loss;
 
@@ -38,20 +39,21 @@ public class BertNextSentenceLoss extends Loss {
 
     @Override
     public NDArray evaluate(NDList labels, NDList predictions) {
-        MemoryScope scope = MemoryScope.from(labels).add(predictions);
-        NDArray label = labels.get(labelIdx).toType(DataType.FLOAT32, false);
-        // predictions are log(softmax)
-        NDArray logPredictions = predictions.get(nextSentencePredictionIdx);
-        NDArray oneHotLabels = label.oneHot(2);
-        // we use negative log likelihood as loss: log(softmax) turns high confidence into
-        // negative values near one, low confidence into negative values near -inf,
-        // negating gives almost 0 for high confidence and near +inf for very low confidence
-        NDArray logPredictionForLabels = oneHotLabels.mul(logPredictions);
-        NDArray summedPredictions = logPredictionForLabels.sum(new int[] {1});
-        NDArray perExampleLoss = summedPredictions.mul(-1f);
-        NDArray result = perExampleLoss.mean();
-        scope.remove(labels, predictions).waitToRead(result).close();
-        return result;
+        try (NDManager scope = NDManager.from(labels)) {
+            scope.tempAttachAll(labels, predictions);
+            NDArray label = labels.get(labelIdx).toType(DataType.FLOAT32, false);
+            // predictions are log(softmax)
+            NDArray logPredictions = predictions.get(nextSentencePredictionIdx);
+            NDArray oneHotLabels = label.oneHot(2);
+            // we use negative log likelihood as loss: log(softmax) turns high confidence into
+            // negative values near one, low confidence into negative values near -inf,
+            // negating gives almost 0 for high confidence and near +inf for very low confidence
+            NDArray logPredictionForLabels = oneHotLabels.mul(logPredictions);
+            NDArray summedPredictions = logPredictionForLabels.sum(new int[] {1});
+            NDArray perExampleLoss = summedPredictions.mul(-1f);
+            NDArray result = perExampleLoss.mean();
+            return scope.ret(result);
+        }
     }
 
     /**
@@ -62,15 +64,16 @@ public class BertNextSentenceLoss extends Loss {
      * @return the fraction of correct predictions.
      */
     public NDArray accuracy(NDList labels, NDList predictions) {
-        MemoryScope scope = MemoryScope.from(labels).add(predictions);
-        NDArray label = labels.get(labelIdx);
-        NDArray predictionLogProbs = predictions.get(nextSentencePredictionIdx);
-        // predictions are log(softmax) -> highest confidence is highest (negative) value near 0
-        NDArray prediction = predictionLogProbs.argMax(1).toType(DataType.INT32, false);
-        NDArray equalCount = label.eq(prediction).sum().toType(DataType.FLOAT32, false);
-        NDArray result = equalCount.div(label.getShape().size());
-        scope.remove(labels, predictions).waitToRead(result).close();
+        try (NDManager scope = NDManager.from(labels)) {
+            scope.tempAttachAll(labels, predictions);
+            NDArray label = labels.get(labelIdx);
+            NDArray predictionLogProbs = predictions.get(nextSentencePredictionIdx);
+            // predictions are log(softmax) -> highest confidence is highest (negative) value near 0
+            NDArray prediction = predictionLogProbs.argMax(1).toType(DataType.INT32, false);
+            NDArray equalCount = label.eq(prediction).sum().toType(DataType.FLOAT32, false);
+            NDArray result = equalCount.div(label.getShape().size());
 
-        return result;
+            return scope.ret(result);
+        }
     }
 }

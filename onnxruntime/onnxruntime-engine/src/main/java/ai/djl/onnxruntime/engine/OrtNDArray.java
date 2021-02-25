@@ -44,7 +44,7 @@ public class OrtNDArray implements NDArrayAdapter {
         this.manager = manager;
         this.tensor = tensor;
         uid = UUID.randomUUID().toString();
-        manager.attach(uid, this);
+        manager.attachInternal(uid, this);
     }
 
     OnnxTensor getTensor() {
@@ -102,18 +102,25 @@ public class OrtNDArray implements NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager attach(NDManager manager) {
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (OrtNDManager) manager;
+        manager.attachInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
         detach();
         NDManager original = this.manager;
         this.manager = (OrtNDManager) manager;
-        manager.attach(getUid(), this);
-        return original;
+        manager.tempAttachInternal(original, getUid(), this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void detach() {
-        manager.detach(getUid());
+        manager.detachInternal(getUid());
         manager = OrtNDManager.getSystemManager();
     }
 

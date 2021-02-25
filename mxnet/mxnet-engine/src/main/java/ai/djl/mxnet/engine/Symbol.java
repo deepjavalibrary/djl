@@ -52,7 +52,7 @@ public class Symbol extends NativeResource<Pointer> {
     Symbol(MxNDManager manager, Pointer pointer) {
         super(pointer);
         this.manager = manager;
-        manager.attach(getUid(), this);
+        manager.attachInternal(getUid(), this);
         //        argParams = JnaUtils.listSymbolArguments(getHandle());
         //        auxParams = JnaUtils.listSymbolAuxiliaryStates(getHandle());
     }
@@ -311,7 +311,7 @@ public class Symbol extends NativeResource<Pointer> {
     public void close() {
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
-            manager.detach(getUid());
+            manager.detachInternal(getUid());
             JnaUtils.freeSymbol(pointer);
             manager = null;
         }

@@ -69,7 +69,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         super(handle);
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
-        manager.attach(getUid(), this);
+        manager.attachInternal(getUid(), this);
     }
 
     /**
@@ -84,7 +84,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         super(handle);
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
-        manager.attach(getUid(), this);
+        manager.attachInternal(getUid(), this);
         dataRef = data;
     }
 
@@ -279,18 +279,25 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager attach(NDManager manager) {
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (PtNDManager) manager;
+        manager.attachInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
         detach();
         NDManager original = this.manager;
         this.manager = (PtNDManager) manager;
-        manager.attach(getUid(), this);
-        return original;
+        manager.tempAttachInternal(original, getUid(), this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void detach() {
-        manager.detach(getUid());
+        manager.detachInternal(getUid());
         manager = PtNDManager.getSystemManager();
     }
 
@@ -1436,7 +1443,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         Long pointer = handle.getAndSet(null);
         if (pointer != null) {
             JniUtils.deleteNDArray(pointer);
-            manager.detach(getUid());
+            manager.detachInternal(getUid());
             manager = null;
             dataRef = null;
         }

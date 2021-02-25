@@ -272,7 +272,7 @@ public class MxNDManager extends BaseNDManager {
     @Override
     public MxNDManager newSubManager(Device dev) {
         MxNDManager manager = new MxNDManager(this, dev, version);
-        attach(manager.uid, manager);
+        attachInternal(manager.uid, manager);
         return manager;
     }
 
@@ -386,11 +386,11 @@ public class MxNDManager extends BaseNDManager {
 
         /** {@inheritDoc} */
         @Override
-        public void attach(String resourceId, AutoCloseable resource) {}
+        public void attachInternal(String resourceId, AutoCloseable resource) {}
 
         /** {@inheritDoc} */
         @Override
-        public void detach(String resourceId) {}
+        public void detachInternal(String resourceId) {}
 
         /** {@inheritDoc} */
         @Override

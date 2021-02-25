@@ -70,30 +70,31 @@ public class BertPretrainingBlock extends AbstractBlock {
         NDArray typeIds = inputs.get(1);
         NDArray sequenceMasks = inputs.get(2);
         NDArray maskedIndices = inputs.get(3);
-        MemoryScope scope = MemoryScope.from(tokenIds).add(typeIds, sequenceMasks, maskedIndices);
-        // run the core bert model
-        NDList bertResult =
-                bertBlock.forward(ps, new NDList(tokenIds, typeIds, sequenceMasks), training);
-        NDArray embeddedSequence = bertResult.get(0);
-        NDArray pooledOutput = bertResult.get(1);
-        // apply pooled output to the classifier
-        NDArray nextSentenceProbabilities =
-                nsBlock.forward(ps, new NDList(pooledOutput), training).singletonOrThrow();
-        // de-mask masked tokens
-        NDArray embeddingTable =
-                bertBlock.getTokenEmbedding().getValue(ps, embeddedSequence.getDevice(), training);
-        NDArray logProbs =
-                mlBlock.forward(
-                                ps,
-                                new NDList(embeddedSequence, maskedIndices, embeddingTable),
-                                training)
-                        .singletonOrThrow();
+        try (NDManager scope = NDManager.from(tokenIds)) {
+            scope.tempAttachAll(inputs);
+            // run the core bert model
+            NDList bertResult =
+                    bertBlock.forward(ps, new NDList(tokenIds, typeIds, sequenceMasks), training);
+            NDArray embeddedSequence = bertResult.get(0);
+            NDArray pooledOutput = bertResult.get(1);
+            // apply pooled output to the classifier
+            NDArray nextSentenceProbabilities =
+                    nsBlock.forward(ps, new NDList(pooledOutput), training).singletonOrThrow();
+            // de-mask masked tokens
+            NDArray embeddingTable =
+                    bertBlock
+                            .getTokenEmbedding()
+                            .getValue(ps, embeddedSequence.getDevice(), training);
+            NDArray logProbs =
+                    mlBlock.forward(
+                                    ps,
+                                    new NDList(embeddedSequence, maskedIndices, embeddingTable),
+                                    training)
+                            .singletonOrThrow();
 
-        scope.remove(tokenIds, typeIds, sequenceMasks, maskedIndices)
-                .waitToRead(nextSentenceProbabilities, logProbs)
-                .close();
-        // return the next sentence & masked language result to apply the loss to
-        return new NDList(nextSentenceProbabilities, logProbs);
+            // return the next sentence & masked language result to apply the loss to
+            return scope.ret(new NDList(nextSentenceProbabilities, logProbs));
+        }
     }
 
     /** {@inheritDoc} */

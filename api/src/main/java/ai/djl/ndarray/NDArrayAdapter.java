@@ -83,7 +83,7 @@ public interface NDArrayAdapter extends NDArray {
 
     /** {@inheritDoc} */
     @Override
-    default NDManager attach(NDManager manager) {
+    default void attach(NDManager manager) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 

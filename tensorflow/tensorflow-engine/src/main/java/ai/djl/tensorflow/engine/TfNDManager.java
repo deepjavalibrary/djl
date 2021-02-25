@@ -423,7 +423,7 @@ public class TfNDManager extends BaseNDManager {
     @Override
     public TfNDManager newSubManager(Device device) {
         TfNDManager manager = new TfNDManager(this, device);
-        attach(manager.uid, manager);
+        attachInternal(manager.uid, manager);
         // initialize eager sessions and operators only for sub managers
         manager.getEagerSession();
         manager.getTf();
@@ -447,11 +447,11 @@ public class TfNDManager extends BaseNDManager {
 
         /** {@inheritDoc} */
         @Override
-        public void attach(String resrouceId, AutoCloseable resource) {}
+        public void attachInternal(String resrouceId, AutoCloseable resource) {}
 
         /** {@inheritDoc} */
         @Override
-        public void detach(String resourceId) {}
+        public void detachInternal(String resourceId) {}
 
         /** {@inheritDoc} */
         @Override

@@ -213,7 +213,8 @@ public final class BertBlock extends AbstractBlock {
         NDArray typeIds = inputs.get(1);
         // Third are the masks for the input
         NDArray masks = inputs.get(2);
-        MemoryScope initScope = MemoryScope.from(tokenIds).add(typeIds, masks);
+        NDManager initScope = NDManager.from(tokenIds);
+        initScope.tempAttachAll(inputs);
         // Create embeddings for inputs
         NDArray embeddedTokens =
                 tokenEmbedding.forward(ps, new NDList(tokenIds), training).singletonOrThrow();
@@ -241,16 +242,15 @@ public final class BertBlock extends AbstractBlock {
                         .mul(-100000f); // turn 1s (original 0s) into -100000
         // Run through all transformer blocks
         NDList lastOutput = dropoutEmbedding;
-        initScope
-                .remove(tokenIds, typeIds, masks)
-                .waitToRead(dropoutEmbedding)
-                .waitToRead(offsetMask)
-                .close();
+        initScope.ret(lastOutput);
+        initScope.ret(offsetMask);
+        initScope.close();
         for (final TransformerEncoderBlock block : transformerEncoderBlocks) {
             NDList input = new NDList(lastOutput.head(), offsetMask);
-            MemoryScope innerScope = MemoryScope.from(input);
-            lastOutput = block.forward(ps, input, training);
-            innerScope.remove(offsetMask).waitToRead(lastOutput).close();
+            try (NDManager innerScope = NDManager.from(input)) {
+                innerScope.tempAttachAll(input);
+                lastOutput = innerScope.ret(block.forward(ps, input, training));
+            }
         }
         // We also return the pooled output - this is an additional fully connected layer
         // only applied to the first token, assumed to be the CLS token to be used for training
