@@ -23,8 +23,8 @@ import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.recurrent.RNN;
-import ai.djl.util.PairList;
 import ai.djl.util.Preconditions;
 import java.util.Arrays;
 import java.util.List;
@@ -606,21 +606,17 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDList embedding(
-            NDList inputs,
-            int numItems,
-            int embeddingSize,
-            boolean sparseGrad,
-            DataType dataType,
-            PairList<String, Object> additional) {
+    public NDList embedding(NDArray input, NDArray weight, SparseFormat sparse) {
+        if (!sparse.equals(SparseFormat.DENSE) && !sparse.equals(SparseFormat.ROW_SPARSE)) {
+            throw new IllegalArgumentException("MXNet only supports row sparse");
+        }
         MxOpParams params = new MxOpParams();
-        params.addParam("input_dim", numItems);
-        params.addParam("output_dim", embeddingSize);
-        params.addParam("sparse_grad", sparseGrad);
-        params.setDataType(dataType);
-        params.addAll(additional);
-
-        return getManager().invoke("Embedding", inputs, params);
+        long inputDim = weight.getShape().get(0);
+        long outputDim = weight.getShape().get(1);
+        params.addParam("input_dim", inputDim);
+        params.addParam("output_dim", outputDim);
+        params.addParam("sparse_grad", sparse.getValue());
+        return getManager().invoke("_npx_embedding", new NDList(input, weight), params);
     }
 
     /** {@inheritDoc} */

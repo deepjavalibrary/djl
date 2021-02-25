@@ -416,3 +416,14 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLpPool(JNI
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNEmbedding(
+    JNIEnv* env, jobject jthis, jlong jinput, jlong jweight, jboolean jsparse) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
+  const auto* weight_ptr = reinterpret_cast<torch::Tensor*>(jweight);
+  auto* result_ptr = new torch::Tensor(torch::nn::functional::embedding(
+      *tensor_ptr, *weight_ptr, torch::nn::functional::EmbeddingFuncOptions().sparse(jsparse)));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}

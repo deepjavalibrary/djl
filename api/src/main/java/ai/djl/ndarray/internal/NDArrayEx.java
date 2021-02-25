@@ -18,9 +18,9 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.Activation;
 import ai.djl.nn.recurrent.RNN;
-import ai.djl.util.PairList;
 import java.util.List;
 
 /** An internal interface that encapsulates engine specific operations. */
@@ -290,13 +290,7 @@ public interface NDArrayEx {
 
     NDList linear(NDArray input, NDArray weight, NDArray bias);
 
-    NDList embedding(
-            NDList inputs,
-            int numItems,
-            int embeddingSize,
-            boolean sparseGrad,
-            DataType dataType,
-            PairList<String, Object> additional);
+    NDList embedding(NDArray input, NDArray weight, SparseFormat sparse);
 
     NDList prelu(NDArray input, NDArray alpha);
 

@@ -55,7 +55,7 @@ public class SimpleTextEncoderTest {
             NDList output =
                     encoder.forward(
                             new ParameterStore(manager, false),
-                            new NDList(manager.zeros(new Shape(4, 7))),
+                            new NDList(manager.zeros(new Shape(4, 7), DataType.INT64)),
                             false);
             Assert.assertEquals(output.head().getShape(), new Shape(4, 7, 16));
             Assert.assertEquals(output.size(), 3);

@@ -18,8 +18,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.AbstractBlock;
@@ -32,7 +30,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -42,12 +39,11 @@ import java.util.Optional;
  */
 public abstract class Embedding<T> extends AbstractBlock implements AbstractIndexedEmbedding<T> {
 
-    private static final byte VERSION = 5;
+    private static final byte VERSION = 6;
 
+    protected int numEmbeddings;
     protected int embeddingSize;
-    protected boolean sparseGrad;
-    protected DataType dataType;
-    protected int numItems;
+    protected SparseFormat sparseFormat;
 
     protected AbstractIndexedEmbedding<T> fallthroughEmbedding;
 
@@ -56,17 +52,12 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
     protected Embedding(BaseBuilder<T, ?> baseBuilder) {
         super(VERSION);
         embeddingSize = baseBuilder.embeddingSize;
-        sparseGrad = baseBuilder.sparseGrad;
-        dataType = baseBuilder.dataType;
+        numEmbeddings = baseBuilder.numEmbeddings != 0 ? baseBuilder.numEmbeddings : 1;
+        sparseFormat = baseBuilder.sparseFormat;
         embedding =
                 addParameter(
-                        new Parameter(
-                                "embedding",
-                                this,
-                                ParameterType.WEIGHT,
-                                true,
-                                sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE),
-                        (inputShapes) -> new Shape(numItems, embeddingSize));
+                        new Parameter("embedding", this, ParameterType.WEIGHT, true, sparseFormat),
+                        (inputShapes) -> new Shape(numEmbeddings, embeddingSize));
         if (baseBuilder.fallthrough != null && baseBuilder.defaultItem != null) {
             throw new IllegalArgumentException(
                     "You can not specify both a fallthrough and a defaultItem");
@@ -77,7 +68,6 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
         } else if (baseBuilder.useDefault) {
             fallthroughEmbedding = new DefaultEmbedding();
         }
-        numItems = 1; // numItems includes a zero element for use by fallthroughEmbeddings
         inputShapes = new Shape[] {new Shape(-1)};
     }
 
@@ -87,31 +77,25 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
      * @param embedding the embedding array
      */
     public Embedding(NDArray embedding) {
-        this(embedding, true);
+        this(embedding, SparseFormat.DENSE);
     }
 
     /**
      * Constructs a pretrained embedding.
      *
      * @param embedding the embedding array
-     * @param sparseGrad whether to compute row sparse gradient in the backward calculation
+     * @param format whether to compute row sparse gradient in the backward calculation
      */
-    public Embedding(NDArray embedding, boolean sparseGrad) {
+    public Embedding(NDArray embedding, SparseFormat format) {
         super(VERSION);
+        numEmbeddings = Math.toIntExact(embedding.getShape().get(0));
         embeddingSize = Math.toIntExact(embedding.getShape().get(1));
-        this.sparseGrad = sparseGrad;
-        dataType = embedding.getDataType();
+        this.sparseFormat = format;
         this.embedding =
                 addParameter(
-                        new Parameter(
-                                "embedding",
-                                this,
-                                ParameterType.WEIGHT,
-                                true,
-                                sparseGrad ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE),
-                        (inputShapes) -> new Shape(numItems, embeddingSize));
+                        new Parameter("embedding", this, ParameterType.WEIGHT, true, sparseFormat),
+                        (inputShapes) -> new Shape(numEmbeddings, embeddingSize));
         this.embedding.setArray(embedding);
-        numItems = Math.toIntExact(embedding.getShape().size(0));
         inputShapes = new Shape[] {new Shape(-1)};
     }
 
@@ -128,15 +112,10 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        NDList opInputs = opInputs(parameterStore, inputs, training);
-
-        NDArrayEx ex = opInputs.head().getNDArrayInternal();
-        NDList result =
-                ex.embedding(opInputs, numItems, embeddingSize, sparseGrad, dataType, params);
-        if (inputs.head().getShape().dimension() == 0) {
-            result = new NDList(result.singletonOrThrow().reshape(embeddingSize));
-        }
-        return result;
+        NDArray input = inputs.head();
+        Device device = input.getDevice();
+        NDArray weightArr = parameterStore.getValue(embedding, device, training);
+        return embedding(input, weightArr, sparseFormat);
     }
 
     /** {@inheritDoc} */
@@ -144,8 +123,7 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
         saveInputShapes(os);
-        os.writeBoolean(sparseGrad);
-        os.writeUTF(dataType.toString());
+        os.writeInt(sparseFormat.getValue());
         embedding.save(os);
     }
 
@@ -165,8 +143,15 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
             if (version == 3) {
                 addMissingZero = !is.readBoolean();
             }
-            sparseGrad = is.readBoolean();
-            dataType = DataType.valueOf(is.readUTF().toUpperCase(Locale.ENGLISH));
+            if (version == 6) {
+                sparseFormat = SparseFormat.fromValue(is.readInt());
+            } else {
+                sparseFormat = is.readBoolean() ? SparseFormat.ROW_SPARSE : SparseFormat.DENSE;
+            }
+            if (version < 6) {
+                // read the datatype from old version
+                is.readUTF();
+            }
             if (version == 3 || version == 4) {
                 int embedderSize = is.readInt();
                 for (int i = 1; i <= embedderSize; i++) {
@@ -185,10 +170,10 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
         embedding.load(manager, is);
-        numItems = (int) embedding.getArray().getShape().get(0);
+        numEmbeddings = (int) embedding.getArray().getShape().get(0);
         embeddingSize = (int) embedding.getArray().getShape().get(1);
         if (addMissingZero) {
-            numItems++;
+            numEmbeddings++;
             embedding.setArray(
                     NDArrays.concat(
                             new NDList(
@@ -197,24 +182,23 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
         }
     }
 
-    private NDList opInputs(ParameterStore parameterStore, NDList inputs, boolean training) {
-        NDArray items = inputs.head();
-        Device device = items.getDevice();
-
-        NDList ret = new NDList(2);
-        if (items.getShape().dimension() == 0) {
-            ret.add(items.reshape(1));
-        } else {
-            ret.add(items);
-        }
-        ret.add(parameterStore.getValue(embedding, device, training));
-        return ret;
-    }
-
     /** {@inheritDoc} */
     @Override
     public NDArray embed(NDManager manager, T[] items) {
         return manager.create(Arrays.stream(items).mapToLong(this::embed).toArray());
+    }
+
+    /**
+     * A simple lookup table that looks up embeddings in a fixed dictionary and size.
+     *
+     * @param input NDArray containing indices into the embedding matrix
+     * @param weight The embedding matrix with number of rows equal to the maximum possible index +
+     *     1, and number of columns equal to the embedding size
+     * @param sparse SparseFormat of the gradient
+     * @return output NDArray
+     */
+    public static NDList embedding(NDArray input, NDArray weight, SparseFormat sparse) {
+        return input.getNDArrayInternal().embedding(input, weight, sparse);
     }
 
     /**
@@ -225,12 +209,12 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
     public abstract static class BaseBuilder<T, B extends BaseBuilder<T, B>> {
 
         protected Class<T> embeddingType;
+        protected int numEmbeddings;
         protected int embeddingSize;
         protected boolean useDefault = true;
         protected T defaultItem;
         protected AbstractIndexedEmbedding<T> fallthrough;
-        protected boolean sparseGrad = true;
-        protected DataType dataType = DataType.FLOAT32;
+        protected SparseFormat sparseFormat = SparseFormat.DENSE;
 
         protected BaseBuilder() {}
 
@@ -259,6 +243,17 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
          */
         public B setEmbeddingSize(int embeddingSize) {
             this.embeddingSize = embeddingSize;
+            return self();
+        }
+
+        /**
+         * Sets the size of the dictionary of embeddings.
+         *
+         * @param numEmbeddings the size of the dictionary of embeddings
+         * @return this Builder
+         */
+        public B optNumEmbeddings(int numEmbeddings) {
+            this.numEmbeddings = numEmbeddings;
             return self();
         }
 
@@ -303,22 +298,11 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
          * Sets the optional parameter whether to compute row sparse gradient in the backward
          * calculation. If set to True, the grad’s storage type is row_sparse.
          *
-         * @param sparseGrad whether to compute row sparse gradient in the backward calculation
+         * @param sparseFormat whether to compute row sparse gradient in the backward calculation
          * @return this Builder
          */
-        public B optSparseGrad(boolean sparseGrad) {
-            this.sparseGrad = sparseGrad;
-            return self();
-        }
-
-        /**
-         * Sets the data type of the embedding arrays (default is Float32).
-         *
-         * @param dataType the dataType to use for the embedding
-         * @return this Builder
-         */
-        public B optDataType(DataType dataType) {
-            this.dataType = dataType;
+        public B optSparseFormat(SparseFormat sparseFormat) {
+            this.sparseFormat = sparseFormat;
             return self();
         }
 

@@ -32,14 +32,14 @@ Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3I_3Ljava
   std::unordered_map<std::string, std::string> map;
   size_t len = static_cast<size_t>(env->GetArrayLength(jefnames));
   for (size_t i = 0; i < len; ++i) {
-    auto jname = (jstring)env->GetObjectArrayElement(jefnames, i);
+    auto jname = (jstring) env->GetObjectArrayElement(jefnames, i);
     auto name = djl::utils::jni::GetStringFromJString(env, jname);
     map[name] = "";
   }
   const torch::jit::script::Module module = torch::jit::load(path, device, map);
   const auto* module_ptr = new torch::jit::script::Module(module);
   for (size_t i = 0; i < len; ++i) {
-    auto jname = (jstring)env->GetObjectArrayElement(jefnames, i);
+    auto jname = (jstring) env->GetObjectArrayElement(jefnames, i);
     auto name = djl::utils::jni::GetStringFromJString(env, jname);
     env->SetObjectArrayElement(jefvalues, i, env->NewStringUTF(map[name].c_str()));
   }
@@ -101,13 +101,13 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleWrite(
   int i = 0;
   for (; i + len < str.length(); i += len) {
     auto substr = str.substr(i, i + len);
-    env->SetByteArrayRegion(arr, 0, len, (jbyte*)substr.c_str());
+    env->SetByteArrayRegion(arr, 0, len, (jbyte*) substr.c_str());
     env->CallVoidMethod(jos, method_id, arr, 0, len);
   }
   auto last_len = str.length() - i;
   if (last_len > 0) {
     auto substr = str.substr(i, last_len);
-    env->SetByteArrayRegion(arr, 0, last_len, (jbyte*)substr.c_str());
+    env->SetByteArrayRegion(arr, 0, last_len, (jbyte*) substr.c_str());
     env->CallVoidMethod(jos, method_id, arr, 0, last_len);
   }
   API_END()

@@ -74,8 +74,8 @@ public abstract class RecurrentBlock extends AbstractBlock {
         }
         String[] gateStrings = {"i2h", "h2h"};
 
-        for (ParameterType parameterType : parameterTypes) {
-            for (int i = 0; i < numLayers; i++) {
+        for (int i = 0; i < numLayers; i++) {
+            for (ParameterType parameterType : parameterTypes) {
                 for (String direction : directions) {
                     for (String gateString : gateStrings) {
                         String name =
