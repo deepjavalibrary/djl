@@ -531,5 +531,5 @@ final class PyTorchLibrary {
             float clipGrad,
             float momentum);
 
-    native long torchNorm(long handle, int ord, long [] axis, boolean keepDims);
+    native long torchNorm(long handle, int ord, long[] axis, boolean keepDims);
 }
