@@ -12,6 +12,7 @@
  */
 package ai.djl.pytorch.engine;
 
+import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -22,6 +23,9 @@ import ai.djl.pytorch.jni.IValueUtils;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +66,19 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         this.manager = manager;
         uid = String.valueOf(handle);
         manager.attach(uid, this);
+        // training mode is on by default
+        isTrain = true;
+        first = true;
+    }
+
+    /**
+     * Constructs an Empty {@code PtSymbolBlock}.
+     *
+     * @param manager the manager to use for the block
+     */
+    public PtSymbolBlock(PtNDManager manager) {
+        super(VERSION);
+        this.manager = manager;
         // training mode is on by default
         isTrain = true;
         first = true;
@@ -140,6 +157,27 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
         return new Shape[0];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void saveParameters(DataOutputStream os) throws IOException {
+        os.writeByte(VERSION);
+        JniUtils.writeModule(this, os, true);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void loadParameters(NDManager manager, DataInputStream is)
+            throws IOException, MalformedModelException {
+        byte version = is.readByte();
+        if (version != VERSION) {
+            throw new MalformedModelException("Unsupported encoding version: " + version);
+        }
+        long rawHandle = JniUtils.loadModuleHandle(is, manager.getDevice(), true);
+        this.handle = new AtomicReference<>(rawHandle);
+        uid = String.valueOf(rawHandle);
+        manager.attach(uid, this);
     }
 
     /**

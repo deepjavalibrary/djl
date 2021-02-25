@@ -79,11 +79,11 @@ public class TorchScriptTest {
                 new URL("https://djl-ai.s3.amazonaws.com/resources/test-models/traced_resnet18.pt");
         try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
             try (InputStream is = url.openStream()) {
-                PtSymbolBlock block = JniUtils.loadModule(manager, is, manager.getDevice());
+                PtSymbolBlock block = JniUtils.loadModule(manager, is, manager.getDevice(), false);
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
-                JniUtils.writeModule(block, os);
+                JniUtils.writeModule(block, os, true);
                 ByteArrayInputStream bis = new ByteArrayInputStream(os.toByteArray());
-                JniUtils.loadModule(manager, bis, manager.getDevice());
+                JniUtils.loadModule(manager, bis, manager.getDevice(), true);
                 bis.close();
                 os.close();
             }
