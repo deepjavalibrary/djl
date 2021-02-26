@@ -98,28 +98,24 @@ public class TransformerEncoderBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     protected NDList forwardInternal(
-            final ParameterStore ps,
-            final NDList inputs,
-            final boolean training,
-            final PairList<String, Object> params) {
-        final NDArray embedding = inputs.head();
+            ParameterStore ps, NDList inputs, boolean training, PairList<String, Object> params) {
+        NDArray embedding = inputs.head();
         // perform attention lookup
-        final NDList attentionOutput = selfAttentionBlock.forward(ps, inputs, training);
+        NDList attentionOutput = selfAttentionBlock.forward(ps, inputs, training);
         // add dropout to attention Output
-        final NDList attentionOutputAfterDropout =
+        NDList attentionOutputAfterDropout =
                 selfAttentionDropout.forward(ps, attentionOutput, training);
         // add input as residual
-        final NDArray withResidual = attentionOutputAfterDropout.singletonOrThrow().add(embedding);
+        NDArray withResidual = attentionOutputAfterDropout.singletonOrThrow().add(embedding);
         // apply normalization
-        final NDList normalized = attentionNorm.forward(ps, new NDList(withResidual), training);
+        NDList normalized = attentionNorm.forward(ps, new NDList(withResidual), training);
         // apply pointwise projection
-        final NDList afterFullyConnected =
-                pointWisefullyConnected.forward(ps, normalized, training);
+        NDList afterFullyConnected = pointWisefullyConnected.forward(ps, normalized, training);
         // apply dropout to fully connected output
-        final NDList afterFullyConnectedDropout =
+        NDList afterFullyConnectedDropout =
                 fullyConnectedDropout.forward(ps, afterFullyConnected, training);
         // add residual again
-        final NDList outputWithResidual =
+        NDList outputWithResidual =
                 new NDList(afterFullyConnectedDropout.singletonOrThrow().add(embedding));
         // normalize result
         return outputNorm.forward(ps, new NDList(outputWithResidual), training);

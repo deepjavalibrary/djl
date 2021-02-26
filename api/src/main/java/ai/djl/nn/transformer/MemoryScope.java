@@ -24,8 +24,8 @@ import ai.djl.ndarray.NDManager;
  */
 public final class MemoryScope implements AutoCloseable {
 
-    private final NDManager parentManager;
-    private final NDManager subManager;
+    private NDManager parentManager;
+    private NDManager subManager;
 
     private MemoryScope(NDManager parentManager, NDManager subManager) {
         this.parentManager = parentManager;
@@ -159,7 +159,7 @@ public final class MemoryScope implements AutoCloseable {
      * @return a new memory scope
      */
     public static MemoryScope from(final NDList list) {
-        final NDArray ndArray = list.head();
+        NDArray ndArray = list.head();
         return new MemoryScope(
                         ndArray.getManager(),
                         ndArray.getManager().newSubManager(ndArray.getDevice()))

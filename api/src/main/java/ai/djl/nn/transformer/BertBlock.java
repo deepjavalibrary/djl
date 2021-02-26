@@ -50,17 +50,17 @@ public final class BertBlock extends AbstractBlock {
     private static final byte VERSION = 1;
     private static final String PARAM_POSITION_EMBEDDING = "positionEmbedding";
 
-    private final int embeddingSize;
-    private final int tokenDictionarySize;
-    private final int typeDictionarySize;
+    private int embeddingSize;
+    private int tokenDictionarySize;
+    private int typeDictionarySize;
 
-    private final IdEmbedding tokenEmbedding;
-    private final IdEmbedding typeEmbedding;
-    private final Parameter positionEmebdding;
-    private final BatchNorm embeddingNorm;
-    private final Dropout embeddingDropout;
-    private final List<TransformerEncoderBlock> transformerEncoderBlocks;
-    private final Linear pooling;
+    private IdEmbedding tokenEmbedding;
+    private IdEmbedding typeEmbedding;
+    private Parameter positionEmebdding;
+    private BatchNorm embeddingNorm;
+    private Dropout embeddingDropout;
+    private List<TransformerEncoderBlock> transformerEncoderBlocks;
+    private Linear pooling;
 
     private BertBlock(Builder builder) {
         super(VERSION);
@@ -154,9 +154,11 @@ public final class BertBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
-        final long B = inputShapes[0].get(0);
-        final long S = inputShapes[0].get(1);
-        return new Shape[] {new Shape(B, S, embeddingSize), new Shape(B, embeddingSize)};
+        long batch = inputShapes[0].get(0);
+        long seqLength = inputShapes[0].get(1);
+        return new Shape[] {
+            new Shape(batch, seqLength, embeddingSize), new Shape(batch, embeddingSize)
+        };
     }
 
     /** {@inheritDoc} */

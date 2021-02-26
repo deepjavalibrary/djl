@@ -36,10 +36,10 @@ public final class IdEmbedding extends AbstractBlock {
     private static final byte VERSION = 1;
     private static final String EMBEDDING_PARAM_NAME = "embedding";
 
-    private final int dictionarySize;
-    private final int embeddingSize;
+    private int dictionarySize;
+    private int embeddingSize;
 
-    private final Parameter embedding;
+    private Parameter embedding;
 
     private IdEmbedding(Builder builder) {
         super(VERSION);

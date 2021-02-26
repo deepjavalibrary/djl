@@ -20,9 +20,9 @@ import ai.djl.training.loss.Loss;
 /** Calculates the loss for the next sentence prediction task. */
 public class BertNextSentenceLoss extends Loss {
 
-    private final int labelIdx;
+    private int labelIdx;
 
-    private final int nextSentencePredictionIdx;
+    private int nextSentencePredictionIdx;
 
     /**
      * Creates a new bert next sentence loss.
@@ -37,7 +37,7 @@ public class BertNextSentenceLoss extends Loss {
     }
 
     @Override
-    public NDArray evaluate(final NDList labels, final NDList predictions) {
+    public NDArray evaluate(NDList labels, NDList predictions) {
         MemoryScope scope = MemoryScope.from(labels).add(predictions);
         NDArray label = labels.get(labelIdx).toType(DataType.FLOAT32, false);
         // predictions are log(softmax)
@@ -61,14 +61,14 @@ public class BertNextSentenceLoss extends Loss {
      * @param predictions the bert pretraining model output
      * @return the fraction of correct predictions.
      */
-    public NDArray accuracy(final NDList labels, final NDList predictions) {
-        final MemoryScope scope = MemoryScope.from(labels).add(predictions);
-        final NDArray label = labels.get(labelIdx);
-        final NDArray predictionLogProbs = predictions.get(nextSentencePredictionIdx);
+    public NDArray accuracy(NDList labels, NDList predictions) {
+        MemoryScope scope = MemoryScope.from(labels).add(predictions);
+        NDArray label = labels.get(labelIdx);
+        NDArray predictionLogProbs = predictions.get(nextSentencePredictionIdx);
         // predictions are log(softmax) -> highest confidence is highest (negative) value near 0
-        final NDArray prediction = predictionLogProbs.argMax(1).toType(DataType.INT32, false);
-        final NDArray equalCount = label.eq(prediction).sum().toType(DataType.FLOAT32, false);
-        final NDArray result = equalCount.div(label.getShape().size());
+        NDArray prediction = predictionLogProbs.argMax(1).toType(DataType.INT32, false);
+        NDArray equalCount = label.eq(prediction).sum().toType(DataType.FLOAT32, false);
+        NDArray result = equalCount.div(label.getShape().size());
         scope.remove(labels, predictions).waitToRead(result).close();
 
         return result;

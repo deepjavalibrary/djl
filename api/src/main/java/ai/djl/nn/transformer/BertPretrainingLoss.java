@@ -20,8 +20,8 @@ import java.util.Arrays;
 /** Loss that combines the next sentence and masked language losses of bert pretraining. */
 public class BertPretrainingLoss extends AbstractCompositeLoss {
 
-    private final BertNextSentenceLoss bertNextSentenceLoss = new BertNextSentenceLoss(0, 0);
-    private final BertMaskedLanguageModelLoss bertMaskedLanguageModelLoss =
+    private BertNextSentenceLoss bertNextSentenceLoss = new BertNextSentenceLoss(0, 0);
+    private BertMaskedLanguageModelLoss bertMaskedLanguageModelLoss =
             new BertMaskedLanguageModelLoss(1, 2, 1);
 
     /** Creates a loss combining the next sentence and masked language loss for bert pretraining. */

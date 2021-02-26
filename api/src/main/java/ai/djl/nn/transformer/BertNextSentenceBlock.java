@@ -27,7 +27,7 @@ public class BertNextSentenceBlock extends AbstractBlock {
 
     private static final byte VERSION = 1;
 
-    private final Linear binaryClassifier;
+    private Linear binaryClassifier;
 
     /** Creates a next sentence block. */
     public BertNextSentenceBlock() {

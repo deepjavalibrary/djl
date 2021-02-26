@@ -81,7 +81,7 @@ public class PointwiseFeedForwardBlock extends AbstractBlock {
                     "Pointwise feed forward blocks need an input of at least dimension 2.");
         }
         Shape lastShape = inputShape;
-        for (final Block child : children.values()) {
+        for (Block child : children.values()) {
             lastShape = child.initialize(manager, dataType, lastShape)[0];
         }
         outputShape = lastShape;
@@ -93,7 +93,7 @@ public class PointwiseFeedForwardBlock extends AbstractBlock {
             ParameterStore ps, NDList inputs, boolean training, PairList<String, Object> params) {
         // go through all layers
         NDList layerResult = inputs;
-        for (final Pair<String, Block> child : getChildren()) {
+        for (Pair<String, Block> child : getChildren()) {
             layerResult = child.getValue().forward(ps, layerResult, training);
         }
         return layerResult;

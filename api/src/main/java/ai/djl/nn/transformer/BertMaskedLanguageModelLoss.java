@@ -20,9 +20,9 @@ import ai.djl.training.loss.Loss;
 /** The loss for the bert masked language model task. */
 public class BertMaskedLanguageModelLoss extends Loss {
 
-    final int labelIdx;
-    final int maskIdx;
-    final int logProbsIdx;
+    private int labelIdx;
+    private int maskIdx;
+    private int logProbsIdx;
 
     /**
      * Creates an MLM loss.
@@ -72,7 +72,7 @@ public class BertMaskedLanguageModelLoss extends Loss {
      * @param predictions prediction of a bert model
      * @return the percentage of correctly predicted masked tokens
      */
-    public NDArray accuracy(final NDList labels, final NDList predictions) {
+    public NDArray accuracy(NDList labels, NDList predictions) {
         MemoryScope scope = MemoryScope.from(labels).add(predictions);
 
         NDArray mask = labels.get(maskIdx).flatten(); // (B * I)
