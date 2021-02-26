@@ -36,10 +36,10 @@ public final class IdEmbedding extends AbstractBlock {
     private static final byte VERSION = 1;
     private static final String EMBEDDING_PARAM_NAME = "embedding";
 
-    private final int dictionarySize;
-    private final int embeddingSize;
+    private int dictionarySize;
+    private int embeddingSize;
 
-    private final Parameter embedding;
+    private Parameter embedding;
 
     private IdEmbedding(Builder builder) {
         super(VERSION);
@@ -61,33 +61,16 @@ public final class IdEmbedding extends AbstractBlock {
     @Override
     protected NDList forwardInternal(
             ParameterStore ps, NDList inputs, boolean training, PairList<String, Object> params) {
-        return forward(ps, inputs, training);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList forward(ParameterStore ps, NDList inputs, boolean training) {
-        return new NDList(inputs.singletonOrThrow());
-    }
-
-    /**
-     * Performs a lookup into the embedding using the given input ids.
-     *
-     * @param parameterStore used to get the current state of the embedding table
-     * @param input an ndarry of token ids
-     * @param training true for a training forward pass
-     * @return the embeddings for the given ids
-     */
-    public NDArray forward(ParameterStore parameterStore, NDArray input, boolean training) {
+        NDArray input = inputs.singletonOrThrow();
         // on info to the right shapes, see: http://beta.mxnet.io/r/api/mx.symbol.gather_nd.html
         NDArray ids = input.flatten().reshape(1, input.getShape().size());
         // create the embedding Table
-        NDArray embeddingTable = parameterStore.getValue(embedding, ids.getDevice(), training);
+        NDArray embeddingTable = ps.getValue(embedding, ids.getDevice(), training);
         // We do not perform a sparse lookup, instead we just project into the table
         NDArray result = MissingOps.gatherNd(embeddingTable, ids);
         // we want the original shape of the input + the last dimension of the embedding
         Shape targetShape = input.getShape().addAll(new Shape(embeddingTable.getShape().get(1)));
-        return result.reshape(targetShape);
+        return new NDList(result.reshape(targetShape));
     }
 
     /**

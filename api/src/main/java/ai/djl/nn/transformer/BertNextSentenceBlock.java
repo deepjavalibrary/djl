@@ -12,7 +12,6 @@
  */
 package ai.djl.nn.transformer;
 
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -21,14 +20,14 @@ import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
-import java.util.Arrays;
+import java.util.Collections;
 
 /** Block to perform the Bert next-sentence-prediction task. */
 public class BertNextSentenceBlock extends AbstractBlock {
 
     private static final byte VERSION = 1;
 
-    private final Linear binaryClassifier;
+    private Linear binaryClassifier;
 
     /** Creates a next sentence block. */
     public BertNextSentenceBlock() {
@@ -41,7 +40,7 @@ public class BertNextSentenceBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
-        this.inputNames = Arrays.asList("pooledOutput");
+        this.inputNames = Collections.singletonList("pooledOutput");
         this.binaryClassifier.initialize(manager, dataType, inputShapes);
     }
 
@@ -49,28 +48,7 @@ public class BertNextSentenceBlock extends AbstractBlock {
     @Override
     protected NDList forwardInternal(
             ParameterStore ps, NDList inputs, boolean training, PairList<String, Object> params) {
-        return forward(ps, inputs, training);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList forward(ParameterStore ps, NDList inputs, boolean training) {
-        return new NDList(forward(ps, inputs.singletonOrThrow(), training));
-    }
-
-    /**
-     * Applies the internal binary classifier.
-     *
-     * @param ps the parameter store
-     * @param pooledOutput the pooled output of the bert models first token (CLS)
-     * @param training true: apply dropout etc.
-     * @return log probabilities for each batch whether the two sentences are consecutive or not.
-     */
-    public NDArray forward(ParameterStore ps, NDArray pooledOutput, boolean training) {
-        return binaryClassifier
-                .forward(ps, new NDList(pooledOutput), training)
-                .head()
-                .logSoftmax(1);
+        return new NDList(binaryClassifier.forward(ps, inputs, training).head().logSoftmax(1));
     }
 
     /** {@inheritDoc} */

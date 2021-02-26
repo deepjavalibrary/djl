@@ -50,17 +50,17 @@ public final class BertBlock extends AbstractBlock {
     private static final byte VERSION = 1;
     private static final String PARAM_POSITION_EMBEDDING = "positionEmbedding";
 
-    private final int embeddingSize;
-    private final int tokenDictionarySize;
-    private final int typeDictionarySize;
+    private int embeddingSize;
+    private int tokenDictionarySize;
+    private int typeDictionarySize;
 
-    private final IdEmbedding tokenEmbedding;
-    private final IdEmbedding typeEmbedding;
-    private final Parameter positionEmebdding;
-    private final BatchNorm embeddingNorm;
-    private final Dropout embeddingDropout;
-    private final List<TransformerEncoderBlock> transformerEncoderBlocks;
-    private final Linear pooling;
+    private IdEmbedding tokenEmbedding;
+    private IdEmbedding typeEmbedding;
+    private Parameter positionEmebdding;
+    private BatchNorm embeddingNorm;
+    private Dropout embeddingDropout;
+    private List<TransformerEncoderBlock> transformerEncoderBlocks;
+    private Linear pooling;
 
     private BertBlock(Builder builder) {
         super(VERSION);
@@ -154,9 +154,11 @@ public final class BertBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
-        final long B = inputShapes[0].get(0);
-        final long S = inputShapes[0].get(1);
-        return new Shape[] {new Shape(B, S, embeddingSize), new Shape(B, embeddingSize)};
+        long batch = inputShapes[0].get(0);
+        long seqLength = inputShapes[0].get(1);
+        return new Shape[] {
+            new Shape(batch, seqLength, embeddingSize), new Shape(batch, embeddingSize)
+        };
     }
 
     /** {@inheritDoc} */
@@ -201,40 +203,18 @@ public final class BertBlock extends AbstractBlock {
     @Override
     protected NDList forwardInternal(
             ParameterStore ps, NDList inputs, boolean training, PairList<String, Object> params) {
-        return forward(ps, inputs, training);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList forward(final ParameterStore ps, final NDList inputs, boolean training) {
         // First input are the tokens.
         NDArray tokenIds = inputs.get(0);
         // Second are the token types (first / second sentence).
         NDArray typeIds = inputs.get(1);
         // Third are the masks for the input
         NDArray masks = inputs.get(2);
-        return forward(ps, tokenIds, typeIds, masks, training);
-    }
-
-    /**
-     * Embeds the input, runs it through a transformer encoder stack and outputs the resulting
-     * embeddings and the pooled classifier.
-     *
-     * @param ps the parameter store
-     * @param tokenIds Ids for the tokens (word pieces, BPE pieces, words etc.) (B, S)
-     * @param typeIds Ids for the token type, during pretraining this is used to encode the
-     *     first/second sentence (B, S)
-     * @param masks Masks for the input, used to mask out tokens in input that is shorter than the
-     *     max number of input tokens (B, S)
-     * @param training true=apply dropout etc.
-     * @return token embeddings (B, S, E), pooled classifier (B, E)
-     */
-    public NDList forward(
-            ParameterStore ps, NDArray tokenIds, NDArray typeIds, NDArray masks, boolean training) {
         MemoryScope initScope = MemoryScope.from(tokenIds).add(typeIds, masks);
         // Create embeddings for inputs
-        NDArray embeddedTokens = tokenEmbedding.forward(ps, tokenIds, training);
-        NDArray embeddedTypes = typeEmbedding.forward(ps, typeIds, training);
+        NDArray embeddedTokens =
+                tokenEmbedding.forward(ps, new NDList(tokenIds), training).singletonOrThrow();
+        NDArray embeddedTypes =
+                typeEmbedding.forward(ps, new NDList(typeIds), training).singletonOrThrow();
         NDArray embeddedPositions = ps.getValue(positionEmebdding, tokenIds.getDevice(), training);
         // Merge them to one embedding by adding them
         // (We can just add the position embedding, even though it does not have a batch dimension:

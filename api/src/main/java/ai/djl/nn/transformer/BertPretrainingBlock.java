@@ -28,9 +28,9 @@ public class BertPretrainingBlock extends AbstractBlock {
 
     private static final byte VERSION = 1;
 
-    private final BertBlock bertBlock;
-    private final BertMaskedLanguageModelBlock mlBlock;
-    private final BertNextSentenceBlock nsBlock;
+    private BertBlock bertBlock;
+    private BertMaskedLanguageModelBlock mlBlock;
+    private BertNextSentenceBlock nsBlock;
 
     /**
      * Creates a new Bert pretraining block fitting the given bert configuration.
@@ -49,8 +49,7 @@ public class BertPretrainingBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void initializeChildBlocks(
-            final NDManager manager, final DataType dataType, final Shape... inputShapes) {
+    public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         inputNames = Arrays.asList("tokenIds", "typeIds", "sequenceMasks", "maskedIndices");
         Shape[] bertOutputShapes = bertBlock.initialize(manager, dataType, inputShapes);
         Shape embeddedSequence = bertOutputShapes[0];
@@ -66,50 +65,28 @@ public class BertPretrainingBlock extends AbstractBlock {
     @Override
     protected NDList forwardInternal(
             ParameterStore ps, NDList inputs, boolean training, PairList<String, Object> params) {
-        return forward(ps, inputs, training);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList forward(ParameterStore ps, NDList inputs, boolean training) {
         NDArray tokenIds = inputs.get(0);
         NDArray typeIds = inputs.get(1);
         NDArray sequenceMasks = inputs.get(2);
         NDArray maskedIndices = inputs.get(3);
-        return forward(ps, tokenIds, typeIds, sequenceMasks, maskedIndices, training);
-    }
-
-    /**
-     * Applies one bert pretraining step.
-     *
-     * @param ps the parameter store
-     * @param tokenIds int, (B, S)
-     * @param typeIds int, (B, S)
-     * @param sequenceMasks int, (B, S)
-     * @param maskedIndices int, (B, I)
-     * @param training true=apply dropout etc.
-     * @return next sentence probabilities (B, 2), masked token probabilities (B, I, D),
-     */
-    public NDList forward(
-            final ParameterStore ps,
-            final NDArray tokenIds,
-            final NDArray typeIds,
-            final NDArray sequenceMasks,
-            final NDArray maskedIndices,
-            final boolean training) {
-        final MemoryScope scope =
-                MemoryScope.from(tokenIds).add(typeIds, sequenceMasks, maskedIndices);
+        MemoryScope scope = MemoryScope.from(tokenIds).add(typeIds, sequenceMasks, maskedIndices);
         // run the core bert model
-        final NDList bertResult = bertBlock.forward(ps, tokenIds, typeIds, sequenceMasks, training);
-        final NDArray embeddedSequence = bertResult.get(0);
-        final NDArray pooledOutput = bertResult.get(1);
+        NDList bertResult =
+                bertBlock.forward(ps, new NDList(tokenIds, typeIds, sequenceMasks), training);
+        NDArray embeddedSequence = bertResult.get(0);
+        NDArray pooledOutput = bertResult.get(1);
         // apply pooled output to the classifier
-        final NDArray nextSentenceProbabilities = nsBlock.forward(ps, pooledOutput, training);
+        NDArray nextSentenceProbabilities =
+                nsBlock.forward(ps, new NDList(pooledOutput), training).singletonOrThrow();
         // de-mask masked tokens
-        final NDArray embeddingTable =
+        NDArray embeddingTable =
                 bertBlock.getTokenEmbedding().getValue(ps, embeddedSequence.getDevice(), training);
-        final NDArray logProbs =
-                mlBlock.forward(ps, embeddedSequence, maskedIndices, embeddingTable, training);
+        NDArray logProbs =
+                mlBlock.forward(
+                                ps,
+                                new NDList(embeddedSequence, maskedIndices, embeddingTable),
+                                training)
+                        .singletonOrThrow();
 
         scope.remove(tokenIds, typeIds, sequenceMasks, maskedIndices)
                 .waitToRead(nextSentenceProbabilities, logProbs)
@@ -121,8 +98,8 @@ public class BertPretrainingBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
-        final long batchSize = inputShapes[0].get(0);
-        final long maskedIndexCount = inputShapes[3].get(1);
+        long batchSize = inputShapes[0].get(0);
+        long maskedIndexCount = inputShapes[3].get(1);
         return new Shape[] {
             new Shape(batchSize, 2),
             new Shape(batchSize, maskedIndexCount, bertBlock.getTokenDictionarySize())
