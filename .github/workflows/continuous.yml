@@ -108,6 +108,12 @@ jobs:
         with:
           name: pytorch-model-zoo
           path: pytorch/pytorch-model-zoo/build/reports
+      - name: serving test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: serving
+          path: serving/build/reports
       - name: tensorflow-engine test results
         uses: actions/upload-artifact@v1
         if: always()
