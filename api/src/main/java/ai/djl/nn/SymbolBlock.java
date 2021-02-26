@@ -12,6 +12,7 @@
  */
 package ai.djl.nn;
 
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
 
@@ -20,6 +21,16 @@ import ai.djl.util.PairList;
  * the engine in its native format.
  */
 public interface SymbolBlock extends Block {
+
+    /**
+     * Creates an empty SymbolBlock instance.
+     *
+     * @param manager the manager to be applied in the SymbolBlock
+     * @return a new Model instance
+     */
+    static SymbolBlock newInstance(NDManager manager) {
+        return manager.getEngine().newSymbolBlock(manager);
+    }
 
     /** Removes the last block in the symbolic graph. */
     default void removeLastBlock() {

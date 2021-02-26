@@ -260,10 +260,8 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
         for (String name : inputNames) {
             os.writeUTF(name);
         }
-        for (Parameter parameter : parameters.values()) {
-            if (!inputNames.contains(parameter.getName())) {
-                parameter.save(os);
-            }
+        for (Parameter parameter : mxNetParams) {
+            parameter.save(os);
         }
     }
 
@@ -286,21 +284,20 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
                 throw new MalformedModelException("InputStream ends at symbol loading!");
             }
             // init block only if it is not set
-            if (symbol == null) {
-                symbol =
-                        Symbol.loadJson(
-                                (MxNDManager) manager, new String(bytes, StandardCharsets.UTF_8));
-                initBlock();
-            }
+            symbol =
+                    Symbol.loadJson(
+                            (MxNDManager) manager, new String(bytes, StandardCharsets.UTF_8));
+            initBlock();
         }
         int size = is.readInt();
         for (int i = 0; i < size; ++i) {
             inputNames.add(is.readUTF());
         }
 
-        for (Parameter parameter : parameters.values()) {
+        for (Parameter parameter : mxNetParams) {
             parameter.load(this.manager, is);
         }
+        setInputNames(inputNames);
     }
 
     private void initBlock() {

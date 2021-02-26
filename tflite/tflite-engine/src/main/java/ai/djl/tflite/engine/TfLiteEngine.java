@@ -17,6 +17,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
 
 /**
@@ -81,6 +82,12 @@ public final class TfLiteEngine extends Engine {
     public Model newModel(String name, Device device) {
         // We need pass TfLiteManager explicitly
         return new TfLiteModel(name, newBaseManager(device));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public SymbolBlock newSymbolBlock(NDManager manager) {
+        throw new UnsupportedOperationException("TFLite does not support empty SymbolBlock");
     }
 
     /** {@inheritDoc} */
