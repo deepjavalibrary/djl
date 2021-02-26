@@ -1379,13 +1379,13 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray norm(boolean keepDims) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.norm(this, 2, new int[] {}, keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray norm(int order, int[] axes, boolean keepDims) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.norm(this, order, axes, keepDims);
     }
 
     /** {@inheritDoc} */
