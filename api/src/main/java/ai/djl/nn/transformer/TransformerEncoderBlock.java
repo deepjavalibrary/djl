@@ -102,12 +102,6 @@ public class TransformerEncoderBlock extends AbstractBlock {
             final NDList inputs,
             final boolean training,
             final PairList<String, Object> params) {
-        return forward(ps, inputs, training);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList forward(final ParameterStore ps, final NDList inputs, final boolean training) {
         final NDArray embedding = inputs.head();
         // perform attention lookup
         final NDList attentionOutput = selfAttentionBlock.forward(ps, inputs, training);

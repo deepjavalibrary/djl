@@ -113,36 +113,9 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
             final NDList inputs,
             final boolean training,
             final PairList<String, Object> params) {
-        return forward(ps, inputs, training);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList forward(final ParameterStore ps, final NDList inputs, final boolean training) {
         final NDArray sequenceOutput = inputs.get(0); // (B, S, E)
         final NDArray maskedIndices = inputs.get(1); // (B, I)
         final NDArray embeddingTable = inputs.get(2); // (D, E)
-        final NDArray logProbs =
-                forward(ps, sequenceOutput, maskedIndices, embeddingTable, training);
-        return new NDList(logProbs);
-    }
-
-    /**
-     * Calculates the result of the masked language task.
-     *
-     * @param ps the parameter store
-     * @param sequenceOutput The sequence output of the bert model (B, S, E)
-     * @param maskedIndices The indices of the tokens masked for pretraining (B, I)
-     * @param embeddingTable The embedding table of the bert model (D, E)
-     * @param training true=apply dropout etc.
-     * @return the log probabilities for each dictionary item for each masked token, size (B * I, D)
-     */
-    public NDArray forward(
-            final ParameterStore ps,
-            final NDArray sequenceOutput,
-            final NDArray maskedIndices,
-            final NDArray embeddingTable,
-            final boolean training) {
         MemoryScope scope = MemoryScope.from(sequenceOutput).add(maskedIndices);
         final NDArray gatheredTokens =
                 gatherFromIndices(sequenceOutput, maskedIndices); // (B * I, E)
@@ -167,7 +140,7 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
 
         scope.remove(sequenceOutput, maskedIndices).waitToRead(logProbs).close();
 
-        return logProbs;
+        return new NDList(logProbs);
     }
 
     /** {@inheritDoc} */

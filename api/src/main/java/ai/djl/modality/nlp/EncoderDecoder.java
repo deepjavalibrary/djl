@@ -77,12 +77,6 @@ public class EncoderDecoder extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(ParameterStore parameterStore, NDList inputs, boolean training) {
-        return forward(parameterStore, inputs, training, null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDList forward(
             ParameterStore parameterStore,
             NDList data,
