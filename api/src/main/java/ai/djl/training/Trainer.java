@@ -72,7 +72,6 @@ public class Trainer implements AutoCloseable {
     private ParameterStore parameterStore;
     private List<Evaluator> evaluators;
     private Loss loss;
-    private DataManager dataManager;
 
     private boolean gradientsChecked;
 
@@ -89,7 +88,6 @@ public class Trainer implements AutoCloseable {
         manager.setName("trainer");
         devices = trainingConfig.getDevices();
         loss = trainingConfig.getLossFunction();
-        dataManager = trainingConfig.getDataManager();
         Objects.requireNonNull(loss, "You must specify a loss for the trainer");
         evaluators = new ArrayList<>(trainingConfig.getEvaluators());
         evaluators.add(loss); // track loss as an evaluator by default
@@ -238,15 +236,6 @@ public class Trainer implements AutoCloseable {
      */
     public Model getModel() {
         return model;
-    }
-
-    /**
-     * Returns the {@link DataManager}.
-     *
-     * @return the {@link DataManager}
-     */
-    public DataManager getDataManager() {
-        return dataManager;
     }
 
     /**

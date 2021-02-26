@@ -127,6 +127,20 @@ public class ParallelBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
+    protected NDList forwardInternal(
+            ParameterStore parameterStore,
+            NDList data,
+            NDList labels,
+            PairList<String, Object> params) {
+        return function.apply(
+                children.values()
+                        .stream()
+                        .map(block -> block.forward(parameterStore, data, labels, params))
+                        .collect(Collectors.toList()));
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         for (Block child : getChildren().values()) {
             child.initialize(manager, dataType, inputShapes);

@@ -29,18 +29,13 @@ import ai.djl.modality.nlp.preprocess.PunctuationSeparator;
 import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.modality.nlp.preprocess.TextTerminator;
 import ai.djl.modality.nlp.preprocess.TextTruncator;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.recurrent.LSTM;
-import ai.djl.training.DataManager;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
-import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.listener.SaveModelTrainingListener;
@@ -156,7 +151,6 @@ public final class TrainSeq2Seq {
         return new DefaultTrainingConfig(new MaskedSoftmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy("Accuracy", 0, 2))
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
-                .optDataManager(new Seq2SeqDataManager())
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }
@@ -220,23 +214,5 @@ public final class TrainSeq2Seq {
                         .build();
         dataset.prepare(new ProgressBar());
         return dataset;
-    }
-
-    private static class Seq2SeqDataManager extends DataManager {
-
-        @Override
-        public NDList getData(Batch batch) {
-            NDList data = new NDList();
-            data.add(batch.getData().head());
-            NDArray target = batch.getLabels().head().get(new NDIndex(":, :-1"));
-            data.add(target);
-            return data;
-        }
-
-        @Override
-        public NDList getLabels(Batch batch) {
-            NDList labels = batch.getLabels();
-            return new NDList(labels.head().get(new NDIndex(":, 1:")), labels.get(1).sub(1));
-        }
     }
 }

@@ -33,7 +33,6 @@ public class DefaultTrainingConfig implements TrainingConfig {
     private Optimizer optimizer;
     private Device[] devices;
     private Loss loss;
-    private DataManager dataManager;
     private List<Evaluator> evaluators;
     private List<TrainingListener> listeners;
 
@@ -50,7 +49,6 @@ public class DefaultTrainingConfig implements TrainingConfig {
         this.initializer = new XavierInitializer(RandomType.GAUSSIAN, FactorType.IN, 2);
         optimizer = Adam.builder().build();
         this.loss = loss;
-        dataManager = DataManager.DEFAULT_DATA_MANAGER;
         evaluators = new ArrayList<>();
         listeners = new ArrayList<>();
     }
@@ -86,17 +84,6 @@ public class DefaultTrainingConfig implements TrainingConfig {
      */
     public DefaultTrainingConfig optOptimizer(Optimizer optimizer) {
         this.optimizer = optimizer;
-        return this;
-    }
-
-    /**
-     * Sets the {@link DataManager} to be used during training.
-     *
-     * @param dataManager the {@link DataManager} to be set
-     * @return this {@code DefaultTrainingConfig}
-     */
-    public DefaultTrainingConfig optDataManager(DataManager dataManager) {
-        this.dataManager = dataManager;
         return this;
     }
 
@@ -147,12 +134,6 @@ public class DefaultTrainingConfig implements TrainingConfig {
     @Override
     public Loss getLossFunction() {
         return loss;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public DataManager getDataManager() {
-        return dataManager;
     }
 
     /** {@inheritDoc} */
