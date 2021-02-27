@@ -24,13 +24,13 @@ The javadocs output is built in the `build/doc/javadoc` folder.
 ## Installation
 You can pull the TensorFlow Lite engine from the central Maven repository by including the following dependency:
 
-- ai.djl.tflite:tflite-engine:0.10.0-SNAPSHOT
+- ai.djl.tflite:tflite-engine:0.10.0
 
 ```xml
 <dependency>
     <groupId>ai.djl.tflite</groupId>
     <artifactId>tflite-engine</artifactId>
-    <version>0.10.0-SNAPSHOT</version>
+    <version>0.10.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -43,13 +43,13 @@ Choose a native library based on your platform and needs:
 We offer an automatic option that will download the native libraries into [cache folder](../../docs/development/cache_management.md) the first time you run DJL.
 It will automatically determine the appropriate jars for your system based on the platform.
 
-- ai.djl.tflite:tflite-native-auto:2.3.1-SNAPSHOT
+- ai.djl.tflite:tflite-native-auto:2.4.1
 
 ```xml
 <dependency>
     <groupId>ai.djl.tflite</groupId>
     <artifactId>tflite-native-auto</artifactId>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>2.4.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -57,14 +57,14 @@ It will automatically determine the appropriate jars for your system based on th
 ### macOS
 For macOS, you can use the following library:
 
-- ai.djl.tflite:tflite-native-cpu:2.3.1-SNAPSHOT:osx-x86_64
+- ai.djl.tflite:tflite-native-cpu:2.4.1:osx-x86_64
 
 ```xml
 <dependency>
     <groupId>ai.djl.tflite</groupId>
     <artifactId>tflite-native-cpu</artifactId>
     <classifier>osx-x86_64</classifier>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>2.4.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -72,7 +72,7 @@ For macOS, you can use the following library:
 ### Linux
 For the Linux platform, you can use the following library:
 
-- ai.djl.tflite:tflite-native-cpu:2.3.1-SNAPSHOT:linux-x86_64
+- ai.djl.tflite:tflite-native-cpu:2.4.1:linux-x86_64
 
 ```xml
 <dependency>
@@ -80,6 +80,6 @@ For the Linux platform, you can use the following library:
     <artifactId>tflite-native-cpu</artifactId>
     <classifier>linux-x86_64</classifier>
     <scope>runtime</scope>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>2.4.1</version>
 </dependency>
 ```
