@@ -1,23 +1,59 @@
+plugins {
+    id 'application'
+}
 group "ai.djl.aws"
-
 dependencies {
-    api platform("software.amazon.awssdk:bom:2.15.79")
-    api "software.amazon.awssdk:s3"
-    api "software.amazon.awssdk:sagemaker"
-    api "software.amazon.awssdk:sagemakerruntime"
-    api "software.amazon.awssdk:iam"
-    api "software.amazon.awssdk:sts"
     api project(":api")
-
+    api "com.fasterxml.jackson.core:jackson-annotations:2.10.5"
+    api "com.fasterxml.jackson.core:jackson-core:2.10.5"
+    api "com.fasterxml.jackson.core:jackson-databind:2.10.5.1"
+    api "com.google.code.gson:gson:2.8.6"
+    api "com.typesafe.netty:netty-reactive-streams-http:2.0.4"
+    api "com.typesafe.netty:netty-reactive-streams:2.0.4"
+    api "commons-codec:commons-codec:1.11"
+    api "commons-logging:commons-logging:1.2"
+    api "io.netty:netty-buffer:4.1.53.Final"
+    api "io.netty:netty-codec-http:4.1.53.Final"
+    api "io.netty:netty-codec-http2:4.1.53.Final"
+    api "io.netty:netty-codec:4.1.53.Final"
+    api "io.netty:netty-common:4.1.53.Final"
+    api "io.netty:netty-handler:4.1.53.Final"
+    api "io.netty:netty-resolver:4.1.53.Final"
+    api "io.netty:netty-transport-native-epoll:4.1.53.Final"
+    api "io.netty:netty-transport-native-unix-common:4.1.53.Final"
+    api "io.netty:netty-transport:4.1.53.Final"
+    api "org.apache.httpcomponents:httpclient:4.5.13"
+    api "org.apache.httpcomponents:httpcore:4.4.13"
+    api "org.reactivestreams:reactive-streams:1.0.3"
+    api 'ai.djl:annotations:0.10.0-SNAPSHOT'
+    api 'ai.djl:apache-client:0.10.0-SNAPSHOT'
+    api 'ai.djl:arns:0.10.0-SNAPSHOT'
+    api 'ai.djl:auth:0.10.0-SNAPSHOT'
+    api 'ai.djl:aws-core:0.10.0-SNAPSHOT'
+    api 'ai.djl:aws-json-protocol:0.10.0-SNAPSHOT'
+    api 'ai.djl:aws-query-protocol:0.10.0-SNAPSHOT'
+    api 'ai.djl:aws-xml-protocol:0.10.0-SNAPSHOT'
+    api 'ai.djl:http-client-spi:0.10.0-SNAPSHOT'
+    api 'ai.djl:iam:0.10.0-SNAPSHOT'
+    api 'ai.djl:metrics-spi:0.10.0-SNAPSHOT'
+    api 'ai.djl:netty-nio-client:0.10.0-SNAPSHOT'
+    api 'ai.djl:profiles:0.10.0-SNAPSHOT'
+    api 'ai.djl:protocol-core:0.10.0-SNAPSHOT'
+    api 'ai.djl:regions:0.10.0-SNAPSHOT'
+    api 'ai.djl:s3:0.10.0-SNAPSHOT'
+    api 'ai.djl:sagemaker:0.10.0-SNAPSHOT'
+    api 'ai.djl:sagemakerruntime:0.10.0-SNAPSHOT'
+    api 'ai.djl:sdk-core:0.10.0-SNAPSHOT'
+    api 'ai.djl:sts:0.10.0-SNAPSHOT'
+    api 'ai.djl:utils:0.10.0-SNAPSHOT'
+    api 'ai.djl:eventstream:0.10.0-SNAPSHOT'
     testImplementation project(":mxnet:mxnet-model-zoo")
     testImplementation "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
-
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
     testImplementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
 }
-
 publishing {
     publications {
         maven(MavenPublication) {

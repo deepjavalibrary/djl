@@ -47,13 +47,14 @@ public class SageMakerTest {
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)
-                        .optModelUrls("https://resources.djl.ai/test-models/mlp.tar.gz")
+                        .optModelUrls("https://alpha-djl-demos.s3.amazonaws.com/model/djl-blockrunner/mxnet_resnet18.zip?model_name=resnet18_v1")
                         .build();
         try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria)) {
             SageMaker sageMaker =
                     SageMaker.builder()
                             .setModel(model)
                             .optBucketName("djl-sm-test")
+                            .optModelName("resnet")
                             .optContainerImage("125045733377.dkr.ecr.us-east-1.amazonaws.com/djl")
                             .optExecutionRole(
                                     "arn:aws:iam::125045733377:role/service-role/DJLSageMaker-ExecutionRole-20210213T1027050")
