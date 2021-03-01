@@ -202,7 +202,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray stopGradient() {
-        throw new UnsupportedOperationException("Not supported");
+        return JniUtils.detachGradient(this);
     }
 
     /** {@inheritDoc} */
