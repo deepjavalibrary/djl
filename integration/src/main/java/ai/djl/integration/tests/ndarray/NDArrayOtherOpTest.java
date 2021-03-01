@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.ndarray;
 
+import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.ndarray.LazyNDArray;
 import ai.djl.ndarray.NDArray;
@@ -21,6 +22,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
+import ai.djl.training.GradientCollector;
 import ai.djl.util.Hex;
 import java.nio.FloatBuffer;
 import org.testng.Assert;
@@ -886,6 +888,30 @@ public class NDArrayOtherOpTest {
                                     })
                             .reshape(new Shape(3, 2, 3));
             Assert.assertEquals(array.oneHot(3), expected);
+        }
+    }
+
+    @Test
+    public void testStopGradient() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            // normal gradient
+            NDArray x = manager.create(new float[] {1.0f}, new Shape(1));
+            x.attachGradient();
+            try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
+                NDArray y = x.mul(x);
+                gc.backward(y);
+                NDArray grad = x.getGradient();
+                Assert.assertEquals(2f, grad.getFloat(0));
+            }
+            // stop gradient
+            x = manager.create(new float[] {1.0f}, new Shape(1));
+            x.attachGradient();
+            try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
+                NDArray z = x.mul(x.stopGradient());
+                gc.backward(z);
+                NDArray grad = x.getGradient();
+                Assert.assertEquals(1f, grad.getFloat(0));
+            }
         }
     }
 }
