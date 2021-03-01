@@ -146,7 +146,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         // Return shape is the shape of the query. For 2 or less inputs we have self-attention, i.e.
         // the shape of the output is the shape of the input
         if (inputShapes.length == 1 || inputShapes.length == 2) {

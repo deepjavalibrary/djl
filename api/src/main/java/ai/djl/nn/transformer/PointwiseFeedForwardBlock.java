@@ -59,9 +59,9 @@ public class PointwiseFeedForwardBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         for (Block child : children.values()) {
-            inputShapes = child.getOutputShapes(manager, inputShapes);
+            inputShapes = child.getOutputShapes(inputShapes);
         }
         return inputShapes;
     }
@@ -84,7 +84,7 @@ public class PointwiseFeedForwardBlock extends AbstractBlock {
         Shape lastShape = inputShape;
         for (Block child : children.values()) {
             child.initialize(manager, dataType, lastShape);
-            lastShape = getOutputShapes(manager, new Shape[] {lastShape})[0];
+            lastShape = getOutputShapes(new Shape[] {lastShape})[0];
         }
     }
 

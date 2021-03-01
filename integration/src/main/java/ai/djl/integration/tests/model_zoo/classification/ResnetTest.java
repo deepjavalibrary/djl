@@ -131,8 +131,7 @@ public class ResnetTest {
                 trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
-                Shape[] outputShape =
-                        model.getBlock().getOutputShapes(manager, new Shape[] {inputShape});
+                Shape[] outputShape = model.getBlock().getOutputShapes(new Shape[] {inputShape});
 
                 NDArray data = manager.ones(new Shape(batchSize, 3, 32, 32));
                 NDArray label = manager.ones(outputShape[0]);

@@ -12,7 +12,6 @@
  */
 package ai.djl.nn;
 
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 
 /** {@code AbstractSymbolBlock} is an abstract implementation of {@link SymbolBlock}. */
@@ -29,7 +28,7 @@ public abstract class AbstractSymbolBlock extends AbstractBlock implements Symbo
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         throw new UnsupportedOperationException("not implement!");
     }
 }

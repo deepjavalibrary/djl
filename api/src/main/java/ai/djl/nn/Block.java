@@ -244,11 +244,10 @@ public interface Block {
     /**
      * Returns the expected output shapes of the block for the specified input shapes.
      *
-     * @param manager an NDManager
      * @param inputShapes the shapes of the inputs
      * @return the expected output shapes of the block
      */
-    Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes);
+    Shape[] getOutputShapes(Shape[] inputShapes);
 
     /**
      * Writes the parameters of the block to the given outputStream.

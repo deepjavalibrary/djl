@@ -46,8 +46,8 @@ import java.util.function.Predicate;
  *   <li>Use {@link AbstractBlock#addParameter(Parameter)} to add parameters to your block in the
  *       constructor if necessary.
  *   <li>Use {@link AbstractBlock#addChildBlock(String, Block)} to add child blocks if necessary.
- *   <li>Override {@link AbstractBlock#getOutputShapes(NDManager, Shape[])} to determine the shape
- *       of your custom block's output based on the input it will receive.
+ *   <li>Override {@link Block#getOutputShapes(Shape[])} to determine the shape of your custom
+ *       block's output based on the input it will receive.
  *   <li>Override {@link AbstractBlock#initializeChildBlocks(NDManager, DataType, Shape...)} if you
  *       added child blocks to initialize them based on the input shape your block will receive. You
  *       can skip this if your block does not contain child blocks
@@ -451,7 +451,7 @@ public abstract class AbstractBlock implements Block {
             appendShape(sb, inputShapeDescription.values().toArray(new Shape[0]));
             sb.append(" -> ");
             Shape[] outputShapes =
-                    getOutputShapes(null, inputShapeDescription.values().toArray(new Shape[0]));
+                    getOutputShapes(inputShapeDescription.values().toArray(new Shape[0]));
             appendShape(sb, outputShapes);
         } else {
             sb.append("Uninitialized");

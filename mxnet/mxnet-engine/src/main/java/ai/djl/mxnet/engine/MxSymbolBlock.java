@@ -200,7 +200,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         if (outputShapes == null) {
             String[] outputNames = symbol.getOutputNames();
             outputShapes = new Shape[outputNames.length];

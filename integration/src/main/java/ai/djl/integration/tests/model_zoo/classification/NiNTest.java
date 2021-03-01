@@ -159,10 +159,7 @@ public class NiNTest {
         for (int i = 0; i < nin.getChildren().size(); i++) {
 
             Shape[] newShape =
-                    nin.getChildren()
-                            .get(i)
-                            .getValue()
-                            .getOutputShapes(manager, new Shape[] {currentShape});
+                    nin.getChildren().get(i).getValue().getOutputShapes(new Shape[] {currentShape});
             currentShape = newShape[0];
             shapeMap.put(nin.getChildren().get(i).getKey(), currentShape);
         }
