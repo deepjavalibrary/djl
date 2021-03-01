@@ -147,7 +147,7 @@ public class LeNetTest {
                     leNet.getChildren()
                             .get(i)
                             .getValue()
-                            .getOutputShapes(manager, new Shape[] {currentShape});
+                            .getOutputShapes(new Shape[] {currentShape});
             currentShape = newShape[0];
             shapeMap.put(leNet.getChildren().get(i).getKey(), currentShape);
         }

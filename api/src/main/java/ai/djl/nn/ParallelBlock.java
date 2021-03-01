@@ -149,16 +149,16 @@ public class ParallelBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         Preconditions.checkArgument(!children.isEmpty(), "The parallel block is empty");
 
-        try (NDManager subManager = manager.newSubManager()) {
+        try (NDManager manager = NDManager.newBaseManager()) {
             List<NDList> inputs = new ArrayList<>();
             for (Block block : children.values()) {
-                Shape[] shapes = block.getOutputShapes(manager, inputShapes);
+                Shape[] shapes = block.getOutputShapes(inputShapes);
                 NDList output = new NDList(shapes.length);
                 for (Shape shape : shapes) {
-                    output.add(subManager.create(shape));
+                    output.add(manager.create(shape));
                 }
                 inputs.add(output);
             }

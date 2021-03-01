@@ -55,7 +55,7 @@ public final class IdEmbedding extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         return new Shape[] {inputShapes[0].addAll(new Shape(embeddingSize))};
     }
 

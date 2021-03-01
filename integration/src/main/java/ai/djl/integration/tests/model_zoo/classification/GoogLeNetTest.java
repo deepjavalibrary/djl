@@ -111,7 +111,7 @@ public class GoogLeNetTest {
                             .getChildren()
                             .get(i)
                             .getValue()
-                            .getOutputShapes(manager, new Shape[] {currentShape});
+                            .getOutputShapes(new Shape[] {currentShape});
             currentShape = newShape[0];
             shapeMap.put(googLeNet.getChildren().get(i).getKey(), currentShape);
         }

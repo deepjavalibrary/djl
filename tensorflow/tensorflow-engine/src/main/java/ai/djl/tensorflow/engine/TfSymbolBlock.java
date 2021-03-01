@@ -197,7 +197,7 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         return new Shape[0];
     }
 

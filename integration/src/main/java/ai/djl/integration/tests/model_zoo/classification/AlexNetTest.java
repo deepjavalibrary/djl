@@ -169,7 +169,7 @@ public class AlexNetTest {
                     alexNet.getChildren()
                             .get(i)
                             .getValue()
-                            .getOutputShapes(manager, new Shape[] {currentShape});
+                            .getOutputShapes(new Shape[] {currentShape});
             currentShape = newShape[0];
             shapeMap.put(alexNet.getChildren().get(i).getKey(), currentShape);
         }

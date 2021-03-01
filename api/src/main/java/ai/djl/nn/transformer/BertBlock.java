@@ -156,7 +156,7 @@ public final class BertBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         long batch = inputShapes[0].get(0);
         long seqLength = inputShapes[0].get(1);
         return new Shape[] {
@@ -172,7 +172,7 @@ public final class BertBlock extends AbstractBlock {
         Shape[] tokenShape = {inputShapes[0]};
         Shape[] typeShape = {inputShapes[1]};
         this.tokenEmbedding.initialize(manager, dataType, tokenShape);
-        Shape[] embeddingOutput = this.tokenEmbedding.getOutputShapes(manager, tokenShape);
+        Shape[] embeddingOutput = this.tokenEmbedding.getOutputShapes(tokenShape);
         this.typeEmbedding.initialize(manager, dataType, typeShape);
         this.embeddingNorm.initialize(manager, dataType, embeddingOutput);
         this.embeddingDropout.initialize(manager, dataType, embeddingOutput);

@@ -13,7 +13,6 @@
 package ai.djl.nn.recurrent;
 
 import ai.djl.MalformedModelException;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
@@ -91,7 +90,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
+    public Shape[] getOutputShapes(Shape[] inputs) {
         Shape inputShape = inputs[0];
         Shape outputShape =
                 new Shape(inputShape.get(0), inputShape.get(1), stateSize * getNumDirections());

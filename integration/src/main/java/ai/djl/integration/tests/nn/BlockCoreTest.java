@@ -289,7 +289,7 @@ public class BlockCoreTest {
                 NDArray out = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assert.assertEquals(out, expected);
 
-                Shape[] outputShape = block.getOutputShapes(manager, new Shape[] {inputShape});
+                Shape[] outputShape = block.getOutputShapes(new Shape[] {inputShape});
                 Assert.assertEquals(out.getShape(), outputShape[0]);
 
                 testEncode(manager, block);
@@ -324,7 +324,7 @@ public class BlockCoreTest {
                 NDArray out = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assert.assertEquals(out, expected);
 
-                Shape[] outputShape = block.getOutputShapes(manager, new Shape[] {inputShape});
+                Shape[] outputShape = block.getOutputShapes(new Shape[] {inputShape});
                 Assert.assertEquals(out.getShape(), outputShape[0]);
 
                 testEncode(manager, block);
@@ -432,8 +432,7 @@ public class BlockCoreTest {
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assert.assertEquals(result, expected);
 
-                Shape[] outputShape =
-                        block.getOutputShapes(manager, new Shape[] {new Shape(1, 1, 3, 3, 3)});
+                Shape[] outputShape = block.getOutputShapes(new Shape[] {new Shape(1, 1, 3, 3, 3)});
                 Assert.assertEquals(result.getShape(), outputShape[0]);
 
                 testEncode(manager, block);

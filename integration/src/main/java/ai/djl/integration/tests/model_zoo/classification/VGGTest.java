@@ -114,10 +114,7 @@ public class VGGTest {
         for (int i = 0; i < vgg.getChildren().size(); i++) {
 
             Shape[] newShape =
-                    vgg.getChildren()
-                            .get(i)
-                            .getValue()
-                            .getOutputShapes(manager, new Shape[] {currentShape});
+                    vgg.getChildren().get(i).getValue().getOutputShapes(new Shape[] {currentShape});
             currentShape = newShape[0];
             shapeMap.put(vgg.getChildren().get(i).getKey(), currentShape);
         }

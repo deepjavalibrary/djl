@@ -113,7 +113,7 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         return new Shape[] {inputShapes[0].addAll(new Shape(embeddingSize))};
     }
 

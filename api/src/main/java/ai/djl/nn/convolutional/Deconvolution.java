@@ -16,7 +16,6 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
@@ -146,7 +145,7 @@ public abstract class Deconvolution extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
+    public Shape[] getOutputShapes(Shape[] inputs) {
         long[] shape = new long[numDimensions()];
         shape[0] = inputs[0].get(0);
         shape[1] = filters;

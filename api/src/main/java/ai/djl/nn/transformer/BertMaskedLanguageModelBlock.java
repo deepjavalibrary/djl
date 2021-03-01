@@ -142,7 +142,7 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(final NDManager manager, final Shape[] inputShapes) {
+    public Shape[] getOutputShapes(final Shape[] inputShapes) {
         int batchSize = (int) inputShapes[0].get(0);
         int indexCount = (int) inputShapes[1].get(1);
         int dictionarySize = (int) inputShapes[2].get(0);
