@@ -105,7 +105,11 @@ public final class SageMaker {
         s3 = builder.s3;
         iam = builder.iam;
         model = builder.model;
-        modelName = model.getName();
+        if (builder.modelName != null) {
+            modelName = builder.modelName;
+        } else {
+            modelName = model.getName();
+        }
         bucketName = builder.bucketName;
         bucketPath = builder.bucketPath;
         executionRole = builder.executionRole;
@@ -455,6 +459,7 @@ public final class SageMaker {
         String containerImage;
         String endpointConfigName;
         String endpointName;
+        String modelName;
         String instanceType = "ml.m4.xlarge";
         int instanceCount = 1;
         SageMakerClient sageMaker;
@@ -552,6 +557,19 @@ public final class SageMaker {
          */
         public Builder optEndpointName(String endpointName) {
             this.endpointName = endpointName;
+            return this;
+        }
+
+        /**
+         * Sets the optional model name to create.
+         *
+         * <p>If {@code modelName} is not set, model name will be used as model name.
+         *
+         * @param modelName the model name to create
+         * @return the builder
+         */
+        public Builder optModelName(String modelName) {
+            this.modelName = modelName;
             return this;
         }
 
@@ -658,10 +676,10 @@ public final class SageMaker {
                 bucketPath = bucketPath.substring(1);
             }
             if (endpointConfigName == null) {
-                endpointConfigName = model.getName();
+                endpointConfigName = modelName == null ? model.getName() : modelName;
             }
             if (endpointName == null) {
-                endpointName = model.getName();
+                endpointName = modelName == null ? model.getName() : modelName;
             }
 
             return new SageMaker(this);

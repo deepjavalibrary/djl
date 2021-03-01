@@ -54,6 +54,7 @@ public class SageMakerTest {
                     SageMaker.builder()
                             .setModel(model)
                             .optBucketName("djl-sm-test")
+                            .optModelName("resnet")
                             .optContainerImage("125045733377.dkr.ecr.us-east-1.amazonaws.com/djl")
                             .optExecutionRole(
                                     "arn:aws:iam::125045733377:role/service-role/DJLSageMaker-ExecutionRole-20210213T1027050")
