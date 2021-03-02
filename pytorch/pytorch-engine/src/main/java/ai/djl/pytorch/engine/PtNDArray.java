@@ -1367,7 +1367,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray nonzero() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.nonZeros(this);
     }
 
     /** {@inheritDoc} */

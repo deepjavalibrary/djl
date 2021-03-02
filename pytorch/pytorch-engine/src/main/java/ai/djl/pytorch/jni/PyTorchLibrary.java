@@ -534,4 +534,6 @@ final class PyTorchLibrary {
             float momentum);
 
     native long torchNorm(long handle, int ord, long[] axis, boolean keepDims);
+
+    native long torchNonZeros(long handle);
 }
