@@ -3,7 +3,6 @@ import Button from '@material-ui/core/Button';
 import ReactDOM from 'react-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
-import { theme } from '../css/useStyles'
 import axios from 'axios'
 
 
@@ -50,6 +49,5 @@ export default function ModelDownloadButtons(props) {
     				)
     			)}
     		</>
-    	);
-
+    );
 }
