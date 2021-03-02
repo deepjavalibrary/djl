@@ -63,17 +63,12 @@ final class ModelLink {
                 });
         return links;
     }
-
-    public static void main(String[] args) throws IOException, ModelNotFoundException {
-        logger.info("Output:");
-        logger.info(String.valueOf(linkFinder("simple_pose_resnet50_v1b")));
-    }
 }
 
 
 /**
- * A handler to handle deployment requests from the UI/
- * @author erik.bamberg@web.de
+ * A handler to handle download requests from the UI
+ * @author anfee1@morgan.edu
  *
  */
 public class ModelDownloadHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -99,7 +94,7 @@ public class ModelDownloadHandler extends SimpleChannelInboundHandler<FullHttpRe
                             logger.info(String.valueOf(ModelLink.linkFinder(modelName)));
                             return ModelLink.linkFinder(modelName);
                         } else {
-                            throw new BadRequestException("modelName and url is mandatory.");
+                            throw new BadRequestException("modelName is mandatory.");
                         }
 
                     } catch (IOException | ModelNotFoundException ex) {
