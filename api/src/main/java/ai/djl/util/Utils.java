@@ -275,7 +275,7 @@ public final class Utils {
                     parameter.getArray().getShape());
             checkNDArrayValues(parameter.getArray(), logger, "weight");
 
-            if (parameter.requireGradient() && checkGradient) {
+            if (parameter.requiresGradient() && checkGradient) {
                 logger.debug("Checking gradient of: {}", parameter.getName());
                 checkNDArrayValues(parameter.getArray().getGradient(), logger, "grad");
             }

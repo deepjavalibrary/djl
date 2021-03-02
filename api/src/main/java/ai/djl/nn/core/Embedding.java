@@ -58,7 +58,6 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
                         Parameter.builder()
                                 .setName("embedding")
                                 .setType(Parameter.Type.WEIGHT)
-                                .optGradientFormat(sparseFormat)
                                 .build());
         if (baseBuilder.fallthrough != null && baseBuilder.defaultItem != null) {
             throw new IllegalArgumentException(
@@ -98,7 +97,6 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
                         Parameter.builder()
                                 .setName("embedding")
                                 .setType(Parameter.Type.WEIGHT)
-                                .optGradientFormat(sparseFormat)
                                 .build());
         this.embedding.setArray(embedding);
         inputShapes = new Shape[] {new Shape(-1)};

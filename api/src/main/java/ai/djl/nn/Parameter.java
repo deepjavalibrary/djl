@@ -17,7 +17,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.initializer.XavierInitializer;
 import java.io.DataInputStream;
@@ -48,7 +47,6 @@ public class Parameter implements AutoCloseable {
     private Initializer initializer;
     private NDArray array;
     private boolean requiresGrad;
-    private SparseFormat gradientFormat;
 
     Parameter(Builder builder) {
         this.id = UUID.randomUUID().toString();
@@ -59,7 +57,6 @@ public class Parameter implements AutoCloseable {
         this.requiresGrad = builder.requiresGrad;
         this.initializer =
                 (builder.initializer != null) ? builder.initializer : type.getInitializer();
-        this.gradientFormat = builder.gradientFormat;
     }
 
     /**
@@ -132,7 +129,7 @@ public class Parameter implements AutoCloseable {
      *
      * @return whether this parameter needs gradients to be computed
      */
-    public boolean requireGradient() {
+    public boolean requiresGradient() {
         return requiresGrad;
     }
 
@@ -170,8 +167,8 @@ public class Parameter implements AutoCloseable {
             array.setName(name);
         }
 
-        if (requireGradient()) {
-            array.attachGradient(gradientFormat);
+        if (requiresGradient()) {
+            array.requiresGradient();
         }
     }
 
@@ -288,7 +285,6 @@ public class Parameter implements AutoCloseable {
         Initializer initializer;
         NDArray array;
         boolean requiresGrad = true;
-        SparseFormat gradientFormat;
 
         /**
          * Sets the name of the {@code Parameter}.
@@ -353,17 +349,6 @@ public class Parameter implements AutoCloseable {
          */
         public Builder optRequiresGrad(boolean requiresGrad) {
             this.requiresGrad = requiresGrad;
-            return this;
-        }
-
-        /**
-         * Sets the {@link SparseFormat} of the {@code Parameter}.
-         *
-         * @param gradientFormat the {@link SparseFormat} of the {@code Parameter}
-         * @return this {@code Parameter}
-         */
-        public Builder optGradientFormat(SparseFormat gradientFormat) {
-            this.gradientFormat = gradientFormat;
             return this;
         }
 

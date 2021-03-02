@@ -226,31 +226,25 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void attachGradient() {
-        attachGradient(null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attachGradient(SparseFormat sparseFormat) {
-        try (MxNDArray grad = createGradient(sparseFormat)) {
-            // DJL go with write as only MXNet support GradReq
-            int gradReqValue = GradReq.WRITE.getValue();
-            IntBuffer gradReqBuffer = IntBuffer.allocate(1);
-            gradReqBuffer.put(0, gradReqValue);
-            JnaUtils.autogradMarkVariables(1, getHandle(), gradReqBuffer, grad.getHandle());
+    public void requiresGradient(boolean requiresGrad) {
+        if ((requiresGrad && hasGradient()) || (!requiresGrad && !hasGradient())) {
+            return;
         }
-        hasGradient = true;
+        MxNDArray grad =
+                hasGradient() ? (MxNDArray) getGradient() : createGradient(getSparseFormat());
+        // DJL go with write as only MXNet support GradReq
+        int gradReqValue = requiresGrad ? GradReq.WRITE.getValue() : GradReq.NULL.getValue();
+        IntBuffer gradReqBuffer = IntBuffer.allocate(1);
+        gradReqBuffer.put(0, gradReqValue);
+        JnaUtils.autogradMarkVariables(1, getHandle(), gradReqBuffer, grad.getHandle());
+        hasGradient = requiresGrad;
+        grad.close();
     }
 
     private MxNDArray createGradient(SparseFormat format) {
-        if (format == null) {
-            return (MxNDArray) zerosLike();
+        try (MxNDArray zeros = (MxNDArray) manager.zeros(getShape(), getDataType(), getDevice())) {
+            return (MxNDArray) zeros.toSparse(format);
         }
-        if (format == SparseFormat.DENSE) {
-            return (MxNDArray) manager.zeros(getShape(), getDataType(), getDevice());
-        }
-        return (MxNDArray) manager.zeros(getShape(), getDataType(), getDevice()).toSparse(format);
     }
 
     /** {@inheritDoc} */
@@ -278,7 +272,8 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray stopGradient() {
-        return manager.invoke("stop_gradient", this, null);
+        Pointer pointer = JnaUtils.detachGradient(getHandle());
+        return manager.create(pointer);
     }
 
     /** {@inheritDoc} */
@@ -583,11 +578,10 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray toSparse(SparseFormat fmt) {
-        if (fmt == SparseFormat.DENSE) {
-            throw new IllegalArgumentException("Default type is not allowed");
-        }
-        if (fmt != SparseFormat.CSR && fmt != SparseFormat.ROW_SPARSE) {
-            throw new UnsupportedOperationException(fmt + "is not supported");
+        if (fmt != SparseFormat.DENSE
+                && fmt != SparseFormat.CSR
+                && fmt != SparseFormat.ROW_SPARSE) {
+            throw new UnsupportedOperationException(fmt + " is not supported");
         }
         if (fmt == getSparseFormat()) {
             return duplicate();

@@ -898,9 +898,15 @@ public final class JnaUtils {
     int MXNDArrayGetDataNDArray(Pointer handle, PointerByReference out);
 
     int MXNDArrayGetContext(Pointer handle, IntBuffer out_dev_type, IntBuffer out_dev_id);
-
-    int MXNDArrayDetach(Pointer handle, PointerByReference out);
-
+    */
+    public static Pointer detachGradient(Pointer handle) {
+        PointerByReference ref = REFS.acquire();
+        checkCall(LIB.MXNDArrayDetach(handle, ref));
+        Pointer pointer = ref.getValue();
+        REFS.recycle(ref);
+        return pointer;
+    }
+    /*
     int MXNDArraySetGradState(Pointer handle, int state);
 
     int MXNDArrayGetGradState(Pointer handle, IntBuffer out);
