@@ -429,9 +429,12 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.INFERENCE);
         Assert.assertNotNull(channel);
 
+        result = null;
+        latch = new CountDownLatch(1);
         HttpRequest req = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -441,10 +444,15 @@ public class ModelServerTest {
 
     private void testInvalidUri() throws InterruptedException {
         Channel channel = connect(Connector.ConnectorType.INFERENCE);
+        Assert.assertNotNull(channel);
+
+        result = null;
+        latch = new CountDownLatch(1);
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/InvalidUrl");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -456,11 +464,14 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.INFERENCE);
         Assert.assertNotNull(channel);
 
+        result = null;
+        latch = new CountDownLatch(1);
         HttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, "/predictions/InvalidModel");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -472,10 +483,13 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.INFERENCE);
         Assert.assertNotNull(channel);
 
+        result = null;
+        latch = new CountDownLatch(1);
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/predictions");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -487,11 +501,14 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.INFERENCE);
         Assert.assertNotNull(channel);
 
+        result = null;
+        latch = new CountDownLatch(1);
         HttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.GET, "/predictions/InvalidModel");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -503,10 +520,13 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
+        result = null;
+        latch = new CountDownLatch(1);
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/InvalidUrl");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -518,10 +538,13 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
+        result = null;
+        latch = new CountDownLatch(1);
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.PUT, "/models");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -533,10 +556,13 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
+        result = null;
+        latch = new CountDownLatch(1);
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/models/noop");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -548,11 +574,14 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
+        result = null;
+        latch = new CountDownLatch(1);
         HttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.GET, "/models/InvalidModel");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -564,10 +593,13 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
+        result = null;
+        latch = new CountDownLatch(1);
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/models");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -579,11 +611,14 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
+        result = null;
+        latch = new CountDownLatch(1);
         HttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.POST, "/models?url=InvalidUrl");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -597,6 +632,8 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
+        result = null;
+        latch = new CountDownLatch(1);
         String url = "https://resources.djl.ai/test-models/mlp.tar.gz";
         DefaultFullHttpRequest req =
                 new DefaultFullHttpRequest(
@@ -605,7 +642,8 @@ public class ModelServerTest {
                         "/models?model_name=mlp_2&url="
                                 + URLEncoder.encode(url, StandardCharsets.UTF_8.name()));
         channel.writeAndFlush(req);
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
         Assert.assertEquals(resp.getCode(), HttpResponseStatus.BAD_REQUEST.code());
@@ -617,13 +655,15 @@ public class ModelServerTest {
         Assert.assertNotNull(channel);
 
         result = null;
+        latch = new CountDownLatch(1);
         DefaultFullHttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1,
                         HttpMethod.PUT,
                         "/models/mlp?min_worker=10&max_worker=1");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -635,10 +675,13 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
+        result = null;
+        latch = new CountDownLatch(1);
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.PUT, "/models/fake");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -650,10 +693,13 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
+        result = null;
+        latch = new CountDownLatch(1);
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.DELETE, "/models/fake");
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
 
@@ -675,6 +721,8 @@ public class ModelServerTest {
         channel.writeAndFlush(req);
         latch.await();
 
+        result = null;
+        latch = new CountDownLatch(1);
         req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.POST, "/predictions/mlp_2");
@@ -682,7 +730,8 @@ public class ModelServerTest {
         HttpUtil.setContentLength(req, req.content().readableBytes());
         req.headers().set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_OCTET_STREAM);
         channel.writeAndFlush(req).sync();
-        channel.closeFuture().sync();
+        latch.await();
+        channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
         Assert.assertEquals(resp.getCode(), HttpResponseStatus.SERVICE_UNAVAILABLE.code());
