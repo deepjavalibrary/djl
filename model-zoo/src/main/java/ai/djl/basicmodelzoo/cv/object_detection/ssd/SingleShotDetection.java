@@ -111,46 +111,48 @@ public final class SingleShotDetection extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
-        // TODO: output shape is wrong
-        Shape[] childInputShapes = inputShapes;
-        Shape[] anchorShapes = new Shape[features.size()];
-        Shape[] classPredictionShapes = new Shape[features.size()];
-        Shape[] anchorPredictionShapes = new Shape[features.size()];
-        for (int i = 0; i < features.size(); i++) {
-            childInputShapes = features.get(i).getOutputShapes(manager, childInputShapes);
-            anchorShapes[i] =
-                    multiBoxPriors
-                            .get(i)
-                            .generateAnchorBoxes(manager.ones(childInputShapes[0]))
-                            .getShape();
-            classPredictionShapes[i] =
-                    classPredictionBlocks.get(i).getOutputShapes(manager, childInputShapes)[0];
-            anchorPredictionShapes[i] =
-                    anchorPredictionBlocks.get(i).getOutputShapes(manager, childInputShapes)[0];
-        }
-        Shape anchorOutputShape = new Shape();
-        for (Shape shape : anchorShapes) {
-            anchorOutputShape = concatShape(anchorOutputShape, shape, 1);
-        }
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            // TODO: output shape is wrong
+            Shape[] childInputShapes = inputShapes;
+            Shape[] anchorShapes = new Shape[features.size()];
+            Shape[] classPredictionShapes = new Shape[features.size()];
+            Shape[] anchorPredictionShapes = new Shape[features.size()];
+            for (int i = 0; i < features.size(); i++) {
+                childInputShapes = features.get(i).getOutputShapes(childInputShapes);
+                anchorShapes[i] =
+                        multiBoxPriors
+                                .get(i)
+                                .generateAnchorBoxes(manager.ones(childInputShapes[0]))
+                                .getShape();
+                classPredictionShapes[i] =
+                        classPredictionBlocks.get(i).getOutputShapes(childInputShapes)[0];
+                anchorPredictionShapes[i] =
+                        anchorPredictionBlocks.get(i).getOutputShapes(childInputShapes)[0];
+            }
+            Shape anchorOutputShape = new Shape();
+            for (Shape shape : anchorShapes) {
+                anchorOutputShape = concatShape(anchorOutputShape, shape, 1);
+            }
 
-        NDList classPredictions = new NDList();
-        for (Shape shape : classPredictionShapes) {
-            classPredictions.add(manager.ones(shape));
+            NDList classPredictions = new NDList();
+            for (Shape shape : classPredictionShapes) {
+                classPredictions.add(manager.ones(shape));
+            }
+            NDArray classPredictionOutput = concatPredictions(classPredictions);
+            Shape classPredictionOutputShape =
+                    classPredictionOutput
+                            .reshape(classPredictionOutput.size(0), -1, numClasses + 1)
+                            .getShape();
+            NDList anchorPredictions = new NDList();
+            for (Shape shape : anchorPredictionShapes) {
+                anchorPredictions.add(manager.ones(shape));
+            }
+            Shape anchorPredictionOutputShape = concatPredictions(anchorPredictions).getShape();
+            return new Shape[] {
+                anchorOutputShape, classPredictionOutputShape, anchorPredictionOutputShape
+            };
         }
-        NDArray classPredictionOutput = concatPredictions(classPredictions);
-        Shape classPredictionOutputShape =
-                classPredictionOutput
-                        .reshape(classPredictionOutput.size(0), -1, numClasses + 1)
-                        .getShape();
-        NDList anchorPredictions = new NDList();
-        for (Shape shape : anchorPredictionShapes) {
-            anchorPredictions.add(manager.ones(shape));
-        }
-        Shape anchorPredictionOutputShape = concatPredictions(anchorPredictions).getShape();
-        return new Shape[] {
-            anchorOutputShape, classPredictionOutputShape, anchorPredictionOutputShape
-        };
     }
 
     private Shape concatShape(Shape shape, Shape concat, int axis) {
@@ -177,15 +179,15 @@ public final class SingleShotDetection extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
+    public void initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
         beforeInitialize(inputShapes);
         Shape[] shapes = inputShapes;
         for (int i = 0; i < features.size(); i++) {
-            shapes = features.get(i).initialize(manager, dataType, shapes);
+            features.get(i).initialize(manager, dataType, shapes);
+            shapes = features.get(i).getOutputShapes(shapes);
             classPredictionBlocks.get(i).initialize(manager, dataType, shapes);
             anchorPredictionBlocks.get(i).initialize(manager, dataType, shapes);
         }
-        return getOutputShapes(manager, inputShapes);
     }
 
     /** {@inheritDoc} */

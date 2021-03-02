@@ -20,6 +20,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Blocks;
+import ai.djl.nn.Parameter;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -49,7 +50,8 @@ import org.testng.annotations.Test;
 public class DatasetTest {
 
     private TrainingConfig config =
-            new DefaultTrainingConfig(Loss.l2Loss()).optInitializer(Initializer.ONES);
+            new DefaultTrainingConfig(Loss.l2Loss())
+                    .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
     @Test
     public void testSequenceSampler() throws IOException, TranslateException {

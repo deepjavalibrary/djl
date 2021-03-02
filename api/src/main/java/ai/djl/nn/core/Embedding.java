@@ -23,7 +23,6 @@ import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
@@ -56,8 +55,11 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
         sparseFormat = baseBuilder.sparseFormat;
         embedding =
                 addParameter(
-                        new Parameter("embedding", this, ParameterType.WEIGHT, true, sparseFormat),
-                        (inputShapes) -> new Shape(numEmbeddings, embeddingSize));
+                        Parameter.builder()
+                                .setName("embedding")
+                                .setType(Parameter.Type.WEIGHT)
+                                .optGradientFormat(sparseFormat)
+                                .build());
         if (baseBuilder.fallthrough != null && baseBuilder.defaultItem != null) {
             throw new IllegalArgumentException(
                     "You can not specify both a fallthrough and a defaultItem");
@@ -93,15 +95,25 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
         this.sparseFormat = format;
         this.embedding =
                 addParameter(
-                        new Parameter("embedding", this, ParameterType.WEIGHT, true, sparseFormat),
-                        (inputShapes) -> new Shape(numEmbeddings, embeddingSize));
+                        Parameter.builder()
+                                .setName("embedding")
+                                .setType(Parameter.Type.WEIGHT)
+                                .optGradientFormat(sparseFormat)
+                                .build());
         this.embedding.setArray(embedding);
         inputShapes = new Shape[] {new Shape(-1)};
     }
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public void prepare(Shape[] inputShapes) {
+        // numItems will be adjusted by embedding array or fallthroughEmbedding
+        embedding.setShape(new Shape(numEmbeddings, embeddingSize));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         return new Shape[] {inputShapes[0].addAll(new Shape(embeddingSize))};
     }
 

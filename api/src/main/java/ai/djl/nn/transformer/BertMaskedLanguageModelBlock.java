@@ -19,7 +19,6 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.training.ParameterStore;
@@ -59,8 +58,11 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
         this.sequenceNorm = addChildBlock("sequenceNorm", BatchNorm.builder().optAxis(1).build());
         this.dictionaryBias =
                 addParameter(
-                        new Parameter("dictionaryBias", this, ParameterType.BIAS),
-                        new Shape(bertBlock.getTokenDictionarySize()));
+                        Parameter.builder()
+                                .setName("dictionaryBias")
+                                .setType(Parameter.Type.BIAS)
+                                .optShape(new Shape(bertBlock.getTokenDictionarySize()))
+                                .build());
         this.hiddenActivation = hiddenActivation;
     }
 
@@ -140,7 +142,7 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(final NDManager manager, final Shape[] inputShapes) {
+    public Shape[] getOutputShapes(final Shape[] inputShapes) {
         int batchSize = (int) inputShapes[0].get(0);
         int indexCount = (int) inputShapes[1].get(1);
         int dictionarySize = (int) inputShapes[2].get(0);

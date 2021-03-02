@@ -16,12 +16,10 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
@@ -86,26 +84,37 @@ public class BatchNorm extends AbstractBlock {
         momentum = builder.momentum;
         center = builder.center;
         scale = builder.scale;
-        // When creating parameters we use a callback as "inChannels" is set before initialization,
-        // it is not known yet.
+
         // make gamma trainable if scale
         gamma =
                 addParameter(
-                        new Parameter("gamma", this, ParameterType.GAMMA, scale),
-                        (inputShapes) -> new Shape(inChannels));
+                        Parameter.builder()
+                                .setName("gamma")
+                                .setType(Parameter.Type.GAMMA)
+                                .optRequiresGrad(scale)
+                                .build());
         // make beta trainable if center
         beta =
                 addParameter(
-                        new Parameter("beta", this, ParameterType.BETA, center),
-                        (inputShapes) -> new Shape(inChannels));
+                        Parameter.builder()
+                                .setName("beta")
+                                .setType(Parameter.Type.BETA)
+                                .optRequiresGrad(center)
+                                .build());
         runningMean =
                 addParameter(
-                        new Parameter("runningMean", this, ParameterType.RUNNING_MEAN, false),
-                        (inputShapes) -> new Shape(inChannels));
+                        Parameter.builder()
+                                .setName("runningMean")
+                                .setType(Parameter.Type.RUNNING_MEAN)
+                                .optRequiresGrad(false)
+                                .build());
         runningVar =
                 addParameter(
-                        new Parameter("runningVar", this, ParameterType.RUNNING_VAR, false),
-                        (inputShapes) -> new Shape(inChannels));
+                        Parameter.builder()
+                                .setName("runningVar")
+                                .setType(Parameter.Type.RUNNING_VAR)
+                                .optRequiresGrad(false)
+                                .build());
     }
 
     /** {@inheritDoc} */
@@ -135,15 +144,24 @@ public class BatchNorm extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         return new Shape[] {inputShapes[0]};
     }
 
     /** {@inheritDoc} */
     @Override
-    public void beforeInitialize(Shape[] inputShapes) {
+    protected void beforeInitialize(Shape... inputShapes) {
         super.beforeInitialize(inputShapes);
         inChannels = inputShapes[0].size(axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void prepare(Shape[] inputShapes) {
+        gamma.setShape(new Shape(inChannels));
+        beta.setShape(new Shape(inChannels));
+        runningMean.setShape(new Shape(inChannels));
+        runningVar.setShape(new Shape(inChannels));
     }
 
     /** {@inheritDoc} */

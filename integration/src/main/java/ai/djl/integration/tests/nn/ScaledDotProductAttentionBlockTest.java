@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Parameter;
 import ai.djl.nn.transformer.ScaledDotProductAttentionBlock;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.ParameterStore;
@@ -752,7 +753,7 @@ public class ScaledDotProductAttentionBlockTest {
                         .optAttentionProbsDropoutProb(0.0f)
                         .build();
 
-        block.setInitializer(new NormalInitializer());
+        block.setInitializer(new NormalInitializer(), Parameter.Type.WEIGHT);
         block.getKeyProjection().setInitializer(keyKernelInitializer, "weight");
         block.getValueProjection().setInitializer(valueKernelInitializer, "weight");
         block.getQueryProjection().setInitializer(queryKernelInitializer, "weight");

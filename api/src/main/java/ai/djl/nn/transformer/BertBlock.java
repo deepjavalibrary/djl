@@ -22,7 +22,6 @@ import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.norm.Dropout;
@@ -77,8 +76,12 @@ public final class BertBlock extends AbstractBlock {
         // embedding for the position
         this.positionEmebdding =
                 addParameter(
-                        new Parameter(PARAM_POSITION_EMBEDDING, this, ParameterType.WEIGHT),
-                        new Shape(builder.maxSequenceLength, builder.embeddingSize));
+                        Parameter.builder()
+                                .setName(PARAM_POSITION_EMBEDDING)
+                                .setType(Parameter.Type.WEIGHT)
+                                .optShape(
+                                        new Shape(builder.maxSequenceLength, builder.embeddingSize))
+                                .build());
         // embedding for the input types
         this.typeEmbedding =
                 addChildBlock(
@@ -153,7 +156,7 @@ public final class BertBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         long batch = inputShapes[0].get(0);
         long seqLength = inputShapes[0].get(1);
         return new Shape[] {
@@ -164,11 +167,12 @@ public final class BertBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
-        beforeInitialize(inputShapes);
+        super.beforeInitialize(inputShapes);
         inputNames = Arrays.asList("tokenIds", "typeIds", "masks");
         Shape[] tokenShape = {inputShapes[0]};
         Shape[] typeShape = {inputShapes[1]};
-        Shape[] embeddingOutput = this.tokenEmbedding.initialize(manager, dataType, tokenShape);
+        this.tokenEmbedding.initialize(manager, dataType, tokenShape);
+        Shape[] embeddingOutput = this.tokenEmbedding.getOutputShapes(tokenShape);
         this.typeEmbedding.initialize(manager, dataType, typeShape);
         this.embeddingNorm.initialize(manager, dataType, embeddingOutput);
         this.embeddingDropout.initialize(manager, dataType, embeddingOutput);

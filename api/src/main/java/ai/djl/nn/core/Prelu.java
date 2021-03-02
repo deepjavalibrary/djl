@@ -15,12 +15,10 @@ package ai.djl.nn.core;
 import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
@@ -44,7 +42,13 @@ public class Prelu extends AbstractBlock {
     /** Creates a Parametric ReLU Block. */
     public Prelu() {
         super(VERSION);
-        alpha = addParameter(new Parameter("alpha", this, ParameterType.OTHER), new Shape());
+        alpha =
+                addParameter(
+                        Parameter.builder()
+                                .setName("alpha")
+                                .setType(Parameter.Type.WEIGHT)
+                                .optShape(new Shape())
+                                .build());
     }
 
     /** {@inheritDoc} */
@@ -61,7 +65,7 @@ public class Prelu extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
+    public Shape[] getOutputShapes(Shape[] inputs) {
         return new Shape[] {inputs[0]};
     }
 

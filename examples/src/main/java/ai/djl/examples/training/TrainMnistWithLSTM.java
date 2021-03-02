@@ -31,7 +31,6 @@ import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
-import ai.djl.training.initializer.XavierInitializer;
 import ai.djl.training.listener.SaveModelTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
@@ -119,7 +118,6 @@ public final class TrainMnistWithLSTM {
 
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
-                .optInitializer(new XavierInitializer())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);

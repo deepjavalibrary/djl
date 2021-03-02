@@ -88,7 +88,7 @@ public class TrainableTextEmbedding extends AbstractBlock implements TextEmbeddi
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
-        return trainableWordEmbedding.getOutputShapes(manager, inputShapes);
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
+        return trainableWordEmbedding.getOutputShapes(inputShapes);
     }
 }

@@ -152,17 +152,14 @@ public class NiNTest {
         Shape currentShape = x.getShape();
 
         Block nin = NiN.builder().build();
-        nin.setInitializer(Initializer.ONES);
+        nin.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         nin.initialize(manager, DataType.FLOAT32, currentShape);
 
         Map<String, Shape> shapeMap = new ConcurrentHashMap<>();
         for (int i = 0; i < nin.getChildren().size(); i++) {
 
             Shape[] newShape =
-                    nin.getChildren()
-                            .get(i)
-                            .getValue()
-                            .getOutputShapes(manager, new Shape[] {currentShape});
+                    nin.getChildren().get(i).getValue().getOutputShapes(new Shape[] {currentShape});
             currentShape = newShape[0];
             shapeMap.put(nin.getChildren().get(i).getKey(), currentShape);
         }
@@ -180,7 +177,7 @@ public class NiNTest {
         Block nin = NiN.builder().build();
         int batchSize = 1;
         NDArray x = manager.ones(new Shape(batchSize, 1, 224, 224));
-        nin.setInitializer(Initializer.ONES);
+        nin.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         nin.initialize(manager, DataType.FLOAT32, x.getShape());
         NDArray xHat =
                 nin.forward(new ParameterStore(manager, true), new NDList(x), false)

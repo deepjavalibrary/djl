@@ -57,7 +57,7 @@ public class ResnetTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optDevices(Device.getDevices(2))
-                        .optInitializer(Initializer.ONES);
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block resNet50 =
                 ResNetV1.builder()
@@ -123,7 +123,7 @@ public class ResnetTest {
             TrainingConfig config =
                     new DefaultTrainingConfig(Loss.l1Loss())
                             .optDevices(Device.getDevices(2))
-                            .optInitializer(Initializer.ONES);
+                            .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
             try (Trainer trainer = model.newTrainer(config)) {
                 int batchSize = 2;
                 Shape inputShape = new Shape(batchSize, 3, 32, 32);
@@ -131,8 +131,7 @@ public class ResnetTest {
                 trainer.initialize(inputShape);
 
                 NDManager manager = trainer.getManager();
-                Shape[] outputShape =
-                        model.getBlock().getOutputShapes(manager, new Shape[] {inputShape});
+                Shape[] outputShape = model.getBlock().getOutputShapes(new Shape[] {inputShape});
 
                 NDArray data = manager.ones(new Shape(batchSize, 3, 32, 32));
                 NDArray label = manager.ones(outputShape[0]);

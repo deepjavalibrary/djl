@@ -57,7 +57,7 @@ public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedE
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         return new Shape[] {inputShapes[0].addAll(embedding.getShape())};
     }
 

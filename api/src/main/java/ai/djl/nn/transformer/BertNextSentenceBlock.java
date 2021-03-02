@@ -53,7 +53,7 @@ public class BertNextSentenceBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         return new Shape[] {new Shape(inputShapes[0].get(0), 2)};
     }
 }

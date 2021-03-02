@@ -21,7 +21,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.util.Arrays;
@@ -47,13 +46,16 @@ public final class IdEmbedding extends AbstractBlock {
         this.embeddingSize = builder.embeddingSize;
         this.embedding =
                 addParameter(
-                        new Parameter(EMBEDDING_PARAM_NAME, this, ParameterType.WEIGHT),
-                        new Shape(dictionarySize, embeddingSize));
+                        Parameter.builder()
+                                .setName(EMBEDDING_PARAM_NAME)
+                                .setType(Parameter.Type.WEIGHT)
+                                .optShape(new Shape(dictionarySize, embeddingSize))
+                                .build());
     }
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         return new Shape[] {inputShapes[0].addAll(new Shape(embeddingSize))};
     }
 

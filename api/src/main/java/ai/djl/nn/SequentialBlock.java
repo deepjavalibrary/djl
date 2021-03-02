@@ -154,19 +154,20 @@ public class SequentialBlock extends AbstractBlock {
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         Shape[] shapes = inputShapes;
         for (Block child : getChildren().values()) {
-            shapes = child.initialize(manager, dataType, shapes);
+            child.initialize(manager, dataType, shapes);
+            shapes = child.getOutputShapes(shapes);
         }
     }
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
+    public Shape[] getOutputShapes(Shape[] inputs) {
         if (children.isEmpty()) {
             throw new IllegalArgumentException("The sequential block is empty");
         }
         Shape[] current = inputs;
         for (Block block : children.values()) {
-            current = block.getOutputShapes(manager, current);
+            current = block.getOutputShapes(current);
         }
         return current;
     }

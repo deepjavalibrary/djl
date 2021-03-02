@@ -51,7 +51,8 @@ public class BertPretrainingBlock extends AbstractBlock {
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         inputNames = Arrays.asList("tokenIds", "typeIds", "sequenceMasks", "maskedIndices");
-        Shape[] bertOutputShapes = bertBlock.initialize(manager, dataType, inputShapes);
+        bertBlock.initialize(manager, dataType, inputShapes);
+        Shape[] bertOutputShapes = bertBlock.getOutputShapes(inputShapes);
         Shape embeddedSequence = bertOutputShapes[0];
         Shape pooledOutput = bertOutputShapes[1];
         Shape maskedIndices = inputShapes[2];
@@ -97,7 +98,7 @@ public class BertPretrainingBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         long batchSize = inputShapes[0].get(0);
         long maskedIndexCount = inputShapes[3].get(1);
         return new Shape[] {

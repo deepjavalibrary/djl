@@ -20,6 +20,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.Parameter;
 import ai.djl.nn.core.Linear;
 import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
@@ -46,7 +47,7 @@ public class OptimizerTest {
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
-                        .optInitializer(Initializer.ONES)
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(sgd)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
@@ -78,7 +79,7 @@ public class OptimizerTest {
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
-                        .optInitializer(Initializer.ONES)
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
@@ -118,7 +119,7 @@ public class OptimizerTest {
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
-                        .optInitializer(Initializer.ONES)
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
@@ -147,7 +148,7 @@ public class OptimizerTest {
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
-                        .optInitializer(Initializer.ONES)
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
@@ -176,7 +177,7 @@ public class OptimizerTest {
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
-                        .optInitializer(Initializer.ONES)
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
@@ -209,7 +210,7 @@ public class OptimizerTest {
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
-                        .optInitializer(Initializer.ONES)
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
@@ -243,7 +244,7 @@ public class OptimizerTest {
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
-                        .optInitializer(Initializer.ONES)
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
@@ -273,7 +274,7 @@ public class OptimizerTest {
         Device[] devices = Device.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
-                        .optInitializer(Initializer.ONES)
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
 

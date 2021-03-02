@@ -13,13 +13,13 @@
 package ai.djl.nn.recurrent;
 
 import ai.djl.MalformedModelException;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
+import ai.djl.nn.ParameterList;
+import ai.djl.util.Pair;
 import java.io.DataInputStream;
 import java.io.IOException;
 
@@ -67,7 +67,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
         bidirectional = builder.bidirectional;
         returnState = builder.returnState;
 
-        ParameterType[] parameterTypes = {ParameterType.WEIGHT, ParameterType.BIAS};
+        Parameter.Type[] parameterTypes = {Parameter.Type.WEIGHT, Parameter.Type.BIAS};
         String[] directions = {"l"};
         if (builder.bidirectional) {
             directions = new String[] {"l", "r"};
@@ -75,12 +75,13 @@ public abstract class RecurrentBlock extends AbstractBlock {
         String[] gateStrings = {"i2h", "h2h"};
 
         for (int i = 0; i < numLayers; i++) {
-            for (ParameterType parameterType : parameterTypes) {
+            for (Parameter.Type parameterType : parameterTypes) {
                 for (String direction : directions) {
                     for (String gateString : gateStrings) {
                         String name =
                                 direction + '_' + i + '_' + gateString + '_' + parameterType.name();
-                        addParameter(new Parameter(name, this, parameterType));
+                        addParameter(
+                                Parameter.builder().setName(name).setType(parameterType).build());
                     }
                 }
             }
@@ -89,7 +90,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
+    public Shape[] getOutputShapes(Shape[] inputs) {
         Shape inputShape = inputs[0];
         Shape outputShape =
                 new Shape(inputShape.get(0), inputShape.get(1), stateSize * getNumDirections());
@@ -109,31 +110,34 @@ public abstract class RecurrentBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void beforeInitialize(Shape[] inputs) {
-        super.beforeInitialize(inputs);
-        Shape inputShape = inputs[0];
-        Block.validateLayout(EXPECTED_LAYOUT, inputShape.getLayout());
+    protected void beforeInitialize(Shape... inputShapes) {
+        super.beforeInitialize(inputShapes);
+        Block.validateLayout(EXPECTED_LAYOUT, inputShapes[0].getLayout());
     }
 
     /** {@inheritDoc} */
     @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
-        int layer = Integer.parseInt(name.split("_")[1]);
-        Shape shape = inputShapes[0];
-        long inputs = shape.get(2);
-        if (layer > 0) {
-            inputs = stateSize * getNumDirections();
+    public void prepare(Shape[] inputs) {
+        Shape inputShape = inputs[0];
+        ParameterList parameters = getDirectParameters();
+        for (Pair<String, Parameter> pair : parameters) {
+            String name = pair.getKey();
+            Parameter parameter = pair.getValue();
+            int layer = Integer.parseInt(name.split("_")[1]);
+            long inputSize = inputShape.get(2);
+            if (layer > 0) {
+                inputSize = stateSize * getNumDirections();
+            }
+            if (name.contains("BIAS")) {
+                parameter.setShape(new Shape(gates * stateSize));
+            } else if (name.contains("i2h")) {
+                parameter.setShape(new Shape(gates * stateSize, inputSize));
+            } else if (name.contains("h2h")) {
+                parameter.setShape(new Shape(gates * stateSize, stateSize));
+            } else {
+                throw new IllegalArgumentException("Invalid parameter name");
+            }
         }
-        if (name.contains("BIAS")) {
-            return new Shape(gates * stateSize);
-        }
-        if (name.contains("i2h")) {
-            return new Shape(gates * stateSize, inputs);
-        }
-        if (name.contains("h2h")) {
-            return new Shape(gates * stateSize, stateSize);
-        }
-        throw new IllegalArgumentException("Invalid parameter name");
     }
 
     /** {@inheritDoc} */

@@ -20,7 +20,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.training.ParameterStore;
-import ai.djl.training.initializer.XavierInitializer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,41 +30,34 @@ public class SingleShotDetectionTest {
 
     @Test
     public void testClassPredictorBlocks() {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Block block = SingleShotDetection.getClassPredictionBlock(5, 10);
-            Assert.assertEquals(
-                    block.getOutputShapes(manager, new Shape[] {new Shape(2, 8, 20, 20)})[0],
-                    new Shape(2, 55, 20, 20));
-            block = SingleShotDetection.getClassPredictionBlock(3, 10);
-            Assert.assertEquals(
-                    block.getOutputShapes(manager, new Shape[] {new Shape(2, 16, 10, 10)})[0],
-                    new Shape(2, 33, 10, 10));
-        }
+        Block block = SingleShotDetection.getClassPredictionBlock(5, 10);
+        Assert.assertEquals(
+                block.getOutputShapes(new Shape[] {new Shape(2, 8, 20, 20)})[0],
+                new Shape(2, 55, 20, 20));
+        block = SingleShotDetection.getClassPredictionBlock(3, 10);
+        Assert.assertEquals(
+                block.getOutputShapes(new Shape[] {new Shape(2, 16, 10, 10)})[0],
+                new Shape(2, 33, 10, 10));
     }
 
     @Test
     public void testAnchorPredictorBlocks() {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Block block = SingleShotDetection.getAnchorPredictionBlock(5);
-            Assert.assertEquals(
-                    block.getOutputShapes(manager, new Shape[] {new Shape(2, 8, 20, 20)})[0],
-                    new Shape(2, 20, 20, 20));
-            block = SingleShotDetection.getClassPredictionBlock(3, 10);
-            Assert.assertEquals(
-                    block.getOutputShapes(manager, new Shape[] {new Shape(2, 16, 10, 10)})[0],
-                    new Shape(2, 33, 10, 10));
-        }
+        Block block = SingleShotDetection.getAnchorPredictionBlock(5);
+        Assert.assertEquals(
+                block.getOutputShapes(new Shape[] {new Shape(2, 8, 20, 20)})[0],
+                new Shape(2, 20, 20, 20));
+        block = SingleShotDetection.getClassPredictionBlock(3, 10);
+        Assert.assertEquals(
+                block.getOutputShapes(new Shape[] {new Shape(2, 16, 10, 10)})[0],
+                new Shape(2, 33, 10, 10));
     }
 
     @Test
     public void testDownSamplingBlock() {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Block sequentialBlock = SingleShotDetection.getDownSamplingBlock(10);
-            Assert.assertEquals(
-                    sequentialBlock
-                            .getOutputShapes(manager, new Shape[] {new Shape(2, 3, 20, 20)})[0],
-                    new Shape(2, 10, 10, 10));
-        }
+        Block sequentialBlock = SingleShotDetection.getDownSamplingBlock(10);
+        Assert.assertEquals(
+                sequentialBlock.getOutputShapes(new Shape[] {new Shape(2, 3, 20, 20)})[0],
+                new Shape(2, 10, 10, 10));
     }
 
     @Test
@@ -97,7 +89,6 @@ public class SingleShotDetectionTest {
                             .setSizes(sizes)
                             .setBaseNetwork(block)
                             .build();
-            ssd.setInitializer(new XavierInitializer());
             ssd.initialize(manager, DataType.FLOAT32, new Shape(32, 3, 256, 256));
             ParameterStore ps = new ParameterStore(manager, false);
             NDList output =
@@ -105,8 +96,7 @@ public class SingleShotDetectionTest {
             Assert.assertEquals(output.get(0).getShape(), new Shape(1, 5444, 4));
             Assert.assertEquals(output.get(1).getShape(), new Shape(32, 5444, 2));
             Assert.assertEquals(output.get(2).getShape(), new Shape(32, 21776));
-            Shape[] outputShapes =
-                    ssd.getOutputShapes(manager, new Shape[] {new Shape(32, 3, 256, 256)});
+            Shape[] outputShapes = ssd.getOutputShapes(new Shape[] {new Shape(32, 3, 256, 256)});
             Assert.assertEquals(outputShapes[0], new Shape(1, 5444, 4));
             Assert.assertEquals(outputShapes[1], new Shape(32, 5444, 2));
             Assert.assertEquals(outputShapes[2], new Shape(32, 21776));

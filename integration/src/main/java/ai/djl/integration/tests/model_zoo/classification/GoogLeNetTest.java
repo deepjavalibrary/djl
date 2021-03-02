@@ -100,7 +100,7 @@ public class GoogLeNetTest {
         Shape currentShape = x.getShape();
 
         Block googLeNet = GoogLeNet.builder().build();
-        googLeNet.setInitializer(Initializer.ONES);
+        googLeNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         googLeNet.initialize(manager, DataType.FLOAT32, currentShape);
 
         Map<String, Shape> shapeMap = new ConcurrentHashMap<>();
@@ -111,7 +111,7 @@ public class GoogLeNetTest {
                             .getChildren()
                             .get(i)
                             .getValue()
-                            .getOutputShapes(manager, new Shape[] {currentShape});
+                            .getOutputShapes(new Shape[] {currentShape});
             currentShape = newShape[0];
             shapeMap.put(googLeNet.getChildren().get(i).getKey(), currentShape);
         }
@@ -130,7 +130,7 @@ public class GoogLeNetTest {
         Block googLeNet = GoogLeNet.builder().build();
         int batchSize = 1;
         NDArray x = manager.ones(new Shape(batchSize, 1, 28, 28));
-        googLeNet.setInitializer(Initializer.ONES);
+        googLeNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         googLeNet.initialize(manager, DataType.FLOAT32, x.getShape());
         NDArray xHat =
                 googLeNet
