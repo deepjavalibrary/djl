@@ -19,6 +19,7 @@ import ai.djl.engine.EngineException;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.jna.LibUtils;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
@@ -99,6 +100,12 @@ public final class MxEngine extends Engine {
     @Override
     public boolean hasCapability(String capability) {
         return JnaUtils.getFeatures().contains(capability);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public SymbolBlock newSymbolBlock(NDManager manager) {
+        return new MxSymbolBlock(manager);
     }
 
     /** {@inheritDoc} */
