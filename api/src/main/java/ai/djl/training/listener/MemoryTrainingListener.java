@@ -53,6 +53,10 @@ public class MemoryTrainingListener extends TrainingListenerAdapter {
     /**
      * Constructs a {@link MemoryTrainingListener} that outputs data in the given directory.
      *
+     * <p>If an output directory is provided, the file "$outputDir/memory.log" will be created after
+     * training with the memory usage results. The log file consists of heap bytes, non-heap bytes,
+     * cpu percentage and rss bytes consumption along with the timestamps.
+     *
      * @param outputDir the directory to output the tracked memory data in
      */
     public MemoryTrainingListener(String outputDir) {
@@ -81,7 +85,9 @@ public class MemoryTrainingListener extends TrainingListenerAdapter {
     }
 
     /**
-     * Collect memory information.
+     * Collects memory information. In order to collect metrics, the {@link Trainer} must set
+     * metrics. Monitor the metrics by enabling the following flag in the command line arguments:
+     * -Dcollect-memory=true
      *
      * @param metrics {@link Metrics} to store memory information
      */

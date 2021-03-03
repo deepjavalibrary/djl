@@ -108,7 +108,8 @@ public class SaveModelTrainingListener extends TrainingListenerAdapter {
     }
 
     /**
-     * Returns the checkpoint frequency (or -1 for no checkpointing).
+     * Returns the checkpoint frequency (or -1 for no checkpointing) in {@link
+     * SaveModelTrainingListener}.
      *
      * @return the checkpoint frequency (or -1 for no checkpointing)
      */
@@ -117,7 +118,7 @@ public class SaveModelTrainingListener extends TrainingListenerAdapter {
     }
 
     /**
-     * Sets the checkpoint frequency.
+     * Sets the checkpoint frequency in {@link SaveModelTrainingListener}.
      *
      * @param checkpoint how many epochs between checkpoints (or -1 for no checkpoints)
      */
