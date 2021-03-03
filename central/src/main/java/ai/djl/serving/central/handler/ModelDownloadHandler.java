@@ -84,14 +84,12 @@ public class ModelDownloadHandler extends SimpleChannelInboundHandler<FullHttpRe
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws IOException, ModelNotFoundException {
-        final Logger logger = LoggerFactory.getLogger(ModelDownloadHandler.class);
         QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
         String modelName=NettyUtils.getParameter(decoder, "modelName", null);
         CompletableFuture.supplyAsync(
                 () -> {
                     try {
                         if (modelName!=null) {
-                            logger.info(String.valueOf(ModelLink.linkFinder(modelName)));
                             return ModelLink.linkFinder(modelName);
                         } else {
                             throw new BadRequestException("modelName is mandatory.");
