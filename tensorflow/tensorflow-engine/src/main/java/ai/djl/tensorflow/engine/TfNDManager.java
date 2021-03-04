@@ -149,8 +149,15 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray create(String data) {
-        // create scalar tensor with float
         try (Tensor<TString> tensor = TString.scalarOf(data)) {
+            return new TfNDArray(this, tensor);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(String[] data) {
+        try (Tensor<TString> tensor = TString.vectorOf(data)) {
             return new TfNDArray(this, tensor);
         }
     }

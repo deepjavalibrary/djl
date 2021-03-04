@@ -12,12 +12,17 @@
  */
 package ai.djl.onnxruntime.engine;
 
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.onnxruntime.zoo.tabular.randomforest.IrisFlower;
 import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
@@ -61,6 +66,28 @@ public class OrtTest {
              * to djl cache directory.
              */
             throw new SkipException("Ignore missing libgomp.so.1 error.");
+        }
+    }
+
+    @Test
+    public void testStringTensor()
+            throws MalformedModelException, ModelNotFoundException, IOException,
+                    TranslateException {
+        Criteria<NDList, NDList> criteria =
+                Criteria.builder()
+                        .setTypes(NDList.class, NDList.class)
+                        .optEngine("OnnxRuntime")
+                        .optModelUrls(
+                                "https://resources.djl.ai/test-models/onnxruntime/pipeline_tfidf.zip")
+                        .build();
+        try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria);
+                Predictor<NDList, NDList> predictor = model.newPredictor()) {
+            OrtNDManager manager = (OrtNDManager) OrtNDManager.getSystemManager().newSubManager();
+            NDArray stringNd =
+                    manager.create(
+                            new String[] {" Re: Jack can't hide from keith@cco.", " I like dogs"},
+                            new Shape(1, 2));
+            predictor.predict(new NDList(stringNd));
         }
     }
 }

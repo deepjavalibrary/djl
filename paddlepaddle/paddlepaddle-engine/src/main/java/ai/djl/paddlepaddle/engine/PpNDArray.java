@@ -42,23 +42,6 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
         manager.attach(getUid(), this);
     }
 
-    /**
-     * Constructs an PaddlePaddle NDArray from a {@link PpNDManager} (internal. Use {@link
-     * NDManager} instead).
-     *
-     * @param manager the manager to attach the new array to
-     * @param pointer the native tensor handle
-     * @param shape the shape of {@code PpNDArray}
-     * @param dataType the data type of {@code PpNDArray}
-     */
-    public PpNDArray(PpNDManager manager, long pointer, Shape shape, DataType dataType) {
-        super(pointer);
-        this.manager = manager;
-        this.shape = shape;
-        this.dataType = dataType;
-        manager.attach(getUid(), this);
-    }
-
     /** {@inheritDoc} */
     @Override
     public NDManager getManager() {
