@@ -434,6 +434,7 @@ public class ModelServerTest {
         HttpRequest req = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -452,6 +453,7 @@ public class ModelServerTest {
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/InvalidUrl");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -471,6 +473,7 @@ public class ModelServerTest {
                         HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, "/predictions/InvalidModel");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -489,6 +492,7 @@ public class ModelServerTest {
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/predictions");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -508,6 +512,7 @@ public class ModelServerTest {
                         HttpVersion.HTTP_1_1, HttpMethod.GET, "/predictions/InvalidModel");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -526,6 +531,7 @@ public class ModelServerTest {
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/InvalidUrl");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -544,6 +550,7 @@ public class ModelServerTest {
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.PUT, "/models");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -562,6 +569,7 @@ public class ModelServerTest {
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/models/noop");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -581,6 +589,7 @@ public class ModelServerTest {
                         HttpVersion.HTTP_1_1, HttpMethod.GET, "/models/InvalidModel");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -599,6 +608,7 @@ public class ModelServerTest {
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/models");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -618,6 +628,7 @@ public class ModelServerTest {
                         HttpVersion.HTTP_1_1, HttpMethod.POST, "/models?url=InvalidUrl");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -643,6 +654,7 @@ public class ModelServerTest {
                                 + URLEncoder.encode(url, StandardCharsets.UTF_8.name()));
         channel.writeAndFlush(req);
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -663,6 +675,7 @@ public class ModelServerTest {
                         "/models/mlp?min_worker=10&max_worker=1");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -681,6 +694,7 @@ public class ModelServerTest {
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.PUT, "/models/fake");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -699,6 +713,7 @@ public class ModelServerTest {
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.DELETE, "/models/fake");
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -731,6 +746,7 @@ public class ModelServerTest {
         req.headers().set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_OCTET_STREAM);
         channel.writeAndFlush(req).sync();
         latch.await();
+        channel.closeFuture().sync();
         channel.close();
 
         ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
