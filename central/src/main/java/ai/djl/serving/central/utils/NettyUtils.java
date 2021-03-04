@@ -13,10 +13,7 @@
 package ai.djl.serving.central.utils;
 
 import ai.djl.modality.Input;
-import ai.djl.util.JsonUtils;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.multipart.Attribute;
 import io.netty.handler.codec.http.multipart.FileUpload;
@@ -29,38 +26,6 @@ import java.util.List;
 public final class NettyUtils {
 
     private NettyUtils() {}
-
-    /**
-     * Sends the json object to client.
-     *
-     * @param ctx the connection context
-     * @param json the json object
-     */
-    public static void sendJsonResponse(ChannelHandlerContext ctx, Object json) {
-        sendJsonResponse(ctx, JsonUtils.GSON_PRETTY.toJson(json), HttpResponseStatus.OK);
-    }
-
-    /**
-     * Sends the json string to client with specified status.
-     *
-     * @param ctx the connection context
-     * @param json the json string
-     * @param status the HTTP status
-     */
-    public static void sendJsonResponse(
-            ChannelHandlerContext ctx, Object json, HttpResponseStatus status) {
-        sendJsonResponse(ctx, JsonUtils.GSON_PRETTY.toJson(json), status);
-    }
-
-    /**
-     * Sends the json string to client.
-     *
-     * @param ctx the connection context
-     * @param json the json string
-     */
-    public static void sendJsonResponse(ChannelHandlerContext ctx, String json) {
-        sendJsonResponse(ctx, json, HttpResponseStatus.OK);
-    }
 
     /**
      * Returns the bytes for the specified {@code ByteBuf}.
