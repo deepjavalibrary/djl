@@ -83,12 +83,10 @@ public class HttpRequestResponse {
     }
 
     /**
-     * send content of a ByteBuffer as
-     *  response to the client.
+     * send content of a ByteBuffer as response to the client.
      *
      * @param ctx channel context
-     * @param request full request
-     * @param entity the response
+     * @param buffer response buffer
      */
     public void sendByteBuffer(ChannelHandlerContext ctx, ByteBuf buffer) {
 
@@ -103,11 +101,11 @@ public class HttpRequestResponse {
      * connection after the response being sent.
      *
      * @param ctx context
-     * @param request full request
      * @param response full response
+     * @param keepAlive is alive or not
      */
     private void sendAndCleanupConnection(
-            ChannelHandlerContext ctx, FullHttpResponse response, boolean keepAlive ) {
+            ChannelHandlerContext ctx, FullHttpResponse response, boolean keepAlive) {
         HttpUtil.setContentLength(response, response.content().readableBytes());
         if (!keepAlive) {
             // We're going to close the connection as soon as the response is sent,

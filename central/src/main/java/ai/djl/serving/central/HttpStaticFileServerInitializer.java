@@ -13,8 +13,8 @@
 package ai.djl.serving.central;
 
 import ai.djl.serving.central.handler.HttpStaticFileServerHandler;
-import ai.djl.serving.central.handler.ModelMetaDataHandler;
 import ai.djl.serving.central.handler.ModelDownloadHandler;
+import ai.djl.serving.central.handler.ModelMetaDataHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;

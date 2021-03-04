@@ -12,42 +12,21 @@
  */
 package ai.djl.serving.central.utils;
 
-import ai.djl.ModelException;
 import ai.djl.modality.Input;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.util.JsonUtils;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpUtil;
-import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.multipart.Attribute;
 import io.netty.handler.codec.http.multipart.FileUpload;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
-import io.netty.util.AttributeKey;
-import io.netty.util.CharsetUtil;
 import java.io.IOException;
-import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** A utility class that handling Netty request and response. */
 public final class NettyUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger("NettyUtils");
 
     private NettyUtils() {}
 
@@ -82,8 +61,6 @@ public final class NettyUtils {
     public static void sendJsonResponse(ChannelHandlerContext ctx, String json) {
         sendJsonResponse(ctx, json, HttpResponseStatus.OK);
     }
-
-
 
     /**
      * Returns the bytes for the specified {@code ByteBuf}.
