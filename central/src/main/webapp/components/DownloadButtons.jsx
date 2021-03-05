@@ -6,12 +6,13 @@ import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios'
 
 
-const useFetch = (modelName) => {
+const useFetch = (model) => {
 	const [data, setData] = useState([]);
 
 	useEffect(() => {
 		async function fetchData() {
-			axios.get("http://"+window.location.host+"/serving/models?modelName="+modelName)
+
+			axios.get("http://"+window.location.host+"/serving/models?modelName="+model.name+"&artifactId="+model.metadata.artifactId+"&groupId="+model.metadata.groupId)
 				.then(function(response) {
 					let appdata = Object.keys(response.data).map(function(key) {
 						return {
@@ -24,7 +25,7 @@ const useFetch = (modelName) => {
 				})
 		}
 		fetchData();
-	}, [modelName]);
+	}, [model.modelName,model.metadata.artifactId,model.metadata.groupId]);
 
 	return data;
 };
@@ -32,7 +33,7 @@ const useFetch = (modelName) => {
 
 
 export default function ModelDownloadButtons(props) {
-	const modelUris = useFetch(props.modelName);
+	const modelUris = useFetch(props.model);
     return (
     		<>
     			{Object.keys(modelUris).map((keys) => (

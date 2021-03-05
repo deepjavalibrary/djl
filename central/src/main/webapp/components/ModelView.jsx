@@ -253,7 +253,7 @@ export default function ModelView(props) {
 						}
 					</TabPanel>
 					<TabPanel value={index} index={6} className={classes.tabpanel}>
-                        <ModelDownloadButtons modelName={props.model.name}/>
+                        <ModelDownloadButtons model={props.model}/>
                     </TabPanel>
 				</div>
 

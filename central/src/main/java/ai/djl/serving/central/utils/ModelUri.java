@@ -33,30 +33,35 @@ public final class ModelUri {
     /**
      * Takes in a model name and returns a Map of download URIs.
      *
-     * @param modelName the connection context
+     * @param artifactId is the artifactId of the model
+     * @param groupId is the groupId of the model
+     * @param name is the name of the model
      * @return a map of download URIs
      * @throws IOException if the uri could not be found
      * @throws ModelNotFoundException if Model can not be found
      */
-    public static Map<String, URI> uriFinder(String modelName)
+    public static Map<String, URI> uriFinder(String artifactId, String groupId, String name)
             throws IOException, ModelNotFoundException {
-        Criteria<?, ?> criteria = Criteria.builder().optModelName(modelName).build();
+        Criteria<?, ?> criteria =
+                Criteria.builder()
+                        .optModelName(name)
+                        .optGroupId(groupId)
+                        .optArtifactId(artifactId)
+                        .build();
         Map<Application, List<Artifact>> models = ModelZoo.listModels(criteria);
         Map<String, URI> uris = new ConcurrentHashMap<>();
         models.forEach(
                 (app, list) -> {
                     list.forEach(
                             artifact -> {
-                                if (artifact.getName().equals(modelName)) {
-                                    for (Map.Entry<String, Artifact.Item> entry :
-                                            artifact.getFiles().entrySet()) {
-                                        URI fileUri = URI.create(entry.getValue().getUri());
-                                        URI baseUri = artifact.getMetadata().getRepositoryUri();
-                                        if (!fileUri.isAbsolute()) {
-                                            fileUri = base.resolve(baseUri).resolve(fileUri);
-                                        }
-                                        uris.put(entry.getKey(), fileUri);
+                                for (Map.Entry<String, Artifact.Item> entry :
+                                        artifact.getFiles().entrySet()) {
+                                    URI fileUri = URI.create(entry.getValue().getUri());
+                                    URI baseUri = artifact.getMetadata().getRepositoryUri();
+                                    if (!fileUri.isAbsolute()) {
+                                        fileUri = base.resolve(baseUri).resolve(fileUri);
                                     }
+                                    uris.put(entry.getKey(), fileUri);
                                 }
                             });
                 });

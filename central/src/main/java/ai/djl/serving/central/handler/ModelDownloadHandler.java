@@ -50,11 +50,14 @@ public class ModelDownloadHandler extends SimpleChannelInboundHandler<FullHttpRe
             throws IOException, ModelNotFoundException {
         QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
         String modelName = NettyUtils.getParameter(decoder, "modelName", null);
+        String modelGroupId = NettyUtils.getParameter(decoder, "groupId", null);
+        String modelArtifactId = NettyUtils.getParameter(decoder, "artifactId", null);
         CompletableFuture.supplyAsync(
                         () -> {
                             try {
                                 if (modelName != null) {
-                                    return ModelUri.uriFinder(modelName);
+                                    return ModelUri.uriFinder(
+                                            modelArtifactId, modelGroupId, modelName);
                                 } else {
                                     throw new BadRequestException("modelName is mandatory.");
                                 }
