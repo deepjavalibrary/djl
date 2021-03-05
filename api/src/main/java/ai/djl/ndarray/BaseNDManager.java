@@ -51,6 +51,12 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray create(String[] data) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray create(Shape shape, DataType dataType) {
         throw new UnsupportedOperationException("Not supported!");
     }

@@ -73,7 +73,7 @@ Maven:
 <dependency>
     <groupId>com.microsoft.onnxruntime</groupId>
     <artifactId>onnxruntime_gpu</artifactId>
-    <version>1.5.2</version>
+    <version>1.7.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -83,5 +83,5 @@ Gradle:
     implementation("ai.djl.onnxruntime:onnxruntime-engine:0.10.0") {
         exclude group: "com.microsoft.onnxruntime", module: "onnxruntime"
     }
-    implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.5.2"
+    implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.7.0"
 ```

@@ -60,7 +60,7 @@ public final class PpEngine extends Engine {
         if (alternativeEngine == null) {
             Engine engine = Engine.getInstance();
             if (engine.getRank() < getRank()) {
-                // alternativeEngine should not have the same rank as ORT
+                // alternativeEngine should not have the same rank as Paddle
                 alternativeEngine = engine;
             }
         }

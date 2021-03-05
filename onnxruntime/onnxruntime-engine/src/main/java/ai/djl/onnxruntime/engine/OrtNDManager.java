@@ -65,6 +65,33 @@ public class OrtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray create(String data) {
+        return create(new String[] {data}, new Shape(1));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(String[] data) {
+        return create(data, new Shape(data.length));
+    }
+
+    /**
+     * Create A String tensor based on the provided shape.
+     *
+     * @param data the flattened String array
+     * @param shape the shape of the String NDArray
+     * @return a new instance of {@link NDArray}
+     */
+    public NDArray create(String[] data, Shape shape) {
+        try {
+            return new OrtNDArray(this, OrtUtils.toTensor(env, data, shape));
+        } catch (OrtException e) {
+            throw new EngineException(e);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray zeros(Shape shape, DataType dataType) {
         int bytes = dataType.getNumOfBytes();
         int size = Math.toIntExact(bytes * shape.size());
