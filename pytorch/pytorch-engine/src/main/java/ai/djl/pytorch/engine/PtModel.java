@@ -26,6 +26,7 @@ import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -99,6 +100,18 @@ public class PtModel extends BaseModel {
             }
             readParameters(paramFile, options);
         }
+    }
+
+    /**
+     * Load PyTorch model from {@link InputStream}.
+     *
+     * <p>Currently, only TorchScript file are supported
+     *
+     * @param modelStream the stream of the model file
+     * @throws IOException model loading error
+     */
+    public void load(InputStream modelStream) throws IOException {
+        block = JniUtils.loadModule((PtNDManager) manager, modelStream, manager.getDevice(), false);
     }
 
     private Path findModelFile(String prefix) {

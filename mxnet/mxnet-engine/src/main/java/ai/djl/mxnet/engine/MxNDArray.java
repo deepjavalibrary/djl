@@ -268,9 +268,16 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         return hasGradient;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray stopGradient() {
         return manager.invoke("stop_gradient", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String[] toStringArray() {
+        throw new UnsupportedOperationException("String NDArray is not supported!");
     }
 
     /** {@inheritDoc} */

@@ -54,6 +54,9 @@ public final class TfLiteEngine extends Engine {
     }
 
     private Engine getAlternativeEngine() {
+        if (Boolean.getBoolean("ai.djl.tflite.disable_alternative")) {
+            return null;
+        }
         if (alternativeEngine == null) {
             Engine engine = Engine.getInstance();
             if (engine.getRank() < getRank()) {
@@ -67,7 +70,7 @@ public final class TfLiteEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "1.4.0";
+        return "2.4.1";
     }
 
     /** {@inheritDoc} */

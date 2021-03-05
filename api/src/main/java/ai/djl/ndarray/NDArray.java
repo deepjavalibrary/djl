@@ -372,6 +372,15 @@ public interface NDArray extends AutoCloseable {
     }
 
     /**
+     * Converts this {@code NDArray} to a String array.
+     *
+     * <p>This method is only applicable to the String typed NDArray and not for printing purpose
+     *
+     * @return Array of Strings
+     */
+    String[] toStringArray();
+
+    /**
      * Converts this {@code NDArray} to a Number array based on its {@link DataType}.
      *
      * @return a Number array
