@@ -31,7 +31,7 @@ public final class ModelUri {
     private ModelUri() {}
 
     /**
-     * Takes in a model name and returns a Map of download URIs.
+     * Takes in a model name, artifactId, and groupId to return a Map of download URIs.
      *
      * @param artifactId is the artifactId of the model
      * @param groupId is the groupId of the model
