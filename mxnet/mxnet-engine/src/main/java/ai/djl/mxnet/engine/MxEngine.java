@@ -40,6 +40,7 @@ import java.nio.file.Paths;
 public final class MxEngine extends Engine {
 
     public static final String ENGINE_NAME = "MXNet";
+    private static final String MXNET_EXTRA_LIBRARY_VERBOSE = "MXNET_EXTRA_LIBRARY_VERBOSE";
 
     /** Constructs an MXNet Engine. */
     private MxEngine() {}
@@ -56,6 +57,9 @@ public final class MxEngine extends Engine {
 
             // load extra MXNet library
             String paths = System.getenv("MXNET_EXTRA_LIBRARY_PATH");
+            boolean extraLibVerbose =
+                    System.getenv().containsKey(MXNET_EXTRA_LIBRARY_VERBOSE)
+                            && System.getenv(MXNET_EXTRA_LIBRARY_VERBOSE).equals("true");
             if (paths != null) {
                 String[] files = paths.split(",");
                 for (String file : files) {
@@ -63,7 +67,7 @@ public final class MxEngine extends Engine {
                     if (Files.notExists(path)) {
                         throw new FileNotFoundException("Extra Library not found: " + file);
                     }
-                    JnaUtils.loadLib(path.toAbsolutePath().toString(), 1);
+                    JnaUtils.loadLib(path.toAbsolutePath().toString(), extraLibVerbose);
                 }
             }
 

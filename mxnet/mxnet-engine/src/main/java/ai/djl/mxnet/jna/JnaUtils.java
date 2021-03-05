@@ -1254,8 +1254,9 @@ public final class JnaUtils {
         return null;
     }
 
-    public static void loadLib(String path, int verbose) {
-        checkCall(LIB.MXLoadLib(path, verbose));
+    public static void loadLib(String path, boolean verbose) {
+        int intVerbose = verbose ? 1 : 0;
+        checkCall(LIB.MXLoadLib(path, intVerbose));
     }
 
     public static Pointer optimizeFor(Symbol current, String backend, Device device) {
