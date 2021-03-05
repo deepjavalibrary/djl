@@ -13,9 +13,9 @@
 package ai.djl.serving.central.handler;
 
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.serving.central.classes.ModelLink;
 import ai.djl.serving.central.http.BadRequestException;
 import ai.djl.serving.central.responseencoder.HttpRequestResponse;
+import ai.djl.serving.central.utils.ModelUri;
 import ai.djl.serving.central.utils.NettyUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -34,13 +34,13 @@ public class ModelDownloadHandler extends SimpleChannelInboundHandler<FullHttpRe
 
     HttpRequestResponse jsonResponse;
 
-    /** constructing a ModelDownloadHandler. */
+    /** Constructs a ModelDownloadHandler. */
     public ModelDownloadHandler() {
         jsonResponse = new HttpRequestResponse();
     }
 
     /**
-     * handle the deployment request by forwarding the request to the serving-instance.
+     * Handles the deployment request by forwarding the request to the serving-instance.
      *
      * @param ctx the context
      * @param request the full request
@@ -54,7 +54,7 @@ public class ModelDownloadHandler extends SimpleChannelInboundHandler<FullHttpRe
                         () -> {
                             try {
                                 if (modelName != null) {
-                                    return ModelLink.linkFinder(modelName);
+                                    return ModelUri.uriFinder(modelName);
                                 } else {
                                     throw new BadRequestException("modelName is mandatory.");
                                 }
@@ -64,7 +64,7 @@ public class ModelDownloadHandler extends SimpleChannelInboundHandler<FullHttpRe
                             }
                         })
                 .exceptionally((ex) -> Collections.emptyMap())
-                .thenAccept(linksMap -> jsonResponse.sendAsJson(ctx, request, linksMap));
+                .thenAccept(uriMap -> jsonResponse.sendAsJson(ctx, request, uriMap));
     }
 
     /** {@inheritDoc} */

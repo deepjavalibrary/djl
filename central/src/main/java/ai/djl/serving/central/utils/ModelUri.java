@@ -10,10 +10,11 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.serving.central.classes;
+package ai.djl.serving.central.utils;
 
 import ai.djl.Application;
 import ai.djl.repository.Artifact;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import java.io.IOException;
@@ -21,33 +22,27 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-/**
- * A class to find the URL link when given a model name.
- *
- * @author anfee1@morgan.edu
- */
-public final class ModelLink {
+/** A class to find the URIs when given a model name. */
+public final class ModelUri {
 
     private static URI base = URI.create("https://mlrepo.djl.ai/");
-    private static Map<String, URI> links = new ConcurrentHashMap<>();
-    private static final Logger logger = LoggerFactory.getLogger(ModelLink.class);
 
-    private ModelLink() {}
+    private ModelUri() {}
 
     /**
-     * Takes in a model name and returns a Map of download links.
+     * Takes in a model name and returns a Map of download URIs.
      *
      * @param modelName the connection context
-     * @return This returns a map of download links
-     * @throws IOException throws an exception
-     * @throws ModelNotFoundException throws an exception
+     * @return a map of download URIs
+     * @throws IOException if the uri could not be found
+     * @throws ModelNotFoundException if Model can not be found
      */
-    public static Map<String, URI> linkFinder(String modelName)
+    public static Map<String, URI> uriFinder(String modelName)
             throws IOException, ModelNotFoundException {
-        Map<Application, List<Artifact>> models = ModelZoo.listModels();
+        Criteria<?, ?> criteria = Criteria.builder().optModelName(modelName).build();
+        Map<Application, List<Artifact>> models = ModelZoo.listModels(criteria);
+        Map<String, URI> uris = new ConcurrentHashMap<>();
         models.forEach(
                 (app, list) -> {
                     list.forEach(
@@ -60,15 +55,11 @@ public final class ModelLink {
                                         if (!fileUri.isAbsolute()) {
                                             fileUri = base.resolve(baseUri).resolve(fileUri);
                                         }
-                                        try {
-                                            links.put(entry.getKey(), fileUri);
-                                        } catch (Exception e) {
-                                            logger.info(String.valueOf(e));
-                                        }
+                                        uris.put(entry.getKey(), fileUri);
                                     }
                                 }
                             });
                 });
-        return links;
+        return uris;
     }
 }

@@ -14,7 +14,6 @@ const useFetch = (modelName) => {
 			axios.get("http://"+window.location.host+"/serving/models?modelName="+modelName)
 				.then(function(response) {
 					let appdata = Object.keys(response.data).map(function(key) {
-						console.log(key)
 						return {
 							key: key,
 							link: response.data[key]
@@ -23,16 +22,9 @@ const useFetch = (modelName) => {
 					setData(appdata);
 					console.log(appdata)
 				})
-				.catch(function(error) {
-					console.log(error);
-				})
-				.then(function() {
-					// always executed
-				});
-
 		}
 		fetchData();
-	}, ["http://"+window.location.host+"/serving/models?modelName="+modelName]);
+	}, [modelName]);
 
 	return data;
 };
@@ -40,11 +32,11 @@ const useFetch = (modelName) => {
 
 
 export default function ModelDownloadButtons(props) {
-	const modelLinks = useFetch(props.modelName);
+	const modelUris = useFetch(props.modelName);
     return (
     		<>
-    			{Object.keys(modelLinks).map((keys) => (
-                   <Button href={modelLinks[keys].link}>Download {modelLinks[keys].key}</Button>
+    			{Object.keys(modelUris).map((keys) => (
+                   <Button href={modelUris[keys].link}>Download {modelUris[keys].key}</Button>
 
     				)
     			)}

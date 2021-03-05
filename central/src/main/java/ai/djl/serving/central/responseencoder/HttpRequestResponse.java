@@ -36,7 +36,7 @@ import io.netty.util.CharsetUtil;
 import java.lang.reflect.Modifier;
 
 /**
- * serialize to json and send the response to the client.
+ * Serialize to json and send the response to the client.
  *
  * @author erik.bamberg@web.de
  */
