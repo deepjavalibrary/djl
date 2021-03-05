@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.onnxruntime.zoo.tabular.randomforest;
+package ai.djl.onnxruntime.zoo.tabular.softmax_regression;
 
 /** A class holds the iris flower features. */
 public class IrisFlower {
