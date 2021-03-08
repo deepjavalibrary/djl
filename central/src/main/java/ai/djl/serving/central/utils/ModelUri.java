@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /** A class to find the URIs when given a model name. */
 public final class ModelUri {
 
+    // TODO: Use the artifact repository to create base URI
     private static URI base = URI.create("https://mlrepo.djl.ai/");
 
     private ModelUri() {}
