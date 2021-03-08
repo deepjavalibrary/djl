@@ -110,7 +110,12 @@ nav:
         - TensorFlow Model Zoo: 'tensorflow/tensorflow-model-zoo/README.md'
   - PaddlePaddle:
       - Overview: 'paddlepaddle/README.md'
-      - Load a PaddlePaddle Model: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
+      - Facemask detection using PaddlePaddle: 
+          - English: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
+          - 中文: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle_zh.ipynb'
+      - PaddleOCR example:
+          - English: 'jupyter/paddlepaddle/paddle_ocr_java.ipynb'
+          - 中文: 'jupyter/paddlepaddle/paddle_ocr_java_zh.ipynb'
       - Modules:
           - PaddlePaddle Engine: 'paddlepaddle/paddlepaddle-engine/README.md'
           - PaddlePaddle Model Zoo: 'paddlepaddle/paddlepaddle-model-zoo/README.md'
