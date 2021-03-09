@@ -57,9 +57,10 @@ public final class MxEngine extends Engine {
 
             // load extra MXNet library
             String paths = System.getenv("MXNET_EXTRA_LIBRARY_PATH");
-            boolean extraLibVerbose =
-                    System.getenv().containsKey(MXNET_EXTRA_LIBRARY_VERBOSE)
-                            && System.getenv(MXNET_EXTRA_LIBRARY_VERBOSE).equals("true");
+            boolean extraLibVerbose = false;
+            if (System.getenv().containsKey(MXNET_EXTRA_LIBRARY_VERBOSE)) {
+                extraLibVerbose = Boolean.parseBoolean(System.getenv(MXNET_EXTRA_LIBRARY_VERBOSE));
+            }
             if (paths != null) {
                 String[] files = paths.split(",");
                 for (String file : files) {

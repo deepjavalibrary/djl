@@ -84,6 +84,7 @@ nav:
       - Overview: 'mxnet/README.md'
       - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
       - Load a MXNet Model: 'jupyter/load_mxnet_model.ipynb'
+      - Backend Optimizer for MXNet: 'docs/mxnet/mxnet_backend_optimizer.md'
       - Modules:
         - MXNet Engine: 'mxnet/mxnet-engine/README.md'
         - MXNet Model Zoo: 'mxnet/mxnet-model-zoo/README.md'
