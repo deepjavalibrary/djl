@@ -47,6 +47,9 @@ public final class DlrEngine extends Engine {
     }
 
     private Engine getAlternativeEngine() {
+        if (Boolean.getBoolean("ai.djl.dlr.disable_alternative")) {
+            return null;
+        }
         if (alternativeEngine == null) {
             Engine engine = Engine.getInstance();
             if (engine.getRank() < getRank()) {

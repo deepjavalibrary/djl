@@ -57,6 +57,9 @@ public final class PpEngine extends Engine {
     }
 
     Engine getAlternativeEngine() {
+        if (Boolean.getBoolean("ai.djl.paddlepaddle.disable_alternative")) {
+            return null;
+        }
         if (alternativeEngine == null) {
             Engine engine = Engine.getInstance();
             if (engine.getRank() < getRank()) {

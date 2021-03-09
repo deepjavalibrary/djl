@@ -137,6 +137,12 @@ public interface NDArrayAdapter extends NDArray {
 
     /** {@inheritDoc} */
     @Override
+    default String[] toStringArray() {
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     default ByteBuffer toByteBuffer() {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }

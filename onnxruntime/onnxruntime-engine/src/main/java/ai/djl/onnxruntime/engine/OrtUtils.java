@@ -98,6 +98,8 @@ final class OrtUtils {
                 return DataType.BOOLEAN;
             case UNKNOWN:
                 return DataType.UNKNOWN;
+            case STRING:
+                return DataType.STRING;
             default:
                 throw new UnsupportedOperationException("type is not supported: " + javaType);
         }

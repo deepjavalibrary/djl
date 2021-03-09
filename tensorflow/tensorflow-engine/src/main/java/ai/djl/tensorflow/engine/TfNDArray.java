@@ -257,6 +257,13 @@ public class TfNDArray implements NDArray {
         return result;
     }
 
+    @Override
+    public String[] toStringArray() {
+        // TODO: Parse String Array from bytes[]
+        throw new UnsupportedOperationException(
+                "TensorFlow does not supporting printing String NDArray");
+    }
+
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {

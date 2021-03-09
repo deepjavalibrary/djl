@@ -213,6 +213,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public String[] toStringArray() {
+        throw new UnsupportedOperationException("String NDArray is not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void set(Buffer data) {
         int size = data.remaining();
         if (size != size()) {

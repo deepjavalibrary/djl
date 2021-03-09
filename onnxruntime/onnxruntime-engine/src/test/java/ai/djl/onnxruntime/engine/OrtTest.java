@@ -73,6 +73,7 @@ public class OrtTest {
     public void testStringTensor()
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
+        System.setProperty("ai.djl.onnx.disable_alternative", "true");
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)
@@ -82,12 +83,15 @@ public class OrtTest {
                         .build();
         try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria);
                 Predictor<NDList, NDList> predictor = model.newPredictor()) {
-            OrtNDManager manager = (OrtNDManager) OrtNDManager.getSystemManager().newSubManager();
+            OrtNDManager manager = (OrtNDManager) model.getNDManager();
             NDArray stringNd =
                     manager.create(
                             new String[] {" Re: Jack can't hide from keith@cco.", " I like dogs"},
                             new Shape(1, 2));
-            predictor.predict(new NDList(stringNd));
+            NDList result = predictor.predict(new NDList(stringNd));
+            Assert.assertEquals(result.size(), 2);
+            Assert.assertEquals(result.get(0).toLongArray(), new long[] {1});
         }
+        System.clearProperty("ai.djl.onnx.disable_alternative");
     }
 }
