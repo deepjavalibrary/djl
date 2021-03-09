@@ -65,7 +65,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         this.handle = new AtomicReference<>(handle);
         this.manager = manager;
         uid = String.valueOf(handle);
-        manager.attach(uid, this);
+        manager.attachInternal(uid, this);
         // training mode is on by default
         isTrain = true;
         first = true;
@@ -90,7 +90,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         Long pointer = handle.getAndSet(null);
         if (pointer != null) {
             JniUtils.deleteModule(pointer);
-            manager.detach(uid);
+            manager.detachInternal(uid);
             manager = null;
         }
     }
@@ -177,7 +177,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         long rawHandle = JniUtils.loadModuleHandle(is, manager.getDevice(), true);
         this.handle = new AtomicReference<>(rawHandle);
         uid = String.valueOf(rawHandle);
-        manager.attach(uid, this);
+        manager.attachInternal(uid, this);
     }
 
     /**

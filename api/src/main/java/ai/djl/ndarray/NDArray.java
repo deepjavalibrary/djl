@@ -40,7 +40,7 @@ import java.util.stream.LongStream;
  * href="https://github.com/awslabs/djl/blob/master/docs/development/memory_management.md">NDArray
  * Memory Management Guide</a>
  */
-public interface NDArray extends AutoCloseable {
+public interface NDArray extends NDResource {
 
     /**
      * Decodes {@code NDArray} from bytes.
@@ -52,13 +52,6 @@ public interface NDArray extends AutoCloseable {
     static NDArray decode(NDManager manager, byte[] byteArray) {
         return manager.decode(byteArray);
     }
-
-    /**
-     * Returns the {@link NDManager} used to create this {@code NDArray}.
-     *
-     * @return the {@link NDManager} used to create this {@code NDArray}
-     */
-    NDManager getManager();
 
     /**
      * Returns the name of this {@code NDArray}.
@@ -145,27 +138,6 @@ public interface NDArray extends AutoCloseable {
     default byte[] encode() {
         return NDSerializer.encode(this);
     }
-
-    /**
-     * Attaches this {@code NDArray} to the specified {@link NDManager}.
-     *
-     * <p>Attached resource will be closed when the {@link NDManager} is closed.
-     *
-     * @param manager the {@link NDManager} to be attached
-     * @return the original {@link NDManager}
-     */
-    NDManager attach(NDManager manager);
-
-    /**
-     * Detaches the {@code NDArray} from current {@link NDManager}'s lifecycle.
-     *
-     * <p>The {@code NDArray} becomes un-managed, it is the user's responsibility to close the
-     * {@code NDArray}. Failure to close the resource might cause your machine to run out of native
-     * memory.
-     *
-     * @see NDManager
-     */
-    void detach();
 
     /**
      * Moves this {@code NDArray} to a different {@link Device}.

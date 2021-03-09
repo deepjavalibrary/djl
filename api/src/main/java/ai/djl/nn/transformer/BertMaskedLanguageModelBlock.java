@@ -114,30 +114,32 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
         NDArray sequenceOutput = inputs.get(0); // (B, S, E)
         NDArray maskedIndices = inputs.get(1); // (B, I)
         NDArray embeddingTable = inputs.get(2); // (D, E)
-        MemoryScope scope = MemoryScope.from(sequenceOutput).add(maskedIndices);
-        NDArray gatheredTokens = gatherFromIndices(sequenceOutput, maskedIndices); // (B * I, E)
-        NDArray projectedTokens =
-                hiddenActivation.apply(
-                        sequenceProjection
-                                .forward(ps, new NDList(gatheredTokens), training)
-                                .head()); // (B * I, E)
-        NDArray normalizedTokens =
-                sequenceNorm
-                        .forward(ps, new NDList(projectedTokens), training)
-                        .head(); // (B * I, E)
-        // raw logits for each position to correspond to an entry in the embedding table
-        NDArray embeddingTransposed = embeddingTable.transpose();
-        embeddingTransposed.attach(gatheredTokens.getManager());
-        NDArray logits = normalizedTokens.dot(embeddingTransposed); // (B * I, D)
-        // we add an offset for each dictionary entry
-        NDArray logitsWithBias =
-                logits.add(ps.getValue(dictionaryBias, logits.getDevice(), training)); // (B * I, D)
-        // now we apply log Softmax to get proper log probabilities
-        NDArray logProbs = logitsWithBias.logSoftmax(1); // (B * I, D)
+        try (NDManager scope = NDManager.from(sequenceOutput)) {
+            scope.tempAttachAll(sequenceOutput, maskedIndices);
+            NDArray gatheredTokens = gatherFromIndices(sequenceOutput, maskedIndices); // (B * I, E)
+            NDArray projectedTokens =
+                    hiddenActivation.apply(
+                            sequenceProjection
+                                    .forward(ps, new NDList(gatheredTokens), training)
+                                    .head()); // (B * I, E)
+            NDArray normalizedTokens =
+                    sequenceNorm
+                            .forward(ps, new NDList(projectedTokens), training)
+                            .head(); // (B * I, E)
+            // raw logits for each position to correspond to an entry in the embedding table
+            NDArray embeddingTransposed = embeddingTable.transpose();
+            embeddingTransposed.attach(gatheredTokens.getManager());
+            NDArray logits = normalizedTokens.dot(embeddingTransposed); // (B * I, D)
+            // we add an offset for each dictionary entry
+            NDArray logitsWithBias =
+                    logits.add(
+                            ps.getValue(
+                                    dictionaryBias, logits.getDevice(), training)); // (B * I, D)
+            // now we apply log Softmax to get proper log probabilities
+            NDArray logProbs = logitsWithBias.logSoftmax(1); // (B * I, D)
 
-        scope.remove(sequenceOutput, maskedIndices).waitToRead(logProbs).close();
-
-        return new NDList(logProbs);
+            return scope.ret(new NDList(logProbs));
+        }
     }
 
     /** {@inheritDoc} */

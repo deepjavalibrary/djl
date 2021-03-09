@@ -45,7 +45,7 @@ public class DlrNDArray implements NDArrayAdapter {
         this.data = data;
         this.shape = shape;
         uid = UUID.randomUUID().toString();
-        manager.attach(uid, this);
+        manager.attachInternal(uid, this);
     }
 
     /** {@inheritDoc} */
@@ -94,18 +94,25 @@ public class DlrNDArray implements NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager attach(NDManager manager) {
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (DlrNDManager) manager;
+        manager.attachInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
         detach();
         NDManager original = this.manager;
         this.manager = (DlrNDManager) manager;
-        manager.attach(getUid(), this);
-        return original;
+        manager.tempAttachInternal(original, getUid(), this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void detach() {
-        manager.detach(getUid());
+        manager.detachInternal(getUid());
         manager = DlrNDManager.getSystemManager();
     }
 

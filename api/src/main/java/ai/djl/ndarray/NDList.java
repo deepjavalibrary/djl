@@ -23,9 +23,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * An {@code NDList} represents a sequence of {@link NDArray}s with names.
@@ -35,7 +32,7 @@ import java.util.stream.IntStream;
  *
  * @see NDArray
  */
-public class NDList extends ArrayList<NDArray> implements AutoCloseable {
+public class NDList extends ArrayList<NDArray> implements NDResource {
 
     private static final long serialVersionUID = 1L;
 
@@ -212,36 +209,28 @@ public class NDList extends ArrayList<NDArray> implements AutoCloseable {
         return newNDList;
     }
 
-    /**
-     * Attaches each ndarray in this list to the specified manager.
-     *
-     * @param manager the manager to attach the lists to
-     * @return a list of {@code NDManager} with which original NDArray are attached
-     * @see NDArray#attach(NDManager)
-     */
-    public List<NDManager> attach(NDManager manager) {
-        return stream().map(array -> array.attach(manager)).collect(Collectors.toList());
+    /** {@inheritDoc} */
+    @Override
+    public NDManager getManager() {
+        return head().getManager();
     }
 
-    /**
-     * Attaches each ndarray in this list to the specified manager.
-     *
-     * @param managers the list of managers to attach
-     * @return a list of {@code NDManager} with which original NDArray are attached
-     */
-    public List<NDManager> attach(List<NDManager> managers) {
-        return IntStream.range(0, size())
-                .mapToObj(i -> get(i).attach(managers.get(i)))
-                .collect(Collectors.toList());
+    /** {@inheritDoc} */
+    @Override
+    public void attach(NDManager manager) {
+        stream().forEach(array -> array.attach(manager));
     }
 
-    /**
-     * Detaches each ndarray in this list from their current managers.
-     *
-     * @see NDArray#detach()
-     */
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
+        stream().forEach(array -> array.tempAttach(manager));
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void detach() {
-        forEach(NDArray::detach);
+        stream().forEach(NDResource::detach);
     }
 
     /**

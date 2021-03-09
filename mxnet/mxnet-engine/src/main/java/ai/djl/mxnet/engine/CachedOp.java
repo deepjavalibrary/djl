@@ -73,7 +73,7 @@ public class CachedOp extends NativeResource<Pointer> {
         this.dataIndicesMap = dataIndices.toMap();
         // holds all parameter and data NDArray values, final inputs to CachedOp
         this.manager = manager;
-        manager.attach(getUid(), this);
+        manager.attachInternal(getUid(), this);
     }
 
     /**
@@ -139,7 +139,7 @@ public class CachedOp extends NativeResource<Pointer> {
     public void close() {
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
-            manager.detach(getUid());
+            manager.detachInternal(getUid());
             JnaUtils.freeCachedOp(pointer);
             manager = null;
         }

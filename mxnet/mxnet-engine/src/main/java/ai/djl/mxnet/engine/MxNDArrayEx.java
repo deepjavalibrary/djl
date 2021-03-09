@@ -377,8 +377,7 @@ class MxNDArrayEx implements NDArrayEx {
 
         // create a baseManager to close all intermediate NDArrays
         try (NDManager subManager = NDManager.newBaseManager()) {
-            List<NDManager> inputManagers = inputs.attach(subManager);
-            List<NDManager> weightManagers = weights.attach(subManager);
+            subManager.tempAttachAll(inputs, weights);
 
             // Preprocess Gradient
             grad.muli(rescaleGrad);
@@ -394,10 +393,6 @@ class MxNDArrayEx implements NDArrayEx {
 
             // Update weight
             weight.subi(g);
-
-            // attach back to their previous managers
-            inputs.attach(inputManagers);
-            weights.attach(weightManagers);
         }
     }
 

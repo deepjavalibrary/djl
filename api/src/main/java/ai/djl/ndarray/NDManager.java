@@ -134,6 +134,16 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Creates a new manager based on the given resource.
+     *
+     * @param resource the resource to use
+     * @return a new memory scrope containing the array
+     */
+    static NDManager from(NDResource resource) {
+        return resource.getManager().newSubManager();
+    }
+
+    /**
      * Allocates a new engine specific direct byte buffer.
      *
      * @param capacity the new buffer's capacity, in bytes
@@ -1281,14 +1291,34 @@ public interface NDManager extends AutoCloseable {
     Device getDevice();
 
     /**
-     * Attaches a {@link NDArray} or {@code NDManager} to this {@code NDManager}.
+     * Attaches a resource to this {@code NDManager}.
      *
-     * <p>Attached resource will be closed when this {@code NDManager} is closed.
+     * <p>The attached resource will be closed when this {@code NDManager} is closed.
+     *
+     * <p>This attachment is internal. Many resources will internally track which manager they are
+     * attached to. In that case, you should call {@link NDResource#attach(NDManager)} instead and
+     * that should then call attachInternal.
      *
      * @param resourceId the unique resourceId
      * @param resource the {@link AutoCloseable} resource to be attached
      */
-    void attach(String resourceId, AutoCloseable resource);
+    void attachInternal(String resourceId, AutoCloseable resource);
+
+    /**
+     * Temporarily attaches a resource to this {@code NDManager} to be returned when this is closed.
+     *
+     * <p>The attached resource will be returned to it's original manager when this {@code
+     * NDManager} is closed.
+     *
+     * <p>This attachment is internal. Many resources will internally track which manager they are
+     * attached to. In that case, you should call {@link NDResource#attach(NDManager)} instead and
+     * that should then call tempAttachInternal.
+     *
+     * @param originalManager the original manager to return the resource to
+     * @param resourceId the unique resourceId
+     * @param resource the {@link AutoCloseable} resource to be attached
+     */
+    void tempAttachInternal(NDManager originalManager, String resourceId, NDResource resource);
 
     /**
      * Detaches a {@link NDArray} from this {@code NDManager}'s lifecycle.
@@ -1297,9 +1327,49 @@ public interface NDManager extends AutoCloseable {
      * resource. Failed to close the resource has to wait on GC to be freed, and might cause out of
      * native memory.
      *
+     * <p>This detach is internal. Many resources will internally track which manager they are
+     * attached to. In that case, you should call {@link NDResource#detach()} instead and that
+     * should then call detachInternal.
+     *
      * @param resourceId the resourceId to be removed from this {@code NDManager}'s lifecycle
      */
-    void detach(String resourceId);
+    void detachInternal(String resourceId);
+
+    /**
+     * Returns a value outside of this manager by attaching to this manager's parent.
+     *
+     * @param resource the resource to return
+     * @param <T> the type of the resource
+     * @return the passed in resource, after attaching to a new manager
+     */
+    default <T extends NDResource> T ret(T resource) {
+        resource.attach(getParentManager());
+        return resource;
+    }
+
+    /**
+     * Attaches all resources to this manager.
+     *
+     * @param resources the resources to attach
+     * @see NDResource#attach(NDManager)
+     */
+    default void attachAll(NDResource... resources) {
+        for (NDResource resource : resources) {
+            resource.attach(this);
+        }
+    }
+
+    /**
+     * Temporarily attaches all resources to this manager.
+     *
+     * @param resources the resources to attach
+     * @see NDResource#tempAttach(NDManager)
+     */
+    default void tempAttachAll(NDResource... resources) {
+        for (NDResource resource : resources) {
+            resource.tempAttach(this);
+        }
+    }
 
     /**
      * An engine specific generic invocation to native operation.

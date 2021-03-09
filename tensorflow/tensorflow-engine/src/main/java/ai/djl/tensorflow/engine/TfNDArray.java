@@ -73,7 +73,7 @@ public class TfNDArray implements NDArray {
         this.manager = (TfNDManager) manager;
         this.tf = this.manager.getTf();
         uid = UUID.randomUUID().toString();
-        manager.attach(uid, this);
+        manager.attachInternal(uid, this);
         this.operand =
                 this.manager
                         .getEagerSession()
@@ -286,18 +286,25 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager attach(NDManager manager) {
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (TfNDManager) manager;
+        manager.attachInternal(uid, this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
         detach();
         NDManager original = this.manager;
         this.manager = (TfNDManager) manager;
-        manager.attach(uid, this);
-        return original;
+        manager.tempAttachInternal(original, uid, this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void detach() {
-        manager.detach(getUid());
+        manager.detachInternal(getUid());
         manager = TfNDManager.getSystemManager();
     }
 

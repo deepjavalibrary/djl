@@ -51,7 +51,7 @@ public class PpNDManager extends BaseNDManager {
     @Override
     public PpNDManager newSubManager(Device device) {
         PpNDManager manager = new PpNDManager(this, device);
-        attach(manager.uid, manager);
+        attachInternal(manager.uid, manager);
         return manager;
     }
 
@@ -156,11 +156,11 @@ public class PpNDManager extends BaseNDManager {
 
         /** {@inheritDoc} */
         @Override
-        public void attach(String resourceId, AutoCloseable resource) {}
+        public void attachInternal(String resourceId, AutoCloseable resource) {}
 
         /** {@inheritDoc} */
         @Override
-        public void detach(String resourceId) {}
+        public void detachInternal(String resourceId) {}
 
         /** {@inheritDoc} */
         @Override

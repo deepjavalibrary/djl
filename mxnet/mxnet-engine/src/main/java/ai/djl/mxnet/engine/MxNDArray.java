@@ -92,7 +92,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         super(handle);
         this.manager = manager;
         mxNDArrayEx = new MxNDArrayEx(this);
-        manager.attach(getUid(), this);
+        manager.attachInternal(getUid(), this);
     }
 
     /**
@@ -163,18 +163,25 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager attach(NDManager manager) {
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (MxNDManager) manager;
+        manager.attachInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
         NDManager original = this.manager;
         detach();
         this.manager = (MxNDManager) manager;
-        manager.attach(getUid(), this);
-        return original;
+        manager.tempAttachInternal(original, getUid(), this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void detach() {
-        manager.detach(getUid());
+        manager.detachInternal(getUid());
         manager = MxNDManager.getSystemManager();
     }
 
@@ -1609,7 +1616,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         if (pointer != null) {
             JnaUtils.waitToRead(pointer);
             JnaUtils.freeNdArray(pointer);
-            manager.detach(getUid());
+            manager.detachInternal(getUid());
             manager = null;
         }
     }
