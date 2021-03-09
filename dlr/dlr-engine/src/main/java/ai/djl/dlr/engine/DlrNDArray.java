@@ -118,18 +118,6 @@ public class DlrNDArray implements NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public boolean hasGradient() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray stopGradient() {
-        throw new UnsupportedOperationException("Not supported for DLR");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public ByteBuffer toByteBuffer() {
         data.rewind();
         return data;
