@@ -1,4 +1,4 @@
-This document will show you how to train a model using the Paddle 2.0.
+### How to train a model using the Paddle 2.0
 
 We refer to [LeNet's MNIST Dataset Image Classification](https://www.paddlepaddle.org.cn/documentation/docs/zh/tutorial/cv_case/image_classification/image_classification.html#lenetmnist), and use the Paddle 2.0 interface to train a simple The models are stored as pre-training and predictive deployment models. We will focus on how to generate model files. 
 
@@ -83,7 +83,7 @@ def train(model, optim):
 train(model, optim)
 ```
 
--Store training model (training format): You can refer to [Parameter Storage](https://www.paddlepaddle.org.cn/documentation/docs/en/guides/02_paddle2.0_develop/08_model_save_load_cn.html#id8) to learn how store the training format model under the dynamic graph. Just call the `paddle.save` interface.
+- Store training model (training format): You can refer to [Parameter Storage](https://www.paddlepaddle.org.cn/documentation/docs/en/guides/02_paddle2.0_develop/08_model_save_load_cn.html#id8) to learn how store the training format model under the dynamic graph. Just call the `paddle.save` interface.
 
 ```
 paddle.save(model.state_dict(), 'lenet.pdparams')
