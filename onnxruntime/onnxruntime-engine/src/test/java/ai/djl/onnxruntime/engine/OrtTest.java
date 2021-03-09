@@ -20,7 +20,7 @@ import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.onnxruntime.zoo.tabular.randomforest.IrisFlower;
+import ai.djl.onnxruntime.zoo.tabular.softmax_regression.IrisFlower;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;

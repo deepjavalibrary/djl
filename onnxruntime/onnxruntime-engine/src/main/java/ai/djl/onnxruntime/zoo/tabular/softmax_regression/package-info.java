@@ -14,4 +14,4 @@
 /**
  * Contains classes for the classification models in the {@link ai.djl.onnxruntime.zoo.OrtModelZoo}.
  */
-package ai.djl.onnxruntime.zoo.tabular.randomforest;
+package ai.djl.onnxruntime.zoo.tabular.softmax_regression;

@@ -1,7 +1,7 @@
 {
   "metadataVersion": "0.2",
   "resourceType": "model",
-  "application": "tabular/random_forest",
+  "application": "tabular/softmax_regression",
   "groupId": "ai.djl.onnxruntime",
   "artifactId": "iris_flowers",
   "name": "iris_flowers",

@@ -268,15 +268,6 @@ public class Application {
          * @see <a href="https://d2l.djl.ai/chapter_linear-networks/softmax-regression.html">The D2L
          *     chapter introducing this application</a>
          */
-        Application SOFTMAX_REGRESSION = new Application("tabular/linear_regression");
-
-        /**
-         * This is erroneous because random forest is a technique (not deep learning), not an
-         * application.
-         *
-         * <p>The actual application is likely to be in {@link Tabular}, especially {@link
-         * #SOFTMAX_REGRESSION}.
-         */
-        Application RANDOM_FOREST = new Application("tabular/random_forest");
+        Application SOFTMAX_REGRESSION = new Application("tabular/softmax_regression");
     }
 }

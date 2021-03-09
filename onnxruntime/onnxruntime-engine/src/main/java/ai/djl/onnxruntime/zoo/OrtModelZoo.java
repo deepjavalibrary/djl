@@ -13,7 +13,7 @@
 package ai.djl.onnxruntime.zoo;
 
 import ai.djl.onnxruntime.engine.OrtEngine;
-import ai.djl.onnxruntime.zoo.tabular.randomforest.IrisClassificationModelLoader;
+import ai.djl.onnxruntime.zoo.tabular.softmax_regression.IrisClassificationModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 import java.util.Collections;
