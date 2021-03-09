@@ -98,22 +98,6 @@ public class PpModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("Model (\n\tName: ").append(modelName);
-        if (modelDir != null) {
-            sb.append("\n\tModel location: ").append(modelDir.toAbsolutePath());
-        }
-        sb.append("\n\tData Type: ").append(dataType);
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
-            sb.append("\n\t").append(entry.getKey()).append(": ").append(entry.getValue());
-        }
-        sb.append("\n)");
-        return sb.toString();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
         return new PpPredictor<>(this, paddlePredictor.copy(), translator);
     }
