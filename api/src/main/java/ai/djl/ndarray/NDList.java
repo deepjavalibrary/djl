@@ -19,6 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -77,7 +78,18 @@ public class NDList extends ArrayList<NDArray> implements AutoCloseable {
      * @return {@code NDList}
      */
     public static NDList decode(NDManager manager, byte[] byteArray) {
-        try (DataInputStream dis = new DataInputStream(new ByteArrayInputStream(byteArray))) {
+        return decode(manager, new ByteArrayInputStream(byteArray));
+    }
+
+    /**
+     * Decodes NDList from {@link InputStream}.
+     *
+     * @param manager manager assigned to {@link NDArray}
+     * @param is input stream contains the ndlist information
+     * @return {@code NDList}
+     */
+    public static NDList decode(NDManager manager, InputStream is) {
+        try (DataInputStream dis = new DataInputStream(is)) {
             int size = dis.readInt();
             if (size < 0) {
                 throw new IllegalArgumentException("Invalid NDList size: " + size);
