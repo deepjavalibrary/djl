@@ -217,6 +217,11 @@ public class NDArrayShapesManipulationOpTest {
             expected = manager.create(new Shape(0, 0, 2));
             Assert.assertEquals(array1.stack(array1, 2), expected);
             Assert.assertEquals(NDArrays.stack(new NDList(array1, array1), 2), expected);
+
+            // one array
+            array1 = manager.ones(new Shape(2, 2));
+            expected = manager.ones(new Shape(1, 2, 2));
+            Assert.assertEquals(NDArrays.stack(new NDList(array1)), expected);
         }
     }
 
@@ -254,6 +259,11 @@ public class NDArrayShapesManipulationOpTest {
             array1 = manager.create(1f);
             array2 = manager.create(2f);
             array1.concat(array2);
+
+            // one array
+            array1 = manager.ones(new Shape(2, 2));
+            expected = manager.ones(new Shape(2, 2));
+            Assert.assertEquals(NDArrays.concat(new NDList(array1)), expected);
         }
     }
 
