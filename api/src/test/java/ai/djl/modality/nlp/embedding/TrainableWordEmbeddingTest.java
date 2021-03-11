@@ -30,7 +30,7 @@ public class TrainableWordEmbeddingTest {
                 TrainableWordEmbedding.builder()
                         .setVocabulary(
                                 new SimpleVocabulary(new SimpleTokenizer().tokenize(TEST_STRING)))
-                        .setEmbeddingSize(10)
+                        .optNumEmbeddings(10)
                         .optUseDefault(true)
                         .build();
         try (NDManager manager = NDManager.newBaseManager()) {

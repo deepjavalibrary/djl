@@ -16,13 +16,11 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
@@ -102,13 +100,17 @@ public abstract class Convolution extends AbstractBlock {
 
         weight =
                 addParameter(
-                        new Parameter("weight", this, ParameterType.WEIGHT),
-                        (inputShapes) ->
-                                new Shape(filters, inputShapes[0].get(1)).addAll(kernelShape));
+                        Parameter.builder()
+                                .setName("weight")
+                                .setType(Parameter.Type.WEIGHT)
+                                .build());
         if (includeBias) {
             bias =
                     addParameter(
-                            new Parameter("bias", this, ParameterType.BIAS), new Shape(filters));
+                            Parameter.builder()
+                                    .setName("bias")
+                                    .setType(Parameter.Type.BIAS)
+                                    .build());
         }
     }
 
@@ -149,15 +151,24 @@ public abstract class Convolution extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    protected void beforeInitialize(Shape[] inputs) {
-        super.beforeInitialize(inputs);
-        Shape inputShape = inputs[0];
-        Block.validateLayout(getExpectedLayout(), inputShape.getLayout());
+    protected void beforeInitialize(Shape... inputShapes) {
+        super.beforeInitialize(inputShapes);
+        Block.validateLayout(getExpectedLayout(), inputShapes[0].getLayout());
     }
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputs) {
+    protected void prepare(Shape[] inputs) {
+        long inputChannel = inputs[0].get(1);
+        weight.setShape(new Shape(filters, inputChannel / groups).addAll(kernelShape));
+        if (bias != null) {
+            bias.setShape(new Shape(filters));
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape[] getOutputShapes(Shape[] inputs) {
         long[] shape = new long[numDimensions()];
         shape[0] = inputs[0].get(0);
         shape[1] = filters;

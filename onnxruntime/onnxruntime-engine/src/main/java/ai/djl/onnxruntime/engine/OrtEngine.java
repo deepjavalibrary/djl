@@ -17,6 +17,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
 import ai.onnxruntime.OrtEnvironment;
 
@@ -56,6 +57,9 @@ public final class OrtEngine extends Engine {
     }
 
     private Engine getAlternativeEngine() {
+        if (Boolean.getBoolean("ai.djl.onnx.disable_alternative")) {
+            return null;
+        }
         if (alternativeEngine == null) {
             Engine engine = Engine.getInstance();
             if (engine.getRank() < getRank()) {
@@ -69,7 +73,7 @@ public final class OrtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "1.5.2";
+        return "1.7.0";
     }
 
     /** {@inheritDoc} */
@@ -83,6 +87,12 @@ public final class OrtEngine extends Engine {
     @Override
     public Model newModel(String name, Device device) {
         return new OrtModel(name, newBaseManager(device), env);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public SymbolBlock newSymbolBlock(NDManager manager) {
+        throw new UnsupportedOperationException("ONNXRuntime does not support empty SymbolBlock");
     }
 
     /** {@inheritDoc} */

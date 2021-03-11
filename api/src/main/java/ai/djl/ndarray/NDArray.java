@@ -40,7 +40,7 @@ import java.util.stream.LongStream;
  * href="https://github.com/awslabs/djl/blob/master/docs/development/memory_management.md">NDArray
  * Memory Management Guide</a>
  */
-public interface NDArray extends AutoCloseable {
+public interface NDArray extends NDResource {
 
     /**
      * Decodes {@code NDArray} from bytes.
@@ -52,13 +52,6 @@ public interface NDArray extends AutoCloseable {
     static NDArray decode(NDManager manager, byte[] byteArray) {
         return manager.decode(byteArray);
     }
-
-    /**
-     * Returns the {@link NDManager} used to create this {@code NDArray}.
-     *
-     * @return the {@link NDManager} used to create this {@code NDArray}
-     */
-    NDManager getManager();
 
     /**
      * Returns the name of this {@code NDArray}.
@@ -145,27 +138,6 @@ public interface NDArray extends AutoCloseable {
     default byte[] encode() {
         return NDSerializer.encode(this);
     }
-
-    /**
-     * Attaches this {@code NDArray} to the specified {@link NDManager}.
-     *
-     * <p>Attached resource will be closed when the {@link NDManager} is closed.
-     *
-     * @param manager the {@link NDManager} to be attached
-     * @return the original {@link NDManager}
-     */
-    NDManager attach(NDManager manager);
-
-    /**
-     * Detaches the {@code NDArray} from current {@link NDManager}'s lifecycle.
-     *
-     * <p>The {@code NDArray} becomes un-managed, it is the user's responsibility to close the
-     * {@code NDArray}. Failure to close the resource might cause your machine to run out of native
-     * memory.
-     *
-     * @see NDManager
-     */
-    void detach();
 
     /**
      * Moves this {@code NDArray} to a different {@link Device}.
@@ -370,6 +342,15 @@ public interface NDArray extends AutoCloseable {
         }
         return ret;
     }
+
+    /**
+     * Converts this {@code NDArray} to a String array.
+     *
+     * <p>This method is only applicable to the String typed NDArray and not for printing purpose
+     *
+     * @return Array of Strings
+     */
+    String[] toStringArray();
 
     /**
      * Converts this {@code NDArray} to a Number array based on its {@link DataType}.
@@ -4543,4 +4524,92 @@ public interface NDArray extends AutoCloseable {
      * @return the norm of this {@code NDArray}
      */
     NDArray norm(int ord, int[] axes, boolean keepDims);
+
+    /**
+     * Returns a one-hot {@code NDArray}.
+     *
+     * <ul>
+     *   <li>The locations represented by indices take value 1, while all other locations take value
+     *       0.
+     *   <li>If the input {@code NDArray} is rank N, the output will have rank N+1. The new axis is
+     *       appended at the end.
+     *   <li>If {@code NDArray} is a scalar the output shape will be a vector of length depth.
+     *   <li>If {@code NDArray} is a vector of length features, the output shape will be features x
+     *       depth.
+     *   <li>If {@code NDArray} is a matrix with shape [batch, features], the output shape will be
+     *       batch x features x depth.
+     * </ul>
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new int[] {1, 0, 2, 0});
+     * jshell&gt; array.oneHot(3);
+     * ND: (4, 3) cpu() float32
+     * [[0., 1., 0.],
+     *  [1., 0., 0.],
+     *  [0., 0., 1.],
+     *  [1., 0., 0.],
+     * ]
+     * jshell&gt; NDArray array = manager.create(new int[][] {{1, 0}, {1, 0}, {2, 0}});
+     * jshell&gt; array.oneHot(3);
+     * ND: (3, 2, 3) cpu() float32
+     * [[[0., 1., 0.],
+     *   [1., 0., 0.],
+     *  ],
+     *  [[0., 1., 0.],
+     *   [1., 0., 0.],
+     *  ],
+     *  [[0., 0., 1.],
+     *   [1., 0., 0.],
+     *  ],
+     * ]
+     * </pre>
+     *
+     * @param depth Depth of the one hot dimension.
+     * @return one-hot encoding of this {@code NDArray}
+     * @see <a
+     *     href=https://d2l.djl.ai/chapter_linear-networks/softmax-regression.html#classification-problems>Classification-problems</a>
+     */
+    default NDArray oneHot(int depth) {
+        return oneHot(depth, 1f, 0f, DataType.FLOAT32);
+    }
+
+    /**
+     * Returns a one-hot {@code NDArray}.
+     *
+     * <ul>
+     *   <li>The locations represented by indices take value onValue, while all other locations take
+     *       value offValue.
+     *   <li>If the input {@code NDArray} is rank N, the output will have rank N+1. The new axis is
+     *       appended at the end.
+     *   <li>If {@code NDArray} is a scalar the output shape will be a vector of length depth.
+     *   <li>If {@code NDArray} is a vector of length features, the output shape will be features x
+     *       depth.
+     *   <li>If {@code NDArray} is a matrix with shape [batch, features], the output shape will be
+     *       batch x features x depth.
+     * </ul>
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new int[] {1, 0, 2, 0});
+     * jshell&gt; array.oneHot(3, 8f, 1f, array.getDataType());
+     * ND: (4, 3) cpu() int32
+     * [[ 1,  8,  1],
+     *  [ 8,  1,  1],
+     *  [ 1,  1,  8],
+     *  [ 8,  1,  1],
+     * ]
+     * </pre>
+     *
+     * @param depth Depth of the one hot dimension.
+     * @param onValue The value assigned to the locations represented by indices.
+     * @param offValue The value assigned to the locations not represented by indices.
+     * @param dataType dataType of the output.
+     * @return one-hot encoding of this {@code NDArray}
+     * @see <a
+     *     href=https://d2l.djl.ai/chapter_linear-networks/softmax-regression.html#classification-problems>Classification-problems</a>
+     */
+    NDArray oneHot(int depth, float onValue, float offValue, DataType dataType);
 }

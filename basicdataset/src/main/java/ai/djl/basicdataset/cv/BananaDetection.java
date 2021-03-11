@@ -16,20 +16,18 @@ import ai.djl.Application;
 import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
+import ai.djl.modality.cv.output.Point;
+import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.Resource;
 import ai.djl.training.dataset.RandomAccessDataset;
-import ai.djl.training.dataset.Record;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.JsonUtils;
+import ai.djl.util.PairList;
 import ai.djl.util.Progress;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
@@ -39,22 +37,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Banana image detection dataset contains a 3 x 256 x 256 image in the dataset with a banana of
  * varying sizes in each image. There are 1000 training images and 100 testing images.
  */
-public class BananaDetection extends RandomAccessDataset {
+public class BananaDetection extends ObjectDetectionDataset {
 
     private static final String VERSION = "1.0";
     private static final String ARTIFACT_ID = "banana";
 
     private final Usage usage;
-    private final Image.Flag flag;
     private final List<Path> imagePaths;
-    private final List<float[]> labels;
+    private final PairList<Long, Rectangle> labels;
 
     private final Resource resource;
     private boolean prepared;
@@ -68,9 +67,8 @@ public class BananaDetection extends RandomAccessDataset {
     public BananaDetection(Builder builder) {
         super(builder);
         usage = builder.usage;
-        flag = builder.flag;
         imagePaths = new ArrayList<>();
-        labels = new ArrayList<>();
+        labels = new PairList<>();
         MRL mrl = MRL.dataset(Application.CV.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, VERSION);
     }
@@ -84,18 +82,9 @@ public class BananaDetection extends RandomAccessDataset {
         return new Builder();
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Record get(NDManager manager, long index) throws IOException {
-        int idx = Math.toIntExact(index);
-        NDList d =
-                new NDList(
-                        ImageFactory.getInstance()
-                                .fromFile(imagePaths.get(idx))
-                                .toNDArray(manager, flag));
-        NDArray label = manager.create(labels.get(idx));
-        NDList l = new NDList(label.reshape(new Shape(1).addAll(label.getShape())));
-        return new Record(d, l);
+    public PairList<Long, Rectangle> getObjects(long index) {
+        return new PairList<>(Collections.singletonList(labels.get((int) index)));
     }
 
     /** {@inheritDoc} */
@@ -133,32 +122,44 @@ public class BananaDetection extends RandomAccessDataset {
             Type mapType = new TypeToken<Map<String, List<Float>>>() {}.getType();
             Map<String, List<Float>> metadata = JsonUtils.GSON.fromJson(reader, mapType);
             for (Map.Entry<String, List<Float>> entry : metadata.entrySet()) {
-                float[] labelArray = new float[5];
                 String imgName = entry.getKey();
-                List<Float> label = entry.getValue();
-                // Class label
-                labelArray[0] = label.get(0);
-
-                // Bounding box labels
-                labelArray[1] = label.get(1);
-                labelArray[2] = label.get(2);
-                labelArray[3] = label.get(3);
-                labelArray[4] = label.get(4);
                 imagePaths.add(usagePath.resolve(imgName));
-                labels.add(labelArray);
+
+                List<Float> label = entry.getValue();
+                long objectClass = label.get(0).longValue();
+                Rectangle objectLocation =
+                        new Rectangle(
+                                new Point(label.get(1), label.get(2)),
+                                new Point(label.get(3), label.get(4)));
+                labels.add(objectClass, objectLocation);
             }
         }
         prepared = true;
     }
 
+    @Override
+    protected Image getImage(long index) throws IOException {
+        int idx = Math.toIntExact(index);
+        return ImageFactory.getInstance().fromFile(imagePaths.get(idx));
+    }
+
+    @Override
+    public Optional<Integer> getImageWidth() {
+        return Optional.of(256);
+    }
+
+    @Override
+    public Optional<Integer> getImageHeight() {
+        return Optional.of(256);
+    }
+
     /** A builder for a {@link BananaDetection}. */
-    public static final class Builder extends BaseBuilder<BananaDetection.Builder> {
+    public static final class Builder extends ImageDataset.BaseBuilder<BananaDetection.Builder> {
 
         Repository repository;
         String groupId;
         String artifactId;
         Usage usage;
-        Image.Flag flag;
 
         /** Constructs a new builder. */
         Builder() {
@@ -166,7 +167,6 @@ public class BananaDetection extends RandomAccessDataset {
             groupId = BasicDatasets.GROUP_ID;
             artifactId = ARTIFACT_ID;
             usage = Usage.TRAIN;
-            flag = Image.Flag.COLOR;
         }
 
         /** {@inheritDoc} */
@@ -223,17 +223,6 @@ public class BananaDetection extends RandomAccessDataset {
                 this.artifactId = artifactId;
             }
             return this;
-        }
-
-        /**
-         * Sets the optional color mode flag.
-         *
-         * @param flag the color mode flag
-         * @return this builder
-         */
-        public BananaDetection.Builder optFlag(Image.Flag flag) {
-            this.flag = flag;
-            return self();
         }
 
         /**

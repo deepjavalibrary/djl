@@ -15,6 +15,7 @@ package ai.djl.ndarray;
 import ai.djl.Device;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.file.Path;
@@ -34,18 +35,26 @@ public abstract class BaseNDManager implements NDManager {
     protected String name;
     protected Device device;
     protected ConcurrentHashMap<String, AutoCloseable> resources;
+    protected ConcurrentHashMap<String, Pair<NDResource, NDManager>> tempResources;
     protected AtomicBoolean closed = new AtomicBoolean(false);
 
     protected BaseNDManager(NDManager parent, Device device) {
         this.parent = parent;
         this.device = Device.defaultIfNull(device, getEngine());
         resources = new ConcurrentHashMap<>();
+        tempResources = new ConcurrentHashMap<>();
         uid = UUID.randomUUID().toString();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(String data) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(String[] data) {
         throw new UnsupportedOperationException("Not supported!");
     }
 
@@ -197,7 +206,7 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public synchronized void attach(String resourceId, AutoCloseable resource) {
+    public synchronized void attachInternal(String resourceId, AutoCloseable resource) {
         if (closed.get()) {
             throw new IllegalStateException("NDManager has been closed already.");
         }
@@ -206,7 +215,17 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public synchronized void detach(String resourceId) {
+    public void tempAttachInternal(
+            NDManager originalManager, String resourceId, NDResource resource) {
+        if (closed.get()) {
+            throw new IllegalStateException("NDManager has been closed already.");
+        }
+        tempResources.put(resourceId, new Pair<>(resource, originalManager));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public synchronized void detachInternal(String resourceId) {
         if (closed.get()) {
             // This may happen in the middle of BaseNDManager.close()
             return;
@@ -238,7 +257,14 @@ public abstract class BaseNDManager implements NDManager {
                     logger.error("Resource close failed.", e);
                 }
             }
-            parent.detach(uid);
+            for (Pair<NDResource, NDManager> resource : tempResources.values()) {
+                try {
+                    resource.getKey().attach(resource.getValue());
+                } catch (Exception e) {
+                    logger.error("Temporary resource return failed.", e);
+                }
+            }
+            parent.detachInternal(uid);
             resources.clear();
         }
     }

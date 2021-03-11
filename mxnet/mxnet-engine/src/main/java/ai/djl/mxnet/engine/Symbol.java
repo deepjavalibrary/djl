@@ -52,7 +52,7 @@ public class Symbol extends NativeResource<Pointer> {
     Symbol(MxNDManager manager, Pointer pointer) {
         super(pointer);
         this.manager = manager;
-        manager.attach(getUid(), this);
+        manager.attachInternal(getUid(), this);
         //        argParams = JnaUtils.listSymbolArguments(getHandle());
         //        auxParams = JnaUtils.listSymbolAuxiliaryStates(getHandle());
     }
@@ -66,6 +66,18 @@ public class Symbol extends NativeResource<Pointer> {
      */
     public static Symbol load(MxNDManager manager, String path) {
         Pointer pointer = JnaUtils.createSymbolFromFile(path);
+        return new Symbol(manager, pointer);
+    }
+
+    /**
+     * Loads a symbol from a json string.
+     *
+     * @param manager the manager to load the symbol to
+     * @param json the json string of the symbol.
+     * @return the new symbol
+     */
+    public static Symbol loadJson(MxNDManager manager, String json) {
+        Pointer pointer = JnaUtils.createSymbolFromString(json);
         return new Symbol(manager, pointer);
     }
 
@@ -279,6 +291,15 @@ public class Symbol extends NativeResource<Pointer> {
 
      */
 
+    /**
+     * Converts Symbol to json string for saving purpose.
+     *
+     * @return the json string
+     */
+    public String toJsonString() {
+        return JnaUtils.getSymbolString(getHandle());
+    }
+
     /** {@inheritDoc} */
     @Override
     public String toString() {
@@ -290,7 +311,7 @@ public class Symbol extends NativeResource<Pointer> {
     public void close() {
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
-            manager.detach(getUid());
+            manager.detachInternal(getUid());
             JnaUtils.freeSymbol(pointer);
             manager = null;
         }

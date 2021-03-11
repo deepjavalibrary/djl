@@ -16,6 +16,7 @@ import ai.djl.Model;
 import ai.djl.basicdataset.cv.PikachuDetection;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Blocks;
+import ai.djl.nn.Parameter;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -42,7 +43,7 @@ public class PikachuTest {
                         .build();
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optInitializer(new NormalInitializer(0.01f));
+                        .optInitializer(new NormalInitializer(0.01f), Parameter.Type.WEIGHT);
         try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
             try (Trainer trainer = model.newTrainer(config)) {

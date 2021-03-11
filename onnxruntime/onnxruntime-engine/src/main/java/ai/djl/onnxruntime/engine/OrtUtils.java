@@ -63,6 +63,12 @@ final class OrtUtils {
         }
     }
 
+    public static OnnxTensor toTensor(OrtEnvironment env, String[] inputs, Shape shape)
+            throws OrtException {
+        long[] sh = shape.getShape();
+        return OnnxTensor.createTensor(env, inputs, sh);
+    }
+
     public static NDArray toNDArray(NDManager manager, OnnxTensor tensor) {
         if (manager instanceof OrtNDManager) {
             return ((OrtNDManager) manager).create(tensor);
@@ -92,6 +98,8 @@ final class OrtUtils {
                 return DataType.BOOLEAN;
             case UNKNOWN:
                 return DataType.UNKNOWN;
+            case STRING:
+                return DataType.STRING;
             default:
                 throw new UnsupportedOperationException("type is not supported: " + javaType);
         }

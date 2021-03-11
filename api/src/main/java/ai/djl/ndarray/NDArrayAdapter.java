@@ -83,7 +83,7 @@ public interface NDArrayAdapter extends NDArray {
 
     /** {@inheritDoc} */
     @Override
-    default NDManager attach(NDManager manager) {
+    default void attach(NDManager manager) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
@@ -132,6 +132,12 @@ public interface NDArrayAdapter extends NDArray {
     /** {@inheritDoc} */
     @Override
     default NDArray stopGradient() {
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    default String[] toStringArray() {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
@@ -966,6 +972,12 @@ public interface NDArrayAdapter extends NDArray {
     /** {@inheritDoc} */
     @Override
     default NDArray norm(int ord, int[] axes, boolean keepDims) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    default NDArray oneHot(int depth, float onValue, float offValue, DataType dataType) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 

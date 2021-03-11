@@ -17,6 +17,7 @@ import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.SymbolBlock;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
 import ai.djl.training.GradientCollector;
@@ -79,6 +80,12 @@ public final class PtEngine extends Engine {
     @Override
     public boolean hasCapability(String capability) {
         return JniUtils.getFeatures().contains(capability);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public SymbolBlock newSymbolBlock(NDManager manager) {
+        return new PtSymbolBlock((PtNDManager) manager);
     }
 
     /** {@inheritDoc} */

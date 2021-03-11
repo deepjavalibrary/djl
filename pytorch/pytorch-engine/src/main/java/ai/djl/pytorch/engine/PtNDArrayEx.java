@@ -20,9 +20,9 @@ import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.recurrent.RNN;
 import ai.djl.pytorch.jni.JniUtils;
-import ai.djl.util.PairList;
 import java.util.List;
 
 /** {@code PtNDArrayEx} is the PyTorch implementation of the {@link NDArrayEx}. */
@@ -388,14 +388,15 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDList embedding(
-            NDList inputs,
-            int numItems,
-            int embeddingSize,
-            boolean sparseGrad,
-            DataType dataType,
-            PairList<String, Object> additional) {
-        throw new UnsupportedOperationException("Not implemented");
+    public NDList embedding(NDArray input, NDArray weight, SparseFormat sparseFormat) {
+        if (!sparseFormat.equals(SparseFormat.DENSE) && !sparseFormat.equals(SparseFormat.COO)) {
+            throw new IllegalArgumentException("PyTorch only supports COO");
+        }
+        return new NDList(
+                JniUtils.embedding(
+                        (PtNDArray) input,
+                        (PtNDArray) weight,
+                        sparseFormat.equals(SparseFormat.COO)));
     }
 
     /** {@inheritDoc} */

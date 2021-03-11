@@ -70,7 +70,7 @@ Lu is the PM for DJL. She’s passionate about evangelizing and breaking the bar
 
 Marat is a Senior Solutions Architect at Red Hat. A curious technology evangelist and passionate about open source, he is a fierce promoter of Quarkus, Apache Camel contributor, and DJL enthusiast. Marat contributed to the [DJL Apache Camel integration](https://camel.apache.org/components/latest/djl-component.html).
 
-#### Marcos Nievesa
+#### Marcos Nieves
 
 [github](https://github.com/markbookk)
 

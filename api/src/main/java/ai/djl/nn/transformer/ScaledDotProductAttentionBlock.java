@@ -146,7 +146,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         // Return shape is the shape of the query. For 2 or less inputs we have self-attention, i.e.
         // the shape of the output is the shape of the input
         if (inputShapes.length == 1 || inputShapes.length == 2) {
@@ -166,9 +166,9 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
         // The lookups are fed reshaped input where the batch size is combined with the sequence
         // length.
         // The linear layers only care about the 2nd dimension, so we set the first to -1.
-        final Shape projectionShape = new Shape(-1L, embeddingSize);
+        Shape projectionShape = new Shape(-1L, embeddingSize);
         // We initialize the lookup with that reshaped input shape
-        for (final Block projection : children.values()) {
+        for (Block projection : children.values()) {
             projection.initialize(manager, DataType.FLOAT32, projectionShape);
         }
     }
@@ -251,7 +251,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
                 attentionScores.mul(attentionScores.getManager().create(1f / (float) Math.sqrt(H)));
         // Apply masking if requested, mask has shape (B, T, F)
         if (attentionMask != null) {
-            final NDArray maskOffset;
+            NDArray maskOffset;
 
             // The input mask is initially given as a list of integers with a 1 for each existing
             // token. In order to apply it to the attention result, it needs to be expanded and the

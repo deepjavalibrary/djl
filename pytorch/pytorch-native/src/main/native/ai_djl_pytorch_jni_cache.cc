@@ -31,20 +31,20 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
   }
   jclass temp_class;
   temp_class = env->FindClass("java/lang/NullPointerException");
-  NULL_PTR_EXCEPTION_CLASS = (jclass)env->NewGlobalRef(temp_class);
+  NULL_PTR_EXCEPTION_CLASS = (jclass) env->NewGlobalRef(temp_class);
 
   temp_class = env->FindClass("java/lang/IllegalStateException");
-  ILLEGAL_STATE_EXCEPTION_CLASS = (jclass)env->NewGlobalRef(temp_class);
+  ILLEGAL_STATE_EXCEPTION_CLASS = (jclass) env->NewGlobalRef(temp_class);
 
   temp_class = env->FindClass("ai/djl/engine/EngineException");
-  ENGINE_EXCEPTION_CLASS = (jclass)env->NewGlobalRef(temp_class);
+  ENGINE_EXCEPTION_CLASS = (jclass) env->NewGlobalRef(temp_class);
 
   temp_class = env->FindClass("ai/djl/pytorch/jni/JniUtils");
-  JNI_UTILS_CLASS = (jclass)env->NewGlobalRef(temp_class);
+  JNI_UTILS_CLASS = (jclass) env->NewGlobalRef(temp_class);
   LOGGER_FIELD = env->GetStaticFieldID(JNI_UTILS_CLASS, "logger", "Lorg/slf4j/Logger;");
 
   temp_class = env->FindClass("org/slf4j/Logger");
-  LOG4J_LOGGER_CLASS = (jclass)env->NewGlobalRef(temp_class);
+  LOG4J_LOGGER_CLASS = (jclass) env->NewGlobalRef(temp_class);
 
   INFO_METHOD = env->GetMethodID(LOG4J_LOGGER_CLASS, "info", "(Ljava/lang/String;)V");
   DEBUG_METHOD = env->GetMethodID(LOG4J_LOGGER_CLASS, "debug", "(Ljava/lang/String;)V");

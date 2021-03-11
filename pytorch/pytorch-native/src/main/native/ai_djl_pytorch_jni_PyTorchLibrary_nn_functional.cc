@@ -42,6 +42,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNInterpolat
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const auto size_vec = djl::utils::jni::GetVecFromJLongArray(env, jsize);
+
 #if defined(__ANDROID__)
   torch::Tensor result;
   if (jmode == 0) {
@@ -52,6 +53,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNInterpolat
     result = torch::upsample_bicubic2d(*tensor_ptr, size_vec, jalign_corners);
   } else {
     env->ThrowNew(ENGINE_EXCEPTION_CLASS, "This kind of mode is not supported on Android");
+    return nullptr;
   }
   const auto* result_ptr = new torch::Tensor(result);
 #else
@@ -160,6 +162,7 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRnn(J
         jtraining, jbidirectional, jbatch_first);
   } else {
     env->ThrowNew(ENGINE_EXCEPTION_CLASS, "can't find activation");
+    return nullptr;
   }
 
   // process output
@@ -410,6 +413,17 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLpPool(JNI
     result_ptr = new torch::Tensor(torch::nn::functional::lp_pool2d(*tensor_ptr,
         torch::nn::functional::LPPool2dFuncOptions(jnorm_type, kernel_vec).stride(stride_vec).ceil_mode(jceil_mode)));
   }
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNEmbedding(
+    JNIEnv* env, jobject jthis, jlong jinput, jlong jweight, jboolean jsparse) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
+  const auto* weight_ptr = reinterpret_cast<torch::Tensor*>(jweight);
+  auto* result_ptr = new torch::Tensor(torch::nn::functional::embedding(
+      *tensor_ptr, *weight_ptr, torch::nn::functional::EmbeddingFuncOptions().sparse(jsparse)));
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }

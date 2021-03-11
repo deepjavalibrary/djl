@@ -76,6 +76,7 @@ nav:
       - 'docs/development/memory_management.md'
       - 'docs/development/inference_performance_optimization.md'
       - 'docs/development/benchmark_with_djl.md'
+      - 'docs/development/profiler.md'
   - DJL Community:
       - 'docs/forums.md'
       - 'leaders.md'
@@ -83,6 +84,7 @@ nav:
       - Overview: 'mxnet/README.md'
       - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
       - Load a MXNet Model: 'jupyter/load_mxnet_model.ipynb'
+      - Backend Optimizer for MXNet: 'docs/mxnet/mxnet_backend_optimizer.md'
       - Modules:
         - MXNet Engine: 'mxnet/mxnet-engine/README.md'
         - MXNet Model Zoo: 'mxnet/mxnet-model-zoo/README.md'
@@ -109,7 +111,12 @@ nav:
         - TensorFlow Model Zoo: 'tensorflow/tensorflow-model-zoo/README.md'
   - PaddlePaddle:
       - Overview: 'paddlepaddle/README.md'
-      - Load a PaddlePaddle Model: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
+      - Facemask detection using PaddlePaddle: 
+          - English: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
+          - 中文: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle_zh.ipynb'
+      - PaddleOCR example:
+          - English: 'jupyter/paddlepaddle/paddle_ocr_java.ipynb'
+          - 中文: 'jupyter/paddlepaddle/paddle_ocr_java_zh.ipynb'
       - Modules:
           - PaddlePaddle Engine: 'paddlepaddle/paddlepaddle-engine/README.md'
           - PaddlePaddle Model Zoo: 'paddlepaddle/paddlepaddle-model-zoo/README.md'

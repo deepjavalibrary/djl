@@ -15,6 +15,7 @@ package ai.djl.engine;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
@@ -189,6 +190,14 @@ public abstract class Engine {
         }
         return defaultDevice;
     }
+
+    /**
+     * Construct an empty SymbolBlock for loading.
+     *
+     * @param manager the manager to manage parameters
+     * @return Empty {@link SymbolBlock} for static graph
+     */
+    public abstract SymbolBlock newSymbolBlock(NDManager manager);
 
     /**
      * Constructs a new model.

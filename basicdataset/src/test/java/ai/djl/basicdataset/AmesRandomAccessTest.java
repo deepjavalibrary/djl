@@ -17,6 +17,7 @@ import ai.djl.basicdataset.tabular.AmesRandomAccess;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
+import ai.djl.nn.Parameter;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -48,7 +49,7 @@ public class AmesRandomAccessTest {
     public void testAmesRandomAccessRemote() throws IOException, TranslateException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optInitializer(Initializer.ONES);
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());

@@ -66,11 +66,11 @@ JNIEXPORT jboolean JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_checkModel(
   std::ifstream in(filename, std::ifstream::binary);
   int32_t magic;
   int32_t version;
-  in.read((char*)&(magic), sizeof(int32_t));
+  in.read((char*) &(magic), sizeof(int32_t));
   if (magic != fasttext::FASTTEXT_FILEFORMAT_MAGIC_INT32) {
     return false;
   }
-  in.read((char*)&(version), sizeof(int32_t));
+  in.read((char*) &(version), sizeof(int32_t));
   if (version != fasttext::FASTTEXT_VERSION) {
     return false;
   }
@@ -80,7 +80,7 @@ JNIEXPORT jboolean JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_checkModel(
 JNIEXPORT void JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_unloadModel(JNIEnv* env, jobject jthis, jlong jhandle) {
   auto* fasttext_ptr = reinterpret_cast<fasttext::FastText*>(jhandle);
 
-  FastTextPrivateMembers* privateMembers = (FastTextPrivateMembers*)fasttext_ptr;
+  FastTextPrivateMembers* privateMembers = (FastTextPrivateMembers*) fasttext_ptr;
   privateMembers->args_.reset();
   privateMembers->dict_.reset();
   privateMembers->input_.reset();
@@ -92,7 +92,7 @@ JNIEXPORT jstring JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_getModelType(
     JNIEnv* env, jobject jthis, jlong jhandle) {
   auto* fasttext_ptr = reinterpret_cast<fasttext::FastText*>(jhandle);
 
-  auto* privateMembers = (FastTextPrivateMembers*)fasttext_ptr;
+  auto* privateMembers = (FastTextPrivateMembers*) fasttext_ptr;
   model_name modelName = privateMembers->args_->model;
   if (modelName == model_name::cbow) {
     return env->NewStringUTF("cbow");
@@ -131,7 +131,7 @@ JNIEXPORT jfloatArray JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_getWordVe
     JNIEnv* env, jobject jthis, jlong jhandle, jstring word) {
   std::string word_str = djl::utils::jni::GetStringFromJString(env, word);
   auto* fasttext_ptr = reinterpret_cast<fasttext::FastText*>(jhandle);
-  auto* privateMembers = (FastTextPrivateMembers*)fasttext_ptr;
+  auto* privateMembers = (FastTextPrivateMembers*) fasttext_ptr;
 
   Vector vec(privateMembers->args_->dim);
   fasttext_ptr->getWordVector(vec, word_str);

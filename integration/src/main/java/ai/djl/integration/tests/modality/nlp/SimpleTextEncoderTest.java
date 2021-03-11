@@ -23,7 +23,6 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.recurrent.LSTM;
 import ai.djl.training.ParameterStore;
-import ai.djl.training.initializer.XavierInitializer;
 import java.util.Arrays;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -50,12 +49,11 @@ public class SimpleTextEncoderTest {
                                 .optReturnState(true)
                                 .build());
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getDevices()[0])) {
-            encoder.setInitializer(new XavierInitializer());
             encoder.initialize(manager, DataType.FLOAT32, new Shape(4, 7));
             NDList output =
                     encoder.forward(
                             new ParameterStore(manager, false),
-                            new NDList(manager.zeros(new Shape(4, 7))),
+                            new NDList(manager.zeros(new Shape(4, 7), DataType.INT64)),
                             false);
             Assert.assertEquals(output.head().getShape(), new Shape(4, 7, 16));
             Assert.assertEquals(output.size(), 3);

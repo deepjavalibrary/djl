@@ -15,6 +15,7 @@ package ai.djl.modality.nlp.embedding;
 import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.core.Embedding;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -50,7 +51,6 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
         super(
                 builder()
                         .setEmbeddingSize(embeddingSize)
-                        .optSparseGrad(false)
                         .optDefaultItem(DEFAULT_UNKNOWN_TOKEN)
                         .optUseDefault(false));
         this.vocabulary = vocabulary;
@@ -73,10 +73,11 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
      *
      * @param embedding the embedding array
      * @param items the items in the embedding (in matching order to the embedding array)
-     * @param sparseGrad whether to compute row sparse gradient in the backward calculation
+     * @param sparseFormat whether to compute row sparse gradient in the backward calculation
      */
-    public TrainableWordEmbedding(NDArray embedding, List<String> items, boolean sparseGrad) {
-        super(embedding, sparseGrad);
+    public TrainableWordEmbedding(
+            NDArray embedding, List<String> items, SparseFormat sparseFormat) {
+        super(embedding, sparseFormat);
         this.fallthroughEmbedding = new DefaultItem(DEFAULT_UNKNOWN_TOKEN);
         this.vocabulary = new SimpleVocabulary(items);
     }

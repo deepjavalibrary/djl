@@ -66,7 +66,7 @@ public final class TrainAmazonReviewRanking {
 
     public static TrainingResult runExample(String[] args)
             throws IOException, TranslateException, ModelException, URISyntaxException {
-        Arguments arguments = Arguments.parseArgs(args);
+        Arguments arguments = new Arguments().parseArgs(args);
         if (arguments == null) {
             return null;
         }

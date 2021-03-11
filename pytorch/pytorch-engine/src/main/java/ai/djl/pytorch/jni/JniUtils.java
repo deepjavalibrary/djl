@@ -22,6 +22,10 @@ import ai.djl.pytorch.engine.PtDeviceType;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.pytorch.engine.PtSymbolBlock;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
@@ -43,6 +47,8 @@ public final class JniUtils {
     private static Set<String> configs;
 
     private static final int NULL_PTR = 0;
+
+    private static final int BYTE_LENGTH = 4194304;
 
     private JniUtils() {}
 
@@ -1039,6 +1045,12 @@ public final class JniUtils {
                         bias == null ? NULL_PTR : bias.getHandle()));
     }
 
+    public static PtNDArray embedding(PtNDArray input, PtNDArray weight, boolean sparse) {
+        return new PtNDArray(
+                input.getManager(),
+                PyTorchLibrary.LIB.torchNNEmbedding(input.getHandle(), weight.getHandle(), sparse));
+    }
+
     public static PtNDArray relu(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchNNRelu(ndArray.getHandle()));
@@ -1374,6 +1386,47 @@ public final class JniUtils {
         return new PtSymbolBlock(manager, handle);
     }
 
+    public static PtSymbolBlock loadModule(
+            PtNDManager manager, InputStream is, Device device, boolean hasSize)
+            throws IOException {
+        long handle = loadModuleHandle(is, device, hasSize);
+        return new PtSymbolBlock(manager, handle);
+    }
+
+    public static long loadModuleHandle(InputStream is, Device device, boolean hasSize)
+            throws IOException {
+        byte[] buf = new byte[BYTE_LENGTH];
+        long size = -1;
+        if (hasSize) {
+            size = new DataInputStream(is).readLong();
+        }
+        return PyTorchLibrary.LIB.moduleLoad(
+                is,
+                new int[] {
+                    PtDeviceType.toDeviceType(device),
+                    device.equals(Device.cpu()) ? -1 : device.getDeviceId()
+                },
+                buf,
+                size);
+    }
+
+    public static void writeModule(PtSymbolBlock block, OutputStream os, boolean writeSize) {
+        byte[] buf = new byte[BYTE_LENGTH];
+        PyTorchLibrary.LIB.moduleWrite(block.getHandle(), os, buf, writeSize);
+    }
+
+    public static NDList moduleGetParams(PtSymbolBlock block, PtNDManager manager) {
+        long[] handles = PyTorchLibrary.LIB.moduleGetParams(block.getHandle());
+        String[] names = PyTorchLibrary.LIB.moduleGetParamNames(block.getHandle());
+        NDList list = new NDList(handles.length);
+        for (int i = 0; i < handles.length; i++) {
+            PtNDArray array = new PtNDArray(manager, handles[i]);
+            array.setName(names[i]);
+            list.add(array);
+        }
+        return list;
+    }
+
     public static void enableInferenceMode(PtSymbolBlock block) {
         PyTorchLibrary.LIB.moduleEval(block.getHandle());
     }
@@ -1435,5 +1488,20 @@ public final class JniUtils {
     // Internal use only
     public static int getLayout(PtNDArray array) {
         return PyTorchLibrary.LIB.torchLayout(array.getHandle());
+    }
+
+    public static PtNDArray norm(PtNDArray ndArray, int ord, int[] axes, boolean keepDims) {
+        long[] longAxes = Arrays.stream(axes).mapToLong(i -> i).toArray();
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchNorm(ndArray.getHandle(), ord, longAxes, keepDims));
+    }
+
+    public static PtNDArray nonZeros(PtNDArray ndArray) {
+        if (ndArray.isScalar()) {
+            ndArray = (PtNDArray) ndArray.reshape(-1);
+        }
+        return new PtNDArray(
+                ndArray.getManager(), PyTorchLibrary.LIB.torchNonZeros(ndArray.getHandle()));
     }
 }

@@ -19,6 +19,7 @@ import ai.djl.dlr.jni.LibUtils;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
 
 /**
@@ -46,6 +47,9 @@ public final class DlrEngine extends Engine {
     }
 
     private Engine getAlternativeEngine() {
+        if (Boolean.getBoolean("ai.djl.dlr.disable_alternative")) {
+            return null;
+        }
         if (alternativeEngine == null) {
             Engine engine = Engine.getInstance();
             if (engine.getRank() < getRank()) {
@@ -78,6 +82,12 @@ public final class DlrEngine extends Engine {
     @Override
     public boolean hasCapability(String capability) {
         return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public SymbolBlock newSymbolBlock(NDManager manager) {
+        throw new UnsupportedOperationException("DLR does not support empty SymbolBlock");
     }
 
     /** {@inheritDoc} */

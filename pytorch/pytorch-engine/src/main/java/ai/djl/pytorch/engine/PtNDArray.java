@@ -69,7 +69,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         super(handle);
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
-        manager.attach(getUid(), this);
+        manager.attachInternal(getUid(), this);
     }
 
     /**
@@ -84,7 +84,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         super(handle);
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
-        manager.attach(getUid(), this);
+        manager.attachInternal(getUid(), this);
         dataRef = data;
     }
 
@@ -202,13 +202,19 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray stopGradient() {
-        throw new UnsupportedOperationException("Not supported");
+        return JniUtils.detachGradient(this);
     }
 
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
         return JniUtils.getByteBuffer(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String[] toStringArray() {
+        throw new UnsupportedOperationException("String NDArray is not supported!");
     }
 
     /** {@inheritDoc} */
@@ -279,18 +285,25 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager attach(NDManager manager) {
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (PtNDManager) manager;
+        manager.attachInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
         detach();
         NDManager original = this.manager;
         this.manager = (PtNDManager) manager;
-        manager.attach(getUid(), this);
-        return original;
+        manager.tempAttachInternal(original, getUid(), this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void detach() {
-        manager.detach(getUid());
+        manager.detachInternal(getUid());
         manager = PtNDManager.getSystemManager();
     }
 
@@ -1367,7 +1380,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray nonzero() {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.nonZeros(this);
     }
 
     /** {@inheritDoc} */
@@ -1379,12 +1392,18 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray norm(boolean keepDims) {
-        throw new UnsupportedOperationException("Not implemented");
+        return JniUtils.norm(this, 2, new int[] {}, keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray norm(int order, int[] axes, boolean keepDims) {
+        return JniUtils.norm(this, order, axes, keepDims);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray oneHot(int depth, float onValue, float offValue, DataType dataType) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -1430,7 +1449,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         Long pointer = handle.getAndSet(null);
         if (pointer != null) {
             JniUtils.deleteNDArray(pointer);
-            manager.detach(getUid());
+            manager.detachInternal(getUid());
             manager = null;
             dataRef = null;
         }

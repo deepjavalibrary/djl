@@ -12,6 +12,8 @@
  */
 package ai.djl.pytorch.jni;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.Set;
 
@@ -357,6 +359,8 @@ final class PyTorchLibrary {
 
     native long torchNNLinear(long handle, long weightHandle, long biasHandle);
 
+    native long torchNNEmbedding(long handle, long weightHandle, boolean sparse);
+
     native long torchNNRelu(long handle);
 
     native long torchNNSoftPlus(long handle);
@@ -460,11 +464,19 @@ final class PyTorchLibrary {
     native long moduleLoad(
             String path, int[] device, String[] extraFileNames, String[] extraFileValues);
 
+    native long moduleLoad(InputStream is, int[] device, byte[] buffer, long size);
+
     native void moduleEval(long handle);
 
     native void moduleTrain(long handle);
 
     native long moduleForward(long moduleHandle, long[] iValueHandles, boolean isTrain);
+
+    native void moduleWrite(long moduleHandle, OutputStream os, byte[] buffer, boolean writeSize);
+
+    native long[] moduleGetParams(long moduleHandle);
+
+    native String[] moduleGetParamNames(long moduleHandle);
 
     native long iValueFromTensor(long tensorHandle);
 
@@ -520,4 +532,8 @@ final class PyTorchLibrary {
             float rescaleGrad,
             float clipGrad,
             float momentum);
+
+    native long torchNorm(long handle, int ord, long[] axis, boolean keepDims);
+
+    native long torchNonZeros(long handle);
 }

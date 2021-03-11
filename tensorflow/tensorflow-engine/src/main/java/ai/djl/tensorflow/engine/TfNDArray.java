@@ -41,6 +41,7 @@ import org.tensorflow.op.Ops;
 import org.tensorflow.op.core.Constant;
 import org.tensorflow.op.core.Max;
 import org.tensorflow.op.core.Min;
+import org.tensorflow.op.core.OneHot;
 import org.tensorflow.op.core.Prod;
 import org.tensorflow.op.core.Squeeze;
 import org.tensorflow.op.core.Sum;
@@ -72,7 +73,7 @@ public class TfNDArray implements NDArray {
         this.manager = (TfNDManager) manager;
         this.tf = this.manager.getTf();
         uid = UUID.randomUUID().toString();
-        manager.attach(uid, this);
+        manager.attachInternal(uid, this);
         this.operand =
                 this.manager
                         .getEagerSession()
@@ -256,6 +257,13 @@ public class TfNDArray implements NDArray {
         return result;
     }
 
+    @Override
+    public String[] toStringArray() {
+        // TODO: Parse String Array from bytes[]
+        throw new UnsupportedOperationException(
+                "TensorFlow does not supporting printing String NDArray");
+    }
+
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
@@ -278,18 +286,25 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager attach(NDManager manager) {
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (TfNDManager) manager;
+        manager.attachInternal(uid, this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
         detach();
         NDManager original = this.manager;
         this.manager = (TfNDManager) manager;
-        manager.attach(uid, this);
-        return original;
+        manager.tempAttachInternal(original, uid, this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void detach() {
-        manager.detach(getUid());
+        manager.detachInternal(getUid());
         manager = TfNDManager.getSystemManager();
     }
 
@@ -567,6 +582,21 @@ public class TfNDArray implements NDArray {
                                 getOperand(), tf.constant(axes), EuclideanNorm.keepDims(keepDims))
                         .asTensor()) {
             return new TfNDArray(manager, tensor);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray oneHot(int depth, float onValue, float offValue, DataType dataType) {
+        try (Tensor<?> tensor =
+                tf.oneHot(
+                                getOperand(),
+                                tf.constant(depth),
+                                tf.constant(onValue),
+                                tf.constant(offValue),
+                                OneHot.axis(-1L))
+                        .asTensor()) {
+            return new TfNDArray(manager, tensor).toType(dataType, false);
         }
     }
 

@@ -10,9 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.onnxruntime.zoo.tabular.randomforest;
+package ai.djl.onnxruntime.zoo.tabular.softmax_regression;
 
 import ai.djl.Application;
+import ai.djl.Application.Tabular;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.modality.Classifications;
@@ -39,7 +40,7 @@ import java.util.Map;
 /** Model loader for onnx iris_flowers models. */
 public class IrisClassificationModelLoader extends BaseModelLoader {
 
-    private static final Application APPLICATION = Application.Tabular.RANDOM_FOREST;
+    private static final Application APPLICATION = Tabular.SOFTMAX_REGRESSION;
     private static final String GROUP_ID = OrtModelZoo.GROUP_ID;
     private static final String ARTIFACT_ID = "iris_flowers";
     private static final String VERSION = "0.0.1";

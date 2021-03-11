@@ -70,12 +70,11 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader {
                                 .openStream(artifact.getFiles().get("idx_to_token"), null));
         TrainableWordEmbedding wordEmbedding =
                 TrainableWordEmbedding.builder()
-                        .setEmbeddingSize(
+                        .optNumEmbeddings(
                                 Integer.parseInt(artifact.getProperties().get("dimensions")))
                         .setVocabulary(new SimpleVocabulary(idxToToken))
                         .optUnknownToken((String) arguments.get("unknownToken"))
                         .optUseDefault(true)
-                        .optSparseGrad(false)
                         .build();
         model.setBlock(wordEmbedding);
         model.setProperty("unknownToken", (String) arguments.get("unknownToken"));

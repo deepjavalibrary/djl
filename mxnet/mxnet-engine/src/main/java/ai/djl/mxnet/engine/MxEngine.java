@@ -19,6 +19,7 @@ import ai.djl.engine.EngineException;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.jna.LibUtils;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
@@ -39,6 +40,7 @@ import java.nio.file.Paths;
 public final class MxEngine extends Engine {
 
     public static final String ENGINE_NAME = "MXNet";
+    private static final String MXNET_EXTRA_LIBRARY_VERBOSE = "MXNET_EXTRA_LIBRARY_VERBOSE";
 
     /** Constructs an MXNet Engine. */
     private MxEngine() {}
@@ -55,6 +57,10 @@ public final class MxEngine extends Engine {
 
             // load extra MXNet library
             String paths = System.getenv("MXNET_EXTRA_LIBRARY_PATH");
+            boolean extraLibVerbose = false;
+            if (System.getenv().containsKey(MXNET_EXTRA_LIBRARY_VERBOSE)) {
+                extraLibVerbose = Boolean.parseBoolean(System.getenv(MXNET_EXTRA_LIBRARY_VERBOSE));
+            }
             if (paths != null) {
                 String[] files = paths.split(",");
                 for (String file : files) {
@@ -62,7 +68,7 @@ public final class MxEngine extends Engine {
                     if (Files.notExists(path)) {
                         throw new FileNotFoundException("Extra Library not found: " + file);
                     }
-                    JnaUtils.loadLib(path.toAbsolutePath().toString(), 1);
+                    JnaUtils.loadLib(path.toAbsolutePath().toString(), extraLibVerbose);
                 }
             }
 
@@ -99,6 +105,12 @@ public final class MxEngine extends Engine {
     @Override
     public boolean hasCapability(String capability) {
         return JnaUtils.getFeatures().contains(capability);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public SymbolBlock newSymbolBlock(NDManager manager) {
+        return new MxSymbolBlock(manager);
     }
 
     /** {@inheritDoc} */

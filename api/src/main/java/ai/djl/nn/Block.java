@@ -25,6 +25,7 @@ import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.function.Predicate;
 
 /**
  * A {@code Block} is a composable function that forms a neural network.
@@ -158,11 +159,12 @@ public interface Block {
     }
 
     /**
-     * Sets an {@link Initializer} to the block.
+     * Sets an {@link Initializer} to all the parameters that match parameter type in the block.
      *
      * @param initializer the initializer to set
+     * @param type the Parameter Type we want to setInitializer
      */
-    void setInitializer(Initializer initializer);
+    void setInitializer(Initializer initializer, Parameter.Type type);
 
     /**
      * Sets an {@link Initializer} to the specified direct parameter of the block, overriding the
@@ -174,14 +176,21 @@ public interface Block {
     void setInitializer(Initializer initializer, String paramName);
 
     /**
+     * Sets an {@link Initializer} to all the parameters that match Predicate in the block.
+     *
+     * @param initializer the initializer to be set
+     * @param predicate predicate function to indicate parameters you want to set
+     */
+    void setInitializer(Initializer initializer, Predicate<Parameter> predicate);
+
+    /**
      * Initializes the parameters of the block. This method must be called before calling `forward`.
      *
      * @param manager the NDManager to initialize the parameters
      * @param dataType the datatype of the parameters
      * @param inputShapes the shapes of the inputs to the block
-     * @return the shapes of the outputs of the block
      */
-    Shape[] initialize(NDManager manager, DataType dataType, Shape... inputShapes);
+    void initialize(NDManager manager, DataType dataType, Shape... inputShapes);
 
     /**
      * Returns a boolean whether the block is initialized.
@@ -233,24 +242,12 @@ public interface Block {
     ParameterList getParameters();
 
     /**
-     * Returns the shape of the specified direct parameter of this block given the shapes of the
-     * input to the block.
-     *
-     * @param name the name of the parameter
-     * @param inputShapes the shapes of the input to the block
-     * @return the shape of the parameter specified
-     * @throws IllegalArgumentException if the parameter name specified is invalid
-     */
-    Shape getParameterShape(String name, Shape[] inputShapes);
-
-    /**
      * Returns the expected output shapes of the block for the specified input shapes.
      *
-     * @param manager an NDManager
      * @param inputShapes the shapes of the inputs
      * @return the expected output shapes of the block
      */
-    Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes);
+    Shape[] getOutputShapes(Shape[] inputShapes);
 
     /**
      * Writes the parameters of the block to the given outputStream.

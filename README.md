@@ -87,7 +87,7 @@ The following pseudocode demonstrates running training:
 - [JavaDoc API Reference](https://javadoc.djl.ai/)
 
 ## Release Notes
-
+* [0.10.0](https://github.com/awslabs/djl/releases/tag/v0.10.0) ([Code](https://github.com/awslabs/djl/tree/v0.10.0))
 * [0.9.0](https://github.com/awslabs/djl/releases/tag/v0.9.0) ([Code](https://github.com/awslabs/djl/tree/v0.9.0))
 * [0.8.0](https://github.com/awslabs/djl/releases/tag/v0.8.0) ([Code](https://github.com/awslabs/djl/tree/v0.8.0))
 * [0.6.0](https://github.com/awslabs/djl/releases/tag/v0.6.0) ([Code](https://github.com/awslabs/djl/tree/v0.6.0))

@@ -19,12 +19,19 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.pytorch.engine.PtNDManager;
+import ai.djl.pytorch.engine.PtSymbolBlock;
+import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Path;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -62,6 +69,23 @@ public class TorchScriptTest {
 
             try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria)) {
                 Assert.assertEquals(model.getName(), "dict_input");
+            }
+        }
+    }
+
+    @Test
+    public void testInputOutput() throws IOException {
+        URL url =
+                new URL("https://djl-ai.s3.amazonaws.com/resources/test-models/traced_resnet18.pt");
+        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
+            try (InputStream is = url.openStream()) {
+                PtSymbolBlock block = JniUtils.loadModule(manager, is, manager.getDevice(), false);
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                JniUtils.writeModule(block, os, true);
+                ByteArrayInputStream bis = new ByteArrayInputStream(os.toByteArray());
+                JniUtils.loadModule(manager, bis, manager.getDevice(), true);
+                bis.close();
+                os.close();
             }
         }
     }

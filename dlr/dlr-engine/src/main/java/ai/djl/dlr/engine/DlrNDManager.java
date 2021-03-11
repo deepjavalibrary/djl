@@ -54,7 +54,7 @@ public class DlrNDManager extends BaseNDManager {
     @Override
     public DlrNDManager newSubManager(Device dev) {
         DlrNDManager manager = new DlrNDManager(this, dev);
-        attach(manager.uid, manager);
+        attachInternal(manager.uid, manager);
         return manager;
     }
 
@@ -105,11 +105,11 @@ public class DlrNDManager extends BaseNDManager {
 
         /** {@inheritDoc} */
         @Override
-        public void attach(String resourceId, AutoCloseable resource) {}
+        public void attachInternal(String resourceId, AutoCloseable resource) {}
 
         /** {@inheritDoc} */
         @Override
-        public void detach(String resourceId) {}
+        public void detachInternal(String resourceId) {}
 
         /** {@inheritDoc} */
         @Override

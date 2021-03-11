@@ -1165,6 +1165,20 @@ public final class JnaUtils {
         return pointer;
     }
 
+    public static Pointer createSymbolFromString(String json) {
+        PointerByReference ref = REFS.acquire();
+        checkCall(LIB.MXSymbolCreateFromJSON(json, ref));
+        Pointer pointer = ref.getValue();
+        REFS.recycle(ref);
+        return pointer;
+    }
+
+    public static String getSymbolString(Pointer symbol) {
+        String[] holder = new String[1];
+        checkCall(LIB.MXSymbolSaveToJSON(symbol, holder));
+        return holder[0];
+    }
+
     private static List<Shape> recoverShape(
             NativeSizeByReference size, PointerByReference nDim, PointerByReference data) {
         int shapeLength = (int) size.getValue().longValue();
@@ -1240,8 +1254,9 @@ public final class JnaUtils {
         return null;
     }
 
-    public static void loadLib(String path, int verbose) {
-        checkCall(LIB.MXLoadLib(path, verbose));
+    public static void loadLib(String path, boolean verbose) {
+        int intVerbose = verbose ? 1 : 0;
+        checkCall(LIB.MXLoadLib(path, intVerbose));
     }
 
     public static Pointer optimizeFor(Symbol current, String backend, Device device) {

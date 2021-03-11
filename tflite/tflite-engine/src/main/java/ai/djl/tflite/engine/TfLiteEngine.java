@@ -17,6 +17,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
 
 /**
@@ -53,6 +54,9 @@ public final class TfLiteEngine extends Engine {
     }
 
     private Engine getAlternativeEngine() {
+        if (Boolean.getBoolean("ai.djl.tflite.disable_alternative")) {
+            return null;
+        }
         if (alternativeEngine == null) {
             Engine engine = Engine.getInstance();
             if (engine.getRank() < getRank()) {
@@ -66,7 +70,7 @@ public final class TfLiteEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "1.4.0";
+        return "2.4.1";
     }
 
     /** {@inheritDoc} */
@@ -81,6 +85,12 @@ public final class TfLiteEngine extends Engine {
     public Model newModel(String name, Device device) {
         // We need pass TfLiteManager explicitly
         return new TfLiteModel(name, newBaseManager(device));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public SymbolBlock newSymbolBlock(NDManager manager) {
+        throw new UnsupportedOperationException("TFLite does not support empty SymbolBlock");
     }
 
     /** {@inheritDoc} */

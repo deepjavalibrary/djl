@@ -19,6 +19,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.training.initializer.XavierInitializer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -42,62 +43,23 @@ public class Parameter implements AutoCloseable {
 
     private String id;
     private String name;
-    private Block block;
-    private ParameterType type;
-    private DataType mandatoryDataType;
+    private Shape shape;
+    private Type type;
     private Initializer initializer;
     private NDArray array;
     private boolean requiresGrad;
     private SparseFormat gradientFormat;
 
-    /**
-     * Creates a {@code Parameter} with the given name, and parameter type, and associated with the
-     * given {@link Block}.
-     *
-     * @param name the name of the {@code Parameter}
-     * @param block the block with which this {@code Parameter} is associated
-     * @param type the type of this {@code Parameter}
-     */
-    public Parameter(String name, Block block, ParameterType type) {
-        this(name, block, type, true, SparseFormat.DENSE);
-    }
-
-    /**
-     * Creates a {@code Parameter} with the given name, and parameter type, and associated with the
-     * given {@link Block}.
-     *
-     * @param name the name of the {@code Parameter}
-     * @param block the block with which this {@code Parameter} is associated
-     * @param type the type of this {@code Parameter}
-     * @param requiresGrad whether this {@code Parameter} needs to compute gradients
-     */
-    public Parameter(String name, Block block, ParameterType type, boolean requiresGrad) {
-        this(name, block, type, requiresGrad, SparseFormat.DENSE);
-    }
-
-    /**
-     * Creates a {@code Parameter} with the given name, and parameter type, and associated with the
-     * given {@link Block}.
-     *
-     * @param name the name of the {@code Parameter}
-     * @param block the block with which this {@code Parameter} is associated
-     * @param type the type of this {@code Parameter}
-     * @param requireGrad whether this {@code Parameter} needs to compute gradients
-     * @param gradientFormat the {@link SparseFormat} of the gradient array
-     */
-    public Parameter(
-            String name,
-            Block block,
-            ParameterType type,
-            boolean requireGrad,
-            SparseFormat gradientFormat) {
+    Parameter(Builder builder) {
         this.id = UUID.randomUUID().toString();
-        this.name = name;
-        this.block = block;
-        this.type = type;
-        this.requiresGrad = requireGrad;
-        this.initializer = type.getInitializer();
-        this.gradientFormat = gradientFormat;
+        this.name = builder.name;
+        this.shape = builder.shape;
+        this.type = builder.type;
+        this.array = builder.array;
+        this.requiresGrad = builder.requiresGrad;
+        this.initializer =
+                (builder.initializer != null) ? builder.initializer : type.getInitializer();
+        this.gradientFormat = builder.gradientFormat;
     }
 
     /**
@@ -123,7 +85,7 @@ public class Parameter implements AutoCloseable {
      *
      * @return the type of this {@code Parameter}
      */
-    public ParameterType getType() {
+    public Type getType() {
         return type;
     }
 
@@ -133,8 +95,24 @@ public class Parameter implements AutoCloseable {
      * @param array the {@link NDArray} that contains values of this {@code Parameter}
      */
     public void setArray(NDArray array) {
+        if (shape != null) {
+            throw new IllegalStateException("array has been set! Use either setArray or setShape");
+        }
         this.array = array;
+        shape = array.getShape();
         array.setName(name);
+    }
+
+    /**
+     * Sets the shape of this {@code Parameter}.
+     *
+     * @param shape the shape of this {@code Parameter}
+     */
+    public void setShape(Shape shape) {
+        if (array != null) {
+            throw new IllegalStateException("array has been set! Use either setArray or setShape");
+        }
+        this.shape = shape;
     }
 
     /**
@@ -159,15 +137,6 @@ public class Parameter implements AutoCloseable {
     }
 
     /**
-     * Sets the mandatory data type for this {@code Parameter}.
-     *
-     * @param mandatoryDataType the mandatory data type for this {@code Parameter}
-     */
-    public void setMandatoryDataType(DataType mandatoryDataType) {
-        this.mandatoryDataType = mandatoryDataType;
-    }
-
-    /**
      * Checks if this {@code Parameter} is initialized.
      *
      * @return {@code true} if this {@code Parameter} is initialized
@@ -181,12 +150,9 @@ public class Parameter implements AutoCloseable {
      * flag is true, sets the initializer regardless.
      *
      * @param initializer the initializer to be set
-     * @param overwrite if true, set the initializer regardless of whether its already set or not
      */
-    public void setInitializer(Initializer initializer, boolean overwrite) {
-        if (overwrite || this.initializer == null) {
-            this.initializer = initializer;
-        }
+    public void setInitializer(Initializer initializer) {
+        this.initializer = initializer;
     }
 
     /**
@@ -195,17 +161,12 @@ public class Parameter implements AutoCloseable {
      *
      * @param manager an NDManager to create the arrays
      * @param dataType the datatype of the {@code Parameter}
-     * @param inputShapes the expected input shapes
      */
-    public void initialize(NDManager manager, DataType dataType, Shape[] inputShapes) {
+    public void initialize(NDManager manager, DataType dataType) {
         Objects.requireNonNull(initializer, "No initializer has been set");
+        Objects.requireNonNull(shape, "No parameter shape has been set");
         if (!isInitialized()) {
-            Shape shape = block.getParameterShape(name, inputShapes);
-            array =
-                    initializer.initialize(
-                            manager,
-                            shape,
-                            mandatoryDataType == null ? dataType : mandatoryDataType);
+            array = initializer.initialize(manager, shape, dataType);
             array.setName(name);
         }
 
@@ -266,6 +227,8 @@ public class Parameter implements AutoCloseable {
         }
 
         array = manager.decode(dis);
+        // set the shape of the parameter and prepare() can be skipped
+        shape = array.getShape();
     }
 
     /** {@inheritDoc} */
@@ -274,6 +237,143 @@ public class Parameter implements AutoCloseable {
         if (array != null) {
             array.close();
             array = null;
+        }
+    }
+
+    /**
+     * Creates a builder to build a {@code Parameter}.
+     *
+     * <p>The methods start with {@code set} are required fields, and {@code opt} for optional
+     * fields.
+     *
+     * @return a new builder
+     */
+    public static Parameter.Builder builder() {
+        return new Parameter.Builder();
+    }
+
+    /** Enumerates the types of {@link Parameter}. */
+    public enum Type {
+        WEIGHT(
+                new XavierInitializer(
+                        XavierInitializer.RandomType.GAUSSIAN, XavierInitializer.FactorType.IN, 2)),
+        BIAS(Initializer.ZEROS),
+        GAMMA(Initializer.ONES),
+        BETA(Initializer.ZEROS),
+        RUNNING_MEAN(Initializer.ZEROS),
+        RUNNING_VAR(Initializer.ONES),
+        OTHER(null);
+
+        private final transient Initializer initializer;
+
+        Type(Initializer initializer) {
+            this.initializer = initializer;
+        }
+
+        /**
+         * Gets the {@link Initializer} of this {@code ParameterType}.
+         *
+         * @return the {@link Initializer} of this {@code ParameterType}
+         */
+        public Initializer getInitializer() {
+            return initializer;
+        }
+    }
+
+    /** A Builder to construct a {@code Parameter}. */
+    public static final class Builder {
+        String name;
+        Shape shape;
+        Type type;
+        Initializer initializer;
+        NDArray array;
+        boolean requiresGrad = true;
+        SparseFormat gradientFormat;
+
+        /**
+         * Sets the name of the {@code Parameter}.
+         *
+         * @param name the name of the {@code Parameter}
+         * @return this {@code Parameter}
+         */
+        public Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * Sets the {@code Type} of the {@code Parameter}.
+         *
+         * @param type the {@code Type} of the {@code Parameter}
+         * @return this {@code Parameter}
+         */
+        public Builder setType(Type type) {
+            this.type = type;
+            return this;
+        }
+
+        /**
+         * Sets the shape of the {@code Parameter}.
+         *
+         * @param shape the shape of the {@code Parameter}
+         * @return this {@code Parameter}
+         */
+        public Builder optShape(Shape shape) {
+            this.shape = shape;
+            return this;
+        }
+
+        /**
+         * Sets the Initializer of the {@code Parameter}.
+         *
+         * @param initializer the Initializer of the {@code Parameter}
+         * @return this {@code Parameter}
+         */
+        public Builder optInitializer(Initializer initializer) {
+            this.initializer = initializer;
+            return this;
+        }
+
+        /**
+         * Sets the array of the {@code Parameter}.
+         *
+         * @param array the array of the {@code Parameter}
+         * @return this {@code Parameter}
+         */
+        public Builder optArray(NDArray array) {
+            this.array = array;
+            return this;
+        }
+
+        /**
+         * Sets if the {@code Parameter} requires gradient.
+         *
+         * @param requiresGrad if the {@code Parameter} requires gradient
+         * @return this {@code Parameter}
+         */
+        public Builder optRequiresGrad(boolean requiresGrad) {
+            this.requiresGrad = requiresGrad;
+            return this;
+        }
+
+        /**
+         * Sets the {@link SparseFormat} of the {@code Parameter}.
+         *
+         * @param gradientFormat the {@link SparseFormat} of the {@code Parameter}
+         * @return this {@code Parameter}
+         */
+        public Builder optGradientFormat(SparseFormat gradientFormat) {
+            this.gradientFormat = gradientFormat;
+            return this;
+        }
+
+        /**
+         * Builds a {@code Parameter} instance.
+         *
+         * @return the {@code Parameter} instance
+         */
+        public Parameter build() {
+            return new Parameter(this);
         }
     }
 }

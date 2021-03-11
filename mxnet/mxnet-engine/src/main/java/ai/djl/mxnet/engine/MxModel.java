@@ -24,6 +24,8 @@ import ai.djl.nn.Parameter;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.util.Pair;
+import ai.djl.util.PairList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,6 +35,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,12 +125,16 @@ public class MxModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
-        Initializer initializer = trainingConfig.getInitializer();
+        PairList<Initializer, Predicate<Parameter>> initializer = trainingConfig.getInitializers();
         if (block == null) {
             throw new IllegalStateException(
                     "You must set a block for the model before creating a new trainer");
         }
-        block.setInitializer(initializer);
+        for (Pair<Initializer, Predicate<Parameter>> pair : initializer) {
+            if (pair.getKey() != null && pair.getValue() != null) {
+                block.setInitializer(pair.getKey(), pair.getValue());
+            }
+        }
 
         return new Trainer(this, trainingConfig);
     }
@@ -192,21 +199,5 @@ public class MxModel extends BaseModel {
         // TODO: Find a better to infer model DataType from SymbolBlock.
         dataType = paramNDlist.head().getDataType();
         logger.debug("MXNet Model {} ({}) loaded successfully.", paramFile, dataType);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("Model (\n\tName: ").append(modelName);
-        if (modelDir != null) {
-            sb.append("\n\tModel location: ").append(modelDir.toAbsolutePath());
-        }
-        sb.append("\n\tData Type: ").append(dataType);
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
-            sb.append("\n\t").append(entry.getKey()).append(": ").append(entry.getValue());
-        }
-        sb.append("\n)");
-        return sb.toString();
     }
 }

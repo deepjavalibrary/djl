@@ -19,7 +19,6 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.training.ParameterStore;
@@ -32,13 +31,13 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
 
     private static final byte VERSION = 1;
 
-    private final Linear sequenceProjection;
+    private Linear sequenceProjection;
 
-    private final BatchNorm sequenceNorm;
+    private BatchNorm sequenceNorm;
 
-    private final Parameter dictionaryBias;
+    private Parameter dictionaryBias;
 
-    private final Function<NDArray, NDArray> hiddenActivation;
+    private Function<NDArray, NDArray> hiddenActivation;
 
     /**
      * Creates a new block that applies the masked language task.
@@ -59,8 +58,11 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
         this.sequenceNorm = addChildBlock("sequenceNorm", BatchNorm.builder().optAxis(1).build());
         this.dictionaryBias =
                 addParameter(
-                        new Parameter("dictionaryBias", this, ParameterType.BIAS),
-                        new Shape(bertBlock.getTokenDictionarySize()));
+                        Parameter.builder()
+                                .setName("dictionaryBias")
+                                .setType(Parameter.Type.BIAS)
+                                .optShape(new Shape(bertBlock.getTokenDictionarySize()))
+                                .build());
         this.hiddenActivation = hiddenActivation;
     }
 
@@ -98,10 +100,9 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void initializeChildBlocks(
-            final NDManager manager, final DataType dataType, final Shape... inputShapes) {
+    public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         inputNames = Arrays.asList("sequence", "maskedIndices", "embeddingTable");
-        final int width = (int) inputShapes[0].get(2);
+        int width = (int) inputShapes[0].get(2);
         sequenceProjection.initialize(manager, dataType, new Shape(-1, width));
         sequenceNorm.initialize(manager, dataType, new Shape(-1, width));
     }
@@ -109,73 +110,44 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     protected NDList forwardInternal(
-            final ParameterStore ps,
-            final NDList inputs,
-            final boolean training,
-            final PairList<String, Object> params) {
-        return forward(ps, inputs, training);
+            ParameterStore ps, NDList inputs, boolean training, PairList<String, Object> params) {
+        NDArray sequenceOutput = inputs.get(0); // (B, S, E)
+        NDArray maskedIndices = inputs.get(1); // (B, I)
+        NDArray embeddingTable = inputs.get(2); // (D, E)
+        try (NDManager scope = NDManager.from(sequenceOutput)) {
+            scope.tempAttachAll(sequenceOutput, maskedIndices);
+            NDArray gatheredTokens = gatherFromIndices(sequenceOutput, maskedIndices); // (B * I, E)
+            NDArray projectedTokens =
+                    hiddenActivation.apply(
+                            sequenceProjection
+                                    .forward(ps, new NDList(gatheredTokens), training)
+                                    .head()); // (B * I, E)
+            NDArray normalizedTokens =
+                    sequenceNorm
+                            .forward(ps, new NDList(projectedTokens), training)
+                            .head(); // (B * I, E)
+            // raw logits for each position to correspond to an entry in the embedding table
+            NDArray embeddingTransposed = embeddingTable.transpose();
+            embeddingTransposed.attach(gatheredTokens.getManager());
+            NDArray logits = normalizedTokens.dot(embeddingTransposed); // (B * I, D)
+            // we add an offset for each dictionary entry
+            NDArray logitsWithBias =
+                    logits.add(
+                            ps.getValue(
+                                    dictionaryBias, logits.getDevice(), training)); // (B * I, D)
+            // now we apply log Softmax to get proper log probabilities
+            NDArray logProbs = logitsWithBias.logSoftmax(1); // (B * I, D)
+
+            return scope.ret(new NDList(logProbs));
+        }
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList forward(final ParameterStore ps, final NDList inputs, final boolean training) {
-        final NDArray sequenceOutput = inputs.get(0); // (B, S, E)
-        final NDArray maskedIndices = inputs.get(1); // (B, I)
-        final NDArray embeddingTable = inputs.get(2); // (D, E)
-        final NDArray logProbs =
-                forward(ps, sequenceOutput, maskedIndices, embeddingTable, training);
-        return new NDList(logProbs);
-    }
-
-    /**
-     * Calculates the result of the masked language task.
-     *
-     * @param ps the parameter store
-     * @param sequenceOutput The sequence output of the bert model (B, S, E)
-     * @param maskedIndices The indices of the tokens masked for pretraining (B, I)
-     * @param embeddingTable The embedding table of the bert model (D, E)
-     * @param training true=apply dropout etc.
-     * @return the log probabilities for each dictionary item for each masked token, size (B * I, D)
-     */
-    public NDArray forward(
-            final ParameterStore ps,
-            final NDArray sequenceOutput,
-            final NDArray maskedIndices,
-            final NDArray embeddingTable,
-            final boolean training) {
-        MemoryScope scope = MemoryScope.from(sequenceOutput).add(maskedIndices);
-        final NDArray gatheredTokens =
-                gatherFromIndices(sequenceOutput, maskedIndices); // (B * I, E)
-        final NDArray projectedTokens =
-                hiddenActivation.apply(
-                        sequenceProjection
-                                .forward(ps, new NDList(gatheredTokens), training)
-                                .head()); // (B * I, E)
-        final NDArray normalizedTokens =
-                sequenceNorm
-                        .forward(ps, new NDList(projectedTokens), training)
-                        .head(); // (B * I, E)
-        // raw logits for each position to correspond to an entry in the embedding table
-        final NDArray embeddingTransposed = embeddingTable.transpose();
-        embeddingTransposed.attach(gatheredTokens.getManager());
-        final NDArray logits = normalizedTokens.dot(embeddingTransposed); // (B * I, D)
-        // we add an offset for each dictionary entry
-        final NDArray logitsWithBias =
-                logits.add(ps.getValue(dictionaryBias, logits.getDevice(), training)); // (B * I, D)
-        // now we apply log Softmax to get proper log probabilities
-        final NDArray logProbs = logitsWithBias.logSoftmax(1); // (B * I, D)
-
-        scope.remove(sequenceOutput, maskedIndices).waitToRead(logProbs).close();
-
-        return logProbs;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape[] getOutputShapes(final NDManager manager, final Shape[] inputShapes) {
-        final int batchSize = (int) inputShapes[0].get(0);
-        final int indexCount = (int) inputShapes[1].get(1);
-        final int dictionarySize = (int) inputShapes[2].get(0);
+    public Shape[] getOutputShapes(final Shape[] inputShapes) {
+        int batchSize = (int) inputShapes[0].get(0);
+        int indexCount = (int) inputShapes[1].get(1);
+        int dictionarySize = (int) inputShapes[2].get(0);
         return new Shape[] {new Shape(batchSize * indexCount, dictionarySize)};
     }
 }

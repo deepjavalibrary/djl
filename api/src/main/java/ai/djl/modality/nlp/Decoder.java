@@ -64,8 +64,8 @@ public abstract class Decoder extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
-        return block.getOutputShapes(manager, inputShapes);
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
+        return block.getOutputShapes(inputShapes);
     }
 
     /** {@inheritDoc} */

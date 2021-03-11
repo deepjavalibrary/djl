@@ -18,6 +18,7 @@ import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
 import ai.djl.util.RandomUtils;
 import org.tensorflow.EagerSession;
@@ -54,6 +55,12 @@ public final class TfEngine extends Engine {
     @Override
     public Model newModel(String name, Device device) {
         return new TfModel(name, device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public SymbolBlock newSymbolBlock(NDManager manager) {
+        throw new UnsupportedOperationException("TensorFlow does not support empty SymbolBlock");
     }
 
     /** {@inheritDoc} */

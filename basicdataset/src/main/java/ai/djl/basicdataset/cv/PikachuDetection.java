@@ -16,19 +16,16 @@ import ai.djl.Application.CV;
 import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
+import ai.djl.modality.cv.output.Point;
+import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.Resource;
-import ai.djl.training.dataset.RandomAccessDataset;
-import ai.djl.training.dataset.Record;
 import ai.djl.translate.Pipeline;
 import ai.djl.util.JsonUtils;
+import ai.djl.util.PairList;
 import ai.djl.util.Progress;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
@@ -38,19 +35,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /** Pikachu image detection dataset that contains multiple Pikachus in each image. */
-public class PikachuDetection extends RandomAccessDataset {
+public class PikachuDetection extends ObjectDetectionDataset {
 
     private static final String VERSION = "1.0";
     private static final String ARTIFACT_ID = "pikachu";
 
     private Usage usage;
-    private Image.Flag flag;
     private List<Path> imagePaths;
-    private List<float[]> labels;
+    private PairList<Long, Rectangle> labels;
 
     private Resource resource;
     private boolean prepared;
@@ -58,9 +56,8 @@ public class PikachuDetection extends RandomAccessDataset {
     protected PikachuDetection(Builder builder) {
         super(builder);
         usage = builder.usage;
-        flag = builder.flag;
         imagePaths = new ArrayList<>();
-        labels = new ArrayList<>();
+        labels = new PairList<>();
         MRL mrl = MRL.dataset(CV.ANY, builder.groupId, builder.artifactId);
         resource = new Resource(builder.repository, mrl, VERSION);
     }
@@ -103,36 +100,24 @@ public class PikachuDetection extends RandomAccessDataset {
             Type mapType = new TypeToken<Map<String, List<Float>>>() {}.getType();
             Map<String, List<Float>> metadata = JsonUtils.GSON.fromJson(reader, mapType);
             for (Map.Entry<String, List<Float>> entry : metadata.entrySet()) {
-                float[] labelArray = new float[5];
                 String imgName = entry.getKey();
-                List<Float> label = entry.getValue();
-                // Class label
-                labelArray[0] = label.get(4);
-
-                // Bounding box labels
-                labelArray[1] = label.get(5);
-                labelArray[2] = label.get(6);
-                labelArray[3] = label.get(7);
-                labelArray[4] = label.get(8);
                 imagePaths.add(usagePath.resolve(imgName));
-                labels.add(labelArray);
+
+                List<Float> label = entry.getValue();
+                long objectClass = label.get(4).longValue();
+                Rectangle objectLocation =
+                        new Rectangle(
+                                new Point(label.get(5), label.get(6)),
+                                new Point(label.get(7), label.get(8)));
+                labels.add(objectClass, objectLocation);
             }
         }
         prepared = true;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Record get(NDManager manager, long index) throws IOException {
-        int idx = Math.toIntExact(index);
-        NDList d =
-                new NDList(
-                        ImageFactory.getInstance()
-                                .fromFile(imagePaths.get(idx))
-                                .toNDArray(manager, flag));
-        NDArray label = manager.create(labels.get(idx));
-        NDList l = new NDList(label.reshape(new Shape(1).addAll(label.getShape())));
-        return new Record(d, l);
+    public PairList<Long, Rectangle> getObjects(long index) throws IOException {
+        return new PairList<>(Collections.singletonList(labels.get((int) index)));
     }
 
     /** {@inheritDoc} */
@@ -141,14 +126,29 @@ public class PikachuDetection extends RandomAccessDataset {
         return imagePaths.size();
     }
 
+    @Override
+    protected Image getImage(long index) throws IOException {
+        int idx = Math.toIntExact(index);
+        return ImageFactory.getInstance().fromFile(imagePaths.get(idx));
+    }
+
+    @Override
+    public Optional<Integer> getImageWidth() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Integer> getImageHeight() {
+        return Optional.empty();
+    }
+
     /** A builder for a {@link PikachuDetection}. */
-    public static final class Builder extends BaseBuilder<Builder> {
+    public static final class Builder extends ImageDataset.BaseBuilder<Builder> {
 
         Repository repository;
         String groupId;
         String artifactId;
         Usage usage;
-        Image.Flag flag;
 
         /** Constructs a new builder. */
         Builder() {
@@ -156,7 +156,6 @@ public class PikachuDetection extends RandomAccessDataset {
             groupId = BasicDatasets.GROUP_ID;
             artifactId = ARTIFACT_ID;
             usage = Usage.TRAIN;
-            flag = Image.Flag.COLOR;
         }
 
         /** {@inheritDoc} */
@@ -213,17 +212,6 @@ public class PikachuDetection extends RandomAccessDataset {
                 this.artifactId = artifactId;
             }
             return this;
-        }
-
-        /**
-         * Sets the optional color mode flag.
-         *
-         * @param flag the color mode flag
-         * @return this builder
-         */
-        public Builder optFlag(Image.Flag flag) {
-            this.flag = flag;
-            return self();
         }
 
         /**

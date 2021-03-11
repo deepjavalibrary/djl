@@ -47,7 +47,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromDict(
   torch::Dict<std::string, torch::Tensor> dict;
   dict.reserve(len);
   for (size_t i = 0; i < len; ++i) {
-    auto jname = (jstring)env->GetObjectArrayElement(jnames, i);
+    auto jname = (jstring) env->GetObjectArrayElement(jnames, i);
     std::string name = djl::utils::jni::GetStringFromJString(env, jname);
     dict.insert(name, *reinterpret_cast<torch::Tensor*>(jptrs[i]));
   }

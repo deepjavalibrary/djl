@@ -80,7 +80,7 @@ public class XavierInitializer implements Initializer {
 
     /** Creates a new instance of {@code XavierInitializer}. */
     public XavierInitializer() {
-        this(RandomType.UNIFORM, FactorType.AVG, 3f);
+        this(RandomType.UNIFORM, FactorType.AVG, 6f);
     }
 
     /** {@inheritDoc} */

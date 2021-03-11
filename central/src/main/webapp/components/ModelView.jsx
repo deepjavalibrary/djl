@@ -19,6 +19,7 @@ import Chip from '@material-ui/core/Chip';
 import Divider from '@material-ui/core/Divider';
 
 import DynForm from './DynForm';
+import ModelDownloadButtons from './DownloadButtons';
 
 import axios from 'axios'
 
@@ -186,6 +187,7 @@ export default function ModelView(props) {
 						<Tab label="Arguments" {...a11yProps(3)} />
 						<Tab label="Parameters" {...a11yProps(4)} />
 						<Tab label="Synset" {...a11yProps(5)} />
+						<Tab label="Download" {...a11yProps(6)} />
 					</Tabs>
 
 					<TabPanel value={index} index={0} className={classes.tabpanel}>
@@ -250,6 +252,9 @@ export default function ModelView(props) {
 							: <DynForm data={noSynset}/>
 						}
 					</TabPanel>
+					<TabPanel value={index} index={6} className={classes.tabpanel}>
+                        <ModelDownloadButtons model={props.model}/>
+                    </TabPanel>
 				</div>
 
 			</Paper>

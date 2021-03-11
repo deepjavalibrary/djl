@@ -13,12 +13,16 @@
 package ai.djl.onnxruntime.engine;
 
 import ai.djl.Device;
+import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrayAdapter;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.onnxruntime.OnnxTensor;
+import ai.onnxruntime.OrtException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -44,7 +48,7 @@ public class OrtNDArray implements NDArrayAdapter {
         this.manager = manager;
         this.tensor = tensor;
         uid = UUID.randomUUID().toString();
-        manager.attach(uid, this);
+        manager.attachInternal(uid, this);
     }
 
     OnnxTensor getTensor() {
@@ -102,19 +106,42 @@ public class OrtNDArray implements NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager attach(NDManager manager) {
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (OrtNDManager) manager;
+        manager.attachInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
         detach();
         NDManager original = this.manager;
         this.manager = (OrtNDManager) manager;
-        manager.attach(getUid(), this);
-        return original;
+        manager.tempAttachInternal(original, getUid(), this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void detach() {
-        manager.detach(getUid());
+        manager.detachInternal(getUid());
         manager = OrtNDManager.getSystemManager();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String[] toStringArray() {
+        try {
+            return (String[]) tensor.getValue();
+        } catch (OrtException e) {
+            throw new EngineException(e);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ByteBuffer toByteBuffer() {
+        return tensor.getByteBuffer().order(ByteOrder.nativeOrder());
     }
 
     /** {@inheritDoc} */
@@ -123,14 +150,13 @@ public class OrtNDArray implements NDArrayAdapter {
         if (isClosed) {
             return "This array is already closed";
         }
-        return "ND: "
-                + getShape()
-                + ' '
-                + getDevice()
-                + ' '
-                + getDataType()
-                + '\n'
-                + Arrays.toString(toArray());
+        String arrStr;
+        if (getDataType() == DataType.STRING) {
+            arrStr = Arrays.toString(toStringArray());
+        } else {
+            arrStr = Arrays.toString(toArray());
+        }
+        return "ND: " + getShape() + ' ' + getDevice() + ' ' + getDataType() + '\n' + arrStr;
     }
 
     /** {@inheritDoc} */

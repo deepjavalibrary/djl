@@ -15,9 +15,9 @@ In gradle, you can include the snapshot repository and add the 4 modules in your
 
 ```
 dependencies {
-    implementation "ai.djl:api:0.9.0"
-    implementation "ai.djl.android:core:0.9.0"
-    androidRuntimeOnly "ai.djl.pytorch:pytorch-engine:0.9.0"
-    androidRuntimeOnly "ai.djl.android:pytorch-native:0.9.0"
+    implementation "ai.djl:api:0.10.0"
+    implementation "ai.djl.android:core:0.10.0"
+    androidRuntimeOnly "ai.djl.pytorch:pytorch-engine:0.10.0"
+    androidRuntimeOnly "ai.djl.android:pytorch-native:0.10.0"
 }
 ```

@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.SymbolBlock;
 import ai.djl.paddlepaddle.jni.JniUtils;
 import ai.djl.paddlepaddle.jni.LibUtils;
 import ai.djl.training.GradientCollector;
@@ -56,10 +57,13 @@ public final class PpEngine extends Engine {
     }
 
     Engine getAlternativeEngine() {
+        if (Boolean.getBoolean("ai.djl.paddlepaddle.disable_alternative")) {
+            return null;
+        }
         if (alternativeEngine == null) {
             Engine engine = Engine.getInstance();
             if (engine.getRank() < getRank()) {
-                // alternativeEngine should not have the same rank as ORT
+                // alternativeEngine should not have the same rank as Paddle
                 alternativeEngine = engine;
             }
         }
@@ -83,6 +87,12 @@ public final class PpEngine extends Engine {
     @Override
     public Model newModel(String name, Device device) {
         return new PpModel(name, newBaseManager(device));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public SymbolBlock newSymbolBlock(NDManager manager) {
+        throw new UnsupportedOperationException("PaddlePaddle does not support empty SymbolBlock");
     }
 
     /** {@inheritDoc} */

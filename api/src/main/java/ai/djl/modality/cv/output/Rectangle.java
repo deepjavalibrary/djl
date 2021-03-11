@@ -16,6 +16,10 @@ package ai.djl.modality.cv.output;
  * A {@code Rectangle} specifies an area in a coordinate space that is enclosed by the {@code
  * Rectangle} object's upper-left point {@link Point} in the coordinate space, its width, and its
  * height.
+ *
+ * <p>The rectangle coordinates are usually from 0-1 and are ratios of the image size. For example,
+ * if you have an image width of 400 pixels and the rectangle starts at 100 pixels, you would use
+ * .25.
  */
 public class Rectangle implements BoundingBox {
 
@@ -28,22 +32,32 @@ public class Rectangle implements BoundingBox {
      * Constructs a new {@code Rectangle} whose upper-left corner is specified as {@code (x,y)} and
      * whose width and height are specified by the arguments of the same name.
      *
-     * @param x the specified X coordinate
-     * @param y the specified Y coordinate
-     * @param width the width of the {@code Rectangle}
-     * @param height the height of the {@code Rectangle}
+     * @param x the specified X coordinate (0-1)
+     * @param y the specified Y coordinate (0-1)
+     * @param width the width of the {@code Rectangle} (0-1)
+     * @param height the height of the {@code Rectangle} (0-1)
      */
     public Rectangle(double x, double y, double width, double height) {
         this(new Point(x, y), width, height);
     }
 
     /**
+     * Constructs a new {@code Rectangle} with the upperLeft and lowerRight coordinates.
+     *
+     * @param upperLeft the upper left coordinate (0-1)
+     * @param lowerRight the upper left coordinate (0-1)
+     */
+    public Rectangle(Point upperLeft, Point lowerRight) {
+        this(upperLeft, lowerRight.getX(), lowerRight.getY());
+    }
+
+    /**
      * Constructs a new {@code Rectangle} whose upper-left corner is specified as coordinate {@code
      * point} and whose width and height are specified by the arguments of the same name.
      *
-     * @param point the upper-left corner of the coordinate
-     * @param width the width of the {@code Rectangle}
-     * @param height the height of the {@code Rectangle}
+     * @param point the upper-left corner of the coordinate (0-1)
+     * @param width the width of the {@code Rectangle} (0-1)
+     * @param height the height of the {@code Rectangle} (0-1)
      */
     public Rectangle(Point point, double width, double height) {
         this.point = point;
@@ -121,7 +135,7 @@ public class Rectangle implements BoundingBox {
     /**
      * Returns the left x-coordinate of the Rectangle.
      *
-     * @return the left x-coordinate of the Rectangle
+     * @return the left x-coordinate of the Rectangle (0-1)
      */
     public double getX() {
         return point.getX();
@@ -130,7 +144,7 @@ public class Rectangle implements BoundingBox {
     /**
      * Returns the top y-coordinate of the Rectangle.
      *
-     * @return the top y-coordinate of the Rectangle
+     * @return the top y-coordinate of the Rectangle (0-1)
      */
     public double getY() {
         return point.getY();
@@ -139,7 +153,7 @@ public class Rectangle implements BoundingBox {
     /**
      * Returns the width of the Rectangle.
      *
-     * @return the width of the Rectangle
+     * @return the width of the Rectangle (0-1)
      */
     public double getWidth() {
         return width;
@@ -148,7 +162,7 @@ public class Rectangle implements BoundingBox {
     /**
      * Returns the height of the Rectangle.
      *
-     * @return the height of the Rectangle
+     * @return the height of the Rectangle (0-1)
      */
     public double getHeight() {
         return height;

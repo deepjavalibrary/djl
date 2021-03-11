@@ -21,13 +21,13 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.ParameterType;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -47,7 +47,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
 
     private static final Logger logger = LoggerFactory.getLogger(MxSymbolBlock.class);
 
-    private static final byte VERSION = 2;
+    private static final byte VERSION = 3;
 
     private NDManager manager;
     private CachedOp op;
@@ -72,18 +72,17 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
         super(VERSION);
         this.manager = manager;
         this.symbol = symbol;
-        inputNames = new ArrayList<>();
+        initBlock();
+    }
 
-        String[] allNames = symbol.getAllNames();
-        mxNetParams = new ArrayList<>(allNames.length);
-
-        Set<String> auxNameSet = new HashSet<>(Arrays.asList(symbol.getAuxNames()));
-        for (String name : allNames) {
-            ParameterType type = inferType(name);
-            boolean requireGrad = !auxNameSet.contains(name);
-            mxNetParams.add(new Parameter(name, this, type, requireGrad));
-        }
-        first = true;
+    /**
+     * Constructs an empty {@code MxSymbolBlock}.
+     *
+     * @param manager the manager to use for the block
+     */
+    public MxSymbolBlock(NDManager manager) {
+        super(VERSION);
+        this.manager = manager;
     }
 
     /**
@@ -201,7 +200,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
 
     /** {@inheritDoc} */
     @Override
-    public Shape[] getOutputShapes(NDManager manager, Shape[] inputShapes) {
+    public Shape[] getOutputShapes(Shape[] inputShapes) {
         if (outputShapes == null) {
             String[] outputNames = symbol.getOutputNames();
             outputShapes = new Shape[outputNames.length];
@@ -232,9 +231,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
         }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Shape getParameterShape(String name, Shape[] inputShapes) {
+    private Shape getParameterShape(String name, Shape[] inputShapes) {
         if (paramShapes == null) {
             PairList<String, Shape> pairs = new PairList<>();
             for (int i = 0; i < inputNames.size(); i++) {
@@ -253,15 +250,18 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
         os.writeByte(VERSION);
+        String json = symbol.toJsonString();
+        // symbol size may go beyond os.writeUTF() size (65535)
+        byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
+        os.writeInt(bytes.length);
+        os.write(bytes);
         int size = inputNames.size();
         os.writeInt(size);
         for (String name : inputNames) {
             os.writeUTF(name);
         }
-        for (Parameter parameter : parameters.values()) {
-            if (!inputNames.contains(parameter.getName())) {
-                parameter.save(os);
-            }
+        for (Parameter parameter : mxNetParams) {
+            parameter.save(os);
         }
     }
 
@@ -270,31 +270,70 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
         byte version = is.readByte();
-        if (version != VERSION) {
+        if (version > VERSION) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
+        }
+        if (version < VERSION && symbol == null) {
+            throw new IllegalStateException(
+                    "Symbol is required for version 2, please use Model to load");
+        }
+        if (version == VERSION) {
+            int len = is.readInt();
+            byte[] bytes = new byte[len];
+            if (is.read(bytes) == -1) {
+                throw new MalformedModelException("InputStream ends at symbol loading!");
+            }
+            // init block only if it is not set
+            symbol =
+                    Symbol.loadJson(
+                            (MxNDManager) manager, new String(bytes, StandardCharsets.UTF_8));
+            initBlock();
         }
         int size = is.readInt();
         for (int i = 0; i < size; ++i) {
             inputNames.add(is.readUTF());
         }
 
-        for (Parameter parameter : parameters.values()) {
+        for (Parameter parameter : mxNetParams) {
             parameter.load(this.manager, is);
         }
+        setInputNames(inputNames);
     }
 
-    private static ParameterType inferType(String name) {
-        if (name.endsWith("bias")) {
-            return ParameterType.BIAS;
-        } else if (name.endsWith("gamma")) {
-            return ParameterType.GAMMA;
-        } else if (name.endsWith("beta")) {
-            return ParameterType.BETA;
-        } else if (name.endsWith("moving_mean") || name.endsWith("running_mean")) {
-            return ParameterType.RUNNING_MEAN;
-        } else if (name.endsWith("moving_var") || name.endsWith("running_var")) {
-            return ParameterType.RUNNING_VAR;
+    private void initBlock() {
+        inputNames = new ArrayList<>();
+
+        String[] allNames = symbol.getAllNames();
+        mxNetParams = new ArrayList<>(allNames.length);
+
+        Set<String> auxNameSet = new HashSet<>(Arrays.asList(symbol.getAuxNames()));
+        for (String name : allNames) {
+            Parameter.Type type = inferType(name);
+            boolean requireGrad = !auxNameSet.contains(name);
+            mxNetParams.add(
+                    Parameter.builder()
+                            .setName(name)
+                            .setType(type)
+                            .optRequiresGrad(requireGrad)
+                            .build());
         }
-        return ParameterType.OTHER;
+        first = true;
+    }
+
+    private static Parameter.Type inferType(String name) {
+        if (name.endsWith("bias")) {
+            return Parameter.Type.BIAS;
+        } else if (name.endsWith("gamma")) {
+            return Parameter.Type.GAMMA;
+        } else if (name.endsWith("beta")) {
+            return Parameter.Type.BETA;
+        } else if (name.endsWith("moving_mean") || name.endsWith("running_mean")) {
+            return Parameter.Type.RUNNING_MEAN;
+        } else if (name.endsWith("moving_var") || name.endsWith("running_var")) {
+            return Parameter.Type.RUNNING_VAR;
+        } else if (name.endsWith("weight")) {
+            return Parameter.Type.WEIGHT;
+        }
+        return Parameter.Type.OTHER;
     }
 }

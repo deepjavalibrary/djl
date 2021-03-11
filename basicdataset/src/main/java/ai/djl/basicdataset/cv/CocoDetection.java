@@ -16,36 +16,34 @@ import ai.djl.Application.CV;
 import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
+import ai.djl.modality.cv.output.Point;
+import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.Resource;
-import ai.djl.training.dataset.RandomAccessDataset;
-import ai.djl.training.dataset.Record;
 import ai.djl.translate.Pipeline;
+import ai.djl.util.PairList;
 import ai.djl.util.Progress;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Coco image detection dataset from http://cocodataset.org/#home.
  *
  * <p>Each image might have different {@link ai.djl.ndarray.types.Shape}s.
  */
-public class CocoDetection extends RandomAccessDataset {
+public class CocoDetection extends ObjectDetectionDataset {
 
     private static final String ARTIFACT_ID = "coco";
 
     private Usage usage;
-    private Image.Flag flag;
     private List<Path> imagePaths;
-    private List<double[][]> labels;
+    private List<PairList<Long, Rectangle>> labels;
 
     private Resource resource;
     private boolean prepared;
@@ -53,7 +51,6 @@ public class CocoDetection extends RandomAccessDataset {
     CocoDetection(Builder builder) {
         super(builder);
         usage = builder.usage;
-        flag = builder.flag;
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
         MRL mrl = MRL.dataset(CV.ANY, builder.groupId, builder.artifactId);
@@ -69,17 +66,9 @@ public class CocoDetection extends RandomAccessDataset {
         return new Builder();
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Record get(NDManager manager, long index) throws IOException {
-        int idx = Math.toIntExact(index);
-        NDList d =
-                new NDList(
-                        ImageFactory.getInstance()
-                                .fromFile(imagePaths.get(idx))
-                                .toNDArray(manager, flag));
-        NDList l = new NDList(manager.create(labels.get(idx)));
-        return new Record(d, l);
+    public PairList<Long, Rectangle> getObjects(long index) {
+        return labels.get(Math.toIntExact(index));
     }
 
     /** {@inheritDoc} */
@@ -110,10 +99,10 @@ public class CocoDetection extends RandomAccessDataset {
         List<Long> imageIds = coco.getImageIds();
         for (long id : imageIds) {
             Path imagePath = root.resolve(coco.getRelativeImagePath(id));
-            List<double[]> labelOfImageId = getLabels(coco, id);
+            PairList<Long, Rectangle> labelOfImageId = getLabels(coco, id);
             if (!labelOfImageId.isEmpty()) {
                 imagePaths.add(imagePath);
-                labels.add(labelOfImageId.toArray(new double[0][]));
+                labels.add(labelOfImageId);
             }
         }
         prepared = true;
@@ -125,32 +114,45 @@ public class CocoDetection extends RandomAccessDataset {
         return imagePaths.size();
     }
 
-    private List<double[]> getLabels(CocoUtils coco, long imageId) {
+    private PairList<Long, Rectangle> getLabels(CocoUtils coco, long imageId) {
         List<Long> annotationIds = coco.getAnnotationIdByImageId(imageId);
         if (annotationIds == null) {
-            return Collections.emptyList();
+            return new PairList<>();
         }
 
-        List<double[]> label = new ArrayList<>();
+        PairList<Long, Rectangle> label = new PairList<>(annotationIds.size());
         for (long annotationId : annotationIds) {
             CocoMetadata.Annotation annotation = coco.getAnnotationById(annotationId);
             if (annotation.getArea() > 0) {
                 double[] box = annotation.getBoundingBox();
-                // add the category label
-                // map the original one to incremental index
-                double[] list = new double[5];
-                System.arraycopy(box, 0, list, 0, 4);
-                list[4] = coco.mapCategoryId(annotation.getCategoryId());
-                label.add(list);
+                long labelClass = coco.mapCategoryId(annotation.getCategoryId());
+                Rectangle objectLocation =
+                        new Rectangle(new Point(box[0], box[1]), new Point(box[2], box[3]));
+                label.add(labelClass, objectLocation);
             }
         }
         return label;
     }
 
-    /** A builder to construct a {@link CocoDetection}. */
-    public static final class Builder extends BaseBuilder<Builder> {
+    @Override
+    protected Image getImage(long index) throws IOException {
+        int idx = Math.toIntExact(index);
+        return ImageFactory.getInstance().fromFile(imagePaths.get(idx));
+    }
 
-        Image.Flag flag;
+    @Override
+    public Optional<Integer> getImageWidth() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Integer> getImageHeight() {
+        return Optional.empty();
+    }
+
+    /** A builder to construct a {@link CocoDetection}. */
+    public static final class Builder extends ImageDataset.BaseBuilder<Builder> {
+
         Repository repository;
         String groupId;
         String artifactId;
@@ -219,17 +221,6 @@ public class CocoDetection extends RandomAccessDataset {
                 this.artifactId = artifactId;
             }
             return this;
-        }
-
-        /**
-         * Sets the optional color mode flag.
-         *
-         * @param flag the color mode flag
-         * @return this builder
-         */
-        public Builder optFlag(Image.Flag flag) {
-            this.flag = flag;
-            return self();
         }
 
         /**

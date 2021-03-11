@@ -92,7 +92,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         super(handle);
         this.manager = manager;
         mxNDArrayEx = new MxNDArrayEx(this);
-        manager.attach(getUid(), this);
+        manager.attachInternal(getUid(), this);
     }
 
     /**
@@ -163,18 +163,25 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager attach(NDManager manager) {
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = (MxNDManager) manager;
+        manager.attachInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
         NDManager original = this.manager;
         detach();
         this.manager = (MxNDManager) manager;
-        manager.attach(getUid(), this);
-        return original;
+        manager.tempAttachInternal(original, getUid(), this);
     }
 
     /** {@inheritDoc} */
     @Override
     public void detach() {
-        manager.detach(getUid());
+        manager.detachInternal(getUid());
         manager = MxNDManager.getSystemManager();
     }
 
@@ -268,6 +275,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         return hasGradient;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray stopGradient() {
         return manager.invoke("stop_gradient", this, null);
@@ -275,7 +283,16 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public String[] toStringArray() {
+        throw new UnsupportedOperationException("String NDArray is not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public ByteBuffer toByteBuffer() {
+        if (getSparseFormat() != SparseFormat.DENSE) {
+            throw new IllegalStateException("Require Dense NDArray, actual " + getSparseFormat());
+        }
         Shape sh = getShape();
         DataType dType = getDataType();
         long product = sh.size();
@@ -1498,6 +1515,17 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray oneHot(int depth, float onValue, float offValue, DataType dataType) {
+        MxOpParams params = new MxOpParams();
+        params.add("depth", depth);
+        params.add("on_value", onValue);
+        params.add("off_value", offValue);
+        params.add("dtype", dataType);
+        return manager.invoke("_npx_one_hot", this, params).toType(dataType, false);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArrayEx getNDArrayInternal() {
         return mxNDArrayEx;
     }
@@ -1591,7 +1619,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         if (pointer != null) {
             JnaUtils.waitToRead(pointer);
             JnaUtils.freeNdArray(pointer);
-            manager.detach(getUid());
+            manager.detachInternal(getUid());
             manager = null;
         }
     }

@@ -31,7 +31,7 @@ public abstract class ShapeUtils {
      * @return the corresponding output shape for the provided input
      */
     public static Shape outputShapeForBlock(NDManager manager, Block block, Shape inputShape) {
-        Shape[] outputs = block.getOutputShapes(manager, new Shape[] {inputShape});
+        Shape[] outputs = block.getOutputShapes(new Shape[] {inputShape});
         return outputs[0];
     }
 

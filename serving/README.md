@@ -27,7 +27,7 @@ You can pull the server from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl</groupId>
     <artifactId>serving</artifactId>
-    <version>0.9.0</version>
+    <version>0.10.0</version>
     <scope>runtime</scope>
 </dependency>
 ```

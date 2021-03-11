@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.ndarray;
 
+import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.ndarray.LazyNDArray;
 import ai.djl.ndarray.NDArray;
@@ -21,6 +22,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
+import ai.djl.training.GradientCollector;
 import ai.djl.util.Hex;
 import java.nio.FloatBuffer;
 import org.testng.Assert;
@@ -838,13 +840,13 @@ public class NDArrayOtherOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             // test 1-D
             NDArray array = manager.create(new float[] {1f, 0.5f, -1f});
-            Assert.assertEquals(array.norm().getFloat(), 1.5f);
+            Assert.assertEquals(array.norm(), manager.create(1.5f));
             // test 2-D
             array = manager.create(new float[][] {{1f, 0.5f}, {-1f, 2f}});
-            Assert.assertEquals(array.norm().getFloat(), 2.5f);
+            Assert.assertEquals(array.norm(), manager.create(2.5f));
             // test scalar
             array = manager.create(new float[] {5f});
-            Assert.assertEquals(array.norm().getFloat(), 5f);
+            Assert.assertEquals(array.norm(), manager.create(5f));
             // test zero-dim
             array = manager.create(new float[] {});
             Assert.assertEquals(array.norm().getFloat(), 0f);
@@ -860,6 +862,56 @@ public class NDArrayOtherOpTest {
             array = manager.create(new float[][] {{1f, 0.5f}, {-1f, 2f}});
             expected = manager.create(new float[][] {{1.4142f, 2.0616f}});
             Assertions.assertAlmostEquals(array.norm(new int[] {0}, true), expected);
+        }
+    }
+
+    @Test
+    public void testOneHot() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            // test basic
+            NDArray array = manager.create(new int[] {1, 0, 2, 0});
+            NDArray expected =
+                    manager.create(
+                            new float[][] {{0f, 1f, 0f}, {1f, 0f, 0f}, {0f, 0f, 1f}, {1f, 0f, 0f}});
+            Assert.assertEquals(array.oneHot(3), expected);
+            // test with all parameters
+            array = manager.create(new int[] {1, 0, 2, 0});
+            expected = manager.create(new int[][] {{1, 8, 1}, {8, 1, 1}, {1, 1, 8}, {8, 1, 1}});
+            Assert.assertEquals(array.oneHot(3, 8f, 1f, array.getDataType()), expected);
+            // test basic 2-D
+            array = manager.create(new int[][] {{1, 0}, {1, 0}, {2, 0}});
+            expected =
+                    manager.create(
+                                    new float[] {
+                                        0f, 1f, 0f, 1f, 0f, 0f, 0f, 1f, 0f, 1f, 0f, 0f, 0f, 0f, 1f,
+                                        1f, 0f, 0f
+                                    })
+                            .reshape(new Shape(3, 2, 3));
+            Assert.assertEquals(array.oneHot(3), expected);
+        }
+    }
+
+    @Test
+    public void testStopGradient() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            // normal gradient
+            NDArray x = manager.create(new float[] {1.0f}, new Shape(1));
+            x.attachGradient();
+            try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
+                NDArray y = x.mul(x);
+                gc.backward(y);
+                NDArray grad = x.getGradient();
+                Assert.assertEquals(2f, grad.getFloat(0));
+            }
+            // stop gradient
+            x = manager.create(new float[] {1.0f}, new Shape(1));
+            x.attachGradient();
+            try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
+                NDArray z = x.mul(x.stopGradient());
+                gc.backward(z);
+                NDArray grad = x.getGradient();
+                Assert.assertEquals(1f, grad.getFloat(0));
+            }
         }
     }
 }
