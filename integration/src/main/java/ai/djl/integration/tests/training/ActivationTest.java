@@ -88,7 +88,7 @@ public class ActivationTest {
     }
 
     @Test
-    public void testSoftrelu() {
+    public void testSoftPlus() {
         try (Model model = Model.newInstance("model")) {
             model.setBlock(Activation.softPlusBlock());
 
@@ -97,6 +97,23 @@ public class ActivationTest {
                 NDArray data = manager.create(new float[] {0, 0, 2});
                 NDArray expected = manager.create(new float[] {.6931f, .6931f, 2.1269f});
                 Assertions.assertAlmostEquals(Activation.softPlus(data), expected);
+
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assertions.assertAlmostEquals(result, expected);
+            }
+        }
+    }
+
+    @Test
+    public void testSoftSign() {
+        try (Model model = Model.newInstance("model")) {
+            model.setBlock(Activation.softSignBlock());
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.create(new float[] {0, 1, 2});
+                NDArray expected = manager.create(new float[] {0, 0.5f, 0.6667f});
+                Assertions.assertAlmostEquals(Activation.softSign(data), expected);
 
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assertions.assertAlmostEquals(result, expected);
