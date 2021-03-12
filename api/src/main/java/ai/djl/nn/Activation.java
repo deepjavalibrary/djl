@@ -130,6 +130,30 @@ public final class Activation {
     }
 
     /**
+     * Applies softSign activation on the input {@link NDArray}.
+     *
+     * <p>softPlus is defined by: \( y = x / 1 + |x| \)
+     *
+     * @param array the input {@link NDArray}
+     * @return the {@link NDArray} after applying soft ReLU activation
+     */
+    public static NDArray softSign(NDArray array) {
+        return array.getNDArrayInternal().softSign();
+    }
+
+    /**
+     * Applies softPlus activation on the input singleton {@link NDList}.
+     *
+     * <p>softPlus is defined by: \( y = x / 1 + |x| \)
+     *
+     * @param arrays the input singleton {@link NDList}
+     * @return the singleton {@link NDList} after applying soft ReLU activation
+     */
+    public static NDList softSign(NDList arrays) {
+        return new NDList(arrays.singletonOrThrow().getNDArrayInternal().softSign());
+    }
+
+    /**
      * Applies Leaky ReLU activation on the input {@link NDArray}.
      *
      * <p>Leaky ReLU is defined by: \( y = x \gt 0 ? x : alpha * x \)
@@ -315,14 +339,25 @@ public final class Activation {
     }
 
     /**
-     * Creates a {@link LambdaBlock} that applies the {@link #softPlus(NDList) SoftReLU} activation
-     * function in its forward function.
+     * Creates a {@link LambdaBlock} that applies the {@link #softPlus(NDList)} activation function
+     * in its forward function.
      *
-     * @return the {@link LambdaBlock} that applies the {@link #softPlus(NDList) SoftReLU}
-     *     activation function
+     * @return the {@link LambdaBlock} that applies the {@link #softPlus(NDList)} activation
+     *     function
      */
     public static Block softPlusBlock() {
         return new LambdaBlock(Activation::softPlus);
+    }
+
+    /**
+     * Creates a {@link LambdaBlock} that applies the {@link #softSign(NDList)} activation function
+     * in its forward function.
+     *
+     * @return the {@link LambdaBlock} that applies the {@link #softSign(NDList)} activation
+     *     function
+     */
+    public static Block softSignBlock() {
+        return new LambdaBlock(Activation::softSign);
     }
 
     /**
