@@ -14,10 +14,9 @@ package ai.djl.tensorflow.integration;
 
 import ai.djl.tensorflow.engine.TfEngine;
 import ai.djl.testing.CoverageUtils;
-import org.testng.annotations.Test;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
+import org.testng.annotations.Test;
 
 public class TfCoverageTest {
 
