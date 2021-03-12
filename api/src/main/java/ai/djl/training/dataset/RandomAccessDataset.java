@@ -42,7 +42,6 @@ public abstract class RandomAccessDataset implements Dataset {
     protected Batchifier labelBatchifier;
     protected Pipeline pipeline;
     protected Pipeline targetPipeline;
-    protected ExecutorService executor;
     protected int prefetchNumber;
     protected long limit;
     protected Device device;
@@ -61,7 +60,6 @@ public abstract class RandomAccessDataset implements Dataset {
         this.labelBatchifier = builder.labelBatchifier;
         this.pipeline = builder.pipeline;
         this.targetPipeline = builder.targetPipeline;
-        this.executor = builder.executor;
         this.prefetchNumber = builder.prefetchNumber;
         this.limit = builder.limit;
         this.device = builder.device;
@@ -89,7 +87,25 @@ public abstract class RandomAccessDataset implements Dataset {
                 labelBatchifier,
                 pipeline,
                 targetPipeline,
-                executor,
+                null,
+                prefetchNumber,
+                device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Iterable<Batch> getData(NDManager manager, ExecutorService executorService)
+            throws IOException, TranslateException {
+        prepare();
+        return new DataIterable(
+                this,
+                manager,
+                sampler,
+                dataBatchifier,
+                labelBatchifier,
+                pipeline,
+                targetPipeline,
+                executorService,
                 prefetchNumber,
                 device);
     }
@@ -114,7 +130,35 @@ public abstract class RandomAccessDataset implements Dataset {
                 labelBatchifier,
                 pipeline,
                 targetPipeline,
-                executor,
+                null,
+                prefetchNumber,
+                device);
+    }
+
+    /**
+     * Fetches an iterator that can iterate through the {@link Dataset} with a custom sampler
+     * multi-threaded.
+     *
+     * @param manager the dataset to iterate through
+     * @param sampler the sampler to use to iterate through the dataset
+     * @param executorService the executorService to multi-thread with
+     * @return an {@link Iterable} of {@link Batch} that contains batches of data from the dataset
+     * @throws IOException for various exceptions depending on the dataset
+     * @throws TranslateException if there is an error while processing input
+     */
+    public Iterable<Batch> getData(
+            NDManager manager, Sampler sampler, ExecutorService executorService)
+            throws IOException, TranslateException {
+        prepare();
+        return new DataIterable(
+                this,
+                manager,
+                sampler,
+                dataBatchifier,
+                labelBatchifier,
+                pipeline,
+                targetPipeline,
+                executorService,
                 prefetchNumber,
                 device);
     }
@@ -233,8 +277,7 @@ public abstract class RandomAccessDataset implements Dataset {
         protected Batchifier labelBatchifier = Batchifier.STACK;
         protected Pipeline pipeline;
         protected Pipeline targetPipeline;
-        protected ExecutorService executor;
-        protected int prefetchNumber;
+        protected int prefetchNumber = 2;
         protected long limit = Long.MAX_VALUE;
         protected Device device;
 
@@ -364,14 +407,12 @@ public abstract class RandomAccessDataset implements Dataset {
         }
 
         /**
-         * Sets the {@link ExecutorService} to spawn threads to fetch data.
+         * Sets the number of batches to prefetch at once.
          *
-         * @param executor the {@link ExecutorService} to spawn threads
-         * @param prefetchNumber the number of samples to prefetch at once
+         * @param prefetchNumber the number of batches to prefetch at once
          * @return this {@code BaseBuilder}
          */
-        public T optExecutor(ExecutorService executor, int prefetchNumber) {
-            this.executor = executor;
+        public T optPrefetchNumber(int prefetchNumber) {
             this.prefetchNumber = prefetchNumber;
             return self();
         }
@@ -426,7 +467,6 @@ public abstract class RandomAccessDataset implements Dataset {
             this.labelBatchifier = dataset.labelBatchifier;
             this.pipeline = dataset.pipeline;
             this.targetPipeline = dataset.targetPipeline;
-            this.executor = dataset.executor;
             this.prefetchNumber = dataset.prefetchNumber;
             this.device = dataset.device;
 

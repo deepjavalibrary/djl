@@ -24,6 +24,8 @@ import ai.djl.util.PairList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.Predicate;
 
 /** {@code DefaultTrainingConfig} is an implementation of the {@link TrainingConfig} interface. */
@@ -33,6 +35,7 @@ public class DefaultTrainingConfig implements TrainingConfig {
     private Optimizer optimizer;
     private Device[] devices;
     private Loss loss;
+    private ExecutorService executorService;
     private List<Evaluator> evaluators;
     private List<TrainingListener> listeners;
 
@@ -113,6 +116,26 @@ public class DefaultTrainingConfig implements TrainingConfig {
     }
 
     /**
+     * Sets the {@link ExecutorService} with the global {@link ForkJoinPool#commonPool()}.
+     *
+     * @return this {@link DefaultTrainingConfig}
+     */
+    public DefaultTrainingConfig optExecutorService() {
+        return optExecutorService(ForkJoinPool.commonPool());
+    }
+
+    /**
+     * Sets the {@link ExecutorService} to train with multiple threads.
+     *
+     * @param executorService the executor service
+     * @return this {@link DefaultTrainingConfig}
+     */
+    public DefaultTrainingConfig optExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
+        return this;
+    }
+
+    /**
      * Adds an {@link Evaluator} that needs to be computed during training.
      *
      * @param evaluator the evaluator to be added
@@ -159,6 +182,11 @@ public class DefaultTrainingConfig implements TrainingConfig {
     @Override
     public Loss getLossFunction() {
         return loss;
+    }
+
+    @Override
+    public ExecutorService getExecutorService() {
+        return executorService;
     }
 
     /** {@inheritDoc} */

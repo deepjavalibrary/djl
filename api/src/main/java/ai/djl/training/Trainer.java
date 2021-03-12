@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +74,7 @@ public class Trainer implements AutoCloseable {
     private ParameterStore parameterStore;
     private List<Evaluator> evaluators;
     private Loss loss;
+    private ExecutorService executorService;
 
     private boolean gradientsChecked;
 
@@ -91,6 +94,7 @@ public class Trainer implements AutoCloseable {
         Objects.requireNonNull(loss, "You must specify a loss for the trainer");
         evaluators = new ArrayList<>(trainingConfig.getEvaluators());
         evaluators.add(loss); // track loss as an evaluator by default
+        executorService = trainingConfig.getExecutorService();
 
         ParameterServer parameterServer =
                 manager.getEngine().newParameterServer(trainingConfig.getOptimizer());
@@ -129,7 +133,7 @@ public class Trainer implements AutoCloseable {
      * @throws TranslateException if there is an error while processing input
      */
     public Iterable<Batch> iterateDataset(Dataset dataset) throws IOException, TranslateException {
-        return dataset.getData(getManager());
+        return dataset.getData(getManager(), executorService);
     }
 
     /**
@@ -236,6 +240,15 @@ public class Trainer implements AutoCloseable {
      */
     public Model getModel() {
         return model;
+    }
+
+    /**
+     * Returns the {@link ExecutorService}.
+     *
+     * @return the {@link ExecutorService}
+     */
+    public Optional<ExecutorService> getExecutorService() {
+        return Optional.ofNullable(executorService);
     }
 
     /**

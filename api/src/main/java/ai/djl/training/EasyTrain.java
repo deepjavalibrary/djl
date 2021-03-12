@@ -20,7 +20,11 @@ import ai.djl.training.listener.TrainingListener.BatchData;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Preconditions;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 
 /** Helper for easy training of a whole model, a trainining batch, or a validation batch. */
 public final class EasyTrain {
@@ -86,22 +90,43 @@ public final class EasyTrain {
         BatchData batchData =
                 new BatchData(batch, new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
         try (GradientCollector collector = trainer.newGradientCollector()) {
-            for (Batch split : splits) {
-                NDList data = split.getData();
-                NDList labels = split.getLabels();
-                NDList preds = trainer.forward(data, labels);
-                long time = System.nanoTime();
-                NDArray lossValue = trainer.getLoss().evaluate(labels, preds);
-                collector.backward(lossValue);
-                trainer.addMetric("backward", time);
-                time = System.nanoTime();
-                batchData.getLabels().put(labels.get(0).getDevice(), labels);
-                batchData.getPredictions().put(preds.get(0).getDevice(), preds);
-                trainer.addMetric("training-metrics", time);
+
+            if (splits.length > 1 && trainer.getExecutorService().isPresent()) {
+                // multi-threaded
+                ExecutorService executor = trainer.getExecutorService().get();
+                List<CompletableFuture<Boolean>> futures = new ArrayList<>(splits.length);
+                for (Batch split : splits) {
+                    futures.add(
+                            CompletableFuture.supplyAsync(
+                                    () -> trainSplit(trainer, collector, batchData, split),
+                                    executor));
+                }
+                CompletableFuture.allOf(futures.stream().toArray(CompletableFuture[]::new));
+            } else {
+                // sequence
+                for (Batch split : splits) {
+                    trainSplit(trainer, collector, batchData, split);
+                }
             }
         }
 
         trainer.notifyListeners(listener -> listener.onTrainingBatch(trainer, batchData));
+    }
+
+    private static boolean trainSplit(
+            Trainer trainer, GradientCollector collector, BatchData batchData, Batch split) {
+        NDList data = split.getData();
+        NDList labels = split.getLabels();
+        NDList preds = trainer.forward(data, labels);
+        long time = System.nanoTime();
+        NDArray lossValue = trainer.getLoss().evaluate(labels, preds);
+        collector.backward(lossValue);
+        trainer.addMetric("backward", time);
+        time = System.nanoTime();
+        batchData.getLabels().put(labels.get(0).getDevice(), labels);
+        batchData.getPredictions().put(preds.get(0).getDevice(), preds);
+        trainer.addMetric("training-metrics", time);
+        return true;
     }
 
     /**
@@ -122,15 +147,33 @@ public final class EasyTrain {
         BatchData batchData =
                 new BatchData(batch, new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
 
-        for (Batch split : splits) {
-            NDList data = split.getData();
-            NDList labels = split.getLabels();
-            NDList preds = trainer.evaluate(data);
-            batchData.getLabels().put(labels.get(0).getDevice(), labels);
-            batchData.getPredictions().put(preds.get(0).getDevice(), preds);
+        if (splits.length > 1 && trainer.getExecutorService().isPresent()) {
+            // multi-threaded
+            ExecutorService executor = trainer.getExecutorService().get();
+            List<CompletableFuture<Boolean>> futures = new ArrayList<>(splits.length);
+            for (Batch split : splits) {
+                futures.add(
+                        CompletableFuture.supplyAsync(
+                                () -> validateSplit(trainer, batchData, split), executor));
+            }
+            CompletableFuture.allOf(futures.stream().toArray(CompletableFuture[]::new));
+        } else {
+            // sequence
+            for (Batch split : splits) {
+                validateSplit(trainer, batchData, split);
+            }
         }
 
         trainer.notifyListeners(listener -> listener.onValidationBatch(trainer, batchData));
+    }
+
+    private static boolean validateSplit(Trainer trainer, BatchData batchData, Batch split) {
+        NDList data = split.getData();
+        NDList labels = split.getLabels();
+        NDList preds = trainer.evaluate(data);
+        batchData.getLabels().put(labels.get(0).getDevice(), labels);
+        batchData.getPredictions().put(preds.get(0).getDevice(), preds);
+        return true;
     }
 
     /**
