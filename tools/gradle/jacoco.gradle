@@ -14,7 +14,7 @@ task jacocoMergeTestData(type: JacocoMerge) {
     }
 }
 
-def exclusions = [":examples", ":integration", ":pytorch:pytorch-engine", ":tensorflow:tensorflow-engine"]
+def exclusions = [":examples", ":integration"]
 
 task jacocoRootReport(type: JacocoReport) {
     dependsOn jacocoMergeTestData
