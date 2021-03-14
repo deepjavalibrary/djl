@@ -1,6 +1,6 @@
 ### How to train a model using the Paddle 2.0
 
-We refer to [LeNet's MNIST Dataset Image Classification](https://www.paddlepaddle.org.cn/documentation/docs/zh/tutorial/cv_case/image_classification/image_classification.html#lenetmnist), and use the Paddle 2.0 interface to train a simple The models are stored as pre-training and predictive deployment models. We will focus on how to generate model files. 
+We refer to [LeNet's MNIST Dataset Image Classification](https://www.paddlepaddle.org.cn/documentation/docs/zh/tutorial/cv_case/image_classification/image_classification.html#lenetmnist), and use the Paddle 2.0 interface to train a simple model stored as pre-training and predictive deployment models. We will focus on how to generate model files. 
 
 - Dependent package import
 
