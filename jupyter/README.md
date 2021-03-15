@@ -57,7 +57,7 @@ You may want to use docker for simple installation or you are using Windows.
 ### Run docker image
 
 ```
-cd jupyter
+mkdir /home/jupyter && cd /home/jupyter
 docker run -itd -p 127.0.0.1:8888:8888 -v $PWD:/home/jupyter deepjavalibrary/jupyter
 ```
 
@@ -68,14 +68,14 @@ You can open the `http://localhost:8888` to see the hosted instance on docker.
 You can read [Dockerfile](https://github.com/awslabs/djl/blob/master/jupyter/Dockerfile) for detail. To build docker image:
 
 ```
-cd jupyter
+cd /home/jupyter
 docker build -t deepjavalibrary/jupyter .
 ```
 
 ### Run docker compose
 
 ```
-cd jupyter
+cd /home/jupyter
 docker-compose build
 docker-compose up -d
 ```
