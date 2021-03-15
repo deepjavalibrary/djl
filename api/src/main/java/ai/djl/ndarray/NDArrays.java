@@ -13,6 +13,7 @@
 package ai.djl.ndarray;
 
 import ai.djl.ndarray.types.Shape;
+import ai.djl.util.Preconditions;
 import java.util.Arrays;
 
 /** This class contains various methods for manipulating NDArrays. */
@@ -1818,6 +1819,7 @@ public final class NDArrays {
      *     the the {@link NDArray}
      */
     public static NDArray stack(NDList arrays, int axis) {
+        Preconditions.checkArgument(arrays.size() > 0, "need at least one array to stack");
         NDArray array = arrays.head();
         return array.getNDArrayInternal().stack(arrays.subNDList(1), axis);
     }
@@ -1871,6 +1873,10 @@ public final class NDArrays {
      * @return the concatenated {@link NDArray}
      */
     public static NDArray concat(NDList arrays, int axis) {
+        Preconditions.checkArgument(arrays.size() > 0, "need at least one array to concatenate");
+        if (arrays.size() == 1) {
+            return arrays.singletonOrThrow().duplicate();
+        }
         NDArray array = arrays.head();
         return array.getNDArrayInternal().concat(arrays.subNDList(1), axis);
     }

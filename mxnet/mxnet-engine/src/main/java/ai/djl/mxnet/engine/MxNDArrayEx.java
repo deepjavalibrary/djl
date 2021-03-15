@@ -1016,34 +1016,6 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("_npi_concatenate", srcArray, params);
     }
 
-    /**
-     * Concats the parameters of a recurrent neural network as expected by the engine.
-     *
-     * @param arrays an {@link NDList} containing the the parameter arrays to be concatenated
-     * @param numArgs number of inputs to be concatenated
-     * @return the concatenated {@code NDArray} of parameters
-     */
-    public NDArray rnnParameterConcat(NDList arrays, int numArgs) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("num_args", numArgs);
-        return getManager().invoke("_npi_rnn_param_concat", arrays, params).singletonOrThrow();
-    }
-
-    /**
-     * Concats the parameters of a recurrent neural network as expected by the engine.
-     *
-     * @param arrays an {@link NDList} containing the the parameter arrays to be concatenated
-     * @param numArgs number of inputs to be concatenated
-     * @param dim the dimension to be concatenated
-     * @return the concatenated {@code NDArray} of parameters
-     */
-    public NDArray rnnParameterConcat(NDList arrays, int numArgs, int dim) {
-        MxOpParams params = new MxOpParams();
-        params.addParam("dim", dim);
-        params.addParam("num_args", numArgs);
-        return getManager().invoke("_npi_rnn_param_concat", arrays, params).singletonOrThrow();
-    }
-
     /** {@inheritDoc} */
     @Override
     public NDList multiBoxTarget(

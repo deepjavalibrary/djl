@@ -4,6 +4,7 @@ dependencies {
     api project(":api")
     api project(":tensorflow:tensorflow-api")
 
+    testImplementation(project(":testing"))
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
