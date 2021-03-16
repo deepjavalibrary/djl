@@ -896,7 +896,7 @@ public class NDArrayOtherOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             // normal gradient
             NDArray x = manager.create(new float[] {1.0f}, new Shape(1));
-            x.attachGradient();
+            x.requiresGradient();
             try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
                 NDArray y = x.mul(x);
                 gc.backward(y);
@@ -905,7 +905,7 @@ public class NDArrayOtherOpTest {
             }
             // stop gradient
             x = manager.create(new float[] {1.0f}, new Shape(1));
-            x.attachGradient();
+            x.requiresGradient();
             try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
                 NDArray z = x.mul(x.stopGradient());
                 gc.backward(z);

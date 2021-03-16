@@ -253,10 +253,10 @@ JNIEXPORT jstring JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGradFnName
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchAttachGrad(
-    JNIEnv* env, jobject jthis, jlong jhandle) {
+    JNIEnv* env, jobject jthis, jlong jhandle, jboolean jrequires_grad) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  tensor_ptr->requires_grad_(true);
+  tensor_ptr->requires_grad_(jrequires_grad == JNI_TRUE);
   API_END()
 }
 

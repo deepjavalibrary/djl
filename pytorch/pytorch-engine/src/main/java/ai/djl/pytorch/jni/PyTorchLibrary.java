@@ -452,7 +452,7 @@ final class PyTorchLibrary {
 
     native String torchGradFnName(long inputHandle);
 
-    native void torchAttachGrad(long inputHandle);
+    native void torchAttachGrad(long inputHandle, boolean requiresGrad);
 
     native long torchGrad(long inputHandle);
 

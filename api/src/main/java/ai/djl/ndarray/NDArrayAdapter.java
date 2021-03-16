@@ -107,13 +107,7 @@ public interface NDArrayAdapter extends NDArray {
 
     /** {@inheritDoc} */
     @Override
-    default void attachGradient() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default void attachGradient(SparseFormat sparseFormat) {
+    default void requiresGradient(boolean requiresGrad) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 

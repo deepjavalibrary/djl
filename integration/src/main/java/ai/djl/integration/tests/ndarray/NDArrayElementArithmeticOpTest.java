@@ -142,7 +142,7 @@ public class NDArrayElementArithmeticOpTest {
                             new DefaultTrainingConfig(Loss.l2Loss())
                                     .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT))) {
                 try (GradientCollector gradCol = trainer.newGradientCollector()) {
-                    lhs.attachGradient();
+                    lhs.requiresGradient();
                     result = NDArrays.add(lhs, 2);
                     // check add scalar result
                     gradCol.backward(result);
@@ -363,7 +363,7 @@ public class NDArrayElementArithmeticOpTest {
                             new DefaultTrainingConfig(Loss.l2Loss())
                                     .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT))) {
                 try (GradientCollector gradCol = trainer.newGradientCollector()) {
-                    lhs.attachGradient();
+                    lhs.requiresGradient();
                     result = NDArrays.dot(lhs, rhs);
                     gradCol.backward(result);
                     expected = manager.create(new float[] {33, 14}, new Shape(2, 1));

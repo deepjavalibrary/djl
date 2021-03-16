@@ -1340,8 +1340,8 @@ public final class JniUtils {
         return PyTorchLibrary.LIB.torchGradFnName(ndArray.getHandle());
     }
 
-    public static void attachGradient(PtNDArray ndArray) {
-        PyTorchLibrary.LIB.torchAttachGrad(ndArray.getHandle());
+    public static void attachGradient(PtNDArray ndArray, boolean requiresGrad) {
+        PyTorchLibrary.LIB.torchAttachGrad(ndArray.getHandle(), requiresGrad);
     }
 
     public static PtNDArray detachGradient(PtNDArray ndArray) {

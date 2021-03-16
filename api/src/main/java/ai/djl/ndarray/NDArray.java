@@ -162,16 +162,18 @@ public interface NDArray extends NDResource {
      * ai.djl.training.GradientCollector#backward(NDArray)} can compute the gradient with respect to
      * it.
      */
-    void attachGradient();
+    default void requiresGradient() {
+        requiresGradient(true);
+    }
 
     /**
-     * Attaches a gradient {@code NDArray} with the given {@link SparseFormat} to this {@code
-     * NDArray} and marks it so {@link ai.djl.training.GradientCollector#backward(NDArray)} can
-     * compute the gradient with respect to it.
+     * Attaches a gradient {@code NDArray} to this {@code NDArray} and marks it so {@link
+     * ai.djl.training.GradientCollector#backward(NDArray)} can compute the gradient with respect to
+     * it.
      *
-     * @param sparseFormat the {@link SparseFormat} for the gradient
+     * @param requiresGrad if {@code NDArray} requires gradient or not
      */
-    void attachGradient(SparseFormat sparseFormat);
+    void requiresGradient(boolean requiresGrad);
 
     /**
      * Returns the gradient {@code NDArray} attached to this {@code NDArray}.

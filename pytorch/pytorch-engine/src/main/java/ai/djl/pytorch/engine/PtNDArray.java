@@ -156,19 +156,9 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void attachGradient() {
-        attachGradient(null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attachGradient(SparseFormat sparseFormat) {
-        if (sparseFormat != null && !sparseFormat.equals(SparseFormat.DENSE)) {
-            throw new UnsupportedOperationException(
-                    "Sparse NDArray gradient atttach not supported");
-        }
-        JniUtils.attachGradient(this);
-        hasGradient = true;
+    public void requiresGradient(boolean requiresGrad) {
+        JniUtils.attachGradient(this, requiresGrad);
+        hasGradient = requiresGrad;
     }
 
     /** {@inheritDoc} */

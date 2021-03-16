@@ -315,7 +315,7 @@ public class Trainer implements AutoCloseable {
                 .getParameters()
                 .values()
                 .stream()
-                .filter(Parameter::requireGradient)
+                .filter(Parameter::requiresGradient)
                 .forEach(
                         param ->
                                 grads.add(

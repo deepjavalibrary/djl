@@ -163,11 +163,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void attachGradient() {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void attachGradient(SparseFormat sparseFormat) {}
+    public void requiresGradient(boolean requiresGrad) {}
 
     /** {@inheritDoc} */
     @Override
