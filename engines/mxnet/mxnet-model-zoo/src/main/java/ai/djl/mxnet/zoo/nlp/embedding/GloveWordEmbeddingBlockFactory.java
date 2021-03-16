@@ -13,7 +13,7 @@
 package ai.djl.mxnet.zoo.nlp.embedding;
 
 import ai.djl.Model;
-import ai.djl.modality.nlp.SimpleVocabulary;
+import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.nn.Block;
 import ai.djl.nn.BlockFactory;
@@ -34,14 +34,19 @@ public class GloveWordEmbeddingBlockFactory implements BlockFactory {
             throws IOException {
         List<String> idxToToken = Utils.readLines(modelPath.resolve("idx_to_token.txt"));
         String dimension = (String) arguments.get("dimensions");
+        String unknownToken = (String) arguments.get("unknownToken");
         TrainableWordEmbedding wordEmbedding =
                 TrainableWordEmbedding.builder()
-                        .optNumEmbeddings(Integer.parseInt(dimension))
-                        .setVocabulary(new SimpleVocabulary(idxToToken))
-                        .optUnknownToken((String) arguments.get("unknownToken"))
+                        .setEmbeddingSize(Integer.parseInt(dimension))
+                        .setVocabulary(
+                                DefaultVocabulary.builder()
+                                        .add(idxToToken)
+                                        .optUnknownToken(unknownToken)
+                                        .build())
+                        .optUnknownToken(unknownToken)
                         .optUseDefault(true)
                         .build();
-        model.setProperty("unknownToken", (String) arguments.get("unknownToken"));
+        model.setProperty("unknownToken", unknownToken);
         return wordEmbedding;
     }
 }

@@ -13,7 +13,7 @@
 package ai.djl.mxnet.zoo.nlp.qa;
 
 import ai.djl.Model;
-import ai.djl.modality.nlp.SimpleVocabulary;
+import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.bert.BertToken;
 import ai.djl.modality.nlp.bert.BertTokenizer;
@@ -56,8 +56,7 @@ public class MxBertQATranslator extends QATranslator {
     public void prepare(TranslatorContext ctx) throws IOException {
         Model model = ctx.getModel();
         vocabulary =
-                SimpleVocabulary.builder()
-                        .optMinFrequency(1)
+                DefaultVocabulary.builder()
                         .addFromCustomizedFile(
                                 model.getArtifact("vocab.json"), VocabParser::parseToken)
                         .optUnknownToken("[UNK]")

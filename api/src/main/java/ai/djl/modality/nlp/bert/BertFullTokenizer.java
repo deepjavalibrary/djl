@@ -12,8 +12,8 @@
  */
 package ai.djl.modality.nlp.bert;
 
+import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.modality.nlp.NlpUtils;
-import ai.djl.modality.nlp.SimpleVocabulary;
 import ai.djl.modality.nlp.preprocess.LambdaProcessor;
 import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
 import ai.djl.modality.nlp.preprocess.PunctuationSeparator;
@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class BertFullTokenizer extends SimpleTokenizer {
 
-    private SimpleVocabulary vocabulary;
+    private DefaultVocabulary vocabulary;
     private List<TextProcessor> basicBertPreprocessors;
     private WordpieceTokenizer wordpieceTokenizer;
 
@@ -48,18 +48,18 @@ public class BertFullTokenizer extends SimpleTokenizer {
      * @param vocabulary the BERT vocabulary
      * @param lowerCase whether to convert tokens to lowercase
      */
-    public BertFullTokenizer(SimpleVocabulary vocabulary, boolean lowerCase) {
+    public BertFullTokenizer(DefaultVocabulary vocabulary, boolean lowerCase) {
         this.vocabulary = vocabulary;
         basicBertPreprocessors = getPreprocessors(lowerCase);
         wordpieceTokenizer = new WordpieceTokenizer(vocabulary, "[UNK]", 200);
     }
 
     /**
-     * Returns the {@link SimpleVocabulary} used for tokenization.
+     * Returns the {@link DefaultVocabulary} used for tokenization.
      *
-     * @return the {@link SimpleVocabulary} used for tokenization
+     * @return the {@link DefaultVocabulary} used for tokenization
      */
-    public SimpleVocabulary getVocabulary() {
+    public DefaultVocabulary getVocabulary() {
         return vocabulary;
     }
 
