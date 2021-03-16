@@ -107,7 +107,7 @@ public interface NDArrayAdapter extends NDArray {
 
     /** {@inheritDoc} */
     @Override
-    default void requiresGradient(boolean requiresGrad) {
+    default void setRequiresGradient(boolean requiresGrad) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 

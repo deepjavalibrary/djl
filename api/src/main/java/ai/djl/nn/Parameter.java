@@ -168,7 +168,7 @@ public class Parameter implements AutoCloseable {
         }
 
         if (requiresGradient()) {
-            array.requiresGradient();
+            array.setRequiresGradient(true);
         }
     }
 

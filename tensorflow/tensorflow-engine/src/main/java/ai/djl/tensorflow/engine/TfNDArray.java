@@ -163,7 +163,7 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void requiresGradient(boolean requiresGrad) {}
+    public void setRequiresGradient(boolean requiresGrad) {}
 
     /** {@inheritDoc} */
     @Override
