@@ -58,7 +58,7 @@ public final class TrainBertOnCode {
         dataset.prepare();
 
         // Create model & trainer
-        try (Model model = createBertPretrainingModel(dataset.getDictionarySize())) {
+        try (Model model = createBertPretrainingModel(dataset.getVocabularySize())) {
 
             TrainingConfig config = createTrainingConfig(arguments);
             try (Trainer trainer = model.newTrainer(config)) {
