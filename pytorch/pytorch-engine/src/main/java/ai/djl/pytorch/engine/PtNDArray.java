@@ -156,7 +156,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void requiresGradient(boolean requiresGrad) {
+    public void setRequiresGradient(boolean requiresGrad) {
         JniUtils.attachGradient(this, requiresGrad);
         hasGradient = requiresGrad;
     }

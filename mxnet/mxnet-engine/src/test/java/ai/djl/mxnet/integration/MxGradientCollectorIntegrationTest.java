@@ -46,7 +46,7 @@ public class MxGradientCollectorIntegrationTest {
                     NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
                     NDArray expected =
                             manager.create(new float[] {2, 3, -4, 2, 3, -4}, new Shape(2, 3));
-                    lhs.requiresGradient();
+                    lhs.setRequiresGradient(true);
                     // autograd automatically set recording and training during initialization
                     Assert.assertTrue(MxGradientCollector.isRecording());
                     Assert.assertTrue(MxGradientCollector.isTraining());

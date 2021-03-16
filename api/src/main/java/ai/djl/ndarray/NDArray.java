@@ -161,19 +161,10 @@ public interface NDArray extends NDResource {
      * Attaches a gradient {@code NDArray} to this {@code NDArray} and marks it so {@link
      * ai.djl.training.GradientCollector#backward(NDArray)} can compute the gradient with respect to
      * it.
-     */
-    default void requiresGradient() {
-        requiresGradient(true);
-    }
-
-    /**
-     * Attaches a gradient {@code NDArray} to this {@code NDArray} and marks it so {@link
-     * ai.djl.training.GradientCollector#backward(NDArray)} can compute the gradient with respect to
-     * it.
      *
      * @param requiresGrad if {@code NDArray} requires gradient or not
      */
-    void requiresGradient(boolean requiresGrad);
+    void setRequiresGradient(boolean requiresGrad);
 
     /**
      * Returns the gradient {@code NDArray} attached to this {@code NDArray}.

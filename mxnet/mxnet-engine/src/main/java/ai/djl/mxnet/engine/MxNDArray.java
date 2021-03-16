@@ -226,7 +226,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void requiresGradient(boolean requiresGrad) {
+    public void setRequiresGradient(boolean requiresGrad) {
         if ((requiresGrad && hasGradient()) || (!requiresGrad && !hasGradient())) {
             return;
         }

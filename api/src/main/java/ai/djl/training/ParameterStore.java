@@ -112,7 +112,7 @@ public class ParameterStore {
                         // some parameter doesn't require grad
                         // for example running_mean in BatchNorm
                         if (parameter.requiresGradient()) {
-                            arrays[i].requiresGradient();
+                            arrays[i].setRequiresGradient(true);
                         }
                     }
                     data.add(arrays[i]);
@@ -124,7 +124,7 @@ public class ParameterStore {
                     // some parameter doesn't require grad
                     // for example running_mean in BatchNorm
                     if (parameter.requiresGradient() && training) {
-                        array.requiresGradient();
+                        array.setRequiresGradient(true);
                     }
                 }
                 data.add(array);
