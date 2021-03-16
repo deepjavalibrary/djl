@@ -116,11 +116,11 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
             String key = outputDescriptions.get(i).getKey();
             runner.fetch(inputOutputNames.get(key));
         }
-        List<Tensor<?>> result = runner.run();
+        List<Tensor> result = runner.run();
         TfNDManager tfNDManager = (TfNDManager) inputs.head().getManager();
         NDList resultNDList = new NDList();
         for (int i = 0; i < result.size(); i++) {
-            try (Tensor<?> tensor = result.get(i)) {
+            try (Tensor tensor = result.get(i)) {
                 NDArray array = tfNDManager.create(tensor);
                 array.setName(outputDescriptions.get(i).getKey());
                 resultNDList.add(array);

@@ -88,7 +88,7 @@ task uploadTensorflowNativeLibs() {
         delete("${buildDir}/native/google/")
 
         exec {
-            commandLine "aws", "s3", "sync", "${buildDir}/native/", "s3://djl-ai/publish/tensorflow-2.4.1/"
+            commandLine "aws", "s3", "sync", "${buildDir}/native/", "s3://djl-ai/publish/tensorflow-${tensorflow_version}/"
         }
     }
 }

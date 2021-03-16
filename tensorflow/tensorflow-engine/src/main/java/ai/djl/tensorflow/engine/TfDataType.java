@@ -26,42 +26,43 @@ import org.tensorflow.types.family.TType;
 
 public final class TfDataType {
 
-    private static Map<DataType, org.tensorflow.DataType<? extends TType>> toTf = createMapToTf();
-    private static Map<org.tensorflow.DataType<? extends TType>, DataType> fromTf =
-            createMapFromTf();
+    private static Map<DataType, Class<? extends TType>> classTypeTo = createClassTypeTo();
+    private static Map<org.tensorflow.proto.framework.DataType, DataType> protoTypeFrom =
+            createProtoTypeFrom();
 
     private TfDataType() {}
 
-    private static Map<DataType, org.tensorflow.DataType<? extends TType>> createMapToTf() {
-        Map<DataType, org.tensorflow.DataType<? extends TType>> map = new ConcurrentHashMap<>();
-        map.put(DataType.FLOAT32, TFloat32.DTYPE);
-        map.put(DataType.FLOAT64, TFloat64.DTYPE);
-        map.put(DataType.INT32, TInt32.DTYPE);
-        map.put(DataType.INT64, TInt64.DTYPE);
-        map.put(DataType.UINT8, TUint8.DTYPE);
-        map.put(DataType.INT8, TUint8.DTYPE);
-        map.put(DataType.BOOLEAN, TBool.DTYPE);
-        map.put(DataType.STRING, TString.DTYPE);
+    private static Map<DataType, Class<? extends TType>> createClassTypeTo() {
+        Map<DataType, Class<? extends TType>> map = new ConcurrentHashMap<>();
+        map.put(DataType.FLOAT32, TFloat32.class);
+        map.put(DataType.FLOAT64, TFloat64.class);
+        map.put(DataType.INT32, TInt32.class);
+        map.put(DataType.INT64, TInt64.class);
+        map.put(DataType.UINT8, TUint8.class);
+        map.put(DataType.INT8, TUint8.class);
+        map.put(DataType.BOOLEAN, TBool.class);
+        map.put(DataType.STRING, TString.class);
         return map;
     }
 
-    private static Map<org.tensorflow.DataType<? extends TType>, DataType> createMapFromTf() {
-        Map<org.tensorflow.DataType<? extends TType>, DataType> map = new ConcurrentHashMap<>();
-        map.put(TFloat32.DTYPE, DataType.FLOAT32);
-        map.put(TFloat64.DTYPE, DataType.FLOAT64);
-        map.put(TInt32.DTYPE, DataType.INT32);
-        map.put(TInt64.DTYPE, DataType.INT64);
-        map.put(TUint8.DTYPE, DataType.UINT8);
-        map.put(TBool.DTYPE, DataType.BOOLEAN);
-        map.put(TString.DTYPE, DataType.STRING);
+    private static Map<org.tensorflow.proto.framework.DataType, DataType> createProtoTypeFrom() {
+        Map<org.tensorflow.proto.framework.DataType, DataType> map = new ConcurrentHashMap<>();
+        map.put(org.tensorflow.proto.framework.DataType.DT_FLOAT, DataType.FLOAT32);
+        map.put(org.tensorflow.proto.framework.DataType.DT_DOUBLE, DataType.FLOAT64);
+        map.put(org.tensorflow.proto.framework.DataType.DT_INT32, DataType.INT32);
+        map.put(org.tensorflow.proto.framework.DataType.DT_INT64, DataType.INT64);
+        map.put(org.tensorflow.proto.framework.DataType.DT_UINT8, DataType.UINT8);
+        map.put(org.tensorflow.proto.framework.DataType.DT_INT8, DataType.INT8);
+        map.put(org.tensorflow.proto.framework.DataType.DT_BOOL, DataType.BOOLEAN);
+        map.put(org.tensorflow.proto.framework.DataType.DT_STRING, DataType.STRING);
         return map;
     }
 
-    public static DataType fromTf(org.tensorflow.DataType<? extends TType> tfType) {
-        return fromTf.get(tfType);
+    public static Class<? extends TType> toClassType(DataType type) {
+        return classTypeTo.get(type);
     }
 
-    public static org.tensorflow.DataType<? extends TType> toTf(DataType type) {
-        return toTf.get(type);
+    public static DataType fromProtoType(org.tensorflow.proto.framework.DataType tfType) {
+        return protoTypeFrom.get(tfType);
     }
 }
