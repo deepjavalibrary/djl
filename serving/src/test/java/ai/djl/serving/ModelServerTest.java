@@ -87,10 +87,10 @@ public class ModelServerTest {
     private ConfigManager configManager;
     private ModelServer server;
     private byte[] testImage;
-    CountDownLatch latch;
-    HttpResponseStatus httpStatus;
-    String result;
-    HttpHeaders headers;
+    volatile CountDownLatch latch;
+    volatile HttpResponseStatus httpStatus;
+    volatile String result;
+    volatile HttpHeaders headers;
 
     static {
         try {
