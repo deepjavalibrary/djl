@@ -142,7 +142,7 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray relu() {
-        try (Tensor<?> tensor = tf.nn.relu(array.getOperand()).asTensor()) {
+        try (Tensor tensor = tf.nn.relu(array.getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -150,7 +150,7 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray sigmoid() {
-        try (Tensor<?> tensor = tf.math.sigmoid(array.getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.sigmoid(array.getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -170,7 +170,7 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray softSign() {
-        try (Tensor<?> tensor = tf.nn.softsign(array.getOperand()).asTensor()) {
+        try (Tensor tensor = tf.nn.softsign(array.getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -190,7 +190,7 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray selu() {
-        try (Tensor<?> tensor = tf.nn.selu(array.getOperand()).asTensor()) {
+        try (Tensor tensor = tf.nn.selu(array.getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -485,7 +485,7 @@ public class TfNDArrayEx implements NDArrayEx {
         BiFunction<Operand<TNumber>, Operand<TInt32>, Operand<? extends TNumber>> function =
                 getResizeFunction(interpolation);
         if (array.getShape().dimension() == 3) {
-            try (Tensor<?> tensor =
+            try (Tensor tensor =
                     tf.squeeze(
                                     function.apply(
                                             ((TfNDArray) array.expandDims(0)).getOperand(),
@@ -494,7 +494,7 @@ public class TfNDArrayEx implements NDArrayEx {
                 return new TfNDArray(manager, tensor);
             }
         }
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 function.apply((Operand<TNumber>) operand, tf.constant(new int[] {height, width}))
                         .asTensor()) {
             return new TfNDArray(manager, tensor);
@@ -562,7 +562,7 @@ public class TfNDArrayEx implements NDArrayEx {
         for (NDArray ndArray : arrays) {
             operands.add(((TfNDArray) ndArray).getOperand());
         }
-        try (Tensor<?> tensor = tf.stack(operands, Stack.axis((long) axis)).asTensor()) {
+        try (Tensor tensor = tf.stack(operands, Stack.axis((long) axis)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -580,7 +580,7 @@ public class TfNDArrayEx implements NDArrayEx {
         for (NDArray ndArray : arrays) {
             operands.add(((TfNDArray) ndArray).getOperand());
         }
-        try (Tensor<?> tensor = tf.concat(operands, tf.constant(axis)).asTensor()) {
+        try (Tensor tensor = tf.concat(operands, tf.constant(axis)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }

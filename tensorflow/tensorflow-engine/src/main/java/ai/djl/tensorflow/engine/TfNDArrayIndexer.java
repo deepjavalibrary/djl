@@ -51,7 +51,7 @@ public class TfNDArrayIndexer extends NDArrayIndexer {
                     Arrays.stream(toSqueeze).mapToLong(i -> i).boxed().collect(Collectors.toList());
             sliced = tf.squeeze(sliced, Squeeze.axis(squeeze));
         }
-        try (Tensor<?> tensor = sliced.asTensor()) {
+        try (Tensor tensor = sliced.asTensor()) {
             return new TfNDArray(array.getManager(), tensor);
         }
     }
