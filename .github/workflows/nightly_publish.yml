@@ -153,16 +153,16 @@ jobs:
       #            ./gradlew publish -P${{ github.event.inputs.mode }}
       #          fi
       - name: Configure AWS Credentials
-          uses: aws-actions/configure-aws-credentials@v1
-          with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: us-east-2
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
-          run: |
-            if [${{ github.event.inputs.mode }} == "snapshot"]; then
-              aws s3 cp serving/build/distribution/serving-0.11.0-SNAPSHOT.tar s3://djl-ai-akshay/publish/djl-serving-${{ github.event.inputs.mode }}/serving-0.11.0-${{ github.event.inputs.mode }}.tar
-              aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving-${{ github.event.inputs.mode }}"
+        run: |
+          if [${{ github.event.inputs.mode }} == "snapshot"]; then
+          aws s3 cp serving/build/distribution/serving-0.11.0-SNAPSHOT.tar s3://djl-ai-akshay/publish/djl-serving-${{ github.event.inputs.mode }}/serving-0.11.0-${{ github.event.inputs.mode }}.tar
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving-${{ github.event.inputs.mode }}"
 #        env:
 #          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
 #          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
