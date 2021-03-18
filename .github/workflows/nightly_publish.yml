@@ -125,7 +125,7 @@ jobs:
   #        run: ./gradlew :integration:test "-Dai.djl.default_engine=TensorFlow"
   #
   publish:
-    if: github.repository == 'awslabs/djl'
+    if: github.repository == 'aksrajvanshi/djl'
     runs-on: ubuntu-18.04
     needs: [ build, test-pytorch, test-tensorflow ]
     steps:
