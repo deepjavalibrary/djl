@@ -77,6 +77,16 @@ jobs:
         with:
           name: mxnet-model-zoo
           path: mxnet/mxnet-model-zoo/build/reports
+      - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: us-west-2
+      - name: Copy files to S3 with the AWS CLI
+          if: ${{ github.event.inputs.mode == 'snapshot' }}
+          run: |
+            aws s3 cp serving/build/distributions/serving-0.11.0-SNAPSHOT.tar s3://djl-ai-akshay/publish/djl-serving-${{ github.event.inputs.mode }}/serving-0.11.0-${{ github.event.inputs.mode }}.tar
 
   test-pytorch:
     if: github.repository == 'awslabs/djl'
