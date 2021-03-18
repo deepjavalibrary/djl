@@ -2,7 +2,7 @@ name: Nightly Publish
 
 on:
   schedule:
-    - cron: '10 6 * * *'
+    - cron: '15 6 * * *'
   workflow_dispatch:
     inputs:
       mode:
