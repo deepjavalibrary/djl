@@ -86,7 +86,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
           if: ${{ github.event.inputs.mode == 'snapshot' }}
           run: |
-            aws s3 cp serving/build/distributions/serving-0.11.0-SNAPSHOT.tar s3://djl-ai-akshay/publish/djl-serving-${{ github.event.inputs.mode }}/serving-0.11.0-${{ github.event.inputs.mode }}.tar
+            aws s3 cp serving/build/distributions/serving-0.11.0-SNAPSHOT.tar s3://djl-ai-akshay/publish/djl-serve-${{ github.event.inputs.mode }}/serving-0.11.0-${{ github.event.inputs.mode }}.tar
 
   test-pytorch:
     if: github.repository == 'awslabs/djl'
