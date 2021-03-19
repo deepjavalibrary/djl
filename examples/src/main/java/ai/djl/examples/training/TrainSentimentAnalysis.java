@@ -234,7 +234,7 @@ public final class TrainSentimentAnalysis {
             for (TextProcessor processor : TEXT_PROCESSORS) {
                 tokens = processor.preprocess(tokens);
             }
-            NDArray array = textEmbedding.embedText(manager, tokens);
+            NDArray array = manager.create(textEmbedding.preprocessTextToEmbed(tokens));
             return new NDList(array);
         }
 
@@ -243,7 +243,7 @@ public final class TrainSentimentAnalysis {
         public Batchifier getBatchifier() {
             return PaddingStackBatchifier.builder()
                     .optIncludeValidLengths(false)
-                    .addPad(0, 0, m -> m.ones(new Shape(1, 50)).mul(paddingTokenValue))
+                    .addPad(0, 0, m -> m.ones(new Shape(1)).mul(paddingTokenValue))
                     .build();
         }
     }
