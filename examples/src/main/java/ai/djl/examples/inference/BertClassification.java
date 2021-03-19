@@ -43,6 +43,10 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The example is targeted to specific use case for BERT classification. TODO make it generic enough
+ * for reference.
+ */
 public final class BertClassification {
 
     private static final Logger logger = LoggerFactory.getLogger(BertQaInference.class);
@@ -51,9 +55,9 @@ public final class BertClassification {
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
         List<String> inputs = new ArrayList<>();
-        inputs.add("this is\t sample input");
-        inputs.add("hello, world!");
-        inputs.add("DJL is awesome!!!");
+        inputs.add("class1\tsample input");
+        inputs.add("class2\tHello world!");
+        inputs.add("class3\tDJL is good");
 
         Classifications[] results = predict(inputs);
         if (results == null) {
@@ -72,7 +76,8 @@ public final class BertClassification {
             return null;
         }
         // refer to
-        // https://medium.com/delvify/bert-rest-inference-from-the-fine-tuned-model-499997b32851
+        // https://medium.com/delvify/bert-rest-inference-from-the-fine-tuned-model-499997b32851 and
+        // https://github.com/google-research/bert
         // for converting public bert checkpoints to saved model format.
         String modelUrl = "file:///path/to/saved_model/";
         String vocabularyPath = "/path/to/vocab.txt";
@@ -154,7 +159,7 @@ public final class BertClassification {
             for (int i = 0; i < classes.size(); i++) {
                 labelMap.put(classes.get(i), (long) i);
             }
-            List<String> tokensA = tokenizer.tokenize(inputs[2]);
+            List<String> tokensA = tokenizer.tokenize(inputs[1]);
             if (tokensA.size() > maxSequenceLength - 2) {
                 tokensA = tokensA.subList(0, maxSequenceLength - 2);
             }
@@ -181,7 +186,7 @@ public final class BertClassification {
                 inputMask.add(0L);
                 segmentIds.add(0L);
             }
-            Long labelId = labelMap.get(inputs[1]);
+            Long labelId = labelMap.get(inputs[0]);
             NDList outputList = new NDList();
             outputList.add(manager.create(inputIds.stream().mapToLong(l -> l).toArray()));
             outputList.add(manager.create(inputMask.stream().mapToLong(l -> l).toArray()));
