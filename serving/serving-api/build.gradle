@@ -3,20 +3,16 @@ plugins {
 }
 
 dependencies {
-
-	api project(":serving:serving-api")
-	api "io.netty:netty-all:${netty_version}"
-    api "org.slf4j:slf4j-api:${slf4j_version}"
-
+ 
+    implementation "io.netty:netty-all:${netty_version}"
+ 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
 }
 
 
-
 test {
     maxParallelForks = 1
 }
-
 

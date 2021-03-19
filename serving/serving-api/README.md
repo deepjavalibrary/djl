@@ -32,26 +32,6 @@ You can pull the server from the central Maven repository by including the follo
 </dependency>
 ```
 
-### installing plug-ins
-
-The model server looks for plug-ins during startup in the plugin folder and register this plug-ins.
-
-The default plug-in folder is 
-
-```sh
-{work-dir}/plugins
-```
-
-The plug-in folder can be configured with the 'plugin-folder' parameter.
-
-example:
-running model server with gradle
-
-```sh
-./gradlew run --args="-plugin_folder ~/my_djl/plugins"
-```
-
-
 ## Run model server
 
 Use the following command to start model server locally:
