@@ -49,10 +49,6 @@ import org.testng.annotations.Test;
 
 public class DatasetTest {
 
-    private TrainingConfig config =
-            new DefaultTrainingConfig(Loss.l2Loss())
-                    .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
-
     @Test
     public void testSequenceSampler() throws IOException, TranslateException {
         try (Model model = Model.newInstance("model")) {
@@ -69,7 +65,7 @@ public class DatasetTest {
                             .build();
 
             List<Long> original = new ArrayList<>();
-            try (Trainer trainer = model.newTrainer(config)) {
+            try (Trainer trainer = model.newTrainer(config())) {
                 trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
@@ -97,7 +93,7 @@ public class DatasetTest {
                             .setSampling(new BatchSampler(new RandomSampler(), 1, false))
                             .build();
             List<Long> original = new ArrayList<>();
-            try (Trainer trainer = model.newTrainer(config)) {
+            try (Trainer trainer = model.newTrainer(config())) {
                 trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
@@ -124,7 +120,7 @@ public class DatasetTest {
                             .setSampling(new BatchSampler(new SequenceSampler(), 27, false))
                             .build();
             List<long[]> originalList = new ArrayList<>();
-            try (Trainer trainer = model.newTrainer(config)) {
+            try (Trainer trainer = model.newTrainer(config())) {
                 trainer.iterateDataset(dataset)
                         .iterator()
                         .forEachRemaining(
@@ -144,7 +140,7 @@ public class DatasetTest {
                             .setSampling(new BatchSampler(new RandomSampler(), 33, true))
                             .build();
             List<long[]> originalList2 = new ArrayList<>();
-            try (Trainer trainer = model.newTrainer(config)) {
+            try (Trainer trainer = model.newTrainer(config())) {
                 trainer.iterateDataset(dataset2)
                         .iterator()
                         .forEachRemaining(
@@ -161,7 +157,7 @@ public class DatasetTest {
                             .setSampling(new BatchSampler(new SequenceSampler(), 101, true))
                             .build();
             List<long[]> originalList3 = new ArrayList<>();
-            try (Trainer trainer = model.newTrainer(config)) {
+            try (Trainer trainer = model.newTrainer(config())) {
                 trainer.iterateDataset(dataset3)
                         .iterator()
                         .forEachRemaining(
@@ -178,7 +174,7 @@ public class DatasetTest {
                             .setSampling(new BatchSampler(new SequenceSampler(), 101, false))
                             .build();
             List<long[]> originalList4 = new ArrayList<>();
-            try (Trainer trainer = model.newTrainer(config)) {
+            try (Trainer trainer = model.newTrainer(config())) {
                 trainer.iterateDataset(dataset4)
                         .iterator()
                         .forEachRemaining(
@@ -209,7 +205,7 @@ public class DatasetTest {
                             .build();
 
             int index = 0;
-            try (Trainer trainer = model.newTrainer(config)) {
+            try (Trainer trainer = model.newTrainer(config())) {
                 for (Batch batch : trainer.iterateDataset(dataset)) {
                     Assert.assertEquals(
                             batch.getData().singletonOrThrow(),
@@ -285,11 +281,12 @@ public class DatasetTest {
                             .optUsage(Dataset.Usage.TEST)
                             // you could start trying prefetchNumber with 2 * number of threads.
                             // This number should be adjusted based on your machines and data.
-                            .optExecutor(executor, 4)
+                            .optPrefetchNumber(4)
                             .optLimit(32)
                             .build();
 
-            try (Trainer trainer = model.newTrainer(config)) {
+            TrainingConfig threadedConfig = config().optExecutorService(executor);
+            try (Trainer trainer = model.newTrainer(threadedConfig)) {
                 for (Batch batch : trainer.iterateDataset(cifar10)) {
                     batch.close();
                 }
@@ -322,5 +319,10 @@ public class DatasetTest {
             Assert.assertEquals(data[0][0], 1f);
             Assert.assertEquals(labels[0][0], 0f);
         }
+    }
+
+    private DefaultTrainingConfig config() {
+        return new DefaultTrainingConfig(Loss.l2Loss())
+                .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
     }
 }

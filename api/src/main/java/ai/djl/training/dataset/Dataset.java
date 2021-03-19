@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 /**
  * An interface to represent a set of sample data/label pairs to train a model.
@@ -33,6 +34,20 @@ public interface Dataset {
      * @throws TranslateException if there is an error while processing input
      */
     Iterable<Batch> getData(NDManager manager) throws IOException, TranslateException;
+
+    /**
+     * Fetches an iterator that can iterate through the {@link Dataset} with multiple threads.
+     *
+     * @param manager the dataset to iterate through
+     * @param executorService the executorService to use for multi-threading
+     * @return an {@link Iterable} of {@link Batch} that contains batches of data from the dataset
+     * @throws IOException for various exceptions depending on the dataset
+     * @throws TranslateException if there is an error while processing input
+     */
+    default Iterable<Batch> getData(NDManager manager, ExecutorService executorService)
+            throws IOException, TranslateException {
+        return getData(manager);
+    }
 
     /**
      * Prepares the dataset for use.
