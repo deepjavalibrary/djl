@@ -47,3 +47,10 @@ run {
     systemProperty("file.encoding", "UTF-8")
     applicationDefaultJvmArgs = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=4000"]
 }
+
+startScripts {
+    defaultJvmOpts = []
+    doLast {
+        unixScript.text = unixScript.text.replace('exec "$JAVACMD" "$@"', 'exec "OMP_NUM_THREAD=1; MXNET_ENGINE_TYPE=NaiveEngine; TF_CPP_MIN_LOG_LEVEL=1; TF_NUM_INTRAOP_THREADS=1;" "$JAVACMD" "$@"')
+    }
+}
