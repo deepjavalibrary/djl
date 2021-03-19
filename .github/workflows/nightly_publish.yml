@@ -142,7 +142,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Publish to snapshot repository
-        if: ${{ github.event.inputs.mode == "" || github.event.inputs.mode == "snapshot" }}
+        if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
         run: |
           ./gradlew publish -Psnapshot
           cd bom
