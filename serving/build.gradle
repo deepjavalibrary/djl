@@ -51,6 +51,6 @@ run {
 startScripts {
     defaultJvmOpts = []
     doLast {
-        unixScript.text = unixScript.text.replace('exec "$JAVACMD" "$@"', 'exec "OMP_NUM_THREAD=1; MXNET_ENGINE_TYPE=NaiveEngine; TF_CPP_MIN_LOG_LEVEL=1; TF_NUM_INTRAOP_THREADS=1;" "$JAVACMD" "$@"')
+        unixScript.text = unixScript.text.replace('exec "$JAVACMD" "$@"', 'exec env OMP_NUM_THREADS="1" MXNET_ENGINE_TYPE="NaiveEngine" TF_CPP_MIN_LOG_LEVEL=1 TF_NUM_INTRAOP_THREADS=1 "$JAVACMD" "$@"')
     }
 }
