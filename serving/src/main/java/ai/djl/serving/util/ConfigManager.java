@@ -236,16 +236,13 @@ public final class ConfigManager {
      *
      * @return the model server home directory
      */
-    public String getModelServerHome() {
+    public static String getModelServerHome() {
         String home = System.getenv("MODEL_SERVER_HOME");
         if (home == null) {
             home = System.getProperty(MODEL_SERVER_HOME);
             if (home == null) {
-                home = getProperty(MODEL_SERVER_HOME, null);
-                if (home == null) {
-                    home = getCanonicalPath(".");
-                    return home;
-                }
+                home = getCanonicalPath(".");
+                return home;
             }
         }
 
