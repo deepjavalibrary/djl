@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.List;
@@ -117,7 +116,7 @@ public final class LibUtils {
         Path tmp = null;
         try {
             String libName = System.mapLibraryName(LIB_NAME);
-            Path cacheFolder = getCacheDir();
+            Path cacheFolder = Utils.getEngineCacheDir("tflite");
             logger.debug("Using cache dir: {}", cacheFolder);
 
             Path dir = cacheFolder.resolve(platform.getVersion() + platform.getClassifier());
@@ -156,7 +155,7 @@ public final class LibUtils {
         String os = platform.getOsPrefix();
 
         String libName = System.mapLibraryName(LIB_NAME);
-        Path cacheDir = getCacheDir();
+        Path cacheDir = Utils.getEngineCacheDir("tflite");
         logger.debug("Using cache dir: {}", cacheDir);
         Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
@@ -207,23 +206,5 @@ public final class LibUtils {
                 Utils.deleteQuietly(tmp);
             }
         }
-    }
-
-    private static Path getCacheDir() {
-        String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
-        if (cacheDir == null || cacheDir.isEmpty()) {
-            cacheDir = System.getenv("ENGINE_CACHE_DIR");
-            if (cacheDir == null || cacheDir.isEmpty()) {
-                cacheDir = System.getProperty("DJL_CACHE_DIR");
-                if (cacheDir == null || cacheDir.isEmpty()) {
-                    cacheDir = System.getenv("DJL_CACHE_DIR");
-                    if (cacheDir == null || cacheDir.isEmpty()) {
-                        String userHome = System.getProperty("user.home");
-                        return Paths.get(userHome, ".djl.ai").resolve("tflite");
-                    }
-                }
-            }
-        }
-        return Paths.get(cacheDir, "tflite");
     }
 }

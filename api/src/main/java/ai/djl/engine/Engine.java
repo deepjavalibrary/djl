@@ -20,6 +20,7 @@ import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
+import ai.djl.util.Utils;
 import ai.djl.util.cuda.CudaUtils;
 import java.lang.management.MemoryUsage;
 import java.nio.file.Files;
@@ -267,9 +268,13 @@ public abstract class Engine {
         try {
             Path temp = Paths.get(System.getProperty("java.io.tmpdir"));
             System.out.println("temp directory: " + temp.toString());
-            Files.createTempFile("test", ".tmp");
+            Path tmpFile = Files.createTempFile("test", ".tmp");
+            Files.delete(tmpFile);
 
-            Path path = getEngineCacheDir();
+            Path cacheDir = Utils.getCacheDir();
+            System.out.println("DJL cache directory: " + cacheDir.toAbsolutePath().toString());
+
+            Path path = Utils.getEngineCacheDir();
             System.out.println("Engine cache directory: " + path.toAbsolutePath().toString());
             Files.createDirectories(path);
             if (!Files.isWritable(path)) {
@@ -304,23 +309,5 @@ public abstract class Engine {
             System.out.println("Last error:");
             exception.printStackTrace(System.out);
         }
-    }
-
-    private static Path getEngineCacheDir() {
-        String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
-        if (cacheDir == null || cacheDir.isEmpty()) {
-            cacheDir = System.getenv("ENGINE_CACHE_DIR");
-            if (cacheDir == null || cacheDir.isEmpty()) {
-                cacheDir = System.getProperty("DJL_CACHE_DIR");
-                if (cacheDir == null || cacheDir.isEmpty()) {
-                    cacheDir = System.getenv("DJL_CACHE_DIR");
-                    if (cacheDir == null || cacheDir.isEmpty()) {
-                        String userHome = System.getProperty("user.home");
-                        return Paths.get(userHome, ".djl.ai");
-                    }
-                }
-            }
-        }
-        return Paths.get(cacheDir);
     }
 }
