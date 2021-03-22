@@ -12,6 +12,7 @@ on:
 
 jobs:
   documentation:
+    if: github.repository == 'awslabs/djl'
     runs-on: ubuntu-18.04
     steps:
       - name: Set up JDK 11
