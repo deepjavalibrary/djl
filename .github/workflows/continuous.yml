@@ -20,6 +20,7 @@ on:
 
 jobs:
   build:
+    if: github.repository == 'awslabs/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -137,6 +138,7 @@ jobs:
 
   # Windows platform for testing hybrid engines
   build-windows:
+    if: github.repository == 'awslabs/djl'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1
