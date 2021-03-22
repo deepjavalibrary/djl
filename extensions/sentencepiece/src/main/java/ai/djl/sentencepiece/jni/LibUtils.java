@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 import org.slf4j.Logger;
@@ -56,7 +55,7 @@ public final class LibUtils {
 
     private static String copyJniLibraryFromClasspath() {
         String name = System.mapLibraryName(LIB_NAME);
-        Path nativeDir = getCacheDir();
+        Path nativeDir = Utils.getEngineCacheDir("sentencepiece");
         Properties prop = new Properties();
         Platform platform = Platform.fromSystem();
         String classifier = platform.getClassifier();
@@ -90,23 +89,5 @@ public final class LibUtils {
                 Utils.deleteQuietly(tmp);
             }
         }
-    }
-
-    private static Path getCacheDir() {
-        String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
-        if (cacheDir == null || cacheDir.isEmpty()) {
-            cacheDir = System.getenv("ENGINE_CACHE_DIR");
-            if (cacheDir == null || cacheDir.isEmpty()) {
-                cacheDir = System.getProperty("DJL_CACHE_DIR");
-                if (cacheDir == null || cacheDir.isEmpty()) {
-                    cacheDir = System.getenv("DJL_CACHE_DIR");
-                    if (cacheDir == null || cacheDir.isEmpty()) {
-                        String userHome = System.getProperty("user.home");
-                        return Paths.get(userHome, ".djl.ai").resolve("sentencepiece");
-                    }
-                }
-            }
-        }
-        return Paths.get(cacheDir, "sentencepiece");
     }
 }
