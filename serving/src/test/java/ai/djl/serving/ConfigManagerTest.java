@@ -44,7 +44,7 @@ public class ConfigManagerTest {
         ConfigManager.init(parseArguments(new String[0]));
         ConfigManager config = ConfigManager.getInstance();
         Assert.assertNotNull(config.getSslContext());
-        Assert.assertNotNull(config.getModelServerHome());
+        Assert.assertNotNull(ConfigManager.getModelServerHome());
         Assert.assertEquals(config.getIoRatio(), 50);
 
         setConfiguration(config, "keystore", "build/tmp/keystore.jks");
@@ -73,7 +73,8 @@ public class ConfigManagerTest {
         config = ConfigManager.getInstance();
         config.getSslContext();
 
-        Assert.assertEquals(config.getModelServerHome(), Paths.get(".").toRealPath().toString());
+        Assert.assertEquals(
+                ConfigManager.getModelServerHome(), Paths.get(".").toRealPath().toString());
 
         config.getConnector(Connector.ConnectorType.INFERENCE);
     }

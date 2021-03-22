@@ -12,6 +12,7 @@
  */
 package ai.djl.serving;
 
+import ai.djl.serving.util.ConfigManager;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,13 +83,19 @@ public final class Arguments {
             configFile = System.getProperty("ai.djl.conf", null);
         }
         if (configFile != null) {
+
             Path file = Paths.get(configFile);
             if (!Files.isRegularFile(file)) {
                 throw new IllegalArgumentException("Configuration file not found: " + configFile);
             }
             return file;
         }
-        Path file = Paths.get("config.properties");
+        Path modelServerHome = Paths.get(ConfigManager.getModelServerHome());
+        Path file = modelServerHome.resolve("conf/config.properties");
+        if (Files.isRegularFile(file)) {
+            return file;
+        }
+        file = modelServerHome.resolve("conf/config.properties");
         if (Files.isRegularFile(file)) {
             return file;
         }
