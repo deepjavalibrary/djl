@@ -77,6 +77,19 @@ jobs:
         with:
           name: mxnet-model-zoo
           path: mxnet/mxnet-model-zoo/build/reports
+      - name: onnxruntime/onnxruntime-engine test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: onnxruntime
+          path: onnxruntime/onnxruntime-engine/build/reports
+      - name: pytorch-engine test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: pytorch-engine
+          path: pytorch/pytorch-engine/build/reports
+
 
   test-pytorch:
     if: github.repository == 'awslabs/djl'
