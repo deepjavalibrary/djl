@@ -32,10 +32,8 @@ public class S3RepositoryFactory implements RepositoryFactory {
 
     private S3Client client;
 
-    /** Creates an {@code S3RepositoryFactory} instance with default {@code S3Client}. */
-    public S3RepositoryFactory() {
-        this(S3Client.builder().build());
-    }
+    /** Creates an {@code S3RepositoryFactory}. */
+    public S3RepositoryFactory() {}
 
     /**
      * Creates an {@code S3RepositoryFactory} instance with the specified {@code S3Client}.
@@ -97,6 +95,9 @@ public class S3RepositoryFactory implements RepositoryFactory {
 
         if (modelName == null) {
             modelName = artifactId;
+        }
+        if (client == null) {
+            client = S3Client.create();
         }
         return new S3Repository(client, name, bucket, prefix, artifactId, modelName);
     }
