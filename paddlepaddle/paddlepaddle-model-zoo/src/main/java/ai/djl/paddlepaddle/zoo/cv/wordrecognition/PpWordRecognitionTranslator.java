@@ -64,7 +64,7 @@ public class PpWordRecognitionTranslator implements Translator<Image, String> {
     @Override
     public NDList processInput(TranslatorContext ctx, Image input) {
         NDArray img = input.toNDArray(ctx.getNDManager());
-        int[] hw = resize32(input.getHeight(), input.getWidth());
+        int[] hw = resize32(input.getWidth());
         img = NDImageUtils.resize(img, hw[1], hw[0]);
         img = NDImageUtils.toTensor(img).sub(0.5f).div(0.5f);
         img = img.expandDims(0);
@@ -77,14 +77,9 @@ public class PpWordRecognitionTranslator implements Translator<Image, String> {
         return null;
     }
 
-    private int[] resize32(double h, double w) {
-        double min = Math.min(h, w);
-        if (min < 32) {
-            h = 32.0 / min * h;
-            w = 32.0 / min * w;
-        }
-        int h32 = (int) h / 32;
-        int w32 = (int) w / 32;
-        return new int[] {h32 * 32, w32 * 32};
+    private int[] resize32(double w) {
+        // Paddle doesn't rely on aspect ratio
+        int width = ((int) Math.max(32, w)) / 32 * 32;
+        return new int[] {32, width};
     }
 }
