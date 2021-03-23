@@ -50,7 +50,6 @@ public class ConfigManagerTest {
         setConfiguration(config, "keystore", "build/tmp/keystore.jks");
         setConfiguration(config, "keystore_pass", "changeit");
         setConfiguration(config, "keystore_type", "JKS");
-        setConfiguration(config, "model_server_home", ".");
 
         Path dir = Paths.get("build/tmp");
         Files.createDirectories(dir);

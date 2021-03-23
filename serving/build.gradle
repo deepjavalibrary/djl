@@ -51,6 +51,13 @@ run {
 startScripts {
     defaultJvmOpts = []
     doLast {
-        unixScript.text = unixScript.text.replace('exec "$JAVACMD" "$@"', 'exec env OMP_NUM_THREADS="1" MXNET_ENGINE_TYPE="NaiveEngine" TF_CPP_MIN_LOG_LEVEL=1 TF_NUM_INTRAOP_THREADS=1 "$JAVACMD" "$@"')
+        String text = unixScript.text.replace('exec "$JAVACMD" "$@"', 'exec env OMP_NUM_THREADS="1" MXNET_ENGINE_TYPE="NaiveEngine" TF_CPP_MIN_LOG_LEVEL=1 TF_NUM_INTRAOP_THREADS=1 "$JAVACMD" "$@"')
+        text = text.replace('DEFAULT_JVM_OPTS=""', 'DEFAULT_JVM_OPTS="-DMODEL_SERVER_HOME=${APP_HOME}"')
+        unixScript.text = text
     }
 }
+
+applicationDistribution.from("src/main/conf/") {
+    into "conf"
+}
+tasks.distZip.enabled = false

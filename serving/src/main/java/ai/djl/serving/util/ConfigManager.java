@@ -64,7 +64,6 @@ public final class ConfigManager {
     private static final String CERTIFICATE_FILE = "certificate_file";
     private static final String PRIVATE_KEY_FILE = "private_key_file";
     private static final String MAX_REQUEST_SIZE = "max_request_size";
-    private static final String MODEL_SERVER_HOME = "model_server_home";
     private static final String MODEL_STORE = "model_store";
     private static final String MODEL_URL_PATTERN = "model_url_pattern";
 
@@ -239,7 +238,7 @@ public final class ConfigManager {
     public static String getModelServerHome() {
         String home = System.getenv("MODEL_SERVER_HOME");
         if (home == null) {
-            home = System.getProperty(MODEL_SERVER_HOME);
+            home = System.getProperty("MODEL_SERVER_HOME");
             if (home == null) {
                 home = getCanonicalPath(".");
                 return home;
