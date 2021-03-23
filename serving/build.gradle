@@ -52,7 +52,7 @@ startScripts {
     defaultJvmOpts = []
     doLast {
         String text = unixScript.text.replace('exec "$JAVACMD" "$@"', 'exec env OMP_NUM_THREADS="1" MXNET_ENGINE_TYPE="NaiveEngine" TF_CPP_MIN_LOG_LEVEL=1 TF_NUM_INTRAOP_THREADS=1 "$JAVACMD" "$@"')
-        text = text.replace('DEFAULT_JVM_OPTS=""', 'DEFAULT_JVM_OPTS="-DMODEL_SERVER_HOME=${APP_HOME}"')
+        text = text.replace('DEFAULT_JVM_OPTS=""', 'DEFAULT_JVM_OPTS="-DMODEL_SERVER_HOME=${APP_HOME} -Dlog4j.configurationFile=${APP_HOME}/conf/log4j2.xml"')
         unixScript.text = text
     }
 }
