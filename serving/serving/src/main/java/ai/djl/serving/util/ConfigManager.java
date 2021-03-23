@@ -307,14 +307,14 @@ public final class ConfigManager {
     public String getCorsAllowedHeaders() {
         return prop.getProperty(CORS_ALLOWED_HEADERS);
     }
-    
+
     /**
      * return the folder where the model search for plugins.
-     * 
+     *
      * @return the configured plugin folder or the default folder.
      */
     public Path getPluginFolder() {
-	return Paths.get(prop.getProperty(PLUGIN_FOLDER,"plugins"));
+        return Paths.get(prop.getProperty(PLUGIN_FOLDER, "plugins"));
     }
 
     /**

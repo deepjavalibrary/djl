@@ -19,7 +19,12 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,10 +45,18 @@ public class PluginManager {
     private static final Logger logger = LoggerFactory.getLogger(PluginManager.class);
 
     private ConfigManager configManager;
-    
-    /** constructing a PluginManager. */
+
+    private Map<Class<?>, Set<Plugin<?>>> pluginsRegistry;
+
+    /**
+     * constructing a PluginManager.
+     *
+     * @param configManager a instance of the configManager to lookup configuration like
+     *     plugin-folder.
+     */
     public PluginManager(ConfigManager configManager) {
-	this.configManager=configManager;
+        this.configManager = configManager;
+        this.pluginsRegistry = new HashMap<>();
     }
 
     /**
@@ -52,25 +65,58 @@ public class PluginManager {
      * @throws IOException when error during IO operation occurs.
      */
     public void loadPlugins() throws IOException {
-	logger.info("scanning for plugins...");
+        logger.info("scanning for plugins...");
         URL[] pluginUrls = listPluginJars().toArray(new URL[] {});
-        
+
         URLClassLoader ucl = new URLClassLoader(pluginUrls);
 
-        int pluginsFound=0;
+        int pluginsFound = 0;
         ServiceLoader<RequestHandler> sl = ServiceLoader.load(RequestHandler.class, ucl);
+
         Iterator<RequestHandler> apit = sl.iterator();
         while (apit.hasNext()) {
             pluginsFound++;
-            logger.debug("load plugin: {}",apit.next().getClass().getSimpleName());
+            RequestHandler service = apit.next();
+            logger.debug("load plugin: {}", service.getClass().getSimpleName());
+            Plugin<RequestHandler> plugin = new Plugin<>(service);
+            pluginsRegistry
+                    .computeIfAbsent(RequestHandler.class, k -> new HashSet<Plugin<?>>())
+                    .add(plugin);
         }
-        logger.info("{} plug-ins found.",pluginsFound);
+        logger.info("{} plug-ins found.", pluginsFound);
     }
 
+    /**
+     * returns a set of plug-in components implementing the specific service interface.
+     *
+     * <p>only active plug-ins are returned which are fully initialised at this point.
+     *
+     * <p>{@code Set<RequestHandler>
+     * allActiveRequestHandler=findImplementations(RequestHandler.class)}
+     *
+     * @param <T> generic type of service interface
+     * @param pluginInterface the specific service interface
+     * @return a set of all plugin components implementing this service interface
+     */
+    public <T> Set<T> findImplementations(Class<T> pluginInterface) {
+        return Collections.unmodifiableSet(
+                pluginsRegistry
+                        .getOrDefault(pluginInterface, new HashSet<Plugin<?>>())
+                        .stream()
+                        .map(Plugin::getComponent)
+                        .map(pluginInterface::cast)
+                        .collect(Collectors.toSet()));
+    }
+
+    @SuppressWarnings("unchecked")
     private Set<URL> listPluginJars() throws IOException {
         Path pluginsFolder = configManager.getPluginFolder();
-        logger.debug("scanning in plug-in folder :{}",pluginsFolder);
-        
+        if (!(Files.exists(pluginsFolder) && Files.isDirectory(pluginsFolder))) {
+            logger.warn("scanning in plug-in folder :{}....folder does not exists", pluginsFolder);
+            return (Set<URL>) Collections.EMPTY_SET;
+        }
+        logger.debug("scanning in plug-in folder :{}", pluginsFolder);
+
         try (Stream<Path> stream = Files.walk(pluginsFolder, Integer.MAX_VALUE)) {
             return stream.filter(file -> !Files.isDirectory(file))
                     .filter(file -> file.getFileName() != null)
@@ -86,6 +132,34 @@ public class PluginManager {
                                 return null;
                             })
                     .collect(Collectors.toSet());
+        }
+    }
+
+    class Plugin<T> {
+        private T component;
+        private LocalDateTime loadtime;
+
+        public Plugin(T component) {
+            this.component = component;
+            this.loadtime = LocalDateTime.now();
+        }
+
+        /**
+         * gets the value of component.
+         *
+         * @return the component value.
+         */
+        public T getComponent() {
+            return component;
+        }
+
+        /**
+         * gets the value of loadtime.
+         *
+         * @return the loadtime value.
+         */
+        public LocalDateTime getLoadtime() {
+            return loadtime;
         }
     }
 }

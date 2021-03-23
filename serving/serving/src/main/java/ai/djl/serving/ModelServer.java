@@ -60,7 +60,7 @@ public class ModelServer {
     private AtomicBoolean stopped = new AtomicBoolean(false);
 
     private ConfigManager configManager;
-    
+
     private PluginManager pluginManager;
 
     /**
@@ -156,14 +156,12 @@ public class ModelServer {
         futures.clear();
         if (inferenceConnector.equals(managementConnector)) {
             Connector both = configManager.getConnector(Connector.ConnectorType.BOTH);
-            futures.add(initializeServer(both, serverGroup, workerGroup, "Both"));
+            futures.add(initializeServer(both, serverGroup, workerGroup));
         } else {
-            futures.add(
-                    initializeServer(inferenceConnector, serverGroup, workerGroup, "Inference"));
-            futures.add(
-                    initializeServer(managementConnector, serverGroup, workerGroup, "Management"));
+            futures.add(initializeServer(inferenceConnector, serverGroup, workerGroup));
+            futures.add(initializeServer(managementConnector, serverGroup, workerGroup));
         }
-        
+
         return futures;
     }
 
@@ -191,13 +189,13 @@ public class ModelServer {
     }
 
     private ChannelFuture initializeServer(
-            Connector connector,
-            EventLoopGroup serverGroup,
-            EventLoopGroup workerGroup,
-            final String purpose)
+            Connector connector, EventLoopGroup serverGroup, EventLoopGroup workerGroup)
             throws InterruptedException, IOException, GeneralSecurityException {
         Class<? extends ServerChannel> channelClass = connector.getServerChannel();
-        logger.info("Initialize {} server with: {}.", purpose, channelClass.getSimpleName());
+        logger.info(
+                "Initialize {} server with: {}.",
+                connector.getType(),
+                channelClass.getSimpleName());
 
         ServerBootstrap b = new ServerBootstrap();
         b.option(ChannelOption.SO_BACKLOG, 1024)
@@ -211,7 +209,7 @@ public class ModelServer {
         if (connector.isSsl()) {
             sslCtx = configManager.getSslContext();
         }
-        b.childHandler(new ServerInitializer(sslCtx, connector.getType()));
+        b.childHandler(new ServerInitializer(sslCtx, connector.getType(), pluginManager));
 
         ChannelFuture future;
         try {
@@ -244,7 +242,7 @@ public class ModelServer {
                 (ChannelFutureListener)
                         listener -> logger.info("{} model server stopped.", connector.getType()));
 
-        logger.info("{} API bind to: {}", purpose, connector);
+        logger.info("{} API bind to: {}", connector.getType(), connector);
         return f;
     }
 
