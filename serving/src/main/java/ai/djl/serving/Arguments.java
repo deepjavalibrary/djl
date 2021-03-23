@@ -95,7 +95,7 @@ public final class Arguments {
         if (Files.isRegularFile(file)) {
             return file;
         }
-        file = modelServerHome.resolve("conf/config.properties");
+        file = modelServerHome.resolve("config.properties");
         if (Files.isRegularFile(file)) {
             return file;
         }
