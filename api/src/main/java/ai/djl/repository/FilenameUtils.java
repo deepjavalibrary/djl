@@ -65,7 +65,7 @@ public final class FilenameUtils {
             return name.substring(0, name.length() - 7);
         } else if (name.endsWith(".tar.z")) {
             return name.substring(0, name.length() - 6);
-        } else if (name.endsWith(".tgz") || name.endsWith(".zip")) {
+        } else if (name.endsWith(".tgz") || name.endsWith(".zip") || name.endsWith(".tar")) {
             return name.substring(0, name.length() - 4);
         } else if (name.endsWith(".gz")) {
             return name.substring(0, name.length() - 3);

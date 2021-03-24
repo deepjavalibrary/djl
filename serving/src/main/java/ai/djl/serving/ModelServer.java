@@ -300,7 +300,7 @@ public class ModelServer {
             int workers = configManager.getDefaultWorkers();
             CompletableFuture<ModelInfo> future =
                     modelManager.registerModel(
-                            null,
+                            ModelInfo.inferModelNameFromUrl(url),
                             url,
                             configManager.getBatchSize(),
                             configManager.getMaxBatchDelay(),

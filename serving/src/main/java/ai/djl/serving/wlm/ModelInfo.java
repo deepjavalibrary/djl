@@ -14,7 +14,9 @@ package ai.djl.serving.wlm;
 
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.repository.FilenameUtils;
 import ai.djl.repository.zoo.ZooModel;
+import java.net.URI;
 import java.nio.file.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -209,7 +211,7 @@ public final class ModelInfo implements AutoCloseable, Cloneable {
     }
 
     /**
-     * returns the configured size of the workers queue.
+     * Returns the configured size of the workers queue.
      *
      * @return requested size of the workers queue.
      */
@@ -224,5 +226,26 @@ public final class ModelInfo implements AutoCloseable, Cloneable {
             logger.debug("closing model {}", modelName);
             model.close();
         }
+    }
+
+    /**
+     * Infer model name form model URL in case model name is not provided.
+     *
+     * @param url the model URL
+     * @return the model name
+     */
+    public static String inferModelNameFromUrl(String url) {
+        URI uri = URI.create(url);
+        String path = uri.getPath();
+        String modelName;
+        int pos = path.lastIndexOf('/');
+        if (pos >= 0) {
+            modelName = path.substring(pos + 1);
+        } else {
+            modelName = path;
+        }
+        modelName = FilenameUtils.getNamePart(modelName);
+        modelName = modelName.replaceAll("(\\W|^_)", "_");
+        return modelName;
     }
 }
