@@ -6,8 +6,8 @@
         </Console>
         <RollingFile
                 name="rollingFile"
-                fileName="${sys:MODEL_SERVER_HOME}/logs/serving.log"
-                filePattern="${sys:MODEL_SERVER_HOME}/logs/serving.%d{dd-MMM}.log.gz"
+                fileName="${env:MODEL_SERVER_HOME}/logs/serving.log"
+                filePattern="${env:MODEL_SERVER_HOME}/logs/serving.%d{dd-MMM}.log.gz"
                 ignoreExceptions="false">
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n</Pattern>
