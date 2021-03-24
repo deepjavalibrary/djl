@@ -95,17 +95,9 @@ public final class ModelManager {
                                         .optModelUrls(modelUrl)
                                         .build();
                         ZooModel<Input, Output> model = ModelZoo.loadModel(criteria);
-                        String actualModelName;
-                        if (modelName == null || modelName.isEmpty()) {
-                            actualModelName = model.getName();
-                            actualModelName = actualModelName.replaceAll("(\\W|^_)", "_");
-                        } else {
-                            actualModelName = modelName;
-                        }
-
                         ModelInfo modelInfo =
                                 new ModelInfo(
-                                        actualModelName,
+                                        modelName,
                                         modelUrl,
                                         model,
                                         configManager.getJobQueueSize(),
@@ -113,12 +105,12 @@ public final class ModelManager {
                                         maxBatchDelay,
                                         batchSize);
 
-                        ModelInfo existingModel = models.putIfAbsent(actualModelName, modelInfo);
+                        ModelInfo existingModel = models.putIfAbsent(modelName, modelInfo);
                         if (existingModel != null) {
                             // model already exists
                             model.close();
                             throw new BadRequestException(
-                                    "Model " + actualModelName + " is already registered.");
+                                    "Model " + modelName + " is already registered.");
                         }
                         logger.info("Model {} loaded.", modelInfo.getModelName());
 

@@ -143,7 +143,10 @@ public class ManagementRequestHandler extends HttpRequestHandler {
             throw new BadRequestException("Parameter url is required.");
         }
 
-        final String modelName = NettyUtils.getParameter(decoder, MODEL_NAME_PARAMETER, null);
+        String modelName = NettyUtils.getParameter(decoder, MODEL_NAME_PARAMETER, null);
+        if (modelName == null || modelName.isEmpty()) {
+            modelName = ModelInfo.inferModelNameFromUrl(modelUrl);
+        }
         int batchSize = NettyUtils.getIntParameter(decoder, BATCH_SIZE_PARAMETER, 1);
         int maxBatchDelay = NettyUtils.getIntParameter(decoder, MAX_BATCH_DELAY_PARAMETER, 100);
         int maxIdleTime = NettyUtils.getIntParameter(decoder, MAX_IDLE_TIME__PARAMETER, 60);
