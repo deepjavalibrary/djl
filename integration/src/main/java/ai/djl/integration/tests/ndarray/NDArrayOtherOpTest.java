@@ -218,6 +218,17 @@ public class NDArrayOtherOpTest {
         }
     }
 
+    @Test
+    public void testIntern() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.ones(new Shape(3, 2));
+            NDArray replaced = manager.zeros(new Shape(5, 5));
+            original.intern(replaced);
+            Assert.assertEquals(original, manager.zeros(new Shape(5, 5)));
+            Assert.assertThrows(IllegalStateException.class, replaced::toFloatArray);
+        }
+    }
+
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testBooleanMask() {
         try (NDManager manager = NDManager.newBaseManager()) {
@@ -274,6 +285,18 @@ public class NDArrayOtherOpTest {
                         NDArray ndArray = manager.create(1f);
                         ndArray.set(FloatBuffer.wrap(new float[] {-1, 1}));
                     });
+        }
+    }
+
+    @Test
+    public void testSetBoolean() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.arange(0f, 6f).reshape(2, 3);
+            array.set(array.gte(2), 10f);
+            NDArray expected = manager.create(new float[] {0, 1, 10, 10, 10, 10}, new Shape(2, 3));
+            Assert.assertEquals(array, expected);
+            array.set(array.lt(-1), -1f);
+            Assert.assertEquals(array, expected);
         }
     }
 

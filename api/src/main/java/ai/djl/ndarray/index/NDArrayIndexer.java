@@ -13,6 +13,7 @@
 package ai.djl.ndarray.index;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.index.dim.NDIndexBooleans;
 import ai.djl.ndarray.index.dim.NDIndexElement;
 import ai.djl.ndarray.index.full.NDIndexFullPick;
@@ -90,9 +91,11 @@ public abstract class NDArrayIndexer {
      *
      * @param array the array to set
      * @param indices a boolean array where true indicates values to update
-     * @param value the value to set with
+     * @param value the value to set with when condition is true
      */
-    public abstract void set(NDArray array, NDIndexBooleans indices, NDArray value);
+    public void set(NDArray array, NDIndexBooleans indices, NDArray value) {
+        array.intern(NDArrays.where(indices.getIndex(), value, array));
+    }
 
     /**
      * Sets the values of the array at the index locations with an array.
@@ -142,6 +145,16 @@ public abstract class NDArrayIndexer {
                 NDIndexFullSlice.fromIndex(index, array.getShape()).orElse(null);
         if (fullSlice != null) {
             set(array, fullSlice, value);
+            return;
+        }
+        // use booleanMask for NDIndexBooleans case
+        List<NDIndexElement> indices = index.getIndices();
+        if (!indices.isEmpty() && indices.get(0) instanceof NDIndexBooleans) {
+            if (indices.size() != 1) {
+                throw new IllegalArgumentException(
+                        "set() currently didn't support more that one boolean NDArray");
+            }
+            set(array, (NDIndexBooleans) indices.get(0), array.getManager().create(value));
             return;
         }
         throw new UnsupportedOperationException(
