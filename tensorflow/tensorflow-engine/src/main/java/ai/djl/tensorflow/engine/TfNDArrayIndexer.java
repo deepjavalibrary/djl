@@ -45,14 +45,14 @@ public class TfNDArrayIndexer extends NDArrayIndexer {
         Constant<TInt64> end = tf.constant(fullSlice.getMax());
         Constant<TInt64> step = tf.constant(fullSlice.getStep());
         int[] toSqueeze = fullSlice.getToSqueeze();
-        Operand<?> sliced = tf.stridedSlice(tfArray.getOperand(), begin, end, step);
+        Operand<?> sliced = tf.stridedSlice(tfArray.getHandle(), begin, end, step);
         if (toSqueeze.length > 0) {
             List<Long> squeeze =
                     Arrays.stream(toSqueeze).mapToLong(i -> i).boxed().collect(Collectors.toList());
             sliced = tf.squeeze(sliced, Squeeze.axis(squeeze));
         }
         try (Tensor tensor = sliced.asTensor()) {
-            return new TfNDArray(array.getManager(), tensor);
+            return new TfNDArray((TfNDManager) array.getManager(), tensor);
         }
     }
 

@@ -51,7 +51,7 @@ public class TfNDArrayEx implements NDArrayEx {
         this.array = parent;
         this.manager = (TfNDManager) parent.getManager();
         this.tf = manager.getTf();
-        this.operand = parent.getOperand();
+        this.operand = parent.getHandle();
     }
 
     /** {@inheritDoc} */
@@ -142,7 +142,7 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray relu() {
-        try (Tensor tensor = tf.nn.relu(array.getOperand()).asTensor()) {
+        try (Tensor tensor = tf.nn.relu(array.getHandle()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -150,7 +150,7 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray sigmoid() {
-        try (Tensor tensor = tf.math.sigmoid(array.getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.sigmoid(array.getHandle()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -169,8 +169,9 @@ public class TfNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public NDArray softSign() {
-        try (Tensor tensor = tf.nn.softsign(array.getOperand()).asTensor()) {
+        try (Tensor tensor = tf.nn.softsign((Operand) array.getHandle()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -189,8 +190,9 @@ public class TfNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public NDArray selu() {
-        try (Tensor tensor = tf.nn.selu(array.getOperand()).asTensor()) {
+        try (Tensor tensor = tf.nn.selu((Operand) array.getHandle()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -488,7 +490,7 @@ public class TfNDArrayEx implements NDArrayEx {
             try (Tensor tensor =
                     tf.squeeze(
                                     function.apply(
-                                            ((TfNDArray) array.expandDims(0)).getOperand(),
+                                            (Operand) ((TfNDArray) array.expandDims(0)).getHandle(),
                                             tf.constant(new int[] {height, width})))
                             .asTensor()) {
                 return new TfNDArray(manager, tensor);
@@ -556,11 +558,12 @@ public class TfNDArrayEx implements NDArrayEx {
         return stackHelper(arrays, axis);
     }
 
+    @SuppressWarnings("unchecked")
     private <T extends TType> NDArray stackHelper(NDList arrays, int axis) {
         ArrayList<Operand<T>> operands = new ArrayList<>(arrays.size() + 1);
-        operands.add(array.getOperand());
+        operands.add((Operand<T>) array.getHandle());
         for (NDArray ndArray : arrays) {
-            operands.add(((TfNDArray) ndArray).getOperand());
+            operands.add((Operand<T>) ((TfNDArray) ndArray).getHandle());
         }
         try (Tensor tensor = tf.stack(operands, Stack.axis((long) axis)).asTensor()) {
             return new TfNDArray(manager, tensor);
@@ -574,11 +577,12 @@ public class TfNDArrayEx implements NDArrayEx {
         return concatHelper(arrays, axis);
     }
 
+    @SuppressWarnings("unchecked")
     private <T extends TType> NDArray concatHelper(NDList arrays, int axis) {
         ArrayList<Operand<T>> operands = new ArrayList<>(arrays.size() + 1);
-        operands.add(array.getOperand());
+        operands.add((Operand<T>) array.getHandle());
         for (NDArray ndArray : arrays) {
-            operands.add(((TfNDArray) ndArray).getOperand());
+            operands.add((Operand<T>) ((TfNDArray) ndArray).getHandle());
         }
         try (Tensor tensor = tf.concat(operands, tf.constant(axis)).asTensor()) {
             return new TfNDArray(manager, tensor);
