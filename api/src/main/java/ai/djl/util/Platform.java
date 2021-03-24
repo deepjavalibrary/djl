@@ -172,6 +172,6 @@ public final class Platform {
         if (system.flavor.startsWith("cu")) {
             return "".equals(flavor) || "cpu".equals(flavor) || flavor.equals(system.flavor);
         }
-        return "".equals(flavor) || "cpu".equals(flavor);
+        return "".equals(flavor) || "cpu".equals(flavor) || "mkl".equals(flavor);
     }
 }
