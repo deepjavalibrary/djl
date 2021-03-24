@@ -66,9 +66,8 @@ It uses clang-format to format the code.
 ### Step 1: Build new JNI on top of new libtorch on osx, linux-cpu, linux-gpu, windows
 
 1. Spin up a EC2 instance for linux, linux-gpu, windows, windows-gpu and cd pytorch/pytorch-native.
-2. download the new libtorch, unzip it and put libtorch in pytorch/pytorch-native. 
-3. Run ./gradlew compileJNI for CPU ./gradlew compileJNIGPU and resolve all the issues you are facing.
-4. Raise a PR for the JNI code change and don’t merge it until we have the rest things ready.
+2. Run ./gradlew compileJNI for CPU ./gradlew compileJNIGPU and resolve all the issues you are facing.
+3. Raise a PR for the JNI code change and don’t merge it until we have the rest things ready.
 
 ### Step 2: Check dependencies of each JNI
 
