@@ -239,6 +239,108 @@ public abstract class Loss extends Evaluator {
         return new HingeLoss(name, margin, weight);
     }
 
+    /**
+     * Returns a new instance of {@link L1WeightDecay} with default weight and name.
+     *
+     * @return a new instance of {@link L1WeightDecay}
+     */
+    public static L1WeightDecay l1WeightedDecay(NDList parameters) {
+        return new L1WeightDecay(parameters);
+    }
+
+    /**
+     * Returns a new instance of {@link L1WeightDecay} with default weight.
+     *
+     * @param name the name of the weight decay
+     * @return a new instance of {@link L1WeightDecay}
+     */
+    public static L1WeightDecay l1WeightedDecay(String name, NDList parameters) {
+        return new L1WeightDecay(name, parameters);
+    }
+
+    /**
+     * Returns a new instance of {@link L1WeightDecay}.
+     *
+     * @param name the name of the weight decay
+     * @param weight the weight to apply on weight decay value, default 1
+     * @return a new instance of {@link L1WeightDecay}
+     */
+    public static L1WeightDecay l1WeightedDecay(String name, float weight, NDList parameters) {
+        return new L1WeightDecay(name, parameters, weight);
+    }
+
+    /**
+     * Returns a new instance of {@link L2WeightDecay} with default weight and name.
+     *
+     * @return a new instance of {@link L2WeightDecay}
+     */
+    public static L2WeightDecay l2WeightedDecay(NDList parameters) {
+        return new L2WeightDecay(parameters);
+    }
+
+    /**
+     * Returns a new instance of {@link L2WeightDecay} with default weight.
+     *
+     * @param name the name of the weight decay
+     * @return a new instance of {@link L2WeightDecay}
+     */
+    public static L2WeightDecay l2WeightedDecay(String name, NDList parameters) {
+        return new L2WeightDecay(name, parameters);
+    }
+
+    /**
+     * Returns a new instance of {@link L2WeightDecay}.
+     *
+     * @param name the name of the weight decay
+     * @param weight the weight to apply on weight decay value, default 1
+     * @return a new instance of {@link L2WeightDecay}
+     */
+    public static L2WeightDecay l2WeightedDecay(String name, float weight, NDList parameters) {
+        return new L2WeightDecay(name, parameters, weight);
+    }
+
+    /**
+     * Returns a new instance of {@link ElasticNetWeightDecay} with default weight and name.
+     *
+     * @return a new instance of {@link ElasticNetWeightDecay}
+     */
+    public static ElasticNetWeightDecay elasticNetWeightedDecay(NDList parameters) {
+        return new ElasticNetWeightDecay(parameters);
+    }
+
+    /**
+     * Returns a new instance of {@link ElasticNetWeightDecay} with default weight.
+     *
+     * @param name the name of the weight decay
+     * @return a new instance of {@link ElasticNetWeightDecay}
+     */
+    public static ElasticNetWeightDecay elasticNetWeightedDecay(String name, NDList parameters) {
+        return new ElasticNetWeightDecay(name, parameters);
+    }
+
+    /**
+     * Returns a new instance of {@link ElasticNetWeightDecay}.
+     *
+     * @param name the name of the weight decay
+     * @param weight the weight to apply on weight decay values, default 1
+     * @return a new instance of {@link ElasticNetWeightDecay}
+     */
+    public static ElasticNetWeightDecay elasticNetWeightedDecay(String name, float weight, NDList parameters) {
+        return new ElasticNetWeightDecay(name, parameters, weight);
+    }
+
+    /**
+     * Returns a new instance of {@link ElasticNetWeightDecay}.
+     *
+     * @param name the name of the weight decay
+     * @param weight1 the weight to apply on weight decay L1 value, default 1
+     * @param weight2 the weight to apply on weight decay L2 value, default 1
+     * @return a new instance of {@link ElasticNetWeightDecay}
+     */
+    public static ElasticNetWeightDecay elasticNetWeightedDecay(String name, float weight1, float weight2, NDList parameters) {
+        return new ElasticNetWeightDecay(name, parameters, weight1, weight2);
+    }
+
     /** {@inheritDoc} */
     @Override
     public void addAccumulator(String key) {
