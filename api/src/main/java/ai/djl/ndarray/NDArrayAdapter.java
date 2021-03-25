@@ -785,6 +785,12 @@ public interface NDArrayAdapter extends NDArray {
 
     /** {@inheritDoc} */
     @Override
+    default void intern(NDArray replaced) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     default NDArray isInfinite() {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }

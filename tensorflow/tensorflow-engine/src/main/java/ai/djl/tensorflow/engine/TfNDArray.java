@@ -1385,6 +1385,12 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public void intern(NDArray replaced) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray isInfinite() {
         OperationBuilder opBuilder = manager.getEagerSession().opBuilder("IsInf", "IsInf");
         opBuilder.addInput(getHandle().asOutput());
