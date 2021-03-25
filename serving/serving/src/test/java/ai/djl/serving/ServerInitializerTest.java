@@ -12,7 +12,7 @@
  */
 package ai.djl.serving;
 
-import ai.djl.serving.plugins.PluginManager;
+import ai.djl.serving.plugins.DefaultPluginManager;
 import ai.djl.serving.util.ConfigManager;
 import ai.djl.serving.util.Connector;
 import io.netty.channel.local.LocalChannel;
@@ -24,7 +24,7 @@ public class ServerInitializerTest {
     @Test
     public void testServerInitializer() throws ParseException {
         ConfigManager.init(ConfigManagerTest.parseArguments(new String[0]));
-        PluginManager pluginManager = new PluginManager(ConfigManager.getInstance());
+        DefaultPluginManager pluginManager = new DefaultPluginManager(ConfigManager.getInstance());
 
         ServerInitializer initializer =
                 new ServerInitializer(null, Connector.ConnectorType.INFERENCE, pluginManager);

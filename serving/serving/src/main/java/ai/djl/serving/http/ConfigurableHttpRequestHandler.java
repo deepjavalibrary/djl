@@ -13,7 +13,7 @@
 package ai.djl.serving.http;
 
 import ai.djl.ModelException;
-import ai.djl.serving.plugins.PluginManager;
+import ai.djl.serving.plugins.DefaultPluginManager;
 import ai.djl.serving.plugins.RequestHandler;
 import ai.djl.serving.util.NettyUtils;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,7 +30,7 @@ import java.util.Optional;
  */
 public class ConfigurableHttpRequestHandler extends HttpRequestHandler {
 
-    private PluginManager pluginManager;
+    private DefaultPluginManager pluginManager;
 
     /**
      * constructing a ConfigurableHttpRequestHandler.
@@ -38,7 +38,7 @@ public class ConfigurableHttpRequestHandler extends HttpRequestHandler {
      * @param pluginManager a pluginManager instance used to search for available plug-ins to
      *     process a request.
      */
-    public ConfigurableHttpRequestHandler(PluginManager pluginManager) {
+    public ConfigurableHttpRequestHandler(DefaultPluginManager pluginManager) {
         this.pluginManager = pluginManager;
     }
 

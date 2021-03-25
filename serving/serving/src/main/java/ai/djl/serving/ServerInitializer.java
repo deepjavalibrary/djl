@@ -16,7 +16,7 @@ import ai.djl.serving.http.ConfigurableHttpRequestHandler;
 import ai.djl.serving.http.InferenceRequestHandler;
 import ai.djl.serving.http.InvalidRequestHandler;
 import ai.djl.serving.http.ManagementRequestHandler;
-import ai.djl.serving.plugins.PluginManager;
+import ai.djl.serving.plugins.DefaultPluginManager;
 import ai.djl.serving.util.ConfigManager;
 import ai.djl.serving.util.Connector;
 import io.netty.channel.Channel;
@@ -35,7 +35,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
 
     private Connector.ConnectorType connectorType;
     private SslContext sslCtx;
-    private PluginManager pluginManager;
+    private DefaultPluginManager pluginManager;
 
     /**
      * Creates a new {@code HttpRequestHandler} instance.
@@ -45,7 +45,9 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
      * @param pluginManager a pluginManager instance.
      */
     public ServerInitializer(
-            SslContext sslCtx, Connector.ConnectorType connectorType, PluginManager pluginManager) {
+            SslContext sslCtx,
+            Connector.ConnectorType connectorType,
+            DefaultPluginManager pluginManager) {
         this.sslCtx = sslCtx;
         this.connectorType = connectorType;
         this.pluginManager = pluginManager;
