@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author erik.bamberg@web.de
  */
-public class PluginManagementRequestHandler implements RequestHandler {
+public class PluginManagementRequestHandler implements RequestHandler<String> {
 
     private static final Logger logger =
             LoggerFactory.getLogger(PluginManagementRequestHandler.class);
@@ -45,11 +45,12 @@ public class PluginManagementRequestHandler implements RequestHandler {
 
     /** {@inheritDoc} */
     @Override
-    public void handleRequest(
+    public String handleRequest(
             ChannelHandlerContext ctx,
             FullHttpRequest req,
             QueryStringDecoder decoder,
             String[] segments) {
         logger.info("handle plugin management request");
+        return "handle plugin management request";
     }
 }

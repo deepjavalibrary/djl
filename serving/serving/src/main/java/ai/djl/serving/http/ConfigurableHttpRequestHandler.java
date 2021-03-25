@@ -15,6 +15,7 @@ package ai.djl.serving.http;
 import ai.djl.ModelException;
 import ai.djl.serving.plugins.PluginManager;
 import ai.djl.serving.plugins.RequestHandler;
+import ai.djl.serving.util.NettyUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -49,11 +50,14 @@ public class ConfigurableHttpRequestHandler extends HttpRequestHandler {
             QueryStringDecoder decoder,
             String[] segments)
             throws ModelException {
-        RequestHandler requestHandler =
+        RequestHandler<?> requestHandler =
                 findRequestHandler(req)
                         .orElseThrow(
                                 () -> new BadRequestException("request handler no longer valid"));
-        requestHandler.handleRequest(ctx, req, decoder, segments);
+        Object result = requestHandler.handleRequest(ctx, req, decoder, segments);
+        if (result != null) {
+            NettyUtils.sendJsonResponse(ctx, result);
+        }
     }
 
     /**
@@ -62,6 +66,7 @@ public class ConfigurableHttpRequestHandler extends HttpRequestHandler {
      * @param req the full Http Request.
      * @return an optional RequestHandler.
      */
+    @SuppressWarnings("rawtypes")
     private Optional<RequestHandler> findRequestHandler(FullHttpRequest req) {
         return pluginManager
                 .findImplementations(RequestHandler.class)

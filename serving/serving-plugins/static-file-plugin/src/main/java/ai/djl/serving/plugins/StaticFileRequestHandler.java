@@ -23,7 +23,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
  *
  * @author erik.bamberg@web.de
  */
-public class StaticFileRequestHandler implements RequestHandler {
+public class StaticFileRequestHandler implements RequestHandler<Void> {
 
     /** {@inheritDoc} */
     @Override
@@ -31,11 +31,17 @@ public class StaticFileRequestHandler implements RequestHandler {
         return false;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     *
+     * @return
+     */
     @Override
-    public void handleRequest(
+    public Void handleRequest(
             ChannelHandlerContext ctx,
             FullHttpRequest req,
             QueryStringDecoder decoder,
-            String[] segments) {}
+            String[] segments) {
+        return null;
+    }
 }

@@ -25,7 +25,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
  *
  * @author erik.bamberg@web.de
  */
-public interface RequestHandler {
+public interface RequestHandler<T> {
 
     /**
      * returns true if this handler can handle the incoming HTTP request. following the chain of
@@ -44,8 +44,10 @@ public interface RequestHandler {
      * @param req the full HttpRequest object.
      * @param decoder a query string decoder helps to parse the url query string.
      * @param segments array of splitted segments of the path.
+     * @return a response or null. The response is returned to the client converting it to the
+     *     requested format by the server.
      */
-    public void handleRequest(
+    public T handleRequest(
             ChannelHandlerContext ctx,
             FullHttpRequest req,
             QueryStringDecoder decoder,

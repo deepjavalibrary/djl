@@ -64,6 +64,7 @@ public class PluginManager {
      *
      * @throws IOException when error during IO operation occurs.
      */
+    @SuppressWarnings("rawtypes")
     public void loadPlugins() throws IOException {
         logger.info("scanning for plugins...");
         URL[] pluginUrls = listPluginJars().toArray(new URL[] {});
@@ -71,14 +72,15 @@ public class PluginManager {
         URLClassLoader ucl = new URLClassLoader(pluginUrls);
 
         int pluginsFound = 0;
+
         ServiceLoader<RequestHandler> sl = ServiceLoader.load(RequestHandler.class, ucl);
 
         Iterator<RequestHandler> apit = sl.iterator();
         while (apit.hasNext()) {
             pluginsFound++;
-            RequestHandler service = apit.next();
+            RequestHandler<?> service = apit.next();
             logger.debug("load plugin: {}", service.getClass().getSimpleName());
-            Plugin<RequestHandler> plugin = new Plugin<>(service);
+            Plugin<RequestHandler<?>> plugin = new Plugin<>(service);
             pluginsRegistry
                     .computeIfAbsent(RequestHandler.class, k -> new HashSet<Plugin<?>>())
                     .add(plugin);
