@@ -249,6 +249,36 @@ task downloadPyTorchNativeLib() {
     }
 }
 
+task uploadS3 {
+    doLast {
+        exec {
+            commandLine "sh", "-c", "find ${BINARY_ROOT} -type f | xargs gzip"
+        }
+        def f = new File("${BINARY_ROOT}/files.txt")
+        def uploadDirs = [
+                "${BINARY_ROOT}/cpu/linux/native/lib/",
+                "${BINARY_ROOT}/cpu/osx/native/lib/",
+                "${BINARY_ROOT}/cpu/win/native/lib/",
+                "${BINARY_ROOT}/cu102/linux/native/lib/",
+                "${BINARY_ROOT}/cu102/win/native/lib/",
+                "${BINARY_ROOT}/cu111/linux/native/lib/",
+                "${BINARY_ROOT}/cu111/win/native/lib/"
+        ]
+        uploadDirs.each { item ->
+            fileTree(item).files.name.each {
+                def out = item - "${BINARY_ROOT}/native/"
+                f << out + it
+                f << "\n"
+            }
+        }
+        exec {
+            commandLine "aws", "s3", "sync", "${BINARY_ROOT}/native/", "s3://djl-ai/publish/pytorch-${VERSION}/"
+        }
+    }
+}
+
+
+
 def flavorNames = file(BINARY_ROOT).list() ?: []
 flavorNames.each { flavor ->
 
