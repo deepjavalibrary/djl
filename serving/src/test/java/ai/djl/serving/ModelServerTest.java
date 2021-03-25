@@ -87,10 +87,10 @@ public class ModelServerTest {
     private ConfigManager configManager;
     private ModelServer server;
     private byte[] testImage;
-    CountDownLatch latch;
-    HttpResponseStatus httpStatus;
-    String result;
-    HttpHeaders headers;
+    volatile CountDownLatch latch;
+    volatile HttpResponseStatus httpStatus;
+    volatile String result;
+    volatile HttpHeaders headers;
 
     static {
         try {
@@ -134,7 +134,8 @@ public class ModelServerTest {
     @Test
     public void test()
             throws InterruptedException, HttpPostRequestEncoder.ErrorDataEncoderException,
-                    IOException {
+                    IOException, ParseException, GeneralSecurityException,
+                    ReflectiveOperationException {
         Assert.assertTrue(server.isRunning());
 
         Channel channel = null;
@@ -185,11 +186,12 @@ public class ModelServerTest {
         testRegisterModelNotFound();
         testRegisterModelConflict();
         testServiceUnavailable();
+
+        ConfigManagerTest.testSsl();
     }
 
     private void testRoot(Channel channel) throws InterruptedException {
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, "/");
         channel.writeAndFlush(req).sync();
         latch.await();
@@ -198,8 +200,7 @@ public class ModelServerTest {
     }
 
     private void testPing(Channel channel) throws InterruptedException {
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/ping");
         channel.writeAndFlush(req);
         latch.await();
@@ -210,8 +211,7 @@ public class ModelServerTest {
     }
 
     private void testPredictions(Channel channel) throws InterruptedException {
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         DefaultFullHttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.POST, "/predictions/mlp");
@@ -228,8 +228,7 @@ public class ModelServerTest {
     }
 
     private void testInvocations(Channel channel) throws InterruptedException {
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         DefaultFullHttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/invocations");
         req.content().writeBytes(testImage);
@@ -246,8 +245,7 @@ public class ModelServerTest {
     private void testInvocationsMultipart(Channel channel)
             throws InterruptedException, HttpPostRequestEncoder.ErrorDataEncoderException,
                     IOException {
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         DefaultFullHttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.POST, "/invocations?model_name=mlp");
@@ -275,9 +273,7 @@ public class ModelServerTest {
 
     private void testRegisterModelAsync(Channel channel)
             throws InterruptedException, UnsupportedEncodingException {
-        result = null;
-        latch = new CountDownLatch(1);
-
+        reset();
         String url = "https://resources.djl.ai/test-models/mlp.tar.gz";
         HttpRequest req =
                 new DefaultFullHttpRequest(
@@ -296,9 +292,7 @@ public class ModelServerTest {
         for (int i = 0; i < 5; ++i) {
             String token = "";
             while (token != null) {
-                result = null;
-                latch = new CountDownLatch(1);
-
+                reset();
                 req =
                         new DefaultFullHttpRequest(
                                 HttpVersion.HTTP_1_1,
@@ -324,8 +318,7 @@ public class ModelServerTest {
 
     private void testRegisterModel(Channel channel)
             throws InterruptedException, UnsupportedEncodingException {
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
 
         String url = "https://resources.djl.ai/test-models/mlp.tar.gz";
         HttpRequest req =
@@ -342,8 +335,7 @@ public class ModelServerTest {
     }
 
     private void testScaleModel(Channel channel) throws InterruptedException {
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1,
@@ -359,8 +351,7 @@ public class ModelServerTest {
     }
 
     private void testDescribeModel(Channel channel) throws InterruptedException {
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/models/mlp_2");
         channel.writeAndFlush(req);
@@ -384,8 +375,7 @@ public class ModelServerTest {
     }
 
     private void testUnregisterModel(Channel channel) throws InterruptedException {
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.DELETE, "/models/mlp_1");
@@ -397,8 +387,7 @@ public class ModelServerTest {
     }
 
     private void testDescribeApi(Channel channel) throws InterruptedException {
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, "/predictions/mlp");
@@ -409,8 +398,7 @@ public class ModelServerTest {
     }
 
     private void testPredictionsInvalidRequestSize(Channel channel) throws InterruptedException {
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         DefaultFullHttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.POST, "/predictions/mlp");
@@ -429,8 +417,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.INFERENCE);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
         channel.writeAndFlush(req).sync();
         latch.await();
@@ -447,8 +434,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.INFERENCE);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/InvalidUrl");
         channel.writeAndFlush(req).sync();
@@ -466,8 +452,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.INFERENCE);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, "/predictions/InvalidModel");
@@ -486,8 +471,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.INFERENCE);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/predictions");
         channel.writeAndFlush(req).sync();
@@ -505,8 +489,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.INFERENCE);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.GET, "/predictions/InvalidModel");
@@ -525,8 +508,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/InvalidUrl");
         channel.writeAndFlush(req).sync();
@@ -544,8 +526,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.PUT, "/models");
         channel.writeAndFlush(req).sync();
@@ -563,8 +544,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/models/noop");
         channel.writeAndFlush(req).sync();
@@ -582,8 +562,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.GET, "/models/InvalidModel");
@@ -602,8 +581,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/models");
         channel.writeAndFlush(req).sync();
@@ -621,8 +599,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.POST, "/models?url=InvalidUrl");
@@ -643,8 +620,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         String url = "https://resources.djl.ai/test-models/mlp.tar.gz";
         DefaultFullHttpRequest req =
                 new DefaultFullHttpRequest(
@@ -666,8 +642,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         DefaultFullHttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1,
@@ -688,8 +663,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.PUT, "/models/fake");
         channel.writeAndFlush(req).sync();
@@ -707,8 +681,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         HttpRequest req =
                 new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.DELETE, "/models/fake");
         channel.writeAndFlush(req).sync();
@@ -726,8 +699,7 @@ public class ModelServerTest {
         Channel channel = connect(Connector.ConnectorType.MANAGEMENT);
         Assert.assertNotNull(channel);
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         DefaultFullHttpRequest req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1,
@@ -736,8 +708,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req);
         latch.await();
 
-        result = null;
-        latch = new CountDownLatch(1);
+        reset();
         req =
                 new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, HttpMethod.POST, "/predictions/mlp_2");
@@ -791,6 +762,13 @@ public class ModelServerTest {
             logger.warn("Connect error.", t);
         }
         throw new AssertionError("Failed connect to model server.");
+    }
+
+    private void reset() {
+        result = null;
+        httpStatus = null;
+        headers = null;
+        latch = new CountDownLatch(1);
     }
 
     @ChannelHandler.Sharable
