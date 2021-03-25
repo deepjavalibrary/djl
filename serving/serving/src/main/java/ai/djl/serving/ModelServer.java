@@ -13,7 +13,7 @@
 package ai.djl.serving;
 
 import ai.djl.repository.FilenameUtils;
-import ai.djl.serving.plugins.DefaultPluginManager;
+import ai.djl.serving.plugins.FolderScanPluginManager;
 import ai.djl.serving.util.ConfigManager;
 import ai.djl.serving.util.Connector;
 import ai.djl.serving.util.ServerGroups;
@@ -61,7 +61,7 @@ public class ModelServer {
 
     private ConfigManager configManager;
 
-    private DefaultPluginManager pluginManager;
+    private FolderScanPluginManager pluginManager;
 
     /**
      * Creates a new {@code ModelServer} instance.
@@ -70,7 +70,7 @@ public class ModelServer {
      */
     public ModelServer(ConfigManager configManager) {
         this.configManager = configManager;
-        this.pluginManager = new DefaultPluginManager(configManager);
+        this.pluginManager = new FolderScanPluginManager(configManager);
         serverGroups = new ServerGroups(configManager);
     }
 

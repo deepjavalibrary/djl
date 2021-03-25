@@ -42,14 +42,24 @@ The default plug-in folder is
 {work-dir}/plugins
 ```
 
-The plug-in folder can be configured with the 'plugin-folder' parameter.
+The plug-in folder can be configured with the 'plugin-folder' parameter in the server-config file.
 
 example:
-running model server with gradle
+running model server with gradle using a specific config-file:
 
 ```sh
-./gradlew run --args="-plugin_folder ~/my_djl/plugins"
+./gradlew run -Dai.djl.conf=~/modelserver-config.properties
 ```
+
+ example config.properties file for djl-server
+ 
+```sh
+inference_address=http://127.0.0.1:8081
+management_address=http://127.0.0.1:8081
+plugin_folder=~/serving_plugins
+```
+
+
 
 
 ## Run model server

@@ -109,7 +109,7 @@ jobs:
         with:
           name: pytorch-model-zoo
           path: pytorch/pytorch-model-zoo/build/reports
-      - name: serving test results
+      - name: serving-core test results
         uses: actions/upload-artifact@v1
         if: always()
         with:

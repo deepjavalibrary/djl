@@ -13,7 +13,7 @@
 package ai.djl.serving.http;
 
 import ai.djl.ModelException;
-import ai.djl.serving.plugins.DefaultPluginManager;
+import ai.djl.serving.plugins.FolderScanPluginManager;
 import ai.djl.serving.plugins.RequestHandler;
 import ai.djl.serving.util.NettyUtils;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,7 +30,7 @@ import java.util.Optional;
  */
 public class ConfigurableHttpRequestHandler extends HttpRequestHandler {
 
-    private DefaultPluginManager pluginManager;
+    private FolderScanPluginManager pluginManager;
 
     /**
      * constructing a ConfigurableHttpRequestHandler.
@@ -38,7 +38,7 @@ public class ConfigurableHttpRequestHandler extends HttpRequestHandler {
      * @param pluginManager a pluginManager instance used to search for available plug-ins to
      *     process a request.
      */
-    public ConfigurableHttpRequestHandler(DefaultPluginManager pluginManager) {
+    public ConfigurableHttpRequestHandler(FolderScanPluginManager pluginManager) {
         this.pluginManager = pluginManager;
     }
 
@@ -54,9 +54,13 @@ public class ConfigurableHttpRequestHandler extends HttpRequestHandler {
                 findRequestHandler(req)
                         .orElseThrow(
                                 () -> new BadRequestException("request handler no longer valid"));
-        Object result = requestHandler.handleRequest(ctx, req, decoder, segments);
-        if (result != null) {
-            NettyUtils.sendJsonResponse(ctx, result);
+        try {
+            Object result = requestHandler.handleRequest(ctx, req, decoder, segments);
+            if (result != null) {
+                NettyUtils.sendJsonResponse(ctx, result);
+            }
+        } catch (Exception ex) {
+            NettyUtils.sendError(ctx, ex);
         }
     }
 

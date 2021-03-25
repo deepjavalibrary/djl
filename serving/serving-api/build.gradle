@@ -1,18 +1,9 @@
-plugins {
-    id 'java'
-}
-
 dependencies {
- 
-    implementation "io.netty:netty-all:${netty_version}"
- 
+    api "io.netty:netty-all:${netty_version}"
+
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
 }
 
-
-test {
-    maxParallelForks = 1
-}
 

@@ -1,11 +1,5 @@
-plugins {
-    id 'java'
-}
-
 dependencies {
-
-	api project(":serving:serving-api")
-	api "io.netty:netty-all:${netty_version}"
+    api project(":serving:serving-api")
     api "org.slf4j:slf4j-api:${slf4j_version}"
 
     testImplementation("org.testng:testng:${testng_version}") {
@@ -13,10 +7,8 @@ dependencies {
     }
 }
 
-
-
-test {
-    maxParallelForks = 1
+task copyJar(type: Copy) {
+    from jar // here it automatically reads jar file produced from jar task
+    into '../../serving-core/plugins'
 }
-
-
+build.dependsOn copyJar
