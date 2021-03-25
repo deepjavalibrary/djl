@@ -1532,14 +1532,14 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void intern(NDArray replaced) {
-        throw new UnsupportedOperationException("Not implemented");
+    public NDArray cumSum() {
+        return cumSum(0);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray cumSum() {
-        return cumSum(0);
+    public void intern(NDArray replaced) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
