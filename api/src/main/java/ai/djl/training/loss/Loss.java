@@ -242,6 +242,7 @@ public abstract class Loss extends Evaluator {
     /**
      * Returns a new instance of {@link L1WeightDecay} with default weight and name.
      *
+     * @param parameters holds the model weights that will be penalized
      * @return a new instance of {@link L1WeightDecay}
      */
     public static L1WeightDecay l1WeightedDecay(NDList parameters) {
@@ -252,6 +253,7 @@ public abstract class Loss extends Evaluator {
      * Returns a new instance of {@link L1WeightDecay} with default weight.
      *
      * @param name the name of the weight decay
+     * @param parameters holds the model weights that will be penalized
      * @return a new instance of {@link L1WeightDecay}
      */
     public static L1WeightDecay l1WeightedDecay(String name, NDList parameters) {
@@ -263,6 +265,7 @@ public abstract class Loss extends Evaluator {
      *
      * @param name the name of the weight decay
      * @param weight the weight to apply on weight decay value, default 1
+     * @param parameters holds the model weights that will be penalized
      * @return a new instance of {@link L1WeightDecay}
      */
     public static L1WeightDecay l1WeightedDecay(String name, float weight, NDList parameters) {
@@ -272,6 +275,7 @@ public abstract class Loss extends Evaluator {
     /**
      * Returns a new instance of {@link L2WeightDecay} with default weight and name.
      *
+     * @param parameters holds the model weights that will be penalized
      * @return a new instance of {@link L2WeightDecay}
      */
     public static L2WeightDecay l2WeightedDecay(NDList parameters) {
@@ -282,6 +286,7 @@ public abstract class Loss extends Evaluator {
      * Returns a new instance of {@link L2WeightDecay} with default weight.
      *
      * @param name the name of the weight decay
+     * @param parameters holds the model weights that will be penalized
      * @return a new instance of {@link L2WeightDecay}
      */
     public static L2WeightDecay l2WeightedDecay(String name, NDList parameters) {
@@ -293,6 +298,7 @@ public abstract class Loss extends Evaluator {
      *
      * @param name the name of the weight decay
      * @param weight the weight to apply on weight decay value, default 1
+     * @param parameters holds the model weights that will be penalized
      * @return a new instance of {@link L2WeightDecay}
      */
     public static L2WeightDecay l2WeightedDecay(String name, float weight, NDList parameters) {
@@ -302,6 +308,7 @@ public abstract class Loss extends Evaluator {
     /**
      * Returns a new instance of {@link ElasticNetWeightDecay} with default weight and name.
      *
+     * @param parameters holds the model weights that will be penalized
      * @return a new instance of {@link ElasticNetWeightDecay}
      */
     public static ElasticNetWeightDecay elasticNetWeightedDecay(NDList parameters) {
@@ -312,6 +319,7 @@ public abstract class Loss extends Evaluator {
      * Returns a new instance of {@link ElasticNetWeightDecay} with default weight.
      *
      * @param name the name of the weight decay
+     * @param parameters holds the model weights that will be penalized
      * @return a new instance of {@link ElasticNetWeightDecay}
      */
     public static ElasticNetWeightDecay elasticNetWeightedDecay(String name, NDList parameters) {
@@ -323,6 +331,7 @@ public abstract class Loss extends Evaluator {
      *
      * @param name the name of the weight decay
      * @param weight the weight to apply on weight decay values, default 1
+     * @param parameters holds the model weights that will be penalized
      * @return a new instance of {@link ElasticNetWeightDecay}
      */
     public static ElasticNetWeightDecay elasticNetWeightedDecay(
@@ -336,6 +345,7 @@ public abstract class Loss extends Evaluator {
      * @param name the name of the weight decay
      * @param weight1 the weight to apply on weight decay L1 value, default 1
      * @param weight2 the weight to apply on weight decay L2 value, default 1
+     * @param parameters holds the model weights that will be penalized
      * @return a new instance of {@link ElasticNetWeightDecay}
      */
     public static ElasticNetWeightDecay elasticNetWeightedDecay(

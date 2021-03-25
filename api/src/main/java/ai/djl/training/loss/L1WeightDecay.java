@@ -27,7 +27,11 @@ public class L1WeightDecay extends Loss {
     private float lambda;
     private NDList parameters;
 
-    /** Calculates L1 weight decay for regularization. */
+    /**
+     * Calculates L1 weight decay for regularization.
+     *
+     * @param parameters holds the model weights that will be penalized
+     */
     public L1WeightDecay(NDList parameters) {
         this("L1WeightDecay", parameters);
     }
@@ -36,6 +40,7 @@ public class L1WeightDecay extends Loss {
      * Calculates L1 weight decay for regularization.
      *
      * @param name the name of the penalty
+     * @param parameters holds the model weights that will be penalized
      */
     public L1WeightDecay(String name, NDList parameters) {
         this(name, parameters, 1);
@@ -45,6 +50,7 @@ public class L1WeightDecay extends Loss {
      * Calculates L1 weight decay for regularization.
      *
      * @param name the name of the penalty
+     * @param parameters holds the model weights that will be penalized
      * @param lambda the weight to apply to the penalty value, default 1
      */
     public L1WeightDecay(String name, NDList parameters, float lambda) {

@@ -29,7 +29,10 @@ public class ElasticNetWeightDecay extends Loss {
     private float lambda2;
     private NDList parameters;
 
-    /** Calculates Elastic Net weight decay for regularization. */
+    /** Calculates Elastic Net weight decay for regularization. 
+     * 
+     * @param parameters holds the model weights that will be penalized
+     */
     public ElasticNetWeightDecay(NDList parameters) {
         this("ElasticNetWeightDecay", parameters);
     }
