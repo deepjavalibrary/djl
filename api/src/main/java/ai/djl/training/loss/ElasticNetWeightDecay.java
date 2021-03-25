@@ -17,11 +17,11 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 
-
 /**
- * {@code ElasticWeightDecay} calculates L1+L2 penalty of a set of parameters. Used for regularization.
- * 
- * <p>L loss is defined by \(L = \lambda \sum_i \vert W_i\vert + \lambda \sum_i \vert {W_i}^2\vert\).
+ * {@code ElasticWeightDecay} calculates L1+L2 penalty of a set of parameters. Used for
+ * regularization.
+ *
+ * <p>L loss is defined as \(L = \lambda_1 \sum_i \vert W_i\vert + \lambda_2 \sum_i {W_i}^2\).
  */
 public class ElasticNetWeightDecay extends Loss {
 
@@ -29,25 +29,27 @@ public class ElasticNetWeightDecay extends Loss {
     private float lambda2;
     private NDList parameters;
 
-    /** Calculates L2 weight decay for regularization. */
+    /** Calculates Elastic Net weight decay for regularization. */
     public ElasticNetWeightDecay(NDList parameters) {
         this("ElasticNetWeightDecay", parameters);
     }
 
     /**
-     * Calculates L2 weight decay for regularization.
+     * Calculates Elastic Net weight decay for regularization.
      *
      * @param name the name of the penalty
+     * @param parameters holds the model weights that will be penalized
      */
     public ElasticNetWeightDecay(String name, NDList parameters) {
         this(name, parameters, 1);
     }
 
     /**
-     * Calculates L2 weight decay for regularization.
+     * Calculates Elastic Net weight decay for regularization.
      *
      * @param name the name of the penalty
-     * @param weight the weight to apply on penalty value, default 1
+     * @param parameters holds the model weights that will be penalized
+     * @param lambda the weight to apply to the penalty value, default 1 (both L1 and L2)
      */
     public ElasticNetWeightDecay(String name, NDList parameters, float lambda) {
         super(name);
@@ -57,10 +59,12 @@ public class ElasticNetWeightDecay extends Loss {
     }
 
     /**
-     * Calculates L2 weight decay for regularization.
+     * Calculates Elastic Net weight decay for regularization.
      *
      * @param name the name of the penalty
-     * @param weight the weight to apply on penalty value, default 1
+     * @param parameters holds the model weights that will be penalized
+     * @param lambda1 the weight to apply to the L1 penalty value, default 1
+     * @param lambda2 the weight to apply to the L2 penalty value, default 1
      */
     public ElasticNetWeightDecay(String name, NDList parameters, float lambda1, float lambda2) {
         super(name);
@@ -84,10 +88,10 @@ public class ElasticNetWeightDecay extends Loss {
         NDManager manager = parameters.getManager();
         NDArray sum1 = manager.create(0.0f);
         NDArray sum2 = manager.create(0.0f);
-        for(NDArray wi : parameters){
-            sum1.addi( l1(wi) );
-            sum2.addi( l2(wi) );
+        for (NDArray wi : parameters) {
+            sum1.addi(l1(wi));
+            sum2.addi(l2(wi));
         }
-        return sum1.muli(lambda1).addi( sum2.muli(lambda2));
+        return sum1.muli(lambda1).addi(sum2.muli(lambda2));
     }
 }

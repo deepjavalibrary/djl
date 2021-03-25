@@ -325,7 +325,8 @@ public abstract class Loss extends Evaluator {
      * @param weight the weight to apply on weight decay values, default 1
      * @return a new instance of {@link ElasticNetWeightDecay}
      */
-    public static ElasticNetWeightDecay elasticNetWeightedDecay(String name, float weight, NDList parameters) {
+    public static ElasticNetWeightDecay elasticNetWeightedDecay(
+            String name, float weight, NDList parameters) {
         return new ElasticNetWeightDecay(name, parameters, weight);
     }
 
@@ -337,7 +338,8 @@ public abstract class Loss extends Evaluator {
      * @param weight2 the weight to apply on weight decay L2 value, default 1
      * @return a new instance of {@link ElasticNetWeightDecay}
      */
-    public static ElasticNetWeightDecay elasticNetWeightedDecay(String name, float weight1, float weight2, NDList parameters) {
+    public static ElasticNetWeightDecay elasticNetWeightedDecay(
+            String name, float weight1, float weight2, NDList parameters) {
         return new ElasticNetWeightDecay(name, parameters, weight1, weight2);
     }
 

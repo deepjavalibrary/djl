@@ -17,14 +17,10 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 
-
 /**
- * {@code L1WeightDecay} calculates L1 penalty of a set of parameters. Used for regularization.
  * {@code L2WeightDecay} calculates L2 penalty of a set of parameters. Used for regularization.
- * {@code ElasticWeightDecay} calculates L1+L2 penalty of a set of parameters. Used for regularization.
- * 
- * <p>L1 loss is defined by \(L1 = \lambda \sum_i \vert W_i\vert\).
- * <p>L2 loss is defined by \(L2 = \lambda \sum_i \vert {W_i}^2\vert\).
+ *
+ * <p>L2 loss is defined by \(L2 = \lambda \sum_i {W_i}^2\).
  */
 public class L2WeightDecay extends Loss {
 
@@ -49,7 +45,7 @@ public class L2WeightDecay extends Loss {
      * Calculates L2 weight decay for regularization.
      *
      * @param name the name of the penalty
-     * @param weight the weight to apply on penalty value, default 1
+     * @param lambda the weight to apply to the penalty value, default 1
      */
     public L2WeightDecay(String name, NDList parameters, float lambda) {
         super(name);
@@ -67,8 +63,8 @@ public class L2WeightDecay extends Loss {
 
         NDManager manager = parameters.getManager();
         NDArray sum = manager.create(0.0f);
-        for(NDArray wi : parameters){
-            sum.addi( l2(wi) );
+        for (NDArray wi : parameters) {
+            sum.addi(l2(wi));
         }
         return sum.muli(lambda);
     }
