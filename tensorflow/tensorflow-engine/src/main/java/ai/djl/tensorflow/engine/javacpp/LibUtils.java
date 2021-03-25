@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package ai.djl.tensorflow.engine;
+package ai.djl.tensorflow.engine.javacpp;
 
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;

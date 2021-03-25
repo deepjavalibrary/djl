@@ -12,6 +12,8 @@
  */
 package ai.djl.tensorflow.engine;
 
+import static org.tensorflow.internal.c_api.global.tensorflow.TF_DeleteDeviceList;
+
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
@@ -19,8 +21,10 @@ import ai.djl.engine.EngineException;
 import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.SymbolBlock;
+import ai.djl.tensorflow.engine.javacpp.LibUtils;
 import ai.djl.training.GradientCollector;
 import ai.djl.util.RandomUtils;
+import org.bytedeco.javacpp.PointerScope;
 import org.tensorflow.EagerSession;
 import org.tensorflow.TensorFlow;
 import org.tensorflow.internal.c_api.TF_DeviceList;
@@ -43,8 +47,9 @@ public final class TfEngine extends Engine {
     static TfEngine newInstance() {
         try {
             LibUtils.loadLibrary();
+            // load the native library right here
+            // if it throws exception, we can catch it here
             EagerSession.getDefault();
-
             return new TfEngine();
         } catch (Throwable t) {
             throw new EngineException("Failed to load TensorFlow native library", t);
@@ -83,22 +88,36 @@ public final class TfEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"unchecked", "try"})
     public boolean hasCapability(String capability) {
         if (StandardCapabilities.MKL.equals(capability)) {
             return true;
         } else if (StandardCapabilities.CUDA.equals(capability)) {
-            TF_Status status = tensorflow.TF_NewStatus();
-            TF_DeviceList deviceList =
-                    tensorflow.TFE_ContextListDevices(
-                            tensorflow.TFE_NewContext(tensorflow.TFE_NewContextOptions(), status),
-                            status);
-            int deviceCount = tensorflow.TF_DeviceListCount(deviceList);
-            for (int i = 0; i < deviceCount; i++) {
-                if (tensorflow.TF_DeviceListName(deviceList, i, status)
-                        .getString()
-                        .toLowerCase()
-                        .contains("gpu")) {
-                    return true;
+            TF_DeviceList deviceList = null;
+            try (PointerScope scope = new PointerScope()) {
+                TF_Status status = tensorflow.TF_NewStatus();
+                deviceList =
+                        tensorflow.TFE_ContextListDevices(
+                                tensorflow.TFE_NewContext(
+                                        tensorflow.TFE_NewContextOptions(), status),
+                                status);
+                int deviceCount = tensorflow.TF_DeviceListCount(deviceList);
+                for (int i = 0; i < deviceCount; i++) {
+                    if (tensorflow.TF_DeviceListName(deviceList, i, status)
+                            .getString()
+                            .toLowerCase()
+                            .contains("gpu")) {
+                        return true;
+                    }
+                }
+            } finally {
+                // deviceList isn't registered with deallocator
+                // so it's not closed by PointerScope
+                // close it manually
+                synchronized (deviceList) {
+                    if (deviceList != null && !deviceList.isNull()) {
+                        TF_DeleteDeviceList(deviceList);
+                    }
                 }
             }
             return false;
