@@ -266,13 +266,13 @@ task uploadS3 {
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
-                def out = item - "${BINARY_ROOT}/native/"
+                def out = item - "${BINARY_ROOT}/"
                 f << out + it
                 f << "\n"
             }
         }
         exec {
-            commandLine "aws", "s3", "sync", "${BINARY_ROOT}/native/", "s3://djl-ai/publish/pytorch-${VERSION}/"
+            commandLine "aws", "s3", "sync", "${BINARY_ROOT}", "s3://djl-ai/publish/pytorch-${VERSION}/"
         }
     }
 }
