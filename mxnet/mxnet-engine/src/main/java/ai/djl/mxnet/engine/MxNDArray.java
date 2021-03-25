@@ -1232,6 +1232,17 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public void intern(NDArray replaced) {
+        MxNDArray arr = (MxNDArray) replaced;
+        Pointer oldHandle = handle.getAndSet(arr.handle.getAndSet(null));
+        JnaUtils.waitToRead(oldHandle);
+        JnaUtils.freeNdArray(oldHandle);
+        // dereference old ndarray
+        arr.close();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray isInfinite() {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
@@ -1613,8 +1624,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         if (pointer != null) {
             JnaUtils.waitToRead(pointer);
             JnaUtils.freeNdArray(pointer);
-            manager.detachInternal(getUid());
-            manager = null;
         }
+        manager.detachInternal(getUid());
     }
 }

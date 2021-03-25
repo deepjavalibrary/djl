@@ -470,6 +470,16 @@ public interface NDArray extends NDResource {
     }
 
     /**
+     * Sets the {@code NDArray} by boolean mask.
+     *
+     * @param index the boolean {@code NDArray} that indicates what to get
+     * @param value the value to replace with
+     */
+    default void set(NDArray index, Number value) {
+        set(new NDIndex().addBooleanIndex(index), value);
+    }
+
+    /**
      * Sets the specified scalar in this {@code NDArray} with the given value.
      *
      * @param index the single index to update
@@ -3545,6 +3555,16 @@ public interface NDArray extends NDResource {
      * @return the cumulative sum along the specified axis
      */
     NDArray cumSum(int axis);
+
+    /**
+     * Replace the handle of the NDArray with the other. The NDArray used for replacement will be
+     * killed.
+     *
+     * <p>Please use with caution, this method will make the input argument unusable.
+     *
+     * @param replaced the handle provider that will be killed
+     */
+    void intern(NDArray replaced);
 
     /**
      * Returns the boolean {@code NDArray} with value {@code true} where this {@code NDArray}'s

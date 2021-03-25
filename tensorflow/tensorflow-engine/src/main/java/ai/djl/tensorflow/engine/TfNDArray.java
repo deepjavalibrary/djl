@@ -1538,6 +1538,12 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public void intern(NDArray replaced) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray isInfinite() {
         try (Tensor tensor = tf.dtypes.cast(tf.math.isInf(getOperand()), TBool.class).asTensor()) {
             return new TfNDArray(manager, tensor);
