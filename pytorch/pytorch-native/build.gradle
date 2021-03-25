@@ -81,11 +81,9 @@ task releaseJNI {
                 downloadBuild("win", "cpu")
                 cleanBuild()
             } else {
-                downloadBuild("win", "cu101")
-                cleanBuild()
                 downloadBuild("win", "cu102")
                 cleanBuild()
-                downloadBuild("win", "cu110")
+                downloadBuild("win", "cu111")
                 cleanBuild()
             }
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac") && !isGPU) {
@@ -96,11 +94,9 @@ task releaseJNI {
                 downloadBuild("linux", "cpu", isPrecxx11)
                 cleanBuild()
             } else {
-                downloadBuild("linux", "cu101", isPrecxx11)
-                cleanBuild()
                 downloadBuild("linux", "cu102", isPrecxx11)
                 cleanBuild()
-                downloadBuild("linux", "cu110", isPrecxx11)
+                downloadBuild("linux", "cu111", isPrecxx11)
                 cleanBuild()
             }
         } else {
@@ -203,12 +199,10 @@ task downloadPyTorchNativeLib() {
                 "cpu/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcpu.zip"    : "cpu/linux",
                 "cpu/libtorch-macos-${VERSION}.zip"                               : "cpu/osx",
                 "cpu/libtorch-win-shared-with-deps-${VERSION}%2Bcpu.zip"          : "cpu/win",
-                "cu101/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu101.zip": "cu101/linux",
                 "cu102/libtorch-cxx11-abi-shared-with-deps-${VERSION}.zip"        : "cu102/linux",
-                "cu110/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu110.zip": "cu110/linux",
-                "cu101/libtorch-win-shared-with-deps-${VERSION}%2Bcu101.zip"      : "cu101/win",
+                "cu111/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu111.zip": "cu111/linux",
                 "cu102/libtorch-win-shared-with-deps-${VERSION}.zip"              : "cu102/win",
-                "cu110/libtorch-win-shared-with-deps-${VERSION}%2Bcu110.zip"      : "cu110/win"
+                "cu111/libtorch-win-shared-with-deps-${VERSION}%2Bcu111.zip"      : "cu111/win"
         ]
         if (isPrecxx11) {
             // precxx11 only support cpu for now
