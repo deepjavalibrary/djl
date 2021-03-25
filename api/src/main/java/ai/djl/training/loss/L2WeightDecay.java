@@ -27,8 +27,9 @@ public class L2WeightDecay extends Loss {
     private float lambda;
     private NDList parameters;
 
-    /** Calculates L2 weight decay for regularization. 
-     * 
+    /**
+     * Calculates L2 weight decay for regularization.
+     *
      * @param parameters holds the model weights that will be penalized
      */
     public L2WeightDecay(NDList parameters) {
