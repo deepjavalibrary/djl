@@ -45,7 +45,7 @@ jobs:
   build-pytorch-jni-linux-gpu:
     if: github.repository == 'awslabs/djl'
     runs-on: ubuntu-latest
-    container: nvidia/cuda:10.1-cudnn7-devel-ubuntu16.04
+    container: nvidia/cuda:10.2-cudnn7-devel-ubuntu16.04
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK 1.8
