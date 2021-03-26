@@ -108,7 +108,7 @@ public class ModelServerTest {
     @BeforeSuite
     public void beforeSuite()
             throws InterruptedException, IOException, GeneralSecurityException, ParseException {
-        Path imageFile = Paths.get("../examples/src/test/resources/0.png");
+        Path imageFile = Paths.get("../../examples/src/test/resources/0.png");
         try (InputStream is = Files.newInputStream(imageFile)) {
             testImage = Utils.toByteArray(is);
         }

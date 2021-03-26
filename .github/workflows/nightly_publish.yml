@@ -196,6 +196,6 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         if: ${{ github.event.inputs.mode == 'staging' }}
         run: |
-          ./gradlew serving:dT -Pstaging
-          aws s3 cp serving/build/distributions/serving-*.tar s3://djl-ai/publish/djl-serving/
+          ./gradlew serving:serving:dT -Pstaging
+          aws s3 cp serving/serving/build/distributions/serving-*.tar s3://djl-ai/publish/djl-serving/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/*"
