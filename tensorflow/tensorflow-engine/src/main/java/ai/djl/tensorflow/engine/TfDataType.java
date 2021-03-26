@@ -29,6 +29,8 @@ public final class TfDataType {
     private static Map<DataType, Class<? extends TType>> classTypeTo = createClassTypeTo();
     private static Map<org.tensorflow.proto.framework.DataType, DataType> protoTypeFrom =
             createProtoTypeFrom();
+    private static Map<DataType, org.tensorflow.proto.framework.DataType> protoTypeTo =
+            createProtoTypeTo();
 
     private TfDataType() {}
 
@@ -58,11 +60,28 @@ public final class TfDataType {
         return map;
     }
 
+    private static Map<DataType, org.tensorflow.proto.framework.DataType> createProtoTypeTo() {
+        Map<DataType, org.tensorflow.proto.framework.DataType> map = new ConcurrentHashMap<>();
+        map.put(DataType.FLOAT32, org.tensorflow.proto.framework.DataType.DT_FLOAT);
+        map.put(DataType.FLOAT64, org.tensorflow.proto.framework.DataType.DT_DOUBLE);
+        map.put(DataType.INT32, org.tensorflow.proto.framework.DataType.DT_INT32);
+        map.put(DataType.INT64, org.tensorflow.proto.framework.DataType.DT_INT64);
+        map.put(DataType.UINT8, org.tensorflow.proto.framework.DataType.DT_UINT8);
+        map.put(DataType.INT8, org.tensorflow.proto.framework.DataType.DT_UINT8);
+        map.put(DataType.BOOLEAN, org.tensorflow.proto.framework.DataType.DT_BOOL);
+        map.put(DataType.STRING, org.tensorflow.proto.framework.DataType.DT_STRING);
+        return map;
+    }
+
     public static Class<? extends TType> toClassType(DataType type) {
         return classTypeTo.get(type);
     }
 
     public static DataType fromProtoType(org.tensorflow.proto.framework.DataType tfType) {
         return protoTypeFrom.get(tfType);
+    }
+
+    public static org.tensorflow.proto.framework.DataType toProtoType(DataType dataType) {
+        return protoTypeTo.get(dataType);
     }
 }
