@@ -33,12 +33,12 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
-import org.testng.annotations.Test;
 
-public class ConfigManagerTest {
+public final class ConfigManagerTest {
 
-    @Test
-    public void testSsl()
+    private ConfigManagerTest() {}
+
+    public static void testSsl()
             throws IOException, GeneralSecurityException, ParseException,
                     ReflectiveOperationException {
         ConfigManager.init(parseArguments(new String[0]));
