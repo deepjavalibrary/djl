@@ -103,7 +103,7 @@ export default function ModelNavigator(props) {
 	const [typeValue, setTypeValue] = useState('');
 	const [versionValue, setVersionValue] = useState('');
 
-    const nameFilteredModels =
+    const filteredModels =
         modelZooData.map((application) => (
             application.models.filter((model) => {
                 if ((versionValue == '') || (versionValue == model.version)){
@@ -114,9 +114,9 @@ export default function ModelNavigator(props) {
             })
         ))
 
-	const modelNameFilterOnChange = (event) => {
+	const modelFilterOnChange = (event) => {
         setNameValue(event.target.value);
-        setModelList(nameFilteredModels)
+        setModelList(filteredModels)
 
     };
 
@@ -146,7 +146,7 @@ export default function ModelNavigator(props) {
                                         id="name-search"
                                         label="Enter Name"
                                         value={nameValue}
-                                        onChange={modelNameFilterOnChange}
+                                        onChange={modelFilterOnChange}
                                         inputProps={{style: { backgroundColor:"white"},}}
                                     />
                                 </TreeItem>
@@ -174,7 +174,7 @@ export default function ModelNavigator(props) {
                             </TreeView>
                             <TreeItem nodeId="Models" label="Models">
                                 <div>
-                                    <button onClick={modelNameFilterOnChange} > Search </button>
+                                    <button onClick={modelFilterOnChange} > Search </button>
                                     {modelList.map(application => (
                                       application.map((model) => (
                                           <TreeItem nodeId={model.name} label={model.name} onLabelClick={() => setModel(model)}>
