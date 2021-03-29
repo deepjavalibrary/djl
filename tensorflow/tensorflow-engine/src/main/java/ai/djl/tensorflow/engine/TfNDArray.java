@@ -12,10 +12,9 @@
  */
 package ai.djl.tensorflow.engine;
 
-import static ai.djl.tensorflow.engine.TfOpExecutor.MAX_OUTPUTS_PER_OP;
-
 import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.internal.NDArrayEx;
@@ -217,8 +216,26 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray booleanMask(NDArray index, int axis) {
-        // FIXME: re-implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        // handle scalar case manually to behave like numpy
+        if (isScalar()) {
+            if (!index.isScalar()) {
+                throw new IllegalArgumentException("Input is scalar, index must also be scalar.");
+            }
+            if (index.toBooleanArray()[0]) {
+                return expandDims(0);
+            } else {
+                return manager.create(new Shape());
+            }
+        }
+        try (NDArray where = manager.opExecutor("Where").addInput(index).buildSingletonOrThrow();
+                NDArray squeeze = where.squeeze(1);
+                NDArray axisArr = manager.create(axis)) {
+            return manager.opExecutor("GatherV2")
+                    .addInput(this)
+                    .addInput(squeeze)
+                    .addInput(axisArr)
+                    .buildSingletonOrThrow();
+        }
     }
 
     /** {@inheritDoc} */
@@ -578,7 +595,8 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray addi(NDArray other) {
-        return inPlaceHelper(add(other), this);
+        inPlaceHelper(add(other), this);
+        return this;
     }
 
     /** {@inheritDoc} */
@@ -592,7 +610,8 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray subi(NDArray other) {
-        return inPlaceHelper(sub(other), this);
+        inPlaceHelper(sub(other), this);
+        return this;
     }
 
     /** {@inheritDoc} */
@@ -606,7 +625,8 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray muli(NDArray other) {
-        return inPlaceHelper(mul(other), this);
+        inPlaceHelper(mul(other), this);
+        return this;
     }
 
     /** {@inheritDoc} */
@@ -620,12 +640,23 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray divi(NDArray other) {
-        return inPlaceHelper(div(other), this);
+        inPlaceHelper(div(other), this);
+        return this;
     }
 
-    NDArray inPlaceHelper(NDArray source, NDArray destination) {
-        // FIXME: re-implement later
-        throw new UnsupportedOperationException("Not implemented");
+    void inPlaceHelper(NDArray source, NDArray destination) {
+        if (getShape().isScalar()) {
+            throw new UnsupportedOperationException(
+                    "TensorFlow engine does not support inplace operations on scalars yet");
+        }
+        try (NDArray indices = manager.arange((int) size(0))) {
+            manager.opExecutor("InplaceUpdate")
+                    .addInput(destination)
+                    .addInput(indices)
+                    .addInput(source)
+                    .buildSingletonOrThrow()
+                    .close();
+        }
     }
 
     /** {@inheritDoc} */
@@ -645,7 +676,8 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray modi(NDArray other) {
-        return inPlaceHelper(mod(other), this);
+        inPlaceHelper(mod(other), this);
+        return this;
     }
 
     /** {@inheritDoc} */
@@ -659,7 +691,8 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray powi(NDArray other) {
-        return inPlaceHelper(pow(other), this);
+        inPlaceHelper(pow(other), this);
+        return this;
     }
 
     /** {@inheritDoc} */
@@ -671,7 +704,8 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray signi() {
-        return inPlaceHelper(sign(), this);
+        inPlaceHelper(sign(), this);
+        return this;
     }
 
     /** {@inheritDoc} */
@@ -683,7 +717,8 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray negi() {
-        return inPlaceHelper(neg(), this);
+        inPlaceHelper(neg(), this);
+        return this;
     }
 
     /** {@inheritDoc} */
@@ -977,10 +1012,6 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDList split(long[] indices, int axis) {
-        if (indices.length > MAX_OUTPUTS_PER_OP) {
-            throw new UnsupportedOperationException(
-                    "the indices should be smaller than " + MAX_OUTPUTS_PER_OP);
-        }
         if (indices.length == 0) {
             return new NDList(duplicate());
         }
@@ -1017,7 +1048,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
                             .addInput(sizesArr)
                             .addInput(axisArr)
                             .addParam("num_split", sizes.size())
-                            .build());
+                            .build(indices.length + 1));
         }
     }
 
@@ -1102,36 +1133,134 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray argSort(int axis, boolean ascending) {
-        // FIXME: re-implement
-        throw new UnsupportedOperationException("Not Implemented");
+        return sortHelper(axis, ascending, true);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sort(int axis) {
-        // FIXME: re-implement
-        throw new UnsupportedOperationException("Not Implemented");
+        return sortHelper(axis, true, false);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sort() {
-        // FIXME: re-implement
-        throw new UnsupportedOperationException("Not Implemented");
+        return sortHelper(-1, true, false);
+    }
+
+    private NDArray sortHelper(int axis, boolean ascending, boolean returnIndices) {
+        if (isScalar()) {
+            return duplicate();
+        }
+        // using topK to implement argSort
+        int k;
+        int rank = getShape().dimension();
+        int[] transposition;
+        NDArray input;
+        NDArray result;
+        try (TfNDManager subManager = (TfNDManager) manager.newSubManager()) {
+            attach(subManager);
+            if (axis == -1 || axis + 1 == getShape().dimension()) {
+                // last axis
+                transposition = null;
+                input = this;
+                long[] arrayShape = getShape().getShape();
+                k = (int) arrayShape[arrayShape.length - 1];
+            } else {
+                k = (int) getShape().getShape()[axis];
+                NDArray axisArr = subManager.arange(0, axis, 1, DataType.INT32, getDevice());
+                NDArray axisArr1 = subManager.create(new int[] {rank - 1});
+                NDArray axisArr2 =
+                        subManager.arange(axis + 1, rank - 1, 1, DataType.INT32, getDevice());
+                NDArray axisArr3 = subManager.create(new int[] {axis});
+                transposition =
+                        NDArrays.concat(new NDList(axisArr, axisArr1, axisArr2, axisArr3))
+                                .toIntArray();
+                input = transpose(transposition);
+            }
+            NDArray[] outputs;
+            NDArray kArr = subManager.create(k);
+            if (ascending) {
+                outputs =
+                        subManager
+                                .opExecutor("TopKV2")
+                                .addInput(input.neg())
+                                .addInput(kArr)
+                                .build(2);
+            } else {
+                outputs = subManager.opExecutor("TopKV2").addInput(input).addInput(kArr).build(2);
+            }
+            if (returnIndices) {
+                result = outputs[1].toType(DataType.INT64, true);
+            } else {
+                result = outputs[0];
+            }
+            if (transposition != null) {
+                result = result.transpose(transposition);
+            }
+            // re-apply neg after sort if ascending
+            if (ascending && !returnIndices) {
+                result = result.neg();
+            }
+            attach(subManager.getParentManager());
+            result.attach(subManager.getParentManager());
+            return result;
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray softmax(int axis) {
-        // FIXME: re-implement
-        throw new UnsupportedOperationException("Not Implemented");
+        return softmaxHelper("Softmax", axis);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray logSoftmax(int axis) {
-        // FIXME: re-implement
-        throw new UnsupportedOperationException("Not Implemented");
+        return softmaxHelper("LogSoftmax", axis);
+    }
+
+    private NDArray softmaxHelper(String operation, int axis) {
+        long dim = getShape().dimension();
+        if (dim == 0) {
+            return duplicate();
+        }
+        if (axis == -1 || axis == dim - 1) {
+            return manager.opExecutor(operation).addInput(this).buildSingletonOrThrow();
+        }
+        if (axis < -dim || axis >= dim) {
+            throw new IllegalArgumentException(
+                    "Invalid axes value: "
+                            + axis
+                            + ", must be in range ["
+                            + -dim
+                            + ", "
+                            + dim
+                            + ") where "
+                            + dim
+                            + " is the number of dimensions in the input.");
+        }
+        // tf.softmax always apply on last dimension, transpose input to make axes[0] last dimension
+        try (NDManager subManager = getManager().newSubManager()) {
+            attach(subManager);
+            NDList concatList = new NDList();
+            concatList.add(subManager.arange((int) (axis % dim)));
+            concatList.add(subManager.create((int) dim - 1).expandDims(0));
+            concatList.add(subManager.arange(axis + 1, (int) dim - 1));
+            concatList.add(subManager.create(axis).expandDims(0));
+            int[] axes = NDArrays.concat(concatList, 0).toIntArray();
+            NDArray transposed = transpose(axes);
+            NDArray output =
+                    ((TfNDManager) subManager)
+                            .opExecutor(operation)
+                            .addInput(transposed)
+                            .buildSingletonOrThrow();
+            NDArray result = output.transpose(axes);
+
+            result.attach(subManager.getParentManager());
+            attach(subManager.getParentManager());
+            return result;
+        }
     }
 
     /** {@inheritDoc} */
@@ -1244,8 +1373,44 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray matMul(NDArray other) {
-        // FIXME: re-implement
-        throw new UnsupportedOperationException("Not implemented");
+        if (isScalar() || other.isScalar()) {
+            throw new IllegalArgumentException("scalar is not allowed for matMul()");
+        }
+        if (getShape().dimension() > 2 || other.getShape().dimension() > 2) {
+            return manager.opExecutor("BatchMatMulV2")
+                    .addInput(this)
+                    .addInput(other)
+                    .buildSingletonOrThrow();
+        }
+        boolean broadcast = false;
+        NDArray lhs = this;
+        NDArray rhs = other;
+        if (getShape().dimension() == 1) {
+            lhs = broadcast(1, getShape().get(0));
+            broadcast = true;
+        }
+        if (other.getShape().dimension() == 1) {
+            rhs = rhs.broadcast(1, getShape().get(0));
+            broadcast = true;
+        }
+        NDArray result =
+                manager.opExecutor("MatMul").addInput(lhs).addInput(rhs).buildSingletonOrThrow();
+        try {
+            if (broadcast) {
+                return result.squeeze();
+            }
+            return result;
+        } finally {
+            if (lhs != this) {
+                lhs.close();
+            }
+            if (rhs != other) {
+                rhs.close();
+            }
+            if (broadcast) {
+                result.close();
+            }
+        }
     }
 
     /** {@inheritDoc} */
