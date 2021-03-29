@@ -34,8 +34,12 @@ public class NDArrayCreationOpTest {
     @Test
     public void testCreation() {
         try (NDManager manager = NDManager.newBaseManager()) {
+            // regular case
+            NDArray array = manager.create(new float[] {0, 1, 2, 3}, new Shape(2, 2));
+            Assert.assertEquals(array.toFloatArray(), new float[] {0, 1, 2, 3});
+            Assert.assertEquals(array.getShape(), new Shape(2, 2));
             // test scalar
-            NDArray array = manager.create(-100f);
+            array = manager.create(-100f);
             Assert.assertEquals(array.getFloat(), -100f);
             Assert.assertEquals(array.getShape(), new Shape());
             // test zero-dim

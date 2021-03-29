@@ -12,8 +12,9 @@
  */
 package ai.djl.tensorflow.engine;
 
+import static ai.djl.tensorflow.engine.TfOpExecutor.MAX_OUTPUTS_PER_OP;
+
 import ai.djl.Device;
-import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -21,48 +22,36 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
 import ai.djl.util.NativeResource;
-import ai.djl.util.Pair;
+import ai.djl.util.Preconditions;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.UUID;
+import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
-import org.tensorflow.Operand;
-import org.tensorflow.OperationBuilder;
-import org.tensorflow.Tensor;
-import org.tensorflow.types.family.TType;
+import org.tensorflow.internal.c_api.TFE_TensorHandle;
 
-public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
+public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArray {
 
     private static final int MAX_SIZE = 100;
     private static final int MAX_DEPTH = 10;
     private static final int MAX_ROWS = 10;
     private static final int MAX_COLUMNS = 20;
 
-    private String uid;
     private Shape shape;
+    private Device device;
     private TfNDManager manager;
     private String name = "";
     private TfNDArrayEx tfNDArrayEx;
     private DataType dataType;
 
-    TfNDArray(TfNDManager manager, Tensor tensor) {
-        super(
-                manager.getEagerSession()
-                        .opBuilder("Const", "Const_" + TfNDManager.nextNameAssignment())
-                        .setAttr("dtype", tensor.dataType())
-                        .setAttr("value", tensor)
-                        .setDevice(getTfDevice(manager.getDevice()))
-                        .build()
-                        .output(0));
+    TfNDArray(TfNDManager manager, TFE_TensorHandle handle) {
+        super(handle);
         this.manager = manager;
-        uid = UUID.randomUUID().toString();
-        manager.attachInternal(uid, this);
-        // cache shape and data type information so we can close tensor later
-        this.shape = new Shape(tensor.shape().asArray());
-        this.dataType = TfDataType.fromProtoType(tensor.dataType());
+        manager.attachInternal(getUid(), this);
         tfNDArrayEx = new TfNDArrayEx(this);
     }
 
@@ -87,18 +76,33 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
+        if (dataType == null) {
+            Preconditions.checkArgument(
+                    getHandle() != null && !getHandle().isNull(), "Eager session has been closed");
+            dataType = JavacppUtils.getDataType(getHandle());
+        }
         return dataType;
     }
 
     /** {@inheritDoc} */
     @Override
     public Device getDevice() {
-        return manager.getDevice();
+        if (device == null) {
+            Preconditions.checkArgument(
+                    getHandle() != null && !getHandle().isNull(), "Eager session has been closed");
+            device = JavacppUtils.getDevice(getHandle());
+        }
+        return device;
     }
 
     /** {@inheritDoc} */
     @Override
     public Shape getShape() {
+        if (shape == null) {
+            Preconditions.checkArgument(
+                    getHandle() != null && !getHandle().isNull(), "Eager session has been closed");
+            shape = JavacppUtils.getShape(getHandle());
+        }
         return shape;
     }
 
@@ -123,19 +127,18 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Cast", "Cast");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.setAttr("DstT", TfDataType.toProtoType(dataType));
-        Operand<?> output = opBuilder.build().output(0);
         // FIXME: !copy is not implemented yet!
-        try (Tensor tensor = output.asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Cast")
+                .addInput(this)
+                .addParam("DstT", dataType)
+                .buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setRequiresGradient(boolean requiresGrad) {}
+    public void setRequiresGradient(boolean requiresGrad) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -157,75 +160,6 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public double[] toDoubleArray() {
-        if (getDataType() != DataType.FLOAT64) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required double" + " Actual " + getDataType());
-        }
-        double[] result = new double[(int) getShape().size()];
-        try (Tensor tensor = getHandle().asTensor()) {
-            tensor.asRawTensor().data().asDoubles().read(result);
-        }
-        return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public float[] toFloatArray() {
-        if (getDataType() != DataType.FLOAT32) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required float, Actual " + getDataType());
-        }
-        float[] result = new float[(int) getShape().size()];
-        try (Tensor tensor = getHandle().asTensor()) {
-            tensor.asRawTensor().data().asFloats().read(result);
-        }
-        return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int[] toIntArray() {
-        if (getDataType() != DataType.INT32) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required int" + " Actual " + getDataType());
-        }
-        int[] result = new int[(int) getShape().size()];
-        try (Tensor tensor = getHandle().asTensor().asRawTensor()) {
-            tensor.asRawTensor().data().asInts().read(result);
-        }
-        return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public long[] toLongArray() {
-        if (getDataType() != DataType.INT64) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required long" + " Actual " + getDataType());
-        }
-        long[] result = new long[(int) getShape().size()];
-        try (Tensor tensor = getHandle().asTensor().asRawTensor()) {
-            tensor.asRawTensor().data().asLongs().read(result);
-        }
-        return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean[] toBooleanArray() {
-        if (getDataType() != DataType.BOOLEAN) {
-            throw new IllegalStateException(
-                    "DataType mismatch, Required boolean" + " Actual " + getDataType());
-        }
-        boolean[] result = new boolean[(int) getShape().size()];
-        try (Tensor tensor = getHandle().asTensor().asRawTensor()) {
-            tensor.asRawTensor().data().asBooleans().read(result);
-        }
-        return result;
-    }
-
-    @Override
     public String[] toStringArray() {
         // TODO: Parse String Array from bytes[]
         throw new UnsupportedOperationException(
@@ -235,15 +169,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
-        Shape sh = getShape();
-        DataType dType = getDataType();
-        long product = sh.size();
-        long len = dType.getNumOfBytes() * product;
-        byte[] buf = new byte[Math.toIntExact(len)];
-        try (Tensor tensor = getHandle().asTensor().asRawTensor()) {
-            tensor.asRawTensor().data().read(buf);
-        }
-        return ByteBuffer.wrap(buf);
+        return JavacppUtils.getByteBuffer(getHandle());
     }
 
     /** {@inheritDoc} */
@@ -257,7 +183,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     public void attach(NDManager manager) {
         detach();
         this.manager = (TfNDManager) manager;
-        manager.attachInternal(uid, this);
+        manager.attachInternal(getUid(), this);
     }
 
     /** {@inheritDoc} */
@@ -266,7 +192,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
         detach();
         NDManager original = this.manager;
         this.manager = (TfNDManager) manager;
-        manager.tempAttachInternal(original, uid, this);
+        manager.tempAttachInternal(original, getUid(), this);
     }
 
     /** {@inheritDoc} */
@@ -279,22 +205,13 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void copyTo(NDArray ndArray) {
-        if (!(ndArray instanceof TfNDArray)) {
-            throw new IllegalArgumentException("Only TfNDArray is supported.");
-        }
-        Shape inShape = getShape();
-        Shape destShape = ndArray.getShape();
-        if (!Arrays.equals(inShape.getShape(), destShape.getShape())) {
-            throw new IllegalArgumentException(
-                    "shape are diff. Required: " + destShape + ", Actual " + inShape);
-        }
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("DeepCopy", "DeepCopy");
-        opBuilder.addInput(getHandle().asOutput());
-        Operand<? extends TType> operand = opBuilder.build().output(0);
-        ((TfNDArray) ndArray).handle.set(operand);
-        ((TfNDArray) ndArray).dataType = getDataType();
-        ((TfNDArray) ndArray).shape =
-                new Shape(getShape().stream().mapToLong(Pair::getKey).toArray());
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray duplicate() {
+        return manager.opExecutor("DeepCopy").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -319,21 +236,13 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray zerosLike() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("ZerosLike", "ZerosLike");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("ZerosLike").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray onesLike() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("OnesLike", "OnesLike");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("OnesLike").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -371,12 +280,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray eq(NDArray other) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Equal", "Equal");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Equal").addInput(this).addInput(other).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -390,12 +294,10 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray neq(NDArray other) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("NotEqual", "NotEqual");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("NotEqual")
+                .addInput(this)
+                .addInput(other)
+                .buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -409,12 +311,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gt(NDArray other) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Greater", "Greater");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Greater").addInput(this).addInput(other).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -428,13 +325,10 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gte(NDArray other) {
-        OperationBuilder opBuilder =
-                manager.getEagerSession().opBuilder("GreaterEqual", "GreaterEqual");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("GreaterEqual")
+                .addInput(this)
+                .addInput(other)
+                .buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -448,12 +342,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lt(NDArray other) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Less", "Less");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Less").addInput(this).addInput(other).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -467,44 +356,40 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lte(NDArray other) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("LessEqual", "LessEqual");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("LessEqual")
+                .addInput(this)
+                .addInput(other)
+                .buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray all() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("All", "ReduceAll");
-        opBuilder.addInput(((TfNDArray) toType(DataType.BOOLEAN, false)).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.arange(getRank())).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray casted = toType(DataType.BOOLEAN, true);
+                NDArray axes = manager.arange(getShape().dimension())) {
+            return manager.opExecutor("All")
+                    .addInput(casted)
+                    .addInput(axes)
+                    .buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray any() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Any", "ReduceAny");
-        opBuilder.addInput(((TfNDArray) toType(DataType.BOOLEAN, false)).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.arange(getRank())).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray casted = toType(DataType.BOOLEAN, false);
+                NDArray axes = manager.arange(getShape().dimension())) {
+            return manager.opExecutor("Any")
+                    .addInput(casted)
+                    .addInput(axes)
+                    .buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray erfinv() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Erfinv", "erfinv");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Erfinv").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -512,26 +397,28 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     public NDArray norm(boolean keepDims) {
         // We have to flatten first to be able to simulate "numpy.linalg.norm" whenever axis isn't
         // specified
-        if (dataType == DataType.FLOAT64) {
+        if (getDataType() == DataType.FLOAT64) {
             throw new UnsupportedOperationException("float64 is not supported");
         }
         NDArray flatten = flatten();
-        OperationBuilder opBuilder =
-                manager.getEagerSession().opBuilder("EuclideanNorm", "EuclideanNorm");
-        opBuilder.addInput(((TfNDArray) flatten).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(0)).getHandle().asOutput());
-        opBuilder.setAttr("keep_dims", keepDims);
+        NDArray axis = manager.create(0);
+        NDArray res =
+                manager.opExecutor("EuclideanNorm")
+                        .addInput(flatten)
+                        .addInput(axis)
+                        .addParam("keep_dims", keepDims)
+                        .buildSingletonOrThrow();
         // close the temp NDArray
         flatten.close();
+        axis.close();
         if (!keepDims) {
-            try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-                return new TfNDArray(manager, tensor);
-            }
+            return res;
         }
-        long[] shapes = LongStream.generate(() -> 1).limit(shape.dimension()).toArray();
-        try (Tensor tensor = opBuilder.build().output(0).asTensor();
-                NDArray temp = new TfNDArray(manager, tensor)) {
-            return temp.reshape(shapes);
+        try {
+            long[] shapes = LongStream.generate(() -> 1).limit(getShape().dimension()).toArray();
+            return res.reshape(shapes);
+        } finally {
+            res.close();
         }
     }
 
@@ -541,27 +428,30 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
         if (ord != 2) {
             throw new UnsupportedOperationException("Only ord=2 is supported");
         }
-        OperationBuilder opBuilder =
-                manager.getEagerSession().opBuilder("EuclideanNorm", "EuclideanNorm");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(axes)).getHandle().asOutput());
-        opBuilder.setAttr("keep_dims", keepDims);
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axesArr = manager.create(axes)) {
+            return manager.opExecutor("EuclideanNorm")
+                    .addInput(this)
+                    .addInput(axesArr)
+                    .addParam("keep_dims", keepDims)
+                    .buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray oneHot(int depth, float onValue, float offValue, DataType dataType) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("OneHot", "OneHot");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(depth)).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(onValue)).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(offValue)).getHandle().asOutput());
-        opBuilder.setAttr("axis", -1);
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor).toType(dataType, false);
+        try (NDArray depthArr = manager.create(depth);
+                NDArray onValueArr = manager.create(onValue);
+                NDArray offValueArr = manager.create(offValue);
+                NDArray result =
+                        manager.opExecutor("OneHot")
+                                .addInput(this)
+                                .addInput(depthArr)
+                                .addInput(onValueArr)
+                                .addInput(offValueArr)
+                                .addParam("axis", -1)
+                                .buildSingletonOrThrow()) {
+            return result.toType(dataType, true);
         }
     }
 
@@ -576,12 +466,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray add(NDArray other) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Add", "Add");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Add").addInput(this).addInput(other).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -595,12 +480,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sub(NDArray other) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Sub", "Sub");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Sub").addInput(this).addInput(other).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -614,12 +494,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mul(NDArray other) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Mul", "Mul");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Mul").addInput(this).addInput(other).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -633,12 +508,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray div(NDArray other) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Div", "Div");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Div").addInput(this).addInput(other).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -652,12 +522,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mod(NDArray other) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Mod", "Mod");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Mod").addInput(this).addInput(other).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -671,12 +536,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray pow(NDArray other) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Pow", "Pow");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Pow").addInput(this).addInput(other).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -690,12 +550,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray maximum(NDArray other) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Maximum", "Maximum");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Maximum").addInput(this).addInput(other).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -709,12 +564,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray minimum(NDArray other) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Minimum", "inimum");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) other).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Minimum").addInput(this).addInput(other).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -774,19 +624,8 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     }
 
     NDArray inPlaceHelper(NDArray source, NDArray destination) {
-        if (getShape().isScalar()) {
-            throw new UnsupportedOperationException(
-                    "TensorFlow engine does not support inplace operations on scalars yet");
-        }
-        // select all indices for inplace update
-        NDArray indices = manager.arange((int) getShape().getShape()[0]);
-        OperationBuilder opBuilder =
-                manager.getEagerSession().opBuilder("InplaceUpdate", "InplaceUpdate");
-        opBuilder.addInput(((TfNDArray) destination).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) indices).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) source).getHandle().asOutput());
-        ((TfNDArray) destination).setOperand(opBuilder.build().output(0));
-        return destination;
+        // FIXME: re-implement later
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -826,11 +665,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sign() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Sign", "Sign");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Sign").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -842,11 +677,7 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray neg() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Neg", "Neg");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Neg").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -858,76 +689,53 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray abs() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Abs", "Abs");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Abs").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray square() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Square", "Square");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Square").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sqrt() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Sqrt", "Sqrt");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Sqrt").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray cbrt() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Pow", "Pow");
-        opBuilder.addInput(getHandle().asOutput());
+        NDArray pow;
         if (getDataType().equals(DataType.FLOAT64)) {
-            opBuilder.addInput(((TfNDArray) manager.create(1.0 / 3)).getHandle().asOutput());
+            pow = manager.create(1.0 / 3);
         } else {
-            opBuilder.addInput(((TfNDArray) manager.create(1f / 3)).getHandle().asOutput());
+            pow = manager.create(1f / 3);
         }
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try {
+            return manager.opExecutor("Pow").addInput(this).addInput(pow).buildSingletonOrThrow();
+        } finally {
+            pow.close();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray floor() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Floor", "Floor");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Floor").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray ceil() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Ceil", "Ceil");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Ceil").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray round() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Round", "Round");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Round").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -939,21 +747,13 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray exp() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Exp", "Exp");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Exp").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray log() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Log", "Log");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Log").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -971,121 +771,73 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sin() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Sin", "Sin");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Sin").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray cos() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Cos", "Cos");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Cos").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray tan() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Tan", "Tan");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Tan").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray asin() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Asin", "Asin");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Asin").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray acos() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Acos", "Acos");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Acos").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray atan() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Atan", "Atan");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Atan").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sinh() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Sinh", "Sinh");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Sinh").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray cosh() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Cosh", "Cosh");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Cosh").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray tanh() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Tanh", "Tanh");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Tanh").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray asinh() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Asinh", "Asinh");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Asinh").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray acosh() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Acosh", "Acosh");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Acosh").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray atanh() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Atanh", "Atanh");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Atanh").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -1103,46 +855,40 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray max() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Max", "Max");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.arange(0, getRank(), 1)).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axes = manager.arange(getShape().dimension())) {
+            return manager.opExecutor("Max").addInput(this).addInput(axes).buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray max(int[] axes, boolean keepDims) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Max", "Max");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(axes)).getHandle().asOutput());
-        opBuilder.setAttr("keep_dims", keepDims);
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axesArr = manager.create(axes)) {
+            return manager.opExecutor("Max")
+                    .addInput(this)
+                    .addInput(axesArr)
+                    .addParam("keep_dims", keepDims)
+                    .buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray min() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Min", "Min");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.arange(0, getRank(), 1)).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axes = manager.arange(getShape().dimension())) {
+            return manager.opExecutor("Min").addInput(this).addInput(axes).buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray min(int[] axes, boolean keepDims) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Min", "Min");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(axes)).getHandle().asOutput());
-        opBuilder.setAttr("keep_dims", keepDims);
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axesArr = manager.create(axes)) {
+            return manager.opExecutor("Min")
+                    .addInput(this)
+                    .addInput(axesArr)
+                    .addParam("keep_dims", keepDims)
+                    .buildSingletonOrThrow();
         }
     }
 
@@ -1155,69 +901,64 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
         if (getDataType() == DataType.BOOLEAN) {
             array = array.toType(DataType.INT64, false);
         }
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Sum", "Sum");
-        opBuilder.addInput(((TfNDArray) array).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.arange(0, getRank(), 1)).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axes = manager.arange(getShape().dimension())) {
+            return manager.opExecutor("Sum").addInput(array).addInput(axes).buildSingletonOrThrow();
+        } finally {
+            if (array != this) {
+                array.close();
+            }
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sum(int[] axes, boolean keepDims) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Sum", "Sum");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(axes)).getHandle().asOutput());
-        opBuilder.setAttr("keep_dims", keepDims);
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axesArr = manager.create(axes)) {
+            return manager.opExecutor("Sum")
+                    .addInput(this)
+                    .addInput(axesArr)
+                    .addParam("keep_dims", keepDims)
+                    .buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray prod() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Prod", "Prod");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.arange(0, getRank())).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axes = manager.arange(getShape().dimension())) {
+            return manager.opExecutor("Prod").addInput(this).addInput(axes).buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray prod(int[] axes, boolean keepDims) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Prod", "Prod");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput((((TfNDArray) manager.create(axes)).getHandle().asOutput()));
-        opBuilder.setAttr("keep_dims", keepDims);
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axesArr = manager.create(axes)) {
+            return manager.opExecutor("Prod")
+                    .addInput(this)
+                    .addInput(axesArr)
+                    .addParam("keep_dims", keepDims)
+                    .buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray mean() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Mean", "Mean");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput((((TfNDArray) manager.arange(0, getRank())).getHandle().asOutput()));
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axes = manager.arange(getShape().dimension())) {
+            return manager.opExecutor("Mean").addInput(this).addInput(axes).buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray mean(int[] axes, boolean keepDims) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Mean", "Mean");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput((((TfNDArray) manager.create(axes)).getHandle().asOutput()));
-        opBuilder.setAttr("keep_dims", keepDims);
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axesArr = manager.create(axes)) {
+            return manager.opExecutor("Mean")
+                    .addInput(this)
+                    .addInput(axesArr)
+                    .addParam("keep_dims", keepDims)
+                    .buildSingletonOrThrow();
         }
     }
 
@@ -1236,8 +977,48 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDList split(long[] indices, int axis) {
-        // FIXME: re-implement
-        throw new UnsupportedOperationException("Not Implemented");
+        if (indices.length > MAX_OUTPUTS_PER_OP) {
+            throw new UnsupportedOperationException(
+                    "the indices should be smaller than " + MAX_OUTPUTS_PER_OP);
+        }
+        if (indices.length == 0) {
+            return new NDList(duplicate());
+        }
+        List<Long> sizes = new ArrayList<>();
+        int lastIndex = indices.length - 1;
+        long dimSize = getShape().get(axis);
+        // does not add to size if indices starts at 0
+        if (indices[0] > 0) {
+            sizes.add(indices[0]);
+        }
+        for (int i = 1; i < indices.length; i++) {
+            sizes.add(indices[i] - indices[i - 1]);
+        }
+        // add last size if last index smaller than max size of that axis
+        if (indices[lastIndex] < dimSize) {
+            sizes.add(dimSize - indices[lastIndex]);
+        }
+        long totalSize = sizes.stream().mapToLong(Long::longValue).sum();
+
+        if (totalSize != getShape().get(axis)) {
+            throw new IllegalArgumentException(
+                    "split sizes :"
+                            + totalSize
+                            + " must sum to dimension on axis "
+                            + axis
+                            + ": "
+                            + getShape().get(axis));
+        }
+        try (NDArray sizesArr = manager.create(sizes.stream().mapToInt(Long::intValue).toArray());
+                NDArray axisArr = manager.create(axis)) {
+            return new NDList(
+                    manager.opExecutor("SplitV")
+                            .addInput(this)
+                            .addInput(sizesArr)
+                            .addInput(axisArr)
+                            .addParam("num_split", sizes.size())
+                            .build());
+        }
     }
 
     /** {@inheritDoc} */
@@ -1249,23 +1030,22 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray reshape(Shape shape) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Reshape", "Reshape");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput((((TfNDArray) manager.create(shape.getShape())).getHandle().asOutput()));
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray shapeArr = manager.create(shape.getShape())) {
+            return manager.opExecutor("Reshape")
+                    .addInput(this)
+                    .addInput(shapeArr)
+                    .buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray expandDims(int axis) {
-        OperationBuilder opBuilder =
-                manager.getEagerSession().opBuilder("ExpandDims", "ExpandDims");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput((((TfNDArray) manager.create(axis)).getHandle().asOutput()));
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axisArr = manager.create(axis)) {
+            return manager.opExecutor("ExpandDims")
+                    .addInput(this)
+                    .addInput(axisArr)
+                    .buildSingletonOrThrow();
         }
     }
 
@@ -1275,34 +1055,33 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
         if (isScalar()) {
             axes = new int[0];
         }
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Squeeze", "Squeeze");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.setAttr("squeeze_dims", Arrays.stream(axes).mapToLong(i -> i).toArray());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Squeeze")
+                .addInput(this)
+                .addParam("squeeze_dims", Arrays.stream(axes).mapToLong(i -> i).toArray())
+                .buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray logicalAnd(NDArray n) {
-        OperationBuilder opBuilder =
-                manager.getEagerSession().opBuilder("LogicalAnd", "LogicalAnd");
-        opBuilder.addInput(((TfNDArray) toType(DataType.BOOLEAN, false)).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) n.toType(DataType.BOOLEAN, false)).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray input1 = toType(DataType.BOOLEAN, false);
+                NDArray input2 = n.toType(DataType.BOOLEAN, false)) {
+            return manager.opExecutor("LogicalAnd")
+                    .addInput(input1)
+                    .addInput(input2)
+                    .buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray logicalOr(NDArray n) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("LogicalOr", "LogicalOr");
-        opBuilder.addInput(((TfNDArray) toType(DataType.BOOLEAN, false)).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) n.toType(DataType.BOOLEAN, false)).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray input1 = toType(DataType.BOOLEAN, false);
+                NDArray input2 = n.toType(DataType.BOOLEAN, false)) {
+            return manager.opExecutor("LogicalOr")
+                    .addInput(input1)
+                    .addInput(input2)
+                    .buildSingletonOrThrow();
         }
     }
 
@@ -1315,11 +1094,8 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray logicalNot() {
-        OperationBuilder opBuilder =
-                manager.getEagerSession().opBuilder("LogicalNot", "LogicalNot");
-        opBuilder.addInput(((TfNDArray) toType(DataType.BOOLEAN, false)).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray input = toType(DataType.BOOLEAN, false)) {
+            return manager.opExecutor("LogicalNot").addInput(input).buildSingletonOrThrow();
         }
     }
 
@@ -1369,11 +1145,11 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
         if (Arrays.stream(getShape().getShape()).anyMatch(dim -> dim == 0L)) {
             return manager.create(new Shape(0));
         }
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Cumsum", "Cumsum");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput((((TfNDArray) manager.create(axis)).getHandle().asOutput()));
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axisArr = manager.create(axis)) {
+            return manager.opExecutor("Cumsum")
+                    .addInput(this)
+                    .addInput(axisArr)
+                    .buildSingletonOrThrow();
         }
     }
 
@@ -1392,21 +1168,13 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray isInfinite() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("IsInf", "IsInf");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("IsInf").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray isNaN() {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("IsNan", "IsNan");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("IsNan").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -1429,11 +1197,11 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray tile(long[] repeats) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Tile", "Tile");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(repeats)).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray repeatsArr = manager.create(repeats)) {
+            return manager.opExecutor("Tile")
+                    .addInput(this)
+                    .addInput(repeatsArr)
+                    .buildSingletonOrThrow();
         }
     }
 
@@ -1483,24 +1251,24 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray clip(Number min, Number max) {
-        OperationBuilder opBuilder =
-                manager.getEagerSession().opBuilder("ClipByValue", "ClipByValueClipByValue");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(min.floatValue())).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(max.floatValue())).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray minArr = manager.create(min.floatValue());
+                NDArray maxArr = manager.create(max.floatValue())) {
+            return manager.opExecutor("ClipByValue")
+                    .addInput(this)
+                    .addInput(minArr)
+                    .addInput(maxArr)
+                    .buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray flip(int... axes) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("ReverseV2", "Reverse");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(axes)).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axesArr = manager.create(axes)) {
+            return manager.opExecutor("ReverseV2")
+                    .addInput(this)
+                    .addInput(axesArr)
+                    .buildSingletonOrThrow();
         }
     }
 
@@ -1526,23 +1294,22 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
                     "You must include each of the dimensions from 0 until "
                             + getShape().dimension());
         }
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("Transpose", "Transpose");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(dimensions)).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray dimensionsArr = manager.create(dimensions)) {
+            return manager.opExecutor("Transpose")
+                    .addInput(this)
+                    .addInput(dimensionsArr)
+                    .buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray broadcast(Shape shape) {
-        OperationBuilder opBuilder =
-                manager.getEagerSession().opBuilder("BroadcastTo", "BroadcastTo");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(shape.getShape())).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray shapeArr = manager.create(shape.getShape())) {
+            return manager.opExecutor("BroadcastTo")
+                    .addInput(this)
+                    .addInput(shapeArr)
+                    .buildSingletonOrThrow();
         }
     }
 
@@ -1552,21 +1319,17 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
         if (isEmpty()) {
             throw new IllegalArgumentException("attempt to get argMax of an empty NDArray");
         }
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("ArgMax", "ArgMax");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("ArgMax").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray argMax(int axis) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("ArgMax", "ArgMax");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(axis)).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axisArr = manager.create(axis)) {
+            return manager.opExecutor("ArgMax")
+                    .addInput(this)
+                    .addInput(axisArr)
+                    .buildSingletonOrThrow();
         }
     }
 
@@ -1576,21 +1339,17 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
         if (isEmpty()) {
             throw new IllegalArgumentException("attempt to get argMin of an empty NDArray");
         }
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("ArgMin", "ArgMin");
-        opBuilder.addInput(getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("ArgMin").addInput(this).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray argMin(int axis) {
-        OperationBuilder opBuilder = manager.getEagerSession().opBuilder("ArgMin", "ArgMin");
-        opBuilder.addInput(getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) manager.create(axis)).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray axisArr = manager.create(axis)) {
+            return manager.opExecutor("ArgMin")
+                    .addInput(this)
+                    .addInput(axisArr)
+                    .buildSingletonOrThrow();
         }
     }
 
@@ -1657,47 +1416,18 @@ public class TfNDArray extends NativeResource<Operand<?>> implements NDArray {
         if (isReleased()) {
             return "This array is already closed";
         }
-
         return toDebugString(MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
     }
 
     /** {@inheritDoc} */
     @Override
     public void close() {
-        Operand<?> operand = handle.getAndSet(null);
-        if (operand != null) {
-            operand.asTensor().close();
+        TFE_TensorHandle tensorHandle = handle.getAndSet(null);
+        if (tensorHandle != null && !tensorHandle.isNull()) {
+            tensorHandle.close();
             manager.detachInternal(getUid());
             manager = null;
         }
         tfNDArrayEx = null;
-    }
-
-    private static String getTfDevice(Device device) {
-        if (device.getDeviceType().equals(Device.Type.CPU)) {
-            return "/device:CPU:0";
-        } else if (device.getDeviceType().equals(Device.Type.GPU)) {
-            return "/device:GPU:" + device.getDeviceId();
-        } else {
-            throw new EngineException(
-                    "Unknown device type to TensorFlow Engine: " + device.toString());
-        }
-    }
-
-    public Tensor getTensor() {
-        return getHandle().asTensor();
-    }
-
-    void setOperand(Operand<?> operand) {
-        handle.set(operand);
-        uid = handle.toString();
-    }
-
-    int getRank() {
-        return getShape().dimension();
-    }
-
-    public static org.tensorflow.ndarray.Shape toTfShape(Shape shape) {
-        return org.tensorflow.ndarray.Shape.of(shape.getShape());
     }
 }

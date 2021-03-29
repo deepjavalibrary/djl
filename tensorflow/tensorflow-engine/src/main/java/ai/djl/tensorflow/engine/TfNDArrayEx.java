@@ -18,20 +18,10 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDUtils;
 import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.recurrent.RNN;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
-import org.tensorflow.Operand;
-import org.tensorflow.Tensor;
-import org.tensorflow.op.Ops;
-import org.tensorflow.op.core.Stack;
-import org.tensorflow.types.TInt32;
-import org.tensorflow.types.family.TNumber;
-import org.tensorflow.types.family.TType;
 
 public class TfNDArrayEx implements NDArrayEx {
 
@@ -39,19 +29,15 @@ public class TfNDArrayEx implements NDArrayEx {
 
     private TfNDArray array;
     private TfNDManager manager;
-    private Ops tf;
-    private Operand<?> operand;
 
     /**
      * Constructs an {@code MxNDArrayEx} given a {@link NDArray}.
      *
      * @param parent the {@link NDArray} to extend
      */
-    TfNDArrayEx(TfNDArray parent) {
-        this.array = parent;
-        this.manager = (TfNDManager) parent.getManager();
-        this.tf = manager.getTf();
-        this.operand = parent.getHandle();
+    TfNDArrayEx(TfNDArray array) {
+        this.array = array;
+        this.manager = (TfNDManager) array.getManager();
     }
 
     /** {@inheritDoc} */
@@ -142,17 +128,13 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray relu() {
-        try (Tensor tensor = tf.nn.relu(array.getHandle()).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Relu").addInput(array).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sigmoid() {
-        try (Tensor tensor = tf.math.sigmoid(array.getHandle()).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Sigmoid").addInput(array).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -171,9 +153,7 @@ public class TfNDArrayEx implements NDArrayEx {
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public NDArray softSign() {
-        try (Tensor tensor = tf.nn.softsign((Operand) array.getHandle()).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Softsign").addInput(array).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -192,9 +172,7 @@ public class TfNDArrayEx implements NDArrayEx {
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public NDArray selu() {
-        try (Tensor tensor = tf.nn.selu((Operand) array.getHandle()).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        return manager.opExecutor("Selu").addInput(array).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -445,61 +423,39 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray normalize(float[] mean, float[] std) {
+        // FIXME: use inplace operator
         // TODO: TensorFlow does not support channels first on CPU for conv2d
         // https://github.com/tensorflow/tensorflow/issues/32691
         // https://github.com/tensorflow/tensorflow/issues/26411
         int dim = getArray().getShape().dimension();
         Shape shape = (dim == 3) ? new Shape(1, 1, 3) : new Shape(1, 1, 1, 3);
         try (NDArray meanArr = manager.create(mean, shape);
-                NDArray stdArr = manager.create(std, shape)) {
-            return getArray().sub(meanArr).divi(stdArr);
+                NDArray stdArr = manager.create(std, shape);
+                NDArray temp = getArray().sub(meanArr)) {
+            return temp.div(stdArr);
         }
     }
 
     /** {@inheritDoc} */
-    @Override
-    public NDArray toTensor() {
-        // TODO: TensorFlow does not support channels first on CPU for conv2d
-        // https://github.com/tensorflow/tensorflow/issues/32691
-        // https://github.com/tensorflow/tensorflow/issues/26411
-        NDArray input = array;
-        int dim = input.getShape().dimension();
-        if (dim == 3) {
-            input = input.expandDims(0);
-        }
-        input = input.div(255.0);
-        if (dim == 3) {
-            input = input.squeeze(0);
-        }
-        // The network by default takes float32
-        return (!input.getDataType().equals(DataType.FLOAT32))
-                ? input.toType(DataType.FLOAT32, false)
-                : input;
-    }
-
-    /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     @Override
     public NDArray resize(int width, int height, int interpolation) {
-        if (manager.create(array.getShape().getShape()).prod().toLongArray()[0] == 0L) {
+        if (array.isEmpty()) {
             throw new IllegalArgumentException("Can't resize image with 0 dims.");
         }
-        BiFunction<Operand<TNumber>, Operand<TInt32>, Operand<? extends TNumber>> function =
-                getResizeFunction(interpolation);
+        String op = getResizeOpName(interpolation);
         if (array.getShape().dimension() == 3) {
-            try (Tensor tensor =
-                    tf.squeeze(
-                                    function.apply(
-                                            (Operand) ((TfNDArray) array.expandDims(0)).getHandle(),
-                                            tf.constant(new int[] {height, width})))
-                            .asTensor()) {
-                return new TfNDArray(manager, tensor);
+            try (NDArray temp = array.expandDims(0);
+                    NDArray size = manager.create(new int[] {height, width});
+                    NDArray image =
+                            manager.opExecutor(op)
+                                    .addInput(temp)
+                                    .addInput(size)
+                                    .buildSingletonOrThrow()) {
+                return image.squeeze();
             }
         }
-        try (Tensor tensor =
-                function.apply((Operand<TNumber>) operand, tf.constant(new int[] {height, width}))
-                        .asTensor()) {
-            return new TfNDArray(manager, tensor);
+        try (NDArray size = manager.create(new int[] {height, width})) {
+            return manager.opExecutor(op).addInput(array).addInput(size).buildSingletonOrThrow();
         }
     }
 
@@ -555,38 +511,21 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray stack(NDList arrays, int axis) {
-        return stackHelper(arrays, axis);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T extends TType> NDArray stackHelper(NDList arrays, int axis) {
-        ArrayList<Operand<T>> operands = new ArrayList<>(arrays.size() + 1);
-        operands.add((Operand<T>) array.getHandle());
-        for (NDArray ndArray : arrays) {
-            operands.add((Operand<T>) ((TfNDArray) ndArray).getHandle());
-        }
-        try (Tensor tensor = tf.stack(operands, Stack.axis((long) axis)).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        NDArray[] srcArray = new NDArray[arrays.size() + 1];
+        srcArray[0] = array;
+        System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
+        return manager.opExecutor("Pack")
+                .addInputList(srcArray)
+                .addParam("axis", axis)
+                .buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray concat(NDList arrays, int axis) {
         NDUtils.checkConcatInput(arrays);
-        return concatHelper(arrays, axis);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T extends TType> NDArray concatHelper(NDList arrays, int axis) {
-        ArrayList<Operand<T>> operands = new ArrayList<>(arrays.size() + 1);
-        operands.add((Operand<T>) array.getHandle());
-        for (NDArray ndArray : arrays) {
-            operands.add((Operand<T>) ((TfNDArray) ndArray).getHandle());
-        }
-        try (Tensor tensor = tf.concat(operands, tf.constant(axis)).asTensor()) {
-            return new TfNDArray(manager, tensor);
-        }
+        // FIXME: re-implement later
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
@@ -631,17 +570,16 @@ public class TfNDArrayEx implements NDArrayEx {
         return array;
     }
 
-    private BiFunction<Operand<TNumber>, Operand<TInt32>, Operand<? extends TNumber>>
-            getResizeFunction(int interpolate) {
+    private String getResizeOpName(int interpolate) {
         switch (interpolate) {
             case 0:
-                return tf.image::resizeNearestNeighbor;
+                return "ResizeNearestNeighbor";
             case 1:
-                return tf.image::resizeBilinear;
+                return "ResizeBilinear";
             case 2:
-                return tf.image::resizeArea;
+                return "ResizeArea";
             case 3:
-                return tf.image::resizeBicubic;
+                return "ResizeBicubic";
             default:
                 throw new UnsupportedOperationException(
                         "The kind of interpolation is not supported.");
