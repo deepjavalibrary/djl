@@ -17,10 +17,10 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Block;
+import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -29,11 +29,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import org.tensorflow.SavedModelBundle;
 import org.tensorflow.proto.framework.ConfigProto;
 import org.tensorflow.proto.framework.RunOptions;
 
 public class TfModel extends BaseModel {
+
+    private static final String DEFAULT_SERVING_SIGNATURE_DEF_KEY = "serving_default";
 
     /**
      * Constructs a new Model on a given device.
@@ -66,7 +67,7 @@ public class TfModel extends BaseModel {
         String[] tags = null;
         ConfigProto configProto = null;
         RunOptions runOptions = null;
-        String signatureDefKey = "serving_default";
+        String signatureDefKey = DEFAULT_SERVING_SIGNATURE_DEF_KEY;
         if (options != null) {
             Object tagOption = options.get("Tags");
             if (tagOption instanceof String[]) {
@@ -108,27 +109,9 @@ public class TfModel extends BaseModel {
             tags = new String[] {"serve"};
         }
 
-        SavedModelBundle.Loader loader = SavedModelBundle.loader(exportDir.toString());
-        if (tags.length > 0) {
-            loader.withTags(tags);
-        } else {
-            // FIXME: workaround TF-java bug
-            try {
-                Field field = SavedModelBundle.Loader.class.getDeclaredField("tags");
-                field.setAccessible(true);
-                field.set(loader, tags);
-            } catch (ReflectiveOperationException e) {
-                throw new AssertionError(e);
-            }
-        }
-        if (configProto != null) {
-            loader.withConfigProto(configProto);
-        }
-        if (runOptions != null) {
-            loader.withRunOptions(runOptions);
-        }
-
-        SavedModelBundle bundle = loader.load();
+        SavedModelBundle bundle =
+                JavacppUtils.loadSavedModelBundle(
+                        exportDir.toString(), tags, configProto, runOptions);
         block = new TfSymbolBlock(bundle, signatureDefKey);
     }
 

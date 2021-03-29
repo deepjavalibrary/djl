@@ -12,6 +12,7 @@
  */
 package ai.djl.tensorflow.engine;
 
+
 import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.BaseNDManager;
@@ -19,6 +20,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -26,29 +28,20 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
-import org.tensorflow.EagerSession;
-import org.tensorflow.OperationBuilder;
-import org.tensorflow.Tensor;
-import org.tensorflow.ndarray.buffer.ByteDataBuffer;
-import org.tensorflow.ndarray.buffer.DataBuffers;
-import org.tensorflow.op.Ops;
-import org.tensorflow.types.TBool;
-import org.tensorflow.types.TFloat32;
-import org.tensorflow.types.TInt32;
-import org.tensorflow.types.TString;
-import org.tensorflow.types.TUint8;
+import java.util.concurrent.atomic.AtomicReference;
+import org.tensorflow.internal.c_api.TFE_Context;
+import org.tensorflow.internal.c_api.TFE_TensorHandle;
 
 public class TfNDManager extends BaseNDManager {
 
     static final TfNDManager SYSTEM_MANAGER = new SystemManager();
 
-    private static int nameAssignment = 1;
-    EagerSession eagerSession;
-    Ops tf;
+    private AtomicReference<TFE_Context> eagerSessionHandle;
     private static Integer seed;
 
     private TfNDManager(NDManager parent, Device device) {
         super(parent, device);
+        eagerSessionHandle = new AtomicReference<>(JavacppUtils.createEagerSession(true, 0, null));
     }
 
     static TfNDManager getSystemManager() {
@@ -61,100 +54,12 @@ public class TfNDManager extends BaseNDManager {
         return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     }
 
-    EagerSession getEagerSession() {
-        if (eagerSession == null) {
-            eagerSession = EagerSession.options().async(true).build();
-        }
-        return eagerSession;
-    }
-
-    Ops getTf() {
-        if (tf == null) {
-            tf = Ops.create(eagerSession);
-        }
-        return tf;
-    }
-
     public static void setRandomSeed(Integer seed) {
         TfNDManager.seed = seed;
     }
 
     public static Integer getRandomSeed() {
         return seed;
-    }
-
-    static int nextNameAssignment() {
-        return nameAssignment++;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(byte[] data) {
-        org.tensorflow.ndarray.Shape shape = org.tensorflow.ndarray.Shape.of(data.length);
-        try (Tensor tensor = TUint8.tensorOf(shape, DataBuffers.of(data))) {
-            return new TfNDArray(this, tensor);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(float[] data) {
-        org.tensorflow.ndarray.Shape shape = org.tensorflow.ndarray.Shape.of(data.length);
-        try (Tensor tensor = TFloat32.tensorOf(shape, DataBuffers.of(data))) {
-            return new TfNDArray(this, tensor);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(int[] data) {
-        org.tensorflow.ndarray.Shape shape = org.tensorflow.ndarray.Shape.of(data.length);
-        try (Tensor tensor = TInt32.tensorOf(shape, DataBuffers.of(data))) {
-            return new TfNDArray(this, tensor);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(boolean[] data) {
-        org.tensorflow.ndarray.Shape shape = org.tensorflow.ndarray.Shape.of(data.length);
-        try (Tensor tensor = TBool.tensorOf(shape, DataBuffers.of(data))) {
-            return new TfNDArray(this, tensor);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(int data) {
-        // create scalar tensor with int
-        try (Tensor tensor = TInt32.scalarOf(data)) {
-            return new TfNDArray(this, tensor);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(float data) {
-        // create scalar tensor with float
-        try (Tensor tensor = TFloat32.scalarOf(data)) {
-            return new TfNDArray(this, tensor);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(String data) {
-        try (Tensor tensor = TString.scalarOf(data)) {
-            return new TfNDArray(this, tensor);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(String[] data) {
-        try (Tensor tensor = TString.vectorOf(data)) {
-            return new TfNDArray(this, tensor);
-        }
     }
 
     /** {@inheritDoc} */
@@ -165,20 +70,8 @@ public class TfNDManager extends BaseNDManager {
             // initialize with scalar 0
             return create(0f).toType(dataType, false);
         }
-
-        Tensor tensor = Tensor.of(TfDataType.toClassType(dataType), TfNDArray.toTfShape(shape));
-        return new TfNDArray(this, tensor);
-    }
-
-    public TfNDArray create(Tensor tensor) {
-        return new TfNDArray(this, tensor);
-    }
-
-    public TfNDArray create(ByteBuffer data, Shape shape) {
-        try (Tensor tensor =
-                Tensor.of(TUint8.class, TfNDArray.toTfShape(shape), DataBuffers.of(data))) {
-            return new TfNDArray(this, tensor);
-        }
+        TFE_TensorHandle handle = JavacppUtils.createEmptyTFETensor(shape, dataType);
+        return new TfNDArray(this, handle);
     }
 
     /** {@inheritDoc} */
@@ -187,10 +80,9 @@ public class TfNDManager extends BaseNDManager {
         int size = data.remaining();
         // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
         DataType inputType = DataType.fromBuffer(data);
-
         int numOfBytes = inputType.getNumOfBytes();
-        ByteBuffer buf = allocateDirect(size * numOfBytes);
 
+        ByteBuffer buf = allocateDirect(size * numOfBytes);
         switch (inputType) {
             case FLOAT32:
                 buf.asFloatBuffer().put((FloatBuffer) data);
@@ -214,12 +106,9 @@ public class TfNDManager extends BaseNDManager {
                 throw new AssertionError("Show never happen");
         }
         buf.rewind();
-
-        ByteDataBuffer db = DataBuffers.of(buf);
-        try (Tensor tensor =
-                Tensor.of(TfDataType.toClassType(dataType), TfNDArray.toTfShape(shape), db)) {
-            return new TfNDArray(this, tensor);
-        }
+        // FIXME: avoid data copy by using another C API
+        TFE_TensorHandle handle = JavacppUtils.createTFETensorFromByteBuffer(buf, shape, dataType);
+        return new TfNDArray(this, handle);
     }
 
     /** {@inheritDoc} */
@@ -243,13 +132,13 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray full(Shape shape, float value, DataType dataType) {
-        TfNDArray valueArr = (TfNDArray) create(value).toType(dataType, false);
-        TfNDArray dimArr = (TfNDArray) create(shape.getShape());
-        OperationBuilder opBuilder = getEagerSession().opBuilder("Fill", "Fill");
-        opBuilder.addInput(dimArr.getHandle().asOutput());
-        opBuilder.addInput(valueArr.getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(this, tensor);
+        try (NDArray valueArr = create(value);
+                NDArray castedValueArr = valueArr.toType(dataType, false);
+                NDArray dimArr = create(shape.getShape())) {
+            return opExecutor("Fill")
+                    .addInput(dimArr)
+                    .addInput(castedValueArr)
+                    .buildSingletonOrThrow();
         }
     }
 
@@ -259,32 +148,35 @@ public class TfNDManager extends BaseNDManager {
         if (stop <= start && step > 0) {
             return create(new Shape(0), dataType);
         }
-        OperationBuilder opBuilder = getEagerSession().opBuilder("Range", "Range");
-        opBuilder.addInput(
-                ((TfNDArray) create(start).toType(dataType, false)).getHandle().asOutput());
-        opBuilder.addInput(
-                ((TfNDArray) create(stop).toType(dataType, false)).getHandle().asOutput());
-        opBuilder.addInput(
-                ((TfNDArray) create(step).toType(dataType, false)).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(this, tensor);
+        try (NDArray startArr = create(start);
+                NDArray stopArr = create(stop);
+                NDArray stepArr = create(step);
+                NDArray castedStartArr = startArr.toType(dataType, false);
+                NDArray castedStopArr = stopArr.toType(dataType, false);
+                NDArray castedStepArr = stepArr.toType(dataType, false)) {
+            return opExecutor("Range")
+                    .addInput(castedStartArr)
+                    .addInput(castedStopArr)
+                    .addInput(castedStepArr)
+                    .buildSingletonOrThrow();
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray eye(int rows, int cols, int k, DataType dataType) {
-        OperationBuilder opBuilder = getEagerSession().opBuilder("MatrixDiagV2", "MatrixDiag");
-        opBuilder.addInput(
-                ((TfNDArray) ones(new Shape(Math.min(rows, cols)), dataType))
-                        .getHandle()
-                        .asOutput());
-        opBuilder.addInput(((TfNDArray) create(k)).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) create(rows)).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) create(cols)).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) zeros(new Shape(1))).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(this, tensor);
+        try (NDArray ones = ones(new Shape(Math.min(rows, cols)), dataType);
+                NDArray kArr = create(k);
+                NDArray rowsArr = create(rows);
+                NDArray colsArr = create(cols);
+                NDArray zeros = zeros(new Shape(1))) {
+            return opExecutor("MatrixDiagV2")
+                    .addInput(ones)
+                    .addInput(kArr)
+                    .addInput(rowsArr)
+                    .addInput(colsArr)
+                    .addInput(zeros)
+                    .buildSingletonOrThrow();
         }
     }
 
@@ -300,12 +192,14 @@ public class TfNDManager extends BaseNDManager {
         if (!endpoint && num > 1) {
             stop -= (int) ((stop - start) / num);
         }
-        OperationBuilder opBuilder = getEagerSession().opBuilder("LinSpace", "LinSpace");
-        opBuilder.addInput(((TfNDArray) create(start)).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) create(stop)).getHandle().asOutput());
-        opBuilder.addInput(((TfNDArray) create(num)).getHandle().asOutput());
-        try (Tensor tensor = opBuilder.build().output(0).asTensor()) {
-            return new TfNDArray(this, tensor);
+        try (NDArray startArr = create(start);
+                NDArray stopArr = create(stop);
+                NDArray numArr = create(num)) {
+            return opExecutor("LinSpace")
+                    .addInput(startArr)
+                    .addInput(stopArr)
+                    .addInput(numArr)
+                    .buildSingletonOrThrow();
         }
     }
 
@@ -315,17 +209,18 @@ public class TfNDManager extends BaseNDManager {
         if (DataType.STRING.equals(dataType)) {
             throw new IllegalArgumentException("String data type is not supported!");
         }
-        OperationBuilder opBuilder = getEagerSession().opBuilder("RandomUniform", "RandomUniform");
-        opBuilder.addInput(((TfNDArray) create(shape.getShape())).getHandle().asOutput());
-        opBuilder.setAttr("dtype", TfDataType.toProtoType(dataType));
+        NDArray axes = create(shape.getShape());
+        TfOpExecutor opBuilder =
+                opExecutor("RandomUniform").addInput(axes).addParam("dtype", dataType);
         if (seed != null) {
-            opBuilder.setAttr("seed", 1234);
-            opBuilder.setAttr("seed2", 1234);
+            opBuilder.addParam("seed", 1234);
+            opBuilder.addParam("seed2", 1234);
         }
-        try (Tensor tensor = opBuilder.build().output(0).asTensor();
-                NDArray temp1 = new TfNDArray(this, tensor);
-                NDArray temp2 = temp1.mul(high - low)) {
-            return temp2.add(low);
+        try (NDArray array = opBuilder.buildSingletonOrThrow();
+                NDArray temp = array.mul(high - low)) {
+            return temp.add(low);
+        } finally {
+            axes.close();
         }
     }
 
@@ -335,18 +230,18 @@ public class TfNDManager extends BaseNDManager {
         if (DataType.STRING.equals(dataType)) {
             throw new IllegalArgumentException("String data type is not supported!");
         }
-        OperationBuilder opBuilder =
-                getEagerSession().opBuilder("RandomStandardNormal", "RandomStandardNormal");
-        opBuilder.addInput(((TfNDArray) create(shape.getShape())).getHandle().asOutput());
-        opBuilder.setAttr("dtype", TfDataType.toProtoType(dataType));
+        NDArray axes = create(shape.getShape());
+        TfOpExecutor opBuilder =
+                opExecutor("RandomStandardNormal").addInput(axes).addParam("dtype", dataType);
         if (seed != null) {
-            opBuilder.setAttr("seed", 1234);
-            opBuilder.setAttr("seed2", 1234);
+            opBuilder.addParam("seed", 1234);
+            opBuilder.addParam("seed2", 1234);
         }
-        try (Tensor tensor = opBuilder.build().output(0).asTensor();
-                NDArray temp1 = new TfNDArray(this, tensor);
-                NDArray temp2 = temp1.mul(scale)) {
-            return temp2.add(loc);
+        try (NDArray array = opBuilder.buildSingletonOrThrow();
+                NDArray temp = array.mul(scale)) {
+            return temp.add(loc);
+        } finally {
+            axes.close();
         }
     }
 
@@ -355,18 +250,20 @@ public class TfNDManager extends BaseNDManager {
     public TfNDManager newSubManager(Device device) {
         TfNDManager manager = new TfNDManager(this, device);
         attachInternal(manager.uid, manager);
-        // initialize eager sessions and operators only for sub managers
-        manager.getEagerSession();
-        manager.getTf();
         return manager;
+    }
+
+    public TfOpExecutor opExecutor(String operation) {
+        return new TfOpExecutor(this, eagerSessionHandle.get(), operation);
     }
 
     /** {@inheritDoc} */
     @Override
     public void close() {
         super.close();
-        if (eagerSession != null) {
-            eagerSession.close();
+        TFE_Context handle = eagerSessionHandle.getAndSet(null);
+        if (handle != null && !handle.isNull()) {
+            handle.close();
         }
     }
 
