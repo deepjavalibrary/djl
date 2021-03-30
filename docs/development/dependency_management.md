@@ -38,7 +38,7 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [bom](../../bom/README.md) | Bill of Materials (BOM), used to manage DJL package dependencies |
 | | [basicdataset](../../basicdataset/README.md#installation) | Contains a collection of built-in datasets |
 | | [model-zoo](../../model-zoo/README.md#installation) | Contains a collection of built-in engine-agnostic models |
-| | [serving](../../serving/README.md#installation) | Contains an universal model server implementation |
+| | [serving](../../serving/serving/README.md#installation) | Contains an universal model server implementation |
 | | examples (deprecated) | Contains DJL examples |
 | | repository (deprecated, use api instead) | Contain classes for DJL Repository API. The package is moved into api in newer releases |
 | | | |

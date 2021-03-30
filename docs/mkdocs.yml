@@ -131,9 +131,9 @@ nav:
         - Model Serving on AWS BeanStalk EC2: 'docs/demos/aws/beanstalk-model-serving/README.md'
         - Serverless Model Serving with DJL: 'docs/demos/aws/lambda-model-serving/README.md'
         - Distributed inference with AWS EMR: 'docs/demos/aws/emr-distributed-inference/dataprocess/README.md'
-        - Start with SageMaker Notebook: 'docs/demos/aws/sagemaker-notebook/README.md'
+        - Start with SageMaker: 'docs/demos/aws/sagemaker/README.md'
     - Android:
-        - Doodledraw Applications with Android: 'docs/demos/android/README.md'
+        - Doodledraw Applications with Android: 'docs/demos/android/pytorch_android/README.md'
     - EcoSystem:
         - Java Integrations:
             - DJL Component in Apache Camel: 'docs/demos/camel-djl/README.md'

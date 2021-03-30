@@ -105,14 +105,12 @@ public final class TrainSentimentAnalysis {
             paddingTokenValue =
                     modelZooTextEmbedding
                             .preprocessTextToEmbed(Collections.singletonList("<unk>"))[0];
-            StanfordMovieReview trainingSet =
-                    getDataset(Dataset.Usage.TRAIN, executorService, arguments);
-            StanfordMovieReview validateSet =
-                    getDataset(Dataset.Usage.TEST, executorService, arguments);
+            StanfordMovieReview trainingSet = getDataset(Dataset.Usage.TRAIN, arguments);
+            StanfordMovieReview validateSet = getDataset(Dataset.Usage.TEST, arguments);
             model.setBlock(getModel(modelZooTextEmbedding));
 
             // setup training configuration
-            DefaultTrainingConfig config = setupTrainingConfig(arguments);
+            DefaultTrainingConfig config = setupTrainingConfig(arguments, executorService);
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
                 Shape encoderInputShape = new Shape(arguments.getBatchSize(), 10);
@@ -169,7 +167,8 @@ public final class TrainSentimentAnalysis {
                 .add(Linear.builder().setUnits(2).build());
     }
 
-    public static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
+    public static DefaultTrainingConfig setupTrainingConfig(
+            Arguments arguments, ExecutorService executorService) {
         String outputDir = arguments.getOutputDir();
         SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir);
         listener.setSaveModelCallback(
@@ -184,12 +183,12 @@ public final class TrainSentimentAnalysis {
         return new DefaultTrainingConfig(new SoftmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                .optExecutorService(executorService)
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }
 
-    public static StanfordMovieReview getDataset(
-            Dataset.Usage usage, ExecutorService executorService, Arguments arguments)
+    public static StanfordMovieReview getDataset(Dataset.Usage usage, Arguments arguments)
             throws IOException, TranslateException {
         StanfordMovieReview stanfordMovieReview =
                 StanfordMovieReview.builder()
@@ -205,7 +204,7 @@ public final class TrainSentimentAnalysis {
                         .setSourceConfiguration(
                                 new TextData.Configuration().setTextProcessors(TEXT_PROCESSORS))
                         .optUsage(usage)
-                        .optExecutor(executorService, 8)
+                        .optPrefetchNumber(8)
                         .optLimit(arguments.getLimit())
                         .build();
         stanfordMovieReview.prepare(new ProgressBar());
@@ -234,7 +233,7 @@ public final class TrainSentimentAnalysis {
             for (TextProcessor processor : TEXT_PROCESSORS) {
                 tokens = processor.preprocess(tokens);
             }
-            NDArray array = textEmbedding.embedText(manager, tokens);
+            NDArray array = manager.create(textEmbedding.preprocessTextToEmbed(tokens));
             return new NDList(array);
         }
 
@@ -243,7 +242,7 @@ public final class TrainSentimentAnalysis {
         public Batchifier getBatchifier() {
             return PaddingStackBatchifier.builder()
                     .optIncludeValidLengths(false)
-                    .addPad(0, 0, m -> m.ones(new Shape(1, 50)).mul(paddingTokenValue))
+                    .addPad(0, 0, m -> m.ones(new Shape(1)).mul(paddingTokenValue))
                     .build();
         }
     }

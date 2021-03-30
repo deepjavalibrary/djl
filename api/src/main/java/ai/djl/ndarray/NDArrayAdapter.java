@@ -107,13 +107,7 @@ public interface NDArrayAdapter extends NDArray {
 
     /** {@inheritDoc} */
     @Override
-    default void attachGradient() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default void attachGradient(SparseFormat sparseFormat) {
+    default void setRequiresGradient(boolean requiresGrad) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
@@ -786,6 +780,12 @@ public interface NDArrayAdapter extends NDArray {
     /** {@inheritDoc} */
     @Override
     default NDArray cumSum(int axis) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    default void intern(NDArray replaced) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 

@@ -57,7 +57,7 @@ public class GradientCollectorIntegrationTest {
                     NDArray rhs = manager.create(new float[] {2, 3, -4}, new Shape(3, 1));
                     NDArray expected =
                             manager.create(new float[] {2, 3, -4, 2, 3, -4}, new Shape(2, 3));
-                    lhs.attachGradient();
+                    lhs.setRequiresGradient(true);
                     // autograd automatically set recording and training during initialization
 
                     NDArray result = NDArrays.dot(lhs, rhs);

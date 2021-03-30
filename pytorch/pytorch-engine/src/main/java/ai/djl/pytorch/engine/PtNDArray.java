@@ -156,19 +156,9 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void attachGradient() {
-        attachGradient(null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attachGradient(SparseFormat sparseFormat) {
-        if (sparseFormat != null && !sparseFormat.equals(SparseFormat.DENSE)) {
-            throw new UnsupportedOperationException(
-                    "Sparse NDArray gradient atttach not supported");
-        }
-        JniUtils.attachGradient(this);
-        hasGradient = true;
+    public void setRequiresGradient(boolean requiresGrad) {
+        JniUtils.attachGradient(this, requiresGrad);
+        hasGradient = requiresGrad;
     }
 
     /** {@inheritDoc} */
@@ -1120,6 +1110,16 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public void intern(NDArray replaced) {
+        PtNDArray arr = (PtNDArray) replaced;
+        Long oldHandle = handle.getAndSet(arr.handle.getAndSet(null));
+        JniUtils.deleteNDArray(oldHandle);
+        // dereference old ndarray
+        arr.close();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray isInfinite() {
         return JniUtils.isInf(this);
     }
@@ -1449,9 +1449,8 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         Long pointer = handle.getAndSet(null);
         if (pointer != null) {
             JniUtils.deleteNDArray(pointer);
-            manager.detachInternal(getUid());
-            manager = null;
-            dataRef = null;
         }
+        manager.detachInternal(getUid());
+        dataRef = null;
     }
 }

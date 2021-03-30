@@ -14,7 +14,6 @@ package ai.djl.tensorflow.engine;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.index.NDArrayIndexer;
-import ai.djl.ndarray.index.dim.NDIndexBooleans;
 import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
 import java.util.Arrays;
@@ -51,7 +50,7 @@ public class TfNDArrayIndexer extends NDArrayIndexer {
                     Arrays.stream(toSqueeze).mapToLong(i -> i).boxed().collect(Collectors.toList());
             sliced = tf.squeeze(sliced, Squeeze.axis(squeeze));
         }
-        try (Tensor<?> tensor = sliced.asTensor()) {
+        try (Tensor tensor = sliced.asTensor()) {
             return new TfNDArray(array.getManager(), tensor);
         }
     }
@@ -59,12 +58,6 @@ public class TfNDArrayIndexer extends NDArrayIndexer {
     /** {@inheritDoc} */
     @Override
     public void set(NDArray array, NDIndexFullSlice fullSlice, NDArray value) {
-        throw new UnsupportedOperationException("Tensor cannot be modified after creation");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(NDArray array, NDIndexBooleans indices, NDArray value) {
         throw new UnsupportedOperationException("Tensor cannot be modified after creation");
     }
 

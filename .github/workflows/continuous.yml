@@ -20,6 +20,7 @@ on:
 
 jobs:
   build:
+    if: github.repository == 'awslabs/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -113,7 +114,7 @@ jobs:
         if: always()
         with:
           name: serving
-          path: serving/build/reports
+          path: serving/serving/build/reports
       - name: tensorflow-engine test results
         uses: actions/upload-artifact@v1
         if: always()
@@ -137,6 +138,7 @@ jobs:
 
   # Windows platform for testing hybrid engines
   build-windows:
+    if: github.repository == 'awslabs/djl'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1

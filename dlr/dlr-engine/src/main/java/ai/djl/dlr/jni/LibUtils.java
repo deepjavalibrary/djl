@@ -119,7 +119,7 @@ public final class LibUtils {
                 return cacheDir.toAbsolutePath().toString();
             }
 
-            Path dlrCacheRoot = getCacheDir();
+            Path dlrCacheRoot = Utils.getEngineCacheDir("dlr");
             Files.createDirectories(dlrCacheRoot);
             tmp = Files.createTempDirectory(dlrCacheRoot, "tmp");
             for (String file : platform.getLibraries()) {
@@ -234,7 +234,7 @@ public final class LibUtils {
             return cacheDir.toAbsolutePath().toString();
         }
         // if files not found
-        Path dlrCacheRoot = getCacheDir();
+        Path dlrCacheRoot = Utils.getEngineCacheDir("dlr");
         Files.createDirectories(dlrCacheRoot);
 
         Matcher matcher = VERSION_PATTERN.matcher(version);
@@ -279,24 +279,6 @@ public final class LibUtils {
         }
     }
 
-    private static Path getCacheDir() {
-        String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
-        if (cacheDir == null || cacheDir.isEmpty()) {
-            cacheDir = System.getenv("ENGINE_CACHE_DIR");
-            if (cacheDir == null || cacheDir.isEmpty()) {
-                cacheDir = System.getProperty("DJL_CACHE_DIR");
-                if (cacheDir == null || cacheDir.isEmpty()) {
-                    cacheDir = System.getenv("DJL_CACHE_DIR");
-                    if (cacheDir == null || cacheDir.isEmpty()) {
-                        String userHome = System.getProperty("user.home");
-                        return Paths.get(userHome, ".djl.ai").resolve("dlr");
-                    }
-                }
-            }
-        }
-        return Paths.get(cacheDir, "dlr");
-    }
-
     private static Path getCacheDir(Platform platform) {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
@@ -304,7 +286,7 @@ public final class LibUtils {
             flavor = "cpu";
         }
         String classifier = platform.getClassifier();
-        Path cacheDir = getCacheDir();
+        Path cacheDir = Utils.getEngineCacheDir("dlr");
         logger.debug("Using cache dir: {}", cacheDir);
         return cacheDir.resolve(version + '-' + flavor + '-' + classifier);
     }

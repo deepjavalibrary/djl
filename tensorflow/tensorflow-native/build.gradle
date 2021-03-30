@@ -13,11 +13,11 @@ configurations {
 }
 
 dependencies {
-    download "org.tensorflow:tensorflow-core-api:0.2.0:linux-x86_64-gpu"
-    download "org.tensorflow:tensorflow-core-api:0.2.0:linux-x86_64"
-    download "org.tensorflow:tensorflow-core-api:0.2.0:macosx-x86_64"
-    download "org.tensorflow:tensorflow-core-api:0.2.0:windows-x86_64"
-    download "org.tensorflow:tensorflow-core-api:0.2.0:windows-x86_64-gpu"
+    download "org.tensorflow:tensorflow-core-api:0.3.0:linux-x86_64-gpu"
+    download "org.tensorflow:tensorflow-core-api:0.3.0:linux-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.3.0:macosx-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.3.0:windows-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.3.0:windows-x86_64-gpu"
     /*
     download("org.bytedeco:mkl-dnn:${mkl_dnn_version}:macosx-x86_64") {
         exclude group: "org.bytedeco", module: "javacpp"

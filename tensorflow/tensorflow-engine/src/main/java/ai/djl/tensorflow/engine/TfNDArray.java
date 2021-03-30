@@ -22,6 +22,7 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.util.Pair;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -69,7 +70,7 @@ public class TfNDArray implements NDArray {
     private TfNDArrayEx tfNDArrayEx;
     private DataType dataType;
 
-    TfNDArray(NDManager manager, Tensor<?> tensor) {
+    TfNDArray(NDManager manager, Tensor tensor) {
         this.manager = (TfNDManager) manager;
         this.tf = this.manager.getTf();
         uid = UUID.randomUUID().toString();
@@ -85,7 +86,7 @@ public class TfNDArray implements NDArray {
                         .output(0);
         // cache shape and data type information so we can close tensor later
         this.shape = new Shape(tensor.shape().asArray());
-        this.dataType = TfDataType.fromTf(tensor.dataType());
+        this.dataType = TfDataType.fromProtoType(tensor.dataType());
         tfNDArrayEx = new TfNDArrayEx(this);
     }
 
@@ -152,22 +153,18 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
-        Operand<?> output = tf.dtypes.cast(getOperand(), TfDataType.toTf(dataType));
+        Operand<?> output = tf.dtypes.cast(getOperand(), TfDataType.toClassType(dataType));
         if (copy) {
             output = tf.deepCopy(output);
         }
-        try (Tensor<?> tensor = output.asTensor()) {
+        try (Tensor tensor = output.asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
 
     /** {@inheritDoc} */
     @Override
-    public void attachGradient() {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void attachGradient(SparseFormat sparseFormat) {}
+    public void setRequiresGradient(boolean requiresGrad) {}
 
     /** {@inheritDoc} */
     @Override
@@ -195,8 +192,8 @@ public class TfNDArray implements NDArray {
                     "DataType mismatch, Required double" + " Actual " + getDataType());
         }
         double[] result = new double[(int) getShape().size()];
-        try (Tensor<?> tensor = operand.asTensor()) {
-            tensor.rawData().asDoubles().read(result);
+        try (Tensor tensor = operand.asTensor()) {
+            tensor.asRawTensor().data().asDoubles().read(result);
         }
         return result;
     }
@@ -209,8 +206,8 @@ public class TfNDArray implements NDArray {
                     "DataType mismatch, Required float, Actual " + getDataType());
         }
         float[] result = new float[(int) getShape().size()];
-        try (Tensor<?> tensor = operand.asTensor()) {
-            tensor.rawData().asFloats().read(result);
+        try (Tensor tensor = operand.asTensor()) {
+            tensor.asRawTensor().data().asFloats().read(result);
         }
         return result;
     }
@@ -223,8 +220,8 @@ public class TfNDArray implements NDArray {
                     "DataType mismatch, Required int" + " Actual " + getDataType());
         }
         int[] result = new int[(int) getShape().size()];
-        try (Tensor<?> tensor = operand.asTensor()) {
-            tensor.rawData().asInts().read(result);
+        try (Tensor tensor = operand.asTensor().asRawTensor()) {
+            tensor.asRawTensor().data().asInts().read(result);
         }
         return result;
     }
@@ -237,8 +234,8 @@ public class TfNDArray implements NDArray {
                     "DataType mismatch, Required long" + " Actual " + getDataType());
         }
         long[] result = new long[(int) getShape().size()];
-        try (Tensor<?> tensor = operand.asTensor()) {
-            tensor.rawData().asLongs().read(result);
+        try (Tensor tensor = operand.asTensor().asRawTensor()) {
+            tensor.asRawTensor().data().asLongs().read(result);
         }
         return result;
     }
@@ -251,8 +248,8 @@ public class TfNDArray implements NDArray {
                     "DataType mismatch, Required boolean" + " Actual " + getDataType());
         }
         boolean[] result = new boolean[(int) getShape().size()];
-        try (Tensor<?> tensor = operand.asTensor()) {
-            tensor.rawData().asBooleans().read(result);
+        try (Tensor tensor = operand.asTensor().asRawTensor()) {
+            tensor.asRawTensor().data().asBooleans().read(result);
         }
         return result;
     }
@@ -272,8 +269,8 @@ public class TfNDArray implements NDArray {
         long product = sh.size();
         long len = dType.getNumOfBytes() * product;
         byte[] buf = new byte[Math.toIntExact(len)];
-        try (Tensor<?> tensor = operand.asTensor()) {
-            tensor.rawData().read(buf);
+        try (Tensor tensor = operand.asTensor().asRawTensor()) {
+            tensor.asRawTensor().data().read(buf);
         }
         return ByteBuffer.wrap(buf);
     }
@@ -323,7 +320,7 @@ public class TfNDArray implements NDArray {
         ((TfNDArray) ndArray).operand = tf.deepCopy(getOperand()).asOutput();
         ((TfNDArray) ndArray).dataType = getDataType();
         ((TfNDArray) ndArray).shape =
-                new Shape(getShape().stream().mapToLong(pair -> pair.getKey()).toArray());
+                new Shape(getShape().stream().mapToLong(Pair::getKey).toArray());
     }
 
     /** {@inheritDoc} */
@@ -340,7 +337,7 @@ public class TfNDArray implements NDArray {
                 return manager.create(new Shape());
             }
         }
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.gather(
                                 getOperand(),
                                 tf.squeeze(
@@ -367,7 +364,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray zerosLike() {
-        try (Tensor<?> tensor = tf.zerosLike(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.zerosLike(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -375,7 +372,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray onesLike() {
-        try (Tensor<?> tensor = tf.onesLike(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.onesLike(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -415,7 +412,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray eq(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.equal(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -432,7 +429,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray neq(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.notEqual(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -449,7 +446,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gt(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.greater(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -466,7 +463,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gte(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.greaterEqual(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -483,7 +480,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lt(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.less(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -500,7 +497,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lte(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.lessEqual(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -510,9 +507,9 @@ public class TfNDArray implements NDArray {
     @Override
     public NDArray all() {
         // TF takes bool for reduce and INT64 for indices
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.reduceAll(
-                                tf.dtypes.cast(getOperand(), TBool.DTYPE),
+                                tf.dtypes.cast(getOperand(), TBool.class),
                                 tf.range(
                                         tf.constant(0L),
                                         tf.constant((long) getRank()),
@@ -526,9 +523,9 @@ public class TfNDArray implements NDArray {
     @Override
     public NDArray any() {
         // TF takes bool for reduce and INT64 for indices
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.reduceAny(
-                                tf.dtypes.cast(getOperand(), TBool.DTYPE),
+                                tf.dtypes.cast(getOperand(), TBool.class),
                                 tf.range(
                                         tf.constant(0L),
                                         tf.constant((long) getRank()),
@@ -541,7 +538,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray erfinv() {
-        try (Tensor<?> tensor = tf.math.erfinv(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.erfinv(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -555,14 +552,14 @@ public class TfNDArray implements NDArray {
             throw new UnsupportedOperationException("float64 is not supported");
         }
         TfNDArray flattenTensor = (TfNDArray) flatten();
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.linalg.euclideanNorm(flattenTensor.getOperand(), tf.constant(0)).asTensor()) {
             // close the temp NDArray
             flattenTensor.close();
             if (!keepDims) {
                 return new TfNDArray(manager, tensor);
             } else {
-                float number = tensor.rawData().asFloats().getFloat(0);
+                float number = tensor.asRawTensor().data().asFloats().getFloat(0);
                 // Keeping dimensions but with shape 1
                 long[] shapes = LongStream.generate(() -> 1).limit(shape.dimension()).toArray();
                 return manager.create(new float[] {number}, new Shape(shapes));
@@ -576,7 +573,7 @@ public class TfNDArray implements NDArray {
         if (ord != 2) {
             throw new UnsupportedOperationException("Only ord=2 is supported");
         }
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.linalg
                         .euclideanNorm(
                                 getOperand(), tf.constant(axes), EuclideanNorm.keepDims(keepDims))
@@ -588,7 +585,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray oneHot(int depth, float onValue, float offValue, DataType dataType) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.oneHot(
                                 getOperand(),
                                 tf.constant(depth),
@@ -611,7 +608,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray add(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.add(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -628,7 +625,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sub(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.sub(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -645,7 +642,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mul(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.mul(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -662,7 +659,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray div(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.div(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -679,7 +676,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mod(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.mod(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -696,7 +693,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray pow(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.pow(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -713,7 +710,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray maximum(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.maximum(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -730,7 +727,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray minimum(NDArray other) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.minimum(getOperand(), ((TfNDArray) other).getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -854,7 +851,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sign() {
-        try (Tensor<?> tensor = tf.math.sign(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.sign(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -868,7 +865,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray neg() {
-        try (Tensor<?> tensor = tf.math.neg(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.neg(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -882,7 +879,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray abs() {
-        try (Tensor<?> tensor = tf.math.abs(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.abs(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -890,7 +887,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray square() {
-        try (Tensor<?> tensor = tf.math.square(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.square(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -898,7 +895,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sqrt() {
-        try (Tensor<?> tensor = tf.math.sqrt(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.sqrt(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -906,7 +903,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray cbrt() {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.pow(getOperand(), toConstant(1f / 3, getDataType())).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -915,7 +912,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray floor() {
-        try (Tensor<?> tensor = tf.math.floor(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.floor(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -923,7 +920,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray ceil() {
-        try (Tensor<?> tensor = tf.math.ceil(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.ceil(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -931,7 +928,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray round() {
-        try (Tensor<?> tensor = tf.math.round(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.round(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -945,7 +942,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray exp() {
-        try (Tensor<?> tensor = tf.math.exp(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.exp(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -953,7 +950,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray log() {
-        try (Tensor<?> tensor = tf.math.log(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.log(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -961,7 +958,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray log10() {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math
                         .div(tf.math.log(getOperand()), tf.math.log(toConstant(10, getDataType())))
                         .asTensor()) {
@@ -972,7 +969,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray log2() {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math
                         .div(tf.math.log(getOperand()), tf.math.log(toConstant(2, getDataType())))
                         .asTensor()) {
@@ -983,7 +980,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sin() {
-        try (Tensor<?> tensor = tf.math.sin(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.sin(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -991,7 +988,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray cos() {
-        try (Tensor<?> tensor = tf.math.cos(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.cos(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -999,7 +996,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray tan() {
-        try (Tensor<?> tensor = tf.math.tan(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.tan(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1007,7 +1004,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray asin() {
-        try (Tensor<?> tensor = tf.math.asin(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.asin(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1015,7 +1012,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray acos() {
-        try (Tensor<?> tensor = tf.math.acos(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.acos(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1023,7 +1020,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray atan() {
-        try (Tensor<?> tensor = tf.math.atan(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.atan(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1031,7 +1028,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sinh() {
-        try (Tensor<?> tensor = tf.math.sinh(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.sinh(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1039,7 +1036,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray cosh() {
-        try (Tensor<?> tensor = tf.math.cosh(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.cosh(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1047,7 +1044,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray tanh() {
-        try (Tensor<?> tensor = tf.math.tanh(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.tanh(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1055,7 +1052,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray asinh() {
-        try (Tensor<?> tensor = tf.math.asinh(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.asinh(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1063,7 +1060,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray acosh() {
-        try (Tensor<?> tensor = tf.math.acosh(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.acosh(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1071,7 +1068,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray atanh() {
-        try (Tensor<?> tensor = tf.math.atanh(getOperand()).asTensor()) {
+        try (Tensor tensor = tf.math.atanh(getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1091,7 +1088,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray max() {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.max(getOperand(), ((TfNDArray) manager.arange(0, getRank(), 1)).getOperand())
                         .asTensor()) {
             return new TfNDArray(manager, tensor);
@@ -1101,7 +1098,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray max(int[] axes, boolean keepDims) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.max(getOperand(), tf.constant(axes), Max.keepDims(keepDims)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -1110,7 +1107,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray min() {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.min(getOperand(), ((TfNDArray) manager.arange(0, getRank(), 1)).getOperand())
                         .asTensor()) {
             return new TfNDArray(manager, tensor);
@@ -1120,7 +1117,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray min(int[] axes, boolean keepDims) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.min(getOperand(), tf.constant(axes), Min.keepDims(keepDims)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -1134,11 +1131,11 @@ public class TfNDArray implements NDArray {
         Operand op;
         // tf can't sum boolean values
         if (getDataType() == DataType.BOOLEAN) {
-            op = tf.dtypes.cast(getOperand(), TInt64.DTYPE);
+            op = tf.dtypes.cast(getOperand(), TInt64.class);
         } else {
             op = getOperand();
         }
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.sum(
                                 op,
                                 tf.range(
@@ -1153,7 +1150,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sum(int[] axes, boolean keepDims) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.sum(
                                 getOperand(),
                                 ((TfNDArray) manager.create(axes)).getOperand(),
@@ -1166,7 +1163,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray prod() {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.prod(
                                 getOperand(),
                                 tf.range(
@@ -1181,7 +1178,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray prod(int[] axes, boolean keepDims) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.prod(getOperand(), tf.constant(axes), Prod.keepDims(keepDims))
                         .asOutput()
                         .asTensor()) {
@@ -1193,7 +1190,7 @@ public class TfNDArray implements NDArray {
     @Override
     public NDArray mean() {
         try (TfNDArray array = ((TfNDArray) manager.arange(0, getRank(), 1));
-                Tensor<?> tensor = tf.math.mean(getOperand(), array.getOperand()).asTensor()) {
+                Tensor tensor = tf.math.mean(getOperand(), array.getOperand()).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1201,7 +1198,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mean(int[] axes, boolean keepDims) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math.mean(getOperand(), tf.constant(axes), Mean.keepDims(keepDims)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -1299,7 +1296,7 @@ public class TfNDArray implements NDArray {
                         (long) sizes.size())
                 .forEach(
                         output -> {
-                            try (Tensor<?> tensor = output.asTensor()) {
+                            try (Tensor tensor = output.asTensor()) {
                                 result.add(new TfNDArray(manager, tensor));
                             }
                         });
@@ -1315,8 +1312,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray reshape(Shape shape) {
-        try (Tensor<?> tensor =
-                tf.reshape(getOperand(), tf.constant(shape.getShape())).asTensor()) {
+        try (Tensor tensor = tf.reshape(getOperand(), tf.constant(shape.getShape())).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1324,7 +1320,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray expandDims(int axis) {
-        try (Tensor<?> tensor = tf.expandDims(getOperand(), tf.constant(axis)).asTensor()) {
+        try (Tensor tensor = tf.expandDims(getOperand(), tf.constant(axis)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1335,7 +1331,7 @@ public class TfNDArray implements NDArray {
         if (isScalar()) {
             axes = new int[0];
         }
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.squeeze(
                                 getOperand(),
                                 Squeeze.axis(
@@ -1351,11 +1347,11 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray logicalAnd(NDArray n) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math
                         .logicalAnd(
-                                tf.dtypes.cast(getOperand(), TBool.DTYPE),
-                                tf.dtypes.cast(((TfNDArray) n).getOperand(), TBool.DTYPE))
+                                tf.dtypes.cast(getOperand(), TBool.class),
+                                tf.dtypes.cast(((TfNDArray) n).getOperand(), TBool.class))
                         .asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -1364,11 +1360,11 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray logicalOr(NDArray n) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.math
                         .logicalOr(
-                                tf.dtypes.cast(getOperand(), TBool.DTYPE),
-                                tf.dtypes.cast(((TfNDArray) n).getOperand(), TBool.DTYPE))
+                                tf.dtypes.cast(getOperand(), TBool.class),
+                                tf.dtypes.cast(((TfNDArray) n).getOperand(), TBool.class))
                         .asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -1383,8 +1379,8 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray logicalNot() {
-        try (Tensor<?> tensor =
-                tf.math.logicalNot(tf.dtypes.cast(getOperand(), TBool.DTYPE)).asTensor()) {
+        try (Tensor tensor =
+                tf.math.logicalNot(tf.dtypes.cast(getOperand(), TBool.class)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1445,7 +1441,7 @@ public class TfNDArray implements NDArray {
         }
         if (returnIndices) {
             // always return long as indices type
-            result = tf.dtypes.cast(topK.indices(), TInt64.DTYPE);
+            result = tf.dtypes.cast(topK.indices(), TInt64.class);
         } else {
             result = topK.values();
         }
@@ -1457,7 +1453,7 @@ public class TfNDArray implements NDArray {
         if (ascending && !returnIndices) {
             result = tf.math.neg(result);
         }
-        try (Tensor<?> tensor = result.asTensor()) {
+        try (Tensor tensor = result.asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1465,7 +1461,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray softmax(int axis) {
-        try (Tensor<?> tensor = softmaxHelper(axis, false).asTensor()) {
+        try (Tensor tensor = softmaxHelper(axis, false).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1473,7 +1469,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray logSoftmax(int axis) {
-        try (Tensor<?> tensor = softmaxHelper(axis, true).asTensor()) {
+        try (Tensor tensor = softmaxHelper(axis, true).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1529,7 +1525,7 @@ public class TfNDArray implements NDArray {
         if (Arrays.stream(getShape().getShape()).anyMatch(dim -> dim == 0L)) {
             return manager.create(new Shape(0));
         }
-        try (Tensor<?> tensor = tf.math.cumsum(getOperand(), tf.constant(axis)).asTensor()) {
+        try (Tensor tensor = tf.math.cumsum(getOperand(), tf.constant(axis)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1542,9 +1538,14 @@ public class TfNDArray implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public void intern(NDArray replaced) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray isInfinite() {
-        try (Tensor<?> tensor =
-                tf.dtypes.cast(tf.math.isInf(getOperand()), TBool.DTYPE).asTensor()) {
+        try (Tensor tensor = tf.dtypes.cast(tf.math.isInf(getOperand()), TBool.class).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1552,8 +1553,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray isNaN() {
-        try (Tensor<?> tensor =
-                tf.dtypes.cast(tf.math.isNan(getOperand()), TBool.DTYPE).asTensor()) {
+        try (Tensor tensor = tf.dtypes.cast(tf.math.isNan(getOperand()), TBool.class).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1578,7 +1578,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray tile(long[] repeats) {
-        try (Tensor<?> tensor = tf.tile(getOperand(), tf.constant(repeats)).asTensor()) {
+        try (Tensor tensor = tf.tile(getOperand(), tf.constant(repeats)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1627,7 +1627,7 @@ public class TfNDArray implements NDArray {
             throw new IllegalArgumentException("scalar is not allowed for matMul()");
         }
         if (getShape().dimension() > 2 || other.getShape().dimension() > 2) {
-            try (Tensor<?> tensor =
+            try (Tensor tensor =
                     tf.train
                             .batchMatMul(getOperand(), ((TfNDArray) other).getOperand())
                             .asTensor()) {
@@ -1649,7 +1649,7 @@ public class TfNDArray implements NDArray {
                             tf.constant(new long[] {1L, getShape().get(0)}));
             broadcast = true;
         }
-        try (Tensor<?> tensor = tf.linalg.matMul(lhs, rhs).asTensor()) {
+        try (Tensor tensor = tf.linalg.matMul(lhs, rhs).asTensor()) {
             TfNDArray result = new TfNDArray(manager, tensor);
             if (broadcast) {
                 return result.squeeze();
@@ -1662,7 +1662,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray clip(Number min, Number max) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.clipByValue(
                                 getOperand(),
                                 toConstant(min, getDataType()),
@@ -1675,7 +1675,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray flip(int... axes) {
-        try (Tensor<?> tensor = tf.reverse(getOperand(), tf.constant(axes)).asTensor()) {
+        try (Tensor tensor = tf.reverse(getOperand(), tf.constant(axes)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1702,7 +1702,7 @@ public class TfNDArray implements NDArray {
                     "You must include each of the dimensions from 0 until "
                             + getShape().dimension());
         }
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.linalg.transpose(getOperand(), tf.constant(dimensions)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -1711,7 +1711,7 @@ public class TfNDArray implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray broadcast(Shape shape) {
-        try (Tensor<?> tensor =
+        try (Tensor tensor =
                 tf.broadcastTo(getOperand(), tf.constant(shape.getShape())).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
@@ -1732,7 +1732,7 @@ public class TfNDArray implements NDArray {
         if (isScalar()) {
             return manager.create(0L);
         }
-        try (Tensor<?> tensor = tf.math.argMax(getOperand(), tf.constant(axis)).asTensor()) {
+        try (Tensor tensor = tf.math.argMax(getOperand(), tf.constant(axis)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1752,7 +1752,7 @@ public class TfNDArray implements NDArray {
         if (isScalar()) {
             return manager.create(0L);
         }
-        try (Tensor<?> tensor = tf.math.argMin(getOperand(), tf.constant(axis)).asTensor()) {
+        try (Tensor tensor = tf.math.argMin(getOperand(), tf.constant(axis)).asTensor()) {
             return new TfNDArray(manager, tensor);
         }
     }
@@ -1848,7 +1848,7 @@ public class TfNDArray implements NDArray {
         }
     }
 
-    public Tensor<?> getTensor() {
+    public Tensor getTensor() {
         return operand.asTensor();
     }
 
@@ -1857,9 +1857,7 @@ public class TfNDArray implements NDArray {
     }
 
     int getRank() {
-        try (Tensor<?> tensor = tf.rank(getOperand()).asOutput().tensor()) {
-            return tensor.rawData().asInts().getInt(0);
-        }
+        return getShape().dimension();
     }
 
     private <T extends TType> Constant<T> toConstant(Number n, DataType jType) {

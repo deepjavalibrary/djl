@@ -25,7 +25,7 @@ import ai.djl.nn.transformer.BertBlock;
 import ai.djl.nn.transformer.BertPretrainingBlock;
 import ai.djl.nn.transformer.BertPretrainingLoss;
 import ai.djl.training.DefaultTrainingConfig;
-import ai.djl.training.ParallelTrain;
+import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.TrainingResult;
@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -105,7 +106,6 @@ public final class TrainBertOnCode {
                 // Initialize training
                 Shape inputShape = new Shape(MAX_SEQUENCE_LENGTH, 512);
                 trainer.initialize(inputShape, inputShape, inputShape, inputShape);
-                ParallelTrain parallelTrain = new ParallelTrain(trainer.getDevices());
 
                 trainer.notifyListeners(listener -> listener.onTrainingBegin(trainer));
                 for (int epoch = 0; epoch < arguments.getEpoch(); ++epoch) {
@@ -117,10 +117,7 @@ public final class TrainBertOnCode {
                                     maskedInstances.subList(idx - BATCH_SIZE, idx);
                             Batch batch =
                                     createBatch(ndManager, batchData, idx, maskedInstances.size());
-                            // the following uses the GPUs alternating
-                            // EasyTrain.trainBatch(trainer, batch);
-                            // this actually uses both GPUs at once
-                            parallelTrain.trainBatch(trainer, batch);
+                            EasyTrain.trainBatch(trainer, batch);
                         }
                     }
                     trainer.notifyListeners(listener -> listener.onEpoch(trainer));
@@ -164,6 +161,7 @@ public final class TrainBertOnCode {
                 new DefaultTrainingConfig(new BertPretrainingLoss())
                         .optOptimizer(optimizer)
                         .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                        .optExecutorService(ForkJoinPool.commonPool())
                         .addTrainingListeners(Defaults.logging());
         return model.newTrainer(trainingConfig);
     }

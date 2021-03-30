@@ -24,6 +24,7 @@ import ai.djl.util.PairList;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Predicate;
 
 /** An interface that is responsible for holding the configuration required by fastText training. */
@@ -263,6 +264,12 @@ public class FtTrainingConfig implements TrainingConfig {
     /** {@inheritDoc} */
     @Override
     public Loss getLossFunction() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ExecutorService getExecutorService() {
         return null;
     }
 

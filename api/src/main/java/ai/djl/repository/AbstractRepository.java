@@ -141,16 +141,7 @@ public abstract class AbstractRepository implements Repository {
     /** {@inheritDoc} */
     @Override
     public Path getCacheDirectory() throws IOException {
-        String cacheDir = System.getProperty("DJL_CACHE_DIR");
-        if (cacheDir == null || cacheDir.isEmpty()) {
-            cacheDir = System.getenv("DJL_CACHE_DIR");
-            if (cacheDir == null || cacheDir.isEmpty()) {
-                String userHome = System.getProperty("user.home");
-                cacheDir = userHome + "/.djl.ai/cache";
-            }
-        }
-
-        Path dir = Paths.get(cacheDir, "repo");
+        Path dir = Utils.getCacheDir().resolve("cache/repo");
         if (Files.notExists(dir)) {
             Files.createDirectories(dir);
         } else if (!Files.isDirectory(dir)) {

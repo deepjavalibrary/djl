@@ -77,6 +77,30 @@ jobs:
         with:
           name: mxnet-model-zoo
           path: mxnet/mxnet-model-zoo/build/reports
+      - name: onnxruntime/onnxruntime-engine test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: onnxruntime
+          path: onnxruntime/onnxruntime-engine/build/reports
+      - name: pytorch-engine test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: pytorch-engine
+          path: pytorch/pytorch-engine/build/reports
+      - name: tensorflow-engine test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: tensorflow-engine
+          path: tensorflow/tensorflow-engine/build/reports
+      - name: tensorflow-model-zoo test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: tensorflow-model-zoo
+          path: tensorflow/tensorflow-model-zoo/build/reports
 
   test-pytorch:
     if: github.repository == 'awslabs/djl'
@@ -142,18 +166,36 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Publish to snapshot repository
+        if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
         run: |
-          if [${{ github.event.inputs.mode }} == ""]; then
-            ./gradlew publish -Psnapshot
-            cd bom
-            ./gradlew publish -Psnapshot
-          else
-            ./gradlew publish -P${{ github.event.inputs.mode }}
-            cd bom
-            ./gradlew publish -P${{ github.event.inputs.mode }}
-          fi
+          ./gradlew publish -Psnapshot
+          cd bom
+          ./gradlew publish -Psnapshot
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
           ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
           ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
+      - name: Publish to staging repository
+        if: ${{ github.event.inputs.mode == 'staging' }}
+        run: |
+          ./gradlew publish -P${{ github.event.inputs.mode }}
+          cd bom
+          ./gradlew publish -P${{ github.event.inputs.mode }}
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
+          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
+          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Copy files to S3 with the AWS CLI
+        if: ${{ github.event.inputs.mode == 'staging' }}
+        run: |
+          ./gradlew serving:serving:dT -Pstaging
+          aws s3 cp serving/serving/build/distributions/serving-*.tar s3://djl-ai/publish/djl-serving/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/*"

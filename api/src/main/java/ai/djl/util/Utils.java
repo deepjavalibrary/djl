@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -275,7 +276,7 @@ public final class Utils {
                     parameter.getArray().getShape());
             checkNDArrayValues(parameter.getArray(), logger, "weight");
 
-            if (parameter.requireGradient() && checkGradient) {
+            if (parameter.requiresGradient() && checkGradient) {
                 logger.debug("Checking gradient of: {}", parameter.getName());
                 checkNDArrayValues(parameter.getArray().getGradient(), logger, "grad");
             }
@@ -301,5 +302,51 @@ public final class Utils {
         logger.debug("{} max: {}", prefix, array.max().getFloat());
         logger.debug("{} min: {}", prefix, array.min().getFloat());
         logger.debug("{} shape: {}", prefix, array.getShape().toString());
+    }
+
+    /**
+     * Utility function to get Engine specific cache directory.
+     *
+     * @param engine the engine name
+     * @return DJL engine cache directory
+     */
+    public static Path getEngineCacheDir(String engine) {
+        return getEngineCacheDir().resolve(engine);
+    }
+
+    /**
+     * Utility function to get Engine cache directory.
+     *
+     * @return DJL engine cache directory
+     */
+    public static Path getEngineCacheDir() {
+        String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
+        if (cacheDir == null || cacheDir.isEmpty()) {
+            cacheDir = System.getenv("ENGINE_CACHE_DIR");
+            if (cacheDir == null || cacheDir.isEmpty()) {
+                return getCacheDir();
+            }
+        }
+        return Paths.get(cacheDir);
+    }
+
+    /**
+     * Utility function to get DJL cache directory.
+     *
+     * @return DJL cache directory
+     */
+    public static Path getCacheDir() {
+        String cacheDir = System.getProperty("DJL_CACHE_DIR");
+        if (cacheDir == null || cacheDir.isEmpty()) {
+            cacheDir = System.getenv("DJL_CACHE_DIR");
+            if (cacheDir == null || cacheDir.isEmpty()) {
+                Path dir = Paths.get(System.getProperty("user.home"));
+                if (!Files.isWritable(dir)) {
+                    dir = Paths.get(System.getProperty("java.io.tmpdir"));
+                }
+                return dir.resolve(".djl.ai");
+            }
+        }
+        return Paths.get(cacheDir);
     }
 }

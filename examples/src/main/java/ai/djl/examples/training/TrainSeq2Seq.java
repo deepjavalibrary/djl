@@ -67,8 +67,7 @@ public final class TrainSeq2Seq {
         ExecutorService executorService = Executors.newFixedThreadPool(8);
         try (Model model = Model.newInstance("seq2seqMTEn-Fr")) {
             // get training and validation dataset
-            TextDataset trainingSet =
-                    getDataset(Dataset.Usage.TRAIN, arguments, executorService, null, null);
+            TextDataset trainingSet = getDataset(Dataset.Usage.TRAIN, arguments, null, null);
             // Fetch TextEmbedding from dataset
             TrainableTextEmbedding sourceEmbedding =
                     (TrainableTextEmbedding) trainingSet.getTextEmbedding(true);
@@ -84,7 +83,7 @@ public final class TrainSeq2Seq {
             model.setBlock(block);
 
             // setup training configuration
-            DefaultTrainingConfig config = setupTrainingConfig(arguments);
+            DefaultTrainingConfig config = setupTrainingConfig(arguments, executorService);
 
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
@@ -136,7 +135,8 @@ public final class TrainSeq2Seq {
         return new EncoderDecoder(simpleTextEncoder, simpleTextDecoder);
     }
 
-    public static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
+    public static DefaultTrainingConfig setupTrainingConfig(
+            Arguments arguments, ExecutorService executorService) {
         String outputDir = arguments.getOutputDir();
         SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir);
         listener.setSaveModelCallback(
@@ -151,6 +151,7 @@ public final class TrainSeq2Seq {
         return new DefaultTrainingConfig(new MaskedSoftmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy("Accuracy", 0, 2))
                 .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                .optExecutorService(executorService)
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }
@@ -158,7 +159,6 @@ public final class TrainSeq2Seq {
     public static TextDataset getDataset(
             Dataset.Usage usage,
             Arguments arguments,
-            ExecutorService executorService,
             TextEmbedding sourceEmbedding,
             TextEmbedding targetEmbedding)
             throws IOException, TranslateException {
@@ -178,7 +178,7 @@ public final class TrainSeq2Seq {
                                         .addPad(0, 0, (m) -> m.ones(new Shape(1)), 10)
                                         .build())
                         .optUsage(usage)
-                        .optExecutor(executorService, 8)
+                        .optPrefetchNumber(8)
                         .optLimit(limit);
         Configuration sourceConfig =
                 new Configuration()

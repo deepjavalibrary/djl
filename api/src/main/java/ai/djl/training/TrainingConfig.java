@@ -21,6 +21,7 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.PairList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Predicate;
 
 /**
@@ -48,6 +49,9 @@ import java.util.function.Predicate;
  *       minimize the loss function. There are a variety of optimizers, most of which are variants
  *       of stochastic gradient descent. When you are just starting, you can use the default
  *       optimizer. Later on, customizing the optimizer can result in faster training.
+ *   <li>{@link ExecutorService} - The executorService is used for parallelization when training
+ *       batches on multiple GPUs or loading data from the dataset. If none is provided, all
+ *       operations with be sequential.
  *   <li>{@link TrainingListener} - The training listeners add additional functionality to the
  *       training process through a listener interface. This can include showing training progress,
  *       stopping early if the training fails, or recording performance metrics. We offer several
@@ -86,6 +90,13 @@ public interface TrainingConfig {
      * @return a {@link Loss} function
      */
     Loss getLossFunction();
+
+    /**
+     * Gets the {@link ExecutorService} for parallelization.
+     *
+     * @return an {@link ExecutorService}
+     */
+    ExecutorService getExecutorService();
 
     /**
      * Returns the list of {@link Evaluator}s that should be computed during training.

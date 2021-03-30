@@ -15,7 +15,6 @@ package ai.djl.mxnet.engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.index.NDArrayIndexer;
-import ai.djl.ndarray.index.dim.NDIndexBooleans;
 import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
 import ai.djl.ndarray.types.Shape;
@@ -86,12 +85,6 @@ public class MxNDArrayIndexer extends NDArrayIndexer {
                 toClean.close();
             }
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(NDArray array, NDIndexBooleans indices, NDArray value) {
-        throw new UnsupportedOperationException("Setting with a boolean mask is not yet supported");
     }
 
     /** {@inheritDoc} */

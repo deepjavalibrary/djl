@@ -290,7 +290,7 @@ public final class LibUtils {
         String classifier = platform.getClassifier();
         try {
             String libName = System.mapLibraryName(NATIVE_LIB_NAME);
-            Path cacheDir = getCacheDir();
+            Path cacheDir = Utils.getEngineCacheDir("pytorch");
             logger.debug("Using cache dir: {}", cacheDir);
             Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
             Path path = dir.resolve(libName);
@@ -343,7 +343,7 @@ public final class LibUtils {
         String os = platform.getOsPrefix();
 
         String libName = System.mapLibraryName(NATIVE_LIB_NAME);
-        Path cacheDir = getCacheDir();
+        Path cacheDir = Utils.getEngineCacheDir("pytorch");
         logger.debug("Using cache dir: {}", cacheDir);
         Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
@@ -395,23 +395,5 @@ public final class LibUtils {
                 Utils.deleteQuietly(tmp);
             }
         }
-    }
-
-    private static Path getCacheDir() {
-        String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
-        if (cacheDir == null || cacheDir.isEmpty()) {
-            cacheDir = System.getenv("ENGINE_CACHE_DIR");
-            if (cacheDir == null || cacheDir.isEmpty()) {
-                cacheDir = System.getProperty("DJL_CACHE_DIR");
-                if (cacheDir == null || cacheDir.isEmpty()) {
-                    cacheDir = System.getenv("DJL_CACHE_DIR");
-                    if (cacheDir == null || cacheDir.isEmpty()) {
-                        String userHome = System.getProperty("user.home");
-                        return Paths.get(userHome, ".djl.ai").resolve("pytorch");
-                    }
-                }
-            }
-        }
-        return Paths.get(cacheDir, "pytorch");
     }
 }

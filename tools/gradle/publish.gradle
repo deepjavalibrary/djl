@@ -1,24 +1,24 @@
 configure([
         project(':api'),
         project(':basicdataset'),
+        project(':dlr:dlr-engine'),
+        project(':extensions:aws-ai'),
+        project(':extensions:fasttext'),
+        project(':extensions:hadoop'),
+        project(':extensions:sentencepiece'),
         project(':model-zoo'),
-        project(':serving'),
         project(':mxnet:mxnet-engine'),
         project(':mxnet:mxnet-model-zoo'),
+        project(':onnxruntime:onnxruntime-engine'),
         project(':paddlepaddle:paddlepaddle-engine'),
         project(':paddlepaddle:paddlepaddle-model-zoo'),
         project(':pytorch:pytorch-engine'),
         project(':pytorch:pytorch-model-zoo'),
+        project(':serving:serving'),
         project(':tensorflow:tensorflow-api'),
         project(':tensorflow:tensorflow-engine'),
         project(':tensorflow:tensorflow-model-zoo'),
-        project(':onnxruntime:onnxruntime-engine'),
-        project(':dlr:dlr-engine'),
-        project(':tflite:tflite-engine'),
-        project(':extensions:aws-ai'),
-        project(':extensions:fasttext'),
-        project(':extensions:hadoop'),
-        project(':extensions:sentencepiece')]) {
+        project(':tflite:tflite-engine')]) {
     apply plugin: "maven-publish"
     apply plugin: "signing"
 

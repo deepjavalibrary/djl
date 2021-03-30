@@ -229,7 +229,7 @@ public final class LibUtils {
         Path tmp = null;
         try {
             String libName = System.mapLibraryName(NATIVE_LIB_NAME);
-            Path cacheFolder = getCacheDir();
+            Path cacheFolder = Utils.getEngineCacheDir("paddle");
             logger.debug("Using cache dir: {}", cacheFolder);
 
             Path dir = cacheFolder.resolve(platform.getVersion() + platform.getClassifier());
@@ -290,7 +290,7 @@ public final class LibUtils {
         String os = platform.getOsPrefix();
 
         String libName = System.mapLibraryName(NATIVE_LIB_NAME);
-        Path cacheDir = getCacheDir();
+        Path cacheDir = Utils.getEngineCacheDir("paddle");
         logger.debug("Using cache dir: {}", cacheDir);
         Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
@@ -341,23 +341,5 @@ public final class LibUtils {
                 Utils.deleteQuietly(tmp);
             }
         }
-    }
-
-    private static Path getCacheDir() {
-        String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
-        if (cacheDir == null || cacheDir.isEmpty()) {
-            cacheDir = System.getenv("ENGINE_CACHE_DIR");
-            if (cacheDir == null || cacheDir.isEmpty()) {
-                cacheDir = System.getProperty("DJL_CACHE_DIR");
-                if (cacheDir == null || cacheDir.isEmpty()) {
-                    cacheDir = System.getenv("DJL_CACHE_DIR");
-                    if (cacheDir == null || cacheDir.isEmpty()) {
-                        String userHome = System.getProperty("user.home");
-                        return Paths.get(userHome, ".djl.ai").resolve("paddle");
-                    }
-                }
-            }
-        }
-        return Paths.get(cacheDir, "paddle");
     }
 }
