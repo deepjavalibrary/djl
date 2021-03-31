@@ -9,6 +9,6 @@ dependencies {
 
 task copyJar(type: Copy) {
     from jar // here it automatically reads jar file produced from jar task
-    into '../../serving-core/plugins'
+    into '../../serving/plugins'
 }
 build.dependsOn copyJar

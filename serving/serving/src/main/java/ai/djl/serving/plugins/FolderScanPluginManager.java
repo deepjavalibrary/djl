@@ -85,7 +85,7 @@ public class FolderScanPluginManager implements PluginManager {
         while (apit.hasNext()) {
             pluginsFound++;
             RequestHandler<?> service = apit.next();
-            logger.debug("load plugin: {}", service.getClass().getSimpleName());
+            logger.info("load plugin: {}", service.getClass().getSimpleName());
             Plugin<RequestHandler<?>> plugin = new Plugin<>(service);
             // TODO add a plugin Lifecycle "INITIALIZING", "ACTIVE", "SHUTTING DOWN" , so a plug-in
             // can be dependent on another plugin.
