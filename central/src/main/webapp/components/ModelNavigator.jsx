@@ -160,14 +160,17 @@ export default function ModelNavigator(props) {
                                 </TreeItem>
                                 <TreeItem nodeId="Application" label="Application">
                                     <div onChange={modelApplicationFilterOnChange}>
-                                       <button disabled={applicationValue=='CV.ACTION_RECOGNITION'} value= 'CV.ACTION_RECOGNITION' onClick={modelApplicationFilterOnChange} > action_recognition </button>
-                                       <button disabled={applicationValue=='CV.IMAGE_CLASSIFICATION'} value= 'CV.IMAGE_CLASSIFICATION' onClick={modelApplicationFilterOnChange} > image_classification </button>
-                                       <button disabled={applicationValue=='CV.INSTANCE_SEGMENTATION'} value= 'CV.INSTANCE_SEGMENTATION' onClick={modelApplicationFilterOnChange} > instance_segmentation </button>
-                                       <button disabled={applicationValue=='CV.OBJECT_DETECTION'} value= 'CV.OBJECT_DETECTION' onClick={modelApplicationFilterOnChange} > object_detection </button>
-                                       <button disabled={applicationValue=='CV.POSE_ESTIMATION'} value='CV.POSE_ESTIMATION' onClick={modelApplicationFilterOnChange} > pose_estimation </button>
-                                       <button disabled={applicationValue=='NLP.QUESTION_ANSWER'} value='NLP.QUESTION_ANSWER' onClick={modelApplicationFilterOnChange} > question_answer </button>
-                                       <button disabled={applicationValue=='NLP.SENTIMENT_ANALYSIS'} value='NLP.SENTIMENT_ANALYSIS' onClick={modelApplicationFilterOnChange} > sentiment_analysis </button>
-                                       <button disabled={applicationValue=='NLP.WORD_EMBEDDING'} value='NLP.WORD_EMBEDDING' onClick={modelApplicationFilterOnChange} > word_embedding </button>
+                                        {modelZooData.map((application) => (
+                                            <button
+                                                disabled={applicationValue == application.title}
+                                                value={application.title}
+                                                onClick={modelApplicationFilterOnChange}
+                                            >
+
+                                                {application.title}
+
+                                            </button>
+                                        ))}
                                        <button value='' onClick={modelApplicationFilterOnChange} > Clear </button>
                                     </div>
                                 </TreeItem>
