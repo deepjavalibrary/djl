@@ -87,7 +87,7 @@ public final class Assertions {
             double a = actualDoubleArray[i].doubleValue();
             double b = expectedDoubleArray[i].doubleValue();
             if (Math.abs(a - b) > (atol + rtol * Math.abs(b))) {
-                throw new AssertionError(getDefaultErrorMessage(actual, expected));
+                throw new AssertionError("Expected:" + b + "but got " + a);
             }
         }
     }
