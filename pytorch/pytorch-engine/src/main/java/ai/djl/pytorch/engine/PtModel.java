@@ -64,6 +64,11 @@ public class PtModel extends BaseModel {
         if (prefix == null) {
             prefix = modelName;
         }
+
+        if (block == null) {
+            block = loadFromBlockFactory();
+        }
+
         if (block == null) {
             Path modelFile = findModelFile(prefix);
             if (modelFile == null) {

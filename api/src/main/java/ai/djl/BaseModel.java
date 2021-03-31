@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.BlockFactory;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
@@ -212,6 +213,14 @@ public abstract class BaseModel implements Model {
 
     protected void setModelDir(Path modelDir) {
         this.modelDir = modelDir.toAbsolutePath();
+    }
+
+    protected Block loadFromBlockFactory() {
+        BlockFactory factory = Utils.findImplementation(modelDir, null);
+        if (factory == null) {
+            return null;
+        }
+        return factory.newBlock(manager);
     }
 
     /** {@inheritDoc} */
