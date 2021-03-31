@@ -152,6 +152,7 @@ jobs:
         run: |
           curl.exe -L https://developer.download.nvidia.com/compute/cuda/11.1.0/local_installers/cuda_11.1.0_456.43_win10.exe -o cuda.exe
           cuda.exe -s
+          rm.exe -Rf cuda.exe
       - name: Release JNI
         shell: cmd
         run: |

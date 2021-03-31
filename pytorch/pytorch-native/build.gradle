@@ -65,6 +65,7 @@ def cleanBuild() {
     delete "${project.projectDir}/build"
     delete "${project.projectDir}/libtorch"
     delete "${project.projectDir}/libtorch_android"
+    delete fileTree(dir:'${project.projectDir}', include: '**.zip')
 }
 
 task compileAndroidJNI {
