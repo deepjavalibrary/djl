@@ -115,6 +115,7 @@ public final class PtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public void setRandomSeed(int seed) {
+        super.setRandomSeed(seed);
         JniUtils.setSeed(seed);
         RandomUtils.RANDOM.setSeed(seed);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -12,9 +12,6 @@
  */
 
 package ai.djl.tensorflow.engine.javacpp;
-
-import static org.tensorflow.internal.c_api.AbstractTFE_Context.newContext;
-import static org.tensorflow.internal.c_api.global.tensorflow.*;
 
 import ai.djl.Device;
 import ai.djl.engine.EngineException;
@@ -34,7 +31,22 @@ import org.bytedeco.javacpp.Pointer;
 import org.bytedeco.javacpp.PointerPointer;
 import org.bytedeco.javacpp.PointerScope;
 import org.tensorflow.exceptions.TensorFlowException;
-import org.tensorflow.internal.c_api.*;
+import org.tensorflow.internal.c_api.AbstractTFE_Context;
+import org.tensorflow.internal.c_api.AbstractTFE_TensorHandle;
+import org.tensorflow.internal.c_api.AbstractTF_Graph;
+import org.tensorflow.internal.c_api.AbstractTF_Tensor;
+import org.tensorflow.internal.c_api.TFE_Context;
+import org.tensorflow.internal.c_api.TFE_ContextOptions;
+import org.tensorflow.internal.c_api.TFE_TensorHandle;
+import org.tensorflow.internal.c_api.TF_Buffer;
+import org.tensorflow.internal.c_api.TF_Graph;
+import org.tensorflow.internal.c_api.TF_Operation;
+import org.tensorflow.internal.c_api.TF_Output;
+import org.tensorflow.internal.c_api.TF_Session;
+import org.tensorflow.internal.c_api.TF_SessionOptions;
+import org.tensorflow.internal.c_api.TF_Status;
+import org.tensorflow.internal.c_api.TF_Tensor;
+import org.tensorflow.internal.c_api.global.tensorflow;
 import org.tensorflow.proto.framework.ConfigProto;
 import org.tensorflow.proto.framework.MetaGraphDef;
 import org.tensorflow.proto.framework.RunOptions;
@@ -42,9 +54,9 @@ import org.tensorflow.proto.framework.RunOptions;
 /** A class containing utilities to interact with the TensorFlow Engine's Javacpp layer. */
 public final class JavacppUtils {
 
-    private JavacppUtils() {}
-
     private static final Pattern DEVICE_PATTERN = Pattern.compile(".*device:([A-Z]PU):(\\d+)");
+
+    private JavacppUtils() {}
 
     @SuppressWarnings({"unchecked", "try"})
     public static SavedModelBundle loadSavedModelBundle(
@@ -56,7 +68,7 @@ public final class JavacppUtils {
             TF_SessionOptions opts = TF_SessionOptions.newSessionOptions();
             if (config != null) {
                 BytePointer configBytes = new BytePointer(config.toByteArray());
-                TF_SetConfig(opts, configBytes, configBytes.capacity(), status);
+                tensorflow.TF_SetConfig(opts, configBytes, configBytes.capacity(), status);
                 status.throwExceptionIfNotOK();
             }
             TF_Buffer runOpts = TF_Buffer.newBufferFromString(runOptions);
@@ -65,7 +77,7 @@ public final class JavacppUtils {
             TF_Graph graphHandle = AbstractTF_Graph.newGraph().retainReference();
             TF_Buffer metaGraphDef = TF_Buffer.newBuffer();
             TF_Session sessionHandle =
-                    TF_LoadSessionFromSavedModel(
+                    tensorflow.TF_LoadSessionFromSavedModel(
                             opts,
                             runOpts,
                             new BytePointer(exportDir),
@@ -91,7 +103,7 @@ public final class JavacppUtils {
     private static TF_Operation getGraphOpByName(TF_Graph graphHandle, String operation) {
         TF_Operation opHandle;
         synchronized (graphHandle) {
-            opHandle = TF_GraphOperationByName(graphHandle, operation);
+            opHandle = tensorflow.TF_GraphOperationByName(graphHandle, operation);
         }
         if (opHandle == null || opHandle.isNull()) {
             throw new IllegalArgumentException(
@@ -129,12 +141,12 @@ public final class JavacppUtils {
         int numOutputs = outputOpHandles.length;
         int numTargets = targetOpHandles.length;
         try (PointerScope scope = new PointerScope()) {
-            // TODO: check if TF_Output is freed
+            // TODO: check with sig-jvm if TF_Output here is freed
             TF_Output inputs = new TF_Output(numInputs);
-            PointerPointer<TF_Tensor> inputValues = new PointerPointer<TF_Tensor>(numInputs);
+            PointerPointer<TF_Tensor> inputValues = new PointerPointer<>(numInputs);
             TF_Output outputs = new TF_Output(numOutputs);
-            PointerPointer<TF_Tensor> outputValues = new PointerPointer<TF_Tensor>(numOutputs);
-            PointerPointer<TF_Operation> targets = new PointerPointer<TF_Operation>(numTargets);
+            PointerPointer<TF_Tensor> outputValues = new PointerPointer<>(numOutputs);
+            PointerPointer<TF_Operation> targets = new PointerPointer<>(numTargets);
 
             // set input
             for (int i = 0; i < numInputs; ++i) {
@@ -160,7 +172,7 @@ public final class JavacppUtils {
             TF_Status status = TF_Status.newStatus();
             TF_Buffer runOpts = TF_Buffer.newBufferFromString(runOptions);
 
-            TF_SessionRun(
+            tensorflow.TF_SessionRun(
                     handle,
                     runOpts,
                     inputs,
@@ -191,12 +203,13 @@ public final class JavacppUtils {
             TF_Status status = TF_Status.newStatus();
             if (config != null) {
                 BytePointer configBytes = new BytePointer(config.toByteArray());
-                TFE_ContextOptionsSetConfig(opts, configBytes, configBytes.capacity(), status);
+                tensorflow.TFE_ContextOptionsSetConfig(
+                        opts, configBytes, configBytes.capacity(), status);
                 status.throwExceptionIfNotOK();
             }
-            TFE_ContextOptionsSetAsync(opts, (byte) (async ? 1 : 0));
-            TFE_ContextOptionsSetDevicePlacementPolicy(opts, devicePlacementPolicy);
-            TFE_Context context = newContext(opts, status);
+            tensorflow.TFE_ContextOptionsSetAsync(opts, (byte) (async ? 1 : 0));
+            tensorflow.TFE_ContextOptionsSetDevicePlacementPolicy(opts, devicePlacementPolicy);
+            TFE_Context context = AbstractTFE_Context.newContext(opts, status);
             status.throwExceptionIfNotOK();
             return context.retainReference();
         }
@@ -206,25 +219,25 @@ public final class JavacppUtils {
     public static Device getDevice(TFE_TensorHandle handle) {
         try (PointerScope scope = new PointerScope()) {
             TF_Status status = TF_Status.newStatus();
-            BytePointer pointer = TFE_TensorHandleBackingDeviceName(handle, status);
+            BytePointer pointer = tensorflow.TFE_TensorHandleBackingDeviceName(handle, status);
             String device = new String(pointer.getStringBytes(), StandardCharsets.UTF_8);
             return fromTfDevice(device);
         }
     }
 
     public static DataType getDataType(TFE_TensorHandle handle) {
-        return TfDataType.fromTf(TFE_TensorHandleDataType(handle));
+        return TfDataType.fromTf(tensorflow.TFE_TensorHandleDataType(handle));
     }
 
     @SuppressWarnings({"unchecked", "try"})
     public static Shape getShape(TFE_TensorHandle handle) {
         try (PointerScope scope = new PointerScope()) {
             TF_Status status = TF_Status.newStatus();
-            int numDims = TFE_TensorHandleNumDims(handle, status);
+            int numDims = tensorflow.TFE_TensorHandleNumDims(handle, status);
             status.throwExceptionIfNotOK();
             long[] shapeArr = new long[numDims];
             for (int i = 0; i < numDims; i++) {
-                shapeArr[i] = TFE_TensorHandleDim(handle, i, status);
+                shapeArr[i] = tensorflow.TFE_TensorHandleDim(handle, i, status);
                 status.throwExceptionIfNotOK();
             }
             return new Shape(shapeArr);
@@ -258,9 +271,12 @@ public final class JavacppUtils {
             ByteBuffer buf, Shape shape, DataType dataType) {
         int dType = TfDataType.toTf(dataType);
         long[] dims = shape.getShape();
-        BytePointer data = new BytePointer(buf);
+        long numBytes = shape.size() * dataType.getNumOfBytes();
         try (PointerScope scope = new PointerScope()) {
-            TF_Tensor tensor = AbstractTF_Tensor.newTensor(dType, dims, data);
+            TF_Tensor tensor = AbstractTF_Tensor.allocateTensor(dType, dims, numBytes);
+            // get data pointer in native engine
+            Pointer pointer = tensorflow.TF_TensorData(tensor).capacity(numBytes);
+            pointer.asByteBuffer().put(buf);
             TF_Status status = TF_Status.newStatus();
             TFE_TensorHandle handle = AbstractTFE_TensorHandle.newTensor(tensor, status);
             status.throwExceptionIfNotOK();
@@ -272,7 +288,7 @@ public final class JavacppUtils {
     public static TF_Tensor resolveTFETensor(TFE_TensorHandle handle) {
         try (PointerScope scope = new PointerScope()) {
             TF_Status status = TF_Status.newStatus();
-            TF_Tensor tensor = TFE_TensorHandleResolve(handle, status).withDeallocator();
+            TF_Tensor tensor = tensorflow.TFE_TensorHandleResolve(handle, status).withDeallocator();
             status.throwExceptionIfNotOK();
             return tensor.retainReference();
         }
@@ -293,9 +309,10 @@ public final class JavacppUtils {
         try (PointerScope scope = new PointerScope()) {
             // convert to TF_Tensor
             TF_Status status = TF_Status.newStatus();
-            TF_Tensor tensor = TFE_TensorHandleResolve(handle, status).withDeallocator();
+            TF_Tensor tensor = tensorflow.TFE_TensorHandleResolve(handle, status).withDeallocator();
             status.throwExceptionIfNotOK();
-            Pointer pointer = TF_TensorData(tensor).capacity(TF_TensorByteSize(tensor));
+            Pointer pointer =
+                    tensorflow.TF_TensorData(tensor).capacity(tensorflow.TF_TensorByteSize(tensor));
             return pointer.asByteBuffer().order(ByteOrder.nativeOrder());
         }
     }
@@ -303,12 +320,23 @@ public final class JavacppUtils {
     private static Device fromTfDevice(String device) {
         Matcher m = DEVICE_PATTERN.matcher(device);
         if (m.matches()) {
-            if (m.group(1).equals("CPU")) {
+            if ("CPU".equals(m.group(1))) {
                 return Device.cpu();
-            } else if (m.group(2).equals("GPU")) {
+            } else if ("GPU".equals(m.group(2))) {
                 return Device.of(Device.Type.GPU, Integer.parseInt(m.group(1)));
             }
         }
         throw new EngineException("Unknown device type to TensorFlow Engine: " + device);
+    }
+
+    private static String toTfDevice(Device device) {
+        if (device.getDeviceType().equals(Device.Type.CPU)) {
+            return "/device:CPU:0";
+        } else if (device.getDeviceType().equals(Device.Type.GPU)) {
+            return "/device:GPU:" + device.getDeviceId();
+        } else {
+            throw new EngineException(
+                    "Unknown device type to TensorFlow Engine: " + device.toString());
+        }
     }
 }

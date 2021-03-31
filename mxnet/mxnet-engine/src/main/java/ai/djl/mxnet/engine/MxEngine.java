@@ -148,6 +148,7 @@ public final class MxEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public void setRandomSeed(int seed) {
+        super.setRandomSeed(seed);
         JnaUtils.randomSeed(seed);
         RandomUtils.RANDOM.setSeed(seed);
     }

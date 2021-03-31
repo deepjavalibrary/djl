@@ -57,6 +57,9 @@ public abstract class Engine {
 
     private Device defaultDevice;
 
+    // use object to check if it's set
+    private Integer seed;
+
     private static synchronized String initEngine() {
         ServiceLoader<EngineProvider> loaders = ServiceLoader.load(EngineProvider.class);
         for (EngineProvider provider : loaders) {
@@ -251,7 +254,18 @@ public abstract class Engine {
      *
      * @param seed the seed to be fixed in Engine
      */
-    public abstract void setRandomSeed(int seed);
+    public void setRandomSeed(int seed) {
+        this.seed = seed;
+    }
+
+    /**
+     * Returns the random seed in DJL Engine.
+     *
+     * @return seed the seed to be fixed in Engine
+     */
+    public Integer getSeed() {
+        return seed;
+    }
 
     /** Prints debug information about the environment for debugging environment issues. */
     @SuppressWarnings("PMD.SystemPrintln")

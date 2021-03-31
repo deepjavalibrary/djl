@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDUtils;
 import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.internal.NDArrayEx;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.recurrent.RNN;
@@ -33,7 +34,7 @@ public class TfNDArrayEx implements NDArrayEx {
     /**
      * Constructs an {@code MxNDArrayEx} given a {@link NDArray}.
      *
-     * @param parent the {@link NDArray} to extend
+     * @param array the array
      */
     TfNDArrayEx(TfNDArray array) {
         this.array = array;
@@ -61,7 +62,8 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rdivi(NDArray b) {
-        return array.inPlaceHelper(b.div(array), array);
+        array.inPlaceHelper(b.div(array), array);
+        return array;
     }
 
     /** {@inheritDoc} */
@@ -85,7 +87,8 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rsubi(NDArray b) {
-        return array.inPlaceHelper(b.sub(array), array);
+        array.inPlaceHelper(b.sub(array), array);
+        return array;
     }
 
     /** {@inheritDoc} */
@@ -109,13 +112,13 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rmodi(NDArray b) {
-        return array.inPlaceHelper(b.mod(array), array);
+        array.inPlaceHelper(b.mod(array), array);
+        return array;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rpow(Number n) {
-
         return manager.create(n).toType(array.getDataType(), false).pow(array);
     }
 
@@ -423,16 +426,42 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray normalize(float[] mean, float[] std) {
-        // FIXME: use inplace operator
         // TODO: TensorFlow does not support channels first on CPU for conv2d
         // https://github.com/tensorflow/tensorflow/issues/32691
         // https://github.com/tensorflow/tensorflow/issues/26411
         int dim = getArray().getShape().dimension();
         Shape shape = (dim == 3) ? new Shape(1, 1, 3) : new Shape(1, 1, 1, 3);
         try (NDArray meanArr = manager.create(mean, shape);
-                NDArray stdArr = manager.create(std, shape);
-                NDArray temp = getArray().sub(meanArr)) {
-            return temp.div(stdArr);
+                NDArray stdArr = manager.create(std, shape)) {
+            return getArray().sub(meanArr).divi(stdArr);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray toTensor() {
+        // TODO: TensorFlow does not support channels first on CPU for conv2d
+        // https://github.com/tensorflow/tensorflow/issues/32691
+        // https://github.com/tensorflow/tensorflow/issues/26411
+        try (TfNDManager subManager = (TfNDManager) array.getManager().newSubManager()) {
+            array.attach(subManager);
+            NDArray input = array;
+            int dim = input.getShape().dimension();
+            if (dim == 3) {
+                input = input.expandDims(0);
+            }
+            input = input.div(255.0);
+            if (dim == 3) {
+                input = input.squeeze(0);
+            }
+            // The network by default takes float32
+            NDArray output =
+                    (!input.getDataType().equals(DataType.FLOAT32))
+                            ? input.toType(DataType.FLOAT32, false)
+                            : input;
+            array.attach(subManager.getParentManager());
+            output.attach(subManager.getParentManager());
+            return output;
         }
     }
 
@@ -524,8 +553,15 @@ public class TfNDArrayEx implements NDArrayEx {
     @Override
     public NDArray concat(NDList arrays, int axis) {
         NDUtils.checkConcatInput(arrays);
-        // FIXME: re-implement later
-        throw new UnsupportedOperationException("Not implemented");
+        NDArray[] srcArray = new NDArray[arrays.size() + 1];
+        srcArray[0] = array;
+        System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
+        try (NDArray axisArr = manager.create(axis); ) {
+            return manager.opExecutor("ConcatV2")
+                    .addInputList(srcArray)
+                    .addInput(axisArr)
+                    .buildSingletonOrThrow();
+        }
     }
 
     /** {@inheritDoc} */
