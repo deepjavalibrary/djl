@@ -100,14 +100,14 @@ export default function ModelNavigator(props) {
 	const [model, setModel] = useState(null);
 	const [modelList, setModelList] = useState([]);
 	const [nameValue, setNameValue] = useState('');
-	const [typeValue, setTypeValue] = useState('');
+	const [applicationValue, setApplicationValue] = useState('');
 	const [versionValue, setVersionValue] = useState('');
 
     const filteredModels =
         modelZooData.map((application) => (
             application.models.filter((model) => {
                 if ((versionValue == '') || (versionValue == model.version)){
-                    if ((typeValue == '') || (typeValue == application.key)){
+                    if ((applicationValue == '') || (applicationValue == application.key)){
                         return model.name.toLowerCase().includes(nameValue.toLowerCase());
                     }
                 }
@@ -120,8 +120,8 @@ export default function ModelNavigator(props) {
 
     };
 
-    const modelTypeFilterOnChange = (event) => {
-        setTypeValue(event.target.value);
+    const modelApplicationFilterOnChange = (event) => {
+        setApplicationValue(event.target.value);
     };
 
     const modelVersionFilterOnChange = (event) => {
@@ -158,17 +158,17 @@ export default function ModelNavigator(props) {
                                         <button value="" onClick={modelVersionFilterOnChange} > Clear </button>
                                     </div>
                                 </TreeItem>
-                                <TreeItem nodeId="Type" label="Type">
-                                    <div onChange={modelVersionFilterOnChange}>
-                                       <button disabled={typeValue=='CV.ACTION_RECOGNITION'} value= 'CV.ACTION_RECOGNITION' onClick={modelTypeFilterOnChange} > action_recognition </button>
-                                       <button disabled={typeValue=='CV.IMAGE_CLASSIFICATION'} value= 'CV.IMAGE_CLASSIFICATION' onClick={modelTypeFilterOnChange} > image_classification </button>
-                                       <button disabled={typeValue=='CV.INSTANCE_SEGMENTATION'} value= 'CV.INSTANCE_SEGMENTATION' onClick={modelTypeFilterOnChange} > instance_segmentation </button>
-                                       <button disabled={typeValue=='CV.OBJECT_DETECTION'} value= 'CV.OBJECT_DETECTION' onClick={modelTypeFilterOnChange} > object_detection </button>
-                                       <button disabled={typeValue=='CV.POSE_ESTIMATION'} value='CV.POSE_ESTIMATION' onClick={modelTypeFilterOnChange} > pose_estimation </button>
-                                       <button disabled={typeValue=='NLP.QUESTION_ANSWER'} value='NLP.QUESTION_ANSWER' onClick={modelTypeFilterOnChange} > question_answer </button>
-                                       <button disabled={typeValue=='NLP.SENTIMENT_ANALYSIS'} value='NLP.SENTIMENT_ANALYSIS' onClick={modelTypeFilterOnChange} > sentiment_analysis </button>
-                                       <button disabled={typeValue=='NLP.WORD_EMBEDDING'} value='NLP.WORD_EMBEDDING' onClick={modelTypeFilterOnChange} > word_embedding </button>
-                                       <button value='' onClick={modelTypeFilterOnChange} > Clear </button>
+                                <TreeItem nodeId="Application" label="Application">
+                                    <div onChange={modelApplicationFilterOnChange}>
+                                       <button disabled={applicationValue=='CV.ACTION_RECOGNITION'} value= 'CV.ACTION_RECOGNITION' onClick={modelApplicationFilterOnChange} > action_recognition </button>
+                                       <button disabled={applicationValue=='CV.IMAGE_CLASSIFICATION'} value= 'CV.IMAGE_CLASSIFICATION' onClick={modelApplicationFilterOnChange} > image_classification </button>
+                                       <button disabled={applicationValue=='CV.INSTANCE_SEGMENTATION'} value= 'CV.INSTANCE_SEGMENTATION' onClick={modelApplicationFilterOnChange} > instance_segmentation </button>
+                                       <button disabled={applicationValue=='CV.OBJECT_DETECTION'} value= 'CV.OBJECT_DETECTION' onClick={modelApplicationFilterOnChange} > object_detection </button>
+                                       <button disabled={applicationValue=='CV.POSE_ESTIMATION'} value='CV.POSE_ESTIMATION' onClick={modelApplicationFilterOnChange} > pose_estimation </button>
+                                       <button disabled={applicationValue=='NLP.QUESTION_ANSWER'} value='NLP.QUESTION_ANSWER' onClick={modelApplicationFilterOnChange} > question_answer </button>
+                                       <button disabled={applicationValue=='NLP.SENTIMENT_ANALYSIS'} value='NLP.SENTIMENT_ANALYSIS' onClick={modelApplicationFilterOnChange} > sentiment_analysis </button>
+                                       <button disabled={applicationValue=='NLP.WORD_EMBEDDING'} value='NLP.WORD_EMBEDDING' onClick={modelApplicationFilterOnChange} > word_embedding </button>
+                                       <button value='' onClick={modelApplicationFilterOnChange} > Clear </button>
                                     </div>
                                 </TreeItem>
                             </TreeView>
