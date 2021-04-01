@@ -26,6 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -385,8 +387,7 @@ public final class Utils {
                 urls.add(p.toUri().toURL());
             }
 
-            ClassLoader parentCl = Thread.currentThread().getContextClassLoader();
-            ClassLoader cl = new URLClassLoader(urls.toArray(new URL[0]), parentCl);
+            ClassLoader cl = AccessController.doPrivileged(new MyPrivilegedAction(urls));
             if (className != null && !className.isEmpty()) {
                 return initClass(cl, className);
             }
@@ -459,5 +460,20 @@ public final class Utils {
             logger.trace("Not able to load Object", e);
         }
         return null;
+    }
+
+    private static final class MyPrivilegedAction implements PrivilegedAction<ClassLoader> {
+
+        List<URL> urls;
+
+        private MyPrivilegedAction(List<URL> urls) {
+            this.urls = urls;
+        }
+
+        @Override
+        public ClassLoader run() {
+            ClassLoader parentCl = Thread.currentThread().getContextClassLoader();
+            return new URLClassLoader(urls.toArray(new URL[0]), parentCl);
+        }
     }
 }
