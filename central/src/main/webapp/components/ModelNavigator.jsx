@@ -102,6 +102,7 @@ export default function ModelNavigator(props) {
 	const [nameValue, setNameValue] = useState('');
 	const [applicationValue, setApplicationValue] = useState('');
 	const [versionValue, setVersionValue] = useState('');
+	const [versionList, setVersionList] = useState([]);
 
     const filteredModels =
         modelZooData.map((application) => (
@@ -128,6 +129,13 @@ export default function ModelNavigator(props) {
         setVersionValue(event.target.value);
     };
 
+    function handleAdd(version) {
+        if (versionList.includes(version) == false){
+            const newList = versionList;
+            setVersionList(newList.concat(version));
+        }
+      }
+
 	return (
 		<>
            <div className={classes.view_root}>
@@ -152,9 +160,15 @@ export default function ModelNavigator(props) {
                                 </TreeItem>
                                 <TreeItem nodeId="Version" label="Version">
                                     <div onChange={modelVersionFilterOnChange}>
-                                        <button disabled={versionValue=="0.0.1"} value="0.0.1" onClick={modelVersionFilterOnChange} > 0.0.1 </button>
-                                        <button disabled={versionValue=="0.0.2"} value="0.0.2" onClick={modelVersionFilterOnChange} > 0.0.2 </button>
-                                        <button disabled={versionValue=="0.0.3"} value="0.0.3" onClick={modelVersionFilterOnChange} > 0.0.3 </button>
+                                        {modelZooData.map((application) => (
+                                            application.models.map((model) => (
+                                                    handleAdd(model.version)
+                                            ))
+                                        ))}
+
+                                        {versionList.map((version) => (
+                                            <button disabled={versionValue==version} value={version} onClick={modelVersionFilterOnChange} > {version} </button>
+                                        ))}
                                         <button value="" onClick={modelVersionFilterOnChange} > Clear </button>
                                     </div>
                                 </TreeItem>
