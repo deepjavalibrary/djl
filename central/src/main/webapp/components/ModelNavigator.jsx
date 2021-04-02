@@ -98,7 +98,7 @@ export default function ModelNavigator(props) {
 	const modelZooData = useFetch(URL);
 
 	const [model, setModel] = useState(null);
-	const [modelList, setModelList] = useState([]);
+	const [modelList, setModelList] = useState(modelZooData);
 	const [nameValue, setNameValue] = useState('');
 	const [applicationValue, setApplicationValue] = useState('');
 	const [versionValue, setVersionValue] = useState('');
@@ -190,7 +190,7 @@ export default function ModelNavigator(props) {
                                     </div>
                                 </TreeItem>
                             </TreeView>
-                            <button onClick={modelFilterOnChange} > Search </button>
+                            <button onClick={modelFilterOnChange} value={nameValue} > Search </button>
                         </TreeItem>
                     </TreeView>
 
@@ -199,16 +199,26 @@ export default function ModelNavigator(props) {
 					defaultCollapseIcon={<ExpandMoreIcon />}
 					defaultExpandIcon={<ChevronRightIcon />}
 				>
-				    <TreeItem nodeId={'Models'} label={'Models'}></TreeItem>
-					<div>
-                        {modelList.map(application => (
-                            console.log(application),
-                            application.map((model) => (
-                                <TreeItem nodeId={model.name} label={model.name} onLabelClick={() => setModel(model)}>
-                                </TreeItem>
-                            ))
-                        ))}
-                    </div>
+                    {nameValue != '' || versionValue!='' || applicationValue!=''
+                        ?<div>
+                           {
+                            modelList.map(application => (
+                                application.map((model) => (
+                                    <TreeItem nodeId={model.name} label={model.name} onLabelClick={() => setModel(model)}>
+                                    </TreeItem>
+                                ))
+                            ))}
+                        </div>
+                        :
+                          modelZooData.map((application) => (
+                            <TreeItem nodeId={application.key} label={application.title}>
+                                {application.models.map((model) => (
+                                    <TreeItem nodeId={model.name} label={model.name} onLabelClick={() => setModel(model)}>
+                                    </TreeItem>
+                                ))}
+                            </TreeItem>
+                          ))
+                    }
 
 				</TreeView>
 				</div>
