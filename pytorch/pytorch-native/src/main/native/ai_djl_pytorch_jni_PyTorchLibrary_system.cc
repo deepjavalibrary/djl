@@ -179,11 +179,11 @@ static torch::jit::CodeTemplate event_template(R"(
 // The function doesn't support GPU yet
 // You can refer to
 // https://github.com/pytorch/pytorch/blob/8908f6ad8e9f2815b4ec49e15eefa467ffee03c3/torch/autograd/profiler.py#L925
-void WriteProfilerEventsToStream(std::ostream& out, const std::vector<std::vector<Event*>>& thread_events) {
+void WriteProfilerEventsToStream(std::ostream& out, const std::vector<std::vector<LegacyEvent*>>& thread_events) {
   TORCH_CHECK(out, "Could not open file");
   std::set<std::string> filtered_out_names = {
       "profiler::_record_function_enter", "profiler::_record_function_exit", "is_leaf", "output_nr", "_version"};
-  Event* profiler_start = nullptr;
+  LegacyEvent* profiler_start = nullptr;
   for (const auto& events : thread_events) {
     for (auto e : events) {
       if (0 == strcmp(e->name(), "__start_profile")) {
@@ -201,22 +201,22 @@ void WriteProfilerEventsToStream(std::ostream& out, const std::vector<std::vecto
   };
   out << "[\n";
   bool first = true;
-  for (const std::vector<Event*>& thread_event_list : thread_events) {
+  for (const std::vector<LegacyEvent*>& thread_event_list : thread_events) {
     // accumulated memory allocations per handle
     std::unordered_map<std::pair<at::RecordFunctionHandle, int64_t>, int64_t, PairHash> cpu_memory_allocs;
-    std::unordered_map<std::pair<at::RecordFunctionHandle, int64_t>, Event*, PairHash> events_map;
+    std::unordered_map<std::pair<at::RecordFunctionHandle, int64_t>, LegacyEvent*, PairHash> events_map;
     std::set<std::pair<at::RecordFunctionHandle, int64_t>> filtered_handles;
-    for (Event* evt : thread_event_list) {
+    for (LegacyEvent* evt : thread_event_list) {
       auto event_key = std::make_pair<at::RecordFunctionHandle, int64_t>(evt->handle(), evt->nodeId());
       if (filtered_out_names.find(evt->name()) != filtered_out_names.end() ||
           filtered_handles.find(event_key) != filtered_handles.end()) {
         filtered_handles.insert(event_key);
         continue;
       }
-      if (evt->kind() == "push") {
+      if (evt->kindStr() == "push") {
         events_map[event_key] = evt;
         cpu_memory_allocs[event_key] = 0;
-      } else if (evt->kind() == "pop") {
+      } else if (evt->kindStr() == "pop") {
         if (!first) {
           out << ",\n";
         }
@@ -224,7 +224,7 @@ void WriteProfilerEventsToStream(std::ostream& out, const std::vector<std::vecto
         auto it = events_map.find(event_key);
         auto mem_it = cpu_memory_allocs.find(event_key);
         TORCH_CHECK(it != events_map.end(), "Unmatched pop event");
-        Event* start = it->second;
+        LegacyEvent* start = it->second;
         int64_t memory_usage = mem_it->second;
 
         torch::jit::TemplateEnv env;
@@ -239,7 +239,7 @@ void WriteProfilerEventsToStream(std::ostream& out, const std::vector<std::vecto
 
         events_map.erase(it);
         cpu_memory_allocs.erase(mem_it);
-      } else if (evt->kind() == "memory_alloc") {
+      } else if (evt->kindStr() == "memory_alloc") {
         for (const auto& e : cpu_memory_allocs) {
           cpu_memory_allocs[e.first] += evt->cpuMemoryUsage();
         }
@@ -257,7 +257,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStartProfile(
     env->ThrowNew(ENGINE_EXCEPTION_CLASS, "please call stopProfile before you start a new section");
     return;
   }
-  enableProfiler(ProfilerConfig(juse_cuda ? ProfilerState::CUDA : ProfilerState::CPU,
+  enableProfilerLegacy(ProfilerConfig(juse_cuda ? ProfilerState::CUDA : ProfilerState::CPU,
       /* report_input_shapes */ jrecord_shape,
       /* profile_memory */ jprofile_memory));
   API_END()
@@ -272,10 +272,10 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStopProfile(
   }
   std::string output_file = djl::utils::jni::GetStringFromJString(env, joutput_file);
   std::ofstream file(output_file);
-  std::vector<std::vector<Event>> event_lists = disableProfiler();
-  std::vector<std::vector<Event*>> event_ptr_lists;
+  std::vector<std::vector<LegacyEvent>> event_lists = disableProfilerLegacy();
+  std::vector<std::vector<LegacyEvent*>> event_ptr_lists;
   for (auto& l : event_lists) {
-    std::vector<Event*> events;
+    std::vector<LegacyEvent*> events;
     for (auto& e : l) {
       events.emplace_back(&e);
     }
