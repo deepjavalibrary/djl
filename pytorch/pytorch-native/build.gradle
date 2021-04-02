@@ -6,7 +6,7 @@ plugins {
 group = "ai.djl.pytorch"
 apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
-def VERSION = "1.7.1"
+def VERSION = "1.8.0"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 boolean isPrecxx11 = project.hasProperty("precxx11")
 boolean isGPU = project.hasProperty("gpu")
@@ -65,6 +65,7 @@ def cleanBuild() {
     delete "${project.projectDir}/build"
     delete "${project.projectDir}/libtorch"
     delete "${project.projectDir}/libtorch_android"
+    delete fileTree(dir:'${project.projectDir}', include: '**.zip')
 }
 
 task compileAndroidJNI {
@@ -81,11 +82,9 @@ task releaseJNI {
                 downloadBuild("win", "cpu")
                 cleanBuild()
             } else {
-                downloadBuild("win", "cu101")
-                cleanBuild()
                 downloadBuild("win", "cu102")
                 cleanBuild()
-                downloadBuild("win", "cu110")
+                downloadBuild("win", "cu111")
                 cleanBuild()
             }
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac") && !isGPU) {
@@ -96,11 +95,9 @@ task releaseJNI {
                 downloadBuild("linux", "cpu", isPrecxx11)
                 cleanBuild()
             } else {
-                downloadBuild("linux", "cu101", isPrecxx11)
-                cleanBuild()
                 downloadBuild("linux", "cu102", isPrecxx11)
                 cleanBuild()
-                downloadBuild("linux", "cu110", isPrecxx11)
+                downloadBuild("linux", "cu111", isPrecxx11)
                 cleanBuild()
             }
         } else {
@@ -203,12 +200,10 @@ task downloadPyTorchNativeLib() {
                 "cpu/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcpu.zip"    : "cpu/linux",
                 "cpu/libtorch-macos-${VERSION}.zip"                               : "cpu/osx",
                 "cpu/libtorch-win-shared-with-deps-${VERSION}%2Bcpu.zip"          : "cpu/win",
-                "cu101/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu101.zip": "cu101/linux",
                 "cu102/libtorch-cxx11-abi-shared-with-deps-${VERSION}.zip"        : "cu102/linux",
-                "cu110/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu110.zip": "cu110/linux",
-                "cu101/libtorch-win-shared-with-deps-${VERSION}%2Bcu101.zip"      : "cu101/win",
+                "cu111/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu111.zip": "cu111/linux",
                 "cu102/libtorch-win-shared-with-deps-${VERSION}.zip"              : "cu102/win",
-                "cu110/libtorch-win-shared-with-deps-${VERSION}%2Bcu110.zip"      : "cu110/win"
+                "cu111/libtorch-win-shared-with-deps-${VERSION}%2Bcu111.zip"      : "cu111/win"
         ]
         if (isPrecxx11) {
             // precxx11 only support cpu for now
@@ -254,6 +249,36 @@ task downloadPyTorchNativeLib() {
         }
     }
 }
+
+task uploadS3 {
+    doLast {
+        exec {
+            commandLine "sh", "-c", "find ${BINARY_ROOT} -type f | xargs gzip"
+        }
+        def f = new File("${BINARY_ROOT}/files.txt")
+        def uploadDirs = [
+                "${BINARY_ROOT}/cpu/linux/native/lib/",
+                "${BINARY_ROOT}/cpu/osx/native/lib/",
+                "${BINARY_ROOT}/cpu/win/native/lib/",
+                "${BINARY_ROOT}/cu102/linux/native/lib/",
+                "${BINARY_ROOT}/cu102/win/native/lib/",
+                "${BINARY_ROOT}/cu111/linux/native/lib/",
+                "${BINARY_ROOT}/cu111/win/native/lib/"
+        ]
+        uploadDirs.each { item ->
+            fileTree(item).files.name.each {
+                def out = item - "${BINARY_ROOT}/"
+                f << out + it
+                f << "\n"
+            }
+        }
+        exec {
+            commandLine "aws", "s3", "sync", "${BINARY_ROOT}", "s3://djl-ai/publish/pytorch-${VERSION}/"
+        }
+    }
+}
+
+
 
 def flavorNames = file(BINARY_ROOT).list() ?: []
 flavorNames.each { flavor ->

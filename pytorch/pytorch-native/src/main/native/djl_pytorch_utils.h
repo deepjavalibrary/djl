@@ -134,6 +134,7 @@ inline torch::TensorOptions CreateTensorOptions(
                       // for tensor creation API, MKLDNN layout is not supported
                       // the workaround is to create with Strided then call to_mkldnn()
                      .layout((jlayout != 1) ? torch::kStrided : torch::kSparse)
+                     .memory_format(torch::MemoryFormat::Contiguous)
                      .device(device)
                      .requires_grad(JNI_TRUE == jrequired_grad);
   // DJL's UNKNOWN type
