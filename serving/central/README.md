@@ -37,7 +37,7 @@ You can pull the server from the central Maven repository by including the follo
 Use the following command to start model server locally:
 
 ```sh
-cd central
+cd serving/central
 
 # for Linux/macOS:
 ./gradlew run
