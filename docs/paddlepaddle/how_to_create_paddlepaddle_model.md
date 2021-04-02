@@ -89,3 +89,13 @@ train(model, optim)
 paddle.save(model.state_dict(), 'lenet.pdparams')
 paddle.save(optim.state_dict(), "lenet.pdopt")
 ```
+
+- PaddleHub provides a quick way to save the deployment model. You only need the following code to save the specified model.
+
+```
+# https://www.paddlepaddle.org.cn/hubdetail?name=resnet50_vd_animals
+import paddlehub as hub
+module = hub.Module(name="resnet50_vd_animals", version='1.0.0')
+module.save_inference_model(dirname="work/models/resnet50_vd_animals")
+print("The models have been saved!")
+```
