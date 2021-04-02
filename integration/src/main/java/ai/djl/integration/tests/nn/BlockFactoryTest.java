@@ -24,7 +24,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.BlockFactory;
-import ai.djl.nn.Blocks;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
@@ -48,8 +47,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 public class BlockFactoryTest {
@@ -91,6 +88,7 @@ public class BlockFactoryTest {
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
         Path savedDir = Paths.get("build/testBlockFactory");
+        Utils.deleteQuietly(savedDir);
         Path zipPath = prepareModel(savedDir);
         // load model from here
         Criteria<NDList, NDList> criteria =
@@ -126,16 +124,11 @@ public class BlockFactoryTest {
                 Paths.get(
                         "build/classes/java/main/ai/djl/integration/tests/nn/BlockFactoryTest$TestBlockFactory.class"),
                 classDir.resolve("BlockFactoryTest$TestBlockFactory.class"));
-        Path zipPath = Paths.get("build/testBlockFactory.zip");
+        Path zipPath =
+                Paths.get("build/testBlockFactory" + Engine.getInstance().getEngineName() + ".zip");
+        Files.deleteIfExists(zipPath);
         ZipUtils.zip(savedDir, zipPath, false);
         return zipPath;
-    }
-
-    @BeforeTest
-    @AfterTest
-    private void cleanUp() {
-        Utils.deleteQuietly(Paths.get("build/testBlockFactory"));
-        Utils.deleteQuietly(Paths.get("build/testBlockFactory.zip"));
     }
 
     public static class TestBlockFactory implements BlockFactory {
@@ -146,7 +139,6 @@ public class BlockFactoryTest {
         public Block newBlock(NDManager manager) {
             SequentialBlock newBlock = new SequentialBlock();
             newBlock.add(SymbolBlock.newInstance(manager));
-            newBlock.add(Blocks.batchFlattenBlock());
             newBlock.add(Linear.builder().setUnits(10).build());
             return newBlock;
         }
@@ -166,9 +158,7 @@ public class BlockFactoryTest {
             Model model = ModelZoo.loadModel(builder.build());
             SequentialBlock newBlock = new SequentialBlock();
             SymbolBlock block = (SymbolBlock) model.getBlock();
-            block.removeLastBlock();
             newBlock.add(block);
-            newBlock.add(Blocks.batchFlattenBlock());
             newBlock.add(Linear.builder().setUnits(10).build());
             model.setBlock(newBlock);
             return model;
