@@ -1,6 +1,7 @@
 dependencies {
-    api project(":serving:serving-api")
-    api "org.slf4j:slf4j-api:${slf4j_version}"
+    implementation project(":serving:serving")
+    implementation "io.netty:netty-all:${netty_version}"
+    implementation "org.slf4j:slf4j-api:${slf4j_version}"
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"

@@ -26,7 +26,7 @@ import java.util.Set;
 public interface PluginManager {
 
     /**
-     * returns a set of plug-in components implementing the specific service interface.
+     * Returns a set of plug-in components implementing the specific service interface.
      *
      * <p>only active plug-ins are returned which are fully initialised at this point.
      *

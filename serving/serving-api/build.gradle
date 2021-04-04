@@ -1,9 +1,0 @@
-dependencies {
-    api "io.netty:netty-all:${netty_version}"
-
-    testImplementation("org.testng:testng:${testng_version}") {
-        exclude group: "junit", module: "junit"
-    }
-}
-
-

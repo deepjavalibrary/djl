@@ -18,18 +18,18 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -39,15 +39,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The Plugin Manager is responsible to load and manage plugins from the filesystem.
+ * The {@link PluginManager} is responsible to load and manage plugins from the file system.
  *
- * <p>The Plugin Folder configuration is received from the ConfigManager and usually defaults to
- * {workpath}/plugins. The plugins uses Java's SPI and have to implement interfaces from
+ * <p>The Plugin Folder configuration is received from the {@link ConfigManager} and usually
+ * defaults to {workpath}/plugins. The plugins uses Java's SPI and have to implement interfaces from
  * serving-api.
  *
  * @author erik.bamberg@web.de
  */
 public class FolderScanPluginManager implements PluginManager {
+
     private static final Logger logger = LoggerFactory.getLogger(FolderScanPluginManager.class);
 
     private ConfigManager configManager;
@@ -55,7 +56,7 @@ public class FolderScanPluginManager implements PluginManager {
     private Map<Class<?>, Set<Plugin<?>>> pluginsRegistry;
 
     /**
-     * constructing a PluginManager.
+     * Constructs a {@code PluginManager} instance.
      *
      * @param configManager a instance of the configManager to lookup configuration like
      *     plugin-folder.
@@ -66,32 +67,33 @@ public class FolderScanPluginManager implements PluginManager {
     }
 
     /**
-     * loads all plugins from the plugin folder and register them.
+     * Loads all plugins from the plugin folder and register them.
      *
      * @throws IOException when error during IO operation occurs.
      */
     @SuppressWarnings("rawtypes")
     public void loadPlugins() throws IOException {
         logger.info("scanning for plugins...");
-        URL[] pluginUrls = listPluginJars().toArray(new URL[] {});
+        URL[] pluginUrls = listPluginJars();
 
-        URLClassLoader ucl = new URLClassLoader(pluginUrls);
+        ClassLoader ucl =
+                AccessController.doPrivileged(
+                        (PrivilegedAction<ClassLoader>) () -> new URLClassLoader(pluginUrls));
 
         int pluginsFound = 0;
 
         ServiceLoader<RequestHandler> sl = ServiceLoader.load(RequestHandler.class, ucl);
 
-        Iterator<RequestHandler> apit = sl.iterator();
-        while (apit.hasNext()) {
+        for (RequestHandler requestHandler : sl) {
             pluginsFound++;
-            RequestHandler<?> service = apit.next();
+            RequestHandler<?> service = requestHandler;
             logger.info("load plugin: {}", service.getClass().getSimpleName());
             Plugin<RequestHandler<?>> plugin = new Plugin<>(service);
             // TODO add a plugin Lifecycle "INITIALIZING", "ACTIVE", "SHUTTING DOWN" , so a plug-in
             // can be dependent on another plugin.
             if (initializePlugin(plugin)) {
                 pluginsRegistry
-                        .computeIfAbsent(RequestHandler.class, k -> new HashSet<Plugin<?>>())
+                        .computeIfAbsent(RequestHandler.class, k -> new HashSet<>())
                         .add(plugin);
             }
         }
@@ -99,10 +101,8 @@ public class FolderScanPluginManager implements PluginManager {
     }
 
     /**
-     * initialize a plugin by calling known setters to inject managers and other dependant plugins
-     * into the plugins
-     *
-     * <p>initializePlugin.
+     * Initializes a plugin by calling known setters to inject managers and other dependant plugins
+     * into the plugins.
      *
      * @param plugin the plugin to get initialized
      * @return true if plugin could get initialized successfully false otherwise
@@ -126,9 +126,8 @@ public class FolderScanPluginManager implements PluginManager {
                 }
             }
         } catch (IntrospectionException
-                | IllegalAccessException
-                | IllegalArgumentException
-                | InvocationTargetException e) {
+                | ReflectiveOperationException
+                | IllegalArgumentException e) {
             logger.error(
                     "plugin {} could not get loaded. Initialization failed", plugin.getName(), e);
             return false;
@@ -152,19 +151,18 @@ public class FolderScanPluginManager implements PluginManager {
     public <T> Set<T> findImplementations(Class<T> pluginInterface) {
         return Collections.unmodifiableSet(
                 pluginsRegistry
-                        .getOrDefault(pluginInterface, new HashSet<Plugin<?>>())
+                        .getOrDefault(pluginInterface, new HashSet<>())
                         .stream()
                         .map(Plugin::getComponent)
                         .map(pluginInterface::cast)
                         .collect(Collectors.toSet()));
     }
 
-    @SuppressWarnings("unchecked")
-    private Set<URL> listPluginJars() throws IOException {
+    private URL[] listPluginJars() throws IOException {
         Path pluginsFolder = configManager.getPluginFolder();
         if (!(Files.exists(pluginsFolder) && Files.isDirectory(pluginsFolder))) {
             logger.warn("scanning in plug-in folder :{}....folder does not exists", pluginsFolder);
-            return (Set<URL>) Collections.EMPTY_SET;
+            return new URL[0];
         }
         logger.debug("scanning in plug-in folder :{}", pluginsFolder);
 
@@ -182,23 +180,24 @@ public class FolderScanPluginManager implements PluginManager {
                                 }
                                 return null;
                             })
-                    .collect(Collectors.toSet());
+                    .toArray(URL[]::new);
         }
     }
 
-    // TODO maybe extract this to a public class in serving-api, so we can have functions like
+    // TODO: maybe extract this to a public class in serving-api, so we can have functions like
     // "listPlugin" which return Plugin objects
-    class Plugin<T> {
+    static class Plugin<T> {
+
         private T component;
-        private LocalDateTime loadtime;
+        private LocalDateTime loadTime;
 
         public Plugin(T component) {
             this.component = component;
-            this.loadtime = LocalDateTime.now();
+            this.loadTime = LocalDateTime.now();
         }
 
         /**
-         * gets the value of component.
+         * Returns the value of component.
          *
          * @return the component value.
          */
@@ -207,16 +206,16 @@ public class FolderScanPluginManager implements PluginManager {
         }
 
         /**
-         * gets the value of loadtime.
+         * Returns the value of loadtime.
          *
          * @return the loadtime value.
          */
-        public LocalDateTime getLoadtime() {
-            return loadtime;
+        public LocalDateTime getLoadTime() {
+            return loadTime;
         }
 
         /**
-         * return the name of the plug-in.
+         * Returns the name of the plug-in.
          *
          * @return name of the plug-in.
          */

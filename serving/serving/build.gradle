@@ -3,12 +3,12 @@ plugins {
 }
 
 dependencies {
+    implementation "io.netty:netty-all:${netty_version}"
     implementation "com.google.code.gson:gson:${gson_version}"
     implementation "commons-cli:commons-cli:${commons_cli_version}"
     implementation "org.slf4j:slf4j-api:${slf4j_version}"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
-    api project(":api")
-    api project(":serving:serving-api")
+    implementation project(":api")
     implementation project(":mxnet:mxnet-engine")
 
     runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"

@@ -10,5 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-/** Contains plugin manager implementation of the model server. */
+/**
+ * Contains plugin manager implementation of the model server.
+ *
+ * @author erik.bamberg@web.de
+ */
 package ai.djl.serving.plugins;

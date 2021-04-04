@@ -31,11 +31,7 @@ public class StaticFileRequestHandler implements RequestHandler<Void> {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return
-     */
+    /** {@inheritDoc} */
     @Override
     public Void handleRequest(
             ChannelHandlerContext ctx,
