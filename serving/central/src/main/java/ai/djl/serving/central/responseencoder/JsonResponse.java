@@ -71,12 +71,18 @@ public class JsonResponse {
      */
     public void send(ChannelHandlerContext ctx, FullHttpRequest request, Object entity) {
 
+        HttpResponseStatus status = HttpResponseStatus.OK;
+        if (entity instanceof Throwable) {
+            status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+            entity = ((Exception) entity).getMessage();
+        }
+
         String serialized = GSON_WITH_TRANSIENT_FIELDS.toJson(entity);
         ByteBuf buffer = ctx.alloc().buffer(serialized.length());
         buffer.writeCharSequence(serialized, CharsetUtil.UTF_8);
 
         FullHttpResponse response =
-                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buffer);
+                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, buffer);
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
 
         this.sendAndCleanupConnection(ctx, request, response);

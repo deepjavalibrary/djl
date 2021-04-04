@@ -12,29 +12,30 @@
  */
 package ai.djl.serving.central.handler;
 
+import ai.djl.Application;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
-import ai.djl.serving.central.responseencoder.JsonResponse;
+import ai.djl.serving.plugins.RequestHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * handler to handler model meta data requests.
  *
  * @author erik.bamberg@web.de
  */
-public class ModelMetaDataHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class ModelMetaDataHandler
+        implements RequestHandler<CompletableFuture<Map<Application, List<Artifact>>>> {
 
-    private JsonResponse jsonResponse;
-
-    /** construct handler. */
-    public ModelMetaDataHandler() {
-        jsonResponse = new JsonResponse();
-    }
+    private static final Logger logger = LoggerFactory.getLogger(ModelMetaDataHandler.class);
 
     /**
      * chain of responsibility accept method.
@@ -47,26 +48,31 @@ public class ModelMetaDataHandler extends SimpleChannelInboundHandler<FullHttpRe
         FullHttpRequest request = (FullHttpRequest) msg;
 
         String uri = request.uri();
-        return uri.startsWith("/models");
+        return uri.startsWith("/modelzoo/models");
     }
 
     /**
      * handle get Model meta data requests.
      *
      * @param ctx the context
-     * @param request the full request
+     * @param req the full request
+     * @param decoder query string decoder for this request.
+     * @param segments parsed segments of the URL.
      */
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
-        CompletableFuture.supplyAsync(
-                        () -> {
-                            try {
-                                return ModelZoo.listModels();
-                            } catch (IOException | ModelNotFoundException ex) {
-                                throw new IllegalArgumentException(ex.getMessage(), ex);
-                            }
-                        })
-                .exceptionally((ex) -> Collections.emptyMap())
-                .thenAccept(modelMap -> jsonResponse.send(ctx, request, modelMap));
+    public CompletableFuture<Map<Application, List<Artifact>>> handleRequest(
+            ChannelHandlerContext ctx,
+            FullHttpRequest req,
+            QueryStringDecoder decoder,
+            String[] segments) {
+        logger.info("request models");
+        return CompletableFuture.supplyAsync(
+                () -> {
+                    try {
+                        return ModelZoo.listModels();
+                    } catch (IOException | ModelNotFoundException ex) {
+                        throw new IllegalArgumentException(ex.getMessage(), ex);
+                    }
+                });
     }
 }

@@ -17,12 +17,14 @@ import ai.djl.serving.central.http.BadRequestException;
 import ai.djl.serving.central.responseencoder.HttpRequestResponse;
 import ai.djl.serving.central.utils.ModelUri;
 import ai.djl.serving.central.utils.NettyUtils;
+import ai.djl.serving.plugins.RequestHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -30,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
  *
  * @author anfee1@morgan.edu
  */
-public class ModelDownloadHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class ModelDownloadHandler implements RequestHandler<CompletableFuture<Map<String, URI>>> {
 
     HttpRequestResponse jsonResponse;
 
@@ -39,20 +41,33 @@ public class ModelDownloadHandler extends SimpleChannelInboundHandler<FullHttpRe
         jsonResponse = new HttpRequestResponse();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public boolean acceptInboundMessage(Object msg) {
+        FullHttpRequest request = (FullHttpRequest) msg;
+
+        String uri = request.uri();
+        return uri.startsWith("/serving/models?");
+    }
+
     /**
      * Handles the deployment request by forwarding the request to the serving-instance.
      *
      * @param ctx the context
-     * @param request the full request
+     * @param req the full request
+     * @param decoder the queryStringDecoder
+     * @param segments of the parsed URL
      */
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request)
-            throws IOException, ModelNotFoundException {
-        QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
+    public CompletableFuture<Map<String, URI>> handleRequest(
+            ChannelHandlerContext ctx,
+            FullHttpRequest req,
+            QueryStringDecoder decoder,
+            String[] segments) {
         String modelName = NettyUtils.getParameter(decoder, "modelName", null);
         String modelGroupId = NettyUtils.getParameter(decoder, "groupId", null);
         String modelArtifactId = NettyUtils.getParameter(decoder, "artifactId", null);
-        CompletableFuture.supplyAsync(
+        return CompletableFuture.supplyAsync(
                         () -> {
                             try {
                                 if (modelName != null) {
@@ -66,16 +81,6 @@ public class ModelDownloadHandler extends SimpleChannelInboundHandler<FullHttpRe
                                 throw new IllegalArgumentException(ex.getMessage(), ex);
                             }
                         })
-                .exceptionally((ex) -> Collections.emptyMap())
-                .thenAccept(uriMap -> jsonResponse.sendAsJson(ctx, request, uriMap));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean acceptInboundMessage(Object msg) {
-        FullHttpRequest request = (FullHttpRequest) msg;
-
-        String uri = request.uri();
-        return uri.startsWith("/serving/models?");
+                .exceptionally((ex) -> Collections.emptyMap());
     }
 }

@@ -20,6 +20,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * HttpRequestHandler that tries to process a http-request using the configured RequestHandlers.
@@ -43,6 +44,7 @@ public class ConfigurableHttpRequestHandler extends HttpRequestHandler {
     }
 
     /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
     protected void handleRequest(
             ChannelHandlerContext ctx,
@@ -57,7 +59,20 @@ public class ConfigurableHttpRequestHandler extends HttpRequestHandler {
         try {
             Object result = requestHandler.handleRequest(ctx, req, decoder, segments);
             if (result != null) {
-                NettyUtils.sendJsonResponse(ctx, result);
+                if (result instanceof CompletableFuture) {
+                    ((CompletableFuture<Object>) result)
+                            .handle(
+                                    (response, error) -> {
+                                        if (error != null) {
+                                            NettyUtils.sendError(ctx, error);
+                                        } else {
+                                            NettyUtils.sendJsonResponse(ctx, response);
+                                        }
+                                        return response;
+                                    });
+                } else {
+                    NettyUtils.sendJsonResponse(ctx, result);
+                }
             }
         } catch (Exception ex) {
             NettyUtils.sendError(ctx, ex);
