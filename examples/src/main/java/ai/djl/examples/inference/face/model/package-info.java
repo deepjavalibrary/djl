@@ -11,20 +11,8 @@
  * and limitations under the License.
  */
 
+/**
+ * Contains java beans used for the inference face detection examples within the package {@link
+ * ai.djl.examples.inference.face}.
+ */
 package ai.djl.examples.inference.face.model;
-
-import ai.djl.modality.cv.output.Point;
-
-import java.util.List;
-
-public class Landmark {
-    private List<Point> points;
-
-    public Landmark(List<Point> points) {
-        this.points = points;
-    }
-
-    public List<Point> getPoints() {
-        return points;
-    }
-}

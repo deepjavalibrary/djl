@@ -10,6 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+
 package ai.djl.examples.inference.face;
 
 import ai.djl.examples.inference.face.model.FaceDetectedObjects;
@@ -34,7 +35,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FaceDetectionTranslator implements Translator<Image, FaceDetectedObjects> {
-    protected Batchifier batchifier = Batchifier.STACK;
+    private Batchifier batchifier = Batchifier.STACK;
     private double confThresh;
     private double nmsThresh;
     private int topK;
@@ -71,8 +72,7 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
         }
         NDArray mean = ctx.getNDManager().create(new float[]{104f, 117f, 123f}, new Shape(3, 1, 1));
         array = array.sub(mean);
-        NDList list = new NDList(array);
-        return list;
+        return new NDList(array);
     }
 
     @Override
@@ -82,10 +82,9 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
         double scaleWH = variance[1];
 
         NDArray prob = list.get(1).get(":, 1:");
-        prob = NDArrays.stack(
-                new NDList(
-                        prob.argMax(1).toType(DataType.FLOAT32, false),
-                        prob.max(new int[]{1})));
+        prob =
+                NDArrays.stack(
+                        new NDList(prob.argMax(1).toType(DataType.FLOAT32, false), prob.max(new int[]{1})));
 
         NDArray boxRecover = this.boxRecover(manager, width, height, scales, steps);
         NDArray boundingBoxes = list.get(0);
@@ -119,7 +118,6 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
 
         Map<Integer, List<BoundingBox>> recorder = new ConcurrentHashMap<>();
 
-
         for (int i = order.length - 1; i >= 0; i--) {
             long currMaxLoc = order[i];
             float[] classProb = prob.get(currMaxLoc).toFloatArray();
@@ -140,7 +138,7 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
             if (belowIoU) {
                 boxes.add(rect);
                 recorder.put(classId, boxes);
-                String className = "Face"; //classes.get(classId)
+                String className = "Face"; // classes.get(classId)
                 retNames.add(className);
                 retProbs.add(probability);
                 retBB.add(rect);
@@ -150,15 +148,16 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
                     double y = landmsArr[j * 2 + 1];
                     keyPoints.add(new Point(x * width, y * height));
                 }
-                Landmark Landmark = new Landmark(keyPoints);
-                landmarks.add(Landmark);
+                Landmark landmark = new Landmark(keyPoints);
+                landmarks.add(landmark);
             }
         }
 
         return new FaceDetectedObjects(retNames, retProbs, retBB, landmarks);
     }
 
-    private NDArray boxRecover(NDManager manager, int width, int height, int[][] scales, int[] steps) {
+    private NDArray boxRecover(
+            NDManager manager, int width, int height, int[][] scales, int[] steps) {
         int[][] aspectRatio = new int[steps.length][2];
         for (int i = 0; i < steps.length; i++) {
             int wRatio = (int) Math.ceil((float) width / steps[i]);
@@ -191,15 +190,18 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
     }
 
     // decode face landmarks, 5 points per face
-    private NDArray decodeLandm(
-            NDArray pre, NDArray priors, double scaleXY) {
-        NDArray point1 = pre.get(":, :2").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
-        NDArray point2 = pre.get(":, 2:4").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
-        NDArray point3 = pre.get(":, 4:6").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
-        NDArray point4 = pre.get(":, 6:8").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
-        NDArray point5 = pre.get(":, 8:10").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
-        NDArray landms = NDArrays.concat(new NDList(point1, point2, point3, point4, point5), 1);
-        return landms;
+    private NDArray decodeLandm(NDArray pre, NDArray priors, double scaleXY) {
+        NDArray point1 =
+                pre.get(":, :2").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
+        NDArray point2 =
+                pre.get(":, 2:4").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
+        NDArray point3 =
+                pre.get(":, 4:6").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
+        NDArray point4 =
+                pre.get(":, 6:8").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
+        NDArray point5 =
+                pre.get(":, 8:10").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
+        return NDArrays.concat(new NDList(point1, point2, point3, point4, point5), 1);
     }
 
     @Override

@@ -10,6 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+
 package ai.djl.examples.inference.face.model;
 
 import ai.djl.modality.cv.output.BoundingBox;
@@ -17,13 +18,15 @@ import ai.djl.modality.cv.output.DetectedObjects;
 
 import java.util.List;
 
-
 public class FaceDetectedObjects extends DetectedObjects {
     private static final long serialVersionUID = 1L;
     private List<Landmark> landmarks;
 
     public FaceDetectedObjects(
-            List<String> classNames, List<Double> probabilities, List<BoundingBox> boundingBoxes, List<Landmark> landmarks) {
+            List<String> classNames,
+            List<Double> probabilities,
+            List<BoundingBox> boundingBoxes,
+            List<Landmark> landmarks) {
         super(classNames, probabilities, boundingBoxes);
         this.landmarks = landmarks;
     }

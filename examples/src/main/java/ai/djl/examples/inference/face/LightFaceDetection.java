@@ -10,6 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+
 package ai.djl.examples.inference.face;
 
 import ai.djl.ModelException;
@@ -25,11 +26,10 @@ import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +37,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import javax.imageio.ImageIO;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An example of inference using a face detection model.
@@ -48,17 +52,6 @@ import java.util.List;
 public final class LightFaceDetection {
     private static final Logger logger = LoggerFactory.getLogger(LightFaceDetection.class);
 
-    private static double CONF_THRESH = 0.85f;
-    private static double NMS_THRESH = 0.45f;
-    private static double[] VARIANCE = new double[]{0.1f, 0.2f};
-    private static int TOP_K = 5000;
-    private static int[][] SCALES = new int[][]{{10, 16, 24}, {32, 48}, {64, 96}, {128, 192, 256}};
-    private static int[] STEPS = new int[]{8, 16, 32, 64};
-
-    public LightFaceDetection() {
-        super();
-    }
-
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
         FaceDetectedObjects detection = LightFaceDetection.predict();
         logger.info("{}", detection);
@@ -66,20 +59,27 @@ public final class LightFaceDetection {
 
     public static FaceDetectedObjects predict()
             throws IOException, ModelException, TranslateException {
+        double confThresh = 0.85f;
+        double nmsThresh = 0.45f;
+        double[] variance = new double[]{0.1f, 0.2f};
+        int topK = 5000;
+        int[][] scales = new int[][]{{10, 16, 24}, {32, 48}, {64, 96}, {128, 192, 256}};
+        int[] steps = new int[]{8, 16, 32, 64};
         String facePath = "src/test/resources/largest_selfie.jpg";
+
         BufferedImage bufImg = ImageIO.read(new File(facePath));
         Image img = ImageFactory.getInstance().fromImage(bufImg);
         img.getWrappedImage();
+
         Criteria<Image, FaceDetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, FaceDetectedObjects.class)
                         .optModelUrls("https://djl-model.oss-cn-hongkong.aliyuncs.com/ultranet.zip")
                         // Load model from local file, e.g: "file:///Users/calvin/pytorch_models/retinaface/"
-                        //.optModelUrls("file:///path/to/model_dir/")
+                        // .optModelUrls("file:///path/to/model_dir/")
                         .optModelName("ultranet") // specify model file prefix
                         .optTranslator(
-                                new FaceDetectionTranslator(
-                                        CONF_THRESH, NMS_THRESH, VARIANCE, TOP_K, SCALES, STEPS))
+                                new FaceDetectionTranslator(confThresh, nmsThresh, variance, topK, scales, steps))
                         .optProgress(new ProgressBar())
                         .optEngine("PyTorch") // Use PyTorch engine
                         .build();
