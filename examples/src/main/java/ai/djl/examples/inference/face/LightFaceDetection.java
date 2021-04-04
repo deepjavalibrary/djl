@@ -84,7 +84,7 @@ public final class LightFaceDetection {
                         .optEngine("PyTorch") // Use PyTorch engine
                         .build();
 
-        try (ZooModel model = ModelZoo.loadModel(criteria)) {
+        try (ZooModel<Image, FaceDetectedObjects> model = ModelZoo.loadModel(criteria)) {
             try (Predictor<Image, FaceDetectedObjects> predictor = model.newPredictor()) {
                 FaceDetectedObjects detection = predictor.predict(img);
                 drawLandmarks(bufImg, detection.getLandmarks());
@@ -94,7 +94,7 @@ public final class LightFaceDetection {
         }
     }
 
-    public static void saveBoundingBoxImage(Image img, DetectedObjects detection)
+    private static void saveBoundingBoxImage(Image img, DetectedObjects detection)
             throws IOException {
         Path outputDir = Paths.get("build/output");
         Files.createDirectories(outputDir);
@@ -108,7 +108,7 @@ public final class LightFaceDetection {
         logger.info("Face detection result image has been saved in: {}", imagePath);
     }
 
-    public static void drawLandmarks(BufferedImage image, List<Landmark> landmarks) {
+    private static void drawLandmarks(BufferedImage image, List<Landmark> landmarks) {
         Graphics2D g = (Graphics2D) image.getGraphics();
         try {
             g.setColor(new Color(246, 96, 0));
