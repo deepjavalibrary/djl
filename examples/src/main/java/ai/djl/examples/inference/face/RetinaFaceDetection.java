@@ -46,15 +46,14 @@ import java.util.List;
  * information about this example.
  */
 public final class RetinaFaceDetection {
-    private static double CONF_THRESH = 0.02f;
-    private static double VIS_THRESH = 0.6f;
-    private static double NMS_THRESH = 0.4f;
+    private static final Logger logger = LoggerFactory.getLogger(RetinaFaceDetection.class);
+
+    private static double CONF_THRESH = 0.85f;
+    private static double NMS_THRESH = 0.45f;
     private static double[] VARIANCE = new double[]{0.1f, 0.2f};
     private static int TOP_K = 5000;
     private static int[][] SCALES = new int[][]{{16, 32}, {64, 128}, {256, 512}};
     private static int[] STEPS = new int[]{8, 16, 32};
-
-    private static final Logger logger = LoggerFactory.getLogger(RetinaFaceDetection.class);
 
     public RetinaFaceDetection() {
     }
@@ -74,10 +73,12 @@ public final class RetinaFaceDetection {
                 Criteria.builder()
                         .setTypes(Image.class, FaceDetectedObjects.class)
                         .optModelUrls("https://djl-model.oss-cn-hongkong.aliyuncs.com/retinaface.zip")
+                        // Load model from local file, e.g: "file:///Users/calvin/pytorch_models/retinaface/"
+                        //.optModelUrls("file:///path/to/model_dir/")
                         .optModelName("retinaface") // specify model file prefix
                         .optTranslator(
                                 new FaceDetectionTranslator(
-                                        CONF_THRESH, VIS_THRESH, NMS_THRESH, VARIANCE, TOP_K, SCALES, STEPS))
+                                        CONF_THRESH, NMS_THRESH, VARIANCE, TOP_K, SCALES, STEPS))
                         .optProgress(new ProgressBar())
                         .optEngine("PyTorch") // Use PyTorch engine
                         .build();

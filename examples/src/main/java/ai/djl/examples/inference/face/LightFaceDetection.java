@@ -46,12 +46,10 @@ import java.util.List;
  * information about this example.
  */
 public final class LightFaceDetection {
-
     private static final Logger logger = LoggerFactory.getLogger(LightFaceDetection.class);
 
-    private static double CONF_THRESH = 0.02f;
-    private static double VIS_THRESH = 0.85f;
-    private static double NMS_THRESH = 0.4f;
+    private static double CONF_THRESH = 0.85f;
+    private static double NMS_THRESH = 0.45f;
     private static double[] VARIANCE = new double[]{0.1f, 0.2f};
     private static int TOP_K = 5000;
     private static int[][] SCALES = new int[][]{{10, 16, 24}, {32, 48}, {64, 96}, {128, 192, 256}};
@@ -62,7 +60,7 @@ public final class LightFaceDetection {
     }
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        FaceDetectedObjects detection = RetinaFaceDetection.predict();
+        FaceDetectedObjects detection = LightFaceDetection.predict();
         logger.info("{}", detection);
     }
 
@@ -76,10 +74,12 @@ public final class LightFaceDetection {
                 Criteria.builder()
                         .setTypes(Image.class, FaceDetectedObjects.class)
                         .optModelUrls("https://djl-model.oss-cn-hongkong.aliyuncs.com/ultranet.zip")
+                        // Load model from local file, e.g: "file:///Users/calvin/pytorch_models/retinaface/"
+                        //.optModelUrls("file:///path/to/model_dir/")
                         .optModelName("ultranet") // specify model file prefix
                         .optTranslator(
                                 new FaceDetectionTranslator(
-                                        CONF_THRESH, VIS_THRESH, NMS_THRESH, VARIANCE, TOP_K, SCALES, STEPS))
+                                        CONF_THRESH, NMS_THRESH, VARIANCE, TOP_K, SCALES, STEPS))
                         .optProgress(new ProgressBar())
                         .optEngine("PyTorch") // Use PyTorch engine
                         .build();

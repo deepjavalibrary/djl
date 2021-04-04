@@ -13,254 +13,197 @@
 package ai.djl.examples.inference.face;
 
 import ai.djl.examples.inference.face.model.FaceDetectedObjects;
-import ai.djl.examples.inference.face.model.FaceObject;
 import ai.djl.examples.inference.face.model.Landmark;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.Point;
 import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.index.NDIndex;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FaceDetectionTranslator implements Translator<Image, FaceDetectedObjects> {
-  protected Batchifier batchifier = Batchifier.STACK;
-  private double confThresh;
-  private double visThresh;
-  private double nmsThresh;
-  private int topK;
-  private double[] variance;
-  private int[][] scales;
-  private int[] steps;
-  private int width;
-  private int height;
+    protected Batchifier batchifier = Batchifier.STACK;
+    private double confThresh;
+    private double nmsThresh;
+    private int topK;
+    private double[] variance;
+    private int[][] scales;
+    private int[] steps;
+    private int width;
+    private int height;
 
-  public FaceDetectionTranslator(
-      double confThresh,
-      double visThresh,
-      double nmsThresh,
-      double[] variance,
-      int topK,
-      int[][] scales,
-      int[] steps) {
-    this.confThresh = confThresh;
-    this.visThresh = visThresh;
-    this.nmsThresh = nmsThresh;
-    this.variance = variance;
-    this.topK = topK;
-    this.scales = scales;
-    this.steps = steps;
-  }
-
-  @Override
-  public NDList processInput(TranslatorContext ctx, Image input) {
-    width = input.getWidth();
-    height = input.getHeight();
-    NDArray array = input.toNDArray(ctx.getNDManager(), Image.Flag.COLOR);
-    array = array.transpose(2, 0, 1).flip(0); // HWC -> CHW RGB -> BGR
-    // The network by default takes float32
-    if (!array.getDataType().equals(DataType.FLOAT32)) {
-      array = array.toType(DataType.FLOAT32, false);
-    }
-    NDArray mean = ctx.getNDManager().create(new float[] {104f, 117f, 123f}, new Shape(3, 1, 1));
-    array = array.sub(mean);
-    NDList list = new NDList(array);
-
-    return list;
-  }
-
-  @Override
-  public FaceDetectedObjects processOutput(TranslatorContext ctx, NDList list) {
-    double[][] priors = this.boxRecover(width, height, scales, steps);
-    NDArray loc = list.get(0);
-    float[] locFloat = loc.toFloatArray();
-    double[][] boxes = this.decodeBoxes(locFloat, priors, variance);
-    NDArray conf = list.get(1);
-    float[] scores = this.decodeConf(conf);
-    NDArray landms = list.get(2);
-    List<List<Point>> landmsList =
-        this.decodeLandm(landms.toFloatArray(), priors, variance, width, height);
-
-    PriorityQueue<FaceObject> pq =
-        new PriorityQueue<FaceObject>(
-            10,
-            new Comparator<FaceObject>() {
-              @Override
-              public int compare(final FaceObject lhs, final FaceObject rhs) {
-                return Double.compare(rhs.getScore(), lhs.getScore());
-              }
-            });
-
-    for (int i = 0; i < scores.length; i++) {
-      if (scores[i] > this.confThresh) {
-        BoundingBox rect =
-            new Rectangle(
-                boxes[i][0], boxes[i][1], boxes[i][2] - boxes[i][0], boxes[i][3] - boxes[i][1]);
-
-        FaceObject faceObject = new FaceObject(scores[i], rect, landmsList.get(i));
-        pq.add(faceObject);
-      }
+    public FaceDetectionTranslator(
+            double confThresh,
+            double nmsThresh,
+            double[] variance,
+            int topK,
+            int[][] scales,
+            int[] steps) {
+        this.confThresh = confThresh;
+        this.nmsThresh = nmsThresh;
+        this.variance = variance;
+        this.topK = topK;
+        this.scales = scales;
+        this.steps = steps;
     }
 
-    ArrayList<FaceObject> topKArrayList = new ArrayList<FaceObject>();
-    int index = 0;
-    while (pq.size() > 0) {
-      FaceObject faceObject = pq.poll();
-      if (index >= this.topK) {
-        break;
-      }
-      topKArrayList.add(faceObject);
-    }
-
-    ArrayList<FaceObject> nmsList = this.nms(topKArrayList, this.nmsThresh);
-
-    List<String> classNames = new ArrayList<String>();
-    List<Double> probabilities = new ArrayList<Double>();
-    List<BoundingBox> boundingBoxes = new ArrayList<BoundingBox>();
-    List<Landmark> landmarks = new ArrayList<Landmark>();
-
-    for (int i = 0; i < nmsList.size(); i++) {
-      FaceObject faceObject = nmsList.get(i);
-
-      if (faceObject.getScore() < this.visThresh) {
-        continue;
-      }
-
-      classNames.add(new String("Face"));
-      probabilities.add((double) faceObject.getScore());
-      boundingBoxes.add(faceObject.getBoundingBox());
-      List<Point> keyPoints = faceObject.getKeyPoints();
-      Landmark landmark = new Landmark(keyPoints);
-      landmarks.add(landmark);
-    }
-
-    return new FaceDetectedObjects(classNames, probabilities, boundingBoxes, landmarks);
-  }
-
-  private double[][] boxRecover(int width, int height, int[][] scales, int[] steps) {
-    int[][] aspectRatio = new int[steps.length][2];
-    for (int i = 0; i < steps.length; i++) {
-      int wRatio = (int) Math.ceil((float) width / steps[i]);
-      int hRatio = (int) Math.ceil((float) height / steps[i]);
-      aspectRatio[i] = new int[] {hRatio, wRatio};
-    }
-
-    List<double[]> defaultBoxes = new ArrayList<>();
-
-    for (int idx = 0; idx < steps.length; idx++) {
-      int[] scale = scales[idx];
-      for (int h = 0; h < aspectRatio[idx][0]; h++) {
-        for (int w = 0; w < aspectRatio[idx][1]; w++) {
-          for (int index = 0; index < scale.length; index++) {
-            double skx = scale[index] * 1.0 / width;
-            double sky = scale[index] * 1.0 / height;
-            double cx = (w + 0.5) * steps[idx] / width;
-            double cy = (h + 0.5) * steps[idx] / height;
-            defaultBoxes.add(new double[] {cx, cy, skx, sky});
-          }
+    @Override
+    public NDList processInput(TranslatorContext ctx, Image input) {
+        width = input.getWidth();
+        height = input.getHeight();
+        NDArray array = input.toNDArray(ctx.getNDManager(), Image.Flag.COLOR);
+        array = array.transpose(2, 0, 1).flip(0); // HWC -> CHW RGB -> BGR
+        // The network by default takes float32
+        if (!array.getDataType().equals(DataType.FLOAT32)) {
+            array = array.toType(DataType.FLOAT32, false);
         }
-      }
+        NDArray mean = ctx.getNDManager().create(new float[]{104f, 117f, 123f}, new Shape(3, 1, 1));
+        array = array.sub(mean);
+        NDList list = new NDList(array);
+        return list;
     }
 
-    double[][] boxes = new double[defaultBoxes.size()][defaultBoxes.get(0).length];
-    for (int i = 0; i < defaultBoxes.size(); i++) {
-      boxes[i] = defaultBoxes.get(i);
-    }
-    return boxes;
-  }
-  // decode prior boxes
-  private double[][] decodeBoxes(float[] locs, double[][] priors, double[] variance) {
-    double[][] boxes = new double[priors.length][4];
-    for (int i = 0; i < priors.length; i++) {
-      double x = priors[i][0] + locs[i * 4 + 0] * variance[0] * priors[i][2];
-      double y = priors[i][1] + locs[i * 4 + 1] * variance[0] * priors[i][3];
-      double w = priors[i][2] * (float) Math.exp(locs[i * 4 + 2] * variance[1]);
-      double h = priors[i][3] * (float) Math.exp(locs[i * 4 + 3] * variance[1]);
-      x = x - w / 2;
-      y = y - h / 2;
-      w = w + x;
-      h = h + y;
-      boxes[i] = new double[] {x, y, w, h};
-    }
+    @Override
+    public FaceDetectedObjects processOutput(TranslatorContext ctx, NDList list) {
+        NDManager manager = ctx.getNDManager();
+        double scaleXY = variance[0];
+        double scaleWH = variance[1];
 
-    return boxes;
-  }
+        NDArray prob = list.get(1).get(":, 1:");
+        prob = NDArrays.stack(
+                new NDList(
+                        prob.argMax(1).toType(DataType.FLOAT32, false),
+                        prob.max(new int[]{1})));
 
-  // decode face confidence
-  private float[] decodeConf(NDArray conf) {
-    return conf.get(new NDIndex(":, 1")).toFloatArray();
-  }
+        NDArray boxRecover = this.boxRecover(manager, width, height, scales, steps);
+        NDArray boundingBoxes = list.get(0);
+        NDArray bbWH = boundingBoxes.get(":, 2:").mul(scaleWH).exp().mul(boxRecover.get(":, 2:"));
+        NDArray bbXY =
+                boundingBoxes
+                        .get(":, :2")
+                        .mul(scaleXY)
+                        .mul(boxRecover.get(":, 2:"))
+                        .add(boxRecover.get(":, :2"))
+                        .sub(bbWH.mul(0.5f));
 
-  // decode face landmarks, 5 points per face
-  private List<List<Point>> decodeLandm(
-      float[] landms, double[][] priors, double[] variance, int width, int height) {
-    List<List<Point>> landmsArr = new ArrayList<>();
-    List<Point> points = new ArrayList<>();
-    for (int i = 0; i < priors.length; i++) {
-      points = new ArrayList<>();
-      for (int j = 0; j < 5; j++) { // 5 face landmarks
-        double x = priors[i][0] + landms[i * 5 * 2 + j * 2] * variance[0] * priors[i][2];
-        double y = priors[i][1] + landms[i * 5 * 2 + j * 2 + 1] * variance[0] * priors[i][3];
-        points.add(new Point(x * width, y * height));
-      }
-      landmsArr.add(points);
-    }
-    return landmsArr;
-  }
+        boundingBoxes = NDArrays.concat(new NDList(bbXY, bbWH), 1);
 
-  // NMS - non maximum suppression
-  public static ArrayList<FaceObject> nms(ArrayList<FaceObject> list, double nmsThresh) {
-    ArrayList<FaceObject> nmsList = new ArrayList<FaceObject>();
-    // Find max confidence
-    PriorityQueue<FaceObject> pq =
-        new PriorityQueue<FaceObject>(
-            10,
-            new Comparator<FaceObject>() {
-              @Override
-              public int compare(final FaceObject lhs, final FaceObject rhs) {
-                // Intentionally reversed to put high confidence at the head of the queue.
-                return Float.compare(rhs.getScore(), lhs.getScore());
-              }
-            });
+        NDArray landms = list.get(2);
+        landms = this.decodeLandm(landms, boxRecover, scaleXY);
 
-    for (int i = 0; i < list.size(); i++) {
-      // put high confidence at the head of the queue.
-      pq.add(list.get(i));
-    }
+        // filter the result below the threshold
+        NDArray cutOff = prob.get(1).gt(this.confThresh);
+        boundingBoxes = boundingBoxes.transpose().booleanMask(cutOff, 1).transpose();
+        landms = landms.transpose().booleanMask(cutOff, 1).transpose();
+        prob = prob.booleanMask(cutOff, 1);
 
-    while (pq.size() > 0) {
-      // insert face object with max confidence
-      FaceObject[] a = new FaceObject[pq.size()];
-      FaceObject[] detections = pq.toArray(a);
-      FaceObject max = detections[0];
-      nmsList.add(max);
+        // start categorical filtering
+        long[] order = prob.get(1).argSort().get(":" + this.topK).toLongArray();
+        prob = prob.transpose();
+        List<String> retNames = new ArrayList<>();
+        List<Double> retProbs = new ArrayList<>();
+        List<BoundingBox> retBB = new ArrayList<>();
+        List<Landmark> landmarks = new ArrayList<Landmark>();
 
-      // clear pq to do next nms
-      pq.clear();
+        Map<Integer, List<BoundingBox>> recorder = new ConcurrentHashMap<>();
 
-      for (int j = 1; j < detections.length; j++) {
-        FaceObject detection = detections[j];
-        BoundingBox b = detection.getBoundingBox();
-        double boxIoU = max.getBoundingBox().getIoU(b);
-        if (boxIoU <= nmsThresh) {
-          pq.add(detection);
+
+        for (int i = order.length - 1; i >= 0; i--) {
+            long currMaxLoc = order[i];
+            float[] classProb = prob.get(currMaxLoc).toFloatArray();
+            int classId = (int) classProb[0];
+            double probability = classProb[1];
+
+            double[] boxArr = boundingBoxes.get(currMaxLoc).toDoubleArray();
+            Rectangle rect = new Rectangle(boxArr[0], boxArr[1], boxArr[2], boxArr[3]);
+            double[] landmsArr = landms.get(currMaxLoc).toDoubleArray();
+            List<BoundingBox> boxes = recorder.getOrDefault(classId, new ArrayList<>());
+            boolean belowIoU = true;
+            for (BoundingBox box : boxes) {
+                if (box.getIoU(rect) > this.nmsThresh) {
+                    belowIoU = false;
+                    break;
+                }
+            }
+            if (belowIoU) {
+                boxes.add(rect);
+                recorder.put(classId, boxes);
+                String className = "Face"; //classes.get(classId)
+                retNames.add(className);
+                retProbs.add(probability);
+                retBB.add(rect);
+                List<Point> keyPoints = new ArrayList<>();
+                for (int j = 0; j < 5; j++) { // 5 face landmarks
+                    double x = landmsArr[j * 2];
+                    double y = landmsArr[j * 2 + 1];
+                    keyPoints.add(new Point(x * width, y * height));
+                }
+                Landmark Landmark = new Landmark(keyPoints);
+                landmarks.add(Landmark);
+            }
         }
-      }
-    }
-    return nmsList;
-  }
 
-  @Override
-  public Batchifier getBatchifier() {
-    return batchifier;
-  }
+        return new FaceDetectedObjects(retNames, retProbs, retBB, landmarks);
+    }
+
+    private NDArray boxRecover(NDManager manager, int width, int height, int[][] scales, int[] steps) {
+        int[][] aspectRatio = new int[steps.length][2];
+        for (int i = 0; i < steps.length; i++) {
+            int wRatio = (int) Math.ceil((float) width / steps[i]);
+            int hRatio = (int) Math.ceil((float) height / steps[i]);
+            aspectRatio[i] = new int[]{hRatio, wRatio};
+        }
+
+        List<double[]> defaultBoxes = new ArrayList<>();
+
+        for (int idx = 0; idx < steps.length; idx++) {
+            int[] scale = scales[idx];
+            for (int h = 0; h < aspectRatio[idx][0]; h++) {
+                for (int w = 0; w < aspectRatio[idx][1]; w++) {
+                    for (int index = 0; index < scale.length; index++) {
+                        double skx = scale[index] * 1.0 / width;
+                        double sky = scale[index] * 1.0 / height;
+                        double cx = (w + 0.5) * steps[idx] / width;
+                        double cy = (h + 0.5) * steps[idx] / height;
+                        defaultBoxes.add(new double[]{cx, cy, skx, sky});
+                    }
+                }
+            }
+        }
+
+        double[][] boxes = new double[defaultBoxes.size()][defaultBoxes.get(0).length];
+        for (int i = 0; i < defaultBoxes.size(); i++) {
+            boxes[i] = defaultBoxes.get(i);
+        }
+        return manager.create(boxes).clip(0.0, 1.0);
+    }
+
+    // decode face landmarks, 5 points per face
+    private NDArray decodeLandm(
+            NDArray pre, NDArray priors, double scaleXY) {
+        NDArray point1 = pre.get(":, :2").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
+        NDArray point2 = pre.get(":, 2:4").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
+        NDArray point3 = pre.get(":, 4:6").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
+        NDArray point4 = pre.get(":, 6:8").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
+        NDArray point5 = pre.get(":, 8:10").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
+        NDArray landms = NDArrays.concat(new NDList(point1, point2, point3, point4, point5), 1);
+        return landms;
+    }
+
+    @Override
+    public Batchifier getBatchifier() {
+        return batchifier;
+    }
 }
