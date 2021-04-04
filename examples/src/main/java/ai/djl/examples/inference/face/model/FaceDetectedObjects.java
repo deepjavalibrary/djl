@@ -19,6 +19,7 @@ import java.util.List;
 
 
 public class FaceDetectedObjects extends DetectedObjects {
+    private static final long serialVersionUID = 1L;
     private List<Landmark> landmarks;
 
     public FaceDetectedObjects(
