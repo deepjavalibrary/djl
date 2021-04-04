@@ -26,7 +26,6 @@ import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -38,7 +37,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import javax.imageio.ImageIO;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +49,8 @@ import org.slf4j.LoggerFactory;
  */
 public final class RetinaFaceDetection {
     private static final Logger logger = LoggerFactory.getLogger(RetinaFaceDetection.class);
+
+    private RetinaFaceDetection() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
         FaceDetectedObjects detection = RetinaFaceDetection.predict();

@@ -14,7 +14,6 @@
 package ai.djl.examples.inference.face.model;
 
 import ai.djl.modality.cv.output.Point;
-
 import java.util.List;
 
 public class Landmark {

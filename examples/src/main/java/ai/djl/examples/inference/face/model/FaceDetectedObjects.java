@@ -15,7 +15,6 @@ package ai.djl.examples.inference.face.model;
 
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
-
 import java.util.List;
 
 public class FaceDetectedObjects extends DetectedObjects {
