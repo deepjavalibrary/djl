@@ -66,6 +66,7 @@ public final class ConfigManager {
     private static final String MAX_REQUEST_SIZE = "max_request_size";
     private static final String MODEL_STORE = "model_store";
     private static final String MODEL_URL_PATTERN = "model_url_pattern";
+    private static final String PLUGIN_FOLDER = "plugin_folder";
 
     // Configuration which are not documented or enabled through environment variables
     private static final String USE_NATIVE_IO = "use_native_io";
@@ -305,6 +306,15 @@ public final class ConfigManager {
      */
     public String getCorsAllowedHeaders() {
         return prop.getProperty(CORS_ALLOWED_HEADERS);
+    }
+
+    /**
+     * return the folder where the model search for plugins.
+     *
+     * @return the configured plugin folder or the default folder.
+     */
+    public Path getPluginFolder() {
+        return Paths.get(prop.getProperty(PLUGIN_FOLDER, "plugins"));
     }
 
     /**

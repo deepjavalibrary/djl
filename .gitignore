@@ -24,7 +24,3 @@ bin/
 #node
 node_modules/
 **/static/dist/
-# repository/src/main/resources/static/dist/modelzoo-frontend.js/main.js
-
-
-
