@@ -20,15 +20,11 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.Map;
 
-
-/**
- * A handler to handle upload requests from the ModelView.
- *
- */
+/** A handler to handle upload requests from the ModelView. */
 public class ModelUploadHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     HttpRequestResponse jsonResponse;
@@ -45,19 +41,19 @@ public class ModelUploadHandler extends SimpleChannelInboundHandler<FullHttpRequ
      * @param request the full request
      */
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request){
+    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
         QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
         String modelName = NettyUtils.getParameter(decoder, "modelName", null);
         Map<String, String> names = new ConcurrentHashMap<>();
         CompletableFuture.supplyAsync(
-                () -> {
-                    if (modelName != null) {
-                        names.put(modelName, modelName);
-                        return names;
-                    } else {
-                        throw new BadRequestException("modelName is mandatory.");
-                    }
-                })
+                        () -> {
+                            if (modelName != null) {
+                                names.put(modelName, modelName);
+                                return names;
+                            } else {
+                                throw new BadRequestException("modelName is mandatory.");
+                            }
+                        })
                 .exceptionally((ex) -> Collections.emptyMap())
                 .thenAccept(nameResponse -> jsonResponse.sendAsJson(ctx, request, nameResponse));
     }
