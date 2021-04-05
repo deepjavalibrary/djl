@@ -7,6 +7,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import TreeItem from '@material-ui/lab/TreeItem';
 import ModelView from './ModelView';
+import UploadFab from './UploadFab';
 
 import axios from 'axios'
 
@@ -229,6 +230,7 @@ export default function ModelNavigator(props) {
 					</div>
 				}
 			</div>
+			<UploadFab/>
 		</>
 	);
 }
