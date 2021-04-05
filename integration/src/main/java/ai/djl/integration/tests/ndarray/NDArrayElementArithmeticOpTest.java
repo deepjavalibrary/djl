@@ -629,7 +629,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray inPlaceResult = array.powi(2);
             NDArray expected = manager.create(new float[] {36, 0, 1, 25, 4}, new Shape(1, 5));
             Assertions.assertAlmostEquals(result, expected);
-            Assertions.assertInPlaceAlmostEquals(inPlaceResult, expected, array, 1e-5, 2e-3);
+            Assertions.assertInPlaceAlmostEquals(inPlaceResult, expected, array);
 
             testScalarCornerCase(manager, NDArray::pow, (x, y) -> (float) Math.pow(x, y), false);
             testScalarCornerCase(manager, NDArray::powi, (x, y) -> (float) Math.pow(x, y), true);

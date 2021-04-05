@@ -313,7 +313,14 @@ public final class JavacppUtils {
             status.throwExceptionIfNotOK();
             Pointer pointer =
                     tensorflow.TF_TensorData(tensor).capacity(tensorflow.TF_TensorByteSize(tensor));
-            return pointer.asByteBuffer().order(ByteOrder.nativeOrder());
+            ByteBuffer buf = pointer.asByteBuffer();
+            // do the copy since we should make sure the returned ByteBuffer is still valid after
+            // the tensor is deleted
+            ByteBuffer ret = ByteBuffer.allocate(buf.capacity());
+            buf.rewind();
+            ret.put(buf);
+            ret.flip();
+            return ret.order(ByteOrder.nativeOrder());
         }
     }
 
