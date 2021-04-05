@@ -2,14 +2,14 @@
 
 The Dataset in DJL represents both the raw data and loading process.
 RandomAccessDataset implements the Dataset interface and provides comprehensive data loading functionality.
-RandomAccessDataset is also a basic dataset that supports random access of data using indices.
+RandomAccessDataset is also a basic dataset that supports random or sequential access of data using indices.
 You can easily customize your own dataset by extending RandomAccessDataset.
 
 We provide several well-known datasets that you can use in our [Basic Datasets module](https://javadoc.io/doc/ai.djl/basicdataset/latest/index.html).
 
 We also provide several built-in datasets that you can easily wrap around existing NDArrays and images.
 
-- ArrayDataset - a dataset that wraps your existing NDArray as inputs and labels.
+- ArrayDataset - a dataset that wraps your existing NDArrays as inputs and labels.
 - ImageFolder - a dataset that wraps your images under folders for image classification.
 
 If none of the provided datasets meet your requirements, you can also easily customize you own dataset by extending
@@ -17,7 +17,7 @@ the RandomAccessDataset.
 
 ## How to use the ArrayDataset
 
-The following code illustrates an implementation of ArrayDataset.
+The following code illustrates an implementation of [ArrayDataset](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/training/dataset/ArrayDataset.html).
 The ArrayDataset is recommended only if your dataset is small enough to fit in memory.
 
 ```java
@@ -30,8 +30,10 @@ ArrayDataset dataset = new ArrayDataset.Builder()
 
 ```
 
-When you get the `Batch` from `trainer.iterateDataset(dataset)`,
-you can use ``batch.getData()`` to get a NDList with size 2. You can then use `NDList.get(0)` to get your first data and `NDList.get(1)` to get your second data.
+When you get the `Batch` from `trainer.iterateDataset(dataset)` or `dataset.getData(manager)`,
+you can use ``batch.getData()`` to get a NDList. The size of this NDList is the amount of data NDArrays 
+entered in `setData()`, in this case the size is 2. You can then use `NDList.get(0)` to get your first 
+data and `NDList.get(1)` to get your second data.
 Similarly, you can use `batch.getLabels()` to get a NDList with size 3.
 
 ## How to use the ImageFolder dataset
@@ -112,9 +114,10 @@ api "ai.djl:api:0.10.0"
 api "ai.djl:basicdataset:0.10.0"
 ```
 
-There are three parts we need to implement for CSVDataset.
+There are four parts we need to implement for CSVDataset.
 
 1. Constructor and Builder
+
 First, we need a private field that holds the CSVRecord list from the csv file.
 We create a constructor and pass the CSVRecord list from builder to the class field.
 For builder, we have all we need in `BaseBuilder` so we only need to include the two minimal methods as shown.
@@ -158,7 +161,29 @@ public class CSVDataset extends RandomAccessDataset {
 }
 ```
 
-2. Getter
+2. Prepare
+
+As mentioned, in this example we are taking advantage of CSVParser to prepare the data for us. To prepare
+the data on our own, we use the `prepare()` method. Normally here we would load or create any data 
+for our dataset and then save it in one of the private fields previously created. This `prepare()` method
+is called everytime we call `getData()` so in every case we want to only load the data once, we use a 
+boolean variable called `prepared` to check if it has previously been loaded or prepared.
+
+Since we don't have to prepare any data on our own for this example, we only have to override it.
+
+```java
+@Override
+public void prepare(Progress progress) {}
+```
+
+There are great [examples](https://github.com/awslabs/djl/blob/master/basicdataset/src/main/java/ai/djl/basicdataset/nlp/AmazonReview.java)
+in our [basicdataset](https://github.com/awslabs/djl/blob/master/basicdataset/src/main/java/ai/djl/basicdataset)
+folder that show use cases for `prepare()`.
+
+
+
+3. Getter
+
 The getter returns a Record object which contains encoded inputs and labels.
 Here, we use simple encoding to transform the url String to an int array and create a NDArray on top of it.
 The reason why we use NDList here is that you might have multiple inputs and labels in different tasks.
@@ -174,7 +199,8 @@ public Record get(NDManager manager, long index) {
 }
 ```
 
-3. Size
+4. Size
+
 The number of records available to be read in this Dataset.
 Here, we can directly use the size of the List<CSVRecord>.
 
