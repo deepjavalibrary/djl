@@ -309,7 +309,7 @@ public final class JniUtils {
                         shape.getShape(), indices.getHandle(), values.getHandle(), false));
     }
 
-    public static PtNDArray to(PtNDArray ndArray, DataType dataType, Device device, boolean copy) {
+    public static PtNDArray to(PtNDArray ndArray, DataType dataType, Device device) {
         PtNDManager manager = ndArray.getManager();
         // the device of the manager should always match the one in NDArray which the manager attach
         // to
@@ -324,8 +324,7 @@ public final class JniUtils {
                         new int[] {
                             PtDeviceType.toDeviceType(device),
                             device.equals(Device.cpu()) ? -1 : device.getDeviceId()
-                        },
-                        copy));
+                        }));
     }
 
     public static PtNDArray toSparse(PtNDArray ndArray) {

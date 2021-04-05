@@ -51,7 +51,9 @@ public final class TfEngine extends Engine implements AutoCloseable {
         try {
             LibUtils.loadLibrary();
             eagerSessionHandle =
-                    new AtomicReference<>(JavacppUtils.createEagerSession(true, 0, null));
+                    new AtomicReference<>(
+                            JavacppUtils.createEagerSession(
+                                    true, 2, JavacppUtils.getSessionConfig()));
             // call a function from tensorflow-java package to
             // load the native library right here
             // if it throws exception, we can catch it here
@@ -102,11 +104,7 @@ public final class TfEngine extends Engine implements AutoCloseable {
             TF_DeviceList deviceList = null;
             try (PointerScope scope = new PointerScope()) {
                 TF_Status status = tensorflow.TF_NewStatus();
-                deviceList =
-                        tensorflow.TFE_ContextListDevices(
-                                tensorflow.TFE_NewContext(
-                                        tensorflow.TFE_NewContextOptions(), status),
-                                status);
+                deviceList = tensorflow.TFE_ContextListDevices(eagerSessionHandle.get(), status);
                 int deviceCount = tensorflow.TF_DeviceListCount(deviceList);
                 for (int i = 0; i < deviceCount; i++) {
                     if (tensorflow.TF_DeviceListName(deviceList, i, status)
