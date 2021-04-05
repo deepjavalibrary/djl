@@ -88,7 +88,7 @@ export default function UploadFab() {
                       >
                             <Fade in={show}>
                               <div className={classes.paper}>
-                                <h2 id="transition-modal-title">Transition modal</h2>
+                                <h2 id="transition-modal-title">Model Uploader</h2>
                                      <input type="file" name="file" onChange={onChangeHandler}/>
                                     <button type="button" onClick={handleClose}>
                                         press to close
