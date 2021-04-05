@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.IntPointer;
+import org.bytedeco.javacpp.Pointer;
 import org.bytedeco.javacpp.PointerPointer;
 import org.bytedeco.javacpp.PointerScope;
 import org.tensorflow.internal.c_api.TFE_Context;
@@ -51,9 +52,32 @@ final class TfOpExecutor implements AutoCloseable {
         }
     }
 
+    public NDArray[] build(int numOutputs) {
+        TFE_TensorHandle[] handles = buildRawPointer(numOutputs);
+        NDArray[] outputs = new NDArray[handles.length];
+        for (int i = 0; i < handles.length; ++i) {
+            // attach the TfNDArray along with pointer to manager
+            outputs[i] = new TfNDArray(manager, handles[i]);
+        }
+        return outputs;
+    }
+
+    public NDArray buildSingletonOrThrow() {
+        TFE_TensorHandle[] handles = buildRawPointer(1);
+        try {
+            Preconditions.checkArgument(
+                    handles.length == 1,
+                    "The expected size of outputs is 1 but got " + handles.length);
+        } catch (IllegalArgumentException e) {
+            Arrays.stream(handles).forEach(Pointer::close);
+            throw e;
+        }
+        return new TfNDArray(manager, handles[0]);
+    }
+
     // please make sure you close the output manually or attach to NDManager
     @SuppressWarnings({"unchecked", "try"})
-    private TFE_TensorHandle[] execute(TFE_Op opHandle, int numOutputs) {
+    public TFE_TensorHandle[] buildRawPointer(int numOutputs) {
         try (PointerScope scope = new PointerScope()) {
             IntPointer numReturnValues = new IntPointer(1).put(numOutputs);
             PointerPointer<TFE_TensorHandle> returnValues = new PointerPointer<>(numOutputs);
@@ -73,30 +97,6 @@ final class TfOpExecutor implements AutoCloseable {
                                 .retainReference();
             }
             return results;
-        }
-    }
-
-    public NDArray[] build(int numOutputs) {
-        try {
-            TFE_TensorHandle[] handles = execute(opHandle, numOutputs);
-            NDArray[] outputs = new NDArray[handles.length];
-            for (int i = 0; i < handles.length; ++i) {
-                // attach the TfNDArray along with pointer to manager
-                outputs[i] = new TfNDArray(manager, handles[i]);
-            }
-            return outputs;
-        } finally {
-            close();
-        }
-    }
-
-    public NDArray buildSingletonOrThrow() {
-        try {
-            TFE_TensorHandle[] handles = execute(opHandle, 1);
-            Preconditions.checkArgument(
-                    handles.length == 1,
-                    "The expected size of outputs is 1 but got " + handles.length);
-            return new TfNDArray(manager, handles[0]);
         } finally {
             close();
         }

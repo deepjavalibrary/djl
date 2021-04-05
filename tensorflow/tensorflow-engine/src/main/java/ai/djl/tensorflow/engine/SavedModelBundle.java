@@ -14,11 +14,8 @@
 package ai.djl.tensorflow.engine;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.bytedeco.javacpp.PointerScope;
 import org.tensorflow.internal.c_api.TF_Graph;
 import org.tensorflow.internal.c_api.TF_Session;
-import org.tensorflow.internal.c_api.TF_Status;
-import org.tensorflow.internal.c_api.global.tensorflow;
 import org.tensorflow.proto.framework.MetaGraphDef;
 
 /** The wrapper class for native resources required for SavedModelBundle. */
@@ -65,7 +62,6 @@ public class SavedModelBundle implements AutoCloseable {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings({"unchecked", "try"})
     @Override
     public void close() {
         // to prevent double free
@@ -75,18 +71,8 @@ public class SavedModelBundle implements AutoCloseable {
         if (graphHandle != null && !graphHandle.isNull()) {
             graphHandle.close();
         }
-        // manually use C API to release session native resource
-        // as the default session's deallocator in org/tensorflow/c_api/internal/TF_Session.java
-        // have not released status and called throwExceptionIfNotOK
-        // usually we should prefer to use default deallocator as much as possible
-        // the code is fixed in upstream tensorflow java, we can refactor with their next releaase
-        // https://github.com/tensorflow/java/pull/253/files
-        try (PointerScope scope = new PointerScope()) {
-            TF_Status status = TF_Status.newStatus();
-            tensorflow.TF_CloseSession(sessionHandle, status);
-            // Result of close is ignored, delete anyway.
-            tensorflow.TF_DeleteSession(sessionHandle, status);
-            status.throwExceptionIfNotOK();
+        if (sessionHandle != null && !sessionHandle.isNull()) {
+            sessionHandle.close();
         }
         metaGraphDef = null;
     }

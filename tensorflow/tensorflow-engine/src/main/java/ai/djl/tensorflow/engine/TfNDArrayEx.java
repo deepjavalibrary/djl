@@ -23,6 +23,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.recurrent.RNN;
 import java.util.List;
+import org.tensorflow.internal.c_api.TFE_TensorHandle;
 
 public class TfNDArrayEx implements NDArrayEx {
 
@@ -62,7 +63,9 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rdivi(NDArray b) {
-        array.inPlaceHelper(b.div(array), array);
+        TFE_TensorHandle newHandle =
+                manager.opExecutor("Div").addInput(b).addInput(array).buildRawPointer(1)[0];
+        array.setHandle(newHandle);
         return array;
     }
 
@@ -87,7 +90,9 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rsubi(NDArray b) {
-        array.inPlaceHelper(b.sub(array), array);
+        TFE_TensorHandle newHandle =
+                manager.opExecutor("Sub").addInput(b).addInput(array).buildRawPointer(1)[0];
+        array.setHandle(newHandle);
         return array;
     }
 
@@ -112,7 +117,9 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rmodi(NDArray b) {
-        array.inPlaceHelper(b.mod(array), array);
+        TFE_TensorHandle newHandle =
+                manager.opExecutor("Mod").addInput(b).addInput(array).buildRawPointer(1)[0];
+        array.setHandle(newHandle);
         return array;
     }
 
@@ -125,7 +132,16 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rpowi(Number n) {
-        return manager.create(n).toType(array.getDataType(), false).powi(array);
+        try (NDArray temp = manager.create(n);
+                NDArray casted = temp.toType(array.getDataType(), false)) {
+            TFE_TensorHandle newHandle =
+                    manager.opExecutor("Pow")
+                            .addInput(casted)
+                            .addInput(array)
+                            .buildRawPointer(1)[0];
+            array.setHandle(newHandle);
+            return array;
+        }
     }
 
     /** {@inheritDoc} */

@@ -595,7 +595,9 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray addi(NDArray other) {
-        inPlaceHelper(add(other), this);
+        TFE_TensorHandle newHandle =
+                manager.opExecutor("Add").addInput(this).addInput(other).buildRawPointer(1)[0];
+        setHandle(newHandle);
         return this;
     }
 
@@ -610,7 +612,9 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray subi(NDArray other) {
-        inPlaceHelper(sub(other), this);
+        TFE_TensorHandle newHandle =
+                manager.opExecutor("Sub").addInput(this).addInput(other).buildRawPointer(1)[0];
+        setHandle(newHandle);
         return this;
     }
 
@@ -625,7 +629,9 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray muli(NDArray other) {
-        inPlaceHelper(mul(other), this);
+        TFE_TensorHandle newHandle =
+                manager.opExecutor("Mul").addInput(this).addInput(other).buildRawPointer(1)[0];
+        setHandle(newHandle);
         return this;
     }
 
@@ -640,23 +646,10 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray divi(NDArray other) {
-        inPlaceHelper(div(other), this);
+        TFE_TensorHandle newHandle =
+                manager.opExecutor("Div").addInput(this).addInput(other).buildRawPointer(1)[0];
+        setHandle(newHandle);
         return this;
-    }
-
-    void inPlaceHelper(NDArray source, NDArray destination) {
-        if (getShape().isScalar()) {
-            throw new UnsupportedOperationException(
-                    "TensorFlow engine does not support inplace operations on scalars yet");
-        }
-        try (NDArray indices = manager.arange((int) size(0))) {
-            manager.opExecutor("InplaceUpdate")
-                    .addInput(destination)
-                    .addInput(indices)
-                    .addInput(source)
-                    .buildSingletonOrThrow()
-                    .close();
-        }
     }
 
     /** {@inheritDoc} */
@@ -676,7 +669,9 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray modi(NDArray other) {
-        inPlaceHelper(mod(other), this);
+        TFE_TensorHandle newHandle =
+                manager.opExecutor("Mod").addInput(this).addInput(other).buildRawPointer(1)[0];
+        setHandle(newHandle);
         return this;
     }
 
@@ -691,7 +686,9 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray powi(NDArray other) {
-        inPlaceHelper(pow(other), this);
+        TFE_TensorHandle newHandle =
+                manager.opExecutor("Pow").addInput(this).addInput(other).buildRawPointer(1)[0];
+        setHandle(newHandle);
         return this;
     }
 
@@ -704,7 +701,9 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray signi() {
-        inPlaceHelper(sign(), this);
+        TFE_TensorHandle newHandle =
+                manager.opExecutor("Sign").addInput(this).buildRawPointer(1)[0];
+        setHandle(newHandle);
         return this;
     }
 
@@ -717,7 +716,8 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray negi() {
-        inPlaceHelper(neg(), this);
+        TFE_TensorHandle newHandle = manager.opExecutor("Neg").addInput(this).buildRawPointer(1)[0];
+        setHandle(newHandle);
         return this;
     }
 
@@ -1594,5 +1594,13 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
             manager = null;
         }
         tfNDArrayEx = null;
+    }
+
+    // TensorFlow doesn't support in-place operation
+    // each operator execution will generate a new node in the graph
+    // workaround the limitation by updating the handle
+    protected void setHandle(TFE_TensorHandle newHandle) {
+        TFE_TensorHandle oldHandle = handle.getAndSet(newHandle);
+        oldHandle.close();
     }
 }
