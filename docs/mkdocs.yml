@@ -111,6 +111,9 @@ nav:
         - TensorFlow Model Zoo: 'tensorflow/tensorflow-model-zoo/README.md'
   - PaddlePaddle:
       - Overview: 'paddlepaddle/README.md'
+      - Import your Paddle model:
+          - English: 'docs/paddlepaddle/how_to_create_paddlepaddle_model.md'
+          - 中文: 'docs/paddlepaddle/how_to_create_paddlepaddle_model_zh.md'
       - Facemask detection using PaddlePaddle: 
           - English: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
           - 中文: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle_zh.ipynb'

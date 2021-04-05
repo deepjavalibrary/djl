@@ -32,18 +32,20 @@ You can pull the server from the central Maven repository by including the follo
 </dependency>
 ```
 
+
+
 ## Run model server
 
 Use the following command to start model server locally:
 
 ```sh
-cd serving
+cd serving/serving
 
 # for Linux/macOS:
 ./gradlew run
 
 # for Windows:
-..\..\gradlew run
+..\..\..\gradlew run
 ```
 
 The model server will be listening on port 8080.
@@ -87,6 +89,36 @@ curl -X POST http://127.0.0.1:8080/predictions/mlp -F "data=@../examples/src/tes
   ]
 }
 ```
+
+### installing plug-ins
+
+The model server looks for plug-ins during startup in the plugin folder and register this plug-ins.
+
+The default plug-in folder is 
+
+```sh
+{work-dir}/plugins
+```
+
+The plug-in folder can be configured with the 'plugin-folder' parameter in the server-config file.
+
+example:
+running model server with gradle using a specific config-file:
+
+```sh
+./gradlew run -Dai.djl.conf=~/modelserver-config.properties
+```
+
+ example config.properties file for djl-server
+ 
+```sh
+inference_address=http://127.0.0.1:8081
+management_address=http://127.0.0.1:8081
+plugin_folder=~/serving_plugins
+```
+
+
+
 
 ### REST API
 

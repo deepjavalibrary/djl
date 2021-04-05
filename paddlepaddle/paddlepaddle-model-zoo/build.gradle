@@ -10,7 +10,7 @@ dependencies {
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
     testRuntimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
     testRuntimeOnly project(":pytorch:pytorch-engine")
-    testRuntimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
+    testRuntimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}-SNAPSHOT"
 }
 
 task syncS3(type: Exec) {

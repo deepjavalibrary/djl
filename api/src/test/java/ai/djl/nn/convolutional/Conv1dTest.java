@@ -40,7 +40,16 @@ public class Conv1dTest extends OutputShapeTest {
                         * strideWidthRange.size()
                         * dilationWidthRange.size();
 
-        IntStream.range(0, (int) rows)
+        IntStream streamToTest;
+        if (Boolean.getBoolean("nightly")) {
+            // During nightly testing, test all rows
+            streamToTest = IntStream.range(0, (int) rows);
+        } else {
+            // During unit testing, only test the first and last
+            streamToTest = IntStream.of(0, (int) rows - 1);
+        }
+
+        streamToTest
                 .mapToObj(TestData::new)
                 .peek(
                         td -> {
