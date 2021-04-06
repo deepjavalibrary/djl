@@ -2,6 +2,7 @@
 
 There are many sources to use PaddlePaddle model in DJL. You can choose to pick from PaddleHub or directly export from the training logic.
 In this section, we will go over two ways to load your Paddle model:
+
 - PaddleHub: a model hub contains bunch of the pretrained model
 - Paddle model from code
 

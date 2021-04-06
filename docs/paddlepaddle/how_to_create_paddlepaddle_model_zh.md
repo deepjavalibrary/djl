@@ -2,6 +2,7 @@
 
 PaddlePaddle的模型来源有很多种。你可以选择直接从 PaddleHub 下载 或者直接从现有代码中导出。
 在这个教学中，我们会介绍两种主要的转换途径：
+
 - PaddleHub: PaddlePaddle提供的模型库
 - 来自代码的 Paddle 模型 
 
