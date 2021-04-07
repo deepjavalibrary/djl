@@ -89,6 +89,9 @@ public class TfModel extends BaseModel {
                 } catch (InvalidProtocolBufferException e) {
                     throw new MalformedModelException("Invalid ConfigProto: " + config, e);
                 }
+            } else {
+                // default one
+                configProto = JavacppUtils.getSessionConfig();
             }
             Object run = options.get("RunOptions");
             if (run instanceof RunOptions) {

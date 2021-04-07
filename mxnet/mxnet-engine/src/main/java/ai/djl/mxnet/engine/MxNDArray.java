@@ -200,7 +200,6 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         if (device.equals(getDevice()) && !copy) {
             return this;
         }
-        // TODO support copy
         return duplicate(getManager(), getShape(), getDataType(), device, getName());
     }
 
@@ -210,7 +209,6 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         if (dataType.equals(getDataType()) && !copy) {
             return this;
         }
-        // TODO support copy
         return duplicate(getManager(), getShape(), dataType, getDevice(), getName());
     }
 

@@ -120,13 +120,26 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray toDevice(Device device, boolean copy) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (device.equals(getDevice()) && !copy) {
+            return this;
+        } else if (device.equals(getDevice()) && copy) {
+            // tensorflow toDevice don't do the copy if data is already in the same device
+            return duplicate();
+        }
+        return new TfNDArray(
+                (TfNDManager) getManager(),
+                JavacppUtils.toDevice(
+                        getHandle(),
+                        ((TfEngine) getManager().getEngine()).getEagerSession(),
+                        device));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
-        // FIXME: !copy is not implemented yet!
+        if (dataType.equals(getDataType()) && !copy) {
+            return this;
+        }
         return manager.opExecutor("Cast")
                 .addInput(this)
                 .addParam("DstT", dataType)
@@ -394,7 +407,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray any() {
-        try (NDArray casted = toType(DataType.BOOLEAN, false);
+        try (NDArray casted = toType(DataType.BOOLEAN, true);
                 NDArray axes = manager.arange(getShape().dimension())) {
             return manager.opExecutor("Any")
                     .addInput(casted)
@@ -1095,8 +1108,8 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray logicalAnd(NDArray n) {
-        try (NDArray input1 = toType(DataType.BOOLEAN, false);
-                NDArray input2 = n.toType(DataType.BOOLEAN, false)) {
+        try (NDArray input1 = toType(DataType.BOOLEAN, true);
+                NDArray input2 = n.toType(DataType.BOOLEAN, true)) {
             return manager.opExecutor("LogicalAnd")
                     .addInput(input1)
                     .addInput(input2)
@@ -1107,8 +1120,8 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray logicalOr(NDArray n) {
-        try (NDArray input1 = toType(DataType.BOOLEAN, false);
-                NDArray input2 = n.toType(DataType.BOOLEAN, false)) {
+        try (NDArray input1 = toType(DataType.BOOLEAN, true);
+                NDArray input2 = n.toType(DataType.BOOLEAN, true)) {
             return manager.opExecutor("LogicalOr")
                     .addInput(input1)
                     .addInput(input2)
@@ -1125,7 +1138,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray logicalNot() {
-        try (NDArray input = toType(DataType.BOOLEAN, false)) {
+        try (NDArray input = toType(DataType.BOOLEAN, true)) {
             return manager.opExecutor("LogicalNot").addInput(input).buildSingletonOrThrow();
         }
     }
@@ -1191,7 +1204,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
                 outputs = subManager.opExecutor("TopKV2").addInput(input).addInput(kArr).build(2);
             }
             if (returnIndices) {
-                result = outputs[1].toType(DataType.INT64, true);
+                result = outputs[1].toType(DataType.INT64, false);
             } else {
                 result = outputs[0];
             }

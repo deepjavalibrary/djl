@@ -145,13 +145,19 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray toDevice(Device device, boolean copy) {
-        return JniUtils.to(this, getDataType(), device, copy);
+        if (device.equals(getDevice()) && !copy) {
+            return this;
+        }
+        return JniUtils.to(this, getDataType(), device);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray toType(DataType dataType, boolean copy) {
-        return JniUtils.to(this, dataType, getDevice(), copy);
+        if (dataType.equals(getDataType()) && !copy) {
+            return this;
+        }
+        return JniUtils.to(this, dataType, getDevice());
     }
 
     /** {@inheritDoc} */

@@ -68,12 +68,12 @@ JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchLayout(JNIEnv
 }
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTo(
-    JNIEnv* env, jobject jthis, jlong jhandle, jint jdtype, jintArray jdevice, jboolean jcopy) {
+    JNIEnv* env, jobject jthis, jlong jhandle, jint jdtype, jintArray jdevice) {
   API_BEGIN()
   torch::NoGradGuard NoGradGuard;
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
-  auto result = tensor_ptr->to(device, utils::GetScalarTypeFromDType(jdtype), false, jcopy == JNI_TRUE);
+  auto result = tensor_ptr->to(device, utils::GetScalarTypeFromDType(jdtype), false);
   const auto* result_ptr = new torch::Tensor(result);
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()

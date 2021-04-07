@@ -50,7 +50,7 @@ final class PyTorchLibrary {
 
     native int torchLayout(long handle);
 
-    native long torchTo(long handle, int dType, int[] device, boolean copy);
+    native long torchTo(long handle, int dType, int[] device);
 
     native long torchGetItem(long handle, long index);
 

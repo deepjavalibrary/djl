@@ -48,6 +48,7 @@ import org.tensorflow.internal.c_api.TF_Status;
 import org.tensorflow.internal.c_api.TF_Tensor;
 import org.tensorflow.internal.c_api.global.tensorflow;
 import org.tensorflow.proto.framework.ConfigProto;
+import org.tensorflow.proto.framework.GPUOptions;
 import org.tensorflow.proto.framework.MetaGraphDef;
 import org.tensorflow.proto.framework.RunOptions;
 
@@ -219,7 +220,7 @@ public final class JavacppUtils {
     public static Device getDevice(TFE_TensorHandle handle) {
         try (PointerScope scope = new PointerScope()) {
             TF_Status status = TF_Status.newStatus();
-            BytePointer pointer = tensorflow.TFE_TensorHandleBackingDeviceName(handle, status);
+            BytePointer pointer = tensorflow.TFE_TensorHandleDeviceName(handle, status);
             String device = new String(pointer.getStringBytes(), StandardCharsets.UTF_8);
             return fromTfDevice(device);
         }
@@ -324,19 +325,48 @@ public final class JavacppUtils {
         }
     }
 
-    private static Device fromTfDevice(String device) {
+    @SuppressWarnings({"unchecked", "try"})
+    public static TFE_TensorHandle toDevice(
+            TFE_TensorHandle handle, TFE_Context eagerSessionHandle, Device device) {
+        try (PointerScope scope = new PointerScope()) {
+            String deviceName = toTfDevice(device);
+            TF_Status status = TF_Status.newStatus();
+            TFE_TensorHandle newHandle =
+                    tensorflow.TFE_TensorHandleCopyToDevice(
+                            handle, eagerSessionHandle, deviceName, status);
+            status.throwExceptionIfNotOK();
+            return newHandle;
+        }
+    }
+
+    public static ConfigProto getSessionConfig() {
+        Integer interop = Integer.getInteger("ai.djl.tensorflow.num_interop_threads");
+        Integer intraop = Integer.getInteger("ai.djl.tensorflow.num_intraop_threads");
+        ConfigProto.Builder configBuilder = ConfigProto.newBuilder();
+        if (interop != null) {
+            configBuilder.setInterOpParallelismThreads(interop);
+        }
+        if (intraop != null) {
+            configBuilder.setIntraOpParallelismThreads(intraop);
+        }
+        GPUOptions gpuOptions = GPUOptions.newBuilder().setVisibleDeviceList("0").build();
+        configBuilder.setGpuOptions(gpuOptions);
+        return configBuilder.build();
+    }
+
+    public static Device fromTfDevice(String device) {
         Matcher m = DEVICE_PATTERN.matcher(device);
         if (m.matches()) {
             if ("CPU".equals(m.group(1))) {
                 return Device.cpu();
-            } else if ("GPU".equals(m.group(2))) {
-                return Device.of(Device.Type.GPU, Integer.parseInt(m.group(1)));
+            } else if ("GPU".equals(m.group(1))) {
+                return Device.of(Device.Type.GPU, Integer.parseInt(m.group(2)));
             }
         }
         throw new EngineException("Unknown device type to TensorFlow Engine: " + device);
     }
 
-    private static String toTfDevice(Device device) {
+    public static String toTfDevice(Device device) {
         if (device.getDeviceType().equals(Device.Type.CPU)) {
             return "/device:CPU:0";
         } else if (device.getDeviceType().equals(Device.Type.GPU)) {

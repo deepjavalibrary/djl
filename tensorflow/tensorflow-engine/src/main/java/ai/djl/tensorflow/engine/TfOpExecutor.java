@@ -147,8 +147,9 @@ final class TfOpExecutor implements AutoCloseable {
             tensorflow.TFE_OpSetDevice(opHandle, deviceStr, status);
             status.throwExceptionIfNotOK();
             return this;
-        } finally {
+        } catch (Exception e) {
             close();
+            throw e;
         }
     }
 
