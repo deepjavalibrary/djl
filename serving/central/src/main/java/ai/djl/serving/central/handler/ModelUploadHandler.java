@@ -35,7 +35,7 @@ public class ModelUploadHandler extends SimpleChannelInboundHandler<FullHttpRequ
     }
 
     /**
-     * Handles the deployment request by forwarding the request to the serving-instance.
+     * Handles the upload request by processing the file and testing it..
      *
      * @param ctx the context
      * @param request the full request

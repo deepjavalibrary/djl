@@ -42,10 +42,12 @@ export default function UploadFab() {
         console.log(event.target.files[0])
     }
 
-    const handleClose = (event) => {
-           setShow(false);
+    const handleUpload = (event) => {
+       setShow(false);
+       if (selectedFile){
            alert("Your file is being uploaded!")
-           axios.get("http://"+window.location.host+"/uploading/models?modelName="+selectedFile.name)
+
+           axios.post("http://"+window.location.host+"/uploading/models?modelName="+selectedFile.name)
                 .then(function(response) {
                     let appdata = Object.keys(response.data).map(function(key) {
                         return {
@@ -56,7 +58,9 @@ export default function UploadFab() {
                     setData(appdata);
                     console.log(appdata)
                 })
-        };
+       }
+       setSelectedFile(null)
+    };
 
 	function handleFabClick() {
         handleShow()
@@ -89,8 +93,8 @@ export default function UploadFab() {
                             <Fade in={show}>
                               <div className={classes.paper}>
                                 <h2 id="transition-modal-title">Model Uploader</h2>
-                                     <input type="file" name="file" onChange={onChangeHandler}/>
-                                    <button type="button" onClick={handleClose}>
+                                    <input type="file" name="file" onChange={onChangeHandler}/>
+                                    <button type="button" onClick={handleUpload}>
                                         press to close
                                     </button>
                               </div>
