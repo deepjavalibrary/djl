@@ -47,7 +47,7 @@ export default function UploadFab() {
        if (selectedFile){
            alert("Your file is being uploaded!")
 
-           axios.post("http://"+window.location.host+"/uploading/models?modelName="+selectedFile.name)
+           axios.get("http://"+window.location.host+"/uploading/models?modelName="+selectedFile.name)
                 .then(function(response) {
                     let appdata = Object.keys(response.data).map(function(key) {
                         return {
