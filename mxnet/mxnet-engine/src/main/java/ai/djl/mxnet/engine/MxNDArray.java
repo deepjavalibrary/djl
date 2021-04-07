@@ -386,9 +386,9 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sequenceMask(NDArray sequenceLength, float value) {
-        if (getShape().dimension() < 3 || getShape().isScalar() || getShape().hasZeroDimension()) {
+        if (getShape().dimension() < 2 || getShape().isScalar() || getShape().hasZeroDimension()) {
             throw new IllegalArgumentException(
-                    "sequenceMask is not supported for NDArray with less than 3 dimensions");
+                    "sequenceMask is not supported for NDArray with less than 2 dimensions");
         }
         Shape expectedSequenceLengthShape = new Shape(getShape().get(0));
         if (!sequenceLength.getShape().equals(expectedSequenceLengthShape)) {
