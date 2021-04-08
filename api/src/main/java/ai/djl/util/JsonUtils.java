@@ -15,37 +15,34 @@ package ai.djl.util;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.Classifications.ClassificationsSerializer;
 import ai.djl.modality.cv.output.DetectedObjects;
-
-import java.lang.reflect.Modifier;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
+import java.lang.reflect.Modifier;
 
 /** An interface containing Gson constants. */
 public interface JsonUtils {
 
     Gson GSON = new GsonBuilder().create();
-    
-    GsonBuilder GSON_BUILDER = new GsonBuilder()
-            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-            .setPrettyPrinting()
-            .excludeFieldsWithModifiers(Modifier.STATIC)
-            .registerTypeAdapter(Classifications.class, new ClassificationsSerializer())
-            .registerTypeAdapter(DetectedObjects.class, new ClassificationsSerializer())
-            .registerTypeAdapter(
-                    Double.class,
-                    (JsonSerializer<Double>)
-                            (src, t, ctx) -> {
-                                long v = src.longValue();
-                                if (src.equals(Double.valueOf(String.valueOf(v)))) {
-                                    return new JsonPrimitive(v);
-                                }
-                                return new JsonPrimitive(src);
-                            });
+
+    GsonBuilder GSON_BUILDER =
+            new GsonBuilder()
+                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                    .setPrettyPrinting()
+                    .excludeFieldsWithModifiers(Modifier.STATIC)
+                    .registerTypeAdapter(Classifications.class, new ClassificationsSerializer())
+                    .registerTypeAdapter(DetectedObjects.class, new ClassificationsSerializer())
+                    .registerTypeAdapter(
+                            Double.class,
+                            (JsonSerializer<Double>)
+                                    (src, t, ctx) -> {
+                                        long v = src.longValue();
+                                        if (src.equals(Double.valueOf(String.valueOf(v)))) {
+                                            return new JsonPrimitive(v);
+                                        }
+                                        return new JsonPrimitive(src);
+                                    });
 
     Gson GSON_PRETTY = GSON_BUILDER.create();
-    
- 
 }

@@ -12,24 +12,8 @@
  */
 package ai.djl.serving.util;
 
-import java.io.IOException;
-import java.net.SocketAddress;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializer;
-
 import ai.djl.ModelException;
-import ai.djl.modality.Classifications;
-import ai.djl.modality.Classifications.ClassificationsSerializer;
 import ai.djl.modality.Input;
-import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.serving.http.BadRequestException;
 import ai.djl.serving.http.ErrorResponse;
@@ -59,6 +43,12 @@ import io.netty.handler.codec.http.multipart.FileUpload;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.util.AttributeKey;
 import io.netty.util.CharsetUtil;
+import java.io.IOException;
+import java.net.SocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A utility class that handling Netty request and response. */
 public final class NettyUtils {
@@ -344,7 +334,4 @@ public final class NettyUtils {
             throw new AssertionError(e);
         }
     }
-    
-
-    
 }

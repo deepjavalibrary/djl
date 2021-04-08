@@ -118,56 +118,19 @@ public class HttpStaticClasspathResourceHandler implements RequestHandler<Void> 
                                     new HttpChunkedInput(
                                             new ChunkedNioStream(channel, HTTP_CHUNK_SIZE)),
                                     ctx.newProgressivePromise());
-                    //    if (!HttpUtil.isKeepAlive(request)) {
-                    // Close the connection when the whole content is written out.
-                    sendFileFuture.addListener(ChannelFutureListener.CLOSE);
-                    //    }
+                    if (!HttpUtil.isKeepAlive(request)) {
+                        // Close the connection when the whole content is written out.
+                        sendFileFuture.addListener(ChannelFutureListener.CLOSE);
+                    }
                 }
 
             } else {
                 throw new ResourceNotFoundException();
             }
 
-            // RandomAccessFile raf;
-            // try {
-            // raf = new RandomAccessFile(file.toFile(), "r");
-            // } catch (FileNotFoundException ignore) {
-            // throw new ResourceNotFoundException();
-            // }
-            // long fileLength = raf.length();
-            //
-
-            //
-            // // Write the content.
-            // ChannelFuture sendFileFuture;
-            // ChannelFuture lastContentFuture;
-            // if (ctx.pipeline().get(SslHandler.class) == null) {
-            // sendFileFuture =
-            // ctx.write(
-            // new DefaultFileRegion(raf.getChannel(), 0,
-            // fileLength),
-            // ctx.newProgressivePromise());
-            // // Write the end marker.
-            // lastContentFuture =
-            // ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
-            // } else {
-            // sendFileFuture =
-            // ctx.writeAndFlush(
-            // new HttpChunkedInput(new ChunkedFile(raf, 0,
-            // fileLength, 8192)),
-            // ctx.newProgressivePromise());
-            // // HttpChunkedInput will write the end marker (LastHttpContent) for
-            // us.
-            // lastContentFuture = sendFileFuture;
-            // }
-            //
-            // // Decide whether to close the connection or not.
-            // if (!keepAlive) {
-            // // Close the connection when the whole content is written out.
-            // lastContentFuture.addListener(ChannelFutureListener.CLOSE);
-            // }
         } catch (IOException ex) {
             logger.error("error reading requested resource", ex);
+            throw new ResourceNotFoundException(ex);
         }
         return null;
     }
