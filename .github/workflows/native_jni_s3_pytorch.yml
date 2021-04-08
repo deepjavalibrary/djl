@@ -101,7 +101,7 @@ jobs:
         run: |
           yum -y update
           yum -y install centos-release-scl-rh epel-release
-          yum -y install java-1.8.1-openjdk-devel devtoolset-7 rh-git218 patch cmake3
+          yum -y install java-1.8.0-openjdk-devel devtoolset-7 rh-git218 patch cmake3
           ln -s /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
       - name: Release JNI prep
