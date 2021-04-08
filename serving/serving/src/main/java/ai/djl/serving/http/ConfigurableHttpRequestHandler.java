@@ -22,6 +22,9 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * HttpRequestHandler that tries to process a http-request using the configured RequestHandlers.
  *
@@ -31,6 +34,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public class ConfigurableHttpRequestHandler extends HttpRequestHandler {
 
+	 private static final Logger logger = LoggerFactory.getLogger(ConfigurableHttpRequestHandler.class);
+	
     private FolderScanPluginManager pluginManager;
 
     /**
@@ -56,6 +61,7 @@ public class ConfigurableHttpRequestHandler extends HttpRequestHandler {
                 findRequestHandler(req)
                         .orElseThrow(
                                 () -> new BadRequestException("request handler no longer valid"));
+        logger.debug("request handler {} processes request ",requestHandler.getClass().getSimpleName());
         try {
             Object result = requestHandler.handleRequest(ctx, req, decoder, segments);
             if (result != null) {
