@@ -153,7 +153,7 @@ public class FolderScanPluginManager implements PluginManager {
     }
     
     private void registerPlugins() {
-    	for (JsonSerializer serializer : findImplementations(JsonSerializer.class)) {
+    	for (JsonSerializer<?> serializer : findImplementations(JsonSerializer.class)) {
     		Type genericType=null;    		
     		Type[] interfaces =  serializer.getClass().getGenericInterfaces();
         	for (Type t: interfaces) {

@@ -67,17 +67,17 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new ChunkedWriteHandler());
         switch (connectorType) {
             case MANAGEMENT:
+            	pipeline.addLast(new ConfigurableHttpRequestHandler(pluginManager));
                 pipeline.addLast("management", new ManagementRequestHandler());
-                pipeline.addLast(new ConfigurableHttpRequestHandler(pluginManager));
                 break;
             case INFERENCE:
                 pipeline.addLast("inference", new InferenceRequestHandler());
                 break;
             case BOTH:
             default:
+            	pipeline.addLast(new ConfigurableHttpRequestHandler(pluginManager));
                 pipeline.addLast("inference", new InferenceRequestHandler());
                 pipeline.addLast("management", new ManagementRequestHandler());
-                pipeline.addLast(new ConfigurableHttpRequestHandler(pluginManager));
                 break;
         }
         pipeline.addLast("badRequest", new InvalidRequestHandler());

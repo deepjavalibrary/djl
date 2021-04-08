@@ -48,7 +48,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * handler to publish file resources.
+ * handler to publish file resources classpath.
+ *
+ * <p>this handler exposes every file which is in /static/-folder in the classpath.
  *
  * @author erik.bamberg@web.de
  */
@@ -63,9 +65,6 @@ public class HttpStaticClasspathResourceHandler implements RequestHandler<Void> 
     private static final int HTTP_CHUNK_SIZE = 8192;
 
     private static final String RESOURCE_FOLDER = "/static";
-    //    private static final Pattern INSECURE_URI = Pattern.compile(".*[<>&\"].*");
-
-    //    private FullHttpRequest request;
 
     /**
      * chain of responsibility. accept-method.

@@ -38,12 +38,9 @@ public abstract class HttpRequestHandler extends SimpleChannelInboundHandler<Ful
 
             QueryStringDecoder decoder = new QueryStringDecoder(req.uri());
             String path = decoder.path();
-            if ("/".equals(path)) {
-                if (HttpMethod.OPTIONS.equals(req.method())) {
+            if ("/".equals(path) && HttpMethod.OPTIONS.equals(req.method())) {              
                     handleApiDescription(ctx);
                     return;
-                }
-                throw new MethodNotAllowedException();
             }
 
             String[] segments = path.split("/");
