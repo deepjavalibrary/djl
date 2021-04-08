@@ -47,22 +47,22 @@ This example supports building with both Gradle and Maven. To build, use either 
 
 * Gradle build
 
-    ```sh
-    cd examples
+```sh
+cd examples
 
-    # for Linux/macOS:
-    ./gradlew jar
+# for Linux/macOS:
+./gradlew jar
 
-    # for Windows:
-    ..\gradlew jar
-    ```
+# for Windows:
+..\gradlew jar
+```
 
 * Maven build
 
-    ```sh
-    cd examples
-    mvn package -DskipTests
-    ```
+```sh
+cd examples
+mvn package -DskipTests
+```
 
 ### Run example code
 With the gradle `application` plugin you can execute example code directly.
@@ -72,23 +72,23 @@ The following command executes an object detection example:
 
 * Gradle
 
-    ```sh
-    cd examples
+```sh
+cd examples
 
-    # for Linux/macOS:
-    ./gradlew run
+# for Linux/macOS:
+./gradlew run
 
-    # for Windows:
-    ..\gradlew run
-    ```
+# for Windows:
+..\gradlew run
+```
 
 * Maven
 
-    ```sh
-    cd examples
-    mvn clean package -DskipTests
-    mvn exec:java
-    ```
+```sh
+cd examples
+mvn clean package -DskipTests
+mvn exec:java
+```
 
 ## Engine selection
 
