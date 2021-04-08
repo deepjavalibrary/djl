@@ -12,13 +12,20 @@
  */
 package ai.djl.serving.plugins;
 
+import ai.djl.modality.Classifications;
+import ai.djl.modality.Classifications.ClassificationsSerializer;
+import ai.djl.repository.Metadata;
 import ai.djl.serving.util.ConfigManager;
+import ai.djl.util.JsonUtils;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -27,16 +34,20 @@ import java.nio.file.Path;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.JsonSerializer;
 
 /**
  * The {@link PluginManager} is responsible to load and manage plugins from the file system.
@@ -51,8 +62,10 @@ public class FolderScanPluginManager implements PluginManager {
 
     private static final Logger logger = LoggerFactory.getLogger(FolderScanPluginManager.class);
 
-    private ConfigManager configManager;
+    private static Class<?>[] pluginInterfaces=new Class<?>[] {RequestHandler.class, JsonSerializer.class};
 
+    private ConfigManager configManager;
+    
     private Map<Class<?>, Set<Plugin<?>>> pluginsRegistry;
 
     /**
@@ -80,24 +93,28 @@ public class FolderScanPluginManager implements PluginManager {
                 AccessController.doPrivileged(
                         (PrivilegedAction<ClassLoader>) () -> new URLClassLoader(pluginUrls));
 
-        int pluginsFound = 0;
+        AtomicInteger pluginsFound = new AtomicInteger(0);
 
-        ServiceLoader<RequestHandler> sl = ServiceLoader.load(RequestHandler.class, ucl);
+        Arrays.stream(pluginInterfaces) .forEach( pluginInterface -> {
+        	logger.trace("looking for plugin of type {}",pluginInterface);
+            ServiceLoader<?> sl = ServiceLoader.load(pluginInterface, ucl);
 
-        for (RequestHandler requestHandler : sl) {
-            pluginsFound++;
-            RequestHandler<?> service = requestHandler;
-            logger.info("load plugin: {}", service.getClass().getSimpleName());
-            Plugin<RequestHandler<?>> plugin = new Plugin<>(service);
-            // TODO add a plugin Lifecycle "INITIALIZING", "ACTIVE", "SHUTTING DOWN" , so a plug-in
-            // can be dependent on another plugin.
-            if (initializePlugin(plugin)) {
-                pluginsRegistry
-                        .computeIfAbsent(RequestHandler.class, k -> new HashSet<>())
-                        .add(plugin);
+            for (Object service : sl) {
+                pluginsFound.incrementAndGet();
+                logger.info("load plugin: {}", service.getClass().getSimpleName());
+                Plugin<?> plugin = new Plugin<>(service);
+                // TODO add a plugin Lifecycle "INITIALIZING", "ACTIVE", "SHUTTING DOWN" , so a plug-in
+                // can be dependent on another plugin.
+                if (initializePlugin(plugin)) {
+                    pluginsRegistry
+                            .computeIfAbsent(pluginInterface, k -> new HashSet<>())
+                            .add(plugin);
+                }
             }
-        }
-        logger.info("{} plug-ins found.", pluginsFound);
+        	
+        });
+        registerPlugins();
+        logger.info("{} plug-ins found.", pluginsFound.intValue());
     }
 
     /**
@@ -133,6 +150,27 @@ public class FolderScanPluginManager implements PluginManager {
             return false;
         }
         return true;
+    }
+    
+    private void registerPlugins() {
+    	for (JsonSerializer serializer : findImplementations(JsonSerializer.class)) {
+    		Type genericType=null;    		
+    		Type[] interfaces =  serializer.getClass().getGenericInterfaces();
+        	for (Type t: interfaces) {
+        		ParameterizedType parameterizedType = (ParameterizedType) t;
+        		if (parameterizedType.getRawType()==JsonSerializer.class) {
+        			genericType=parameterizedType.getActualTypeArguments()[0];
+        		}
+        	}
+
+        	
+    		if (genericType!=null) {
+    			JsonUtils.GSON_BUILDER.registerTypeAdapter(genericType, serializer);
+    			logger.debug("registered serializer {} for type {}",serializer.getClass().getSimpleName(),genericType.getTypeName());
+    		} else {
+    			logger.warn("could not determine type for JSonSerializer {}",serializer.getClass().getSimpleName());
+    		}
+    	}
     }
 
     /**
