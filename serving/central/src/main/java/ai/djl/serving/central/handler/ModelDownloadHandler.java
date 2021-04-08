@@ -13,10 +13,10 @@
 package ai.djl.serving.central.handler;
 
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.serving.central.http.BadRequestException;
 import ai.djl.serving.central.responseencoder.HttpRequestResponse;
 import ai.djl.serving.central.utils.ModelUri;
 import ai.djl.serving.central.utils.NettyUtils;
+import ai.djl.serving.http.BadRequestException;
 import ai.djl.serving.plugins.RequestHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;

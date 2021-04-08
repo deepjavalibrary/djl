@@ -67,10 +67,11 @@ public class RequestHandlerWrapper extends SimpleChannelInboundHandler<FullHttpR
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
         try {
             if (!request.decoderResult().isSuccess()) {
-                throw new ai.djl.serving.central.http.BadRequestException("Invalid HTTP message.");
+                throw new ai.djl.serving.http.BadRequestException("Invalid HTTP message.");
             }
 
             QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
+
             String path = decoder.path();
 
             String[] segments = path.split("/");
