@@ -259,8 +259,8 @@ public final class ConfigManager {
      *
      * @return the model store location
      */
-    public String getModelStore() {
-        return getCanonicalPath(prop.getProperty(MODEL_STORE));
+    public Path getModelStore() {
+        return getPathProperty(MODEL_STORE);
     }
 
     /**
@@ -314,7 +314,7 @@ public final class ConfigManager {
      * @return the configured plugin folder or the default folder.
      */
     public Path getPluginFolder() {
-        return Paths.get(prop.getProperty(PLUGIN_FOLDER, "plugins"));
+        return getPathProperty(prop.getProperty(PLUGIN_FOLDER, "plugins"));
     }
 
     /**
@@ -332,14 +332,14 @@ public final class ConfigManager {
 
         PrivateKey privateKey;
         X509Certificate[] chain;
-        String keyStoreFile = prop.getProperty(KEYSTORE);
-        String privateKeyFile = prop.getProperty(PRIVATE_KEY_FILE);
-        String certificateFile = prop.getProperty(CERTIFICATE_FILE);
+        Path keyStoreFile = getPathProperty(KEYSTORE);
+        Path privateKeyFile = getPathProperty(PRIVATE_KEY_FILE);
+        Path certificateFile = getPathProperty(CERTIFICATE_FILE);
         if (keyStoreFile != null) {
             char[] keystorePass = getProperty(KEYSTORE_PASS, "changeit").toCharArray();
             String keystoreType = getProperty(KEYSTORE_TYPE, "PKCS12");
             KeyStore keyStore = KeyStore.getInstance(keystoreType);
-            try (InputStream is = Files.newInputStream(Paths.get(keyStoreFile))) {
+            try (InputStream is = Files.newInputStream(keyStoreFile)) {
                 keyStore.load(is, keystorePass);
             }
 
@@ -464,6 +464,18 @@ public final class ConfigManager {
         return Integer.parseInt(value);
     }
 
+    private Path getPathProperty(String key) {
+        String property = prop.getProperty(key);
+        if (property == null) {
+            return null;
+        }
+        Path path = Paths.get(property);
+        if (!path.isAbsolute()) {
+            path = Paths.get(getModelServerHome()).resolve(path);
+        }
+        return path;
+    }
+
     private static String getCanonicalPath(Path file) {
         try {
             return file.toRealPath().toString();
@@ -479,9 +491,9 @@ public final class ConfigManager {
         return getCanonicalPath(Paths.get(path));
     }
 
-    private PrivateKey loadPrivateKey(String keyFile) throws IOException, GeneralSecurityException {
+    private PrivateKey loadPrivateKey(Path keyFile) throws IOException, GeneralSecurityException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        try (InputStream is = Files.newInputStream(Paths.get(keyFile))) {
+        try (InputStream is = Files.newInputStream(keyFile)) {
             String content = Utils.toString(is);
             content = content.replaceAll("-----(BEGIN|END)( RSA)? PRIVATE KEY-----\\s*", "");
             byte[] buf = Base64.getMimeDecoder().decode(content);
@@ -497,10 +509,10 @@ public final class ConfigManager {
         }
     }
 
-    private X509Certificate[] loadCertificateChain(String keyFile)
+    private X509Certificate[] loadCertificateChain(Path keyFile)
             throws IOException, GeneralSecurityException {
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        try (InputStream is = Files.newInputStream(Paths.get(keyFile))) {
+        try (InputStream is = Files.newInputStream(keyFile)) {
             Collection<? extends Certificate> certs = cf.generateCertificates(is);
             int i = 0;
             X509Certificate[] chain = new X509Certificate[certs.size()];

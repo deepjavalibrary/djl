@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -258,21 +257,20 @@ public class ModelServer {
         ModelManager modelManager = ModelManager.getInstance();
         List<String> urls;
         if ("ALL".equalsIgnoreCase(loadModels)) {
-            String modelStore = configManager.getModelStore();
+            Path modelStore = configManager.getModelStore();
             if (modelStore == null) {
                 logger.warn("Model store is not configured.");
                 return;
             }
 
-            Path modelStoreDir = Paths.get(modelStore);
-            if (!Files.isDirectory(modelStoreDir)) {
+            if (!Files.isDirectory(modelStore)) {
                 logger.warn("Model store path is not found: {}", modelStore);
                 return;
             }
 
             // Check folders to see if they can be models as well
             urls =
-                    Files.list(modelStoreDir)
+                    Files.list(modelStore)
                             .filter(
                                     p -> {
                                         logger.info("Found file in model_store: {}", p);
