@@ -160,7 +160,7 @@ public class FolderScanPluginManager implements PluginManager {
 
     private URL[] listPluginJars() throws IOException {
         Path pluginsFolder = configManager.getPluginFolder();
-        if (!(Files.exists(pluginsFolder) && Files.isDirectory(pluginsFolder))) {
+        if (pluginsFolder == null || !Files.isDirectory(pluginsFolder)) {
             logger.warn("scanning in plug-in folder :{}....folder does not exists", pluginsFolder);
             return new URL[0];
         }
