@@ -16,15 +16,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.tensorflow.Operand;
-import org.tensorflow.Tensor;
-import org.tensorflow.op.Ops;
-import org.tensorflow.op.core.Constant;
-import org.tensorflow.op.core.Squeeze;
-import org.tensorflow.types.TInt64;
 
 /** The {@link NDArrayIndexer} used by the {@link TfNDArray}. */
 public class TfNDArrayIndexer extends NDArrayIndexer {
@@ -38,20 +29,24 @@ public class TfNDArrayIndexer extends NDArrayIndexer {
     /** {@inheritDoc} */
     @Override
     public NDArray get(NDArray array, NDIndexFullSlice fullSlice) {
-        TfNDArray tfArray = (TfNDArray) array;
-        Ops tf = ((TfNDManager) tfArray.getManager()).getTf();
-        Constant<TInt64> begin = tf.constant(fullSlice.getMin());
-        Constant<TInt64> end = tf.constant(fullSlice.getMax());
-        Constant<TInt64> step = tf.constant(fullSlice.getStep());
+        TfNDManager manager = (TfNDManager) array.getManager();
         int[] toSqueeze = fullSlice.getToSqueeze();
-        Operand<?> sliced = tf.stridedSlice(tfArray.getOperand(), begin, end, step);
-        if (toSqueeze.length > 0) {
-            List<Long> squeeze =
-                    Arrays.stream(toSqueeze).mapToLong(i -> i).boxed().collect(Collectors.toList());
-            sliced = tf.squeeze(sliced, Squeeze.axis(squeeze));
-        }
-        try (Tensor tensor = sliced.asTensor()) {
-            return new TfNDArray(array.getManager(), tensor);
+        try (NDArray begin = manager.create(fullSlice.getMin());
+                NDArray end = manager.create(fullSlice.getMax());
+                NDArray step = manager.create(fullSlice.getStep())) {
+            NDArray result =
+                    manager.opExecutor("StridedSlice")
+                            .addInput(array)
+                            .addInput(begin)
+                            .addInput(end)
+                            .addInput(step)
+                            .buildSingletonOrThrow();
+            if (toSqueeze.length > 0) {
+                NDArray oldResult = result;
+                result = result.squeeze(toSqueeze);
+                oldResult.close();
+            }
+            return result;
         }
     }
 

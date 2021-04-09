@@ -19,10 +19,15 @@ import ai.djl.engine.EngineException;
 import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.SymbolBlock;
+import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
+import ai.djl.tensorflow.engine.javacpp.LibUtils;
 import ai.djl.training.GradientCollector;
 import ai.djl.util.RandomUtils;
-import org.tensorflow.EagerSession;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
+import org.bytedeco.javacpp.PointerScope;
 import org.tensorflow.TensorFlow;
+import org.tensorflow.internal.c_api.TFE_Context;
 import org.tensorflow.internal.c_api.TF_DeviceList;
 import org.tensorflow.internal.c_api.TF_Status;
 import org.tensorflow.internal.c_api.global.tensorflow;
@@ -34,17 +39,25 @@ import org.tensorflow.internal.c_api.global.tensorflow;
  * <p>To get an instance of the {@code TfEngine} when it is not the default Engine, call {@link
  * Engine#getEngine(String)} with the Engine name "TensorFlow".
  */
-public final class TfEngine extends Engine {
+public final class TfEngine extends Engine implements AutoCloseable {
 
     public static final String ENGINE_NAME = "TensorFlow";
+
+    private static AtomicReference<TFE_Context> eagerSessionHandle;
 
     private TfEngine() {}
 
     static TfEngine newInstance() {
         try {
             LibUtils.loadLibrary();
-            EagerSession.getDefault();
-
+            eagerSessionHandle =
+                    new AtomicReference<>(
+                            JavacppUtils.createEagerSession(
+                                    true, 2, JavacppUtils.getSessionConfig()));
+            // call a function from tensorflow-java package to
+            // load the native library right here
+            // if it throws exception, we can catch it here
+            TensorFlow.version();
             return new TfEngine();
         } catch (Throwable t) {
             throw new EngineException("Failed to load TensorFlow native library", t);
@@ -83,22 +96,32 @@ public final class TfEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"unchecked", "try"})
     public boolean hasCapability(String capability) {
         if (StandardCapabilities.MKL.equals(capability)) {
             return true;
         } else if (StandardCapabilities.CUDA.equals(capability)) {
-            TF_Status status = tensorflow.TF_NewStatus();
-            TF_DeviceList deviceList =
-                    tensorflow.TFE_ContextListDevices(
-                            tensorflow.TFE_NewContext(tensorflow.TFE_NewContextOptions(), status),
-                            status);
-            int deviceCount = tensorflow.TF_DeviceListCount(deviceList);
-            for (int i = 0; i < deviceCount; i++) {
-                if (tensorflow.TF_DeviceListName(deviceList, i, status)
-                        .getString()
-                        .toLowerCase()
-                        .contains("gpu")) {
-                    return true;
+            TF_DeviceList deviceList = null;
+            try (PointerScope scope = new PointerScope()) {
+                TF_Status status = tensorflow.TF_NewStatus();
+                deviceList = tensorflow.TFE_ContextListDevices(eagerSessionHandle.get(), status);
+                int deviceCount = tensorflow.TF_DeviceListCount(deviceList);
+                for (int i = 0; i < deviceCount; i++) {
+                    if (tensorflow.TF_DeviceListName(deviceList, i, status)
+                            .getString()
+                            .toLowerCase()
+                            .contains("gpu")) {
+                        return true;
+                    }
+                }
+            } finally {
+                // deviceList isn't registered with deallocator
+                // so it's not closed by PointerScope
+                // close it manually
+                synchronized (Objects.requireNonNull(deviceList)) {
+                    if (!deviceList.isNull()) {
+                        tensorflow.TF_DeleteDeviceList(deviceList);
+                    }
                 }
             }
             return false;
@@ -127,8 +150,12 @@ public final class TfEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public void setRandomSeed(int seed) {
-        TfNDManager.setRandomSeed(seed);
+        super.setRandomSeed(seed);
         RandomUtils.RANDOM.setSeed(seed);
+    }
+
+    public TFE_Context getEagerSession() {
+        return eagerSessionHandle.get();
     }
 
     /** {@inheritDoc} */
@@ -144,5 +171,14 @@ public final class TfEngine extends Engine {
         }
         sb.append("]\nTensorFlow Library: ").append(LibUtils.getLibName());
         return sb.toString();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        TFE_Context handle = eagerSessionHandle.getAndSet(null);
+        if (handle != null && !handle.isNull()) {
+            handle.close();
+        }
     }
 }
