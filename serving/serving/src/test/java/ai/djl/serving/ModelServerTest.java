@@ -73,6 +73,7 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -136,6 +137,9 @@ public class ModelServerTest {
             throws InterruptedException, HttpPostRequestEncoder.ErrorDataEncoderException,
                     IOException, ParseException, GeneralSecurityException,
                     ReflectiveOperationException {
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            throw new SkipException("Test is flaky on windows");
+        }
         Assert.assertTrue(server.isRunning());
 
         Channel channel = null;
