@@ -25,6 +25,7 @@ import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
+import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import ai.djl.util.Utils;
@@ -52,6 +53,7 @@ public abstract class BaseModel implements Model {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseModel.class);
     private static final int MODEL_VERSION = 1;
+
     protected Path modelDir;
     protected Block block;
     protected String modelName;
@@ -216,7 +218,7 @@ public abstract class BaseModel implements Model {
     }
 
     protected Block loadFromBlockFactory() {
-        BlockFactory factory = Utils.findImplementation(modelDir, null);
+        BlockFactory factory = ClassLoaderUtils.findImplementation(modelDir, null);
         if (factory == null) {
             return null;
         }
