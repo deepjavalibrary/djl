@@ -71,7 +71,7 @@ public class BertCodeDataset implements Dataset {
 
     /** {@inheritDoc} */
     @Override
-    public Iterable<Batch> getData(NDManager manager) throws IOException, TranslateException {
+    public Iterable<Batch> getData(NDManager manager) {
         return new EpochIterable();
     }
 
@@ -273,10 +273,10 @@ public class BertCodeDataset implements Dataset {
                         .stream()
                         .map(BertCodeDataset::tokenizeLine)
                         .collect(Collectors.toList());
-        return new ParsedFile(file, normalizedLines, tokens);
+        return new ParsedFile(tokens);
     }
 
-    private static final Dictionary buildDictionary(Map<String, Long> countedTokens, int maxSize) {
+    private static Dictionary buildDictionary(Map<String, Long> countedTokens, int maxSize) {
         if (maxSize < RESERVED_TOKENS.size()) {
             throw new IllegalArgumentException(
                     "Dictionary needs at least size "
@@ -334,25 +334,11 @@ public class BertCodeDataset implements Dataset {
     }
 
     private static final class ParsedFile {
-        final Path sourceFile;
-        final List<String> normalizedLines;
-        final List<List<String>> tokenizedLines;
 
-        private ParsedFile(
-                Path sourceFile, List<String> normalizedLines, List<List<String>> tokenizedLines) {
-            this.sourceFile = sourceFile;
-            this.normalizedLines = normalizedLines;
+        private List<List<String>> tokenizedLines;
+
+        private ParsedFile(List<List<String>> tokenizedLines) {
             this.tokenizedLines = tokenizedLines;
-        }
-
-        public String toDebugString() {
-            return sourceFile
-                    + "\n"
-                    + "=======================\n"
-                    + tokenizedLines
-                            .stream()
-                            .map(tokens -> String.join("|", tokens))
-                            .collect(Collectors.joining("\n"));
         }
 
         public void addToSentencePairs(List<SentencePair> sentencePairs) {
@@ -516,20 +502,13 @@ public class BertCodeDataset implements Dataset {
             }
             return result;
         }
-
-        public String toDebugString() {
-            return originalSentencePair.consecutive
-                    + "\n"
-                    + String.join("", label)
-                    + "\n"
-                    + String.join("", masked);
-        }
     }
 
     /** Helper class to create a token to id mapping. */
     private static final class Dictionary {
-        final List<String> tokens;
-        final Map<String, Integer> tokenToId;
+
+        private List<String> tokens;
+        private Map<String, Integer> tokenToId;
 
         private Dictionary(List<String> tokens) {
             this.tokens = tokens;
@@ -545,10 +524,6 @@ public class BertCodeDataset implements Dataset {
 
         public int getId(String token) {
             return tokenToId.getOrDefault(token, UNK_ID);
-        }
-
-        public String toDebugString() {
-            return String.join("\n", tokens);
         }
 
         public List<Integer> toIds(final List<String> tokens) {

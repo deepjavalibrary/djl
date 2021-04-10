@@ -39,7 +39,6 @@ import ai.djl.translate.TranslateException;
 import java.io.IOException;
 
 /** Simple example that performs Bert pretraining on the java source files in this repo. */
-@SuppressWarnings("PMD")
 public final class TrainBertOnCode {
 
     private static final int DEFAULT_BATCH_SIZE = 48;
@@ -112,6 +111,7 @@ public final class TrainBertOnCode {
 
     public static class BertArguments extends Arguments {
 
+        /** {@inheritDoc} */
         @Override
         protected void initialize() {
             super.initialize();
