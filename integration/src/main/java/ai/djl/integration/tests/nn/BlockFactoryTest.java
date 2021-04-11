@@ -24,23 +24,29 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.BlockFactory;
-import ai.djl.nn.Blocks;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
+import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.Assertions;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
+import ai.djl.util.Utils;
+import ai.djl.util.ZipUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class BlockFactoryTest {
@@ -77,7 +83,55 @@ public class BlockFactoryTest {
         }
     }
 
-    static class TestBlockFactory implements BlockFactory {
+    @Test
+    public void testBlockFactoryLoadingFromZip()
+            throws MalformedModelException, ModelNotFoundException, IOException,
+                    TranslateException {
+        Path savedDir = Paths.get("build/testBlockFactory");
+        Utils.deleteQuietly(savedDir);
+        Path zipPath = prepareModel(savedDir);
+        // load model from here
+        Criteria<NDList, NDList> criteria =
+                Criteria.builder()
+                        .setTypes(NDList.class, NDList.class)
+                        .optModelPath(zipPath)
+                        .optModelName("exported")
+                        .build();
+        try (NDManager manager = NDManager.newBaseManager()) {
+            try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria);
+                    Predictor<NDList, NDList> pred = model.newPredictor()) {
+                NDList destOut = pred.predict(new NDList(manager.ones(new Shape(1, 3, 32, 32))));
+                Assert.assertEquals(destOut.singletonOrThrow().getShape(), new Shape(1, 10));
+            }
+        }
+    }
+
+    private Path prepareModel(Path savedDir)
+            throws IOException, ModelNotFoundException, MalformedModelException {
+        TestBlockFactory factory = new TestBlockFactory();
+        Model model = factory.getRemoveLastBlockModel();
+        try (NDManager manager = NDManager.newBaseManager()) {
+            Block block = model.getBlock();
+            block.forward(
+                    new ParameterStore(manager, true),
+                    new NDList(manager.ones(new Shape(1, 3, 32, 32))),
+                    true);
+            model.save(savedDir, "exported");
+        }
+        Path classDir = savedDir.resolve("classes/ai/djl/integration/tests/nn");
+        Files.createDirectories(classDir);
+        Files.copy(
+                Paths.get(
+                        "build/classes/java/main/ai/djl/integration/tests/nn/BlockFactoryTest$TestBlockFactory.class"),
+                classDir.resolve("BlockFactoryTest$TestBlockFactory.class"));
+        Path zipPath =
+                Paths.get("build/testBlockFactory" + Engine.getInstance().getEngineName() + ".zip");
+        Files.deleteIfExists(zipPath);
+        ZipUtils.zip(savedDir, zipPath, false);
+        return zipPath;
+    }
+
+    public static class TestBlockFactory implements BlockFactory {
 
         private static final long serialVersionUID = 1234567L;
 
@@ -85,7 +139,6 @@ public class BlockFactoryTest {
         public Block newBlock(NDManager manager) {
             SequentialBlock newBlock = new SequentialBlock();
             newBlock.add(SymbolBlock.newInstance(manager));
-            newBlock.add(Blocks.batchFlattenBlock());
             newBlock.add(Linear.builder().setUnits(10).build());
             return newBlock;
         }
@@ -105,9 +158,7 @@ public class BlockFactoryTest {
             Model model = ModelZoo.loadModel(builder.build());
             SequentialBlock newBlock = new SequentialBlock();
             SymbolBlock block = (SymbolBlock) model.getBlock();
-            block.removeLastBlock();
             newBlock.add(block);
-            newBlock.add(Blocks.batchFlattenBlock());
             newBlock.add(Linear.builder().setUnits(10).build());
             model.setBlock(newBlock);
             return model;

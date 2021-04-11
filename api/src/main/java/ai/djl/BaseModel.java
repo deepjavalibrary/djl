@@ -19,11 +19,13 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.BlockFactory;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
+import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import ai.djl.util.Utils;
@@ -51,6 +53,7 @@ public abstract class BaseModel implements Model {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseModel.class);
     private static final int MODEL_VERSION = 1;
+
     protected Path modelDir;
     protected Block block;
     protected String modelName;
@@ -212,6 +215,14 @@ public abstract class BaseModel implements Model {
 
     protected void setModelDir(Path modelDir) {
         this.modelDir = modelDir.toAbsolutePath();
+    }
+
+    protected Block loadFromBlockFactory() {
+        BlockFactory factory = ClassLoaderUtils.findImplementation(modelDir, null);
+        if (factory == null) {
+            return null;
+        }
+        return factory.newBlock(manager);
     }
 
     /** {@inheritDoc} */
