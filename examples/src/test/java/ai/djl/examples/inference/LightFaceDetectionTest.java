@@ -15,23 +15,31 @@ package ai.djl.examples.inference;
 import ai.djl.ModelException;
 import ai.djl.examples.inference.face.LightFaceDetection;
 import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.output.FaceDetectedObjects;
+import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class LightFaceDetectionTest {
 
     @Test
     public void testLightFaceDetection() throws ModelException, TranslateException, IOException {
-        FaceDetectedObjects result = LightFaceDetection.predict();
-        List<String> objects = Arrays.asList("Face");
-        for (Classifications.Classification obj : result.items()) {
-            Assert.assertTrue(objects.contains(obj.getClassName()));
-            Assert.assertTrue(Double.compare(obj.getProbability(), 0.6) > 0);
+        if (Boolean.getBoolean("nightly")) {
+            DetectedObjects result = LightFaceDetection.predict();
+            // only works for PyTorch
+            if (result == null) {
+                throw new SkipException("Only works for PyTorch engine.");
+            }
+
+            List<String> objects = Collections.singletonList("Face");
+            for (Classifications.Classification obj : result.items()) {
+                Assert.assertTrue(objects.contains(obj.getClassName()));
+                Assert.assertTrue(Double.compare(obj.getProbability(), 0.6) > 0);
+            }
         }
     }
 }

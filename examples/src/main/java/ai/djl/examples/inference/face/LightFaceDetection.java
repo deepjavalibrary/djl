@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -14,27 +14,20 @@
 package ai.djl.examples.inference.face;
 
 import ai.djl.ModelException;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.output.FaceDetectedObjects;
-import ai.djl.modality.cv.output.Landmark;
-import ai.djl.modality.cv.output.Point;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,48 +39,46 @@ import org.slf4j.LoggerFactory;
  * information about this example.
  */
 public final class LightFaceDetection {
+
     private static final Logger logger = LoggerFactory.getLogger(LightFaceDetection.class);
 
     private LightFaceDetection() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        FaceDetectedObjects detection = LightFaceDetection.predict();
+        DetectedObjects detection = LightFaceDetection.predict();
         logger.info("{}", detection);
     }
 
-    public static FaceDetectedObjects predict()
-            throws IOException, ModelException, TranslateException {
+    public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
+        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
+            return null;
+        }
+
+        Path facePath = Paths.get("src/test/resources/largest_selfie.jpg");
+        Image img = ImageFactory.getInstance().fromFile(facePath);
+
         double confThresh = 0.85f;
         double nmsThresh = 0.45f;
-        double[] variance = new double[] {0.1f, 0.2f};
+        double[] variance = {0.1f, 0.2f};
         int topK = 5000;
-        int[][] scales = new int[][] {{10, 16, 24}, {32, 48}, {64, 96}, {128, 192, 256}};
-        int[] steps = new int[] {8, 16, 32, 64};
-        String facePath = "src/test/resources/largest_selfie.jpg";
+        int[][] scales = {{10, 16, 24}, {32, 48}, {64, 96}, {128, 192, 256}};
+        int[] steps = {8, 16, 32, 64};
 
-        BufferedImage bufImg = ImageIO.read(new File(facePath));
-        Image img = ImageFactory.getInstance().fromImage(bufImg);
-        img.getWrappedImage();
+        FaceDetectionTranslator translator =
+                new FaceDetectionTranslator(confThresh, nmsThresh, variance, topK, scales, steps);
 
-        Criteria<Image, FaceDetectedObjects> criteria =
+        Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
-                        .setTypes(Image.class, FaceDetectedObjects.class)
-                        .optModelUrls("https://djl-model.oss-cn-hongkong.aliyuncs.com/ultranet.zip")
-                        // Load model from local file, e.g:
-                        // "file:///Users/calvin/pytorch_models/retinaface/"
-                        // .optModelUrls("file:///path/to/model_dir/")
-                        .optModelName("ultranet") // specify model file prefix
-                        .optTranslator(
-                                new FaceDetectionTranslator(
-                                        confThresh, nmsThresh, variance, topK, scales, steps))
+                        .setTypes(Image.class, DetectedObjects.class)
+                        .optModelUrls("https://resources.djl.ai/test-models/pytorch/ultranet.zip")
+                        .optTranslator(translator)
                         .optProgress(new ProgressBar())
                         .optEngine("PyTorch") // Use PyTorch engine
                         .build();
 
-        try (ZooModel<Image, FaceDetectedObjects> model = ModelZoo.loadModel(criteria)) {
-            try (Predictor<Image, FaceDetectedObjects> predictor = model.newPredictor()) {
-                FaceDetectedObjects detection = predictor.predict(img);
-                drawLandmarks(bufImg, detection.getLandmarks());
+        try (ZooModel<Image, DetectedObjects> model = ModelZoo.loadModel(criteria)) {
+            try (Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
+                DetectedObjects detection = predictor.predict(img);
                 saveBoundingBoxImage(img, detection);
                 return detection;
             }
@@ -106,21 +97,5 @@ public final class LightFaceDetection {
         Path imagePath = outputDir.resolve("ultranet_detected.png");
         newImage.save(Files.newOutputStream(imagePath), "png");
         logger.info("Face detection result image has been saved in: {}", imagePath);
-    }
-
-    private static void drawLandmarks(BufferedImage image, List<Landmark> landmarks) {
-        Graphics2D g = (Graphics2D) image.getGraphics();
-        try {
-            g.setColor(new Color(246, 96, 0));
-            BasicStroke bStroke = new BasicStroke(4, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
-            g.setStroke(bStroke);
-            for (Landmark landmark : landmarks) {
-                for (Point point : landmark.getPoints()) {
-                    g.drawRect((int) point.getX(), (int) point.getY(), 2, 2);
-                }
-            }
-        } finally {
-            g.dispose();
-        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -14,9 +14,11 @@
 package ai.djl.examples.inference.face;
 
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.output.*;
-import ai.djl.modality.cv.transform.Normalize;
-import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.modality.cv.output.BoundingBox;
+import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.output.Landmark;
+import ai.djl.modality.cv.output.Point;
+import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -24,7 +26,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Batchifier;
-import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
@@ -32,8 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FaceDetectionTranslator implements Translator<Image, FaceDetectedObjects> {
+public class FaceDetectionTranslator implements Translator<Image, DetectedObjects> {
+
     private Batchifier batchifier = Batchifier.STACK;
+
     private double confThresh;
     private double nmsThresh;
     private int topK;
@@ -58,6 +61,7 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
         this.steps = steps;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, Image input) {
         width = input.getWidth();
@@ -68,21 +72,15 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
         if (!array.getDataType().equals(DataType.FLOAT32)) {
             array = array.toType(DataType.FLOAT32, false);
         }
-        NDArray mean = ctx.getNDManager().create(new float[]{104f, 117f, 123f}, new Shape(3, 1, 1));
+        NDArray mean =
+                ctx.getNDManager().create(new float[] {104f, 117f, 123f}, new Shape(3, 1, 1));
         array = array.sub(mean);
         return new NDList(array);
-//        Pipeline pipeline = new Pipeline();
-//        pipeline.add(new ToTensor())
-//                .add(
-//                        new Normalize(
-//                                new float[] {123f / 255f, 117f / 255f, 104f / 255f},
-//                                new float[] {1f / 255f, 1f / 255f, 1f / 255f}));
-//        NDList list = pipeline.transform(new NDList(array));
-//        return list;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public FaceDetectedObjects processOutput(TranslatorContext ctx, NDList list) {
+    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
         NDManager manager = ctx.getNDManager();
         double scaleXY = variance[0];
         double scaleWH = variance[1];
@@ -94,7 +92,7 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
                                 prob.argMax(1).toType(DataType.FLOAT32, false),
                                 prob.max(new int[] {1})));
 
-        NDArray boxRecover = this.boxRecover(manager, width, height, scales, steps);
+        NDArray boxRecover = boxRecover(manager, width, height, scales, steps);
         NDArray boundingBoxes = list.get(0);
         NDArray bbWH = boundingBoxes.get(":, 2:").mul(scaleWH).exp().mul(boxRecover.get(":, 2:"));
         NDArray bbXY =
@@ -108,21 +106,20 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
         boundingBoxes = NDArrays.concat(new NDList(bbXY, bbWH), 1);
 
         NDArray landms = list.get(2);
-        landms = this.decodeLandm(landms, boxRecover, scaleXY);
+        landms = decodeLandm(landms, boxRecover, scaleXY);
 
         // filter the result below the threshold
-        NDArray cutOff = prob.get(1).gt(this.confThresh);
+        NDArray cutOff = prob.get(1).gt(confThresh);
         boundingBoxes = boundingBoxes.transpose().booleanMask(cutOff, 1).transpose();
         landms = landms.transpose().booleanMask(cutOff, 1).transpose();
         prob = prob.booleanMask(cutOff, 1);
 
         // start categorical filtering
-        long[] order = prob.get(1).argSort().get(":" + this.topK).toLongArray();
+        long[] order = prob.get(1).argSort().get(":" + topK).toLongArray();
         prob = prob.transpose();
         List<String> retNames = new ArrayList<>();
         List<Double> retProbs = new ArrayList<>();
         List<BoundingBox> retBB = new ArrayList<>();
-        List<Landmark> landmarks = new ArrayList<Landmark>();
 
         Map<Integer, List<BoundingBox>> recorder = new ConcurrentHashMap<>();
 
@@ -133,35 +130,36 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
             double probability = classProb[1];
 
             double[] boxArr = boundingBoxes.get(currMaxLoc).toDoubleArray();
-            Rectangle rect = new Rectangle(boxArr[0], boxArr[1], boxArr[2], boxArr[3]);
             double[] landmsArr = landms.get(currMaxLoc).toDoubleArray();
+            Rectangle rect = new Rectangle(boxArr[0], boxArr[1], boxArr[2], boxArr[3]);
             List<BoundingBox> boxes = recorder.getOrDefault(classId, new ArrayList<>());
             boolean belowIoU = true;
             for (BoundingBox box : boxes) {
-                if (box.getIoU(rect) > this.nmsThresh) {
+                if (box.getIoU(rect) > nmsThresh) {
                     belowIoU = false;
                     break;
                 }
             }
             if (belowIoU) {
-                boxes.add(rect);
-                recorder.put(classId, boxes);
-                String className = "Face"; // classes.get(classId)
-                retNames.add(className);
-                retProbs.add(probability);
-                retBB.add(rect);
                 List<Point> keyPoints = new ArrayList<>();
                 for (int j = 0; j < 5; j++) { // 5 face landmarks
                     double x = landmsArr[j * 2];
                     double y = landmsArr[j * 2 + 1];
                     keyPoints.add(new Point(x * width, y * height));
                 }
-                Landmark landmark = new Landmark(keyPoints);
-                landmarks.add(landmark);
+                Landmark landmark =
+                        new Landmark(boxArr[0], boxArr[1], boxArr[2], boxArr[3], keyPoints);
+
+                boxes.add(landmark);
+                recorder.put(classId, boxes);
+                String className = "Face"; // classes.get(classId)
+                retNames.add(className);
+                retProbs.add(probability);
+                retBB.add(landmark);
             }
         }
 
-        return new FaceDetectedObjects(retNames, retProbs, retBB, landmarks);
+        return new DetectedObjects(retNames, retProbs, retBB);
     }
 
     private NDArray boxRecover(
@@ -179,9 +177,9 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
             int[] scale = scales[idx];
             for (int h = 0; h < aspectRatio[idx][0]; h++) {
                 for (int w = 0; w < aspectRatio[idx][1]; w++) {
-                    for (int index = 0; index < scale.length; index++) {
-                        double skx = scale[index] * 1.0 / width;
-                        double sky = scale[index] * 1.0 / height;
+                    for (int i : scale) {
+                        double skx = i * 1.0 / width;
+                        double sky = i * 1.0 / height;
                         double cx = (w + 0.5) * steps[idx] / width;
                         double cy = (h + 0.5) * steps[idx] / height;
                         defaultBoxes.add(new double[] {cx, cy, skx, sky});
@@ -212,6 +210,7 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
         return NDArrays.concat(new NDList(point1, point2, point3, point4, point5), 1);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Batchifier getBatchifier() {
         return batchifier;

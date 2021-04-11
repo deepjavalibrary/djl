@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -15,24 +15,29 @@ package ai.djl.modality.cv.output;
 import java.util.List;
 
 /** {@code Landmark} is the container that stores the key points for landmark on a single face. */
-public class Landmark {
+public class Landmark extends Rectangle {
+
+    private static final long serialVersionUID = 1L;
+
     private List<Point> points;
 
     /**
      * Constructs a {@code Landmark} using a list of points.
      *
+     * @param x the left coordinate of the bounding rectangle
+     * @param y the top coordinate of the bounding rectangle
+     * @param width the width of the bounding rectangle
+     * @param height the height of the bounding rectangle
      * @param points the key points for each face
      */
-    public Landmark(List<Point> points) {
+    public Landmark(double x, double y, double width, double height, List<Point> points) {
+        super(x, y, width, height);
         this.points = points;
     }
 
-    /**
-     * Returns the key points.
-     *
-     * @return the points
-     */
-    public List<Point> getPoints() {
+    /** {@inheritDoc} */
+    @Override
+    public Iterable<Point> getPath() {
         return points;
     }
 }
