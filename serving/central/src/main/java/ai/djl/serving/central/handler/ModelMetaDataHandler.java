@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * handler to handler model meta data requests.
+ * A handler to handler model meta data requests.
  *
  * @author erik.bamberg@web.de
  */
@@ -37,12 +37,7 @@ public class ModelMetaDataHandler
 
     private static final Logger logger = LoggerFactory.getLogger(ModelMetaDataHandler.class);
 
-    /**
-     * chain of responsibility accept method.
-     *
-     * @param msg the request message to handle.
-     * @return true/false if this handler can handler this kind of request.
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean acceptInboundMessage(Object msg) {
         FullHttpRequest request = (FullHttpRequest) msg;
@@ -51,14 +46,7 @@ public class ModelMetaDataHandler
         return uri.startsWith("/modelzoo/models");
     }
 
-    /**
-     * handle get Model meta data requests.
-     *
-     * @param ctx the context
-     * @param req the full request
-     * @param decoder query string decoder for this request.
-     * @param segments parsed segments of the URL.
-     */
+    /** {@inheritDoc} */
     @Override
     public CompletableFuture<Map<Application, List<Artifact>>> handleRequest(
             ChannelHandlerContext ctx,

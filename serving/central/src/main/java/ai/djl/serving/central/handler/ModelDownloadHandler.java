@@ -13,7 +13,6 @@
 package ai.djl.serving.central.handler;
 
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.serving.central.responseencoder.HttpRequestResponse;
 import ai.djl.serving.central.utils.ModelUri;
 import ai.djl.serving.central.utils.NettyUtils;
 import ai.djl.serving.http.BadRequestException;
@@ -34,13 +33,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public class ModelDownloadHandler implements RequestHandler<CompletableFuture<Map<String, URI>>> {
 
-    HttpRequestResponse jsonResponse;
-
-    /** Constructs a ModelDownloadHandler. */
-    public ModelDownloadHandler() {
-        jsonResponse = new HttpRequestResponse();
-    }
-
     /** {@inheritDoc} */
     @Override
     public boolean acceptInboundMessage(Object msg) {
@@ -50,14 +42,7 @@ public class ModelDownloadHandler implements RequestHandler<CompletableFuture<Ma
         return uri.startsWith("/serving/models?");
     }
 
-    /**
-     * Handles the deployment request by forwarding the request to the serving-instance.
-     *
-     * @param ctx the context
-     * @param req the full request
-     * @param decoder the queryStringDecoder
-     * @param segments of the parsed URL
-     */
+    /** {@inheritDoc} */
     @Override
     public CompletableFuture<Map<String, URI>> handleRequest(
             ChannelHandlerContext ctx,
@@ -76,9 +61,8 @@ public class ModelDownloadHandler implements RequestHandler<CompletableFuture<Ma
                                 } else {
                                     throw new BadRequestException("modelName is mandatory.");
                                 }
-
                             } catch (IOException | ModelNotFoundException ex) {
-                                throw new IllegalArgumentException(ex.getMessage(), ex);
+                                throw new IllegalArgumentException(ex);
                             }
                         })
                 .exceptionally((ex) -> Collections.emptyMap());
