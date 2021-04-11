@@ -14,15 +14,14 @@ package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
 import ai.djl.examples.inference.face.LightFaceDetection;
-import ai.djl.examples.inference.face.model.FaceDetectedObjects;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.output.FaceDetectedObjects;
 import ai.djl.translate.TranslateException;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class LightFaceDetectionTest {
 

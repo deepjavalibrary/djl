@@ -11,16 +11,29 @@
  * and limitations under the License.
  */
 
-package ai.djl.examples.inference.face.model;
+package ai.djl.modality.cv.output;
 
-import ai.djl.modality.cv.output.BoundingBox;
-import ai.djl.modality.cv.output.DetectedObjects;
 import java.util.List;
 
+/**
+ * A class representing the detected face objects results for a single image in an {@link
+ * ai.djl.Application.CV#OBJECT_DETECTION} case.
+ */
 public class FaceDetectedObjects extends DetectedObjects {
     private static final long serialVersionUID = 1L;
     private List<Landmark> landmarks;
 
+    /**
+     * Constructs a FaceDetectedObjects, usually during post-processing.
+     *
+     * <p>All four inputs(classNames, probabilities, boundingBoxes, landmarks) should be parallel
+     * lists.
+     *
+     * @param classNames the names of the face objects that were detected
+     * @param probabilities the probability of the face objects that were detected
+     * @param boundingBoxes the bounding boxes of the face objects that were detected
+     * @param landmarks the landmarks of the face objects that were detected
+     */
     public FaceDetectedObjects(
             List<String> classNames,
             List<Double> probabilities,
@@ -30,6 +43,11 @@ public class FaceDetectedObjects extends DetectedObjects {
         this.landmarks = landmarks;
     }
 
+    /**
+     * Returns the landmarks of face objects found in an image.
+     *
+     * @return the landmarks of face objects found in an image
+     */
     public List<Landmark> getLandmarks() {
         return landmarks;
     }

@@ -13,12 +13,10 @@
 
 package ai.djl.examples.inference.face;
 
-import ai.djl.examples.inference.face.model.FaceDetectedObjects;
-import ai.djl.examples.inference.face.model.Landmark;
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.output.BoundingBox;
-import ai.djl.modality.cv.output.Point;
-import ai.djl.modality.cv.output.Rectangle;
+import ai.djl.modality.cv.output.*;
+import ai.djl.modality.cv.transform.Normalize;
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -26,6 +24,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Batchifier;
+import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
@@ -72,6 +71,14 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
         NDArray mean = ctx.getNDManager().create(new float[]{104f, 117f, 123f}, new Shape(3, 1, 1));
         array = array.sub(mean);
         return new NDList(array);
+//        Pipeline pipeline = new Pipeline();
+//        pipeline.add(new ToTensor())
+//                .add(
+//                        new Normalize(
+//                                new float[] {123f / 255f, 117f / 255f, 104f / 255f},
+//                                new float[] {1f / 255f, 1f / 255f, 1f / 255f}));
+//        NDList list = pipeline.transform(new NDList(array));
+//        return list;
     }
 
     @Override
@@ -83,7 +90,9 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
         NDArray prob = list.get(1).get(":, 1:");
         prob =
                 NDArrays.stack(
-                        new NDList(prob.argMax(1).toType(DataType.FLOAT32, false), prob.max(new int[]{1})));
+                        new NDList(
+                                prob.argMax(1).toType(DataType.FLOAT32, false),
+                                prob.max(new int[] {1})));
 
         NDArray boxRecover = this.boxRecover(manager, width, height, scales, steps);
         NDArray boundingBoxes = list.get(0);
@@ -161,7 +170,7 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
         for (int i = 0; i < steps.length; i++) {
             int wRatio = (int) Math.ceil((float) width / steps[i]);
             int hRatio = (int) Math.ceil((float) height / steps[i]);
-            aspectRatio[i] = new int[]{hRatio, wRatio};
+            aspectRatio[i] = new int[] {hRatio, wRatio};
         }
 
         List<double[]> defaultBoxes = new ArrayList<>();
@@ -175,7 +184,7 @@ public class FaceDetectionTranslator implements Translator<Image, FaceDetectedOb
                         double sky = scale[index] * 1.0 / height;
                         double cx = (w + 0.5) * steps[idx] / width;
                         double cy = (h + 0.5) * steps[idx] / height;
-                        defaultBoxes.add(new double[]{cx, cy, skx, sky});
+                        defaultBoxes.add(new double[] {cx, cy, skx, sky});
                     }
                 }
             }

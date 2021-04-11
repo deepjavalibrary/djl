@@ -14,21 +14,19 @@
 package ai.djl.examples.inference.face;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.face.model.FaceDetectedObjects;
-import ai.djl.examples.inference.face.model.Landmark;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.output.FaceDetectedObjects;
+import ai.djl.modality.cv.output.Landmark;
 import ai.djl.modality.cv.output.Point;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -61,10 +59,10 @@ public final class RetinaFaceDetection {
             throws IOException, ModelException, TranslateException {
         double confThresh = 0.85f;
         double nmsThresh = 0.45f;
-        double[] variance = new double[]{0.1f, 0.2f};
+        double[] variance = new double[] {0.1f, 0.2f};
         int topK = 5000;
-        int[][] scales = new int[][]{{16, 32}, {64, 128}, {256, 512}};
-        int[] steps = new int[]{8, 16, 32};
+        int[][] scales = new int[][] {{16, 32}, {64, 128}, {256, 512}};
+        int[] steps = new int[] {8, 16, 32};
         String facePath = "src/test/resources/largest_selfie.jpg";
 
         BufferedImage bufImg = ImageIO.read(new File(facePath));
@@ -74,12 +72,15 @@ public final class RetinaFaceDetection {
         Criteria<Image, FaceDetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, FaceDetectedObjects.class)
-                        .optModelUrls("https://djl-model.oss-cn-hongkong.aliyuncs.com/retinaface.zip")
-                        // Load model from local file, e.g: "file:///Users/calvin/pytorch_models/retinaface/"
+                        .optModelUrls(
+                                "https://djl-model.oss-cn-hongkong.aliyuncs.com/retinaface.zip")
+                        // Load model from local file, e.g:
+                        // "file:///Users/calvin/pytorch_models/retinaface/"
                         // .optModelUrls("file:///path/to/model_dir/")
                         .optModelName("retinaface") // specify model file prefix
                         .optTranslator(
-                                new FaceDetectionTranslator(confThresh, nmsThresh, variance, topK, scales, steps))
+                                new FaceDetectionTranslator(
+                                        confThresh, nmsThresh, variance, topK, scales, steps))
                         .optProgress(new ProgressBar())
                         .optEngine("PyTorch") // Use PyTorch engine
                         .build();

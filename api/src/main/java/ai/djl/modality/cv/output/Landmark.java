@@ -10,19 +10,28 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+package ai.djl.modality.cv.output;
 
-package ai.djl.examples.inference.face.model;
-
-import ai.djl.modality.cv.output.Point;
 import java.util.List;
 
+/** {@code Landmark} is the container that stores the key points for landmark on a single face. */
 public class Landmark {
     private List<Point> points;
 
+    /**
+     * Constructs a {@code Landmark} using a list of points.
+     *
+     * @param points the key points for each face
+     */
     public Landmark(List<Point> points) {
         this.points = points;
     }
 
+    /**
+     * Returns the key points.
+     *
+     * @return the points
+     */
     public List<Point> getPoints() {
         return points;
     }
