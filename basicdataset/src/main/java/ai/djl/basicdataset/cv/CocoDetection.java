@@ -126,8 +126,7 @@ public class CocoDetection extends ObjectDetectionDataset {
             if (annotation.getArea() > 0) {
                 double[] box = annotation.getBoundingBox();
                 long labelClass = coco.mapCategoryId(annotation.getCategoryId());
-                Rectangle objectLocation =
-                        new Rectangle(new Point(box[0], box[1]), new Point(box[2], box[3]));
+                Rectangle objectLocation = new Rectangle(new Point(box[0], box[1]), box[2], box[3]);
                 label.add(labelClass, objectLocation);
             }
         }

@@ -47,16 +47,6 @@ public class Rectangle implements BoundingBox {
     }
 
     /**
-     * Constructs a new {@code Rectangle} with the upperLeft and lowerRight coordinates.
-     *
-     * @param upperLeft the upper left coordinate (0-1)
-     * @param lowerRight the upper left coordinate (0-1)
-     */
-    public Rectangle(Point upperLeft, Point lowerRight) {
-        this(upperLeft, lowerRight.getX() - upperLeft.getX(), lowerRight.getY() - upperLeft.getY());
-    }
-
-    /**
      * Constructs a new {@code Rectangle} whose upper-left corner is specified as coordinate {@code
      * point} and whose width and height are specified by the arguments of the same name.
      *
@@ -68,6 +58,7 @@ public class Rectangle implements BoundingBox {
         this.width = width;
         this.height = height;
         corners = new ArrayList<>(4);
+        corners.add(point);
         corners.add(new Point(point.getX() + width, point.getY()));
         corners.add(new Point(point.getX() + width, point.getY() + height));
         corners.add(new Point(point.getX(), point.getY() + height));

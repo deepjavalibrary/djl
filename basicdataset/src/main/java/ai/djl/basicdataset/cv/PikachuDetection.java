@@ -107,8 +107,7 @@ public class PikachuDetection extends ObjectDetectionDataset {
                 long objectClass = label.get(4).longValue();
                 Rectangle objectLocation =
                         new Rectangle(
-                                new Point(label.get(5), label.get(6)),
-                                new Point(label.get(7), label.get(8)));
+                                new Point(label.get(5), label.get(6)), label.get(7), label.get(8));
                 labels.add(objectClass, objectLocation);
             }
         }
@@ -116,7 +115,7 @@ public class PikachuDetection extends ObjectDetectionDataset {
     }
 
     @Override
-    public PairList<Long, Rectangle> getObjects(long index) throws IOException {
+    public PairList<Long, Rectangle> getObjects(long index) {
         return new PairList<>(Collections.singletonList(labels.get((int) index)));
     }
 
