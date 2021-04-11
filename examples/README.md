@@ -1,6 +1,7 @@
 # Examples
 
 This module contains examples to demonstrate use of the Deep Java Library (DJL).
+You can find more examples from our [djl-demo github repo](https://github.com/aws-samples/djl-demo).
 
 The following examples are included for training:
 
