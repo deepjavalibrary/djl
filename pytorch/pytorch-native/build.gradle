@@ -200,9 +200,9 @@ task downloadPyTorchNativeLib() {
                 "cpu/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcpu.zip"    : "cpu/linux",
                 "cpu/libtorch-macos-${VERSION}.zip"                               : "cpu/osx",
                 "cpu/libtorch-win-shared-with-deps-${VERSION}%2Bcpu.zip"          : "cpu/win",
-                "cu102/libtorch-cxx11-abi-shared-with-deps-${VERSION}.zip"        : "cu102/linux",
+                "cu102/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu102.zip": "cu102/linux",
                 "cu111/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu111.zip": "cu111/linux",
-                "cu102/libtorch-win-shared-with-deps-${VERSION}.zip"              : "cu102/win",
+                "cu102/libtorch-win-shared-with-deps-${VERSION}%2Bcu102.zip"      : "cu102/win",
                 "cu111/libtorch-win-shared-with-deps-${VERSION}%2Bcu111.zip"      : "cu111/win"
         ]
         if (isPrecxx11) {
@@ -231,7 +231,7 @@ task downloadPyTorchNativeLib() {
             // GPU dependencies
             copy {
                 from("${outputDir}/libtorch/lib/") {
-                    include "libtorch_cuda.so", "torch_cuda.dll", "libc10_cuda.so", "c10_cuda.dll", "libcaffe2_nvrtc.so", "libnvrtc*.so.*", "libcudart*.*", "*nvToolsExt*.*", "cudnn*.dll", "caffe2_nvrtc.dll", "nvrtc64*.dll"
+                    include "libtorch_cuda.so", "torch_cuda*.dll", "libc10_cuda.so", "c10_cuda.dll", "libcaffe2_nvrtc.so", "libnvrtc*.so.*", "libcudart*.*", "*nvToolsExt*.*", "cudnn*.dll", "caffe2_nvrtc.dll", "nvrtc64*.dll"
                 }
                 into("${outputDir}/native/lib")
             }
