@@ -4625,4 +4625,30 @@ public interface NDArray extends NDResource {
      *     href=https://d2l.djl.ai/chapter_linear-networks/softmax-regression.html#classification-problems>Classification-problems</a>
      */
     NDArray oneHot(int depth, float onValue, float offValue, DataType dataType);
+
+    /**
+     * Batchwise product of this {@code NDArray} and the other {@code NDArray}.
+     *
+     * <ul>
+     *   <li> batch_dot is used to compute dot product of x and y when x and y are data in batch, namely N-D (N >= 3) arrays in shape of (B0, …, B_i, :, :).
+     * </ul>
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array1 = manager.ones(new Shape(2, 1, 4));
+     * jshell&gt; NDArray array2 = manager.ones(new Shape(2, 4, 6));
+     * jshell&gt; array1.batchDot(array2);
+     * ND: (2, 1, 6) cpu() float32
+     * [[[4., 4., 4., 4., 4., 4.],
+     *  ],
+     *  [[4., 4., 4., 4., 4., 4.],
+     *  ],
+     * ]
+     * </pre>
+     *
+     * @param other the other {@code NDArray} to perform batch dot product with
+     * @return the result {@code NDArray}
+     */
+    NDArray batchDot(NDArray other);
 }

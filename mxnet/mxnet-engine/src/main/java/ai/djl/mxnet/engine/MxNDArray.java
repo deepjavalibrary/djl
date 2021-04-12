@@ -1527,6 +1527,10 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         return manager.invoke("_npx_one_hot", this, params).toType(dataType, false);
     }
 
+    public NDArray batchDot(NDArray other) {
+        return manager.invoke("_npx_batch_dot", new NDArray[] {this, other}, null);
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArrayEx getNDArrayInternal() {

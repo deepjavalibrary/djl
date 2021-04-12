@@ -983,6 +983,12 @@ public interface NDArrayAdapter extends NDArray {
 
     /** {@inheritDoc} */
     @Override
+    default NDArray batchDot(NDArray other) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     default NDArrayEx getNDArrayInternal() {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
