@@ -22,6 +22,18 @@ public class XgbEngineProvider implements EngineProvider {
 
     /** {@inheritDoc} */
     @Override
+    public String getEngineName() {
+        return XgbEngine.ENGINE_NAME;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getEngineRank() {
+        return XgbEngine.RANK;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public synchronized Engine getEngine() {
         if (engine == null) {
             engine = XgbEngine.newInstance();

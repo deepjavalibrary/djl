@@ -30,6 +30,7 @@ import ml.dmlc.xgboost4j.java.JniUtils;
 public final class XgbEngine extends Engine {
 
     public static final String ENGINE_NAME = "XGBoost";
+    static final int RANK = 10;
 
     private XgbEngine() {}
 
@@ -47,7 +48,7 @@ public final class XgbEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public int getRank() {
-        return 10;
+        return RANK;
     }
 
     /** {@inheritDoc} */
