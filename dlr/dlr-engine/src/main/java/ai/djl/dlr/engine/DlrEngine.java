@@ -32,6 +32,7 @@ import ai.djl.training.GradientCollector;
 public final class DlrEngine extends Engine {
 
     public static final String ENGINE_NAME = "DLR";
+    static final int RANK = 10;
 
     private Engine alternativeEngine;
 
@@ -69,7 +70,7 @@ public final class DlrEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public int getRank() {
-        return 10;
+        return RANK;
     }
 
     /** {@inheritDoc} */

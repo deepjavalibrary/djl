@@ -37,6 +37,7 @@ public final class PtEngine extends Engine {
     private static final Logger logger = LoggerFactory.getLogger(PtEngine.class);
 
     public static final String ENGINE_NAME = "PyTorch";
+    static final int RANK = 2;
 
     private PtEngine() {}
 
@@ -67,7 +68,7 @@ public final class PtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public int getRank() {
-        return 2;
+        return RANK;
     }
 
     /** {@inheritDoc} */
