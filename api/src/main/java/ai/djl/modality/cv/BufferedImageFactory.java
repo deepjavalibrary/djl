@@ -15,7 +15,9 @@ package ai.djl.modality.cv;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Joints;
+import ai.djl.modality.cv.output.Landmark;
 import ai.djl.modality.cv.output.Mask;
+import ai.djl.modality.cv.output.Point;
 import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
@@ -268,6 +270,8 @@ public class BufferedImageFactory extends ImageFactory {
                 if (box instanceof Mask) {
                     Mask mask = (Mask) box;
                     drawMask(image, mask);
+                } else if (box instanceof Landmark) {
+                    drawLandmarks(image, box);
                 }
             }
             g.dispose();
@@ -351,6 +355,17 @@ public class BufferedImageFactory extends ImageFactory {
             Graphics2D gR = (Graphics2D) image.getGraphics();
             gR.drawImage(maskImage, x, y, null);
             gR.dispose();
+        }
+
+        private void drawLandmarks(BufferedImage image, BoundingBox box) {
+            Graphics2D g = (Graphics2D) image.getGraphics();
+            g.setColor(new Color(246, 96, 0));
+            BasicStroke bStroke = new BasicStroke(4, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+            g.setStroke(bStroke);
+            for (Point point : box.getPath()) {
+                g.drawRect((int) point.getX(), (int) point.getY(), 2, 2);
+            }
+            g.dispose();
         }
     }
 }

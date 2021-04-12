@@ -12,6 +12,9 @@
  */
 package ai.djl.modality.cv.output;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A {@code Rectangle} specifies an area in a coordinate space that is enclosed by the {@code
  * Rectangle} object's upper-left point {@link Point} in the coordinate space, its width, and its
@@ -24,7 +27,9 @@ package ai.djl.modality.cv.output;
 public class Rectangle implements BoundingBox {
 
     private static final long serialVersionUID = 1L;
-    private Point point;
+
+    private List<Point> corners;
+
     private double width;
     private double height;
 
@@ -42,16 +47,6 @@ public class Rectangle implements BoundingBox {
     }
 
     /**
-     * Constructs a new {@code Rectangle} with the upperLeft and lowerRight coordinates.
-     *
-     * @param upperLeft the upper left coordinate (0-1)
-     * @param lowerRight the upper left coordinate (0-1)
-     */
-    public Rectangle(Point upperLeft, Point lowerRight) {
-        this(upperLeft, lowerRight.getX(), lowerRight.getY());
-    }
-
-    /**
      * Constructs a new {@code Rectangle} whose upper-left corner is specified as coordinate {@code
      * point} and whose width and height are specified by the arguments of the same name.
      *
@@ -60,9 +55,13 @@ public class Rectangle implements BoundingBox {
      * @param height the height of the {@code Rectangle} (0-1)
      */
     public Rectangle(Point point, double width, double height) {
-        this.point = point;
         this.width = width;
         this.height = height;
+        corners = new ArrayList<>(4);
+        corners.add(point);
+        corners.add(new Point(point.getX() + width, point.getY()));
+        corners.add(new Point(point.getX() + width, point.getY() + height));
+        corners.add(new Point(point.getX(), point.getY() + height));
     }
 
     /** {@inheritDoc} */
@@ -73,49 +72,14 @@ public class Rectangle implements BoundingBox {
 
     /** {@inheritDoc} */
     @Override
-    public PathIterator getPath() {
-        return new PathIterator() {
-
-            private int index;
-
-            /** {@inheritDoc} */
-            @Override
-            public boolean hasNext() {
-                return index < 4;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public void next() {
-                if (index > 3) {
-                    throw new IllegalStateException("No more path in iterator.");
-                }
-                ++index;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public Point currentPoint() {
-                switch (index) {
-                    case 0:
-                        return point;
-                    case 1:
-                        return new Point(point.getX() + width, point.getY());
-                    case 2:
-                        return new Point(point.getX() + width, point.getY() + height);
-                    case 3:
-                        return new Point(point.getX(), point.getY() + height);
-                    default:
-                        throw new AssertionError("Invalid index: " + index);
-                }
-            }
-        };
+    public Iterable<Point> getPath() {
+        return corners;
     }
 
     /** {@inheritDoc} */
     @Override
     public Point getPoint() {
-        return point;
+        return corners.get(0);
     }
 
     /** {@inheritDoc} */
@@ -138,7 +102,7 @@ public class Rectangle implements BoundingBox {
      * @return the left x-coordinate of the Rectangle (0-1)
      */
     public double getX() {
-        return point.getX();
+        return getPoint().getX();
     }
 
     /**
@@ -147,7 +111,7 @@ public class Rectangle implements BoundingBox {
      * @return the top y-coordinate of the Rectangle (0-1)
      */
     public double getY() {
-        return point.getY();
+        return getPoint().getY();
     }
 
     /**
@@ -171,8 +135,8 @@ public class Rectangle implements BoundingBox {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        double x = point.getX();
-        double y = point.getY();
+        double x = getX();
+        double y = getY();
         return String.format("[x=%.3f, y=%.3f, width=%.3f, height=%.3f]", x, y, width, height);
     }
 }
