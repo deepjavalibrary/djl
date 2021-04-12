@@ -1,6 +1,19 @@
+/*
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ * with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
 package ai.djl.examples.inference.face;
 
 import ai.djl.ModelException;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
@@ -12,7 +25,11 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.*;
+import ai.djl.translate.Batchifier;
+import ai.djl.translate.Pipeline;
+import ai.djl.translate.TranslateException;
+import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,13 +44,16 @@ public final class FeatureExtraction {
     private FeatureExtraction() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
+        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
+            logger.info("This example only works for PyTorch.");
+            return;
+        }
+
         Path imageFile = Paths.get("src/test/resources/kana1.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
         float[] feature = FeatureExtraction.predict(img);
-        if (feature == null) {
-            logger.info("Failed to extract feature.");
-        } else {
+        if (feature != null) {
             logger.info(Arrays.toString(feature));
         }
     }
@@ -45,27 +65,24 @@ public final class FeatureExtraction {
                 Criteria.builder()
                         .setTypes(Image.class, float[].class)
                         .optModelUrls(
-                                "https://djl-model.oss-cn-hongkong.aliyuncs.com/face_feature.zip")
-                        // Load model from local file, e.g:
-                        // "file:///Users/calvin/pytorch_models/face_feature/"
-                        // .optModelUrls("file:///path/to/model_dir/")
+                                "https://resources.djl.ai/test-models/pytorch/face_feature.zip")
                         .optModelName("face_feature") // specify model file prefix
                         .optTranslator(new FaceFeatureTranslator())
                         .optProgress(new ProgressBar())
                         .optEngine("PyTorch") // Use PyTorch engine
                         .build();
 
-        ZooModel model = ModelZoo.loadModel(criteria);
-        Predictor<Image, float[]> predictor = model.newPredictor();
-        float[] feature = predictor.predict(img);
-        return feature;
+        try (ZooModel<Image, float[]> model = ModelZoo.loadModel(criteria)) {
+            Predictor<Image, float[]> predictor = model.newPredictor();
+            return predictor.predict(img);
+        }
     }
 
     private static final class FaceFeatureTranslator implements Translator<Image, float[]> {
-        protected Batchifier batchifier = Batchifier.STACK;
 
         FaceFeatureTranslator() {}
 
+        /** {@inheritDoc} */
         @Override
         public NDList processInput(TranslatorContext ctx, Image input) {
             NDArray array = input.toNDArray(ctx.getNDManager(), Image.Flag.COLOR);
@@ -80,10 +97,10 @@ public final class FeatureExtraction {
                                         128.0f / 255.0f, 128.0f / 255.0f, 128.0f / 255.0f
                                     }));
 
-            NDList list = pipeline.transform(new NDList(array));
-            return list;
+            return pipeline.transform(new NDList(array));
         }
 
+        /** {@inheritDoc} */
         @Override
         public float[] processOutput(TranslatorContext ctx, NDList list) {
             NDList result = new NDList();
@@ -100,9 +117,10 @@ public final class FeatureExtraction {
             return feature;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Batchifier getBatchifier() {
-            return batchifier;
+            return Batchifier.STACK;
         }
     }
 }

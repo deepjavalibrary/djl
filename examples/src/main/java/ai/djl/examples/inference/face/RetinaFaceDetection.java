@@ -10,7 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-
 package ai.djl.examples.inference.face;
 
 import ai.djl.ModelException;
@@ -45,15 +44,16 @@ public final class RetinaFaceDetection {
     private RetinaFaceDetection() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
+        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
+            logger.info("This example only works for PyTorch.");
+            return;
+        }
+
         DetectedObjects detection = RetinaFaceDetection.predict();
         logger.info("{}", detection);
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
-        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
-            return null;
-        }
-
         Path facePath = Paths.get("src/test/resources/largest_selfie.jpg");
         Image img = ImageFactory.getInstance().fromFile(facePath);
 

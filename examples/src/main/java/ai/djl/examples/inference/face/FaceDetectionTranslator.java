@@ -10,7 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-
 package ai.djl.examples.inference.face;
 
 import ai.djl.modality.cv.Image;
@@ -34,8 +33,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FaceDetectionTranslator implements Translator<Image, DetectedObjects> {
-
-    private Batchifier batchifier = Batchifier.STACK;
 
     private double confThresh;
     private double nmsThresh;
@@ -213,6 +210,6 @@ public class FaceDetectionTranslator implements Translator<Image, DetectedObject
     /** {@inheritDoc} */
     @Override
     public Batchifier getBatchifier() {
-        return batchifier;
+        return Batchifier.STACK;
     }
 }

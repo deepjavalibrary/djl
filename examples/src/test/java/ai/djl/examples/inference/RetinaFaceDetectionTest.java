@@ -13,6 +13,7 @@
 package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
+import ai.djl.engine.Engine;
 import ai.djl.examples.inference.face.RetinaFaceDetection;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.output.DetectedObjects;
@@ -28,12 +29,12 @@ public class RetinaFaceDetectionTest {
 
     @Test
     public void testRetinaFaceDetection() throws ModelException, TranslateException, IOException {
+        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
+            throw new SkipException("Only works for PyTorch engine.");
+        }
+
         if (Boolean.getBoolean("nightly")) {
             DetectedObjects result = RetinaFaceDetection.predict();
-            // only works for PyTorch
-            if (result == null) {
-                throw new SkipException("Only works for PyTorch engine.");
-            }
 
             List<String> objects = Collections.singletonList("Face");
             for (Classifications.Classification obj : result.items()) {

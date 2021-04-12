@@ -14,6 +14,7 @@ package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
+import ai.djl.examples.inference.face.FeatureComparison;
 import ai.djl.examples.inference.face.FeatureExtraction;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
@@ -25,7 +26,7 @@ import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
-public class FeatureExtractionTest {
+public class FeatureComparisonTest {
 
     @Test
     public void testFeatureComparison() throws ModelException, TranslateException, IOException {
@@ -33,9 +34,17 @@ public class FeatureExtractionTest {
             throw new SkipException("Only works for PyTorch engine.");
         }
 
-        Path imageFile = Paths.get("src/test/resources/kana1.jpg");
-        Image img = ImageFactory.getInstance().fromFile(imageFile);
-        float[] feature = FeatureExtraction.predict(img);
-        Assert.assertEquals(feature.length, 512);
+        if (Boolean.getBoolean("nightly")) {
+            Path imageFile1 = Paths.get("src/test/resources/kana1.jpg");
+            Image img1 = ImageFactory.getInstance().fromFile(imageFile1);
+            Path imageFile2 = Paths.get("src/test/resources/kana2.jpg");
+            Image img2 = ImageFactory.getInstance().fromFile(imageFile2);
+
+            float[] feature1 = FeatureExtraction.predict(img1);
+            float[] feature2 = FeatureExtraction.predict(img2);
+
+            Assert.assertTrue(
+                    Double.compare(FeatureComparison.calculSimilar(feature1, feature2), 0.6) > 0);
+        }
     }
 }
