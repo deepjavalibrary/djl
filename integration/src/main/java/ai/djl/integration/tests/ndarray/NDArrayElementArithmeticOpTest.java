@@ -677,7 +677,10 @@ public class NDArrayElementArithmeticOpTest {
             NDArray array1 = manager.ones(new Shape(2, 1, 4));
             NDArray array2 = manager.ones(new Shape(2, 4, 6));
             NDArray expected = manager.create(4f).tile(12).reshape(new Shape(2, 1, 6));
-            Assert.assertEquals(array1.batchDot(array2), expected, "batch dot product: Incorrect value in result ndarray");
+            Assert.assertEquals(
+                    array1.batchDot(array2),
+                    expected,
+                    "batch dot product: Incorrect value in result ndarray");
         }
     }
 }
