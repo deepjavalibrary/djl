@@ -33,3 +33,5 @@ include ':tensorflow:tensorflow-native'
 include ':testing'
 include ':tflite:tflite-engine'
 include ':tflite:tflite-native'
+include ':ml:xgboost'
+

@@ -554,6 +554,21 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray createCSR(
+            float[] data, long[] indptr, long[] indices, Shape shape, Device device) {
+        return createCSR(FloatBuffer.wrap(data), indptr, indices, shape, device);
+    }
+
+    /**
+     * Creates a Compressed Sparse Row Storage (CSR) Format Matrix.
+     *
+     * @param data the data to set for the CSR Matrix
+     * @param indptr the indptr array is what will help identify the rows where the data appears
+     * @param indices the indices array stores the column index for each non-zero element in data
+     * @param shape the {@link Shape} of the {@link NDArray}
+     * @param device the {@link Device} of the {@link NDArray}
+     * @return a new instance of {@link NDArray}
+     */
+    default NDArray createCSR(
             Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
         if (device == null || device.equals(getDevice())) {
             return createCSR(data, indptr, indices, shape);
