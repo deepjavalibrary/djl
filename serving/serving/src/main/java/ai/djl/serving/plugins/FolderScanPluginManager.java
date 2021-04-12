@@ -13,16 +13,12 @@
 package ai.djl.serving.plugins;
 
 import ai.djl.serving.util.ConfigManager;
-import ai.djl.util.JsonUtils;
-import com.google.gson.JsonSerializer;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -57,7 +53,7 @@ public class FolderScanPluginManager implements PluginManager {
 
     private static final Logger logger = LoggerFactory.getLogger(FolderScanPluginManager.class);
 
-    private static Class<?>[] pluginInterfaces = {RequestHandler.class, JsonSerializer.class};
+    private static Class<?>[] pluginInterfaces = {RequestHandler.class};
 
     private ConfigManager configManager;
 
@@ -110,7 +106,6 @@ public class FolderScanPluginManager implements PluginManager {
                                 }
                             }
                         });
-        registerPlugins();
         logger.info("{} plug-ins found.", pluginsFound.intValue());
     }
 
@@ -147,31 +142,6 @@ public class FolderScanPluginManager implements PluginManager {
             return false;
         }
         return true;
-    }
-
-    private void registerPlugins() {
-        for (JsonSerializer<?> serializer : findImplementations(JsonSerializer.class)) {
-            Type genericType = null;
-            Type[] interfaces = serializer.getClass().getGenericInterfaces();
-            for (Type t : interfaces) {
-                ParameterizedType parameterizedType = (ParameterizedType) t;
-                if (parameterizedType.getRawType() == JsonSerializer.class) {
-                    genericType = parameterizedType.getActualTypeArguments()[0];
-                }
-            }
-
-            if (genericType != null) {
-                JsonUtils.GSON_BUILDER.registerTypeAdapter(genericType, serializer);
-                logger.debug(
-                        "registered serializer {} for type {}",
-                        serializer.getClass().getSimpleName(),
-                        genericType.getTypeName());
-            } else {
-                logger.warn(
-                        "could not determine type for JSonSerializer {}",
-                        serializer.getClass().getSimpleName());
-            }
-        }
     }
 
     /**
