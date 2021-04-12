@@ -4630,7 +4630,7 @@ public interface NDArray extends NDResource {
      * Batchwise product of this {@code NDArray} and the other {@code NDArray}.
      *
      * <ul>
-     *   <li>batch_dot is used to compute dot product of x and y when x and y are data in batch,
+     *   <li>batchDot is used to compute dot product of x and y when x and y are data in batch,
      *       namely N-D (N greater or equal to 3) arrays in shape of (B0, …, B_i, :, :). For
      *       example, given x with shape (B_0, …, B_i, N, M) and y with shape (B_0, …, B_i, M, K),
      *       the result array will have shape (B_0, …, B_i, N, K), which is computed by:
