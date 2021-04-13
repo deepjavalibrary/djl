@@ -62,7 +62,7 @@ public class XgbModel extends BaseModel {
                         .setMode(
                                 XgbSymbolBlock.Mode.valueOf(
                                         ((String) options.get("Mode"))
-                                                .toUpperCase(Locale.ENGLISH)));
+                                                .toUpperCase(Locale.ROOT)));
             }
             if (options.containsKey("TreeLimit")) {
                 ((XgbSymbolBlock) block)
