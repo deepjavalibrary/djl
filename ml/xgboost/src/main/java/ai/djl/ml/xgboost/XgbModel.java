@@ -54,6 +54,17 @@ public class XgbModel extends BaseModel {
             }
         }
         block = JniUtils.loadModel((XgbNDManager) manager, modelFile.toAbsolutePath().toString());
+        // set extra options
+        if (options != null) {
+            if (options.containsKey("Mode")) {
+                ((XgbSymbolBlock) block)
+                        .setMode(XgbSymbolBlock.Mode.getMode((String) options.get("Mode")));
+            }
+            if (options.containsKey("TreeLimit")) {
+                ((XgbSymbolBlock) block)
+                        .setTreeLimit(Integer.parseInt((String) options.get("TreeLimit")));
+            }
+        }
     }
 
     private Path findModelFile(String prefix) {

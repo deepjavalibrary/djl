@@ -29,6 +29,8 @@ public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
     private AtomicReference<Long> handle;
     private String uid;
     private XgbNDManager manager;
+    private Mode mode;
+    private int treeLimit;
 
     /**
      * Constructs a {@code XgbSymbolBlock}.
@@ -45,6 +47,8 @@ public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
         this.manager = manager;
         uid = String.valueOf(handle);
         manager.attachInternal(uid, this);
+        mode = Mode.DEFAULT;
+        treeLimit = 0;
     }
 
     /** {@inheritDoc} */
@@ -54,16 +58,6 @@ public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        Mode mode = Mode.DEFAULT;
-        int treeLimit = 0;
-        if (params != null) {
-            if (params.contains("Mode")) {
-                mode = (Mode) params.get("Mode");
-            }
-            if (params.contains("TreeLimit")) {
-                treeLimit = (int) params.get("TreeLimit");
-            }
-        }
         XgbNDArray array = (XgbNDArray) inputs.singletonOrThrow();
         float[] result = JniUtils.inference(this, array, treeLimit, mode);
         ByteBuffer buf = XgbNDManager.getSystemManager().allocateDirect(result.length * 4);
@@ -96,6 +90,14 @@ public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
         return reference;
     }
 
+    void setMode(Mode mode) {
+        this.mode = mode;
+    }
+
+    void setTreeLimit(int treeLimit) {
+        this.treeLimit = treeLimit;
+    }
+
     /** The mode of inference for OptionMask. */
     public enum Mode {
         DEFAULT(0),
@@ -107,6 +109,28 @@ public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
 
         Mode(int value) {
             this.value = value;
+        }
+
+        /**
+         * Gets the mode from name.
+         *
+         * @param name the name of the mode
+         * @return the corresponding name
+         */
+        public static Mode getMode(String name) {
+            String lowerCased = name.toLowerCase();
+            switch (lowerCased) {
+                case "default":
+                    return DEFAULT;
+                case "output_margin":
+                    return OUTPUT_MARGIN;
+                case "leaf":
+                    return LEAF;
+                case "contrib":
+                    return CONTRIB;
+                default:
+                    throw new IllegalArgumentException("Mode not found: " + name);
+            }
         }
 
         /**
