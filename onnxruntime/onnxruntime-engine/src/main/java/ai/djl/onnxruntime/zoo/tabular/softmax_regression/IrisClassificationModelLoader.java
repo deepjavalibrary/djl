@@ -33,6 +33,7 @@ import ai.djl.translate.TranslatorContext;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -110,7 +111,12 @@ public class IrisClassificationModelLoader extends BaseModelLoader {
         /** {@inheritDoc} */
         @Override
         public Classifications processOutput(TranslatorContext ctx, NDList list) {
-            return new Classifications(synset, list.get(1));
+            float[] data = list.get(1).toFloatArray();
+            List<Double> probabilities = new ArrayList<>(data.length);
+            for (float f : data) {
+                probabilities.add((double) f);
+            }
+            return new Classifications(synset, probabilities);
         }
 
         /** {@inheritDoc} */
