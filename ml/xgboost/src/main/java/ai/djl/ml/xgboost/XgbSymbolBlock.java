@@ -112,28 +112,6 @@ public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
         }
 
         /**
-         * Gets the mode from name.
-         *
-         * @param name the name of the mode
-         * @return the corresponding name
-         */
-        public static Mode getMode(String name) {
-            String lowerCased = name.toLowerCase();
-            switch (lowerCased) {
-                case "default":
-                    return DEFAULT;
-                case "output_margin":
-                    return OUTPUT_MARGIN;
-                case "leaf":
-                    return LEAF;
-                case "contrib":
-                    return CONTRIB;
-                default:
-                    throw new IllegalArgumentException("Mode not found: " + name);
-            }
-        }
-
-        /**
          * Gets the value of the mode.
          *
          * @return the value in number

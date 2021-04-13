@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Map;
 import ml.dmlc.xgboost4j.java.JniUtils;
 
@@ -58,7 +59,10 @@ public class XgbModel extends BaseModel {
         if (options != null) {
             if (options.containsKey("Mode")) {
                 ((XgbSymbolBlock) block)
-                        .setMode(XgbSymbolBlock.Mode.getMode((String) options.get("Mode")));
+                        .setMode(
+                                XgbSymbolBlock.Mode.valueOf(
+                                        ((String) options.get("Mode"))
+                                                .toUpperCase(Locale.ENGLISH)));
             }
             if (options.containsKey("TreeLimit")) {
                 ((XgbSymbolBlock) block)
