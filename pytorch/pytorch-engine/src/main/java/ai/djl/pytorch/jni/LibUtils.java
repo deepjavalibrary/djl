@@ -139,8 +139,13 @@ public final class LibUtils {
                 }
                 // Windows System.load is global load
                 loadNativeLibrary(libDir.resolve("c10_cuda.dll").toAbsolutePath().toString());
-                loadNativeLibrary(libDir.resolve("torch_cuda_cpp.dll").toAbsolutePath().toString());
-                loadNativeLibrary(libDir.resolve("torch_cuda_cu.dll").toAbsolutePath().toString());
+                // workaround for CU111, these files not exist in CU102
+                if (Files.exists(libDir.resolve("torch_cuda_cpp.dll"))) {
+                    loadNativeLibrary(
+                            libDir.resolve("torch_cuda_cpp.dll").toAbsolutePath().toString());
+                    loadNativeLibrary(
+                            libDir.resolve("torch_cuda_cu.dll").toAbsolutePath().toString());
+                }
                 loadNativeLibrary(libDir.resolve("torch_cuda.dll").toAbsolutePath().toString());
             }
             loadNativeLibrary(libDir.resolve("torch.dll").toAbsolutePath().toString());
