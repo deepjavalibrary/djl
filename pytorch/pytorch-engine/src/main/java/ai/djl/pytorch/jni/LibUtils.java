@@ -104,6 +104,8 @@ public final class LibUtils {
                                 "torch.dll",
                                 "torch_cpu.dll",
                                 "torch_cuda.dll",
+                                "torch_cuda_cpp.dll",
+                                "torch_cuda_cu.dll",
                                 "fbgemm.dll"));
 
         try (Stream<Path> paths = Files.walk(libDir)) {
