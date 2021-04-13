@@ -12,6 +12,7 @@
  */
 package ai.djl.serving.central.responseencoder;
 
+import ai.djl.repository.Metadata;
 import ai.djl.util.JsonUtils;
 import com.google.gson.Gson;
 import io.netty.buffer.ByteBuf;
@@ -36,8 +37,12 @@ import java.lang.reflect.Modifier;
  */
 public class JsonResponse {
 
+    // FIXME: include transient fields is dangerous, it may cause dead loop.
     private static final Gson GSON_WITH_TRANSIENT_FIELDS =
-            JsonUtils.builder().excludeFieldsWithModifiers(Modifier.STATIC).create();
+            JsonUtils.builder()
+                    .excludeFieldsWithModifiers(Modifier.STATIC)
+                    .registerTypeAdapter(Metadata.class, new MetaDataSerializer())
+                    .create();
 
     /**
      * send a response to the client.
@@ -61,7 +66,7 @@ public class JsonResponse {
                 new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, buffer);
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
 
-        this.sendAndCleanupConnection(ctx, request, response);
+        sendAndCleanupConnection(ctx, request, response);
     }
 
     /**

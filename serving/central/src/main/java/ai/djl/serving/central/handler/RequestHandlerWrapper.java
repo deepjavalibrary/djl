@@ -78,14 +78,14 @@ public class RequestHandlerWrapper extends SimpleChannelInboundHandler<FullHttpR
             Object response = wrappedRequestHandler.handleRequest(ctx, request, decoder, segments);
             if (response instanceof CompletableFuture) {
                 ((CompletableFuture<Object>) response)
+                        .thenAccept(resultOrError -> jsonResponse.send(ctx, request, resultOrError))
                         .exceptionally(
                                 (ex) -> {
                                     logger.error("error handling request", ex);
-                                    return ex;
-                                })
-                        .thenAccept(
-                                resultOrError -> jsonResponse.send(ctx, request, resultOrError));
-            } else {
+                                    jsonResponse.send(ctx, request, ex);
+                                    return null;
+                                });
+            } else if (response != null) {
                 jsonResponse.send(ctx, request, response);
             }
         } catch (Throwable t) {
