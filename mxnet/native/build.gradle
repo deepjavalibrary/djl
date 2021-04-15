@@ -176,7 +176,12 @@ task downloadMxnetNativeLib() {
                 "linux/mkl/libmxnet.so.gz"        : "mkl/linux/native/lib/libmxnet.so",
                 "linux/cu102mkl/libmxnet.so.gz"   : "cu102mkl/linux/native/lib/libmxnet.so",
                 "linux/cu110mkl/libmxnet.so.gz"   : "cu110mkl/linux/native/lib/libmxnet.so",
-                "osx/mkl/libmxnet.dylib.gz"       : "mkl/osx/native/lib/libmxnet.dylib"
+                "osx/mkl/libmxnet.dylib.gz"       : "mkl/osx/native/lib/libmxnet.dylib",
+                "win/common/libgcc_s_seh-1.dll.gz": "mkl/win/native/lib/libgcc_s_seh-1.dll",
+                "win/common/libgfortran-3.dll.gz" : "mkl/win/native/lib/libgfortran-3.dll",
+                "win/common/libopenblas.dll.gz"   : "mkl/win/native/lib/libopenblas.dll",
+                "win/common/libquadmath-0.dll.gz" : "mkl/win/native/lib/libquadmath-0.dll",
+                "win/mkl/libmxnet.dll.gz"         : "mkl/win/native/lib/mxnet.dll"
         ]
 
         files.each { entry ->
