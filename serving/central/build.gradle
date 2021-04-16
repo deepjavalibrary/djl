@@ -12,6 +12,7 @@ node {
 }
 
 dependencies {
+	api project(":serving:serving")
     implementation "io.netty:netty-all:${netty_version}"
     implementation "com.google.code.gson:gson:${gson_version}"
     implementation project(':model-zoo')
@@ -66,4 +67,10 @@ run {
     systemProperty("file.encoding", "UTF-8")
     applicationDefaultJvmArgs = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=4000"]
 }
+
+task copyJar(type: Copy) {
+    from jar // here it automatically reads jar file produced from jar task
+    into '../serving/plugins'
+}
+build.dependsOn copyJar
 

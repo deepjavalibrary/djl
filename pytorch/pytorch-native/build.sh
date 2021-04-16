@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 WORK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export WORK_DIR
 NUM_PROC=1
@@ -11,7 +11,7 @@ elif [[ -n $(command -v sysctl) ]]; then
 fi
 
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
-VERSION=1.8.0
+VERSION=1.8.1
 CXX11ABI="-cxx11-abi"
 if [[ $2 == "precxx11" ]]; then
   CXX11ABI=""
@@ -22,7 +22,7 @@ if [[ ! -d "libtorch" ]]; then
     if [[ $1 == "cpu" ]] ||  [[ $1 == "cu111" ]]; then
       curl -s https://download.pytorch.org/libtorch/${1}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${1}.zip | jar xv
     elif [[ $1 == "cu102" ]]; then
-      curl -s https://download.pytorch.org/libtorch/${1}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}.zip | jar xv
+      curl -s https://download.pytorch.org/libtorch/${1}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${1}.zip | jar xv
     else
       echo "$1 is not supported."
       exit 1

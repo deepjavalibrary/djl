@@ -156,7 +156,15 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(Shape[] inputShapes) {
-        return new Shape[0];
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDList list = new NDList();
+            // TODO: Only tested for float32
+            for (Shape shape : inputShapes) {
+                list.add(manager.ones(shape));
+            }
+            NDList result = forwardInternal(new ParameterStore(manager, false), list, false, null);
+            return result.stream().map(NDArray::getShape).toArray(Shape[]::new);
+        }
     }
 
     /** {@inheritDoc} */

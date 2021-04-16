@@ -15,7 +15,6 @@ package ai.djl.ndarray;
 import ai.djl.Device;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.nio.Buffer;
 import java.nio.file.Path;
@@ -35,7 +34,7 @@ public abstract class BaseNDManager implements NDManager {
     protected String name;
     protected Device device;
     protected ConcurrentHashMap<String, AutoCloseable> resources;
-    protected ConcurrentHashMap<String, Pair<NDResource, NDManager>> tempResources;
+    protected ConcurrentHashMap<String, TempResource> tempResources;
     protected AtomicBoolean closed = new AtomicBoolean(false);
 
     protected BaseNDManager(NDManager parent, Device device) {
@@ -210,7 +209,22 @@ public abstract class BaseNDManager implements NDManager {
         if (closed.get()) {
             throw new IllegalStateException("NDManager has been closed already.");
         }
-        resources.put(resourceId, resource);
+        tempResources.compute(
+                resourceId,
+                (key, tempResource) -> {
+                    if (tempResource != null) {
+                        // This state occurs when this manager (manA) tempAttaches a resource that
+                        // is later
+                        // tempAttached to another manager (manB)
+                        // When manB is closed, it will use attach to return the resource to this
+                        // (manA)
+                        // In that case, it should stay as a tempResource in this (manA)
+                        tempResource.detached = false;
+                    } else {
+                        resources.put(resourceId, resource);
+                    }
+                    return tempResource;
+                });
     }
 
     /** {@inheritDoc} */
@@ -220,7 +234,7 @@ public abstract class BaseNDManager implements NDManager {
         if (closed.get()) {
             throw new IllegalStateException("NDManager has been closed already.");
         }
-        tempResources.put(resourceId, new Pair<>(resource, originalManager));
+        tempResources.put(resourceId, new TempResource(resource, originalManager));
     }
 
     /** {@inheritDoc} */
@@ -230,6 +244,12 @@ public abstract class BaseNDManager implements NDManager {
             // This may happen in the middle of BaseNDManager.close()
             return;
         }
+        tempResources.computeIfPresent(
+                resourceId,
+                (key, tempResource) -> {
+                    tempResource.detached = true;
+                    return tempResource;
+                });
         resources.remove(resourceId);
     }
 
@@ -257,15 +277,18 @@ public abstract class BaseNDManager implements NDManager {
                     logger.error("Resource close failed.", e);
                 }
             }
-            for (Pair<NDResource, NDManager> resource : tempResources.values()) {
+            for (TempResource resource : tempResources.values()) {
                 try {
-                    resource.getKey().attach(resource.getValue());
+                    if (!resource.detached) {
+                        resource.resource.attach(resource.manager);
+                    }
                 } catch (Exception e) {
                     logger.error("Temporary resource return failed.", e);
                 }
             }
             parent.detachInternal(uid);
             resources.clear();
+            tempResources.clear();
         }
     }
 
@@ -289,6 +312,18 @@ public abstract class BaseNDManager implements NDManager {
             if (c instanceof BaseNDManager) {
                 ((BaseNDManager) c).debugDump(level + 1);
             }
+        }
+    }
+
+    protected static final class TempResource {
+        private NDResource resource;
+        private NDManager manager;
+        private boolean detached;
+
+        public TempResource(NDResource resource, NDManager manager) {
+            this.resource = resource;
+            this.manager = manager;
+            this.detached = false;
         }
     }
 }

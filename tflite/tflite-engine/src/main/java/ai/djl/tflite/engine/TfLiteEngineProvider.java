@@ -18,13 +18,27 @@ import ai.djl.engine.EngineProvider;
 /** {@code TfLiteEngineProvider} is the TFLite implementation of {@link EngineProvider}. */
 public class TfLiteEngineProvider implements EngineProvider {
 
-    private static Engine engine;
+    private static volatile Engine engine; // NOPMD
 
     /** {@inheritDoc} */
     @Override
-    public synchronized Engine getEngine() {
+    public String getEngineName() {
+        return TfLiteEngine.ENGINE_NAME;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getEngineRank() {
+        return TfLiteEngine.RANK;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Engine getEngine() {
         if (engine == null) {
-            engine = TfLiteEngine.newInstance();
+            synchronized (this) {
+                engine = TfLiteEngine.newInstance();
+            }
         }
         return engine;
     }

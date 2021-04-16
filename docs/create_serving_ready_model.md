@@ -46,30 +46,31 @@ There are two ways to supply configurations to the default Translator:
 
     Here is an example:
 
-    ```
-    # specify model's application
-    application=cv/image_classification
-    # specify image size to be cropped
-    width=224
-    height=224
-    # spcifiy the input image should be treated as grayscale image
-    flag=GRAYSCALE
-    # spcficy if apply softmax for post processing
-    softmax=true
-    ```
+```
+# specify model's application
+application=cv/image_classification
+# specify image size to be cropped
+width=224
+height=224
+# spcifiy the input image should be treated as grayscale image
+flag=GRAYSCALE
+# spcficy if apply softmax for post processing
+softmax=true
+```
+
 - Pass arguments in Criteria:
 
     You can customize Translator's behavior with Criteria, for example:
 
-    ```
-    Criteria<Image, Classifications> criteria = Criteria.builder()
-            .setTypes(Image.class, Classifications.class) // defines input and output data type
-            .optApplication(Application.CV.IMAGE_CLASSIFICATION) // spcific model's application
-            .optModelUrls("file:///var/models/my_resnet50") // search models in specified path
-            .optArgument("width", 224)
-            .optArgument("height", 224)
-            .optArgument("height", 224)
-            .optArgument("flag", "GRAYSCALE")
-            .optArgument("softmax", true)
-            .build();
-    ```
+```
+Criteria<Image, Classifications> criteria = Criteria.builder()
+        .setTypes(Image.class, Classifications.class) // defines input and output data type
+        .optApplication(Application.CV.IMAGE_CLASSIFICATION) // spcific model's application
+        .optModelUrls("file:///var/models/my_resnet50") // search models in specified path
+        .optArgument("width", 224)
+        .optArgument("height", 224)
+        .optArgument("height", 224)
+        .optArgument("flag", "GRAYSCALE")
+        .optArgument("softmax", true)
+        .build();
+```

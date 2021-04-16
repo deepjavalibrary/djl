@@ -40,6 +40,7 @@ import java.nio.file.Paths;
 public final class MxEngine extends Engine {
 
     public static final String ENGINE_NAME = "MXNet";
+    static final int RANK = 1;
     private static final String MXNET_EXTRA_LIBRARY_VERBOSE = "MXNET_EXTRA_LIBRARY_VERBOSE";
 
     /** Constructs an MXNet Engine. */
@@ -87,7 +88,7 @@ public final class MxEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public int getRank() {
-        return 1;
+        return RANK;
     }
 
     /** {@inheritDoc} */
@@ -148,6 +149,7 @@ public final class MxEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public void setRandomSeed(int seed) {
+        super.setRandomSeed(seed);
         JnaUtils.randomSeed(seed);
         RandomUtils.RANDOM.setSeed(seed);
     }

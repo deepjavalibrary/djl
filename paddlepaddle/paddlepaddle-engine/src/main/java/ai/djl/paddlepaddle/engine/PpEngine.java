@@ -31,6 +31,7 @@ import ai.djl.training.GradientCollector;
 public final class PpEngine extends Engine {
 
     public static final String ENGINE_NAME = "PaddlePaddle";
+    static final int RANK = 10;
 
     private Engine alternativeEngine;
     private String version;
@@ -53,7 +54,7 @@ public final class PpEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public int getRank() {
-        return 10;
+        return RANK;
     }
 
     Engine getAlternativeEngine() {

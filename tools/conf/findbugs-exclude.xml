@@ -27,11 +27,6 @@
         <Method name="forwardInternal"/>
     </Match>
     <Match>
-        <Bug pattern="DC_DOUBLECHECK"/>
-        <Class name="~ai\.djl\.tensorflow\.engine\.TfSymbolBlock"/>
-        <Method name="forwardInternal"/>
-    </Match>
-    <Match>
         <Bug pattern="URF_UNREAD_FIELD"/>
         <Class name="~ai\.djl\.pytorch\.engine\.PtNDArray"/>
     </Match>

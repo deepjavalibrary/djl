@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package ai.djl.tensorflow.engine;
+package ai.djl.tensorflow.engine.javacpp;
 
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
@@ -48,6 +48,7 @@ public final class LibUtils {
             String path = new File(libName).getParentFile().toString();
             System.setProperty("org.bytedeco.javacpp.platform.preloadpath", path);
             // workaround javacpp physical memory check bug
+            System.setProperty("org.bytedeco.javacpp.maxBytes", "0");
             System.setProperty("org.bytedeco.javacpp.maxPhysicalBytes", "0");
         }
         // defer to tensorflow-core-api to handle loading native library.

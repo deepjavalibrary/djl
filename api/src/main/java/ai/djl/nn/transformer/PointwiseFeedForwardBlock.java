@@ -13,24 +13,14 @@
 package ai.djl.nn.transformer;
 
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
-import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.AbstractBlock;
-import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
+import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
-import ai.djl.training.ParameterStore;
-import ai.djl.util.Pair;
-import ai.djl.util.PairList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
 /** Fully connected Feed-Forward network, only applied to the last dimension of the input. */
-public class PointwiseFeedForwardBlock extends AbstractBlock {
-
-    private static final byte VERSION = 1;
+public class PointwiseFeedForwardBlock extends SequentialBlock {
 
     /**
      * Creates a pointwise feed-forward block.
@@ -44,59 +34,12 @@ public class PointwiseFeedForwardBlock extends AbstractBlock {
             List<Integer> hiddenSizes,
             int outputSize,
             Function<NDList, NDList> activationFunction) {
-        super(VERSION);
         // add hidden layers with activation
-        int count = 0;
         for (int hiddenSize : hiddenSizes) {
-            addChildBlock(
-                    "linear_" + count, Linear.builder().optBias(true).setUnits(hiddenSize).build());
-            addChildBlock("activation_" + count, new LambdaBlock(activationFunction));
-            ++count;
+            add(Linear.builder().optBias(true).setUnits(hiddenSize).build());
+            add(new LambdaBlock(activationFunction));
         }
         // add output layer without activation
-        addChildBlock("output_layer", Linear.builder().optBias(true).setUnits(outputSize).build());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape[] getOutputShapes(Shape[] inputShapes) {
-        for (Block child : children.values()) {
-            inputShapes = child.getOutputShapes(inputShapes);
-        }
-        return inputShapes;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
-        inputNames = Collections.singletonList("input");
-        if (inputShapes.length != 1) {
-            throw new IllegalArgumentException(
-                    "Pointwise feed forward blocks can only have one input.");
-        }
-        // Now that we know the input shape, we can determine the reshape necessary
-        // to shape the input and re-shape the output
-        Shape inputShape = inputShapes[0];
-        if (inputShape.dimension() < 2) {
-            throw new IllegalArgumentException(
-                    "Pointwise feed forward blocks need an input of at least dimension 2.");
-        }
-        Shape lastShape = inputShape;
-        for (Block child : children.values()) {
-            child.initialize(manager, dataType, lastShape);
-            lastShape = getOutputShapes(new Shape[] {lastShape})[0];
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected NDList forwardInternal(
-            ParameterStore ps, NDList inputs, boolean training, PairList<String, Object> params) {
-        // go through all layers
-        NDList layerResult = inputs;
-        for (Pair<String, Block> child : getChildren()) {
-            layerResult = child.getValue().forward(ps, layerResult, training);
-        }
-        return layerResult;
+        add(Linear.builder().optBias(true).setUnits(outputSize).build());
     }
 }

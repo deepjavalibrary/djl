@@ -37,6 +37,7 @@ public final class PtEngine extends Engine {
     private static final Logger logger = LoggerFactory.getLogger(PtEngine.class);
 
     public static final String ENGINE_NAME = "PyTorch";
+    static final int RANK = 2;
 
     private PtEngine() {}
 
@@ -67,13 +68,13 @@ public final class PtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public int getRank() {
-        return 2;
+        return RANK;
     }
 
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "1.8.0";
+        return "1.8.1";
     }
 
     /** {@inheritDoc} */
@@ -115,6 +116,7 @@ public final class PtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public void setRandomSeed(int seed) {
+        super.setRandomSeed(seed);
         JniUtils.setSeed(seed);
         RandomUtils.RANDOM.setSeed(seed);
     }

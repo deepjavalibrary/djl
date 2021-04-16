@@ -19,19 +19,23 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
+import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
 import ai.djl.training.ParameterStore;
+import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import org.bytedeco.javacpp.Pointer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tensorflow.SavedModelBundle;
-import org.tensorflow.Session;
-import org.tensorflow.Tensor;
+import org.tensorflow.internal.c_api.TF_Graph;
+import org.tensorflow.internal.c_api.TF_Operation;
+import org.tensorflow.internal.c_api.TF_Session;
+import org.tensorflow.internal.c_api.TF_Tensor;
 import org.tensorflow.proto.framework.MetaGraphDef;
 import org.tensorflow.proto.framework.SignatureDef;
 import org.tensorflow.proto.framework.TensorInfo;
@@ -44,18 +48,24 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
     private static final byte VERSION = 1;
 
     private SavedModelBundle bundle;
-    private Session session;
+    private TF_Graph graphHandle;
+    private TF_Session sessionHandle;
     private SignatureDef servingDefault;
     private PairList<String, Shape> inputDescriptions;
     private PairList<String, Shape> outputDescriptions;
-    // store mapping of meaningful key names and actual tensor names used in session
-    private ConcurrentHashMap<String, String> inputOutputNames = new ConcurrentHashMap<>();
+    // cached input & output information
+    private TF_Operation[] inputOpHandles;
+    private int[] inputOpIndices;
+    private TF_Operation[] outputOpHandles;
+    private int[] outputOpIndices;
+    private TF_Operation[] targetOpHandles;
 
     public TfSymbolBlock(SavedModelBundle bundle, String signatureDefKey) {
         super(VERSION);
         this.bundle = bundle;
-        session = bundle.session();
-        MetaGraphDef metaGraphDef = bundle.metaGraphDef();
+        graphHandle = bundle.getGraph();
+        sessionHandle = bundle.getSession();
+        MetaGraphDef metaGraphDef = bundle.getMetaGraphDef();
         Map<String, SignatureDef> signatureDefMap = metaGraphDef.getSignatureDefMap();
         if (signatureDefMap.containsKey(signatureDefKey)) {
             servingDefault = signatureDefMap.get(signatureDefKey);
@@ -75,6 +85,8 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         }
         describeInput();
         describeOutput();
+        // we don't use target for now
+        targetOpHandles = new TF_Operation[0];
     }
 
     /** {@inheritDoc} */
@@ -90,42 +102,50 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        Session.Runner runner = session.runner();
+        TF_Tensor[] inputTensorHandles = new TF_Tensor[inputDescriptions.size()];
+
         for (int i = 0; i < inputDescriptions.size(); i++) {
             String inputName = inputDescriptions.get(i).getKey();
-            String tensorName = inputOutputNames.get(inputName);
 
-            NDArray inputArray = inputs.get(i);
-            // no name specified in input array, use default order from translator
-            if (inputArray.getName().isEmpty()) {
-                runner.feed(tensorName, ((TfNDArray) inputArray).getTensor());
-            } else {
-                if (inputArray.getName().equals(inputName)) {
-                    runner.feed(tensorName, ((TfNDArray) inputArray).getTensor());
-                } else {
-                    // find the array with correct name
-                    for (NDArray array : inputs) {
-                        if (array.getName().equals(inputName)) {
-                            runner.feed(tensorName, ((TfNDArray) array).getTensor());
-                        }
-                    }
+            TfNDArray currentNDArray = (TfNDArray) inputs.get(i);
+            // if no name specified in input array or
+            // the input order matches inputDescriptions
+            // use default order from translator
+            if (currentNDArray.getName().isEmpty() || currentNDArray.getName().equals(inputName)) {
+                inputTensorHandles[i] = JavacppUtils.resolveTFETensor(currentNDArray.getHandle());
+                continue;
+            }
+            // for loop to search the right NDArray
+            for (NDArray array : inputs) {
+                if (array.getName().equals(inputName)) {
+                    inputTensorHandles[i] =
+                            JavacppUtils.resolveTFETensor(((TfNDArray) array).getHandle());
                 }
             }
         }
-        for (int i = 0; i < outputDescriptions.size(); i++) {
-            String key = outputDescriptions.get(i).getKey();
-            runner.fetch(inputOutputNames.get(key));
-        }
-        List<Tensor> result = runner.run();
+
+        TF_Tensor[] outputs =
+                JavacppUtils.runSession(
+                        sessionHandle,
+                        null,
+                        inputTensorHandles,
+                        inputOpHandles,
+                        inputOpIndices,
+                        outputOpHandles,
+                        outputOpIndices,
+                        targetOpHandles);
+
         TfNDManager tfNDManager = (TfNDManager) inputs.head().getManager();
         NDList resultNDList = new NDList();
-        for (int i = 0; i < result.size(); i++) {
-            try (Tensor tensor = result.get(i)) {
-                NDArray array = tfNDManager.create(tensor);
-                array.setName(outputDescriptions.get(i).getKey());
-                resultNDList.add(array);
-            }
+        for (int i = 0; i < outputs.length; i++) {
+            TfNDArray array = new TfNDArray(tfNDManager, JavacppUtils.createTFETensor(outputs[i]));
+            array.setName(outputDescriptions.get(i).getKey());
+            resultNDList.add(array);
         }
+
+        // free all unused native resources
+        Arrays.stream(inputTensorHandles).forEach(Pointer::close);
+        Arrays.stream(outputs).forEach(Pointer::close);
         return resultNDList;
     }
 
@@ -149,18 +169,24 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
             Map<String, TensorInfo> inputsMap = servingDefault.getInputsMap();
             List<String> keys = new ArrayList<>(inputsMap.keySet());
             Collections.sort(keys);
-            for (String key : keys) {
-                TensorInfo tensorInfo = inputsMap.get(key);
+
+            inputOpHandles = new TF_Operation[keys.size()];
+            inputOpIndices = new int[keys.size()];
+            for (int i = 0; i < keys.size(); ++i) {
+                TensorInfo tensorInfo = inputsMap.get(keys.get(i));
                 TensorShapeProto shapeProto = tensorInfo.getTensorShape();
-                inputOutputNames.put(key, tensorInfo.getName());
                 inputDescriptions.add(
-                        key,
+                        keys.get(i),
                         new Shape(
                                 shapeProto
                                         .getDimList()
                                         .stream()
                                         .mapToLong(TensorShapeProto.Dim::getSize)
                                         .toArray()));
+                Pair<TF_Operation, Integer> pair =
+                        JavacppUtils.getGraphOperationByName(graphHandle, tensorInfo.getName());
+                inputOpHandles[i] = pair.getKey();
+                inputOpIndices[i] = pair.getValue();
             }
         }
         return inputDescriptions;
@@ -174,6 +200,9 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
             Map<String, TensorInfo> outputsMap = servingDefault.getOutputsMap();
             List<String> keys = new ArrayList<>(outputsMap.keySet());
             Collections.sort(keys);
+
+            List<TF_Operation> outputOpHandlesList = new ArrayList<>();
+            List<Integer> outputOpIndicesList = new ArrayList<>();
             for (String key : keys) {
                 TensorInfo tensorInfo = outputsMap.get(key);
                 TensorShapeProto shapeProto = tensorInfo.getTensorShape();
@@ -181,7 +210,6 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
                 if (tensorInfo.getDtype() == org.tensorflow.proto.framework.DataType.DT_STRING) {
                     continue;
                 }
-                inputOutputNames.put(key, tensorInfo.getName());
                 outputDescriptions.add(
                         key,
                         new Shape(
@@ -190,7 +218,13 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
                                         .stream()
                                         .mapToLong(TensorShapeProto.Dim::getSize)
                                         .toArray()));
+                Pair<TF_Operation, Integer> pair =
+                        JavacppUtils.getGraphOperationByName(graphHandle, tensorInfo.getName());
+                outputOpHandlesList.add(pair.getKey());
+                outputOpIndicesList.add(pair.getValue());
             }
+            outputOpHandles = outputOpHandlesList.toArray(new TF_Operation[0]);
+            outputOpIndices = outputOpIndicesList.stream().mapToInt(i -> i).toArray();
         }
         return outputDescriptions;
     }
@@ -204,11 +238,12 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
     /** {@inheritDoc} */
     @Override
     public void close() {
-        if (session != null) {
-            session.close();
-        }
         if (bundle != null) {
             bundle.close();
         }
+        // free cached input & output native resources
+        Arrays.stream(inputOpHandles).forEach(Pointer::close);
+        Arrays.stream(outputOpHandles).forEach(Pointer::close);
+        Arrays.stream(targetOpHandles).forEach(Pointer::close);
     }
 }

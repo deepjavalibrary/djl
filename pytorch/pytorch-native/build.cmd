@@ -5,11 +5,11 @@
 @rem choco install jdk8 -y
 
 set FILEPATH="libtorch"
-set VERSION="1.8.0"
+set VERSION="1.8.1"
 if "%1" == "cpu" (
     set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-%VERSION%%%2Bcpu.zip"
 ) else if "%1" == "cu102" (
-      set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu102/libtorch-win-shared-with-deps-%VERSION%.zip"
+      set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu102/libtorch-win-shared-with-deps-%VERSION%%%2Bcu102.zip"
 ) else if "%1" == "cu111" (
       set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu111/libtorch-win-shared-with-deps-%VERSION%%%2Bcu111.zip"
 )

@@ -129,8 +129,7 @@ public class BananaDetection extends ObjectDetectionDataset {
                 long objectClass = label.get(0).longValue();
                 Rectangle objectLocation =
                         new Rectangle(
-                                new Point(label.get(1), label.get(2)),
-                                new Point(label.get(3), label.get(4)));
+                                new Point(label.get(1), label.get(2)), label.get(3), label.get(4));
                 labels.add(objectClass, objectLocation);
             }
         }

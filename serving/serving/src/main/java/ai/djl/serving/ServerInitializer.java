@@ -25,6 +25,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.ssl.SslContext;
+import io.netty.handler.stream.ChunkedWriteHandler;
 
 /**
  * A special {@link io.netty.channel.ChannelInboundHandler} which offers an easy way to initialize a
@@ -63,10 +64,11 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         }
         pipeline.addLast("http", new HttpServerCodec());
         pipeline.addLast("aggregator", new HttpObjectAggregator(maxRequestSize, true));
+        pipeline.addLast(new ChunkedWriteHandler());
         switch (connectorType) {
             case MANAGEMENT:
-                pipeline.addLast("management", new ManagementRequestHandler());
                 pipeline.addLast(new ConfigurableHttpRequestHandler(pluginManager));
+                pipeline.addLast("management", new ManagementRequestHandler());
                 break;
             case INFERENCE:
                 pipeline.addLast("inference", new InferenceRequestHandler());
@@ -74,8 +76,8 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
             case BOTH:
             default:
                 pipeline.addLast("inference", new InferenceRequestHandler());
-                pipeline.addLast("management", new ManagementRequestHandler());
                 pipeline.addLast(new ConfigurableHttpRequestHandler(pluginManager));
+                pipeline.addLast("management", new ManagementRequestHandler());
                 break;
         }
         pipeline.addLast("badRequest", new InvalidRequestHandler());

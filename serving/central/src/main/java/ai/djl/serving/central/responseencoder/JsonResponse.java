@@ -12,14 +12,9 @@
  */
 package ai.djl.serving.central.responseencoder;
 
-import ai.djl.modality.Classifications;
-import ai.djl.modality.Classifications.ClassificationsSerializer;
-import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.repository.Metadata;
+import ai.djl.util.JsonUtils;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -42,24 +37,11 @@ import java.lang.reflect.Modifier;
  */
 public class JsonResponse {
 
+    // FIXME: include transient fields is dangerous, it may cause dead loop.
     private static final Gson GSON_WITH_TRANSIENT_FIELDS =
-            new GsonBuilder()
-                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                    .setPrettyPrinting()
+            JsonUtils.builder()
                     .excludeFieldsWithModifiers(Modifier.STATIC)
-                    .registerTypeAdapter(Classifications.class, new ClassificationsSerializer())
-                    .registerTypeAdapter(DetectedObjects.class, new ClassificationsSerializer())
                     .registerTypeAdapter(Metadata.class, new MetaDataSerializer())
-                    .registerTypeAdapter(
-                            Double.class,
-                            (JsonSerializer<Double>)
-                                    (src, t, ctx) -> {
-                                        long v = src.longValue();
-                                        if (src.equals(Double.valueOf(String.valueOf(v)))) {
-                                            return new JsonPrimitive(v);
-                                        }
-                                        return new JsonPrimitive(src);
-                                    })
                     .create();
 
     /**
@@ -70,16 +52,21 @@ public class JsonResponse {
      * @param entity the response
      */
     public void send(ChannelHandlerContext ctx, FullHttpRequest request, Object entity) {
+        HttpResponseStatus status = HttpResponseStatus.OK;
+        if (entity instanceof Throwable) {
+            status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+            entity = ((Exception) entity).getMessage();
+        }
 
         String serialized = GSON_WITH_TRANSIENT_FIELDS.toJson(entity);
         ByteBuf buffer = ctx.alloc().buffer(serialized.length());
         buffer.writeCharSequence(serialized, CharsetUtil.UTF_8);
 
         FullHttpResponse response =
-                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buffer);
+                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, buffer);
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
 
-        this.sendAndCleanupConnection(ctx, request, response);
+        sendAndCleanupConnection(ctx, request, response);
     }
 
     /**

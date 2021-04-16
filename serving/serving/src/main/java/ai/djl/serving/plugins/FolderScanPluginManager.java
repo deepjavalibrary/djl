@@ -27,12 +27,14 @@ import java.nio.file.Path;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -50,6 +52,8 @@ import org.slf4j.LoggerFactory;
 public class FolderScanPluginManager implements PluginManager {
 
     private static final Logger logger = LoggerFactory.getLogger(FolderScanPluginManager.class);
+
+    private static Class<?>[] pluginInterfaces = {RequestHandler.class};
 
     private ConfigManager configManager;
 
@@ -80,24 +84,29 @@ public class FolderScanPluginManager implements PluginManager {
                 AccessController.doPrivileged(
                         (PrivilegedAction<ClassLoader>) () -> new URLClassLoader(pluginUrls));
 
-        int pluginsFound = 0;
+        AtomicInteger pluginsFound = new AtomicInteger(0);
 
-        ServiceLoader<RequestHandler> sl = ServiceLoader.load(RequestHandler.class, ucl);
+        Arrays.stream(pluginInterfaces)
+                .forEach(
+                        pluginInterface -> {
+                            logger.trace("looking for plugin of type {}", pluginInterface);
+                            ServiceLoader<?> sl = ServiceLoader.load(pluginInterface, ucl);
 
-        for (RequestHandler requestHandler : sl) {
-            pluginsFound++;
-            RequestHandler<?> service = requestHandler;
-            logger.info("load plugin: {}", service.getClass().getSimpleName());
-            Plugin<RequestHandler<?>> plugin = new Plugin<>(service);
-            // TODO add a plugin Lifecycle "INITIALIZING", "ACTIVE", "SHUTTING DOWN" , so a plug-in
-            // can be dependent on another plugin.
-            if (initializePlugin(plugin)) {
-                pluginsRegistry
-                        .computeIfAbsent(RequestHandler.class, k -> new HashSet<>())
-                        .add(plugin);
-            }
-        }
-        logger.info("{} plug-ins found.", pluginsFound);
+                            for (Object service : sl) {
+                                pluginsFound.incrementAndGet();
+                                logger.info("load plugin: {}", service.getClass().getSimpleName());
+                                Plugin<?> plugin = new Plugin<>(service);
+                                // TODO add a plugin Lifecycle "INITIALIZING", "ACTIVE", "SHUTTING
+                                // DOWN" , so a plug-in
+                                // can be dependent on another plugin.
+                                if (initializePlugin(plugin)) {
+                                    pluginsRegistry
+                                            .computeIfAbsent(pluginInterface, k -> new HashSet<>())
+                                            .add(plugin);
+                                }
+                            }
+                        });
+        logger.info("{} plug-ins found.", pluginsFound.intValue());
     }
 
     /**
@@ -160,7 +169,7 @@ public class FolderScanPluginManager implements PluginManager {
 
     private URL[] listPluginJars() throws IOException {
         Path pluginsFolder = configManager.getPluginFolder();
-        if (!(Files.exists(pluginsFolder) && Files.isDirectory(pluginsFolder))) {
+        if (pluginsFolder == null || !Files.isDirectory(pluginsFolder)) {
             logger.warn("scanning in plug-in folder :{}....folder does not exists", pluginsFolder);
             return new URL[0];
         }

@@ -49,25 +49,20 @@ public abstract class Engine {
 
     private static final Logger logger = LoggerFactory.getLogger(Engine.class);
 
-    private static final Map<String, Engine> ALL_ENGINES = new ConcurrentHashMap<>();
+    private static final Map<String, EngineProvider> ALL_ENGINES = new ConcurrentHashMap<>();
 
     private static final String DEFAULT_ENGINE = initEngine();
 
-    private static EngineException exception;
-
     private Device defaultDevice;
+
+    // use object to check if it's set
+    private Integer seed;
 
     private static synchronized String initEngine() {
         ServiceLoader<EngineProvider> loaders = ServiceLoader.load(EngineProvider.class);
         for (EngineProvider provider : loaders) {
-            try {
-                Engine engine = provider.getEngine();
-                logger.debug("Engine loaded from provider: {}", engine.getEngineName());
-                ALL_ENGINES.put(engine.getEngineName(), engine);
-            } catch (EngineException e) {
-                exception = e;
-                logger.warn("Failed to load engine from: " + provider.getClass().getName(), e);
-            }
+            logger.debug("Found EngineProvider: {}", provider.getEngineName());
+            ALL_ENGINES.put(provider.getEngineName(), provider);
         }
 
         if (ALL_ENGINES.isEmpty()) {
@@ -78,14 +73,11 @@ public abstract class Engine {
         String defaultEngine = System.getenv("DJL_DEFAULT_ENGINE");
         defaultEngine = System.getProperty("ai.djl.default_engine", defaultEngine);
         if (defaultEngine == null || defaultEngine.isEmpty()) {
-            if (ALL_ENGINES.size() > 1) {
-                logger.warn("More than one deep learning engines found.");
-            }
             int rank = Integer.MAX_VALUE;
-            for (Engine engine : ALL_ENGINES.values()) {
-                if (engine.getRank() < rank) {
-                    defaultEngine = engine.getEngineName();
-                    rank = engine.getRank();
+            for (EngineProvider provider : ALL_ENGINES.values()) {
+                if (provider.getEngineRank() < rank) {
+                    defaultEngine = provider.getEngineName();
+                    rank = provider.getEngineRank();
                 }
             }
         } else if (!ALL_ENGINES.containsKey(defaultEngine)) {
@@ -120,8 +112,7 @@ public abstract class Engine {
             throw new EngineException(
                     "No deep learning engine found."
                             + System.lineSeparator()
-                            + "Please refer to https://github.com/awslabs/djl/blob/master/docs/development/troubleshooting.md for more details.",
-                    exception);
+                            + "Please refer to https://github.com/awslabs/djl/blob/master/docs/development/troubleshooting.md for more details.");
         }
         return getEngine(System.getProperty("ai.djl.default_engine", DEFAULT_ENGINE));
     }
@@ -154,11 +145,11 @@ public abstract class Engine {
      * @see EngineProvider
      */
     public static Engine getEngine(String engineName) {
-        Engine engine = ALL_ENGINES.get(engineName);
-        if (engine == null) {
+        EngineProvider provider = ALL_ENGINES.get(engineName);
+        if (provider == null) {
             throw new IllegalArgumentException("Deep learning engine not found: " + engineName);
         }
-        return engine;
+        return provider.getEngine();
     }
 
     /**
@@ -251,7 +242,18 @@ public abstract class Engine {
      *
      * @param seed the seed to be fixed in Engine
      */
-    public abstract void setRandomSeed(int seed);
+    public void setRandomSeed(int seed) {
+        this.seed = seed;
+    }
+
+    /**
+     * Returns the random seed in DJL Engine.
+     *
+     * @return seed the seed to be fixed in Engine
+     */
+    public Integer getSeed() {
+        return seed;
+    }
 
     /** Prints debug information about the environment for debugging environment issues. */
     @SuppressWarnings("PMD.SystemPrintln")
@@ -267,15 +269,15 @@ public abstract class Engine {
         System.out.println("-------------- Directories --------------");
         try {
             Path temp = Paths.get(System.getProperty("java.io.tmpdir"));
-            System.out.println("temp directory: " + temp.toString());
+            System.out.println("temp directory: " + temp);
             Path tmpFile = Files.createTempFile("test", ".tmp");
             Files.delete(tmpFile);
 
             Path cacheDir = Utils.getCacheDir();
-            System.out.println("DJL cache directory: " + cacheDir.toAbsolutePath().toString());
+            System.out.println("DJL cache directory: " + cacheDir.toAbsolutePath());
 
             Path path = Utils.getEngineCacheDir();
-            System.out.println("Engine cache directory: " + path.toAbsolutePath().toString());
+            System.out.println("Engine cache directory: " + path.toAbsolutePath());
             Files.createDirectories(path);
             if (!Files.isWritable(path)) {
                 System.out.println("Engine cache directory is not writable!!!");
@@ -302,12 +304,13 @@ public abstract class Engine {
         System.out.println();
         System.out.println("----------------- Engines ---------------");
         System.out.println("Default Engine: " + DEFAULT_ENGINE);
-        for (Engine engine : ALL_ENGINES.values()) {
-            System.out.println(engine);
-        }
-        if (exception != null) {
-            System.out.println("Last error:");
-            exception.printStackTrace(System.out);
+        for (EngineProvider provider : ALL_ENGINES.values()) {
+            System.out.println(provider.getEngineName() + ": " + provider.getEngineRank());
+            try {
+                provider.getEngine();
+            } catch (EngineException e) {
+                e.printStackTrace(System.out);
+            }
         }
     }
 }
