@@ -1,6 +1,9 @@
 let app = new Vue({
     el: '#app',
     data: {
+        hasRenderTwitter: false,
+        customerWrap_page4: '',
+        footerSwiper_page5: '',
         navLinks: [
             {
                 name: 'GitHub',
@@ -37,6 +40,10 @@ let app = new Vue({
             {
                 name: 'D2L-Java Book',
                 url: 'https://d2l.djl.ai'
+            },
+            {
+                name: 'version1.0',
+                url: './index1.0.html'
             }
         ],
         page1: {
@@ -85,55 +92,143 @@ let app = new Vue({
         page5: {
             title: 'About Us',
             abstract: 'Built with ❤️ for the Java community by',
-            contactUrl: 'https://docs.djl.ai/leaders.html'
+            contactUrl: 'https://docs.djl.ai/leaders.html',
+            leadrs: [
+                {
+                    name: 'anthony',
+                    url: './website/img/community_leader/anthony.jpeg'
+                },
+                {
+                    name: 'christoph',
+                    url: './website/img/community_leader/christoph.png',
+                },
+                {
+                    name: 'erik',
+                    url: './website/img/community_leader/erik.png',
+                }, {
+                    name: 'frank',
+                    url: './website/img/community_leader/frank.png',
+                }, {
+                    name: 'jake',
+                    url: './website/img/community_leader/jake.jpg',
+                }, {
+                    name: 'keerthan',
+                    url: './website/img/community_leader/keerthan.jpg',
+                }, {
+                    name: 'kimi',
+                    url: './website/img/community_leader/kimi.png',
+                }, {
+                    name: 'lai',
+                    url: './website/img/community_leader/lai.jpg',
+                }, {
+                    name: 'lu',
+                    url: './website/img/community_leader/lu.png',
+                }, {
+                    name: 'qing',
+                    url: './website/img/community_leader/qing.jpeg',
+                }, {
+                    name: 'stanislav',
+                    url: './website/img/community_leader/stanislav.png',
+                }, {
+                    name: 'wei',
+                    url: './website/img/community_leader/wei.jpg',
+                }, {
+                    name: 'zach',
+                    url: './website/img/community_leader/zach.jpeg',
+                }, {
+                    name: 'fyz',
+                    url: './website/img/community_leader/fyz.jpg',
+                }
+            ]
         }
     },
     created() {
 
     },
     mounted() {
-        var mySwiper = new Swiper('#app.swiper-container', {
+        $('.sidenav').sidenav();
+        var mySwiper = new Swiper('.app-swiper-container', {
             direction: 'vertical',
             loop: false,
             // effect: 'cube',
             keyboardControl: true,
             mousewheelControl: true,
-
+            longSwipesRatio: 0.1,
             // 如果需要分页器
             pagination: '.swiper-pagination',
             paginationClickable: true,
+            shortSwipes: true,
 
-            // 如果需要前进后退按钮
-            // nextButton: '.swiper-button-next',
-            // prevButton: '.swiper-button-prev',
+            noSwiping: true,
+            lazyLoading: true,
 
-            // 如果需要滚动条
-            // scrollbar: '.swiper-scrollbar',
+            onSlideChangeStart: (swiper) => {
+                // console.log(swiper, swiper.activeIndex);
+                if (swiper.activeIndex === 2) {
+                    if (this.hasRenderTwitter) return
+                    let srciptEle = document.createElement('script')
+                    srciptEle.src = 'https://platform.twitter.com/widgets.js'
+                    document.body.appendChild(srciptEle)
+                    srciptEle.onload = () => {
+                        this.hasRenderTwitter = true
+                    }
 
-            onTransitionStart: function (swiper) {
-                // debugger
+                } else if (swiper.activeIndex === 3) {
+                    if (this.customerWrap_page4) return
+                    this.customerWrap_page4 = new Swiper('.customerWrap .swiper-container', {
+                        direction: 'horizontal',
+                        loop: false,
+                        autoplay: 3000,
+                        autoplayStopOnLast: true,
+                        parallax: true,
+                        // effect: 'cube',
+                        speed: 2000,
+                        keyboardControl: true,
+                        mousewheelControl: true,
+                        lazyLoading: true,
+
+                        // 如果需要分页器
+                        pagination: '.customer-swiper-pagination',
+                        paginationClickable: true,
+
+                        // 如果需要前进后退按钮
+                        nextButton: '.swiper-button-next',
+                        prevButton: '.swiper-button-prev',
+
+                        // 如果需要滚动条
+                        // scrollbar: '.swiper-scrollbar',
+
+                    })
+                } else if (swiper.activeIndex === 4) {
+                    if (this.footerSwiper_page5) return
+                    this.footerSwiper_page5 = new Swiper('.app-footer .swiper-container', {
+                        direction: 'horizontal',
+                        loop: true,
+                        autoplay: 3000,
+                        autoplayDisableOnInteraction: false,
+                        // grabCursor: true,
+                        // effect: 'cube',
+                        // effect: 'coverflow',
+                        slidesPerView: 4,
+                        spaceBetween: 5,
+                        shortSwipes: true,
+
+                        speed: 1000,
+                        keyboardControl: true,
+                        mousewheelControl: true,
+                        lazyLoading: true,
+
+                        // 如果需要分页器
+                        paginationType: 'progress',
+                        pagination: '.leader-swiper-pagination',
+                        paginationClickable: true,
+
+                    })
+                }
             }
-        })
-        var mySwiper2 = new Swiper('.customerWrap .swiper-container', {
-            direction: 'horizontal',
-            loop: true,
-            effect: 'cube',
-            speed: 1000,
-            keyboardControl: true,
-            mousewheelControl: true,
-
-            // 如果需要分页器
-            pagination: '.customer-swiper-pagination',
-            paginationClickable: true,
-
-            // 如果需要前进后退按钮
-            // nextButton: '.swiper-button-next',
-            // prevButton: '.swiper-button-prev',
-
-            // 如果需要滚动条
-            // scrollbar: '.swiper-scrollbar',
 
         })
+
 
     },
     methods: {
