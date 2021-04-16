@@ -49,7 +49,7 @@ public class MyTranslator implements ServingTranslator {
 
         Input input = (Input) ctx.getAttachment("input");
         Output output = new Output(input.getRequestId(), 200, "OK");
-        output.setContent(JsonUtils.GSON_PRETTY.toJson(classifications));
+        output.setContent(classifications.toJson());
         return output;
     }
 

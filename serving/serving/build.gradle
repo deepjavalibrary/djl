@@ -13,6 +13,11 @@ dependencies {
 
     runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
 
+    implementation project(':model-zoo')
+    implementation project(':mxnet:mxnet-model-zoo')
+    implementation project(':tensorflow:tensorflow-model-zoo')
+    implementation project(':pytorch:pytorch-model-zoo:')
+
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }

@@ -426,8 +426,8 @@ public class ModelServerTest {
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
-            Assert.assertEquals(resp.getCode(), HttpResponseStatus.METHOD_NOT_ALLOWED.code());
-            Assert.assertEquals(resp.getMessage(), ERROR_METHOD_NOT_ALLOWED);
+            Assert.assertEquals(resp.getCode(), HttpResponseStatus.NOT_FOUND.code());
+            Assert.assertEquals(resp.getMessage(), ERROR_NOT_FOUND);
         }
     }
 

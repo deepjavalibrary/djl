@@ -24,4 +24,13 @@ public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException() {
         super("Requested resource is not found, please refer to API document.");
     }
+
+    /**
+     * Constructs an {@code ResourceNotFoundException} with a root cause.
+     *
+     * @param cause the root cause
+     */
+    public ResourceNotFoundException(Throwable cause) {
+        super("Requested resource is not found, please refer to API document.", cause);
+    }
 }

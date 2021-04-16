@@ -14,10 +14,12 @@ package ai.djl.modality;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.util.JsonSerializable;
+import ai.djl.util.JsonUtils;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,9 +32,15 @@ import java.util.stream.Collectors;
  * {@code Classifications} is the container that stores the classification results for
  * classification on a single input.
  */
-public class Classifications implements Serializable {
+public class Classifications implements JsonSerializable {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Gson GSON =
+            JsonUtils.builder()
+                    .registerTypeAdapter(Classifications.class, new ClassificationsSerializer())
+                    .create();
+
     protected List<String> classNames;
     protected List<Double> probabilities;
 
@@ -128,6 +136,12 @@ public class Classifications implements Serializable {
             }
         }
         return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toJson() {
+        return GSON.toJson(this);
     }
 
     /** {@inheritDoc} */
