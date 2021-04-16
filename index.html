@@ -1,21 +1,35 @@
 <!DOCTYPE html>
-
 <html lang="en" class="gr__materializecss_com">
+
 <head>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-159559852-2"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
         gtag('js', new Date());
         gtag('config', 'UA-159559852-2');
     </script>
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                                                          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                                                                                                    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                                                                                                        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-     })(window,document,'script','dataLayer','GTM-WQBQJWP');</script>
+    <script>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({
+                'gtm.start': new Date().getTime(),
+                event: 'gtm.js'
+            });
+            var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s),
+                dl = l != 'dataLayer' ? '&l=' + l : '';
+            j.async = true;
+            j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+            f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-WQBQJWP');
+    </script>
     <!-- End Google Tag Manager -->
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -23,185 +37,232 @@
     <!-- CSS  -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <link href="website/css/style.css" type="text/css" rel="stylesheet" media="screen,projection">
-    <link rel="shortcut icon" type="image/x-icon" href="website/img/favicon.png"/>
+    <link rel="shortcut icon" type="image/x-icon" href="website/img/favicon.png" />
     <link rel="shortcut icon" sizes="96x96" href="website/img/favicon.png">
     <link rel="apple-touch-icon" href="website/img/favicon.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.4.2/css/swiper.min.css">
+    <link href="website/css/style.css" type="text/css" rel="stylesheet" media="screen,projection">
+
 </head>
+
 <body data-gr-c-s-loaded="true">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WQBQJWP"
-                    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-<nav class="white" role="navigation">
-    <div class="nav-wrapper">
-        <div class="row">
-            <a href="https://djl.ai" class="logo" id="logo-container">
-                <img src="website/img/djl-middle.png">
-            </a>
-            <ul class="right col s10 hide-on-med-and-down">
-                <li><a href="https://github.com/awslabs/djl">GitHub</a></li>
-                <li><a href="https://docs.djl.ai/">Documentation</a></li>
-                <li><a href="website/javadoc.html">JavaDoc</a></li>
-                <li><a href="website/demo.html">Demos</a></li>
-                <li><a href="website/blog.html">Blogs</a></li>
-                <li><a href="https://docs.djl.ai/jupyter/tutorial/index.html">Tutorial</a></li>
-                <li><a href="https://github.com/awslabs/djl/tree/master/examples">Examples</a></li>
-                <li><a href="https://deepjavalibrary.slack.com/join/shared_invite/zt-ar91gjkz-qbXhr1l~LFGEIEeGBibT7w#/">Slack</a></li>
-                <li><a href="https://d2l.djl.ai">D2L-Java Book</a></li>
-            </ul>
-            <ul id="nav-mobile" class="sidenav">
-                <li><a href="https://github.com/awslabs/djl">GitHub</a></li>
-                <li><a href="https://docs.djl.ai/">Documentation</a></li>
-                <li><a href="website/javadoc.html">JavaDoc</a></li>
-                <li><a href="website/demo.html">Demos</a></li>
-                <li><a href="website/blog.html">Blogs</a></li>
-                <li><a href="https://docs.djl.ai/jupyter/tutorial/index.html">Tutorial</a></li>
-                <li><a href="https://github.com/awslabs/djl/tree/master/examples">Examples</a></li>
-                <li><a href="https://deepjavalibrary.slack.com/join/shared_invite/zt-ar91gjkz-qbXhr1l~LFGEIEeGBibT7w#/">Slack</a></li>
-                <li><a href="https://d2l.djl.ai">D2L-Java Book</a></li>
-            </ul>
-            <a data-target="nav-mobile"
-               class="sidenav-trigger"><i class="material-icons">menu</i></a>
-        </div>
-    </div>
-</nav>
-
-<div id="index-banner" class="parallax-container">
-    <div id="particles-js">
-        <div class="container graph-container">
-            <br><br>
-            <h1 class="header center light-blue-text text-accent-2">Deep Java Library</h1>
-            <div class="row center">
-                <h5 class="header col s12 light">Open source library to build and deploy deep learning in Java</h5>
-            </div>
-            <div class="row center">
-                <a href="https://docs.djl.ai/docs/quick_start.html" id="download-button"
-                   class="btn-large waves-effect waves-light light-blue accent-2">Get Started</a>
-                <a href="https://github.com/awslabs/djl"
-                   class="btn-large waves-effect waves-light light-blue accent-2">GitHub</a>
-            </div>
-            <!-- Begin Mailchimp Signup Form -->
-            <link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css">
-            <div id="mc_embed_signup">
-                <form action="https://djl.us7.list-manage.com/subscribe/post?u=f7896b2c176e28fed0ac92717&amp;id=03099ec163" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-                    <div id="mc_embed_signup_scroll">
-                        <h5>Join the DJL newsletter</h5>
-                        <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
-                        <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-                        <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f7896b2c176e28fed0ac92717_03099ec163" tabindex="-1" value=""></div>
-                        <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    <div id="app">
+        <div class="app-swiper-container swiper-container">
+            <!-- Google Tag Manager (noscript) -->
+            <noscript>
+                <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WQBQJWP" height="0" width="0"
+                    style="display:none;visibility:hidden"></iframe>
+            </noscript>
+            <!-- End Google Tag Manager (noscript) -->
+            <nav class="white app-nav swiper-no-swiping" role="navigation" v-cloak>
+                <div class="nav-wrapper">
+                    <div class="row">
+                        <a href="https://djl.ai" class="logo" id="logo-container">
+                            <img src="website/img/djl-middle.png">
+                        </a>
+                        <div class="right col s10 hide-on-med-and-down navLinksWrap">
+                            <ul class="nav-ul">
+                                <li v-for="(item, i) in navLinks" :key="i">
+                                    <a :href="item.url">{{item.name}}</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <ul id="nav-mobile" class="sidenav">
+                            <li v-for="(item, i) in navLinks" :key="i">
+                                <a :href="item.url">{{item.name}}</a>
+                            </li>
+                        </ul>
+                        <a data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                     </div>
-                </form>
-            </div>
-            <br><br>
-            <!--End mc_embed_signup-->
+                </div>
+            </nav>
+            <main class="swiper-wrapper">
+                <section id="index-banner" class="parallax-container swiper-slide page1">
+                    <div class="sky-bg background">
+                    </div>
+                    <div id="particles-js">
+                        <div class="container graph-container" v-cloak>
+                            <br><br>
+                            <h1 class="header center light-blue-text text-accent-2">{{page1.title}}
+                            </h1>
+                            <div class="row center">
+                                <h5 class="header col s12 light an-1">{{page1.abstract}}</h5>
+                            </div>
+                            <div class="row center">
+                                <a :href="page1.getStartUtl"
+                                    class="btn-large waves-effect waves-light light-blue accent-2 an-2">Get Started</a>
+                                <a :href="page1.gitHubUrl"
+                                    class="btn-large waves-effect waves-light light-blue accent-2 an-2">GitHub</a>
+                            </div>
+                            <!-- Begin Mailchimp Signup Form -->
+                            <!-- <link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css"> -->
+                            <div id="mc_embed_signup">
+                                <form
+                                    action="https://djl.us7.list-manage.com/subscribe/post?u=f7896b2c176e28fed0ac92717&amp;id=03099ec163"
+                                    method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form"
+                                    class="validate swiper-no-swiping" target="_blank" novalidate>
+                                    <div id="mc_embed_signup_scroll">
+                                        <h5 class="an-1">Join the DJL newsletter</h5>
+                                        <input type="email" value="" name="EMAIL" class="email email-input"
+                                            id="mce-EMAIL" placeholder="email address" required>
+                                        <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+                                        <div style="position: absolute; left: -5000px;" aria-hidden="true"><input
+                                                type="text" name="b_f7896b2c176e28fed0ac92717_03099ec163" tabindex="-1"
+                                                value=""></div>
+                                        <div class="clear">
+                                            <input type="submit" value="Subscribe" name="subscribe"
+                                                id="mc-embedded-subscribe"
+                                                class="button btn-small waves-effect waves-light light-blue accent-2 subscribe-btn an-2">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <br><br>
+                            <!--End mc_embed_signup-->
+                        </div>
+                    </div>
+                </section>
+
+                <section class="swiper-slide featureWrap page2">
+                    <div class="feature-bg background swiper-lazy"
+                        data-background="./website/img/bg/img-bg-feature.jpeg">
+                    </div>
+                    <div class="section ">
+                        <!--   Icon Section   -->
+                        <div class="container">
+                            <div :class="'row feature-item'+i" v-for="(item, i) in page2.feature" :key="i">
+                                <!-- <div class="icon-block"> -->
+                                <div class="col s12 m2 icon-block">
+                                    <h3 class="center an-1 feature-title"><i class="material-icons">{{ item.icon }}</i>
+                                    </h3>
+                                </div>
+                                <div class="col s12 m8">
+                                    <h5 class="center an-1">{{ item.title }}</h5>
+                                </div>
+                                <div class="col s12 m8">
+                                    <div class="light an-2">{{ item.des }}</div>
+                                </div>
+                                <!-- </div> -->
+                            </div>
+                        </div>
+                        <!-- </div> -->
+                </section>
+                <section class="swiper-slide page3">
+                    <div class="twitter-bg background swiper-lazy"
+                        data-background="./website/img/bg/img-bg-twitter.jpg">
+                    </div>
+                    <div class="section timelineWrap">
+                        <div class="container">
+                            <div class="an-1">
+                                <a class="twitter-timeline " data-height="80vh" data-dnt="true"
+                                    href="https://twitter.com/deepjavalibrary?ref_src=twsrc%5Etfw">Tweets by
+                                    deepjavalibrary</a>
+                                <img v-if="!hasRenderTwitter" width="80%" src="./website/img/deepjavalibrary.png"
+                                    alt="">
+                                <!-- <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="swiper-slide customerWrap page4">
+                    <div class="customer-bg background swiper-lazy"
+                        data-background="./website/img/bg/img-bg-customer.jpg"></div>
+                    <div class="section">
+                        <div class="container ">
+                            <h4 class="center an-1 ">{{ page4.title }}</h4>
+                            <div class="swiper-container an-2 customer-swiper">
+                                <div class="parallax-bg swiper-lazy" data-swiper-parallax="-30%"
+                                    data-src="./website/img/bg/img-customer-bg.jpg">
+                                </div>
+                                <div class="swiper-wrapper">
+                                    <div class="swiper-slide" v-for='(item, i) in page4.customers' :key="i">
+                                        <!-- <img src="website/img/stars-in-the-night-sky.jpg"> -->
+                                        <div class="caption" data-swiper-parallax="-10%">
+                                            <div class="customerContent">
+                                                <h5>{{ item.words }}</h5>
+                                                <br>
+                                                <h6 class="light grey-text text-lighten-3">
+                                                    {{ item.by }}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="customer-swiper-pagination swiper-pagination"></div>
+                                <div class="swiper-button-prev swiper-button-white"></div>
+                                <div class="swiper-button-next swiper-button-white"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="app-footer swiper-slide page5">
+                    <div class="footer-bg background swiper-lazy" data-background="./website/img/bg/img-bg5.jpg"></div>
+                    <div class="section">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col l12 s12">
+                                    <h3 class="white-text an-1">{{ page5.title }}</h3>
+                                    <h5 class="grey-text text-lighten-4 an-1 ">
+                                        {{ page5.abstract }}
+                                    </h5>
+                                    <div class="swiper-container an-1 leader-swiper">
+                                        <div class="swiper-wrapper">
+                                            <div class="swiper-slide" v-for='(item, i) in page5.leadrs' :key="i">
+                                                <img class="leaders-img swiper-lazy" :data-src="item.url"
+                                                    :alt="item.name" :title="item.name">
+                                                <div>{{ item.name }}</div>
+                                                <div class="swiper-lazy-preloader"></div>
+                                            </div>
+                                        </div>
+                                        <div class="leader-swiper-pagination swiper-pagination"></div>
+                                    </div>
+                                    <br>
+                                    <a :href="page5.contactUrl"
+                                        class="btn-small waves-effect waves-light light-blue accent-2  an-2">
+                                        DJL Developers</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="footer-copyright">
+                            <div class="container swiper-no-swiping">
+                                <div>
+                                    Copyright 2019 <a class="blue-text text-lighten-3 text-underLine"
+                                        href="http://aws.amazon.com/" target="_blank"><i class="material-icons tiny"
+                                            style="vertical-align: middle;">link</i>Amazon.com,
+                                        Inc.</a> or its affiliates. All Rights Reserved.
+                                </div>
+                                <div>Website builder & Maintainer: <a class="blue-text text-lighten-3 text-underLine"
+                                        href="https://github.com/fuyz" target="_blank">
+                                        <i class="material-icons tiny" style="vertical-align: middle;">link</i>fuyingzhi
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+            <div class="app-swiper-pagination swiper-pagination"></div>
         </div>
+        <!-- <div class="sidenav-overlay"></div>
+        <div class="drag-target"></div> -->
     </div>
-</div>
 
-<div class="container">
-    <div class="section">
-        <!--   Icon Section   -->
-        <div class="row">
-            <div class="col s12 m4">
-                <div class="icon-block">
-                    <h2 class="center brown-text"><i class="material-icons">device_hub</i></h2>
-                    <h5 class="center">Engine Agnostic</h5>
-                    <p class="light">Write once and run anywhere. Develop your model using DJL and run it on an engine of your choice</p>
-                </div>
-            </div>
+    <!--  Scripts-->
+    <!-- 生产环境版本，优化了尺寸和速度 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- <script src="website/js/init.js"></script> -->
+    <!-- <script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script> -->
 
-            <div class="col s12 m4">
-                <div class="icon-block">
-                    <h2 class="center brown-text"><i class="material-icons">group</i></h2>
-                    <h5 class="center">Built for Java developers</h5>
-                    <p class="light">Intuitive APIs use native Java concepts and abstract away complexity involved with Deep learning</p>
-                </div>
-            </div>
-
-            <div class="col s12 m4">
-                <div class="icon-block">
-                    <h2 class="center brown-text"><i class="material-icons">cloud_upload</i></h2>
-                    <h5 class="center">Ease of deployment</h5>
-                    <p class="light">Bring in your own model, or use a state of the art model from our library to deploy in minutes</p>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<div class="container">
-    <div class="section">
-        <a class="twitter-timeline" data-height="800" data-dnt="true" href="https://twitter.com/deepjavalibrary?ref_src=twsrc%5Etfw">Tweets by deepjavalibrary</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-    </div>
-</div>
-
-<div class="container">
-    <div class="section">
-        <h4 class="center">From our customers</h4>
-    <div class="slider">
-        <ul class="slides">
-            <li>
-                <img src="website/img/stars-in-the-night-sky.jpg">
-                <div class="caption center-align">
-                    <h5>“The Netflix observability team's future plans with DJL include trying out its training API, scaling usage of transfer learning inference, and exploring its bindings for PyTorch and MXNet to harness the power and availability of transfer learning.”</h5>
-                    <h5 class="light grey-text text-lighten-3">Stanislav Kirdey, Engineer at Netflix observability team</h5>
-                </div>
-            </li>
-            <li>
-                <img src="website/img/stars-in-the-night-sky.jpg">
-                <div class="caption center-align">
-                    <h5>“Using DJL allowed us to run large batch inference on Spark for Pytorch models. DJL helped reduce inference time from over six hours to under two hours.”</h5>
-                    <h5 class="light grey-text text-lighten-3">-- Xiaoyan Zhang, Data Scientist at TalkingData</h5>
-                </div>
-            </li>
-            <li>
-                <img src="website/img/stars-in-the-night-sky.jpg">
-                <div class="caption center-align">
-                    <h5>“DJL enables us to run models built with different ML frameworks side by side in the same JVM without infrastructure changes. ”</h5>
-                    <h5 class="light grey-text text-lighten-3">-- Hermann Burgmeier, Engineer at Amazon Advertising team </h5>
-                </div>
-            </li>
-            <li>
-                <img src="website/img/stars-in-the-night-sky.jpg">
-                <div class="caption center-align">
-                    <h5>“Our science team prefers using Python. Our engineering team prefers using Java/Scala. With DJL, data science team can build models in different Python APIs such as Tensorflow, Pytorch, and MXNet,  and engineering team can run inference on these models using DJL. We found that our batch inference time was reduced by 85% from using DJL.” </h5>
-                    <h5 class="light grey-text text-lighten-3">-- Vaibhav Goel, Engineer at Amazon Behavior Analytics team</h5>
-                </div>
-            </li>
-        </ul>
-    </div>
-    </div>
-</div>
-
-<footer class="page-footer grey darken-3">
-    <div class="container">
-        <div class="row">
-            <div class="col l6 s12">
-                <h5 class="white-text">About Us</h5>
-                <p class="grey-text text-lighten-4">Built with <span style="color: red;">&hearts;</span> for the Java community by <a href="https://docs.djl.ai/leaders.html">DJL Developers</a></p>
-            </div>
-        </div>
-    </div>
-    <div class="footer-copyright">
-        <div class="container">
-            Copyright 2019 <a class="brown-text text-lighten-3" href="http://aws.amazon.com/">Amazon.com, Inc.</a> or its
-            affiliates. All Rights Reserved.
-        </div>
-    </div>
-</footer>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.4.2/js/swiper.jquery.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.4.2/js/swiper.min.js"></script>
+    <!-- <script src="website/js/script.js"></script> -->
+    <script src="website/js/index.js"></script>
 
 
-<!--  Scripts-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-<script src="website/js/init.js"></script>
-<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>
-<script src="website/js/script.js"></script>
-
-<div class="sidenav-overlay"></div>
-<div class="drag-target"></div>
 </body>
+
 </html>
