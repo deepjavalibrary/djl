@@ -15,15 +15,15 @@ let app = new Vue({
             },
             {
                 name: 'JavaDoc',
-                url: 'website/javadoc.html'
+                url: 'https://djl.ai/website/javadoc.html'
             },
             {
                 name: 'Demos',
-                url: 'website/demo.html'
+                url: 'https://djl.ai/website/demo.html'
             },
             {
                 name: 'Blogs',
-                url: 'website/blog.html'
+                url: 'https://djl.ai/website/blog.html'
             },
             {
                 name: 'Tutorial',
@@ -43,7 +43,7 @@ let app = new Vue({
             },
             {
                 name: 'version1.0',
-                url: './index1.0.html'
+                url: 'https://djl.ai/index1.0.html'
             }
         ],
         page1: {
@@ -147,6 +147,7 @@ let app = new Vue({
     },
     mounted() {
         $('.sidenav').sidenav();
+        if (typeof Swiper === 'undefined') return
         var mySwiper = new Swiper('.app-swiper-container', {
             direction: 'vertical',
             loop: false,
