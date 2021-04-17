@@ -33,41 +33,32 @@
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WQBQJWP"
                     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
-<nav class="white" role="navigation">
-    <div class="nav-wrapper">
-        <div class="row">
-            <a href="https://djl.ai" class="logo" id="logo-container">
-                <img src="https://djl.ai/website/img/djl-middle.png">
-            </a>
-            <ul class="right col s10 hide-on-med-and-down">
-                <li><a href="https://github.com/awslabs/djl">GitHub</a></li>
-                <li><a href="https://docs.djl.ai/">Documentation</a></li>
-                <li><a href="https://djl.ai/website/javadoc.html">JavaDoc</a></li>
-                <li><a href="https://djl.ai/website/demo.html">Demos</a></li>
-                <li><a href="https://djl.ai/website/blog.html">Blogs</a></li>
-                <li><a href="https://docs.djl.ai/jupyter/tutorial/index.html">Tutorial</a></li>
-                <li><a href="https://github.com/awslabs/djl/tree/master/examples">Examples</a></li>
-                <li><a href="https://deepjavalibrary.slack.com/join/shared_invite/zt-ar91gjkz-qbXhr1l~LFGEIEeGBibT7w#/">Slack</a></li>
-                <li><a href="https://d2l.djl.ai">D2L-Java Book</a></li>
-            </ul>
-            <ul id="nav-mobile" class="sidenav">
-                <li><a href="https://github.com/awslabs/djl">GitHub</a></li>
-                <li><a href="https://docs.djl.ai/">Documentation</a></li>
-                <li><a href="https://djl.ai/website/javadoc.html">JavaDoc</a></li>
-                <li><a href="https://djl.ai/website/demo.html">Demos</a></li>
-                <li><a href="https://djl.ai/website/blog.html">Blogs</a></li>
-                <li><a href="https://docs.djl.ai/jupyter/tutorial/index.html">Tutorial</a></li>
-                <li><a href="https://github.com/awslabs/djl/tree/master/examples">Examples</a></li>
-                <li><a href="https://deepjavalibrary.slack.com/join/shared_invite/zt-ar91gjkz-qbXhr1l~LFGEIEeGBibT7w#/">Slack</a></li>
-                <li><a href="https://d2l.djl.ai">D2L-Java Book</a></li>
-            </ul>
-            <a data-target="nav-mobile"
-               class="sidenav-trigger"><i class="material-icons">menu</i></a>
+<div id="app">
+    <nav class="white app-nav" role="navigation" v-cloak>
+        <div class="nav-wrapper">
+            <div class="row">
+                <a href="https://djl.ai" class="logo" id="logo-container">
+                    <img src="https://djl.ai/website/img/djl-middle.png">
+                </a>
+                <div class="right col s10 hide-on-med-and-down navLinksWrap">
+                    <ul class="nav-ul">
+                        <li v-for="(item, i) in navLinks" :key="i">
+                            <a :href="item.url">{{item.name}}</a>
+                        </li>
+                    </ul>
+                </div>
+                <ul id="nav-mobile" class="sidenav">
+                    <li v-for="(item, i) in navLinks" :key="i">
+                        <a :href="item.url">{{item.name}}</a>
+                    </li>
+                </ul>
+                <a data-target="nav-mobile"
+                class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            </div>
         </div>
-    </div>
-</nav>
-
-<div class="container">
+    </nav>
+</div>
+<div class="container contentWrap">
     <div class="card white z-depth-5">
         <div class="section">
             <div class="row">
@@ -209,7 +200,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <script src="js/init.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="./js/index.js"></script>
+ 
 <div class="sidenav-overlay"></div>
 <div class="drag-target"></div>
 <div class="sidenav-overlay"></div><div class="drag-target"></div></body></html>
