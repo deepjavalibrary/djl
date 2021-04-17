@@ -18,7 +18,7 @@ dependencies {
     runtimeOnly project(":pytorch:pytorch-model-zoo")
     runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}-SNAPSHOT"
     runtimeOnly project(":tensorflow:tensorflow-model-zoo")
-    runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}-SNAPSHOT"
+    runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
 
     if (System.getProperty("ai.djl.default_engine") == "OnnxRuntime") {
         // onnxruntime requires user install libgomp.so.1 manually, exclude from default dependency
