@@ -65,7 +65,7 @@ def cleanBuild() {
     delete "${project.projectDir}/build"
     delete "${project.projectDir}/libtorch"
     delete "${project.projectDir}/libtorch_android"
-    delete fileTree(dir:'${project.projectDir}', include: '**.zip')
+    delete fileTree(dir: '${project.projectDir}', include: '**.zip')
 }
 
 task compileAndroidJNI {
@@ -231,7 +231,7 @@ task downloadPyTorchNativeLib() {
             // GPU dependencies
             copy {
                 from("${outputDir}/libtorch/lib/") {
-                    include "libtorch_cuda.so", "torch_cuda*.dll", "libc10_cuda.so", "c10_cuda.dll", "libcaffe2_nvrtc.so", "libnvrtc*.so.*", "libcudart*.*", "*nvToolsExt*.*", "cudnn*.dll", "caffe2_nvrtc.dll", "nvrtc64*.dll"
+                    include "libtorch_cuda*.so", "torch_cuda*.dll", "libc10_cuda.so", "c10_cuda.dll", "libcaffe2_nvrtc.so", "libnvrtc*.so.*", "libcudart*.*", "*nvToolsExt*.*", "cudnn*.dll", "caffe2_nvrtc.dll", "nvrtc64*.dll"
                 }
                 into("${outputDir}/native/lib")
             }
@@ -277,7 +277,6 @@ task uploadS3 {
         }
     }
 }
-
 
 
 def flavorNames = file(BINARY_ROOT).list() ?: []
