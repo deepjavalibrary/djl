@@ -28,17 +28,20 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 public interface RequestHandler<T> {
 
     /**
-     * returns true if this handler can handle the incoming HTTP request. following the chain of
-     * responsibility pattern.
+     * Returns true if this handler can handle the incoming HTTP request.
+     *
+     * <p>The interface following the chain of responsibility pattern.
      *
      * @param msg the incoming HTTP message
      * @return true if this handler can handle the incoming HTTP request. false otherwise
      */
-    public boolean acceptInboundMessage(Object msg);
+    boolean acceptInboundMessage(Object msg);
 
     /**
-     * main method which handle request. this method is called by the framework if {@code
-     * acceptInboundMessage} indicates that this handler can handle the request.
+     * The main method which handles request.
+     *
+     * <p>This method is called by the framework if {@code acceptInboundMessage} indicates that this
+     * handler can handle the request.
      *
      * @param ctx the handler context.
      * @param req the full HttpRequest object.
@@ -47,7 +50,7 @@ public interface RequestHandler<T> {
      * @return a response or null. The response is returned to the client converting it to the
      *     requested format by the server.
      */
-    public T handleRequest(
+    T handleRequest(
             ChannelHandlerContext ctx,
             FullHttpRequest req,
             QueryStringDecoder decoder,

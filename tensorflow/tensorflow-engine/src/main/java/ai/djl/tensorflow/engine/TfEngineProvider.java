@@ -17,13 +17,27 @@ import ai.djl.engine.EngineProvider;
 
 public class TfEngineProvider implements EngineProvider {
 
-    private static Engine engine;
+    private static volatile Engine engine; // NOPMD
 
     /** {@inheritDoc} */
     @Override
-    public synchronized Engine getEngine() {
+    public String getEngineName() {
+        return TfEngine.ENGINE_NAME;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getEngineRank() {
+        return TfEngine.RANK;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Engine getEngine() {
         if (engine == null) {
-            engine = TfEngine.newInstance();
+            synchronized (this) {
+                engine = TfEngine.newInstance();
+            }
         }
         return engine;
     }

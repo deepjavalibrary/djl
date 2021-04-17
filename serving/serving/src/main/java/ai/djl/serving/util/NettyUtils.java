@@ -21,6 +21,7 @@ import ai.djl.serving.http.MethodNotAllowedException;
 import ai.djl.serving.http.ResourceNotFoundException;
 import ai.djl.serving.http.ServiceUnavailableException;
 import ai.djl.serving.http.Session;
+import ai.djl.util.JsonSerializable;
 import ai.djl.util.JsonUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -99,22 +100,28 @@ public final class NettyUtils {
      * Sends the json object to client.
      *
      * @param ctx the connection context
-     * @param json the json object
+     * @param obj the object to be sent
      */
-    public static void sendJsonResponse(ChannelHandlerContext ctx, Object json) {
-        sendJsonResponse(ctx, JsonUtils.GSON_PRETTY.toJson(json), HttpResponseStatus.OK);
+    public static void sendJsonResponse(ChannelHandlerContext ctx, Object obj) {
+        sendJsonResponse(ctx, obj, HttpResponseStatus.OK);
     }
 
     /**
      * Sends the json string to client with specified status.
      *
      * @param ctx the connection context
-     * @param json the json string
+     * @param obj the object to be sent
      * @param status the HTTP status
      */
     public static void sendJsonResponse(
-            ChannelHandlerContext ctx, Object json, HttpResponseStatus status) {
-        sendJsonResponse(ctx, JsonUtils.GSON_PRETTY.toJson(json), status);
+            ChannelHandlerContext ctx, Object obj, HttpResponseStatus status) {
+        String content;
+        if (obj instanceof JsonSerializable) {
+            content = ((JsonSerializable) obj).toJson();
+        } else {
+            content = JsonUtils.GSON_PRETTY.toJson(obj);
+        }
+        sendJsonResponse(ctx, content, status);
     }
 
     /**

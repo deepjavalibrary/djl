@@ -19,7 +19,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 /**
  * A HTTP endpoint handler to sends static-resources as response to a client request.
  *
- * <p>This classs is registered by the model-server as a HTTP endpoint handler.
+ * <p>This class is registered by the model-server as a HTTP endpoint handler.
  *
  * @author erik.bamberg@web.de
  */

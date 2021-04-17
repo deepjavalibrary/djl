@@ -30,6 +30,7 @@ import ai.djl.training.GradientCollector;
 public final class TfLiteEngine extends Engine {
 
     public static final String ENGINE_NAME = "TFLite";
+    static final int RANK = 10;
 
     private Engine alternativeEngine;
 
@@ -50,7 +51,7 @@ public final class TfLiteEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public int getRank() {
-        return 10;
+        return RANK;
     }
 
     private Engine getAlternativeEngine() {

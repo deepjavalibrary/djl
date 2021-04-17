@@ -31,6 +31,7 @@ import ai.onnxruntime.OrtEnvironment;
 public final class OrtEngine extends Engine {
 
     public static final String ENGINE_NAME = "OnnxRuntime";
+    static final int RANK = 10;
 
     private Engine alternativeEngine;
     private OrtEnvironment env;
@@ -53,7 +54,7 @@ public final class OrtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public int getRank() {
-        return 10;
+        return RANK;
     }
 
     private Engine getAlternativeEngine() {

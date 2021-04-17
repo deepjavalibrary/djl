@@ -28,10 +28,10 @@ public interface BoundingBox extends Serializable {
      * Returns an iterator object that iterates along the {@code BoundingBox} boundary and provides
      * access to the geometry of the {@code BoundingBox} outline.
      *
-     * @return a {@code PathIterator} object, which independently traverses the geometry of the
-     *     {@code BoundingBox}
+     * @return a {@code Iterable} object, which independently traverses the geometry of the {@code
+     *     BoundingBox}
      */
-    PathIterator getPath();
+    Iterable<Point> getPath();
 
     /**
      * Returns the top left point of the bounding box.

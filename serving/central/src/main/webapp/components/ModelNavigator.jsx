@@ -94,7 +94,7 @@ export default function ModelNavigator(props) {
 
 	const classes = useStyles();
 
-	const URL = 'http://localhost:8080/models';
+	const URL = 'http://'+window.location.hostname+':'+window.location.port+'/modelzoo/models';
 	const modelZooData = useFetch(URL);
 
 	const [model, setModel] = useState(null);

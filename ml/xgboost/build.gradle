@@ -1,0 +1,81 @@
+import groovy.xml.QName
+
+group "ai.djl.ml.xgboost"
+
+configurations {
+    exclusion
+}
+
+dependencies {
+    api project(":api")
+    api("ml.dmlc:xgboost4j_2.12:${xgboost_version}"){
+        // get rid of the unused XGBoost Dependencies
+        exclude group: "org.apache.hadoop", module: "hadoop-hdfs"
+        exclude group: "org.apache.hadoop", module: "hadoop-common"
+        exclude group: "junit", module: "junit"
+        exclude group: "com.typesafe.akka", module: "akka-actor_2.12"
+        exclude group: "com.typesafe.akka", module: "akka-testkit_2.12"
+        exclude group: "com.esotericsoftware", module: "kryo"
+        exclude group: "org.scalatest", module: "scalatest_2.12"
+        exclude group: "org.scala-lang.modules", module: "scala-java8-compat_2.12"
+        exclude group: "org.scala-lang", module: "scala-compiler"
+        exclude group: "org.scala-lang", module: "scala-reflect"
+        exclude group: "org.scala-lang", module: "scala-library"
+    }
+
+    exclusion project(":api")
+    exclusion "commons-logging:commons-logging:1.2"
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+
+//    testRuntimeOnly project(":pytorch:pytorch-engine")
+//    testRuntimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}-SNAPSHOT"
+    testRuntimeOnly "org.slf4j:slf4j-simple:${slf4j_version}"
+}
+
+jar {
+    from {
+        (configurations.compileClasspath - configurations.exclusion).collect {
+            it.isDirectory() ? [] : zipTree(it)
+        }
+    }
+}
+
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "DJL Engine Adapter for XGBoost"
+                description = "Deep Java Library (DJL) Engine Adapter for XGBoost"
+                url = "https://djl.ai/ml/${project.name}"
+
+                withXml {
+                    Node pomNode = asNode()
+                    Node dependencies = pomNode.dependencies.get(0)
+                    addDependency(dependencies, "commons-logging", "commons-logging", "1.2")
+                    pomNode.dependencies."*".findAll() {
+                        it.artifactId.text().startsWith("xgboost")
+                    }.each() {
+                        it.parent().remove(it)
+                    }
+                }
+            }
+        }
+    }
+}
+
+def addDependency(Node parent, String groupId, String artifactId, String version) {
+    QName name = new QName("http://maven.apache.org/POM/4.0.0", "dependency")
+    Node dep = new Node(parent, name)
+    addNode(dep, "groupId", groupId)
+    addNode(dep, "artifactId", artifactId)
+    addNode(dep, "version", version)
+}
+
+def addNode(Node parent, String name, String value) {
+    QName qName = new QName("http://maven.apache.org/POM/4.0.0", name)
+    Node node = new Node(parent, qName, new NodeList())
+    node.value().add(value)
+}

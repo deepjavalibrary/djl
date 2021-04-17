@@ -22,6 +22,7 @@ import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.util.JsonSerializable;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.PairList;
 import java.io.ByteArrayInputStream;
@@ -245,7 +246,11 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
             Input input = (Input) ctx.getAttachment("input");
             Output output = new Output(input.getRequestId(), 200, "OK");
             Object obj = translator.processOutput(ctx, list);
-            output.setContent(JsonUtils.GSON_PRETTY.toJson(obj) + '\n');
+            if (obj instanceof JsonSerializable) {
+                output.setContent(((JsonSerializable) obj).toJson() + '\n');
+            } else {
+                output.setContent(JsonUtils.GSON_PRETTY.toJson(obj) + '\n');
+            }
             return output;
         }
 

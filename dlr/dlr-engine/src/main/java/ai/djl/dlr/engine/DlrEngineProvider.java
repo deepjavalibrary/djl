@@ -17,13 +17,28 @@ import ai.djl.engine.EngineProvider;
 
 /** {@code DlrEngineProvider} is the DLR implementation of {@link EngineProvider}. */
 public class DlrEngineProvider implements EngineProvider {
-    private static Engine engine;
+
+    private static volatile Engine engine; // NOPMD
 
     /** {@inheritDoc} */
     @Override
-    public synchronized Engine getEngine() {
+    public String getEngineName() {
+        return DlrEngine.ENGINE_NAME;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getEngineRank() {
+        return DlrEngine.RANK;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Engine getEngine() {
         if (engine == null) {
-            engine = DlrEngine.newInstance();
+            synchronized (this) {
+                engine = DlrEngine.newInstance();
+            }
         }
         return engine;
     }

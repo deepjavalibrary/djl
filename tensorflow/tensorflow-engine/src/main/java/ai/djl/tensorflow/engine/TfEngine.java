@@ -42,6 +42,7 @@ import org.tensorflow.internal.c_api.global.tensorflow;
 public final class TfEngine extends Engine implements AutoCloseable {
 
     public static final String ENGINE_NAME = "TensorFlow";
+    static final int RANK = 3;
 
     private static AtomicReference<TFE_Context> eagerSessionHandle;
 
@@ -85,7 +86,7 @@ public final class TfEngine extends Engine implements AutoCloseable {
     /** {@inheritDoc} */
     @Override
     public int getRank() {
-        return 3;
+        return RANK;
     }
 
     /** {@inheritDoc} */
