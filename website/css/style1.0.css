@@ -5,7 +5,9 @@
  *
  * Made By MaterializeCSS.com
  */
-
+[v-cloak] {
+    display: none
+}
 .logo {
     display: inline-block;
 }
@@ -70,6 +72,16 @@ canvas {
     /* display: none; */
 }
 
+.navLinksWrap {
+    overflow-x: scroll;
+    height: 64px;
+}
+  
+.nav-ul {
+    width: max-content;
+    height: 64px;
+}
+
 @media only screen and (max-width : 992px) {
     .parallax-container .section {
         position: absolute;
@@ -121,4 +133,10 @@ footer.page-footer {
 #draw {
     width: 100%;
     overflow: hidden;
+}
+#terminal canvas, #terminal .xterm-screen{
+    width: 100% !important;
+}
+.contentWrap{
+    margin-top: 55px;
 }
