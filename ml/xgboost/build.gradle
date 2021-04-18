@@ -37,11 +37,15 @@ dependencies {
 jar {
     from {
         (configurations.compileClasspath - configurations.exclusion).collect {
-            it.isDirectory() ? [] : zipTree(it)
+            it.isDirectory() ? [] : zipTree(it).matching {
+                include "lib/**",
+                        "ml/dmlc/xgboost4j/java/NativeLibLoader.*",
+                        "ml/dmlc/xgboost4j/java/XGBoost*",
+                        "xgboost4j-version.properties"
+            }
         }
     }
 }
-
 
 publishing {
     publications {
