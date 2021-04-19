@@ -260,7 +260,7 @@ public final class ConfigManager {
      * @return the model store location
      */
     public Path getModelStore() {
-        return getPathProperty(MODEL_STORE, null);
+        return getPathProperty(MODEL_STORE);
     }
 
     /**
@@ -332,9 +332,9 @@ public final class ConfigManager {
 
         PrivateKey privateKey;
         X509Certificate[] chain;
-        Path keyStoreFile = getPathProperty(KEYSTORE, null);
-        Path privateKeyFile = getPathProperty(PRIVATE_KEY_FILE, null);
-        Path certificateFile = getPathProperty(CERTIFICATE_FILE, null);
+        Path keyStoreFile = getPathProperty(KEYSTORE);
+        Path privateKeyFile = getPathProperty(PRIVATE_KEY_FILE);
+        Path certificateFile = getPathProperty(CERTIFICATE_FILE);
         if (keyStoreFile != null) {
             char[] keystorePass = getProperty(KEYSTORE_PASS, "changeit").toCharArray();
             String keystoreType = getProperty(KEYSTORE_TYPE, "PKCS12");
@@ -465,17 +465,13 @@ public final class ConfigManager {
     }
 
     private Path getPathProperty(String key) {
-		return getPathProperty(key, null);
-	}
+        return getPathProperty(key, null);
+    }
 
-	private Path getPathProperty(String key, String defaultValue) {
-        String property = prop.getProperty(key);
+    private Path getPathProperty(String key, String defaultValue) {
+        String property = prop.getProperty(key, defaultValue);
         if (property == null) {
-        	if (defaultValue!=null) {
-        		property=defaultValue;
-        	} else {
-        		return null;
-        	}
+            return null;
         }
         Path path = Paths.get(property);
         if (!path.isAbsolute()) {
