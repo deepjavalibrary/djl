@@ -65,3 +65,7 @@ applicationDistribution.from("src/main/conf/") {
     into "conf"
 }
 tasks.distZip.enabled = false
+tasks.test.dependsOn(
+        ":serving:central:jar",
+        ":serving:serving-plugins:plugin-managment-plugin:jar",
+        ":serving:serving-plugins:static-file-plugin:jar")
