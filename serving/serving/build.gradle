@@ -57,6 +57,7 @@ startScripts {
                 '    export MODEL_SERVER_HOME=${APP_HOME}\n' +
                 'fi\n' +
                 'DEFAULT_JVM_OPTS="-Dlog4j.configurationFile=${APP_HOME}/conf/log4j2.xml"\n')
+        text = text.replaceAll('CLASSPATH=\\$APP_HOME/lib/.*', 'CLASSPATH=\\$APP_HOME/lib/*')
         unixScript.text = text
     }
 }
