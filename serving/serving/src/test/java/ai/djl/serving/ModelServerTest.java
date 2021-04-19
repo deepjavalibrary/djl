@@ -167,10 +167,12 @@ public class ModelServerTest {
 
         testPredictionsInvalidRequestSize(channel);
 
+        // plugin tests
+        testStaticHtmlRequest();
+
         channel.close();
 
         // negative test case that channel will be closed by server
-        testInvalidRootRequest();
         testInvalidUri();
         testInvalidPredictionsUri();
         testInvalidPredictionsMethod();
@@ -397,6 +399,18 @@ public class ModelServerTest {
         Assert.assertEquals(result, "{}\n");
     }
 
+    private void testStaticHtmlRequest() throws InterruptedException {
+        Channel channel = connect(Connector.ConnectorType.INFERENCE);
+        Assert.assertNotNull(channel);
+
+        reset();
+        HttpRequest req = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
+        channel.writeAndFlush(req).sync();
+        latch.await();
+
+        Assert.assertEquals(httpStatus.code(), HttpResponseStatus.OK.code());
+    }
+
     private void testPredictionsInvalidRequestSize(Channel channel) throws InterruptedException {
         reset();
         DefaultFullHttpRequest req =
@@ -411,24 +425,6 @@ public class ModelServerTest {
         latch.await();
 
         Assert.assertEquals(httpStatus, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
-    }
-
-    private void testInvalidRootRequest() throws InterruptedException {
-        Channel channel = connect(Connector.ConnectorType.INFERENCE);
-        Assert.assertNotNull(channel);
-
-        reset();
-        HttpRequest req = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
-        channel.writeAndFlush(req).sync();
-        latch.await();
-        channel.closeFuture().sync();
-        channel.close();
-
-        if (!System.getProperty("os.name").startsWith("Win")) {
-            ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
-            Assert.assertEquals(resp.getCode(), HttpResponseStatus.NOT_FOUND.code());
-            Assert.assertEquals(resp.getMessage(), ERROR_NOT_FOUND);
-        }
     }
 
     private void testInvalidUri() throws InterruptedException {
