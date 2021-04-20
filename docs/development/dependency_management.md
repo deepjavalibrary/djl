@@ -102,6 +102,8 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [tflite-native-cpu(osx-x86_64)](../../tflite/tflite-engine/README.md#macos) | Contains TensorFlow Lite native library for macOS |
 | | [tflite-native-cpu(linux-x86_64)](../../tflite/tflite-engine/README.md#linux) | Contains TensorFlow Lite native library for Linux |
 | | | |
+| [ai.djl.ml.xgboost](https://search.maven.org/search?q=g:ai.djl.ml.xgboost) | [xgboost](../../ml/xgboost/README.md#installation) | XGBoost engine adapter |
+| | | |
 | [ai.djl.android](https://search.maven.org/search?q=g:ai.djl.android) | [core](../../android/README.md#installation) | Contains Android specific utilities (e.g. ImageFactory) for DJL |
 | | [pytorch-native](../../android/README.md#installation) | Contains DJL PyTorch Android native package |
 | | | |
