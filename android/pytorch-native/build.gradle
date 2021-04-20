@@ -59,9 +59,9 @@ afterEvaluate {
                     }
 
                     scm {
-                        connection = "scm:git:git@github.com:awslabs/djl.git"
-                        developerConnection = "scm:git:git@github.com:awslabs/djl.git"
-                        url = "https://github.com/awslabs/djl"
+                        connection = "scm:git:git@github.com:deepjavalibrary/djl.git"
+                        developerConnection = "scm:git:git@github.com:deepjavalibrary/djl.git"
+                        url = "https://github.com/deepjavalibrary/djl"
                         tag = "HEAD"
                     }
 

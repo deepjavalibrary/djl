@@ -29,7 +29,7 @@ Gradle:
 
 ```
 implementation "ai.djl.mxnet:mxnet-engine:0.10.0"
-// See https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
+// See https://github.com/deepjavalibrary/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
 runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.7.0-backport"
 ```
 
@@ -43,7 +43,7 @@ Maven:
 </dependency>
 <dependency>
     <!--
-        See https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
+        See https://github.com/deepjavalibrary/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
     -->
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-native-auto</artifactId>
@@ -84,7 +84,7 @@ libtorch.dylib:
 ```
 
 It shows the `libtorch.dylib` depends on `libiomp5.dylib` and `libc10.dylib`. If one of them is missing, it throws an `UnsatisfiedLinkError` exception.
-If you are using `ai.djl.{engine}:{engine}-native-auto`, please create an issue at `https://github.com/awslabs/djl`.
+If you are using `ai.djl.{engine}:{engine}-native-auto`, please create an issue at `https://github.com/deepjavalibrary/djl`.
 
 **Windows**
 
@@ -104,7 +104,7 @@ DJL on Windows, please download and install
 
 CN: 如果您在中国，可以使用 [DirectX 修复工具](https://blog.csdn.net/VBcom/article/details/6962388) 来安装遗失依赖项。
 
-If the issue continues to persist, you can use the [docker file](https://github.com/awslabs/djl/blob/master/docker/windows/Dockerfile) provided by us.
+If the issue continues to persist, you can use the [docker file](https://github.com/deepjavalibrary/djl/blob/master/docker/windows/Dockerfile) provided by us.
 Please note that this docker will only work with Windows server 2019 by default. If you want it to work with other
 versions of Windows, you need to pass the version as an argument as follows:
 
@@ -146,9 +146,9 @@ Then, right click the `log4j2.xml` file and select `Recompile log4j2.xml`.
 
 ## 4. How to run DJL using other versions of Apache MXNet?
 **Note:** this is not officially supported by DJL, and some functions may not work. 
-If you require features in Apache MXNet not provided by DJL, please submit an [issue](https://github.com/awslabs/djl/issues).
+If you require features in Apache MXNet not provided by DJL, please submit an [issue](https://github.com/deepjavalibrary/djl/issues).
 
-By default, DJL is running on the [MXNet engine](https://github.com/awslabs/djl/tree/master/mxnet/mxnet-engine).
+By default, DJL is running on the [MXNet engine](https://github.com/deepjavalibrary/djl/tree/master/mxnet/mxnet-engine).
 We use `mxnet-mkl` on CPU machines and `mxnet-cu102mkl` on GPU machines.
 `mkl` means [Intel-MKLDNN](https://github.com/intel/mkl-dnn) is enabled.
 `cu102` means [Nvidia CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit) version 10.2 is enabled.

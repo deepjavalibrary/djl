@@ -4,7 +4,7 @@ In this example, you learn how to train the Amazon Review dataset.
 This dataset includes 30k reviews from Amazon customers on different products.
 We only use `review_body` and `star_rating` for data and label.
 
-You can find the example source code in: [TrainAmazonReviewRanking.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/training/transferlearning/TrainAmazonReviewRanking.java).
+You can find the example source code in: [TrainAmazonReviewRanking.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/training/transferlearning/TrainAmazonReviewRanking.java).
 
 ## Setup guide
 

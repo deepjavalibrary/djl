@@ -32,10 +32,11 @@ import org.slf4j.LoggerFactory;
  * <p>See:
  *
  * <ul>
- *   <li>the <a href="https://github.com/awslabs/djl/blob/master/jupyter/BERTQA.ipynb">jupyter
+ *   <li>the <a
+ *       href="https://github.com/deepjavalibrary/djl/blob/master/jupyter/BERTQA.ipynb">jupyter
  *       demo</a> with more information about BERT.
  *   <li>the <a
- *       href="https://github.com/awslabs/djl/blob/master/examples/docs/BERT_question_and_answer.md">docs</a>
+ *       href="https://github.com/deepjavalibrary/djl/blob/master/examples/docs/BERT_question_and_answer.md">docs</a>
  *       for information about running this example.
  * </ul>
  */

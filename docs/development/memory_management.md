@@ -9,8 +9,8 @@ to help us release the native memory.
 
 We design the NDManager in tree structure. It provides fine-grained control of native resource and manage the resource scope in more effectively way.
 NDManager can make any kind of tree. However, using the Predictor/Trainer classes will automatically create a certain kind of tree.
-The structure of the NDManager for the classic inference case is like ![structure of the NDManager](https://raw.githubusercontent.com/awslabs/djl/master/docs/development/img/ndmanager_structure_for_inference.png).
-The structure of the NDManager for the classic training case is like ![structure of the NDManager](https://github.com/awslabs/djl/blob/master/docs/development/img/ndmanager_structure_for_training.png?raw=true).
+The structure of the NDManager for the classic inference case is like ![structure of the NDManager](https://raw.githubusercontent.com/deepjavalibrary/djl/master/docs/development/img/ndmanager_structure_for_inference.png).
+The structure of the NDManager for the classic training case is like ![structure of the NDManager](https://github.com/deepjavalibrary/djl/blob/master/docs/development/img/ndmanager_structure_for_training.png?raw=true).
 The topmost is System NDManager. The model, which is one layer below, contains the weight and bias of the Neural Network.
 The bottommost NDManager takes care of the intermediate NDArrays we would like to close as soon as the program exit the scope of the functions that use them.
 

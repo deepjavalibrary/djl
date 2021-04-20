@@ -112,7 +112,7 @@ public abstract class Engine {
             throw new EngineException(
                     "No deep learning engine found."
                             + System.lineSeparator()
-                            + "Please refer to https://github.com/awslabs/djl/blob/master/docs/development/troubleshooting.md for more details.");
+                            + "Please refer to https://github.com/deepjavalibrary/djl/blob/master/docs/development/troubleshooting.md for more details.");
         }
         return getEngine(System.getProperty("ai.djl.default_engine", DEFAULT_ENGINE));
     }

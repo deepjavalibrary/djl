@@ -37,7 +37,7 @@ import java.util.stream.LongStream;
  * multidimensional, fixed-size homogeneous array. It has very similar behaviour to the Numpy python
  * package with the addition of efficient computing. To understand how to manage NDArray lifecycle,
  * please refer to <a
- * href="https://github.com/awslabs/djl/blob/master/docs/development/memory_management.md">NDArray
+ * href="https://github.com/deepjavalibrary/djl/blob/master/docs/development/memory_management.md">NDArray
  * Memory Management Guide</a>
  */
 public interface NDArray extends NDResource {
