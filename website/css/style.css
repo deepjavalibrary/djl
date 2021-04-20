@@ -5,19 +5,23 @@
  *
  * Made By MaterializeCSS.com
  */
+[v-cloak] {
+  display: none
+}
 
 .logo {
-    display: inline-block;
+  display: inline-block;
 }
 
 .logo>img {
-    vertical-align: middle;
-    height: 60px;
-    width: auto;
+  vertical-align: middle;
+  height: 35px;
+  width: auto;
 }
 
 nav li a {
-    color: #795548;
+  /* color: #795548; */
+  color: white;
 }
 
 p {
@@ -30,37 +34,394 @@ p {
 
 canvas {
   display: block;
-  vertical-align: bottom;
+  /* vertical-align: bottom; */
+}
+
+.text-underLine {
+  text-decoration: underline;
+}
+
+.app-swiper-container {
+  z-index: auto
 }
 
 .parallax-container {
   min-height: 380px;
   line-height: 0;
   height: auto;
-  color: rgba(255,255,255,.9);
+  color: rgba(255, 255, 255, .9);
 }
+
 .parallax-container .section {
-    width: 100%;
-  }
+  width: 100%;
+}
+
+
+.icon-block {
+  padding: 0 15px;
+}
+
+.icon-block .material-icons {
+  font-size: inherit;
+}
+
+/* 
+#particles-js {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: grey;
+  background-image: url("../img/stars-in-the-night-sky.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50% 50%;
+} */
 
 .graph-container {
-    color: #fff;
-    left: 0;
-    position: absolute;
-    right: 0;
-    text-align: center;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2;
-    max-width: 850px;
-    margin: 0 auto;
+  color: #fff;
+  left: 0;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 20px 0;
 }
 
+
+#draw {
+  width: 100%;
+  overflow: hidden;
+}
+
+/* fyz */
+.app-nav {
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0) !important;
+  /* display: none; */
+}
+
+.navLinksWrap {
+  overflow-x: scroll;
+  height: 64px;
+}
+
+.nav-ul {
+  width: max-content;
+  height: 64px;
+}
+
+section {
+  overflow: hidden;
+}
+
+.subscribe-btn input {
+  color: white;
+  cursor: pointer;
+}
+
+.email-input {
+  color: white;
+}
+
+.timelineWrap {
+  box-shadow: 0px 0px 10px 0px rgb(0, 191, 255, 0.3);
+}
+
+section.app-footer {
+  margin: 0;
+  /* background: pink; */
+}
+
+/* bg */
+.background {
+  -webkit-transform: scale(1.1) rotate(-1deg);
+  transform: scale(1.1) rotate(-1deg);
+  opacity: .2;
+  z-index: 1;
+  background-color: black;
+}
+
+.swiper-slide-active .background {
+  opacity: 1;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  transition: opacity 1s ease, -webkit-transform 8s cubic-bezier(.3, 0, .7, 1);
+  transition: transform 8s cubic-bezier(.3, 0, .7, 1), opacity 1s ease;
+  /* transition: transform 5s cubic-bezier(.3, 0, .7, 1), opacity 1s ease, -webkit-transform 5s cubic-bezier(.3, 0, .7, 1); */
+}
+
+
+.sky-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('../img/bg/img-bg-sky.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.feature-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('../img/bg/img-bg-feature.jpeg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.feature-title {
+  margin-bottom: 0;
+}
+
+.twitter-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('../img/bg/img-bg-twitter.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.customer-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('../img/bg/img-bg-customer.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.customer-swiper {
+  /* background: url('../img/bg/img-customer-bg.jpg') 0 no-repeat; */
+  background-size: cover;
+  /* opacity: 0.5; */
+}
+
+.customerWrap .swiper-container {
+  height: 100%;
+  /* background: rgba(255, 255, 255); */
+  border-radius: 10px;
+}
+
+.customerWrap .swiper-slide {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.customerWrap .swiper-slide .caption {
+  padding: 20px 50px;
+  min-height: 65vh;
+  position: relative;
+}
+
+.customerContent {
+  width: 70%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.parallax-bg {
+  background-image: url('../img/bg/img-customer-bg.jpg');
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 150%;
+  height: 100%;
+  -webkit-background-size: cover;
+  background-size: cover;
+}
+
+.customer-swiper-pagination .swiper-pagination-bullet {
+  background: white;
+}
+
+.footer-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('../img/bg/img-bg5.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.leader-swiper {
+  height: 100%;
+}
+
+.leader-swiper .swiper-slide {
+  text-align: center;
+}
+
+.leaders-img {
+  max-width: 100%;
+}
+
+.section {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, .3);
+  color: white;
+  box-sizing: border-box;
+}
+
+.section .container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.iframe {
+  width: 100%;
+  min-height: 90vh;
+  opacity: 0.9;
+}
+
+/* 内容 */
+[class*=an-] {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  visibility: hidden;
+  /* transform: translate3d(-50px, 50px, 0);
+  -webkit-transform: translate3d(-50px, 50px, 0); */
+  opacity: 0;
+}
+
+[class*=an-1] {
+  transform: translate3d(-50px, 0px, 0);
+  -webkit-transform: translate3d(-50px, 0px, 0);
+}
+
+[class*=an-2] {
+  transform: translate3d(-50px, 0px, 0);
+  -webkit-transform: translate3d(-100px, 0px, 0);
+}
+
+[class*=an-3] {
+  transform: translate3d(-50px, 0px, 0);
+  -webkit-transform: translate3d(-50px, 250px, 0);
+}
+
+.swiper-slide-active [class*=an-] {
+  visibility: visible;
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  transition: opacity 1s ease, -webkit-transform 2s cubic-bezier(.25, .1, .2, 1);
+  transition: transform 1s cubic-bezier(.25, .1, .2, 1), opacity 1s ease;
+  transition: transform 1s cubic-bezier(.25, .1, .2, 1), opacity 1s ease, -webkit-transform 1s cubic-bezier(.25, .1, .2, 1);
+  /* transition-timing-function: cubic-bezier(.25, .1, .2, 1); */
+}
+
+.swiper-slide-active [class*=an-1] {
+  transition-delay: 0s;
+}
+
+.swiper-slide-active [class*=an-2] {
+  transition-delay: 1s;
+}
+
+.swiper-slide-active [class*=an-3] {
+  transition-delay: 1.5s;
+}
+
+[class*=feature-item] {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  visibility: hidden;
+  transform: translate3d(-50px, 0px, 0);
+  -webkit-transform: translate3d(-50px, 0px, 0);
+  opacity: 0;
+}
+
+.swiper-slide-active [class*=feature-item] {
+  visibility: visible;
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  transition: opacity 1s ease, -webkit-transform 3s cubic-bezier(.25, .1, .2, 1);
+  transition: transform 1s cubic-bezier(.25, .1, .2, 1), opacity 1s ease;
+  transition: transform 1s cubic-bezier(.25, .1, .2, 1), opacity 1s ease, -webkit-transform 1s cubic-bezier(.25, .1, .2, 1);
+}
+
+.swiper-slide-active .feature-item0 {
+  transition-delay: 0s;
+}
+
+.swiper-slide-active .feature-item1 {
+  transition-delay: 0.5s;
+}
+
+.swiper-slide-active .feature-item2 {
+  transition-delay: 1s;
+}
+
+.swiper-slide-active .feature-item3 {
+  transition-delay: 1.5s;
+}
+
+.swiper-slide-active .feature-item4 {
+  transition-delay: 2s;
+}
+
+
+.footer-copyright {
+  position: absolute;
+  bottom: 50px;
+  color: white;
+  width: 100%;
+}
+
+/* swiper */
+.app-swiper-container {
+  height: 100vh;
+}
+
+.app-swiper-pagination .swiper-pagination-bullet {
+  border-radius: 8px;
+  transition: height 1s cubic-bezier(.25, .1, .2, 1);
+  background: white;
+  opacity: 0.5;
+  /* width: 10px; */
+  /* height: 10px; */
+}
+
+.app-swiper-pagination .swiper-pagination-bullet-active {
+  border-radius: 8px;
+  height: 60px;
+  background: white;
+  opacity: 1;
+}
+
+
 @media only screen and (max-width : 992px) {
+
   .parallax-container .section {
     position: absolute;
     top: 40%;
   }
+
   #index-banner .section {
     top: 10%;
   }
@@ -70,31 +431,4 @@ canvas {
   #index-banner .section {
     top: 0;
   }
-}
-
-.icon-block {
-  padding: 0 15px;
-}
-.icon-block .material-icons {
-  font-size: inherit;
-}
-
-footer.page-footer {
-  margin: 0;
-}
-
-#particles-js {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-color: grey;
-  background-image: url("../img/stars-in-the-night-sky.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: 50% 50%;
-}
-
-#draw {
-  width: 100%;
-  overflow: hidden;
 }

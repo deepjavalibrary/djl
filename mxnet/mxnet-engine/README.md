@@ -51,7 +51,7 @@ It will automatically determine the appropriate jars for your system based on th
 <dependency>
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-native-auto</artifactId>
-    <version>1.7.0-backport</version>
+    <version>1.8.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -59,7 +59,7 @@ It will automatically determine the appropriate jars for your system based on th
 ### macOS
 For macOS, you can use the following library:
 
-- ai.djl.mxnet:mxnet-native-mkl:1.7.0-backport:osx-x86_64
+- ai.djl.mxnet:mxnet-native-mkl:1.8.0:osx-x86_64
 
     This package takes advantage of the Intel MKL library to boost performance.
 ```xml
@@ -67,7 +67,7 @@ For macOS, you can use the following library:
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-native-mkl</artifactId>
     <classifier>osx-x86_64</classifier>
-    <version>1.7.0-backport</version>
+    <version>1.8.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -78,32 +78,32 @@ installed on your GPU machine, you can use one of the following library:
 
 #### Linux GPU
 
-- ai.djl.mxnet:mxnet-native-cu102mkl:1.7.0-backport:linux-x86_64 - CUDA 10.2
-- ai.djl.mxnet:mxnet-native-cu101mkl:1.7.0-backport:linux-x86_64 - CUDA 10.1
+- ai.djl.mxnet:mxnet-native-cu102mkl:1.8.0:linux-x86_64 - CUDA 11.0
+- ai.djl.mxnet:mxnet-native-cu101mkl:1.8.0:linux-x86_64 - CUDA 10.2
+
+```xml
+<dependency>
+    <groupId>ai.djl.mxnet</groupId>
+    <artifactId>mxnet-native-cu110mkl</artifactId>
+    <classifier>linux-x86_64</classifier>
+    <version>1.8.0</version>
+    <scope>runtime</scope>
+</dependency>
+```
 
 ```xml
 <dependency>
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-native-cu102mkl</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>1.7.0-backport</version>
-    <scope>runtime</scope>
-</dependency>
-```
-
-```xml
-<dependency>
-    <groupId>ai.djl.mxnet</groupId>
-    <artifactId>mxnet-native-cu101mkl</artifactId>
-    <classifier>linux-x86_64</classifier>
-    <version>1.7.0-backport</version>
+    <version>1.8.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
 
 #### Linux CPU
 
-- ai.djl.mxnet:mxnet-native-mkl:1.7.0-backport:linux-x86_64
+- ai.djl.mxnet:mxnet-native-mkl:1.8.0:linux-x86_64
 
 ```xml
 <dependency>
@@ -111,7 +111,7 @@ installed on your GPU machine, you can use one of the following library:
     <artifactId>mxnet-native-mkl</artifactId>
     <classifier>linux-x86_64</classifier>
     <scope>runtime</scope>
-    <version>1.7.0-backport</version>
+    <version>1.8.0</version>
 </dependency>
 ```
 
@@ -127,13 +127,13 @@ use [Automatic](#automatic-(recommended)) package.
 
 #### Windows GPU
 
-- ai.djl.mxnet:mxnet-native-auto:1.7.0-backport
+- ai.djl.mxnet:mxnet-native-auto:1.8.0
 
-    This package supports CUDA 10.1 and CUDA 10.2 for Windows.
+    This package supports CUDA 11.0 and CUDA 10.2 for Windows.
 
 ### Windows CPU
 
-- ai.djl.mxnet:mxnet-native-mkl:1.7.0-backport:win-x86_64
+- ai.djl.mxnet:mxnet-native-mkl:1.8.0:win-x86_64
 
 ```xml
 <dependency>
@@ -141,6 +141,6 @@ use [Automatic](#automatic-(recommended)) package.
     <artifactId>mxnet-native-mkl</artifactId>
     <classifier>win-x86_64</classifier>
     <scope>runtime</scope>
-    <version>1.7.0-backport</version>
+    <version>1.8.0</version>
 </dependency>
 ```

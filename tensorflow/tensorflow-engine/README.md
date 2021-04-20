@@ -27,6 +27,8 @@ The javadocs output is built in the `build/doc/javadoc` folder.
 ## Installation
 You can pull the TensorFlow engine from the central Maven repository by including the following dependency:
 
+- ai.djl.tensorflow:tensorflow-engine:0.10.0
+
 ```xml
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
@@ -35,19 +37,101 @@ You can pull the TensorFlow engine from the central Maven repository by includin
     <scope>runtime</scope>
 </dependency>
 ```
-
 Besides the `tensorflow-engine` library, you may also need to include the TensorFlow native library in your project.
 
-### Install TensorFlow native library
+Choose a native library based on your platform and needs:
+
+### Automatic (Recommended)
 
 We offer an automatic option that will download the native libraries into [cache folder](../../docs/development/cache_management.md) the first time you run DJL.
 It will automatically determine the appropriate jars for your system based on the platform and GPU support.
+
+- ai.djl.tensorflow:tensorflow-native-auto:2.4.1
 
 ```xml
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-native-auto</artifactId>
-    <version>2.3.1</version>
+    <version>2.4.1</version>
     <scope>runtime</scope>
+</dependency>
+```
+
+### macOS
+For macOS, you can use the following library:
+
+- ai.djl.tensorflow:tensorflow-native-cpu:2.4.1:osx-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.tensorflow</groupId>
+    <artifactId>tensorflow-native-cpu</artifactId>
+    <classifier>osx-x86_64</classifier>
+    <version>2.4.1</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+### Linux
+For the Linux platform, you can choose between CPU, GPU. If you have NVIDIA [CUDA](https://en.wikipedia.org/wiki/CUDA)
+installed on your GPU machine, you can use one of the following library:
+
+#### Linux GPU
+
+- ai.djl.tensorflow:tensorflow-native-cu110:2.4.1:linux-x86_64 - CUDA 11.0
+
+```xml
+<dependency>
+    <groupId>ai.djl.tensorflow</groupId>
+    <artifactId>tensorflow-native-cu110</artifactId>
+    <classifier>linux-x86_64</classifier>
+    <version>2.4.1</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+### Linux CPU
+
+- ai.djl.tensorflow:tensorflow-native-cpu:2.4.1:linux-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.tensorflow</groupId>
+    <artifactId>tensorflow-native-cpu</artifactId>
+    <classifier>linux-x86_64</classifier>
+    <scope>runtime</scope>
+    <version>2.4.1</version>
+</dependency>
+```
+
+### Windows
+
+For the Windows platform, you can choose between CPU and GPU.
+
+#### Windows GPU
+
+- ai.djl.tensorflow:tensorflow-native-cu110:2.4.1:win-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.tensorflow</groupId>
+    <artifactId>tensorflow-native-cu110</artifactId>
+    <classifier>win-x86_64</classifier>
+    <version>2.4.1</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+### Windows CPU
+
+- ai.djl.tensorflow:tensorflow-native-cpu:2.4.1:win-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.tensorflow</groupId>
+    <artifactId>tensorflow-native-cpu</artifactId>
+    <classifier>win-x86_64</classifier>
+    <scope>runtime</scope>
+    <version>2.4.1/version>
 </dependency>
 ```

@@ -24,3 +24,6 @@ bin/
 #node
 node_modules/
 **/static/dist/
+
+#vscode
+.vscode

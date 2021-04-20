@@ -10,10 +10,14 @@ dependencies {
 
     if (System.getProperty("ai.djl.default_engine") == "PyTorch") {
         runtimeOnly project(":pytorch:pytorch-model-zoo")
-        runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}-SNAPSHOT"
+        runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
     } else if (System.getProperty("ai.djl.default_engine") == "TensorFlow") {
-        runtimeOnly project(":tensorflow:tensorflow-model-zoo")
-        runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}-SNAPSHOT"
+        // javacpp bug fix https://github.com/bytedeco/javacpp/commit/7f27899578dfa18e22738a3dd49701e1806b464a
+        runtimeOnly "org.bytedeco:javacpp:1.5.6-SNAPSHOT"
+        runtimeOnly (project(":tensorflow:tensorflow-model-zoo")) {
+            exclude group: "org.bytedeco", module: "javacpp"
+        }
+        runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
     } else {
         runtimeOnly project(":mxnet:mxnet-model-zoo")
         runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"

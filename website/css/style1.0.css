@@ -1,0 +1,142 @@
+/* Custom Stylesheet */
+/**
+ * Use this file to override Materialize files so you can update
+ * the core Materialize files in the future
+ *
+ * Made By MaterializeCSS.com
+ */
+[v-cloak] {
+    display: none
+}
+.logo {
+    display: inline-block;
+}
+
+.logo>img {
+    vertical-align: middle;
+    height: 35px;
+    width: auto;
+}
+
+nav li a {
+    color: #795548;
+}
+
+p {
+    line-height: 2rem;
+}
+
+.sidenav-trigger {
+    color: #26a69a;
+}
+
+canvas {
+    display: block;
+    vertical-align: bottom;
+}
+
+.parallax-container {
+    min-height: 380px;
+    line-height: 0;
+    /* height: auto; */
+    color: rgba(255, 255, 255, .9);
+    margin-top: 55px;
+}
+
+#mce-EMAIL {
+    color: white;
+}
+
+.parallax-container .section {
+    width: 100%;
+}
+
+.graph-container {
+    color: #fff;
+    left: 0;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.app-nav {
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 1) !important;
+    /* display: none; */
+}
+
+.navLinksWrap {
+    overflow-x: scroll;
+    height: 64px;
+}
+  
+.nav-ul {
+    width: max-content;
+    height: 64px;
+}
+
+@media only screen and (max-width : 992px) {
+    .parallax-container .section {
+        position: absolute;
+        top: 40%;
+    }
+
+    #index-banner .section {
+        top: 10%;
+    }
+}
+
+@media only screen and (max-width : 600px) {
+    #index-banner .section {
+        top: 0;
+    }
+}
+
+.icon-block {
+    padding: 0 15px;
+}
+
+.icon-block .material-icons {
+    font-size: inherit;
+}
+
+.subscribe-btn input {
+    color: white;
+}
+
+#mc_embed_signup {
+    padding-bottom: 50px;
+}
+
+footer.page-footer {
+    margin: 0;
+}
+
+#particles-js {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: grey;
+    background-image: url("../img/stars-in-the-night-sky.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 50% 50%;
+}
+
+#draw {
+    width: 100%;
+    overflow: hidden;
+}
+#terminal canvas, #terminal .xterm-screen{
+    width: 100% !important;
+}
+.contentWrap{
+    margin-top: 55px;
+}

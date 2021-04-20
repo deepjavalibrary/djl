@@ -128,13 +128,12 @@ jobs:
           name: tensorflow-model-zoo
           path: tensorflow/tensorflow-model-zoo/build/reports
       - name: upload to codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v1.4.0
         with:
           files: ./build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml
           name: codecov-umbrella
           fail_ci_if_error: true
           path_to_write_report: ./codecov_report.txt
-          verbose: true
 
   # Windows platform for testing hybrid engines
   build-windows:

@@ -270,6 +270,9 @@ public final class LibUtils {
             }
 
             if (matching != null) {
+                if ("cpu".equals(matching.getFlavor())) {
+                    fallback.set(true);
+                }
                 return copyNativeLibraryFromClasspath(matching);
             }
 

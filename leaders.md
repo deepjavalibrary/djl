@@ -8,7 +8,8 @@ The community leaders are those who are the most active members of our community
 |-------|----------------|---------|------------| ----------- |
 | ![](website/img/community_leader/anthony.jpeg) <br>Anthony | ![](website/img/community_leader/christoph.png) <br>Christoph | ![](website/img/community_leader/erik.png) <br>Erik | ![](website/img/community_leader/frank.png) <br>Frank | ![](website/img/community_leader/jake.jpg) <br>Jake |
 | ![](website/img/community_leader/keerthan.jpg) <br>Keerthan | ![](website/img/community_leader/kimi.png) <br>Kimi | ![](website/img/community_leader/lai.jpg) <br>Lai | ![](website/img/community_leader/lu.png) <br>Lu | ![](website/img/community_leader/marat.png) <br>Marat |
-| ![](website/img/community_leader/marcos.png) <br>Marcos | ![](website/img/community_leader/qing.jpeg) <br>Qing | ![](website/img/community_leader/stanislav.png) <br>Stanislav | ![](website/img/community_leader/wei.jpg) <br>Wei | ![](website/img/community_leader/zach.jpeg) <br>Zach |
+| ![](website/img/community_leader/marcos.png) <br>Marcos | ![](website/img/community_leader/qing.jpeg) <br>Qing | ![](website/img/community_leader/stanislav.png) <br>Stanislav | ![](website/img/community_leader/wei.jpg) <br>Wei | ![](website/img/community_leader/zach.jpeg) <br>Zach 
+ | ![](website/img/community_leader/fyz.jpg) <br>fuyingzhi
 
 #### Anthony Feenster
 
@@ -100,3 +101,8 @@ Wei is a Java full stack Development Engineer in Shanghai international human ph
 
 Zach is one of the core developers at DJL. He is a committer on the Apache MXNet deep learning framework who worked on the Java/Scala frontend before joining DJL to create a framework that is designed for Java first. He focuses on training and making a deep learning system that is as easy to use as possible. Outside of DJL, he is interested in the design of programming languages, decentralized systems, and general AI.
 
+#### Yingzhi Fu
+
+[github](https://github.com/fuyz)
+
+Fu is a PC and Mobile web developer from China and working in Ascend International Education Group. He is living and working in Shenzhen. Outside of work, he enjoys playing basketball, swimming and bodybuilding.
