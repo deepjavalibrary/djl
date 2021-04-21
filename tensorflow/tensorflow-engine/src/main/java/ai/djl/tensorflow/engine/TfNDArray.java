@@ -487,6 +487,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
+    public NDArray batchDot(NDArray other) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray add(Number n) {
         try (NDArray number = manager.create(n).toType(getDataType(), false)) {
             return add(number);
