@@ -111,7 +111,8 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
             // if no name specified in input array or
             // the input order matches inputDescriptions
             // use default order from translator
-            if (currentNDArray.getName().isEmpty() || currentNDArray.getName().equals(inputName)) {
+            String name = currentNDArray.getName();
+            if (name == null || name.isEmpty() || name.equals(inputName)) {
                 inputTensorHandles[i] = JavacppUtils.resolveTFETensor(currentNDArray.getHandle());
                 continue;
             }
