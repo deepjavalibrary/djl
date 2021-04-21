@@ -9,14 +9,15 @@ dependencies {
     implementation "org.slf4j:slf4j-api:${slf4j_version}"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
     implementation project(":api")
-    implementation project(":mxnet:mxnet-engine")
+
+    runtimeOnly project(':model-zoo')
+    runtimeOnly project(':mxnet:mxnet-model-zoo')
+    runtimeOnly project(':tensorflow:tensorflow-model-zoo')
+    runtimeOnly project(':pytorch:pytorch-model-zoo:')
 
     runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
-
-    implementation project(':model-zoo')
-    implementation project(':mxnet:mxnet-model-zoo')
-    implementation project(':tensorflow:tensorflow-model-zoo')
-    implementation project(':pytorch:pytorch-model-zoo:')
+    runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
+    runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
