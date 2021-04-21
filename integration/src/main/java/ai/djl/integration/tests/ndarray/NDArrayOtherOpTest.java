@@ -542,7 +542,6 @@ public class NDArrayOtherOpTest {
             Assert.assertEquals(array.tile(1, 3), expected);
             Assert.assertEquals(array.tile(3), expected);
 
-
             // zero-dim
             array = manager.create(new Shape(2, 0));
             expected = manager.create(new Shape(2, 0));
