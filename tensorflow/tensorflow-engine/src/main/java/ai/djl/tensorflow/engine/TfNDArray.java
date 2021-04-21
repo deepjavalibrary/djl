@@ -43,7 +43,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     private Shape shape;
     private Device device;
     private TfNDManager manager;
-    private String name = "";
+    private String name;
     private TfNDArrayEx tfNDArrayEx;
     private DataType dataType;
 
@@ -1322,6 +1322,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray tile(long repeats) {
+        // tf tile doesn't support scalar
+        if (isScalar()) {
+            try (NDArray temp = reshape(1)) {
+                return temp.tile(repeats);
+            }
+        }
         long[] multiples = new long[getShape().dimension()];
         Arrays.fill(multiples, repeats);
         return tile(multiples);
