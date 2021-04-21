@@ -2,7 +2,7 @@ from pathlib import Path
 import glob, json
 
 constructor = {"cell_type": "markdown", "metadata": {}}
-prefix = "Run this notebook online:[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/awslabs/djl/master?filepath="
+prefix = "Run this notebook online:[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/deepjavalibrary/djl/master?filepath="
 
 for file in Path('.').glob('**/*.ipynb'):
     with open(file, mode= "r", encoding= "utf-8") as f:

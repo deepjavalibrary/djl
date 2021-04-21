@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  * href="https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md">here</a>
  *
  * <p>See this <a
- * href="https://github.com/awslabs/djl/blob/master/examples/docs/object_detection_with_tensorflow_saved_model.md">doc</a>
+ * href="https://github.com/deepjavalibrary/djl/blob/master/examples/docs/object_detection_with_tensorflow_saved_model.md">doc</a>
  * for information about this example.
  */
 public final class ObjectDetectionWithTensorflowSavedModel {

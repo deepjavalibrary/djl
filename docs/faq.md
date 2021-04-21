@@ -37,7 +37,7 @@ setting the devices. For example, if you have 7 GPUs available, and you want the
             // Set the devices to run on multi-GPU
             .setDevices(Device.getDevices(numberOfGpus));
 All of the examples in the example folder can be run on 
-multiple GPUs with the appropriate arguments. Follow the steps in the example to [train a ResNet50 model on CIFAR-10 dataset](https://github.com/awslabs/djl/blob/master/examples/docs/train_cifar10_resnet.md#train-using-multiple-gpus) on a GPU.
+multiple GPUs with the appropriate arguments. Follow the steps in the example to [train a ResNet50 model on CIFAR-10 dataset](https://github.com/deepjavalibrary/djl/blob/master/examples/docs/train_cifar10_resnet.md#train-using-multiple-gpus) on a GPU.
 
 ### 5. Does DJL support inference on multiple threads?
 Yes. DJL offers multi-threaded inference. If using the MXNet engine for a multi-threaded inference case, you need to 

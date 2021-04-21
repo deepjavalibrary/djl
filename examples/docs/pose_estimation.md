@@ -4,7 +4,7 @@ Pose estimation is a computer vision technique for determining the pose of an ob
 
 In this example, you learn how to implement inference code with a [ModelZoo model](../../docs/model-zoo.md) to detect dogs in an image.
 
-The source code can be found at [PoseEstimation.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/PoseEstimation.java).
+The source code can be found at [PoseEstimation.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/PoseEstimation.java).
 
 ## Setup guide
 

@@ -14,7 +14,7 @@ This folder contains tutorials that illustrate how to accomplish basic AI tasks 
 - [Transfer learning example](transfer_learning_on_cifar10.ipynb)
 - [Question answering example](BERTQA.ipynb)
 
-You can run our notebook online: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/awslabs/djl/master?filepath=jupyter)
+You can run our notebook online: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/deepjavalibrary/djl/master?filepath=jupyter)
 
 ## Setup
 
@@ -65,7 +65,7 @@ You can open the `http://localhost:8888` to see the hosted instance on docker.
 
 ### Build docker image by yourself
 
-You can read [Dockerfile](https://github.com/awslabs/djl/blob/master/jupyter/Dockerfile) for detail. To build docker image:
+You can read [Dockerfile](https://github.com/deepjavalibrary/djl/blob/master/jupyter/Dockerfile) for detail. To build docker image:
 
 ```
 cd jupyter

@@ -14,7 +14,7 @@ API to load models.
 
 The ModelZoo API provides a unified way to load models. The declarative nature of this API allows you to store model
 information inside a configuration file. This gives you great flexibility to test and deploy your model.
-See our reference project: [DJL Spring Boot Starter](https://github.com/awslabs/djl-spring-boot-starter#spring-djl-mxnet-autoconfiguration). 
+See our reference project: [DJL Spring Boot Starter](https://github.com/deepjavalibrary/djl-spring-boot-starter#spring-djl-mxnet-autoconfiguration). 
 
 ### Criteria class
 

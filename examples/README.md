@@ -23,14 +23,14 @@ The following examples are included for inference:
 These examples focus on the overall experience of training and inference. We keep components
 that are reusable within separate modules for other users to take advantage of in their own
 applications. For examples and references on creating datasets, look at the
-[basic dataset module](https://github.com/awslabs/djl/tree/master/basicdataset).
+[basic dataset module](https://github.com/deepjavalibrary/djl/tree/master/basicdataset).
 For examples and references on building models and translators, look in our
-[basic model zoo](https://github.com/awslabs/djl/tree/master/model-zoo).
+[basic model zoo](https://github.com/deepjavalibrary/djl/tree/master/model-zoo).
 
 You may be able to find more translator examples in our engine specific model zoos:
-[Apache MXNet](https://github.com/awslabs/djl/tree/master/mxnet/mxnet-model-zoo),
-[PyTorch](https://github.com/awslabs/djl/tree/master/pytorch/pytorch-model-zoo),
-and [TensorFlow](https://github.com/awslabs/djl/tree/master/tensorflow/tensorflow-model-zoo).
+[Apache MXNet](https://github.com/deepjavalibrary/djl/tree/master/mxnet/mxnet-model-zoo),
+[PyTorch](https://github.com/deepjavalibrary/djl/tree/master/pytorch/pytorch-model-zoo),
+and [TensorFlow](https://github.com/deepjavalibrary/djl/tree/master/tensorflow/tensorflow-model-zoo).
 
 More examples and demos of applications featuring DJL are located in our [demo repository](https://github.com/aws-samples/djl-demo).
 

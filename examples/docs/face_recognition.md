@@ -3,11 +3,11 @@
 In this example, you learn how to implement inference code with a pytorch model to extract and compare face features.
 
 Extract face feature:
-The source code can be found at [FeatureExtraction.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/face/FeatureExtraction.java).  
+The source code can be found at [FeatureExtraction.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/face/FeatureExtraction.java).  
 The model github can be found at [facenet-pytorch](https://github.com/timesler/facenet-pytorch).
 
 Compare face features:
-The source code can be found at [FeatureComparison.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/face/FeatureComparison.java).  
+The source code can be found at [FeatureComparison.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/face/FeatureComparison.java).  
 
 ## Setup guide
 

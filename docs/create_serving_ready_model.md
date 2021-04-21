@@ -23,7 +23,7 @@ this class to conduct the data processing.
 
 ### Step 1: Create a ServingTranslator class
 Create a java class that implements [ServingTranslator](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/translate/ServingTranslator.html)
-interface. See: [MyTranslator](https://github.com/awslabs/djl/blob/master/integration/src/test/translator/MyTranslator.java) as an example.
+interface. See: [MyTranslator](https://github.com/deepjavalibrary/djl/blob/master/integration/src/test/translator/MyTranslator.java) as an example.
 
 ### Step 2: Create a `libs` folder in your model directory
 DJL will look into `libs` folder to search for Translator implementation.

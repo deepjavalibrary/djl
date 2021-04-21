@@ -71,7 +71,7 @@
         </dependency>
         <dependency>
             <!--
-                See https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
+                See https://github.com/deepjavalibrary/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
             -->
             <groupId>ai.djl.mxnet</groupId>
             <artifactId>mxnet-native-auto</artifactId>
@@ -84,7 +84,7 @@
         </dependency>
         <dependency>
             <!--
-                See https://github.com/awslabs/djl/blob/master/pytorch/README.md for more PyTorch library selection options
+                See https://github.com/deepjavalibrary/djl/blob/master/pytorch/README.md for more PyTorch library selection options
             -->
             <groupId>ai.djl.pytorch</groupId>
             <artifactId>pytorch-native-auto</artifactId>

@@ -61,7 +61,7 @@ public class BitmapWrapperTest {
     public void testImageToNDArray() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             ImageFactory factory = ImageFactory.getInstance();
-            Image img = factory.fromUrl("https://github.com/awslabs/djl/raw/master/examples/src/test/resources/dog_bike_car.jpg");
+            Image img = factory.fromUrl("https://github.com/deepjavalibrary/djl/raw/master/examples/src/test/resources/dog_bike_car.jpg");
             NDArray array = img.toNDArray(manager);
             assertEquals(new Shape(img.getHeight(), img.getWidth(), 3), array.getShape());
         }
@@ -71,7 +71,7 @@ public class BitmapWrapperTest {
     public void testImageGetSubImage() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             ImageFactory factory = ImageFactory.getInstance();
-            Image img = factory.fromUrl("https://github.com/awslabs/djl/raw/master/examples/src/test/resources/dog_bike_car.jpg");
+            Image img = factory.fromUrl("https://github.com/deepjavalibrary/djl/raw/master/examples/src/test/resources/dog_bike_car.jpg");
             NDArray array = img.toNDArray(manager);
             Image subImg = img.getSubimage(10, 20, 30, 40);
             NDArray subArray = subImg.toNDArray(manager);
@@ -83,7 +83,7 @@ public class BitmapWrapperTest {
     public void testImageDuplicate() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             ImageFactory factory = ImageFactory.getInstance();
-            Image img = factory.fromUrl("https://github.com/awslabs/djl/raw/master/examples/src/test/resources/dog_bike_car.jpg");
+            Image img = factory.fromUrl("https://github.com/deepjavalibrary/djl/raw/master/examples/src/test/resources/dog_bike_car.jpg");
             NDArray array = img.toNDArray(manager);
             NDArray duplicate = img.duplicate(Image.Type.TYPE_INT_ARGB).toNDArray(manager);
             assertEquals(array, duplicate);
