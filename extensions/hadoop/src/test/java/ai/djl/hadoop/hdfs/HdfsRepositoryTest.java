@@ -45,7 +45,7 @@ public class HdfsRepositoryTest {
 
         System.setProperty("DJL_CACHE_DIR", "build/cache");
         String userHome = System.getProperty("user.home");
-        System.setProperty("ENGINE_CACHE_DIR", userHome);
+        System.setProperty("ENGINE_CACHE_DIR", userHome + "/.djl.ai");
 
         java.nio.file.Path dir = Paths.get("build/test/mlp");
         java.nio.file.Path zipFile = Paths.get("build/test/mlp.zip");
@@ -75,8 +75,8 @@ public class HdfsRepositoryTest {
     @AfterClass
     public void tearDown() {
         miniDfs.shutdown();
-        System.setProperty("DJL_CACHE_DIR", "");
-        System.setProperty("ENGINE_CACHE_DIR", "");
+        System.clearProperty("DJL_CACHE_DIR");
+        System.clearProperty("ENGINE_CACHE_DIR");
     }
 
     @Test
