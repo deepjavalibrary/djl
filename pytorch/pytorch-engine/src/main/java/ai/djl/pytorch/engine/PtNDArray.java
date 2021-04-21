@@ -1413,6 +1413,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray batchDot(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
