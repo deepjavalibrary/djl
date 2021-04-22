@@ -15,6 +15,7 @@ package ai.djl.tensorflow.engine;
 import ai.djl.BaseModel;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Block;
 import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 import org.tensorflow.proto.framework.ConfigProto;
 import org.tensorflow.proto.framework.RunOptions;
 
+/** {@code TfModel} is the TensorFlow implementation of {@link Model}. */
 public class TfModel extends BaseModel {
 
     private static final String DEFAULT_SERVING_SIGNATURE_DEF_KEY = "serving_default";

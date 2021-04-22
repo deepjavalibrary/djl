@@ -33,6 +33,7 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import org.tensorflow.internal.c_api.TFE_TensorHandle;
 
+/** {@code TfNDArray} is the TensorFlow implementation of {@link NDArray}. */
 public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArray {
 
     private static final int MAX_SIZE = 100;
@@ -56,7 +57,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
-    public NDManager getManager() {
+    public TfNDManager getManager() {
         return manager;
     }
 
@@ -127,11 +128,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
             return duplicate();
         }
         return new TfNDArray(
-                (TfNDManager) getManager(),
-                JavacppUtils.toDevice(
-                        getHandle(),
-                        ((TfEngine) getManager().getEngine()).getEagerSession(),
-                        device));
+                manager, JavacppUtils.toDevice(getHandle(), manager.getEagerSession(), device));
     }
 
     /** {@inheritDoc} */
@@ -1260,7 +1257,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
                             + " is the number of dimensions in the input.");
         }
         // tf.softmax always apply on last dimension, transpose input to make axes[0] last dimension
-        try (NDManager subManager = getManager().newSubManager()) {
+        try (NDManager subManager = manager.newSubManager()) {
             attach(subManager);
             NDList concatList = new NDList();
             concatList.add(subManager.arange((int) (axis % dim)));

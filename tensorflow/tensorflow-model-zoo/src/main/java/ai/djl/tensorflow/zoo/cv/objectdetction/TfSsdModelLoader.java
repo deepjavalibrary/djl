@@ -26,14 +26,13 @@ import java.util.Map;
 /**
  * Model loader for Single Shot Detection models.
  *
- * <p>The model was trained on TensorFlow and loaded in DJL in {@link
- * ai.djl.tensorflow.engine.TfSymbolBlock}. See <a
+ * <p>The model was trained on TensorFlow and loaded in DJL. See <a
  * href="https://arxiv.org/pdf/1512.02325.pdf">SSD</a>.
  *
  * <p>The model was obtained from <a
  * href="https://tfhub.dev/google/openimages_v4/ssd/mobilenet_v2/1">TensorFlow Hub</a>
  *
- * @see ai.djl.tensorflow.engine.TfSymbolBlock
+ * @see ai.djl.nn.SymbolBlock
  */
 public class TfSsdModelLoader extends ObjectDetectionModelLoader {
 

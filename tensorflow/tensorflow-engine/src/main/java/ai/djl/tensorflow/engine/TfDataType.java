@@ -16,6 +16,7 @@ import ai.djl.ndarray.types.DataType;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/** Helper to convert between {@link DataType} an the TensorFlow internal DataTypes. */
 public final class TfDataType {
 
     private static Map<DataType, Integer> toTfMap = createToTfMap();
@@ -49,10 +50,22 @@ public final class TfDataType {
         return map;
     }
 
+    /**
+     * Converts a {@link DataType} into the corresponding TensorFlow type value.
+     *
+     * @param dataType the {@link DataType} to convert
+     * @return the converted TensorFlow type value
+     */
     public static int toTf(DataType dataType) {
         return toTfMap.get(dataType);
     }
 
+    /**
+     * Converts a TensorFlow type value into a {@link DataType}.
+     *
+     * @param dataType the TensorFlow type value to convert
+     * @return the {@link DataType}
+     */
     public static DataType fromTf(int dataType) {
         return fromTfMap.get(dataType);
     }

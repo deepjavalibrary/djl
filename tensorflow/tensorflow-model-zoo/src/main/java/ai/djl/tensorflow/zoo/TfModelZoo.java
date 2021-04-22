@@ -21,10 +21,7 @@ import ai.djl.tensorflow.zoo.cv.objectdetction.TfSsdModelLoader;
 import java.util.Collections;
 import java.util.Set;
 
-/**
- * TfModelZoo is a repository that contains all TensorFlow models in {@link
- * ai.djl.tensorflow.engine.TfSymbolBlock} for DJL.
- */
+/** TfModelZoo is a repository that contains the TensorFlow models for DJL. */
 public class TfModelZoo implements ModelZoo {
 
     private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";

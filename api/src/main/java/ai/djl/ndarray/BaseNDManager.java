@@ -268,7 +268,7 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public synchronized void close() {
+    public void close() {
         if (!closed.getAndSet(true)) {
             for (AutoCloseable closeable : resources.values()) {
                 try {
