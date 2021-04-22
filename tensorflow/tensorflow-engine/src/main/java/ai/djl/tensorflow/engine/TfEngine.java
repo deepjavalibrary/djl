@@ -155,10 +155,6 @@ public final class TfEngine extends Engine implements AutoCloseable {
         RandomUtils.RANDOM.setSeed(seed);
     }
 
-    public TFE_Context getEagerSession() {
-        return eagerSessionHandle.get();
-    }
-
     /** {@inheritDoc} */
     @Override
     public String toString() {

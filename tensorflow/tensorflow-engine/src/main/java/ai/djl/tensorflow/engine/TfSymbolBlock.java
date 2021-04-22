@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
+import ai.djl.nn.SymbolBlock;
 import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.Pair;
@@ -41,6 +42,7 @@ import org.tensorflow.proto.framework.SignatureDef;
 import org.tensorflow.proto.framework.TensorInfo;
 import org.tensorflow.proto.framework.TensorShapeProto;
 
+/** {@code TfSymbolBlock} is the TensorFlow implementation of {@link SymbolBlock}. */
 public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(TfSymbolBlock.class);

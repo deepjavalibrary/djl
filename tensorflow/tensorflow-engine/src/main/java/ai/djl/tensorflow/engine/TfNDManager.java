@@ -27,14 +27,21 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.util.concurrent.atomic.AtomicReference;
+import org.tensorflow.internal.c_api.TFE_Context;
 import org.tensorflow.internal.c_api.TFE_TensorHandle;
 
 public class TfNDManager extends BaseNDManager {
 
     static final TfNDManager SYSTEM_MANAGER = new SystemManager();
 
+    private AtomicReference<TFE_Context> eagerSessionHandle;
+
     private TfNDManager(NDManager parent, Device device) {
         super(parent, device);
+        eagerSessionHandle =
+                new AtomicReference<>(
+                        JavacppUtils.createEagerSession(true, 2, JavacppUtils.getSessionConfig()));
     }
 
     static TfNDManager getSystemManager() {
@@ -248,8 +255,22 @@ public class TfNDManager extends BaseNDManager {
         return manager;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        super.close();
+        TFE_Context eagerSession = eagerSessionHandle.getAndSet(null);
+        if (eagerSession != null && !eagerSession.isNull()) {
+            eagerSession.close();
+        }
+    }
+
     public TfOpExecutor opExecutor(String operation) {
-        return new TfOpExecutor(this, ((TfEngine) getEngine()).getEagerSession(), operation);
+        return new TfOpExecutor(this, eagerSessionHandle.get(), operation);
+    }
+
+    TFE_Context getEagerSession() {
+        return eagerSessionHandle.get();
     }
 
     private static final class SystemManager extends TfNDManager {
@@ -260,7 +281,7 @@ public class TfNDManager extends BaseNDManager {
 
         /** {@inheritDoc} */
         @Override
-        public void attachInternal(String resrouceId, AutoCloseable resource) {}
+        public void attachInternal(String resourceId, AutoCloseable resource) {}
 
         /** {@inheritDoc} */
         @Override
