@@ -5,7 +5,7 @@ plugins {
 
 group = "ai.djl.mxnet"
 
-def VERSION = "1.7.0-backport"
+def VERSION = "1.8.0"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 version = VERSION + (isRelease ? "" : "-SNAPSHOT")
 
@@ -170,13 +170,19 @@ task downloadMxnetNativeLib() {
     doLast {
         def url = "https://publish.djl.ai/mxnet-${VERSION}"
         def files = [
-                "linux/common/libgfortran.so.3.gz": "mkl/linux/native/lib/libgfortran.so.3",
+                "linux/common/libgfortran.so.4.gz": "mkl/linux/native/lib/libgfortran.so.4",
                 "linux/common/libgomp.so.1.gz"    : "mkl/linux/native/lib/libgomp.so.1",
+                "linux/common/libopenblas.so.0.gz": "mkl/linux/native/lib/libopenblas.so.0",
                 "linux/common/libquadmath.so.0.gz": "mkl/linux/native/lib/libquadmath.so.0",
                 "linux/mkl/libmxnet.so.gz"        : "mkl/linux/native/lib/libmxnet.so",
-                "linux/cu101mkl/libmxnet.so.gz"   : "cu101mkl/linux/native/lib/libmxnet.so",
                 "linux/cu102mkl/libmxnet.so.gz"   : "cu102mkl/linux/native/lib/libmxnet.so",
-                "osx/mkl/libmxnet.dylib.gz"       : "mkl/osx/native/lib/libmxnet.dylib"
+                "linux/cu110mkl/libmxnet.so.gz"   : "cu110mkl/linux/native/lib/libmxnet.so",
+                "osx/mkl/libmxnet.dylib.gz"       : "mkl/osx/native/lib/libmxnet.dylib",
+                "win/common/libgcc_s_seh-1.dll.gz": "mkl/win/native/lib/libgcc_s_seh-1.dll",
+                "win/common/libgfortran-3.dll.gz" : "mkl/win/native/lib/libgfortran-3.dll",
+                "win/common/libopenblas.dll.gz"   : "mkl/win/native/lib/libopenblas.dll",
+                "win/common/libquadmath-0.dll.gz" : "mkl/win/native/lib/libquadmath-0.dll",
+                "win/mkl/libmxnet.dll.gz"         : "mkl/win/native/lib/mxnet.dll"
         ]
 
         files.each { entry ->
@@ -190,13 +196,13 @@ task downloadMxnetNativeLib() {
             from("${BINARY_ROOT}/mkl/linux/native/lib") {
                 exclude '**/libmxnet.so'
             }
-            into("${BINARY_ROOT}/cu101mkl/linux/native/lib")
+            into("${BINARY_ROOT}/cu102mkl/linux/native/lib")
         }
         copy {
             from("${BINARY_ROOT}/mkl/linux/native/lib") {
                 exclude '**/libmxnet.so'
             }
-            into("${BINARY_ROOT}/cu102mkl/linux/native/lib")
+            into("${BINARY_ROOT}/cu110mkl/linux/native/lib")
         }
 
         new File("${BINARY_ROOT}/auto").mkdirs()
