@@ -36,7 +36,7 @@ export OMP_NUM_THREADS=1
 
 ### PyTorch
 
-### Multithreading Inference
+#### Multithreading Inference
 
 If you use multithreading inference feature with DJL 0.8.0 and earlier version, we have to disable GC to close the NDArray by
 
@@ -49,7 +49,7 @@ If you use multithreading inference feature with DJL 0.8.0 and earlier version, 
 
 Please make sure all the NDArrays are attached to the NDManager.
 
-### oneDNN(MKLDNN) acceleration
+#### oneDNN(MKLDNN) acceleration
 Unlike TensorFlow and Apache MXNet, PyTorch by default doesn't enable MKLDNN which is treated as a device type like CPU and GPU.
 You can enable it by
 
@@ -59,7 +59,7 @@ You can enable it by
 
 You might see the exception if certain data type or operator is not supported with the oneDNN device.
 
-### Thread configuration
+#### Thread configuration
 There are two configurations you can set to optimize the inference performance.
 
 ```
@@ -94,7 +94,7 @@ This should only be disabled when you do not have the time to "warmup" a model w
 
 ### TensorFlow
 
-### Multithreading Inference
+#### Multithreading Inference
 You can follow the same steps as other engines for running multithreading inference using TensorFlow engine.
 It's recommended to use one `Predictor` for each thread and avoid using a new `Predictor` for each inference call.
 You can refer to our [Multithreading Benchmark](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/benchmark/MultithreadedBenchmark.java) as an example, 
@@ -104,10 +104,10 @@ here is how to run it using TensorFlow engine.
 ./gradlew benchmark -Dai.djl.default_engine=TensorFlow --args='-c 100 -r {"layers":"50"}'
 ```
 
-### oneDNN(MKLDNN) acceleration
+#### oneDNN(MKLDNN) acceleration
 By default, TensorFlow engine comes with oneDNN enabled, no special configuration needed.
 
-### Thread configuration
+#### Thread configuration
 It's recommended to use 1 thread for operator parallelism during multithreading inference. 
 You can configure it by setting the following 3 envinronment variables:
 
@@ -119,7 +119,7 @@ export TF_NUM_INTRAOP_THREADS=1
 
 ### DLR(Experimental)
 
-### Multithreading Inference(Experimental)
+#### Multithreading Inference(Experimental)
 DLR(TVM) itself doesn't support multithreading. The most obvious reason is that in the implementation of forward(), it is require to setInputs, runInference followed by getOutputs.
 As a result, we create a new TVM model when we call newPredictor() and free the model when you call Predictor.close().
 Please make sure to create a new Predictor in each thread.
