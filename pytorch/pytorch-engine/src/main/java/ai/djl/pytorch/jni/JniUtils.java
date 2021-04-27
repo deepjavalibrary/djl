@@ -1367,6 +1367,10 @@ public final class JniUtils {
         PyTorchLibrary.LIB.torchDeleteModule(pointer);
     }
 
+    public static void setGraphExecutorOptimize(boolean enabled) {
+        PyTorchLibrary.LIB.setGraphExecutorOptimize(enabled);
+    }
+
     public static PtSymbolBlock loadModule(
             PtNDManager manager,
             Path path,
