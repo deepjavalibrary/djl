@@ -11,6 +11,7 @@
  * and limitations under the License.
  */
 #include <torch/script.h>
+#include <torch/csrc/jit/python/update_graph_executor_opt.h>
 
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_exception.h"
@@ -91,6 +92,13 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava
   const auto* module_ptr = new torch::jit::script::Module(module);
   return reinterpret_cast<uintptr_t>(module_ptr);
   API_END_RETURN()
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_setGraphExecutorOptimize(
+    JNIEnv* env, jobject jthis, jboolean jenabled) {
+  API_BEGIN()
+  torch::jit::setGraphExecutorOptimize(jenabled);
+  API_END()
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleWrite(

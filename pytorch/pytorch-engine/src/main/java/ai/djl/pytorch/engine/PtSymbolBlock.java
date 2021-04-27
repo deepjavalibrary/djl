@@ -114,6 +114,11 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         if (first) {
             synchronized (PtSymbolBlock.class) {
                 if (first) {
+                    String optimizeProperty = System.getProperty("ai.djl.pytorch.setGraphExecutorOptimize");
+                    if (optimizeProperty != null && !optimizeProperty.isEmpty()) {
+                        boolean optimize = Boolean.parseBoolean(optimizeProperty);
+                        JniUtils.setGraphExecutorOptimize(optimize);
+                    }
                     inputDescriptions = new PairList<>();
                     outputDescriptions = new PairList<>();
                     for (NDArray array : inputs) {

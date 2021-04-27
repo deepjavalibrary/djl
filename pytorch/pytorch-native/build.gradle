@@ -125,7 +125,7 @@ task compileJNIGPU {
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
             downloadBuild("win", "cu102")
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
-            downloadBuild("linux", "cu102")
+            downloadBuild("linux", "cu111")
         } else {
             throw new IllegalStateException("Architecture not supported: " + System.properties['os.name'])
         }

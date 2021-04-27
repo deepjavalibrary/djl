@@ -17,12 +17,15 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.Set;
 
-/** A class containing utilities to interact with the PyTorch Engine's JNI layer. */
+/**
+ * A class containing utilities to interact with the PyTorch Engine's JNI layer.
+ */
 final class PyTorchLibrary {
 
     static final PyTorchLibrary LIB = new PyTorchLibrary();
 
-    private PyTorchLibrary() {}
+    private PyTorchLibrary() {
+    }
 
     native int torchGetNumInteropThreads();
 
@@ -471,6 +474,8 @@ final class PyTorchLibrary {
     native void moduleTrain(long handle);
 
     native long moduleForward(long moduleHandle, long[] iValueHandles, boolean isTrain);
+
+    native void setGraphExecutorOptimize(boolean enabled);
 
     native void moduleWrite(long moduleHandle, OutputStream os, byte[] buffer, boolean writeSize);
 
