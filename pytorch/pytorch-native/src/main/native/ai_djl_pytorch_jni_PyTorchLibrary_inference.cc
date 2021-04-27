@@ -94,13 +94,6 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava
   API_END_RETURN()
 }
 
-JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_setGraphExecutorOptimize(
-    JNIEnv* env, jobject jthis, jboolean jenabled) {
-  API_BEGIN()
-  torch::jit::setGraphExecutorOptimize(jenabled);
-  API_END()
-}
-
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleWrite(
     JNIEnv* env, jobject jthis, jlong module_handle, jobject jos, jbyteArray arr, jboolean jwrite_size) {
   API_BEGIN()
@@ -141,6 +134,13 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleWrite(
     env->SetByteArrayRegion(arr, 0, last_len, (jbyte*) substr.c_str());
     env->CallVoidMethod(jos, method_id, arr, 0, last_len);
   }
+  API_END()
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_setGraphExecutorOptimize(
+    JNIEnv* env, jobject jthis, jboolean jenabled) {
+  API_BEGIN()
+  torch::jit::setGraphExecutorOptimize(jenabled);
   API_END()
 }
 
