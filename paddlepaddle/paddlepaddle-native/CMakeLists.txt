@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(JNI REQUIRED)
 find_library(PADDLE_LIBRARY
-        NAMES paddle_fluid
+        NAMES paddle_inference
         PATHS paddle/paddle
         PATH_SUFFIXES lib
         DOC "The paddlepaddle library")
