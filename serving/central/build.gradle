@@ -23,6 +23,7 @@ dependencies {
 
 
 task buildReactApp(type: NodeTask, dependsOn: 'npmInstall') {
+	project.logger.info('Build the react frontend application')
     script = project.file('./node_modules/webpack/bin/webpack.js')
     args = [
             '--mode', 'development',
@@ -30,6 +31,8 @@ task buildReactApp(type: NodeTask, dependsOn: 'npmInstall') {
             '-o', './src/main/resources/static/dist/modelzoo-frontend.js'
     ]
 }
+
+assemble.dependsOn buildReactApp
 
 task startDevServer(type: NodeTask, dependsOn: 'buildReactApp') {
     script = project.file('./node_modules/webpack-dev-server/bin/webpack-dev-server.js')
@@ -45,6 +48,7 @@ clean.delete << file('src/main/resources/static/dist')
 
 
 jar {
+	project.logger.info('building the jar')
     manifest {
         attributes 'Main-Class': 'ai.djl.serving.central.ModelZooRepositoryServer'
     }
