@@ -670,4 +670,17 @@ public class NDArrayElementArithmeticOpTest {
                     manager, NDArrays::powi, (x, y) -> (float) Math.pow(x, y), true);
         }
     }
+
+    @Test
+    public void testBatchDot() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array1 = manager.ones(new Shape(2, 1, 4));
+            NDArray array2 = manager.ones(new Shape(2, 4, 6));
+            NDArray expected = manager.create(4f).tile(12).reshape(new Shape(2, 1, 6));
+            Assert.assertEquals(
+                    array1.batchDot(array2),
+                    expected,
+                    "batch dot product: Incorrect value in result ndarray");
+        }
+    }
 }

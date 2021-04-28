@@ -3,11 +3,11 @@
 In this example, you learn how to implement inference code with a pytorch model to detect faces in an image.
 
 Server model:
-The source code can be found at [RetinaFaceDetection.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/face/RetinaFaceDetection.java).  
+The source code can be found at [RetinaFaceDetection.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/face/RetinaFaceDetection.java).  
 The model github can be found at [Pytorch_Retinaface](https://github.com/biubug6/Pytorch_Retinaface).
 
 Lightweight model:
-The source code can be found at [LightFaceDetection.java](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/face/LightFaceDetection.java).  
+The source code can be found at [LightFaceDetection.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/face/LightFaceDetection.java).  
 The model github can be found at [Ultra-Light-Fast-Generic-Face-Detector-1MB](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB).
 
 ## Setup guide

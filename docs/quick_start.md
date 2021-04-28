@@ -26,13 +26,13 @@ To get started, we recommend that you follow our short [beginner tutorial](../ju
 
 ## Run examples
 
-DJL also provides examples for both training and performing inference with deep learning models. You can find the examples and their source code in the [examples](https://github.com/awslabs/djl/tree/master/examples) directory.
+DJL also provides examples for both training and performing inference with deep learning models. You can find the examples and their source code in the [examples](https://github.com/deepjavalibrary/djl/tree/master/examples) directory.
  
 All of our examples are executed by a simple command. For detailed command line instructions, see each example’s Readme.md file.
 
 - [Train your first model](../examples/docs/train_mnist_mlp.md)
 - [Single-shot Object Detection inference example](../examples/docs/object_detection.md)
-- [More examples](https://github.com/awslabs/djl/tree/master/examples)
+- [More examples](https://github.com/deepjavalibrary/djl/tree/master/examples)
 - [Jupyter examples](../jupyter/README.md)
 
 ## Other resources

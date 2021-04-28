@@ -24,18 +24,36 @@ The javadocs output is built in the `build/doc/javadoc` folder.
 ## Installation
 You can pull the PyTorch engine from the central Maven repository by including the following dependency:
 
-- ai.djl.pytorch:pytorch-engine:0.10.0
+- ai.djl.pytorch:pytorch-engine:0.11.0-SNAPSHOT
 
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-engine</artifactId>
-    <version>0.10.0</version>
+    <version>0.11.0-SNAPSHOT</version>
     <scope>runtime</scope>
 </dependency>
 ```
+
 Besides the `pytorch-engine` library, you may also need to include the PyTorch native library in your project.
 All current provided PyTorch native libraries are downloaded from [PyTorch C++ distribution](https://pytorch.org/get-started/locally/#start-locally).
+
+In current implementation, one version of pytorch-engine can only load a specific version of pytorch native library.
+
+The following table illustrates which pytorch version that DJL supports:
+
+| PyTorch engine version | PyTorch native library version           |
+|------------------------|------------------------------------------|
+| pytorch-engine:0.11.0  | pytorch-native-auto:1.8.0                |
+| pytorch-engine:0.10.0  | pytorch-native-auto:1.7.1                |
+| pytorch-engine:0.9.0   | pytorch-native-auto:1.7.0                |
+| pytorch-engine:0.8.0   | pytorch-native-auto:1.6.0                |
+| pytorch-engine:0.7.0   | pytorch-native-auto:1.6.0                |
+| pytorch-engine:0.6.0   | pytorch-native-auto:1.5.0                |
+| pytorch-engine:0.5.0   | pytorch-native-auto:1.4.0                |
+| pytorch-engine:0.4.0   | pytorch-native-auto:1.4.0                |
+
+We strongly recommend you to use [Bill of Materials (BOM)](../../bom/README.md) to manage your dependencies.
 
 Choose a native library based on your platform and needs:
 

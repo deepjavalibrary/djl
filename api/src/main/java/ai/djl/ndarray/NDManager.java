@@ -96,7 +96,7 @@ import java.nio.file.Path;
  * @see Translator
  * @see TranslatorContext#getNDManager()
  * @see <a
- *     href="https://github.com/awslabs/djl/blob/master/docs/development/memory_management.md">NDArray
+ *     href="https://github.com/deepjavalibrary/djl/blob/master/docs/development/memory_management.md">NDArray
  *     Memory Management Guide</a>
  */
 public interface NDManager extends AutoCloseable {

@@ -39,7 +39,7 @@ public class TfNDArrayEx implements NDArrayEx {
      */
     TfNDArrayEx(TfNDArray array) {
         this.array = array;
-        this.manager = (TfNDManager) array.getManager();
+        this.manager = array.getManager();
     }
 
     /** {@inheritDoc} */
@@ -572,7 +572,7 @@ public class TfNDArrayEx implements NDArrayEx {
         NDArray[] srcArray = new NDArray[arrays.size() + 1];
         srcArray[0] = array;
         System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
-        try (NDArray axisArr = manager.create(axis); ) {
+        try (NDArray axisArr = manager.create(axis)) {
             return manager.opExecutor("ConcatV2")
                     .addInputList(srcArray)
                     .addInput(axisArr)

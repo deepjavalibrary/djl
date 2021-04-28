@@ -260,7 +260,8 @@ public final class LibUtils {
                         flavor = "mkl";
                     }
                 } else if ("linux".equals(os)) {
-                    if (!lines.contains(os + '/' + flavor + "/libmxnet.so.gz")) {
+                    if (!lines.contains(os + '/' + flavor + "/libmxnet.so.gz")
+                            || notSupported(platform)) {
                         logger.warn(
                                 "No matching cuda flavor for {} found: {}/sm_{}.",
                                 os,
@@ -309,5 +310,20 @@ public final class LibUtils {
         } finally {
             Utils.deleteQuietly(tmp);
         }
+    }
+
+    private static boolean notSupported(Platform platform) {
+        // mxnet-native-cu102mkl:1.8.0: 3.0, 5.0, 6.0, 7.0, 7.5
+        // mxnet-native-cu110mkl:1.8.0: 5.0, 6.0, 7.0, 8.0
+        if (platform.getVersion().startsWith("1.8.")) {
+            String flavor = platform.getFlavor();
+            String cudaArch = platform.getCudaArch();
+            if ("cu110".equals(flavor)) {
+                return !Arrays.asList("50", "60", "70", "80").contains(cudaArch);
+            } else if ("cu102".equals(flavor)) {
+                return !Arrays.asList("30", "50", "60", "70", "75").contains(cudaArch);
+            }
+        }
+        return false;
     }
 }

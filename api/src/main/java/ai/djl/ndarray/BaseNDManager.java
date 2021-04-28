@@ -268,7 +268,7 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public synchronized void close() {
+    public void close() {
         if (!closed.getAndSet(true)) {
             for (AutoCloseable closeable : resources.values()) {
                 try {
@@ -278,13 +278,7 @@ public abstract class BaseNDManager implements NDManager {
                 }
             }
             for (TempResource resource : tempResources.values()) {
-                try {
-                    if (!resource.detached) {
-                        resource.resource.attach(resource.manager);
-                    }
-                } catch (Exception e) {
-                    logger.error("Temporary resource return failed.", e);
-                }
+                resource.returnResource();
             }
             parent.detachInternal(uid);
             resources.clear();
@@ -307,7 +301,7 @@ public abstract class BaseNDManager implements NDManager {
                 .append(") resource count: ")
                 .append(resources.size());
 
-        System.out.println(sb.toString()); // NOPMD
+        System.out.println(sb); // NOPMD
         for (AutoCloseable c : resources.values()) {
             if (c instanceof BaseNDManager) {
                 ((BaseNDManager) c).debugDump(level + 1);
@@ -316,6 +310,7 @@ public abstract class BaseNDManager implements NDManager {
     }
 
     protected static final class TempResource {
+
         private NDResource resource;
         private NDManager manager;
         private boolean detached;
@@ -324,6 +319,20 @@ public abstract class BaseNDManager implements NDManager {
             this.resource = resource;
             this.manager = manager;
             this.detached = false;
+        }
+
+        public void returnResource() {
+            try {
+                if (!detached) {
+                    if (manager.isOpen()) {
+                        resource.attach(manager);
+                    } else {
+                        resource.close();
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("Temporary resource return failed.", e);
+            }
         }
     }
 }

@@ -100,7 +100,7 @@ import java.util.function.Predicate;
  * fully-trained model.
  *
  * @see <a
- *     href="https://github.com/awslabs/djl/blob/master/jupyter/tutorial/01_create_your_first_network.ipynb">this
+ *     href="https://github.com/deepjavalibrary/djl/blob/master/jupyter/tutorial/01_create_your_first_network.ipynb">this
  *     tutorial on creating your first network</a>
  * @see <a href="https://d2l.djl.ai/chapter_deep-learning-computation/model-construction.html">The
  *     D2L chapter on blocks</a> and <a

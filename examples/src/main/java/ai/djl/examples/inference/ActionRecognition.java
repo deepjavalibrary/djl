@@ -33,8 +33,8 @@ import org.slf4j.LoggerFactory;
  * An example of inference using an action recognition model.
  *
  * <p>See this <a
- * href="https://github.com/awslabs/djl/blob/master/examples/docs/action_recognition.md">doc</a> for
- * information about this example.
+ * href="https://github.com/deepjavalibrary/djl/blob/master/examples/docs/action_recognition.md">doc</a>
+ * for information about this example.
  */
 public final class ActionRecognition {
 

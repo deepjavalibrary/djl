@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-paddle-jni-cpu:
-    if: github.repository == 'awslabs/djl'
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -35,7 +35,7 @@ jobs:
           path: paddlepaddle/paddlepaddle-native/jnilib
 
   publish:
-    if: github.repository == 'awslabs/djl'
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-18.04
     needs: [build-paddle-jni-cpu]
     steps:
@@ -63,5 +63,5 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync jnilib s3://djl-ai/publish/paddlepaddle-2.0.0/jnilib
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/paddlepaddle-2.0.0/jnilib*"
+          aws s3 sync jnilib s3://djl-ai/publish/paddlepaddle-2.0.2/jnilib
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/paddlepaddle-2.0.2/jnilib*"

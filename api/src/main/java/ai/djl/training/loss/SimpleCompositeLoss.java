@@ -26,7 +26,7 @@ import java.util.List;
  * AbstractCompositeLoss}.
  *
  * <p>For an example of using this loss, see <a
- * href="https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/training/TrainCaptcha.java">the
+ * href="https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/training/TrainCaptcha.java">the
  * captcha training example.</a>
  */
 public class SimpleCompositeLoss extends AbstractCompositeLoss {

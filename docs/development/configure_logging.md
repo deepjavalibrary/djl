@@ -47,8 +47,8 @@ See [SimpleLogger](http://www.slf4j.org/api/org/slf4j/impl/SimpleLogger.html) fo
 
 ### Use log4j2
 
-In our examples module, we use [log4j2 binding](https://github.com/awslabs/djl/blob/master/examples/build.gradle#L13).
-While using log4j2 binding, you also need add a [log4j2.xml](https://github.com/awslabs/djl/blob/master/examples/src/main/resources/log4j2.xml) file.
+In our examples module, we use [log4j2 binding](https://github.com/deepjavalibrary/djl/blob/master/examples/build.gradle#L13).
+While using log4j2 binding, you also need add a [log4j2.xml](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/resources/log4j2.xml) file.
 
 ### Use logback
 
@@ -71,7 +71,7 @@ or for Maven:
 
 ## Configure logging level
 
-`log4j2` allows you to customize logging level using system properties. See our examples [log4j2.xml](https://github.com/awslabs/djl/blob/master/examples/src/main/resources/log4j2.xml#L13).
+`log4j2` allows you to customize logging level using system properties. See our examples [log4j2.xml](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/resources/log4j2.xml#L13).
 With this configuration, you can easily change your logging level using java command line options:
 
 ```shell

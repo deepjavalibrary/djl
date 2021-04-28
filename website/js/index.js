@@ -7,7 +7,7 @@ let app = new Vue({
         navLinks: [
             {
                 name: 'GitHub',
-                url: 'https://github.com/awslabs/djl'
+                url: 'https://github.com/deepjavalibrary/djl'
             },
             {
                 name: 'Documentation',
@@ -31,7 +31,7 @@ let app = new Vue({
             },
             {
                 name: 'Examples',
-                url: 'https://github.com/awslabs/djl/tree/master/examples'
+                url: 'https://github.com/deepjavalibrary/djl/tree/master/examples'
             },
             {
                 name: 'Slack',
@@ -50,7 +50,7 @@ let app = new Vue({
             title: 'Deep Java Library',
             abstract: 'Open source library to build and deploy deep learning in Java',
             getStartUtl: 'https://docs.djl.ai/docs/quick_start.html',
-            gitHubUrl: 'https://github.com/awslabs/djl',
+            gitHubUrl: 'https://github.com/deepjavalibrary/djl',
         },
         page2: {
             feature: [

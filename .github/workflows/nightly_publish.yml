@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    if: github.repository == 'awslabs/djl'
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -103,7 +103,7 @@ jobs:
           path: tensorflow/tensorflow-model-zoo/build/reports
 
   test-pytorch:
-    if: github.repository == 'awslabs/djl'
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -126,7 +126,7 @@ jobs:
         run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
 
   test-tensorflow:
-    if: github.repository == 'awslabs/djl'
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -149,7 +149,7 @@ jobs:
         run: ./gradlew :integration:test "-Dai.djl.default_engine=TensorFlow"
 
   publish:
-    if: github.repository == 'awslabs/djl'
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-18.04
     needs: [ build, test-pytorch, test-tensorflow ]
     steps:
