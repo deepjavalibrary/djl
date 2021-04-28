@@ -19,8 +19,6 @@ if [[ ! -d "paddle" ]]; then
   if [[ $PLATFORM == 'linux' ]]; then
     if [[ $1 == "cpu" ]]; then
       curl -s https://alpha-djl-demos.s3.amazonaws.com/temp/paddle202/paddle_inference_install_dir-2.0.2-openblas-gcc54-ubuntu.tgz -o paddle.tgz
-      tar -xvzf paddle.tgz
-      mv paddle_inference paddle
     else
       echo "$1 is not supported."
       exit 1
