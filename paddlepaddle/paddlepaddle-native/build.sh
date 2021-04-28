@@ -18,7 +18,7 @@ if [[ ! -d "paddle" ]]; then
   echo "Folder not found. Downloading C++ package..."
   if [[ $PLATFORM == 'linux' ]]; then
     if [[ $1 == "cpu" ]]; then
-      curl -s https://paddle-inference-lib.bj.bcebos.com/2.0.2-cpu-avx-openblas/paddle_inference.tgz -o paddle.tgz
+      curl -s https://alpha-djl-demos.s3.amazonaws.com/temp/paddle202/paddle_inference_install_dir-2.0.2-openblas-gcc54-ubuntu.tgz -o paddle.tgz
       tar -xvzf paddle.tgz
       mv paddle_inference paddle
     else
@@ -27,12 +27,12 @@ if [[ ! -d "paddle" ]]; then
     fi
   elif [[ $PLATFORM == 'darwin' ]]; then
     curl -s https://paddle-inference-lib.bj.bcebos.com/mac/2.0.2/cpu_avx_openblas/paddle_inference.tgz -o paddle.tgz
-    tar -xvzf paddle.tgz
-    mv paddle_inference_install_dir paddle
   else
     echo "$PLATFORM is not supported."
     exit 1
   fi
+  tar -xvzf paddle.tgz
+  mv paddle_inference_install_dir paddle
 
 fi
 
