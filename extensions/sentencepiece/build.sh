@@ -10,7 +10,7 @@ elif [[ -n $(command -v sysctl) ]]; then
 fi
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 
-VERSION=v0.1.92
+VERSION=v0.1.95
 
 pushd $WORK_DIR
 if [ ! -d "sentencepiece" ];
