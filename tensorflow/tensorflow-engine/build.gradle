@@ -2,10 +2,7 @@ group "ai.djl.tensorflow"
 
 dependencies {
     api project(":api")
-
-    // FIXME: upgrade to javacpp:1.5.6
-    // See: javacpp bug fix https://github.com/bytedeco/javacpp/commit/7f27899578dfa18e22738a3dd49701e1806b464a
-    api "org.tensorflow:tensorflow-core-api:0.3.1"
+    api project(":tensorflow:tensorflow-api")
 
     testImplementation(project(":testing"))
     testImplementation("org.testng:testng:${testng_version}") {
