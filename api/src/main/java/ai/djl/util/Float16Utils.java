@@ -17,6 +17,7 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
 /** {@code Float16Utils} is a set of utilities for working with float16. */
+@SuppressWarnings("PMD.AvoidUsingShortType")
 public final class Float16Utils {
 
     private Float16Utils() {}
