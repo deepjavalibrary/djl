@@ -16,9 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.translate.Transform;
 
-/**
- * A {@link Transform} that converts the input to float16 if needed.
- */
+/** A {@link Transform} that converts the input to float16 if needed. */
 public class ToHalf implements Transform {
 
     /** {@inheritDoc} */

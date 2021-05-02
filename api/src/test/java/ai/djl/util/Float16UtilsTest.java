@@ -19,7 +19,23 @@ public class Float16UtilsTest {
 
     @Test
     public void testFixedValues() {
-        float[] from = new float[]{0.44700000f, 0.553f, 0.999f, 0.9998f, -0.9998f, 4.782f, 0.3f, 0.2f, 0.002f, 1f, 2f, -2f, 0.22f, 0.44f};
+        float[] from =
+                new float[] {
+                    0.44700000f,
+                    0.553f,
+                    0.999f,
+                    0.9998f,
+                    -0.9998f,
+                    4.782f,
+                    0.3f,
+                    0.2f,
+                    0.002f,
+                    1f,
+                    2f,
+                    -2f,
+                    0.22f,
+                    0.44f
+                };
         for (float v : from) {
             float value = (float) Math.random() * 2048f;
             float found = Float16Utils.halfToFloat(Float16Utils.floatToHalf(value));
@@ -37,5 +53,4 @@ public class Float16UtilsTest {
             Assert.assertTrue(diff < 0.6);
         }
     }
-
 }

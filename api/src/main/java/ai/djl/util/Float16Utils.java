@@ -16,7 +16,9 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
 /** {@code Float16Utils} is a set of utilities for working with float16. */
-public class Float16Utils {
+public final class Float16Utils {
+
+    private Float16Utils() {}
 
     /**
      * Converts a byte buffer of float16 values into a float32 array.
@@ -65,7 +67,6 @@ public class Float16Utils {
      *
      * @param fVal a float32 value.
      * @return a float16 value represented as a short.
-     * @author x4u on StackOverFlow.
      */
     public static short floatToHalf(float fVal) {
         int bits = Float.floatToIntBits(fVal);
@@ -76,8 +77,7 @@ public class Float16Utils {
                 if (val < 0x7f800000) {
                     return (short) (sign | 0x7c00);
                 }
-                return (short) (sign | 0x7c00 |
-                        (bits & 0x007fffff) >>> 13);
+                return (short) (sign | 0x7c00 | (bits & 0x007fffff) >>> 13);
             }
             return (short) (sign | 0x7bff);
         }
@@ -88,7 +88,8 @@ public class Float16Utils {
             return (short) sign;
         }
         val = (bits & 0x7fffffff) >>> 23;
-        return (short) (sign | ((bits & 0x7fffff | 0x800000) + (0x800000 >>> val - 102) >>> 126 - val));
+        return (short)
+                (sign | ((bits & 0x7fffff | 0x800000) + (0x800000 >>> val - 102) >>> 126 - val));
     }
 
     /**
@@ -96,7 +97,6 @@ public class Float16Utils {
      *
      * @param half a float16 value represented as a short.
      * @return a float32 value.
-     * @author x4u on StackOverFlow.
      */
     public static float halfToFloat(short half) {
         int mant = half & 0x03ff;
