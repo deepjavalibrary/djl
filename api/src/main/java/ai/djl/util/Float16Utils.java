@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -11,6 +11,8 @@
  * and limitations under the License.
  */
 package ai.djl.util;
+
+import ai.djl.ndarray.NDManager;
 
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
@@ -49,11 +51,12 @@ public final class Float16Utils {
     /**
      * Converts an array of float32 values into a byte buffer of float16 values.
      *
+     * @param manager the manager to allocate the buffer from.
      * @param floats an array of float32 values.
      * @return a byte buffer with float16 values represented as shorts (2 bytes each).
      */
-    public static ByteBuffer toByteBuffer(float[] floats) {
-        ByteBuffer buffer = ByteBuffer.allocate(floats.length * 2);
+    public static ByteBuffer toByteBuffer(NDManager manager, float[] floats) {
+        ByteBuffer buffer = manager.allocateDirect(floats.length * 2);
         for (float f : floats) {
             short value = floatToHalf(f);
             buffer.putShort(value);
