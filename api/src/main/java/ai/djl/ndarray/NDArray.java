@@ -19,6 +19,8 @@ import ai.djl.ndarray.internal.NDFormat;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.util.Float16Utils;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -242,7 +244,9 @@ public interface NDArray extends NDResource {
      * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
      */
     default float[] toFloatArray() {
-        if (getDataType() != DataType.FLOAT32) {
+        if (getDataType() == DataType.FLOAT16) {
+            return Float16Utils.fromByteBuffer(toByteBuffer());
+        } else if (getDataType() != DataType.FLOAT32) {
             throw new IllegalStateException(
                     "DataType mismatch, Required float, Actual " + getDataType());
         }
@@ -352,6 +356,7 @@ public interface NDArray extends NDResource {
      */
     default Number[] toArray() {
         switch (getDataType()) {
+            case FLOAT16:
             case FLOAT32:
                 float[] floatArray = toFloatArray();
                 return IntStream.range(0, floatArray.length)
