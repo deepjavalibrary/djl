@@ -95,9 +95,12 @@ mvn exec:java
 
 DJL is engine agnostic, so it's capable of supporting different backends.
 
-With Apache MXNet, PyTorch, TensorFlow and ONNX Runtime, you can choose different builds of the native library.
-We recommend the automatic engine selection which downloads the best engine for your platform and available hardware during the first runtime.
-Activate the automatic selection by adding `ai.djl.mxnet:mxnet-native-auto:1.7.0-backport` for MXNet and `ai.djl.pytorch:pytorch-native-auto:1.7.0` for PyTorh as a dependency.
+With Apache MXNet, PyTorch, TensorFlow and ONNX Runtime, you can choose different
+builds of the native library.
+We recommend the automatic engine selection which downloads the best engine for your
+platform and available hardware during the first runtime.
+Activate the automatic selection by adding `ai.djl.mxnet:mxnet-native-auto:1.8.0`
+for Apache MXNet, and `ai.djl.pytorch:pytorch-native-auto:1.8.1` for PyTorch as a dependency.
 You can also see:
 
 - [MXNet Engine](../mxnet/mxnet-engine/README.md)

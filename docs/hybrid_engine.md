@@ -22,7 +22,7 @@ To use it along with Apache MXNet for additional API support, add the following 
 
 ```
 runtimeOnly "ai.djl.mxnet:mxnet-engine:0.10.0"
-runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.7.0-backport"
+runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.8.0"
 ```
 
 You can also use PyTorch or TensorFlow Engine as the supplemental engine by adding their corresponding dependencies.
