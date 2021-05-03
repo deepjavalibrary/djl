@@ -10,8 +10,8 @@ jobs:
       matrix:
         format: ["armeabi-v7a", "arm64-v8a", "x86" ,"x86_64"]
     env:
-      PYTORCH_TAG_VERSION:    "v1.7.1"
-      PYTORCH_VERSION: "1.7.1"
+      PYTORCH_TAG_VERSION:    "v1.8.1"
+      PYTORCH_VERSION: "1.8.1"
       NDK_VERSION: "20.0.5594570"
     steps:
       - uses: actions/checkout@v1
@@ -26,7 +26,7 @@ jobs:
       - name: clone pytorch
         run: git clone https://github.com/pytorch/pytorch android_pytorch_tmp -b "${PYTORCH_TAG_VERSION}" --recursive
       - name: install Python Dependencies
-        run: pip install numpy ninja pyyaml mkl mkl-include setuptools cmake cffi
+        run: pip install numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions
       - name: Install NDK
         run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${NDK_VERSION}"
       - name: build android
