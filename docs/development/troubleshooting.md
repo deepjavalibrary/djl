@@ -212,12 +212,12 @@ is a snapshot depency, it is updated by the build system regularly. If your inte
 it is most likely just the automatic binary dependency being updated. As the total size is roughly
 1.7GB the download may take a while. Once this download is over, all further tests will run instantly.
 
-## 8. `UnsatisfiedLinkError` when running TensorFlow Engine 2.3.1
-If you are using TensorFlow 2.3.1 engine with GPU and encountered the following error:
+## 8. `UnsatisfiedLinkError` when running with old version of libstdc++.so
+If you encountered the following error:
 ```bash
-Caused by: java.lang.UnsatisfiedLinkError: /home/ubuntu/.tensorflow/cache/2.3.1-SNAPSHOT-cu101-linux-x86_64/libjni$
+Caused by: java.lang.UnsatisfiedLinkError: /home/ubuntu/.tensorflow/cache/2.3.1-cu101-linux-x86_64/libjni$
 ensorflow.so: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `CXXABI_1.3.11' not found (required by /home/ubuntu/.te
-nsorflow/cache/2.3.0-SNAPSHOT-cu101-linux-x86_64/libtensorflow.so.2)
+nsorflow/cache/2.3.1-cu101-linux-x86_64/libtensorflow.so.2)
 ```
 
 Please upgrade gcc version according to the steps on [TensorFlow install page](https://docs.djl.ai/tensorflow/index.html#note)
