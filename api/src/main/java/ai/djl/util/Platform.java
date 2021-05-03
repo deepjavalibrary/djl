@@ -170,7 +170,11 @@ public final class Platform {
         }
         // if system Machine is GPU
         if (system.flavor.startsWith("cu")) {
-            return "".equals(flavor) || "cpu".equals(flavor) || flavor.equals(system.flavor);
+            // system flavor doesn't contain mkl, but MXNet has: cu110mkl
+            return "".equals(flavor)
+                    || "cpu".equals(flavor)
+                    || "mkl".equals(flavor)
+                    || flavor.startsWith(system.flavor);
         }
         return "".equals(flavor) || "cpu".equals(flavor) || "mkl".equals(flavor);
     }

@@ -1,6 +1,6 @@
 # Roadmap
 
-This is the tenative roadmap for DJL through 2021. If there is something you feel is missing from this roadmap, please [raise an issue](https://github.com/awslabs/djl/issues) so we can discuss it.
+This is the tenative roadmap for DJL through 2021. If there is something you feel is missing from this roadmap, please [raise an issue](https://github.com/deepjavalibrary/djl/issues) so we can discuss it.
 
 - **Quarkus Integration** - Integrate with Quarkus where users can get a smaller memory profile and faster startup time
 - **Big Data Ecosystem Integration** - Better integration with the JVM Big Data libraries including Apache Spark

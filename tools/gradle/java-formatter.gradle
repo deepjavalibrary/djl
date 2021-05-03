@@ -58,7 +58,7 @@ class JavaFormatterPlugin implements Plugin<Project> {
                                     + System.lineSeparator()
                                     + "In order to reformat your code, run './gradlew formatJava' (or './gradlew fJ' for short)"
                                     + System.lineSeparator()
-                                    + "See https://github.com/awslabs/djl/blob/master/docs/development/development_guideline.md#coding-conventions for more details")
+                                    + "See https://github.com/deepjavalibrary/djl/blob/master/docs/development/development_guideline.md#coding-conventions for more details")
                         }
                     }
                 }

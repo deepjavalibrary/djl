@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: apache/incubator-mxnet
-          ref: v1.7.x
+          ref: 1.8.0
           submodules: 'recursive'
       - name: Install Dependencies
         run: |

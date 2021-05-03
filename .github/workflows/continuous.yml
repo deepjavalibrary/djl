@@ -20,11 +20,11 @@ on:
 
 jobs:
   build:
-    if: github.repository == 'awslabs/djl'
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ ubuntu-18.04, macos-latest ]
+        operating-system: [ ubuntu-16.04, macos-latest ]
 
     steps:
       - uses: actions/checkout@v1
@@ -128,17 +128,16 @@ jobs:
           name: tensorflow-model-zoo
           path: tensorflow/tensorflow-model-zoo/build/reports
       - name: upload to codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v1.4.1
         with:
           files: ./build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml
           name: codecov-umbrella
           fail_ci_if_error: true
           path_to_write_report: ./codecov_report.txt
-          verbose: true
 
   # Windows platform for testing hybrid engines
   build-windows:
-    if: github.repository == 'awslabs/djl'
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1

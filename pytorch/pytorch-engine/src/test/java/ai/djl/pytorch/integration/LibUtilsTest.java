@@ -27,7 +27,7 @@ public class LibUtilsTest {
 
     @AfterClass
     public void teardown() {
-        System.setProperty("ai.djl.pytorch.native_helper", "");
+        System.clearProperty("ai.djl.pytorch.native_helper");
     }
 
     @Test

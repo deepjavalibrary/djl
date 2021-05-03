@@ -69,7 +69,7 @@ To start your benchmarking, we need to make sure we provide the following inform
 - Sample input for the model
 - (Optional) Multi-thread benchmark
 
-The benchmark script located [here](https://github.com/awslabs/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/benchmark/Benchmark.java).
+The benchmark script located [here](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/benchmark/Benchmark.java).
 
 Just do the following:
 

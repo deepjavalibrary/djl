@@ -1,6 +1,6 @@
 site_name: Deep Java Library
-repo_name: awslabs/djl
-repo_url: https://github.com/awslabs/djl/
+repo_name: deepjavalibrary/djl
+repo_url: https://github.com/deepjavalibrary/djl/
 site_url: https://djl.ai
 use_directory_urls: false
 markdown_extensions:
@@ -23,7 +23,7 @@ google_analytics:
 extra:
   social:
     - icon: fontawesome/brands/github-alt
-      link: https://github.com/awslabs/djl
+      link: https://github.com/deepjavalibrary/djl
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/deepjavalibrary
     - icon: fontawesome/brands/slack
@@ -114,7 +114,7 @@ nav:
       - Import your Paddle model:
           - English: 'docs/paddlepaddle/how_to_create_paddlepaddle_model.md'
           - 中文: 'docs/paddlepaddle/how_to_create_paddlepaddle_model_zh.md'
-      - Facemask detection using PaddlePaddle: 
+      - Facemask detection using PaddlePaddle:
           - English: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
           - 中文: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle_zh.ipynb'
       - PaddleOCR example:

@@ -31,7 +31,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -204,12 +203,14 @@ public class BufferedImageFactory extends ImageFactory {
 
             ByteBuffer bb = manager.allocateDirect(channel * height * width);
             if (image.getType() == BufferedImage.TYPE_BYTE_GRAY) {
-                byte[] data = ((DataBufferByte) image.getData().getDataBuffer()).getData();
-                for (byte gray : data) {
-                    bb.put(gray);
+                int[] data = new int[width * height];
+                image.getData().getPixels(0, 0, width, height, data);
+                for (int gray : data) {
+                    byte b = (byte) gray;
+                    bb.put(b);
                     if (flag != Flag.GRAYSCALE) {
-                        bb.put(gray);
-                        bb.put(gray);
+                        bb.put(b);
+                        bb.put(b);
                     }
                 }
             } else {

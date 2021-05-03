@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-pytorch-jni-cpu:
-    if: github.repository == 'awslabs/djl'
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -43,7 +43,7 @@ jobs:
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-1.8.1/jnilib*"
 
   build-pytorch-jni-linux-gpu:
-    if: github.repository == 'awslabs/djl'
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
     container: nvidia/cuda:10.2-cudnn7-devel-ubuntu16.04
     steps:
@@ -82,7 +82,7 @@ jobs:
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-1.8.1/jnilib*"
 
   build-pytorch-jni-precxx11:
-    if: github.repository == 'awslabs/djl'
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
     container: nvidia/cuda:10.1-cudnn7-devel-centos7
     steps:
@@ -120,7 +120,7 @@ jobs:
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-1.8.1/jnilib/precxx11*"
 
   build-pytorch-jni-windows-gpu:
-    if: github.repository == 'awslabs/djl'
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1

@@ -54,13 +54,13 @@ import org.slf4j.LoggerFactory;
  *
  * <ul>
  *   <li><a
- *       href="https://github.com/awslabs/djl/blob/master/jupyter/tutorial/03_image_classification_with_your_model.ipynb">Inference
+ *       href="https://github.com/deepjavalibrary/djl/blob/master/jupyter/tutorial/03_image_classification_with_your_model.ipynb">Inference
  *       with a custom trained model</a>
  *   <li><a
- *       href="https://github.com/awslabs/djl/blob/master/jupyter/object_detection_with_model_zoo.ipynb">Inference
+ *       href="https://github.com/deepjavalibrary/djl/blob/master/jupyter/object_detection_with_model_zoo.ipynb">Inference
  *       with a model zoo model</a>
  *   <li><a
- *       href="https://github.com/awslabs/djl/blob/master/jupyter/load_mxnet_model.ipynb">Inference
+ *       href="https://github.com/deepjavalibrary/djl/blob/master/jupyter/load_mxnet_model.ipynb">Inference
  *       with an MXNet model</a>
  * </ul>
  *
@@ -71,7 +71,7 @@ import org.slf4j.LoggerFactory;
  * @see <a href="http://docs.djl.ai/docs/development/memory_management.html">The guide on memory
  *     management</a>
  * @see <a
- *     href="https://github.com/awslabs/djl/blob/master/examples/docs/multithread_inference.md">The
+ *     href="https://github.com/deepjavalibrary/djl/blob/master/examples/docs/multithread_inference.md">The
  *     guide on running multi-threaded inference</a>
  * @see <a href="http://docs.djl.ai/docs/development/inference_performance_optimization.html">The
  *     guide on inference performance optimization</a>

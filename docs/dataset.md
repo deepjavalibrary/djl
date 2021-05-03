@@ -11,7 +11,7 @@ Machine learning typically works with three datasets:
 - Validation dataset
 
     The validation set is used to evaluate a given model during the training process. It helps machine learning
-    engineers to fine-tune the [HyperParameter](https://github.com/awslabs/djl/blob/master/api/src/main/java/ai/djl/training/hyperparameter/param/Hyperparameter.java)
+    engineers to fine-tune the [HyperParameter](https://github.com/deepjavalibrary/djl/blob/master/api/src/main/java/ai/djl/training/hyperparameter/param/Hyperparameter.java)
     at model development stage.
     The model doesn't learn from validation dataset; and validation dataset is optional.
     

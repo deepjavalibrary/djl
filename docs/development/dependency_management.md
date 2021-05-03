@@ -48,9 +48,10 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [mxnet-native-mkl(osx-x86_64)](../../mxnet/mxnet-engine/README.md#macos) | Contains Apache MXNet native library for macOS |
 | | [mxnet-native-mkl(win-x86_64)](../../mxnet/mxnet-engine/README.md#windows-cpu) | Contains Apache MXNet native library for Windows |
 | | [mxnet-native-mkl(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-cpu) | Contains Apache MXNet native library for Linux |
+| | [mxnet-native-cu110(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-gpu) | Contains Apache MXNet native library for Linux with CUDA 11.0|
 | | [mxnet-native-cu102(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-gpu) | Contains Apache MXNet native library for Linux with CUDA 10.2|
-| | [mxnet-native-cu101(linux-x86_64)](../../mxnet/mxnet-engine/README.md#linux-gpu) | Contains Apache MXNet native library for Linux with CUDA 10.1 |
-| | mxnet-native-cu92(linux-x86_64) (deprecated) | Contains Apache MXNet native library for Linux with CUDA 9.2 |
+| | mxnet-native-cu101(linux-x86_64) (deprecated) | Contains Apache MXNet native library <= 1.7.0 for Linux with CUDA 10.1 |
+| | mxnet-native-cu92(linux-x86_64) (deprecated) | Contains Apache MXNet native library <= 1.6.0 for Linux with CUDA 9.2 |
 | | | |
 | [ai.djl.pytorch](https://search.maven.org/search?q=g:ai.djl.pytorch) | [pytorch-engine](../../pytorch/pytorch-engine/README.md#installation) | PyTorch engine adapter |
 | | [pytorch-model-zoo](../../pytorch/pytorch-model-zoo/README.md#installation) | Contains state of the art PyTorch torch script models |
@@ -58,16 +59,16 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [pytorch-native-cpu(osx-x86_64)](../../pytorch/pytorch-engine/README.md#macos) | Contains PyTorch native library for macOS |
 | | [pytorch-native-cpu(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-cpu) | Contains PyTorch native library for Windows |
 | | [pytorch-native-cpu(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-cpu) | Contains PyTorch native library for Linux |
-| | [pytorch-native-cu110(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-gpu) | Contains PyTorch native library for Linux with CUDA 11.0 |
-| | [pytorch-native-cu110(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-gpu) | Contains PyTorch native library for Windows with CUDA 11.0 |
+| | [pytorch-native-cu111(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-gpu) | Contains PyTorch native library for Linux with CUDA 11.1 |
+| | [pytorch-native-cu111(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-gpu) | Contains PyTorch native library for Windows with CUDA 11.1 |
 | | [pytorch-native-cu102(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-gpu) | Contains PyTorch native library for Linux with CUDA 10.2 |
 | | [pytorch-native-cu102(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-gpu) | Contains PyTorch native library for Windows with CUDA 10.2 |
-| | [pytorch-native-cu101(linux-x86_64)](../../pytorch/pytorch-engine/README.md#linux-gpu) | Contains PyTorch native library for Linux with CUDA 10.1 |
-| | [pytorch-native-cu101(win-x86_64)](../../pytorch/pytorch-engine/README.md#windows-gpu) | Contains PyTorch native library for Windows with CUDA 10.1 |
-| | pytorch-native-cu92(linux-x86_64) (deprecated) | Contains PyTorch native library for Linux with CUDA 9.2 |
-| | pytorch-native-cu92(win-x86_64) (deprecated) | Contains PyTorch native library for Windows with CUDA 9.2 |
-| | [pytorch-engine-precxx11](../../pytorch/pytorch-engine/README.md#for-pre-cxx11-build) | PyTorch engine adapter specific for precxx11 environment like CentOs 7 and Ubuntu 14.04 |
-| | [pytorch-native-cpu-precxx11(linux-x86_64)](../../pytorch/pytorch-engine/README.md#centos-7ubuntu-1404-cpu) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
+| | [pytorch-native-cpu-precxx11 (linux-x86_64)](../../pytorch/pytorch-engine/README.md#for-pre-cxx11-build) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
+| | pytorch-native-cu101(linux-x86_64) (deprecated) | Contains PyTorch native library <= 1.7.1 for Linux with CUDA 10.1 |
+| | pytorch-native-cu101(win-x86_64) (deprecated) | Contains PyTorch native library <= 1.7.1 for Windows with CUDA 10.1 |
+| | pytorch-native-cu92(linux-x86_64) (deprecated) | Contains PyTorch native library <= 1.6.0 for Linux with CUDA 9.2 |
+| | pytorch-native-cu92(win-x86_64) (deprecated) | Contains PyTorch native library <= 1.6.0 for Windows with CUDA 9.2 |
+| | pytorch-engine-precxx11 (deprecated) | PyTorch engine adapter <= 0.9.0 specific for precxx11 environment like CentOs 7 and Ubuntu 14.04 |
 | | | |
 | [ai.djl.tensorflow](https://search.maven.org/search?q=g:ai.djl.tensorflow) | [tensorflow-engine](../../tensorflow/tensorflow-engine/README.md#installation) | TensorFlow engine adapter |
 | | [tensorflow-api](../../tensorflow/tensorflow-api/README.md#installation) | A redistribution of tensorFlow core java API 2.x |
@@ -76,7 +77,8 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [tensorflow-native-cpu(osx-x86_64)](../../tensorflow/README.md#macos) | Contains TensorFlow native library for macOS |
 | | [tensorflow-native-cpu(linux-x86_64)](../../tensorflow/README.md#linux-cpu) | Contains TensorFlow native library for Linux |
 | | [tensorflow-native-cpu(win-x86_64)](../../tensorflow/README.md#windows-cpu) | Contains TensorFlow native library for Windows |
-| | [tensorflow-native-cu101(linux-x86_84)](../../tensorflow/README.md#linux-gpu) | Contains TensorFlow native library for Linux with CUDA 10.1 |
+| | [tensorflow-native-cu110(linux-x86_84)](../../tensorflow/README.md#linux-gpu) | Contains TensorFlow native library for Linux with CUDA 11.0 |
+| | tensorflow-native-cu101(linux-x86_84) (deprecated) | Contains TensorFlow native library <= 2.3.0 for Linux with CUDA 10.1 |
 | | | |
 | [ai.djl.paddlepaddle](https://search.maven.org/search?q=g:ai.djl.paddlepaddle) | [paddlepaddle-engine](../../paddlepaddle/paddlepaddle-engine/README.md#installation) | PaddlePaddle engine adapter |
 | | [paddlepaddle-model-zoo](../../paddlepaddle/paddlepaddle-model-zoo/README.md#installation) | Contains state of the art PaddlePaddle models |
@@ -99,6 +101,8 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [tflite-native-auto](../../tflite/tflite-engine/README.md#automatic-recommended) | A placeholder package to automatically download native libraries for your platform |
 | | [tflite-native-cpu(osx-x86_64)](../../tflite/tflite-engine/README.md#macos) | Contains TensorFlow Lite native library for macOS |
 | | [tflite-native-cpu(linux-x86_64)](../../tflite/tflite-engine/README.md#linux) | Contains TensorFlow Lite native library for Linux |
+| | | |
+| [ai.djl.ml.xgboost](https://search.maven.org/search?q=g:ai.djl.ml.xgboost) | [xgboost](../../ml/xgboost/README.md#installation) | XGBoost engine adapter |
 | | | |
 | [ai.djl.android](https://search.maven.org/search?q=g:ai.djl.android) | [core](../../android/README.md#installation) | Contains Android specific utilities (e.g. ImageFactory) for DJL |
 | | [pytorch-native](../../android/README.md#installation) | Contains DJL PyTorch Android native package |

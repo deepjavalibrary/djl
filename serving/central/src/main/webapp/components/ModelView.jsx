@@ -169,7 +169,7 @@ export default function ModelView(props) {
 		<div className={classes.model_view_root}>
 			<Paper ref={myRef} elevation={3} className={classes.model_view_paper} >
 				<h2>{props.model.name}</h2>
-				<h3>{props.model.metadata.groupId}:{props.model.metadata.artifactId}:{props.model.version}</h3>
+				<h3>{typeof props.model.metadata==="undefined" ? "" : props.model.metadata.groupId +":"+props.model.metadata.artifactId+":"+props.model.version }</h3>
 				<Chip size="small" label={props.model.properties.dataset} />
 				<Chip size="small" label={props.model.version} />
 				<div className={classes.tabbar}>
@@ -227,9 +227,13 @@ export default function ModelView(props) {
 						</>
 					</TabPanel>
 					<TabPanel value={index} index={1} className={classes.tabpanel}>
-						<DynForm data={props.model.metadata} />
-						<h4>Licenses</h4>
-						<DynForm data={props.model.metadata.licenses}/>
+						{typeof props.model.metadata!=="undefined" && 
+							<div>
+								<DynForm data={props.model.metadata} />
+								<h4>Licenses</h4>
+								<DynForm data={props.model.metadata.licenses}/>
+							</div>
+						}
 					</TabPanel>
 					<TabPanel value={index} index={2} className={classes.tabpanel}>
 						<DynForm data={props.model.properties} />

@@ -1415,6 +1415,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray batchDot(NDArray other) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArrayEx getNDArrayInternal() {
         return ptNDArrayEx;
     }

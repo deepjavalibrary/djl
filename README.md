@@ -1,11 +1,11 @@
 
 ![DeepJavaLibrary](website/img/deepjavalibrary.png?raw=true "Deep Java Library")
 
-![Continuous](https://github.com/awslabs/djl/workflows/Continuous/badge.svg)
-![Continuous PyTorch](https://github.com/awslabs/djl/workflows/Continous%20PyTorch/badge.svg)
-![Continuous Tensorflow](https://github.com/awslabs/djl/workflows/Continuous%20Tensorflow/badge.svg)
-![Docs](https://github.com/awslabs/djl/workflows/Docs/badge.svg)
-![Nightly Publish](https://github.com/awslabs/djl/workflows/Nightly%20Publish/badge.svg)
+![Continuous](https://github.com/deepjavalibrary/djl/workflows/Continuous/badge.svg)
+![Continuous PyTorch](https://github.com/deepjavalibrary/djl/workflows/Continous%20PyTorch/badge.svg)
+![Continuous Tensorflow](https://github.com/deepjavalibrary/djl/workflows/Continuous%20Tensorflow/badge.svg)
+![Docs](https://github.com/deepjavalibrary/djl/workflows/Docs/badge.svg)
+![Nightly Publish](https://github.com/deepjavalibrary/djl/workflows/Nightly%20Publish/badge.svg)
 
 # Deep Java Library (DJL)
 
@@ -87,15 +87,15 @@ The following pseudocode demonstrates running training:
 - [JavaDoc API Reference](https://javadoc.djl.ai/)
 
 ## Release Notes
-* [0.10.0](https://github.com/awslabs/djl/releases/tag/v0.10.0) ([Code](https://github.com/awslabs/djl/tree/v0.10.0))
-* [0.9.0](https://github.com/awslabs/djl/releases/tag/v0.9.0) ([Code](https://github.com/awslabs/djl/tree/v0.9.0))
-* [0.8.0](https://github.com/awslabs/djl/releases/tag/v0.8.0) ([Code](https://github.com/awslabs/djl/tree/v0.8.0))
-* [0.6.0](https://github.com/awslabs/djl/releases/tag/v0.6.0) ([Code](https://github.com/awslabs/djl/tree/v0.6.0))
-* [0.5.0](https://github.com/awslabs/djl/releases/tag/v0.5.0) ([Code](https://github.com/awslabs/djl/tree/v0.5.0))
-* [0.4.0](https://github.com/awslabs/djl/releases/tag/v0.4.0) ([Code](https://github.com/awslabs/djl/tree/v0.4.0))
-* [0.3.0](https://github.com/awslabs/djl/releases/tag/v0.3.0) ([Code](https://github.com/awslabs/djl/tree/v0.3.0))
-* [0.2.1](https://github.com/awslabs/djl/releases/tag/v0.2.1) ([Code](https://github.com/awslabs/djl/tree/v0.2.1))
-* [0.2.0 Initial release](https://github.com/awslabs/djl/releases/tag/v0.2.0) ([Code](https://github.com/awslabs/djl/tree/v0.2.0))
+* [0.10.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.10.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.10.0))
+* [0.9.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.9.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.9.0))
+* [0.8.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.8.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.8.0))
+* [0.6.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.6.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.6.0))
+* [0.5.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.5.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.5.0))
+* [0.4.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.4.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.4.0))
+* [0.3.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.3.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.3.0))
+* [0.2.1](https://github.com/deepjavalibrary/djl/releases/tag/v0.2.1) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.2.1))
+* [0.2.0 Initial release](https://github.com/deepjavalibrary/djl/releases/tag/v0.2.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.2.0))
 
 ## Building From Source
 

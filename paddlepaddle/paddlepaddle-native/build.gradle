@@ -56,9 +56,9 @@ task prepareNativeLibs() {
         delete "${buildDir}/native"
 
         def files = [
-                "cpu/linux": "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-openblas-2.0.0-gcc54.tgz",
-                "cpu/osx"  : "https://paddle-inference-lib.bj.bcebos.com/mac/2.0.0/cpu_avx_openblas/paddle_inference.tgz",
-                "cpu/win"  : "https://paddle-wheel.bj.bcebos.com/2.0.0/win-infer/open/cpu/paddle_inference_install_dir.zip"
+                "cpu/linux": "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle202/paddle_inference_install_dir-2.0.2-openblas-gcc54-ubuntu.tgz",
+                "cpu/osx"  : "https://paddle-inference-lib.bj.bcebos.com/mac/2.0.2/cpu_avx_openblas/paddle_inference.tgz",
+                "cpu/win"  : "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-windows-openblas-2.0.2.zip"
         ]
 
         def downloadDir = file("${buildDir}/download")
@@ -67,7 +67,9 @@ task prepareNativeLibs() {
         files.each { entry ->
             String url = entry.value
             String fileName = url.substring(url.lastIndexOf('/') + 1)
-            File file = new File(downloadDir, fileName)
+            def dir = file("${downloadDir}/" + entry.key)
+            dir.mkdirs()
+            File file = new File(dir, fileName)
             if (!file.exists()) {
                 project.logger.lifecycle("Downloading ${entry.key} -> ${url}")
                 new URL(url).withInputStream { i -> file.withOutputStream { it << i } }
@@ -242,9 +244,9 @@ flavorNames.each { flavor ->
                 }
 
                 scm {
-                    connection = "scm:git:git@github.com:awslabs/djl.git"
-                    developerConnection = "scm:git:git@github.com:awslabs/djl.git"
-                    url = "https://github.com/awslabs/djl"
+                    connection = "scm:git:git@github.com:deepjavalibrary/djl.git"
+                    developerConnection = "scm:git:git@github.com:deepjavalibrary/djl.git"
+                    url = "https://github.com/deepjavalibrary/djl"
                     tag = "HEAD"
                 }
 

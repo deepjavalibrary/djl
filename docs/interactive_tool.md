@@ -44,7 +44,7 @@ Criteria<Image, Classifications> criteria = Criteria.builder()
   .build();
 ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
 Predictor<Image, Classifications> predictor = model.newPredictor();
-String imageURL = "https://raw.githubusercontent.com/awslabs/djl/master/examples/src/test/resources/kitten.jpg";
+String imageURL = "https://raw.githubusercontent.com/deepjavalibrary/djl/master/examples/src/test/resources/kitten.jpg";
 Image image = ImageFactory.getInstance().fromUrl(imageURL);
 predictor.predict(image);
 ```

@@ -32,7 +32,7 @@ public class ListModelsTest {
 
     @AfterClass
     public void tearDown() {
-        System.setProperty("ai.djl.repository.zoo.location", "");
+        System.clearProperty("ai.djl.repository.zoo.location");
     }
 
     @Test

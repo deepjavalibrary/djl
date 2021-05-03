@@ -27,6 +27,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import org.tensorflow.internal.c_api.TFE_Context;
 import org.tensorflow.internal.c_api.TFE_TensorHandle;
 
 public class TfNDManager extends BaseNDManager {
@@ -248,8 +249,12 @@ public class TfNDManager extends BaseNDManager {
         return manager;
     }
 
+    public TFE_Context getEagerSession() {
+        return ((TfEngine) getEngine()).getEagerSession();
+    }
+
     public TfOpExecutor opExecutor(String operation) {
-        return new TfOpExecutor(this, ((TfEngine) getEngine()).getEagerSession(), operation);
+        return new TfOpExecutor(this, getEagerSession(), operation);
     }
 
     private static final class SystemManager extends TfNDManager {
@@ -260,7 +265,7 @@ public class TfNDManager extends BaseNDManager {
 
         /** {@inheritDoc} */
         @Override
-        public void attachInternal(String resrouceId, AutoCloseable resource) {}
+        public void attachInternal(String resourceId, AutoCloseable resource) {}
 
         /** {@inheritDoc} */
         @Override

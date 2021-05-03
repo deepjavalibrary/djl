@@ -314,7 +314,7 @@ public final class ConfigManager {
      * @return the configured plugin folder or the default folder.
      */
     public Path getPluginFolder() {
-        return getPathProperty(prop.getProperty(PLUGIN_FOLDER, "plugins"));
+        return getPathProperty(PLUGIN_FOLDER, "plugins");
     }
 
     /**
@@ -465,7 +465,11 @@ public final class ConfigManager {
     }
 
     private Path getPathProperty(String key) {
-        String property = prop.getProperty(key);
+        return getPathProperty(key, null);
+    }
+
+    private Path getPathProperty(String key, String defaultValue) {
+        String property = prop.getProperty(key, defaultValue);
         if (property == null) {
             return null;
         }

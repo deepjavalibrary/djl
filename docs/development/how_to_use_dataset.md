@@ -176,8 +176,8 @@ Since we don't have to prepare any data on our own for this example, we only hav
 public void prepare(Progress progress) {}
 ```
 
-There are great [examples](https://github.com/awslabs/djl/blob/master/basicdataset/src/main/java/ai/djl/basicdataset/nlp/AmazonReview.java)
-in our [basicdataset](https://github.com/awslabs/djl/blob/master/basicdataset/src/main/java/ai/djl/basicdataset)
+There are great [examples](https://github.com/deepjavalibrary/djl/blob/master/basicdataset/src/main/java/ai/djl/basicdataset/nlp/AmazonReview.java)
+in our [basicdataset](https://github.com/deepjavalibrary/djl/blob/master/basicdataset/src/main/java/ai/djl/basicdataset)
 folder that show use cases for `prepare()`.
 
 
@@ -226,4 +226,4 @@ for (Batch batch : dataset.getData(model.getNDManager())) {
 }
 ```
 
-Full example code could be found in [CSVDataset.java](https://github.com/awslabs/djl/blob/master/docs/development/CSVDataset.java).
+Full example code could be found in [CSVDataset.java](https://github.com/deepjavalibrary/djl/blob/master/docs/development/CSVDataset.java).

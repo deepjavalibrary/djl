@@ -16,28 +16,29 @@ dependencies {
         api "ai.djl:basicdataset:${version}"
         api "ai.djl:model-zoo:${version}"
         api "ai.djl:serving:${version}"
+        api "ai.djl.aws:aws-ai:${version}"
+        api "ai.djl.dlr:dlr-engine:${version}"
+        api "ai.djl.dlr:dlr-native-auto:${dlr_version}"
+        api "ai.djl.fasttext:fasttext-engine:${version}"
+        api "ai.djl.hadoop:hadoop:${version}"
         api "ai.djl.mxnet:mxnet-engine:${version}"
         api "ai.djl.mxnet:mxnet-model-zoo:${version}"
         api "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
+        api "ai.djl.onnxruntime:onnxruntime-engine:${version}"
+        api "ai.djl.paddlepaddle:paddlepaddle-engine:${version}"
+        api "ai.djl.paddlepaddle:paddlepaddle-model-zoo:${version}"
+        api "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
+        api "ai.djl.pytorch:pytorch-engine:${version}"
+        api "ai.djl.pytorch:pytorch-model-zoo:${version}"
+        api "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
+        api "ai.djl.sentencepiece:sentencepiece:${version}"
         api "ai.djl.tensorflow:tensorflow-api:${version}"
         api "ai.djl.tensorflow:tensorflow-engine:${version}"
         api "ai.djl.tensorflow:tensorflow-model-zoo:${version}"
         api "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
-        api "ai.djl.pytorch:pytorch-engine:${version}"
-        api "ai.djl.pytorch:pytorch-model-zoo:${version}"
-        api "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
-        api "ai.djl.paddlepaddle:paddlepaddle-engine:${version}"
-        api "ai.djl.paddlepaddle:paddlepaddle-model-zoo:${version}"
-        api "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
-        api "ai.djl.onnxruntime:onnxruntime-engine:${version}"
-        api "ai.djl.dlr:dlr-engine:${version}"
-        api "ai.djl.dlr:dlr-native-auto:${dlr_version}"
         api "ai.djl.tflite:tflite-engine:${version}"
         api "ai.djl.tflite:tflite-native-auto:${tflite_version}"
-        api "ai.djl.aws:aws-ai:${version}"
-        api "ai.djl.fasttext:fasttext-engine:${version}"
-        api "ai.djl.hadoop:hadoop:${version}"
-        api "ai.djl.sentencepiece:sentencepiece:${version}"
+        api "ai.djl.ml.xgboost:xgboost:${version}"
     }
 }
 
@@ -72,9 +73,9 @@ publishing {
                 }
 
                 scm {
-                    connection = "scm:git:git@github.com:awslabs/djl.git"
-                    developerConnection = "scm:git:git@github.com:awslabs/djl.git"
-                    url = "https://github.com/awslabs/djl"
+                    connection = "scm:git:git@github.com:deepjavalibrary/djl.git"
+                    developerConnection = "scm:git:git@github.com:deepjavalibrary/djl.git"
+                    url = "https://github.com/deepjavalibrary/djl"
                     tag = "HEAD"
                 }
 
@@ -93,22 +94,20 @@ publishing {
                     addDependency(dependencies, "ai.djl.mxnet", "mxnet-native-mkl", "osx-x86_64", "${mxnet_version}")
                     addDependency(dependencies, "ai.djl.mxnet", "mxnet-native-mkl", "linux-x86_64", "${mxnet_version}")
                     addDependency(dependencies, "ai.djl.mxnet", "mxnet-native-mkl", "win-x86_64", "${mxnet_version}")
-                    addDependency(dependencies, "ai.djl.mxnet", "mxnet-native-cu101mkl", "linux-x86_64", "${mxnet_version}")
                     addDependency(dependencies, "ai.djl.mxnet", "mxnet-native-cu102mkl", "linux-x86_64", "${mxnet_version}")
+                    addDependency(dependencies, "ai.djl.mxnet", "mxnet-native-cu110mkl", "linux-x86_64", "${mxnet_version}")
                     addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cpu", "osx-x86_64", "${pytorch_version}")
                     addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cpu", "linux-x86_64", "${pytorch_version}")
                     addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cpu", "win-x86_64", "${pytorch_version}")
                     addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cpu-precxx11", "linux-x86_64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cu101", "linux-x86_64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cu101", "win-x86_64", "${pytorch_version}")
                     addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cu102", "linux-x86_64", "${pytorch_version}")
                     addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cu102", "win-x86_64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cu110", "linux-x86_64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cu110", "win-x86_64", "${pytorch_version}")
+                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cu111", "linux-x86_64", "${pytorch_version}")
+                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cu111", "win-x86_64", "${pytorch_version}")
                     addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cpu", "osx-x86_64", "${tensorflow_version}")
                     addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cpu", "linux-x86_64", "${tensorflow_version}")
                     addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cpu", "win-x86_64", "${tensorflow_version}")
-                    addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cu101", "linux-x86_64", "${tensorflow_version}")
+                    addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cu110", "linux-x86_64", "${tensorflow_version}")
                     addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cpu", "osx-x86_64", "${paddlepaddle_version}")
                     addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cpu", "linux-x86_64", "${paddlepaddle_version}")
                     addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cpu", "win-x86_64", "${paddlepaddle_version}")

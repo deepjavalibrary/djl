@@ -38,8 +38,8 @@ import java.io.IOException;
  * An example of training an image classification (MNIST) model.
  *
  * <p>See this <a
- * href="https://github.com/awslabs/djl/blob/master/examples/docs/train_mnist_mlp.md">doc</a> for
- * information about this example.
+ * href="https://github.com/deepjavalibrary/djl/blob/master/examples/docs/train_mnist_mlp.md">doc</a>
+ * for information about this example.
  */
 public final class TrainMnist {
 

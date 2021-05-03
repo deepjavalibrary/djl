@@ -159,8 +159,6 @@ public class HttpStaticClasspathResourceHandler implements RequestHandler<Void> 
         StringBuilder newURI = new StringBuilder(RESOURCE_FOLDER);
         if ("/".equals(uri)) {
             newURI.append("/index.html");
-        } else if (uri.startsWith("/modelzoo-frontend.js")) {
-            newURI.append("/dist/").append(uri);
         } else {
             newURI.append(uri);
         }
