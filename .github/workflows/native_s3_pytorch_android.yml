@@ -26,7 +26,7 @@ jobs:
       - name: clone pytorch
         run: git clone https://github.com/pytorch/pytorch android_pytorch_tmp -b "${PYTORCH_TAG_VERSION}" --recursive
       - name: install Python Dependencies
-        run: pip install numpy ninja pyyaml mkl mkl-include setuptools cmake cffi
+        run: pip install numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions
       - name: Install NDK
         run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${NDK_VERSION}"
       - name: build android
