@@ -19,6 +19,7 @@ if [[ ! -d libtorch_android/"$1" ]]; then
         mkdir -p libtorch_android/"$1"
         cd libtorch_android/"$1"
         curl -s https://publish.djl.ai/pytorch-"{$VERSION}/android_native/{$1}"_native.zip | jar xv
+        mv install/include include
         cd ../../
     fi
 fi
