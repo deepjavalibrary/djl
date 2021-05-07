@@ -14,6 +14,7 @@ package ai.djl.serving.central;
 
 import ai.djl.serving.central.handler.HttpStaticClasspathResourceHandler;
 import ai.djl.serving.central.handler.ModelDownloadHandler;
+import ai.djl.serving.central.handler.ModelListMetaDataHandler;
 import ai.djl.serving.central.handler.ModelMetaDataHandler;
 import ai.djl.serving.central.handler.RequestHandlerWrapper;
 import io.netty.channel.ChannelInitializer;
@@ -57,6 +58,7 @@ public class HttpStaticFileServerInitializer extends ChannelInitializer<SocketCh
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new ChunkedWriteHandler());
         pipeline.addLast(new RequestHandlerWrapper(new ModelDownloadHandler()));
+        pipeline.addLast(new RequestHandlerWrapper(new ModelListMetaDataHandler()));
         pipeline.addLast(new RequestHandlerWrapper(new ModelMetaDataHandler()));
         pipeline.addLast(new RequestHandlerWrapper(new HttpStaticClasspathResourceHandler()));
     }
