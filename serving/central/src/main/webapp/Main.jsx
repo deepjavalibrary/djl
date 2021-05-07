@@ -30,7 +30,8 @@ export default function Main() {
 				<CssBaseline />
 				<Typography>
 					<Container>
-						<ModelNavigator />
+
+								<ModelNavigator />
 					</Container>
 				</Typography>
 			</div>

@@ -5,6 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
+import Typography from '@material-ui/core/Typography';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { theme } from '../../css/useStyles'
@@ -12,21 +13,14 @@ import { theme } from '../../css/useStyles'
 const useStyles = makeStyles((theme) => ({
 	tabs: {
 		borderRight: `1px solid ${theme.dividerColor}`,
+		overflow: "initial",
 	},
-	tabbar: {
-		flexGrow: 1,
 
-		display: 'flex',
-	},
-	tabpanel: {
-		flex: '2 1 auto',
-		alignSelf: 'stretch',
-	},
 	root: {
 	    flexGrow: 1,
 	    backgroundColor: theme.palette.background.paper,
 	    display: 'flex',
-	    height: 224,
+	    height: "100%",
   	},
 
 }));
@@ -59,7 +53,7 @@ function TabPanel(props) {
 						variant="scrollable"
 						value={currentIndex}
 						onChange={handleTabChange}
-				
+						className={classes.tabs}
 						aria-label="{props.model.name}">
 						{
 							
@@ -69,7 +63,7 @@ function TabPanel(props) {
 					</Tabs>
 	
 						{children.filter((child, index) => index == currentIndex)
-							.map(child => <div role="tabpanel"><Box p={3}>{child}</Box></div>)
+							.map(child => <div role="tabpanel" {...other}><Box p={3}><Typography>{child}</Typography></Box></div>)
 						}
 		</div>
 

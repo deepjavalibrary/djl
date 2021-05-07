@@ -2,14 +2,14 @@ import React, { Component, useState, useEffect, useRef } from "react";
 import ReactDOM from 'react-dom';
 
 
-import Paper from '@material-ui/core/Paper';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/Info';
-
+import Box from '@material-ui/core/Box';
+import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 
 
@@ -38,28 +38,22 @@ import { theme } from '../css/useStyles'
 
 
 const useStyles = makeStyles((theme) => ({
-	model_view_root: {
-
-		flexWrap: 'wrap',
-		justifyContent: 'space-around',
-		overflow: 'hidden',
-
-		order: 3,
-		flex: '2 1 auto',
-		alignSelf: 'stretch',
-
+	model_view_root : {
+		padding: "2em",
+		marginTop: "2em",
+		backgroundColor: "white",
+		color: "black",
+		minHeight: "100%",
+    	overflow: "scroll",
+    	borderRadius: "25",
+    	'-webkit-box-shadow': '0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(11,60,93,0)',
+		boxShadow: '0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(11,60,93,0)',
 	},
-	model_view_paper: {
-		minHeight: '600px',
-		padding: '20px',
-		overflowY: "auto",
-		marginRight: 'auto',
-		marginLeft: '2em',
-		marginBottom: '5vh',
+	header: {
+	//	transform: "rotate(-10deg)",
+		background: theme.overlayColor,
+		borderRadius: "5",
 	},
-
-
-
 }));
 
 
@@ -73,40 +67,44 @@ export default function ModelView(props) {
 	const URL = 'http://' + window.location.hostname + ':' + window.location.port + '/modelzoo/models/' + props.modelRef.groupId + ":" + props.modelRef.artifactId + ":" + props.modelRef.version + ":" + props.modelRef.name;
 	const model = fetchData(URL);
 
-	const classes = useStyles();
+	const classes = useStyles(theme);
 	const myRef = useRef(null);
 
 
 
 	return (
 
-		<div className={classes.model_view_root}>
+		<>
 
 			{model != null &&
-				<Paper ref={myRef} elevation={3} className={classes.model_view_paper} >
-					<Grid container spacing={3}>
-						<Grid item xs={12}>
-							<h2>{model.name} - {model.version}</h2>
-							<h3>{model.groupId}:{model.artifactId}:{model.version}</h3>
-							<Chip size="small" label={model.version} />
-							<Chip size="small" label={model.resourceType} />
-						</Grid>
-						<Grid item xs={8}>
+				<div className={classes.model_view_root}>
+							<Typography>
+								<Box className={classes.header}>
+								<h2>{model.name} - {model.version}</h2>
+								<h3>{model.groupId}:{model.artifactId}:{model.version}</h3>
+								<Chip size="small" label={model.version} />
+								<Chip size="small" label={model.resourceType} />
+								</Box>
+							</Typography>
+							
+					<Grid container spacing={2} >
+						<Grid item xs={10}>
 							<TabPanel tabs={["General", "Model", "Files"]} >
 								<GeneralTabPanel model={model} />
 								<ModelTabPanel model={model} />
 								<FilesTabPanel model={model} />
 							</TabPanel>
 						</Grid>
-						<Grid item xs={4}>
+						<Grid item xs={2}>
 						</Grid>
+					
 					</Grid>
-
-
-				</Paper>
+			
+				</div>
+			
 			}
 
-		</div>
+		</>
 
 	);
 }

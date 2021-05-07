@@ -7,40 +7,22 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import TreeItem from '@material-ui/lab/TreeItem';
 import ModelView from './ModelView';
+import Grid from '@material-ui/core/Grid';
 
 import {fetchData} from './network.functions'
 
 import axios from 'axios'
 
 const useStyles = makeStyles({
-	view_root: {
-		display: "flex",
-		flexDirection: "row",
-		flexWrap: "nowrap",
-		justifyContent: "flex-start",
-		alignContent: "stretch",
-		alignItems: "flex-start",
-		margin: '3em',
+	
+	scrollable : {
+	    maxHeight: "500px",
+    	height: "100%",
+    	overflowY: "scroll",
 	},
-	navigator_root: {
-		order: 0,
-		flex: "0 0 auto",
-		alignSelf: "stretch",
-		maxHeight: '600px',
-		overflowY: "auto",
+	
 
-	},
-
-	model_root: {
-		order: 0,
-		flex: "2 0 auto",
-		alignSelf: "stretch",	},
 });
-
-
-
-
-
 
 
 
@@ -94,9 +76,10 @@ export default function ModelNavigator(props) {
 
 	return (
 		<>
-           <div className={classes.view_root}>
-                <div className={classes.navigator_root}>
+			<Grid container spacing={3} >
+				<Grid item xs={4}>
                     <TreeView
+                    	
                         defaultExpanded={['Model Searching']}
                         defaultCollapseIcon={<ExpandMoreIcon />}
                         defaultExpandIcon={<ChevronRightIcon />}
@@ -151,7 +134,7 @@ export default function ModelNavigator(props) {
                     </TreeView>
 
 				<TreeView
-
+					className={classes.scrollable}
 					defaultCollapseIcon={<ExpandMoreIcon />}
 					defaultExpandIcon={<ChevronRightIcon />}
 				>
@@ -177,14 +160,14 @@ export default function ModelNavigator(props) {
                     }
 
 				</TreeView>
-				</div>
-
+				</Grid>
+				<Grid item xs={8}>
+				
 				{model != null &&
-					<div className={classes.model_root}>
 						<ModelView modelRef={model} />
-					</div>
 				}
-			</div>
+				</Grid>
+			</Grid>
 		</>
 	);
 }
