@@ -51,10 +51,11 @@ public class ModelReferenceDTO {
      * @param artifact to construct a reference from
      */
     public ModelReferenceDTO(Artifact artifact) {
- //       if (!"model".equals(artifact.getMetadata().getResourceType())) {
- //           throw new IllegalArgumentException(
- //                   "trying to build a model reference from an artifact which is not model. resourcetype:"+artifact.getMetadata().getResourceType());
- //       }
+        //       if (!"model".equals(artifact.getMetadata().getResourceType())) {
+        //           throw new IllegalArgumentException(
+        //                   "trying to build a model reference from an artifact which is not model.
+        // resourcetype:"+artifact.getMetadata().getResourceType());
+        //       }
         this.name = artifact.getName();
         this.version = artifact.getVersion();
         this.groupId = artifact.getMetadata().getGroupId();

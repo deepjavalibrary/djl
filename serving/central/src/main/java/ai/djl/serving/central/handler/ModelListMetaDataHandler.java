@@ -38,15 +38,15 @@ public class ModelListMetaDataHandler
 
     private static final Logger logger = LoggerFactory.getLogger(ModelListMetaDataHandler.class);
 
-    private static final Pattern pattern=Pattern.compile("^/modelzoo/models$");
-    
+    private static final Pattern URL_PATTERN = Pattern.compile("^/modelzoo/models$");
+
     /** {@inheritDoc} */
     @Override
     public boolean acceptInboundMessage(Object msg) {
         FullHttpRequest request = (FullHttpRequest) msg;
 
         String uri = request.uri();
-        return pattern.matcher(uri).matches();
+        return URL_PATTERN.matcher(uri).matches();
     }
 
     /** {@inheritDoc} */
@@ -55,7 +55,7 @@ public class ModelListMetaDataHandler
             ChannelHandlerContext ctx,
             FullHttpRequest req,
             QueryStringDecoder decoder,
-            String[] segments ) {
+            String[] segments) {
         logger.info("request models.");
         return CompletableFuture.supplyAsync(
                 () -> {
@@ -63,7 +63,6 @@ public class ModelListMetaDataHandler
                         return ModelZoo.listModels()
                                 .entrySet()
                                 .stream()
-                              
                                 .collect(
                                         Collectors.toMap(
                                                 e -> e.getKey().getPath(),
