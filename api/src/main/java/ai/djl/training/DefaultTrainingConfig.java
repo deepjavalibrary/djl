@@ -47,8 +47,8 @@ public class DefaultTrainingConfig implements TrainingConfig {
      * @param loss the loss to use for training
      */
     public DefaultTrainingConfig(Loss loss) {
-        optimizer = Adam.builder().build();
         this.loss = loss;
+        optimizer = Adam.builder().build();
         evaluators = new ArrayList<>();
         listeners = new ArrayList<>();
     }

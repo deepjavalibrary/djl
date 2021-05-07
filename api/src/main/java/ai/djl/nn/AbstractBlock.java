@@ -182,7 +182,7 @@ public abstract class AbstractBlock implements Block {
      */
     protected final <B extends Block> B addChildBlock(String name, B block) {
         int childNumber = children.size() + 1;
-        children.add(String.format(Locale.ENGLISH, "%02d%s", childNumber, name), block);
+        children.add(String.format(Locale.ROOT, "%02d%s", childNumber, name), block);
         return block;
     }
 
