@@ -174,12 +174,29 @@ If we would like to fake an image:
 -s 1,3,224,224
 ```
 
-This will create a NDArray of shape(1, 3, 224, 224).
+This will create a NDArray (DataType FLOAT32) of shape(1, 3, 224, 224).
 
 If your model requires multiple inputs like three NDArrays with shape 1, 384 and 384. You can do the followings:
 
 ```
 -s (1),(384),(384)
+```
+
+If you input `DataType` is not FLOAT32, you can specify the data type with suffix:
+
+- f: FLOAT32, this is default and is optional
+- s: FLOAT16 (short float)
+- d: FLOAT64 (double)
+- u: UINT8 (unsigned byte)
+- b: INT8 (byte)
+- i: INT32 (int)
+- l: INT64 (long)
+- B: BOOLEAN (boolean)
+
+For example:
+
+```
+-s (1)i,(384)f,(384)
 ```
 
 ### Optional Step: multithreading inference 

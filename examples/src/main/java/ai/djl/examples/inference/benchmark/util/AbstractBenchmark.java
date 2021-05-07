@@ -18,6 +18,7 @@ import ai.djl.engine.Engine;
 import ai.djl.examples.inference.benchmark.MultithreadedBenchmark;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
@@ -28,6 +29,8 @@ import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.Pair;
+import ai.djl.util.PairList;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.time.Duration;
@@ -276,7 +279,7 @@ public abstract class AbstractBenchmark {
         String artifactId = arguments.getArtifactId();
         Class<?> input = arguments.getInputClass();
         Class<?> output = arguments.getOutputClass();
-        Shape[] shapes = arguments.getInputShapes();
+        PairList<DataType, Shape> shapes = arguments.getInputShapes();
 
         Criteria.Builder<?, ?> builder =
                 Criteria.builder()
@@ -285,7 +288,7 @@ public abstract class AbstractBenchmark {
                         .optArtifactId(artifactId)
                         .optProgress(new ProgressBar());
 
-        if (shapes != null) {
+        if (!shapes.isEmpty()) {
             builder.optTranslator(
                     new Translator() {
 
@@ -293,8 +296,10 @@ public abstract class AbstractBenchmark {
                         @Override
                         public NDList processInput(TranslatorContext ctx, Object input) {
                             NDList list = new NDList();
-                            for (Shape shape : shapes) {
-                                list.add(ctx.getNDManager().ones(shape));
+                            for (Pair<DataType, Shape> pair : shapes) {
+                                DataType dataType = pair.getKey();
+                                Shape shape = pair.getValue();
+                                list.add(ctx.getNDManager().ones(shape, dataType));
                             }
                             return list;
                         }
