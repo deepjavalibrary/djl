@@ -34,14 +34,7 @@ public class BenchmarkTest {
     @Test
     public void testMultithreadedBenchmark() {
         String[] args = {
-            "-c",
-            "2",
-            "-i",
-            "src/test/resources/segmentation.jpg",
-            "-r",
-            "{'layers':'18','flavor':'v1'}",
-            "-t",
-            "2"
+            "-c", "2", "-s", "(1,3,224,224)f", "-r", "{'layers':'18','flavor':'v1'}", "-t", "2"
         };
         new MultithreadedBenchmark().runBenchmark(args);
     }
