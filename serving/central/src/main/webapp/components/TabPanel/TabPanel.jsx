@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import Box from '@material-ui/core/Box';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { theme } from '../../css/useStyles'
@@ -66,15 +67,10 @@ function TabPanel(props) {
 						}
 
 					</Tabs>
-						<div
-					      role="tabpanel"
-					      hidden={value !== index}
-					      id={`vertical-tabpanel-${index}`}
-					      aria-labelledby={`vertical-tab-${index}`}
-					      {...other}
-					    >
-						{children.filter((child, index) => index == currentIndex)}
-						</div>
+	
+						{children.filter((child, index) => index == currentIndex)
+							.map(child => <div role="tabpanel"><Box p={3}>{child}</Box></div>)
+						}
 		</div>
 
 
