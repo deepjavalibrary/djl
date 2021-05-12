@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "devDependencies": {
     "webpack": "^5.11.0",
-    "css-loader": "^3.5.2",
+    "css-loader": "^5.2.4",
     "style-loader": "^1.1.4"
   },
   "dependencies": {
