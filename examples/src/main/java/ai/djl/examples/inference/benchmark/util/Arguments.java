@@ -91,7 +91,7 @@ public class Arguments {
                     long[] array = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
                     DataType dataType;
                     String dataTypeStr = matcher.group(4);
-                    if (dataTypeStr == null) {
+                    if (dataTypeStr == null || dataTypeStr.isEmpty()) {
                         dataType = DataType.FLOAT32;
                     } else {
                         switch (dataTypeStr) {
