@@ -14,9 +14,15 @@ package ai.djl.serving.central.model.dto;
 
 import ai.djl.repository.Artifact;
 import ai.djl.repository.License;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -48,12 +54,8 @@ public class ModelDTO extends ModelReferenceDTO {
     private String layers;
     private String backbone;
 
-    private double width;
-    private double height;
-    private boolean resize;
-    private boolean rescale;
-    private double threshold;
-    private String synsetFileName;
+    // a map of dynamic properties not mapped to any other field.
+    private Map<String, Object> properties;
 
     /**
      * construct using reference data.
@@ -79,6 +81,7 @@ public class ModelDTO extends ModelReferenceDTO {
         this.website = artifact.getMetadata().getWebsite();
         this.repositoryURI = artifact.getResourceUri();
         this.lastUpdated = artifact.getMetadata().getLastUpdated();
+        this.properties = new HashMap<>();
 
         licenses =
                 Collections.unmodifiableMap(
@@ -94,21 +97,22 @@ public class ModelDTO extends ModelReferenceDTO {
             this.dataset = artifact.getProperties().getOrDefault("dataset", "N/A");
             this.layers = artifact.getProperties().getOrDefault("layers", "N/A");
             this.backbone = artifact.getProperties().getOrDefault("backbone", "N/A");
+            artifact.getProperties().forEach((k, v) -> properties.put(k, v));
         }
 
         // arguments
         Map<String, Object> arguments = artifact.getArguments(null);
         if (arguments != null) {
             try {
-                this.width = (double) arguments.getOrDefault("width", 0.0d);
-                this.height = (double) arguments.getOrDefault("height", 0.0d);
-                this.resize = (boolean) arguments.getOrDefault("resize", false);
-                this.rescale = (boolean) arguments.getOrDefault("rescale", false);
-                this.threshold = (double) arguments.getOrDefault("threshold", 0.0d);
-                this.synsetFileName = (String) arguments.getOrDefault("synsetFileName", "N/A");
+                arguments.forEach((k, v) -> properties.put(k, v));
             } catch (ClassCastException ex) {
                 logger.error("Argument in model is not of expected type.", ex);
             }
+        }
+
+        Map<String, String> options = artifact.getOptions(null);
+        if (options != null) {
+            options.forEach((k, v) -> properties.put(k, v));
         }
 
         if (artifact.getFiles() != null) {
@@ -121,6 +125,8 @@ public class ModelDTO extends ModelReferenceDTO {
         } else {
             files = Collections.emptyList();
         }
+
+        cleanUpDuplicateProperties();
     }
 
     /**
@@ -135,7 +141,7 @@ public class ModelDTO extends ModelReferenceDTO {
     /**
      * access the description-property.
      *
-     * @return the description of this class.
+     * @return the description of this Object.
      */
     public String getDescription() {
         return description;
@@ -144,7 +150,7 @@ public class ModelDTO extends ModelReferenceDTO {
     /**
      * access the website-property.
      *
-     * @return the website of this class.
+     * @return the website of this Object.
      */
     public String getWebsite() {
         return website;
@@ -153,7 +159,7 @@ public class ModelDTO extends ModelReferenceDTO {
     /**
      * access the repositoryURI-property.
      *
-     * @return the repositoryURI of this class.
+     * @return the repositoryURI of this Object.
      */
     public URI getRepositoryURI() {
         return repositoryURI;
@@ -162,7 +168,7 @@ public class ModelDTO extends ModelReferenceDTO {
     /**
      * access the lastUpdated-property.
      *
-     * @return the lastUpdated of this class.
+     * @return the lastUpdated of this Object.
      */
     public Date getLastUpdated() {
         return lastUpdated;
@@ -171,7 +177,7 @@ public class ModelDTO extends ModelReferenceDTO {
     /**
      * access the resourceType-property.
      *
-     * @return the resourceType of this class.
+     * @return the resourceType of this Object.
      */
     public String getResourceType() {
         return resourceType;
@@ -180,7 +186,7 @@ public class ModelDTO extends ModelReferenceDTO {
     /**
      * access the licenses-property.
      *
-     * @return the licenses of this class.
+     * @return the licenses of this Object.
      */
     public Map<String, String> getLicenses() {
         return licenses;
@@ -189,7 +195,7 @@ public class ModelDTO extends ModelReferenceDTO {
     /**
      * access the files-property.
      *
-     * @return the files of this class.
+     * @return the files of this Object.
      */
     public List<FileResourceDTO> getFiles() {
         return files;
@@ -198,7 +204,7 @@ public class ModelDTO extends ModelReferenceDTO {
     /**
      * access the dataset-property.
      *
-     * @return the dataset of this class.
+     * @return the dataset of this Object.
      */
     public String getDataset() {
         return dataset;
@@ -207,7 +213,7 @@ public class ModelDTO extends ModelReferenceDTO {
     /**
      * access the layers-property.
      *
-     * @return the layers of this class.
+     * @return the layers of this Object.
      */
     public String getLayers() {
         return layers;
@@ -216,63 +222,29 @@ public class ModelDTO extends ModelReferenceDTO {
     /**
      * access the backbone-property.
      *
-     * @return the backbone of this class.
+     * @return the backbone of this Object.
      */
     public String getBackbone() {
         return backbone;
     }
 
     /**
-     * access the width-property.
+     * access the properties which is a list of model specific key/values.
      *
-     * @return the width of this class.
+     * @return the properties of this object.
      */
-    public double getWidth() {
-        return width;
+    public Map<String, Object> getProperties() {
+        return Collections.unmodifiableMap(properties);
     }
 
-    /**
-     * access the height-property.
-     *
-     * @return the height of this class.
-     */
-    public double getHeight() {
-        return height;
-    }
-
-    /**
-     * access the resize-property.
-     *
-     * @return the resize of this class.
-     */
-    public boolean isResize() {
-        return resize;
-    }
-
-    /**
-     * access the rescale-property.
-     *
-     * @return the rescale of this class.
-     */
-    public boolean isRescale() {
-        return rescale;
-    }
-
-    /**
-     * access the threshold-property.
-     *
-     * @return the threshold of this class.
-     */
-    public double getThreshold() {
-        return threshold;
-    }
-
-    /**
-     * access the synsetFileName-property.
-     *
-     * @return the synsetFileName of this class.
-     */
-    public String getSynsetFileName() {
-        return synsetFileName;
+    protected final void cleanUpDuplicateProperties() {
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo(this.getClass());
+            Arrays.stream(beanInfo.getPropertyDescriptors())
+                    .map(PropertyDescriptor::getName)
+                    .forEach(properties::remove);
+        } catch (IntrospectionException e) {
+            logger.warn("cannot cleanup duplicate property fields", e);
+        }
     }
 }

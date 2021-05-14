@@ -15,6 +15,7 @@ package ai.djl.serving.central.handler;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
+import ai.djl.serving.central.model.dto.DataTransferObjectFactory;
 import ai.djl.serving.central.model.dto.ModelDTO;
 import ai.djl.serving.plugins.RequestHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -38,6 +39,13 @@ public class ModelMetaDataHandler implements RequestHandler<CompletableFuture<Mo
 
     private static final Pattern URL_PATTERN =
             Pattern.compile("/modelzoo/models/([a-zA-Z0-9.:@_-]+)/?");
+
+    private DataTransferObjectFactory dtoFactory;
+
+    /** constructs the ModelMetaDataHandler. */
+    public ModelMetaDataHandler() {
+        dtoFactory = new DataTransferObjectFactory();
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -83,7 +91,7 @@ public class ModelMetaDataHandler implements RequestHandler<CompletableFuture<Mo
                                             a ->
                                                     modelName.equals(a.getName())
                                                             && version.equals(a.getVersion()))
-                                    .map(artifact -> new ModelDTO(artifact))
+                                    .map(artifact -> dtoFactory.create(artifact))
                                     .findFirst()
                                     .orElseThrow(
                                             () ->

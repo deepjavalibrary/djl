@@ -13,6 +13,7 @@ import Grid from '@material-ui/core/Grid';
 export function ModelTabPanel(props) {
 	const { model } = props;
 
+console.log(model)
 
 	return (
 		<div>
@@ -29,27 +30,35 @@ export function ModelTabPanel(props) {
 				<Grid item xs={12}>
 				</Grid>
 				
-				<Grid item xs={6}>
-					<Label label={"Width"} value={model.width} />
-				</Grid>
-				<Grid item xs={6}>
-					<Label label={"Height"} value={model.height} />
-				</Grid>
-				<Grid item xs={6}>
-					<Label label={"Resize"} value={model.resize} />
-				</Grid>
-				<Grid item xs={6}>
-					<Label label={"Rescale"} value={model.rescale} />
-				</Grid>
-				<Grid item xs={6}>
-					<Label label={"Threshold"} value={model.threshold} />
-				</Grid>
-				<Grid item xs={6}>
-				</Grid>
-				<Grid item xs={6}>
-					<Label label={"Synset FileName"} value={model.synsetFileName} />
-				</Grid>
+				{ typeof model.width !=='undefined' &&
+					<Grid item xs={6}>
+						<Label label={"Width"} value={model.width} />
+					</Grid>
+				}
+				{ typeof model.height !=='undefined' &&
+					<Grid item xs={6}>
+						<Label label={"Height"} value={model.height} />
+					</Grid>
+				}
+				{ typeof model.resize !=='undefined' &&
+					<Grid item xs={6}>
+						<Label label={"Resize"} value={model.resize} />
+					</Grid>
+				}
+				{ typeof model.rescale !=='undefined' &&
+					<Grid item xs={6}>
+						<Label label={"Rescale"} value={model.rescale} />
+					</Grid>
+				}
 				
+				{
+					Object.keys(model.properties).map((key) => {
+									return 	<Grid item xs={6}>
+												<Label label={key} value={model.properties[key]} />
+											</Grid>
+								}		
+						)
+				}
 				
 			</Grid>	
 			
