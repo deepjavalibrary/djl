@@ -258,14 +258,14 @@ public class Arguments {
     }
 
     public Class<?> getInputClass() {
-        if (inputShapes == null) {
+        if (inputShapes.isEmpty()) {
             return Image.class;
         }
         return NDList.class;
     }
 
     public Class<?> getOutputClass() {
-        if (inputShapes == null) {
+        if (inputShapes.isEmpty()) {
             if (artifactId != null && artifactId.contains("ssd")) {
                 return DetectedObjects.class;
             }
@@ -275,7 +275,7 @@ public class Arguments {
     }
 
     public Object getInputData() throws IOException {
-        if (inputShapes == null) {
+        if (inputShapes.isEmpty()) {
             return ImageFactory.getInstance().fromFile(getImageFile());
         }
         return null;
