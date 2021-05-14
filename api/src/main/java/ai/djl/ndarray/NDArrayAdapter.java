@@ -149,6 +149,12 @@ public interface NDArrayAdapter extends NDArray {
 
     /** {@inheritDoc} */
     @Override
+    default void set(Buffer data, Shape shape) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     default void copyTo(NDArray array) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }

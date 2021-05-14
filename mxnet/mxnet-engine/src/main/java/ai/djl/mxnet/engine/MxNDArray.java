@@ -300,19 +300,19 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     @Override
     public void set(Buffer data) {
 
+        int size = Math.toIntExact(getShape().size());
         if (data.isDirect()) {
-            int size = Math.toIntExact(getShape().size());
             JnaUtils.syncCopyFromCPU(getHandle(), data, size);
             return;
         }
 
-        int size = data.remaining();
+        int dataSize = data.remaining();
         // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
         DataType inputType = DataType.fromBuffer(data);
-        validate(inputType, size);
+        validate(inputType, dataSize);
 
         int numOfBytes = inputType.getNumOfBytes();
-        ByteBuffer buf = manager.allocateDirect(size * numOfBytes);
+        ByteBuffer buf = manager.allocateDirect(dataSize * numOfBytes);
 
         switch (inputType) {
             case FLOAT32:
@@ -338,6 +338,12 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         }
         buf.rewind();
         JnaUtils.syncCopyFromCPU(getHandle(), buf, size);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void set(Buffer data, Shape shape) {
+        throw new UnsupportedOperationException("set with shape is not supported in MxNDArray");
     }
 
     /** {@inheritDoc} */
@@ -1573,9 +1579,14 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
             throw new IllegalStateException(
                     "DataType mismatch, required: " + dataType + ", actual: " + inputType);
         }
-        if (size != getShape().size()) {
+        if (size < getShape().size()) {
             throw new IllegalArgumentException(
-                    "array size (" + size + ") do not match NDArray shape: " + shape);
+                    "array size "
+                            + size
+                            + " is less than NDArray size: "
+                            + shape.size()
+                            + " "
+                            + shape);
         }
     }
 
