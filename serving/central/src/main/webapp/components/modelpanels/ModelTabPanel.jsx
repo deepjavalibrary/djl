@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { theme } from '../../css/useStyles'
 
 import Label from './Label/Label'
-
+import Field from './Field/Field'
 import Grid from '@material-ui/core/Grid';
 
 
@@ -21,42 +21,20 @@ console.log(model)
 				<Grid item xs={12}>
 					<Label label={"Dataset"} value={model.dataset} />
 				</Grid>
-				<Grid item xs={6}>
-					<Label label={"Layers"} value={model.layers} />
-				</Grid>
-				<Grid item xs={6}>
-					<Label label={"Backbone"} value={model.backbone} />
-				</Grid>
+				<Field label={"Layers"} value={model.layers} />
+				<Field label={"Backbone"} value={model.backbone} />
 				<Grid item xs={12}>
 				</Grid>
 				
-				{ typeof model.width !=='undefined' &&
-					<Grid item xs={6}>
-						<Label label={"Width"} value={model.width} />
-					</Grid>
-				}
-				{ typeof model.height !=='undefined' &&
-					<Grid item xs={6}>
-						<Label label={"Height"} value={model.height} />
-					</Grid>
-				}
-				{ typeof model.resize !=='undefined' &&
-					<Grid item xs={6}>
-						<Label label={"Resize"} value={model.resize} />
-					</Grid>
-				}
-				{ typeof model.rescale !=='undefined' &&
-					<Grid item xs={6}>
-						<Label label={"Rescale"} value={model.rescale} />
-					</Grid>
-				}
+				<Field label={"Width"} value={model.width} />
+				<Field label={"Height"} value={model.height} />
+				<Field label={"Resize"} value={model.resize} />
+				<Field label={"Rescale"} value={model.rescale} />
 				
 				{
-					Object.keys(model.properties).map((key) => {
-									return 	<Grid item xs={6}>
-												<Label label={key} value={model.properties[key]} />
-											</Grid>
-								}		
+					Object.keys(model.properties).map((key) => 
+									 	<Field label={key} value={model.properties[key]} />
+										
 						)
 				}
 				
