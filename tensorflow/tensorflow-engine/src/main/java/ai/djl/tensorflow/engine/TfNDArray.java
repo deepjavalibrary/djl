@@ -189,6 +189,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
+    public void set(Buffer data, Shape shape) {
+        throw new UnsupportedOperationException("Tensor cannot be modified after creation");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void attach(NDManager manager) {
         detach();
         this.manager = (TfNDManager) manager;

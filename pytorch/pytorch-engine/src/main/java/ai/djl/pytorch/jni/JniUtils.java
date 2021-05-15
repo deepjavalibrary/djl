@@ -367,9 +367,9 @@ public final class JniUtils {
                 ndArray.getHandle(), value.getHandle(), minIndices, maxIndices, stepIndices);
     }
 
-    public static void set(PtNDArray self, ByteBuffer data) {
+    public static void set(PtNDArray self, ByteBuffer data, Shape shape) {
         // Note the ByteBuffer here is directByteBuffer
-        PyTorchLibrary.LIB.torchSet(self.getHandle(), data);
+        PyTorchLibrary.LIB.torchSet(self.getHandle(), data, shape.getShape());
     }
 
     public static PtNDArray pick(PtNDArray ndArray, PtNDArray index, long dim) {
