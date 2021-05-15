@@ -10,7 +10,6 @@ export const theme = {
 
 
 
-
 const useStyles = makeStyles({
 	appRoot: {
 		// background: "rgb(14,14,13)",
@@ -27,6 +26,7 @@ const useStyles = makeStyles({
 	},
 
 
+
 	pageTitle: {
 		color: "#ffffff",
 		bottom: '4rem',
@@ -37,5 +37,8 @@ const useStyles = makeStyles({
 		boxShadow: '0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(11,60,93,0)',
 	},
 });
+
+
+
 
 export default useStyles;

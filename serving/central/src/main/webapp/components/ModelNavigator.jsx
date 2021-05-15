@@ -7,95 +7,32 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import TreeItem from '@material-ui/lab/TreeItem';
 import ModelView from './ModelView';
+import Grid from '@material-ui/core/Grid';
+
+import {fetchData} from './network.functions'
 
 import axios from 'axios'
 
 const useStyles = makeStyles({
-	view_root: {
-		display: "flex",
-		flexDirection: "row",
-		flexWrap: "nowrap",
-		justifyContent: "flex-start",
-		alignContent: "stretch",
-		alignItems: "flex-start",
-		margin: '3em',
+	
+	scrollable : {
+	    maxHeight: "500px",
+    	height: "100%",
+    	overflowY: "scroll",
 	},
-	navigator_root: {
-		order: 0,
-		flex: "0 1 auto",
-		alignSelf: "stretch",
-		maxHeight: '600px',
-		overflowY: "auto",
+	
 
-	},
-	inputComponent: {
-        height: '15%',
-        width:  '33%',
-        backgroundColor: 'white',
-        boxShadow: '0 1px 0 0 rgba(170,170,170,0.01)'
-    },
-    inputText: {
-        color: '#D3D4D0',
-        fontSize: '16px',
-        letterSpacing: '0.5px',
-        lineHeight: '28px',
-        textAlign: 'center',
-    },
-	model_root: {
-		order: 0,
-		flex: "2 1 auto",
-		alignSelf: "stretch",
-	//			'-webkit-box-shadow': '0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(11,60,93,0)',
-	//	boxShadow: '0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(11,60,93,0)',
-	},
 });
-
-
-const useFetch = (url) => {
-	const [data, setData] = useState([]);
-
-	// empty array as second argument equivalent to componentDidMount
-	useEffect(() => {
-		async function fetchData() {
-			axios.get(url)
-				.then(function(response) {
-					console.log(response)
-
-					let appdata = Object.keys(response.data).map(function(key) {
-						console.log(key)
-						return {
-							key: key,
-							title: key,
-							models: response.data[key]
-						};
-					});
-					console.log(appdata)
-					setData(appdata);
-				})
-				.catch(function(error) {
-					console.log(error);
-				})
-				.then(function() {
-					// always executed
-				});
-
-		}
-		fetchData();
-	}, [url]);
-
-	return data;
-};
-
-
 
 
 
 export default function ModelNavigator(props) {
 
+
 	const classes = useStyles();
 
 	const URL = 'http://'+window.location.hostname+':'+window.location.port+'/modelzoo/models';
-	const modelZooData = useFetch(URL);
+	const modelZooData = fetchData(URL);
 
 	const [model, setModel] = useState(null);
 	const [modelList, setModelList] = useState(modelZooData);
@@ -105,15 +42,16 @@ export default function ModelNavigator(props) {
 	const [versionList, setVersionList] = useState([]);
 
     const filteredModels =
-        modelZooData.map((application) => (
-            application.models.filter((model) => {
-                if ((versionValue == '') || (versionValue == model.version)){
-                    if ((applicationValue == '') || (applicationValue == application.key)){
-                        return model.name.toLowerCase().includes(nameValue.toLowerCase());
+        Object.keys(modelZooData).map((application) => (
+            modelZooData[application].filter((modelReference) => {
+                if ((versionValue == '') || (versionValue == modelReference.version)){
+                    if ((applicationValue == '') || (applicationValue == application)){
+                        return modelReference.name.toLowerCase().includes(nameValue.toLowerCase());
                     }
                 }
             })
         ))
+	
 
 	const modelFilterOnChange = (event) => {
         setNameValue(event.target.value);
@@ -138,9 +76,10 @@ export default function ModelNavigator(props) {
 
 	return (
 		<>
-           <div className={classes.view_root}>
-                <div className={classes.navigator_root}>
+			<Grid container spacing={3} >
+				<Grid item xs={4}>
                     <TreeView
+                    	
                         defaultExpanded={['Model Searching']}
                         defaultCollapseIcon={<ExpandMoreIcon />}
                         defaultExpandIcon={<ChevronRightIcon />}
@@ -161,9 +100,9 @@ export default function ModelNavigator(props) {
                                 </TreeItem>
                                 <TreeItem nodeId="Version" label="Version">
                                     <div onChange={modelVersionFilterOnChange}>
-                                        {modelZooData.map((application) => (
-                                            application.models.map((model) => (
-                                                    handleAdd(model.version)
+                                        {Object.keys(modelZooData).map((application) => (
+                                            modelZooData[application].map((modelReference) => (
+                                                    handleAdd(modelReference.version)
                                             ))
                                         ))}
 
@@ -175,14 +114,14 @@ export default function ModelNavigator(props) {
                                 </TreeItem>
                                 <TreeItem nodeId="Application" label="Application">
                                     <div onChange={modelApplicationFilterOnChange}>
-                                        {modelZooData.map((application) => (
+                                        {Object.keys(modelZooData).map((application) => (
                                             <button
-                                                disabled={applicationValue == application.title}
-                                                value={application.title}
+                                                disabled={applicationValue == application}
+                                                value={application}
                                                 onClick={modelApplicationFilterOnChange}
                                             >
 
-                                                {application.title}
+                                                {application}
 
                                             </button>
                                         ))}
@@ -195,7 +134,7 @@ export default function ModelNavigator(props) {
                     </TreeView>
 
 				<TreeView
-
+					className={classes.scrollable}
 					defaultCollapseIcon={<ExpandMoreIcon />}
 					defaultExpandIcon={<ChevronRightIcon />}
 				>
@@ -210,9 +149,9 @@ export default function ModelNavigator(props) {
                             ))}
                         </div>
                         :
-                          modelZooData.map((application) => (
-                            <TreeItem nodeId={application.key} label={application.title}>
-                                {application.models.map((model) => (
+                          Object.keys(modelZooData).map((application) => (
+                            <TreeItem nodeId={application} label={application}>
+                                {modelZooData[application].map((model) => (
                                     <TreeItem nodeId={model.name} label={model.name} onLabelClick={() => setModel(model)}>
                                     </TreeItem>
                                 ))}
@@ -221,14 +160,14 @@ export default function ModelNavigator(props) {
                     }
 
 				</TreeView>
-				</div>
-
+				</Grid>
+				<Grid item xs={8}>
+				
 				{model != null &&
-					<div className={classes.model_root}>
-						<ModelView model={model} />
-					</div>
+						<ModelView modelRef={model} />
 				}
-			</div>
+				</Grid>
+			</Grid>
 		</>
 	);
 }
