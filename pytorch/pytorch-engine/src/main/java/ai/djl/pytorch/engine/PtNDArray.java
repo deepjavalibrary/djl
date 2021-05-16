@@ -216,21 +216,10 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
-        set(data, getShape());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void set(Buffer data, Shape shape) {
         int size = data.remaining();
-        if (size < shape.size()) {
+        if (size != size()) {
             throw new IllegalArgumentException(
-                    "array size "
-                            + size
-                            + " is less than NDArray size: "
-                            + shape.size()
-                            + " "
-                            + shape);
+                    "size mismatch! the NDArray has size " + size() + " but set with size " + size);
         }
         // TODO how do we handle the exception happened in the middle
         dataRef = null;
@@ -240,7 +229,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             if (!Device.Type.GPU.equals(getDevice().getDeviceType())) {
                 dataRef = (ByteBuffer) data;
             }
-            JniUtils.set(this, (ByteBuffer) data, shape);
+            JniUtils.set(this, (ByteBuffer) data);
             return;
         }
         // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
@@ -275,7 +264,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         if (!Device.Type.GPU.equals(getDevice().getDeviceType())) {
             dataRef = buf;
         }
-        JniUtils.set(this, buf, shape);
+        JniUtils.set(this, buf);
     }
 
     /** {@inheritDoc} */

@@ -442,64 +442,6 @@ public interface NDArray extends NDResource {
     }
 
     /**
-     * Sets this {@code NDArray} value from {@link Buffer} and overrides {@link Shape}.
-     *
-     * @param data the input buffered data
-     * @param shape the shape of input data
-     */
-    void set(Buffer data, Shape shape);
-
-    /**
-     * Sets this {@code NDArray} value from an array of floats and overrides {@link Shape}.
-     *
-     * @param data the array of floats to set
-     * @param shape the shape of input data
-     */
-    default void set(float[] data, Shape shape) {
-        set(FloatBuffer.wrap(data), shape);
-    }
-
-    /**
-     * Sets this {@code NDArray} value from an array of ints and overrides {@link Shape}.
-     *
-     * @param data the array of integers to set
-     * @param shape the shape of input data
-     */
-    default void set(int[] data, Shape shape) {
-        set(IntBuffer.wrap(data), shape);
-    }
-
-    /**
-     * Sets this {@code NDArray} value from an array of doubles and overrides {@link Shape}.
-     *
-     * @param data the array of doubles to set
-     * @param shape the shape of input data
-     */
-    default void set(double[] data, Shape shape) {
-        set(DoubleBuffer.wrap(data), shape);
-    }
-
-    /**
-     * Sets this {@code NDArray} value from an array of longs and overrides {@link Shape}.
-     *
-     * @param data the array of longs to set
-     * @param shape the shape of input data
-     */
-    default void set(long[] data, Shape shape) {
-        set(LongBuffer.wrap(data), shape);
-    }
-
-    /**
-     * Sets this {@code NDArray} value from an array of bytes and overrides {@link Shape}.
-     *
-     * @param data the array of bytes to set
-     * @param shape the shape of input data
-     */
-    default void set(byte[] data, Shape shape) {
-        set(ByteBuffer.wrap(data), shape);
-    }
-
-    /**
      * Sets the specified index in this {@code NDArray} with the given values.
      *
      * @param index the locations to update
