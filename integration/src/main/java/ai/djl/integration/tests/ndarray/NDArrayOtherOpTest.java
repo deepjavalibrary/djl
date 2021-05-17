@@ -279,11 +279,19 @@ public class NDArrayOtherOpTest {
             expected = manager.create(data, new Shape(2, 1, 1, 2));
             Assert.assertEquals(array, expected);
 
+            // test buffer larger than NDArray
+            array = manager.create(new float[] {0, 1, 2});
+            data = new float[] {9, 8, 7, 6, 5};
+            array.set(FloatBuffer.wrap(data));
+            expected = manager.create(new float[] {9, 8, 7});
+            Assert.assertEquals(array, expected);
+
+            // test buffer smaller than NDArray
             Assert.assertThrows(
                     IllegalArgumentException.class,
                     () -> {
-                        NDArray ndArray = manager.create(1f);
-                        ndArray.set(FloatBuffer.wrap(new float[] {-1, 1}));
+                        NDArray ndArray = manager.create(new float[] {0, 1, 2});
+                        ndArray.set(FloatBuffer.wrap(new float[] {-1}));
                     });
         }
     }
