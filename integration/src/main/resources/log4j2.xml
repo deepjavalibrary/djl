@@ -13,5 +13,8 @@
     <Logger name="ai.djl" level="${sys:ai.djl.logging.level:-info}" additivity="false">
       <AppenderRef ref="console"/>
     </Logger>
+    <Logger name="ai.djl.repository.zoo" level="${sys:ai.djl.modelzoo.level:-info}" additivity="false">
+      <AppenderRef ref="console"/>
+    </Logger>
   </Loggers>
 </Configuration>

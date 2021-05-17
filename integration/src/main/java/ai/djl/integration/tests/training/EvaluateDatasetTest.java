@@ -37,44 +37,45 @@ public class EvaluateDatasetTest {
 
     @Test
     public void testDatasetEvaluation() throws IOException, TranslateException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            Mnist testMnistDataset =
+                    Mnist.builder()
+                            .optManager(manager)
+                            .optUsage(Dataset.Usage.TEST)
+                            .setSampling(32, true)
+                            .build();
 
-        NDManager manager = NDManager.newBaseManager();
+            testMnistDataset.prepare();
 
-        Mnist testMnistDataset =
-                Mnist.builder()
-                        .optManager(manager)
-                        .optUsage(Dataset.Usage.TEST)
-                        .setSampling(32, true)
-                        .build();
+            Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation::relu);
 
-        testMnistDataset.prepare();
+            Model model = Model.newInstance("lin-reg");
+            model.setBlock(mlpModel);
 
-        Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation::relu);
+            Loss l2loss = Loss.l2Loss();
 
-        Model model = Model.newInstance("lin-reg");
+            Tracker lrt = Tracker.fixed(0.5f);
+            Optimizer sgd = Optimizer.sgd().setLearningRateTracker(lrt).build();
 
-        model.setBlock(mlpModel);
+            DefaultTrainingConfig config =
+                    new DefaultTrainingConfig(l2loss)
+                            .optOptimizer(sgd) // Optimizer (loss function)
+                            .addTrainingListeners(TrainingListener.Defaults.logging()); // Logging
 
-        Loss l2loss = Loss.l2Loss();
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(1, 784));
 
-        Tracker lrt = Tracker.fixed(0.5f);
-        Optimizer sgd = Optimizer.sgd().setLearningRateTracker(lrt).build();
+                Metrics metrics = new Metrics();
+                trainer.setMetrics(metrics);
 
-        DefaultTrainingConfig config =
-                new DefaultTrainingConfig(l2loss)
-                        .optOptimizer(sgd) // Optimizer (loss function)
-                        .addTrainingListeners(TrainingListener.Defaults.logging()); // Logging
+                EasyTrain.evaluateDataset(trainer, testMnistDataset);
 
-        Trainer trainer = model.newTrainer(config);
-        trainer.initialize(new Shape(1, 784));
+                Assert.assertTrue(
+                        l2loss.getAccumulator(EvaluatorTrainingListener.VALIDATE_EPOCH) < 25.0f,
+                        "dataset L2 loss is more than expected.");
+            }
 
-        Metrics metrics = new Metrics();
-        trainer.setMetrics(metrics);
-
-        EasyTrain.evaluateDataset(trainer, testMnistDataset);
-
-        Assert.assertTrue(
-                l2loss.getAccumulator(EvaluatorTrainingListener.VALIDATE_EPOCH) < 25.0f,
-                "dataset L2 loss is more than expected.");
+            model.close();
+        }
     }
 }
