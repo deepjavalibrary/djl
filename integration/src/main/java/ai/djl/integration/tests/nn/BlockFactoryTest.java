@@ -81,6 +81,7 @@ public class BlockFactoryTest {
                 }
             }
         }
+        model.close();
     }
 
     @Test
@@ -118,6 +119,7 @@ public class BlockFactoryTest {
                     true);
             model.save(savedDir, "exported");
         }
+        model.close();
         Path classDir = savedDir.resolve("classes/ai/djl/integration/tests/nn");
         Files.createDirectories(classDir);
         Files.copy(
