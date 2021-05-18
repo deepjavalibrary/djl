@@ -222,7 +222,7 @@ public class BufferedImageFactory extends ImageFactory {
                     int blue = rgb & 0xFF;
 
                     if (flag == Flag.GRAYSCALE) {
-                        int gray = (red + green + blue) / 3;
+                        int gray = Math.round(0.299f * red + 0.587f * green + 0.114f * blue);
                         bb.put((byte) gray);
                     } else {
                         bb.put((byte) red);
