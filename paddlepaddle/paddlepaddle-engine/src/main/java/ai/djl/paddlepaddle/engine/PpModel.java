@@ -68,6 +68,9 @@ public class PpModel extends BaseModel {
             }
         }
         long config = JniUtils.createConfig(modelFiles[0], modelFiles[1], manager.getDevice());
+        if (System.getenv().containsKey("PADDLE_ENABLE_MKLDNN")) {
+            JniUtils.enableMKLDNN(config);
+        }
         paddlePredictor = new PaddlePredictor(JniUtils.createPredictor(config));
         JniUtils.deleteConfig(config);
         setBlock(new PpSymbolBlock(paddlePredictor));
