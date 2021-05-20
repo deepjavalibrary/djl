@@ -27,7 +27,8 @@
         "height": 224,
         "resize": true,
         "normalize": true,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "applySoftmax": true
       },
       "files": {
         "classes": {
@@ -60,7 +61,8 @@
         "height": 299,
         "resize": true,
         "normalize": true,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "applySoftmax": true
       },
       "files": {
         "classes": {
