@@ -128,7 +128,7 @@ jobs:
           name: tensorflow-model-zoo
           path: tensorflow/tensorflow-model-zoo/build/reports
       - name: upload to codecov
-        uses: codecov/codecov-action@v1.4.1
+        uses: codecov/codecov-action@v1.5.0
         with:
           files: ./build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml
           name: codecov-umbrella
