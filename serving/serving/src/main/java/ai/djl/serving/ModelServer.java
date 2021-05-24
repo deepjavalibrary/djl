@@ -303,6 +303,7 @@ public class ModelServer {
                     modelManager.registerModel(
                             ModelInfo.inferModelNameFromUrl(url),
                             url,
+                            null,
                             configManager.getBatchSize(),
                             configManager.getMaxBatchDelay(),
                             configManager.getMaxIdleTime());

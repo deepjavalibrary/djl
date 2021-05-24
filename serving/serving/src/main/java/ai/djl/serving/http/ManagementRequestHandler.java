@@ -35,23 +35,25 @@ import java.util.regex.Pattern;
  */
 public class ManagementRequestHandler extends HttpRequestHandler {
 
-    /** HTTP Paramater "synchronous". */
+    /** HTTP Parameter "synchronous". */
     private static final String SYNCHRONOUS_PARAMETER = "synchronous";
-    /** HTTP Paramater "initial_workers". */
+    /** HTTP Parameter "initial_workers". */
     private static final String INITIAL_WORKERS_PARAMETER = "initial_workers";
-    /** HTTP Paramater "url". */
+    /** HTTP Parameter "url". */
     private static final String URL_PARAMETER = "url";
-    /** HTTP Paramater "batch_size". */
+    /** HTTP Parameter "batch_size". */
     private static final String BATCH_SIZE_PARAMETER = "batch_size";
-    /** HTTP Paramater "model_name". */
+    /** HTTP Parameter "model_name". */
     private static final String MODEL_NAME_PARAMETER = "model_name";
-    /** HTTP Paramater "max_batch_delay". */
+    /** HTTP Parameter "model_name". */
+    private static final String ENGINE_NAME_PARAMETER = "engine_name";
+    /** HTTP Parameter "max_batch_delay". */
     private static final String MAX_BATCH_DELAY_PARAMETER = "max_batch_delay";
-    /** HTTP Paramater "max_idle_time". */
+    /** HTTP Parameter "max_idle_time". */
     private static final String MAX_IDLE_TIME__PARAMETER = "max_idle_time";
-    /** HTTP Paramater "max_worker". */
+    /** HTTP Parameter "max_worker". */
     private static final String MAX_WORKER_PARAMETER = "max_worker";
-    /** HTTP Paramater "min_worker". */
+    /** HTTP Parameter "min_worker". */
     private static final String MIN_WORKER_PARAMETER = "min_worker";
 
     private static final Pattern PATTERN = Pattern.compile("^/models([/?].*)?");
@@ -147,6 +149,7 @@ public class ManagementRequestHandler extends HttpRequestHandler {
         if (modelName == null || modelName.isEmpty()) {
             modelName = ModelInfo.inferModelNameFromUrl(modelUrl);
         }
+        String engineName = NettyUtils.getParameter(decoder, ENGINE_NAME_PARAMETER, null);
         int batchSize = NettyUtils.getIntParameter(decoder, BATCH_SIZE_PARAMETER, 1);
         int maxBatchDelay = NettyUtils.getIntParameter(decoder, MAX_BATCH_DELAY_PARAMETER, 100);
         int maxIdleTime = NettyUtils.getIntParameter(decoder, MAX_IDLE_TIME__PARAMETER, 60);
@@ -159,7 +162,7 @@ public class ManagementRequestHandler extends HttpRequestHandler {
         final ModelManager modelManager = ModelManager.getInstance();
         CompletableFuture<ModelInfo> future =
                 modelManager.registerModel(
-                        modelName, modelUrl, batchSize, maxBatchDelay, maxIdleTime);
+                        modelName, modelUrl, engineName, batchSize, maxBatchDelay, maxIdleTime);
         CompletableFuture<Void> f =
                 future.thenAccept(
                         modelInfo ->
