@@ -13,7 +13,7 @@ allprojects {
         maven {
             url "https://mlrepo.djl.ai/maven/"
         }
-        jcenter()
+        mavenCentral()
         maven {
             url 'https://oss.sonatype.org/content/repositories/snapshots/'
         }
