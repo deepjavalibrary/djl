@@ -146,6 +146,7 @@ public class InferenceRequestHandler extends HttpRequestHandler {
                     throw new ModelNotFoundException("Permission denied: " + modelUrl);
                 }
             }
+            String engineName = input.getProperty("engine_name", null);
 
             logger.info("Loading model {} from: {}", modelName, modelUrl);
 
@@ -153,6 +154,7 @@ public class InferenceRequestHandler extends HttpRequestHandler {
                     .registerModel(
                             modelName,
                             modelUrl,
+                            engineName,
                             ConfigManager.getInstance().getBatchSize(),
                             ConfigManager.getInstance().getMaxBatchDelay(),
                             ConfigManager.getInstance().getMaxIdleTime())

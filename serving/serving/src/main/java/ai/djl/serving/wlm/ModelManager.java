@@ -75,6 +75,7 @@ public final class ModelManager {
      *
      * @param modelName the name of the model for HTTP endpoint
      * @param modelUrl the model url
+     * @param engineName the engine to load the model
      * @param batchSize the batch size
      * @param maxBatchDelay the maximum delay for batching
      * @param maxIdleTime the maximum idle time of the worker threads before scaling down.
@@ -83,6 +84,7 @@ public final class ModelManager {
     public CompletableFuture<ModelInfo> registerModel(
             final String modelName,
             final String modelUrl,
+            final String engineName,
             final int batchSize,
             final int maxBatchDelay,
             final int maxIdleTime) {
@@ -93,6 +95,7 @@ public final class ModelManager {
                                 Criteria.builder()
                                         .setTypes(Input.class, Output.class)
                                         .optModelUrls(modelUrl)
+                                        .optEngine(engineName)
                                         .build();
                         ZooModel<Input, Output> model = ModelZoo.loadModel(criteria);
                         ModelInfo modelInfo =
