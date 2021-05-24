@@ -115,7 +115,7 @@ public final class ModelManager {
                             throw new BadRequestException(
                                     "Model " + modelName + " is already registered.");
                         }
-                        logger.info("Model {} loaded.", modelInfo.getModelName());
+                        logger.info("Model {} loaded.", modelName);
 
                         return modelInfo;
                     } catch (ModelException | IOException e) {
