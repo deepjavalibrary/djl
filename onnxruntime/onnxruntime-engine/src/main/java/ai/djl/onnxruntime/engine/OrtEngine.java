@@ -16,10 +16,13 @@ package ai.djl.onnxruntime.engine;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
+import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
 import ai.onnxruntime.OrtEnvironment;
+import ai.onnxruntime.OrtException;
+import ai.onnxruntime.OrtSession;
 
 /**
  * The {@code OrtEngine} is an implementation of the {@link Engine} based on the <a
@@ -80,7 +83,17 @@ public final class OrtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public boolean hasCapability(String capability) {
-        // TODO: Support GPU
+        if (StandardCapabilities.MKL.equals(capability)) {
+            return true;
+        } else if (StandardCapabilities.CUDA.equals(capability)) {
+            try {
+                OrtSession.SessionOptions sessionOptions = new OrtSession.SessionOptions();
+                sessionOptions.addCUDA();
+                return true;
+            } catch (OrtException e) {
+                return false;
+            }
+        }
         return false;
     }
 
@@ -128,10 +141,17 @@ public final class OrtEngine extends Engine {
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
         sb.append(getEngineName()).append(':').append(getVersion()).append(", ");
+        sb.append(getEngineName())
+                .append(':')
+                .append(getVersion())
+                .append(", capabilities: [\n\t" + StandardCapabilities.MKL + ",\n");
+        if (hasCapability(StandardCapabilities.CUDA)) {
+            sb.append("\t").append(StandardCapabilities.CUDA).append(",\n"); // NOPMD
+        }
         if (alternativeEngine != null) {
-            sb.append("Alternative engine: ").append(alternativeEngine.getEngineName());
+            sb.append("]\nAlternative engine: ").append(alternativeEngine.getEngineName());
         } else {
-            sb.append("No alternative engine found");
+            sb.append("]\nNo alternative engine found");
         }
         return sb.toString();
     }
