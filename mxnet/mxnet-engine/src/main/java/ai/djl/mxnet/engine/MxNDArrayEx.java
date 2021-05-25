@@ -964,6 +964,7 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings("PMD.UseTryWithResources")
     public NDArray where(NDArray condition, NDArray other) {
         NDArray array1;
         NDArray array2;

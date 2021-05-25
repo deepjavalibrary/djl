@@ -227,8 +227,8 @@ public class Criteria<I, O> {
         if (application != null) {
             sb.append("\tApplication: ").append(application).append('\n');
         }
-        sb.append("\tInput: ").append(inputClass).append('\n');
-        sb.append("\tOutput: ").append(outputClass).append('\n');
+        sb.append("\tInput: ").append(inputClass);
+        sb.append("\n\tOutput: ").append(outputClass).append('\n');
         if (engine != null) {
             sb.append("\tEngine: ").append(engine).append('\n');
         }
