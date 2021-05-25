@@ -237,14 +237,20 @@ public final class ModelInfo implements AutoCloseable, Cloneable {
     public static String inferModelNameFromUrl(String url) {
         URI uri = URI.create(url);
         String path = uri.getPath();
-        String modelName;
+        boolean isDirectory = path.endsWith("/");
+        if (isDirectory) {
+            path = path.substring(0, path.length() - 1);
+        }
         int pos = path.lastIndexOf('/');
+        String modelName;
         if (pos >= 0) {
             modelName = path.substring(pos + 1);
         } else {
             modelName = path;
         }
-        modelName = FilenameUtils.getNamePart(modelName);
+        if (!isDirectory) {
+            modelName = FilenameUtils.getNamePart(modelName);
+        }
         modelName = modelName.replaceAll("(\\W|^_)", "_");
         return modelName;
     }

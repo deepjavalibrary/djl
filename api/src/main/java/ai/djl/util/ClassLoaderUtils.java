@@ -96,7 +96,7 @@ public final class ClassLoaderUtils {
 
     private static <T> T scanDirectory(ClassLoader cl, Path dir) throws IOException {
         if (!Files.isDirectory(dir)) {
-            logger.debug("Directory not exists: {}", dir);
+            logger.trace("Directory not exists: {}", dir);
             return null;
         }
         Collection<Path> files =
