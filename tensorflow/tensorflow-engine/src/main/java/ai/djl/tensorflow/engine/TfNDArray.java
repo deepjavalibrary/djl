@@ -34,6 +34,7 @@ import java.util.stream.LongStream;
 import org.tensorflow.internal.c_api.TFE_TensorHandle;
 
 /** {@code TfNDArray} is the TensorFlow implementation of {@link NDArray}. */
+@SuppressWarnings("PMD.UseTryWithResources")
 public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArray {
 
     private static final int MAX_SIZE = 100;

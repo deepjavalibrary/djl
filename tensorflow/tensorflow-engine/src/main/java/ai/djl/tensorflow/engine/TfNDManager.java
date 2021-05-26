@@ -30,6 +30,7 @@ import java.nio.LongBuffer;
 import org.tensorflow.internal.c_api.TFE_Context;
 import org.tensorflow.internal.c_api.TFE_TensorHandle;
 
+@SuppressWarnings("PMD.UseTryWithResources")
 public class TfNDManager extends BaseNDManager {
 
     static final TfNDManager SYSTEM_MANAGER = new SystemManager();

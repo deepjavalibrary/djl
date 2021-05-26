@@ -202,7 +202,7 @@ public class BaseModelLoader implements ModelLoader {
         } catch (IOException e) {
             sb.append("\tFailed load metadata.");
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
@@ -221,7 +221,7 @@ public class BaseModelLoader implements ModelLoader {
     }
 
     private String getFactoryLookupErrorMessage(String msg) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(200);
         sb.append(msg);
         sb.append("The valid input and output classes are: \n");
         for (Pair<Type, Type> io : factories.keySet()) {
