@@ -44,13 +44,6 @@ processResources {
         }
         def propFile = file("${classDir}/sentencepiece.properties")
         propFile.text = "version=${versionName}\n"
-
-        // for ci to upload to S3
-        def ciDir = "${project.projectDir}/jnilib/${djl_version}"
-        copy {
-            from jniDir
-            into ciDir
-        }
     }
 }
 
@@ -74,6 +67,13 @@ task compileJNI {
                 || System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
             exec {
                 commandLine 'bash', 'build.sh'
+            }
+            def jniDir = "${project.buildDir}/jnilib"
+            // for ci to upload to S3
+            def ciDir = "${project.projectDir}/jnilib/${djl_version}"
+            copy {
+                from jniDir
+                into ciDir
             }
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])

@@ -18,8 +18,10 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.JsonUtils;
+import ai.djl.util.PairList;
 import com.google.gson.reflect.TypeToken;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,9 +29,7 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,7 +48,7 @@ public class Arguments {
     private int iteration;
     private int threads;
     private int delay;
-    private Shape[] inputShapes;
+    private PairList<DataType, Shape> inputShapes;
     private boolean help;
 
     public Arguments(CommandLine cmd) {
@@ -56,6 +56,8 @@ public class Arguments {
         outputDir = cmd.getOptionValue("output-dir");
         imageFile = cmd.getOptionValue("image");
         help = cmd.hasOption("help");
+        inputShapes = new PairList<>();
+
         if (cmd.hasOption("duration")) {
             duration = Integer.parseInt(cmd.getOptionValue("duration"));
         }
@@ -81,19 +83,52 @@ public class Arguments {
         if (cmd.hasOption("input-shapes")) {
             String shape = cmd.getOptionValue("input-shapes");
             if (shape.contains("(")) {
-                Pattern pattern = Pattern.compile("\\((\\s*(\\d+)([,\\s]+\\d+)*\\s*)\\)");
+                Pattern pattern =
+                        Pattern.compile("\\((\\s*(\\d+)([,\\s]+\\d+)*\\s*)\\)([sfduislbS]?)");
                 Matcher matcher = pattern.matcher(shape);
-                List<Shape> shapes = new ArrayList<>();
                 while (matcher.find()) {
                     String[] tokens = matcher.group(1).split(",");
                     long[] array = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
-                    shapes.add(new Shape(array));
+                    DataType dataType;
+                    String dataTypeStr = matcher.group(4);
+                    if (dataTypeStr == null || dataTypeStr.isEmpty()) {
+                        dataType = DataType.FLOAT32;
+                    } else {
+                        switch (dataTypeStr) {
+                            case "s":
+                                dataType = DataType.FLOAT16;
+                                break;
+                            case "d":
+                                dataType = DataType.FLOAT64;
+                                break;
+                            case "u":
+                                dataType = DataType.UINT8;
+                                break;
+                            case "b":
+                                dataType = DataType.INT8;
+                                break;
+                            case "i":
+                                dataType = DataType.INT32;
+                                break;
+                            case "l":
+                                dataType = DataType.INT64;
+                                break;
+                            case "B":
+                                dataType = DataType.BOOLEAN;
+                                break;
+                            case "f":
+                                dataType = DataType.FLOAT32;
+                                break;
+                            default:
+                                throw new IllegalArgumentException("Invalid input-shape: " + shape);
+                        }
+                    }
+                    inputShapes.add(dataType, new Shape(array));
                 }
-                inputShapes = shapes.toArray(new Shape[0]);
             } else {
                 String[] tokens = shape.split(",");
                 long[] shapes = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
-                inputShapes = new Shape[] {new Shape(shapes)};
+                inputShapes.add(DataType.FLOAT32, new Shape(shapes));
             }
         }
     }
@@ -223,14 +258,14 @@ public class Arguments {
     }
 
     public Class<?> getInputClass() {
-        if (inputShapes == null) {
+        if (inputShapes.isEmpty()) {
             return Image.class;
         }
         return NDList.class;
     }
 
     public Class<?> getOutputClass() {
-        if (inputShapes == null) {
+        if (inputShapes.isEmpty()) {
             if (artifactId != null && artifactId.contains("ssd")) {
                 return DetectedObjects.class;
             }
@@ -240,7 +275,7 @@ public class Arguments {
     }
 
     public Object getInputData() throws IOException {
-        if (inputShapes == null) {
+        if (inputShapes.isEmpty()) {
             return ImageFactory.getInstance().fromFile(getImageFile());
         }
         return null;
@@ -250,7 +285,7 @@ public class Arguments {
         return delay;
     }
 
-    public Shape[] getInputShapes() {
+    public PairList<DataType, Shape> getInputShapes() {
         return inputShapes;
     }
 

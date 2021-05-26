@@ -15,6 +15,7 @@ configure([
         project(':pytorch:pytorch-engine'),
         project(':pytorch:pytorch-model-zoo'),
         project(':serving:serving'),
+        project(':tensorflow:tensorflow-api'),
         project(':tensorflow:tensorflow-engine'),
         project(':tensorflow:tensorflow-model-zoo'),
         project(':tflite:tflite-engine'),

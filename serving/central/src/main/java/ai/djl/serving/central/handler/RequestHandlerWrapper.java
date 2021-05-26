@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * wraps a Request-Handler into a SimpleChannelInboundHandler to use central as a stand-alone
  * component without serving.
  *
- * @author erikb
+ * @author erik.bamberg@web.de
  */
 public class RequestHandlerWrapper extends SimpleChannelInboundHandler<FullHttpRequest> {
 

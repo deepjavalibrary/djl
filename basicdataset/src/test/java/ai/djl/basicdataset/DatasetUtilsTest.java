@@ -53,7 +53,7 @@ public class DatasetUtilsTest {
                 NDArray array = split[i].getData().singletonOrThrow();
                 Assert.assertEquals(array.getDevice(), devices[i]);
 
-                String ndIndex = String.format(Locale.ENGLISH, "%d:%d", i * step, (i + 1) * step);
+                String ndIndex = String.format(Locale.ROOT, "%d:%d", i * step, (i + 1) * step);
                 Assert.assertEquals(data.get(ndIndex).toDevice(devices[i], true), array);
             }
         }
@@ -86,11 +86,11 @@ public class DatasetUtilsTest {
                 NDArray array = split[i].getData().singletonOrThrow();
                 Assert.assertEquals(array.getDevice(), devices[i]);
                 if (i == split.length - 1) {
-                    String indices = String.format(Locale.ENGLISH, "%d:%d", i * step, data.size(0));
+                    String indices = String.format(Locale.ROOT, "%d:%d", i * step, data.size(0));
                     Assert.assertEquals(data.get(indices).toDevice(devices[i], true), array);
                     return;
                 }
-                String indices = String.format(Locale.ENGLISH, "%d:%d", i * step, (i + 1) * step);
+                String indices = String.format(Locale.ROOT, "%d:%d", i * step, (i + 1) * step);
                 Assert.assertEquals(data.get(indices).toDevice(devices[i], true), array);
             }
         }
@@ -123,11 +123,11 @@ public class DatasetUtilsTest {
                 NDArray array = split[i].getData().singletonOrThrow();
                 Assert.assertEquals(array.getDevice(), devices[i]);
                 if (i == split.length - 1) {
-                    String indices = String.format(Locale.ENGLISH, "%d:%d", i * step, data.size(0));
+                    String indices = String.format(Locale.ROOT, "%d:%d", i * step, data.size(0));
                     Assert.assertEquals(data.get(indices).toDevice(devices[i], true), array);
                     return;
                 }
-                String indices = String.format(Locale.ENGLISH, "%d:%d", i * step, (i + 1) * step);
+                String indices = String.format(Locale.ROOT, "%d:%d", i * step, (i + 1) * step);
                 Assert.assertEquals(data.get(indices).toDevice(devices[i], true), array);
             }
         }

@@ -242,7 +242,7 @@ public abstract class BaseModel implements Model {
                         ? Utils.getCurrentEpoch(modelPath, newModelName) + 1
                         : Integer.parseInt(epochValue);
 
-        String fileName = String.format(Locale.ENGLISH, "%s-%04d.params", newModelName, epoch);
+        String fileName = String.format(Locale.ROOT, "%s-%04d.params", newModelName, epoch);
         Path paramFile = modelPath.resolve(fileName);
         try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(paramFile))) {
             dos.writeBytes("DJL@");
@@ -320,7 +320,7 @@ public abstract class BaseModel implements Model {
             epoch = Integer.parseInt(epochOption.toString());
         }
 
-        return modelDir.resolve(String.format(Locale.ENGLISH, "%s-%04d.params", prefix, epoch));
+        return modelDir.resolve(String.format(Locale.ROOT, "%s-%04d.params", prefix, epoch));
     }
 
     protected boolean readParameters(Path paramFile, Map<String, ?> options)

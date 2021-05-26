@@ -5,7 +5,7 @@ buildscript {
             url "https://mlrepo.djl.ai/maven/"
         }
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
@@ -20,7 +20,7 @@ allprojects {
 
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 

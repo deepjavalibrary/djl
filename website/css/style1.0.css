@@ -73,7 +73,7 @@ canvas {
 }
 
 .navLinksWrap {
-    overflow-x: scroll;
+    overflow: hidden;
     height: 64px;
 }
   

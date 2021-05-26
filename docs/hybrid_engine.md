@@ -11,18 +11,18 @@ The minimum dependencies for the ONNX Runtime Engine are:
 #### gradle
 
 ```
-runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine:0.10.0"
+runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine:0.11.0"
 ```
 
 ```
-runtimeOnly "ai.djl.dlr:dlr-engine:0.10.0"
+runtimeOnly "ai.djl.dlr:dlr-engine:0.11.0"
 ```
 
 To use it along with Apache MXNet for additional API support, add the following two dependencies:
 
 ```
-runtimeOnly "ai.djl.mxnet:mxnet-engine:0.10.0"
-runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.7.0-backport"
+runtimeOnly "ai.djl.mxnet:mxnet-engine:0.11.0"
+runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.8.0"
 ```
 
 You can also use PyTorch or TensorFlow Engine as the supplemental engine by adding their corresponding dependencies.

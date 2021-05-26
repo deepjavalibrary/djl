@@ -56,7 +56,7 @@ task prepareNativeLibs() {
         delete "${buildDir}/native"
 
         def files = [
-                "cpu/linux": "https://paddle-inference-lib.bj.bcebos.com/2.0.2-cpu-avx-openblas/paddle_inference.tgz",
+                "cpu/linux": "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle202/paddle_inference_install_dir-2.0.2-openblas-gcc54-ubuntu.tgz",
                 "cpu/osx"  : "https://paddle-inference-lib.bj.bcebos.com/mac/2.0.2/cpu_avx_openblas/paddle_inference.tgz",
                 "cpu/win"  : "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-windows-openblas-2.0.2.zip"
         ]

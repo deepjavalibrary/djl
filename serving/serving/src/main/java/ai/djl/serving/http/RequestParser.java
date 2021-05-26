@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * a parser for inbound request.
  *
- * @author erikb
+ * @author erik.bamberg@web.de
  */
 public class RequestParser {
 

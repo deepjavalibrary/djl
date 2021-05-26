@@ -33,7 +33,7 @@ jobs:
           export ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}
           cd android
           ./gradlew :pytorch-native:assemble
-          ./gradlew publish -Pstaging
+          ./gradlew publish -P${{ github.event.inputs.mode }}
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}

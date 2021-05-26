@@ -13,12 +13,14 @@
 package ai.djl.onnxruntime.engine;
 
 import ai.djl.BaseModel;
+import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
+import ai.onnxruntime.OrtSession;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -65,9 +67,16 @@ public class OrtModel extends BaseModel {
                 throw new FileNotFoundException(".onnx file not found in: " + modelPath);
             }
         }
-        // TODO: Support SessionOption here for further optimization
+
         try {
-            block = new OrtSymbolBlock(env.createSession(modelFile.toString()));
+            Device device = manager.getDevice();
+            if (Device.Type.GPU.equals(device.getDeviceType())) {
+                OrtSession.SessionOptions sessionOptions = new OrtSession.SessionOptions();
+                sessionOptions.addCUDA(manager.getDevice().getDeviceId());
+                block = new OrtSymbolBlock(env.createSession(modelFile.toString(), sessionOptions));
+            } else {
+                block = new OrtSymbolBlock(env.createSession(modelFile.toString()));
+            }
         } catch (OrtException e) {
             throw new MalformedModelException("ONNX Model cannot be loaded", e);
         }

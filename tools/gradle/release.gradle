@@ -21,6 +21,7 @@ task staging() {
             file.text = file.text.replaceAll("https://oss\\.sonatype\\.org/content/repositories/snapshots/",
                     "https://oss.sonatype.org/service/local/repositories/${stagingRepo}/content/")
                     .replaceAll("-SNAPSHOT", "")
+                    .replaceAll("//\\s*%mavenRepo snapshots", "%mavenRepo snapshots")
         }
     }
 }

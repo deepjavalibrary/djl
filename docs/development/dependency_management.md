@@ -71,13 +71,13 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | pytorch-engine-precxx11 (deprecated) | PyTorch engine adapter <= 0.9.0 specific for precxx11 environment like CentOs 7 and Ubuntu 14.04 |
 | | | |
 | [ai.djl.tensorflow](https://search.maven.org/search?q=g:ai.djl.tensorflow) | [tensorflow-engine](../../tensorflow/tensorflow-engine/README.md#installation) | TensorFlow engine adapter |
+| | [tensorflow-api](../../tensorflow/tensorflow-api/README.md#installation) | A redistribution of tensorFlow core java API 2.x |
 | | [tensorflow-model-zoo](../../tensorflow/tensorflow-model-zoo/README.md#installation) | Contains state of the art TensorFlow saved bundle models |
 | | [tensorflow-native-auto](../../tensorflow/README.md#automatic-recommended) | A placeholder package to automatically download native libraries for your platform |
 | | [tensorflow-native-cpu(osx-x86_64)](../../tensorflow/README.md#macos) | Contains TensorFlow native library for macOS |
 | | [tensorflow-native-cpu(linux-x86_64)](../../tensorflow/README.md#linux-cpu) | Contains TensorFlow native library for Linux |
 | | [tensorflow-native-cpu(win-x86_64)](../../tensorflow/README.md#windows-cpu) | Contains TensorFlow native library for Windows |
 | | [tensorflow-native-cu110(linux-x86_84)](../../tensorflow/README.md#linux-gpu) | Contains TensorFlow native library for Linux with CUDA 11.0 |
-| | tensorflow-api(deprecated) | Removed since 0.11.0. A redistribution of org.tensorflow:tensorflow-core-api:0.2.x |
 | | tensorflow-native-cu101(linux-x86_84) (deprecated) | Contains TensorFlow native library <= 2.3.0 for Linux with CUDA 10.1 |
 | | | |
 | [ai.djl.paddlepaddle](https://search.maven.org/search?q=g:ai.djl.paddlepaddle) | [paddlepaddle-engine](../../paddlepaddle/paddlepaddle-engine/README.md#installation) | PaddlePaddle engine adapter |

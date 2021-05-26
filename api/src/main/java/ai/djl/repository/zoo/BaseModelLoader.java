@@ -32,10 +32,13 @@ import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
 import ai.djl.util.Progress;
 import java.io.IOException;
+import java.io.Reader;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -107,10 +110,20 @@ public class BaseModelLoader implements ModelLoader {
 
             Path modelPath = resource.getRepository().getResourceDirectory(artifact);
 
+            loadServingProperties(modelPath, arguments);
+            Application application = criteria.getApplication();
+            if (application != Application.UNDEFINED) {
+                arguments.put("application", application.getPath());
+            }
+            String engine = criteria.getEngine();
+            if (engine == null) {
+                // get engine from serving.properties
+                engine = (String) arguments.get("engine");
+            }
+
             // Check if the engine is specified in Criteria, use it if it is.
             // Otherwise check the modelzoo supported engine and grab a random engine in the list.
             // Otherwise if none of them is specified or model zoo is null, go to default engine.
-            String engine = criteria.getEngine();
             if (engine == null && modelZoo != null) {
                 String defaultEngine = Engine.getInstance().getEngineName();
                 for (String supportedEngine : modelZoo.getSupportedEngines()) {
@@ -141,10 +154,6 @@ public class BaseModelLoader implements ModelLoader {
                 model.setBlock(criteria.getBlock());
             }
             model.load(modelPath, null, options);
-            Application application = criteria.getApplication();
-            if (application != Application.UNDEFINED) {
-                arguments.put("application", application.getPath());
-            }
             Translator<I, O> translator = factory.newInstance(model, arguments);
             return new ZooModel<>(model, translator);
         } catch (TranslateException e) {
@@ -193,7 +202,7 @@ public class BaseModelLoader implements ModelLoader {
         } catch (IOException e) {
             sb.append("\tFailed load metadata.");
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
@@ -212,13 +221,30 @@ public class BaseModelLoader implements ModelLoader {
     }
 
     private String getFactoryLookupErrorMessage(String msg) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(200);
         sb.append(msg);
         sb.append("The valid input and output classes are: \n");
         for (Pair<Type, Type> io : factories.keySet()) {
-            sb.append(
-                    "\t(" + io.getKey().getTypeName() + ", " + io.getValue().getTypeName() + ")\n");
+            sb.append("\t(")
+                    .append(io.getKey().getTypeName())
+                    .append(", ")
+                    .append(io.getValue().getTypeName())
+                    .append(")\n");
         }
         return sb.toString();
+    }
+
+    private void loadServingProperties(Path modelDir, Map<String, Object> arguments)
+            throws IOException {
+        Path manifestFile = modelDir.resolve("serving.properties");
+        if (Files.isRegularFile(manifestFile)) {
+            Properties prop = new Properties();
+            try (Reader reader = Files.newBufferedReader(manifestFile)) {
+                prop.load(reader);
+            }
+            for (String key : prop.stringPropertyNames()) {
+                arguments.putIfAbsent(key, prop.getProperty(key));
+            }
+        }
     }
 }

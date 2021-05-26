@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ ubuntu-18.04, macos-latest ]
+        operating-system: [ ubuntu-16.04, macos-latest ]
 
     steps:
       - uses: actions/checkout@v1
@@ -128,7 +128,7 @@ jobs:
           name: tensorflow-model-zoo
           path: tensorflow/tensorflow-model-zoo/build/reports
       - name: upload to codecov
-        uses: codecov/codecov-action@v1.4.1
+        uses: codecov/codecov-action@v1.5.0
         with:
           files: ./build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml
           name: codecov-umbrella

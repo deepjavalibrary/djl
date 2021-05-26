@@ -10,10 +10,10 @@ allprojects {
     version = "${djl_version}" + (isRelease ? "" : "-SNAPSHOT")
 
     repositories {
-        maven {
-            url "https://mlrepo.djl.ai/maven/"
-        }
-        jcenter()
+//        maven {
+//            url "https://mlrepo.djl.ai/maven/"
+//        }
+        mavenCentral()
         maven {
             url 'https://oss.sonatype.org/content/repositories/snapshots/'
         }

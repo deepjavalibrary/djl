@@ -216,13 +216,14 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
-        int size = data.remaining();
-        if (size != size()) {
+        int size = Math.toIntExact(size());
+        if (data.remaining() < size) {
             throw new IllegalArgumentException(
-                    "size mismatch! the NDArray has size " + size() + " but set with size " + size);
+                    "The NDArray size is: " + size + ", but buffer size is: " + data.remaining());
         }
         // TODO how do we handle the exception happened in the middle
         dataRef = null;
+        data.limit(size);
         if (data.isDirect() && data instanceof ByteBuffer) {
             // If NDArray is on the GPU, it is native code responsibility to control the data life
             // cycle

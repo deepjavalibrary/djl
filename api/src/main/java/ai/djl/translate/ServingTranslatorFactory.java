@@ -28,7 +28,6 @@ import ai.djl.util.PairList;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -39,8 +38,6 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -56,38 +53,23 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
 
     /** {@inheritDoc} */
     @Override
-    public Translator<Input, Output> newInstance(Model model, Map<String, ?> arguments)
-            throws TranslateException {
-        Map<String, Object> merged = new ConcurrentHashMap<>(arguments);
+    public Translator<Input, Output> newInstance(Model model, Map<String, ?> arguments) {
         Path modelDir = model.getModelPath();
-        String className = null;
-        Path manifestFile = modelDir.resolve("serving.properties");
-        if (Files.isRegularFile(manifestFile)) {
-            Properties prop = new Properties();
-            try (Reader reader = Files.newBufferedReader(manifestFile)) {
-                prop.load(reader);
-            } catch (IOException e) {
-                throw new TranslateException("Failed to load serving.properties file", e);
-            }
-            for (String key : prop.stringPropertyNames()) {
-                merged.putIfAbsent(key, prop.getProperty(key));
-            }
-            className = prop.getProperty("translator");
-        }
+        String className = (String) arguments.get("translator");
 
         Path libPath = modelDir.resolve("libs");
         if (!Files.isDirectory(libPath)) {
             libPath = modelDir.resolve("lib");
             if (!Files.isDirectory(libPath)) {
-                return loadDefaultTranslator(merged);
+                return loadDefaultTranslator(arguments);
             }
         }
         ServingTranslator translator = findTranslator(libPath, className);
         if (translator != null) {
-            translator.setArguments(merged);
+            translator.setArguments(arguments);
             return translator;
         }
-        return loadDefaultTranslator(merged);
+        return loadDefaultTranslator(arguments);
     }
 
     private ServingTranslator findTranslator(Path path, String className) {
@@ -181,7 +163,7 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
         return null;
     }
 
-    private Translator<Input, Output> loadDefaultTranslator(Map<String, Object> arguments) {
+    private Translator<Input, Output> loadDefaultTranslator(Map<String, ?> arguments) {
         String appName = (String) arguments.get("application");
         if (appName != null) {
             Application application = Application.of(appName);
@@ -195,12 +177,11 @@ public class ServingTranslatorFactory implements TranslatorFactory<Input, Output
         return new RawTranslator();
     }
 
-    private Translator<Input, Output> getImageClassificationTranslator(
-            Map<String, Object> arguments) {
+    private Translator<Input, Output> getImageClassificationTranslator(Map<String, ?> arguments) {
         return new ImageServingTranslator(ImageClassificationTranslator.builder(arguments).build());
     }
 
-    private Translator<Input, Output> getSsdTranslator(Map<String, Object> arguments) {
+    private Translator<Input, Output> getSsdTranslator(Map<String, ?> arguments) {
         return new ImageServingTranslator(SingleShotDetectionTranslator.builder(arguments).build());
     }
 

@@ -5,7 +5,6 @@ on:
 
 jobs:
   build-pytorch-jni-android:
-    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-18.04
     env:
       NDK_VERSION: "20.0.5594570"
@@ -36,7 +35,6 @@ jobs:
           path: pytorch/pytorch-native/jnilib
 
   publish:
-    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-18.04
     needs: [build-pytorch-jni-android]
     steps:
@@ -54,5 +52,5 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.7.1/jnilib
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-1.7.1/jnilib*"
+          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.8.1/jnilib
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-1.8.1/jnilib*"
