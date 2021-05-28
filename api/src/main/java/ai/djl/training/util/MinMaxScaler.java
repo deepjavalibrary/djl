@@ -67,10 +67,6 @@ public class MinMaxScaler {
         if (fittedRange == null) {
             fit(data, new int[] {0});
         }
-        /*
-        *  X *= self.scale_
-              X += self.min_
-        */
         NDArray std = data.sub(fittedMin).divi(fittedRange);
         return scale(std);
     }

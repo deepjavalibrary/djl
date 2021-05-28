@@ -28,9 +28,6 @@ public class MinMaxScalerTest {
     /**
      * data = [[-1, 2], [-0.5, 6], [0, 10], [1, 18]]
      *
-     * <p>>>> scaler = MinMaxScaler() >>> print(scaler.fit(data)) MinMaxScaler() >>>
-     * print(scaler.data_max_) [ 1. 18.] >>> print(scaler.transform(data)) [[0. 0. ] [0.25 0.25]
-     * [0.5 0.5 ] [1. 1. ]] >>> print(scaler.transform([[2, 2]])) [[1.5 0. ]]
      */
     private static final float[][] TESTDATA = {{-1f, 2f}, {-0.5f, 6f}, {0f, 10f}, {1f, 18f}};
 
