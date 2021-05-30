@@ -29,10 +29,10 @@ public class MinMaxScaler {
     private float maxRange = 1f;
 
     /**
-     * compute the minimum and maximum to be used for later scaling.
+     * Computes the minimum and maximum to be used for later scaling.
      *
      * @param data used to compute the minimum and maximum used for later scaling
-     * @param axises minimum maxium computation along this axises
+     * @param axises minimum maximum computation along this axises
      * @return the fitted MinMaxScaler
      */
     public MinMaxScaler fit(NDArray data, int[] axises) {
@@ -43,7 +43,7 @@ public class MinMaxScaler {
     }
 
     /**
-     * compute the minimum and maximum to be used for later scaling.
+     * Computes the minimum and maximum to be used for later scaling.
      *
      * @param data used to compute the minimum and maximum used for later scaling
      * @return the fitted MinMaxScaler
@@ -54,7 +54,7 @@ public class MinMaxScaler {
     }
 
     /**
-     * transform the data using the previous calculated minimum and maximum.
+     * Transforms the data using the previous calculated minimum and maximum.
      *
      * <p>if {@code fit()} is not executed yet, then the minimum/maximum is computer based on the
      * input data array and used for later computations. X_std = (X - X.min(axis=0)) /
@@ -72,7 +72,7 @@ public class MinMaxScaler {
     }
 
     /**
-     * transform the data in-place using the previous calculated minimum and maximum.
+     * tTransforms the data in-place using the previous calculated minimum and maximum.
      *
      * <p>if {@code fit()} is not called before then the minimum/maximum is computer based on the
      * input data array and used for later computations. X_std = (X - X.min(axis=0)) /
@@ -91,7 +91,7 @@ public class MinMaxScaler {
     }
 
     /**
-     * scale array from std if range is not default range otherwise return the unchanged array.
+     * Scales array from std if range is not default range otherwise return the unchanged array.
      *
      * <p>this is an in-place operation.
      *
@@ -102,13 +102,12 @@ public class MinMaxScaler {
         // we don't have to scale by custom range when range is default 0..1
         if (maxRange != 1f || minRange != 0f) {
             return std.muli(maxRange - minRange).addi(minRange);
-        } else {
-            return std;
         }
+        return std;
     }
 
     /**
-     * inverse scale array from std if range is not default range otherwise return the unchanged
+     * Inverses scale array from std if range is not default range otherwise return the unchanged
      * array as a duplicate.
      *
      * @param std input array to scale
@@ -118,15 +117,15 @@ public class MinMaxScaler {
         // we don't have to scale by custom range when range is default 0..1
         if (maxRange != 1f || minRange != 0f) {
             return std.sub(minRange).divi(maxRange - minRange);
-        } else {
-            return std.duplicate();
         }
+        return std.duplicate();
     }
 
     /**
-     * inverse scale array from std if range is not default range otherwise return the array itself.
+     * Inverses scale array from std if range is not default range otherwise return the array
+     * itself.
      *
-     * <p>this is an inplace operation.
+     * <p>this is an in-place operation.
      *
      * @param std input array to scale in-place
      * @return re-scaled array
@@ -135,13 +134,12 @@ public class MinMaxScaler {
         // we don't have to scale by custom range when range is default 0..1
         if (maxRange != 1f || minRange != 0f) {
             return std.subi(minRange).divi(maxRange - minRange);
-        } else {
-            return std;
         }
+        return std;
     }
 
     /**
-     * Undo the transformation of X according to feature_range.
+     * Undoes the transformation of X according to feature_range.
      *
      * @param data to get transformed
      * @return the transformed array
@@ -149,12 +147,11 @@ public class MinMaxScaler {
     public NDArray inverseTransform(NDArray data) {
         throwsIllegalStateWhenNotFitted();
         NDArray result = inverseScale(data);
-        result = result.muli(fittedRange).addi(fittedMin);
-        return result;
+        return result.muli(fittedRange).addi(fittedMin);
     }
 
     /**
-     * Undo the transformation of X according to feature_range as an in-place operation.
+     * Undoes the transformation of X according to feature_range as an in-place operation.
      *
      * @param data to get transformed, the data get changed in-place
      * @return the transformed array
@@ -162,13 +159,13 @@ public class MinMaxScaler {
     public NDArray inverseTransformi(NDArray data) {
         throwsIllegalStateWhenNotFitted();
         NDArray result = inverseScalei(data);
-        result = result.muli(fittedRange).addi(fittedMin);
-        return result;
+        return result.muli(fittedRange).addi(fittedMin);
     }
 
     /**
-     * check if this MinMaxScaler is already fitted and throws exception otherwise.
-     * throwsIllegalStateWhenNotFitted.
+     * Checks if this MinMaxScaler is already fitted and throws exception otherwise.
+     *
+     * @throws IllegalStateException when not Fitted
      */
     private void throwsIllegalStateWhenNotFitted() {
         if (fittedRange == null) {
@@ -177,11 +174,11 @@ public class MinMaxScaler {
     }
 
     /**
-     * desired range of transformed data.
+     * Sets desired range of transformed data.
      *
-     * @param minRange min value for desired range.
-     * @param maxRange max value for desired range.
-     * @return the configured MinMaxScaler.
+     * @param minRange min value for desired range
+     * @param maxRange max value for desired range
+     * @return the configured MinMaxScaler
      */
     public MinMaxScaler optRange(float minRange, float maxRange) {
         this.minRange = minRange;
@@ -190,9 +187,9 @@ public class MinMaxScaler {
     }
 
     /**
-     * gets the value of fittedMin.
+     * Returns the value of fittedMin.
      *
-     * @return the fittedMin value.
+     * @return the fittedMin value
      */
     public NDArray getMin() {
         throwsIllegalStateWhenNotFitted();
@@ -200,9 +197,9 @@ public class MinMaxScaler {
     }
 
     /**
-     * gets the value of fittedMax.
+     * Returns the value of fittedMax.
      *
-     * @return the fittedMax value.
+     * @return the fittedMax value
      */
     public NDArray getMax() {
         throwsIllegalStateWhenNotFitted();

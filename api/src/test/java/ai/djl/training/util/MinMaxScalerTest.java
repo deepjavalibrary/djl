@@ -12,10 +12,9 @@
  */
 package ai.djl.training.util;
 
-import static org.testng.Assert.assertTrue;
-
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -25,10 +24,7 @@ import org.testng.annotations.Test;
  */
 public class MinMaxScalerTest {
 
-    /**
-     * data = [[-1, 2], [-0.5, 6], [0, 10], [1, 18]]
-     *
-     */
+    /** data = [[-1, 2], [-0.5, 6], [0, 10], [1, 18]] */
     private static final float[][] TESTDATA = {{-1f, 2f}, {-0.5f, 6f}, {0f, 10f}, {1f, 18f}};
 
     private static final float[] EXPECTED_MIN = {-1f, 2f};
@@ -44,8 +40,8 @@ public class MinMaxScalerTest {
             NDArray data = manager.create(TESTDATA);
             MinMaxScaler scaler = new MinMaxScaler();
             scaler.fit(data);
-            assertTrue(manager.create(EXPECTED_MIN).contentEquals(scaler.getMin()));
-            assertTrue(manager.create(EXPECTED_MAX).contentEquals(scaler.getMax()));
+            Assert.assertTrue(manager.create(EXPECTED_MIN).contentEquals(scaler.getMin()));
+            Assert.assertTrue(manager.create(EXPECTED_MAX).contentEquals(scaler.getMax()));
         }
     }
 
@@ -67,7 +63,7 @@ public class MinMaxScalerTest {
             NDArray data = manager.create(TESTDATA);
             MinMaxScaler scaler = new MinMaxScaler();
             MinMaxScaler returned = scaler.fit(data);
-            assertTrue(scaler == returned);
+            Assert.assertSame(scaler, returned);
         }
     }
 
@@ -78,11 +74,11 @@ public class MinMaxScalerTest {
             MinMaxScaler scaler = new MinMaxScaler();
             scaler.fit(data);
             NDArray transformed = scaler.transform(data);
-            assertTrue(manager.create(EXPECTED_TRANSFORMED_DATA).contentEquals(transformed));
+            Assert.assertTrue(manager.create(EXPECTED_TRANSFORMED_DATA).contentEquals(transformed));
             // now test other testdata fitted to the same MinMax
             NDArray data2 = manager.create(new float[][] {{2f, 2f}});
             NDArray transformed2 = scaler.transform(data2);
-            assertTrue(
+            Assert.assertTrue(
                     manager.create(EXPECTED_SECOND_TRANSFORMED_DATA).contentEquals(transformed2));
         }
     }
@@ -95,7 +91,7 @@ public class MinMaxScalerTest {
             MinMaxScaler scaler = new MinMaxScaler();
             scaler.fit(data);
             NDArray transformed = scaler.transform(data);
-            assertTrue(
+            Assert.assertTrue(
                     manager.create(new float[][] {{0f, 1f}, {1f, 0f}, {1f, 0.5f}})
                             .contentEquals(transformed));
         }
@@ -110,7 +106,7 @@ public class MinMaxScalerTest {
             scaler.optRange(5f, 10f);
             scaler.fit(data);
             NDArray transformed = scaler.transform(data);
-            assertTrue(
+            Assert.assertTrue(
                     manager.create(new float[][] {{5f, 10f}, {10f, 5f}, {10f, 7.5f}})
                             .contentEquals(transformed));
         }
@@ -125,9 +121,9 @@ public class MinMaxScalerTest {
             scaler.fit(data);
             NDArray iData = manager.create(new float[][] {{0f, 1f}, {1f, 0f}, {1f, 0.5f}});
             NDArray transformed = scaler.inverseTransform(iData);
-            assertTrue(data.contentEquals(transformed));
+            Assert.assertTrue(data.contentEquals(transformed));
             // assertion is that calculation are not done in-place, but returns a new array
-            assertTrue(iData != transformed);
+            Assert.assertNotSame(iData, transformed);
         }
     }
 
@@ -141,9 +137,9 @@ public class MinMaxScalerTest {
             scaler.fit(data);
             NDArray iData = manager.create(new float[][] {{5f, 10f}, {10f, 5f}, {10f, 7.5f}});
             NDArray transformed = scaler.inverseTransform(iData);
-            assertTrue(data.contentEquals(transformed));
+            Assert.assertTrue(data.contentEquals(transformed));
             // assertion is that calculation are not done in-place, but returns a new array
-            assertTrue(iData != transformed);
+            Assert.assertNotSame(iData, transformed);
         }
     }
 
@@ -156,9 +152,9 @@ public class MinMaxScalerTest {
             scaler.fit(data);
             NDArray iData = manager.create(new float[][] {{0f, 1f}, {1f, 0f}, {1f, 0.5f}});
             NDArray transformed = scaler.inverseTransformi(iData);
-            assertTrue(data.contentEquals(transformed));
+            Assert.assertTrue(data.contentEquals(transformed));
             // assertion is that calculation are done in-place
-            assertTrue(iData == transformed);
+            Assert.assertSame(iData, transformed);
         }
     }
 
@@ -171,7 +167,7 @@ public class MinMaxScalerTest {
             scaler.fit(data);
             scaler.optRange(0f, 2f);
             NDArray transformed = scaler.transform(data);
-            assertTrue(
+            Assert.assertTrue(
                     manager.create(new float[][] {{0f, 2f}, {2f, 0f}, {2f, 1f}})
                             .contentEquals(transformed));
         }
