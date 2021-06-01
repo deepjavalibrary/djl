@@ -18,18 +18,26 @@ import ai.djl.ndarray.NDArray;
  * Transform arrays by scaling each value to a given range. The desired range of transformed data
  * can be set using {@code optRange}. the range defaults to 0...1.
  *
+ * <p>After fitting the scaler the fitted values are attached to the same NDManager as the input
+ * array.
+ *
  * @author erik.bamberg@web.de
  */
-public class MinMaxScaler {
+public class MinMaxScaler implements AutoCloseable {
 
     private NDArray fittedMin;
     private NDArray fittedMax;
     private NDArray fittedRange;
     private float minRange;
     private float maxRange = 1f;
+    private boolean detached;
 
     /**
      * Computes the minimum and maximum to be used for later scaling.
+     *
+     * <p>After fitting the scaler the fitted values are attached to the same NDManager as the input
+     * array. reusing the minMaxScaler in the context of other NDManager's is possible by {@code
+     * detach()} the scaler from the NDManager.
      *
      * @param data used to compute the minimum and maximum used for later scaling
      * @param axises minimum maximum computation along this axises
@@ -39,11 +47,18 @@ public class MinMaxScaler {
         fittedMin = data.min(axises);
         fittedMax = data.max(axises);
         fittedRange = fittedMax.sub(fittedMin);
+        if (detached) {
+            detach();
+        }
         return this;
     }
 
     /**
      * Computes the minimum and maximum to be used for later scaling.
+     *
+     * <p>After fitting the scaler the fitted values are attached to the same NDManager as the input
+     * array. reusing the minMaxScaler in the context of other NDManager's is possible by {@code
+     * detach()} the scaler from the NDManager.
      *
      * @param data used to compute the minimum and maximum used for later scaling
      * @return the fitted MinMaxScaler
@@ -72,7 +87,7 @@ public class MinMaxScaler {
     }
 
     /**
-     * tTransforms the data in-place using the previous calculated minimum and maximum.
+     * Transforms the data in-place using the previous calculated minimum and maximum.
      *
      * <p>if {@code fit()} is not called before then the minimum/maximum is computer based on the
      * input data array and used for later computations. X_std = (X - X.min(axis=0)) /
@@ -174,6 +189,33 @@ public class MinMaxScaler {
     }
 
     /**
+     * Detaches this MinMaxScaler fitted value from current NDManager's lifecycle.
+     *
+     * <p>this becomes un-managed and it is the user's responsibility to close this. Failure to
+     * close the resource might cause your machine to run out of native memory.
+     *
+     * <p>After fitting the scaler the fitted values are attached to the same NDManager as the input
+     * array.
+     *
+     * <p>Re-fitting the scaler after detaching doesn't re-attach the scaler to any NDManager.
+     *
+     * @return the detached MinMaxScaler (itself) - to use as a fluent API
+     */
+    public MinMaxScaler detach() {
+        detached = true;
+        if (fittedMin != null) {
+            fittedMin.detach();
+        }
+        if (fittedMax != null) {
+            fittedMax.detach();
+        }
+        if (fittedRange != null) {
+            fittedRange.detach();
+        }
+        return this;
+    }
+
+    /**
      * Sets desired range of transformed data.
      *
      * @param minRange min value for desired range
@@ -204,5 +246,19 @@ public class MinMaxScaler {
     public NDArray getMax() {
         throwsIllegalStateWhenNotFitted();
         return fittedMax;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        if (fittedMin != null) {
+            fittedMin.close();
+        }
+        if (fittedMax != null) {
+            fittedMax.close();
+        }
+        if (fittedRange != null) {
+            fittedRange.close();
+        }
     }
 }

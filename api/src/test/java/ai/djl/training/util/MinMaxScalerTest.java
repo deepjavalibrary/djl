@@ -190,4 +190,61 @@ public class MinMaxScalerTest {
             scaler.inverseTransformi(data);
         }
     }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testScalerThrowsExceptionWhenNDManagerIsClosed() {
+        MinMaxScaler scaler = new MinMaxScaler();
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray data = manager.create(new float[][] {{0f, 4f}, {2f, 2f}, {2f, 3f}});
+            scaler.fit(data);
+        }
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray data = manager.create(new float[][] {{0f, 4f}, {2f, 2f}, {2f, 3f}});
+            NDArray transformed = scaler.transform(data);
+        }
+    }
+
+    @Test
+    public void testDetachedScalerCanBeReusedAfterOriginalManageIsClosed() {
+        MinMaxScaler scaler = new MinMaxScaler();
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray data = manager.create(new float[][] {{0f, 4f}, {2f, 2f}, {2f, 3f}});
+            scaler.fit(data);
+            scaler.detach();
+        }
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray data = manager.create(new float[][] {{0f, 4f}, {2f, 2f}, {2f, 3f}});
+            NDArray transformed = scaler.transform(data);
+            Assert.assertTrue(
+                    manager.create(new float[][] {{0f, 1f}, {1f, 0f}, {1f, 0.5f}})
+                            .contentEquals(transformed));
+
+        } finally {
+            scaler.close();
+        }
+    }
+
+    @Test
+    public void testDetachedScalerIsStillDetachedAfter() {
+        MinMaxScaler scaler = new MinMaxScaler();
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray data = manager.create(new float[][] {{1f, 1f}});
+            scaler.fit(data);
+            scaler.detach();
+        }
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray data = manager.create(new float[][] {{0f, 4f}, {2f, 2f}, {2f, 3f}});
+            scaler.fit(data);
+        }
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray data = manager.create(new float[][] {{0f, 4f}, {2f, 2f}, {2f, 3f}});
+            NDArray transformed = scaler.transform(data);
+            Assert.assertTrue(
+                    manager.create(new float[][] {{0f, 1f}, {1f, 0f}, {1f, 0.5f}})
+                            .contentEquals(transformed));
+
+        } finally {
+            scaler.close();
+        }
+    }
 }
