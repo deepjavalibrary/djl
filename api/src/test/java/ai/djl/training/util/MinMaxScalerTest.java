@@ -200,7 +200,7 @@ public class MinMaxScalerTest {
         }
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray data = manager.create(new float[][] {{0f, 4f}, {2f, 2f}, {2f, 3f}});
-            NDArray transformed = scaler.transform(data);
+            scaler.transform(data);
         }
     }
 
