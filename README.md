@@ -121,8 +121,6 @@ To increase build speed, you can use the following command to skip unit tests:
 gradlew build -x test
 ```
 
-**Note:** SpotBugs is not compatible with JDK 11+. SpotBugs will not be executed if you are using JDK 11+.
-
 ### Importing into eclipse
 
 to import source project into eclipse
