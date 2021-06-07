@@ -228,6 +228,9 @@ public abstract class BaseModel implements Model {
     /** {@inheritDoc} */
     @Override
     public void save(Path modelPath, String newModelName) throws IOException {
+        if (newModelName == null || newModelName.isEmpty()) {
+            newModelName = modelName;
+        }
         if (Files.notExists(modelPath)) {
             Files.createDirectories(modelPath);
         }

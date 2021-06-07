@@ -8,6 +8,7 @@ configurations {
 
 dependencies {
     api project(":api")
+    api "commons-logging:commons-logging:1.2"
     api("ml.dmlc:xgboost4j_2.12:${xgboost_version}") {
         // get rid of the unused XGBoost Dependencies
         exclude group: "org.apache.hadoop", module: "hadoop-hdfs"
@@ -60,8 +61,6 @@ publishing {
 
                 withXml {
                     Node pomNode = asNode()
-                    Node dependencies = pomNode.dependencies.get(0)
-                    addDependency(dependencies, "commons-logging", "commons-logging", "1.2")
                     pomNode.dependencies."*".findAll() {
                         it.artifactId.text().startsWith("xgboost")
                     }.each() {
@@ -71,18 +70,4 @@ publishing {
             }
         }
     }
-}
-
-def addDependency(Node parent, String groupId, String artifactId, String version) {
-    QName name = new QName("http://maven.apache.org/POM/4.0.0", "dependency")
-    Node dep = new Node(parent, name)
-    addNode(dep, "groupId", groupId)
-    addNode(dep, "artifactId", artifactId)
-    addNode(dep, "version", version)
-}
-
-def addNode(Node parent, String name, String value) {
-    QName qName = new QName("http://maven.apache.org/POM/4.0.0", name)
-    Node node = new Node(parent, qName, new NodeList())
-    node.value().add(value)
 }
