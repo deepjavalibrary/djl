@@ -17,8 +17,11 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
+import ai.djl.modality.Classifications;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.translator.ImageClassificationTranslatorFactory;
 import ai.djl.ndarray.NDList;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
@@ -65,6 +68,9 @@ public class BaseModelLoader implements ModelLoader {
                 new Pair<>(NDList.class, NDList.class),
                 (TranslatorFactory<NDList, NDList>) (m, c) -> new NoopTranslator());
         factories.put(new Pair<>(Input.class, Output.class), new ServingTranslatorFactory());
+        factories.put(
+                new Pair<>(Image.class, Classifications.class),
+                new ImageClassificationTranslatorFactory());
     }
 
     /** {@inheritDoc} */
