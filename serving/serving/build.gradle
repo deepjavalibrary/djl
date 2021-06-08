@@ -13,7 +13,7 @@ dependencies {
     runtimeOnly project(':model-zoo')
     runtimeOnly project(':mxnet:mxnet-model-zoo')
     runtimeOnly project(':tensorflow:tensorflow-model-zoo')
-    runtimeOnly project(':pytorch:pytorch-model-zoo:')
+    runtimeOnly project(':pytorch:pytorch-model-zoo')
 
     runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
     runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
@@ -29,7 +29,6 @@ jar {
         attributes 'Main-Class': 'ai.djl.serving.ModelServer'
     }
     includeEmptyDirs = false
-    from configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
 
     exclude "META-INF/maven/**"
     exclude "META-INF/INDEX.LIST"

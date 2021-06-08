@@ -1,21 +1,19 @@
-if (JavaVersion.current() < JavaVersion.VERSION_11) {
-    apply plugin: "com.github.spotbugs"
-    spotbugs {
-        excludeFilter = file("${rootProject.projectDir}/tools/conf/findbugs-exclude.xml")
-        ignoreFailures = false
-        spotbugsTest.enabled = true
+apply plugin: "com.github.spotbugs"
+spotbugs {
+    excludeFilter = file("${rootProject.projectDir}/tools/conf/findbugs-exclude.xml")
+    ignoreFailures = false
+    spotbugsTest.enabled = true
+}
+spotbugsMain {
+    reports {
+        xml.enabled false
+        html.enabled true
     }
-    spotbugsMain {
-        reports {
-            xml.enabled false
-            html.enabled true
-        }
-    }
-    spotbugsTest {
-        reports {
-            xml.enabled false
-            html.enabled true
-        }
+}
+spotbugsTest {
+    reports {
+        xml.enabled false
+        html.enabled true
     }
 }
 
@@ -45,7 +43,7 @@ checkstyle {
     configFile = file("${rootProject.projectDir}/tools/conf/checkstyle.xml")
 }
 checkstyleMain {
-    classpath += configurations.compile
+    classpath += configurations.compileClasspath
 }
 tasks.withType(Checkstyle) {
     reports {

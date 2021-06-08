@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "devDependencies": {
     "webpack": "^5.11.0",
-    "css-loader": "^3.5.2",
+    "css-loader": "^5.2.4",
     "style-loader": "^1.1.4"
   },
   "dependencies": {
@@ -22,7 +22,8 @@
     "@material-ui/icons": "^4.11.1",
     "@material-ui/lab": "*",
     "axios": "^0.21.1",
-    "regenerator-runtime": "^0.13.7"
+    "regenerator-runtime": "^0.13.7",
+    "ws": ">=7.4.6"
   },
   "scripts": {
     "start": "webpack-dev-server --scripts-prepend-node-path --hot"

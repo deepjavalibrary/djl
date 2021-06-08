@@ -48,12 +48,10 @@ clean.delete << file('src/main/resources/static/dist')
 
 
 jar {
-    project.logger.info('building the jar')
     manifest {
         attributes 'Main-Class': 'ai.djl.serving.central.ModelZooRepositoryServer'
     }
     includeEmptyDirs = false
-    from configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
 
     exclude "META-INF/maven/**"
     exclude "META-INF/INDEX.LIST"

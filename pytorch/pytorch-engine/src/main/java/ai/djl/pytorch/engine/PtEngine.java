@@ -22,6 +22,10 @@ import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
 import ai.djl.training.GradientCollector;
 import ai.djl.util.RandomUtils;
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +57,21 @@ public final class PtEngine extends Engine {
             }
             logger.info("Number of inter-op threads is " + JniUtils.getNumInteropThreads());
             logger.info("Number of intra-op threads is " + JniUtils.getNumThreads());
+
+            String paths = System.getenv("PYTORCH_EXTRA_LIBRARY_PATH");
+            if (paths == null) {
+                paths = System.getProperty("PYTORCH_EXTRA_LIBRARY_PATH");
+            }
+            if (paths != null) {
+                String[] files = paths.split(",");
+                for (String file : files) {
+                    Path path = Paths.get(file);
+                    if (Files.notExists(path)) {
+                        throw new FileNotFoundException("PyTorch extra Library not found: " + file);
+                    }
+                    System.load(path.toAbsolutePath().toString()); // NOPMD
+                }
+            }
             return new PtEngine();
         } catch (Throwable t) {
             throw new EngineException("Failed to load PyTorch native library", t);

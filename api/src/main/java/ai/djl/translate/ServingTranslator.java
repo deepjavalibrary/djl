@@ -24,5 +24,5 @@ public interface ServingTranslator extends Translator<Input, Output> {
      *
      * @param arguments the configurations for the {@code Translator} instance
      */
-    void setArguments(Map<String, Object> arguments);
+    void setArguments(Map<String, ?> arguments);
 }

@@ -28,12 +28,12 @@ export default function Main() {
 
 			<div className={classes.content}>
 				<CssBaseline />
+				<Typography>
+					<Container>
 
-
-						<ModelNavigator />
-			
-
-
+								<ModelNavigator />
+					</Container>
+				</Typography>
 			</div>
 			<PageTitle title="MODEL|zoo"></PageTitle>
 		</div>

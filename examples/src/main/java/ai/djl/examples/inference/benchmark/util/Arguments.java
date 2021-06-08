@@ -91,7 +91,7 @@ public class Arguments {
                     long[] array = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
                     DataType dataType;
                     String dataTypeStr = matcher.group(4);
-                    if (dataTypeStr == null) {
+                    if (dataTypeStr == null || dataTypeStr.isEmpty()) {
                         dataType = DataType.FLOAT32;
                     } else {
                         switch (dataTypeStr) {
@@ -258,14 +258,14 @@ public class Arguments {
     }
 
     public Class<?> getInputClass() {
-        if (inputShapes == null) {
+        if (inputShapes.isEmpty()) {
             return Image.class;
         }
         return NDList.class;
     }
 
     public Class<?> getOutputClass() {
-        if (inputShapes == null) {
+        if (inputShapes.isEmpty()) {
             if (artifactId != null && artifactId.contains("ssd")) {
                 return DetectedObjects.class;
             }
@@ -275,7 +275,7 @@ public class Arguments {
     }
 
     public Object getInputData() throws IOException {
-        if (inputShapes == null) {
+        if (inputShapes.isEmpty()) {
             return ImageFactory.getInstance().fromFile(getImageFile());
         }
         return null;
