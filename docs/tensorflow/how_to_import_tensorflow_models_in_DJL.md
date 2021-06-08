@@ -121,7 +121,7 @@ Criteria<Image, DetectedObjects> criteria =
                         .setTypes(Image.class, DetectedObjects.class)
                         .optFilter("backbone", "mobilenet_v2")
                         .optEngine("TensorFlow")
-                        .optOption("Tags", new String[] {})
+                        .optOption("Tags", "")
                         .optOption("SignatureDefKey", "default")
                         .optProgress(new ProgressBar())
                         .build();
