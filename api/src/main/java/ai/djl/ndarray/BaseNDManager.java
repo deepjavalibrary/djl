@@ -155,6 +155,12 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray truncatedNormal(float loc, float scale, Shape shape, DataType dataType) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray randomMultinomial(int n, NDArray pValues) {
         throw new UnsupportedOperationException("Not supported!");
     }
