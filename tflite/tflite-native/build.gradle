@@ -179,7 +179,3 @@ flavorNames.each { flavor ->
 
 checkstyleMain.enabled = false
 pmdMain.enabled = false
-
-if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
-    tasks.getByName("spotbugsMain").enabled = false
-}
