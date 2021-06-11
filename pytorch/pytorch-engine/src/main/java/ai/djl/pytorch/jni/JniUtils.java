@@ -720,6 +720,14 @@ public final class JniUtils {
                 ndArray.getManager(), PyTorchLibrary.LIB.torchCumSum(ndArray.getHandle(), dim));
     }
 
+    public static PtNDArray oneHot(PtNDArray ndArray, int depth, DataType dataType) {
+        return new PtNDArray(
+                        ndArray.getManager(),
+                        PyTorchLibrary.LIB.torchNNOneHot(
+                                ndArray.toType(DataType.INT64, false).getHandle(), depth))
+                .toType(dataType, false);
+    }
+
     public static NDList split(PtNDArray ndArray, long size, long axis) {
         long[] ndPtrs = PyTorchLibrary.LIB.torchSplit(ndArray.getHandle(), size, axis);
         NDList list = new NDList();

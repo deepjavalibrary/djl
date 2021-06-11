@@ -1410,6 +1410,18 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray oneHot(int depth) {
+        return JniUtils.oneHot(this, depth, DataType.FLOAT32);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray oneHot(int depth, DataType dataType) {
+        return JniUtils.oneHot(this, depth, dataType);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray oneHot(int depth, float onValue, float offValue, DataType dataType) {
         throw new UnsupportedOperationException("Not implemented");
     }
