@@ -448,6 +448,8 @@ final class PyTorchLibrary {
     native long torchNNLpPool(
             long inputHandle, double normType, long[] kernelSize, long[] stride, boolean ceilMode);
 
+    native long torchNNOneHot(long inputHandle, int depth);
+
     native boolean torchRequiresGrad(long inputHandle);
 
     native String torchGradFnName(long inputHandle);
