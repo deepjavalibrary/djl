@@ -13,6 +13,7 @@
 package ai.djl.ndarray;
 
 import ai.djl.Device;
+import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
@@ -156,7 +157,24 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray truncatedNormal(float loc, float scale, Shape shape, DataType dataType) {
-        throw new UnsupportedOperationException("Not supported!");
+        float leftClip = loc - 2 * scale;
+        float rightClip = loc + 2 * scale;
+        int sampleSize = (int) shape.size();
+
+        Shape sampleShape = new Shape();
+        double[] dist = new double[sampleSize];
+
+        for (int i = 0; i < sampleSize; i++) {
+
+            NDArray sample = randomNormal(loc, scale, sampleShape, DataType.FLOAT64);
+            while (sample.getDouble() < leftClip || sample.getDouble() > rightClip) {
+                sample = randomNormal(loc, scale, sampleShape, DataType.FLOAT64);
+            }
+
+            dist[i] = sample.getDouble();
+        }
+
+        return create(dist).reshape(shape).toType(dataType, false);
     }
 
     /** {@inheritDoc} */
