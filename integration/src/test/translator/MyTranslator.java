@@ -54,7 +54,7 @@ public class MyTranslator implements ServingTranslator {
     }
 
     @Override
-    public void setArguments(Map<String, Object> arguments) {
+    public void setArguments(Map<String, ?> arguments) {
     }
 
     @Override
