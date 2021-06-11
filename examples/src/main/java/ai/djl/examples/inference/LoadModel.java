@@ -19,16 +19,11 @@ import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.transform.CenterCrop;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import ai.djl.translate.Translator;
 import java.io.IOException;
 import java.nio.file.Path;
 import org.apache.commons.cli.CommandLine;
@@ -74,28 +69,14 @@ public final class LoadModel {
                         .setTypes(Image.class, Classifications.class)
                         .optArtifactId(artifactId)
                         .optFilters(arguments.getCriteria())
+                        .optArgument("resize", "true")
+                        .optArgument("toTensor", "true")
                         .optProgress(new ProgressBar());
-        if (artifactId.startsWith("ai.djl.localmodelzoo")) {
-            // load model from local folder
-            // since local pre-trained model doesn't have a translator defined,
-            // we need to supply a translator manually.
-            builder.optTranslator(getTranslator());
-        }
 
         Criteria<Image, Classifications> criteria = builder.build();
         try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
                 Predictor<Image, Classifications> predictor = model.newPredictor()) {
             return predictor.predict(img);
         }
-    }
-
-    private static Translator<Image, Classifications> getTranslator() {
-        // This ImageClassificationTranslator is just a default, you need to
-        // make proper changes to match your local model's behavior.
-        return ImageClassificationTranslator.builder()
-                .addTransform(new CenterCrop())
-                .addTransform(new Resize(224, 224))
-                .addTransform(new ToTensor())
-                .build();
     }
 }

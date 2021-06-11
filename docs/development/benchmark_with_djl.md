@@ -31,13 +31,13 @@ the 4-step instructions for your own model.
 Benchmark on a Tensorflow model from http url with all-ones NDArray input for 10 times:
 
 ```
-./gradlew benchmark -Dai.djl.default_engine=TensorFlow -Dai.djl.repository.zoo.location=https://storage.googleapis.com/tfhub-modules/tensorflow/resnet_50/classification/1.tar.gz?artifact_id=tf_resnet --args='-n tf_resnet -c 10 -s 1,224,224,3'
+./gradlew benchmark -Dai.djl.default_engine=TensorFlow -Dai.djl.repository.zoo.location=https://storage.googleapis.com/tfhub-modules/tensorflow/resnet_50/classification/1.tar.gz --args='-c 10 -s 1,224,224,3'
 ```
 
 Similarly, this is for PyTorch
 
 ```
-./gradlew benchmark -Dai.djl.default_engine=PyTorch -Dai.djl.repository.zoo.location=https://alpha-djl-demos.s3.amazonaws.com/model/djl-blockrunner/pytorch_resnet18.zip?model_name=traced_resnet18 --args='-c 10 -s 1,3,224,224'
+./gradlew benchmark -Dai.djl.default_engine=PyTorch -Dai.djl.repository.zoo.location=https://alpha-djl-demos.s3.amazonaws.com/model/djl-blockrunner/pytorch_resnet18.zip --args='-n traced_resnet18 -c 10 -s 1,3,224,224'
 ```
 
 ### Benchmark from ModelZoo
@@ -47,7 +47,7 @@ Similarly, this is for PyTorch
 Resnet50 image classification model:
 
 ```
-./gradlew benchmark --args="-c 1 -s 1,3,224,224 -n ai.djl.mxnet:resnet -r {'layers':'50','flavor':'v2','dataset':'imagenet'}"
+./gradlew benchmark --args="-c 1 -s 1,3,224,224 -a ai.djl.mxnet:resnet -r {'layers':'50','flavor':'v2','dataset':'imagenet'}"
 ```
 
 #### PyTorch
@@ -55,7 +55,7 @@ Resnet50 image classification model:
 SSD object detection model:
 
 ```
-./gradlew benchmark -Dai.djl.default_engine=PyTorch --args="-c 1 -s 1,3,300,300 -n ai.djl.pytorch:ssd -r {'size':'300','backbone':'resnet50'}"
+./gradlew benchmark -Dai.djl.default_engine=PyTorch --args="-c 1 -s 1,3,300,300 -a ai.djl.pytorch:ssd -r {'size':'300','backbone':'resnet50'}"
 ```
 
 
@@ -87,12 +87,13 @@ This will print out the possible arguments to pass in:
 
 ```
 usage: ./gradlew benchmark --args='[OPTIONS]'
+ -a,--artifact-id <ARTIFACT-ID>     Model artifact id.
  -c,--iteration <ITERATION>         Number of total iterations (per thread).
  -d,--duration <DURATION>           Duration of the test in minutes.
  -h,--help                          Print this help.
  -i,--image <IMAGE>                 Image file path for benchmarking CV model.
  -l,--delay <DELAY>                 Delay of incremental threads.
- -n,--artifact-id <ARTIFACT-ID>     Model artifact id.
+ -n,--model-name <MODEL-NAME>       Model name.
  -o,--output-dir <OUTPUT-DIR>       Directory for output logs.
  -r,--criteria <CRITERIA>           The criteria (json string) used for searching the model.
  -s,--input-shapes <INPUT-SHAPES>   Input data shapes for non-CV model.
@@ -118,7 +119,7 @@ DJL accept variety of models came from different places.
 The following is a pytorch model
 
 ```
--Dai.djl.repository.zoo.location=https://alpha-djl-demos.s3.amazonaws.com/model/djl-blockrunner/pytorch_resnet18.zip?model_name=traced_resnet18
+-Dai.djl.repository.zoo.location=https://alpha-djl-demos.s3.amazonaws.com/model/djl-blockrunner/pytorch_resnet18.zip
 ```
 We would recommend to make model files in a zip for better file tracking.
 
@@ -127,13 +128,22 @@ We would recommend to make model files in a zip for better file tracking.
 Mac/Linux
 
 ```
--Dai.djl.repository.zoo.location=file:///pytorch_resnet18.zip?model_name=traced_resnet18
+-Dai.djl.repository.zoo.location=file:///home/ubuntu/models/pytorch_resnet18
+-Dai.djl.repository.zoo.location=file:///home/ubuntu/models/pytorch_resnet18.zip
 ```
 
 Windows
 
 ```
--Dai.djl.repository.zoo.location=file:///C:/pytorch_resnet18.zip?model_name=traced_resnet18 # windows
+-Dai.djl.repository.zoo.location=file:///C:/models/pytorch_resnet18
+-Dai.djl.repository.zoo.location=file:///C:/models/pytorch_resnet18.zip
+```
+
+If the model file name is different from the parent folder name (or the archive file name), you need
+to specify `-n MODEL_NAME` in the `--args`:
+
+```
+--args='-n traced_resnet18'
 ```
 
 #### DJL Model zoo
@@ -146,11 +156,11 @@ You can run `listmodels` to list available models that you can use from differen
 ./gradlew listmodels -Dai.djl.default_engine=PyTorch # PyTorch models
 ```
 
-After that, just simply copy the json formatted criteria like `{"layers":"18","flavor":"v1","dataset":"imagenet"}` with the model name like `ai.djl.mxnet:resnet:0.0.1`.
-Then, you can just pass These information in the `--args` (remove `0.0.1` at the end):
+After that, just simply copy the json formatted criteria like `{"layers":"18","flavor":"v1","dataset":"imagenet"}` with the artifact id like `ai.djl.mxnet:resnet:0.0.1`.
+Then, you can just pass the information in the `--args` (remove `0.0.1` at the end):
 
 ```
--n ai.djl.mxnet:resnet -r {"layers":"18","flavor":"v1","dataset":"imagenet"}
+-a ai.djl.mxnet:resnet -r {"layers":"18","flavor":"v1","dataset":"imagenet"}
 ```
 
 ### Step 3: Define how many runs you would like to make

@@ -41,6 +41,7 @@ import org.apache.commons.cli.Options;
 public class Arguments {
 
     private String artifactId;
+    private String modelName;
     private String imageFile;
     private String outputDir;
     private Map<String, String> criteria;
@@ -53,6 +54,7 @@ public class Arguments {
 
     public Arguments(CommandLine cmd) {
         artifactId = cmd.getOptionValue("artifact-id");
+        modelName = cmd.getOptionValue("model-name");
         outputDir = cmd.getOptionValue("output-dir");
         imageFile = cmd.getOptionValue("image");
         help = cmd.hasOption("help");
@@ -138,11 +140,18 @@ public class Arguments {
         options.addOption(
                 Option.builder("h").longOpt("help").hasArg(false).desc("Print this help.").build());
         options.addOption(
-                Option.builder("n")
+                Option.builder("a")
                         .longOpt("artifact-id")
                         .hasArg()
                         .argName("ARTIFACT-ID")
                         .desc("Model artifact id.")
+                        .build());
+        options.addOption(
+                Option.builder("n")
+                        .longOpt("model-name")
+                        .hasArg()
+                        .argName("MODEL-NAME")
+                        .desc("Model name.")
                         .build());
         options.addOption(
                 Option.builder("s")
@@ -207,7 +216,15 @@ public class Arguments {
         return duration;
     }
 
+    public String getModelName() {
+        return modelName;
+    }
+
     public String getArtifactId() {
+        if (System.getProperty("ai.djl.repository.zoo.location") != null) {
+            return "ai.djl.localmodelzoo:";
+        }
+
         if (artifactId != null) {
             return artifactId;
         }
