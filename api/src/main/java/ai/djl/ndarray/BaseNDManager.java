@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
+import ai.djl.util.RandomUtils;
 import java.nio.Buffer;
 import java.nio.file.Path;
 import java.util.UUID;
@@ -156,7 +157,19 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray truncatedNormal(float loc, float scale, Shape shape, DataType dataType) {
-        throw new UnsupportedOperationException("Not supported!");
+        int sampleSize = (int) shape.size();
+        double[] dist = new double[sampleSize];
+
+        for (int i = 0; i < sampleSize; i++) {
+            double sample = RandomUtils.nextGaussian();
+            while (sample < -2 || sample > 2) {
+                sample = RandomUtils.nextGaussian();
+            }
+
+            dist[i] = sample;
+        }
+
+        return create(dist).addi(loc).muli(scale).reshape(shape).toType(dataType, false);
     }
 
     /** {@inheritDoc} */
