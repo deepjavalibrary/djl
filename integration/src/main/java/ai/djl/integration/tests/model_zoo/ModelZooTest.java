@@ -52,7 +52,7 @@ public class ModelZooTest {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
             throw new SkipException("Weekly only");
         }
-        if (Calendar.SATURDAY == Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
+        if (Calendar.SATURDAY != Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
             throw new SkipException("Weekly only");
         }
 
