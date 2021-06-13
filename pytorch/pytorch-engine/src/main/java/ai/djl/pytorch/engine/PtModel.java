@@ -74,7 +74,8 @@ public class PtModel extends BaseModel {
             if (modelFile == null) {
                 modelFile = findModelFile(modelDir.toFile().getName());
                 if (modelFile == null) {
-                    throw new FileNotFoundException(".pt file not found in: " + modelDir);
+                    String fileName = prefix.endsWith(".pt") ? prefix : prefix + ".pt";
+                    throw new FileNotFoundException(fileName + " file not found in: " + modelDir);
                 }
             }
             String[] extraFileKeys = new String[0];
