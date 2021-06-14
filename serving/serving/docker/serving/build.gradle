@@ -2,11 +2,13 @@ plugins {
     id "java"
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
-    implementation platform("ai.djl:bom:0.9.0")
-    runtimeOnly "ai.djl:serving:0.9.0"
-    runtimeOnly "ai.djl.mxnet:mxnet-engine"
-    runtimeOnly "ai.djl.mxnet:mxnet-native-auto"
+    implementation platform("ai.djl:bom:0.11.0")
+    runtimeOnly "ai.djl:serving"
 }
 
 java {
