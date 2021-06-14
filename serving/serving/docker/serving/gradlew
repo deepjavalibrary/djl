@@ -120,7 +120,7 @@ if [ ! -r "${WRAPPER_JAR_PATH}" ]; then
         if [ -e "$javaClass" ]; then
             if [ ! -e "$APP_HOME/gradle/wrapper/GradleWrapperDownloader.class" ]; then
                 # Compiling the Java class
-                ("$JAVA_HOME/bin/javac" "$javaClass")
+                ("${JAVACMD}c" "$javaClass")
             fi
             if [ -e "$APP_HOME/gradle/wrapper/GradleWrapperDownloader.class" ]; then
                 ("$JAVACMD" -cp gradle/wrapper GradleWrapperDownloader "$APP_HOME")

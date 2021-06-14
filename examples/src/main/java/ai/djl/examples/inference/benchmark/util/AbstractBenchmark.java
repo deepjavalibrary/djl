@@ -277,6 +277,7 @@ public abstract class AbstractBenchmark {
             throws ModelException, IOException {
         long begin = System.nanoTime();
         String artifactId = arguments.getArtifactId();
+        String modelName = arguments.getModelName();
         Class<?> input = arguments.getInputClass();
         Class<?> output = arguments.getOutputClass();
         PairList<DataType, Shape> shapes = arguments.getInputShapes();
@@ -287,6 +288,9 @@ public abstract class AbstractBenchmark {
                         .optFilters(arguments.getCriteria())
                         .optArtifactId(artifactId)
                         .optProgress(new ProgressBar());
+        if (modelName != null) {
+            builder.optModelName(modelName);
+        }
 
         if (!shapes.isEmpty()) {
             builder.optTranslator(

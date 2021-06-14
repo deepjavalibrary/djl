@@ -370,10 +370,10 @@ public class Criteria<I, O> {
          * @return this {@code Builder}
          */
         public Builder<I, O> optArtifactId(String artifactId) {
-            if (artifactId.contains(":")) {
-                String[] tokens = artifactId.split(":");
-                groupId = tokens[0];
-                this.artifactId = tokens[1];
+            if (artifactId != null && artifactId.contains(":")) {
+                String[] tokens = artifactId.split(":", -1);
+                groupId = tokens[0].isEmpty() ? null : tokens[0];
+                this.artifactId = tokens[1].isEmpty() ? null : tokens[1];
             } else {
                 this.artifactId = artifactId;
             }
