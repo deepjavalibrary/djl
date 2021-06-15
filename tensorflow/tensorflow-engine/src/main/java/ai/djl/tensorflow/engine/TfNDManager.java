@@ -244,6 +244,31 @@ public class TfNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray truncatedNormal(float loc, float scale, Shape shape, DataType dataType) {
+        if (DataType.STRING.equals(dataType)) {
+            throw new IllegalArgumentException("String data type is not supported!");
+        }
+        NDArray axes = create(shape.getShape());
+        TfOpExecutor opBuilder =
+                opExecutor("TruncatedNormal").addInput(axes).addParam("dtype", dataType);
+        Integer seed = getEngine().getSeed();
+        if (seed != null) {
+            // seed1 is graph-level seed
+            // set it to default graph seed used by tensorflow
+            // https://github.com/tensorflow/tensorflow/blob/85c8b2a817f95a3e979ecd1ed95bff1dc1335cff/tensorflow/python/framework/random_seed.py#L31
+            opBuilder.addParam("seed", 87654321);
+            opBuilder.addParam("seed2", seed);
+        }
+        try (NDArray array = opBuilder.buildSingletonOrThrow();
+                NDArray temp = array.mul(scale)) {
+            return temp.add(loc);
+        } finally {
+            axes.close();
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public TfNDManager newSubManager(Device device) {
         TfNDManager manager = new TfNDManager(this, device);
         attachInternal(manager.uid, manager);

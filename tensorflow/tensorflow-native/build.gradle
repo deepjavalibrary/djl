@@ -366,7 +366,3 @@ task downloadTensorflowNativeLib() {
         new File("${BINARY_ROOT}/auto").mkdirs()
     }
 }
-
-if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
-    tasks.getByName("spotbugsMain").enabled = false
-}

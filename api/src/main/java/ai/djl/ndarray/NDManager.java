@@ -1233,6 +1233,65 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Draws random samples from a normal (Gaussian) distribution with mean 0 and standard deviation
+     * 1, discarding and re-drawing any samples that are more than two standard deviations from the
+     * mean.
+     *
+     * <p>Samples are distributed according to a normal distribution parametrized by mean = 0 and
+     * standard deviation = 1.
+     *
+     * @param shape the output {@link Shape}
+     * @return the drawn samples {@link NDArray}
+     */
+    default NDArray truncatedNormal(Shape shape) {
+        return truncatedNormal(0f, 1f, shape, DataType.FLOAT32);
+    }
+
+    /**
+     * Draws random samples from a normal (Gaussian) distribution with mean 0 and standard deviation
+     * 1, discarding and re-drawing any samples that are more than two standard deviations from the
+     * mean.
+     *
+     * @param shape the output {@link Shape}
+     * @param dataType the {@link DataType} of the {@link NDArray}
+     * @return the drawn samples {@link NDArray}
+     */
+    default NDArray truncatedNormal(Shape shape, DataType dataType) {
+        return truncatedNormal(0.0f, 1.0f, shape, dataType);
+    }
+
+    /**
+     * Draws random samples from a normal (Gaussian) distribution, discarding and re-drawing any
+     * samples that are more than two standard deviations from the mean.
+     *
+     * @param loc the mean (centre) of the distribution
+     * @param scale the standard deviation (spread or "width") of the distribution
+     * @param shape the output {@link Shape}
+     * @param dataType the {@link DataType} of the {@link NDArray}
+     * @return the drawn samples {@link NDArray}
+     */
+    NDArray truncatedNormal(float loc, float scale, Shape shape, DataType dataType);
+
+    /**
+     * Draws random samples from a normal (Gaussian) distribution, discarding and re-drawing any
+     * samples that are more than two standard deviations from the mean.
+     *
+     * @param loc the mean (centre) of the distribution
+     * @param scale the standard deviation (spread or "width") of the distribution
+     * @param shape the output {@link Shape}
+     * @param dataType the {@link DataType} of the {@link NDArray}
+     * @param device the {@link Device} of the {@link NDArray}
+     * @return the drawn samples {@link NDArray}
+     */
+    default NDArray truncatedNormal(
+            float loc, float scale, Shape shape, DataType dataType, Device device) {
+        if (device == null || device.equals(getDevice())) {
+            return truncatedNormal(loc, scale, shape, dataType);
+        }
+        return newSubManager(device).truncatedNormal(loc, scale, shape, dataType);
+    }
+
+    /**
      * Draw samples from a multinomial distribution.
      *
      * <p>The multinomial distribution is a multivariate generalization of the binomial

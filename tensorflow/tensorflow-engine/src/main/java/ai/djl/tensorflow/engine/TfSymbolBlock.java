@@ -79,7 +79,7 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
                             + "not found in Saved Model Bundle."
                             + "Available keys: "
                             + String.join(" ", keys)
-                            + "Please use .optOptions(\"SignatureDefKey\", \"value\") with Criteria.builder to load the model."
+                            + "Please use .optOption(\"SignatureDefKey\", \"value\") with Criteria.builder to load the model."
                             + "Normally the value is \"default\" for TF1.x models and \"serving_default\" for TF2.x models. "
                             + "Refer to: https://www.tensorflow.org/guide/saved_model"
                             + "Loading the model using next available key.");

@@ -44,7 +44,7 @@ dependencies {
 }
 
 application {
-    mainClassName = System.getProperty("main", "ai.djl.examples.inference.ObjectDetection")
+    mainClassName = System.getProperty("main", "ai.djl.examples.inference.biggan.Generator")
 }
 
 run {
