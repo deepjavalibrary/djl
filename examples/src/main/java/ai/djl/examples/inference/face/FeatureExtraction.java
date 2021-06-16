@@ -22,7 +22,6 @@ import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Batchifier;
@@ -72,7 +71,7 @@ public final class FeatureExtraction {
                         .optEngine("PyTorch") // Use PyTorch engine
                         .build();
 
-        try (ZooModel<Image, float[]> model = ModelZoo.loadModel(criteria)) {
+        try (ZooModel<Image, float[]> model = criteria.loadModel()) {
             Predictor<Image, float[]> predictor = model.newPredictor();
             return predictor.predict(img);
         }

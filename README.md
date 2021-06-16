@@ -35,7 +35,7 @@ The following pseudocode demonstrates running inference:
                     .optFilter("backbone", "resnet50") // choose network architecture
                     .build();
 
-    try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria)) {
+    try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
         try (Predictor<Image, Classifications> predictor = model.newPredictor()) {
             Image img = ImageFactory.getInstance().fromUrl("http://..."); // read image
             Classifications result = predictor.predict(img);

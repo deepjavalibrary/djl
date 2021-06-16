@@ -21,7 +21,6 @@ import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -51,7 +50,7 @@ public class TfSsdTest {
 
         Path file = Paths.get("../../examples/src/test/resources/dog_bike_car.jpg");
         Image img = ImageFactory.getInstance().fromFile(file);
-        try (ZooModel<Image, DetectedObjects> model = ModelZoo.loadModel(criteria);
+        try (ZooModel<Image, DetectedObjects> model = criteria.loadModel();
                 Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
             Assert.assertEquals(model.describeInput().get(0).getValue(), new Shape(-1, -1, -1, 3));
             for (Pair<String, Shape> pair : model.describeOutput()) {

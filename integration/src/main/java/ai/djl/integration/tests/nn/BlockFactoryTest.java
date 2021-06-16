@@ -29,7 +29,6 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.Assertions;
 import ai.djl.training.ParameterStore;
@@ -98,12 +97,11 @@ public class BlockFactoryTest {
                         .optModelPath(zipPath)
                         .optModelName("exported")
                         .build();
-        try (NDManager manager = NDManager.newBaseManager()) {
-            try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria);
-                    Predictor<NDList, NDList> pred = model.newPredictor()) {
-                NDList destOut = pred.predict(new NDList(manager.ones(new Shape(1, 3, 32, 32))));
-                Assert.assertEquals(destOut.singletonOrThrow().getShape(), new Shape(1, 10));
-            }
+        try (NDManager manager = NDManager.newBaseManager();
+                ZooModel<NDList, NDList> model = criteria.loadModel();
+                Predictor<NDList, NDList> pred = model.newPredictor()) {
+            NDList destOut = pred.predict(new NDList(manager.ones(new Shape(1, 3, 32, 32))));
+            Assert.assertEquals(destOut.singletonOrThrow().getShape(), new Shape(1, 10));
         }
     }
 
@@ -157,7 +155,7 @@ public class BlockFactoryTest {
                             .optEngine(name)
                             .optGroupId("ai.djl." + name.toLowerCase())
                             .optFilter("layers", "50");
-            Model model = ModelZoo.loadModel(builder.build());
+            Model model = builder.build().loadModel();
             SequentialBlock newBlock = new SequentialBlock();
             SymbolBlock block = (SymbolBlock) model.getBlock();
             newBlock.add(block);

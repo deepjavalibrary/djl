@@ -33,7 +33,6 @@ import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
@@ -144,6 +143,6 @@ public class SingleShotDetectionTest {
                         .optFilter("dataset", "pikachu")
                         .build();
 
-        return ModelZoo.loadModel(criteria);
+        return criteria.loadModel();
     }
 }

@@ -31,7 +31,7 @@ Wrap the code snippet you want to profile in between `JniUtils.startProfile` and
 Here is an example.
 
 ```
-try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria)) {
+try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
     try (Predictor<Image, Classifications> predictor = model.newPredictor()) {
         Image image = ImageFactory.getInstance()
                         .fromNDArray(manager.zeros(new Shape(3, 224, 224), DataType.UINT8));

@@ -40,7 +40,6 @@ import ai.djl.nn.core.Linear;
 import ai.djl.nn.recurrent.LSTM;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
@@ -99,7 +98,7 @@ public final class TrainSentimentAnalysis {
                         .build();
 
         try (Model model = Model.newInstance("stanfordSentimentAnalysis");
-                ZooModel<String, NDList> embedding = ModelZoo.loadModel(criteria)) {
+                ZooModel<String, NDList> embedding = criteria.loadModel()) {
             ModelZooTextEmbedding modelZooTextEmbedding = new ModelZooTextEmbedding(embedding);
             // get training and validation dataset
             paddingTokenValue =
@@ -228,7 +227,7 @@ public final class TrainSentimentAnalysis {
         }
 
         @Override
-        public NDList processInput(TranslatorContext ctx, String input) throws EmbeddingException {
+        public NDList processInput(TranslatorContext ctx, String input) {
             List<String> tokens = Collections.singletonList(input);
             for (TextProcessor processor : TEXT_PROCESSORS) {
                 tokens = processor.preprocess(tokens);

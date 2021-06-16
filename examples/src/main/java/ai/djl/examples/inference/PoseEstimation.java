@@ -23,7 +23,6 @@ import ai.djl.modality.cv.output.Joints;
 import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -83,7 +82,7 @@ public final class PoseEstimation {
                         .build();
 
         DetectedObjects detectedObjects;
-        try (ZooModel<Image, DetectedObjects> ssd = ModelZoo.loadModel(criteria)) {
+        try (ZooModel<Image, DetectedObjects> ssd = criteria.loadModel()) {
             try (Predictor<Image, DetectedObjects> predictor = ssd.newPredictor()) {
                 detectedObjects = predictor.predict(img);
             }
@@ -118,12 +117,11 @@ public final class PoseEstimation {
                         .optFilter("dataset", "imagenet")
                         .build();
 
-        try (ZooModel<Image, Joints> pose = ModelZoo.loadModel(criteria)) {
-            try (Predictor<Image, Joints> predictor = pose.newPredictor()) {
-                Joints joints = predictor.predict(person);
-                saveJointsImage(person, joints);
-                return joints;
-            }
+        try (ZooModel<Image, Joints> pose = criteria.loadModel();
+                Predictor<Image, Joints> predictor = pose.newPredictor()) {
+            Joints joints = predictor.predict(person);
+            saveJointsImage(person, joints);
+            return joints;
         }
     }
 

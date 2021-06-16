@@ -21,7 +21,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.training.util.ProgressBar;
@@ -325,7 +324,7 @@ public abstract class AbstractBenchmark {
                     });
         }
 
-        ZooModel<?, ?> model = ModelZoo.loadModel(builder.build());
+        ZooModel<?, ?> model = builder.build().loadModel();
         long delta = System.nanoTime() - begin;
         logger.info(
                 "Model {} loaded in: {} ms.",

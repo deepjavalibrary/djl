@@ -27,7 +27,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -41,7 +40,9 @@ import org.testng.annotations.Test;
 public class ProfilerTest {
 
     @Test
-    public void testProfiler() throws MalformedModelException, ModelNotFoundException, IOException {
+    public void testProfiler()
+            throws MalformedModelException, ModelNotFoundException, IOException,
+                    TranslateException {
         try (NDManager manager = NDManager.newBaseManager()) {
             ImageClassificationTranslator translator =
                     ImageClassificationTranslator.builder().addTransform(new ToTensor()).build();
@@ -55,18 +56,14 @@ public class ProfilerTest {
                             .optProgress(new ProgressBar())
                             .build();
             String outputFile = "build/profile.json";
-            try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria)) {
-                try (Predictor<Image, Classifications> predictor = model.newPredictor()) {
-                    Image image =
-                            ImageFactory.getInstance()
-                                    .fromNDArray(
-                                            manager.zeros(new Shape(3, 224, 224), DataType.UINT8));
-                    JniUtils.startProfile(false, true, true);
-                    predictor.predict(image);
-                    JniUtils.stopProfile(outputFile);
-                } catch (TranslateException e) {
-                    e.printStackTrace();
-                }
+            try (ZooModel<Image, Classifications> model = criteria.loadModel();
+                    Predictor<Image, Classifications> predictor = model.newPredictor()) {
+                Image image =
+                        ImageFactory.getInstance()
+                                .fromNDArray(manager.zeros(new Shape(3, 224, 224), DataType.UINT8));
+                JniUtils.startProfile(false, true, true);
+                predictor.predict(image);
+                JniUtils.stopProfile(outputFile);
             }
             Assert.assertTrue(Files.exists(Paths.get(outputFile)), "The profiler file not found!");
         }

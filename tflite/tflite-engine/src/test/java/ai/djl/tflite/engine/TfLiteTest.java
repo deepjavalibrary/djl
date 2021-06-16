@@ -19,7 +19,6 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -42,7 +41,7 @@ public class TfLiteTest {
                         .optEngine("TFLite")
                         .optFilter("dataset", "aiyDish")
                         .build();
-        ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
+        ZooModel<Image, Classifications> model = criteria.loadModel();
         Predictor<Image, Classifications> predictor = model.newPredictor();
 
         Image image =
