@@ -52,5 +52,5 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.8.1/jnilib
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-1.8.1/jnilib*"
+          aws s3 sync jnilib s3://djl-ai/publish/pytorch-1.9.0/jnilib
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-1.9.0/jnilib*"

@@ -16,7 +16,7 @@ dependencies {
     runtimeOnly project(':pytorch:pytorch-model-zoo')
 
     runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
-    runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
+    runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}-SNAPSHOT"
     runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
 
     testImplementation("org.testng:testng:${testng_version}") {
