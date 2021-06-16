@@ -42,7 +42,7 @@ Criteria<Image, Classifications> criteria = Criteria.builder()
                               .add(new ToTensor()))
                  .optApplySoftmax(true).build())
   .build();
-ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
+ZooModel<Image, Classifications> model = criteria.loadModel();
 Predictor<Image, Classifications> predictor = model.newPredictor();
 String imageURL = "https://raw.githubusercontent.com/deepjavalibrary/djl/master/examples/src/test/resources/kitten.jpg";
 Image image = ImageFactory.getInstance().fromUrl(imageURL);

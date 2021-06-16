@@ -30,7 +30,6 @@ import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
@@ -166,6 +165,6 @@ public class ResnetTest {
                         .optFilter("dataset", "cifar10")
                         .build();
 
-        return ModelZoo.loadModel(criteria);
+        return criteria.loadModel();
     }
 }

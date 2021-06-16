@@ -17,7 +17,6 @@ import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.serving.http.BadRequestException;
 import ai.djl.serving.http.DescribeModelResponse;
@@ -97,7 +96,7 @@ public final class ModelManager {
                                         .optModelUrls(modelUrl)
                                         .optEngine(engineName)
                                         .build();
-                        ZooModel<Input, Output> model = ModelZoo.loadModel(criteria);
+                        ZooModel<Input, Output> model = criteria.loadModel();
                         ModelInfo modelInfo =
                                 new ModelInfo(
                                         modelName,

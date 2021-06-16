@@ -21,7 +21,6 @@ import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -62,10 +61,9 @@ public final class SentimentAnalysis {
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<String, Classifications> model = ModelZoo.loadModel(criteria)) {
-            try (Predictor<String, Classifications> predictor = model.newPredictor()) {
-                return predictor.predict(input);
-            }
+        try (ZooModel<String, Classifications> model = criteria.loadModel();
+                Predictor<String, Classifications> predictor = model.newPredictor()) {
+            return predictor.predict(input);
         }
     }
 }

@@ -20,7 +20,6 @@ import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -74,7 +73,7 @@ public final class LoadModel {
                         .optProgress(new ProgressBar());
 
         Criteria<Image, Classifications> criteria = builder.build();
-        try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
+        try (ZooModel<Image, Classifications> model = criteria.loadModel();
                 Predictor<Image, Classifications> predictor = model.newPredictor()) {
             return predictor.predict(img);
         }

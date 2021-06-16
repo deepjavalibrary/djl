@@ -18,7 +18,6 @@ import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -70,7 +69,7 @@ public final class BertQaInference {
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<QAInput, String> model = ModelZoo.loadModel(criteria)) {
+        try (ZooModel<QAInput, String> model = criteria.loadModel()) {
             try (Predictor<QAInput, String> predictor = model.newPredictor()) {
                 return predictor.predict(input);
             }

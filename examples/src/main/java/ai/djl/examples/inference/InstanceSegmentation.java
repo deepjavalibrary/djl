@@ -19,7 +19,6 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -62,7 +61,7 @@ public final class InstanceSegmentation {
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<Image, DetectedObjects> model = ModelZoo.loadModel(criteria)) {
+        try (ZooModel<Image, DetectedObjects> model = criteria.loadModel()) {
             try (Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
                 DetectedObjects detection = predictor.predict(img);
                 saveBoundingBoxImage(img, detection);

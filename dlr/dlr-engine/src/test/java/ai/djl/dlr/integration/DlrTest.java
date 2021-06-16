@@ -22,7 +22,6 @@ import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -62,7 +61,7 @@ public class DlrTest {
                         .build();
         Path file = Paths.get("../../examples/src/test/resources/kitten.jpg");
         Image image = ImageFactory.getInstance().fromFile(file);
-        try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
+        try (ZooModel<Image, Classifications> model = criteria.loadModel();
                 Predictor<Image, Classifications> predictor = model.newPredictor()) {
             Classifications result = predictor.predict(image);
             Assert.assertEquals(result.best().getClassName(), "n02123045 tabby, tabby cat");

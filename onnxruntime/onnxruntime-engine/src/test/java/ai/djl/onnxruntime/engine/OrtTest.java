@@ -23,7 +23,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.onnxruntime.zoo.tabular.softmax_regression.IrisFlower;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -44,7 +43,7 @@ public class OrtTest {
                             .build();
 
             IrisFlower virginica = new IrisFlower(1.0f, 2.0f, 3.0f, 4.0f);
-            try (ZooModel<IrisFlower, Classifications> model = ModelZoo.loadModel(criteria);
+            try (ZooModel<IrisFlower, Classifications> model = criteria.loadModel();
                     Predictor<IrisFlower, Classifications> predictor = model.newPredictor()) {
                 Classifications classifications = predictor.predict(virginica);
                 Assert.assertEquals(classifications.best().getClassName(), "virginica");
@@ -81,7 +80,7 @@ public class OrtTest {
                         .optModelUrls(
                                 "https://resources.djl.ai/test-models/onnxruntime/pipeline_tfidf.zip")
                         .build();
-        try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria);
+        try (ZooModel<NDList, NDList> model = criteria.loadModel();
                 Predictor<NDList, NDList> predictor = model.newPredictor()) {
             OrtNDManager manager = (OrtNDManager) model.getNDManager();
             NDArray stringNd =

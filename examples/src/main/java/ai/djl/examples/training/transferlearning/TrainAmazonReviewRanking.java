@@ -35,7 +35,6 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.Dropout;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
@@ -87,7 +86,7 @@ public final class TrainAmazonReviewRanking {
                         .build();
         int maxTokenLength = 64;
         try (Model model = Model.newInstance("AmazonReviewRatingClassification");
-                ZooModel<NDList, NDList> embedding = ModelZoo.loadModel(criteria)) {
+                ZooModel<NDList, NDList> embedding = criteria.loadModel()) {
             // Prepare the vocabulary
             SimpleVocabulary vocabulary =
                     SimpleVocabulary.builder()
