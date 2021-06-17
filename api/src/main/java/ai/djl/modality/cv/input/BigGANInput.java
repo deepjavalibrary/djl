@@ -19,6 +19,11 @@ public final class BigGANInput {
     private int sampleSize;
     private float truncation;
 
+    /**
+     * Construct a {@code BIgGANInput}, this is needed for preprocessing.
+     *
+     * @param categoryId the id of the desired ImageNet class, from 0 to 999
+     */
     public BigGANInput(int categoryId) {
         this.categoryId = categoryId;
         sampleSize = 1;
@@ -28,6 +33,7 @@ public final class BigGANInput {
     /**
      * Construct a {@code BIgGANInput}, this is needed for preprocessing.
      *
+     * @param categoryId the id of the desired ImageNet class, from 0 to 999
      * @param sampleSize the desired number of image samples
      * @param truncation the level of truncation, level of variability in the output
      */
