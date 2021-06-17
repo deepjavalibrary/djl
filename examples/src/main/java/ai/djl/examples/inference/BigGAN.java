@@ -12,17 +12,15 @@
  */
 package ai.djl.examples.inference;
 
+import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.input.BigGANInput;
-import ai.djl.modality.cv.input.ImageNetCategory;
 import ai.djl.modality.cv.translator.BigGANTranslator;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.training.util.DownloadUtils;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -33,14 +31,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** An example of generation using BigGAN. */
-public final class Generator {
+public final class BigGAN {
 
-    private static final Logger logger = LoggerFactory.getLogger(Generator.class);
+    private static final Logger logger = LoggerFactory.getLogger(BigGAN.class);
 
-    private Generator() {}
+    private BigGAN() {}
 
     public static void main(String[] args) throws ModelException, TranslateException, IOException {
-        Image[] generatedImages = Generator.generate();
+        Image[] generatedImages = BigGAN.generate();
 
         if (generatedImages == null) {
             logger.info("This example only works for PyTorch Engine");
@@ -54,9 +52,9 @@ public final class Generator {
         Path outputPath = Paths.get("build/output/gan/");
         Files.createDirectories(outputPath);
 
-        for (int i = 0; i < generatedImages.length; i++) {
-            Path imagePath = outputPath.resolve("image" + i + ".jpg");
-            generatedImages[i].save(Files.newOutputStream(imagePath), "jpg");
+        for (int i = 0; i < generatedImages.length; ++i) {
+            Path imagePath = outputPath.resolve("image" + i + ".png");
+            generatedImages[i].save(Files.newOutputStream(imagePath), "png");
         }
         logger.info("Generated images have been saved in: {}", outputPath);
     }
@@ -66,36 +64,19 @@ public final class Generator {
             return null;
         }
 
-        String modelPath = "build/models/gan/";
-        String modelName = "biggan-deep-256";
-
-        DownloadUtils.download(
-                "https://djl-ai.s3.amazonaws.com/mlrepo/model/cv/gan/ai/djl/pytorch/biggan-deep/0.0.1/"
-                        + modelName
-                        + ".pt.gz",
-                modelPath + modelName + ".pt",
-                new ProgressBar());
-
         Criteria<BigGANInput, Image[]> criteria =
                 Criteria.builder()
+                        .optApplication(Application.CV.GAN)
                         .setTypes(BigGANInput.class, Image[].class)
-                        .optModelName(modelName)
-                        .optModelPath(Paths.get(modelPath))
+                        .optEngine("PyTorch")
                         .optTranslator(new BigGANTranslator())
                         .optProgress(new ProgressBar())
                         .build();
 
-        BigGANInput input =
-                BigGANInput.builder()
-                        .setCategory(ImageNetCategory.of("cheeseburger"))
-                        .optSampleSize(5)
-                        .optTruncation(0.5f)
-                        .build();
-
-        try (ZooModel<BigGANInput, Image[]> model = ModelZoo.loadModel(criteria)) {
-            try (Predictor<BigGANInput, Image[]> generator = model.newPredictor()) {
-                return generator.predict(input);
-            }
+        BigGANInput input = new BigGANInput(1);
+        try (ZooModel<BigGANInput, Image[]> model = criteria.loadModel();
+                Predictor<BigGANInput, Image[]> generator = model.newPredictor()) {
+            return generator.predict(input);
         }
     }
 }

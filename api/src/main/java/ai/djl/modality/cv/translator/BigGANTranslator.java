@@ -12,11 +12,9 @@
  */
 package ai.djl.modality.cv.translator;
 
-import ai.djl.engine.Engine;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.input.BigGANInput;
-import ai.djl.modality.cv.input.ImageNetCategory;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -25,12 +23,12 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Arrays;
 
 /** Built-in {@code Translator} that provides preprocessing and postprocessing for BigGAN. */
 public final class BigGANTranslator implements Translator<BigGANInput, Image[]> {
-    private static final Logger logger = LoggerFactory.getLogger(BigGANTranslator.class);
+
+    private static final int NUMBER_OF_CATEGORIES = 1000;
     private static final int SEED_COLUMN_SIZE = 128;
 
     /**
@@ -42,29 +40,20 @@ public final class BigGANTranslator implements Translator<BigGANInput, Image[]> 
      */
     @Override
     public Image[] processOutput(TranslatorContext ctx, NDList list) {
-        logOutputList(list);
-
         NDArray output = list.get(0).addi(1).muli(128).clip(0, 255).toType(DataType.UINT8, false);
 
         int sampleSize = (int) output.getShape().get(0);
         Image[] images = new Image[sampleSize];
 
-        for (int i = 0; i < sampleSize; i++) {
+        for (int i = 0; i < sampleSize; ++i) {
             images[i] = ImageFactory.getInstance().fromNDArray(output.get(i));
         }
 
         return images;
     }
 
-    private void logOutputList(NDList list) {
-        logger.info("");
-        logger.info("MY OUTPUT:");
-        list.forEach(array -> logger.info("   out: {}", array.getShape()));
-    }
-
     @Override
     public NDList processInput(TranslatorContext ctx, BigGANInput input) throws Exception {
-        Engine.getInstance().setRandomSeed(0);
         NDManager manager = ctx.getNDManager();
 
         NDArray categoryArray = createCategoryArray(manager, input);
@@ -72,9 +61,12 @@ public final class BigGANTranslator implements Translator<BigGANInput, Image[]> 
                 manager.truncatedNormal(new Shape(input.getSampleSize(), SEED_COLUMN_SIZE))
                         .muli(input.getTruncation());
         NDArray truncation = manager.create(input.getTruncation());
-
-        logInputArrays(categoryArray, seed, truncation);
         return new NDList(seed, categoryArray, truncation);
+    }
+
+    @Override
+    public Batchifier getBatchifier() {
+        return null;
     }
 
     /**
@@ -86,26 +78,11 @@ public final class BigGANTranslator implements Translator<BigGANInput, Image[]> 
      * @return one-hot matrix
      */
     private NDArray createCategoryArray(NDManager manager, BigGANInput input) {
-        int categoryId = input.getCategory().getId();
+        int categoryId = input.getCategoryId();
         int sampleSize = input.getSampleSize();
 
         int[] indices = new int[sampleSize];
-        for (int i = 0; i < sampleSize; i++) {
-            indices[i] = categoryId;
-        }
-        return manager.create(indices).oneHot(ImageNetCategory.NUMBER_OF_CATEGORIES);
-    }
-
-    private void logInputArrays(NDArray categoryArray, NDArray seed, NDArray truncation) {
-        logger.info("");
-        logger.info("MY INPUTS: ");
-        logger.info("   y: {}", categoryArray.getShape());
-        logger.info("   z: {}", seed.get(":, :10"));
-        logger.info("   truncation: {}", truncation.getShape());
-    }
-
-    @Override
-    public Batchifier getBatchifier() {
-        return null;
+        Arrays.fill(indices, categoryId);
+        return manager.create(indices).oneHot(NUMBER_OF_CATEGORIES);
     }
 }
