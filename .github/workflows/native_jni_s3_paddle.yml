@@ -35,6 +35,7 @@ jobs:
           path: paddlepaddle/paddlepaddle-native/jnilib
 
   build-paddle-jni-gpu:
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
     container: ubuntu:16.04
     steps:
