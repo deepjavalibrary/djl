@@ -34,10 +34,44 @@ jobs:
           name: jnilib-${{ runner.os }}
           path: paddlepaddle/paddlepaddle-native/jnilib
 
+  build-paddle-jni-gpu:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: ubuntu-latest
+    container: ubuntu:16.04
+    steps:
+      - name: Setup environment
+        run: |
+          apt update
+          apt install -y cmake curl unzip software-properties-common
+          add-apt-repository ppa:ubuntu-toolchain-r/test
+          apt update && apt install -y gcc-8 g++-8
+          echo "CC=gcc-8" >> $GITHUB_ENV
+          echo "CXX=g++-8" >> $GITHUB_ENV
+      - uses: actions/checkout@v1
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Release JNI prep
+        run: ./gradlew :paddlepaddle:paddlepaddle-native:compileJNIGPU
+      - name: Upload compiled jni library
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: jnilib-${{ runner.os }}-GPU
+          path: paddlepaddle/paddlepaddle-native/jnilib
+
+
   publish:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-18.04
-    needs: [build-paddle-jni-cpu]
+    needs: [build-paddle-jni-cpu, build-paddle-jni-gpu]
     steps:
       - uses: actions/checkout@v2
       - name: Download compiledJNI Mac
@@ -54,6 +88,11 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: jnilib-Linux
+          path: jnilib
+      - name: Download compiledJNI Linux GPU
+        uses: actions/download-artifact@v1
+        with:
+          name: jnilib-Linux-GPU
           path: jnilib
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1

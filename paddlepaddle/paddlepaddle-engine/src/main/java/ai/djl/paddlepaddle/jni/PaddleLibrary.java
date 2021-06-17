@@ -40,6 +40,8 @@ final class PaddleLibrary {
 
     native long createAnalysisConfig(String modelDir, String paramDir, int deviceId);
 
+    native void analysisConfigEnableMKLDNN(long handle);
+
     native void useFeedFetchOp(long handle);
 
     native void deleteAnalysisConfig(long handle);

@@ -66,8 +66,7 @@ public final class LibUtils {
             }
         }
         if (System.getProperty("os.name").startsWith("Linux")) {
-            // TODO: put MKL fix once 2.0.1 comes
-            // loadLinuxDependencies(libName);
+            loadLinuxDependencies(libName);
         } else if (System.getProperty("os.name").startsWith("Win")) {
             loadWindowsDependencies(libName);
         }
@@ -81,30 +80,22 @@ public final class LibUtils {
         libName = copyJniLibraryFromClasspath(nativeLibDir, fallback.get());
         logger.debug("Loading paddle library from: {}", libName);
         System.load(libName); // NOPMD
-
-        // post configure extralib path
-        //        if (System.getProperty("os.name").startsWith("Linux")) {
-        //            Path libDir = Paths.get(libName).getParent();
-        //            if (libDir == null) {
-        //                throw new IllegalStateException("Native folder cannot be found");
-        //            }
-        //            String[] args = {
-        //                "dummy", "--mklml_dir=\"" + libDir.toAbsolutePath().toString() + "/\""
-        //            };
-        //            PaddleLibrary.LIB.loadExtraDir(args);
-        //        }
     }
 
-    //    public static void loadLinuxDependencies(String libName) {
-    //        Path libDir = Paths.get(libName).getParent();
-    //        List<String> names = Arrays.asList("libiomp5.so", "libdnnl.so.1");
-    //        names.forEach(
-    //                name -> {
-    //                    String lib = libDir.resolve(name).toAbsolutePath().toString();
-    //                    logger.debug("Now loading " + lib);
-    //                    System.load(lib);
-    //                });
-    //    }
+    public static void loadLinuxDependencies(String libName) {
+        Path libDir = Paths.get(libName).getParent();
+        if (libDir != null) {
+            String mkl = "libdnnl.so.2";
+            Path path = libDir.resolve(mkl);
+            if (Files.isRegularFile(path)) {
+                String lib = path.toAbsolutePath().toString();
+                logger.debug("Now loading " + lib);
+                System.load(lib);
+            } else {
+                logger.debug(mkl + "is not found, skip loading...");
+            }
+        }
+    }
 
     public static void loadWindowsDependencies(String libName) {
         Path libDir = Paths.get(libName).getParent();

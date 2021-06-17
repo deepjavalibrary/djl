@@ -72,6 +72,10 @@ public final class JniUtils {
         return PaddleLibrary.LIB.createAnalysisConfig(modelDir, paramDir, deviceId);
     }
 
+    public static void enableMKLDNN(long config) {
+        PaddleLibrary.LIB.analysisConfigEnableMKLDNN(config);
+    }
+
     public static void useFeedFetchOp(long config) {
         PaddleLibrary.LIB.useFeedFetchOp(config);
     }
