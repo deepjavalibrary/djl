@@ -33,9 +33,7 @@ import ai.djl.util.Progress;
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * Model loader for BigGAN.
- */
+/** Model loader for BigGAN. */
 public class BigGANModelLoader extends BaseModelLoader {
 
     private static final Application APPLICATION = Application.CV.GAN;
