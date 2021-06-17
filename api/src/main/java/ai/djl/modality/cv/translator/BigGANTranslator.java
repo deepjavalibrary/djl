@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,11 +10,13 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference.biggan;
+package ai.djl.modality.cv.translator;
 
 import ai.djl.engine.Engine;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
+import ai.djl.modality.cv.input.BigGANInput;
+import ai.djl.modality.cv.input.ImageNetCategory;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -26,12 +28,20 @@ import ai.djl.translate.TranslatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class BigGANTranslator implements Translator<BigGANInput, Image[]> {
+/** Built-in {@code Translator} that provides preprocessing and postprocessing for BigGAN. */
+public final class BigGANTranslator implements Translator<BigGANInput, Image[]> {
     private static final Logger logger = LoggerFactory.getLogger(BigGANTranslator.class);
     private static final int SEED_COLUMN_SIZE = 128;
 
+    /**
+     * Creates the array of images generated.
+     *
+     * @param ctx the toolkit used for post-processing
+     * @param list the output NDList after inference
+     * @return the array of generated images
+     */
     @Override
-    public Image[] processOutput(TranslatorContext ctx, NDList list) throws Exception {
+    public Image[] processOutput(TranslatorContext ctx, NDList list) {
         logOutputList(list);
 
         NDArray output = list.get(0).addi(1).muli(128).clip(0, 255).toType(DataType.UINT8, false);
@@ -67,6 +77,14 @@ final class BigGANTranslator implements Translator<BigGANInput, Image[]> {
         return new NDList(seed, categoryArray, truncation);
     }
 
+    /**
+     * Creates a one-hot matrix where each row is a one-hot vector indicating the chosen category to
+     * sample.
+     *
+     * @param manager to create NDArrays
+     * @param input the input object to pre-process
+     * @return one-hot matrix
+     */
     private NDArray createCategoryArray(NDManager manager, BigGANInput input) {
         int categoryId = input.getCategory().getId();
         int sampleSize = input.getSampleSize();
@@ -75,7 +93,7 @@ final class BigGANTranslator implements Translator<BigGANInput, Image[]> {
         for (int i = 0; i < sampleSize; i++) {
             indices[i] = categoryId;
         }
-        return manager.create(indices).oneHot(BigGANCategory.NUMBER_OF_CATEGORIES);
+        return manager.create(indices).oneHot(ImageNetCategory.NUMBER_OF_CATEGORIES);
     }
 
     private void logInputArrays(NDArray categoryArray, NDArray seed, NDArray truncation) {

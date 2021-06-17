@@ -1,0 +1,81 @@
+{
+  "metadataVersion": "0.1",
+  "resourceType": "model",
+  "application": "cv/gan",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "biggan-deep",
+  "name": "BigGAN-Deep",
+  "description": "BigGAN image generation",
+  "website": "http://www.djl.ai/pytorch/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "biggan-deep-128",
+      "properties": {
+        "layers": "12",
+        "size": "128",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 128,
+        "height": 128
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/biggan-deep-128.pt.gz",
+          "sha1Hash": "7a96e8d7f6bd772164487b0527a32bbdb018b9d9",
+          "size": 211327059
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "biggan-deep-256",
+      "properties": {
+        "layers": "24",
+        "size": "256",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 256,
+        "height": 256
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/biggan-deep-256.pt.gz",
+          "sha1Hash": "aceb74ab804423b94872ed3cd3dca88623b58637",
+          "size": 234976411
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "biggan-deep-512",
+      "properties": {
+        "layers": "12",
+        "size": "512",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 512,
+        "height": 512
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/biggan-deep-512.pt.gz",
+          "sha1Hash": "87a04a5787fd61479bd19379a567306b390c3185",
+          "size": 236433099
+        }
+      }
+    }
+  ]
+}

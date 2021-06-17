@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,12 +10,15 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference.biggan;
+package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.input.BigGANInput;
+import ai.djl.modality.cv.input.ImageNetCategory;
+import ai.djl.modality.cv.translator.BigGANTranslator;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
@@ -29,6 +32,7 @@ import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/** An example of generation using BigGAN. */
 public final class Generator {
 
     private static final Logger logger = LoggerFactory.getLogger(Generator.class);
@@ -83,7 +87,7 @@ public final class Generator {
 
         BigGANInput input =
                 BigGANInput.builder()
-                        .setCategory(BigGANCategory.of("tiger cat"))
+                        .setCategory(ImageNetCategory.of("cheeseburger"))
                         .optSampleSize(5)
                         .optTruncation(0.5f)
                         .build();
