@@ -5,7 +5,7 @@
 @rem choco install jdk8 -y
 
 set FILEPATH="libtorch"
-set VERSION="1.8.1"
+set VERSION="1.9.0"
 if "%1" == "cpu" (
     set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-%VERSION%%%2Bcpu.zip"
 ) else if "%1" == "cu102" (
