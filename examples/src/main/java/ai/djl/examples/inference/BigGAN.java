@@ -17,8 +17,6 @@ import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.input.BigGANInput;
-import ai.djl.modality.cv.translator.BigGANTranslator;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
@@ -64,18 +62,19 @@ public final class BigGAN {
             return null;
         }
 
-        Criteria<BigGANInput, Image[]> criteria =
+        Criteria<int[], Image[]> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.GAN)
-                        .setTypes(BigGANInput.class, Image[].class)
+                        .setTypes(int[].class, Image[].class)
                         .optEngine("PyTorch")
-                        .optTranslator(new BigGANTranslator())
+                        .optArgument("truncation", 0.4f)
                         .optProgress(new ProgressBar())
                         .build();
 
-        BigGANInput input = new BigGANInput(1);
-        try (ZooModel<BigGANInput, Image[]> model = criteria.loadModel();
-                Predictor<BigGANInput, Image[]> generator = model.newPredictor()) {
+        int[] input = {0, 100, 200, 300, 400};
+
+        try (ZooModel<int[], Image[]> model = criteria.loadModel();
+                Predictor<int[], Image[]> generator = model.newPredictor()) {
             return generator.predict(input);
         }
     }

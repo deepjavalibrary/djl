@@ -14,7 +14,6 @@ package ai.djl.modality.cv.translator;
 
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.input.BigGANInput;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -23,21 +22,23 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
-import java.util.Arrays;
 
 /** Built-in {@code Translator} that provides preprocessing and postprocessing for BigGAN. */
-public final class BigGANTranslator implements Translator<BigGANInput, Image[]> {
+public final class BigGANTranslator implements Translator<int[], Image[]> {
 
     private static final int NUMBER_OF_CATEGORIES = 1000;
     private static final int SEED_COLUMN_SIZE = 128;
+    private float truncation;
 
     /**
-     * Creates the array of images generated.
+     * Construct a translator for BigGAN.
      *
-     * @param ctx the toolkit used for post-processing
-     * @param list the output NDList after inference
-     * @return the array of generated images
+     * @param truncation value used to scale the normal seed for BigGAN
      */
+    public BigGANTranslator(float truncation) {
+        this.truncation = truncation;
+    }
+
     @Override
     public Image[] processOutput(TranslatorContext ctx, NDList list) {
         NDArray output = list.get(0).addi(1).muli(128).clip(0, 255).toType(DataType.UINT8, false);
@@ -53,36 +54,18 @@ public final class BigGANTranslator implements Translator<BigGANInput, Image[]> 
     }
 
     @Override
-    public NDList processInput(TranslatorContext ctx, BigGANInput input) throws Exception {
+    public NDList processInput(TranslatorContext ctx, int[] input) throws Exception {
         NDManager manager = ctx.getNDManager();
 
-        NDArray categoryArray = createCategoryArray(manager, input);
+        NDArray classes = manager.create(input).oneHot(NUMBER_OF_CATEGORIES);
         NDArray seed =
-                manager.truncatedNormal(new Shape(input.getSampleSize(), SEED_COLUMN_SIZE))
-                        .muli(input.getTruncation());
-        NDArray truncation = manager.create(input.getTruncation());
-        return new NDList(seed, categoryArray, truncation);
+                manager.truncatedNormal(new Shape(input.length, SEED_COLUMN_SIZE)).muli(truncation);
+
+        return new NDList(seed, classes, manager.create(truncation));
     }
 
     @Override
     public Batchifier getBatchifier() {
         return null;
-    }
-
-    /**
-     * Creates a one-hot matrix where each row is a one-hot vector indicating the chosen category to
-     * sample.
-     *
-     * @param manager to create NDArrays
-     * @param input the input object to pre-process
-     * @return one-hot matrix
-     */
-    private NDArray createCategoryArray(NDManager manager, BigGANInput input) {
-        int categoryId = input.getCategoryId();
-        int sampleSize = input.getSampleSize();
-
-        int[] indices = new int[sampleSize];
-        Arrays.fill(indices, categoryId);
-        return manager.create(indices).oneHot(NUMBER_OF_CATEGORIES);
     }
 }

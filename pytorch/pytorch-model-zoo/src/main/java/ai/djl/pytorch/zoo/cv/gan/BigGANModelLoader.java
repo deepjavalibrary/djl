@@ -17,7 +17,6 @@ import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.input.BigGANInput;
 import ai.djl.modality.cv.translator.BigGANTranslator;
 import ai.djl.pytorch.zoo.PtModelZoo;
 import ai.djl.repository.MRL;
@@ -49,7 +48,7 @@ public class BigGANModelLoader extends BaseModelLoader {
     public BigGANModelLoader(Repository repository) {
         super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION, new PtModelZoo());
         FactoryImpl factory = new FactoryImpl();
-        factories.put(new Pair<>(BigGANInput.class, Image[].class), factory);
+        factories.put(new Pair<>(int[].class, Image[].class), factory);
     }
 
     /**
@@ -60,7 +59,7 @@ public class BigGANModelLoader extends BaseModelLoader {
      * @throws ModelNotFoundException if no model with the specified criteria is found
      * @throws MalformedModelException if the model data is malformed
      */
-    public ZooModel<BigGANInput, Image[]> loadModel()
+    public ZooModel<int[], Image[]> loadModel()
             throws MalformedModelException, ModelNotFoundException, IOException {
         return loadModel(null, null, null);
     }
@@ -74,7 +73,7 @@ public class BigGANModelLoader extends BaseModelLoader {
      * @throws ModelNotFoundException if no model with the specified criteria is found
      * @throws MalformedModelException if the model data is malformed
      */
-    public ZooModel<BigGANInput, Image[]> loadModel(Progress progress)
+    public ZooModel<int[], Image[]> loadModel(Progress progress)
             throws MalformedModelException, ModelNotFoundException, IOException {
         return loadModel(null, null, progress);
     }
@@ -90,12 +89,12 @@ public class BigGANModelLoader extends BaseModelLoader {
      * @throws ModelNotFoundException if no model with the specified criteria is found
      * @throws MalformedModelException if the model data is malformed
      */
-    public ZooModel<BigGANInput, Image[]> loadModel(
+    public ZooModel<int[], Image[]> loadModel(
             Map<String, String> filters, Device device, Progress progress)
             throws IOException, ModelNotFoundException, MalformedModelException {
-        Criteria<BigGANInput, Image[]> criteria =
+        Criteria<int[], Image[]> criteria =
                 Criteria.builder()
-                        .setTypes(BigGANInput.class, Image[].class)
+                        .setTypes(int[].class, Image[].class)
                         .optModelZoo(modelZoo)
                         .optGroupId(resource.getMrl().getGroupId())
                         .optArtifactId(resource.getMrl().getArtifactId())
@@ -106,12 +105,13 @@ public class BigGANModelLoader extends BaseModelLoader {
         return loadModel(criteria);
     }
 
-    private static final class FactoryImpl implements TranslatorFactory<BigGANInput, Image[]> {
+    private static final class FactoryImpl implements TranslatorFactory<int[], Image[]> {
 
         /** {@inheritDoc} */
         @Override
-        public Translator<BigGANInput, Image[]> newInstance(Model model, Map<String, ?> arguments) {
-            return new BigGANTranslator();
+        public Translator<int[], Image[]> newInstance(Model model, Map<String, ?> arguments) {
+            Float truncation = (Float) arguments.get("truncation");
+            return new BigGANTranslator(truncation == null ? 0.5f : truncation);
         }
     }
 }
