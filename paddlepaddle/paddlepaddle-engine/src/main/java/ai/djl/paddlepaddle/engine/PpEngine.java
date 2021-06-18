@@ -106,6 +106,10 @@ public final class PpEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         if (getAlternativeEngine() != null) {
+            // use CPU as a default to achieve best performance
+            if (device == null) {
+                device = Device.cpu();
+            }
             return alternativeEngine.newBaseManager(device);
         }
         return PpNDManager.getSystemManager().newSubManager(device);
