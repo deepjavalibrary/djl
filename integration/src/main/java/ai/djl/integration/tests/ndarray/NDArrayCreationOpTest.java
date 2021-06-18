@@ -414,6 +414,16 @@ public class NDArrayCreationOpTest {
     }
 
     @Test
+    public void testTruncatedNormal() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray normal = manager.truncatedNormal(new Shape(1000, 1000));
+            Assertions.assertAlmostEquals(normal.mean().getFloat(), 0f, 2e-2f, 2e-2f);
+            Assert.assertTrue(normal.gte(-2).all().getBoolean());
+            Assert.assertTrue(normal.lte(2).all().getBoolean());
+        }
+    }
+
+    @Test
     public void testFixedSeed() {
         try (NDManager manager = NDManager.newBaseManager()) {
             if ("TensorFlow".equals(Engine.getInstance().getEngineName())) {
