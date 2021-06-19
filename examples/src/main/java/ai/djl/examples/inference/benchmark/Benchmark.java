@@ -37,17 +37,15 @@ public final class Benchmark extends AbstractBenchmark {
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public Object predict(Arguments arguments, Metrics metrics, int iteration)
+    public float[] predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException, TranslateException {
-        Object inputData = arguments.getInputData();
-        try (ZooModel<?, ?> model = loadModel(arguments, metrics)) {
-            Object predictResult = null;
-            try (Predictor predictor = model.newPredictor()) {
+        try (ZooModel<Void, float[]> model = loadModel(arguments, metrics)) {
+            float[] predictResult = null;
+            try (Predictor<Void, float[]> predictor = model.newPredictor()) {
                 predictor.setMetrics(metrics); // Let predictor collect metrics
 
                 for (int i = 0; i < iteration; ++i) {
-                    predictResult = predictor.predict(inputData);
+                    predictResult = predictor.predict(null);
 
                     progressBar.update(i);
                     MemoryTrainingListener.collectMemoryInfo(metrics);

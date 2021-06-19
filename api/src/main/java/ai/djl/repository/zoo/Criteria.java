@@ -490,7 +490,9 @@ public class Criteria<I, O> {
          * @return this {@code Builder}
          */
         public Builder<I, O> optModelUrls(String modelUrls) {
-            this.modelZoo = new DefaultModelZoo(modelUrls);
+            if (modelUrls != null) {
+                this.modelZoo = new DefaultModelZoo(modelUrls);
+            }
             return this;
         }
 
@@ -502,7 +504,9 @@ public class Criteria<I, O> {
          * @throws MalformedURLException wrong path format
          */
         public Builder<I, O> optModelPath(Path modelPath) throws MalformedURLException {
-            this.modelZoo = new DefaultModelZoo(modelPath.toUri().toURL().toString());
+            if (modelPath != null) {
+                this.modelZoo = new DefaultModelZoo(modelPath.toUri().toURL().toString());
+            }
             return this;
         }
 
@@ -624,7 +628,9 @@ public class Criteria<I, O> {
          * @return this {@code Builder}
          */
         public Builder<I, O> optTranslator(Translator<I, O> translator) {
-            this.factory = new TranslatorFactorImpl<>(translator);
+            if (translator != null) {
+                this.factory = new TranslatorFactorImpl<>(translator);
+            }
             return this;
         }
 

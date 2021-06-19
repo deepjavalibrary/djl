@@ -44,13 +44,12 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
 
     /** {@inheritDoc} */
     @Override
-    public Object predict(Arguments arguments, Metrics metrics, int iteration)
+    public float[] predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException {
 
         MemoryTrainingListener.collectMemoryInfo(metrics); // Measure memory before loading model
 
-        Object inputData = arguments.getInputData();
-        ZooModel<?, ?> model = loadModel(arguments, metrics);
+        ZooModel<Void, float[]> model = loadModel(arguments, metrics);
 
         int numOfThreads = arguments.getThreads();
         int delay = arguments.getDelay();
@@ -59,10 +58,10 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
 
         List<PredictorCallable> callables = new ArrayList<>(numOfThreads);
         for (int i = 0; i < numOfThreads; ++i) {
-            callables.add(new PredictorCallable(model, inputData, metrics, counter, i, i == 0));
+            callables.add(new PredictorCallable(model, metrics, counter, i, i == 0));
         }
 
-        Object classification = null;
+        float[] result = null;
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
 
         MemoryTrainingListener.collectMemoryInfo(metrics); // Measure memory before worker kickoff
@@ -71,7 +70,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         try {
             metrics.addMetric("mt_start", System.currentTimeMillis(), "mills");
             try {
-                List<Future<Object>> futures;
+                List<Future<float[]>> futures;
                 if (delay > 0) {
                     futures = new ArrayList<>();
                     for (PredictorCallable callable : callables) {
@@ -82,9 +81,9 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
                     futures = executorService.invokeAll(callables);
                 }
 
-                for (Future<Object> future : futures) {
-                    classification = future.get();
-                    if (classification != null) {
+                for (Future<float[]> future : futures) {
+                    result = future.get();
+                    if (result != null) {
                         ++successThreads;
                     }
                 }
@@ -104,15 +103,13 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
             return null;
         }
 
-        return classification;
+        return result;
     }
 
-    private static class PredictorCallable implements Callable<Object> {
+    private static class PredictorCallable implements Callable<float[]> {
 
-        @SuppressWarnings("rawtypes")
-        private Predictor predictor;
+        private Predictor<Void, float[]> predictor;
 
-        private Object inputData;
         private Metrics metrics;
         private String workerId;
         private boolean collectMemory;
@@ -121,14 +118,12 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         private int steps;
 
         public PredictorCallable(
-                ZooModel<?, ?> model,
-                Object inputData,
+                ZooModel<Void, float[]> model,
                 Metrics metrics,
                 AtomicInteger counter,
                 int workerId,
                 boolean collectMemory) {
             this.predictor = model.newPredictor();
-            this.inputData = inputData;
             this.metrics = metrics;
             this.counter = counter;
             this.workerId = String.format("%02d", workerId);
@@ -144,14 +139,13 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
 
         /** {@inheritDoc} */
         @Override
-        @SuppressWarnings("unchecked")
-        public Object call() throws Exception {
-            Object result = null;
+        public float[] call() throws Exception {
+            float[] result = null;
             int count = 0;
             int remaining;
             while ((remaining = counter.decrementAndGet()) > 0 || result == null) {
                 try {
-                    result = predictor.predict(inputData);
+                    result = predictor.predict(null);
                 } catch (Exception e) {
                     // stop immediately when we find any exception
                     counter.set(0);

@@ -20,14 +20,7 @@ public class BenchmarkTest {
 
     @Test
     public void testBenchmark() {
-        String[] args = {
-            "-c",
-            "2",
-            "-i",
-            "src/test/resources/segmentation.jpg",
-            "-r",
-            "{'layers':'18','flavor':'v1'}"
-        };
+        String[] args = {"-c", "2", "-r", "{'layers':'18','flavor':'v1'}"};
         new Benchmark().runBenchmark(args);
     }
 

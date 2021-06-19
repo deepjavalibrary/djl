@@ -90,11 +90,12 @@ usage: ./gradlew benchmark --args='[OPTIONS]'
  -a,--artifact-id <ARTIFACT-ID>     Model artifact id.
  -c,--iteration <ITERATION>         Number of total iterations (per thread).
  -d,--duration <DURATION>           Duration of the test in minutes.
+ -e,--engine-name <ENGINE-NAME>     Engine name.
  -h,--help                          Print this help.
- -i,--image <IMAGE>                 Image file path for benchmarking CV model.
  -l,--delay <DELAY>                 Delay of incremental threads.
  -n,--model-name <MODEL-NAME>       Model name.
  -o,--output-dir <OUTPUT-DIR>       Directory for output logs.
+ -p,--model-path <MODEL-PATH>       Model directory file path.
  -r,--criteria <CRITERIA>           The criteria (json string) used for searching the model.
  -s,--input-shapes <INPUT-SHAPES>   Input data shapes for non-CV model.
  -t,--threads <NUMBER_THREADS>      Number of inference threads.
@@ -128,15 +129,17 @@ We would recommend to make model files in a zip for better file tracking.
 Mac/Linux
 
 ```
--Dai.djl.repository.zoo.location=file:///home/ubuntu/models/pytorch_resnet18
--Dai.djl.repository.zoo.location=file:///home/ubuntu/models/pytorch_resnet18.zip
+--args='-p /home/ubuntu/models/pytorch_resnet18'
+or
+--args='-p /home/ubuntu/models/pytorch_resnet18.zip'
 ```
 
 Windows
 
 ```
--Dai.djl.repository.zoo.location=file:///C:/models/pytorch_resnet18
--Dai.djl.repository.zoo.location=file:///C:/models/pytorch_resnet18.zip
+--args='-p C:\models\pytorch_resnet18'
+or
+--args='-p C:\models\pytorch_resnet18.zip'
 ```
 
 If the model file name is different from the parent folder name (or the archive file name), you need

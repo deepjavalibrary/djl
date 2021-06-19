@@ -46,8 +46,6 @@ public abstract class AbstractBenchmark {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractBenchmark.class);
 
-    private Object lastResult;
-
     protected ProgressBar progressBar;
 
     /**
@@ -62,7 +60,7 @@ public abstract class AbstractBenchmark {
      * @throws TranslateException if error occurs when processing input or output
      * @throws ClassNotFoundException if input or output class cannot be loaded
      */
-    protected abstract Object predict(Arguments arguments, Metrics metrics, int iteration)
+    protected abstract float[] predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException, TranslateException, ClassNotFoundException;
 
     /**
@@ -131,7 +129,7 @@ public abstract class AbstractBenchmark {
                 Metrics metrics = new Metrics(); // Reset Metrics for each test loop.
                 progressBar = new ProgressBar("Iteration", iteration);
                 long begin = System.currentTimeMillis();
-                lastResult = predict(arguments, metrics, iteration);
+                float[] lastResult = predict(arguments, metrics, iteration);
                 if (lastResult == null) {
                     return false;
                 }
@@ -141,20 +139,16 @@ public abstract class AbstractBenchmark {
                 }
                 long totalTime = System.currentTimeMillis() - begin;
 
-                if (lastResult instanceof float[]) {
-                    float[] display = (float[]) lastResult;
-                    if (display.length > 3) {
-                        logger.info(
-                                "Inference result: [{}, {}, {} ...]",
-                                display[0],
-                                display[1],
-                                display[2]);
-                    } else {
-                        logger.info("Inference result: {}", lastResult);
-                    }
+                if (lastResult.length > 3) {
+                    logger.info(
+                            "Inference result: [{}, {}, {} ...]",
+                            lastResult[0],
+                            lastResult[1],
+                            lastResult[2]);
                 } else {
                     logger.info("Inference result: {}", lastResult);
                 }
+
                 String throughput = String.format("%.2f", iteration * 1000d / totalTime);
                 logger.info(
                         "Throughput: {}, completed {} iteration in {} ms.",
@@ -260,71 +254,25 @@ public abstract class AbstractBenchmark {
         return false;
     }
 
-    /**
-     * Returns last predict result.
-     *
-     * <p>This method is used for unit test only.
-     *
-     * @return last predict result
-     */
-    public Object getPredictResult() {
-        return lastResult;
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    protected ZooModel<?, ?> loadModel(Arguments arguments, Metrics metrics)
+    protected ZooModel<Void, float[]> loadModel(Arguments arguments, Metrics metrics)
             throws ModelException, IOException {
         long begin = System.nanoTime();
         String artifactId = arguments.getArtifactId();
-        String modelName = arguments.getModelName();
-        Class<?> input = arguments.getInputClass();
-        Class<?> output = arguments.getOutputClass();
         PairList<DataType, Shape> shapes = arguments.getInputShapes();
+        BenchmarkTranslator translator = new BenchmarkTranslator(shapes);
 
-        Criteria.Builder<?, ?> builder =
+        Criteria<Void, float[]> criteria =
                 Criteria.builder()
-                        .setTypes(input, output)
+                        .setTypes(Void.class, float[].class)
+                        .optModelUrls(arguments.getModelUrls())
+                        .optModelName(arguments.getModelName())
                         .optFilters(arguments.getCriteria())
                         .optArtifactId(artifactId)
-                        .optProgress(new ProgressBar());
-        if (modelName != null) {
-            builder.optModelName(modelName);
-        }
+                        .optTranslator(translator)
+                        .optProgress(new ProgressBar())
+                        .build();
 
-        if (!shapes.isEmpty()) {
-            builder.optTranslator(
-                    new Translator() {
-
-                        /** {@inheritDoc} */
-                        @Override
-                        public NDList processInput(TranslatorContext ctx, Object input) {
-                            NDList list = new NDList();
-                            for (Pair<DataType, Shape> pair : shapes) {
-                                DataType dataType = pair.getKey();
-                                Shape shape = pair.getValue();
-                                list.add(ctx.getNDManager().ones(shape, dataType));
-                            }
-                            return list;
-                        }
-
-                        /** {@inheritDoc} */
-                        @Override
-                        public Object processOutput(TranslatorContext ctx, NDList list) {
-                            FloatBuffer fb = list.get(0).toByteBuffer().asFloatBuffer();
-                            float[] ret = new float[fb.remaining()];
-                            fb.get(ret);
-                            return ret;
-                        }
-
-                        /** {@inheritDoc} */
-                        @Override
-                        public Batchifier getBatchifier() {
-                            return null;
-                        }
-                    });
-        }
-
-        ZooModel<?, ?> model = builder.build().loadModel();
+        ZooModel<Void, float[]> model = criteria.loadModel();
         long delta = System.nanoTime() - begin;
         logger.info(
                 "Model {} loaded in: {} ms.",
@@ -339,5 +287,41 @@ public abstract class AbstractBenchmark {
         formatter.setLeftPadding(1);
         formatter.setWidth(120);
         formatter.printHelp(msg, options);
+    }
+
+    private static final class BenchmarkTranslator implements Translator<Void, float[]> {
+
+        private PairList<DataType, Shape> shapes;
+
+        public BenchmarkTranslator(PairList<DataType, Shape> shapes) {
+            this.shapes = shapes;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public NDList processInput(TranslatorContext ctx, Void input) {
+            NDList list = new NDList();
+            for (Pair<DataType, Shape> pair : shapes) {
+                DataType dataType = pair.getKey();
+                Shape shape = pair.getValue();
+                list.add(ctx.getNDManager().ones(shape, dataType));
+            }
+            return list;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public float[] processOutput(TranslatorContext ctx, NDList list) {
+            FloatBuffer fb = list.get(0).toByteBuffer().asFloatBuffer();
+            float[] ret = new float[fb.remaining()];
+            fb.get(ret);
+            return ret;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Batchifier getBatchifier() {
+            return null;
+        }
     }
 }
