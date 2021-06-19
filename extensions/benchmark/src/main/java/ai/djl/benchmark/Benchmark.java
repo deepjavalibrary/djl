@@ -10,11 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference.benchmark;
+package ai.djl.benchmark;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.benchmark.util.AbstractBenchmark;
-import ai.djl.examples.inference.benchmark.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.repository.zoo.ZooModel;
@@ -22,12 +20,22 @@ import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
+/** A class runs single threaded benchmark. */
 public final class Benchmark extends AbstractBenchmark {
 
+    /**
+     * Main entry point.
+     *
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
+        List<String> list = Arrays.asList(args);
+        boolean multithreading = list.contains("-t") || list.contains("--threads");
+        configEngines(multithreading);
         boolean success;
-        if (Arrays.asList(args).contains("-t")) {
+        if (multithreading) {
             success = new MultithreadedBenchmark().runBenchmark(args);
         } else {
             success = new Benchmark().runBenchmark(args);
@@ -52,6 +60,29 @@ public final class Benchmark extends AbstractBenchmark {
                 }
             }
             return predictResult;
+        }
+    }
+
+    private static void configEngines(boolean multithreading) {
+        if (multithreading) {
+            if (System.getProperty("ai.djl.pytorch.num_interop_threads") == null) {
+                System.setProperty("ai.djl.pytorch.num_interop_threads", "1");
+            }
+            if (System.getProperty("ai.djl.pytorch.num_threads") == null) {
+                System.setProperty("ai.djl.pytorch.num_threads", "1");
+            }
+        }
+        if (System.getProperty("ai.djl.tflite.disable_alternative") == null) {
+            System.setProperty("ai.djl.tflite.disable_alternative", "true");
+        }
+        if (System.getProperty("ai.djl.dlr.disable_alternative") == null) {
+            System.setProperty("ai.djl.dlr.disable_alternative", "true");
+        }
+        if (System.getProperty("ai.djl.paddlepaddle.disable_alternative") == null) {
+            System.setProperty("ai.djl.paddlepaddle.disable_alternative", "true");
+        }
+        if (System.getProperty("ai.djl.onnx.disable_alternative") == null) {
+            System.setProperty("ai.djl.onnx.disable_alternative", "true");
         }
     }
 }

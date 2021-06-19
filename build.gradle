@@ -83,7 +83,7 @@ configure(javaProjects()) {
         doFirst {
             systemProperties System.getProperties()
             systemProperties.remove("user.dir")
-            systemProperty "ai.djl.logging.level", "debug"
+            // systemProperty "ai.djl.logging.level", "debug"
             systemProperty "org.slf4j.simpleLogger.defaultLogLevel", "debug"
             systemProperty "org.slf4j.simpleLogger.log.org.mortbay.log", "warn"
             systemProperty "disableProgressBar", "true"

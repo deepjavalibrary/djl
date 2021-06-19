@@ -10,11 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference.benchmark;
+package ai.djl.benchmark;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.benchmark.util.AbstractBenchmark;
-import ai.djl.examples.inference.benchmark.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.repository.zoo.ZooModel;
@@ -31,16 +29,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/** A class runs single threaded benchmark. */
 public class MultithreadedBenchmark extends AbstractBenchmark {
 
     private static final Logger logger = LoggerFactory.getLogger(MultithreadedBenchmark.class);
-
-    public static void main(String[] args) {
-        if (new MultithreadedBenchmark().runBenchmark(args)) {
-            System.exit(0); // NOPMD
-        }
-        System.exit(-1); // NOPMD
-    }
 
     /** {@inheritDoc} */
     @Override
@@ -54,7 +46,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         int numOfThreads = arguments.getThreads();
         int delay = arguments.getDelay();
         AtomicInteger counter = new AtomicInteger(iteration);
-        logger.info("Multithreaded inference with {} threads.", numOfThreads);
+        logger.info("Multithreading inference with {} threads.", numOfThreads);
 
         List<PredictorCallable> callables = new ArrayList<>(numOfThreads);
         for (int i = 0; i < numOfThreads; ++i) {
