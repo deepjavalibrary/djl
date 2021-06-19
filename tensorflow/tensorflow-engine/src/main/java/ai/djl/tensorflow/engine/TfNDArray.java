@@ -26,6 +26,7 @@ import ai.djl.util.NativeResource;
 import ai.djl.util.Preconditions;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -171,9 +172,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public String[] toStringArray() {
-        // TODO: Parse String Array from bytes[]
-        throw new UnsupportedOperationException(
-                "TensorFlow does not supporting printing String NDArray");
+        return new String[] {JavacppUtils.getString(getHandle(), StandardCharsets.UTF_8)};
     }
 
     /** {@inheritDoc} */
