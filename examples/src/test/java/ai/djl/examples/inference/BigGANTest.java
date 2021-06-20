@@ -13,10 +13,8 @@
 package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
-import ai.djl.engine.Engine;
 import ai.djl.modality.cv.Image;
 import ai.djl.translate.TranslateException;
-import java.io.File;
 import java.io.IOException;
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -26,17 +24,16 @@ public class BigGANTest {
 
     @Test
     public void testBigGAN() throws ModelException, TranslateException, IOException {
-        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
+        Image[] generatedImages = BigGAN.generate();
+
+        if (generatedImages == null) {
             throw new SkipException("Only works for PyTorch engine.");
         }
 
-        Image[] generatedImages = BigGAN.generate();
         Assert.assertEquals(generatedImages.length, 5);
-        Assert.assertEquals(new File("build/output/gan/").list().length, 5);
-
         for (Image img : generatedImages) {
-            Assert.assertEquals(img.getWidth(), 128);
-            Assert.assertEquals(img.getHeight(), 128);
+            Assert.assertEquals(img.getWidth(), 256);
+            Assert.assertEquals(img.getHeight(), 256);
         }
     }
 }

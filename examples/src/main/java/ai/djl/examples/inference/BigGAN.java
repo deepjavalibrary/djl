@@ -66,12 +66,12 @@ public final class BigGAN {
                 Criteria.builder()
                         .optApplication(Application.CV.GAN)
                         .setTypes(int[].class, Image[].class)
-                        .optEngine("PyTorch")
+                        .optFilter("size", "256")
                         .optArgument("truncation", 0.4f)
                         .optProgress(new ProgressBar())
                         .build();
 
-        int[] input = {0, 100, 200, 300, 400};
+        int[] input = {100, 207, 971, 970, 933};
 
         try (ZooModel<int[], Image[]> model = criteria.loadModel();
                 Predictor<int[], Image[]> generator = model.newPredictor()) {
