@@ -75,7 +75,7 @@ nav:
       - 'docs/development/cache_management.md'
       - 'docs/development/memory_management.md'
       - 'docs/development/inference_performance_optimization.md'
-      - 'docs/development/benchmark_with_djl.md'
+      - 'extensions/benchmark/README.md'
       - 'docs/development/profiler.md'
   - DJL Community:
       - 'docs/forums.md'
