@@ -107,8 +107,7 @@ public final class PpEngine extends Engine {
     public NDManager newBaseManager(Device device) {
         if (getAlternativeEngine() != null) {
             // use CPU as a default to achieve best performance
-            device = Device.cpu();
-            return alternativeEngine.newBaseManager(device);
+            return alternativeEngine.newBaseManager(Device.cpu());
         }
         return PpNDManager.getSystemManager().newSubManager(device);
     }
