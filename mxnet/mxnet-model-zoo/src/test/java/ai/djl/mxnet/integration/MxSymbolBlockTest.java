@@ -14,12 +14,10 @@ package ai.djl.mxnet.integration;
 
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
-import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -30,6 +28,7 @@ import ai.djl.nn.Parameter;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.Assertions;
@@ -52,11 +51,17 @@ import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class MxSymbolBlockTest {
+
     @Test
     public void testSymbolModelInputOutput()
             throws IOException, ModelNotFoundException, MalformedModelException,
                     TranslateException {
-        try (ZooModel<Image, Classifications> model = MxModelZoo.MLP.loadModel();
+        Criteria<Image, Classifications> criteria =
+                Criteria.builder()
+                        .setTypes(Image.class, Classifications.class)
+                        .optArtifactId("ai.djl.mxnet:mlp")
+                        .build();
+        try (ZooModel<Image, Classifications> model = criteria.loadModel();
                 Predictor<Image, Classifications> predictor = model.newPredictor()) {
             Path imageFile = Paths.get("../../examples/src/test/resources/0.png");
             Image img = ImageFactory.getInstance().fromFile(imageFile);
@@ -68,7 +73,12 @@ public class MxSymbolBlockTest {
 
     @Test
     public void testForward() throws IOException, ModelNotFoundException, MalformedModelException {
-        try (Model model = MxModelZoo.MLP.loadModel()) {
+        Criteria<Image, Classifications> criteria =
+                Criteria.builder()
+                        .setTypes(Image.class, Classifications.class)
+                        .optArtifactId("ai.djl.mxnet:mlp")
+                        .build();
+        try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
             NDManager manager = model.getNDManager();
 
             ParameterStore parameterStore = new ParameterStore(manager, false);
@@ -94,7 +104,13 @@ public class MxSymbolBlockTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
-        try (Model model = MxModelZoo.MLP.loadModel()) {
+
+        Criteria<Image, Classifications> criteria =
+                Criteria.builder()
+                        .setTypes(Image.class, Classifications.class)
+                        .optArtifactId("ai.djl.mxnet:mlp")
+                        .build();
+        try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
             model.getBlock().clear();
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
@@ -122,7 +138,13 @@ public class MxSymbolBlockTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
-        try (Model model = MxModelZoo.MLP.loadModel()) {
+
+        Criteria<Image, Classifications> criteria =
+                Criteria.builder()
+                        .setTypes(Image.class, Classifications.class)
+                        .optArtifactId("ai.djl.mxnet:mlp")
+                        .build();
+        try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
             try (Trainer trainer = model.newTrainer(config)) {
                 NDManager manager = trainer.getManager();
 
@@ -149,7 +171,13 @@ public class MxSymbolBlockTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
-        try (Model model = MxModelZoo.MLP.loadModel()) {
+
+        Criteria<Image, Classifications> criteria =
+                Criteria.builder()
+                        .setTypes(Image.class, Classifications.class)
+                        .optArtifactId("ai.djl.mxnet:mlp")
+                        .build();
+        try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
             NDManager manager = model.getNDManager();
             SymbolBlock mlp = (SymbolBlock) model.getBlock();
             SequentialBlock newMlp = new SequentialBlock();

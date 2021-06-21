@@ -32,6 +32,7 @@
         "threshold": 0.4,
         "synsetFileName": "classes.txt",
         "size": 300,
+        "translatorFactory": "ai.djl.pytorch.zoo.cv.objectdetection.PtSsdTranslatorFactory",
         "feat_size": [
           38,
           19,

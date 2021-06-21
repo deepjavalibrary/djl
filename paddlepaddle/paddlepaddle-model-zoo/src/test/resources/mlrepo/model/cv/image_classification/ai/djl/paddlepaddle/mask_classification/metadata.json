@@ -21,6 +21,9 @@
       "properties": {
         "flavor": "mobile"
       },
+      "arguments": {
+        "translatorFactory": "ai.djl.paddlepaddle.zoo.cv.imageclassification.PpImageClassificationTranslatorFactory"
+      },
       "files": {
         "classes": {
           "uri": "0.0.1/synset.txt.gz",
@@ -41,6 +44,9 @@
       "name": "mask_classification",
       "properties": {
         "flavor": "server"
+      },
+      "arguments": {
+        "translatorFactory": "ai.djl.paddlepaddle.zoo.cv.imageclassification.PpImageClassificationTranslatorFactory"
       },
       "files": {
         "classes": {

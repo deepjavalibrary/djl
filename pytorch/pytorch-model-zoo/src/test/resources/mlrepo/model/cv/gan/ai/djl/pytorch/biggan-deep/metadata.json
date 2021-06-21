@@ -25,7 +25,9 @@
       },
       "arguments": {
         "width": 128,
-        "height": 128
+        "height": 128,
+        "truncation": 0.5,
+        "translatorFactory": "ai.djl.modality.cv.translator.BigGANTranslatorFactory"
       },
       "files": {
         "model": {
@@ -46,7 +48,9 @@
       },
       "arguments": {
         "width": 256,
-        "height": 256
+        "height": 256,
+        "truncation": 0.5,
+        "translatorFactory": "ai.djl.modality.cv.translator.BigGANTranslatorFactory"
       },
       "files": {
         "model": {
@@ -67,7 +71,9 @@
       },
       "arguments": {
         "width": 512,
-        "height": 512
+        "height": 512,
+        "truncation": 0.5,
+        "translatorFactory": "ai.djl.modality.cv.translator.BigGANTranslatorFactory"
       },
       "files": {
         "model": {

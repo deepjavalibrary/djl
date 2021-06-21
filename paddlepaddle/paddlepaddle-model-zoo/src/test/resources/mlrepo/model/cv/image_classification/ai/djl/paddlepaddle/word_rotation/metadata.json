@@ -21,6 +21,9 @@
       "properties": {
         "flavor": "mobile"
       },
+      "arguments": {
+        "translatorFactory": "ai.djl.paddlepaddle.zoo.cv.imageclassification.PpWordRotateTranslatorFactory"
+      },
       "files": {
         "model": {
           "uri": "0.0.1/cls.zip",

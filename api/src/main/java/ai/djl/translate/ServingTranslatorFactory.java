@@ -24,20 +24,24 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.util.JsonSerializable;
 import ai.djl.util.JsonUtils;
+import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -47,13 +51,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A {@link TranslatorFactory} that creates an generic {@link Translator}. */
-public class ServingTranslatorFactory implements TranslatorFactory<Input, Output> {
+public class ServingTranslatorFactory implements TranslatorFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(ServingTranslatorFactory.class);
 
     /** {@inheritDoc} */
     @Override
-    public Translator<Input, Output> newInstance(Model model, Map<String, ?> arguments) {
+    public Set<Pair<Type, Type>> getSupportedTypes() {
+        return Collections.singleton(new Pair<>(Input.class, Output.class));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Translator<?, ?> newInstance(
+            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments) {
+        if (!isSupported(input, output)) {
+            throw new IllegalArgumentException("Unsupported input/output types.");
+        }
+
         Path modelDir = model.getModelPath();
         String className = (String) arguments.get("translator");
 

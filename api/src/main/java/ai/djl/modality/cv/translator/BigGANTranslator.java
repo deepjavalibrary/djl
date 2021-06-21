@@ -31,7 +31,7 @@ public final class BigGANTranslator implements Translator<int[], Image[]> {
     private float truncation;
 
     /**
-     * Construct a translator for BigGAN.
+     * Constructs a translator for BigGAN.
      *
      * @param truncation value used to scale the normal seed for BigGAN
      */
@@ -39,6 +39,7 @@ public final class BigGANTranslator implements Translator<int[], Image[]> {
         this.truncation = truncation;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Image[] processOutput(TranslatorContext ctx, NDList list) {
         NDArray output = list.get(0).addi(1).muli(128).clip(0, 255).toType(DataType.UINT8, false);
@@ -53,6 +54,7 @@ public final class BigGANTranslator implements Translator<int[], Image[]> {
         return images;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, int[] input) throws Exception {
         NDManager manager = ctx.getNDManager();
@@ -64,6 +66,7 @@ public final class BigGANTranslator implements Translator<int[], Image[]> {
         return new NDList(seed, classes, manager.create(truncation));
     }
 
+    /** {@inheritDoc} */
     @Override
     public Batchifier getBatchifier() {
         return null;

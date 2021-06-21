@@ -26,11 +26,7 @@ import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * The {@link ai.djl.translate.Translator} for PyTorch Question Answering model.
- *
- * @see BertQAModelLoader
- */
+/** The {@link ai.djl.translate.Translator} for PyTorch Question Answering model. */
 public class PtBertQATranslator extends QATranslator {
 
     private List<String> tokens;
