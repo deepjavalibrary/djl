@@ -10,12 +10,11 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference.benchmark.util;
+package ai.djl.benchmark;
 
 import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
-import ai.djl.examples.inference.benchmark.MultithreadedBenchmark;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
@@ -41,7 +40,7 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Abstract class that encapsulate command line options for example project. */
+/** Abstract benchmark class. */
 public abstract class AbstractBenchmark {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractBenchmark.class);
@@ -64,52 +63,31 @@ public abstract class AbstractBenchmark {
             throws IOException, ModelException, TranslateException, ClassNotFoundException;
 
     /**
-     * Returns command line options.
-     *
-     * <p>Child class can override this method and return different command line options.
-     *
-     * @return command line options
-     */
-    protected Options getOptions() {
-        return Arguments.getOptions();
-    }
-
-    /**
-     * Parse command line into arguments.
-     *
-     * <p>Child class can override this method and return extension of {@link Arguments}.
-     *
-     * @param cmd list of arguments parsed against a {@link Options} descriptor
-     * @return parsed arguments
-     */
-    protected Arguments parseArguments(CommandLine cmd) {
-        return new Arguments(cmd);
-    }
-
-    /**
-     * Execute example code.
+     * Execute benchmark.
      *
      * @param args input raw arguments
      * @return if example execution complete successfully
      */
     public final boolean runBenchmark(String[] args) {
-        Options options = getOptions();
+        Options options = Arguments.getOptions();
         try {
-            DefaultParser parser = new DefaultParser();
-            CommandLine cmd = parser.parse(options, args, null, false);
-            Arguments arguments = parseArguments(cmd);
-            if (arguments.hasHelp()) {
-                printHelp("./gradlew benchmark --args='[OPTIONS]'", options);
+            if (Arguments.hasHelp(args)) {
+                printHelp("benchmark [-p MODEL-PATH] -s INPUT-SHAPES [OPTIONS]", options);
                 return true;
             }
+            DefaultParser parser = new DefaultParser();
+            CommandLine cmd = parser.parse(options, args, null, false);
+            Arguments arguments = new Arguments(cmd);
+            String engine = arguments.getEngine();
 
             long init = System.nanoTime();
-            String version = Engine.getInstance().getVersion();
+            String version = Engine.getEngine(engine).getVersion();
             long loaded = System.nanoTime();
             logger.info(
                     String.format(
-                            "Load library %s in %.3f ms.", version, (loaded - init) / 1_000_000f));
-            Duration duration = Duration.ofMinutes(arguments.getDuration());
+                            "Load %s (%s) in %.3f ms.",
+                            engine, version, (loaded - init) / 1_000_000f));
+            Duration duration = Duration.ofSeconds(arguments.getDuration());
             if (arguments.getDuration() != 0) {
                 logger.info(
                         "Running {} on: {}, duration: {} minutes.",
@@ -219,23 +197,26 @@ public abstract class AbstractBenchmark {
                                 metrics.getMetric("Heap").get(1).getValue().longValue();
                         float heap = metrics.percentile("Heap", 90).getValue().longValue();
                         float nonHeap = metrics.percentile("NonHeap", 90).getValue().longValue();
-                        float rssBeforeModel =
-                                metrics.getMetric("rss").get(0).getValue().longValue();
-                        float rssBeforeInference =
-                                metrics.getMetric("rss").get(1).getValue().longValue();
-                        float rss = metrics.percentile("rss", 90).getValue().longValue();
-                        float cpu = metrics.percentile("cpu", 90).getValue().longValue();
                         int mb = 1024 * 1024;
-
-                        logger.info(String.format("cpu P90: %.3f %%", cpu));
                         logger.info(String.format("heap (base): %.3f MB", heapBeforeModel / mb));
                         logger.info(
                                 String.format("heap (model): %.3f MB", heapBeforeInference / mb));
                         logger.info(String.format("heap P90: %.3f MB", heap / mb));
                         logger.info(String.format("nonHeap P90: %.3f MB", nonHeap / mb));
-                        logger.info(String.format("rss (base): %.3f MB", rssBeforeModel / mb));
-                        logger.info(String.format("rss (model): %.3f MB", rssBeforeInference / mb));
-                        logger.info(String.format("rss P90: %.3f MB", rss / mb));
+
+                        if (!System.getProperty("os.name").startsWith("Win")) {
+                            float rssBeforeModel =
+                                    metrics.getMetric("rss").get(0).getValue().longValue();
+                            float rssBeforeInference =
+                                    metrics.getMetric("rss").get(1).getValue().longValue();
+                            float rss = metrics.percentile("rss", 90).getValue().longValue();
+                            float cpu = metrics.percentile("cpu", 90).getValue().longValue();
+                            logger.info(String.format("cpu P90: %.3f %%", cpu));
+                            logger.info(String.format("rss (base): %.3f MB", rssBeforeModel / mb));
+                            logger.info(
+                                    String.format("rss (model): %.3f MB", rssBeforeInference / mb));
+                            logger.info(String.format("rss P90: %.3f MB", rss / mb));
+                        }
                     }
                 }
                 MemoryTrainingListener.dumpMemoryInfo(metrics, arguments.getOutputDir());
@@ -266,6 +247,7 @@ public abstract class AbstractBenchmark {
                         .setTypes(Void.class, float[].class)
                         .optModelUrls(arguments.getModelUrls())
                         .optModelName(arguments.getModelName())
+                        .optEngine(arguments.getEngine())
                         .optFilters(arguments.getCriteria())
                         .optArtifactId(artifactId)
                         .optTranslator(translator)

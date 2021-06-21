@@ -1,6 +1,6 @@
 # Benchmark your DL model
 
-DJL offers a comprehensive script to benchmark the model on all different 
+DJL offers a comprehensive script to benchmark the model on all different
 platforms for single-thread/multi-thread inference performance.This document will guide you how to run benchmark with DJL.
 
 ## Prerequisite
@@ -31,13 +31,13 @@ the 4-step instructions for your own model.
 Benchmark on a Tensorflow model from http url with all-ones NDArray input for 10 times:
 
 ```
-./gradlew benchmark -Dai.djl.default_engine=TensorFlow -Dai.djl.repository.zoo.location=https://storage.googleapis.com/tfhub-modules/tensorflow/resnet_50/classification/1.tar.gz --args='-c 10 -s 1,224,224,3'
+./gradlew benchmark --args='-e TensorFlow -u https://storage.googleapis.com/tfhub-modules/tensorflow/resnet_50/classification/1.tar.gz -c 10 -s 1,224,224,3'
 ```
 
 Similarly, this is for PyTorch
 
 ```
-./gradlew benchmark -Dai.djl.default_engine=PyTorch -Dai.djl.repository.zoo.location=https://alpha-djl-demos.s3.amazonaws.com/model/djl-blockrunner/pytorch_resnet18.zip --args='-n traced_resnet18 -c 10 -s 1,3,224,224'
+./gradlew benchmark --args='-e PyTorch -u https://alpha-djl-demos.s3.amazonaws.com/model/djl-blockrunner/pytorch_resnet18.zip -n traced_resnet18 -c 10 -s 1,3,224,224'
 ```
 
 ### Benchmark from ModelZoo
@@ -47,7 +47,7 @@ Similarly, this is for PyTorch
 Resnet50 image classification model:
 
 ```
-./gradlew benchmark --args="-c 1 -s 1,3,224,224 -a ai.djl.mxnet:resnet -r {'layers':'50','flavor':'v2','dataset':'imagenet'}"
+./gradlew benchmark --args="-c 2 -s 1,3,224,224 -a ai.djl.mxnet:resnet -r {'layers':'50','flavor':'v2','dataset':'imagenet'}"
 ```
 
 #### PyTorch
@@ -55,7 +55,7 @@ Resnet50 image classification model:
 SSD object detection model:
 
 ```
-./gradlew benchmark -Dai.djl.default_engine=PyTorch --args="-c 1 -s 1,3,300,300 -a ai.djl.pytorch:ssd -r {'size':'300','backbone':'resnet50'}"
+./gradlew benchmark --args="-e PyTorch -c 2 -s 1,3,300,300 -a ai.djl.pytorch:ssd -r {'size':'300','backbone':'resnet50'}"
 ```
 
 
@@ -69,7 +69,7 @@ To start your benchmarking, we need to make sure we provide the following inform
 - Sample input for the model
 - (Optional) Multi-thread benchmark
 
-The benchmark script located [here](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/benchmark/Benchmark.java).
+The benchmark script located [here](https://github.com/deepjavalibrary/djl/blob/master/benchmark/src/main/java/ai/djl/benchmark/Benchmark.java).
 
 Just do the following:
 
@@ -90,15 +90,16 @@ usage: ./gradlew benchmark --args='[OPTIONS]'
  -a,--artifact-id <ARTIFACT-ID>     Model artifact id.
  -c,--iteration <ITERATION>         Number of total iterations (per thread).
  -d,--duration <DURATION>           Duration of the test in minutes.
- -e,--engine-name <ENGINE-NAME>     Engine name.
+ -e,--engine <ENGINE-NAME>          Choose an Engine for the benchmark.
  -h,--help                          Print this help.
  -l,--delay <DELAY>                 Delay of incremental threads.
- -n,--model-name <MODEL-NAME>       Model name.
+ -n,--model-name <MODEL-NAME>       Specify model file name.
  -o,--output-dir <OUTPUT-DIR>       Directory for output logs.
  -p,--model-path <MODEL-PATH>       Model directory file path.
  -r,--criteria <CRITERIA>           The criteria (json string) used for searching the model.
- -s,--input-shapes <INPUT-SHAPES>   Input data shapes for non-CV model.
+ -s,--input-shapes <INPUT-SHAPES>   Input data shapes for the model.
  -t,--threads <NUMBER_THREADS>      Number of inference threads.
+ -u,--model-url <MODEL-URL>         Model archive file URL.
 ```
 
 ### Step 1: Pick your deep engine
@@ -106,10 +107,15 @@ usage: ./gradlew benchmark --args='[OPTIONS]'
 By default, the above script will use MXNet as the default Engine, but you can always change that by adding the followings:
 
 ```
--Dai.djl.default_engine=TensorFlow # tensorflow
--Dai.djl.default_engine=PyTorch # pytorch
+--args='-e TensorFlow' # TensorFlow
+--args='-e PyTorch' # PyTorch
+--args='-e MXNet' # Apache MXNet
+--args='-e PaddlePaddle' # PaddlePaddle
+--args='-e OnnxRuntime' # pytorch
+--args='-e TFLite' # TFLite
+--args='-e DLR' # Neo DLR
+--args='-e XGBoost' # XGBoost
 ```
-to change your default engine.
 
 ### Step 2: Identify the source of your model
 
@@ -117,14 +123,18 @@ DJL accept variety of models came from different places.
 
 #### Remote location
 
+Use `--model-url` option to load a model from a URL. The URL must point to an archive file.
+
 The following is a pytorch model
 
 ```
--Dai.djl.repository.zoo.location=https://alpha-djl-demos.s3.amazonaws.com/model/djl-blockrunner/pytorch_resnet18.zip
+--args='-u https://alpha-djl-demos.s3.amazonaws.com/model/djl-blockrunner/pytorch_resnet18.zip'
 ```
 We would recommend to make model files in a zip for better file tracking.
 
 #### Local directory
+
+Use `--model-path` option to load model from a local directory or an archive file.
 
 Mac/Linux
 
@@ -143,27 +153,10 @@ or
 ```
 
 If the model file name is different from the parent folder name (or the archive file name), you need
-to specify `-n MODEL_NAME` in the `--args`:
+to specify `--model-name` in the `--args`:
 
 ```
 --args='-n traced_resnet18'
-```
-
-#### DJL Model zoo
-
-You can run `listmodels` to list available models that you can use from different model zoos.
-
-```
-./gradlew listmodels # MXNet models
-./gradlew listmodels -Dai.djl.default_engine=TensorFlow # TensorFlow models
-./gradlew listmodels -Dai.djl.default_engine=PyTorch # PyTorch models
-```
-
-After that, just simply copy the json formatted criteria like `{"layers":"18","flavor":"v1","dataset":"imagenet"}` with the artifact id like `ai.djl.mxnet:resnet:0.0.1`.
-Then, you can just pass the information in the `--args` (remove `0.0.1` at the end):
-
-```
--a ai.djl.mxnet:resnet -r {"layers":"18","flavor":"v1","dataset":"imagenet"}
 ```
 
 ### Step 3: Define how many runs you would like to make
@@ -178,7 +171,7 @@ This will run 1000 times inference.
 
 ### Step 4: Define your model inputs
 
-The benchmark script support dummy NDArray inputs.
+The benchmark script uses dummy NDArray inputs.
 It will make fake NDArrays (like `NDArray.ones`) to feed in the model for inference.
 
 If we would like to fake an image:
@@ -212,7 +205,7 @@ For example:
 -s (1)i,(384)f,(384)
 ```
 
-### Optional Step: multithreading inference 
+### Optional Step: multithreading inference
 
 You can also do multi-threading inference with DJL. For example, if you would like to run the inference with 10 threads:
 
@@ -234,10 +227,10 @@ The above code will create 10 threads with the wait time of 100ms.
 For different purposes, we designed different mode you can play with. Such as the following arg:
 
 ```
--d 1440
+-d 86400
 ```
 
-This will ask the benchmark script repeatly running the designed task for 1440 minutes (24 hour).
+This will ask the benchmark script repeatedly running the designed task for 86400 seconds (24 hour).
 If you would like to make sure DJL is stable in the long run, you can do that.
 
 You can also keep monitoring the DJL memory usages by enable the following flag:

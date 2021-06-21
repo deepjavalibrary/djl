@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference.benchmark.util;
+package ai.djl.benchmark;
 
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.types.DataType;
@@ -23,11 +23,13 @@ import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 
 /** A class represents parsed command line arguments. */
@@ -44,28 +46,33 @@ public class Arguments {
     private int threads;
     private int delay;
     private PairList<DataType, Shape> inputShapes;
-    private boolean help;
 
-    public Arguments(CommandLine cmd) {
-        help = cmd.hasOption("help");
+    /**
+     * Constructs a {@code Arguments} instance.
+     *
+     * @param cmd command line options
+     */
+    Arguments(CommandLine cmd) {
         artifactId = cmd.getOptionValue("artifact-id");
-        modelUrls = cmd.getOptionValue("model-path");
-        if (modelUrls == null) {
-            String location = System.getProperty("ai.djl.repository.zoo.location");
-            if (location != null) {
-                modelUrls = location;
-            }
-        } else if (!modelUrls.startsWith("http") || !modelUrls.startsWith("file")) {
-            Path path = Paths.get(modelUrls);
+        if (cmd.hasOption("model-path")) {
+            String modelPath = cmd.getOptionValue("model-path");
+            Path path = Paths.get(modelPath);
             try {
                 modelUrls = path.toUri().toURL().toExternalForm();
             } catch (IOException e) {
                 throw new IllegalArgumentException("Invalid model-path: " + modelUrls, e);
             }
+        } else if (cmd.hasOption("model-url")) {
+            modelUrls = cmd.getOptionValue("model-url");
         }
+        if (modelUrls != null) {
+            artifactId = "ai.djl.localmodelzoo:";
+        }
+
         modelName = cmd.getOptionValue("model-name");
         outputDir = cmd.getOptionValue("output-dir");
         inputShapes = new PairList<>();
+
         if (cmd.hasOption("engine")) {
             engine = cmd.getOptionValue("engine");
         } else {
@@ -94,8 +101,9 @@ public class Arguments {
         if (cmd.hasOption("delay")) {
             delay = Integer.parseInt(cmd.getOptionValue("delay"));
         }
-        if (cmd.hasOption("input-shapes")) {
-            String shape = cmd.getOptionValue("input-shapes");
+
+        String shape = cmd.getOptionValue("input-shapes");
+        if (shape != null) {
             if (shape.contains("(")) {
                 Pattern pattern =
                         Pattern.compile("\\((\\s*(\\d+)([,\\s]+\\d+)*\\s*)\\)([sdubilBfS]?)");
@@ -147,44 +155,55 @@ public class Arguments {
         }
     }
 
-    public static Options getOptions() {
+    static Options getOptions() {
         Options options = new Options();
         options.addOption(
                 Option.builder("h").longOpt("help").hasArg(false).desc("Print this help.").build());
-        options.addOption(
+        OptionGroup artifactGroup = new OptionGroup();
+        artifactGroup.setRequired(true);
+        artifactGroup.addOption(
                 Option.builder("a")
                         .longOpt("artifact-id")
                         .hasArg()
                         .argName("ARTIFACT-ID")
                         .desc("Model artifact id.")
                         .build());
-        options.addOption(
+        artifactGroup.addOption(
                 Option.builder("p")
                         .longOpt("model-path")
                         .hasArg()
                         .argName("MODEL-PATH")
                         .desc("Model directory file path.")
                         .build());
+        artifactGroup.addOption(
+                Option.builder("u")
+                        .longOpt("model-url")
+                        .hasArg()
+                        .argName("MODEL-URL")
+                        .desc("Model archive file URL.")
+                        .build());
+        options.addOptionGroup(artifactGroup);
         options.addOption(
                 Option.builder("n")
                         .longOpt("model-name")
                         .hasArg()
                         .argName("MODEL-NAME")
-                        .desc("Model name.")
+                        .desc("Specify model file name.")
                         .build());
         options.addOption(
                 Option.builder("e")
-                        .longOpt("engine-name")
+                        .longOpt("engine")
                         .hasArg()
                         .argName("ENGINE-NAME")
-                        .desc("Engine name.")
+                        .desc("Choose an Engine for the benchmark.")
                         .build());
         options.addOption(
                 Option.builder("s")
+                        .required()
                         .longOpt("input-shapes")
                         .hasArg()
                         .argName("INPUT-SHAPES")
-                        .desc("Input data shapes for non-CV model.")
+                        .desc("Input data shapes for the model.")
                         .build());
         options.addOption(
                 Option.builder("d")
@@ -231,73 +250,55 @@ public class Arguments {
         return options;
     }
 
-    public int getDuration() {
+    static boolean hasHelp(String[] args) {
+        List<String> list = Arrays.asList(args);
+        return list.contains("-h") || list.contains("help");
+    }
+
+    int getDuration() {
         return duration;
     }
 
-    public String getModelUrls() {
+    String getEngine() {
+        return engine;
+    }
+
+    String getModelUrls() {
         return modelUrls;
     }
 
-    public String getModelName() {
+    String getModelName() {
         return modelName;
     }
 
-    public String getArtifactId() {
-        if (modelUrls != null) {
-            return "ai.djl.localmodelzoo:";
-        }
-
-        if (artifactId != null) {
-            return artifactId;
-        }
-
-        if (inputShapes.isEmpty()) {
-            inputShapes.add(DataType.FLOAT32, new Shape(1, 3, 224, 224));
-        }
-
-        switch (engine) {
-            case "PyTorch":
-                return "ai.djl.pytorch:resnet";
-            case "TensorFlow":
-                return "ai.djl.tensorflow:resnet";
-            case "MXNet":
-            default:
-                return "ai.djl.mxnet:resnet";
-        }
+    String getArtifactId() {
+        return artifactId;
     }
 
-    public int getIteration() {
+    int getIteration() {
         return iteration;
     }
 
-    public int getThreads() {
+    int getThreads() {
         return threads;
     }
 
-    public String getOutputDir() {
+    String getOutputDir() {
         if (outputDir == null) {
             outputDir = "build";
         }
         return outputDir;
     }
 
-    public Map<String, String> getCriteria() {
+    Map<String, String> getCriteria() {
         return criteria;
     }
 
-    public int getDelay() {
+    int getDelay() {
         return delay;
     }
 
-    public PairList<DataType, Shape> getInputShapes() {
-        if (inputShapes.isEmpty()) {
-            throw new IllegalArgumentException("Input share is required.");
-        }
+    PairList<DataType, Shape> getInputShapes() {
         return inputShapes;
-    }
-
-    public boolean hasHelp() {
-        return help;
     }
 }

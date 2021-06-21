@@ -23,21 +23,6 @@ dependencies {
         runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
     }
 
-    // DLR, tflite, PaddlePaddle and OnnxRuntime are only used for benchmark
-    if (System.getProperty("ai.djl.default_engine") == "DLR") {
-        runtimeOnly project(":dlr:dlr-engine")
-        runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
-    } else if (System.getProperty("ai.djl.default_engine") == "TFLite") {
-        runtimeOnly project(":tflite:tflite-engine")
-        runtimeOnly "ai.djl.tflite:tflite:tflite-native:${tflite_version}"
-    } else if (System.getProperty("ai.djl.default_engine") == "PaddlePaddle") {
-        runtimeOnly project(":paddlepaddle:paddlepaddle-model-zoo")
-        runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
-    } else if (System.getProperty("ai.djl.default_engine") == "OnnxRuntime") {
-        // onnxruntime requires user install libgomp.so.1 manually, exclude from default dependency
-        runtimeOnly project(":onnxruntime:onnxruntime-engine")
-    }
-
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
@@ -61,45 +46,5 @@ task listmodels(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = "ai.djl.examples.inference.ListModels"
 }
-
-task benchmark(type: JavaExec) {
-    environment("TF_CPP_MIN_LOG_LEVEL", "1") // turn off TensorFlow print out
-    List<String> arguments = gradle.startParameter["taskRequests"]["args"].getAt(0)
-    for (String argument : arguments) {
-        if (argument.trim().startsWith("--args")) {
-            String[] line = argument.split("=", 2)
-            if (line.length == 2) {
-                line = line[1].split(" ");
-                if (line.contains("-t")) {
-                    if (System.properties["ai.djl.default_engine"] == "PyTorch") {
-                        System.setProperty("ai.djl.pytorch.num_interop_threads", "1")
-                        System.setProperty("ai.djl.pytorch.num_threads", "1")
-                    } else if (System.properties["ai.djl.default_engine"] == "TensorFlow") {
-                        environment("OMP_NUM_THREADS", "1")
-                        environment("TF_NUM_INTRAOP_THREADS", "1")
-                    } else {
-                        environment("MXNET_ENGINE_TYPE", "NaiveEngine")
-                        environment("OMP_NUM_THREADS", "1")
-                    }
-                }
-                break;
-            }
-        }
-    }
-
-    systemProperties System.getProperties()
-    systemProperties.remove("user.dir")
-    systemProperty("file.encoding", "UTF-8")
-    classpath = sourceSets.main.runtimeClasspath
-    // restrict the jvm heap size for better monitoring benchmark
-    jvmArgs = ["-Xmx2g"]
-    if (Boolean.getBoolean("loggc")) {
-        if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
-            jvmArgs += ["-XX:+PrintGCTimeStamps", "-Xloggc:build/gc.log"]
-        } else {
-            jvmArgs += ["-Xlog:gc*=debug:file=build/gc.log"]
-        }
-    }
-    main = "ai.djl.examples.inference.benchmark.Benchmark"
-}
 tasks.distTar.enabled = false
+tasks.distZip.enabled = false
