@@ -133,6 +133,7 @@ task uploadS3 {
         def f = new File("${buildDir}/native/files.txt")
         def uploadDirs = [
                 "${buildDir}/native/cpu/linux/native/lib/",
+                "${buildDir}/native/cu101/linux/native/lib/",
                 "${buildDir}/native/cpu/osx/native/lib/",
                 "${buildDir}/native/cpu/win/native/lib/"
         ]

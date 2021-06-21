@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -85,15 +86,18 @@ public final class LibUtils {
     public static void loadLinuxDependencies(String libName) {
         Path libDir = Paths.get(libName).getParent();
         if (libDir != null) {
-            String mkl = "libdnnl.so.2";
-            Path path = libDir.resolve(mkl);
-            if (Files.isRegularFile(path)) {
-                String lib = path.toAbsolutePath().toString();
-                logger.debug("Now loading " + lib);
-                System.load(lib);
-            } else {
-                logger.debug(mkl + "is not found, skip loading...");
-            }
+            List<String> names = Arrays.asList("libdnnl.so.2", "libiomp5.so", "libmklml_intel.so");
+            names.forEach(
+                    name -> {
+                        Path path = libDir.resolve(name);
+                        if (Files.isRegularFile(path)) {
+                            String lib = path.toAbsolutePath().toString();
+                            logger.debug("Now loading " + lib);
+                            System.load(lib);
+                        } else {
+                            logger.debug(name + " is not found, skip loading...");
+                        }
+                    });
         }
     }
 
@@ -300,7 +304,7 @@ public final class LibUtils {
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
             if (flavor.startsWith("cu")
-                    && !lines.contains(flavor + '/' + os + "/native/lib/" + libName)) {
+                    && !lines.contains(flavor + '/' + os + "/native/lib/" + libName + ".gz")) {
                 logger.warn("No matching cuda flavor for {} found: {}.", os, flavor);
                 // fallback to CPU
                 flavor = "cpu";
