@@ -14,17 +14,13 @@ package ai.djl.mxnet.zoo.nlp.embedding;
 
 import ai.djl.Application;
 import ai.djl.Application.NLP;
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.modality.nlp.SimpleVocabulary;
-import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.modality.nlp.embedding.WordEmbedding;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.core.Embedding;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
@@ -36,9 +32,7 @@ import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
-import ai.djl.util.Utils;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,38 +54,6 @@ public class GloveWordEmbeddingModelLoader extends BaseModelLoader {
     public GloveWordEmbeddingModelLoader(Repository repository) {
         super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION, new MxModelZoo());
         factories.put(new Pair<>(String.class, NDList.class), new FactoryImpl());
-    }
-
-    private Model customGloveBlock(Model model, Artifact artifact, Map<String, Object> arguments)
-            throws IOException {
-        List<String> idxToToken =
-                Utils.readLines(
-                        resource.getRepository()
-                                .openStream(artifact.getFiles().get("idx_to_token"), null));
-        TrainableWordEmbedding wordEmbedding =
-                TrainableWordEmbedding.builder()
-                        .optNumEmbeddings(
-                                Integer.parseInt(artifact.getProperties().get("dimensions")))
-                        .setVocabulary(new SimpleVocabulary(idxToToken))
-                        .optUnknownToken((String) arguments.get("unknownToken"))
-                        .optUseDefault(true)
-                        .build();
-        model.setBlock(wordEmbedding);
-        model.setProperty("unknownToken", (String) arguments.get("unknownToken"));
-        return model;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected Model createModel(
-            String name,
-            Device device,
-            Artifact artifact,
-            Map<String, Object> arguments,
-            String engine)
-            throws IOException {
-        Model model = Model.newInstance(name, device, engine);
-        return customGloveBlock(model, artifact, arguments);
     }
 
     /**

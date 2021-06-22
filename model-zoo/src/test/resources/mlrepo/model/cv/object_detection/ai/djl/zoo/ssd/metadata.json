@@ -88,6 +88,7 @@
         "width": 256,
         "height": 256,
         "numFeatures": 3,
+        "blockFactory": "ai.djl.basicmodelzoo.cv.object_detection.ssd.SsdBlockFactory",
         "numFilters": [
           16,
           32,

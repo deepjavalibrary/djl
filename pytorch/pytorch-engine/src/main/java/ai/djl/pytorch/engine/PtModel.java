@@ -66,10 +66,6 @@ public class PtModel extends BaseModel {
         }
 
         if (block == null) {
-            block = loadFromBlockFactory();
-        }
-
-        if (block == null) {
             Path modelFile = findModelFile(prefix);
             if (modelFile == null) {
                 modelFile = findModelFile(modelDir.toFile().getName());
