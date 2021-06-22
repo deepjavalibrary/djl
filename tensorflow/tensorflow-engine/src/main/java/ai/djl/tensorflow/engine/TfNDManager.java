@@ -62,7 +62,6 @@ public class TfNDManager extends BaseNDManager {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings({"unchecked", "try"})
     @Override
     public TfNDArray create(Buffer data, Shape shape, DataType dataType) {
         int size = data.remaining();
@@ -96,6 +95,13 @@ public class TfNDManager extends BaseNDManager {
         buf.rewind();
         // TODO(improvement): avoid data copy by creating directByteBuffer on tensor data pointer
         TFE_TensorHandle handle = JavacppUtils.createTFETensorFromByteBuffer(buf, shape, dataType);
+        return new TfNDArray(this, handle);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(String data) {
+        TFE_TensorHandle handle = JavacppUtils.createStringTensor(data);
         return new TfNDArray(this, handle);
     }
 
