@@ -23,6 +23,8 @@ import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.translator.ImageClassificationTranslatorFactory;
 import ai.djl.ndarray.NDList;
+import ai.djl.nn.Block;
+import ai.djl.nn.BlockFactory;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
@@ -32,6 +34,7 @@ import ai.djl.translate.ServingTranslatorFactory;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
+import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Pair;
 import ai.djl.util.Progress;
 import java.io.IOException;
@@ -155,10 +158,14 @@ public class BaseModelLoader implements ModelLoader {
                 modelName = artifact.getName();
             }
 
-            Model model = createModel(modelName, criteria.getDevice(), artifact, arguments, engine);
-            if (criteria.getBlock() != null) {
-                model.setBlock(criteria.getBlock());
-            }
+            Model model =
+                    createModel(
+                            modelPath,
+                            modelName,
+                            criteria.getDevice(),
+                            criteria.getBlock(),
+                            arguments,
+                            engine);
             model.load(modelPath, null, options);
             Translator<I, O> translator = factory.newInstance(model, arguments);
             return new ZooModel<>(model, translator);
@@ -182,13 +189,25 @@ public class BaseModelLoader implements ModelLoader {
     }
 
     protected Model createModel(
+            Path modelPath,
             String name,
             Device device,
-            Artifact artifact,
+            Block block,
             Map<String, Object> arguments,
             String engine)
             throws IOException {
-        return Model.newInstance(name, device, engine);
+        Model model = Model.newInstance(name, device, engine);
+        if (block == null) {
+            String className = (String) arguments.get("blockFactory");
+            BlockFactory factory = ClassLoaderUtils.findImplementation(modelPath, className);
+            if (factory != null) {
+                block = factory.newBlock(model, modelPath, arguments);
+            }
+        }
+        if (block != null) {
+            model.setBlock(block);
+        }
+        return model;
     }
 
     /** {@inheritDoc} */

@@ -12,10 +12,10 @@
  */
 package ai.djl.basicmodelzoo;
 
-import ai.djl.basicmodelzoo.cv.classification.MlpModelLoader;
-import ai.djl.basicmodelzoo.cv.classification.ResNetModelLoader;
-import ai.djl.basicmodelzoo.cv.object_detection.ssd.SsdModelLoader;
+import ai.djl.modality.cv.zoo.ImageClassificationModelLoader;
+import ai.djl.modality.cv.zoo.ObjectDetectionModelLoader;
 import ai.djl.repository.Repository;
+import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,11 +25,15 @@ public class BasicModelZoo implements ModelZoo {
 
     private static final String REPO_URL = "https://mlrepo.djl.ai/";
     private static final Repository REPOSITORY = Repository.newInstance("zoo", REPO_URL);
+    private static final ModelZoo ZOO = new BasicModelZoo();
     public static final String GROUP_ID = "ai.djl.zoo";
 
-    public static final ResNetModelLoader RESNET = new ResNetModelLoader(REPOSITORY);
-    public static final MlpModelLoader MLP = new MlpModelLoader(REPOSITORY);
-    public static final SsdModelLoader SSD = new SsdModelLoader(REPOSITORY);
+    public static final ModelLoader RESNET =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "resnet", "0.0.2", ZOO);
+    public static final ModelLoader MLP =
+            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "mlp", "0.0.3", ZOO);
+    public static final ModelLoader SSD =
+            new ObjectDetectionModelLoader(REPOSITORY, GROUP_ID, "ssd", "0.0.2", ZOO);
 
     /** {@inheritDoc} */
     @Override

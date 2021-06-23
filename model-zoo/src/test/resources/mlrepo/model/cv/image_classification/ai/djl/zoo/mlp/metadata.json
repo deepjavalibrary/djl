@@ -57,6 +57,7 @@
         "width": 28,
         "height": 28,
         "output": 10,
+        "blockFactory": "ai.djl.basicmodelzoo.basic.MlpBlockFactory",
         "hidden": [
           128,
           64

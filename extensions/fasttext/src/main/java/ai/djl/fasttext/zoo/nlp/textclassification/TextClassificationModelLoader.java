@@ -19,7 +19,7 @@ import ai.djl.Model;
 import ai.djl.fasttext.FtModel;
 import ai.djl.fasttext.zoo.FtModelZoo;
 import ai.djl.modality.Classifications;
-import ai.djl.repository.Artifact;
+import ai.djl.nn.Block;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
@@ -30,6 +30,7 @@ import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Map;
 
 /** Model loader for fastText cooking stackexchange models. */
@@ -68,9 +69,10 @@ public class TextClassificationModelLoader extends BaseModelLoader {
     /** {@inheritDoc} */
     @Override
     protected Model createModel(
+            Path modelPath,
             String name,
             Device device,
-            Artifact artifact,
+            Block block,
             Map<String, Object> arguments,
             String engine) {
         return new FtModel(name);
