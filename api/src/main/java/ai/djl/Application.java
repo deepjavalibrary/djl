@@ -181,6 +181,9 @@ public class Application {
          * String}&gt;.
          */
         Application WORD_RECOGNITION = new Application("cv/word_recognition");
+
+        /** An application that accepts a seed and returns generated images. */
+        Application GAN = new Application("cv/gan");
     }
 
     /** The common set of applications for natural language processing (text data). */

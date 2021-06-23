@@ -14,6 +14,7 @@ package ai.djl.pytorch.zoo;
 
 import ai.djl.modality.cv.zoo.ImageClassificationModelLoader;
 import ai.djl.pytorch.engine.PtEngine;
+import ai.djl.pytorch.zoo.cv.gan.BigGANModelLoader;
 import ai.djl.pytorch.zoo.cv.objectdetection.PtSsdModelLoader;
 import ai.djl.pytorch.zoo.nlp.qa.BertQAModelLoader;
 import ai.djl.pytorch.zoo.nlp.sentimentanalysis.DistilBertSentimentAnalysisModelLoader;
@@ -42,6 +43,8 @@ public class PtModelZoo implements ModelZoo {
 
     public static final DistilBertSentimentAnalysisModelLoader DB_SENTIMENT_ANALYSIS =
             new DistilBertSentimentAnalysisModelLoader(REPOSITORY);
+
+    public static final BigGANModelLoader BIG_GAN = new BigGANModelLoader(REPOSITORY);
 
     /** {@inheritDoc} */
     @Override
