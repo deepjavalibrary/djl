@@ -27,7 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 /** Helper for easy training of a whole model, a trainining batch, or a validation batch. */
-public final class EasyTrain {
+@SuppressWarnings("FinalClass")
+public class EasyTrain {
 
     private EasyTrain() {}
 
