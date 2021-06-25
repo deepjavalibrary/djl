@@ -55,6 +55,7 @@ task compileJNIGPU {
     doFirst {
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
             downloadBuild("linux", "cu101")
+            downloadBuild("linux", "cu102")
         } else {
             throw new IllegalStateException("Architecture not supported: " + System.properties['os.name'])
         }
@@ -69,6 +70,7 @@ task prepareNativeLibs() {
         def files = [
                 "cpu/linux": "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle202/paddle_inference_install_dir-2.0.2-openblas-gcc54-ubuntu.tgz",
                 "cu101/linux": "https://paddle-inference-lib.bj.bcebos.com/2.0.2-gpu-cuda10.1-cudnn7-avx-mkl/paddle_inference.tgz",
+                "cu102/linux": "https://paddle-inference-lib.bj.bcebos.com/2.0.2-gpu-cuda10.2-cudnn8-avx-mkl/paddle_inference.tgz",
                 "cpu/osx"  : "https://paddle-inference-lib.bj.bcebos.com/mac/2.0.2/cpu_avx_openblas/paddle_inference.tgz",
                 "cpu/win"  : "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-windows-openblas-2.0.2.zip"
         ]
@@ -134,6 +136,7 @@ task uploadS3 {
         def uploadDirs = [
                 "${buildDir}/native/cpu/linux/native/lib/",
                 "${buildDir}/native/cu101/linux/native/lib/",
+                "${buildDir}/native/cu102/linux/native/lib/",
                 "${buildDir}/native/cpu/osx/native/lib/",
                 "${buildDir}/native/cpu/win/native/lib/"
         ]
