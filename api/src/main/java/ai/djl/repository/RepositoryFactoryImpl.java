@@ -79,6 +79,9 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         }
 
         String uriPath = uri.getPath();
+        if (uriPath == null) {
+            uriPath = uri.getSchemeSpecificPart();
+        }
         if (uriPath.startsWith("/") && System.getProperty("os.name").startsWith("Win")) {
             uriPath = uriPath.substring(1);
         }

@@ -40,6 +40,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -53,6 +55,8 @@ import org.slf4j.LoggerFactory;
 public class ModelServer {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelServer.class);
+
+    private static final Pattern MODEL_STORE_PATTERN = Pattern.compile("(\\[(.+)]=)?(.+)");
 
     private ServerGroups serverGroups;
     private List<ChannelFuture> futures = new ArrayList<>(2);
@@ -298,18 +302,46 @@ public class ModelServer {
 
         for (String url : urls) {
             logger.info("Initializing model: {}", url);
+            Matcher matcher = MODEL_STORE_PATTERN.matcher(url);
+            if (!matcher.matches()) {
+                throw new AssertionError("Invalid model store url: " + url);
+            }
+            String endpoint = matcher.group(2);
+            String modelUrl = matcher.group(3);
+            String version = null;
+            String engine = null;
+            int gpuId = -1;
+            String modelName;
+            if (endpoint != null) {
+                String[] tokens = endpoint.split(":", -1);
+                modelName = tokens[0];
+                if (tokens.length > 1) {
+                    version = tokens[1].isEmpty() ? null : tokens[1];
+                }
+                if (tokens.length > 2) {
+                    engine = tokens[2].isEmpty() ? null : tokens[2];
+                }
+                if (tokens.length > 3) {
+                    gpuId = tokens[3].isEmpty() ? -1 : Integer.parseInt(tokens[3]);
+                }
+            } else {
+                modelName = ModelInfo.inferModelNameFromUrl(modelUrl);
+            }
+
             int workers = configManager.getDefaultWorkers();
             CompletableFuture<ModelInfo> future =
                     modelManager.registerModel(
-                            ModelInfo.inferModelNameFromUrl(url),
-                            url,
-                            null,
+                            modelName,
+                            version,
+                            modelUrl,
+                            engine,
+                            gpuId,
                             configManager.getBatchSize(),
                             configManager.getMaxBatchDelay(),
                             configManager.getMaxIdleTime());
             ModelInfo modelInfo = future.join();
             modelManager.triggerModelUpdated(modelInfo.scaleWorkers(workers, workers));
-            startupModels.add(modelInfo.getModelName());
+            startupModels.add(modelName);
         }
     }
 
