@@ -44,7 +44,9 @@
         "dataset": "SQuAD",
         "cased": "true"
       },
-      "arguments": {},
+      "arguments": {
+        "translatorFactory": "ai.djl.pytorch.zoo.nlp.qa.PtBertQATranslatorFactory"
+      },
       "files": {
         "bert-base-cased-vocab": {
           "uri": "trace_cased_bertqa/0.0.1/bert-base-cased-vocab.txt.gz",
@@ -67,7 +69,9 @@
         "dataset": "SQuAD",
         "cased": "true"
       },
-      "arguments": {},
+      "arguments": {
+        "translatorFactory": "ai.djl.pytorch.zoo.nlp.qa.PtBertQATranslatorFactory"
+      },
       "files": {
         "bert-base-cased-vocab": {
           "uri": "trace_distilbertqa/0.0.1/bert-base-cased-vocab.txt.gz",

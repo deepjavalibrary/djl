@@ -16,7 +16,6 @@ import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.repository.Artifact;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -43,20 +42,7 @@ public interface ModelZoo {
      *
      * @return the list of all available model families
      */
-    default List<ModelLoader> getModelLoaders() {
-        List<ModelLoader> list = new ArrayList<>();
-        try {
-            Field[] fields = getClass().getDeclaredFields();
-            for (Field field : fields) {
-                if (ModelLoader.class.isAssignableFrom(field.getType())) {
-                    list.add((ModelLoader) field.get(null));
-                }
-            }
-        } catch (ReflectiveOperationException e) {
-            // ignore
-        }
-        return list;
-    }
+    List<ModelLoader> getModelLoaders();
 
     /**
      * Returns the {@link ModelLoader} based on the model name.

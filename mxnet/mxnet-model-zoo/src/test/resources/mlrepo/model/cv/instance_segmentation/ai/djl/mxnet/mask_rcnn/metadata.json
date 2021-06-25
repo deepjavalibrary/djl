@@ -25,7 +25,8 @@
       },
       "arguments": {
         "normalize": true,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.InstanceSegmentationTranslatorFactory"
       },
       "files": {
         "classes": {

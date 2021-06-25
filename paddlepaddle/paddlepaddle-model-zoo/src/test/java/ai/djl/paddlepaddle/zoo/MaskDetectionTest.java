@@ -21,9 +21,9 @@ import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,8 +31,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -103,23 +101,26 @@ public class MaskDetectionTest {
 
     private static Predictor<Image, Classifications> getClassifier()
             throws MalformedModelException, ModelNotFoundException, IOException {
-
-        Map<String, String> filter = new ConcurrentHashMap<>();
-        filter.put("flavor", "server");
-
-        ZooModel<Image, Classifications> model =
-                PpModelZoo.MASK_DETECTION.loadModel(filter, null, new ProgressBar());
+        Criteria<Image, Classifications> criteria =
+                Criteria.builder()
+                        .setTypes(Image.class, Classifications.class)
+                        .optArtifactId("ai.djl.paddlepaddle:mask_classification")
+                        .optFilter("flavor", "server")
+                        .build();
+        ZooModel<Image, Classifications> model = criteria.loadModel();
         return model.newPredictor();
     }
 
     private static DetectedObjects detectFaces(Image img)
             throws ModelException, IOException, TranslateException {
+        Criteria<Image, DetectedObjects> criteria =
+                Criteria.builder()
+                        .setTypes(Image.class, DetectedObjects.class)
+                        .optArtifactId("ai.djl.paddlepaddle:face_detection")
+                        .optFilter("flavor", "server")
+                        .build();
 
-        Map<String, String> filter = new ConcurrentHashMap<>();
-        filter.put("flavor", "server");
-
-        try (ZooModel<Image, DetectedObjects> model =
-                        PpModelZoo.FACE_DETECTION.loadModel(filter, null, new ProgressBar());
+        try (ZooModel<Image, DetectedObjects> model = criteria.loadModel();
                 Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
             return predictor.predict(img);
         }

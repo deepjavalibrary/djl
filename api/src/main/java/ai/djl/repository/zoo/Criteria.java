@@ -15,8 +15,8 @@ package ai.djl.repository.zoo;
 import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
-import ai.djl.Model;
 import ai.djl.nn.Block;
+import ai.djl.translate.DefaultTranslatorFactory;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.JsonUtils;
@@ -69,7 +69,7 @@ public class Criteria<I, O> {
     private Map<String, String> filters;
     private Map<String, Object> arguments;
     private Map<String, String> options;
-    private TranslatorFactory<I, O> factory;
+    private TranslatorFactory factory;
     private Block block;
     private String modelName;
     private Progress progress;
@@ -291,7 +291,7 @@ public class Criteria<I, O> {
      *
      * @return the optional {@link TranslatorFactory} to be used for {@link ZooModel}
      */
-    public TranslatorFactory<I, O> getTranslatorFactory() {
+    public TranslatorFactory getTranslatorFactory() {
         return factory;
     }
 
@@ -385,10 +385,11 @@ public class Criteria<I, O> {
         Map<String, String> filters;
         Map<String, Object> arguments;
         Map<String, String> options;
-        TranslatorFactory<I, O> factory;
+        TranslatorFactory factory;
         Block block;
         String modelName;
         Progress progress;
+        private Translator<I, O> translator;
 
         Builder() {
             application = Application.UNDEFINED;
@@ -628,9 +629,7 @@ public class Criteria<I, O> {
          * @return this {@code Builder}
          */
         public Builder<I, O> optTranslator(Translator<I, O> translator) {
-            if (translator != null) {
-                this.factory = new TranslatorFactorImpl<>(translator);
-            }
+            this.translator = translator;
             return this;
         }
 
@@ -640,7 +639,7 @@ public class Criteria<I, O> {
          * @param factory the override {@code TranslatorFactory}
          * @return this {@code Builder}
          */
-        public Builder<I, O> optTranslatorFactory(TranslatorFactory<I, O> factory) {
+        public Builder<I, O> optTranslatorFactory(TranslatorFactory factory) {
             this.factory = factory;
             return this;
         }
@@ -662,22 +661,12 @@ public class Criteria<I, O> {
          * @return the {@link Criteria} instance
          */
         public Criteria<I, O> build() {
+            if (factory == null && translator != null) {
+                DefaultTranslatorFactory f = new DefaultTranslatorFactory();
+                f.registerTranslator(inputClass, outputClass, translator);
+                factory = f;
+            }
             return new Criteria<>(this);
-        }
-    }
-
-    private static final class TranslatorFactorImpl<I, O> implements TranslatorFactory<I, O> {
-
-        private Translator<I, O> translator;
-
-        public TranslatorFactorImpl(Translator<I, O> translator) {
-            this.translator = translator;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Translator<I, O> newInstance(Model model, Map<String, ?> arguments) {
-            return translator;
         }
     }
 }

@@ -39,7 +39,7 @@ public class PpFaceDetectionTranslator implements Translator<Image, DetectedObje
     private List<String> className;
 
     /**
-     * Creates the {@link PpFaceDetection} translator.
+     * Creates the {@link PpFaceDetectionTranslator} instance.
      *
      * @param arguments the arguments for the translator
      */
@@ -73,7 +73,7 @@ public class PpFaceDetectionTranslator implements Translator<Image, DetectedObje
 
     /** {@inheritDoc} */
     @Override
-    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) throws Exception {
+    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
         NDArray result = list.singletonOrThrow();
         float[] probabilities = result.get(":,1").toFloatArray();
         List<String> names = new ArrayList<>();

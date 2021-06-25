@@ -13,25 +13,20 @@
 package ai.djl.fasttext.zoo.nlp.textclassification;
 
 import ai.djl.Application;
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.fasttext.FtModel;
 import ai.djl.fasttext.zoo.FtModelZoo;
-import ai.djl.modality.Classifications;
-import ai.djl.nn.Block;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.translate.Translator;
-import ai.djl.translate.TranslatorFactory;
-import ai.djl.util.Pair;
+import ai.djl.util.Progress;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Map;
 
 /** Model loader for fastText cooking stackexchange models. */
 public class TextClassificationModelLoader extends BaseModelLoader {
@@ -48,43 +43,30 @@ public class TextClassificationModelLoader extends BaseModelLoader {
      */
     public TextClassificationModelLoader(Repository repository) {
         super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION, new FtModelZoo());
-        factories.put(new Pair<>(String.class, Classifications.class), new FactoryImpl());
-    }
-
-    /**
-     * Loads the model with the given search filters.
-     *
-     * @return the loaded model
-     * @throws IOException for various exceptions loading data from the repository
-     * @throws ModelNotFoundException if no model with the specified criteria is found
-     * @throws MalformedModelException if the model data is malformed
-     */
-    public ZooModel<String, Classifications> loadModel()
-            throws IOException, ModelNotFoundException, MalformedModelException {
-        Criteria<String, Classifications> criteria =
-                Criteria.builder().setTypes(String.class, Classifications.class).build();
-        return loadModel(criteria);
     }
 
     /** {@inheritDoc} */
     @Override
-    protected Model createModel(
-            Path modelPath,
-            String name,
-            Device device,
-            Block block,
-            Map<String, Object> arguments,
-            String engine) {
-        return new FtModel(name);
-    }
-
-    private static final class FactoryImpl implements TranslatorFactory<String, Classifications> {
-
-        /** {@inheritDoc} */
-        @Override
-        public Translator<String, Classifications> newInstance(
-                Model model, Map<String, ?> arguments) {
-            return null;
+    public <I, O> ZooModel<I, O> loadModel(Criteria<I, O> criteria)
+            throws ModelNotFoundException, IOException, MalformedModelException {
+        Artifact artifact = resource.match(criteria.getFilters());
+        if (artifact == null) {
+            throw new ModelNotFoundException("No matching filter found");
         }
+
+        Progress progress = criteria.getProgress();
+        resource.prepare(artifact, progress);
+        if (progress != null) {
+            progress.reset("Loading", 2);
+            progress.update(1);
+        }
+        String modelName = criteria.getModelName();
+        if (modelName == null) {
+            modelName = artifact.getName();
+        }
+        Model model = new FtModel(modelName);
+        Path modelPath = resource.getRepository().getResourceDirectory(artifact);
+        model.load(modelPath);
+        return new ZooModel<>(model, null);
     }
 }

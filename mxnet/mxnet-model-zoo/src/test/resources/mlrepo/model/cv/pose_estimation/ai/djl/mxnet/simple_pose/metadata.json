@@ -28,7 +28,8 @@
         "height": 256,
         "resize": true,
         "normalize": true,
-        "threshold": 0.2
+        "threshold": 0.2,
+        "translatorFactory": "ai.djl.modality.cv.translator.SimplePoseTranslatorFactory"
       },
       "files": {
         "symbol": {
@@ -54,7 +55,11 @@
       },
       "arguments": {
         "width": 192,
-        "height": 256
+        "height": 256,
+        "resize": true,
+        "normalize": true,
+        "threshold": 0.2,
+        "translatorFactory": "ai.djl.modality.cv.translator.SimplePoseTranslatorFactory"
       },
       "files": {
         "symbol": {
@@ -83,7 +88,8 @@
         "height": 256,
         "resize": true,
         "normalize": true,
-        "threshold": 0.2
+        "threshold": 0.2,
+        "translatorFactory": "ai.djl.modality.cv.translator.SimplePoseTranslatorFactory"
       },
       "files": {
         "symbol": {
@@ -112,7 +118,8 @@
         "height": 256,
         "resize": true,
         "normalize": true,
-        "threshold": 0.2
+        "threshold": 0.2,
+        "translatorFactory": "ai.djl.modality.cv.translator.SimplePoseTranslatorFactory"
       },
       "files": {
         "symbol": {
@@ -141,7 +148,8 @@
         "height": 256,
         "resize": true,
         "normalize": true,
-        "threshold": 0.2
+        "threshold": 0.2,
+        "translatorFactory": "ai.djl.modality.cv.translator.SimplePoseTranslatorFactory"
       },
       "files": {
         "symbol": {

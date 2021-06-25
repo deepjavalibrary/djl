@@ -12,15 +12,16 @@
  */
 package ai.djl.paddlepaddle.zoo;
 
+import ai.djl.Application.CV;
 import ai.djl.paddlepaddle.engine.PpEngine;
-import ai.djl.paddlepaddle.zoo.cv.imageclassification.PpMaskClassification;
-import ai.djl.paddlepaddle.zoo.cv.imageclassification.PpWordRotateClassifier;
-import ai.djl.paddlepaddle.zoo.cv.objectdetection.PpFaceDetection;
-import ai.djl.paddlepaddle.zoo.cv.objectdetection.PpWordDetection;
-import ai.djl.paddlepaddle.zoo.cv.wordrecognition.PpWordRecognition;
+import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
+import ai.djl.repository.zoo.BaseModelLoader;
+import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /** PpModelZoo is a repository that contains all PaddlePaddle models for DJL. */
@@ -31,20 +32,30 @@ public class PpModelZoo implements ModelZoo {
     private static final PpModelZoo ZOO = new PpModelZoo();
     public static final String GROUP_ID = "ai.djl.paddlepaddle";
 
-    public static final PpFaceDetection FACE_DETECTION =
-            new PpFaceDetection(REPOSITORY, GROUP_ID, "face_detection", "0.0.1", ZOO);
+    private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
 
-    public static final PpWordDetection WORD_DETECTION =
-            new PpWordDetection(REPOSITORY, GROUP_ID, "word_detection", "0.0.1", ZOO);
+    static {
+        MRL maskDetection = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mask_classification");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, maskDetection, "0.0.1", ZOO));
 
-    public static final PpWordRotateClassifier WORD_ROTATE =
-            new PpWordRotateClassifier(REPOSITORY, GROUP_ID, "word_rotation", "0.0.1", ZOO);
+        MRL wordRotation = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "word_rotation");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, wordRotation, "0.0.1", ZOO));
 
-    public static final PpWordRecognition WORD_RECOGNITION =
-            new PpWordRecognition(REPOSITORY, GROUP_ID, "word_recognition", "0.0.1", ZOO);
+        MRL faceDetection = MRL.model(CV.OBJECT_DETECTION, GROUP_ID, "face_detection");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, faceDetection, "0.0.1", ZOO));
 
-    public static final PpMaskClassification MASK_DETECTION =
-            new PpMaskClassification(REPOSITORY, GROUP_ID, "mask_classification", "0.0.1", ZOO);
+        MRL wordDetection = MRL.model(CV.OBJECT_DETECTION, GROUP_ID, "word_detection");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, wordDetection, "0.0.1", ZOO));
+
+        MRL wordRecognition = MRL.model(CV.WORD_RECOGNITION, GROUP_ID, "word_recognition");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, wordRecognition, "0.0.1", ZOO));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<ModelLoader> getModelLoaders() {
+        return MODEL_LOADERS;
+    }
 
     /** {@inheritDoc} */
     @Override

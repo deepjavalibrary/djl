@@ -24,7 +24,8 @@
       "arguments": {
         "dimensions": "50",
         "unknownToken": "\u003cunk\u003e",
-        "blockFactory": "ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingBlockFactory"
+        "blockFactory": "ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingBlockFactory",
+        "translatorFactory": "ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingTranslatorFactory"
       },
       "files": {
         "parameters": {
@@ -49,7 +50,8 @@
       "arguments": {
         "dimensions": "50",
         "unknownToken": "\u003cunk\u003e",
-        "blockFactory": "ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingBlockFactory"
+        "blockFactory": "ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingBlockFactory",
+        "translatorFactory": "ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingTranslatorFactory"
       },
       "files": {
         "parameters": {

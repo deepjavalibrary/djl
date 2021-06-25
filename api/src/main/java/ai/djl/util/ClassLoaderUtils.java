@@ -135,8 +135,16 @@ public final class ClassLoaderUtils {
         return null;
     }
 
+    /**
+     * Loads the specified class and constructs an instance.
+     *
+     * @param cl the {@code ClassLoader} to use
+     * @param className the class to be loaded
+     * @param <T> the type of the class
+     * @return an instance of the class, null if the class not found
+     */
     @SuppressWarnings("unchecked")
-    private static <T> T initClass(ClassLoader cl, String className) {
+    public static <T> T initClass(ClassLoader cl, String className) {
         try {
             Class<?> clazz = Class.forName(className, true, cl);
             Constructor<T> constructor = (Constructor<T>) clazz.getConstructor();

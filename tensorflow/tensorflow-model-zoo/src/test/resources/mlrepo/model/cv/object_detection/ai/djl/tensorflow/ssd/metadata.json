@@ -27,7 +27,8 @@
         "height": 256,
         "resize": true,
         "threshold": 0.4,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.tensorflow.zoo.cv.objectdetction.TfSsdTranslatorFactory"
       },
       "options": {
         "Tags": ""

@@ -22,6 +22,9 @@
         "backbone": "bert",
         "dataset": "book_corpus_wiki_en_uncased"
       },
+      "arguments": {
+        "translatorFactory": "ai.djl.mxnet.zoo.nlp.qa.MxBertQATranslatorFactory"
+      },
       "files": {
         "vocabulary": {
           "uri": "https://mlrepo.djl.ai/model/nlp/qa/ai/djl/mxnet/bertqa/vocab.json",
