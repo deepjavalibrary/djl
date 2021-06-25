@@ -341,7 +341,7 @@ public final class JnaUtils {
     public static Pointer createNdArray(
             Device device, Shape shape, DataType dtype, int size, boolean delayedAlloc) {
         int deviceType = MxDeviceType.toDeviceType(device);
-        int deviceId = (deviceType != 1) ? device.getDeviceId() : -1;
+        int deviceId = device.getDeviceId();
         int delay = delayedAlloc ? 1 : 0;
 
         PointerByReference ref = REFS.acquire();
@@ -365,7 +365,7 @@ public final class JnaUtils {
             boolean delayedAlloc) {
         int[] shapeArray = Arrays.stream(shape.getShape()).mapToInt(Math::toIntExact).toArray();
         int deviceType = MxDeviceType.toDeviceType(device);
-        int deviceId = (deviceType != 1) ? device.getDeviceId() : -1;
+        int deviceId = device.getDeviceId();
         int delay = delayedAlloc ? 1 : 0;
         PointerByReference ref = REFS.acquire();
         IntBuffer auxDTypesInt =

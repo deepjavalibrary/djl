@@ -68,7 +68,7 @@ public final class JniUtils {
     }
 
     public static long createConfig(String modelDir, String paramDir, Device device) {
-        int deviceId = device == Device.cpu() ? -1 : device.getDeviceId();
+        int deviceId = device.getDeviceId();
         return PaddleLibrary.LIB.createAnalysisConfig(modelDir, paramDir, deviceId);
     }
 
