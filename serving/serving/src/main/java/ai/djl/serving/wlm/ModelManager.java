@@ -46,7 +46,7 @@ public final class ModelManager {
 
     private ModelManager(ConfigManager configManager) {
         this.configManager = configManager;
-        wlm = new WorkLoadManager(configManager);
+        wlm = new WorkLoadManager();
         models = new ConcurrentHashMap<>();
         startupModels = new HashSet<>();
     }

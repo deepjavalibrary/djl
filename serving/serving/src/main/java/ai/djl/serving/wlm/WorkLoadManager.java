@@ -12,7 +12,6 @@
  */
 package ai.djl.serving.wlm;
 
-import ai.djl.serving.util.ConfigManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,18 +33,12 @@ import org.slf4j.LoggerFactory;
 class WorkLoadManager {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkLoadManager.class);
-    private GpuAssignmentStrategy gpuAssignmentStrategy;
     private ExecutorService threadPool;
 
     private ConcurrentHashMap<String, WorkerPool> workerPools;
 
-    /**
-     * construct using the configuration.
-     *
-     * @param configManager configuration manager to get configuration parameter.
-     */
-    public WorkLoadManager(ConfigManager configManager) {
-        this.gpuAssignmentStrategy = new RoundRobinGpuAssignmentStrategy(configManager);
+    /** Constructs a {@code WorkLoadManager} instance. */
+    public WorkLoadManager() {
         threadPool = Executors.newCachedThreadPool();
         workerPools = new ConcurrentHashMap<>();
     }
@@ -200,7 +193,6 @@ class WorkLoadManager {
                     WorkerThread.builder()
                             .setModel(model)
                             .setJobQueue(getWorkerPoolForModel(model).getJobQueue())
-                            .optGpuAssignmentStrategy(gpuAssignmentStrategy)
                             .optFixPoolThread(permanent)
                             .build();
 
