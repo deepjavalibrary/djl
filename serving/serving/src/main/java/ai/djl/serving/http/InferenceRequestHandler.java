@@ -26,6 +26,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,8 +97,15 @@ public class InferenceRequestHandler extends HttpRequestHandler {
         if (segments.length < 3) {
             throw new ResourceNotFoundException();
         }
+        String modelName = segments[2];
+        String version;
+        if (segments.length > 3) {
+            version = segments[3].isEmpty() ? null : segments[3];
+        } else {
+            version = null;
+        }
         Input input = requestParser.parseRequest(ctx, req, decoder);
-        predict(ctx, req, input, segments[2]);
+        predict(ctx, req, input, modelName, version);
     }
 
     private void handleInvocations(
@@ -105,6 +113,7 @@ public class InferenceRequestHandler extends HttpRequestHandler {
             throws ModelNotFoundException {
         Input input = requestParser.parseRequest(ctx, req, decoder);
         String modelName = NettyUtils.getParameter(decoder, "model_name", null);
+        String version = NettyUtils.getParameter(decoder, "model_version", null);
         if ((modelName == null || modelName.isEmpty())) {
             modelName = input.getProperty("model_name", null);
             if (modelName == null) {
@@ -115,21 +124,29 @@ public class InferenceRequestHandler extends HttpRequestHandler {
             }
         }
         if (modelName == null) {
-            if (ModelManager.getInstance().getStartupModels().size() == 1) {
-                modelName = ModelManager.getInstance().getStartupModels().iterator().next();
+            Set<String> startModels = ModelManager.getInstance().getStartupModels();
+            if (startModels.size() == 1) {
+                modelName = startModels.iterator().next();
             }
             if (modelName == null) {
                 throw new BadRequestException("Parameter model_name is required.");
             }
         }
-        predict(ctx, req, input, modelName);
+        if (version == null) {
+            version = input.getProperty("model_version", null);
+        }
+        predict(ctx, req, input, modelName, version);
     }
 
     private void predict(
-            ChannelHandlerContext ctx, FullHttpRequest req, Input input, String modelName)
+            ChannelHandlerContext ctx,
+            FullHttpRequest req,
+            Input input,
+            String modelName,
+            String version)
             throws ModelNotFoundException {
         ModelManager modelManager = ModelManager.getInstance();
-        ModelInfo model = modelManager.getModels().get(modelName);
+        ModelInfo model = modelManager.getModel(modelName, version, true);
         if (model == null) {
             String regex = ConfigManager.getInstance().getModelUrlPattern();
             if (regex == null) {
@@ -147,22 +164,25 @@ public class InferenceRequestHandler extends HttpRequestHandler {
                 }
             }
             String engineName = input.getProperty("engine_name", null);
+            int gpuId = Integer.parseInt(input.getProperty("gpu_id", "-1"));
 
             logger.info("Loading model {} from: {}", modelName, modelUrl);
 
             modelManager
                     .registerModel(
                             modelName,
+                            version,
                             modelUrl,
                             engineName,
+                            gpuId,
                             ConfigManager.getInstance().getBatchSize(),
                             ConfigManager.getInstance().getMaxBatchDelay(),
                             ConfigManager.getInstance().getMaxIdleTime())
-                    .thenAccept(m -> modelManager.triggerModelUpdated(m.scaleWorkers(1, 1)))
+                    .thenApply(m -> modelManager.triggerModelUpdated(m.scaleWorkers(1, 1)))
                     .thenAccept(
-                            p -> {
+                            m -> {
                                 try {
-                                    if (!modelManager.addJob(new Job(ctx, modelName, input))) {
+                                    if (!modelManager.addJob(new Job(ctx, m, input))) {
                                         throw new ServiceUnavailableException(
                                                 "No worker is available to serve request: "
                                                         + modelName);
@@ -186,8 +206,8 @@ public class InferenceRequestHandler extends HttpRequestHandler {
             return;
         }
 
-        Job job = new Job(ctx, modelName, input);
-        if (!ModelManager.getInstance().addJob(job)) {
+        Job job = new Job(ctx, model, input);
+        if (!modelManager.addJob(job)) {
             logger.error("unable to process prediction. no free worker available.");
             throw new ServiceUnavailableException(
                     "No worker is available to serve request: " + modelName);

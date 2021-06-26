@@ -19,7 +19,7 @@ public class ModelInfoTest {
 
     @Test
     public void testQueueSizeIsSet() {
-        ModelInfo modelInfo = new ModelInfo("", "", null, 4711, 1, 300, 1);
+        ModelInfo modelInfo = new ModelInfo("", null, "", null, 4711, 1, 300, 1);
         Assert.assertEquals(4711, modelInfo.getQueueSize());
     }
 }

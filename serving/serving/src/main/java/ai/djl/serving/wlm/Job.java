@@ -32,7 +32,7 @@ public class Job {
 
     private ChannelHandlerContext ctx;
 
-    private String modelName;
+    private ModelInfo modelInfo;
     private Input input;
     private long begin;
     private long scheduled;
@@ -41,12 +41,12 @@ public class Job {
      * Constructs an new {@code Job} instance.
      *
      * @param ctx the {@code ChannelHandlerContext}
-     * @param modelName the model name
+     * @param modelInfo the model to run the job
      * @param input the input data
      */
-    public Job(ChannelHandlerContext ctx, String modelName, Input input) {
+    public Job(ChannelHandlerContext ctx, ModelInfo modelInfo, Input input) {
         this.ctx = ctx;
-        this.modelName = modelName;
+        this.modelInfo = modelInfo;
         this.input = input;
 
         begin = System.currentTimeMillis();
@@ -63,12 +63,12 @@ public class Job {
     }
 
     /**
-     * Returns the model name that associated with this job.
+     * Returns the model that associated with this job.
      *
-     * @return the model name that associated with this job
+     * @return the model that associated with this job
      */
-    public String getModelName() {
-        return modelName;
+    public ModelInfo getModel() {
+        return modelInfo;
     }
 
     /**

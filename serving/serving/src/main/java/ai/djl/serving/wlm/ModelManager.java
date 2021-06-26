@@ -12,6 +12,7 @@
  */
 package ai.djl.serving.wlm;
 
+import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
@@ -41,13 +42,13 @@ public final class ModelManager {
 
     private ConfigManager configManager;
     private WorkLoadManager wlm;
-    private ConcurrentHashMap<String, ModelInfo> models;
+    private Map<String, Endpoint> endpoints;
     private Set<String> startupModels;
 
     private ModelManager(ConfigManager configManager) {
         this.configManager = configManager;
         wlm = new WorkLoadManager();
-        models = new ConcurrentHashMap<>();
+        endpoints = new ConcurrentHashMap<>();
         startupModels = new HashSet<>();
     }
 
@@ -73,8 +74,10 @@ public final class ModelManager {
      * Registers and loads a model.
      *
      * @param modelName the name of the model for HTTP endpoint
+     * @param version the model version
      * @param modelUrl the model url
      * @param engineName the engine to load the model
+     * @param gpuId the GPU device id, -1 for auto selection
      * @param batchSize the batch size
      * @param maxBatchDelay the maximum delay for batching
      * @param maxIdleTime the maximum idle time of the worker threads before scaling down.
@@ -82,24 +85,30 @@ public final class ModelManager {
      */
     public CompletableFuture<ModelInfo> registerModel(
             final String modelName,
+            final String version,
             final String modelUrl,
             final String engineName,
+            final int gpuId,
             final int batchSize,
             final int maxBatchDelay,
             final int maxIdleTime) {
         return CompletableFuture.supplyAsync(
                 () -> {
                     try {
-                        Criteria<Input, Output> criteria =
+                        Criteria.Builder<Input, Output> builder =
                                 Criteria.builder()
                                         .setTypes(Input.class, Output.class)
                                         .optModelUrls(modelUrl)
-                                        .optEngine(engineName)
-                                        .build();
-                        ZooModel<Input, Output> model = criteria.loadModel();
+                                        .optEngine(engineName);
+                        if (gpuId != -1) {
+                            builder.optDevice(Device.gpu(gpuId));
+                        }
+
+                        ZooModel<Input, Output> model = builder.build().loadModel();
                         ModelInfo modelInfo =
                                 new ModelInfo(
                                         modelName,
+                                        version,
                                         modelUrl,
                                         model,
                                         configManager.getJobQueueSize(),
@@ -107,12 +116,13 @@ public final class ModelManager {
                                         maxBatchDelay,
                                         batchSize);
 
-                        ModelInfo existingModel = models.putIfAbsent(modelName, modelInfo);
-                        if (existingModel != null) {
+                        Endpoint endpoint =
+                                endpoints.computeIfAbsent(modelName, k -> new Endpoint());
+                        if (!endpoint.add(modelInfo)) {
                             // model already exists
                             model.close();
                             throw new BadRequestException(
-                                    "Model " + modelName + " is already registered.");
+                                    "Model " + modelInfo + " is already registered.");
                         }
                         logger.info("Model {} loaded.", modelName);
 
@@ -124,22 +134,41 @@ public final class ModelManager {
     }
 
     /**
-     * Unregisters a model by its name.
+     * Unregisters a model by its name and version.
      *
      * @param modelName the model name to be unregistered
+     * @param version the model version
      * @return {@code true} if unregister success
      */
-    public boolean unregisterModel(String modelName) {
-        ModelInfo model = models.remove(modelName);
-        if (model == null) {
+    public boolean unregisterModel(String modelName, String version) {
+        Endpoint endpoint = endpoints.get(modelName);
+        if (endpoint == null) {
             logger.warn("Model not found: " + modelName);
             return false;
         }
-        model = model.scaleWorkers(0, 0);
-        wlm.modelChanged(model);
-        startupModels.remove(modelName);
-        model.close();
-        logger.info("Model {} unregistered.", modelName);
+        if (version == null) {
+            // unregister all versions
+            for (ModelInfo m : endpoint.getModels()) {
+                m.scaleWorkers(0, 0);
+                wlm.modelChanged(m);
+                startupModels.remove(modelName);
+                m.close();
+            }
+            logger.info("Model {} unregistered.", modelName);
+        } else {
+            ModelInfo model = endpoint.remove(version);
+            if (model == null) {
+                logger.warn("Model not found: " + modelName + ':' + version);
+                return false;
+            }
+            model.scaleWorkers(0, 0);
+            wlm.modelChanged(model);
+            startupModels.remove(modelName);
+            model.close();
+        }
+        if (endpoint.getModels().isEmpty()) {
+            endpoints.remove(modelName);
+        }
         return true;
     }
 
@@ -148,23 +177,47 @@ public final class ModelManager {
      * up/down all workers to match the parameters for the model.
      *
      * @param modelInfo the model that has been updated
+     * @return the model
      */
-    public void triggerModelUpdated(ModelInfo modelInfo) {
-        if (!models.containsKey(modelInfo.getModelName())) {
-            throw new AssertionError("Model not found: " + modelInfo.getModelName());
-        }
-        logger.debug("updateModel: {}", modelInfo.getModelName());
-        models.put(modelInfo.getModelName(), modelInfo);
+    public ModelInfo triggerModelUpdated(ModelInfo modelInfo) {
+        String modelName = modelInfo.getModelName();
+        logger.debug("updateModel: {}", modelName);
         wlm.modelChanged(modelInfo);
+        return modelInfo;
     }
 
     /**
-     * Returns the registry of all models.
+     * Returns the registry of all endpoints.
      *
-     * @return the registry of all models
+     * @return the registry of all endpoints
      */
-    public Map<String, ModelInfo> getModels() {
-        return models;
+    public Map<String, Endpoint> getEndpoints() {
+        return endpoints;
+    }
+
+    /**
+     * Returns a version of model.
+     *
+     * @param modelName the model name
+     * @param version the model version
+     * @param predict ture for selecting a model in load balance fashion
+     * @return the model
+     */
+    public ModelInfo getModel(String modelName, String version, boolean predict) {
+        Endpoint endpoint = endpoints.get(modelName);
+        if (endpoint == null) {
+            return null;
+        }
+        if (version == null) {
+            if (endpoint.getModels().isEmpty()) {
+                return null;
+            }
+            if (predict) {
+                return endpoint.next();
+            }
+            return endpoint.getModels().get(0);
+        }
+        return endpoint.get(version);
     }
 
     /**
@@ -184,23 +237,20 @@ public final class ModelManager {
      * @throws ModelNotFoundException if the model is not registered
      */
     public boolean addJob(Job job) throws ModelNotFoundException {
-        String modelName = job.getModelName();
-        ModelInfo model = models.get(modelName);
-        if (model == null) {
-            throw new ModelNotFoundException("Model not found: " + modelName);
-        }
-        return wlm.addJob(model, job);
+        return wlm.addJob(job);
     }
 
     /**
      * Returns a list of worker information for specified model.
      *
-     * @param modelName the model to be queried
+     * @param modelName the model name to be queried
+     * @param version the model version to be queried
      * @return a list of worker information for specified model
      * @throws ModelNotFoundException if specified model not found
      */
-    public DescribeModelResponse describeModel(String modelName) throws ModelNotFoundException {
-        ModelInfo model = models.get(modelName);
+    public DescribeModelResponse describeModel(String modelName, String version)
+            throws ModelNotFoundException {
+        ModelInfo model = getModel(modelName, version, false);
         if (model == null) {
             throw new ModelNotFoundException("Model not found: " + modelName);
         }
@@ -215,11 +265,11 @@ public final class ModelManager {
         resp.setMaxIdleTime(model.getMaxIdleTime());
         resp.setLoadedAtStartup(startupModels.contains(modelName));
 
-        int activeWorker = wlm.getNumRunningWorkers(modelName);
+        int activeWorker = wlm.getNumRunningWorkers(model);
         int targetWorker = model.getMinWorkers();
         resp.setStatus(activeWorker >= targetWorker ? "Healthy" : "Unhealthy");
 
-        List<WorkerThread> workers = wlm.getWorkers(modelName);
+        List<WorkerThread> workers = wlm.getWorkers(model);
         for (WorkerThread worker : workers) {
             int workerId = worker.getWorkerId();
             long startTime = worker.getStartTime();
@@ -242,9 +292,11 @@ public final class ModelManager {
                     int numWorking = 0;
 
                     int numScaled = 0;
-                    for (Map.Entry<String, ModelInfo> m : models.entrySet()) {
-                        numScaled += m.getValue().getMinWorkers();
-                        numWorking += wlm.getNumRunningWorkers(m.getValue().getModelName());
+                    for (Endpoint endpoint : endpoints.values()) {
+                        for (ModelInfo m : endpoint.getModels()) {
+                            numScaled += m.getMinWorkers();
+                            numWorking += wlm.getNumRunningWorkers(m);
+                        }
                     }
 
                     if ((numWorking > 0) && (numWorking < numScaled)) {
