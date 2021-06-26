@@ -51,7 +51,7 @@ public class PtModelZoo implements ModelZoo {
         MRL sentimentAnalysis = MRL.model(NLP.SENTIMENT_ANALYSIS, GROUP_ID, "distilbert");
         MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, sentimentAnalysis, "0.0.1", ZOO));
 
-        MRL bigGan = MRL.model(CV.GAN, GROUP_ID, "biggan-deep");
+        MRL bigGan = MRL.model(CV.IMAGE_GENERATION, GROUP_ID, "biggan-deep");
         MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, bigGan, "0.0.1", ZOO));
     }
 

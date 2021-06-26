@@ -1,7 +1,7 @@
 {
   "metadataVersion": "0.1",
   "resourceType": "model",
-  "application": "cv/gan",
+  "application": "cv/image_generation",
   "groupId": "ai.djl.pytorch",
   "artifactId": "biggan-deep",
   "name": "BigGAN-Deep",

@@ -64,7 +64,7 @@ public final class BigGAN {
 
         Criteria<int[], Image[]> criteria =
                 Criteria.builder()
-                        .optApplication(Application.CV.GAN)
+                        .optApplication(Application.CV.IMAGE_GENERATION)
                         .setTypes(int[].class, Image[].class)
                         .optFilter("size", "256")
                         .optArgument("truncation", 0.4f)
