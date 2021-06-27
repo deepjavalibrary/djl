@@ -78,25 +78,28 @@ public abstract class AbstractBenchmark {
             DefaultParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(options, args, null, false);
             Arguments arguments = new Arguments(cmd);
-            String engine = arguments.getEngine();
+            String engineName = arguments.getEngine();
+            Engine engine = Engine.getEngine(engineName);
 
             long init = System.nanoTime();
-            String version = Engine.getEngine(engine).getVersion();
+            String version = engine.getVersion();
             long loaded = System.nanoTime();
             logger.info(
                     String.format(
                             "Load %s (%s) in %.3f ms.",
-                            engine, version, (loaded - init) / 1_000_000f));
+                            engineName, version, (loaded - init) / 1_000_000f));
             Duration duration = Duration.ofSeconds(arguments.getDuration());
             if (arguments.getDuration() != 0) {
                 logger.info(
                         "Running {} on: {}, duration: {} minutes.",
                         getClass().getSimpleName(),
-                        Device.defaultDevice(),
+                        Device.defaultDevice(engine),
                         duration.toMinutes());
             } else {
                 logger.info(
-                        "Running {} on: {}.", getClass().getSimpleName(), Device.defaultDevice());
+                        "Running {} on: {}.",
+                        getClass().getSimpleName(),
+                        Device.defaultDevice(engine));
             }
             int numOfThreads = arguments.getThreads();
             int iteration = arguments.getIteration();
