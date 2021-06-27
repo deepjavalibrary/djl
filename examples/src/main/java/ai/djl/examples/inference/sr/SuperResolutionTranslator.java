@@ -15,39 +15,29 @@ package ai.djl.examples.inference.sr;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
-import java.util.Arrays;
 
-public class SRTranslator implements Translator<Image[], Image[]> {
+public class SuperResolutionTranslator implements Translator<Image, Image> {
 
     @Override
-    public NDList processInput(TranslatorContext ctx, Image[] input) throws Exception {
+    public NDList processInput(TranslatorContext ctx, Image input) throws Exception {
         NDManager manager = ctx.getNDManager();
-        NDArray[] arrays =
-                Arrays.stream(input).map(image -> image.toNDArray(manager)).toArray(NDArray[]::new);
-        NDArray batch = NDArrays.stack(new NDList(arrays)).toType(DataType.FLOAT32, false);
-        return new NDList(batch);
+        return new NDList(input.toNDArray(manager).toType(DataType.FLOAT32, false));
     }
 
     @Override
-    public Image[] processOutput(TranslatorContext ctx, NDList list) throws Exception {
+    public Image processOutput(TranslatorContext ctx, NDList list) throws Exception {
         NDArray output = list.get(0).clip(0, 255).toType(DataType.UINT8, false);
-        int sampleSize = (int) output.getShape().get(0);
-
-        return output.split(sampleSize)
-                .stream()
-                .map(array -> ImageFactory.getInstance().fromNDArray(array.squeeze()))
-                .toArray(Image[]::new);
+        return ImageFactory.getInstance().fromNDArray(output.squeeze());
     }
 
     @Override
     public Batchifier getBatchifier() {
-        return null;
+        return Batchifier.STACK;
     }
 }

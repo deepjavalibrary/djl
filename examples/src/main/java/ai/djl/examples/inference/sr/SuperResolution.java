@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.inference.sr;
 
+import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
@@ -31,6 +32,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,18 +48,21 @@ public final class SuperResolution {
         String imagePath = "src/test/resources/";
         ImageFactory imageFactory = ImageFactory.getInstance();
 
-        Image[] inputImages = {imageFactory.fromFile(Paths.get(imagePath + "fox.png"))};
-        Image[] enhancedImages = enhance(inputImages);
+        List<Image> inputImages =
+                Arrays.asList(
+                        imageFactory.fromFile(Paths.get(imagePath + "fox.png")),
+                        imageFactory.fromFile(Paths.get(imagePath + "monkey.png")));
+        List<Image> enhancedImages = enhance(inputImages);
 
         if (enhancedImages == null) {
             logger.info("This example only works for TensorFlow Engine");
         } else {
-            logger.info("Using TensorFlow Engine. {} images generated.", enhancedImages.length);
+            logger.info("Using TensorFlow Engine. {} images generated.", enhancedImages.size());
             saveImages(inputImages, enhancedImages);
         }
     }
 
-    private static void saveImages(Image[] input, Image[] generated) throws IOException {
+    private static void saveImages(List<Image> input, List<Image> generated) throws IOException {
         Path outputPath = Paths.get("build/output/super-res/");
         Files.createDirectories(outputPath);
 
@@ -65,56 +72,60 @@ public final class SuperResolution {
         logger.info("Generated images have been saved in: {}", outputPath);
     }
 
-    private static void save(Image[] images, String name, Path path) throws IOException {
-        for (int i = 0; i < images.length; i++) {
+    private static void save(List<Image> images, String name, Path path) throws IOException {
+        for (int i = 0; i < images.size(); i++) {
             Path imagePath = path.resolve(name + i + ".png");
-            images[i].save(Files.newOutputStream(imagePath), "png");
+            images.get(i).save(Files.newOutputStream(imagePath), "png");
         }
     }
 
-    private static Image[] group(Image[] input, Image[] generated) {
-        NDManager manager = Engine.getInstance().newBaseManager();
-        NDList stitches = new NDList(input.length);
+    private static List<Image> group(List<Image> input, List<Image> generated) {
+        NDList stitches = new NDList(input.size());
 
-        int width = input[0].getWidth();
-        int height = input[0].getHeight();
-        for (int i = 0; i < input.length; i++) {
-            NDArray left = input[i].toNDArray(manager);
-            NDArray right = generated[i].toNDArray(manager);
+        try (NDManager manager = Engine.getInstance().newBaseManager()) {
+            for (int i = 0; i < input.size(); i++) {
+                int width = input.get(i).getWidth();
+                int height = input.get(i).getHeight();
 
-            left = NDImageUtils.resize(left, 4 * width, 4 * height, Image.Interpolation.BICUBIC);
-            right = right.toType(DataType.FLOAT32, false);
+                NDArray left = input.get(i).toNDArray(manager);
+                NDArray right = generated.get(i).toNDArray(manager);
 
-            stitches.add(NDArrays.concat(new NDList(left, right), 1));
+                left = NDImageUtils.resize(left, 4 * width, 4 * height);
+                right = right.toType(DataType.FLOAT32, false);
+
+                stitches.add(NDArrays.concat(new NDList(left, right), 1));
+            }
+
+            return stitches.stream()
+                    .map(array -> array.toType(DataType.UINT8, false))
+                    .map(array -> ImageFactory.getInstance().fromNDArray(array))
+                    .collect(Collectors.toList());
         }
-
-        return stitches.stream()
-                .map(array -> array.toType(DataType.UINT8, false))
-                .map(array -> ImageFactory.getInstance().fromNDArray(array))
-                .toArray(Image[]::new);
     }
 
-    public static Image[] enhance(Image[] inputImages)
+    public static List<Image> enhance(List<Image> inputImages)
             throws IOException, ModelException, TranslateException {
+
         if (!"TensorFlow".equals(Engine.getInstance().getEngineName())) {
             return null;
         }
 
         String modelUrl =
                 "https://storage.googleapis.com/tfhub-modules/captain-pool/esrgan-tf2/1.tar.gz";
-        Criteria<Image[], Image[]> criteria =
+        Criteria<Image, Image> criteria =
                 Criteria.builder()
-                        .setTypes(Image[].class, Image[].class)
+                        .optApplication(Application.CV.IMAGE_ENHANCEMENT)
+                        .setTypes(Image.class, Image.class)
                         .optModelUrls(modelUrl)
                         .optOption("Tags", "serve")
                         .optOption("SignatureDefKey", "serving_default")
-                        .optTranslator(new SRTranslator())
+                        .optTranslator(new SuperResolutionTranslator())
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<Image[], Image[]> model = criteria.loadModel();
-                Predictor<Image[], Image[]> enhancer = model.newPredictor()) {
-            return enhancer.predict(inputImages);
+        try (ZooModel<Image, Image> model = criteria.loadModel();
+                Predictor<Image, Image> enhancer = model.newPredictor()) {
+            return enhancer.batchPredict(inputImages);
         }
     }
 }
