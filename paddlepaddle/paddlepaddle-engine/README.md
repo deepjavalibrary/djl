@@ -84,6 +84,37 @@ For macOS, you can use the following library:
 </dependency>
 ```
 
+#### Linux GPU
+
+To use Linux packages, users are also required to set `LD_LIBRARY_PATH` to the folder:
+
+```
+LD_LIBRARY_PATH=$HOME/.djl.ai/paddle/2.0.2-<cuda-flavor>-linux-x86_64
+```
+
+- ai.djl.paddlepaddle:paddlepaddle-native-cu101:2.0.2:linux-x86_64 - CUDA 10.1
+- ai.djl.paddlepaddle:paddlepaddle-native-cu102:2.0.2:linux-x86_64 - CUDA 10.2
+
+```xml
+<dependency>
+    <groupId>ai.djl.paddlepaddle</groupId>
+    <artifactId>paddlepaddle-native-cu101</artifactId>
+    <classifier>linux-x86_64</classifier>
+    <version>2.0.2</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+```xml
+<dependency>
+    <groupId>ai.djl.paddlepaddle</groupId>
+    <artifactId>paddlepaddle-native-cu102</artifactId>
+    <classifier>linux-x86_64</classifier>
+    <version>2.0.2</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
 
 ### Windows
 

@@ -25,6 +25,10 @@ if [[ ! -d "paddle" ]]; then
       curl -s https://paddle-inference-lib.bj.bcebos.com/2.0.2-gpu-cuda10.1-cudnn7-avx-mkl/paddle_inference.tgz -o paddle.tgz
         tar -xvzf paddle.tgz
         mv paddle_inference paddle
+    elif [[ $1 == "cu102" ]]; then
+      curl -s https://paddle-inference-lib.bj.bcebos.com/2.0.2-gpu-cuda10.2-cudnn8-avx-mkl/paddle_inference.tgz -o paddle.tgz
+        tar -xvzf paddle.tgz
+        mv paddle_inference paddle
     else
       echo "$1 is not supported."
       exit 1

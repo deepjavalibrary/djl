@@ -86,6 +86,11 @@ public final class LibUtils {
     public static void loadLinuxDependencies(String libName) {
         Path libDir = Paths.get(libName).getParent();
         if (libDir != null) {
+            logger.info(
+                    "Paddle MKL/GPU requires user to set LD_LIBRARY_PATH="
+                            + libDir
+                            + ", the current one is set to: "
+                            + System.getenv("LD_LIBRARY_PATH"));
             List<String> names = Arrays.asList("libdnnl.so.2", "libiomp5.so", "libmklml_intel.so");
             names.forEach(
                     name -> {
