@@ -103,8 +103,8 @@ startScripts {
                 'fi'
 
         String text = unixScript.text.replaceAll('CLASSPATH=\\$APP_HOME/lib/.*', replacement)
+        text = text.replaceAll("/usr/bin/env sh", "/usr/bin/env bash")
         unixScript.text = text
     }
 }
-
 tasks.distZip.enabled = false
