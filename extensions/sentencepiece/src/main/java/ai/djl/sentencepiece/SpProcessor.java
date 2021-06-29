@@ -44,27 +44,63 @@ final class SpProcessor extends NativeResource<Long> {
         SentencePieceLibrary.LIB.loadModel(getHandle(), path);
     }
 
-    String[] tokenize(String input) {
+    /**
+     * Tokenize a sentence into array of tokens.
+     *
+     * @param input sentence
+     * @return tokens
+     */
+    public String[] tokenize(String input) {
         return SentencePieceLibrary.LIB.tokenize(getHandle(), input);
     }
 
-    String buildSentence(String[] tokens) {
+    /**
+     * Build sentence from tokens.
+     *
+     * @param tokens input
+     * @return recovered sentence
+     */
+    public String buildSentence(String[] tokens) {
         return SentencePieceLibrary.LIB.detokenize(getHandle(), tokens);
     }
 
-    String getToken(int id) {
+    /**
+     * Get tokens from ID.
+     *
+     * @param id the index of token
+     * @return recovered token
+     */
+    public String getToken(int id) {
         return SentencePieceLibrary.LIB.idToPiece(getHandle(), id);
     }
 
-    int getId(String token) {
+    /**
+     * Get ID from token.
+     *
+     * @param token token that ready to map
+     * @return id from token
+     */
+    public int getId(String token) {
         return SentencePieceLibrary.LIB.pieceToId(getHandle(), token);
     }
 
-    int[] encode(String sentence) {
+    /**
+     * Encode sentence into indices.
+     *
+     * @param sentence input sentence
+     * @return indices
+     */
+    public int[] encode(String sentence) {
         return SentencePieceLibrary.LIB.encode(getHandle(), sentence);
     }
 
-    String decode(int[] ids) {
+    /**
+     * Decode indices into sentence.
+     *
+     * @param ids the indices
+     * @return recovered sentence
+     */
+    public String decode(int[] ids) {
         return SentencePieceLibrary.LIB.decode(getHandle(), ids);
     }
 
