@@ -17,7 +17,7 @@ import ai.djl.sentencepiece.jni.SentencePieceLibrary;
 import ai.djl.util.NativeResource;
 
 /** The processor holder for SentencePiece. */
-final class SpProcessor extends NativeResource<Long> {
+public final class SpProcessor extends NativeResource<Long> {
 
     private static RuntimeException libraryStatus;
 
@@ -33,38 +33,38 @@ final class SpProcessor extends NativeResource<Long> {
         super(SentencePieceLibrary.LIB.createSentencePieceProcessor());
     }
 
-    static SpProcessor newInstance() {
+    public static SpProcessor newInstance() {
         if (libraryStatus != null) {
             throw libraryStatus;
         }
         return new SpProcessor();
     }
 
-    void loadModel(String path) {
+    public void loadModel(String path) {
         SentencePieceLibrary.LIB.loadModel(getHandle(), path);
     }
 
-    String[] tokenize(String input) {
+    public String[] tokenize(String input) {
         return SentencePieceLibrary.LIB.tokenize(getHandle(), input);
     }
 
-    String buildSentence(String[] tokens) {
+    public String buildSentence(String[] tokens) {
         return SentencePieceLibrary.LIB.detokenize(getHandle(), tokens);
     }
 
-    String getToken(int id) {
+    public String getToken(int id) {
         return SentencePieceLibrary.LIB.idToPiece(getHandle(), id);
     }
 
-    int getId(String token) {
+    public int getId(String token) {
         return SentencePieceLibrary.LIB.pieceToId(getHandle(), token);
     }
 
-    int[] encode(String sentence) {
+    public int[] encode(String sentence) {
         return SentencePieceLibrary.LIB.encode(getHandle(), sentence);
     }
 
-    String decode(int[] ids) {
+    public String decode(int[] ids) {
         return SentencePieceLibrary.LIB.decode(getHandle(), ids);
     }
 
