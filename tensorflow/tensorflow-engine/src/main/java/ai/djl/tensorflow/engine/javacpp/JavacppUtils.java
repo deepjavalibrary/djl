@@ -271,11 +271,18 @@ public final class JavacppUtils {
     }
 
     @SuppressWarnings({"unchecked", "try"})
-    public static TFE_TensorHandle createStringTensor(String src) {
+    public static Pair<TF_Tensor, TFE_TensorHandle> createStringTensor(String src) {
         int dType = TfDataType.toTf(DataType.STRING);
         long[] dims = {};
         long numBytes = Loader.sizeof(TF_TString.class);
         try (PointerScope ignored = new PointerScope()) {
+            /*
+             * String tensor allocates a separate TF_TString memory. The TF_TString will
+             * be deleted when the string tensor is closed. We have to track TF_TString
+             * memory by ourselves and make sure thw TF_TString lifecycle align with
+             * TFE_TensorHandle. TF_Tensor already handles TF_TString automatically, We
+             * can just keep a TF_Tensor reference in TfNDArray.
+             */
             TF_Tensor tensor = AbstractTF_Tensor.allocateTensor(dType, dims, numBytes);
             Pointer pointer = tensorflow.TF_TensorData(tensor).capacity(numBytes);
             TF_TString data = new TF_TString(pointer).capacity(pointer.position() + 1);
@@ -284,7 +291,10 @@ public final class JavacppUtils {
             TF_Status status = TF_Status.newStatus();
             TFE_TensorHandle handle = AbstractTFE_TensorHandle.newTensor(tensor, status);
             status.throwExceptionIfNotOK();
-            return handle.retainReference();
+
+            handle.retainReference();
+            tensor.retainReference();
+            return new Pair<>(tensor, handle);
         }
     }
 
@@ -332,19 +342,28 @@ public final class JavacppUtils {
     }
 
     @SuppressWarnings({"unchecked", "try"})
-    public static String getString(TFE_TensorHandle handle, Charset charset) {
+    public static String[] getString(TFE_TensorHandle handle, int count, Charset charset) {
         try (PointerScope ignored = new PointerScope()) {
             // convert to TF_Tensor
             TF_Status status = TF_Status.newStatus();
-            TF_Tensor tensor = tensorflow.TFE_TensorHandleResolve(handle, status).withDeallocator();
+            // should not add .withDeallocator() here, otherwise sting data will be destroyed
+            TF_Tensor tensor = tensorflow.TFE_TensorHandleResolve(handle, status);
             status.throwExceptionIfNotOK();
 
-            Pointer pointer =
-                    tensorflow.TF_TensorData(tensor).capacity(tensorflow.TF_TensorByteSize(tensor));
+            long tensorSize = tensorflow.TF_TensorByteSize(tensor);
+            Pointer pointer = tensorflow.TF_TensorData(tensor).capacity(tensorSize);
 
-            TF_TString data = new TF_TString(pointer).capacity(pointer.position() + 1);
-            BytePointer bp = tensorflow.TF_TString_GetDataPointer(data);
-            return bp.getString(charset);
+            TF_TString data = new TF_TString(pointer).capacity(pointer.position() + count);
+            String[] ret = new String[count];
+            for (int i = 0; i < count; ++i) {
+                TF_TString tstring = data.getPointer(i);
+                long size = tensorflow.TF_TString_GetSize(tstring);
+                BytePointer bp = tensorflow.TF_TString_GetDataPointer(tstring).capacity(size);
+                ret[i] = bp.getString(charset);
+            }
+
+            tensorflow.TF_DeleteTensor(tensor); // manually delete tensor
+            return ret;
         }
     }
 

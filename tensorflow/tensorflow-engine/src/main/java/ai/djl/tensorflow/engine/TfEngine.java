@@ -103,7 +103,7 @@ public final class TfEngine extends Engine implements AutoCloseable {
             return true;
         } else if (StandardCapabilities.CUDA.equals(capability)) {
             TF_DeviceList deviceList = null;
-            try (PointerScope scope = new PointerScope()) {
+            try (PointerScope ignore = new PointerScope()) {
                 TF_Status status = tensorflow.TF_NewStatus();
                 deviceList = tensorflow.TFE_ContextListDevices(eagerSessionHandle.get(), status);
                 int deviceCount = tensorflow.TF_DeviceListCount(deviceList);
