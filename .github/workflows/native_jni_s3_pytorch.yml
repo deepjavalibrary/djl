@@ -38,6 +38,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
+        shell: bash
         run: |
           PYTORCH_VERSION="$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')"
           aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
@@ -117,7 +118,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
-        shell: bash
         run: |
           PYTORCH_VERSION="$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')"
           aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib/precxx11
