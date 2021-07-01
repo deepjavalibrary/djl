@@ -45,6 +45,7 @@ public class PluginMetaData {
     private List<String> componentNames;
     private List<String> dependencies;
     private Lifecycle state;
+    private String error;
     //   private List<Object> componentRegistry;
 
     /**
@@ -60,19 +61,10 @@ public class PluginMetaData {
         this.name = name;
         this.url = url;
         this.componentNames = componentNames;
-        this.loadTime = LocalDateTime.now();
         this.state = Lifecycle.INITIALIZING;
         this.dependencies = dependencies;
     }
 
-    /**
-     * Returns the value of loadtime.
-     *
-     * @return the loadtime value.
-     */
-    public LocalDateTime getLoadTime() {
-        return loadTime;
-    }
 
     /**
      * Returns the name of the plug-in.
@@ -108,6 +100,7 @@ public class PluginMetaData {
      */
     public void changeState(Lifecycle state) {
         this.state = state;
+        logger.debug("plugin {} changed state to {}", name, state);
     }
 
     /**
@@ -118,28 +111,15 @@ public class PluginMetaData {
      */
     public void changeState(Lifecycle state, String logMessage) {
         this.state = state;
-        logger.info("plugin {} changed state to {} reason: {}", name, state, logMessage);
-    }
-
-    /**
-     * Sets the property state of the object and log message when the lambda returns true.
-     *
-     * <p>returns the result of the BooleanSupplier.
-     *
-     * @param predicate to test if we should change the state
-     * @param state the state to set
-     * @param logMessage why this status is set
-     * @return result of the predicate
-     */
-    public boolean changeStateWhen(BooleanSupplier predicate, Lifecycle state, String logMessage) {
-        if (predicate.getAsBoolean()) {
-            this.state = state;
-            logger.info("plugin {} changed state to {} reason: {}", name, state, logMessage);
-            return true;
+        
+        if (state==Lifecycle.FAILED) {
+        	error=logMessage;
+        	logger.warn("plugin {} changed state to {} reason: {}", name, state, logMessage);
         } else {
-            return false;
+        	logger.debug("plugin {} changed state to {} reason: {}", name, state, logMessage);
         }
     }
+
 
     /**
      * Access the url-property.
@@ -158,4 +138,12 @@ public class PluginMetaData {
     public List<String> getDependencies() {
         return dependencies;
     }
+
+	/**
+	 * access the error-property. 
+	 * @return the error of this class.
+	 */
+	public String getError() {
+		return error;
+	}
 }

@@ -52,7 +52,7 @@ public class FolderScanPluginManager implements PluginManager {
 
     private static final Logger logger = LoggerFactory.getLogger(FolderScanPluginManager.class);
 
-    // private static Class<?>[] pluginInterfaces = {RequestHandler.class};
+    private static Class<?>[] pluginInterfaces = {RequestHandler.class};
 
     private ConfigManager configManager;
 
@@ -85,7 +85,7 @@ public class FolderScanPluginManager implements PluginManager {
                 AccessController.doPrivileged(
                         (PrivilegedAction<ClassLoader>) () -> new URLClassLoader(pluginUrls));
 
-        // collect plugin information
+        // phase 1: collect plugin information
         pluginRegistry =
                 Collections.list(ucl.getResources("META-INF/plugin.definition"))
                         .parallelStream()
@@ -94,58 +94,43 @@ public class FolderScanPluginManager implements PluginManager {
                         .peek(p -> logger.info("load plugin: {}", p.getName()))
                         .collect(Collectors.toMap(PluginMetaData::getName, i -> i));
 
-        // register components
-        pluginRegistry
-                .values()
-                .parallelStream()
-                // test if we have found all dependencies
-                .filter(
-                        plugin ->
-                                !plugin.changeStateWhen(
-                                        () ->
-                                                !pluginRegistry
-                                                        .keySet()
-                                                        .containsAll(plugin.getDependencies()),
-                                        Lifecycle.FAILED,
-                                        "required dependencies not found"))
-                // now initialise the components in the plug-in
-                .forEach(
-                        plugin -> {
-                            initializeAllComponents(ucl, plugin);
-                        });
+        // phase 2: initialize components
+        for (PluginMetaData plugin: pluginRegistry.values() ) {
+        	if (pluginRegistry.keySet().containsAll(plugin.getDependencies())) {
+        		try {
+	            	for (String handlerClassName: plugin.getComponents()) {
+	            		initializeComponent(ucl, plugin, handlerClassName);
+	            	}
+	            	plugin.changeState(Lifecycle.INITIALIZED);
+        		} catch (Exception ex) {
+                    plugin.changeState(Lifecycle.FAILED,"failed to initialize plugin; caused by "+ex.getMessage());
+                    logger.error("failed to initialize plugin {}", plugin.getName(), ex);
+        		}
+        	} else {
+        		plugin.changeState(Lifecycle.FAILED,"required dependencies not found");
+        	}
+        }
+        
+        // phase 3: set active
+        
+        
         logger.info("{} plug-ins found and loaded.", pluginRegistry.size());
     }
 
-    protected void initializeAllComponents(ClassLoader ucl, PluginMetaData plugin) {
-        plugin.getComponents()
-                .forEach(
-                        handlerClassName -> {
-                            initializeComponent(ucl, plugin, handlerClassName);
-                        });
-    }
-
     @SuppressWarnings("rawtypes")
-    protected void initializeComponent(
-            ClassLoader ucl, PluginMetaData plugin, String handlerClassName) {
-        try {
+    protected void initializeComponent(ClassLoader ucl, PluginMetaData plugin, String handlerClassName)  throws ReflectiveOperationException,SecurityException,IntrospectionException{
             @SuppressWarnings("unchecked")
-            Class<? extends RequestHandler> handlerClass =
-                    (Class<? extends RequestHandler>) ucl.loadClass(handlerClassName);
-            RequestHandler<?> handler =
-                    handlerClass.getConstructor(new Class<?>[] {}).newInstance();
+            Class<? extends RequestHandler> handlerClass = (Class<? extends RequestHandler>) ucl.loadClass(handlerClassName);
+            RequestHandler<?> handler = handlerClass.getConstructor(new Class<?>[] {}).newInstance();
             injectDependenciesIntoComponent(handler);
-            componentRegistry
-                    .computeIfAbsent(RequestHandler.class, k -> new HashSet<>())
-                    .add(handler);
-            plugin.changeState(Lifecycle.INITIALIZED);
-
-        } catch (ReflectiveOperationException
-                | IllegalArgumentException
-                | SecurityException
-                | IntrospectionException e) {
-            plugin.changeState(Lifecycle.FAILED);
-            logger.error("failed to initialize plugin {}", plugin.getName(), e);
-        }
+            
+            for (Class<?> interfaceClass : pluginInterfaces) {
+            	if (interfaceClass.isAssignableFrom(handlerClass)) {
+	                componentRegistry
+	                .computeIfAbsent(interfaceClass, k -> new HashSet<>())
+	                .add(handler);
+            	}
+            }            
     }
 
     /**
