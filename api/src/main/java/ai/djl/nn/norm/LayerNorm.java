@@ -165,26 +165,18 @@ public class LayerNorm extends AbstractBlock {
     @Override
     protected void saveMetadata(DataOutputStream os) throws IOException {
         saveInputShapes(os);
-        os.writeInt(normalizedShape.getShape().length);
-        for (int i = 0; i < normalizedShape.getShape().length; i++) {
-            os.writeLong(normalizedShape.getShape()[i]);
-        }
+        os.write(normalizedShape.getEncoded());
     }
 
     /** {@inheritDoc} */
     @Override
     public void loadMetadata(byte version, DataInputStream is)
             throws IOException, MalformedModelException {
-        if (version == VERSION) {
-            readInputShapes(is);
-        } else if (version != 1) {
+        if (version != VERSION) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
-        long[] shapeRaw = new long[is.readInt()];
-        for (int i = 0; i < shapeRaw.length; i++) {
-            shapeRaw[i] = is.readLong();
-        }
-        normalizedShape = new Shape(shapeRaw);
+        readInputShapes(is);
+        normalizedShape = Shape.decode(is);
     }
 
     /** The Builder to construct a {@link LayerNorm}. */
