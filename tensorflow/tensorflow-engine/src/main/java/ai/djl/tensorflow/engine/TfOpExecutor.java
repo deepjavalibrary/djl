@@ -43,7 +43,7 @@ final class TfOpExecutor implements AutoCloseable {
     TfOpExecutor(TfNDManager manager, TFE_Context eagerSessionHandle, String operation) {
         this.manager = manager;
         closed = new AtomicBoolean(false);
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignore = new PointerScope()) {
             TF_Status status = TF_Status.newStatus();
             opHandle = TFE_Op.newOp(eagerSessionHandle, operation, status);
             status.throwExceptionIfNotOK();
@@ -78,7 +78,7 @@ final class TfOpExecutor implements AutoCloseable {
     // please make sure you close the output manually or attach to NDManager
     @SuppressWarnings({"unchecked", "try"})
     public TFE_TensorHandle[] buildRawPointer(int numOutputs) {
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignore = new PointerScope()) {
             IntPointer numReturnValues = new IntPointer(1).put(numOutputs);
             PointerPointer<TFE_TensorHandle> returnValues = new PointerPointer<>(numOutputs);
             TF_Status status = TF_Status.newStatus();
@@ -104,7 +104,7 @@ final class TfOpExecutor implements AutoCloseable {
 
     @SuppressWarnings({"unchecked", "try"})
     public TfOpExecutor addInput(NDArray input) {
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignore = new PointerScope()) {
             TF_Status status = TF_Status.newStatus();
             tensorflow.TFE_OpAddInput(opHandle, ((TfNDArray) input).getHandle(), status);
             status.throwExceptionIfNotOK();
@@ -118,7 +118,7 @@ final class TfOpExecutor implements AutoCloseable {
                 Arrays.stream(inputs)
                         .map(array -> ((TfNDArray) array).getHandle())
                         .toArray(TFE_TensorHandle[]::new);
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignore = new PointerScope()) {
             PointerPointer<TFE_TensorHandle> tensorPointers =
                     new PointerPointer<>(inputHandles.length);
             for (int i = 0; i < inputHandles.length; ++i) {
@@ -134,14 +134,13 @@ final class TfOpExecutor implements AutoCloseable {
     @SuppressWarnings({"unchecked", "try"})
     public TfOpExecutor setDevice(Device device) {
         String deviceStr;
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignore = new PointerScope()) {
             if (device.getDeviceType().equals(Device.Type.CPU)) {
                 deviceStr = "/device:CPU:0";
             } else if (device.getDeviceType().equals(Device.Type.GPU)) {
                 deviceStr = "/device:GPU:" + device.getDeviceId();
             } else {
-                throw new EngineException(
-                        "Unknown device type to TensorFlow Engine: " + device.toString());
+                throw new EngineException("Unknown device type to TensorFlow Engine: " + device);
             }
             TF_Status status = TF_Status.newStatus();
             tensorflow.TFE_OpSetDevice(opHandle, deviceStr, status);
@@ -156,7 +155,7 @@ final class TfOpExecutor implements AutoCloseable {
     @SuppressWarnings({"unchecked", "try"})
     public TfOpExecutor addParam(String name, String value) {
         byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignore = new PointerScope()) {
             tensorflow.TFE_OpSetAttrString(opHandle, name, new BytePointer(bytes), bytes.length);
         }
         return this;

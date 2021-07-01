@@ -20,6 +20,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
+import ai.djl.util.Pair;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -29,6 +30,7 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import org.tensorflow.internal.c_api.TFE_Context;
 import org.tensorflow.internal.c_api.TFE_TensorHandle;
+import org.tensorflow.internal.c_api.TF_Tensor;
 
 @SuppressWarnings("PMD.UseTryWithResources")
 public class TfNDManager extends BaseNDManager {
@@ -101,8 +103,8 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray create(String data) {
-        TFE_TensorHandle handle = JavacppUtils.createStringTensor(data);
-        return new TfNDArray(this, handle);
+        Pair<TF_Tensor, TFE_TensorHandle> pair = JavacppUtils.createStringTensor(data);
+        return new TfNDArray(this, pair.getValue(), pair.getKey());
     }
 
     /** {@inheritDoc} */
