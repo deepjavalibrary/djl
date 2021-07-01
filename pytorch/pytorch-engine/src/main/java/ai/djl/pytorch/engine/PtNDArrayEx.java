@@ -411,6 +411,18 @@ public class PtNDArrayEx implements NDArrayEx {
         return new NDList(JniUtils.dropout((PtNDArray) input, rate, training));
     }
 
+    @Override
+    public NDList layerNorm(
+            NDArray input, Shape normalizedShape, NDArray gamma, NDArray beta, float eps) {
+
+        return new NDList(
+                JniUtils.layerNorm(
+                        (PtNDArray) input,
+                        normalizedShape,
+                        (PtNDArray) gamma,
+                        (PtNDArray) beta,
+                        eps));
+    }
     /** {@inheritDoc} */
     @Override
     public NDList batchNorm(

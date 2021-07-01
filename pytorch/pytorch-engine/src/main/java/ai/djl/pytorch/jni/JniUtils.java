@@ -1094,6 +1094,18 @@ public final class JniUtils {
                         eps));
     }
 
+    public static PtNDArray layerNorm(
+            PtNDArray ndArray, Shape normalizedShape, PtNDArray gamma, PtNDArray beta, double eps) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchNNLayerNorm(
+                        ndArray.getHandle(),
+                        normalizedShape.getShape(),
+                        gamma.getHandle(),
+                        beta.getHandle(),
+                        eps));
+    }
+
     public static PtNDArray dropout(PtNDArray ndArray, double prob, boolean training) {
         return new PtNDArray(
                 ndArray.getManager(),
