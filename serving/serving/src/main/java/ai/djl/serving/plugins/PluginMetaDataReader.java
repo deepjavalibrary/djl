@@ -10,9 +10,22 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+package ai.djl.serving.plugins;
+
 /**
- * This package contains classes of the static-file-plugin.
+ * Reads plugin-metadata from an url and parse the content.
+ *
+ * <p>Implementations typically reads a definition file like {@code plugin.definion} from the plugin
+ * jar file.
  *
  * @author erik.bamberg@web.de
  */
-package ai.djl.serving.plugins;
+public interface PluginMetaDataReader {
+
+    /**
+     * Reads plugin-metadata from on url.
+     *
+     * @return a parsed plugin metadata object or null if not metadata can be found.
+     */
+    PluginMetaData read();
+}

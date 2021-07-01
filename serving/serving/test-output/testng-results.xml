@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results ignored="0" total="6" passed="5" failed="1" skipped="0">
+  <reporter-output>
+  </reporter-output>
+  <suite started-at="2021-06-11T16:46:45 BST" name="Default suite" finished-at="2021-06-11T16:46:46 BST" duration-ms="968">
+    <groups>
+    </groups>
+    <test started-at="2021-06-11T16:46:45 BST" name="Default test" finished-at="2021-06-11T16:46:46 BST" duration-ms="968">
+      <class name="ai.djl.serving.ServerInitializerTest">
+        <test-method signature="testServerInitializer()[pri:0, instance:ai.djl.serving.ServerInitializerTest@1d7f7be7]" started-at="2021-06-11T16:46:45 BST" name="testServerInitializer" finished-at="2021-06-11T16:46:45 BST" duration-ms="76" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testServerInitializer -->
+      </class> <!-- ai.djl.serving.ServerInitializerTest -->
+      <class name="ai.djl.serving.ModelServerTest">
+        <test-method is-config="true" signature="beforeSuite()[pri:0, instance:ai.djl.serving.ModelServerTest@5860f3d7]" started-at="2021-06-11T16:46:44 BST" name="beforeSuite" finished-at="2021-06-11T16:46:45 BST" duration-ms="1149" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- beforeSuite -->
+        <test-method signature="test()[pri:0, instance:ai.djl.serving.ModelServerTest@5860f3d7]" started-at="2021-06-11T16:46:45 BST" name="test" finished-at="2021-06-11T16:46:46 BST" duration-ms="851" status="FAIL">
+          <exception class="java.lang.AssertionError">
+            <message>
+              <![CDATA[expected [200] but found [404]]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[java.lang.AssertionError: expected [200] but found [404]
+at org.testng.Assert.fail(Assert.java:97)
+at org.testng.Assert.assertEqualsImpl(Assert.java:136)
+at org.testng.Assert.assertEquals(Assert.java:118)
+at org.testng.Assert.assertEquals(Assert.java:839)
+at org.testng.Assert.assertEquals(Assert.java:849)
+at ai.djl.serving.ModelServerTest.testStaticHtmlRequest(ModelServerTest.java:411)
+at ai.djl.serving.ModelServerTest.test(ModelServerTest.java:171)
+at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+at org.testng.internal.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:134)
+at org.testng.internal.TestInvoker.invokeMethod(TestInvoker.java:597)
+at org.testng.internal.TestInvoker.invokeTestMethod(TestInvoker.java:173)
+at org.testng.internal.MethodRunner.runInSequence(MethodRunner.java:46)
+at org.testng.internal.TestInvoker$MethodInvocationAgent.invoke(TestInvoker.java:816)
+at org.testng.internal.TestInvoker.invokeTestMethods(TestInvoker.java:146)
+at org.testng.internal.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:146)
+at org.testng.internal.TestMethodWorker.run(TestMethodWorker.java:128)
+at java.base/java.util.ArrayList.forEach(ArrayList.java:1541)
+at org.testng.TestRunner.privateRun(TestRunner.java:766)
+at org.testng.TestRunner.run(TestRunner.java:587)
+at org.testng.SuiteRunner.runTest(SuiteRunner.java:384)
+at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:378)
+at org.testng.SuiteRunner.privateRun(SuiteRunner.java:337)
+at org.testng.SuiteRunner.run(SuiteRunner.java:286)
+at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:53)
+at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:96)
+at org.testng.TestNG.runSuitesSequentially(TestNG.java:1187)
+at org.testng.TestNG.runSuitesLocally(TestNG.java:1109)
+at org.testng.TestNG.runSuites(TestNG.java:1039)
+at org.testng.TestNG.run(TestNG.java:1007)
+at org.testng.remote.AbstractRemoteTestNG.run(AbstractRemoteTestNG.java:115)
+at org.testng.remote.RemoteTestNG.initAndRun(RemoteTestNG.java:251)
+at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:77)
+]]>
+            </full-stacktrace>
+          </exception> <!-- java.lang.AssertionError -->
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- test -->
+        <test-method is-config="true" signature="afterSuite()[pri:0, instance:ai.djl.serving.ModelServerTest@5860f3d7]" started-at="2021-06-11T16:46:46 BST" name="afterSuite" finished-at="2021-06-11T16:46:48 BST" duration-ms="2108" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- afterSuite -->
+      </class> <!-- ai.djl.serving.ModelServerTest -->
+      <class name="ai.djl.serving.wlm.ModelInfoTest">
+        <test-method signature="testQueueSizeIsSet()[pri:0, instance:ai.djl.serving.wlm.ModelInfoTest@42f3156d]" started-at="2021-06-11T16:46:46 BST" name="testQueueSizeIsSet" finished-at="2021-06-11T16:46:46 BST" duration-ms="0" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testQueueSizeIsSet -->
+      </class> <!-- ai.djl.serving.wlm.ModelInfoTest -->
+      <class name="ai.djl.serving.wlm.WorkerIdGeneratorTest">
+        <test-method signature="testGeneration()[pri:0, instance:ai.djl.serving.wlm.WorkerIdGeneratorTest@427b5f92]" started-at="2021-06-11T16:46:46 BST" name="testGeneration" finished-at="2021-06-11T16:46:46 BST" duration-ms="1" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testGeneration -->
+      </class> <!-- ai.djl.serving.wlm.WorkerIdGeneratorTest -->
+      <class name="ai.djl.serving.ConnectorTest">
+        <test-method signature="testConnector()[pri:0, instance:ai.djl.serving.ConnectorTest@1ddae9b5]" started-at="2021-06-11T16:46:46 BST" name="testConnector" finished-at="2021-06-11T16:46:46 BST" duration-ms="3" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testConnector -->
+        <test-method signature="testInvalidPort()[pri:0, instance:ai.djl.serving.ConnectorTest@1ddae9b5]" started-at="2021-06-11T16:46:46 BST" name="testInvalidPort" finished-at="2021-06-11T16:46:46 BST" duration-ms="2" status="PASS">
+          <exception class="java.lang.IllegalArgumentException">
+            <message>
+              <![CDATA[Invalid port number: http://localhost:65536]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[java.lang.IllegalArgumentException: Invalid port number: http://localhost:65536
+at ai.djl.serving.util.Connector.parse(Connector.java:109)
+at ai.djl.serving.ConnectorTest.testInvalidPort(ConnectorTest.java:42)
+at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+at org.testng.internal.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:134)
+at org.testng.internal.TestInvoker.invokeMethod(TestInvoker.java:597)
+at org.testng.internal.TestInvoker.invokeTestMethod(TestInvoker.java:173)
+at org.testng.internal.MethodRunner.runInSequence(MethodRunner.java:46)
+at org.testng.internal.TestInvoker$MethodInvocationAgent.invoke(TestInvoker.java:816)
+at org.testng.internal.TestInvoker.invokeTestMethods(TestInvoker.java:146)
+at org.testng.internal.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:146)
+at org.testng.internal.TestMethodWorker.run(TestMethodWorker.java:128)
+at java.base/java.util.ArrayList.forEach(ArrayList.java:1541)
+at org.testng.TestRunner.privateRun(TestRunner.java:766)
+at org.testng.TestRunner.run(TestRunner.java:587)
+at org.testng.SuiteRunner.runTest(SuiteRunner.java:384)
+at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:378)
+at org.testng.SuiteRunner.privateRun(SuiteRunner.java:337)
+at org.testng.SuiteRunner.run(SuiteRunner.java:286)
+at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:53)
+at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:96)
+at org.testng.TestNG.runSuitesSequentially(TestNG.java:1187)
+at org.testng.TestNG.runSuitesLocally(TestNG.java:1109)
+at org.testng.TestNG.runSuites(TestNG.java:1039)
+at org.testng.TestNG.run(TestNG.java:1007)
+at org.testng.remote.AbstractRemoteTestNG.run(AbstractRemoteTestNG.java:115)
+at org.testng.remote.RemoteTestNG.initAndRun(RemoteTestNG.java:251)
+at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:77)
+]]>
+            </full-stacktrace>
+          </exception> <!-- java.lang.IllegalArgumentException -->
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testInvalidPort -->
+      </class> <!-- ai.djl.serving.ConnectorTest -->
+    </test> <!-- Default test -->
+  </suite> <!-- Default suite -->
+</testng-results>

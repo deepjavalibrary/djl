@@ -12,12 +12,14 @@
  */
 package ai.djl.serving.plugins;
 
+import ai.djl.serving.plugins.PluginMetaData.Lifecycle;
 import ai.djl.serving.util.ConfigManager;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,15 +28,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -53,11 +52,13 @@ public class FolderScanPluginManager implements PluginManager {
 
     private static final Logger logger = LoggerFactory.getLogger(FolderScanPluginManager.class);
 
-    private static Class<?>[] pluginInterfaces = {RequestHandler.class};
+    // private static Class<?>[] pluginInterfaces = {RequestHandler.class};
 
     private ConfigManager configManager;
 
-    private Map<Class<?>, Set<Plugin<?>>> pluginsRegistry;
+    private Map<String, PluginMetaData> pluginRegistry;
+
+    private Map<Class<?>, Set<Object>> componentRegistry;
 
     /**
      * Constructs a {@code PluginManager} instance.
@@ -67,7 +68,7 @@ public class FolderScanPluginManager implements PluginManager {
      */
     public FolderScanPluginManager(ConfigManager configManager) {
         this.configManager = configManager;
-        this.pluginsRegistry = new HashMap<>();
+        this.componentRegistry = new HashMap<>();
     }
 
     /**
@@ -84,64 +85,96 @@ public class FolderScanPluginManager implements PluginManager {
                 AccessController.doPrivileged(
                         (PrivilegedAction<ClassLoader>) () -> new URLClassLoader(pluginUrls));
 
-        AtomicInteger pluginsFound = new AtomicInteger(0);
+        // collect plugin information
+        pluginRegistry =
+                Collections.list(ucl.getResources("META-INF/plugin.definition"))
+                        .parallelStream()
+                        .map(PropertyFilePluginMetaDataReader::new)
+                        .map(reader -> reader.read())
+                        .peek(p -> logger.info("load plugin: {}", p.getName()))
+                        .collect(Collectors.toMap(PluginMetaData::getName, i -> i));
 
-        Arrays.stream(pluginInterfaces)
+        // register components
+        pluginRegistry
+                .values()
+                .parallelStream()
+                // test if we have found all dependencies
+                .filter(
+                        plugin ->
+                                !plugin.changeStateWhen(
+                                        () ->
+                                                !pluginRegistry
+                                                        .keySet()
+                                                        .containsAll(plugin.getDependencies()),
+                                        Lifecycle.FAILED,
+                                        "required dependencies not found"))
+                // now initialise the components in the plug-in
                 .forEach(
-                        pluginInterface -> {
-                            logger.trace("looking for plugin of type {}", pluginInterface);
-                            ServiceLoader<?> sl = ServiceLoader.load(pluginInterface, ucl);
-
-                            for (Object service : sl) {
-                                pluginsFound.incrementAndGet();
-                                logger.info("load plugin: {}", service.getClass().getSimpleName());
-                                Plugin<?> plugin = new Plugin<>(service);
-                                // TODO add a plugin Lifecycle "INITIALIZING", "ACTIVE", "SHUTTING
-                                // DOWN" , so a plug-in
-                                // can be dependent on another plugin.
-                                if (initializePlugin(plugin)) {
-                                    pluginsRegistry
-                                            .computeIfAbsent(pluginInterface, k -> new HashSet<>())
-                                            .add(plugin);
-                                }
-                            }
+                        plugin -> {
+                            initializeAllComponents(ucl, plugin);
                         });
-        logger.info("{} plug-ins found.", pluginsFound.intValue());
+        logger.info("{} plug-ins found and loaded.", pluginRegistry.size());
+    }
+
+    protected void initializeAllComponents(ClassLoader ucl, PluginMetaData plugin) {
+        plugin.getComponents()
+                .forEach(
+                        handlerClassName -> {
+                            initializeComponent(ucl, plugin, handlerClassName);
+                        });
+    }
+
+    @SuppressWarnings("rawtypes")
+    protected void initializeComponent(
+            ClassLoader ucl, PluginMetaData plugin, String handlerClassName) {
+        try {
+            @SuppressWarnings("unchecked")
+            Class<? extends RequestHandler> handlerClass =
+                    (Class<? extends RequestHandler>) ucl.loadClass(handlerClassName);
+            RequestHandler<?> handler =
+                    handlerClass.getConstructor(new Class<?>[] {}).newInstance();
+            injectDependenciesIntoComponent(handler);
+            componentRegistry
+                    .computeIfAbsent(RequestHandler.class, k -> new HashSet<>())
+                    .add(handler);
+            plugin.changeState(Lifecycle.INITIALIZED);
+
+        } catch (ReflectiveOperationException
+                | IllegalArgumentException
+                | SecurityException
+                | IntrospectionException e) {
+            plugin.changeState(Lifecycle.FAILED);
+            logger.error("failed to initialize plugin {}", plugin.getName(), e);
+        }
     }
 
     /**
      * Initializes a plugin by calling known setters to inject managers and other dependant plugins
      * into the plugins.
      *
-     * @param plugin the plugin to get initialized
-     * @return true if plugin could get initialized successfully false otherwise
+     * @param component the component to get initialized
+     * @throws IntrospectionException when initialization fails.
+     * @throws InvocationTargetException when initialization fails.
+     * @throws ReflectiveOperationException when initialization fails.
      */
-    private boolean initializePlugin(Plugin<?> plugin) {
-        Object component = plugin.getComponent();
-        try {
-            BeanInfo beanInfo = Introspector.getBeanInfo(component.getClass());
-            for (PropertyDescriptor property : beanInfo.getPropertyDescriptors()) {
-                // TODO introduce kind of ServiceRegistry and inject all known Managers and others
-                // plug-ins
-                if ("pluginManager".equals(property.getName())) {
-                    Method method = property.getWriteMethod();
-                    if (method != null) {
-                        method.invoke(component, this);
-                    } else {
-                        logger.warn(
-                                "no accessible setter for pluginManager found in plugin {}. skipping injecting",
-                                plugin.getName());
-                    }
+    protected void injectDependenciesIntoComponent(Object component)
+            throws IntrospectionException, ReflectiveOperationException, InvocationTargetException {
+        BeanInfo beanInfo = Introspector.getBeanInfo(component.getClass());
+        for (PropertyDescriptor property : beanInfo.getPropertyDescriptors()) {
+            // TODO introduce kind of ServiceRegistry and inject all known Managers and
+            // others
+            // plug-ins
+            if ("pluginManager".equals(property.getName())) {
+                Method method = property.getWriteMethod();
+                if (method != null) {
+                    method.invoke(component, this);
+                } else {
+                    logger.warn(
+                            "no accessible setter for pluginManager found in plugin {}. skipping injecting",
+                            component.getClass().getName());
                 }
             }
-        } catch (IntrospectionException
-                | ReflectiveOperationException
-                | IllegalArgumentException e) {
-            logger.error(
-                    "plugin {} could not get loaded. Initialization failed", plugin.getName(), e);
-            return false;
         }
-        return true;
     }
 
     /**
@@ -156,15 +189,12 @@ public class FolderScanPluginManager implements PluginManager {
      * @param pluginInterface the specific service interface
      * @return a set of all plugin components implementing this service interface
      */
+    @SuppressWarnings("unchecked")
     @Override
     public <T> Set<T> findImplementations(Class<T> pluginInterface) {
-        return Collections.unmodifiableSet(
-                pluginsRegistry
-                        .getOrDefault(pluginInterface, new HashSet<>())
-                        .stream()
-                        .map(Plugin::getComponent)
-                        .map(pluginInterface::cast)
-                        .collect(Collectors.toSet()));
+        return (Set<T>)
+                Collections.unmodifiableSet(
+                        componentRegistry.getOrDefault(pluginInterface, new HashSet<>()));
     }
 
     private URL[] listPluginJars() throws IOException {
@@ -193,43 +223,13 @@ public class FolderScanPluginManager implements PluginManager {
         }
     }
 
-    // TODO: maybe extract this to a public class in serving-api, so we can have functions like
-    // "listPlugin" which return Plugin objects
-    static class Plugin<T> {
-
-        private T component;
-        private LocalDateTime loadTime;
-
-        public Plugin(T component) {
-            this.component = component;
-            this.loadTime = LocalDateTime.now();
-        }
-
-        /**
-         * Returns the value of component.
-         *
-         * @return the component value.
-         */
-        public T getComponent() {
-            return component;
-        }
-
-        /**
-         * Returns the value of loadtime.
-         *
-         * @return the loadtime value.
-         */
-        public LocalDateTime getLoadTime() {
-            return loadTime;
-        }
-
-        /**
-         * Returns the name of the plug-in.
-         *
-         * @return name of the plug-in.
-         */
-        public String getName() {
-            return component.getClass().getSimpleName();
-        }
+    /**
+     * List all plugins.
+     *
+     * @return list of all plugins.
+     */
+    @Override
+    public Collection<PluginMetaData> listPlugins() {
+        return Collections.unmodifiableCollection(pluginRegistry.values());
     }
 }

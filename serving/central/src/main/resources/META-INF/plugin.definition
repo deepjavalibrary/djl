@@ -1,0 +1,3 @@
+name=central
+export=ai.djl.serving.central.handler.ModelListMetaDataHandler,ai.djl.serving.central.handler.ModelMetaDataHandler
+requires=static-file-plugin

@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.serving.central.handler;
+package ai.djl.serving.plugins.staticfile;
 
 import ai.djl.repository.FilenameUtils;
 import ai.djl.serving.http.ResourceNotFoundException;
