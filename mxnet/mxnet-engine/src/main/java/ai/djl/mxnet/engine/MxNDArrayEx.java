@@ -636,6 +636,7 @@ class MxNDArrayEx implements NDArrayEx {
         return getManager().invoke("_npx_dropout", new NDList(input), params);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList layerNorm(
             NDArray input, Shape normalizedShape, NDArray gamma, NDArray beta, float eps) {
