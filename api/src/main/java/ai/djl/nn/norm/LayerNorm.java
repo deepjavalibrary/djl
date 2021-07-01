@@ -56,7 +56,7 @@ import java.util.Arrays;
  */
 public class LayerNorm extends AbstractBlock {
 
-    private static final byte VERSION = 2;
+    private static final byte VERSION = 1;
 
     private float epsilon;
     private Shape normalizedShape;
