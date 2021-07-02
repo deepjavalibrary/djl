@@ -415,7 +415,6 @@ public class PtNDArrayEx implements NDArrayEx {
     @Override
     public NDList layerNorm(
             NDArray input, Shape normalizedShape, NDArray gamma, NDArray beta, float eps) {
-
         return new NDList(
                 JniUtils.layerNorm(
                         (PtNDArray) input,
