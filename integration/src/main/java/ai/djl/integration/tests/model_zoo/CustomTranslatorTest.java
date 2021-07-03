@@ -30,7 +30,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.JsonUtils;
@@ -75,7 +74,7 @@ public class CustomTranslatorTest {
                         .optArtifactId("ai.djl.mxnet:mlp")
                         .build();
 
-        try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria)) {
+        try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
             Path symbolFile = modelDir.resolve("mlp-symbol.json");
             try (InputStream is = model.getArtifactAsStream("mlp-symbol.json")) {
                 Files.copy(is, symbolFile, StandardCopyOption.REPLACE_EXISTING);
@@ -167,7 +166,7 @@ public class CustomTranslatorTest {
                         .optArtifactId("ai.djl.mxnet:ssd")
                         .build();
         String modelUrl;
-        try (ZooModel<Image, DetectedObjects> model = ModelZoo.loadModel(c)) {
+        try (ZooModel<Image, DetectedObjects> model = c.loadModel()) {
             modelUrl = model.getModelPath().toUri().toURL().toString();
         }
 
@@ -190,7 +189,7 @@ public class CustomTranslatorTest {
             buf = Utils.toByteArray(is);
         }
 
-        try (ZooModel<Input, Output> model = ModelZoo.loadModel(criteria);
+        try (ZooModel<Input, Output> model = criteria.loadModel();
                 Predictor<Input, Output> predictor = model.newPredictor()) {
             Input input = new Input("1");
             input.addData(buf);
@@ -213,7 +212,7 @@ public class CustomTranslatorTest {
                         .optModelUrls(modelDir.toUri().toURL().toString())
                         .build();
 
-        try (ZooModel<Input, Output> model = ModelZoo.loadModel(criteria);
+        try (ZooModel<Input, Output> model = criteria.loadModel();
                 Predictor<Input, Output> predictor = model.newPredictor()) {
             Input input = new Input("1");
             input.addData("body", data);
@@ -233,7 +232,7 @@ public class CustomTranslatorTest {
                         .optModelUrls(modelDir.toUri().toURL().toString())
                         .build();
 
-        try (ZooModel<Input, Output> model = ModelZoo.loadModel(criteria);
+        try (ZooModel<Input, Output> model = criteria.loadModel();
                 Predictor<Input, Output> predictor = model.newPredictor()) {
             NDManager manager = model.getNDManager();
 

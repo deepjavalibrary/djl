@@ -20,7 +20,6 @@ import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import java.io.IOException;
 import java.net.URI;
@@ -58,7 +57,7 @@ public class S3RepositoryTest {
                         .optModelName("mlp")
                         .build();
 
-        try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria)) {
+        try (ZooModel<NDList, NDList> model = criteria.loadModel()) {
             Assert.assertEquals(model.getName(), "mlp");
         }
     }
@@ -81,7 +80,7 @@ public class S3RepositoryTest {
                         .optModelName("mlp")
                         .build();
 
-        try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria)) {
+        try (ZooModel<NDList, NDList> model = criteria.loadModel()) {
             Assert.assertEquals(model.getName(), "mlp");
         }
     }

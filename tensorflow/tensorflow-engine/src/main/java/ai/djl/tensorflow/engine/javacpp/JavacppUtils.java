@@ -23,10 +23,12 @@ import ai.djl.util.Pair;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bytedeco.javacpp.BytePointer;
+import org.bytedeco.javacpp.Loader;
 import org.bytedeco.javacpp.Pointer;
 import org.bytedeco.javacpp.PointerPointer;
 import org.bytedeco.javacpp.PointerScope;
@@ -45,6 +47,7 @@ import org.tensorflow.internal.c_api.TF_Output;
 import org.tensorflow.internal.c_api.TF_Session;
 import org.tensorflow.internal.c_api.TF_SessionOptions;
 import org.tensorflow.internal.c_api.TF_Status;
+import org.tensorflow.internal.c_api.TF_TString;
 import org.tensorflow.internal.c_api.TF_Tensor;
 import org.tensorflow.internal.c_api.global.tensorflow;
 import org.tensorflow.proto.framework.ConfigProto;
@@ -62,7 +65,7 @@ public final class JavacppUtils {
     @SuppressWarnings({"unchecked", "try"})
     public static SavedModelBundle loadSavedModelBundle(
             String exportDir, String[] tags, ConfigProto config, RunOptions runOptions) {
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignored = new PointerScope()) {
             TF_Status status = TF_Status.newStatus();
 
             // allocate parameters for TF_LoadSessionFromSavedModel
@@ -141,7 +144,7 @@ public final class JavacppUtils {
         int numInputs = inputTensorHandles.length;
         int numOutputs = outputOpHandles.length;
         int numTargets = targetOpHandles.length;
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignored = new PointerScope()) {
             // TODO: check with sig-jvm if TF_Output here is freed
             TF_Output inputs = new TF_Output(numInputs);
             PointerPointer<TF_Tensor> inputValues = new PointerPointer<>(numInputs);
@@ -199,7 +202,7 @@ public final class JavacppUtils {
     @SuppressWarnings({"unchecked", "try"})
     public static TFE_Context createEagerSession(
             boolean async, int devicePlacementPolicy, ConfigProto config) {
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignored = new PointerScope()) {
             TFE_ContextOptions opts = TFE_ContextOptions.newContextOptions();
             TF_Status status = TF_Status.newStatus();
             if (config != null) {
@@ -218,7 +221,7 @@ public final class JavacppUtils {
 
     @SuppressWarnings({"unchecked", "try"})
     public static Device getDevice(TFE_TensorHandle handle) {
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignored = new PointerScope()) {
             TF_Status status = TF_Status.newStatus();
             BytePointer pointer = tensorflow.TFE_TensorHandleDeviceName(handle, status);
             String device = new String(pointer.getStringBytes(), StandardCharsets.UTF_8);
@@ -232,7 +235,7 @@ public final class JavacppUtils {
 
     @SuppressWarnings({"unchecked", "try"})
     public static Shape getShape(TFE_TensorHandle handle) {
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignored = new PointerScope()) {
             TF_Status status = TF_Status.newStatus();
             int numDims = tensorflow.TFE_TensorHandleNumDims(handle, status);
             status.throwExceptionIfNotOK();
@@ -258,7 +261,7 @@ public final class JavacppUtils {
 
     @SuppressWarnings({"unchecked", "try"})
     public static TFE_TensorHandle createEmptyTFETensor(Shape shape, DataType dataType) {
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignored = new PointerScope()) {
             TF_Tensor tensor = createEmptyTFTensor(shape, dataType);
             TF_Status status = TF_Status.newStatus();
             TFE_TensorHandle handle = AbstractTFE_TensorHandle.newTensor(tensor, status);
@@ -268,12 +271,45 @@ public final class JavacppUtils {
     }
 
     @SuppressWarnings({"unchecked", "try"})
+    public static Pair<TF_Tensor, TFE_TensorHandle> createStringTensor(String src) {
+        int dType = TfDataType.toTf(DataType.STRING);
+        long[] dims = {};
+        long numBytes = Loader.sizeof(TF_TString.class);
+        try (PointerScope ignored = new PointerScope()) {
+            /*
+             * String tensor allocates a separate TF_TString memory. The TF_TString will
+             * be deleted when the string tensor is closed. We have to track TF_TString
+             * memory by ourselves and make sure thw TF_TString lifecycle align with
+             * TFE_TensorHandle. TF_Tensor already handles TF_TString automatically, We
+             * can just keep a TF_Tensor reference in TfNDArray.
+             */
+            TF_Tensor tensor = AbstractTF_Tensor.allocateTensor(dType, dims, numBytes);
+            Pointer pointer = tensorflow.TF_TensorData(tensor).capacity(numBytes);
+            TF_TString data = new TF_TString(pointer).capacity(pointer.position() + 1);
+            byte[] buf = src.getBytes(StandardCharsets.UTF_8);
+            tensorflow.TF_TString_Copy(data, new BytePointer(buf), buf.length);
+            TF_Status status = TF_Status.newStatus();
+            TFE_TensorHandle handle = AbstractTFE_TensorHandle.newTensor(tensor, status);
+            status.throwExceptionIfNotOK();
+
+            handle.retainReference();
+            tensor.retainReference();
+            return new Pair<>(tensor, handle);
+        }
+    }
+
+    @SuppressWarnings({"unchecked", "try"})
     public static TFE_TensorHandle createTFETensorFromByteBuffer(
             ByteBuffer buf, Shape shape, DataType dataType) {
         int dType = TfDataType.toTf(dataType);
         long[] dims = shape.getShape();
-        long numBytes = shape.size() * dataType.getNumOfBytes();
-        try (PointerScope scope = new PointerScope()) {
+        long numBytes;
+        if (dataType == DataType.STRING) {
+            numBytes = buf.remaining() + 1;
+        } else {
+            numBytes = shape.size() * dataType.getNumOfBytes();
+        }
+        try (PointerScope ignored = new PointerScope()) {
             TF_Tensor tensor = AbstractTF_Tensor.allocateTensor(dType, dims, numBytes);
             // get data pointer in native engine
             Pointer pointer = tensorflow.TF_TensorData(tensor).capacity(numBytes);
@@ -287,7 +323,7 @@ public final class JavacppUtils {
 
     @SuppressWarnings({"unchecked", "try"})
     public static TF_Tensor resolveTFETensor(TFE_TensorHandle handle) {
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignored = new PointerScope()) {
             TF_Status status = TF_Status.newStatus();
             TF_Tensor tensor = tensorflow.TFE_TensorHandleResolve(handle, status).withDeallocator();
             status.throwExceptionIfNotOK();
@@ -297,7 +333,7 @@ public final class JavacppUtils {
 
     @SuppressWarnings({"unchecked", "try"})
     public static TFE_TensorHandle createTFETensor(TF_Tensor handle) {
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignored = new PointerScope()) {
             TF_Status status = TF_Status.newStatus();
             TFE_TensorHandle tensor = AbstractTFE_TensorHandle.newTensor(handle, status);
             status.throwExceptionIfNotOK();
@@ -306,8 +342,34 @@ public final class JavacppUtils {
     }
 
     @SuppressWarnings({"unchecked", "try"})
+    public static String[] getString(TFE_TensorHandle handle, int count, Charset charset) {
+        try (PointerScope ignored = new PointerScope()) {
+            // convert to TF_Tensor
+            TF_Status status = TF_Status.newStatus();
+            // should not add .withDeallocator() here, otherwise sting data will be destroyed
+            TF_Tensor tensor = tensorflow.TFE_TensorHandleResolve(handle, status);
+            status.throwExceptionIfNotOK();
+
+            long tensorSize = tensorflow.TF_TensorByteSize(tensor);
+            Pointer pointer = tensorflow.TF_TensorData(tensor).capacity(tensorSize);
+
+            TF_TString data = new TF_TString(pointer).capacity(pointer.position() + count);
+            String[] ret = new String[count];
+            for (int i = 0; i < count; ++i) {
+                TF_TString tstring = data.getPointer(i);
+                long size = tensorflow.TF_TString_GetSize(tstring);
+                BytePointer bp = tensorflow.TF_TString_GetDataPointer(tstring).capacity(size);
+                ret[i] = bp.getString(charset);
+            }
+
+            tensorflow.TF_DeleteTensor(tensor); // manually delete tensor
+            return ret;
+        }
+    }
+
+    @SuppressWarnings({"unchecked", "try"})
     public static ByteBuffer getByteBuffer(TFE_TensorHandle handle) {
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignored = new PointerScope()) {
             // convert to TF_Tensor
             TF_Status status = TF_Status.newStatus();
             TF_Tensor tensor = tensorflow.TFE_TensorHandleResolve(handle, status).withDeallocator();
@@ -328,7 +390,7 @@ public final class JavacppUtils {
     @SuppressWarnings({"unchecked", "try"})
     public static TFE_TensorHandle toDevice(
             TFE_TensorHandle handle, TFE_Context eagerSessionHandle, Device device) {
-        try (PointerScope scope = new PointerScope()) {
+        try (PointerScope ignored = new PointerScope()) {
             String deviceName = toTfDevice(device);
             TF_Status status = TF_Status.newStatus();
             TFE_TensorHandle newHandle =
@@ -372,8 +434,7 @@ public final class JavacppUtils {
         } else if (device.getDeviceType().equals(Device.Type.GPU)) {
             return "/device:GPU:" + device.getDeviceId();
         } else {
-            throw new EngineException(
-                    "Unknown device type to TensorFlow Engine: " + device.toString());
+            throw new EngineException("Unknown device type to TensorFlow Engine: " + device);
         }
     }
 }

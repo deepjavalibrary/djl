@@ -37,11 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * The translator for {@link BertQAModelLoader}.
- *
- * @see BertQAModelLoader
- */
+/** The translator for MXNet BERT QA model. */
 public class MxBertQATranslator extends QATranslator {
 
     private List<String> tokens;

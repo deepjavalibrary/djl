@@ -23,7 +23,6 @@ import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.pytorch.engine.PtSymbolBlock;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -50,7 +49,7 @@ public class TorchScriptTest {
                             .build();
 
             Path modelFile;
-            try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria);
+            try (ZooModel<NDList, NDList> model = criteria.loadModel();
                     Predictor<NDList, NDList> predictor = model.newPredictor()) {
                 NDArray array = manager.ones(new Shape(2, 2));
                 array.setName("input1.input");
@@ -67,7 +66,7 @@ public class TorchScriptTest {
                             .optProgress(new ProgressBar())
                             .build();
 
-            try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria)) {
+            try (ZooModel<NDList, NDList> model = criteria.loadModel()) {
                 Assert.assertEquals(model.getName(), "dict_input");
             }
         }

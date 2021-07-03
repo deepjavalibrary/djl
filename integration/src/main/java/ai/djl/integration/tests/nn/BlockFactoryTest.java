@@ -29,60 +29,21 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.testing.Assertions;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Utils;
 import ai.djl.util.ZipUtils;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class BlockFactoryTest {
-
-    @Test
-    public void testBlockLoadingSaving()
-            throws IOException, ModelNotFoundException, MalformedModelException,
-                    TranslateException {
-        TestBlockFactory factory = new TestBlockFactory();
-        Model model = factory.getRemoveLastBlockModel();
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Block block = model.getBlock();
-            block.forward(
-                    new ParameterStore(manager, true),
-                    new NDList(manager.ones(new Shape(1, 3, 32, 32))),
-                    true);
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            block.saveParameters(new DataOutputStream(os));
-            ByteArrayInputStream bis = new ByteArrayInputStream(os.toByteArray());
-            Block newBlock = factory.newBlock(manager);
-            newBlock.loadParameters(manager, new DataInputStream(bis));
-            try (Model test = Model.newInstance("test")) {
-                test.setBlock(newBlock);
-                try (Predictor<NDList, NDList> predOrigin =
-                                model.newPredictor(new NoopTranslator());
-                        Predictor<NDList, NDList> predDest =
-                                test.newPredictor(new NoopTranslator())) {
-                    NDList input = new NDList(manager.ones(new Shape(1, 3, 32, 32)));
-                    NDList originOut = predOrigin.predict(input);
-                    NDList destOut = predDest.predict(input);
-                    Assertions.assertAlmostEquals(originOut, destOut);
-                }
-            }
-        }
-        model.close();
-    }
 
     @Test
     public void testBlockFactoryLoadingFromZip()
@@ -98,12 +59,11 @@ public class BlockFactoryTest {
                         .optModelPath(zipPath)
                         .optModelName("exported")
                         .build();
-        try (NDManager manager = NDManager.newBaseManager()) {
-            try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria);
-                    Predictor<NDList, NDList> pred = model.newPredictor()) {
-                NDList destOut = pred.predict(new NDList(manager.ones(new Shape(1, 3, 32, 32))));
-                Assert.assertEquals(destOut.singletonOrThrow().getShape(), new Shape(1, 10));
-            }
+        try (ZooModel<NDList, NDList> model = criteria.loadModel();
+                Predictor<NDList, NDList> pred = model.newPredictor()) {
+            NDManager manager = model.getNDManager();
+            NDList destOut = pred.predict(new NDList(manager.ones(new Shape(1, 3, 32, 32))));
+            Assert.assertEquals(destOut.singletonOrThrow().getShape(), new Shape(1, 10));
         }
     }
 
@@ -138,9 +98,9 @@ public class BlockFactoryTest {
         private static final long serialVersionUID = 1234567L;
 
         @Override
-        public Block newBlock(NDManager manager) {
+        public Block newBlock(Model model, Path modelPath, Map<String, ?> arguments) {
             SequentialBlock newBlock = new SequentialBlock();
-            newBlock.add(SymbolBlock.newInstance(manager));
+            newBlock.add(SymbolBlock.newInstance(model.getNDManager()));
             newBlock.add(Linear.builder().setUnits(10).build());
             return newBlock;
         }
@@ -157,7 +117,7 @@ public class BlockFactoryTest {
                             .optEngine(name)
                             .optGroupId("ai.djl." + name.toLowerCase())
                             .optFilter("layers", "50");
-            Model model = ModelZoo.loadModel(builder.build());
+            Model model = builder.build().loadModel();
             SequentialBlock newBlock = new SequentialBlock();
             SymbolBlock block = (SymbolBlock) model.getBlock();
             newBlock.add(block);

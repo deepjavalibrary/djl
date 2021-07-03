@@ -29,9 +29,21 @@ inline std::string GetStringFromJString(JNIEnv* env, jstring jstr) {
   if (jstr == nullptr) {
     return std::string();
   }
-  const char* c_str = env->GetStringUTFChars(jstr, JNI_FALSE);
-  std::string str = std::string(c_str);
-  env->ReleaseStringUTFChars(jstr, c_str);
+
+  // TODO: cache reflection to improve performance
+  const jclass string_class = env->GetObjectClass(jstr);
+  const jmethodID getbytes_method = env->GetMethodID(string_class, "getBytes", "(Ljava/lang/String;)[B");
+
+  const jstring charset = env->NewStringUTF("UTF-8");
+  const jbyteArray jbytes = (jbyteArray) env->CallObjectMethod(jstr, getbytes_method, charset);
+  env->DeleteLocalRef(charset);
+
+  const jsize length = env->GetArrayLength(jbytes);
+  jbyte* c_str = env->GetByteArrayElements(jbytes, NULL);
+  std::string str = std::string(reinterpret_cast<const char *>(c_str), length);
+
+  env->ReleaseByteArrayElements(jbytes, c_str, RELEASE_MODE);
+  env->DeleteLocalRef(jbytes);
   return str;
 }
 
@@ -100,9 +112,23 @@ inline std::vector<std::string> GetVecFromJStringArray(JNIEnv* env, jobjectArray
 // String[]
 inline jobjectArray GetStringArrayFromVec(JNIEnv* env, const std::vector <std::string> &vec) {
   jobjectArray array = env->NewObjectArray(vec.size(), env->FindClass("Ljava/lang/String;"), nullptr);
+
+  // TODO: cache reflection to improve performance
+  const jclass string_class = env->FindClass("java/lang/String");
+  const jmethodID ctor = env->GetMethodID(string_class, "<init>", "([BLjava/lang/String;)V");
+  const jstring charset = env->NewStringUTF("UTF-8");
+
   for (int i = 0; i < vec.size(); ++i) {
-    env->SetObjectArrayElement(array, i, env->NewStringUTF(vec[i].c_str()));
+    const char* c_str = vec[i].c_str();
+    int len = vec[i].length();
+    auto jbytes = env->NewByteArray(len);
+    env->SetByteArrayRegion(jbytes, 0, len, reinterpret_cast<const jbyte*>(c_str));
+    jobject jstr = env->NewObject(string_class, ctor, jbytes, charset);
+    env->DeleteLocalRef(jbytes);
+    env->SetObjectArrayElement(array, i, jstr);
   }
+
+  env->DeleteLocalRef(charset);
   return array;
 }
 

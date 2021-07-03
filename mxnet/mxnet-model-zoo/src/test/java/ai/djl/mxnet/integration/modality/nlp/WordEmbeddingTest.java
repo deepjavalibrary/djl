@@ -15,9 +15,9 @@ package ai.djl.mxnet.integration.modality.nlp;
 import ai.djl.MalformedModelException;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.ModelZooTextEmbedding;
-import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import java.io.IOException;
@@ -31,7 +31,12 @@ public class WordEmbeddingTest {
     public void testGlove()
             throws IOException, ModelNotFoundException, MalformedModelException,
                     EmbeddingException {
-        try (ZooModel<NDList, NDList> model = MxModelZoo.GLOVE.loadModel()) {
+        Criteria<String, NDList> criteria =
+                Criteria.builder()
+                        .setTypes(String.class, NDList.class)
+                        .optArtifactId("ai.djl.mxnet:glove")
+                        .build();
+        try (ZooModel<String, NDList> model = criteria.loadModel()) {
             try (ModelZooTextEmbedding wordEmbedding = new ModelZooTextEmbedding(model)) {
                 NDManager manager = model.getNDManager();
                 NDList result =

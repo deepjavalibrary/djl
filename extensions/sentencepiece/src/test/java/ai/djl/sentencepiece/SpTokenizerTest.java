@@ -54,6 +54,21 @@ public class SpTokenizerTest {
     }
 
     @Test
+    @SuppressWarnings("AvoidEscapedUnicodeCharacters")
+    public void testUtf16Tokenize() throws IOException {
+        if (System.getProperty("os.name").startsWith("Win")) {
+            throw new SkipException("Skip windows test.");
+        }
+        Path modelPath = Paths.get("build/test/models/sententpiece_test_model.model");
+        try (SpTokenizer tokenizer = new SpTokenizer(modelPath)) {
+            String original = "\uD83D\uDC4B\uD83D\uDC4B";
+            List<String> tokens = tokenizer.tokenize(original);
+            List<String> expected = Arrays.asList("▁", "\uD83D\uDC4B\uD83D\uDC4B");
+            Assert.assertEquals(tokens, expected);
+        }
+    }
+
+    @Test
     public void testEncodeDecode() throws IOException {
         if (System.getProperty("os.name").startsWith("Win")) {
             throw new SkipException("Skip windows test.");

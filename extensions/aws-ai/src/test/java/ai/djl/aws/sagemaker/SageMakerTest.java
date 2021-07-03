@@ -16,7 +16,6 @@ import ai.djl.ModelException;
 import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDList;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
@@ -49,7 +48,7 @@ public class SageMakerTest {
                         .setTypes(NDList.class, NDList.class)
                         .optModelUrls("https://resources.djl.ai/test-models/mlp.tar.gz")
                         .build();
-        try (ZooModel<NDList, NDList> model = ModelZoo.loadModel(criteria)) {
+        try (ZooModel<NDList, NDList> model = criteria.loadModel()) {
             SageMaker sageMaker =
                     SageMaker.builder()
                             .setModel(model)

@@ -81,9 +81,6 @@ public final class Device {
      * @return the {@code deviceId} of the Device
      */
     public int getDeviceId() {
-        if (Type.CPU.equals(deviceType)) {
-            throw new IllegalStateException("CPU doesn't have device id");
-        }
         return deviceId;
     }
 

@@ -26,7 +26,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Batchifier;
@@ -90,7 +89,7 @@ public final class BertClassification {
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<String[], Classifications[]> model = ModelZoo.loadModel(criteria);
+        try (ZooModel<String[], Classifications[]> model = criteria.loadModel();
                 Predictor<String[], Classifications[]> predictor = model.newPredictor()) {
             return predictor.predict(inputs.toArray(new String[0]));
         }

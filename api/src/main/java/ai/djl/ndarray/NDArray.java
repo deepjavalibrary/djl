@@ -4596,6 +4596,57 @@ public interface NDArray extends NDResource {
      * Returns a one-hot {@code NDArray}.
      *
      * <ul>
+     *   <li>The locations represented by indices take value 1, while all other locations take value
+     *       0.
+     *   <li>If the input {@code NDArray} is rank N, the output will have rank N+1. The new axis is
+     *       appended at the end.
+     *   <li>If {@code NDArray} is a scalar the output shape will be a vector of length depth.
+     *   <li>If {@code NDArray} is a vector of length features, the output shape will be features x
+     *       depth.
+     *   <li>If {@code NDArray} is a matrix with shape [batch, features], the output shape will be
+     *       batch x features x depth.
+     * </ul>
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new int[] {1, 0, 2, 0});
+     * jshell&gt; array.oneHot(3);
+     * ND: (4, 3) cpu() float32
+     * [[0., 1., 0.],
+     *  [1., 0., 0.],
+     *  [0., 0., 1.],
+     *  [1., 0., 0.],
+     * ]
+     * jshell&gt; NDArray array = manager.create(new int[][] {{1, 0}, {1, 0}, {2, 0}});
+     * jshell&gt; array.oneHot(3);
+     * ND: (3, 2, 3) cpu() float32
+     * [[[0., 1., 0.],
+     *   [1., 0., 0.],
+     *  ],
+     *  [[0., 1., 0.],
+     *   [1., 0., 0.],
+     *  ],
+     *  [[0., 0., 1.],
+     *   [1., 0., 0.],
+     *  ],
+     * ]
+     * </pre>
+     *
+     * @param depth Depth of the one hot dimension.
+     * @param dataType dataType of the output.
+     * @return one-hot encoding of this {@code NDArray}
+     * @see <a
+     *     href=https://d2l.djl.ai/chapter_linear-networks/softmax-regression.html#classification-problems>Classification-problems</a>
+     */
+    default NDArray oneHot(int depth, DataType dataType) {
+        return oneHot(depth, 0f, 1f, dataType);
+    }
+
+    /**
+     * Returns a one-hot {@code NDArray}.
+     *
+     * <ul>
      *   <li>The locations represented by indices take value onValue, while all other locations take
      *       value offValue.
      *   <li>If the input {@code NDArray} is rank N, the output will have rank N+1. The new axis is

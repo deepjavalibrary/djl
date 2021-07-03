@@ -19,7 +19,7 @@ The following pseudocode demonstrates how to load model from HDFS url:
                 .optModelName("resnet18-v1")
                 .build();
 
-    ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
+    ZooModel<Image, Classifications> model = criteria.loadModel();
 ```
 
 See [How to load a model](../../docs/load_model.md) for more detail.

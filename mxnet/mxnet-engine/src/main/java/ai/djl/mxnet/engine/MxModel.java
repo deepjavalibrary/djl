@@ -101,10 +101,6 @@ public class MxModel extends BaseModel {
         }
 
         if (block == null) {
-            block = loadFromBlockFactory();
-        }
-
-        if (block == null) {
             // load MxSymbolBlock
             Path symbolFile = modelDir.resolve(prefix + "-symbol.json");
             if (Files.notExists(symbolFile)) {

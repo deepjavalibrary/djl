@@ -25,7 +25,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
@@ -87,7 +86,7 @@ public final class ImageClassification {
                 throw new IllegalArgumentException("Unknown classes");
         }
 
-        return ModelZoo.loadModel(criteria.build());
+        return criteria.build().loadModel();
     }
 
     /**

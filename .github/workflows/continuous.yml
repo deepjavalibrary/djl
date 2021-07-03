@@ -131,8 +131,7 @@ jobs:
         uses: codecov/codecov-action@v1.5.0
         with:
           files: ./build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml
-          name: codecov-umbrella
-          fail_ci_if_error: true
+          fail_ci_if_error: false
           path_to_write_report: ./codecov_report.txt
 
   # Windows platform for testing hybrid engines

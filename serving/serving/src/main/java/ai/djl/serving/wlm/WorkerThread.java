@@ -15,6 +15,7 @@ package ai.djl.serving.wlm;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -48,11 +49,12 @@ final class WorkerThread implements Runnable {
     private WorkerThread(Builder builder) {
         this.workerName = buildWorkerName(builder.model);
         this.aggregator = builder.aggregator;
-        this.gpuId = builder.gpuId;
         this.workerId = new WorkerIdGenerator().generate();
         this.startTime = System.currentTimeMillis();
-        predictor = builder.model.getModel().newPredictor();
         this.fixPoolThread = builder.fixPoolThread;
+        ZooModel<Input, Output> model = builder.model.getModel();
+        predictor = model.newPredictor();
+        this.gpuId = model.getNDManager().getDevice().getDeviceId();
     }
 
     /** {@inheritDoc} */
@@ -165,12 +167,9 @@ final class WorkerThread implements Runnable {
         private ModelInfo model;
         private BatchAggregator aggregator;
         private LinkedBlockingDeque<Job> jobQueue;
-        private int gpuId;
         private boolean fixPoolThread;
-        private GpuAssignmentStrategy gpuAssignmentStrategy;
 
         Builder() {
-            this.gpuId = -1;
             this.fixPoolThread = true;
         }
 
@@ -190,9 +189,6 @@ final class WorkerThread implements Runnable {
                 } else {
                     aggregator = new TemporaryBatchAggregator(model, jobQueue);
                 }
-            }
-            if (gpuAssignmentStrategy != null) {
-                gpuId = gpuAssignmentStrategy.nextGpuId();
             }
         }
 
@@ -254,20 +250,6 @@ final class WorkerThread implements Runnable {
         }
 
         /**
-         * Sets the GPU ID for this worker thread. GPU ID = -1 for non GPU.
-         *
-         * <p>only used when {@link #optGpuAssignmentStrategy(GpuAssignmentStrategy)
-         * optGpuAssignmentStrategy} is not set
-         *
-         * @param gpuId the gpuId to set. defaults to -1=no gpu
-         * @return self-reference to this builder.
-         */
-        public Builder optGpuId(int gpuId) {
-            this.gpuId = gpuId;
-            return self();
-        }
-
-        /**
          * Sets if the workerThread should be part of the fixed pool. Fixed Pool workers don't
          * terminate themself but are managed by WorkLoadManager min/max-worker scale functionality.
          *
@@ -276,18 +258,6 @@ final class WorkerThread implements Runnable {
          */
         public Builder optFixPoolThread(boolean fixPoolThread) {
             this.fixPoolThread = fixPoolThread;
-            return self();
-        }
-
-        /**
-         * sets an optional strategy to assign gpuId to this workerThread. doesn't use any gpu
-         * (gpuId=-1) when no {@code GpuAssignmentStrategy} is set.
-         *
-         * @param gpuAssignmentStrategy the gpuAssignmentStrategy to set
-         * @return self-reference to this builder.
-         */
-        public Builder optGpuAssignmentStrategy(GpuAssignmentStrategy gpuAssignmentStrategy) {
-            this.gpuAssignmentStrategy = gpuAssignmentStrategy;
             return self();
         }
     }

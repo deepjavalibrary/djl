@@ -16,7 +16,6 @@ import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.repository.Artifact;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -24,8 +23,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TreeMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** An interface represents a collection of models. */
 public interface ModelZoo {
@@ -45,20 +42,7 @@ public interface ModelZoo {
      *
      * @return the list of all available model families
      */
-    default List<ModelLoader> getModelLoaders() {
-        List<ModelLoader> list = new ArrayList<>();
-        try {
-            Field[] fields = getClass().getDeclaredFields();
-            for (Field field : fields) {
-                if (ModelLoader.class.isAssignableFrom(field.getType())) {
-                    list.add((ModelLoader) field.get(null));
-                }
-            }
-        } catch (ReflectiveOperationException e) {
-            // ignore
-        }
-        return list;
-    }
+    List<ModelLoader> getModelLoaders();
 
     /**
      * Returns the {@link ModelLoader} based on the model name.
@@ -100,7 +84,7 @@ public interface ModelZoo {
     }
 
     /**
-     * Gets the {@link ModelLoader} based on the model name.
+     * Load the {@link ZooModel} that matches this criteria.
      *
      * @param criteria the requirements for the model
      * @param <I> the input data type for preprocessing
@@ -112,95 +96,7 @@ public interface ModelZoo {
      */
     static <I, O> ZooModel<I, O> loadModel(Criteria<I, O> criteria)
             throws IOException, ModelNotFoundException, MalformedModelException {
-        Logger logger = LoggerFactory.getLogger(ModelZoo.class);
-        logger.debug("Loading model with {}", criteria);
-
-        String artifactId = criteria.getArtifactId();
-        ModelZoo modelZoo = criteria.getModelZoo();
-        String groupId = criteria.getGroupId();
-        String engine = criteria.getEngine();
-        Application application = criteria.getApplication();
-
-        List<ModelZoo> list = new ArrayList<>();
-        if (modelZoo != null) {
-            logger.debug("Searching model in specified model zoo: {}", modelZoo.getGroupId());
-            if (groupId != null && !modelZoo.getGroupId().equals(groupId)) {
-                throw new ModelNotFoundException(
-                        "groupId conflict with ModelZoo criteria."
-                                + modelZoo.getGroupId()
-                                + " v.s. "
-                                + groupId);
-            }
-            Set<String> supportedEngine = modelZoo.getSupportedEngines();
-            if (engine != null && !supportedEngine.contains(engine)) {
-                throw new ModelNotFoundException(
-                        "ModelZoo doesn't support specified with engine: " + engine);
-            }
-            list.add(modelZoo);
-        } else {
-            ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
-            for (ZooProvider provider : providers) {
-                logger.debug("Searching model in zoo provider: {}", provider.getName());
-                ModelZoo zoo = provider.getModelZoo();
-                if (zoo == null) {
-                    logger.debug("No model zoo found in zoo provider: {}", provider.getName());
-                    continue;
-                }
-                if (groupId != null && !zoo.getGroupId().equals(groupId)) {
-                    // filter out ModelZoo by groupId
-                    logger.debug("Ignore ModelZoo {} by groupId: {}", zoo.getGroupId(), groupId);
-                    continue;
-                }
-                Set<String> supportedEngine = zoo.getSupportedEngines();
-                if (engine != null && !supportedEngine.contains(engine)) {
-                    logger.debug("Ignore ModelZoo {} by engine: {}", zoo.getGroupId(), engine);
-                    continue;
-                }
-                list.add(zoo);
-            }
-        }
-
-        Exception lastException = null;
-        for (ModelZoo zoo : list) {
-            String loaderGroupId = zoo.getGroupId();
-            for (ModelLoader loader : zoo.getModelLoaders()) {
-                Application app = loader.getApplication();
-                String loaderArtifactId = loader.getArtifactId();
-                logger.debug("Checking ModelLoader: {}", loader);
-                if (artifactId != null && !artifactId.equals(loaderArtifactId)) {
-                    // filter out by model loader artifactId
-                    logger.debug(
-                            "artifactId mismatch for ModelLoader: {}:{}",
-                            loaderGroupId,
-                            loaderArtifactId);
-                    continue;
-                }
-                if (application != Application.UNDEFINED
-                        && app != Application.UNDEFINED
-                        && !app.matches(application)) {
-                    // filter out ModelLoader by application
-                    logger.debug(
-                            "application mismatch for ModelLoader: {}:{}",
-                            loaderGroupId,
-                            loaderArtifactId);
-                    continue;
-                }
-
-                try {
-                    return loader.loadModel(criteria);
-                } catch (ModelNotFoundException e) {
-                    lastException = e;
-                    logger.trace("", e);
-                    logger.debug(
-                            "{} for ModelLoader: {}:{}",
-                            e.getMessage(),
-                            loaderGroupId,
-                            loaderArtifactId);
-                }
-            }
-        }
-        throw new ModelNotFoundException(
-                "No matching model with specified Input/Output type found.", lastException);
+        return criteria.loadModel();
     }
 
     /**

@@ -30,7 +30,8 @@
         "resize": true,
         "rescale": true,
         "threshold": 0.2,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloTranslatorFactory"
       },
       "files": {
         "classes": {
@@ -67,7 +68,8 @@
         "resize": true,
         "rescale": true,
         "threshold": 0.2,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloTranslatorFactory"
       },
       "files": {
         "classes": {
@@ -104,7 +106,8 @@
         "resize": true,
         "rescale": true,
         "threshold": 0.2,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloTranslatorFactory"
       },
       "files": {
         "classes": {
@@ -141,7 +144,8 @@
         "resize": true,
         "rescale": true,
         "threshold": 0.2,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloTranslatorFactory"
       },
       "files": {
         "classes": {
@@ -178,7 +182,8 @@
         "resize": true,
         "rescale": true,
         "threshold": 0.2,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloTranslatorFactory"
       },
       "files": {
         "classes": {
@@ -215,7 +220,8 @@
         "resize": true,
         "rescale": true,
         "threshold": 0.2,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloTranslatorFactory"
       },
       "files": {
         "classes": {
@@ -252,7 +258,8 @@
         "resize": true,
         "rescale": true,
         "threshold": 0.2,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloTranslatorFactory"
       },
       "files": {
         "classes": {
@@ -289,7 +296,8 @@
         "resize": true,
         "rescale": true,
         "threshold": 0.2,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloTranslatorFactory"
       },
       "files": {
         "classes": {
@@ -326,7 +334,8 @@
         "resize": true,
         "rescale": true,
         "threshold": 0.2,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloTranslatorFactory"
       },
       "files": {
         "classes": {
@@ -363,7 +372,8 @@
         "resize": true,
         "rescale": true,
         "threshold": 0.2,
-        "synsetFileName": "classes.txt"
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloTranslatorFactory"
       },
       "files": {
         "classes": {

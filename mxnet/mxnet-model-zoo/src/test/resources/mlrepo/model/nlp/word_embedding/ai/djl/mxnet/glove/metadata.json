@@ -22,7 +22,10 @@
         "dimensions": "50"
       },
       "arguments": {
-        "unknownToken": "\u003cunk\u003e"
+        "dimensions": "50",
+        "unknownToken": "\u003cunk\u003e",
+        "blockFactory": "ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingBlockFactory",
+        "translatorFactory": "ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingTranslatorFactory"
       },
       "files": {
         "parameters": {
@@ -45,7 +48,10 @@
         "dimensions": "50"
       },
       "arguments": {
-        "unknownToken": "\u003cunk\u003e"
+        "dimensions": "50",
+        "unknownToken": "\u003cunk\u003e",
+        "blockFactory": "ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingBlockFactory",
+        "translatorFactory": "ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingTranslatorFactory"
       },
       "files": {
         "parameters": {

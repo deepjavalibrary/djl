@@ -1,0 +1,87 @@
+{
+  "metadataVersion": "0.1",
+  "resourceType": "model",
+  "application": "cv/image_generation",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "biggan-deep",
+  "name": "BigGAN-Deep",
+  "description": "BigGAN image generation",
+  "website": "http://www.djl.ai/pytorch/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "biggan-deep-128",
+      "properties": {
+        "layers": "12",
+        "size": "128",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 128,
+        "height": 128,
+        "truncation": 0.5,
+        "translatorFactory": "ai.djl.modality.cv.translator.BigGANTranslatorFactory"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/biggan-deep-128.pt.gz",
+          "sha1Hash": "d76c2d51c375b927e9b91a92e3495822d966f490",
+          "size": 195782744
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "biggan-deep-256",
+      "properties": {
+        "layers": "24",
+        "size": "256",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 256,
+        "height": 256,
+        "truncation": 0.5,
+        "translatorFactory": "ai.djl.modality.cv.translator.BigGANTranslatorFactory"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/biggan-deep-256.pt.gz",
+          "sha1Hash": "5adbc01b3257c8d4cf991f49eb11df4669dd6e9c",
+          "size": 217462998
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "biggan-deep-512",
+      "properties": {
+        "layers": "12",
+        "size": "512",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 512,
+        "height": 512,
+        "truncation": 0.5,
+        "translatorFactory": "ai.djl.modality.cv.translator.BigGANTranslatorFactory"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/biggan-deep-512.pt.gz",
+          "sha1Hash": "2b452ac9ab5ada90a67a5e24083f660775fbb810",
+          "size": 218753326
+        }
+      }
+    }
+  ]
+}

@@ -19,7 +19,6 @@ import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -45,7 +44,7 @@ public class ResNetTest {
 
         Path file = Paths.get("../../examples/src/test/resources/kitten.jpg");
         Image img = ImageFactory.getInstance().fromFile(file);
-        try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
+        try (ZooModel<Image, Classifications> model = criteria.loadModel();
                 Predictor<Image, Classifications> predictor = model.newPredictor()) {
             Classifications result = predictor.predict(img);
             System.out.println(result.best().getClassName());

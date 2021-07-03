@@ -25,14 +25,12 @@ import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.testng.annotations.Test;
 
 public class OCRTest {
@@ -46,8 +44,8 @@ public class OCRTest {
         // load Character model
         Predictor<Image, String> recognizer = getRecognizer();
         Predictor<Image, Classifications> rotator = getRotateClassifer();
-        for (int i = 0; i < boxes.size(); i++) {
-            Image subImg = getSubImage(img, boxes.get(i).getBoundingBox());
+        for (DetectedObjects.DetectedObject box : boxes) {
+            Image subImg = getSubImage(img, box.getBoundingBox());
             if (subImg.getHeight() * 1.0 / subImg.getWidth() > 1.5) {
                 subImg = rotateImg(subImg);
             }
@@ -62,11 +60,13 @@ public class OCRTest {
 
     private static DetectedObjects detectWords(Image img)
             throws ModelException, IOException, TranslateException {
-        Map<String, String> filter = new ConcurrentHashMap<>();
-        filter.put("flavor", "mobile");
-
-        try (ZooModel<Image, DetectedObjects> model =
-                        PpModelZoo.WORD_DETECTION.loadModel(filter, null, new ProgressBar());
+        Criteria<Image, DetectedObjects> criteria =
+                Criteria.builder()
+                        .setTypes(Image.class, DetectedObjects.class)
+                        .optArtifactId("ai.djl.paddlepaddle:word_detection")
+                        .optFilter("flavor", "mobile")
+                        .build();
+        try (ZooModel<Image, DetectedObjects> model = criteria.loadModel();
                 Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
             return predictor.predict(img);
         }
@@ -74,21 +74,26 @@ public class OCRTest {
 
     private static Predictor<Image, String> getRecognizer()
             throws MalformedModelException, ModelNotFoundException, IOException {
-        Map<String, String> filter = new ConcurrentHashMap<>();
-        filter.put("flavor", "mobile");
+        Criteria<Image, String> criteria =
+                Criteria.builder()
+                        .setTypes(Image.class, String.class)
+                        .optArtifactId("ai.djl.paddlepaddle:word_recognition")
+                        .optFilter("flavor", "mobile")
+                        .build();
 
-        ZooModel<Image, String> model =
-                PpModelZoo.WORD_RECOGNITION.loadModel(filter, null, new ProgressBar());
+        ZooModel<Image, String> model = criteria.loadModel();
         return model.newPredictor();
     }
 
     private static Predictor<Image, Classifications> getRotateClassifer()
             throws MalformedModelException, ModelNotFoundException, IOException {
-        Map<String, String> filter = new ConcurrentHashMap<>();
-        filter.put("flavor", "mobile");
-
-        ZooModel<Image, Classifications> model =
-                PpModelZoo.WORD_ROTATE.loadModel(filter, null, new ProgressBar());
+        Criteria<Image, Classifications> criteria =
+                Criteria.builder()
+                        .setTypes(Image.class, Classifications.class)
+                        .optArtifactId("ai.djl.paddlepaddle:word_rotation")
+                        .optFilter("flavor", "mobile")
+                        .build();
+        ZooModel<Image, Classifications> model = criteria.loadModel();
         return model.newPredictor();
     }
 

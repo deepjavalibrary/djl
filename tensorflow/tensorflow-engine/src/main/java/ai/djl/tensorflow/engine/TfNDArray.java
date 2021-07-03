@@ -26,12 +26,14 @@ import ai.djl.util.NativeResource;
 import ai.djl.util.Preconditions;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import org.tensorflow.internal.c_api.TFE_TensorHandle;
+import org.tensorflow.internal.c_api.TF_Tensor;
 
 /** {@code TfNDArray} is the TensorFlow implementation of {@link NDArray}. */
 @SuppressWarnings("PMD.UseTryWithResources")
@@ -48,12 +50,18 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     private String name;
     private TfNDArrayEx tfNDArrayEx;
     private DataType dataType;
+    private TF_Tensor tensor;
 
     TfNDArray(TfNDManager manager, TFE_TensorHandle handle) {
         super(handle);
         this.manager = manager;
         manager.attachInternal(getUid(), this);
         tfNDArrayEx = new TfNDArrayEx(this);
+    }
+
+    TfNDArray(TfNDManager manager, TFE_TensorHandle handle, TF_Tensor tensor) {
+        this(manager, handle);
+        this.tensor = tensor;
     }
 
     /** {@inheritDoc} */
@@ -171,9 +179,8 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public String[] toStringArray() {
-        // TODO: Parse String Array from bytes[]
-        throw new UnsupportedOperationException(
-                "TensorFlow does not supporting printing String NDArray");
+        int size = Math.toIntExact(getShape().size());
+        return JavacppUtils.getString(getHandle(), size, StandardCharsets.UTF_8);
     }
 
     /** {@inheritDoc} */
@@ -1613,6 +1620,9 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
         TFE_TensorHandle tensorHandle = handle.getAndSet(null);
         if (tensorHandle != null && !tensorHandle.isNull()) {
             tensorHandle.close();
+            if (tensor != null) {
+                tensor.close();
+            }
             manager.detachInternal(getUid());
             manager = null;
         }

@@ -21,6 +21,9 @@
       "properties": {
         "dataset": "iris_flowers"
       },
+      "arguments": {
+        "translatorFactory": "ai.djl.onnxruntime.zoo.tabular.softmax_regression.IrisClassificationTranslatorFactory"
+      },
       "files": {
         "model": {
           "uri": "0.0.1/iris_flowers.zip",

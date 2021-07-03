@@ -12,9 +12,12 @@
  */
 package ai.djl.nn;
 
-import ai.djl.ndarray.NDManager;
+import ai.djl.Model;
 import ai.djl.repository.zoo.ModelZoo;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Path;
+import java.util.Map;
 
 /**
  * Block factory is a component to make standard for block creating and saving procedure. Block
@@ -27,8 +30,11 @@ public interface BlockFactory extends Serializable {
     /**
      * Constructs the uninitialized block.
      *
-     * @param manager the manager to assign to block
+     * @param model the model of the block
+     * @param modelPath the directory of the model location
+     * @param arguments the block creation arguments
      * @return the uninitialized block
+     * @throws IOException if IO operation fails during creating block
      */
-    Block newBlock(NDManager manager);
+    Block newBlock(Model model, Path modelPath, Map<String, ?> arguments) throws IOException;
 }
