@@ -112,9 +112,29 @@ public class FolderScanPluginManager implements PluginManager {
         // phase 3: set active
         pluginRegistry
                 .values()
+                .stream()
+                .filter(plugin -> plugin.getState() == Lifecycle.INITIALIZED)
+                .filter(plugin -> checkAllRequiredPluginsInitialized(plugin))
                 .forEach(plugin -> plugin.changeState(Lifecycle.ACTIVE, "plugin ready"));
 
         logger.info("{} plug-ins found and loaded.", pluginRegistry.size());
+    }
+
+    /**
+     * Checks if all plug-ins required by this plugin are Initialized.
+     *
+     * @param plugin to check dependencies for state="Initialized"
+     * @return true if all plugins required by this one are in state "Initialized"
+     */
+    private boolean checkAllRequiredPluginsInitialized(PluginMetaData plugin) {
+        boolean result = true;
+        for (String required : plugin.getDependencies()) {
+            PluginMetaData reqPlugin = pluginRegistry.get(required);
+            if (reqPlugin != null && reqPlugin.getState() != Lifecycle.INITIALIZED) {
+                return false;
+            }
+        }
+        return result;
     }
 
     @SuppressWarnings("rawtypes")

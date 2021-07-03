@@ -76,7 +76,7 @@ public class ComponentRegistry {
                                 .collect(Collectors.toSet()));
     }
 
-    private class ComponentEntry {
+    private static class ComponentEntry {
         private PluginMetaData plugin;
         private Object component;
 
