@@ -12,18 +12,17 @@
  */
 package ai.djl.mxnet.zoo;
 
-import ai.djl.modality.cv.zoo.ActionRecognitionModelLoader;
-import ai.djl.modality.cv.zoo.ImageClassificationModelLoader;
-import ai.djl.modality.cv.zoo.InstanceSegmentationModelLoader;
-import ai.djl.modality.cv.zoo.ObjectDetectionModelLoader;
-import ai.djl.modality.cv.zoo.SimplePoseModelLoader;
-import ai.djl.modality.cv.zoo.YoloModelLoader;
+import ai.djl.Application.CV;
+import ai.djl.Application.NLP;
 import ai.djl.mxnet.engine.MxEngine;
-import ai.djl.mxnet.zoo.nlp.embedding.GloveWordEmbeddingModelLoader;
-import ai.djl.mxnet.zoo.nlp.qa.BertQAModelLoader;
+import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
+import ai.djl.repository.zoo.BaseModelLoader;
+import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -37,52 +36,78 @@ public class MxModelZoo implements ModelZoo {
     public static final String GROUP_ID = "ai.djl.mxnet";
     private static final MxModelZoo ZOO = new MxModelZoo();
 
-    public static final ObjectDetectionModelLoader SSD =
-            new ObjectDetectionModelLoader(REPOSITORY, GROUP_ID, "ssd", "0.0.1", ZOO);
-    public static final YoloModelLoader YOLO =
-            new YoloModelLoader(REPOSITORY, GROUP_ID, "yolo", "0.0.1", ZOO);
+    private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
 
-    public static final ImageClassificationModelLoader ALEXNET =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "alexnet", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader DARKNET =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "darknet", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader DENSENET =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "densenet", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader GOOGLENET =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "googlenet", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader INCEPTIONV3 =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "inceptionv3", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader MLP =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "mlp", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader MOBILENET =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "mobilenet", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader RESNEST =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "resnest", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader RESNET =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "resnet", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader RESNEXT =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "resnext", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader SENET =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "senet", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader SE_RESNEXT =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "se_resnext", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader SQUEEZENET =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "squeezenet", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader VGG =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "vgg", "0.0.1", ZOO);
-    public static final ImageClassificationModelLoader XCEPTION =
-            new ImageClassificationModelLoader(REPOSITORY, GROUP_ID, "xception", "0.0.1", ZOO);
+    static {
+        MRL ssd = MRL.model(CV.OBJECT_DETECTION, GROUP_ID, "ssd");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, ssd, "0.0.1", ZOO));
 
-    public static final SimplePoseModelLoader SIMPLE_POSE =
-            new SimplePoseModelLoader(REPOSITORY, GROUP_ID, "simple_pose", "0.0.1", ZOO);
-    public static final InstanceSegmentationModelLoader MASK_RCNN =
-            new InstanceSegmentationModelLoader(REPOSITORY, GROUP_ID, "mask_rcnn", "0.0.1", ZOO);
-    public static final ActionRecognitionModelLoader ACTION_RECOGNITION =
-            new ActionRecognitionModelLoader(
-                    REPOSITORY, GROUP_ID, "action_recognition", "0.0.1", ZOO);
-    public static final BertQAModelLoader BERT_QA = new BertQAModelLoader(REPOSITORY);
-    public static final GloveWordEmbeddingModelLoader GLOVE =
-            new GloveWordEmbeddingModelLoader(REPOSITORY);
+        MRL yolo = MRL.model(CV.OBJECT_DETECTION, GROUP_ID, "yolo");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, yolo, "0.0.1", ZOO));
+
+        MRL alexnet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "alexnet");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, alexnet, "0.0.1", ZOO));
+
+        MRL darknet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "darknet");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, darknet, "0.0.1", ZOO));
+
+        MRL densenet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "densenet");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, densenet, "0.0.1", ZOO));
+
+        MRL googlenet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "googlenet");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, googlenet, "0.0.1", ZOO));
+
+        MRL inceptionv3 = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "inceptionv3");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, inceptionv3, "0.0.1", ZOO));
+
+        MRL mlp = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mlp");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, mlp, "0.0.1", ZOO));
+
+        MRL mobilenet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mobilenet");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, mobilenet, "0.0.1", ZOO));
+
+        MRL resnest = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnest");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, resnest, "0.0.1", ZOO));
+
+        MRL resnet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, resnet, "0.0.1", ZOO));
+
+        MRL senet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "senet");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, senet, "0.0.1", ZOO));
+
+        MRL seresnext = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "se_resnext");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, seresnext, "0.0.1", ZOO));
+
+        MRL squeezenet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "squeezenet");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, squeezenet, "0.0.1", ZOO));
+
+        MRL vgg = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "vgg");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, vgg, "0.0.1", ZOO));
+
+        MRL xception = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "xception");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, xception, "0.0.1", ZOO));
+
+        MRL simplePose = MRL.model(CV.POSE_ESTIMATION, GROUP_ID, "simple_pose");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, simplePose, "0.0.1", ZOO));
+
+        MRL maskrcnn = MRL.model(CV.INSTANCE_SEGMENTATION, GROUP_ID, "mask_rcnn");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, maskrcnn, "0.0.1", ZOO));
+
+        MRL actionRecognition = MRL.model(CV.ACTION_RECOGNITION, GROUP_ID, "action_recognition");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, actionRecognition, "0.0.1", ZOO));
+
+        MRL bertQa = MRL.model(NLP.QUESTION_ANSWER, GROUP_ID, "bertqa");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, bertQa, "0.0.1", ZOO));
+
+        MRL glove = MRL.model(NLP.WORD_EMBEDDING, GROUP_ID, "glove");
+        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, glove, "0.0.2", ZOO));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<ModelLoader> getModelLoaders() {
+        return MODEL_LOADERS;
+    }
 
     /** {@inheritDoc} */
     @Override

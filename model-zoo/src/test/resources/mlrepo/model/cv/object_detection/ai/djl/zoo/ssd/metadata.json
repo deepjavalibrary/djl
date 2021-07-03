@@ -26,6 +26,7 @@
         "width": 256,
         "height": 256,
         "numFeatures": 3,
+        "translatorFactory": "ai.djl.modality.cv.translator.SingleShotDetectionTranslatorFactory",
         "numFilters": [
           16,
           32,
@@ -88,6 +89,8 @@
         "width": 256,
         "height": 256,
         "numFeatures": 3,
+        "blockFactory": "ai.djl.basicmodelzoo.cv.object_detection.ssd.SsdBlockFactory",
+        "translatorFactory": "ai.djl.modality.cv.translator.SingleShotDetectionTranslatorFactory",
         "numFilters": [
           16,
           32,

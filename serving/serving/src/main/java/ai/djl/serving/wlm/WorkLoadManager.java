@@ -12,7 +12,6 @@
  */
 package ai.djl.serving.wlm;
 
-import ai.djl.serving.util.ConfigManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,31 +33,25 @@ import org.slf4j.LoggerFactory;
 class WorkLoadManager {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkLoadManager.class);
-    private GpuAssignmentStrategy gpuAssignmentStrategy;
     private ExecutorService threadPool;
 
-    private ConcurrentHashMap<String, WorkerPool> workerPools;
+    private ConcurrentHashMap<ModelInfo, WorkerPool> workerPools;
 
-    /**
-     * construct using the configuration.
-     *
-     * @param configManager configuration manager to get configuration parameter.
-     */
-    public WorkLoadManager(ConfigManager configManager) {
-        this.gpuAssignmentStrategy = new RoundRobinGpuAssignmentStrategy(configManager);
+    /** Constructs a {@code WorkLoadManager} instance. */
+    public WorkLoadManager() {
         threadPool = Executors.newCachedThreadPool();
         workerPools = new ConcurrentHashMap<>();
     }
 
     /**
-     * get the workers for the specific model.
+     * Returns the workers for the specific model.
      *
-     * @param modelName The name of the model we are looking for.
+     * @param modelInfo the name of the model we are looking for.
      * @return the list of workers responsible to handle predictions for this model.
      */
-    public List<WorkerThread> getWorkers(String modelName) {
+    public List<WorkerThread> getWorkers(ModelInfo modelInfo) {
         List<WorkerThread> list;
-        WorkerPool pool = workerPools.get(modelName);
+        WorkerPool pool = workerPools.get(modelInfo);
         if (pool == null) {
             list = Collections.emptyList();
         } else {
@@ -74,20 +67,18 @@ class WorkLoadManager {
      * Adds an inference job to the job queue of the next free worker. scales up worker if
      * necessary.
      *
-     * @param modelInfo the model to use.
      * @param job an inference job to be executed.
      * @return {@code true} if submit success, false otherwise.
      */
-    public boolean addJob(ModelInfo modelInfo, Job job) {
+    public boolean addJob(Job job) {
         boolean accepted = false;
+        ModelInfo modelInfo = job.getModel();
         WorkerPool pool = getWorkerPoolForModel(modelInfo);
-        if (getNumRunningWorkers(modelInfo.getModelName()) > 0) {
-
+        if (getNumRunningWorkers(modelInfo) > 0) {
             try {
                 accepted = pool.getJobQueue().offer(job);
-
                 if (!accepted) {
-                    synchronized (modelInfo.getModelName()) {
+                    synchronized (modelInfo.getModel()) {
                         scaleUpWorkers(modelInfo, pool);
                         accepted =
                                 pool.getJobQueue()
@@ -107,7 +98,7 @@ class WorkLoadManager {
     }
 
     private void scaleUpWorkers(ModelInfo modelInfo, WorkerPool pool) {
-        int currentWorkers = getNumRunningWorkers(modelInfo.getModelName());
+        int currentWorkers = getNumRunningWorkers(modelInfo);
         if (currentWorkers < modelInfo.getMaxWorkers()) {
             logger.debug("scaling up workers for model {} to {} ", modelInfo, currentWorkers + 1);
             addThreads(pool.getWorkers(), modelInfo, 1, false);
@@ -119,15 +110,15 @@ class WorkLoadManager {
     }
 
     /**
-     * returns the number of running workers of a model. running workers are workers which are not
+     * Returns the number of running workers of a model. running workers are workers which are not
      * stopped, in error or scheduled to scale down.
      *
-     * @param modelName the model we are interested in.
+     * @param modelInfo the model we are interested in.
      * @return number of running workers.
      */
-    public int getNumRunningWorkers(String modelName) {
+    public int getNumRunningWorkers(ModelInfo modelInfo) {
         int numWorking = 0;
-        WorkerPool pool = workerPools.get(modelName);
+        WorkerPool pool = workerPools.get(modelInfo);
         if (pool != null) {
             pool.cleanup();
             List<WorkerThread> threads = pool.getWorkers();
@@ -143,12 +134,12 @@ class WorkLoadManager {
     }
 
     /**
-     * trigger a model change event. scales up and down workers to match minWorkers/maxWorkers.
+     * Triggers a model change event. scales up and down workers to match minWorkers/maxWorkers.
      *
      * @param modelInfo the changed model.
      */
     public void modelChanged(ModelInfo modelInfo) {
-        synchronized (modelInfo.getModelName()) {
+        synchronized (modelInfo.getModel()) {
             int minWorker = modelInfo.getMinWorkers();
 
             WorkerPool pool = getWorkerPoolForModel(modelInfo);
@@ -157,7 +148,7 @@ class WorkLoadManager {
 
                 List<WorkerThread> threads;
                 if (minWorker == 0) {
-                    workerPools.remove(modelInfo.getModelName());
+                    workerPools.remove(modelInfo);
                 }
 
                 threads = pool.getWorkers();
@@ -187,8 +178,7 @@ class WorkLoadManager {
     }
 
     private WorkerPool getWorkerPoolForModel(ModelInfo modelInfo) {
-        return workerPools.computeIfAbsent(
-                modelInfo.getModelName(), k -> new WorkerPool(modelInfo));
+        return workerPools.computeIfAbsent(modelInfo, k -> new WorkerPool(modelInfo));
     }
 
     private void addThreads(
@@ -200,7 +190,6 @@ class WorkLoadManager {
                     WorkerThread.builder()
                             .setModel(model)
                             .setJobQueue(getWorkerPoolForModel(model).getJobQueue())
-                            .optGpuAssignmentStrategy(gpuAssignmentStrategy)
                             .optFixPoolThread(permanent)
                             .build();
 
@@ -266,7 +255,7 @@ class WorkLoadManager {
                                 buf.append("-tmpPool\n");
                             }
                         });
-                logger.debug("worker pool for model {}:\n {}", modelName, buf.toString());
+                logger.debug("worker pool for model {}:\n {}", modelName, buf);
             }
         }
 

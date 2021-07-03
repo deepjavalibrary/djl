@@ -46,6 +46,7 @@ run {
     systemProperties System.getProperties()
     systemProperties.remove("user.dir")
     systemProperty("file.encoding", "UTF-8")
+    systemProperty("ai.djl.pytorch.num_interop_threads", "1")
     applicationDefaultJvmArgs = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=4000"]
 }
 
@@ -56,7 +57,7 @@ startScripts {
         text = text.replace('DEFAULT_JVM_OPTS=""', 'if [[ "${MODEL_SERVER_HOME}" = "" ]] ; then\n' +
                 '    export MODEL_SERVER_HOME=${APP_HOME}\n' +
                 'fi\n' +
-                'DEFAULT_JVM_OPTS="-Dlog4j.configurationFile=${APP_HOME}/conf/log4j2.xml"\n')
+                'DEFAULT_JVM_OPTS="-Dai.djl.pytorch.num_interop_threads=1 -Dlog4j.configurationFile=${APP_HOME}/conf/log4j2.xml"\n')
         text = text.replaceAll('CLASSPATH=\\$APP_HOME/lib/.*', 'CLASSPATH=\\$APP_HOME/lib/*')
         unixScript.text = text
     }

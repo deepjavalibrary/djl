@@ -6,7 +6,7 @@ plugins {
 group = "ai.djl.pytorch"
 apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
-def VERSION = "1.8.1"
+def VERSION = "${pytorch_version}"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 boolean isPrecxx11 = project.hasProperty("precxx11")
 boolean isGPU = project.hasProperty("gpu")

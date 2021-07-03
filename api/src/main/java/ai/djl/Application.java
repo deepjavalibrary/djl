@@ -64,6 +64,8 @@ public class Application {
                 return CV.ACTION_RECOGNITION;
             case "cv/word_recognition":
                 return CV.WORD_RECOGNITION;
+            case "cv/image_generation":
+                return CV.IMAGE_GENERATION;
             case "nlp":
                 return NLP.ANY;
             case "nlp/question_answer":
@@ -181,6 +183,13 @@ public class Application {
          * String}&gt;.
          */
         Application WORD_RECOGNITION = new Application("cv/word_recognition");
+
+        /**
+         * An application that accepts a seed and returns generated images.
+         *
+         * <p>The typical model returns an array of images {@link ai.djl.modality.cv.Image}[].
+         */
+        Application IMAGE_GENERATION = new Application("cv/image_generation");
     }
 
     /** The common set of applications for natural language processing (text data). */

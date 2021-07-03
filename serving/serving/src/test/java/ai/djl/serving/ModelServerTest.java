@@ -170,7 +170,7 @@ public class ModelServerTest {
         // plugin tests
         //   testStaticHtmlRequest();
 
-        channel.close();
+        channel.close().sync();
 
         // negative test case that channel will be closed by server
         testInvalidUri();
@@ -437,7 +437,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -457,7 +457,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -476,7 +476,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -496,7 +496,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -515,7 +515,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -534,7 +534,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -553,7 +553,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -573,7 +573,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -592,7 +592,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -612,7 +612,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -638,7 +638,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req);
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -660,7 +660,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -679,7 +679,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -698,7 +698,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);
@@ -730,7 +730,7 @@ public class ModelServerTest {
         channel.writeAndFlush(req).sync();
         latch.await();
         channel.closeFuture().sync();
-        channel.close();
+        channel.close().sync();
 
         if (!System.getProperty("os.name").startsWith("Win")) {
             ErrorResponse resp = JsonUtils.GSON.fromJson(result, ErrorResponse.class);

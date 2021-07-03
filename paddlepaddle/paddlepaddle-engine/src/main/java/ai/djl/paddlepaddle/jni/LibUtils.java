@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -66,8 +67,7 @@ public final class LibUtils {
             }
         }
         if (System.getProperty("os.name").startsWith("Linux")) {
-            // TODO: put MKL fix once 2.0.1 comes
-            // loadLinuxDependencies(libName);
+            loadLinuxDependencies(libName);
         } else if (System.getProperty("os.name").startsWith("Win")) {
             loadWindowsDependencies(libName);
         }
@@ -81,30 +81,30 @@ public final class LibUtils {
         libName = copyJniLibraryFromClasspath(nativeLibDir, fallback.get());
         logger.debug("Loading paddle library from: {}", libName);
         System.load(libName); // NOPMD
-
-        // post configure extralib path
-        //        if (System.getProperty("os.name").startsWith("Linux")) {
-        //            Path libDir = Paths.get(libName).getParent();
-        //            if (libDir == null) {
-        //                throw new IllegalStateException("Native folder cannot be found");
-        //            }
-        //            String[] args = {
-        //                "dummy", "--mklml_dir=\"" + libDir.toAbsolutePath().toString() + "/\""
-        //            };
-        //            PaddleLibrary.LIB.loadExtraDir(args);
-        //        }
     }
 
-    //    public static void loadLinuxDependencies(String libName) {
-    //        Path libDir = Paths.get(libName).getParent();
-    //        List<String> names = Arrays.asList("libiomp5.so", "libdnnl.so.1");
-    //        names.forEach(
-    //                name -> {
-    //                    String lib = libDir.resolve(name).toAbsolutePath().toString();
-    //                    logger.debug("Now loading " + lib);
-    //                    System.load(lib);
-    //                });
-    //    }
+    public static void loadLinuxDependencies(String libName) {
+        Path libDir = Paths.get(libName).getParent();
+        if (libDir != null) {
+            logger.info(
+                    "Paddle MKL/GPU requires user to set LD_LIBRARY_PATH="
+                            + libDir
+                            + ", the current one is set to: "
+                            + System.getenv("LD_LIBRARY_PATH"));
+            List<String> names = Arrays.asList("libdnnl.so.2", "libiomp5.so", "libmklml_intel.so");
+            names.forEach(
+                    name -> {
+                        Path path = libDir.resolve(name);
+                        if (Files.isRegularFile(path)) {
+                            String lib = path.toAbsolutePath().toString();
+                            logger.debug("Now loading " + lib);
+                            System.load(lib);
+                        } else {
+                            logger.debug(name + " is not found, skip loading...");
+                        }
+                    });
+        }
+    }
 
     public static void loadWindowsDependencies(String libName) {
         Path libDir = Paths.get(libName).getParent();
@@ -309,7 +309,7 @@ public final class LibUtils {
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
             if (flavor.startsWith("cu")
-                    && !lines.contains(flavor + '/' + os + "/native/lib/" + libName)) {
+                    && !lines.contains(flavor + '/' + os + "/native/lib/" + libName + ".gz")) {
                 logger.warn("No matching cuda flavor for {} found: {}.", os, flavor);
                 // fallback to CPU
                 flavor = "cpu";

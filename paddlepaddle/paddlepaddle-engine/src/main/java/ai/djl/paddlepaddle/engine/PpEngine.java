@@ -80,7 +80,7 @@ public final class PpEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public boolean hasCapability(String capability) {
-        // TODO: Support GPU
+        // Default device is always CPU
         return false;
     }
 
@@ -106,7 +106,8 @@ public final class PpEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         if (getAlternativeEngine() != null) {
-            return alternativeEngine.newBaseManager(device);
+            // use CPU as a default to achieve best performance
+            return alternativeEngine.newBaseManager(Device.cpu());
         }
         return PpNDManager.getSystemManager().newSubManager(device);
     }

@@ -15,6 +15,9 @@
     <Match>
         <Class name="~ai\.djl\.mxnet\.jnarator\.parser\..*"/>
     </Match>
+    <Match>
+        <Class name="~org\.tensorflow\.lite\..*"/>
+    </Match>
     <!-- function suppression -->
     <Match>
         <Bug pattern="DC_DOUBLECHECK"/>

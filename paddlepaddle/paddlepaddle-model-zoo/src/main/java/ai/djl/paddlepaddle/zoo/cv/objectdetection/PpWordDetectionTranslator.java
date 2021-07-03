@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 /**
- * A {@link PpWordDetection} that post-process the {@link NDArray} into {@link DetectedObjects} with
+ * A {@link Translator} that post-process the {@link NDArray} into {@link DetectedObjects} with
  * boundaries.
  */
 public class PpWordDetectionTranslator implements Translator<Image, DetectedObjects> {
@@ -37,7 +37,7 @@ public class PpWordDetectionTranslator implements Translator<Image, DetectedObje
     private final int maxLength;
 
     /**
-     * Creates the {@link PpWordDetection} translator.
+     * Creates the {@link PpWordDetectionTranslator} instance.
      *
      * @param arguments the arguments for the translator
      */

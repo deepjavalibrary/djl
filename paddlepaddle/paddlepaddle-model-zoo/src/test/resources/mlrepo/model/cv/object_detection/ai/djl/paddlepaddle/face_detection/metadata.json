@@ -25,7 +25,8 @@
         "width": 128,
         "height": 128,
         "centerCrop": true,
-        "threshold": 0.6
+        "threshold": 0.6,
+        "translatorFactory": "ai.djl.paddlepaddle.zoo.cv.objectdetection.PpFaceDetectionTranslatorFactory"
       },
       "files": {
         "classes": {
@@ -49,7 +50,8 @@
         "flavor": "server"
       },
       "arguments": {
-        "threshold": 0.6
+        "threshold": 0.6,
+        "translatorFactory": "ai.djl.paddlepaddle.zoo.cv.objectdetection.PpFaceDetectionTranslatorFactory"
       },
       "files": {
         "classes": {

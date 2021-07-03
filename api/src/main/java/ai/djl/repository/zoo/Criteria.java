@@ -14,16 +14,24 @@ package ai.djl.repository.zoo;
 
 import ai.djl.Application;
 import ai.djl.Device;
-import ai.djl.Model;
+import ai.djl.MalformedModelException;
 import ai.djl.nn.Block;
+import ai.djl.translate.DefaultTranslatorFactory;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@code Criteria} class contains search criteria to look up a {@link ZooModel}.
@@ -61,7 +69,7 @@ public class Criteria<I, O> {
     private Map<String, String> filters;
     private Map<String, Object> arguments;
     private Map<String, String> options;
-    private TranslatorFactory<I, O> factory;
+    private TranslatorFactory factory;
     private Block block;
     private String modelName;
     private Progress progress;
@@ -82,6 +90,101 @@ public class Criteria<I, O> {
         this.block = builder.block;
         this.modelName = builder.modelName;
         this.progress = builder.progress;
+    }
+
+    /**
+     * Load the {@link ZooModel} that matches this criteria.
+     *
+     * @return the model that matches the criteria
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     * @throws MalformedModelException if the model data is malformed
+     */
+    public ZooModel<I, O> loadModel()
+            throws IOException, ModelNotFoundException, MalformedModelException {
+        Logger logger = LoggerFactory.getLogger(ModelZoo.class);
+        logger.debug("Loading model with {}", this);
+
+        List<ModelZoo> list = new ArrayList<>();
+        if (modelZoo != null) {
+            logger.debug("Searching model in specified model zoo: {}", modelZoo.getGroupId());
+            if (groupId != null && !modelZoo.getGroupId().equals(groupId)) {
+                throw new ModelNotFoundException(
+                        "groupId conflict with ModelZoo criteria."
+                                + modelZoo.getGroupId()
+                                + " v.s. "
+                                + groupId);
+            }
+            Set<String> supportedEngine = modelZoo.getSupportedEngines();
+            if (engine != null && !supportedEngine.contains(engine)) {
+                throw new ModelNotFoundException(
+                        "ModelZoo doesn't support specified with engine: " + engine);
+            }
+            list.add(modelZoo);
+        } else {
+            ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
+            for (ZooProvider provider : providers) {
+                logger.debug("Searching model in zoo provider: {}", provider.getName());
+                ModelZoo zoo = provider.getModelZoo();
+                if (zoo == null) {
+                    logger.debug("No model zoo found in zoo provider: {}", provider.getName());
+                    continue;
+                }
+                if (groupId != null && !zoo.getGroupId().equals(groupId)) {
+                    // filter out ModelZoo by groupId
+                    logger.debug("Ignore ModelZoo {} by groupId: {}", zoo.getGroupId(), groupId);
+                    continue;
+                }
+                Set<String> supportedEngine = zoo.getSupportedEngines();
+                if (engine != null && !supportedEngine.contains(engine)) {
+                    logger.debug("Ignore ModelZoo {} by engine: {}", zoo.getGroupId(), engine);
+                    continue;
+                }
+                list.add(zoo);
+            }
+        }
+
+        Exception lastException = null;
+        for (ModelZoo zoo : list) {
+            String loaderGroupId = zoo.getGroupId();
+            for (ModelLoader loader : zoo.getModelLoaders()) {
+                Application app = loader.getApplication();
+                String loaderArtifactId = loader.getArtifactId();
+                logger.debug("Checking ModelLoader: {}", loader);
+                if (artifactId != null && !artifactId.equals(loaderArtifactId)) {
+                    // filter out by model loader artifactId
+                    logger.debug(
+                            "artifactId mismatch for ModelLoader: {}:{}",
+                            loaderGroupId,
+                            loaderArtifactId);
+                    continue;
+                }
+                if (application != Application.UNDEFINED
+                        && app != Application.UNDEFINED
+                        && !app.matches(application)) {
+                    // filter out ModelLoader by application
+                    logger.debug(
+                            "application mismatch for ModelLoader: {}:{}",
+                            loaderGroupId,
+                            loaderArtifactId);
+                    continue;
+                }
+
+                try {
+                    return loader.loadModel(this);
+                } catch (ModelNotFoundException e) {
+                    lastException = e;
+                    logger.trace("", e);
+                    logger.debug(
+                            "{} for ModelLoader: {}:{}",
+                            e.getMessage(),
+                            loaderGroupId,
+                            loaderArtifactId);
+                }
+            }
+        }
+        throw new ModelNotFoundException(
+                "No matching model with specified Input/Output type found.", lastException);
     }
 
     /**
@@ -188,7 +291,7 @@ public class Criteria<I, O> {
      *
      * @return the optional {@link TranslatorFactory} to be used for {@link ZooModel}
      */
-    public TranslatorFactory<I, O> getTranslatorFactory() {
+    public TranslatorFactory getTranslatorFactory() {
         return factory;
     }
 
@@ -282,10 +385,11 @@ public class Criteria<I, O> {
         Map<String, String> filters;
         Map<String, Object> arguments;
         Map<String, String> options;
-        TranslatorFactory<I, O> factory;
+        TranslatorFactory factory;
         Block block;
         String modelName;
         Progress progress;
+        private Translator<I, O> translator;
 
         Builder() {
             application = Application.UNDEFINED;
@@ -370,10 +474,10 @@ public class Criteria<I, O> {
          * @return this {@code Builder}
          */
         public Builder<I, O> optArtifactId(String artifactId) {
-            if (artifactId.contains(":")) {
-                String[] tokens = artifactId.split(":");
-                groupId = tokens[0];
-                this.artifactId = tokens[1];
+            if (artifactId != null && artifactId.contains(":")) {
+                String[] tokens = artifactId.split(":", -1);
+                groupId = tokens[0].isEmpty() ? null : tokens[0];
+                this.artifactId = tokens[1].isEmpty() ? null : tokens[1];
             } else {
                 this.artifactId = artifactId;
             }
@@ -387,7 +491,9 @@ public class Criteria<I, O> {
          * @return this {@code Builder}
          */
         public Builder<I, O> optModelUrls(String modelUrls) {
-            this.modelZoo = new DefaultModelZoo(modelUrls);
+            if (modelUrls != null) {
+                this.modelZoo = new DefaultModelZoo(modelUrls);
+            }
             return this;
         }
 
@@ -399,7 +505,9 @@ public class Criteria<I, O> {
          * @throws MalformedURLException wrong path format
          */
         public Builder<I, O> optModelPath(Path modelPath) throws MalformedURLException {
-            this.modelZoo = new DefaultModelZoo(modelPath.toUri().toURL().toString());
+            if (modelPath != null) {
+                this.modelZoo = new DefaultModelZoo(modelPath.toUri().toURL().toString());
+            }
             return this;
         }
 
@@ -521,7 +629,7 @@ public class Criteria<I, O> {
          * @return this {@code Builder}
          */
         public Builder<I, O> optTranslator(Translator<I, O> translator) {
-            this.factory = new TranslatorFactorImpl<>(translator);
+            this.translator = translator;
             return this;
         }
 
@@ -531,7 +639,7 @@ public class Criteria<I, O> {
          * @param factory the override {@code TranslatorFactory}
          * @return this {@code Builder}
          */
-        public Builder<I, O> optTranslatorFactory(TranslatorFactory<I, O> factory) {
+        public Builder<I, O> optTranslatorFactory(TranslatorFactory factory) {
             this.factory = factory;
             return this;
         }
@@ -553,22 +661,12 @@ public class Criteria<I, O> {
          * @return the {@link Criteria} instance
          */
         public Criteria<I, O> build() {
+            if (factory == null && translator != null) {
+                DefaultTranslatorFactory f = new DefaultTranslatorFactory();
+                f.registerTranslator(inputClass, outputClass, translator);
+                factory = f;
+            }
             return new Criteria<>(this);
-        }
-    }
-
-    private static final class TranslatorFactorImpl<I, O> implements TranslatorFactory<I, O> {
-
-        private Translator<I, O> translator;
-
-        public TranslatorFactorImpl(Translator<I, O> translator) {
-            this.translator = translator;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Translator<I, O> newInstance(Model model, Map<String, ?> arguments) {
-            return translator;
         }
     }
 }

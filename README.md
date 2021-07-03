@@ -35,7 +35,7 @@ The following pseudocode demonstrates running inference:
                     .optFilter("backbone", "resnet50") // choose network architecture
                     .build();
 
-    try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria)) {
+    try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
         try (Predictor<Image, Classifications> predictor = model.newPredictor()) {
             Image img = ImageFactory.getInstance().fromUrl("http://..."); // read image
             Classifications result = predictor.predict(img);
@@ -120,8 +120,6 @@ To increase build speed, you can use the following command to skip unit tests:
 # for Windows:
 gradlew build -x test
 ```
-
-**Note:** SpotBugs is not compatible with JDK 11+. SpotBugs will not be executed if you are using JDK 11+.
 
 ### Importing into eclipse
 

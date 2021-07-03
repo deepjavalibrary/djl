@@ -97,7 +97,7 @@ Criteria<Image, Classifications> criteria =
                         .optProgress(new ProgressBar())
                         .build();
 
-ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
+ZooModel<Image, Classifications> model = criteria.loadModel();
 ```
 
 ## How to import TensorFlow 1.x models
@@ -121,12 +121,12 @@ Criteria<Image, DetectedObjects> criteria =
                         .setTypes(Image.class, DetectedObjects.class)
                         .optFilter("backbone", "mobilenet_v2")
                         .optEngine("TensorFlow")
-                        .optOption("Tags", new String[] {})
+                        .optOption("Tags", "")
                         .optOption("SignatureDefKey", "default")
                         .optProgress(new ProgressBar())
                         .build();
 
-ZooModel<Image, DetectedObjects> model = ModelZoo.loadModel(criteria);
+ZooModel<Image, DetectedObjects> model = criteria.loadModel();
 ```
 
 ## Tips and tricks when writing Translator for TensorFlow models

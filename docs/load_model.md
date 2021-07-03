@@ -75,7 +75,7 @@ Criteria<Image, Classifications> criteria = Criteria.builder()
         .optModelName("resnet50") // specify model file prefix
         .build();
 
-ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
+ZooModel<Image, Classifications> model = criteria.loadModel();
 ```
 
 DJL supports loading a pre-trained model from a local directory or an [archive file](#current-supported-archive-formats).
@@ -127,7 +127,7 @@ Criteria<Image, Classifications> criteria = Criteria.builder()
         .optModelUrls("https://resources.djl.ai/benchmark/squeezenet_v1.1.tar.gz") // search models in specified path
         .build();
 
-ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
+ZooModel<Image, Classifications> model = criteria.loadModel();
 ```
 
 You can [customize the artifactId and modelName](#customize-artifactid-and-modelname) the same way as loading model from the local file system.

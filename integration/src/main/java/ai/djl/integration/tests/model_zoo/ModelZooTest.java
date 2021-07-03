@@ -23,6 +23,7 @@ import ai.djl.repository.zoo.ZooProvider;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Calendar;
 import java.util.List;
 import java.util.ServiceLoader;
 import org.testng.SkipException;
@@ -49,7 +50,10 @@ public class ModelZooTest {
     @Test
     public void testDownloadModels() throws IOException, ModelException {
         if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
-            throw new SkipException("Nightly only");
+            throw new SkipException("Weekly only");
+        }
+        if (Calendar.SATURDAY != Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
+            throw new SkipException("Weekly only");
         }
 
         ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);

@@ -68,7 +68,12 @@ public class SpTokenizer implements Tokenizer, AutoCloseable {
         processor.close();
     }
 
-    SpProcessor getProcessor() {
+    /**
+     * Get SentencePiece processor.
+     *
+     * @return {@link SpProcessor}
+     */
+    public SpProcessor getProcessor() {
         return processor;
     }
 

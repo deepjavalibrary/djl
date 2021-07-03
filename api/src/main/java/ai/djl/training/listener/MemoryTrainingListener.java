@@ -103,7 +103,7 @@ public class MemoryTrainingListener extends TrainingListenerAdapter {
 
             metrics.addMetric("Heap", heapUsed, "bytes");
             metrics.addMetric("NonHeap", nonHeapUsed, "bytes");
-            int gpuCount = Device.getGpuCount();
+            int gpuCount = CudaUtils.getGpuCount();
 
             // CudaUtils.getGpuMemory() will allocates memory on GPUs if CUDA runtime is not
             // initialized.
@@ -138,7 +138,7 @@ public class MemoryTrainingListener extends TrainingListenerAdapter {
                 list.addAll(metrics.getMetric("NonHeap"));
                 list.addAll(metrics.getMetric("cpu"));
                 list.addAll(metrics.getMetric("rss"));
-                int gpuCount = Device.getGpuCount();
+                int gpuCount = CudaUtils.getGpuCount();
                 for (int i = 0; i < gpuCount; ++i) {
                     list.addAll(metrics.getMetric("GPU-" + i));
                 }

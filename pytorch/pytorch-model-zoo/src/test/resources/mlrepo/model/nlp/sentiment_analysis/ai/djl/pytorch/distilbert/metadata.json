@@ -22,7 +22,9 @@
         "backbone": "distilbert",
         "dataset": "sst"
       },
-      "arguments": {},
+      "arguments": {
+        "translatorFactory": "ai.djl.pytorch.zoo.nlp.sentimentanalysis.PtDistilBertTranslatorFactory"
+      },
       "files": {
         "distilbert-base-uncased-vocab": {
           "uri": "traced_distilbert_sentiment/0.0.1/distilbert-base-uncased-finetuned-sst-2-english-vocab.txt.gz",

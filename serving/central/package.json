@@ -23,7 +23,8 @@
     "@material-ui/lab": "*",
     "axios": "^0.21.1",
     "regenerator-runtime": "^0.13.7",
-    "ws": ">=7.4.6"
+    "ws": ">=7.4.6",
+    "glob-parent": ">=5.1.2"
   },
   "scripts": {
     "start": "webpack-dev-server --scripts-prepend-node-path --hot"

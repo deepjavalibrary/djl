@@ -20,6 +20,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
+import ai.djl.util.Pair;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -29,6 +30,7 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import org.tensorflow.internal.c_api.TFE_Context;
 import org.tensorflow.internal.c_api.TFE_TensorHandle;
+import org.tensorflow.internal.c_api.TF_Tensor;
 
 @SuppressWarnings("PMD.UseTryWithResources")
 public class TfNDManager extends BaseNDManager {
@@ -62,7 +64,6 @@ public class TfNDManager extends BaseNDManager {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings({"unchecked", "try"})
     @Override
     public TfNDArray create(Buffer data, Shape shape, DataType dataType) {
         int size = data.remaining();
@@ -97,6 +98,13 @@ public class TfNDManager extends BaseNDManager {
         // TODO(improvement): avoid data copy by creating directByteBuffer on tensor data pointer
         TFE_TensorHandle handle = JavacppUtils.createTFETensorFromByteBuffer(buf, shape, dataType);
         return new TfNDArray(this, handle);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(String data) {
+        Pair<TF_Tensor, TFE_TensorHandle> pair = JavacppUtils.createStringTensor(data);
+        return new TfNDArray(this, pair.getValue(), pair.getKey());
     }
 
     /** {@inheritDoc} */
@@ -226,6 +234,31 @@ public class TfNDManager extends BaseNDManager {
         NDArray axes = create(shape.getShape());
         TfOpExecutor opBuilder =
                 opExecutor("RandomStandardNormal").addInput(axes).addParam("dtype", dataType);
+        Integer seed = getEngine().getSeed();
+        if (seed != null) {
+            // seed1 is graph-level seed
+            // set it to default graph seed used by tensorflow
+            // https://github.com/tensorflow/tensorflow/blob/85c8b2a817f95a3e979ecd1ed95bff1dc1335cff/tensorflow/python/framework/random_seed.py#L31
+            opBuilder.addParam("seed", 87654321);
+            opBuilder.addParam("seed2", seed);
+        }
+        try (NDArray array = opBuilder.buildSingletonOrThrow();
+                NDArray temp = array.mul(scale)) {
+            return temp.add(loc);
+        } finally {
+            axes.close();
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray truncatedNormal(float loc, float scale, Shape shape, DataType dataType) {
+        if (DataType.STRING.equals(dataType)) {
+            throw new IllegalArgumentException("String data type is not supported!");
+        }
+        NDArray axes = create(shape.getShape());
+        TfOpExecutor opBuilder =
+                opExecutor("TruncatedNormal").addInput(axes).addParam("dtype", dataType);
         Integer seed = getEngine().getSeed();
         if (seed != null) {
             // seed1 is graph-level seed

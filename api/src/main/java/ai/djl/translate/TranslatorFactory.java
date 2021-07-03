@@ -13,23 +13,43 @@
 package ai.djl.translate;
 
 import ai.djl.Model;
+import ai.djl.util.Pair;
+import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Set;
 
-/**
- * A utility class creates {@link Translator} instances.
- *
- * @param <I> the type of the input
- * @param <O> the type of the output
- */
-public interface TranslatorFactory<I, O> {
+/** A utility class creates {@link Translator} instances. */
+public interface TranslatorFactory {
+
+    /**
+     * Returns supported input/output classes.
+     *
+     * @return a set of supported input/output classes
+     */
+    Set<Pair<Type, Type>> getSupportedTypes();
+
+    /**
+     * Returns if the input/output is supported by the {@code TranslatorFactory}.
+     *
+     * @param input the input class
+     * @param output the output class
+     * @return {@code true} if the input/output type is supported
+     */
+    default boolean isSupported(Class<?> input, Class<?> output) {
+        return getSupportedTypes().contains(new Pair<Type, Type>(input, output));
+    }
 
     /**
      * Returns a new instance of the {@link Translator} class.
      *
+     * @param input the input class
+     * @param output the output class
      * @param model the {@link Model} that uses the {@link Translator}
      * @param arguments the configurations for a new {@code Translator} instance
      * @return a new instance of the {@code Translator} class
      * @throws TranslateException if failed to create Translator instance
      */
-    Translator<I, O> newInstance(Model model, Map<String, ?> arguments) throws TranslateException;
+    Translator<?, ?> newInstance(
+            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
+            throws TranslateException;
 }

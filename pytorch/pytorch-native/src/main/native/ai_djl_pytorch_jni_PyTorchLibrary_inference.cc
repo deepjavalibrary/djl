@@ -99,8 +99,8 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleWrite(
   API_BEGIN()
   auto* module_ptr = reinterpret_cast<torch::jit::script::Module*>(module_handle);
 #if defined(__ANDROID__)
-    env->ThrowNew(ENGINE_EXCEPTION_CLASS, "This kind of mode is not supported on Android");
-    return;
+  env->ThrowNew(ENGINE_EXCEPTION_CLASS, "This kind of mode is not supported on Android");
+  return;
 #endif
   std::ostringstream stream;
   module_ptr->save(stream);
@@ -207,8 +207,8 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleSave(
   API_BEGIN()
   auto* module_ptr = reinterpret_cast<torch::jit::script::Module*>(jhandle);
 #if defined(__ANDROID__)
-    env->ThrowNew(ENGINE_EXCEPTION_CLASS, "This kind of mode is not supported on Android");
-    return;
+  env->ThrowNew(ENGINE_EXCEPTION_CLASS, "This kind of mode is not supported on Android");
+  return;
 #endif
   module_ptr->save(djl::utils::jni::GetStringFromJString(env, jpath));
   API_END()

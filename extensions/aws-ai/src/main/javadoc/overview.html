@@ -31,7 +31,7 @@
                 .optProgress(new ProgressBar())
                 .build();
 
-    ZooModel&lt;Image, Classifications&gt; model = ModelZoo.loadModel(criteria);
+    ZooModel&lt;Image, Classifications&gt; model = criteria.loadModel();
 </pre>
 
 </body>

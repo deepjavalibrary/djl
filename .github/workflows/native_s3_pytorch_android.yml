@@ -10,8 +10,8 @@ jobs:
       matrix:
         format: ["armeabi-v7a", "arm64-v8a", "x86" ,"x86_64"]
     env:
-      PYTORCH_TAG_VERSION:    "v1.8.1"
-      PYTORCH_VERSION: "1.8.1"
+      PYTORCH_TAG_VERSION:    "v1.9.0"
+      PYTORCH_VERSION: "1.9.0"
       NDK_VERSION: "20.0.5594570"
     steps:
       - uses: actions/checkout@v1

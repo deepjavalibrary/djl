@@ -29,11 +29,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * The {@link ai.djl.translate.Translator} for PyTorch Sentiment Analysis model.
- *
- * @see DistilBertSentimentAnalysisModelLoader
- */
+/** The {@link ai.djl.translate.Translator} for PyTorch Sentiment Analysis model. */
 public class PtDistilBertTranslator implements Translator<String, Classifications> {
 
     private Vocabulary vocabulary;

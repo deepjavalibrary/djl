@@ -51,6 +51,12 @@ JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_loadExtraDir(
   std::cout << "Pending Paddle fix to proceed with the option" << std::endl;
 }
 
+JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_analysisConfigEnableMKLDNN(
+        JNIEnv* env, jobject jthis, jlong jhandle) {
+    auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
+    config_ptr->EnableMKLDNN();
+}
+
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deleteAnalysisConfig(
     JNIEnv* env, jobject jthis, jlong jhandle) {
   const auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);

@@ -19,9 +19,7 @@ fi
 
 if [[ ! -d "libtorch" ]]; then
   if [[ $PLATFORM == 'linux' ]]; then
-    if [[ $1 == "cpu" ]] ||  [[ $1 == "cu111" ]]; then
-      curl -s https://download.pytorch.org/libtorch/${1}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${1}.zip | jar xv
-    elif [[ $1 == "cu102" ]]; then
+    if [[ $1 == "cpu" ]] ||  [[ $1 == "cu111" ]] || [[ $1 == "cu102" ]]; then
       curl -s https://download.pytorch.org/libtorch/${1}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${1}.zip | jar xv
     else
       echo "$1 is not supported."

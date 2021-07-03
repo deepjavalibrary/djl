@@ -28,7 +28,7 @@ public class PpWordRotateTranslator implements Translator<Image, Classifications
 
     List<String> classes;
 
-    /** The Translator for {@link PpWordRotateClassifier}. */
+    /** The Translator for {@link PpWordRotateTranslator}. */
     public PpWordRotateTranslator() {
         classes = Arrays.asList("No Rotate", "Rotate");
     }
@@ -42,7 +42,7 @@ public class PpWordRotateTranslator implements Translator<Image, Classifications
 
     /** {@inheritDoc} */
     @Override
-    public NDList processInput(TranslatorContext ctx, Image input) throws Exception {
+    public NDList processInput(TranslatorContext ctx, Image input) {
         NDArray img = input.toNDArray(ctx.getNDManager());
         int[] hw = resize32(input.getHeight(), input.getWidth());
         img = NDImageUtils.resize(img, hw[1], hw[0]);

@@ -15,6 +15,7 @@ package ai.djl.serving.http;
 import ai.djl.ModelException;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.serving.util.NettyUtils;
+import ai.djl.serving.wlm.Endpoint;
 import ai.djl.serving.wlm.ModelInfo;
 import ai.djl.serving.wlm.ModelManager;
 import io.netty.channel.ChannelHandlerContext;
@@ -45,8 +46,12 @@ public class ManagementRequestHandler extends HttpRequestHandler {
     private static final String BATCH_SIZE_PARAMETER = "batch_size";
     /** HTTP Parameter "model_name". */
     private static final String MODEL_NAME_PARAMETER = "model_name";
-    /** HTTP Parameter "model_name". */
+    /** HTTP Parameter "model_version". */
+    private static final String MODEL_VERSION_PARAMETER = "model_version";
+    /** HTTP Parameter "engine_name". */
     private static final String ENGINE_NAME_PARAMETER = "engine_name";
+    /** HTTP Parameter "gpu_id". */
+    private static final String GPU_ID_PARAMETER = "gpu_id";
     /** HTTP Parameter "max_batch_delay". */
     private static final String MAX_BATCH_DELAY_PARAMETER = "max_batch_delay";
     /** HTTP Parameter "max_idle_time". */
@@ -88,12 +93,18 @@ public class ManagementRequestHandler extends HttpRequestHandler {
             throw new MethodNotAllowedException();
         }
 
+        String modelName = segments[2];
+        String version = null;
+        if (segments.length > 3) {
+            version = segments[3];
+        }
+
         if (HttpMethod.GET.equals(method)) {
-            handleDescribeModel(ctx, segments[2]);
+            handleDescribeModel(ctx, modelName, version);
         } else if (HttpMethod.PUT.equals(method)) {
-            handleScaleModel(ctx, decoder, segments[2]);
+            handleScaleModel(ctx, decoder, modelName, version);
         } else if (HttpMethod.DELETE.equals(method)) {
-            handleUnregisterModel(ctx, segments[2]);
+            handleUnregisterModel(ctx, modelName, version);
         } else {
             throw new MethodNotAllowedException();
         }
@@ -110,9 +121,9 @@ public class ManagementRequestHandler extends HttpRequestHandler {
         }
 
         ModelManager modelManager = ModelManager.getInstance();
-        Map<String, ModelInfo> models = modelManager.getModels();
+        Map<String, Endpoint> endpoints = modelManager.getEndpoints();
 
-        List<String> keys = new ArrayList<>(models.keySet());
+        List<String> keys = new ArrayList<>(endpoints.keySet());
         Collections.sort(keys);
         ListModelsResponse list = new ListModelsResponse();
 
@@ -125,17 +136,18 @@ public class ManagementRequestHandler extends HttpRequestHandler {
 
         for (int i = pageToken; i < last; ++i) {
             String modelName = keys.get(i);
-            ModelInfo model = models.get(modelName);
-            list.addModel(modelName, model.getModelUrl());
+            for (ModelInfo m : endpoints.get(modelName).getModels()) {
+                list.addModel(modelName, m.getModelUrl());
+            }
         }
 
         NettyUtils.sendJsonResponse(ctx, list);
     }
 
-    private void handleDescribeModel(ChannelHandlerContext ctx, String modelName)
+    private void handleDescribeModel(ChannelHandlerContext ctx, String modelName, String version)
             throws ModelNotFoundException {
         ModelManager modelManager = ModelManager.getInstance();
-        DescribeModelResponse resp = modelManager.describeModel(modelName);
+        DescribeModelResponse resp = modelManager.describeModel(modelName, version);
         NettyUtils.sendJsonResponse(ctx, resp);
     }
 
@@ -149,6 +161,8 @@ public class ManagementRequestHandler extends HttpRequestHandler {
         if (modelName == null || modelName.isEmpty()) {
             modelName = ModelInfo.inferModelNameFromUrl(modelUrl);
         }
+        String version = NettyUtils.getParameter(decoder, MODEL_VERSION_PARAMETER, null);
+        int gpuId = NettyUtils.getIntParameter(decoder, GPU_ID_PARAMETER, -1);
         String engineName = NettyUtils.getParameter(decoder, ENGINE_NAME_PARAMETER, null);
         int batchSize = NettyUtils.getIntParameter(decoder, BATCH_SIZE_PARAMETER, 1);
         int maxBatchDelay = NettyUtils.getIntParameter(decoder, MAX_BATCH_DELAY_PARAMETER, 100);
@@ -162,13 +176,19 @@ public class ManagementRequestHandler extends HttpRequestHandler {
         final ModelManager modelManager = ModelManager.getInstance();
         CompletableFuture<ModelInfo> future =
                 modelManager.registerModel(
-                        modelName, modelUrl, engineName, batchSize, maxBatchDelay, maxIdleTime);
+                        modelName,
+                        version,
+                        modelUrl,
+                        engineName,
+                        gpuId,
+                        batchSize,
+                        maxBatchDelay,
+                        maxIdleTime);
         CompletableFuture<Void> f =
                 future.thenAccept(
-                        modelInfo ->
+                        m ->
                                 modelManager.triggerModelUpdated(
-                                        modelInfo
-                                                .scaleWorkers(initialWorkers, initialWorkers)
+                                        m.scaleWorkers(initialWorkers, initialWorkers)
                                                 .configurePool(maxIdleTime, maxBatchDelay)
                                                 .configureModelBatch(batchSize)));
 
@@ -187,10 +207,10 @@ public class ManagementRequestHandler extends HttpRequestHandler {
                 });
     }
 
-    private void handleUnregisterModel(ChannelHandlerContext ctx, String modelName)
+    private void handleUnregisterModel(ChannelHandlerContext ctx, String modelName, String version)
             throws ModelNotFoundException {
         ModelManager modelManager = ModelManager.getInstance();
-        if (!modelManager.unregisterModel(modelName)) {
+        if (!modelManager.unregisterModel(modelName, version)) {
             throw new ModelNotFoundException("Model not found: " + modelName);
         }
         String msg = "Model \"" + modelName + "\" unregistered";
@@ -198,12 +218,11 @@ public class ManagementRequestHandler extends HttpRequestHandler {
     }
 
     private void handleScaleModel(
-            ChannelHandlerContext ctx, QueryStringDecoder decoder, String modelName)
+            ChannelHandlerContext ctx, QueryStringDecoder decoder, String modelName, String version)
             throws ModelNotFoundException {
         try {
-
             ModelManager modelManager = ModelManager.getInstance();
-            ModelInfo modelInfo = modelManager.getModels().get(modelName);
+            ModelInfo modelInfo = modelManager.getModel(modelName, version, false);
             if (modelInfo == null) {
                 throw new ModelNotFoundException("Model not found: " + modelName);
             }

@@ -30,6 +30,7 @@
         "resize": true,
         "numLayers": 50,
         "outSize": 10,
+        "blockFactory": "ai.djl.basicmodelzoo.cv.classification.ResnetBlockFactory",
         "imageShape": [
           3,
           32,
@@ -66,6 +67,7 @@
         "resize": true,
         "numLayers": 50,
         "outSize": 10,
+        "blockFactory": "ai.djl.basicmodelzoo.cv.classification.ResnetBlockFactory",
         "imageShape": [
           3,
           32,

@@ -28,7 +28,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Batchifier;
@@ -102,7 +101,7 @@ public final class ObjectDetectionWithTensorflowSavedModel {
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<Image, DetectedObjects> model = ModelZoo.loadModel(criteria);
+        try (ZooModel<Image, DetectedObjects> model = criteria.loadModel();
                 Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
             DetectedObjects detection = predictor.predict(img);
             saveBoundingBoxImage(img, detection);

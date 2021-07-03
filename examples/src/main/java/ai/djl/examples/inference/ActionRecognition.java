@@ -19,7 +19,6 @@ import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -60,7 +59,7 @@ public final class ActionRecognition {
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<Image, Classifications> inception = ModelZoo.loadModel(criteria)) {
+        try (ZooModel<Image, Classifications> inception = criteria.loadModel()) {
             try (Predictor<Image, Classifications> action = inception.newPredictor()) {
                 return action.predict(img);
             }

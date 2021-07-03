@@ -37,7 +37,6 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
@@ -140,7 +139,7 @@ public final class TrainResnetWithCifar10 {
             } else {
                 builder.optFilters(options);
             }
-            Model model = ModelZoo.loadModel(builder.build());
+            Model model = builder.build().loadModel();
             SequentialBlock newBlock = new SequentialBlock();
             SymbolBlock block = (SymbolBlock) model.getBlock();
             block.removeLastBlock();
@@ -166,7 +165,7 @@ public final class TrainResnetWithCifar10 {
                 builder.optFilters(options);
             }
             // load pre-trained imperative ResNet50 from DJL model zoo
-            return ModelZoo.loadModel(builder.build());
+            return builder.build().loadModel();
         } else {
             // construct new ResNet50 without pre-trained weights
             Model model = Model.newInstance("resnetv1");
@@ -204,7 +203,7 @@ public final class TrainResnetWithCifar10 {
                         .optModelName("resnetv1")
                         .build();
 
-        try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
+        try (ZooModel<Image, Classifications> model = criteria.loadModel();
                 Predictor<Image, Classifications> predictor = model.newPredictor()) {
             return predictor.predict(img);
         }

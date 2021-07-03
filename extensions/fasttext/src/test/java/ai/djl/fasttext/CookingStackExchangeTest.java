@@ -15,11 +15,11 @@ package ai.djl.fasttext;
 import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
 import ai.djl.basicdataset.nlp.CookingStackExchange;
-import ai.djl.fasttext.zoo.FtModelZoo;
 import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.TrainingResult;
@@ -69,12 +69,15 @@ public class CookingStackExchangeTest {
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
             throw new SkipException("fastText is not supported on windows");
         }
-        try (ZooModel<String, Classifications> model =
-                FtModelZoo.COOKING_STACKEXCHANGE.loadModel()) {
+        Criteria<String, Classifications> criteria =
+                Criteria.builder()
+                        .setTypes(String.class, Classifications.class)
+                        .optArtifactId("ai.djl.fasttext:cooking_stackexchange")
+                        .build();
+        try (ZooModel<String, Classifications> model = criteria.loadModel()) {
+            String input = "Which baking dish is best to bake a banana bread ?";
             FtModel ftModel = (FtModel) model.getWrappedModel();
-            Classifications result =
-                    ftModel.classify("Which baking dish is best to bake a banana bread ?", 8);
-
+            Classifications result = ftModel.classify(input, 8);
             Assert.assertEquals(result.item(0).getClassName(), "bread");
         }
     }
@@ -84,8 +87,12 @@ public class CookingStackExchangeTest {
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
             throw new SkipException("fastText is not supported on windows");
         }
-        try (ZooModel<String, Classifications> model =
-                        FtModelZoo.COOKING_STACKEXCHANGE.loadModel();
+        Criteria<String, Classifications> criteria =
+                Criteria.builder()
+                        .setTypes(String.class, Classifications.class)
+                        .optArtifactId("ai.djl.fasttext:cooking_stackexchange")
+                        .build();
+        try (ZooModel<String, Classifications> model = criteria.loadModel();
                 NDManager manager = NDManager.newBaseManager()) {
 
             FtModel ftModel = (FtModel) model.getWrappedModel();

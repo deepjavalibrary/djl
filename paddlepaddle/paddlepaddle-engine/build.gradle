@@ -16,6 +16,8 @@ processResources {
         def url = "https://publish.djl.ai/paddlepaddle-${paddlepaddle_version}/jnilib"
         def files = [
                 "${djl_version}/linux-x86_64/cpu/libdjl_paddle.so"         : "linux-x86_64/cpu/libdjl_paddle.so",
+                "${djl_version}/linux-x86_64/cu101/libdjl_paddle.so"       : "linux-x86_64/cu101/libdjl_paddle.so",
+                "${djl_version}/linux-x86_64/cu102/libdjl_paddle.so"       : "linux-x86_64/cu102/libdjl_paddle.so",
                 "${djl_version}/osx-x86_64/cpu/libdjl_paddle.dylib"        : "osx-x86_64/cpu/libdjl_paddle.dylib",
                 "${djl_version}/win-x86_64/cpu/djl_paddle.dll"             : "win-x86_64/cpu/djl_paddle.dll"
         ]

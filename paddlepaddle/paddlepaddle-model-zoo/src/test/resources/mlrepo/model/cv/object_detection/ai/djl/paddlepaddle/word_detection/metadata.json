@@ -22,6 +22,9 @@
         "flavor": "mobile",
         "algorithm": "db"
       },
+      "arguments": {
+        "translatorFactory": "ai.djl.paddlepaddle.zoo.cv.objectdetection.PpWordDetectionTranslatorFactory"
+      },
       "files": {
         "model": {
           "uri": "0.0.1/det_db.zip",

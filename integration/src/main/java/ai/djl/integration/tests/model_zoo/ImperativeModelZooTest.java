@@ -25,7 +25,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
@@ -53,7 +52,7 @@ public class ImperativeModelZooTest {
                         .optFilter("layers", "50")
                         .optFilter("dataset", "cifar10")
                         .build();
-        try (Model model = ModelZoo.loadModel(criteria)) {
+        try (Model model = criteria.loadModel()) {
             Assert.assertEquals(model.describeInput().values().get(0), new Shape(1, 3, 32, 32));
             Assert.assertEquals(model.describeOutput().values().get(0), new Shape(1, 10));
         }
@@ -64,7 +63,7 @@ public class ImperativeModelZooTest {
                         .setTypes(Image.class, DetectedObjects.class)
                         .optGroupId(BasicModelZoo.GROUP_ID)
                         .build();
-        try (Model model = ModelZoo.loadModel(ssdCriteria)) {
+        try (Model model = ssdCriteria.loadModel()) {
             Assert.assertEquals(model.describeInput().values().get(0), new Shape(32, 3, 256, 256));
             Assert.assertEquals(model.describeOutput().values().get(0), new Shape(1, 5444, 4));
             Assert.assertEquals(model.describeOutput().values().get(1), new Shape(32, 5444, 2));
