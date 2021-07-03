@@ -30,8 +30,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,13 +50,11 @@ public class FolderScanPluginManager implements PluginManager {
 
     private static final Logger logger = LoggerFactory.getLogger(FolderScanPluginManager.class);
 
-    private static Class<?>[] pluginInterfaces = {RequestHandler.class};
-
     private ConfigManager configManager;
 
     private Map<String, PluginMetaData> pluginRegistry;
 
-    private Map<Class<?>, Set<Object>> componentRegistry;
+    private ComponentRegistry componentRegistry;
 
     /**
      * Constructs a {@code PluginManager} instance.
@@ -68,7 +64,7 @@ public class FolderScanPluginManager implements PluginManager {
      */
     public FolderScanPluginManager(ConfigManager configManager) {
         this.configManager = configManager;
-        this.componentRegistry = new HashMap<>();
+        this.componentRegistry = new ComponentRegistry();
     }
 
     /**
@@ -95,42 +91,43 @@ public class FolderScanPluginManager implements PluginManager {
                         .collect(Collectors.toMap(PluginMetaData::getName, i -> i));
 
         // phase 2: initialize components
-        for (PluginMetaData plugin: pluginRegistry.values() ) {
-        	if (pluginRegistry.keySet().containsAll(plugin.getDependencies())) {
-        		try {
-	            	for (String handlerClassName: plugin.getComponents()) {
-	            		initializeComponent(ucl, plugin, handlerClassName);
-	            	}
-	            	plugin.changeState(Lifecycle.INITIALIZED);
-        		} catch (Exception ex) {
-                    plugin.changeState(Lifecycle.FAILED,"failed to initialize plugin; caused by "+ex.getMessage());
+        for (PluginMetaData plugin : pluginRegistry.values()) {
+            if (pluginRegistry.keySet().containsAll(plugin.getDependencies())) {
+                try {
+                    for (String handlerClassName : plugin.getComponentNames()) {
+                        initializeComponent(ucl, plugin, handlerClassName);
+                    }
+                    plugin.changeState(Lifecycle.INITIALIZED);
+                } catch (Exception ex) {
+                    plugin.changeState(
+                            Lifecycle.FAILED,
+                            "failed to initialize plugin; caused by " + ex.getMessage());
                     logger.error("failed to initialize plugin {}", plugin.getName(), ex);
-        		}
-        	} else {
-        		plugin.changeState(Lifecycle.FAILED,"required dependencies not found");
-        	}
+                }
+            } else {
+                plugin.changeState(Lifecycle.FAILED, "required dependencies not found");
+            }
         }
-        
+
         // phase 3: set active
-        
-        
+        pluginRegistry
+                .values()
+                .forEach(plugin -> plugin.changeState(Lifecycle.ACTIVE, "plugin ready"));
+
         logger.info("{} plug-ins found and loaded.", pluginRegistry.size());
     }
 
     @SuppressWarnings("rawtypes")
-    protected void initializeComponent(ClassLoader ucl, PluginMetaData plugin, String handlerClassName)  throws ReflectiveOperationException,SecurityException,IntrospectionException{
-            @SuppressWarnings("unchecked")
-            Class<? extends RequestHandler> handlerClass = (Class<? extends RequestHandler>) ucl.loadClass(handlerClassName);
-            RequestHandler<?> handler = handlerClass.getConstructor(new Class<?>[] {}).newInstance();
-            injectDependenciesIntoComponent(handler);
-            
-            for (Class<?> interfaceClass : pluginInterfaces) {
-            	if (interfaceClass.isAssignableFrom(handlerClass)) {
-	                componentRegistry
-	                .computeIfAbsent(interfaceClass, k -> new HashSet<>())
-	                .add(handler);
-            	}
-            }            
+    protected void initializeComponent(
+            ClassLoader ucl, PluginMetaData plugin, String handlerClassName)
+            throws ReflectiveOperationException, IntrospectionException {
+        @SuppressWarnings("unchecked")
+        Class<? extends RequestHandler> handlerClass =
+                (Class<? extends RequestHandler>) ucl.loadClass(handlerClassName);
+        RequestHandler<?> handler = handlerClass.getConstructor(new Class<?>[] {}).newInstance();
+        injectDependenciesIntoComponent(handler);
+
+        componentRegistry.register(plugin, handler);
     }
 
     /**
@@ -177,9 +174,7 @@ public class FolderScanPluginManager implements PluginManager {
     @SuppressWarnings("unchecked")
     @Override
     public <T> Set<T> findImplementations(Class<T> pluginInterface) {
-        return (Set<T>)
-                Collections.unmodifiableSet(
-                        componentRegistry.getOrDefault(pluginInterface, new HashSet<>()));
+        return componentRegistry.findImplementations(pluginInterface);
     }
 
     private URL[] listPluginJars() throws IOException {

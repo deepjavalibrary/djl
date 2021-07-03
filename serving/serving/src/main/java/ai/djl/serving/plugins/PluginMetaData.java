@@ -13,10 +13,8 @@
 package ai.djl.serving.plugins;
 
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,13 +38,11 @@ public class PluginMetaData {
     };
 
     private String name;
-    private LocalDateTime loadTime;
     private URL url;
     private List<String> componentNames;
     private List<String> dependencies;
     private Lifecycle state;
     private String error;
-    //   private List<Object> componentRegistry;
 
     /**
      * constructs plug-in meta-info.
@@ -65,7 +61,6 @@ public class PluginMetaData {
         this.dependencies = dependencies;
     }
 
-
     /**
      * Returns the name of the plug-in.
      *
@@ -80,7 +75,7 @@ public class PluginMetaData {
      *
      * @return the classnames of the registered-components.
      */
-    public List<String> getComponents() {
+    public List<String> getComponentNames() {
         return Collections.unmodifiableList(componentNames);
     }
 
@@ -111,15 +106,14 @@ public class PluginMetaData {
      */
     public void changeState(Lifecycle state, String logMessage) {
         this.state = state;
-        
-        if (state==Lifecycle.FAILED) {
-        	error=logMessage;
-        	logger.warn("plugin {} changed state to {} reason: {}", name, state, logMessage);
+
+        if (state == Lifecycle.FAILED) {
+            error = logMessage;
+            logger.warn("plugin {} changed state to {} reason: {}", name, state, logMessage);
         } else {
-        	logger.debug("plugin {} changed state to {} reason: {}", name, state, logMessage);
+            logger.debug("plugin {} changed state to {} reason: {}", name, state, logMessage);
         }
     }
-
 
     /**
      * Access the url-property.
@@ -139,11 +133,12 @@ public class PluginMetaData {
         return dependencies;
     }
 
-	/**
-	 * access the error-property. 
-	 * @return the error of this class.
-	 */
-	public String getError() {
-		return error;
-	}
+    /**
+     * access the error-property.
+     *
+     * @return the error of this class.
+     */
+    public String getError() {
+        return error;
+    }
 }
