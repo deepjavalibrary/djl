@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.nn;
 
+import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
@@ -36,6 +37,7 @@ import ai.djl.nn.convolutional.Conv3d;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.norm.Dropout;
+import ai.djl.nn.norm.LayerNorm;
 import ai.djl.nn.recurrent.GRU;
 import ai.djl.nn.recurrent.LSTM;
 import ai.djl.nn.recurrent.RNN;
@@ -194,6 +196,60 @@ public class BlockCoreTest {
                     NDManager manager = trainer.getManager();
                     NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
                     NDArray expected = manager.create(new float[] {-1, -1, 1, 1}, inputShape);
+                    NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                    Assertions.assertAlmostEquals(result, expected);
+                    testEncode(manager, block);
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("try")
+    @Test
+    public void testLayerNorm() throws IOException, MalformedModelException {
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+
+        Block block = LayerNorm.builder().build();
+        try (Model model = Model.newInstance("model", Device.cpu(), "PyTorch")) {
+            model.setBlock(block);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                try (GradientCollector collector = trainer.newGradientCollector()) {
+                    Shape inputShape = new Shape(2, 2);
+                    trainer.initialize(inputShape);
+
+                    NDManager manager = trainer.getManager();
+                    NDArray data = manager.create(new float[] {1, 3, 2, 4}, inputShape);
+                    NDArray expected = manager.create(new float[] {-1, 1, -1, 1}, inputShape);
+                    NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                    Assertions.assertAlmostEquals(result, expected);
+                    testEncode(manager, block);
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("try")
+    @Test
+    public void test2LayerNorm() throws IOException, MalformedModelException {
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+
+        Block block = LayerNorm.builder().axis(2, 3).build();
+        try (Model model = Model.newInstance("model", Device.cpu(), "PyTorch")) {
+            model.setBlock(block);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                try (GradientCollector collector = trainer.newGradientCollector()) {
+                    Shape inputShape = new Shape(1, 2, 1, 2);
+                    trainer.initialize(inputShape);
+
+                    NDManager manager = trainer.getManager();
+                    NDArray data = manager.create(new float[] {1, 3, 2, 4}, inputShape);
+                    NDArray expected = manager.create(new float[] {-1, 1, -1, 1}, inputShape);
                     NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                     Assertions.assertAlmostEquals(result, expected);
                     testEncode(manager, block);

@@ -296,6 +296,8 @@ public interface NDArrayEx {
 
     NDList dropout(NDArray input, float rate, boolean training);
 
+    NDList layerNorm(NDArray input, Shape normalizedShape, NDArray gamma, NDArray beta, float eps);
+
     NDList batchNorm(
             NDArray input,
             NDArray runningMean,

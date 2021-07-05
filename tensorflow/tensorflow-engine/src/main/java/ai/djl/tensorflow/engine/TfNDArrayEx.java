@@ -380,6 +380,12 @@ public class TfNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    public NDList layerNorm(
+            NDArray input, Shape normalizedShape, NDArray gamma, NDArray beta, float eps) {
+        throw new UnsupportedOperationException();
+    }
+    /** {@inheritDoc} */
+    @Override
     public NDList batchNorm(
             NDArray input,
             NDArray runningMean,

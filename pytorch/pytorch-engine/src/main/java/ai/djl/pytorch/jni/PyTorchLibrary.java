@@ -386,6 +386,13 @@ final class PyTorchLibrary {
 
     native long torchNNDropout(long inputHandle, double probability, boolean isTrain);
 
+    native long torchNNLayerNorm(
+            long inputHandle,
+            long[] normalizedShape,
+            long weigthHandle,
+            long biasHandle,
+            double eps);
+
     native long torchNNBatchNorm(
             long inputHandle,
             long runningMeanHandle,

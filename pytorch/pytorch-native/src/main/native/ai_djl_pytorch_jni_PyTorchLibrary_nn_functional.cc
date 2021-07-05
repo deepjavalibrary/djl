@@ -144,6 +144,25 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNBatchNorm(
   API_END_RETURN()
 }
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLayerNorm(
+    JNIEnv* env, jobject jthis, jlong jinput, jlongArray jnormalizedshape, jlong jweight, jlong jbias, jdouble jeps) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
+  const auto normalized_shape_vec = djl::utils::jni::GetVecFromJLongArray(env, jnormalizedshape);
+  torch::Tensor weight = {};
+  torch::Tensor bias = {};
+  if (jweight != djl::utils::jni::NULL_PTR) {
+    weight = *reinterpret_cast<torch::Tensor*>(jweight);
+  }
+  if (jbias != djl::utils::jni::NULL_PTR) {
+    bias = *reinterpret_cast<torch::Tensor*>(jbias);
+  }
+  const auto* result_ptr = new torch::Tensor(torch::nn::functional::layer_norm(*tensor_ptr,
+      torch::nn::functional::LayerNormFuncOptions(normalized_shape_vec).weight(weight).bias(bias).eps(jeps)));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNDropout(
     JNIEnv* env, jobject jthis, jlong jinput, jdouble probability, jboolean jtraining) {
   API_BEGIN()
