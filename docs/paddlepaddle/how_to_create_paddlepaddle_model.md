@@ -147,7 +147,7 @@ Criteria<NDList, NDList> criteria = Criteria.builder()
         .optModelName("your folder name insize zip")
         .build();
 
-ZooModel<NDList, NDList> model = ModelZoo.load(criteria);
+ZooModel<NDList, NDList> model = criteria.loadModel();
 // run inference
 Predictor<NDList, NDList> predictor = model.newPredictor();
 NDManager manager = NDManager.newBaseManager()
