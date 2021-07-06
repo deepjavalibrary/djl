@@ -49,9 +49,8 @@ public final class SuperResolution {
         ImageFactory imageFactory = ImageFactory.getInstance();
 
         List<Image> inputImages =
-                Arrays.asList(
-                        imageFactory.fromFile(Paths.get(imagePath + "fox.png")),
-                        imageFactory.fromFile(Paths.get(imagePath + "monkey.png")));
+                Arrays.asList(imageFactory.fromFile(Paths.get(imagePath + "fox.png")));
+
         List<Image> enhancedImages = enhance(inputImages);
 
         if (enhancedImages == null) {
@@ -84,13 +83,14 @@ public final class SuperResolution {
 
         try (NDManager manager = Engine.getInstance().newBaseManager()) {
             for (int i = 0; i < input.size(); i++) {
-                int width = input.get(i).getWidth();
-                int height = input.get(i).getHeight();
+                int scale = 4;
+                int width = scale * input.get(i).getWidth();
+                int height = scale * input.get(i).getHeight();
 
                 NDArray left = input.get(i).toNDArray(manager);
                 NDArray right = generated.get(i).toNDArray(manager);
 
-                left = NDImageUtils.resize(left, 4 * width, 4 * height);
+                left = NDImageUtils.resize(left, width, height, Image.Interpolation.BICUBIC);
                 right = right.toType(DataType.FLOAT32, false);
 
                 stitches.add(NDArrays.concat(new NDList(left, right), 1));
