@@ -11,17 +11,17 @@ The minimum dependencies for the ONNX Runtime Engine are:
 #### gradle
 
 ```
-runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine:0.11.0"
+runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine:0.12.0"
 ```
 
 ```
-runtimeOnly "ai.djl.dlr:dlr-engine:0.11.0"
+runtimeOnly "ai.djl.dlr:dlr-engine:0.12.0"
 ```
 
 To use it along with Apache MXNet for additional API support, add the following two dependencies:
 
 ```
-runtimeOnly "ai.djl.mxnet:mxnet-engine:0.11.0"
+runtimeOnly "ai.djl.mxnet:mxnet-engine:0.12.0"
 runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.8.0"
 ```
 
