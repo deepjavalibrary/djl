@@ -87,7 +87,7 @@ public final class PpEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public Model newModel(String name, Device device) {
-        return new PpModel(name, newBaseManager(device));
+        return new PpModel(name, device, newBaseManager(device));
     }
 
     /** {@inheritDoc} */

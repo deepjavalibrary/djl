@@ -13,6 +13,7 @@
 package ai.djl.paddlepaddle.engine;
 
 import ai.djl.BaseModel;
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
@@ -29,15 +30,20 @@ import java.util.Map;
 public class PpModel extends BaseModel {
 
     private PaddlePredictor paddlePredictor;
+    private Device device;
 
     /**
      * Constructs a new Model on a given device.
      *
      * @param name the model name
+     * @param device the device to load the model
      * @param manager the {@link NDManager} to holds the NDArray
      */
-    PpModel(String name, NDManager manager) {
+    PpModel(String name, Device device, NDManager manager) {
         super(name);
+        // Paddle doesn't support detection of CUDA capability, use has to explicitly
+        // specify device if want to use GPU.
+        this.device = device == null ? Device.cpu() : device;
         this.manager = manager;
         dataType = DataType.FLOAT32;
         manager.setName("PpModel");
@@ -67,7 +73,7 @@ public class PpModel extends BaseModel {
                 throw new FileNotFoundException("no __model__ or model file found in: " + modelDir);
             }
         }
-        long config = JniUtils.createConfig(modelFiles[0], modelFiles[1], manager.getDevice());
+        long config = JniUtils.createConfig(modelFiles[0], modelFiles[1], device);
         if (System.getenv().containsKey("PADDLE_ENABLE_MKLDNN")) {
             JniUtils.enableMKLDNN(config);
         }
