@@ -230,9 +230,14 @@ public final class LibUtils {
         try {
             String libName = System.mapLibraryName(NATIVE_LIB_NAME);
             Path cacheFolder = Utils.getEngineCacheDir("paddle");
-            logger.debug("Using cache dir: {}", cacheFolder);
-
-            Path dir = cacheFolder.resolve(platform.getVersion() + platform.getClassifier());
+            String version = platform.getVersion();
+            String flavor = platform.getFlavor();
+            if (flavor.isEmpty()) {
+                flavor = "cpu";
+            }
+            String classifier = platform.getClassifier();
+            Path dir = cacheFolder.resolve(version + '-' + flavor + '-' + classifier);
+            logger.debug("Using cache dir: {}", dir);
             Path path = dir.resolve(libName);
             if (Files.exists(path)) {
                 return path.toAbsolutePath().toString();
@@ -241,9 +246,18 @@ public final class LibUtils {
             tmp = Files.createTempDirectory(cacheFolder, "tmp");
             for (String file : platform.getLibraries()) {
                 String libPath = "/native/lib/" + file;
-                try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
-                    logger.info("Extracting {} to cache ...", file);
-                    Files.copy(is, tmp.resolve(file), StandardCopyOption.REPLACE_EXISTING);
+                logger.info("Extracting {} to cache ...", file);
+                if (file.endsWith(".gz")) {
+                    // FIXME: temporary workaround for paddlepaddle-native-cu102:2.0.2
+                    String f = file.substring(0, file.length() - 3);
+                    try (InputStream is =
+                            new GZIPInputStream(LibUtils.class.getResourceAsStream(libPath))) {
+                        Files.copy(is, tmp.resolve(f), StandardCopyOption.REPLACE_EXISTING);
+                    }
+                } else {
+                    try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
+                        Files.copy(is, tmp.resolve(file), StandardCopyOption.REPLACE_EXISTING);
+                    }
                 }
             }
 
@@ -291,8 +305,8 @@ public final class LibUtils {
 
         String libName = System.mapLibraryName(NATIVE_LIB_NAME);
         Path cacheDir = Utils.getEngineCacheDir("paddle");
-        logger.debug("Using cache dir: {}", cacheDir);
         Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
+        logger.debug("Using cache dir: {}", dir);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {
             return path.toAbsolutePath().toString();

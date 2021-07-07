@@ -117,9 +117,15 @@ public final class LibUtils {
         try {
             String libName = System.mapLibraryName(LIB_NAME);
             Path cacheFolder = Utils.getEngineCacheDir("tflite");
-            logger.debug("Using cache dir: {}", cacheFolder);
+            String version = platform.getVersion();
+            String flavor = platform.getFlavor();
+            if (flavor.isEmpty()) {
+                flavor = "cpu";
+            }
+            String classifier = platform.getClassifier();
+            Path dir = cacheFolder.resolve(version + '-' + flavor + '-' + classifier);
+            logger.debug("Using cache dir: {}", dir);
 
-            Path dir = cacheFolder.resolve(platform.getVersion() + platform.getClassifier());
             Path path = dir.resolve(libName);
             if (Files.exists(path)) {
                 return path.toAbsolutePath().toString();
