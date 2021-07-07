@@ -86,6 +86,8 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [paddlepaddle-native-cpu(osx-x86_64)](../../paddlepaddle/paddlepaddle-engine/README.md#macos) | Contains PaddlePaddle native library for macOS |
 | | [paddlepaddle-native-cpu(linux-x86_64)](../../paddlepaddle/paddlepaddle-engine/README.md#linux) | Contains PaddlePaddle native library for Linux |
 | | [paddlepaddle-native-cpu(win-x86_64)](../../paddlepaddle/paddlepaddle-engine/README.md#windows) | Contains PaddlePaddle native library for Windows |
+| | [paddlepaddle-native-cu102(linux-x86_64)](../../paddlepaddle/paddlepaddle-engine/README.md#Linux-GPU) | Contains PaddlePaddle native library for Linux with CUDA 10.2 |
+| | [paddlepaddle-native-cu101(linux-x86_64)](../../paddlepaddle/paddlepaddle-engine/README.md#Linux-GPU) | Contains PaddlePaddle native library for Linux with CUDA 10.1 |
 | | | |
 | [ai.djl.onnxruntime](https://search.maven.org/search?q=g:ai.djl.onnxruntime) | [onnxruntime-engine](../../onnxruntime/onnxruntime-engine/README.md#installation) | ONNX Runtime engine adapter |
 | | onnxruntime-api(deprecated) | Please use com.microsoft.onnxruntime:onnxruntime instead |
