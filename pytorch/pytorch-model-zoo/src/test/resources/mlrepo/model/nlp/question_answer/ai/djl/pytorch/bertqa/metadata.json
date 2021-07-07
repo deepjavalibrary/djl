@@ -22,6 +22,9 @@
         "backbone": "bert",
         "dataset": "SQuAD"
       },
+      "arguments": {
+        "translatorFactory": "ai.djl.pytorch.zoo.nlp.qa.PtBertQATranslatorFactory"
+      },
       "files": {
         "vocabulary": {
           "uri": "0.0.1/bert-base-uncased-vocab.txt.gz",
