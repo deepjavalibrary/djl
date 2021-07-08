@@ -205,6 +205,11 @@ public final class LibUtils {
             }
 
             if (matching != null) {
+                // in case using native-cpu package on GPU machine, force set fallback to true
+                String flavor = matching.getFlavor();
+                if (flavor.isEmpty() || "cpu".equals(flavor)) {
+                    fallback.set(true);
+                }
                 return loadLibraryFromClasspath(matching);
             }
 
