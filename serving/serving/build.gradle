@@ -36,7 +36,7 @@ jar {
 }
 
 application {
-    mainClassName = System.getProperty("main", "ai.djl.serving.ModelServer")
+    getMainClass().set(System.getProperty("main", "ai.djl.serving.ModelServer"))
 }
 
 run {

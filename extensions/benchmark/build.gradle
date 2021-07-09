@@ -42,7 +42,7 @@ dependencies {
 }
 
 application {
-    mainClassName = System.getProperty("main", "ai.djl.benchmark.Benchmark")
+    getMainClass().set(System.getProperty("main", "ai.djl.benchmark.Benchmark"))
 }
 
 run {

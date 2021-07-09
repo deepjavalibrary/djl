@@ -29,7 +29,7 @@ dependencies {
 }
 
 application {
-    mainClassName = System.getProperty("main", "ai.djl.examples.inference.ObjectDetection")
+    getMainClass().set(System.getProperty("main", "ai.djl.examples.inference.ObjectDetection"))
 }
 
 run {
