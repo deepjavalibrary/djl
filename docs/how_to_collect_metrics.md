@@ -29,11 +29,15 @@ URL url = new URL("https://s3.amazonaws.com/images.pdpics.com/preview/3033-bicyc
 Image img = ImageFactory.getInstance().fromURL(url);
 
 // load the model for SingleShotDetector
-Map<String, String> criteria = new HashMap<>();
-criteria.put("size", "512");
-criteria.put("backbone", "resnet50");
-criteria.put("dataset", "voc");
-ZooModel<Image, DetectedObjects> model = MxModelZoo.SSD.loadModel(criteria);
+Criteria<Image, DetectedObjects> criteria = Criteria.builder()
+    .setTypes(Image.class, DetectedObjects.class)
+    .optArtifactId("ssd")
+    .optFilter("backbone", "resnet50")
+    .optFilter("dataset", "voc")
+    .optFilter("size", "512")
+    .build();
+
+ZooModel<Image, DetectedObjects> model = criteria.loadModel();
 Predictor<Image, DetectedObjects> predictor = model.newPredictor();
 
 // instantiate metrics so that Predictor can record its performance

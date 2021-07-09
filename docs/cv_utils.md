@@ -50,7 +50,11 @@ to demonstrate below.
 
 ```java
 // Load Object Detection Model
-ZooModel<Image, DetectedObjects> model = MxModelZoo.SSD.loadModel();
+Criteria<Image, DetectedObjects> criteria = Criteria.builder()
+        .setTypes(Image.class, DetectedObjects.class)
+        .optArtifactId("ssd")
+        .build();
+ZooModel<Image, DetectedObjects> model = criteria.loadModel();
 Predictor<Image, DetectedObjects> predictor = model.newPredictor();
 
 // Detect Objects
@@ -70,7 +74,10 @@ Here, we'll use the `SimplePose` model from the model zoo!
 
 ```java
 // Load Pose Detection Model
-ZooModel<Image, Joints> model = MxModelZoo.SIMPLE_POSE.loadModel();
+Criteria<Image, Joints> criteria = Criteria.builder()
+        .setTypes(Image.class, Joints.class)
+        .optArtifactId("simple_pose")
+        .build();
 Predictor<Image, Joints> predictor = model.newPredictor();
 
 // Detect Joints

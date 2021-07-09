@@ -27,7 +27,7 @@ You can pull the MXNet engine from the central Maven repository by including the
 <dependency>
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-model-zoo</artifactId>
-    <version>0.11.0</version>
+    <version>0.12.0</version>
 </dependency>
 ```
 
@@ -57,12 +57,16 @@ model found is returned. *ModelNotFoundException* will be thrown if no matching 
 The following is an example of the criteria to find a Resnet50-v1 model that has been trained on the imagenet dataset:
 
 ```java
-    Map<String, String> criteria = new HashMap<>();
-    criteria.put("layers", "50");
-    criteria.put("flavor", "v1");
-    criteria.put("dataset", "imagenet");
+Criteria<Image, Classifications> criteria = Criteria.builder()
+        .setTypes(Image.class, Classifications.class)
+        .optArtifactId("resnet")
+        .optFilter("layers", "50")
+        .optFilter("flavor", "v1")
+        .optFilter("dataset", "imagenet")
+        .optDevice(device)
+        .build();
 
-    ZooModel<Image, Classifications> model = MxModelZoo.RESNET.loadModel(criteria, device);
+ZooModel<Image, Classifications> model = criteria.loadModel();
 ```
 
 ### List of search criteria for each model
