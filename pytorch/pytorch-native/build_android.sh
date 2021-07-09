@@ -10,7 +10,7 @@ elif [[ -n $(command -v sysctl) ]]; then
     NUM_PROC=$(sysctl -n hw.ncpu)
 fi
 
-VERSION=1.8.1
+VERSION=1.9.0
 if [[ ! -d libtorch_android/"$1" ]]; then
     if [[ $1 != "armeabi-v7a" ]] && [[ $1 != "arm64-v8a" ]] && [[ $1 != "x86" ]] && [[ $1 != "x86_64" ]]; then
         echo "$1 is not supported."
