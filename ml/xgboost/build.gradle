@@ -8,7 +8,7 @@ configurations {
 
 dependencies {
     api project(":api")
-    api "commons-logging:commons-logging:1.2"
+    api "commons-logging:commons-logging:${commons_logging_version}"
     api("ml.dmlc:xgboost4j_2.12:${xgboost_version}") {
         // get rid of the unused XGBoost Dependencies
         exclude group: "org.apache.hadoop", module: "hadoop-hdfs"
@@ -25,7 +25,7 @@ dependencies {
     }
 
     exclusion project(":api")
-    exclusion "commons-logging:commons-logging:1.2"
+    exclusion "commons-logging:commons-logging:${commons_logging_version}"
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }

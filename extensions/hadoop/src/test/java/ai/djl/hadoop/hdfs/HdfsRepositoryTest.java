@@ -64,7 +64,8 @@ public class HdfsRepositoryTest {
 
         Configuration config = new Configuration();
         setFilePermission(config);
-        miniDfs = new MiniDFSCluster(config, 1, true, null);
+        MiniDFSCluster.Builder builder = new MiniDFSCluster.Builder(config);
+        miniDfs = builder.numDataNodes(1).format(true).build();
         miniDfs.waitClusterUp();
         FileSystem fs = miniDfs.getFileSystem();
         fs.copyFromLocalFile(new Path(zipFile.toString()), new Path("/mlp.zip"));

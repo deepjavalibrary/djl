@@ -1,7 +1,7 @@
 group "ai.djl.aws"
 
 dependencies {
-    api platform("software.amazon.awssdk:bom:2.15.79")
+    api platform("software.amazon.awssdk:bom:${awssdk_version}")
     api "software.amazon.awssdk:s3"
     api "software.amazon.awssdk:sagemaker"
     api "software.amazon.awssdk:sagemakerruntime"
