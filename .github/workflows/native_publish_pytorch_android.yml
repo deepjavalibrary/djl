@@ -10,7 +10,7 @@ on:
 
 jobs:
   release-android:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       NDK_VERSION: "20.0.5594570"
     steps:

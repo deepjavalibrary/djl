@@ -8,11 +8,11 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [macos-10.15, ubuntu-16.04]
+        operating-system: [macos-10.15, ubuntu-18.04]
         include:
         - operating-system: macos-10.15
           os: osx
-        - operating-system: ubuntu-16.04
+        - operating-system: ubuntu-18.04
           os: linux
 
     steps:

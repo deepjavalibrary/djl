@@ -35,7 +35,7 @@ jobs:
           path: pytorch/pytorch-native/jnilib
 
   publish:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     needs: [build-pytorch-jni-android]
     steps:
       - uses: actions/checkout@v2
