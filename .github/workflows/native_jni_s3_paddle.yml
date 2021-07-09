@@ -102,5 +102,6 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync jnilib s3://djl-ai/publish/paddlepaddle-2.0.2/jnilib
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/paddlepaddle-2.0.2/jnilib*"
+          PADDLE_VERSION="$(cat gradle.properties | awk -F '=' '/paddlepaddle_version/ {print $2}')"
+          aws s3 sync jnilib s3://djl-ai/publish/paddlepaddle-${PADDLE_VERSION}/jnilib
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/paddlepaddle-${PADDLE_VERSION}/jnilib*"
