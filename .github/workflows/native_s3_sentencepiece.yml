@@ -34,4 +34,5 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-0.1.95/jnilib/
+          SENTENCEPIECE_VERSION="$(cat gradle.properties | awk -F '=' '/sentencepiece_version/ {print $2}')"
+          aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/
