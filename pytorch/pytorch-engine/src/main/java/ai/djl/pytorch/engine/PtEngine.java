@@ -93,7 +93,7 @@ public final class PtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "1.8.1";
+        return "1.9.0";
     }
 
     /** {@inheritDoc} */
