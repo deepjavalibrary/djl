@@ -6,14 +6,14 @@ configurations {
 
 dependencies {
     // javacpp bug fix https://github.com/bytedeco/javacpp/commit/7f27899578dfa18e22738a3dd49701e1806b464a
-    api "org.bytedeco:javacpp:1.5.5"
-    api "com.google.protobuf:protobuf-java:3.8.0"
+    api "org.bytedeco:javacpp:${javacpp_version}"
+    api "com.google.protobuf:protobuf-java:${protobuf_version}"
     api("org.tensorflow:tensorflow-core-api:0.3.1") {
         exclude group: "org.bytedeco", module: "javacpp"
     }
 
-    exclusion "org.bytedeco:javacpp:1.5.5"
-    exclusion "com.google.protobuf:protobuf-java:3.8.0"
+    exclusion "org.bytedeco:javacpp:${javacpp_version}"
+    exclusion "com.google.protobuf:protobuf-java:${protobuf_version}"
 }
 
 jar {

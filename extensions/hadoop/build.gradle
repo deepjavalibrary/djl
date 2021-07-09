@@ -2,16 +2,13 @@ group "ai.djl.hadoop"
 
 dependencies {
     api project(":api")
-    api "org.apache.hadoop:hadoop-core:1.2.1"
+    api "org.apache.hadoop:hadoop-client:${hadoop_version}"
 
     testImplementation project(":mxnet:mxnet-engine")
     testImplementation "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
-    testImplementation "org.apache.hadoop:hadoop-test:1.2.1"
+    testImplementation "org.apache.hadoop:hadoop-minicluster:${hadoop_version}"
 
-    testImplementation("org.testng:testng:${testng_version}") {
-        exclude group: "junit", module: "junit"
-    }
-    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
+    testImplementation("org.testng:testng:${testng_version}");
 }
 
 publishing {
