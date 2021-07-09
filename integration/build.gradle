@@ -41,7 +41,7 @@ task copyDependencies(type: Copy) {
 }
 
 application {
-    mainClassName = System.getProperty("main", "ai.djl.integration.IntegrationTest")
+    getMainClass().set(System.getProperty("main", "ai.djl.integration.IntegrationTest"))
 }
 
 run {

@@ -59,7 +59,7 @@ jar {
 }
 
 application {
-    mainClassName = System.getProperty("main", "ai.djl.serving.central.ModelZooRepositoryServer")
+    getMainClass().set(System.getProperty("main", "ai.djl.serving.central.ModelZooRepositoryServer"))
 }
 
 run {
