@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [macos-latest, ubuntu-16.04, windows-latest]
+        operating-system: [macos-latest, ubuntu-18.04, windows-latest]
 
     steps:
       - uses: actions/checkout@v1
@@ -37,7 +37,7 @@ jobs:
   build-paddle-jni-gpu:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    container: ubuntu:16.04
+    container: ubuntu:18.04
     steps:
       - name: Setup environment
         run: |
@@ -70,7 +70,7 @@ jobs:
 
   publish:
     if: github.repository == 'deepjavalibrary/djl'
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     needs: [build-paddle-jni-cpu, build-paddle-jni-gpu]
     steps:
       - uses: actions/checkout@v2
