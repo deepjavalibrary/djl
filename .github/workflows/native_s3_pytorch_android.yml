@@ -14,7 +14,7 @@ jobs:
       PYTORCH_VERSION: "1.9.0"
       NDK_VERSION: "20.0.5594570"
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:

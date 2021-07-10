@@ -11,15 +11,15 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [macos-latest, ubuntu-16.04, windows-latest]
+        operating-system: [macos-latest, windows-latest]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
@@ -34,32 +34,67 @@ jobs:
           name: jnilib-${{ runner.os }}
           path: paddlepaddle/paddlepaddle-native/jnilib
 
-  build-paddle-jni-gpu:
+  build-paddle-jni-linux-cpu:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    container: ubuntu:16.04
+    container: centos:centos7
     steps:
-      - name: Setup environment
+      - name: Install Environment
         run: |
-          apt update
-          apt install -y cmake curl unzip software-properties-common
-          add-apt-repository ppa:ubuntu-toolchain-r/test
-          apt update && apt install -y gcc-8 g++-8
-          echo "CC=gcc-8" >> $GITHUB_ENV
-          echo "CXX=g++-8" >> $GITHUB_ENV
-      - uses: actions/checkout@v1
+          yum -y update
+          yum -y install centos-release-scl-rh epel-release
+          yum -y install devtoolset-8 rh-git218 patch cmake3
+          ln -s /usr/bin/cmake3 /usr/bin/cmake
+          pip3 install awscli --upgrade
+      - uses: actions/checkout@v2
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
-        run: ./gradlew :paddlepaddle:paddlepaddle-native:compileJNIGPU
+        run: |
+          source scl_source enable devtoolset-8 rh-git218 || true
+          ./gradlew :paddlepaddle:paddlepaddle-native:compileJNI
+      - name: Upload compiled jni library
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: jnilib-${{ runner.os }}
+          path: paddlepaddle/paddlepaddle-native/jnilib
+
+  build-paddle-jni-linux-gpu:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: ubuntu-latest
+    container: centos:centos7
+    steps:
+      - name: Setup environment
+        run: |
+          yum -y update
+          yum -y install centos-release-scl-rh epel-release
+          yum -y install devtoolset-8 rh-git218 patch cmake3
+          ln -s /usr/bin/cmake3 /usr/bin/cmake
+          pip3 install awscli --upgrade
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Release JNI prep
+        run: |
+          source scl_source enable devtoolset-8 rh-git218 || true
+          ./gradlew :paddlepaddle:paddlepaddle-native:compileJNIGPU
       - name: Upload compiled jni library
         uses: actions/upload-artifact@v1
         if: always()
@@ -67,11 +102,10 @@ jobs:
           name: jnilib-${{ runner.os }}-GPU
           path: paddlepaddle/paddlepaddle-native/jnilib
 
-
   publish:
     if: github.repository == 'deepjavalibrary/djl'
-    runs-on: ubuntu-18.04
-    needs: [build-paddle-jni-cpu, build-paddle-jni-gpu]
+    runs-on: ubuntu-latest
+    needs: [build-paddle-jni-cpu, build-paddle-jni-linux-cpu, build-paddle-jni-linux-gpu]
     steps:
       - uses: actions/checkout@v2
       - name: Download compiledJNI Mac
