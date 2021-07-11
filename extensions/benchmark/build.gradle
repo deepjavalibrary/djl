@@ -1,5 +1,6 @@
 plugins {
     id 'application'
+    id "nebula.ospackage" version "8.5.6"
 }
 
 dependencies {
@@ -88,6 +89,27 @@ task benchmark(type: JavaExec) {
         }
     }
     main = "ai.djl.benchmark.Benchmark"
+}
+
+task createDeb(type: Deb, dependsOn:distTar) {
+    doFirst {
+        exec {
+            commandLine "tar", "xvf", "${project.buildDir}/distributions/benchmark-${project.version}.tar", "-C", "${project.buildDir}"
+        }
+    }
+
+    packageName = "djlbench"
+    version = "${djl_version}"
+    release = 1
+    maintainer = "Deep Java Library <djl-dev@amazon.com>"
+    summary = "djlbench is a command line tool that allows you to benchmark the\n" +
+            "  model on all different platforms for single-thread/multi-thread\n" +
+            "  inference performance."
+
+    from("${project.buildDir}/benchmark-${version}") {
+        into '/usr/local/djlbench'
+    }
+    link("/usr/local/djlbench/bin/benchmark", "/usr/bin/djlbench")
 }
 
 startScripts {
