@@ -14,7 +14,6 @@ package ai.djl.serving.util;
 
 import ai.djl.serving.Arguments;
 import ai.djl.util.Utils;
-import ai.djl.util.cuda.CudaUtils;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
@@ -49,10 +48,8 @@ public final class ConfigManager {
     private static final String LOAD_MODELS = "load_models";
     private static final String DEFAULT_WORKERS_PER_MODEL = "default_workers_per_model";
     private static final String NUMBER_OF_NETTY_THREADS = "number_of_netty_threads";
-    private static final String NETTY_CLIENT_THREADS = "netty_client_threads";
     private static final String JOB_QUEUE_SIZE = "job_queue_size";
     private static final String MAX_IDLE_TIME = "max_idle_time";
-    private static final String NUMBER_OF_GPU = "number_of_gpu";
     private static final String BATCH_SIZE = "batch_size";
     private static final String MAX_BATCH_DELAY = "max_batch_delay";
     private static final String CORS_ALLOWED_ORIGIN = "cors_allowed_origin";
@@ -98,10 +95,6 @@ public final class ConfigManager {
         if (models != null) {
             prop.setProperty(LOAD_MODELS, String.join(",", models));
         }
-
-        int gpus = getIntProperty(NUMBER_OF_GPU, Integer.MAX_VALUE);
-        gpus = Integer.min(gpus, CudaUtils.getGpuCount());
-        prop.setProperty(NUMBER_OF_GPU, String.valueOf(gpus));
     }
 
     /**
@@ -158,15 +151,6 @@ public final class ConfigManager {
     }
 
     /**
-     * Returns the configured netty client threads.
-     *
-     * @return the configured netty client threads
-     */
-    public int getNettyClientThreads() {
-        return getIntProperty(NETTY_CLIENT_THREADS, 0);
-    }
-
-    /**
      * Returns the default job queue size.
      *
      * @return the default job queue size
@@ -203,15 +187,6 @@ public final class ConfigManager {
     }
 
     /**
-     * Returns the number of GPUs to be used.
-     *
-     * @return the number of GPUs to be used
-     */
-    public int getNumberOfGpu() {
-        return getIntProperty(NUMBER_OF_GPU, 0);
-    }
-
-    /**
      * Returns the default number of workers for a new registered model.
      *
      * @return the default number of workers for a new registered model
@@ -222,9 +197,6 @@ public final class ConfigManager {
         }
 
         int workers = getIntProperty(DEFAULT_WORKERS_PER_MODEL, 0);
-        if (workers == 0) {
-            workers = getNumberOfGpu();
-        }
         if (workers == 0) {
             workers = Runtime.getRuntime().availableProcessors();
         }
@@ -403,8 +375,6 @@ public final class ConfigManager {
                 + getCanonicalPath(".")
                 + "\nTemp directory: "
                 + System.getProperty("java.io.tmpdir")
-                + "\nNumber of GPUs: "
-                + getNumberOfGpu()
                 + "\nNumber of CPUs: "
                 + runtime.availableProcessors()
                 + "\nMax heap size: "
@@ -421,8 +391,6 @@ public final class ConfigManager {
                 + (getLoadModels() == null ? "N/A" : getLoadModels())
                 + "\nNetty threads: "
                 + getNettyThreads()
-                + "\nNetty client threads: "
-                + getNettyClientThreads()
                 + "\nDefault workers per model: "
                 + getDefaultWorkers()
                 + "\nMaximum Request Size: "
