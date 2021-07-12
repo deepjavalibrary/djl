@@ -46,7 +46,8 @@ public class PropertyFilePluginMetaDataReader implements PluginMetaDataReader {
     private URL url;
 
     /**
-     * constructs a PropertyFilePluginMetaDataReader reading meta-information from this URL.
+     * Constructs a {@code PropertyFilePluginMetaDataReader} instance to read meta-information from
+     * the URL.
      *
      * @param url to read the plug-in meta-data from
      */
@@ -61,6 +62,7 @@ public class PropertyFilePluginMetaDataReader implements PluginMetaDataReader {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public PluginMetaData read() {
         String pluginName =

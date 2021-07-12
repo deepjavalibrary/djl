@@ -15,9 +15,9 @@ package ai.djl.serving.plugins;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public class PluginManagementRequestHandler implements RequestHandler<List<Plugi
             QueryStringDecoder decoder,
             String[] segments) {
         logger.info("handle plugin management request");
-        return pluginManager.listPlugins().stream().collect(Collectors.toList());
+        return new ArrayList<>(pluginManager.listPlugins());
     }
 
     /**

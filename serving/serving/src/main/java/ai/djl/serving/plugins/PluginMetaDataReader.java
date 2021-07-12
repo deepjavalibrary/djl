@@ -25,7 +25,7 @@ public interface PluginMetaDataReader {
     /**
      * Reads plugin-metadata from on url.
      *
-     * @return a parsed plugin metadata object or null if not metadata can be found.
+     * @return a parsed plugin metadata object or null if not metadata can be found
      */
     PluginMetaData read();
 }

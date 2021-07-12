@@ -41,7 +41,7 @@ public interface PluginManager {
     <T> Set<T> findImplementations(Class<T> pluginInterface);
 
     /**
-     * returns a collection of all plugins registered.
+     * Returns a collection of all plugins registered.
      *
      * @return collection of all registered plugins.
      */

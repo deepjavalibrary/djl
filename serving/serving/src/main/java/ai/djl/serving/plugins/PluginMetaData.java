@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * represents a loaded Plug-in.
+ * Represents a loaded Plug-in.
  *
  * <p>A plug-in contains MetaData, handler and resource mapping information and references to the
  * plug-in components
@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author erik.bamberg@web.de
  */
 public class PluginMetaData {
+
     private static final Logger logger = LoggerFactory.getLogger(PluginMetaData.class);
 
     enum Lifecycle {
@@ -35,7 +36,7 @@ public class PluginMetaData {
         ACTIVE,
         INACTIVE,
         FAILED
-    };
+    }
 
     private String name;
     private URL url;
@@ -45,12 +46,12 @@ public class PluginMetaData {
     private String error;
 
     /**
-     * constructs plug-in meta-info.
+     * Constructs a plug-in meta-info.
      *
-     * @param name of the plug-in.
-     * @param url where this plug-in is loaded from.
-     * @param componentNames of all exported components of the plug-in.
-     * @param dependencies require this plug-ins to run.
+     * @param name of the plug-in
+     * @param url where this plug-in is loaded from
+     * @param componentNames of all exported components of the plug-in
+     * @param dependencies require this plug-ins to run
      */
     public PluginMetaData(
             String name, URL url, List<String> componentNames, List<String> dependencies) {
@@ -64,23 +65,23 @@ public class PluginMetaData {
     /**
      * Returns the name of the plug-in.
      *
-     * @return name of the plug-in.
+     * @return name of the plug-in
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Return the classnames of the registered-components.
+     * Returns the class names of the registered-components.
      *
-     * @return the classnames of the registered-components.
+     * @return the class names of the registered-components
      */
     public List<String> getComponentNames() {
         return Collections.unmodifiableList(componentNames);
     }
 
     /**
-     * Access the state-property.
+     * Returns the state-property.
      *
      * @return the state of this class.
      */
@@ -116,27 +117,27 @@ public class PluginMetaData {
     }
 
     /**
-     * Access the url-property.
+     * Returns the url-property.
      *
-     * @return the url of this class.
+     * @return the url of this class
      */
     public URL getUrl() {
         return url;
     }
 
     /**
-     * List required plug-in dependencies.
+     * Returns a list of required plug-in dependencies.
      *
-     * @return the depend plug-in names require by this class.
+     * @return the depend plug-in names require by this class
      */
     public List<String> getDependencies() {
         return dependencies;
     }
 
     /**
-     * access the error-property.
+     * Returns the error-property.
      *
-     * @return the error of this class.
+     * @return the error of this class
      */
     public String getError() {
         return error;

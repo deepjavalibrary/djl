@@ -37,9 +37,9 @@ public class ComponentRegistry {
     }
 
     /**
-     * Register a new component and assign the plug-in as source of this component.
+     * Registers a new component and assign the plug-in as source of this component.
      *
-     * @param plugin which this component is linked to.
+     * @param plugin which this component is linked to
      * @param component the component
      */
     public void register(PluginMetaData plugin, RequestHandler<?> component) {

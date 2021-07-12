@@ -72,7 +72,6 @@ public class FolderScanPluginManager implements PluginManager {
      *
      * @throws IOException when error during IO operation occurs.
      */
-    @SuppressWarnings("rawtypes")
     public void loadPlugins() throws IOException {
         logger.info("scanning for plugins...");
         URL[] pluginUrls = listPluginJars();
@@ -86,7 +85,7 @@ public class FolderScanPluginManager implements PluginManager {
                 Collections.list(ucl.getResources("META-INF/plugin.definition"))
                         .parallelStream()
                         .map(PropertyFilePluginMetaDataReader::new)
-                        .map(reader -> reader.read())
+                        .map(PropertyFilePluginMetaDataReader::read)
                         .peek(p -> logger.info("load plugin: {}", p.getName()))
                         .collect(Collectors.toMap(PluginMetaData::getName, i -> i));
 
@@ -98,11 +97,11 @@ public class FolderScanPluginManager implements PluginManager {
                         initializeComponent(ucl, plugin, handlerClassName);
                     }
                     plugin.changeState(Lifecycle.INITIALIZED);
-                } catch (Exception ex) {
+                } catch (Throwable t) {
                     plugin.changeState(
                             Lifecycle.FAILED,
-                            "failed to initialize plugin; caused by " + ex.getMessage());
-                    logger.error("failed to initialize plugin {}", plugin.getName(), ex);
+                            "failed to initialize plugin; caused by " + t.getMessage());
+                    logger.error("failed to initialize plugin {}", plugin.getName(), t);
                 }
             } else {
                 plugin.changeState(Lifecycle.FAILED, "required dependencies not found");
@@ -114,7 +113,7 @@ public class FolderScanPluginManager implements PluginManager {
                 .values()
                 .stream()
                 .filter(plugin -> plugin.getState() == Lifecycle.INITIALIZED)
-                .filter(plugin -> checkAllRequiredPluginsInitialized(plugin))
+                .filter(this::checkAllRequiredPluginsInitialized)
                 .forEach(plugin -> plugin.changeState(Lifecycle.ACTIVE, "plugin ready"));
 
         logger.info("{} plug-ins found and loaded.", pluginRegistry.size());
@@ -127,14 +126,13 @@ public class FolderScanPluginManager implements PluginManager {
      * @return true if all plugins required by this one are in state "Initialized"
      */
     private boolean checkAllRequiredPluginsInitialized(PluginMetaData plugin) {
-        boolean result = true;
         for (String required : plugin.getDependencies()) {
             PluginMetaData reqPlugin = pluginRegistry.get(required);
             if (reqPlugin != null && reqPlugin.getState() != Lifecycle.INITIALIZED) {
                 return false;
             }
         }
-        return result;
+        return true;
     }
 
     @SuppressWarnings("rawtypes")
@@ -191,7 +189,6 @@ public class FolderScanPluginManager implements PluginManager {
      * @param pluginInterface the specific service interface
      * @return a set of all plugin components implementing this service interface
      */
-    @SuppressWarnings("unchecked")
     @Override
     public <T> Set<T> findImplementations(Class<T> pluginInterface) {
         return componentRegistry.findImplementations(pluginInterface);
