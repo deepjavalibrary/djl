@@ -1,3 +1,0 @@
-ai.djl.serving.central.handler.ModelMetaDataHandler
-ai.djl.serving.central.handler.ModelListMetaDataHandler
-ai.djl.serving.central.handler.HttpStaticClasspathResourceHandler

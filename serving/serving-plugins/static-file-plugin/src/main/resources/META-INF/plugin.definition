@@ -1,0 +1,2 @@
+name=static-file-plugin
+export=ai.djl.serving.plugins.staticfile.HttpStaticClasspathResourceHandler

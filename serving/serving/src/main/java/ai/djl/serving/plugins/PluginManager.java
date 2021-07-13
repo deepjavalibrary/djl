@@ -12,6 +12,7 @@
  */
 package ai.djl.serving.plugins;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -38,4 +39,11 @@ public interface PluginManager {
      * @return a set of all plugin components implementing this service interface
      */
     <T> Set<T> findImplementations(Class<T> pluginInterface);
+
+    /**
+     * Returns a collection of all plugins registered.
+     *
+     * @return collection of all registered plugins.
+     */
+    Collection<PluginMetaData> listPlugins();
 }

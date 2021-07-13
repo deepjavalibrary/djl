@@ -168,7 +168,7 @@ public class ModelServerTest {
         testPredictionsInvalidRequestSize(channel);
 
         // plugin tests
-        testStaticHtmlRequest();
+        //   testStaticHtmlRequest();
 
         channel.close().sync();
 

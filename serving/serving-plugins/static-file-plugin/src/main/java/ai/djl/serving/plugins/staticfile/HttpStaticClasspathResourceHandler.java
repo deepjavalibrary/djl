@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.serving.central.handler;
+package ai.djl.serving.plugins.staticfile;
 
 import ai.djl.repository.FilenameUtils;
 import ai.djl.serving.http.ResourceNotFoundException;
@@ -100,8 +100,7 @@ public class HttpStaticClasspathResourceHandler implements RequestHandler<Void> 
         uri = mapToPathInResourceFolder(uri);
 
         try {
-
-            URL resource = this.getClass().getResource(uri);
+            URL resource = getClass().getResource(uri);
             if (resource != null) {
                 ResourceInfo resourceInfo = getResourceInfo(resource);
                 logger.debug(resourceInfo.toString());
@@ -233,7 +232,7 @@ public class HttpStaticClasspathResourceHandler implements RequestHandler<Void> 
                         dateFormatter.format(new Date(resourceInfo.getLastModified())));
     }
 
-    static class ResourceInfo {
+    static final class ResourceInfo {
         private String name;
         private long lastModified;
         private long size;
@@ -263,15 +262,7 @@ public class HttpStaticClasspathResourceHandler implements RequestHandler<Void> 
 
         @Override
         public String toString() {
-            return new StringBuilder()
-                    .append("resource ")
-                    .append(name)
-                    .append(" [ size:")
-                    .append(size)
-                    .append(" lastModified:")
-                    .append(lastModified)
-                    .append(" ]")
-                    .toString();
+            return "resource " + name + " [ size:" + size + " lastModified:" + lastModified + " ]";
         }
     }
 }

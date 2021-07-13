@@ -1,4 +1,5 @@
 dependencies {
+    implementation project(":api")
     implementation project(":serving:serving")
     implementation "io.netty:netty-all:${netty_version}"
     implementation "org.slf4j:slf4j-api:${slf4j_version}"

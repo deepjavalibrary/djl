@@ -15,9 +15,9 @@ package ai.djl.serving.plugins;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author erik.bamberg@web.de
  */
-public class PluginManagementRequestHandler implements RequestHandler<List<String>> {
+public class PluginManagementRequestHandler implements RequestHandler<List<PluginMetaData>> {
 
     private static final Logger logger =
             LoggerFactory.getLogger(PluginManagementRequestHandler.class);
@@ -49,18 +49,13 @@ public class PluginManagementRequestHandler implements RequestHandler<List<Strin
 
     /** {@inheritDoc} */
     @Override
-    public List<String> handleRequest(
+    public List<PluginMetaData> handleRequest(
             ChannelHandlerContext ctx,
             FullHttpRequest req,
             QueryStringDecoder decoder,
             String[] segments) {
         logger.info("handle plugin management request");
-        return pluginManager
-                .findImplementations(RequestHandler.class)
-                .stream()
-                .map(Object::getClass)
-                .map(Class::getSimpleName)
-                .collect(Collectors.toList());
+        return new ArrayList<>(pluginManager.listPlugins());
     }
 
     /**
