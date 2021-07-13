@@ -3,38 +3,70 @@ plugins {
     id "nebula.ospackage" version "8.5.6"
 }
 
+boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
+
 dependencies {
     implementation "commons-cli:commons-cli:${commons_cli_version}"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
-    implementation project(":model-zoo")
+    if (isRelease) {
+        implementation platform("ai.djl:bom:${djl_version}")
 
-    runtimeOnly project(":pytorch:pytorch-model-zoo")
-    runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}-SNAPSHOT"
+        implementation "ai.djl:model-zoo"
+        runtimeOnly "ai.djl.pytorch:pytorch-model-zoo"
+        runtimeOnly "ai.djl.pytorch:pytorch-native-auto"
 
-    // javacpp bug fix https://github.com/bytedeco/javacpp/commit/7f27899578dfa18e22738a3dd49701e1806b464a
-    runtimeOnly "org.bytedeco:javacpp:1.5.6-SNAPSHOT"
-    runtimeOnly(project(":tensorflow:tensorflow-model-zoo")) {
-        exclude group: "org.bytedeco", module: "javacpp"
-    }
-    runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
+        // javacpp bug fix https://github.com/bytedeco/javacpp/commit/7f27899578dfa18e22738a3dd49701e1806b464a
+        runtimeOnly "org.bytedeco:javacpp:1.5.6-SNAPSHOT"
+        runtimeOnly("ai.djl.tensorflow:tensorflow-model-zoo") {
+            exclude group: "org.bytedeco", module: "javacpp"
+        }
+        runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto"
 
-    runtimeOnly project(":mxnet:mxnet-model-zoo")
-    runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
+        runtimeOnly "ai.djl.mxnet:mxnet-model-zoo"
+        runtimeOnly "ai.djl.mxnet:mxnet-native-auto"
 
-    runtimeOnly project(":tflite:tflite-engine")
-    runtimeOnly "ai.djl.tflite:tflite-native-auto:${tflite_version}"
+        runtimeOnly "ai.djl.tflite:tflite-engine"
+        runtimeOnly "ai.djl.tflite:tflite-native-auto"
 
-    runtimeOnly project(":paddlepaddle:paddlepaddle-model-zoo")
-    runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
+        runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-model-zoo"
+        runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto"
 
-    // onnxruntime requires user install libgomp.so.1 manually, exclude from default dependency
-    runtimeOnly project(":onnxruntime:onnxruntime-engine")
+        runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine"
 
-    runtimeOnly project(":dlr:dlr-engine")
-    runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
+        runtimeOnly "ai.djl.dlr:dlr-engine"
+        runtimeOnly "ai.djl.dlr:dlr-native-auto"
 
-    runtimeOnly(project(":ml:xgboost")) {
-        exclude group: "ml.dmlc", module: "xgboost4j_2.12"
+        runtimeOnly "ai.djl.ml.xgboost:xgboost"
+    } else {
+        implementation project(":model-zoo")
+
+        runtimeOnly project(":pytorch:pytorch-model-zoo")
+        runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}-SNAPSHOT"
+
+        // javacpp bug fix https://github.com/bytedeco/javacpp/commit/7f27899578dfa18e22738a3dd49701e1806b464a
+        runtimeOnly "org.bytedeco:javacpp:1.5.6-SNAPSHOT"
+        runtimeOnly(project(":tensorflow:tensorflow-model-zoo")) {
+            exclude group: "org.bytedeco", module: "javacpp"
+        }
+        runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
+
+        runtimeOnly project(":mxnet:mxnet-model-zoo")
+        runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
+
+        runtimeOnly project(":tflite:tflite-engine")
+        runtimeOnly "ai.djl.tflite:tflite-native-auto:${tflite_version}"
+
+        runtimeOnly project(":paddlepaddle:paddlepaddle-model-zoo")
+        runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
+
+        runtimeOnly project(":onnxruntime:onnxruntime-engine")
+
+        runtimeOnly project(":dlr:dlr-engine")
+        runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
+
+        runtimeOnly(project(":ml:xgboost")) {
+            exclude group: "ml.dmlc", module: "xgboost4j_2.12"
+        }
     }
 
     testImplementation("org.testng:testng:${testng_version}") {
@@ -91,25 +123,25 @@ task benchmark(type: JavaExec) {
     main = "ai.djl.benchmark.Benchmark"
 }
 
-task createDeb(type: Deb, dependsOn:distTar) {
+task createDeb(type: Deb, dependsOn: distTar) {
     doFirst {
         exec {
             commandLine "tar", "xvf", "${project.buildDir}/distributions/benchmark-${project.version}.tar", "-C", "${project.buildDir}"
         }
     }
 
-    packageName = "djlbench"
+    packageName = "djl-bench"
     version = "${djl_version}"
     release = 1
     maintainer = "Deep Java Library <djl-dev@amazon.com>"
-    summary = "djlbench is a command line tool that allows you to benchmark the\n" +
+    summary = "djl-bench is a command line tool that allows you to benchmark the\n" +
             "  model on all different platforms for single-thread/multi-thread\n" +
             "  inference performance."
 
-    from("${project.buildDir}/benchmark-${version}") {
-        into '/usr/local/djlbench'
+    from("${project.buildDir}/benchmark-${project.version}") {
+        into "/usr/local/djl-bench-${djl_version}"
     }
-    link("/usr/local/djlbench/bin/benchmark", "/usr/bin/djlbench")
+    link("/usr/bin/djl-bench", "/usr/local/djl-bench-${djl_version}/bin/benchmark")
 }
 
 startScripts {
