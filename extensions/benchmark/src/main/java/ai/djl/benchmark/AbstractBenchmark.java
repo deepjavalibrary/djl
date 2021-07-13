@@ -72,7 +72,7 @@ public abstract class AbstractBenchmark {
         Options options = Arguments.getOptions();
         try {
             if (Arguments.hasHelp(args)) {
-                printHelp("benchmark [-p MODEL-PATH] -s INPUT-SHAPES [OPTIONS]", options);
+                printHelp("djl-bench [-p MODEL-PATH] -s INPUT-SHAPES [OPTIONS]", options);
                 return true;
             }
             DefaultParser parser = new DefaultParser();
