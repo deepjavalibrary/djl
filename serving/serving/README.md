@@ -1,301 +1,132 @@
-# DJL - Model Server
+# DJL Serving
 
 ## Overview
 
-This module contains an universal model serving implementation.
+DJL Serving is an universal model serving solution. You can use djl-serving serve the
+following models out of the box:
 
-## Documentation
+- PyTorch TorchScript model
+- TensorFlow SavedModel bundle
+- Apache MXNet model
 
-The latest javadocs can be found on the [djl.ai website](https://javadoc.io/doc/ai.djl/serving/latest/index.html).
+You can install extra extensions to enable the following models:
 
-You can also build the latest javadocs locally using the following command:
-
-```sh
-# for Linux/macOS:
-./gradlew javadoc
-
-# for Windows:
-..\..\gradlew javadoc
-```
-The javadocs output is built in the `build/doc/javadoc` folder.
-
+- ONNX model
+- PaddlePaddle model
+- TFLite model
+- Neo DLR (TVM) model
+- XGBoost model
+- Sentencepiece model
+- fastText/BlazingText model
 
 ## Installation
-You can pull the server from the central Maven repository by including the following dependency:
 
-```xml
-<dependency>
-    <groupId>ai.djl</groupId>
-    <artifactId>serving</artifactId>
-    <version>0.12.0</version>
-    <scope>runtime</scope>
-</dependency>
+For macOS (Working in progress)
+
+```
+brew install djl-serving
+
+# Start djl-serving as service:
+brew services start djl-serving
+
+# Stop djl-serving service
+brew services stop djl-serving
 ```
 
+For Ubuntu
 
+```
+curl -O https://publish.djl.ai/djl-serving/djl-serving_0.12.0-1_all.deb
+sudo dpkg -i djl-serving_0.12.0-1_all.deb
+```
 
-## Run model server
+For Windows
+
+We are considering to create a `chocolatey` package for Windows. For the time being, we can run
+download djl-serving.zip file from [here](https://publish.djl.ai/djl-serving/serving-0.12.0.zip).
+
+### Docker
+
+You can also use docker to run DJL Serving:
+
+```
+docker run -itd -p 8080:8080 deepjavalibrary/djl-serving
+```
+
+## Run DJL Serving
 
 Use the following command to start model server locally:
 
 ```sh
-cd serving/serving
-
-# for Linux/macOS:
-./gradlew run
-
-# for Windows:
-..\..\..\gradlew run
+djl-serving
 ```
 
-The model server will be listening on port 8080.
-
-You can also load a model for serving on start up:
+The model server will be listening on port 8080. You can also load a model for serving on start up:
 
 ```sh
-./gradlew run --args="-m https://resources.djl.ai/test-models/mlp.tar.gz"
+djl-serving -m "https://resources.djl.ai/demo/mxnet/resnet18_v1.zip"
 ```
 
 Open another terminal, and type the following command to test the inference REST API:
 
 ```sh
-cd serving
-curl -X POST http://127.0.0.1:8080/predictions/mlp -F "data=@../examples/src/test/resources/0.png"
+curl -O https://resources.djl.ai/images/kitten.jpg
+curl -X POST http://localhost:8080/predictions/resnet18_v1 -T kitten.jpg
 
-{
-  "classNames": [
-    "0",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9"
-  ],
-  "probabilities": [
-    0.9999998807907104,
-    2.026697559776025E-11,
-    1.249230336952678E-7,
-    2.777162111389231E-10,
-    1.3042782132099973E-11,
-    6.133447222333999E-11,
-    7.507424681918451E-10,
-    2.7874487162904416E-9,
-    1.0341382195022675E-9,
-    4.075440429573973E-9
-  ]
-}
+or:
+
+curl -X POST http://localhost:8080/predictions/resnet18_v1 -F "data=@kitten.jpg"
+
+[
+  {
+    "className": "n02123045 tabby, tabby cat",
+    "probability": 0.4838452935218811
+  },
+  {
+    "className": "n02123159 tiger cat",
+    "probability": 0.20599420368671417
+  },
+  {
+    "className": "n02124075 Egyptian cat",
+    "probability": 0.18810515105724335
+  },
+  {
+    "className": "n02123394 Persian cat",
+    "probability": 0.06411745399236679
+  },
+  {
+    "className": "n02127052 lynx, catamount",
+    "probability": 0.010215568356215954
+  }
+]
 ```
 
-### installing plug-ins
-
-The model server looks for plug-ins during startup in the plugin folder and register this plug-ins.
-
-The default plug-in folder is 
+For more command line options:
 
 ```sh
-{work-dir}/plugins
+djl-serving --help
+usage: djl-serving [OPTIONS]
+ -f,--config-file <CONFIG-FILE>    Path to the configuration properties file.
+ -h,--help                         Print this help.
+ -m,--models <MODELS>              Models to be loaded at startup.
+ -s,--model-store <MODELS-STORE>   Model store location where models can be loaded.
 ```
 
-The plug-in folder can be configured with the 'plugin-folder' parameter in the server-config file.
+## REST API
 
-example:
-running model server with gradle using a specific config-file:
+DJL Serving use RESTful API for both inference and management calls.
 
-```sh
-./gradlew run -Dai.djl.conf=~/modelserver-config.properties
-```
+When DJL Serving startup, it starts two web services:
+* [Inference API](docs/inference_api.md)
+* [Management API](docs/management_api.md)
 
- example config.properties file for djl-server
- 
-```sh
-inference_address=http://127.0.0.1:8081
-management_address=http://127.0.0.1:8081
-plugin_folder=~/serving_plugins
-```
+By default, DJL Serving listening on 8080 port and only accessible from localhost.
+Please see [DJL Serving Configuration](docs/configuration.md) for how to enable access from remote host.
 
+# Plugin management
 
-
-
-### REST API
-
-
-#### ping
-url:	/ping
-
-method: GET
-
-example:
-
-```sh
-curl -X GET http://localhost:8080/ping
-```
-
-returns
-json 
-
-```sh
-{
-  "status": {Healthy|Partial Healthy|Unhealthy}
-}
-```
-
-
-
-
-#### models - list loaded models
-url:	/models
-
-method: GET
-
-example:
-
-```sh
-curl -X GET http://localhost:8080/models
-```
-
-returns
-json 
-
-```sh
-{
-  "models": [
-    {
-      "modelName": {modelName},
-      "modelUrl": {urlWhereTheModelIsLoadedFrom}
-    }
-  ]
-}
-```
-
-
-
-####	models - get model instance information
-url:	/models/{modelName}
-
-method: GET
-
-example:
-
-```sh
-curl -X GET http://localhost:8080/models/mlp
-```
-
-
-returns
-json 
-
-```sh
-{
-  "modelName": {modelName},
-  "modelUrl": {urlWhereTheModelIsLoadedFrom},
-  "minWorkers": 8,
-  "maxWorkers": 8,
-  "batchSize": 1,
-  "maxBatchDelay": 100,
-  "status": {Healthy|Partial Healthy|Unhealthy},
-  "loadedAtStartup": {true|false},
-  "workers": [
-    {
-      "id": 1,
-      "startTime": {ISO timestamp},
-      "status": {READY|UNLOADING},
-      "gpu": {true|false}
-    },
-    
-	...
-	
-    {
-      "id": {n},
-      "startTime": {ISO timestamp},
-      "status": {READY|UNLOADING},
-      "gpu": {true|false}
-    }
-  ]
-}
-```
-
-#### models - unregister a model
-url:	/models/{modelName}
-
-method: DELETE
-
-example:
-curl -X DELETE http://localhost:8080/models/mlp
-
-returns
-json 
-
-```sh
-{
-  "status": "Model \"{modelName}\" unregistered"
-}
-```
-
-
-#### models - scale model worker instances
-url:	/models/{modelName}?{min_worker}={integer}&{max_worker}={integer}&{max_idle_time}={time in seconds}&{max_batch_delay}={time in ms}
-
-- min_worker is optional
-- max_worker is optional
-- max_idle_time is optional. time is in seconds. the new set max_idle_time is only used by new created worker. Already created workers waiting for data during there idle time are not affected by a parameter change
-- max_batch_delay is optional the max time in milliseconds to wait after automatically scaling up workers to offer the job before giving up.
-
-method: PUT
-
-example:
-
-```sh
-curl -X PUT "http://localhost:8080/models/mlp?min_worker=4&max_worker=12&max_idle_time=60&max_batch_delay=500"
-```
-
-returns
-json 
-
-```sh
-{
-  "status": "Model \"{modelName}\" worker scaled."
-}
-```
-
-#### models - register model
-url:	/models/?{modelName}=modelName&{min_worker}={integer}&{max_worker}={integer}&{max_idle_time}={int.seconds}
-
-
-
-model_name	the name for the model
-batchSize batchsize
-max_batch_delay in milliseconds
-min_worker is optional
-max_worker is optional
-max_idle_time is optional. time is in seconds
-synchronous true/false
-
-method: PUT
-
-example:
-
-```sh
-curl -X PUT "http://localhost:8080/models?modelName=mlp?min_worker=4&max_worker=12&max_idle_time=60&max_batch_delay=100"
-```
-
-returns
-json 
-
-```sh
-{
-  
-}
-```
-
-
-#### prediction - run a prediction using a loaded model
-```sh
-curl -X POST {host}/predictions/mlp -F "data=@../examples/src/test/resources/0.png"
-```
+DJL Serving supports plugins, user can implement their own plugins to enrich DJL Serving features.
+See [DJL Plugin Management](docs/plugin_management.md) for how to install plugins to DJL Serving.
 
 ## Logging
 you can set the logging level on the command-line adding a parameter for the JVM
@@ -303,6 +134,3 @@ you can set the logging level on the command-line adding a parameter for the JVM
 ```sh
 -Dai.djl.logging.level={FATAL|ERROR|WARN|INFO|DEBUG|TRACE}
 ```
-
-
-
