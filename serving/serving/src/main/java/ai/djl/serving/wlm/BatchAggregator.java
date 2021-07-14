@@ -82,10 +82,15 @@ abstract class BatchAggregator {
         jobs.clear();
     }
 
-    /** Sends an internal server error. */
-    public void sendError() {
+    /**
+     * Sends an error response to client.
+     *
+     * @param status the HTTP status
+     * @param error the exception
+     */
+    public void sendError(HttpResponseStatus status, Throwable error) {
         for (Job job : jobs) {
-            job.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+            job.sendError(status, error);
         }
         jobs.clear();
     }

@@ -154,6 +154,7 @@ public final class ModelManager {
                 startupModels.remove(modelName);
                 m.close();
             }
+            endpoint.getModels().clear();
             logger.info("Model {} unregistered.", modelName);
         } else {
             ModelInfo model = endpoint.remove(version);

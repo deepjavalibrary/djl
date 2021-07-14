@@ -168,7 +168,7 @@ public class Predictor<I, O> implements AutoCloseable {
             return ret;
         } catch (EngineException e) {
             throw new TranslateException(e);
-        } catch (RuntimeException e) {
+        } catch (TranslateException | RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new TranslateException(e);
