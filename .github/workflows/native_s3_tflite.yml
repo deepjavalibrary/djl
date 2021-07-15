@@ -4,16 +4,18 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      matrix:
-        operating-system: [macos-latest, ubuntu-16.04]
+  build-osx:
+    runs-on: macos-latest
     steps:
+      - uses: actions/checkout@v2
+      - name: Get TFLITE_VERSION
+        run: |
+          TFLITE_VERSION="$(cat gradle.properties | awk -F '=' '/tflite_version/ {print $2}')"
+          echo "TFLITE_VERSION=${TFLITE_VERSION}" >> $GITHUB_ENV
       - uses: actions/checkout@v2
         with:
           repository: tensorflow/tensorflow
-          ref: 'v2.4.1'
+          ref: v${{ env.TFLITE_VERSION }}
           submodules: 'recursive'
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
@@ -40,4 +42,49 @@ jobs:
           mkdir -p jnilib/${{ runner.os }}
           cp bazel-bin/tensorflow/lite/java/libtensorflowlite_jni.so jnilib/${{ runner.os }}
           cp bazel-bin/tensorflow/lite/java/libtensorflowlitelib.jar jnilib
-          aws s3 sync jnilib s3://djl-ai/publish/tflite-2.4.1/jnilib
+          aws s3 sync jnilib s3://djl-ai/publish/tflite-${TFLITE_VERSION}/jnilib
+
+  build-linux:
+    runs-on: ubuntu-latest
+    container: amazonlinux:2
+    steps:
+      - name: Install Environment
+        run: |
+          yum -y update
+          yum -y groupinstall "Development Tools"
+          yum -y install patch cmake3
+          ln -sf /usr/bin/cmake3 /usr/bin/cmake
+          pip3 install awscli --upgrade
+          pip3 install numpy --upgrade
+      - uses: actions/checkout@v2
+      - name: Get TFLITE_VERSION
+        run: |
+          TFLITE_VERSION="$(cat gradle.properties | awk -F '=' '/tflite_version/ {print $2}')"
+          echo "TFLITE_VERSION=${TFLITE_VERSION}" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+        with:
+          repository: tensorflow/tensorflow
+          ref: v${{ env.TFLITE_VERSION }}
+          submodules: 'recursive'
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: build package
+        run: |
+          cd tensorflow
+          curl -L https://github.com/bazelbuild/bazel/releases/download/3.1.0/bazel-3.1.0-installer-linux-x86_64.sh -o bazel.sh --retry 10
+          bash bazel.sh
+          bazel build -c opt //tensorflow/lite/java:tensorflowlitelib  //tensorflow/lite/delegates/flex:delegate
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: upload to S3
+        run: |
+          mkdir -p jnilib/${{ runner.os }}
+          cp bazel-bin/tensorflow/lite/java/libtensorflowlite_jni.so jnilib/${{ runner.os }}
+          cp bazel-bin/tensorflow/lite/java/libtensorflowlitelib.jar jnilib
+          aws s3 sync jnilib s3://djl-ai/publish/tflite-${TFLITE_VERSION}/jnilib

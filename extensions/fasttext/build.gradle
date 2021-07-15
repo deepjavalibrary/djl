@@ -9,8 +9,8 @@ dependencies {
     }
 
     // ModelZoo requires at least one engine in the class path
-    testImplementation project(":mxnet:mxnet-engine")
-    testImplementation "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
+    testImplementation project(":pytorch:pytorch-engine")
+    testImplementation "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}-SNAPSHOT"
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 

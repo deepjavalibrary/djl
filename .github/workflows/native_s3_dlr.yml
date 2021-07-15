@@ -4,16 +4,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      matrix:
-        operating-system: [macos-10.15, ubuntu-16.04]
-        include:
-          - operating-system: macos-10.15
-            os: osx
-          - operating-system: ubuntu-16.04
-            os: linux
+  build-osx:
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 1.8
@@ -46,5 +38,50 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - name: Upload native DJL to S3
-        run: aws s3 cp *dlr.* s3://djl-ai/publish/dlr-${{ env.DLR_VERSION }}/native/${{ matrix.os }}/cpu/
+        run: aws s3 cp *dlr.* s3://djl-ai/publish/dlr-${{ env.DLR_VERSION }}/native/osx/cpu/
+        working-directory: neo-ai-dlr/build/lib
+
+  build-linux:
+    runs-on: ubuntu-latest
+    container: amazonlinux:2
+    steps:
+      - name: Install Environment
+        run: |
+          yum -y update
+          yum -y groupinstall "Development Tools"
+          yum -y install patch cmake3
+          ln -sf /usr/bin/cmake3 /usr/bin/cmake
+          pip3 install awscli --upgrade
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Get DLR_VERSION
+        run: |
+          DLR_VERSION="$(cat gradle.properties | awk -F '=' '/dlr_version/ {print $2}')"
+          echo "DLR_VERSION=${DLR_VERSION}" >> $GITHUB_ENV
+      - name: Checkout DLR repo
+        uses: actions/checkout@v2
+        with:
+          repository: neo-ai/neo-ai-dlr
+          ref: v${{ env.DLR_VERSION }}
+          path: neo-ai-dlr
+          submodules: 'recursive'
+      - name: Build package
+        # avoid g++ to compile the native, use system-default clang++ instead
+        run: |
+          cd neo-ai-dlr
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build . --config Release -- -j8
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Upload native DJL to S3
+        run: aws s3 cp *dlr.* s3://djl-ai/publish/dlr-${DLR_VERSION}/native/linux/cpu/
         working-directory: neo-ai-dlr/build/lib

@@ -11,15 +11,15 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [macos-latest, ubuntu-16.04, windows-latest]
+        operating-system: [macos-latest, windows-latest]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
@@ -44,34 +44,74 @@ jobs:
           aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-${PYTORCH_VERSION}/jnilib*"
 
-  build-pytorch-jni-linux-gpu:
+  build-pytorch-jni-linux-cpu:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    container: nvidia/cuda:10.2-cudnn7-devel-ubuntu16.04
+    container: amazonlinux:2
     steps:
-      - uses: actions/checkout@v1
+      - name: Install Environment
+        run: |
+          yum -y update
+          yum -y groupinstall "Development Tools"
+          yum -y install patch cmake3
+          ln -sf /usr/bin/cmake3 /usr/bin/cmake
+          pip3 install awscli --upgrade
+      - uses: actions/checkout@v2
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: Workaround for startup run
+        run: ./gradlew jar clean
+      - name: Release JNI prep
+        run: |
+          ./gradlew :pytorch:pytorch-native:releaseJNI
+          ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Copy files to S3 with the AWS CLI
+        run: |
+          PYTORCH_VERSION="$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')"
+          aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-${PYTORCH_VERSION}/jnilib*"
+
+  build-pytorch-jni-linux-gpu:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: ubuntu-latest
+    container: nvidia/cuda:10.2-cudnn7-devel-centos7
+    steps:
       - name: Install Environment
         run: |
-          apt update
-          apt install -y cmake curl unzip software-properties-common
-          add-apt-repository -y ppa:deadsnakes/ppa
-          apt update
-          apt install -y python3.6
-          curl -O https://bootstrap.pypa.io/get-pip.py
-          python3.6 get-pip.py
+          yum -y update
+          yum -y install centos-release-scl-rh epel-release
+          yum -y install devtoolset-7 rh-git218 patch cmake3
+          ln -s /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
       - name: Release JNI prep
-        run: ./gradlew :pytorch:pytorch-native:releaseJNI -Pgpu
+        run: |
+          source scl_source enable devtoolset-7 rh-git218 || true
+          ./gradlew :pytorch:pytorch-native:releaseJNI -Pgpu
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -87,29 +127,28 @@ jobs:
   build-pytorch-jni-precxx11:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    container: nvidia/cuda:10.1-cudnn7-devel-centos7
+    container: centos:centos7
     steps:
-      - uses: actions/checkout@v1
+      - name: Install Environment
+        run: |
+          yum -y update
+          yum -y install centos-release-scl-rh epel-release
+          yum -y install devtoolset-7 rh-git218 patch cmake3
+          ln -s /usr/bin/cmake3 /usr/bin/cmake
+          pip3 install awscli --upgrade
+      - uses: actions/checkout@v2
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Install Environment
-        run: |
-          yum -y update
-          yum -y install centos-release-scl-rh epel-release
-          yum -y install java-1.8.0-openjdk-devel devtoolset-7 rh-git218 patch cmake3
-          ln -s /usr/bin/cmake3 /usr/bin/cmake
-          pip3 install awscli --upgrade
       - name: Release JNI prep
         run: |
-          source scl_source enable devtoolset-7 rh-git218 || true
           ./gradlew :pytorch:pytorch-native:releaseJNI -Pprecxx11
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -127,12 +166,12 @@ jobs:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}

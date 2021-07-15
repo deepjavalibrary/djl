@@ -5,23 +5,14 @@ on:
 
 jobs:
   build-dlr-jni-cpu:
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      matrix:
-        operating-system: [macos-10.15, ubuntu-16.04]
-        include:
-        - operating-system: macos-10.15
-          os: osx
-        - operating-system: ubuntu-16.04
-          os: linux
-
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
@@ -42,5 +33,47 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           DLR_VERSION="$(cat gradle.properties | awk -F '=' '/dlr_version/ {print $2}')"
-          aws s3 cp dlr/dlr-native/build/*djl_dlr* s3://djl-ai/publish/dlr-${DLR_VERSION}/jnilib/0.11.0/${{ matrix.os }}-x86_64/
+          DJL_VERSION="$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')"
+          aws s3 cp dlr/dlr-native/build/*djl_dlr* s3://djl-ai/publish/dlr-${DLR_VERSION}/jnilib/${DJL_VERSION}/osx-x86_64/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/dlr-${DLR_VERSION}/jnilib*"
+
+  build-dlr-jni-linux-cpu:
+    runs-on: ubuntu-latest
+    container: amazonlinux:2
+    steps:
+      - name: Install Environment
+        run: |
+          yum -y update
+          yum -y groupinstall "Development Tools"
+          yum -y install patch cmake3
+          ln -sf /usr/bin/cmake3 /usr/bin/cmake
+          pip3 install awscli --upgrade
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Workaround for startup run
+        run: ./gradlew jar clean
+      - name: Release JNI prep
+        run: |
+          ./gradlew :dlr:dlr-native:compileJNI
+          ./gradlew :dlr:dlr-engine:test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Copy files to S3 with the AWS CLI
+        run: |
+          DLR_VERSION="$(cat gradle.properties | awk -F '=' '/dlr_version/ {print $2}')"
+          DJL_VERSION="$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')"
+          aws s3 cp dlr/dlr-native/build/*djl_dlr* s3://djl-ai/publish/dlr-${DLR_VERSION}/jnilib/${DJL_VERSION}/linux-x86_64/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/dlr-${DLR_VERSION}/jnilib*"
