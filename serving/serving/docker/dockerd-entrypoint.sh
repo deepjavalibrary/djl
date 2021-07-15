@@ -3,10 +3,7 @@ set -e
 
 if [[ "$1" = "serve" ]]; then
     shift 1
-    java $JAVA_OPTS -cp "libs/*" ai.djl.serving.ModelServer "$APP_ARGS"
+    /usr/bin/djl-serving "$@"
 else
     eval "$@"
 fi
-
-# prevent docker exit
-tail -f /dev/null
