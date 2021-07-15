@@ -89,7 +89,7 @@ public class ModelServer {
             CommandLine cmd = parser.parse(options, args, null, false);
             Arguments arguments = new Arguments(cmd);
             if (arguments.hasHelp()) {
-                printHelp("model-server [OPTIONS]", options);
+                printHelp("djl-serving [OPTIONS]", options);
                 return;
             }
 
@@ -340,7 +340,7 @@ public class ModelServer {
                             configManager.getMaxBatchDelay(),
                             configManager.getMaxIdleTime());
             ModelInfo modelInfo = future.join();
-            modelManager.triggerModelUpdated(modelInfo.scaleWorkers(workers, workers));
+            modelManager.triggerModelUpdated(modelInfo.scaleWorkers(1, workers));
             startupModels.add(modelName);
         }
     }

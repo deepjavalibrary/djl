@@ -16,7 +16,9 @@ import ai.djl.inference.Predictor;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.serving.http.InternalServerException;
 import ai.djl.translate.TranslateException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -74,12 +76,11 @@ final class WorkerThread implements Runnable {
                         aggregator.sendResponse(reply);
                     } catch (TranslateException e) {
                         logger.warn("Failed to predict", e);
-                        aggregator.sendError();
+                        aggregator.sendError(HttpResponseStatus.BAD_REQUEST, e);
                     }
                 }
                 req = null;
             }
-
         } catch (InterruptedException e) {
             logger.debug("Shutting down the thread .. Scaling down.");
         } catch (Throwable t) {
@@ -89,7 +90,8 @@ final class WorkerThread implements Runnable {
             currentThread.set(null);
             shutdown(WorkerState.WORKER_STOPPED);
             if (req != null) {
-                aggregator.sendError();
+                Exception e = new InternalServerException("Server shutting down");
+                aggregator.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, e);
             }
         }
     }
@@ -120,7 +122,8 @@ final class WorkerThread implements Runnable {
         Thread thread = currentThread.getAndSet(null);
         if (thread != null) {
             thread.interrupt();
-            aggregator.sendError();
+            Exception e = new InternalServerException("Server shutting down");
+            aggregator.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, e);
         }
         predictor.close();
     }

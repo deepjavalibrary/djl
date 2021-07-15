@@ -76,10 +76,13 @@ public final class ModelInfo implements AutoCloseable {
      * triggerUpdates in the {@code ModelManager} using this new model.
      *
      * @param batchSize the batchSize to set
+     * @param maxBatchDelay maximum time to wait for a free space in worker queue after scaling up
+     *     workers before giving up to offer the job to the queue.
      * @return new configured ModelInfo.
      */
-    public ModelInfo configureModelBatch(int batchSize) {
+    public ModelInfo configureModelBatch(int batchSize, int maxBatchDelay) {
         this.batchSize = batchSize;
+        this.maxBatchDelay = maxBatchDelay;
         return this;
     }
 
@@ -103,13 +106,10 @@ public final class ModelInfo implements AutoCloseable {
      * model.
      *
      * @param maxIdleTime time a WorkerThread can be idle before scaling down this worker.
-     * @param maxBatchDelay maximum time to wait for a free space in worker queue after scaling up
-     *     workers before giving up to offer the job to the queue.
      * @return new configured ModelInfo.
      */
-    public ModelInfo configurePool(int maxIdleTime, int maxBatchDelay) {
+    public ModelInfo configurePool(int maxIdleTime) {
         this.maxIdleTime = maxIdleTime;
-        this.maxBatchDelay = maxBatchDelay;
         return this;
     }
 

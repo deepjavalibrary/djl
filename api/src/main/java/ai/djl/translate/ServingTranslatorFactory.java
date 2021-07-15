@@ -283,7 +283,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
 
         /** {@inheritDoc} */
         @Override
-        public NDList processInput(TranslatorContext ctx, Input input) {
+        public NDList processInput(TranslatorContext ctx, Input input) throws TranslateException {
             ctx.setAttachment("input", input);
             PairList<String, byte[]> inputs = input.getContent();
             byte[] data = inputs.get("data");
@@ -294,7 +294,11 @@ public class ServingTranslatorFactory implements TranslatorFactory {
                 data = input.getContent().valueAt(0);
             }
             NDManager manager = ctx.getNDManager();
-            return NDList.decode(manager, data);
+            try {
+                return NDList.decode(manager, data);
+            } catch (IllegalArgumentException e) {
+                throw new TranslateException("Input is not a NDList data type", e);
+            }
         }
 
         /** {@inheritDoc} */
