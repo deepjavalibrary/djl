@@ -149,6 +149,7 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: |
+          source scl_source enable devtoolset-7 rh-git218 || true
           ./gradlew :pytorch:pytorch-native:releaseJNI -Pprecxx11
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
