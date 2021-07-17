@@ -37,14 +37,14 @@ jobs:
   build-paddle-jni-linux-cpu:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    container: centos:centos7
+    container: amazonlinux:2
     steps:
       - name: Install Environment
         run: |
           yum -y update
-          yum -y install centos-release-scl-rh epel-release
-          yum -y install devtoolset-8 rh-git218 patch cmake3
-          ln -s /usr/bin/cmake3 /usr/bin/cmake
+          yum -y groupinstall "Development Tools"
+          yum -y install patch cmake3
+          ln -sf /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
       - uses: actions/checkout@v2
       - name: Set up JDK 1.8
@@ -59,7 +59,6 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: |
-          source scl_source enable devtoolset-8 rh-git218 || true
           ./gradlew :paddlepaddle:paddlepaddle-native:compileJNI
       - name: Upload compiled jni library
         uses: actions/upload-artifact@v1
