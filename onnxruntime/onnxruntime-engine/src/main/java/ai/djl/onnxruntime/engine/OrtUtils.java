@@ -12,7 +12,6 @@
  */
 package ai.djl.onnxruntime.engine;
 
-import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -42,6 +41,9 @@ final class OrtUtils {
 
     public static OnnxTensor toTensor(
             OrtEnvironment env, Buffer data, Shape shape, DataType dataType) throws OrtException {
+        if (shape.size() == 0) {
+            throw new UnsupportedOperationException("OnnxRuntime doesn't support 0 length tensor.");
+        }
         long[] sh = shape.getShape();
         switch (dataType) {
             case FLOAT32:
@@ -55,11 +57,13 @@ final class OrtUtils {
             case INT8:
             case UINT8:
                 return OnnxTensor.createTensor(env, (ByteBuffer) data, sh, OnnxJavaType.INT8);
+            case STRING:
+                throw new UnsupportedOperationException(
+                        "Use toTensor(OrtEnvironment env, String[] inputs, Shape shape) instead.");
             case BOOLEAN:
-                return OnnxTensor.createTensor(env, (ByteBuffer) data, sh, OnnxJavaType.BOOL);
             case FLOAT16:
             default:
-                throw new EngineException("Data type not supported: " + dataType);
+                throw new UnsupportedOperationException("Data type not supported: " + dataType);
         }
     }
 

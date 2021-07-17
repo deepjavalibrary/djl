@@ -18,7 +18,6 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import java.nio.Buffer;
-import java.nio.ByteBuffer;
 
 /**
  * A base implementation of the {@link NDArray} that does nothing. This can be used for overriding
@@ -35,61 +34,7 @@ public interface NDArrayAdapter extends NDArray {
 
     /** {@inheritDoc} */
     @Override
-    default NDManager getManager() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default String getName() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default void setName(String name) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default String getUid() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default DataType getDataType() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default Device getDevice() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default Shape getShape() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     default SparseFormat getSparseFormat() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default void attach(NDManager manager) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default void detach() {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
@@ -132,12 +77,6 @@ public interface NDArrayAdapter extends NDArray {
     /** {@inheritDoc} */
     @Override
     default String[] toStringArray() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default ByteBuffer toByteBuffer() {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 

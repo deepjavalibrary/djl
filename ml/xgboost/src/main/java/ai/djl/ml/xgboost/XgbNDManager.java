@@ -64,11 +64,11 @@ public class XgbNDManager extends BaseNDManager {
     @Override
     public XgbNDArray create(Buffer data, Shape shape, DataType dataType) {
         if (shape.dimension() != 2) {
-            throw new IllegalArgumentException("Shape must be in two dimension");
+            throw new UnsupportedOperationException("Shape must be in two dimension");
         }
         DataType inputType = DataType.fromBuffer(data);
         if (inputType != DataType.FLOAT32) {
-            throw new IllegalArgumentException(
+            throw new UnsupportedOperationException(
                     "Only Float32 data type supported, actual " + inputType);
         }
         if (data.isDirect() && data instanceof ByteBuffer) {
@@ -82,7 +82,7 @@ public class XgbNDManager extends BaseNDManager {
         ByteBuffer buf = allocateDirect(size * numOfBytes);
         buf.asFloatBuffer().put((FloatBuffer) data);
         buf.rewind();
-        long handle = JniUtils.createDMatrix(data, shape, 0.0f);
+        long handle = JniUtils.createDMatrix(buf, shape, 0.0f);
         return new XgbNDArray(this, handle, shape, SparseFormat.DENSE);
     }
 
@@ -91,7 +91,7 @@ public class XgbNDManager extends BaseNDManager {
     public NDArray createCSR(
             float[] data, long[] indptr, long[] indices, Shape shape, Device device) {
         if (shape.dimension() != 2) {
-            throw new IllegalArgumentException("Shape must be in two dimension");
+            throw new UnsupportedOperationException("Shape must be in two dimension");
         }
         int[] intIndices = Arrays.stream(indices).mapToInt(Math::toIntExact).toArray();
         long handle = JniUtils.createDMatrixCSR(indptr, intIndices, data);
@@ -110,10 +110,10 @@ public class XgbNDManager extends BaseNDManager {
     @Override
     public NDArray zeros(Shape shape, DataType dataType) {
         if (dataType != DataType.FLOAT32) {
-            throw new IllegalArgumentException("Only float32 supported");
+            throw new UnsupportedOperationException("Only float32 supported");
         }
         if (shape.dimension() != 2) {
-            throw new IllegalArgumentException("Shape must be in two dimension");
+            throw new UnsupportedOperationException("Shape must be in two dimension");
         }
         int size = Math.toIntExact(4 * shape.size());
         ByteBuffer buffer = allocateDirect(size);
@@ -124,10 +124,10 @@ public class XgbNDManager extends BaseNDManager {
     @Override
     public NDArray ones(Shape shape, DataType dataType) {
         if (dataType != DataType.FLOAT32) {
-            throw new IllegalArgumentException("Only float32 supported");
+            throw new UnsupportedOperationException("Only float32 supported");
         }
         if (shape.dimension() != 2) {
-            throw new IllegalArgumentException("Shape must be in two dimension");
+            throw new UnsupportedOperationException("Shape must be in two dimension");
         }
         long size = shape.size();
         int bytes = Math.toIntExact(4 * size);

@@ -29,6 +29,7 @@ import ml.dmlc.xgboost4j.java.JniUtils;
 public class XgbNDArray implements NDArrayAdapter {
 
     private AtomicLong handle;
+    private String name;
     private String uid;
     private ByteBuffer data;
     private XgbNDManager manager;
@@ -63,6 +64,18 @@ public class XgbNDArray implements NDArrayAdapter {
     @Override
     public XgbNDManager getManager() {
         return manager;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setName(String name) {
+        this.name = name;
     }
 
     /** {@inheritDoc} */
