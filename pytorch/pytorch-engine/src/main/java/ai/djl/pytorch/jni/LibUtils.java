@@ -222,9 +222,12 @@ public final class LibUtils {
         }
 
         Path tmp = null;
-        try (InputStream stream =
-                LibUtils.class.getResourceAsStream(
-                        "/jnilib/" + classifier + '/' + flavor + '/' + name)) {
+        String libPath = "/jnilib/" + classifier + '/' + flavor + '/' + name;
+        logger.info("Extracting {} to cache ...", libPath);
+        try (InputStream stream = LibUtils.class.getResourceAsStream(libPath)) {
+            if (stream == null) {
+                throw new IllegalStateException("PyTorch jni not found: " + libPath);
+            }
             tmp = Files.createTempFile(nativeDir, "jni", "tmp");
             Files.copy(stream, tmp, StandardCopyOption.REPLACE_EXISTING);
             Utils.moveQuietly(tmp, path);
@@ -314,7 +317,11 @@ public final class LibUtils {
             tmp = Files.createTempDirectory(cacheDir, "tmp");
             for (String file : platform.getLibraries()) {
                 String libPath = "/native/lib/" + file;
+                logger.info("Extracting {} to cache ...", libPath);
                 try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
+                    if (is == null) {
+                        throw new IllegalStateException("PyTorch library not found: " + libPath);
+                    }
                     Files.copy(is, tmp.resolve(file), StandardCopyOption.REPLACE_EXISTING);
                 }
             }

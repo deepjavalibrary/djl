@@ -21,9 +21,13 @@ import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A class runs single threaded benchmark. */
 public final class Benchmark extends AbstractBenchmark {
+
+    private static final Logger logger = LoggerFactory.getLogger(Benchmark.class);
 
     /**
      * Main entry point.
@@ -31,6 +35,11 @@ public final class Benchmark extends AbstractBenchmark {
      * @param args command line arguments
      */
     public static void main(String[] args) {
+        String arch = System.getProperty("os.arch");
+        if (!"x86_64".equals(arch) && !"amd64".equals(arch)) {
+            logger.warn("{} is not supported.", arch);
+            return;
+        }
         List<String> list = Arrays.asList(args);
         boolean multithreading = list.contains("-t") || list.contains("--threads");
         configEngines(multithreading);

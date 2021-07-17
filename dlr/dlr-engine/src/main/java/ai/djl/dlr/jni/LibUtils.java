@@ -124,7 +124,11 @@ public final class LibUtils {
             tmp = Files.createTempDirectory(dlrCacheRoot, "tmp");
             for (String file : platform.getLibraries()) {
                 String libPath = "/native/lib/" + file;
+                logger.info("Extracting {} to cache ...", libPath);
                 try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
+                    if (is == null) {
+                        throw new IllegalStateException("native library not found: " + libPath);
+                    }
                     Files.copy(is, tmp.resolve(file), StandardCopyOption.REPLACE_EXISTING);
                 }
             }
