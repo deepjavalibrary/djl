@@ -155,9 +155,12 @@ public final class LibUtils {
         }
 
         Path tmp = null;
-        try (InputStream stream =
-                LibUtils.class.getResourceAsStream(
-                        "/jnilib/" + classifier + '/' + flavor + '/' + name)) {
+        String libPath = "/jnilib/" + classifier + '/' + flavor + '/' + name;
+        try (InputStream stream = LibUtils.class.getResourceAsStream(libPath)) {
+            logger.info("Extracting {} to cache ...", libPath);
+            if (stream == null) {
+                throw new IllegalStateException("Paddle jni not found: " + libPath);
+            }
             tmp = Files.createTempFile(nativeDir, "jni", "tmp");
             Files.copy(stream, tmp, StandardCopyOption.REPLACE_EXISTING);
             Utils.moveQuietly(tmp, path);

@@ -134,8 +134,11 @@ public final class LibUtils {
             tmp = Files.createTempDirectory(cacheFolder, "tmp");
             for (String file : platform.getLibraries()) {
                 String libPath = "/native/lib/" + file;
+                logger.info("Extracting {} to cache ...", libPath);
                 try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
-                    logger.info("Extracting {} to cache ...", file);
+                    if (is == null) {
+                        throw new IllegalStateException("TFLite library not found: " + libPath);
+                    }
                     Files.copy(is, tmp.resolve(file), StandardCopyOption.REPLACE_EXISTING);
                 }
             }
@@ -143,7 +146,7 @@ public final class LibUtils {
             Utils.moveQuietly(tmp, dir);
             return path.toAbsolutePath().toString();
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to extract MXNet native library", e);
+            throw new IllegalStateException("Failed to extract TFLite native library", e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);

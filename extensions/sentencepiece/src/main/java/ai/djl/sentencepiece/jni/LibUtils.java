@@ -71,11 +71,11 @@ public final class LibUtils {
             return path.toAbsolutePath().toString();
         }
         Path tmp = null;
-        try (InputStream stream =
-                LibUtils.class.getResourceAsStream("/native/lib/" + classifier + "/" + name)) {
+        String libPath = "/native/lib/" + classifier + "/" + name;
+        logger.info("Extracting {} to cache ...", libPath);
+        try (InputStream stream = LibUtils.class.getResourceAsStream(libPath)) {
             if (stream == null) {
-                throw new UnsupportedOperationException(
-                        "SentencePiece is not supported by this platform");
+                throw new IllegalStateException("SentencePiece library not found: " + libPath);
             }
             Files.createDirectories(nativeDir.resolve(version));
             tmp = Files.createTempFile(nativeDir, "jni", "tmp");
