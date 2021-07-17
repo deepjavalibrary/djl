@@ -15,6 +15,7 @@ package ai.djl.serving.plugins;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,5 +142,30 @@ public class PluginMetaData {
      */
     public String getError() {
         return error;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PluginMetaData)) {
+            return false;
+        }
+        PluginMetaData that = (PluginMetaData) o;
+        return name.equals(that.name);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return '{' + name + '/' + url + '}';
     }
 }
