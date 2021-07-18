@@ -34,6 +34,8 @@ To get the best throughput, you may also need to set 'OMP_NUM_THREADS' environme
 export OMP_NUM_THREADS=1
 ```
 
+Note that MxNet uses thread_local storage: Every thread that performs inference will allocate memory. In order to avoid memory leaks it is necessary to call MxNet from a fixed size thread pool. See https://github.com/apache/incubator-mxnet/issues/16431#issuecomment-562052116.
+
 ### PyTorch
 
 #### Multithreading Inference
