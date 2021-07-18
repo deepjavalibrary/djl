@@ -51,7 +51,13 @@ public class BlockFactoryTest {
                     TranslateException {
         Path savedDir = Paths.get("build/testBlockFactory");
         Utils.deleteQuietly(savedDir);
-        Path zipPath = prepareModel(savedDir);
+        Path zipPath;
+        try {
+            zipPath = prepareModel(savedDir);
+        } catch (ModelNotFoundException e) {
+            throw new UnsupportedOperationException(
+                    "No test model for engine: " + Engine.getInstance().getEngineName(), e);
+        }
         // load model from here
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
