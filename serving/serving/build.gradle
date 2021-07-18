@@ -69,6 +69,10 @@ run {
     applicationDefaultJvmArgs = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=4000"]
 }
 
+clean {
+    delete file("plugins")
+}
+
 task createDeb(type: Deb, dependsOn: distTar) {
     doFirst {
         exec {
@@ -77,7 +81,7 @@ task createDeb(type: Deb, dependsOn: distTar) {
     }
 
     packageName = "djl-serving"
-    version = "${djl_version}"
+    archiveVersion = "${djl_version}"
     release = 1
     maintainer = "Deep Java Library <djl-dev@amazon.com>"
     summary = "djl-serving is a general model server that can serve both Deep Learning models" +

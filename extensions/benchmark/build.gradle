@@ -131,7 +131,7 @@ task createDeb(type: Deb, dependsOn: distTar) {
     }
 
     packageName = "djl-bench"
-    version = "${djl_version}"
+    archiveVersion = "${djl_version}"
     release = 1
     maintainer = "Deep Java Library <djl-dev@amazon.com>"
     summary = "djl-bench is a command line tool that allows you to benchmark the\n" +

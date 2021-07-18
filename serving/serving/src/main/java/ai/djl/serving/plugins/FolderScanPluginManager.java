@@ -86,11 +86,12 @@ public class FolderScanPluginManager implements PluginManager {
                         .parallelStream()
                         .map(PropertyFilePluginMetaDataReader::new)
                         .map(PropertyFilePluginMetaDataReader::read)
-                        .peek(p -> logger.info("load plugin: {}", p.getName()))
+                        .distinct()
                         .collect(Collectors.toMap(PluginMetaData::getName, i -> i));
 
         // phase 2: initialize components
         for (PluginMetaData plugin : pluginRegistry.values()) {
+            logger.info("Loading plugin: {}", plugin);
             if (pluginRegistry.keySet().containsAll(plugin.getDependencies())) {
                 try {
                     for (String handlerClassName : plugin.getComponentNames()) {

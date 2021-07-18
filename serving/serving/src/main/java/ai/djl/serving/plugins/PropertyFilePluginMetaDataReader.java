@@ -71,7 +71,7 @@ public class PropertyFilePluginMetaDataReader implements PluginMetaDataReader {
         List<String> exportedComponents = getPropertyAsStringList(PROPERTY_PLUGIN_EXPORT);
         List<String> requires = getPropertyAsStringList(PROPERTY_PLUGIN_REQUIRES);
 
-        logger.info("plugin found and registered {}", pluginName);
+        logger.info("Plugin found: {}/{}", pluginName, url);
         return new PluginMetaData(pluginName, url, exportedComponents, requires);
     }
 
