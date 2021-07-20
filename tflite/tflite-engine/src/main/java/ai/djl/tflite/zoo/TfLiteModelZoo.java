@@ -35,8 +35,8 @@ public class TfLiteModelZoo implements ModelZoo {
     private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
 
     static {
-        MRL mobilenet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mobilenet");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, mobilenet, "0.0.1", ZOO));
+        MRL mobilenet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mobilenet", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(mobilenet, ZOO));
     }
 
     /** {@inheritDoc} */

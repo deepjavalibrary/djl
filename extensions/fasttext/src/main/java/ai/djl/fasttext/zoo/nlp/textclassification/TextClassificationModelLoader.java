@@ -18,7 +18,6 @@ import ai.djl.Model;
 import ai.djl.fasttext.FtModel;
 import ai.djl.fasttext.zoo.FtModelZoo;
 import ai.djl.repository.Artifact;
-import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.BaseModelLoader;
 import ai.djl.repository.zoo.Criteria;
@@ -42,20 +41,20 @@ public class TextClassificationModelLoader extends BaseModelLoader {
      * @param repository the repository to load the model from
      */
     public TextClassificationModelLoader(Repository repository) {
-        super(repository, MRL.model(APPLICATION, GROUP_ID, ARTIFACT_ID), VERSION, new FtModelZoo());
+        super(repository.model(APPLICATION, GROUP_ID, ARTIFACT_ID, VERSION), new FtModelZoo());
     }
 
     /** {@inheritDoc} */
     @Override
     public <I, O> ZooModel<I, O> loadModel(Criteria<I, O> criteria)
             throws ModelNotFoundException, IOException, MalformedModelException {
-        Artifact artifact = resource.match(criteria.getFilters());
+        Artifact artifact = mrl.match(criteria.getFilters());
         if (artifact == null) {
             throw new ModelNotFoundException("No matching filter found");
         }
 
         Progress progress = criteria.getProgress();
-        resource.prepare(artifact, progress);
+        mrl.prepare(artifact, progress);
         if (progress != null) {
             progress.reset("Loading", 2);
             progress.update(1);
@@ -65,7 +64,7 @@ public class TextClassificationModelLoader extends BaseModelLoader {
             modelName = artifact.getName();
         }
         Model model = new FtModel(modelName);
-        Path modelPath = resource.getRepository().getResourceDirectory(artifact);
+        Path modelPath = mrl.getRepository().getResourceDirectory(artifact);
         model.load(modelPath);
         return new ZooModel<>(model, null);
     }

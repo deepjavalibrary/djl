@@ -42,7 +42,7 @@ public class ImageNet extends AbstractImageFolder {
     ImageNet(Builder builder) {
         super(builder);
         String usagePath = getUsagePath(builder.usage);
-        root = Paths.get(resource.getRepository().getBaseUri()).resolve(usagePath);
+        root = Paths.get(mrl.getRepository().getBaseUri()).resolve(usagePath);
     }
 
     /**
@@ -85,7 +85,7 @@ public class ImageNet extends AbstractImageFolder {
     @Override
     public void prepare(Progress progress) throws IOException {
         if (!prepared) {
-            resource.prepare(null, progress);
+            mrl.prepare(null, progress);
 
             if (progress != null) {
                 progress.reset("Preparing", 2);

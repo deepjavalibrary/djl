@@ -111,10 +111,9 @@ public class RemoteRepository extends AbstractRepository {
 
     /** {@inheritDoc} */
     @Override
-    public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
-            throws IOException {
+    public Artifact resolve(MRL mrl, Map<String, String> filter) throws IOException {
         Metadata metadata = locate(mrl);
-        VersionRange range = VersionRange.parse(version);
+        VersionRange range = VersionRange.parse(mrl.getVersion());
         List<Artifact> artifacts = metadata.search(range, filter);
         if (artifacts.isEmpty()) {
             return null;

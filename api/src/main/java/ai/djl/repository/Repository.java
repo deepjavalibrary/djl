@@ -99,6 +99,57 @@ public interface Repository {
     }
 
     /**
+     * Creates a model {@code MRL} with specified application.
+     *
+     * @param application the desired application
+     * @param groupId the desired groupId
+     * @param artifactId the desired artifactId
+     * @return a model {@code MRL}
+     */
+    default MRL model(Application application, String groupId, String artifactId) {
+        return model(application, groupId, artifactId, null);
+    }
+
+    /**
+     * Creates a model {@code MRL} with specified application.
+     *
+     * @param application the desired application
+     * @param groupId the desired groupId
+     * @param artifactId the desired artifactId
+     * @param version the resource version
+     * @return a model {@code MRL}
+     */
+    default MRL model(Application application, String groupId, String artifactId, String version) {
+        return MRL.model(this, application, groupId, artifactId, version);
+    }
+
+    /**
+     * Creates a dataset {@code MRL} with specified application.
+     *
+     * @param application the desired application
+     * @param groupId the desired groupId
+     * @param artifactId the desired artifactId
+     * @return a dataset {@code MRL}
+     */
+    default MRL dataset(Application application, String groupId, String artifactId) {
+        return dataset(application, groupId, artifactId, null);
+    }
+
+    /**
+     * Creates a dataset {@code MRL} with specified application.
+     *
+     * @param application the desired application
+     * @param groupId the desired groupId
+     * @param artifactId the desired artifactId
+     * @param version the resource version
+     * @return a dataset {@code MRL}
+     */
+    default MRL dataset(
+            Application application, String groupId, String artifactId, String version) {
+        return MRL.dataset(this, application, groupId, artifactId, version);
+    }
+
+    /**
      * Returns whether the repository is remote repository.
      *
      * @return whether the repository is remote repository
@@ -132,12 +183,11 @@ public interface Repository {
      * Returns the artifact matching a mrl, version, and property filter.
      *
      * @param mrl the mrl to match the artifact against
-     * @param version the version of the artifact
      * @param filter the property filter
      * @return the matched artifact
      * @throws IOException if it failed to load the artifact
      */
-    Artifact resolve(MRL mrl, String version, Map<String, String> filter) throws IOException;
+    Artifact resolve(MRL mrl, Map<String, String> filter) throws IOException;
 
     /**
      * Returns an {@link InputStream} for an item in a repository.

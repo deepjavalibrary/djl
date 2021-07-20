@@ -87,10 +87,9 @@ public class LocalRepository extends AbstractRepository {
 
     /** {@inheritDoc} */
     @Override
-    public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
-            throws IOException {
+    public Artifact resolve(MRL mrl, Map<String, String> filter) throws IOException {
         Metadata metadata = locate(mrl);
-        VersionRange range = VersionRange.parse(version);
+        VersionRange range = VersionRange.parse(mrl.getVersion());
         List<Artifact> artifacts = metadata.search(range, filter);
         if (artifacts.isEmpty()) {
             return null;
@@ -117,9 +116,9 @@ public class LocalRepository extends AbstractRepository {
                                         String groupId = metadata.getGroupId();
                                         String artifactId = metadata.getArtifactId();
                                         if ("dataset".equals(type)) {
-                                            list.add(MRL.dataset(application, groupId, artifactId));
+                                            list.add(dataset(application, groupId, artifactId));
                                         } else if ("model".equals(type)) {
-                                            list.add(MRL.model(application, groupId, artifactId));
+                                            list.add(model(application, groupId, artifactId));
                                         }
                                     } catch (IOException e) {
                                         logger.warn("Failed to read metadata.json", e);

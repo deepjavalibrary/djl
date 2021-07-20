@@ -39,20 +39,21 @@ public class PtModelZoo implements ModelZoo {
     private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
 
     static {
-        MRL resnet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, resnet, "0.0.1", ZOO));
+        MRL resnet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(resnet, ZOO));
 
-        MRL ssd = MRL.model(CV.OBJECT_DETECTION, GROUP_ID, "ssd");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, ssd, "0.0.1", ZOO));
+        MRL ssd = REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "ssd", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(ssd, ZOO));
 
-        MRL bertQa = MRL.model(NLP.QUESTION_ANSWER, GROUP_ID, "bertqa");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, bertQa, "0.0.1", ZOO));
+        MRL bertQa = REPOSITORY.model(NLP.QUESTION_ANSWER, GROUP_ID, "bertqa", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(bertQa, ZOO));
 
-        MRL sentimentAnalysis = MRL.model(NLP.SENTIMENT_ANALYSIS, GROUP_ID, "distilbert");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, sentimentAnalysis, "0.0.1", ZOO));
+        MRL sentimentAnalysis =
+                REPOSITORY.model(NLP.SENTIMENT_ANALYSIS, GROUP_ID, "distilbert", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(sentimentAnalysis, ZOO));
 
-        MRL bigGan = MRL.model(CV.IMAGE_GENERATION, GROUP_ID, "biggan-deep");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, bigGan, "0.0.1", ZOO));
+        MRL bigGan = REPOSITORY.model(CV.IMAGE_GENERATION, GROUP_ID, "biggan-deep", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(bigGan, ZOO));
     }
 
     /** {@inheritDoc} */

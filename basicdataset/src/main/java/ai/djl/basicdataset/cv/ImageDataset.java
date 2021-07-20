@@ -26,6 +26,7 @@ import java.util.Optional;
  * image.
  */
 public abstract class ImageDataset extends RandomAccessDataset {
+
     protected Image.Flag flag;
 
     /**

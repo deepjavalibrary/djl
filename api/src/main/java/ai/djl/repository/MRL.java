@@ -13,7 +13,13 @@
 package ai.djl.repository;
 
 import ai.djl.Application;
+import ai.djl.util.Progress;
+import java.io.IOException;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@code MRL} (Machine learning Resource Locator) is a pointer to a {@link Metadata} "resource"
@@ -36,59 +42,89 @@ import java.net.URI;
  */
 public final class MRL {
 
+    private static final Logger logger = LoggerFactory.getLogger(MRL.class);
+
     private String type;
     private Application application;
     private String groupId;
     private String artifactId;
+    private String version;
+    private Repository repository;
+    private Metadata metadata;
 
     /**
      * Constructs an MRL.
      *
+     * @param repository the {@link Repository}
      * @param type the resource type
      * @param application the resource application
      * @param groupId the desired groupId
      * @param artifactId the desired artifactId
+     * @param version the resource version
      */
-    private MRL(String type, Application application, String groupId, String artifactId) {
+    private MRL(
+            Repository repository,
+            String type,
+            Application application,
+            String groupId,
+            String artifactId,
+            String version) {
+        this.repository = repository;
         this.type = type;
         this.application = application;
         this.groupId = groupId;
         this.artifactId = artifactId;
+        this.version = version;
     }
 
     /**
      * Creates a model {@code MRL} with specified application.
      *
+     * @param repository the {@link Repository}
      * @param application the desired application
      * @param groupId the desired groupId
      * @param artifactId the desired artifactId
+     * @param version the resource version
      * @return a model {@code MRL}
      */
-    public static MRL model(Application application, String groupId, String artifactId) {
-        return new MRL("model", application, groupId, artifactId);
+    public static MRL model(
+            Repository repository,
+            Application application,
+            String groupId,
+            String artifactId,
+            String version) {
+        return new MRL(repository, "model", application, groupId, artifactId, version);
     }
 
     /**
      * Creates a dataset {@code MRL} with specified application.
      *
+     * @param repository the {@link Repository}
      * @param application the desired application
      * @param groupId the desired groupId
      * @param artifactId the desired artifactId
+     * @param version the resource version
      * @return a dataset {@code MRL}
      */
-    public static MRL dataset(Application application, String groupId, String artifactId) {
-        return new MRL("dataset", application, groupId, artifactId);
+    public static MRL dataset(
+            Repository repository,
+            Application application,
+            String groupId,
+            String artifactId,
+            String version) {
+        return new MRL(repository, "dataset", application, groupId, artifactId, version);
     }
 
     /**
      * Creates a dataset {@code MRL} with specified application.
      *
+     * @param repository the {@link Repository}
      * @param groupId the desired groupId
      * @param artifactId the desired artifactId
      * @return a dataset {@code MRL}
      */
-    public static MRL undefined(String groupId, String artifactId) {
-        return new MRL("", Application.UNDEFINED, groupId, artifactId);
+    public static MRL undefined(Repository repository, String groupId, String artifactId) {
+        return new MRL(repository, "", Application.UNDEFINED, groupId, artifactId, null);
     }
 
     /**
@@ -112,9 +148,18 @@ public final class MRL {
     }
 
     /**
-     * Returns the resource application.
+     * Returns the repository.
      *
-     * @return the resource application
+     * @return the repository
+     */
+    public Repository getRepository() {
+        return repository;
+    }
+
+    /**
+     * Returns the application.
+     *
+     * @return the application
      */
     public Application getApplication() {
         return application;
@@ -136,6 +181,96 @@ public final class MRL {
      */
     public String getArtifactId() {
         return artifactId;
+    }
+
+    /**
+     * Returns the version.
+     *
+     * @return the version
+     */
+    public String getVersion() {
+        return version;
+    }
+
+    /**
+     * Returns the default artifact.
+     *
+     * @return the default artifact
+     * @throws IOException for various exceptions depending on the specific dataset
+     */
+    public Artifact getDefaultArtifact() throws IOException {
+        return repository.resolve(this, null);
+    }
+
+    /**
+     * Returns the first artifact that matches a given criteria.
+     *
+     * @param criteria the criteria to match against
+     * @return the first artifact that matches the criteria. Null will be returned if no artifact
+     *     matches
+     * @throws IOException for errors while loading the model
+     */
+    public Artifact match(Map<String, String> criteria) throws IOException {
+        List<Artifact> list = search(criteria);
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
+
+    /**
+     * Returns a list of artifacts in this resource.
+     *
+     * @return a list of artifacts in this resource
+     * @throws IOException for errors while loading the model
+     */
+    public List<Artifact> listArtifacts() throws IOException {
+        return getMetadata().getArtifacts();
+    }
+
+    /**
+     * Prepares the artifact for use.
+     *
+     * @param artifact the artifact to prepare
+     * @throws IOException if it failed to prepare
+     */
+    public void prepare(Artifact artifact) throws IOException {
+        prepare(artifact, null);
+    }
+
+    /**
+     * Prepares the artifact for use with progress tracking.
+     *
+     * @param artifact the artifact to prepare
+     * @param progress the progress tracker
+     * @throws IOException if it failed to prepare
+     */
+    public void prepare(Artifact artifact, Progress progress) throws IOException {
+        if (artifact != null) {
+            logger.debug("Preparing artifact: {}, {}", repository.getName(), artifact);
+            repository.prepare(artifact, progress);
+        }
+    }
+
+    /**
+     * Returns all the artifacts that match a given criteria.
+     *
+     * @param criteria the criteria to match against
+     * @return all the artifacts that match a given criteria
+     * @throws IOException for errors while loading the model
+     */
+    private List<Artifact> search(Map<String, String> criteria) throws IOException {
+        return getMetadata().search(VersionRange.parse(version), criteria);
+    }
+
+    private Metadata getMetadata() throws IOException {
+        if (metadata == null) {
+            metadata = repository.locate(this);
+            if (metadata == null) {
+                throw new IOException(this + " resource not found.");
+            }
+        }
+        return metadata;
     }
 
     /** {@inheritDoc} */

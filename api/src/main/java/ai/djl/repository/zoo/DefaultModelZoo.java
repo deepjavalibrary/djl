@@ -44,7 +44,7 @@ public class DefaultModelZoo implements ModelZoo {
                 logger.debug("Scanning models in repo: {}, {}", repo.getClass(), url);
                 List<MRL> mrls = repo.getResources();
                 for (MRL mrl : mrls) {
-                    modelLoaders.add(new BaseModelLoader(repo, mrl, null, null));
+                    modelLoaders.add(new BaseModelLoader(mrl, null));
                 }
             } else {
                 logger.warn("Model location is empty.");

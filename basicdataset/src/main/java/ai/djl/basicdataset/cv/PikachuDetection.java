@@ -22,7 +22,6 @@ import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.Resource;
 import ai.djl.translate.Pipeline;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.PairList;
@@ -50,16 +49,15 @@ public class PikachuDetection extends ObjectDetectionDataset {
     private List<Path> imagePaths;
     private PairList<Long, Rectangle> labels;
 
-    private Resource resource;
+    private MRL mrl;
     private boolean prepared;
 
     protected PikachuDetection(Builder builder) {
         super(builder);
         usage = builder.usage;
+        mrl = builder.getMrl();
         imagePaths = new ArrayList<>();
         labels = new PairList<>();
-        MRL mrl = MRL.dataset(CV.ANY, builder.groupId, builder.artifactId);
-        resource = new Resource(builder.repository, mrl, VERSION);
     }
 
     /**
@@ -78,10 +76,10 @@ public class PikachuDetection extends ObjectDetectionDataset {
             return;
         }
 
-        Artifact artifact = resource.getDefaultArtifact();
-        resource.prepare(artifact, progress);
+        Artifact artifact = mrl.getDefaultArtifact();
+        mrl.prepare(artifact, progress);
 
-        Path root = resource.getRepository().getResourceDirectory(artifact);
+        Path root = mrl.getRepository().getResourceDirectory(artifact);
         Path usagePath;
         switch (usage) {
             case TRAIN:
@@ -223,6 +221,10 @@ public class PikachuDetection extends ObjectDetectionDataset {
                 pipeline = new Pipeline(new ToTensor());
             }
             return new PikachuDetection(this);
+        }
+
+        MRL getMrl() {
+            return repository.dataset(CV.ANY, groupId, artifactId, VERSION);
         }
     }
 }

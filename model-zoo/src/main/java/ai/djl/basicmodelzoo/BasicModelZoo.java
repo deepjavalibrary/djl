@@ -34,14 +34,14 @@ public class BasicModelZoo implements ModelZoo {
     private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
 
     static {
-        MRL mlp = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mlp");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, mlp, "0.0.3", ZOO));
+        MRL mlp = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mlp", "0.0.3");
+        MODEL_LOADERS.add(new BaseModelLoader(mlp, ZOO));
 
-        MRL resnet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, resnet, "0.0.2", ZOO));
+        MRL resnet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.2");
+        MODEL_LOADERS.add(new BaseModelLoader(resnet, ZOO));
 
-        MRL ssd = MRL.model(CV.OBJECT_DETECTION, GROUP_ID, "ssd");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, ssd, "0.0.2", ZOO));
+        MRL ssd = REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "ssd", "0.0.2");
+        MODEL_LOADERS.add(new BaseModelLoader(ssd, ZOO));
     }
 
     /** {@inheritDoc} */

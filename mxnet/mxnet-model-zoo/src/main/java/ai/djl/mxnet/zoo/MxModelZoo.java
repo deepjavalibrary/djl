@@ -39,68 +39,70 @@ public class MxModelZoo implements ModelZoo {
     private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
 
     static {
-        MRL ssd = MRL.model(CV.OBJECT_DETECTION, GROUP_ID, "ssd");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, ssd, "0.0.1", ZOO));
+        MRL ssd = REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "ssd", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(ssd, ZOO));
 
-        MRL yolo = MRL.model(CV.OBJECT_DETECTION, GROUP_ID, "yolo");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, yolo, "0.0.1", ZOO));
+        MRL yolo = REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "yolo", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(yolo, ZOO));
 
-        MRL alexnet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "alexnet");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, alexnet, "0.0.1", ZOO));
+        MRL alexnet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "alexnet", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(alexnet, ZOO));
 
-        MRL darknet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "darknet");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, darknet, "0.0.1", ZOO));
+        MRL darknet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "darknet", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(darknet, ZOO));
 
-        MRL densenet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "densenet");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, densenet, "0.0.1", ZOO));
+        MRL densenet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "densenet", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(densenet, ZOO));
 
-        MRL googlenet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "googlenet");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, googlenet, "0.0.1", ZOO));
+        MRL googlenet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "googlenet", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(googlenet, ZOO));
 
-        MRL inceptionv3 = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "inceptionv3");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, inceptionv3, "0.0.1", ZOO));
+        MRL inceptionv3 =
+                REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "inceptionv3", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(inceptionv3, ZOO));
 
-        MRL mlp = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mlp");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, mlp, "0.0.1", ZOO));
+        MRL mlp = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mlp", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(mlp, ZOO));
 
-        MRL mobilenet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mobilenet");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, mobilenet, "0.0.1", ZOO));
+        MRL mobilenet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mobilenet", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(mobilenet, ZOO));
 
-        MRL resnest = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnest");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, resnest, "0.0.1", ZOO));
+        MRL resnest = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnest", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(resnest, ZOO));
 
-        MRL resnet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, resnet, "0.0.1", ZOO));
+        MRL resnet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(resnet, ZOO));
 
-        MRL senet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "senet");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, senet, "0.0.1", ZOO));
+        MRL senet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "senet", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(senet, ZOO));
 
-        MRL seresnext = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "se_resnext");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, seresnext, "0.0.1", ZOO));
+        MRL seresnext = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "se_resnext", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(seresnext, ZOO));
 
-        MRL squeezenet = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "squeezenet");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, squeezenet, "0.0.1", ZOO));
+        MRL squeezenet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "squeezenet", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(squeezenet, ZOO));
 
-        MRL vgg = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "vgg");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, vgg, "0.0.1", ZOO));
+        MRL vgg = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "vgg", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(vgg, ZOO));
 
-        MRL xception = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "xception");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, xception, "0.0.1", ZOO));
+        MRL xception = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "xception", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(xception, ZOO));
 
-        MRL simplePose = MRL.model(CV.POSE_ESTIMATION, GROUP_ID, "simple_pose");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, simplePose, "0.0.1", ZOO));
+        MRL simplePose = REPOSITORY.model(CV.POSE_ESTIMATION, GROUP_ID, "simple_pose", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(simplePose, ZOO));
 
-        MRL maskrcnn = MRL.model(CV.INSTANCE_SEGMENTATION, GROUP_ID, "mask_rcnn");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, maskrcnn, "0.0.1", ZOO));
+        MRL maskrcnn = REPOSITORY.model(CV.INSTANCE_SEGMENTATION, GROUP_ID, "mask_rcnn", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(maskrcnn, ZOO));
 
-        MRL actionRecognition = MRL.model(CV.ACTION_RECOGNITION, GROUP_ID, "action_recognition");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, actionRecognition, "0.0.1", ZOO));
+        MRL actionRecognition =
+                REPOSITORY.model(CV.ACTION_RECOGNITION, GROUP_ID, "action_recognition", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(actionRecognition, ZOO));
 
-        MRL bertQa = MRL.model(NLP.QUESTION_ANSWER, GROUP_ID, "bertqa");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, bertQa, "0.0.1", ZOO));
+        MRL bertQa = REPOSITORY.model(NLP.QUESTION_ANSWER, GROUP_ID, "bertqa", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(bertQa, ZOO));
 
-        MRL glove = MRL.model(NLP.WORD_EMBEDDING, GROUP_ID, "glove");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, glove, "0.0.2", ZOO));
+        MRL glove = REPOSITORY.model(NLP.WORD_EMBEDDING, GROUP_ID, "glove", "0.0.2");
+        MODEL_LOADERS.add(new BaseModelLoader(glove, ZOO));
     }
 
     /** {@inheritDoc} */

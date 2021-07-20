@@ -14,8 +14,9 @@ package ai.djl.basicdataset.cv.classification;
 
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
+import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.Resource;
+import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
@@ -43,7 +44,7 @@ public abstract class AbstractImageFolder extends ImageClassificationDataset {
 
     protected List<String> synset;
     protected PairList<String, Integer> items;
-    protected Resource resource;
+    protected MRL mrl;
     protected boolean prepared;
 
     private int maxDepth;
@@ -57,7 +58,8 @@ public abstract class AbstractImageFolder extends ImageClassificationDataset {
         this.imageHeight = builder.imageHeight;
         this.synset = new ArrayList<>();
         this.items = new PairList<>();
-        this.resource = new Resource(builder.repository, null, "1.0");
+        String path = builder.repository.getBaseUri().toString();
+        mrl = MRL.undefined(builder.repository, DefaultModelZoo.GROUP_ID, path);
     }
 
     /** {@inheritDoc} */

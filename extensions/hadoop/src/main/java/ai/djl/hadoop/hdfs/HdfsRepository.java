@@ -98,8 +98,7 @@ public class HdfsRepository extends AbstractRepository {
 
     /** {@inheritDoc} */
     @Override
-    public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
-            throws IOException {
+    public Artifact resolve(MRL mrl, Map<String, String> filter) throws IOException {
         Metadata m = locate(mrl);
         if (m == null) {
             return null;
@@ -129,7 +128,7 @@ public class HdfsRepository extends AbstractRepository {
         try {
             Metadata m = getMetadata();
             if (m != null && !m.getArtifacts().isEmpty()) {
-                MRL mrl = MRL.model(Application.UNDEFINED, m.getGroupId(), m.getArtifactId());
+                MRL mrl = model(Application.UNDEFINED, m.getGroupId(), m.getArtifactId());
                 return Collections.singletonList(mrl);
             }
         } catch (IOException e) {
@@ -152,7 +151,7 @@ public class HdfsRepository extends AbstractRepository {
 
         metadata = new Metadata.MatchAllMetadata();
         String hash = md5hash(uri.resolve(prefix).toString());
-        MRL mrl = MRL.model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
+        MRL mrl = model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
         metadata.setRepositoryUri(mrl.toURI());
         metadata.setArtifactId(artifactId);
         metadata.setArtifacts(Collections.singletonList(artifact));
