@@ -12,7 +12,7 @@
  */
 package ai.djl.basicdataset.cv;
 
-import ai.djl.Application.CV;
+import ai.djl.Application;
 import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
@@ -22,7 +22,6 @@ import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.Resource;
 import ai.djl.translate.Pipeline;
 import ai.djl.util.PairList;
 import ai.djl.util.Progress;
@@ -40,21 +39,21 @@ import java.util.Optional;
 public class CocoDetection extends ObjectDetectionDataset {
 
     private static final String ARTIFACT_ID = "coco";
+    private static final String VERSION = "1.0";
 
     private Usage usage;
     private List<Path> imagePaths;
     private List<PairList<Long, Rectangle>> labels;
 
-    private Resource resource;
+    private MRL mrl;
     private boolean prepared;
 
     CocoDetection(Builder builder) {
         super(builder);
         usage = builder.usage;
+        mrl = builder.getMrl();
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
-        MRL mrl = MRL.dataset(CV.ANY, builder.groupId, builder.artifactId);
-        resource = new Resource(builder.repository, mrl, "1.0");
     }
 
     /**
@@ -78,9 +77,9 @@ public class CocoDetection extends ObjectDetectionDataset {
             return;
         }
 
-        Artifact artifact = resource.getDefaultArtifact();
-        resource.prepare(artifact, progress);
-        Path root = resource.getRepository().getResourceDirectory(artifact);
+        Artifact artifact = mrl.getDefaultArtifact();
+        mrl.prepare(artifact, progress);
+        Path root = mrl.getRepository().getResourceDirectory(artifact);
 
         Path jsonFile;
         switch (usage) {
@@ -232,6 +231,10 @@ public class CocoDetection extends ObjectDetectionDataset {
                 pipeline = new Pipeline(new ToTensor());
             }
             return new CocoDetection(this);
+        }
+
+        MRL getMrl() {
+            return repository.dataset(Application.CV.ANY, groupId, artifactId, VERSION);
         }
     }
 }

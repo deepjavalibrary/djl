@@ -19,7 +19,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
-import ai.djl.repository.Resource;
 import ai.djl.training.dataset.Record;
 import ai.djl.util.Progress;
 import java.io.File;
@@ -56,8 +55,7 @@ public class StanfordMovieReview extends TextDataset {
     protected StanfordMovieReview(Builder builder) {
         super(builder);
         this.usage = builder.usage;
-        MRL mrl = MRL.dataset(NLP.ANY, builder.groupId, builder.artifactId);
-        resource = new Resource(builder.repository, mrl, VERSION);
+        mrl = builder.getMrl();
     }
 
     /**
@@ -75,9 +73,9 @@ public class StanfordMovieReview extends TextDataset {
         if (prepared) {
             return;
         }
-        Artifact artifact = resource.getDefaultArtifact();
-        resource.prepare(artifact, progress);
-        Path cacheDir = resource.getRepository().getCacheDirectory();
+        Artifact artifact = mrl.getDefaultArtifact();
+        mrl.prepare(artifact, progress);
+        Path cacheDir = mrl.getRepository().getCacheDirectory();
         URI resourceUri = artifact.getResourceUri();
         Path root = cacheDir.resolve(resourceUri.getPath()).resolve("aclImdb").resolve("aclImdb");
 
@@ -166,6 +164,10 @@ public class StanfordMovieReview extends TextDataset {
          */
         public StanfordMovieReview build() {
             return new StanfordMovieReview(this);
+        }
+
+        MRL getMrl() {
+            return repository.dataset(NLP.ANY, groupId, artifactId, VERSION);
         }
     }
 }

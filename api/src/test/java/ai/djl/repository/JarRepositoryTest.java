@@ -43,7 +43,7 @@ public class JarRepositoryTest {
         List<MRL> list = repo.getResources();
         Assert.assertEquals(list.size(), 1);
 
-        Artifact artifact = repo.resolve(list.get(0), null, null);
+        Artifact artifact = repo.resolve(list.get(0), null);
         repo.prepare(artifact);
         Assert.assertEquals(1, artifact.getFiles().size());
     }

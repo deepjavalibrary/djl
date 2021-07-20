@@ -35,8 +35,9 @@ public class OrtModelZoo implements ModelZoo {
     private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
 
     static {
-        MRL irisFlower = MRL.model(Tabular.SOFTMAX_REGRESSION, GROUP_ID, "iris_flowers");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, irisFlower, "0.0.1", ZOO));
+        MRL irisFlower =
+                REPOSITORY.model(Tabular.SOFTMAX_REGRESSION, GROUP_ID, "iris_flowers", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(irisFlower, ZOO));
     }
 
     /** {@inheritDoc} */

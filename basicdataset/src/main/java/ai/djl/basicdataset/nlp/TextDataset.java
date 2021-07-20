@@ -22,8 +22,8 @@ import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.ndarray.NDManager;
+import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.Resource;
 import ai.djl.training.dataset.RandomAccessDataset;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -46,7 +46,7 @@ public abstract class TextDataset extends RandomAccessDataset {
     protected NDManager manager;
     protected Usage usage;
 
-    protected Resource resource;
+    protected MRL mrl;
     protected boolean prepared;
     protected List<Sample> samples;
 

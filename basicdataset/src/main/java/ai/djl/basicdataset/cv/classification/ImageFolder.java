@@ -63,9 +63,9 @@ public final class ImageFolder extends AbstractImageFolder {
     @Override
     public void prepare(Progress progress) throws IOException {
         if (!prepared) {
-            resource.prepare(null, progress);
+            mrl.prepare(null, progress);
             loadSynset();
-            Path root = Paths.get(resource.getRepository().getBaseUri());
+            Path root = Paths.get(mrl.getRepository().getBaseUri());
             if (progress != null) {
                 progress.reset("Preparing", 2);
                 progress.start(0);
@@ -79,7 +79,7 @@ public final class ImageFolder extends AbstractImageFolder {
     }
 
     private void loadSynset() {
-        File root = new File(resource.getRepository().getBaseUri());
+        File root = new File(mrl.getRepository().getBaseUri());
         File[] dir = root.listFiles(f -> f.isDirectory() && !f.getName().startsWith("."));
         if (dir == null || dir.length == 0) {
             throw new IllegalArgumentException(root + " not found or didn't have any file in it");

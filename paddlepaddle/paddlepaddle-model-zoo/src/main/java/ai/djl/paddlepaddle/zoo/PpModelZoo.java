@@ -35,20 +35,25 @@ public class PpModelZoo implements ModelZoo {
     private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
 
     static {
-        MRL maskDetection = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mask_classification");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, maskDetection, "0.0.1", ZOO));
+        MRL maskDetection =
+                REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mask_classification", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(maskDetection, ZOO));
 
-        MRL wordRotation = MRL.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "word_rotation");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, wordRotation, "0.0.1", ZOO));
+        MRL wordRotation =
+                REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "word_rotation", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(wordRotation, ZOO));
 
-        MRL faceDetection = MRL.model(CV.OBJECT_DETECTION, GROUP_ID, "face_detection");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, faceDetection, "0.0.1", ZOO));
+        MRL faceDetection =
+                REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "face_detection", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(faceDetection, ZOO));
 
-        MRL wordDetection = MRL.model(CV.OBJECT_DETECTION, GROUP_ID, "word_detection");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, wordDetection, "0.0.1", ZOO));
+        MRL wordDetection =
+                REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "word_detection", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(wordDetection, ZOO));
 
-        MRL wordRecognition = MRL.model(CV.WORD_RECOGNITION, GROUP_ID, "word_recognition");
-        MODEL_LOADERS.add(new BaseModelLoader(REPOSITORY, wordRecognition, "0.0.1", ZOO));
+        MRL wordRecognition =
+                REPOSITORY.model(CV.WORD_RECOGNITION, GROUP_ID, "word_recognition", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(wordRecognition, ZOO));
     }
 
     /** {@inheritDoc} */

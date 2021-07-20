@@ -22,7 +22,6 @@ import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.Resource;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
@@ -55,7 +54,7 @@ public class BananaDetection extends ObjectDetectionDataset {
     private final List<Path> imagePaths;
     private final PairList<Long, Rectangle> labels;
 
-    private final Resource resource;
+    private final MRL mrl;
     private boolean prepared;
 
     /**
@@ -67,10 +66,9 @@ public class BananaDetection extends ObjectDetectionDataset {
     public BananaDetection(Builder builder) {
         super(builder);
         usage = builder.usage;
+        mrl = builder.getMrl();
         imagePaths = new ArrayList<>();
         labels = new PairList<>();
-        MRL mrl = MRL.dataset(Application.CV.ANY, builder.groupId, builder.artifactId);
-        resource = new Resource(builder.repository, mrl, VERSION);
     }
 
     /**
@@ -100,10 +98,10 @@ public class BananaDetection extends ObjectDetectionDataset {
             return;
         }
 
-        Artifact artifact = resource.getDefaultArtifact();
-        resource.prepare(artifact, progress);
+        Artifact artifact = mrl.getDefaultArtifact();
+        mrl.prepare(artifact, progress);
 
-        Path root = resource.getRepository().getResourceDirectory(artifact);
+        Path root = mrl.getRepository().getResourceDirectory(artifact);
         Path usagePath;
         switch (usage) {
             case TRAIN:
@@ -234,6 +232,10 @@ public class BananaDetection extends ObjectDetectionDataset {
                 pipeline = new Pipeline(new ToTensor());
             }
             return new BananaDetection(this);
+        }
+
+        MRL getMrl() {
+            return repository.dataset(Application.CV.ANY, groupId, artifactId, VERSION);
         }
     }
 }

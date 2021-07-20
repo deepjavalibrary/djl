@@ -92,8 +92,7 @@ public class SimpleRepository extends AbstractRepository {
 
     /** {@inheritDoc} */
     @Override
-    public Artifact resolve(MRL mrl, String version, Map<String, String> filter)
-            throws IOException {
+    public Artifact resolve(MRL mrl, Map<String, String> filter) throws IOException {
         List<Artifact> artifacts = locate(mrl).getArtifacts();
         if (artifacts.isEmpty()) {
             return null;
@@ -156,7 +155,7 @@ public class SimpleRepository extends AbstractRepository {
             return Collections.emptyList();
         }
 
-        MRL mrl = MRL.undefined(DefaultModelZoo.GROUP_ID, artifactId);
+        MRL mrl = MRL.undefined(this, DefaultModelZoo.GROUP_ID, artifactId);
         return Collections.singletonList(mrl);
     }
 
@@ -190,7 +189,7 @@ public class SimpleRepository extends AbstractRepository {
             artifact.setName(modelName);
 
             String hash = md5hash(uri + "artifact_id=" + artifactId + "&model_name=" + modelName);
-            MRL mrl = MRL.model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
+            MRL mrl = model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
             metadata.setRepositoryUri(mrl.toURI());
         } else {
             if (Files.isDirectory(path)) {

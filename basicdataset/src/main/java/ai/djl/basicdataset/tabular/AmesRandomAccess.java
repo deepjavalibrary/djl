@@ -17,7 +17,6 @@ import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.Resource;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
 import java.io.IOException;
@@ -46,16 +45,16 @@ import org.apache.commons.csv.CSVFormat;
 public class AmesRandomAccess extends CsvDataset {
 
     private static final String ARTIFACT_ID = "ames";
+    private static final String VERSION = "1.0";
 
     private Usage usage;
-    private Resource resource;
+    private MRL mrl;
     private boolean prepared;
 
     AmesRandomAccess(Builder builder) {
         super(builder);
         usage = builder.usage;
-        MRL mrl = MRL.dataset(Tabular.ANY, builder.groupId, builder.artifactId);
-        resource = new Resource(builder.repository, mrl, "1.0");
+        mrl = builder.getMrl();
     }
 
     /** {@inheritDoc} */
@@ -65,10 +64,10 @@ public class AmesRandomAccess extends CsvDataset {
             return;
         }
 
-        Artifact artifact = resource.getDefaultArtifact();
-        resource.prepare(artifact, progress);
+        Artifact artifact = mrl.getDefaultArtifact();
+        mrl.prepare(artifact, progress);
 
-        Path dir = resource.getRepository().getResourceDirectory(artifact);
+        Path dir = mrl.getRepository().getResourceDirectory(artifact);
         Path root = dir.resolve("house-prices-advanced-regression-techniques");
         Path csvFile;
         switch (usage) {
@@ -239,6 +238,10 @@ public class AmesRandomAccess extends CsvDataset {
                     throw new AssertionError("Failed to read ames.json from classpath", e);
                 }
             }
+        }
+
+        MRL getMrl() {
+            return repository.dataset(Tabular.ANY, groupId, artifactId, VERSION);
         }
     }
 

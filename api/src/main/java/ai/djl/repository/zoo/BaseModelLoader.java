@@ -21,8 +21,6 @@ import ai.djl.nn.Block;
 import ai.djl.nn.BlockFactory;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
-import ai.djl.repository.Repository;
-import ai.djl.repository.Resource;
 import ai.djl.translate.DefaultTranslatorFactory;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
@@ -44,19 +42,17 @@ import java.util.stream.Collectors;
 public class BaseModelLoader implements ModelLoader {
 
     protected ModelZoo modelZoo;
-    protected Resource resource;
+    protected MRL mrl;
     protected TranslatorFactory defaultFactory;
 
     /**
      * Constructs a {@link ModelLoader} given the repository, mrl, and version.
      *
-     * @param repository the repository to load the model from
      * @param mrl the mrl of the model to load
-     * @param version the version of the model to load
      * @param modelZoo the modelZoo type that is being used to get supported engine types
      */
-    public BaseModelLoader(Repository repository, MRL mrl, String version, ModelZoo modelZoo) {
-        this.resource = new Resource(repository, mrl, version);
+    public BaseModelLoader(MRL mrl, ModelZoo modelZoo) {
+        this.mrl = mrl;
         this.modelZoo = modelZoo;
         defaultFactory = new DefaultTranslatorFactory();
     }
@@ -64,13 +60,13 @@ public class BaseModelLoader implements ModelLoader {
     /** {@inheritDoc} */
     @Override
     public String getArtifactId() {
-        return resource.getMrl().getArtifactId();
+        return mrl.getArtifactId();
     }
 
     /** {@inheritDoc} */
     @Override
     public Application getApplication() {
-        return resource.getMrl().getApplication();
+        return mrl.getApplication();
     }
 
     /** {@inheritDoc} */
@@ -78,7 +74,7 @@ public class BaseModelLoader implements ModelLoader {
     @SuppressWarnings("unchecked")
     public <I, O> ZooModel<I, O> loadModel(Criteria<I, O> criteria)
             throws IOException, ModelNotFoundException, MalformedModelException {
-        Artifact artifact = resource.match(criteria.getFilters());
+        Artifact artifact = mrl.match(criteria.getFilters());
         if (artifact == null) {
             throw new ModelNotFoundException("No matching filter found");
         }
@@ -98,13 +94,13 @@ public class BaseModelLoader implements ModelLoader {
                 }
             }
 
-            resource.prepare(artifact, progress);
+            mrl.prepare(artifact, progress);
             if (progress != null) {
                 progress.reset("Loading", 2);
                 progress.update(1);
             }
 
-            Path modelPath = resource.getRepository().getResourceDirectory(artifact);
+            Path modelPath = mrl.getRepository().getResourceDirectory(artifact);
 
             loadServingProperties(modelPath, arguments);
             Application application = criteria.getApplication();
@@ -169,8 +165,8 @@ public class BaseModelLoader implements ModelLoader {
     /** {@inheritDoc} */
     @Override
     public List<Artifact> listModels() throws IOException {
-        List<Artifact> list = resource.listArtifacts();
-        String version = resource.getVersion();
+        List<Artifact> list = mrl.listArtifacts();
+        String version = mrl.getVersion();
         return list.stream()
                 .filter(a -> version == null || version.equals(a.getVersion()))
                 .collect(Collectors.toList());
@@ -202,9 +198,9 @@ public class BaseModelLoader implements ModelLoader {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
-        sb.append(resource.getMrl().getGroupId())
+        sb.append(mrl.getGroupId())
                 .append(':')
-                .append(resource.getMrl().getArtifactId())
+                .append(mrl.getArtifactId())
                 .append(' ')
                 .append(getApplication())
                 .append(" [\n");

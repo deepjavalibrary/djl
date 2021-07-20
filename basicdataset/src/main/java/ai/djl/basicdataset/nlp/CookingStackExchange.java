@@ -19,7 +19,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.Resource;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.util.Progress;
@@ -33,17 +32,17 @@ import java.nio.file.Path;
 public class CookingStackExchange implements RawDataset<Path> {
 
     private static final String ARTIFACT_ID = "cooking_stackexchange";
+    private static final String VERSION = "1.0";
 
     private Dataset.Usage usage;
     private Path root;
 
-    private Resource resource;
+    private MRL mrl;
     private boolean prepared;
 
     CookingStackExchange(Builder builder) {
         this.usage = builder.usage;
-        MRL mrl = MRL.dataset(NLP.ANY, builder.groupId, builder.artifactId);
-        resource = new Resource(builder.repository, mrl, "1.0");
+        mrl = builder.getMrl();
     }
 
     /** {@inheritDoc} */
@@ -66,8 +65,8 @@ public class CookingStackExchange implements RawDataset<Path> {
             return;
         }
 
-        Artifact artifact = resource.getDefaultArtifact();
-        resource.prepare(artifact, progress);
+        Artifact artifact = mrl.getDefaultArtifact();
+        mrl.prepare(artifact, progress);
 
         Artifact.Item item;
         switch (usage) {
@@ -81,7 +80,7 @@ public class CookingStackExchange implements RawDataset<Path> {
             default:
                 throw new IOException("Only training and testing dataset supported.");
         }
-        root = resource.getRepository().getFile(item, "").toAbsolutePath();
+        root = mrl.getRepository().getFile(item, "").toAbsolutePath();
         prepared = true;
     }
 
@@ -167,6 +166,10 @@ public class CookingStackExchange implements RawDataset<Path> {
          */
         public CookingStackExchange build() {
             return new CookingStackExchange(this);
+        }
+
+        MRL getMrl() {
+            return repository.dataset(NLP.ANY, groupId, artifactId, VERSION);
         }
     }
 }

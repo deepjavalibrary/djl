@@ -87,7 +87,7 @@ public class HdfsRepositoryTest {
         List<MRL> list = repo.getResources();
         Assert.assertFalse(list.isEmpty());
 
-        Artifact artifact = repo.resolve(list.get(0), "1.0", null);
+        Artifact artifact = repo.resolve(list.get(0), null);
         repo.prepare(artifact);
     }
 
@@ -98,7 +98,7 @@ public class HdfsRepositoryTest {
         List<MRL> list = repo.getResources();
         Assert.assertFalse(list.isEmpty());
 
-        Artifact artifact = repo.resolve(list.get(0), "1.0", null);
+        Artifact artifact = repo.resolve(list.get(0), null);
         repo.prepare(artifact);
 
         Assert.assertTrue(repo.isRemote());
@@ -119,8 +119,8 @@ public class HdfsRepositoryTest {
         List<MRL> list = repo.getResources();
         Assert.assertTrue(list.isEmpty());
 
-        MRL mrl = MRL.model(Application.UNDEFINED, "ai.djl.localmodelzoo", "mlp");
-        Artifact artifact = repo.resolve(mrl, "0.0.1", null);
+        MRL mrl = repo.model(Application.UNDEFINED, "ai.djl.localmodelzoo", "mlp");
+        Artifact artifact = repo.resolve(mrl, null);
         Assert.assertNull(artifact);
     }
 

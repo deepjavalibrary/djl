@@ -12,7 +12,7 @@
  */
 package ai.djl.basicdataset.tabular;
 
-import ai.djl.Application;
+import ai.djl.Application.Tabular;
 import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -20,7 +20,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.Resource;
 import ai.djl.util.Progress;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -41,12 +40,13 @@ import org.apache.commons.csv.CSVRecord;
 public final class AirfoilRandomAccess extends CsvDataset {
 
     private static final String ARTIFACT_ID = "airfoil";
+    private static final String VERSION = "1.0";
 
     private static final String[] COLUMNS = {
         "freq", "aoa", "chordlen", "freestreamvel", "ssdt", "ssoundpres"
     };
 
-    private Resource resource;
+    private MRL mrl;
     private Usage usage;
     private boolean prepared;
 
@@ -61,9 +61,8 @@ public final class AirfoilRandomAccess extends CsvDataset {
      */
     AirfoilRandomAccess(Builder builder) {
         super(builder);
-        MRL mrl = MRL.dataset(Application.Tabular.ANY, builder.groupId, builder.artifactId);
-        resource = new Resource(builder.repository, mrl, "1.0");
         usage = builder.usage;
+        mrl = builder.getMrl();
         normalize = builder.normalize;
     }
 
@@ -74,10 +73,10 @@ public final class AirfoilRandomAccess extends CsvDataset {
             return;
         }
 
-        Artifact artifact = resource.getDefaultArtifact();
-        resource.prepare(artifact);
+        Artifact artifact = mrl.getDefaultArtifact();
+        mrl.prepare(artifact);
 
-        Path root = resource.getRepository().getResourceDirectory(artifact);
+        Path root = mrl.getRepository().getResourceDirectory(artifact);
         Path csvFile;
         switch (usage) {
             case TRAIN:
@@ -281,6 +280,10 @@ public final class AirfoilRandomAccess extends CsvDataset {
                 addNumericLabel("ssoundpres");
             }
             return new AirfoilRandomAccess(this);
+        }
+
+        MRL getMrl() {
+            return repository.dataset(Tabular.ANY, groupId, artifactId, VERSION);
         }
     }
 }
