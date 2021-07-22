@@ -28,8 +28,6 @@ import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
@@ -111,7 +109,7 @@ public abstract class AbstractRepository implements Repository {
 
         Path parentDir = resourceDir.toAbsolutePath().getParent();
         if (parentDir == null) {
-            throw new AssertionError("Parent path should never be null: " + resourceDir.toString());
+            throw new AssertionError("Parent path should never be null: " + resourceDir);
         }
 
         Files.createDirectories(parentDir);
@@ -145,15 +143,16 @@ public abstract class AbstractRepository implements Repository {
         if (Files.notExists(dir)) {
             Files.createDirectories(dir);
         } else if (!Files.isDirectory(dir)) {
-            throw new IOException("Failed initialize cache directory: " + dir.toString());
+            throw new IOException("Failed initialize cache directory: " + dir);
         }
         return dir;
     }
 
     /** {@inheritDoc} */
     @Override
-    public List<MRL> getResources() {
-        return Collections.emptyList();
+    public void addResource(MRL mrl) {
+        throw new IllegalArgumentException(
+                getClass().getSimpleName() + " doesn't support addResource.");
     }
 
     protected void download(Path tmp, URI baseUri, Artifact.Item item, Progress progress)
@@ -228,8 +227,7 @@ public abstract class AbstractRepository implements Repository {
                 } else {
                     Path parentFile = file.getParent();
                     if (parentFile == null) {
-                        throw new AssertionError(
-                                "Parent path should never be null: " + file.toString());
+                        throw new AssertionError("Parent path should never be null: " + file);
                     }
                     Files.createDirectories(parentFile);
                     Files.copy(tis, file, StandardCopyOption.REPLACE_EXISTING);

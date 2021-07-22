@@ -18,10 +18,6 @@ public class DefaultZooProvider implements ZooProvider {
     /** {@inheritDoc} */
     @Override
     public ModelZoo getModelZoo() {
-        String locations = System.getProperty("ai.djl.repository.zoo.location");
-        if (locations != null) {
-            return new DefaultModelZoo(locations);
-        }
-        return null;
+        return new DefaultModelZoo();
     }
 }

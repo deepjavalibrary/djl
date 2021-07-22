@@ -75,7 +75,7 @@ public interface Repository {
      * @return the new repository
      */
     static Repository newInstance(String name, Path path) {
-        return RepositoryFactoryImpl.getFactory().newInstance(name, path.toUri().toString());
+        return RepositoryFactoryImpl.getFactory().newInstance(name, path.toUri());
     }
 
     /**
@@ -86,7 +86,7 @@ public interface Repository {
      * @return the new repository
      */
     static Repository newInstance(String name, String url) {
-        return RepositoryFactoryImpl.getFactory().newInstance(name, url);
+        return RepositoryFactoryImpl.getFactory().newInstance(name, URI.create(url));
     }
 
     /**
@@ -107,7 +107,7 @@ public interface Repository {
      * @return a model {@code MRL}
      */
     default MRL model(Application application, String groupId, String artifactId) {
-        return model(application, groupId, artifactId, null);
+        return model(application, groupId, artifactId, null, null);
     }
 
     /**
@@ -120,7 +120,26 @@ public interface Repository {
      * @return a model {@code MRL}
      */
     default MRL model(Application application, String groupId, String artifactId, String version) {
-        return MRL.model(this, application, groupId, artifactId, version);
+        return MRL.model(this, application, groupId, artifactId, version, null);
+    }
+
+    /**
+     * Creates a model {@code MRL} with specified application.
+     *
+     * @param application the desired application
+     * @param groupId the desired groupId
+     * @param artifactId the desired artifactId
+     * @param version the resource version
+     * @param artifactName the desired artifact name
+     * @return a model {@code MRL}
+     */
+    default MRL model(
+            Application application,
+            String groupId,
+            String artifactId,
+            String version,
+            String artifactName) {
+        return MRL.model(this, application, groupId, artifactId, version, artifactName);
     }
 
     /**
@@ -266,4 +285,11 @@ public interface Repository {
      * @return a list of {@link MRL}s in the repository
      */
     List<MRL> getResources();
+
+    /**
+     * Adds resource to the repository.
+     *
+     * @param mrl the resource to add
+     */
+    void addResource(MRL mrl);
 }

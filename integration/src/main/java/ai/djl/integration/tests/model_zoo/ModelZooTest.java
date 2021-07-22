@@ -19,13 +19,11 @@ import ai.djl.repository.Artifact;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
-import ai.djl.repository.zoo.ZooProvider;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.List;
-import java.util.ServiceLoader;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -56,23 +54,19 @@ public class ModelZooTest {
             throw new SkipException("Weekly only");
         }
 
-        ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
-        for (ZooProvider provider : providers) {
-            ModelZoo zoo = provider.getModelZoo();
-            if (zoo != null) {
-                for (ModelLoader modelLoader : zoo.getModelLoaders()) {
-                    List<Artifact> artifacts = modelLoader.listModels();
-                    for (Artifact artifact : artifacts) {
-                        Criteria<NDList, NDList> criteria =
-                                Criteria.builder()
-                                        .setTypes(NDList.class, NDList.class)
-                                        .optFilters(artifact.getProperties())
-                                        .build();
-                        Model model = modelLoader.loadModel(criteria);
-                        model.close();
-                    }
-                    Utils.deleteQuietly(Paths.get("build/cache"));
+        for (ModelZoo zoo : ModelZoo.listModelZoo()) {
+            for (ModelLoader modelLoader : zoo.getModelLoaders()) {
+                List<Artifact> artifacts = modelLoader.listModels();
+                for (Artifact artifact : artifacts) {
+                    Criteria<NDList, NDList> criteria =
+                            Criteria.builder()
+                                    .setTypes(NDList.class, NDList.class)
+                                    .optFilters(artifact.getProperties())
+                                    .build();
+                    Model model = modelLoader.loadModel(criteria);
+                    model.close();
                 }
+                Utils.deleteQuietly(Paths.get("build/cache"));
             }
         }
     }

@@ -49,6 +49,7 @@ public final class MRL {
     private String groupId;
     private String artifactId;
     private String version;
+    private String artifactName;
     private Repository repository;
     private Metadata metadata;
 
@@ -61,6 +62,7 @@ public final class MRL {
      * @param groupId the desired groupId
      * @param artifactId the desired artifactId
      * @param version the resource version
+     * @param artifactName the desired artifact name
      */
     private MRL(
             Repository repository,
@@ -68,13 +70,15 @@ public final class MRL {
             Application application,
             String groupId,
             String artifactId,
-            String version) {
+            String version,
+            String artifactName) {
         this.repository = repository;
         this.type = type;
         this.application = application;
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
+        this.artifactName = artifactName;
     }
 
     /**
@@ -85,6 +89,7 @@ public final class MRL {
      * @param groupId the desired groupId
      * @param artifactId the desired artifactId
      * @param version the resource version
+     * @param artifactName the desired artifact name
      * @return a model {@code MRL}
      */
     public static MRL model(
@@ -92,8 +97,10 @@ public final class MRL {
             Application application,
             String groupId,
             String artifactId,
-            String version) {
-        return new MRL(repository, "model", application, groupId, artifactId, version);
+            String version,
+            String artifactName) {
+        return new MRL(
+                repository, "model", application, groupId, artifactId, version, artifactName);
     }
 
     /**
@@ -112,7 +119,7 @@ public final class MRL {
             String groupId,
             String artifactId,
             String version) {
-        return new MRL(repository, "dataset", application, groupId, artifactId, version);
+        return new MRL(repository, "dataset", application, groupId, artifactId, version, null);
     }
 
     /**
@@ -124,7 +131,7 @@ public final class MRL {
      * @return a dataset {@code MRL}
      */
     public static MRL undefined(Repository repository, String groupId, String artifactId) {
-        return new MRL(repository, "", Application.UNDEFINED, groupId, artifactId, null);
+        return new MRL(repository, "", Application.UNDEFINED, groupId, artifactId, null, null);
     }
 
     /**
@@ -213,6 +220,14 @@ public final class MRL {
     public Artifact match(Map<String, String> criteria) throws IOException {
         List<Artifact> list = search(criteria);
         if (list.isEmpty()) {
+            return null;
+        }
+        if (artifactName != null) {
+            for (Artifact artifact : list) {
+                if (artifactName.equals(artifact.getName())) {
+                    return artifact;
+                }
+            }
             return null;
         }
         return list.get(0);

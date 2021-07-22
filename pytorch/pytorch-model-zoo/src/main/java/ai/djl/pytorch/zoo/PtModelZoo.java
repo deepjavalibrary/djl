@@ -29,31 +29,30 @@ import java.util.Set;
  * PtModelZoo is a repository that contains all PyTorch models in {@link
  * ai.djl.pytorch.engine.PtSymbolBlock} for DJL.
  */
-public class PtModelZoo implements ModelZoo {
+public class PtModelZoo extends ModelZoo {
 
     private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
     private static final Repository REPOSITORY = Repository.newInstance("PyTorch", DJL_REPO_URL);
-    private static final PtModelZoo ZOO = new PtModelZoo();
     public static final String GROUP_ID = "ai.djl.pytorch";
 
     private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
 
     static {
         MRL resnet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(resnet, ZOO));
+        MODEL_LOADERS.add(new BaseModelLoader(resnet));
 
         MRL ssd = REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "ssd", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(ssd, ZOO));
+        MODEL_LOADERS.add(new BaseModelLoader(ssd));
 
         MRL bertQa = REPOSITORY.model(NLP.QUESTION_ANSWER, GROUP_ID, "bertqa", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(bertQa, ZOO));
+        MODEL_LOADERS.add(new BaseModelLoader(bertQa));
 
         MRL sentimentAnalysis =
                 REPOSITORY.model(NLP.SENTIMENT_ANALYSIS, GROUP_ID, "distilbert", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(sentimentAnalysis, ZOO));
+        MODEL_LOADERS.add(new BaseModelLoader(sentimentAnalysis));
 
         MRL bigGan = REPOSITORY.model(CV.IMAGE_GENERATION, GROUP_ID, "biggan-deep", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(bigGan, ZOO));
+        MODEL_LOADERS.add(new BaseModelLoader(bigGan));
     }
 
     /** {@inheritDoc} */

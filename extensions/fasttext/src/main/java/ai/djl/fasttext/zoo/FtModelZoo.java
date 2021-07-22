@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 /** FtModelZoo is a repository that contains all fastText models for DJL. */
-public class FtModelZoo implements ModelZoo {
+public class FtModelZoo extends ModelZoo {
 
     private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
     private static final Repository REPOSITORY = Repository.newInstance("Fasttext", DJL_REPO_URL);

@@ -41,7 +41,7 @@ public class TextClassificationModelLoader extends BaseModelLoader {
      * @param repository the repository to load the model from
      */
     public TextClassificationModelLoader(Repository repository) {
-        super(repository.model(APPLICATION, GROUP_ID, ARTIFACT_ID, VERSION), new FtModelZoo());
+        super(repository.model(APPLICATION, GROUP_ID, ARTIFACT_ID, VERSION));
     }
 
     /** {@inheritDoc} */

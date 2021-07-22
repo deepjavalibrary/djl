@@ -197,7 +197,7 @@ public final class TrainResnetWithCifar10 {
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, Classifications.class)
-                        .optModelUrls(path.toUri().toString())
+                        .optModelPath(path)
                         .optTranslator(translator)
                         .optBlock(block)
                         .optModelName("resnetv1")

@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
 /** Shared code for the {@link ModelLoader} implementations. */
 public class BaseModelLoader implements ModelLoader {
 
-    protected ModelZoo modelZoo;
     protected MRL mrl;
     protected TranslatorFactory defaultFactory;
 
@@ -49,11 +48,9 @@ public class BaseModelLoader implements ModelLoader {
      * Constructs a {@link ModelLoader} given the repository, mrl, and version.
      *
      * @param mrl the mrl of the model to load
-     * @param modelZoo the modelZoo type that is being used to get supported engine types
      */
-    public BaseModelLoader(MRL mrl, ModelZoo modelZoo) {
+    public BaseModelLoader(MRL mrl) {
         this.mrl = mrl;
-        this.modelZoo = modelZoo;
         defaultFactory = new DefaultTranslatorFactory();
     }
 
@@ -116,20 +113,23 @@ public class BaseModelLoader implements ModelLoader {
             // Check if the engine is specified in Criteria, use it if it is.
             // Otherwise check the modelzoo supported engine and grab a random engine in the list.
             // Otherwise if none of them is specified or model zoo is null, go to default engine.
-            if (engine == null && modelZoo != null) {
-                String defaultEngine = Engine.getDefaultEngineName();
-                for (String supportedEngine : modelZoo.getSupportedEngines()) {
-                    if (supportedEngine.equals(defaultEngine)) {
-                        engine = supportedEngine;
-                        break;
-                    } else if (Engine.hasEngine(supportedEngine)) {
-                        engine = supportedEngine;
+            if (engine == null) {
+                ModelZoo modelZoo = ModelZoo.getModelZoo(mrl.getGroupId());
+                if (modelZoo != null) {
+                    String defaultEngine = Engine.getDefaultEngineName();
+                    for (String supportedEngine : modelZoo.getSupportedEngines()) {
+                        if (supportedEngine.equals(defaultEngine)) {
+                            engine = supportedEngine;
+                            break;
+                        } else if (Engine.hasEngine(supportedEngine)) {
+                            engine = supportedEngine;
+                        }
                     }
-                }
-                if (engine == null) {
-                    throw new ModelNotFoundException(
-                            "No supported engine available for model zoo: "
-                                    + modelZoo.getGroupId());
+                    if (engine == null) {
+                        throw new ModelNotFoundException(
+                                "No supported engine available for model zoo: "
+                                        + modelZoo.getGroupId());
+                    }
                 }
             }
             if (engine != null && !Engine.hasEngine(engine)) {
