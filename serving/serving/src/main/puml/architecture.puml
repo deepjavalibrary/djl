@@ -1,0 +1,72 @@
+@startuml
+skinparam componentStyle uml1
+
+database "Model Store" as ms {
+    file URL [
+        https://my.com/resnet.zip
+        s3://djl/BERT.tar.gz
+        djl://mxnet/ssd
+        /opt/ml/bigGAN
+    ]
+}
+
+package "DJL Serving - single process" {
+    frame Netty {
+        package REST_API [
+            /resnet18
+            ..
+            /resnet18/v1
+            ..
+            /resnet18/v2
+            --
+            /BERT
+            ===
+            Management API
+        ]
+        HTTP - REST_API
+    }
+
+    frame "Worker thread pool" as wp {
+        package Workers [
+            resent18_v1 (GPU0)
+            resent18_v1 (GPU1)
+            resent18_v2
+            BERT
+            BERT
+            BERT
+        ]
+        [Translator]
+    }
+
+    queue "Job queue\nauto batch" as jq
+    [Model Manager] as wlm
+
+    frame Models {
+        package Engines [
+            PyTorch
+            TensorFlow
+            MXNet
+            OnnxRuntime
+            TFLite
+            DLR
+            XGBoost
+        ]
+    }
+
+    REST_API -> jq
+    REST_API ---> wlm
+    jq -> Workers : auto scale
+    jq ...> wlm
+    wlm -right-> Engines
+    Engines -[hidden]up- [Translator]
+    Translator <-up- Workers
+}
+
+frame "Python Workers" {
+    [preprocess] -[hidden]-- [postprocess]
+}
+
+wlm -down-> URL : load model
+Translator -up.> preprocess : optional
+Translator -down.> postprocess : optional
+@enduml
