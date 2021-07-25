@@ -2,7 +2,7 @@
 
 ## Overview
 
-DJL Serving is an universal model serving solution. You can use djl-serving serve the
+DJL Serving is a high performance universal model serving solution. You can use djl-serving serve the
 following models out of the box:
 
 - PyTorch TorchScript model
@@ -19,9 +19,24 @@ You can install extra extensions to enable the following models:
 - Sentencepiece model
 - fastText/BlazingText model
 
+## Architecture
+
+![Architecture Diagram](https://resources.djl.ai/images/djl-serving/architecture.png)
+
+## Key features
+
+- Performance, DJL serving running multithreading inference in a single JVM. Our benchmark shows
+DJL serving has higher throughput than most of C++ based model server on the market.
+- Ease of use, DJL serving can serve most of the models out of box.
+- Easy to extend, DJL serving plugins make it easy for user to add their own extensions.
+- Auto-scale, DJL serving automatically scales up/down worker threads based on the load.
+- Dynamic batching, DJL serving supports dynamic batching to increase throughput.
+- Model versioning, DJL allows user to load different version of a model on a single endpoint.
+- Multi-engine support, DJL allows user to serve models from different engines at the same time.
+
 ## Installation
 
-For macOS (Working in progress)
+For macOS
 
 ```
 brew install djl-serving
