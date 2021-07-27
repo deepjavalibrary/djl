@@ -155,7 +155,8 @@ public final class LibUtils {
         }
 
         Path tmp = null;
-        String libPath = "/jnilib/" + classifier + '/' + flavor + '/' + name;
+        // Paddle GPU and CPU share the same jni so file
+        String libPath = "/jnilib/" + classifier + "/cpu/" + name;
         try (InputStream stream = LibUtils.class.getResourceAsStream(libPath)) {
             logger.info("Extracting {} to cache ...", libPath);
             if (stream == null) {
