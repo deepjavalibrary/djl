@@ -51,17 +51,6 @@ task compileJNI {
     }
 }
 
-task compileJNIGPU {
-    doFirst {
-        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
-            downloadBuild("linux", "cu101")
-            downloadBuild("linux", "cu102")
-        } else {
-            throw new IllegalStateException("Architecture not supported: " + System.properties['os.name'])
-        }
-    }
-}
-
 
 task prepareNativeLibs() {
     doLast {
