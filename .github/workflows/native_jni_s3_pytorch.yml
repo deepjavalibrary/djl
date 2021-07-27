@@ -88,15 +88,8 @@ jobs:
   build-pytorch-jni-linux-gpu:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    container: nvidia/cuda:10.2-cudnn7-devel-centos7
+    container: deepjavalibrary/ubuntu-16.04:cuda102-cudnn7
     steps:
-      - name: Install Environment
-        run: |
-          yum -y update
-          yum -y install centos-release-scl-rh epel-release
-          yum -y install devtoolset-7 rh-git218 patch cmake3
-          ln -s /usr/bin/cmake3 /usr/bin/cmake
-          pip3 install awscli --upgrade
       - uses: actions/checkout@v2
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
@@ -109,9 +102,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
-        run: |
-          source scl_source enable devtoolset-7 rh-git218 || true
-          ./gradlew :pytorch:pytorch-native:releaseJNI -Pgpu
+        run: ./gradlew :pytorch:pytorch-native:releaseJNI -Pgpu
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
