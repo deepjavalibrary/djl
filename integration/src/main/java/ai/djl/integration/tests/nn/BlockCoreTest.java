@@ -12,7 +12,6 @@
  */
 package ai.djl.integration.tests.nn;
 
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
@@ -57,6 +56,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class BlockCoreTest {
@@ -207,12 +207,16 @@ public class BlockCoreTest {
     @SuppressWarnings("try")
     @Test
     public void testLayerNorm() throws IOException, MalformedModelException {
+        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
+            throw new SkipException("Only works for PyTorch engine.");
+        }
+
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block = LayerNorm.builder().build();
-        try (Model model = Model.newInstance("model", Device.cpu(), "PyTorch")) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -234,12 +238,16 @@ public class BlockCoreTest {
     @SuppressWarnings("try")
     @Test
     public void test2LayerNorm() throws IOException, MalformedModelException {
+        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
+            throw new SkipException("Only works for PyTorch engine.");
+        }
+
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block = LayerNorm.builder().axis(2, 3).build();
-        try (Model model = Model.newInstance("model", Device.cpu(), "PyTorch")) {
+        try (Model model = Model.newInstance("model")) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
