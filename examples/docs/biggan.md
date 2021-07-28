@@ -1,7 +1,7 @@
 # Image Generation with BigGAN from the Model Zoo
 
 [Generative Adversarial Networks](https://en.wikipedia.org/wiki/Generative_adversarial_network) (GANs) are a branch of deep learning used for generative modeling. 
-They consist of 2 neural networks that act as adversaries, the Generator and the Discriminator. The Generator is assigned to generated fake images that look real, and the Discriminator needs to correctly identify the fake ones.
+They consist of 2 neural networks that act as adversaries, the Generator and the Discriminator. The Generator is assigned to generate fake images that look real, and the Discriminator needs to correctly identify the fake ones.
 
 In this example, you will learn how to use a [BigGAN](https://deepmind.com/research/open-source/biggan) generator to create images, using the generator directly from the [ModelZoo](../../docs/model-zoo.md).
 
