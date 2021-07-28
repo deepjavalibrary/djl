@@ -77,7 +77,7 @@ jobs:
   publish:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    needs: [ build-paddle-jni-cpu, build-paddle-jni-linux-cpu, build-paddle-jni-linux-gpu ]
+    needs: [ build-paddle-jni-cpu, build-paddle-jni-linux ]
     steps:
       - uses: actions/checkout@v2
       - name: Download compiledJNI Mac
