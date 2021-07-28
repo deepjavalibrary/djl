@@ -95,11 +95,6 @@ jobs:
         with:
           name: jnilib-Linux
           path: jnilib
-      - name: Download compiledJNI Linux GPU
-        uses: actions/download-artifact@v1
-        with:
-          name: jnilib-Linux-GPU
-          path: jnilib
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
