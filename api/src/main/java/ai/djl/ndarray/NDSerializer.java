@@ -20,14 +20,26 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** A class contains encoding and decoding logic for NDArray. */
 final class NDSerializer {
 
-    static final int BUFFER_SIZE = 81920;
-    static final String MAGIC_NUMBER = "NDAR";
-    static final int VERSION = 2;
+    private static final int VERSION = 2;
+
+    private static final int BUFFER_SIZE = 1024 * 1024;
+    private static final String MAGIC_NUMBER = "NDAR";
+    private static final byte[] NUMPY_MAGIC = {(byte) 0x93, 'N', 'U', 'M', 'P', 'Y'};
+    private static final int ARRAY_ALIGN = 64;
+
+    private static final Pattern PATTERN =
+            Pattern.compile("\\{'descr': '(.+)', 'fortran_order': False, 'shape': \\((.*)\\),");
 
     private NDSerializer() {}
 
@@ -38,47 +50,82 @@ final class NDSerializer {
      * @return byte array
      */
     static byte[] encode(NDArray array) {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            DataOutputStream dos = new DataOutputStream(baos);
-            // magic string for version identification
-            dos.writeUTF(MAGIC_NUMBER);
-            dos.writeInt(VERSION);
-            String name = array.getName();
-            if (name == null) {
-                dos.write(0);
-            } else {
-                dos.write(1);
-                dos.writeUTF(name);
-            }
-            dos.writeUTF(array.getSparseFormat().name());
-            dos.writeUTF(array.getDataType().name());
-
-            Shape shape = array.getShape();
-            dos.write(shape.getEncoded());
-
-            ByteBuffer bb = array.toByteBuffer();
-            int length = bb.remaining();
-            dos.writeInt(length);
-
-            if (length > 0) {
-                if (length > BUFFER_SIZE) {
-                    byte[] buf = new byte[BUFFER_SIZE];
-                    while (length > BUFFER_SIZE) {
-                        bb.get(buf);
-                        dos.write(buf);
-                        length = bb.remaining();
-                    }
-                }
-
-                byte[] buf = new byte[length];
-                bb.get(buf);
-                dos.write(buf);
-            }
-            dos.flush();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFFER_SIZE)) {
+            encode(array, baos);
             return baos.toByteArray();
         } catch (IOException e) {
             throw new AssertionError("This should never happen", e);
         }
+    }
+
+    static void encode(NDArray array, OutputStream os) throws IOException {
+        DataOutputStream dos = new DataOutputStream(os);
+        // magic string for version identification
+        dos.writeUTF(MAGIC_NUMBER);
+        dos.writeInt(VERSION);
+        String name = array.getName();
+        if (name == null) {
+            dos.write(0);
+        } else {
+            dos.write(1);
+            dos.writeUTF(name);
+        }
+        dos.writeUTF(array.getSparseFormat().name());
+        dos.writeUTF(array.getDataType().name());
+
+        Shape shape = array.getShape();
+        dos.write(shape.getEncoded());
+
+        ByteBuffer bb = array.toByteBuffer();
+        int length = bb.remaining();
+        dos.writeInt(length);
+
+        if (length > 0) {
+            if (length > BUFFER_SIZE) {
+                byte[] buf = new byte[BUFFER_SIZE];
+                while (length > BUFFER_SIZE) {
+                    bb.get(buf);
+                    dos.write(buf);
+                    length = bb.remaining();
+                }
+            }
+
+            byte[] buf = new byte[length];
+            bb.get(buf);
+            dos.write(buf);
+        }
+        dos.flush();
+    }
+
+    static void encodeAsNumpy(NDArray array, OutputStream os) throws IOException {
+        StringBuilder sb = new StringBuilder(80);
+        sb.append("{'descr': '")
+                .append(array.getDataType().asNumpy())
+                .append("', 'fortran_order': False, 'shape': ");
+        long[] shape = array.getShape().getShape();
+        if (shape.length == 1) {
+            sb.append('(').append(shape[0]).append(",)");
+        } else {
+            sb.append(array.getShape());
+        }
+        sb.append(", }");
+
+        int len = sb.length() + 1;
+        int padding = ARRAY_ALIGN - (NUMPY_MAGIC.length + len + 4) % ARRAY_ALIGN;
+        ByteBuffer bb = ByteBuffer.allocate(2);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        bb.putShort((short) (padding + len));
+
+        os.write(NUMPY_MAGIC);
+        os.write(1);
+        os.write(0); // version 1.0
+        os.write(bb.array());
+        os.write(sb.toString().getBytes(StandardCharsets.US_ASCII));
+        for (int i = 0; i < padding; ++i) {
+            os.write(' ');
+        }
+        os.write('\n');
+        os.write(array.toByteArray());
     }
 
     /**
@@ -126,21 +173,76 @@ final class NDSerializer {
         // Data
         int length = dis.readInt();
         ByteBuffer data = manager.allocateDirect(length);
+        readData(dis, data, length);
 
-        if (length > 0) {
-            byte[] buf = new byte[BUFFER_SIZE];
-            while (length > BUFFER_SIZE) {
-                dis.readFully(buf);
-                data.put(buf);
-                length -= BUFFER_SIZE;
-            }
-
-            dis.readFully(buf, 0, length);
-            data.put(buf, 0, length);
-            data.rewind();
-        }
-        NDArray array = manager.create(dataType.asDataType(data), shape);
+        NDArray array = manager.create(dataType.asDataType(data), shape, dataType);
         array.setName(name);
         return array;
+    }
+
+    static NDArray decodeNumpy(NDManager manager, InputStream is) throws IOException {
+        DataInputStream dis;
+        if (is instanceof DataInputStream) {
+            dis = (DataInputStream) is;
+        } else {
+            dis = new DataInputStream(is);
+        }
+
+        byte[] buf = new byte[NUMPY_MAGIC.length];
+        dis.readFully(buf);
+        if (!Arrays.equals(buf, NUMPY_MAGIC)) {
+            throw new IllegalArgumentException("Malformed numpy data");
+        }
+        byte major = dis.readByte();
+        byte minor = dis.readByte();
+        if (major < 1 || major > 3 || minor != 0) {
+            throw new IllegalArgumentException("Unknown numpy version: " + major + '.' + minor);
+        }
+        int len = major == 1 ? 2 : 4;
+        dis.readFully(buf, 0, len);
+        ByteBuffer bb = ByteBuffer.wrap(buf, 0, len);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        if (major == 1) {
+            len = bb.getShort();
+        } else {
+            len = bb.getInt();
+        }
+        buf = new byte[len];
+        dis.readFully(buf);
+        String header = new String(buf, StandardCharsets.UTF_8).trim();
+        Matcher m = PATTERN.matcher(header);
+        if (!m.find()) {
+            throw new IllegalArgumentException("Invalid numpy header: " + header);
+        }
+        DataType dataType = DataType.fromNumpy(m.group(1));
+        String shapeStr = m.group(2);
+        long[] longs;
+        if (shapeStr.isEmpty()) {
+            longs = new long[0];
+        } else {
+            String[] tokens = shapeStr.split(", ?");
+            longs = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
+        }
+        Shape shape = new Shape(longs);
+        len = Math.toIntExact(shape.size() * dataType.getNumOfBytes());
+        ByteBuffer data = manager.allocateDirect(len);
+        readData(dis, data, len);
+
+        return manager.create(dataType.asDataType(data), shape, dataType);
+    }
+
+    private static void readData(DataInputStream dis, ByteBuffer data, int len) throws IOException {
+        if (len > 0) {
+            byte[] buf = new byte[BUFFER_SIZE];
+            while (len > BUFFER_SIZE) {
+                dis.readFully(buf);
+                data.put(buf);
+                len -= BUFFER_SIZE;
+            }
+
+            dis.readFully(buf, 0, len);
+            data.put(buf, 0, len);
+            data.rewind();
+        }
     }
 }

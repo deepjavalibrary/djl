@@ -111,6 +111,37 @@ public enum DataType {
     }
 
     /**
+     * Returns the data type from numpy value.
+     *
+     * @param dtype the numpy datatype
+     * @return the data type
+     */
+    public static DataType fromNumpy(String dtype) {
+        switch (dtype) {
+            case "<f4":
+                return FLOAT32;
+            case "<f8":
+                return FLOAT64;
+            case "<f2":
+                return FLOAT16;
+            case "|u1":
+                return UINT8;
+            case "<i4":
+                return INT32;
+            case "|i1":
+                return INT8;
+            case "<i8":
+                return INT64;
+            case "|b1":
+                return BOOLEAN;
+            case "|S1":
+                return STRING;
+            default:
+                throw new IllegalArgumentException("Unsupported dataType: " + dtype);
+        }
+    }
+
+    /**
      * Converts a {@link ByteBuffer} to a buffer for this data type.
      *
      * @param data the buffer to convert
@@ -132,6 +163,37 @@ public enum DataType {
             case UNKNOWN:
             default:
                 return data;
+        }
+    }
+
+    /**
+     * Returns a numpy string value.
+     *
+     * @return a numpy string value
+     */
+    public String asNumpy() {
+        switch (this) {
+            case FLOAT32:
+                return "<f4";
+            case FLOAT64:
+                return "<f8";
+            case FLOAT16:
+                return "<f2";
+            case UINT8:
+                return "|u1";
+            case INT32:
+                return "<i4";
+            case INT8:
+                return "|i1";
+            case INT64:
+                return "<i8";
+            case BOOLEAN:
+                return "|b1";
+            case STRING:
+                return "|S1";
+            case UNKNOWN:
+            default:
+                throw new IllegalArgumentException("Unsupported dataType: " + this);
         }
     }
 
