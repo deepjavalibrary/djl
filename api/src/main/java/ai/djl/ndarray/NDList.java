@@ -20,9 +20,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PushbackInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * An {@code NDList} represents a sequence of {@link NDArray}s with names.
@@ -86,7 +91,24 @@ public class NDList extends ArrayList<NDArray> implements NDResource {
      * @return {@code NDList}
      */
     public static NDList decode(NDManager manager, InputStream is) {
-        try (DataInputStream dis = new DataInputStream(is)) {
+        try {
+            DataInputStream dis = new DataInputStream(is);
+            byte[] magic = new byte[4];
+            dis.readFully(magic);
+
+            PushbackInputStream pis = new PushbackInputStream(is, 4);
+            pis.unread(magic);
+            if (magic[0] == 'P' && magic[1] == 'K') {
+                // assume this is npz file
+                return decodeNumpy(manager, pis);
+            } else if (magic[0] == (byte) 0x39
+                    && magic[1] == 'N'
+                    && magic[2] == 'U'
+                    && magic[3] == 'M') {
+                return new NDList(NDSerializer.decode(manager, pis));
+            }
+
+            dis = new DataInputStream(pis);
             int size = dis.readInt();
             if (size < 0) {
                 throw new IllegalArgumentException("Invalid NDList size: " + size);
@@ -99,6 +121,21 @@ public class NDList extends ArrayList<NDArray> implements NDResource {
         } catch (IOException e) {
             throw new IllegalArgumentException("Malformed data", e);
         }
+    }
+
+    private static NDList decodeNumpy(NDManager manager, InputStream is) throws IOException {
+        NDList list = new NDList();
+        ZipInputStream zis = new ZipInputStream(is);
+        ZipEntry entry;
+        while ((entry = zis.getNextEntry()) != null) {
+            String name = entry.getName();
+            NDArray array = NDSerializer.decodeNumpy(manager, zis);
+            if (!name.startsWith("arr_") && name.endsWith(".npy")) {
+                array.setName(name.substring(0, name.length() - 4));
+            }
+            list.add(array);
+        }
+        return list;
     }
 
     /**
@@ -200,7 +237,7 @@ public class NDList extends ArrayList<NDArray> implements NDResource {
     public NDList toDevice(Device device, boolean copy) {
         if (!copy) {
             // if all arrays in NDList are already on device, return itself
-            if (this.stream().allMatch(array -> array.getDevice() == device)) {
+            if (stream().allMatch(array -> array.getDevice() == device)) {
                 return this;
             }
         }
@@ -218,19 +255,19 @@ public class NDList extends ArrayList<NDArray> implements NDResource {
     /** {@inheritDoc} */
     @Override
     public void attach(NDManager manager) {
-        stream().forEach(array -> array.attach(manager));
+        forEach(array -> array.attach(manager));
     }
 
     /** {@inheritDoc} */
     @Override
     public void tempAttach(NDManager manager) {
-        stream().forEach(array -> array.tempAttach(manager));
+        forEach(array -> array.tempAttach(manager));
     }
 
     /** {@inheritDoc} */
     @Override
     public void detach() {
-        stream().forEach(NDResource::detach);
+        forEach(NDResource::detach);
     }
 
     /**
@@ -240,16 +277,55 @@ public class NDList extends ArrayList<NDArray> implements NDResource {
      */
     public byte[] encode() {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            DataOutputStream dos = new DataOutputStream(baos);
-            dos.writeInt(size());
-            for (NDArray nd : this) {
-                dos.write(nd.encode());
-            }
-            dos.flush();
+            encode(baos);
             return baos.toByteArray();
         } catch (IOException e) {
             throw new AssertionError("NDList is not writable", e);
         }
+    }
+
+    /**
+     * Writes the encoded NDList to {@code OutputStream}.
+     *
+     * @param os the {@code OutputStream} to be written to
+     * @throws IOException if failed on IO operation
+     */
+    public void encode(OutputStream os) throws IOException {
+        encode(os, false);
+    }
+
+    /**
+     * Writes the encoded NDList to {@code OutputStream}.
+     *
+     * @param os the {@code OutputStream} to be written to
+     * @param numpy encode in npz format if true
+     * @throws IOException if failed on IO operation
+     */
+    public void encode(OutputStream os, boolean numpy) throws IOException {
+        if (numpy) {
+            ZipOutputStream zos = new ZipOutputStream(os);
+            int i = 0;
+            for (NDArray nd : this) {
+                String name = nd.getName();
+                if (name == null) {
+                    zos.putNextEntry(new ZipEntry("arr_" + i + ".npy"));
+                    ++i;
+                } else {
+                    zos.putNextEntry(new ZipEntry(name + ".npy"));
+                }
+                NDSerializer.encodeAsNumpy(nd, zos);
+            }
+            zos.finish();
+            zos.flush();
+            return;
+        }
+
+        DataOutputStream dos = new DataOutputStream(os);
+        dos.writeInt(size());
+        for (NDArray nd : this) {
+            dos.write(nd.encode());
+        }
+        dos.flush();
     }
 
     /**
