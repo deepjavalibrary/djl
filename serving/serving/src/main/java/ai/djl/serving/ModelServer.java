@@ -19,6 +19,7 @@ import ai.djl.serving.util.Connector;
 import ai.djl.serving.util.ServerGroups;
 import ai.djl.serving.wlm.ModelInfo;
 import ai.djl.serving.wlm.ModelManager;
+import ai.djl.util.cuda.CudaUtils;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -43,6 +44,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -56,7 +58,7 @@ public class ModelServer {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelServer.class);
 
-    private static final Pattern MODEL_STORE_PATTERN = Pattern.compile("(\\[(.+)]=)?(.+)");
+    private static final Pattern MODEL_STORE_PATTERN = Pattern.compile("(\\[?(.+?)]?=)?(.+)");
 
     private ServerGroups serverGroups;
     private List<ChannelFuture> futures = new ArrayList<>(2);
@@ -310,7 +312,7 @@ public class ModelServer {
             String modelUrl = matcher.group(3);
             String version = null;
             String engine = null;
-            int gpuId = -1;
+            int[] gpuIds = {-1};
             String modelName;
             if (endpoint != null) {
                 String[] tokens = endpoint.split(":", -1);
@@ -322,25 +324,44 @@ public class ModelServer {
                     engine = tokens[2].isEmpty() ? null : tokens[2];
                 }
                 if (tokens.length > 3) {
-                    gpuId = tokens[3].isEmpty() ? -1 : Integer.parseInt(tokens[3]);
+                    if ("*".equals(tokens[3])) {
+                        int gpuCount = CudaUtils.getGpuCount();
+                        if (gpuCount > 0) {
+                            gpuIds = IntStream.range(0, gpuCount).toArray();
+                        }
+                    } else if (!tokens[3].isEmpty()) {
+                        gpuIds[0] = Integer.parseInt(tokens[3]);
+                    }
                 }
             } else {
                 modelName = ModelInfo.inferModelNameFromUrl(modelUrl);
             }
 
             int workers = configManager.getDefaultWorkers();
-            CompletableFuture<ModelInfo> future =
-                    modelManager.registerModel(
-                            modelName,
-                            version,
-                            modelUrl,
-                            engine,
-                            gpuId,
-                            configManager.getBatchSize(),
-                            configManager.getMaxBatchDelay(),
-                            configManager.getMaxIdleTime());
-            ModelInfo modelInfo = future.join();
-            modelManager.triggerModelUpdated(modelInfo.scaleWorkers(1, workers));
+            for (int i = 0; i < gpuIds.length; ++i) {
+                String modelVersion;
+                if (gpuIds.length > 1) {
+                    if (version == null) {
+                        modelVersion = "v" + i;
+                    } else {
+                        modelVersion = version + i;
+                    }
+                } else {
+                    modelVersion = version;
+                }
+                CompletableFuture<ModelInfo> future =
+                        modelManager.registerModel(
+                                modelName,
+                                modelVersion,
+                                modelUrl,
+                                engine,
+                                gpuIds[i],
+                                configManager.getBatchSize(),
+                                configManager.getMaxBatchDelay(),
+                                configManager.getMaxIdleTime());
+                ModelInfo modelInfo = future.join();
+                modelManager.triggerModelUpdated(modelInfo.scaleWorkers(1, workers));
+            }
             startupModels.add(modelName);
         }
     }

@@ -123,8 +123,6 @@ public class JarRepository extends AbstractRepository {
         artifact.setName(modelName);
 
         metadata = new Metadata.MatchAllMetadata();
-        metadata.setApplication(Application.UNDEFINED);
-        metadata.setGroupId(DefaultModelZoo.GROUP_ID);
         metadata.setArtifactId(artifactId);
         metadata.setArtifacts(Collections.singletonList(artifact));
         String hash = md5hash(uri.toString());

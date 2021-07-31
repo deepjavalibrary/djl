@@ -167,7 +167,6 @@ public class SimpleRepository extends AbstractRepository {
         resolved = true;
         metadata = new Metadata.MatchAllMetadata();
         metadata.setRepositoryUri(URI.create(""));
-        metadata.setApplication(Application.UNDEFINED);
         metadata.setArtifactId(artifactId);
         if (!Files.exists(path)) {
             logger.debug("Specified path doesn't exists: {}", path.toAbsolutePath());
