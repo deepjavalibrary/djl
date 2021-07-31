@@ -28,6 +28,7 @@ import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
 import com.google.gson.annotations.SerializedName;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -164,7 +165,7 @@ public class MxBertQATranslator extends QATranslator {
         List<String> idx2token;
 
         public static List<String> parseToken(URL url) {
-            try (InputStream is = url.openStream();
+            try (InputStream is = new BufferedInputStream(url.openStream());
                     Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
                 return JsonUtils.GSON.fromJson(reader, VocabParser.class).idx2token;
             } catch (IOException e) {

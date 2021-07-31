@@ -19,6 +19,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.util.Progress;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -86,7 +87,7 @@ public class CsvDataset extends RandomAccessDataset {
         if (csvUrl.getFile().endsWith(".gz")) {
             return new GZIPInputStream(csvUrl.openStream());
         }
-        return csvUrl.openStream();
+        return new BufferedInputStream(csvUrl.openStream());
     }
 
     /**

@@ -14,6 +14,7 @@ package ai.djl.repository;
 
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -93,7 +94,7 @@ public class RemoteRepository extends AbstractRepository {
         }
 
         Path tmp = Files.createTempFile(cacheDir, "metadata", ".tmp");
-        try (InputStream is = file.toURL().openStream()) {
+        try (InputStream is = new BufferedInputStream(file.toURL().openStream())) {
             String json = Utils.toString(is);
             Metadata metadata = JsonUtils.GSON_PRETTY.fromJson(json, Metadata.class);
             metadata.init();

@@ -14,6 +14,7 @@ package ai.djl.util;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.nn.Parameter;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -176,7 +177,7 @@ public final class Utils {
         if (Files.notExists(file)) {
             return Collections.emptyList();
         }
-        try (InputStream is = Files.newInputStream(file)) {
+        try (InputStream is = new BufferedInputStream(Files.newInputStream(file))) {
             return readLines(is, trim);
         }
     }
