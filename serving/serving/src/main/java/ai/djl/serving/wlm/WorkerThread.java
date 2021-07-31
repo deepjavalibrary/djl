@@ -12,6 +12,7 @@
  */
 package ai.djl.serving.wlm;
 
+import ai.djl.engine.EngineException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
@@ -67,6 +68,7 @@ final class WorkerThread implements Runnable {
         currentThread.set(thread);
         this.state = WorkerState.WORKER_STARTED;
         List<Input> req = null;
+        String errorMessage = "Worker shutting down";
         try {
             while (isRunning() && !aggregator.isFinished()) {
                 req = aggregator.getRequest();
@@ -74,6 +76,9 @@ final class WorkerThread implements Runnable {
                     try {
                         List<Output> reply = predictor.batchPredict(req);
                         aggregator.sendResponse(reply);
+                    } catch (EngineException e) {
+                        logger.warn("Failed to predict", e);
+                        aggregator.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, e);
                     } catch (TranslateException e) {
                         logger.warn("Failed to predict", e);
                         aggregator.sendError(HttpResponseStatus.BAD_REQUEST, e);
@@ -85,12 +90,13 @@ final class WorkerThread implements Runnable {
             logger.debug("Shutting down the thread .. Scaling down.");
         } catch (Throwable t) {
             logger.error("Server error", t);
+            errorMessage = t.getMessage();
         } finally {
             logger.debug("Shutting down worker thread .. {}", currentThread.get().getName());
             currentThread.set(null);
             shutdown(WorkerState.WORKER_STOPPED);
             if (req != null) {
-                Exception e = new InternalServerException("Server shutting down");
+                Exception e = new InternalServerException(errorMessage);
                 aggregator.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, e);
             }
         }
@@ -122,7 +128,7 @@ final class WorkerThread implements Runnable {
         Thread thread = currentThread.getAndSet(null);
         if (thread != null) {
             thread.interrupt();
-            Exception e = new InternalServerException("Server shutting down");
+            Exception e = new InternalServerException("Worker shutting down");
             aggregator.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, e);
         }
         predictor.close();
