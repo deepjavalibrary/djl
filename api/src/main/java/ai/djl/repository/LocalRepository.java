@@ -20,6 +20,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -34,7 +35,6 @@ public class LocalRepository extends AbstractRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalRepository.class);
 
-    private String name;
     private Path path;
 
     /**
@@ -43,10 +43,11 @@ public class LocalRepository extends AbstractRepository {
      * <p>Use {@link Repository#newInstance(String, String)}.
      *
      * @param name the name of the repository
+     * @param uri the base URI of the repository
      * @param path the path to the repository
      */
-    protected LocalRepository(String name, Path path) {
-        this.name = name;
+    protected LocalRepository(String name, URI uri, Path path) {
+        super(name, uri);
         this.path = path;
     }
 
@@ -54,18 +55,6 @@ public class LocalRepository extends AbstractRepository {
     @Override
     public boolean isRemote() {
         return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public URI getBaseUri() {
-        return path.toUri();
     }
 
     /** {@inheritDoc} */
@@ -79,7 +68,7 @@ public class LocalRepository extends AbstractRepository {
         }
         try (Reader reader = Files.newBufferedReader(file)) {
             Metadata metadata = JsonUtils.GSON_PRETTY.fromJson(reader, Metadata.class);
-            metadata.init();
+            metadata.init(arguments);
             metadata.setRepositoryUri(uri);
             return metadata;
         }
@@ -94,8 +83,7 @@ public class LocalRepository extends AbstractRepository {
         if (artifacts.isEmpty()) {
             return null;
         }
-        // TODO: find highest version.
-        return artifacts.get(0);
+        return artifacts.stream().max(Comparator.comparing(o -> new Version(o.getVersion()))).get();
     }
 
     /** {@inheritDoc} */

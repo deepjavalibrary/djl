@@ -19,7 +19,9 @@ import ai.djl.util.ZipUtils;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,6 +31,7 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -46,6 +49,28 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractRepository implements Repository {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractRepository.class);
+
+    protected String name;
+    protected URI uri;
+    protected Map<String, String> arguments;
+
+    protected AbstractRepository(String name, URI uri) {
+        this.name = name;
+        this.uri = uri;
+        arguments = parseQueryString(uri);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public URI getBaseUri() {
+        return uri;
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -164,12 +189,11 @@ public abstract class AbstractRepository implements Repository {
 
         logger.debug("Downloading artifact: {} ...", fileUri);
         try (InputStream is = new BufferedInputStream(fileUri.toURL().openStream())) {
-            save(is, tmp, baseUri, item, progress);
+            save(is, tmp, item, progress);
         }
     }
 
-    protected void save(
-            InputStream is, Path tmp, URI baseUri, Artifact.Item item, Progress progress)
+    protected void save(InputStream is, Path tmp, Artifact.Item item, Progress progress)
             throws IOException {
         ProgressInputStream pis = new ProgressInputStream(is, progress);
         String fileName = item.getName();
@@ -242,6 +266,27 @@ public abstract class AbstractRepository implements Repository {
             return Hex.toHexString(md.digest(input.getBytes(StandardCharsets.UTF_8)));
         } catch (NoSuchAlgorithmException e) {
             throw new AssertionError("MD5 algorithm not found.", e);
+        }
+    }
+
+    private static Map<String, String> parseQueryString(URI uri) {
+        try {
+            Map<String, String> map = new ConcurrentHashMap<>();
+            String queryString = uri.getQuery();
+            if (queryString != null && !queryString.isEmpty()) {
+                String[] pairs = uri.getQuery().split("&");
+                for (String pair : pairs) {
+                    String[] tokens = pair.split("=", 2);
+                    if (tokens.length > 1) {
+                        String key = URLDecoder.decode(tokens[0], "UTF-8");
+                        String value = URLDecoder.decode(tokens[1], "UTF-8");
+                        map.put(key, value);
+                    }
+                }
+            }
+            return map;
+        } catch (UnsupportedEncodingException e) {
+            throw new AssertionError("Should not happen.", e);
         }
     }
 

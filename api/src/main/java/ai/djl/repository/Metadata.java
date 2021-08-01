@@ -316,11 +316,14 @@ public class Metadata {
      * Restores artifacts state.
      *
      * <p>This call is required after the metadata is restored back from JSON.
+     *
+     * @param arguments the override arguments
      */
-    public final void init() {
+    public final void init(Map<String, String> arguments) {
         if (artifacts != null) {
             for (Artifact artifact : artifacts) {
                 artifact.setMetadata(this);
+                artifact.getArguments().putAll(arguments);
             }
         }
     }

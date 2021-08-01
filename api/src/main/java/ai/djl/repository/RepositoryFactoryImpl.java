@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +34,6 @@ class RepositoryFactoryImpl implements RepositoryFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(RepositoryFactoryImpl.class);
 
-    private static final Pattern NAME_PATTERN = Pattern.compile("model_name=([^&]*)");
-    private static final Pattern ARTIFACT_PATTERN = Pattern.compile("artifact_id=([^&]*)");
     private static final RepositoryFactory FACTORY = new RepositoryFactoryImpl();
     private static final Map<String, RepositoryFactory> REGISTRY = init();
 
@@ -66,8 +62,8 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         Path path = parseFilePath(uri);
         String fileName = path.toFile().getName();
         if (FilenameUtils.isArchiveFile(fileName)) {
-            String[] names = parseQueryString(uri, fileName);
-            return new SimpleUrlRepository(name, uri, names[0], names[1]);
+            fileName = FilenameUtils.getNamePart(fileName);
+            return new SimpleUrlRepository(name, uri, fileName);
         }
         return new RemoteRepository(name, uri);
     }
@@ -97,30 +93,6 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             }
         }
         return registry;
-    }
-
-    private static String[] parseQueryString(URI uri, String fileName) {
-        String modelName = null;
-        String artifactId = null;
-        String query = uri.getQuery();
-        if (query != null) {
-            Matcher matcher = NAME_PATTERN.matcher(query);
-            if (matcher.find()) {
-                modelName = matcher.group(1);
-            }
-            matcher = ARTIFACT_PATTERN.matcher(query);
-            if (matcher.find()) {
-                artifactId = matcher.group(1);
-            }
-        }
-
-        if (artifactId == null) {
-            artifactId = FilenameUtils.getNamePart(fileName);
-        }
-        if (modelName == null) {
-            modelName = artifactId;
-        }
-        return new String[] {artifactId, modelName};
     }
 
     static Path parseFilePath(URI uri) {
@@ -159,8 +131,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
                 throw new IllegalArgumentException("Only archive file is supported for res URL.");
             }
 
-            String[] names = parseQueryString(uri, fileName);
-            return new JarRepository(name, uri, names[0], names[1]);
+            return new JarRepository(name, uri, fileName);
         }
 
         /** {@inheritDoc} */
@@ -176,8 +147,6 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         @Override
         public Repository newInstance(String name, URI uri) {
             Path path = parseFilePath(uri);
-            String fileName = path.toFile().getName();
-            String[] names = parseQueryString(uri, fileName);
             if (Files.exists(path) && Files.isDirectory(path)) {
                 try {
                     if (Files.walk(path)
@@ -187,13 +156,13 @@ class RepositoryFactoryImpl implements RepositoryFactory {
                                                     && Files.isRegularFile(f)
                                                     && !f.getParent().equals(path))) {
                         logger.debug("Found local repository: {}", path);
-                        return new LocalRepository(name, path);
+                        return new LocalRepository(name, path.toUri(), path);
                     }
                 } catch (IOException e) {
                     logger.warn("Failed locate metadata.json file, defaulting to simple", e);
                 }
             }
-            return new SimpleRepository(name, path, names[0], names[1]);
+            return new SimpleRepository(name, uri, path);
         }
 
         /** {@inheritDoc} */
@@ -208,8 +177,15 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         /** {@inheritDoc} */
         @Override
         public Repository newInstance(String name, URI uri) {
-            RemoteRepository repo =
-                    new RemoteRepository(name, URI.create("https://mlrepo.djl.ai/"));
+            String queryString = uri.getQuery();
+            URI djlUri;
+            if (queryString != null) {
+                djlUri = URI.create("https://mlrepo.djl.ai/?" + queryString);
+            } else {
+                djlUri = URI.create("https://mlrepo.djl.ai/");
+            }
+
+            RemoteRepository repo = new RemoteRepository(name, djlUri);
             String groupId = uri.getHost();
             Path path = parseFilePath(uri);
             int size = path.getNameCount();

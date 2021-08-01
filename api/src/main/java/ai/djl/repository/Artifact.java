@@ -165,6 +165,18 @@ public class Artifact {
     }
 
     /**
+     * Returns the artifact arguments.
+     *
+     * @return the artifact arguments
+     */
+    public Map<String, Object> getArguments() {
+        if (arguments == null) {
+            arguments = new ConcurrentHashMap<>();
+        }
+        return arguments;
+    }
+
+    /**
      * Sets the artifact arguments.
      *
      * @param arguments the new arguments

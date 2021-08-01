@@ -15,6 +15,7 @@ package ai.djl.hadoop.hdfs;
 import ai.djl.Application;
 import ai.djl.repository.AbstractRepository;
 import ai.djl.repository.Artifact;
+import ai.djl.repository.FilenameUtils;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Metadata;
 import ai.djl.repository.Repository;
@@ -23,6 +24,7 @@ import ai.djl.util.Progress;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -45,8 +47,6 @@ public class HdfsRepository extends AbstractRepository {
     private static final Logger logger = LoggerFactory.getLogger(HdfsRepository.class);
 
     private Configuration config;
-    private String name;
-    private URI uri;
     private String prefix;
     private String artifactId;
     private String modelName;
@@ -55,39 +55,48 @@ public class HdfsRepository extends AbstractRepository {
     private boolean resolved;
     private boolean isDirectory;
 
-    HdfsRepository(
-            Configuration config,
-            String name,
-            URI uri,
-            String prefix,
-            String artifactId,
-            String modelName,
-            boolean isDirectory) {
+    HdfsRepository(String name, URI uri, Configuration config) {
+        super(name, uri);
         this.config = config;
-        this.name = name;
-        this.uri = uri;
-        this.prefix = prefix;
-        this.artifactId = artifactId;
-        this.modelName = modelName;
-        this.isDirectory = isDirectory;
+
+        prefix = uri.getPath();
+        String fileName = Paths.get(prefix).toFile().getName();
+        isDirectory = !FilenameUtils.isArchiveFile(fileName);
+        if (!isDirectory) {
+            fileName = FilenameUtils.getNamePart(fileName);
+        }
+
+        modelName = arguments.get("model_name");
+        artifactId = arguments.get("artifact_id");
+        if (artifactId == null) {
+            artifactId = fileName;
+        }
+        if (modelName == null) {
+            modelName = artifactId;
+        }
+        if (prefix.isEmpty()) {
+            prefix = "/";
+        }
+
+        try {
+            this.uri =
+                    new URI(
+                            uri.getScheme(),
+                            uri.getUserInfo(),
+                            uri.getHost(),
+                            uri.getPort(),
+                            null,
+                            null,
+                            null);
+        } catch (URISyntaxException e) {
+            throw new AssertionError(e);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean isRemote() {
         return true;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public URI getBaseUri() {
-        return uri;
     }
 
     /** {@inheritDoc} */
@@ -118,7 +127,7 @@ public class HdfsRepository extends AbstractRepository {
         org.apache.hadoop.fs.Path path = new org.apache.hadoop.fs.Path(item.getUri());
         logger.debug("Downloading artifact: {} ...", path);
         try (InputStream is = fs.open(path)) {
-            save(is, tmp, baseUri, item, progress);
+            save(is, tmp, item, progress);
         }
     }
 
@@ -167,6 +176,7 @@ public class HdfsRepository extends AbstractRepository {
 
         Artifact artifact = new Artifact();
         artifact.setName(modelName);
+        artifact.getArguments().putAll(arguments);
         Map<String, Artifact.Item> files = new ConcurrentHashMap<>();
         artifact.setFiles(files);
         if (isDirectory) {
