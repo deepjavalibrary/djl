@@ -12,11 +12,11 @@
  */
 package ai.djl.examples.training;
 
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicdataset.cv.PikachuDetection;
 import ai.djl.basicmodelzoo.cv.object_detection.ssd.SingleShotDetection;
+import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
@@ -155,7 +155,7 @@ public final class TrainPikachu {
         return new DefaultTrainingConfig(new SingleShotDetectionLoss())
                 .addEvaluator(new SingleShotDetectionAccuracy("classAccuracy"))
                 .addEvaluator(new BoundingBoxError("boundingBoxError"))
-                .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }

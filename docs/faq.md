@@ -35,7 +35,7 @@ setting the devices. For example, if you have 7 GPUs available, and you want the
             .addEvaluator(accuracy)
             .setBatchSize(batchSize)
             // Set the devices to run on multi-GPU
-            .setDevices(Device.getDevices(numberOfGpus));
+            .setDevices(Engine.getInstance().getDevices(numberOfGpus));
 All of the examples in the example folder can be run on 
 multiple GPUs with the appropriate arguments. Follow the steps in the example to [train a ResNet50 model on CIFAR-10 dataset](https://github.com/deepjavalibrary/djl/blob/master/examples/docs/train_cifar10_resnet.md#train-using-multiple-gpus) on a GPU.
 
@@ -48,7 +48,7 @@ specify the 'MXNET_ENGINE_TYPE' environment variable to 'NaiveEngine'. For more 
 DJL does not currently support distributed training.
 
 ### 7. Can I run DJL on other versions of MxNet?
-This is not officially supported by DJL, but you can follow the steps outlined in the [troubleshooting document](development/troubleshooting.md#4-how-to-run-djl-using-other-versions-of-mxnet)
+This is not officially supported by DJL, but you can follow the steps outlined in the [troubleshooting document](development/troubleshooting.md#4-how-to-run-djl-using-other-versions-of-apache-mxnet)
 to use other versions of MXNet or built your own customized version.
 
 ### 8. I have a model trained and saved by another DL engine. Can I load that model on to DJL?

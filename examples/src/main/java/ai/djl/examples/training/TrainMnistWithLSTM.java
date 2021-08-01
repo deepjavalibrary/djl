@@ -12,9 +12,9 @@
  */
 package ai.djl.examples.training;
 
-import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicdataset.cv.classification.Mnist;
+import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.types.Shape;
@@ -118,7 +118,7 @@ public final class TrainMnistWithLSTM {
 
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
-                .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }

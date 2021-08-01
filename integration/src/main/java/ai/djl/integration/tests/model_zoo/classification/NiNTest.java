@@ -12,9 +12,9 @@
  */
 package ai.djl.integration.tests.model_zoo.classification;
 
-import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.cv.classification.NiN;
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -43,7 +43,7 @@ public class NiNTest {
     public void testTrainWithDefaultChannels() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optDevices(Device.getDevices(2));
+                        .optDevices(Engine.getInstance().getDevices(2));
         Block nin = NiN.builder().build();
         try (Model model = Model.newInstance("nin")) {
             model.setBlock(nin);
@@ -95,7 +95,7 @@ public class NiNTest {
     public void testTrainWithCustomChannels() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optDevices(Device.getDevices(2));
+                        .optDevices(Engine.getInstance().getDevices(2));
         Block nin =
                 NiN.builder()
                         .setDropOutRate(0.8f)

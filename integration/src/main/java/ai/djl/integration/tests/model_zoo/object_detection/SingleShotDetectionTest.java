@@ -14,10 +14,10 @@
 package ai.djl.integration.tests.model_zoo.object_detection;
 
 import ai.djl.Application;
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.basicdataset.cv.PikachuDetection;
 import ai.djl.basicmodelzoo.BasicModelZoo;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.cv.Image;
@@ -124,7 +124,7 @@ public class SingleShotDetectionTest {
         return new DefaultTrainingConfig(new SingleShotDetectionLoss())
                 .addEvaluator(new SingleShotDetectionAccuracy("classAccuracy"))
                 .addEvaluator(new BoundingBoxError("boundingBoxError"))
-                .optDevices(Device.getDevices(1));
+                .optDevices(Engine.getInstance().getDevices(1));
     }
 
     private ZooModel<Image, DetectedObjects> getModel()

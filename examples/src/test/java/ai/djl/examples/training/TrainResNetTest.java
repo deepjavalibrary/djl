@@ -13,7 +13,6 @@
 
 package ai.djl.examples.training;
 
-import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.transferlearning.TrainResnetWithCifar10;
@@ -44,7 +43,7 @@ public class TrainResNetTest {
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");
         }
-        if (Device.getGpuCount() > 0) {
+        if (Engine.getInstance().getGpuCount() > 0) {
             // Limit max 4 gpu for cifar10 training to make it converge faster.
             // and only train 10 batch for unit test.
             String[] args = {"-e", "10", "-g", "4", "-s", "-p"};
@@ -66,7 +65,7 @@ public class TrainResNetTest {
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");
         }
-        if (Device.getGpuCount() > 0) {
+        if (Engine.getInstance().getGpuCount() > 0) {
             // Limit max 4 gpu for cifar10 training to make it converge faster.
             // and only train 10 batch for unit test.
             String[] args = {"-e", "10", "-g", "4"};

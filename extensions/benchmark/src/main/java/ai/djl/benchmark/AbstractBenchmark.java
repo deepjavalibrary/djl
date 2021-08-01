@@ -12,7 +12,6 @@
  */
 package ai.djl.benchmark;
 
-import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.metric.Metrics;
@@ -93,13 +92,11 @@ public abstract class AbstractBenchmark {
                 logger.info(
                         "Running {} on: {}, duration: {} minutes.",
                         getClass().getSimpleName(),
-                        Device.defaultDevice(engine),
+                        engine.defaultDevice(),
                         duration.toMinutes());
             } else {
                 logger.info(
-                        "Running {} on: {}.",
-                        getClass().getSimpleName(),
-                        Device.defaultDevice(engine));
+                        "Running {} on: {}.", getClass().getSimpleName(), engine.defaultDevice());
             }
             int numOfThreads = arguments.getThreads();
             int iteration = arguments.getIteration();

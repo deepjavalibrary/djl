@@ -13,13 +13,13 @@
 package ai.djl.examples.training.transferlearning;
 
 import ai.djl.Application;
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.basicdataset.cv.classification.Cifar10;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
+import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
@@ -212,7 +212,7 @@ public final class TrainResnetWithCifar10 {
     private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
-                .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                .optDevices(Engine.getInstance().getInstance().getDevices(arguments.getMaxGpus()))
                 .addTrainingListeners(TrainingListener.Defaults.logging(arguments.getOutputDir()));
     }
 

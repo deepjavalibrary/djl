@@ -12,9 +12,9 @@
  */
 package ai.djl.integration.tests.model_zoo.classification;
 
-import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.cv.classification.VGG;
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -44,12 +44,12 @@ public class VGGTest {
     public void testTrainWithDefaultChannels() {
         // Vgg is too large to be fit into the github action cpu main memory
         // only run the test when we have GPU
-        if (Device.getGpuCount() == 0) {
+        if (Engine.getInstance().getGpuCount() == 0) {
             throw new SkipException("GPU only");
         }
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optDevices(Device.getDevices(2));
+                        .optDevices(Engine.getInstance().getDevices(2));
 
         Block vgg = VGG.builder().build();
         try (Model model = Model.newInstance("vgg")) {

@@ -12,8 +12,8 @@
  */
 package ai.djl.mxnet.integration;
 
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
@@ -96,7 +96,7 @@ public class MxSymbolBlockTest {
     @Test
     public void trainWithNewParam()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        if (Device.getGpuCount() == 0) {
+        if (Engine.getInstance().getGpuCount() == 0) {
             // TODO: WARN The gradMeans (but not predictions or loss) changed during the upgrade
             // to MXNet 1.8. The issue affect only CPU, but GPU has not changed.
             throw new SkipException("Ignore engine error");

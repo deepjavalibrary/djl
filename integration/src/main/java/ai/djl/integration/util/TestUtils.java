@@ -58,6 +58,6 @@ public final class TestUtils {
                 Device.cpu()
             }; // TODO: RNN is not implemented on MXNet without cuDNN
         }
-        return Device.getDevices(1);
+        return Engine.getInstance().getDevices(1);
     }
 }

@@ -13,9 +13,9 @@
 
 package ai.djl.integration.tests.model_zoo.classification;
 
-import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.cv.classification.AlexNet;
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -44,7 +44,7 @@ public class AlexNetTest {
     public void testTrainWithDefaultChannels() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optDevices(Device.getDevices(2));
+                        .optDevices(Engine.getInstance().getDevices(2));
 
         Block alexNet = AlexNet.builder().build();
         try (Model model = Model.newInstance("alexnet")) {
@@ -98,7 +98,7 @@ public class AlexNetTest {
     public void testTrainWithCustomChannels() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optDevices(Device.getDevices(2));
+                        .optDevices(Engine.getInstance().getDevices(2));
         Block alexNet =
                 AlexNet.builder()
                         .setDropOutRate(0.8f)

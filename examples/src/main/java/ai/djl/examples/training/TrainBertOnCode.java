@@ -12,8 +12,8 @@
  */
 package ai.djl.examples.training;
 
-import ai.djl.Device;
 import ai.djl.Model;
+import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.BertCodeDataset;
 import ai.djl.ndarray.types.Shape;
@@ -105,7 +105,7 @@ public final class TrainBertOnCode {
                         .build();
         return new DefaultTrainingConfig(new BertPretrainingLoss())
                 .optOptimizer(optimizer)
-                .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
                 .addTrainingListeners(Defaults.logging());
     }
 

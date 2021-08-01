@@ -12,8 +12,8 @@
  */
 package ai.djl.examples.training;
 
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.engine.Engine;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class TrainSentimentAnalysisTest {
         if (!Boolean.getBoolean("nightly")) {
             throw new SkipException("Nightly only");
         }
-        if (Device.getGpuCount() == 0) {
+        if (Engine.getInstance().getGpuCount() == 0) {
             throw new SkipException("GPU only");
         }
 

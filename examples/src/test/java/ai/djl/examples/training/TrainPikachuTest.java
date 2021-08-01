@@ -12,8 +12,8 @@
  */
 package ai.djl.examples.training;
 
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
+import ai.djl.engine.Engine;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class TrainPikachuTest {
         float expectedLoss = 0;
         int expectedMinNumber = 0;
         int expectedMaxNumber = 0;
-        if (Device.getGpuCount() > 0) {
+        if (Engine.getInstance().getGpuCount() > 0) {
             args = new String[] {"-e", "20", "-b", "32", "-g", "1"};
             expectedLoss = 2.5e-3f;
             expectedMaxNumber = 15;

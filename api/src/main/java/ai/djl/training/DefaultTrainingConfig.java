@@ -13,6 +13,7 @@
 package ai.djl.training;
 
 import ai.djl.Device;
+import ai.djl.engine.Engine;
 import ai.djl.nn.Parameter;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.initializer.Initializer;
@@ -161,7 +162,7 @@ public class DefaultTrainingConfig implements TrainingConfig {
     @Override
     public Device[] getDevices() {
         if (devices == null) {
-            return Device.getDevices();
+            return Engine.getInstance().getDevices();
         }
         return devices;
     }
