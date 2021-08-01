@@ -117,7 +117,7 @@ public class BaseModelLoader implements ModelLoader {
             // Otherwise check the modelzoo supported engine and grab a random engine in the list.
             // Otherwise if none of them is specified or model zoo is null, go to default engine.
             if (engine == null && modelZoo != null) {
-                String defaultEngine = Engine.getInstance().getEngineName();
+                String defaultEngine = Engine.getDefaultEngineName();
                 for (String supportedEngine : modelZoo.getSupportedEngines()) {
                     if (supportedEngine.equals(defaultEngine)) {
                         engine = supportedEngine;

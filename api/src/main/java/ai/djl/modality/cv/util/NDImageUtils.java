@@ -12,7 +12,6 @@
  */
 package ai.djl.modality.cv.util;
 
-import ai.djl.engine.Engine;
 import ai.djl.modality.cv.Image;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.Shape;
@@ -109,7 +108,7 @@ public final class NDImageUtils {
      */
     public static NDArray normalize(NDArray input, float[] mean, float[] std) {
         boolean chw = isCHW(input.getShape());
-        boolean tf = "TensorFlow".equals(Engine.getInstance().getEngineName());
+        boolean tf = "TensorFlow".equals(input.getManager().getEngine().getEngineName());
         if ((chw && tf) || (!chw && !tf)) {
             throw new IllegalArgumentException(
                     "normalize requires CHW format. TensorFlow requires HWC");
