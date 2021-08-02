@@ -102,6 +102,15 @@ public abstract class Engine {
     public abstract int getRank();
 
     /**
+     * Returns the default Engine name.
+     *
+     * @return the default Engine name
+     */
+    public static String getDefaultEngineName() {
+        return DEFAULT_ENGINE;
+    }
+
+    /**
      * Returns the default Engine.
      *
      * @return the instance of {@code Engine}

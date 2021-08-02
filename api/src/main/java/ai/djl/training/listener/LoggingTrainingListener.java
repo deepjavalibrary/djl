@@ -158,8 +158,9 @@ public class LoggingTrainingListener implements TrainingListener {
         logger.info("Training on: {}.", devicesMsg);
 
         long init = System.nanoTime();
-        String engineName = Engine.getInstance().getEngineName();
-        String version = Engine.getInstance().getVersion();
+        Engine engine = trainer.getManager().getEngine();
+        String engineName = engine.getEngineName();
+        String version = engine.getVersion();
         long loaded = System.nanoTime();
         logger.info(
                 String.format(

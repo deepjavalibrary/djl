@@ -76,7 +76,7 @@ public class Arguments {
         if (cmd.hasOption("engine")) {
             engine = cmd.getOptionValue("engine");
         } else {
-            engine = Engine.getInstance().getEngineName();
+            engine = Engine.getDefaultEngineName();
         }
 
         if (cmd.hasOption("duration")) {

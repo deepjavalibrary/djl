@@ -50,6 +50,6 @@ public class FtModelZoo implements ModelZoo {
     /** {@inheritDoc} */
     @Override
     public Set<String> getSupportedEngines() {
-        return Collections.singleton(Engine.getInstance().getEngineName());
+        return Collections.singleton(Engine.getDefaultEngineName());
     }
 }
