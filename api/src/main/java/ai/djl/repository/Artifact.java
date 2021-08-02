@@ -12,6 +12,7 @@
  */
 package ai.djl.repository;
 
+import ai.djl.Application;
 import ai.djl.util.JsonUtils;
 import java.io.Serializable;
 import java.net.URI;
@@ -153,6 +154,12 @@ public class Artifact {
         }
         if (override != null) {
             map.putAll(override);
+        }
+        if (!map.containsKey("application") && metadata != null) {
+            Application application = metadata.getApplication();
+            if (application != null && Application.UNDEFINED != application) {
+                map.put("application", application.getPath());
+            }
         }
         return map;
     }
