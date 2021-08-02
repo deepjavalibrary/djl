@@ -26,18 +26,6 @@ The javadocs output is built in the `build/doc/javadoc` folder.
 
 ## Installation
 
-**Note:** One of the dependency *JavaCPP* has a bug that will cause memory leak. See
-[here](https://github.com/bytedeco/javacpp/commit/7f27899578dfa18e22738a3dd49701e1806b464a) for
-more detail. The issue has been fixed in javacpp 1.5.6-SNAPSHOT version. You need to include the
-javacpp SNAPSHOT version explicitly to avoid memory leak:
-
-```
-runtimeOnly "org.bytedeco:javacpp:1.5.6-SNAPSHOT"
-runtimeOnly ("ai.djl.tensorflow:tensorflow-engine") {
-    exclude group: "org.bytedeco", module: "javacpp"
-}
-```
-
 You can pull the TensorFlow engine from the central Maven repository by including the following dependency:
 
 - ai.djl.tensorflow:tensorflow-engine:0.12.0

@@ -42,6 +42,26 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
         manager.attachInternal(getUid(), this);
     }
 
+    /**
+     * Sets the Level-of-Detail field of the NDArray.
+     *
+     * <p>checkout https://www.bookstack.cn/read/PaddlePaddle-1.3-fluid/27.md
+     *
+     * @param lod the Level-of-Detail representation
+     */
+    public void setLoD(long[][] lod) {
+        JniUtils.setNdLoD(this, lod);
+    }
+
+    /**
+     * Gets the Level-of-Detail field of the NDArray.
+     *
+     * @return the Level-of-Detail representation
+     */
+    public long[][] getLoD() {
+        return JniUtils.getNdLoD(this);
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDManager getManager() {
