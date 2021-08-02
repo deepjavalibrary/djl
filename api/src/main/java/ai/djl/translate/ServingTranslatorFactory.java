@@ -247,6 +247,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
             } else {
                 output.setContent(JsonUtils.GSON_PRETTY.toJson(obj) + '\n');
             }
+            output.addProperty("Content-Type", "application/json");
             return output;
         }
 
@@ -262,8 +263,12 @@ public class ServingTranslatorFactory implements TranslatorFactory {
             if (data == null) {
                 data = input.getContent().valueAt(0);
             }
-            Image image = factory.fromInputStream(new ByteArrayInputStream(data));
-            return translator.processInput(ctx, image);
+            try {
+                Image image = factory.fromInputStream(new ByteArrayInputStream(data));
+                return translator.processInput(ctx, image);
+            } catch (IOException e) {
+                throw new TranslateException("Input is not an Image data type", e);
+            }
         }
 
         /** {@inheritDoc} */
@@ -307,6 +312,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
             Input input = (Input) ctx.getAttachment("input");
             Output output = new Output(input.getRequestId(), 200, "OK");
             output.setContent(list.encode());
+            output.addProperty("Content-Type", "tensor/ndlist");
             return output;
         }
     }

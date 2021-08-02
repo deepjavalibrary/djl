@@ -13,6 +13,7 @@
 package ai.djl.modality;
 
 import ai.djl.util.PairList;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -82,7 +83,7 @@ public class Input {
      * @return the value to which the specified key is mapped
      */
     public String getProperty(String key, String defaultValue) {
-        return properties.getOrDefault(key, defaultValue);
+        return properties.getOrDefault(key.toLowerCase(Locale.ROOT), defaultValue);
     }
 
     /**

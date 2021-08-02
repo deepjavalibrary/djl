@@ -24,6 +24,7 @@ import io.netty.handler.codec.http.multipart.HttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,9 +59,13 @@ public class RequestParser {
             }
         }
 
-        CharSequence contentType = HttpUtil.getMimeType(req);
         for (Map.Entry<String, String> entry : req.headers().entries()) {
-            input.addProperty(entry.getKey(), entry.getValue());
+            input.addProperty(entry.getKey().toLowerCase(Locale.ROOT), entry.getValue());
+        }
+        CharSequence contentType = HttpUtil.getMimeType(req);
+        if (contentType != null) {
+            // use normalized content type
+            input.addProperty("content-type", contentType.toString());
         }
 
         if (HttpPostRequestDecoder.isMultipart(req)
