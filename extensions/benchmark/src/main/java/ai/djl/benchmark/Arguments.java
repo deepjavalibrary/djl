@@ -44,6 +44,7 @@ public class Arguments {
     private int duration;
     private int iteration;
     private int threads;
+    private int maxGpus;
     private int delay;
     private PairList<DataType, Shape> inputShapes;
 
@@ -60,7 +61,7 @@ public class Arguments {
             try {
                 modelUrls = path.toUri().toURL().toExternalForm();
             } catch (IOException e) {
-                throw new IllegalArgumentException("Invalid model-path: " + modelUrls, e);
+                throw new IllegalArgumentException("Invalid model-path: " + modelPath, e);
             }
         } else if (cmd.hasOption("model-url")) {
             modelUrls = cmd.getOptionValue("model-url");
@@ -93,6 +94,12 @@ public class Arguments {
             }
         } else {
             threads = Runtime.getRuntime().availableProcessors() * 2 - 1;
+        }
+        if (cmd.hasOption("gpus")) {
+            maxGpus = Integer.parseInt(cmd.getOptionValue("gpus"));
+            if (maxGpus <= 0) {
+                maxGpus = Integer.MAX_VALUE;
+            }
         }
         if (cmd.hasOption("criteria")) {
             Type type = new TypeToken<Map<String, String>>() {}.getType();
@@ -217,7 +224,7 @@ public class Arguments {
                         .longOpt("iteration")
                         .hasArg()
                         .argName("ITERATION")
-                        .desc("Number of total iterations (per thread).")
+                        .desc("Number of total iterations.")
                         .build());
         options.addOption(
                 Option.builder("t")
@@ -225,6 +232,13 @@ public class Arguments {
                         .hasArg()
                         .argName("NUMBER_THREADS")
                         .desc("Number of inference threads.")
+                        .build());
+        options.addOption(
+                Option.builder("g")
+                        .longOpt("gpus")
+                        .hasArg()
+                        .argName("NUMBER_GPUS")
+                        .desc("Number of GPUS to run multithreading inference.")
                         .build());
         options.addOption(
                 Option.builder("l")
@@ -281,6 +295,10 @@ public class Arguments {
 
     int getThreads() {
         return threads;
+    }
+
+    int getMaxGpus() {
+        return maxGpus;
     }
 
     String getOutputDir() {

@@ -12,6 +12,7 @@
  */
 package ai.djl.benchmark;
 
+import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.metric.Metrics;
@@ -101,7 +102,13 @@ public abstract class AbstractBenchmark {
             int numOfThreads = arguments.getThreads();
             int iteration = arguments.getIteration();
             if (this instanceof MultithreadedBenchmark) {
-                iteration = Math.max(iteration, 10) * numOfThreads;
+                int expected = 10 * numOfThreads;
+                if (iteration < expected) {
+                    iteration = expected;
+                    logger.info(
+                            "Iteration is too small for multi-threading benchmark. Adjust to: {}",
+                            iteration);
+                }
             }
             while (!duration.isNegative()) {
                 Metrics metrics = new Metrics(); // Reset Metrics for each test loop.
@@ -235,7 +242,7 @@ public abstract class AbstractBenchmark {
         return false;
     }
 
-    protected ZooModel<Void, float[]> loadModel(Arguments arguments, Metrics metrics)
+    protected ZooModel<Void, float[]> loadModel(Arguments arguments, Metrics metrics, Device device)
             throws ModelException, IOException {
         long begin = System.nanoTime();
         String artifactId = arguments.getArtifactId();
@@ -248,6 +255,7 @@ public abstract class AbstractBenchmark {
                         .optModelUrls(arguments.getModelUrls())
                         .optModelName(arguments.getModelName())
                         .optEngine(arguments.getEngine())
+                        .optDevice(device)
                         .optFilters(arguments.getCriteria())
                         .optArtifactId(artifactId)
                         .optTranslator(translator)
@@ -255,12 +263,14 @@ public abstract class AbstractBenchmark {
                         .build();
 
         ZooModel<Void, float[]> model = criteria.loadModel();
-        long delta = System.nanoTime() - begin;
-        logger.info(
-                "Model {} loaded in: {} ms.",
-                model.getName(),
-                String.format("%.3f", delta / 1_000_000f));
-        metrics.addMetric("LoadModel", delta);
+        if (device == Device.cpu() || device == Device.gpu()) {
+            long delta = System.nanoTime() - begin;
+            logger.info(
+                    "Model {} loaded in: {} ms.",
+                    model.getName(),
+                    String.format("%.3f", delta / 1_000_000f));
+            metrics.addMetric("LoadModel", delta);
+        }
         return model;
     }
 
