@@ -25,18 +25,17 @@ import java.util.List;
 import java.util.Set;
 
 /** TfLiteModelZoo is a repository that contains all TFLite models for DJL. */
-public class TfLiteModelZoo implements ModelZoo {
+public class TfLiteModelZoo extends ModelZoo {
 
     private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
     private static final Repository REPOSITORY = Repository.newInstance("TFLite", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.tflite";
-    private static final TfLiteModelZoo ZOO = new TfLiteModelZoo();
 
     private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
 
     static {
         MRL mobilenet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mobilenet", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(mobilenet, ZOO));
+        MODEL_LOADERS.add(new BaseModelLoader(mobilenet));
     }
 
     /** {@inheritDoc} */

@@ -12,6 +12,7 @@
  */
 package ai.djl.repository;
 
+import java.net.URI;
 import java.util.Set;
 
 /** A interface responsible to create {@link ai.djl.repository.Repository} instances. */
@@ -21,10 +22,10 @@ public interface RepositoryFactory {
      * Creates a new instance of a repository with a name and url.
      *
      * @param name the repository name
-     * @param url the repository location
+     * @param uri the repository location
      * @return the new repository
      */
-    Repository newInstance(String name, String url);
+    Repository newInstance(String name, URI uri);
 
     /**
      * Returns a set of URI scheme that the {@code RepositoryFactory} supports.

@@ -23,6 +23,9 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +41,7 @@ public class RemoteRepository extends AbstractRepository {
 
     private String name;
     private URI uri;
+    private List<MRL> resources;
 
     /**
      * (Internal) Constructs a remote repository.
@@ -119,7 +123,21 @@ public class RemoteRepository extends AbstractRepository {
         if (artifacts.isEmpty()) {
             return null;
         }
-        // TODO: find highest version.
-        return artifacts.get(0);
+        return artifacts.stream().max(Comparator.comparing(o -> new Version(o.getVersion()))).get();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<MRL> getResources() {
+        return resources == null ? Collections.emptyList() : resources;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void addResource(MRL mrl) {
+        if (resources == null) {
+            resources = new ArrayList<>();
+        }
+        resources.add(mrl);
     }
 }

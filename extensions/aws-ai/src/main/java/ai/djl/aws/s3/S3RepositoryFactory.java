@@ -46,11 +46,10 @@ public class S3RepositoryFactory implements RepositoryFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Repository newInstance(String name, String url) {
-        URI uri = URI.create(url);
+    public Repository newInstance(String name, URI uri) {
         String scheme = uri.getScheme();
         if (!"s3".equalsIgnoreCase(scheme)) {
-            throw new IllegalArgumentException("Invalid s3 url: " + url);
+            throw new IllegalArgumentException("Invalid s3 url: " + uri);
         }
 
         String bucket = uri.getHost();

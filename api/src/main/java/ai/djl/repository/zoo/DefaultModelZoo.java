@@ -16,13 +16,14 @@ import ai.djl.engine.Engine;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A {@link ModelZoo} that contains models in specified locations. */
-public class DefaultModelZoo implements ModelZoo {
+public class DefaultModelZoo extends ModelZoo {
 
     public static final String GROUP_ID = "ai.djl.localmodelzoo";
 
@@ -30,32 +31,29 @@ public class DefaultModelZoo implements ModelZoo {
 
     private List<ModelLoader> modelLoaders;
 
+    /** Constructs a new {@code LocalModelZoo} instance. */
+    public DefaultModelZoo() {}
+
     /**
-     * Creates the {@code LocalModelZoo} instance from the given search locations.
+     * Constructs a new {@code LocalModelZoo} instance from the given search locations.
      *
      * @param locations a comma separated urls where the models to be loaded from
      */
     public DefaultModelZoo(String locations) {
-        String[] urls = locations.split("\\s*,\\s*");
-        modelLoaders = new ArrayList<>(urls.length);
-        for (String url : urls) {
-            if (!url.isEmpty()) {
-                Repository repo = Repository.newInstance(url, url);
-                logger.debug("Scanning models in repo: {}, {}", repo.getClass(), url);
-                List<MRL> mrls = repo.getResources();
-                for (MRL mrl : mrls) {
-                    modelLoaders.add(new BaseModelLoader(mrl, null));
-                }
-            } else {
-                logger.warn("Model location is empty.");
-            }
-        }
+        modelLoaders = parseLocation(locations);
     }
 
     /** {@inheritDoc} */
     @Override
     public List<ModelLoader> getModelLoaders() {
-        return modelLoaders;
+        if (modelLoaders != null) {
+            return modelLoaders;
+        }
+        String locations = System.getProperty("ai.djl.repository.zoo.location");
+        if (locations != null) {
+            return parseLocation(locations);
+        }
+        return Collections.emptyList();
     }
 
     /** {@inheritDoc} */
@@ -68,5 +66,23 @@ public class DefaultModelZoo implements ModelZoo {
     @Override
     public Set<String> getSupportedEngines() {
         return Engine.getAllEngines();
+    }
+
+    private List<ModelLoader> parseLocation(String locations) {
+        String[] urls = locations.split("\\s*,\\s*");
+        List<ModelLoader> list = new ArrayList<>(urls.length);
+        for (String url : urls) {
+            if (!url.isEmpty()) {
+                Repository repo = Repository.newInstance(url, url);
+                logger.debug("Scanning models in repo: {}, {}", repo.getClass(), url);
+                List<MRL> mrls = repo.getResources();
+                for (MRL mrl : mrls) {
+                    list.add(new BaseModelLoader(mrl));
+                }
+            } else {
+                logger.warn("Model location is empty.");
+            }
+        }
+        return list;
     }
 }

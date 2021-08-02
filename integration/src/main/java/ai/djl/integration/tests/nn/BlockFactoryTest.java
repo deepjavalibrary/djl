@@ -122,7 +122,8 @@ public class BlockFactoryTest {
                             .optArtifactId("resnet")
                             .optEngine(name)
                             .optGroupId("ai.djl." + name.toLowerCase())
-                            .optFilter("layers", "50");
+                            .optFilter("layers", "50")
+                            .optFilter("flavor", "v2");
             Model model = builder.build().loadModel();
             SequentialBlock newBlock = new SequentialBlock();
             SymbolBlock block = (SymbolBlock) model.getBlock();

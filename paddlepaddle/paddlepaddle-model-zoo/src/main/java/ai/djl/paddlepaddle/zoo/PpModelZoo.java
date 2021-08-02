@@ -25,11 +25,10 @@ import java.util.List;
 import java.util.Set;
 
 /** PpModelZoo is a repository that contains all PaddlePaddle models for DJL. */
-public class PpModelZoo implements ModelZoo {
+public class PpModelZoo extends ModelZoo {
 
     private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
     private static final Repository REPOSITORY = Repository.newInstance("Paddle", DJL_REPO_URL);
-    private static final PpModelZoo ZOO = new PpModelZoo();
     public static final String GROUP_ID = "ai.djl.paddlepaddle";
 
     private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
@@ -37,23 +36,23 @@ public class PpModelZoo implements ModelZoo {
     static {
         MRL maskDetection =
                 REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mask_classification", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(maskDetection, ZOO));
+        MODEL_LOADERS.add(new BaseModelLoader(maskDetection));
 
         MRL wordRotation =
                 REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "word_rotation", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(wordRotation, ZOO));
+        MODEL_LOADERS.add(new BaseModelLoader(wordRotation));
 
         MRL faceDetection =
                 REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "face_detection", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(faceDetection, ZOO));
+        MODEL_LOADERS.add(new BaseModelLoader(faceDetection));
 
         MRL wordDetection =
                 REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "word_detection", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(wordDetection, ZOO));
+        MODEL_LOADERS.add(new BaseModelLoader(wordDetection));
 
         MRL wordRecognition =
                 REPOSITORY.model(CV.WORD_RECOGNITION, GROUP_ID, "word_recognition", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(wordRecognition, ZOO));
+        MODEL_LOADERS.add(new BaseModelLoader(wordRecognition));
     }
 
     /** {@inheritDoc} */

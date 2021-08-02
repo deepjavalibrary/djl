@@ -48,11 +48,10 @@ public class HdfsRepositoryFactory implements RepositoryFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Repository newInstance(String name, String url) {
-        URI uri = URI.create(url);
+    public Repository newInstance(String name, URI uri) {
         String scheme = uri.getScheme();
         if (!"hdfs".equalsIgnoreCase(scheme)) {
-            throw new IllegalArgumentException("Invalid hdfs url: " + url);
+            throw new IllegalArgumentException("Invalid hdfs url: " + uri);
         }
 
         String path = uri.getPath();

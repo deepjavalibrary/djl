@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,14 +121,7 @@ public class Criteria<I, O> {
             }
             list.add(modelZoo);
         } else {
-            ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
-            for (ZooProvider provider : providers) {
-                logger.debug("Searching model in zoo provider: {}", provider.getName());
-                ModelZoo zoo = provider.getModelZoo();
-                if (zoo == null) {
-                    logger.debug("No model zoo found in zoo provider: {}", provider.getName());
-                    continue;
-                }
+            for (ModelZoo zoo : ModelZoo.listModelZoo()) {
                 if (groupId != null && !zoo.getGroupId().equals(groupId)) {
                     // filter out ModelZoo by groupId
                     logger.debug("Ignore ModelZoo {} by groupId: {}", zoo.getGroupId(), groupId);

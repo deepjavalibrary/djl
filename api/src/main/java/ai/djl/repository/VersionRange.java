@@ -188,6 +188,9 @@ public final class VersionRange {
      * @return true if the version falls within this range
      */
     public boolean contains(Version version) {
+        if (ANY == this) {
+            return true;
+        }
         if (recommendedVersion != null) {
             return recommendedVersion.equals(version);
         }

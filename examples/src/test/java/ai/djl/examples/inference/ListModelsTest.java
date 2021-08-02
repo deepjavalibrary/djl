@@ -22,6 +22,7 @@ import ai.djl.repository.zoo.ModelZoo;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.testng.Assert;
@@ -41,6 +42,7 @@ public class ListModelsTest {
         String repoUrl = path.toRealPath().toAbsolutePath().toUri().toURL().toExternalForm();
         System.setProperty("ai.djl.repository.zoo.location", "src/test/resources," + repoUrl);
         Map<Application, List<Artifact>> models = ModelZoo.listModels();
+        System.out.println(Arrays.toString(models.keySet().toArray()));
         List<Artifact> artifacts = models.get(Application.UNDEFINED);
         Assert.assertFalse(artifacts.isEmpty());
     }
