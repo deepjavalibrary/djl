@@ -16,6 +16,7 @@ import ai.djl.Application;
 import ai.djl.repository.Artifact.Item;
 import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Progress;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -114,7 +115,7 @@ public class SimpleRepository extends AbstractRepository {
     protected void download(Path tmp, URI baseUri, Artifact.Item item, Progress progress)
             throws IOException {
         logger.debug("Extracting artifact: {} ...", path);
-        try (InputStream is = Files.newInputStream(path)) {
+        try (InputStream is = new BufferedInputStream(Files.newInputStream(path))) {
             save(is, tmp, baseUri, item, progress);
         }
     }

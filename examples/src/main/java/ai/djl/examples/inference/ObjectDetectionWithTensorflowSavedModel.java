@@ -36,6 +36,7 @@ import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
 import com.google.gson.annotations.SerializedName;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -130,7 +131,7 @@ public final class ObjectDetectionWithTensorflowSavedModel {
                         "https://raw.githubusercontent.com/tensorflow/models/master/research/object_detection/data/mscoco_label_map.pbtxt");
         Map<Integer, String> map = new ConcurrentHashMap<>();
         int maxId = 0;
-        try (InputStream is = synsetUrl.openStream();
+        try (InputStream is = new BufferedInputStream(synsetUrl.openStream());
                 Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
             scanner.useDelimiter("item ");
             while (scanner.hasNext()) {

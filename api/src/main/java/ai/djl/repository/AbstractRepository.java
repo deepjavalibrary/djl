@@ -52,7 +52,7 @@ public abstract class AbstractRepository implements Repository {
     /** {@inheritDoc} */
     @Override
     public InputStream openStream(Artifact.Item item, String path) throws IOException {
-        return Files.newInputStream(Paths.get(resolvePath(item, path)));
+        return new BufferedInputStream(Files.newInputStream(Paths.get(resolvePath(item, path))));
     }
 
     /** {@inheritDoc} */
@@ -164,7 +164,7 @@ public abstract class AbstractRepository implements Repository {
         }
 
         logger.debug("Downloading artifact: {} ...", fileUri);
-        try (InputStream is = fileUri.toURL().openStream()) {
+        try (InputStream is = new BufferedInputStream(fileUri.toURL().openStream())) {
             save(is, tmp, baseUri, item, progress);
         }
     }

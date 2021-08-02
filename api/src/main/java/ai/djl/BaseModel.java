@@ -27,6 +27,8 @@ import ai.djl.translate.Translator;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import ai.djl.util.Utils;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
@@ -196,7 +198,7 @@ public abstract class BaseModel implements Model {
     @Override
     public InputStream getArtifactAsStream(String name) throws IOException {
         URL url = getArtifact(name);
-        return url.openStream();
+        return new BufferedInputStream(url.openStream());
     }
 
     /** {@inheritDoc} */
@@ -237,7 +239,8 @@ public abstract class BaseModel implements Model {
 
         String fileName = String.format(Locale.ROOT, "%s-%04d.params", newModelName, epoch);
         Path paramFile = modelPath.resolve(fileName);
-        try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(paramFile))) {
+        try (DataOutputStream dos =
+                new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(paramFile)))) {
             dos.writeBytes("DJL@");
             dos.writeInt(MODEL_VERSION);
             dos.writeUTF(newModelName);
@@ -319,7 +322,8 @@ public abstract class BaseModel implements Model {
     protected boolean readParameters(Path paramFile, Map<String, ?> options)
             throws IOException, MalformedModelException {
         logger.debug("Try to load model from {}", paramFile);
-        try (DataInputStream dis = new DataInputStream(Files.newInputStream(paramFile))) {
+        try (DataInputStream dis =
+                new DataInputStream(new BufferedInputStream(Files.newInputStream(paramFile)))) {
             byte[] buf = new byte[4];
             dis.readFully(buf);
             if (!"DJL@".equals(new String(buf, StandardCharsets.US_ASCII))) {

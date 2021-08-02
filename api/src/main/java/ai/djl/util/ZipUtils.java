@@ -12,6 +12,7 @@
  */
 package ai.djl.util;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,7 +67,8 @@ public final class ZipUtils {
      * @throws IOException for failures to zip the input directory
      */
     public static void zip(Path src, Path dest, boolean includeFolderName) throws IOException {
-        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(dest))) {
+        try (ZipOutputStream zos =
+                new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(dest)))) {
             Path root = includeFolderName ? src.getParent() : src;
             if (root == null) {
                 throw new AssertionError("Parent folder should not be null.");
