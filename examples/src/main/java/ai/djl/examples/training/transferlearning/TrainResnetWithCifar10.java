@@ -212,7 +212,7 @@ public final class TrainResnetWithCifar10 {
     private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
-                .optDevices(Engine.getInstance().getInstance().getDevices(arguments.getMaxGpus()))
+                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
                 .addTrainingListeners(TrainingListener.Defaults.logging(arguments.getOutputDir()));
     }
 
