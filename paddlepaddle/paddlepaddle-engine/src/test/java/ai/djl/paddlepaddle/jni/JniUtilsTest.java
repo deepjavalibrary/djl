@@ -15,6 +15,7 @@ package ai.djl.paddlepaddle.jni;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.paddlepaddle.engine.PpNDArray;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -32,6 +33,17 @@ public class JniUtilsTest {
             expected = new float[] {1, 3, 2};
             array = manager.create(expected);
             Assert.assertEquals(array.toFloatArray(), expected);
+        }
+    }
+
+    @Test
+    void testLoD() {
+        try (NDManager manager = NDManager.newBaseManager(null, "PaddlePaddle")) {
+            PpNDArray array = (PpNDArray) manager.zeros(new Shape(1, 4));
+            long[][] lodInfo = new long[][] {new long[] {1, 3}};
+            array.setLoD(lodInfo);
+            long[][] fetched = array.getLoD();
+            Assert.assertEquals(fetched, lodInfo);
         }
     }
 }

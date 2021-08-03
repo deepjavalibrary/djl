@@ -138,12 +138,44 @@ inline jintArray GetIntArrayFromVec(JNIEnv* env, const std::vector<int> &vec) {
   return array;
 }
 
+inline jlongArray GetLongArrayFromVec(JNIEnv* env, const std::vector<size_t> &vec) {
+    jlongArray array = env->NewLongArray(vec.size());
+    env->SetLongArrayRegion(array, 0, vec.size(), reinterpret_cast<const jlong*>(vec.data()));
+    return array;
+}
+
 inline jobjectArray Get2DIntArrayFrom2DVec(JNIEnv* env, const std::vector<std::vector<int>> &vec) {
   jobjectArray array = env->NewObjectArray(vec.size(), env->FindClass("[I"), nullptr);
   for (size_t i = 0; i < vec.size(); ++i) {
     env->SetObjectArrayElement(array, i, djl::utils::jni::GetIntArrayFromVec(env, vec[i]));
   }
   return array;
+}
+
+inline jobjectArray Get2DLongArrayFrom2DVec(JNIEnv* env, const std::vector<std::vector<size_t>> &vec) {
+    jobjectArray array = env->NewObjectArray(vec.size(), env->FindClass("[J"), nullptr);
+    for (size_t i = 0; i < vec.size(); ++i) {
+        env->SetObjectArrayElement(array, i, djl::utils::jni::GetLongArrayFromVec(env, vec[i]));
+    }
+    return array;
+}
+
+inline std::vector<std::vector<size_t>> Get2DVecFrom2DLongArray(JNIEnv* env, jobjectArray array) {
+    std::vector <std::vector<size_t>> vec;
+    jsize len = env->GetArrayLength(array);
+    vec.reserve(len);
+    for (int i = 0; i < len; ++i) {
+        auto long_array = (jlongArray) env->GetObjectArrayElement(array, i);
+        jlong* jarr = env->GetLongArrayElements(long_array, JNI_FALSE);
+        std::vector<size_t> temp;
+        temp.reserve(env->GetArrayLength(long_array));
+        for (size_t j = 0; j < env->GetArrayLength(long_array); ++j) {
+            temp.emplace_back(jarr[j]);
+        }
+        vec.emplace_back(temp);
+        env->ReleaseLongArrayElements(long_array, jarr, RELEASE_MODE);
+    }
+    return vec;
 }
 
 // String[][]

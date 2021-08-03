@@ -25,6 +25,7 @@ namespace utils {
 
 inline void GetZTensorFromTensor(paddle::ZeroCopyTensor* z_tensor, paddle::PaddleTensor* tensor) {
   z_tensor->Reshape(tensor->shape);
+  z_tensor->SetLoD(tensor->lod);
   switch (tensor->dtype) {
     case paddle::PaddleDType::FLOAT32:
       z_tensor->copy_from_cpu(static_cast<float*>(tensor->data.data()));
@@ -48,6 +49,7 @@ inline void GetTensorFromZTensor(paddle::ZeroCopyTensor *z_tensor, paddle::Paddl
   tensor->name = z_tensor->name();
   tensor->dtype = z_tensor->type();
   tensor->shape = z_tensor->shape();
+  tensor->lod = z_tensor->lod();
   std::vector<int> output_shape = z_tensor->shape();
   int out_num = std::accumulate(output_shape.begin(), output_shape.end(), 1, std::multiplies<int>());
   auto dtype = z_tensor->type();

@@ -67,3 +67,15 @@ JNIEXPORT jstring JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_getTensorNa
   auto tensor_ptr = reinterpret_cast<paddle::PaddleTensor*>(jhandle);
   return env->NewStringUTF(tensor_ptr->name.c_str());
 }
+
+JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_setTensorLoD(
+        JNIEnv* env, jobject jthis, jlong jhandle, jobjectArray j2dlongarray) {
+    auto tensor_ptr = reinterpret_cast<paddle::PaddleTensor*>(jhandle);
+    tensor_ptr->lod = djl::utils::jni::Get2DVecFrom2DLongArray(env, j2dlongarray);
+}
+
+JNIEXPORT jobjectArray JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_getTensorLoD(
+        JNIEnv* env, jobject jthis, jlong jhandle) {
+    auto tensor_ptr = reinterpret_cast<paddle::PaddleTensor*>(jhandle);
+    return djl::utils::jni::Get2DLongArrayFrom2DVec(env, tensor_ptr->lod);
+}

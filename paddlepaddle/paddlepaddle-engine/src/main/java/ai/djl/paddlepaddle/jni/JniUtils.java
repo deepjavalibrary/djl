@@ -63,6 +63,14 @@ public final class JniUtils {
         return PaddleLibrary.LIB.getTensorName(array.getHandle());
     }
 
+    public static void setNdLoD(PpNDArray array, long[][] lod) {
+        PaddleLibrary.LIB.setTensorLoD(array.getHandle(), lod);
+    }
+
+    public static long[][] getNdLoD(PpNDArray array) {
+        return PaddleLibrary.LIB.getTensorLoD(array.getHandle());
+    }
+
     public static void deleteNd(Long handle) {
         PaddleLibrary.LIB.deleteTensor(handle);
     }
