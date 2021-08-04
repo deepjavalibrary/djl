@@ -193,6 +193,54 @@ public abstract class Engine {
     }
 
     /**
+     * Returns an array of devices.
+     *
+     * <p>If GPUs are available, it will return an array of {@code Device} of size
+     * \(min(numAvailable, maxGpus)\). Else, it will return an array with a single CPU device.
+     *
+     * @return an array of devices
+     */
+    public Device[] getDevices() {
+        return getDevices(Integer.MAX_VALUE);
+    }
+
+    /**
+     * Returns an array of devices given the maximum number of GPUs to use.
+     *
+     * <p>If GPUs are available, it will return an array of {@code Device} of size
+     * \(min(numAvailable, maxGpus)\). Else, it will return an array with a single CPU device.
+     *
+     * @param maxGpus the max number of GPUs to use. Use 0 for no GPUs.
+     * @return an array of devices
+     */
+    public Device[] getDevices(int maxGpus) {
+        int count = getGpuCount();
+        if (maxGpus <= 0 || count <= 0) {
+            return new Device[] {Device.cpu()};
+        }
+
+        count = Math.min(maxGpus, count);
+
+        Device[] devices = new Device[count];
+        for (int i = 0; i < count; ++i) {
+            devices[i] = Device.gpu(i);
+        }
+        return devices;
+    }
+
+    /**
+     * Returns the number of GPUs available in the system.
+     *
+     * @return the number of GPUs available in the system
+     */
+    public int getGpuCount() {
+        if (hasCapability(StandardCapabilities.CUDA)) {
+            return CudaUtils.getGpuCount();
+        }
+        return 0;
+    }
+
+    /**
      * Construct an empty SymbolBlock for loading.
      *
      * @param manager the manager to manage parameters
@@ -297,9 +345,8 @@ public abstract class Engine {
 
         System.out.println();
         System.out.println("------------------ CUDA -----------------");
-        int gpuCount = Device.getGpuCount();
+        int gpuCount = CudaUtils.getGpuCount();
         System.out.println("GPU Count: " + gpuCount);
-        System.out.println("Default Device: " + Device.defaultDevice());
         if (gpuCount > 0) {
             System.out.println("CUDA: " + CudaUtils.getCudaVersionString());
             System.out.println("ARCH: " + CudaUtils.getComputeCapability(0));
@@ -313,6 +360,7 @@ public abstract class Engine {
         System.out.println();
         System.out.println("----------------- Engines ---------------");
         System.out.println("Default Engine: " + DEFAULT_ENGINE);
+        System.out.println("Default Device: " + Engine.getInstance().defaultDevice);
         for (EngineProvider provider : ALL_ENGINES.values()) {
             System.out.println(provider.getEngineName() + ": " + provider.getEngineRank());
             try {

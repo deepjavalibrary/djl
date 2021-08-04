@@ -32,7 +32,7 @@ public class MxParameterStoreTest {
     public void testParameterStore() {
         try (Model model = Model.newInstance("model")) {
             NDManager manager = model.getNDManager();
-            int numGpus = Device.getGpuCount();
+            int numGpus = manager.getEngine().getGpuCount();
             int numDevices;
             if (numGpus > 0) {
                 numDevices = numGpus;

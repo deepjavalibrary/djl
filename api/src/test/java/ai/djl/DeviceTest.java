@@ -13,6 +13,7 @@
 
 package ai.djl;
 
+import ai.djl.engine.Engine;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -21,10 +22,11 @@ public class DeviceTest {
     @Test
     public void testDevice() {
         Assert.assertEquals(Device.cpu(), Device.of("cpu", -1));
-        if (Device.getGpuCount() > 0) {
-            Assert.assertEquals(Device.gpu(), Device.defaultDevice());
+        Engine engine = Engine.getInstance();
+        if (engine.getGpuCount() > 0) {
+            Assert.assertEquals(Device.gpu(), engine.defaultDevice());
         } else {
-            Assert.assertEquals(Device.cpu(), Device.defaultDevice());
+            Assert.assertEquals(Device.cpu(), engine.defaultDevice());
         }
         Assert.assertEquals(Device.gpu(), Device.of("gpu", 0));
         Assert.assertEquals(Device.gpu(3), Device.of("gpu", 3));

@@ -13,12 +13,12 @@
 package ai.djl.examples.training;
 
 import ai.djl.Application;
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicdataset.nlp.StanfordMovieReview;
 import ai.djl.basicdataset.utils.FixedBucketSampler;
 import ai.djl.basicdataset.utils.TextData;
+import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
@@ -181,7 +181,7 @@ public final class TrainSentimentAnalysis {
 
         return new DefaultTrainingConfig(new SoftmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
-                .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
                 .optExecutorService(executorService)
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);

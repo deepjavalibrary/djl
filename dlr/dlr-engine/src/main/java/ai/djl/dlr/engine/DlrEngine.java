@@ -94,7 +94,11 @@ public final class DlrEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public Model newModel(String name, Device device) {
-        return new DlrModel(name, newBaseManager(device), Device.defaultIfNull(device, this));
+        // Only support CPU for now
+        if (device != null && device != Device.cpu()) {
+            throw new IllegalArgumentException("DLR only support CPU");
+        }
+        return new DlrModel(name, newBaseManager(Device.cpu()), Device.cpu());
     }
 
     /** {@inheritDoc} */

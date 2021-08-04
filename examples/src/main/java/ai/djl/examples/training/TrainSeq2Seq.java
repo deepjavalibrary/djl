@@ -12,13 +12,13 @@
  */
 package ai.djl.examples.training;
 
-import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicdataset.nlp.TatoebaEnglishFrenchDataset;
 import ai.djl.basicdataset.nlp.TextDataset;
 import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.basicmodelzoo.nlp.SimpleTextDecoder;
 import ai.djl.basicmodelzoo.nlp.SimpleTextEncoder;
+import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.nlp.EncoderDecoder;
@@ -150,7 +150,7 @@ public final class TrainSeq2Seq {
 
         return new DefaultTrainingConfig(new MaskedSoftmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy("Accuracy", 0, 2))
-                .optDevices(Device.getDevices(arguments.getMaxGpus()))
+                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
                 .optExecutorService(executorService)
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);

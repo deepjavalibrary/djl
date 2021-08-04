@@ -12,7 +12,6 @@
  */
 package ai.djl.integration.tests.training;
 
-import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicdataset.cv.classification.Cifar10;
 import ai.djl.ndarray.NDArray;
@@ -60,7 +59,7 @@ public class DatasetTest {
                     new ArrayDataset.Builder()
                             .setData(
                                     manager.arange(
-                                            0, 100, 1, DataType.INT64, Device.defaultDevice()))
+                                            0, 100, 1, DataType.INT64, manager.defaultDevice()))
                             .setSampling(new BatchSampler(new SequenceSampler(), 1, false))
                             .build();
 
@@ -89,7 +88,7 @@ public class DatasetTest {
                     new ArrayDataset.Builder()
                             .setData(
                                     manager.arange(
-                                            0, 10, 1, DataType.INT64, Device.defaultDevice()))
+                                            0, 10, 1, DataType.INT64, manager.defaultDevice()))
                             .setSampling(new BatchSampler(new RandomSampler(), 1, false))
                             .build();
             List<Long> original = new ArrayList<>();
@@ -112,7 +111,7 @@ public class DatasetTest {
 
             NDManager manager = model.getNDManager();
 
-            NDArray data = manager.arange(0, 100, 1, DataType.INT64, Device.defaultDevice());
+            NDArray data = manager.arange(0, 100, 1, DataType.INT64, manager.defaultDevice());
 
             ArrayDataset dataset =
                     new ArrayDataset.Builder()

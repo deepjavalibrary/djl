@@ -144,6 +144,16 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Returns the default context used in Engine.
+     *
+     * <p>The default type is defined by whether the deep learning engine is recognizing GPUs
+     * available on your machine. If there is no GPU available, CPU will be used.
+     *
+     * @return a {@link Device}
+     */
+    Device defaultDevice();
+
+    /**
      * Allocates a new engine specific direct byte buffer.
      *
      * @param capacity the new buffer's capacity, in bytes

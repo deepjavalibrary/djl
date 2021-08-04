@@ -12,8 +12,8 @@
  */
 package ai.djl.examples.training;
 
-import ai.djl.Device;
 import ai.djl.ModelException;
+import ai.djl.engine.Engine;
 import ai.djl.examples.training.transferlearning.TrainAmazonReviewRanking;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class TrainAmazonReviewTest {
             throw new SkipException("Nightly only");
         }
         String[] args;
-        if (Device.getGpuCount() > 0) {
+        if (Engine.getInstance().getGpuCount() > 0) {
             args = new String[] {"-e", "1", "-g", "1"};
         } else {
             args = new String[] {"-e", "1", "-m", "2"};

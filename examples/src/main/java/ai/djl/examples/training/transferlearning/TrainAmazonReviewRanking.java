@@ -13,7 +13,6 @@
 package ai.djl.examples.training.transferlearning;
 
 import ai.djl.Application;
-import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.basicdataset.tabular.CsvDataset;
@@ -206,7 +205,7 @@ public final class TrainAmazonReviewRanking {
                 });
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
-                .optDevices(Device.getDevices(1))
+                .optDevices(Engine.getInstance().getDevices(1))
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }

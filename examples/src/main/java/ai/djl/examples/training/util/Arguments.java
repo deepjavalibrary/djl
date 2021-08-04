@@ -12,7 +12,7 @@
  */
 package ai.djl.examples.training.util;
 
-import ai.djl.Device;
+import ai.djl.engine.Engine;
 import ai.djl.util.JsonUtils;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -38,7 +38,7 @@ public class Arguments {
 
     protected void initialize() {
         epoch = 2;
-        maxGpus = Device.getGpuCount();
+        maxGpus = Engine.getInstance().getGpuCount();
         outputDir = "build/model";
         limit = Long.MAX_VALUE;
         modelDir = null;

@@ -14,6 +14,7 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.Device;
 import ai.djl.Model;
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -44,7 +45,7 @@ public class OptimizerTest {
     public void testSgd() {
         Optimizer sgd = Optimizer.sgd().setLearningRateTracker(Tracker.fixed(0.1f)).build();
 
-        Device[] devices = Device.getDevices(1);
+        Device[] devices = Engine.getInstance().getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
@@ -76,7 +77,7 @@ public class OptimizerTest {
                         .optMomentum(0.9f)
                         .build();
 
-        Device[] devices = Device.getDevices(1);
+        Device[] devices = Engine.getInstance().getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
@@ -116,7 +117,7 @@ public class OptimizerTest {
                         .build();
 
         // Limit to 1 GPU for consist result.
-        Device[] devices = Device.getDevices(1);
+        Device[] devices = Engine.getInstance().getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
@@ -145,7 +146,7 @@ public class OptimizerTest {
     public void testAdam() {
         Optimizer optim = Optimizer.adam().optLearningRateTracker(Tracker.fixed(0.1f)).build();
 
-        Device[] devices = Device.getDevices(1);
+        Device[] devices = Engine.getInstance().getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
@@ -174,7 +175,7 @@ public class OptimizerTest {
     public void testAdagrad() {
         Optimizer optim = Optimizer.adagrad().optLearningRateTracker(Tracker.fixed(0.1f)).build();
 
-        Device[] devices = Device.getDevices(1);
+        Device[] devices = Engine.getInstance().getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
@@ -207,7 +208,7 @@ public class OptimizerTest {
                         .optCentered(false)
                         .build();
 
-        Device[] devices = Device.getDevices(1);
+        Device[] devices = Engine.getInstance().getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
@@ -241,7 +242,7 @@ public class OptimizerTest {
                         .optCentered(true)
                         .build();
 
-        Device[] devices = Device.getDevices(1);
+        Device[] devices = Engine.getInstance().getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
@@ -271,7 +272,7 @@ public class OptimizerTest {
     public void testAdadelta() {
         Optimizer optim = Optimizer.adadelta().build();
 
-        Device[] devices = Device.getDevices(1);
+        Device[] devices = Engine.getInstance().getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)

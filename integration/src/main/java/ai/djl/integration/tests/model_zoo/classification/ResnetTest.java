@@ -13,11 +13,11 @@
 package ai.djl.integration.tests.model_zoo.classification;
 
 import ai.djl.Application;
-import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.Classifications;
@@ -55,7 +55,7 @@ public class ResnetTest {
     public void testTrain() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optDevices(Device.getDevices(2))
+                        .optDevices(Engine.getInstance().getDevices(2))
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block resNet50 =
@@ -121,7 +121,7 @@ public class ResnetTest {
         try (ZooModel<Image, Classifications> model = getModel()) {
             TrainingConfig config =
                     new DefaultTrainingConfig(Loss.l1Loss())
-                            .optDevices(Device.getDevices(2))
+                            .optDevices(Engine.getInstance().getDevices(2))
                             .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
             try (Trainer trainer = model.newTrainer(config)) {
                 int batchSize = 2;

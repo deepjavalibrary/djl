@@ -40,10 +40,16 @@ public abstract class BaseNDManager implements NDManager {
 
     protected BaseNDManager(NDManager parent, Device device) {
         this.parent = parent;
-        this.device = Device.defaultIfNull(device, getEngine());
+        this.device = device == null ? defaultDevice() : device;
         resources = new ConcurrentHashMap<>();
         tempResources = new ConcurrentHashMap<>();
         uid = UUID.randomUUID().toString();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final Device defaultDevice() {
+        return getEngine().defaultDevice();
     }
 
     /** {@inheritDoc} */
