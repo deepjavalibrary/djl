@@ -16,7 +16,6 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.internal.NDFormat;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -38,11 +37,6 @@ import java.util.stream.IntStream;
 
 /** {@code PtNDArray} is the PyTorch implementation of {@link NDArray}. */
 public class PtNDArray extends NativeResource<Long> implements NDArray {
-
-    private static final int MAX_SIZE = 100;
-    private static final int MAX_DEPTH = 10;
-    private static final int MAX_ROWS = 10;
-    private static final int MAX_COLUMNS = 20;
 
     private String name;
     private Device device;
@@ -328,9 +322,9 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         } else {
             throw new UnsupportedOperationException(
                     "Not supported for shape not broadcastable "
-                            + indexShape.toString()
+                            + indexShape
                             + " vs "
-                            + getShape().toString());
+                            + getShape());
         }
     }
 
@@ -1447,10 +1441,10 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         // index operator in toDebugString is not supported for MKLDNN & Sparse layout
         if (JniUtils.getLayout(this) != 0) {
             try (NDArray tmp = toDense()) {
-                return NDFormat.format(tmp, MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
+                return tmp.toDebugString();
             }
         }
-        return toDebugString(MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
+        return toDebugString();
     }
 
     /** {@inheritDoc} */

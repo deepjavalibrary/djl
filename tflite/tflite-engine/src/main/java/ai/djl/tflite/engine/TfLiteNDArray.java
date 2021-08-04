@@ -161,8 +161,7 @@ public class TfLiteNDArray implements NDArrayAdapter {
                 return manager.create(booleanResult).reshape(shape);
             default:
                 throw new UnsupportedOperationException(
-                        "Type conversion is not supported for TFLite for data type "
-                                + dataType.toString());
+                        "Type conversion is not supported for TFLite for data type " + dataType);
         }
     }
 
@@ -196,14 +195,7 @@ public class TfLiteNDArray implements NDArrayAdapter {
         if (isClosed) {
             return "This array is already closed";
         }
-        return "ND: "
-                + getShape()
-                + ' '
-                + getDevice()
-                + ' '
-                + getDataType()
-                + '\n'
-                + Arrays.toString(toArray());
+        return toDebugString();
     }
 
     /** {@inheritDoc} */

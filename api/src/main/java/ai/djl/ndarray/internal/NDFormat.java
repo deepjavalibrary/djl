@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.Utils;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,6 +49,15 @@ public abstract class NDFormat {
             format = new BooleanFormat();
         } else if (dataType.isInteger()) {
             format = new IntFormat(array);
+        } else if (dataType == DataType.STRING) {
+            return "ND: "
+                    + array.getShape()
+                    + ' '
+                    + array.getDevice()
+                    + ' '
+                    + array.getDevice()
+                    + '\n'
+                    + Arrays.toString(array.toStringArray());
         } else {
             format = new FloatFormat(array);
         }
@@ -72,22 +82,24 @@ public abstract class NDFormat {
         if (array.hasGradient()) {
             sb.append(" hasGradient");
         }
-        sb.append(LF);
+        if (maxSize > 0) {
+            sb.append(LF);
 
-        long size = array.size();
-        long dimension = array.getShape().dimension();
-        if (size == 0) {
-            // corner case: 0 dimension
-            sb.append("[]").append(LF);
-        } else if (dimension == 0) {
-            // scalar case
-            sb.append(format(array.toArray()[0])).append(LF);
-        } else if (size > maxSize) {
-            sb.append("[ Exceed max print size ]");
-        } else if (dimension > maxDepth) {
-            sb.append("[ Exceed max print dimension ]");
-        } else {
-            dump(sb, array, 0, true, maxRows, maxColumns);
+            long size = array.size();
+            long dimension = array.getShape().dimension();
+            if (size == 0) {
+                // corner case: 0 dimension
+                sb.append("[]").append(LF);
+            } else if (dimension == 0) {
+                // scalar case
+                sb.append(format(array.toArray()[0])).append(LF);
+            } else if (size > maxSize) {
+                sb.append("[ Exceed max print size ]");
+            } else if (dimension > maxDepth) {
+                sb.append("[ Exceed max print dimension ]");
+            } else {
+                dump(sb, array, 0, true, maxRows, maxColumns);
+            }
         }
         return sb.toString();
     }

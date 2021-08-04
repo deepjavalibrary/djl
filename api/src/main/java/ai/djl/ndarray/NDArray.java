@@ -4400,6 +4400,16 @@ public interface NDArray extends NDResource {
     /**
      * Runs the debug string representation of this {@code NDArray}.
      *
+     * @return the debug string representation of this {@code NDArray}
+     */
+    default String toDebugString() {
+        int maxSize = Integer.getInteger("ai.djl.nd_display_limit", 0);
+        return NDFormat.format(this, maxSize, 10, 10, 20);
+    }
+
+    /**
+     * Runs the debug string representation of this {@code NDArray}.
+     *
      * @param maxSize the maximum elements to print out
      * @param maxDepth the maximum depth to print out
      * @param maxRows the maximum rows to print out

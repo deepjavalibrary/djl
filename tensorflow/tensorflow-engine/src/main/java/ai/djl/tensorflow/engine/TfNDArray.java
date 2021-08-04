@@ -39,11 +39,6 @@ import org.tensorflow.internal.c_api.TF_Tensor;
 @SuppressWarnings("PMD.UseTryWithResources")
 public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArray {
 
-    private static final int MAX_SIZE = 100;
-    private static final int MAX_DEPTH = 10;
-    private static final int MAX_ROWS = 10;
-    private static final int MAX_COLUMNS = 20;
-
     private Shape shape;
     private Device device;
     private TfNDManager manager;
@@ -1611,7 +1606,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
         if (isReleased()) {
             return "This array is already closed";
         }
-        return toDebugString(MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
+        return toDebugString();
     }
 
     /** {@inheritDoc} */
