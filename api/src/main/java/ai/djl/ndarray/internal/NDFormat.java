@@ -55,7 +55,7 @@ public abstract class NDFormat {
                     + ' '
                     + array.getDevice()
                     + ' '
-                    + array.getDevice()
+                    + array.getDataType()
                     + '\n'
                     + Arrays.toString(array.toStringArray());
         } else {
