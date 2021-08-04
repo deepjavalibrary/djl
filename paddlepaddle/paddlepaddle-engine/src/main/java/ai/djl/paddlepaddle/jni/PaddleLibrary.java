@@ -46,6 +46,8 @@ final class PaddleLibrary {
 
     native void analysisConfigEnableMKLDNN(long handle);
 
+    native void analysisConfigRemovePass(long handle, String pass);
+
     native void useFeedFetchOp(long handle);
 
     native void deleteAnalysisConfig(long handle);

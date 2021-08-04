@@ -84,6 +84,10 @@ public final class JniUtils {
         PaddleLibrary.LIB.analysisConfigEnableMKLDNN(config);
     }
 
+    public static void removePass(long config, String pass) {
+        PaddleLibrary.LIB.analysisConfigRemovePass(config, pass);
+    }
+
     public static void useFeedFetchOp(long config) {
         PaddleLibrary.LIB.useFeedFetchOp(config);
     }

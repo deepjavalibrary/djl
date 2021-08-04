@@ -57,6 +57,12 @@ JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_analysisConfig
     config_ptr->EnableMKLDNN();
 }
 
+JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_analysisConfigRemovePass(
+        JNIEnv* env, jobject jthis, jlong jhandle, jstring jpass) {
+    auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
+    config_ptr->pass_builder()->DeletePass(djl::utils::jni::GetStringFromJString(env, jpass));
+}
+
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deleteAnalysisConfig(
     JNIEnv* env, jobject jthis, jlong jhandle) {
   const auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
