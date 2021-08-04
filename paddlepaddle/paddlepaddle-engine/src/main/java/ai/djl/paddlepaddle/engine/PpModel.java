@@ -77,6 +77,12 @@ public class PpModel extends BaseModel {
         if (System.getenv().containsKey("PADDLE_ENABLE_MKLDNN")) {
             JniUtils.enableMKLDNN(config);
         }
+        if (options != null && options.containsKey("removePass")) {
+            String[] values = ((String) options.get("removePass")).split(",");
+            for (String value : values) {
+                JniUtils.removePass(config, value);
+            }
+        }
         paddlePredictor = new PaddlePredictor(JniUtils.createPredictor(config));
         JniUtils.deleteConfig(config);
         setBlock(new PpSymbolBlock(paddlePredictor));
