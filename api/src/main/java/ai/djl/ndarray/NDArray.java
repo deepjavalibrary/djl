@@ -4400,6 +4400,15 @@ public interface NDArray extends NDResource {
     /**
      * Runs the debug string representation of this {@code NDArray}.
      *
+     * @return the debug string representation of this {@code NDArray}
+     */
+    default String toDebugString() {
+        return toDebugString(100, 10, 10, 20);
+    }
+
+    /**
+     * Runs the debug string representation of this {@code NDArray}.
+     *
      * @param maxSize the maximum elements to print out
      * @param maxDepth the maximum depth to print out
      * @param maxRows the maximum rows to print out

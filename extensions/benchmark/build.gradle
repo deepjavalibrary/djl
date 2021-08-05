@@ -14,6 +14,8 @@ dependencies {
         implementation "ai.djl:model-zoo"
         runtimeOnly "ai.djl.pytorch:pytorch-model-zoo"
         runtimeOnly "ai.djl.pytorch:pytorch-native-auto"
+
+        runtimeOnly "ai.djl.tensorflow:tensorflow-model-zoo"
         runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto"
 
         runtimeOnly "ai.djl.mxnet:mxnet-model-zoo"

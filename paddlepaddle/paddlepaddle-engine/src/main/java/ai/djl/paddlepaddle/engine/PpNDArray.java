@@ -21,7 +21,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.paddlepaddle.jni.JniUtils;
 import ai.djl.util.NativeResource;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 /** {@code PpNDArray} is the PaddlePaddle implementation of {@link NDArray}. */
 public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
@@ -140,14 +139,7 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
         if (isReleased()) {
             return "This array is already closed";
         }
-        return "ND: "
-                + getShape()
-                + ' '
-                + getDevice()
-                + ' '
-                + getDataType()
-                + '\n'
-                + Arrays.toString(toArray());
+        return toDebugString();
     }
 
     /** {@inheritDoc} */

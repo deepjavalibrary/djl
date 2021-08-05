@@ -37,11 +37,6 @@ import java.util.stream.IntStream;
 /** {@code MxNDArray} is the MXNet implementation of {@link NDArray}. */
 public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
-    private static final int MAX_SIZE = 100;
-    private static final int MAX_DEPTH = 10;
-    private static final int MAX_ROWS = 10;
-    private static final int MAX_COLUMNS = 20;
-
     private String name;
     private Device device;
     private SparseFormat sparseFormat;
@@ -1617,7 +1612,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         if (isReleased()) {
             return "This array is already closed";
         }
-        return toDebugString(MAX_SIZE, MAX_DEPTH, MAX_ROWS, MAX_COLUMNS);
+        return toDebugString();
     }
 
     /** {@inheritDoc} */
