@@ -12,7 +12,9 @@
  */
 package ai.djl.benchmark;
 
+import ai.djl.Device;
 import ai.djl.ModelException;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.repository.zoo.ZooModel;
@@ -41,16 +43,28 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
 
         MemoryTrainingListener.collectMemoryInfo(metrics); // Measure memory before loading model
 
-        ZooModel<Void, float[]> model = loadModel(arguments, metrics);
-
+        Engine engine = Engine.getEngine(arguments.getEngine());
+        Device[] devices = engine.getDevices(arguments.getMaxGpus());
         int numOfThreads = arguments.getThreads();
+        if (numOfThreads < devices.length) {
+            logger.warn("Number of threads is less than GPU count, adjust to: {}", devices.length);
+        } else if (numOfThreads % devices.length != 0) {
+            numOfThreads = numOfThreads / devices.length * devices.length;
+            logger.warn("Number of threads should be multiple of GPU count.");
+        }
         int delay = arguments.getDelay();
         AtomicInteger counter = new AtomicInteger(iteration);
         logger.info("Multithreading inference with {} threads.", numOfThreads);
 
+        List<ZooModel<Void, float[]>> models = new ArrayList<>(devices.length);
         List<PredictorCallable> callables = new ArrayList<>(numOfThreads);
-        for (int i = 0; i < numOfThreads; ++i) {
-            callables.add(new PredictorCallable(model, metrics, counter, i, i == 0));
+        for (Device device : devices) {
+            ZooModel<Void, float[]> model = loadModel(arguments, metrics, device);
+            models.add(model);
+
+            for (int i = 0; i < numOfThreads / devices.length; ++i) {
+                callables.add(new PredictorCallable(model, metrics, counter, i, i == 0));
+            }
         }
 
         float[] result = null;
@@ -89,7 +103,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
             executorService.shutdown();
         }
 
-        model.close();
+        models.forEach(ZooModel::close);
         if (successThreads != numOfThreads) {
             logger.error("Only {}/{} threads finished.", successThreads, numOfThreads);
             return null;

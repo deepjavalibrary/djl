@@ -12,7 +12,9 @@
  */
 package ai.djl.benchmark;
 
+import ai.djl.Device;
 import ai.djl.ModelException;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.repository.zoo.ZooModel;
@@ -56,7 +58,8 @@ public final class Benchmark extends AbstractBenchmark {
     @Override
     public float[] predict(Arguments arguments, Metrics metrics, int iteration)
             throws IOException, ModelException, TranslateException {
-        try (ZooModel<Void, float[]> model = loadModel(arguments, metrics)) {
+        Device device = Engine.getEngine(arguments.getEngine()).defaultDevice();
+        try (ZooModel<Void, float[]> model = loadModel(arguments, metrics, device)) {
             float[] predictResult = null;
             try (Predictor<Void, float[]> predictor = model.newPredictor()) {
                 predictor.setMetrics(metrics); // Let predictor collect metrics
