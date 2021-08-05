@@ -15,16 +15,12 @@ package ai.djl.benchmark;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.util.JsonUtils;
 import ai.djl.util.PairList;
-import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.cli.CommandLine;
@@ -35,12 +31,10 @@ import org.apache.commons.cli.Options;
 /** A class represents parsed command line arguments. */
 public class Arguments {
 
-    private String artifactId;
-    private String modelUrls;
+    private String modelUrl;
     private String modelName;
     private String engine;
     private String outputDir;
-    private Map<String, String> criteria;
     private int duration;
     private int iteration;
     private int threads;
@@ -54,20 +48,16 @@ public class Arguments {
      * @param cmd command line options
      */
     Arguments(CommandLine cmd) {
-        artifactId = cmd.getOptionValue("artifact-id");
         if (cmd.hasOption("model-path")) {
             String modelPath = cmd.getOptionValue("model-path");
             Path path = Paths.get(modelPath);
             try {
-                modelUrls = path.toUri().toURL().toExternalForm();
+                modelUrl = path.toUri().toURL().toExternalForm();
             } catch (IOException e) {
                 throw new IllegalArgumentException("Invalid model-path: " + modelPath, e);
             }
         } else if (cmd.hasOption("model-url")) {
-            modelUrls = cmd.getOptionValue("model-url");
-        }
-        if (modelUrls != null) {
-            artifactId = "ai.djl.localmodelzoo:";
+            modelUrl = cmd.getOptionValue("model-url");
         }
 
         modelName = cmd.getOptionValue("model-name");
@@ -90,20 +80,16 @@ public class Arguments {
         if (cmd.hasOption("threads")) {
             threads = Integer.parseInt(cmd.getOptionValue("threads"));
             if (threads <= 0) {
-                threads = Runtime.getRuntime().availableProcessors() * 2 - 1;
+                threads = Runtime.getRuntime().availableProcessors();
             }
-        } else {
-            threads = Runtime.getRuntime().availableProcessors() * 2 - 1;
         }
         if (cmd.hasOption("gpus")) {
             maxGpus = Integer.parseInt(cmd.getOptionValue("gpus"));
-            if (maxGpus <= 0) {
+            if (maxGpus < 0) {
                 maxGpus = Integer.MAX_VALUE;
             }
-        }
-        if (cmd.hasOption("criteria")) {
-            Type type = new TypeToken<Map<String, String>>() {}.getType();
-            criteria = JsonUtils.GSON.fromJson(cmd.getOptionValue("criteria"), type);
+        } else {
+            maxGpus = Integer.MAX_VALUE;
         }
         if (cmd.hasOption("delay")) {
             delay = Integer.parseInt(cmd.getOptionValue("delay"));
@@ -168,13 +154,6 @@ public class Arguments {
                 Option.builder("h").longOpt("help").hasArg(false).desc("Print this help.").build());
         OptionGroup artifactGroup = new OptionGroup();
         artifactGroup.setRequired(true);
-        artifactGroup.addOption(
-                Option.builder("a")
-                        .longOpt("artifact-id")
-                        .hasArg()
-                        .argName("ARTIFACT-ID")
-                        .desc("Model artifact id.")
-                        .build());
         artifactGroup.addOption(
                 Option.builder("p")
                         .longOpt("model-path")
@@ -254,13 +233,6 @@ public class Arguments {
                         .argName("OUTPUT-DIR")
                         .desc("Directory for output logs.")
                         .build());
-        options.addOption(
-                Option.builder("r")
-                        .longOpt("criteria")
-                        .hasArg()
-                        .argName("CRITERIA")
-                        .desc("The criteria (json string) used for searching the model.")
-                        .build());
         return options;
     }
 
@@ -277,16 +249,12 @@ public class Arguments {
         return engine;
     }
 
-    String getModelUrls() {
-        return modelUrls;
+    String getModelUrl() {
+        return modelUrl;
     }
 
     String getModelName() {
         return modelName;
-    }
-
-    String getArtifactId() {
-        return artifactId;
     }
 
     int getIteration() {
@@ -306,10 +274,6 @@ public class Arguments {
             outputDir = "build";
         }
         return outputDir;
-    }
-
-    Map<String, String> getCriteria() {
-        return criteria;
     }
 
     int getDelay() {

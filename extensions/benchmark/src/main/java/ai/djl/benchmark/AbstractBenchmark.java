@@ -245,19 +245,16 @@ public abstract class AbstractBenchmark {
     protected ZooModel<Void, float[]> loadModel(Arguments arguments, Metrics metrics, Device device)
             throws ModelException, IOException {
         long begin = System.nanoTime();
-        String artifactId = arguments.getArtifactId();
         PairList<DataType, Shape> shapes = arguments.getInputShapes();
         BenchmarkTranslator translator = new BenchmarkTranslator(shapes);
 
         Criteria<Void, float[]> criteria =
                 Criteria.builder()
                         .setTypes(Void.class, float[].class)
-                        .optModelUrls(arguments.getModelUrls())
+                        .optModelUrls(arguments.getModelUrl())
                         .optModelName(arguments.getModelName())
                         .optEngine(arguments.getEngine())
                         .optDevice(device)
-                        .optFilters(arguments.getCriteria())
-                        .optArtifactId(artifactId)
                         .optTranslator(translator)
                         .optProgress(new ProgressBar())
                         .build();
