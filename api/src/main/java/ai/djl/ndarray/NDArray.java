@@ -4403,8 +4403,7 @@ public interface NDArray extends NDResource {
      * @return the debug string representation of this {@code NDArray}
      */
     default String toDebugString() {
-        int maxSize = Integer.getInteger("ai.djl.nd_display_limit", 0);
-        return NDFormat.format(this, maxSize, 10, 10, 20);
+        return toDebugString(100, 10, 10, 20);
     }
 
     /**

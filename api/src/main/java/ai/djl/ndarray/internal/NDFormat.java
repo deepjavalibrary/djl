@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.Utils;
+import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -27,6 +28,11 @@ public abstract class NDFormat {
     private static final int PRECISION = 8;
     private static final String LF = System.getProperty("line.separator");
     private static final Pattern PATTERN = Pattern.compile("\\s*\\d\\.(\\d*?)0*e[+-](\\d+)");
+    private static final boolean DEBUG =
+            ManagementFactory.getRuntimeMXBean()
+                    .getInputArguments()
+                    .stream()
+                    .anyMatch(arg -> arg.startsWith("-agentlib:jdwp"));
 
     /**
      * Formats the contents of an array as a pretty printable string.
@@ -40,33 +46,6 @@ public abstract class NDFormat {
      */
     public static String format(
             NDArray array, int maxSize, int maxDepth, int maxRows, int maxColumns) {
-        NDFormat format;
-        DataType dataType = array.getDataType();
-
-        if (dataType == DataType.UINT8) {
-            format = new HexFormat();
-        } else if (dataType == DataType.BOOLEAN) {
-            format = new BooleanFormat();
-        } else if (dataType.isInteger()) {
-            format = new IntFormat(array);
-        } else if (dataType == DataType.STRING) {
-            return "ND: "
-                    + array.getShape()
-                    + ' '
-                    + array.getDevice()
-                    + ' '
-                    + array.getDataType()
-                    + '\n'
-                    + Arrays.toString(array.toStringArray());
-        } else {
-            format = new FloatFormat(array);
-        }
-        return format.dump(array, maxSize, maxDepth, maxRows, maxColumns);
-    }
-
-    protected abstract CharSequence format(Number value);
-
-    private String dump(NDArray array, int maxSize, int maxDepth, int maxRows, int maxColumns) {
         StringBuilder sb = new StringBuilder(1000);
         String name = array.getName();
         if (name != null) {
@@ -82,24 +61,55 @@ public abstract class NDFormat {
         if (array.hasGradient()) {
             sb.append(" hasGradient");
         }
-        if (maxSize > 0) {
-            sb.append(LF);
+        if (DEBUG) {
+            return sb.toString();
+        }
 
-            long size = array.size();
-            long dimension = array.getShape().dimension();
-            if (size == 0) {
-                // corner case: 0 dimension
-                sb.append("[]").append(LF);
-            } else if (dimension == 0) {
-                // scalar case
-                sb.append(format(array.toArray()[0])).append(LF);
-            } else if (size > maxSize) {
-                sb.append("[ Exceed max print size ]");
-            } else if (dimension > maxDepth) {
-                sb.append("[ Exceed max print dimension ]");
-            } else {
-                dump(sb, array, 0, true, maxRows, maxColumns);
-            }
+        NDFormat format;
+        DataType dataType = array.getDataType();
+
+        if (dataType == DataType.UINT8) {
+            format = new HexFormat();
+        } else if (dataType == DataType.BOOLEAN) {
+            format = new BooleanFormat();
+        } else if (dataType == DataType.STRING) {
+            format = new StringFormat();
+        } else if (dataType.isInteger()) {
+            format = new IntFormat();
+        } else {
+            format = new FloatFormat();
+        }
+        return format.dump(sb, array, maxSize, maxDepth, maxRows, maxColumns);
+    }
+
+    protected abstract CharSequence format(Number value);
+
+    protected void init(NDArray array) {}
+
+    protected String dump(
+            StringBuilder sb,
+            NDArray array,
+            int maxSize,
+            int maxDepth,
+            int maxRows,
+            int maxColumns) {
+        init(array);
+        sb.append(LF);
+
+        long size = array.size();
+        long dimension = array.getShape().dimension();
+        if (size == 0) {
+            // corner case: 0 dimension
+            sb.append("[]").append(LF);
+        } else if (dimension == 0) {
+            // scalar case
+            sb.append(format(array.toArray()[0])).append(LF);
+        } else if (size > maxSize) {
+            sb.append("[ Exceed max print size ]");
+        } else if (dimension > maxDepth) {
+            sb.append("[ Exceed max print dimension ]");
+        } else {
+            dump(sb, array, 0, true, maxRows, maxColumns);
         }
         return sb.toString();
     }
@@ -164,7 +174,9 @@ public abstract class NDFormat {
         private int precision;
         private int totalLength;
 
-        public FloatFormat(NDArray array) {
+        /** {@inheritDoc} */
+        @Override
+        public void init(NDArray array) {
             Number[] values = array.toArray();
             int maxIntPartLen = 0;
             int maxFractionLen = 0;
@@ -302,7 +314,9 @@ public abstract class NDFormat {
         private int precision;
         private int totalLength;
 
-        public IntFormat(NDArray array) {
+        /** {@inheritDoc} */
+        @Override
+        public void init(NDArray array) {
             Number[] values = array.toArray();
             // scalar case
             if (values.length == 1) {
@@ -348,6 +362,27 @@ public abstract class NDFormat {
         @Override
         public CharSequence format(Number value) {
             return value.byteValue() != 0 ? " true" : "false";
+        }
+    }
+
+    private static final class StringFormat extends NDFormat {
+
+        /** {@inheritDoc} */
+        @Override
+        public CharSequence format(Number value) {
+            return null;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected String dump(
+                StringBuilder sb,
+                NDArray array,
+                int maxSize,
+                int maxDepth,
+                int maxRows,
+                int maxColumns) {
+            return Arrays.toString(array.toStringArray());
         }
     }
 }
