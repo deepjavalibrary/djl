@@ -15,6 +15,7 @@ package ai.djl.aws.s3;
 import ai.djl.Application;
 import ai.djl.repository.AbstractRepository;
 import ai.djl.repository.Artifact;
+import ai.djl.repository.FilenameUtils;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Metadata;
 import ai.djl.repository.Repository;
@@ -23,6 +24,7 @@ import ai.djl.util.Progress;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +50,6 @@ public class S3Repository extends AbstractRepository {
     private static final Logger logger = LoggerFactory.getLogger(S3Repository.class);
 
     private S3Client client;
-    private String name;
     private String bucket;
     private String prefix;
     private String artifactId;
@@ -57,41 +58,47 @@ public class S3Repository extends AbstractRepository {
     private Metadata metadata;
     private boolean resolved;
 
-    S3Repository(
-            S3Client client,
-            String name,
-            String bucket,
-            String prefix,
-            String artifactId,
-            String modelName) {
+    S3Repository(String name, URI uri, S3Client client) {
+        super(name, uri);
         this.client = client;
-        this.name = name;
-        this.bucket = bucket;
-        this.prefix = prefix;
-        this.artifactId = artifactId;
-        this.modelName = modelName;
+
+        bucket = uri.getHost();
+        prefix = uri.getPath();
+        if (!prefix.isEmpty()) {
+            prefix = prefix.substring(1);
+        }
+        boolean isArchive = FilenameUtils.isArchiveFile(prefix);
+        if (!isArchive && !prefix.isEmpty() && !prefix.endsWith("/")) {
+            prefix += '/'; // NOPMD
+        }
+
+        modelName = arguments.get("model_name");
+        artifactId = arguments.get("artifact_id");
+        if (artifactId == null) {
+            if (prefix.isEmpty()) {
+                artifactId = bucket;
+            } else {
+                Path path = Paths.get(prefix);
+                Path fileName = path.getFileName();
+                if (fileName == null) {
+                    throw new AssertionError("This should never happen.");
+                }
+                artifactId = fileName.toString();
+                if (isArchive) {
+                    artifactId = FilenameUtils.getNamePart(artifactId);
+                }
+            }
+        }
+
+        if (modelName == null) {
+            modelName = artifactId;
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean isRemote() {
         return true;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public URI getBaseUri() {
-        URI uri = URI.create(bucket);
-        if (prefix.isEmpty()) {
-            return uri;
-        }
-        return uri.resolve(prefix);
     }
 
     /** {@inheritDoc} */
@@ -122,7 +129,7 @@ public class S3Repository extends AbstractRepository {
         logger.debug("Downloading artifact from: s3://{}/{} ...", bucket, key);
         GetObjectRequest req = GetObjectRequest.builder().bucket(bucket).key(key).build();
         try (ResponseInputStream<GetObjectResponse> is = client.getObject(req)) {
-            save(is, tmp, baseUri, item, progress);
+            save(is, tmp, item, progress);
         }
     }
 
@@ -183,6 +190,7 @@ public class S3Repository extends AbstractRepository {
 
         Artifact artifact = new Artifact();
         artifact.setName(modelName);
+        artifact.getArguments().putAll(arguments);
         Map<String, Artifact.Item> files = new ConcurrentHashMap<>();
         for (S3Object obj : list) {
             Artifact.Item item = new Artifact.Item();

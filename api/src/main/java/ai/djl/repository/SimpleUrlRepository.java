@@ -37,37 +37,28 @@ public class SimpleUrlRepository extends AbstractRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleUrlRepository.class);
 
-    private String name;
-    private URI uri;
     private String artifactId;
     private String modelName;
 
     private Metadata metadata;
     private boolean resolved;
 
-    SimpleUrlRepository(String name, URI uri, String artifactId, String modelName) {
-        this.name = name;
-        this.uri = uri;
-        this.artifactId = artifactId;
-        this.modelName = modelName;
+    SimpleUrlRepository(String name, URI uri, String fileName) {
+        super(name, uri);
+        modelName = arguments.get("model_name");
+        artifactId = arguments.get("artifact_id");
+        if (artifactId == null) {
+            artifactId = fileName;
+        }
+        if (modelName == null) {
+            modelName = artifactId;
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean isRemote() {
         return true;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public URI getBaseUri() {
-        return uri;
     }
 
     /** {@inheritDoc} */
@@ -107,7 +98,7 @@ public class SimpleUrlRepository extends AbstractRepository {
             throws IOException {
         logger.debug("Downloading artifact: {} ...", uri);
         try (InputStream is = new BufferedInputStream(uri.toURL().openStream())) {
-            save(is, tmp, baseUri, item, progress);
+            save(is, tmp, item, progress);
         }
     }
 
@@ -117,6 +108,8 @@ public class SimpleUrlRepository extends AbstractRepository {
         }
 
         Artifact artifact = new Artifact();
+        artifact.setName(modelName);
+        artifact.getArguments().putAll(arguments);
         Map<String, Artifact.Item> files = new ConcurrentHashMap<>();
         Artifact.Item item = new Artifact.Item();
         item.setUri(uri.getPath());
@@ -125,7 +118,6 @@ public class SimpleUrlRepository extends AbstractRepository {
         item.setSize(getContentLength());
         files.put(artifactId, item);
         artifact.setFiles(files);
-        artifact.setName(modelName);
 
         metadata = new Metadata.MatchAllMetadata();
         metadata.setArtifactId(artifactId);

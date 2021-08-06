@@ -12,23 +12,15 @@
  */
 package ai.djl.hadoop.hdfs;
 
-import ai.djl.repository.FilenameUtils;
 import ai.djl.repository.Repository;
 import ai.djl.repository.RepositoryFactory;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.hadoop.conf.Configuration;
 
 /** A class responsible to create {@link HdfsRepository} instances. */
 public class HdfsRepositoryFactory implements RepositoryFactory {
-
-    private static final Pattern NAME_PATTERN = Pattern.compile("model_name=([^&]*)");
-    private static final Pattern ARTIFACT_PATTERN = Pattern.compile("artifact_id=([^&]*)");
 
     private Configuration config;
 
@@ -53,51 +45,7 @@ public class HdfsRepositoryFactory implements RepositoryFactory {
         if (!"hdfs".equalsIgnoreCase(scheme)) {
             throw new IllegalArgumentException("Invalid hdfs url: " + uri);
         }
-
-        String path = uri.getPath();
-        String fileName = Paths.get(path).toFile().getName();
-        boolean isDirectory = !FilenameUtils.isArchiveFile(fileName);
-        if (!isDirectory) {
-            fileName = FilenameUtils.getNamePart(fileName);
-        }
-        String modelName = null;
-        String artifactId = null;
-        String query = uri.getQuery();
-        if (query != null) {
-            Matcher matcher = NAME_PATTERN.matcher(query);
-            if (matcher.find()) {
-                modelName = matcher.group(1);
-            }
-            matcher = ARTIFACT_PATTERN.matcher(query);
-            if (matcher.find()) {
-                artifactId = matcher.group(1);
-            }
-        }
-
-        if (artifactId == null) {
-            artifactId = fileName;
-        }
-        if (modelName == null) {
-            modelName = artifactId;
-        }
-        if (path.isEmpty()) {
-            path = "/";
-        }
-        try {
-            uri =
-                    new URI(
-                            "hdfs",
-                            uri.getUserInfo(),
-                            uri.getHost(),
-                            uri.getPort(),
-                            null,
-                            null,
-                            null);
-        } catch (URISyntaxException e) {
-            throw new AssertionError(e);
-        }
-
-        return new HdfsRepository(config, name, uri, path, artifactId, modelName, isDirectory);
+        return new HdfsRepository(name, uri, config);
     }
 
     /** {@inheritDoc} */

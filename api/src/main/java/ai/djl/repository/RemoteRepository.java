@@ -39,8 +39,6 @@ public class RemoteRepository extends AbstractRepository {
 
     private static final long ONE_DAY = Duration.ofDays(1).toMillis();
 
-    private String name;
-    private URI uri;
     private List<MRL> resources;
 
     /**
@@ -52,26 +50,13 @@ public class RemoteRepository extends AbstractRepository {
      * @param uri the repository location
      */
     protected RemoteRepository(String name, URI uri) {
-        this.name = name;
-        this.uri = uri;
+        super(name, uri);
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean isRemote() {
         return true;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public URI getBaseUri() {
-        return uri;
     }
 
     /** {@inheritDoc} */
@@ -87,7 +72,7 @@ public class RemoteRepository extends AbstractRepository {
         if (Files.exists(cacheFile)) {
             try (Reader reader = Files.newBufferedReader(cacheFile)) {
                 Metadata metadata = JsonUtils.GSON_PRETTY.fromJson(reader, Metadata.class);
-                metadata.init();
+                metadata.init(arguments);
                 Date lastUpdated = metadata.getLastUpdated();
                 if (Boolean.getBoolean("offline")
                         || System.currentTimeMillis() - lastUpdated.getTime() < ONE_DAY) {
@@ -101,7 +86,7 @@ public class RemoteRepository extends AbstractRepository {
         try (InputStream is = new BufferedInputStream(file.toURL().openStream())) {
             String json = Utils.toString(is);
             Metadata metadata = JsonUtils.GSON_PRETTY.fromJson(json, Metadata.class);
-            metadata.init();
+            metadata.init(arguments);
             metadata.setLastUpdated(new Date());
             try (Writer writer = Files.newBufferedWriter(tmp)) {
                 writer.write(JsonUtils.GSON_PRETTY.toJson(metadata));
