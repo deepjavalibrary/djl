@@ -266,6 +266,7 @@ public final class ModelManager {
         resp.setMaxWorkers(model.getMaxWorkers());
         resp.setMinWorkers(model.getMinWorkers());
         resp.setMaxIdleTime(model.getMaxIdleTime());
+        resp.setQueueLength(wlm.getQueueLength(model));
         resp.setLoadedAtStartup(startupModels.contains(modelName));
 
         int activeWorker = wlm.getNumRunningWorkers(model);

@@ -19,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,42 +70,28 @@ class WorkLoadManager {
      * @return {@code true} if submit success, false otherwise.
      */
     public boolean addJob(Job job) {
-        boolean accepted = false;
         ModelInfo modelInfo = job.getModel();
+        int maxWorkers = modelInfo.getMaxWorkers();
+        if (maxWorkers == 0) {
+            logger.info("All model workers has been shutdown: {}", modelInfo.getModelName());
+            return false;
+        }
         WorkerPool pool = getWorkerPoolForModel(modelInfo);
-        if (getNumRunningWorkers(modelInfo) > 0) {
-            try {
-                accepted = pool.getJobQueue().offer(job);
-                if (!accepted) {
-                    synchronized (modelInfo.getModel()) {
-                        scaleUpWorkers(modelInfo, pool);
-                        accepted =
-                                pool.getJobQueue()
-                                        .offer(
-                                                job,
-                                                modelInfo.getMaxBatchDelay(),
-                                                TimeUnit.MILLISECONDS);
-                    }
-                }
+        LinkedBlockingDeque<Job> queue = pool.getJobQueue();
+        if (!queue.offer(job)) {
+            logger.warn("Worker queue capacity exceeded for model: {}", modelInfo.getModelName());
+            return false;
+        }
 
-            } catch (InterruptedException e) {
-                logger.info(
-                        "Worker Queue Capacity Exceeded. cannot add to worker queue in appropriate time. You can configure max batch delay time for this model.");
+        int currentWorkers = getNumRunningWorkers(modelInfo);
+        if (currentWorkers == 0
+                || currentWorkers < maxWorkers && queue.size() > modelInfo.getBatchSize() * 2) {
+            logger.info("Scaling up workers for model {} to {} ", modelInfo, currentWorkers + 1);
+            synchronized (modelInfo.getModel()) {
+                addThreads(pool.getWorkers(), modelInfo, 1, false);
             }
         }
-        return accepted;
-    }
-
-    private void scaleUpWorkers(ModelInfo modelInfo, WorkerPool pool) {
-        int currentWorkers = getNumRunningWorkers(modelInfo);
-        if (currentWorkers < modelInfo.getMaxWorkers()) {
-            logger.debug("scaling up workers for model {} to {} ", modelInfo, currentWorkers + 1);
-            addThreads(pool.getWorkers(), modelInfo, 1, false);
-        } else {
-            logger.warn(
-                    "scale up capacity of {} workers reached. Unable to scale up worker pool.",
-                    modelInfo.getMaxWorkers());
-        }
+        return true;
     }
 
     /**
@@ -175,6 +160,17 @@ class WorkLoadManager {
                 pool.log();
             }
         }
+    }
+
+    /**
+     * Returns the current number of request in the queue.
+     *
+     * @param modelInfo the model
+     * @return the current number of request in the queue
+     */
+    public int getQueueLength(ModelInfo modelInfo) {
+        WorkerPool pool = getWorkerPoolForModel(modelInfo);
+        return pool.getJobQueue().size();
     }
 
     private WorkerPool getWorkerPoolForModel(ModelInfo modelInfo) {

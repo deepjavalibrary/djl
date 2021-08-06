@@ -26,6 +26,7 @@ public class DescribeModelResponse {
     private int batchSize;
     private int maxBatchDelay;
     private int maxIdleTime;
+    private int queueLength;
     private String status;
     private boolean loadedAtStartup;
 
@@ -160,6 +161,24 @@ public class DescribeModelResponse {
      */
     public void setMaxBatchDelay(int maxBatchDelay) {
         this.maxBatchDelay = maxBatchDelay;
+    }
+
+    /**
+     * Returns the number of request in the queue.
+     *
+     * @return the number of request in the queue
+     */
+    public int getQueueLength() {
+        return queueLength;
+    }
+
+    /**
+     * Sets the number of request in the queue.
+     *
+     * @param queueLength the number of request in the queue
+     */
+    public void setQueueLength(int queueLength) {
+        this.queueLength = queueLength;
     }
 
     /**
