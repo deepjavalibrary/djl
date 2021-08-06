@@ -117,7 +117,7 @@ public class Criteria<I, O> {
             Set<String> supportedEngine = modelZoo.getSupportedEngines();
             if (engine != null && !supportedEngine.contains(engine)) {
                 throw new ModelNotFoundException(
-                        "ModelZoo doesn't support specified with engine: " + engine);
+                        "ModelZoo doesn't support specified engine: " + engine);
             }
             list.add(modelZoo);
         } else {

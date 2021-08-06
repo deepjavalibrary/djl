@@ -102,9 +102,9 @@ public final class ModelManager {
                                         .optEngine(engineName);
                         if (gpuId != -1) {
                             builder.optDevice(Device.gpu(gpuId));
-                            logger.info("Loading model {} on {}.", modelName, Device.cpu());
-                        } else {
                             logger.info("Loading model {} on {}.", modelName, Device.gpu(gpuId));
+                        } else {
+                            logger.info("Loading model {} on {}.", modelName, Device.cpu());
                         }
 
                         ZooModel<Input, Output> model = builder.build().loadModel();
