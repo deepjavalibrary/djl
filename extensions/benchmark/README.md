@@ -8,6 +8,7 @@ With djl-bench, you can easily compare your model's behavior in different use ca
 - single-threaded vs. multi-threaded
 - single input vs. batched inputs
 - CPU vs. GPU or other hardware accelerator
+- Single GPU vs. multiple GPUs
 - default engine options vs. customized engine configuration
 - running with different engines
 - running with different version of the engine
@@ -95,7 +96,7 @@ djl-bench -e PyTorch -u https://alpha-djl-demos.s3.amazonaws.com/model/djl-block
 Resnet50 image classification model:
 
 ```
-djl-bench -c 2 -s 1,3,224,224 -a ai.djl.mxnet:resnet -r "{'layers':'50','flavor':'v2','dataset':'imagenet'}"
+djl-bench -c 2 -s 1,3,224,224 -u djl://ai.djl.mxnet/resnet/0.0.1/resnet50_v2"
 ```
 
 #### PyTorch
@@ -103,7 +104,7 @@ djl-bench -c 2 -s 1,3,224,224 -a ai.djl.mxnet:resnet -r "{'layers':'50','flavor'
 SSD object detection model:
 
 ```
-djl-bench -e PyTorch -c 2 -s 1,3,300,300 -a ai.djl.pytorch:ssd -r "{'size':'300','backbone':'resnet50'}"
+djl-bench -e PyTorch -c 2 -s 1,3,300,300 -u djl://ai.djl.pytorch/ssd/0.0.1/ssd_300_resnet50"
 ```
 
 
@@ -128,17 +129,16 @@ djl-bench --help
 This will print out the possible arguments to pass in:
 
 ```
-usage: djl-bench [OPTIONS]
- -a,--artifact-id <ARTIFACT-ID>     Model artifact id.
+usage: djl-bench [-p MODEL-PATH] -s INPUT-SHAPES [OPTIONS]
  -c,--iteration <ITERATION>         Number of total iterations (per thread).
  -d,--duration <DURATION>           Duration of the test in minutes.
  -e,--engine <ENGINE-NAME>          Choose an Engine for the benchmark.
+ -g,--gpus <NUMBER_GPUS>            Number of GPUS to run multithreading inference.
  -h,--help                          Print this help.
  -l,--delay <DELAY>                 Delay of incremental threads.
  -n,--model-name <MODEL-NAME>       Specify model file name.
  -o,--output-dir <OUTPUT-DIR>       Directory for output logs.
  -p,--model-path <MODEL-PATH>       Model directory file path.
- -r,--criteria <CRITERIA>           The criteria (json string) used for searching the model.
  -s,--input-shapes <INPUT-SHAPES>   Input data shapes for the model.
  -t,--threads <NUMBER_THREADS>      Number of inference threads.
  -u,--model-url <MODEL-URL>         Model archive file URL.
