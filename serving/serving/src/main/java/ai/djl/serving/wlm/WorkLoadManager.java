@@ -12,10 +12,10 @@
  */
 package ai.djl.serving.wlm;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -86,9 +86,15 @@ class WorkLoadManager {
         int currentWorkers = getNumRunningWorkers(modelInfo);
         if (currentWorkers == 0
                 || currentWorkers < maxWorkers && queue.size() > modelInfo.getBatchSize() * 2) {
-            logger.info("Scaling up workers for model {} to {} ", modelInfo, currentWorkers + 1);
             synchronized (modelInfo.getModel()) {
-                addThreads(pool.getWorkers(), modelInfo, 1, false);
+                currentWorkers = getNumRunningWorkers(modelInfo); // check again
+                if (currentWorkers < maxWorkers) {
+                    logger.info(
+                            "Scaling up workers for model {} to {} ",
+                            modelInfo,
+                            currentWorkers + 1);
+                    addThreads(pool.getWorkers(), modelInfo, 1, false);
+                }
             }
         }
         return true;
@@ -211,7 +217,7 @@ class WorkLoadManager {
          * @param model the model this WorkerPool belongs to.
          */
         public WorkerPool(ModelInfo model) {
-            workers = Collections.synchronizedList(new ArrayList<>());
+            workers = new CopyOnWriteArrayList<>();
             jobQueue = new LinkedBlockingDeque<>(model.getQueueSize());
             modelName = model.getModelName();
         }

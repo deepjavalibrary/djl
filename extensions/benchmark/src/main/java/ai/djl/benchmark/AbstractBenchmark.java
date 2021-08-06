@@ -96,8 +96,8 @@ public abstract class AbstractBenchmark {
                         engine.defaultDevice(),
                         duration.toMinutes());
             } else {
-                logger.info(
-                        "Running {} on: {}.", getClass().getSimpleName(), engine.defaultDevice());
+                Device[] devices = engine.getDevices(arguments.getMaxGpus());
+                logger.info("Running {} on: {}.", getClass().getSimpleName(), devices);
             }
             int numOfThreads = arguments.getThreads();
             int iteration = arguments.getIteration();

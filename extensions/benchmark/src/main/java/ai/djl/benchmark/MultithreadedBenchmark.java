@@ -46,12 +46,6 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         Engine engine = Engine.getEngine(arguments.getEngine());
         Device[] devices = engine.getDevices(arguments.getMaxGpus());
         int numOfThreads = arguments.getThreads();
-        if (numOfThreads < devices.length) {
-            logger.warn("Number of threads is less than GPU count, adjust to: {}", devices.length);
-        } else if (numOfThreads % devices.length != 0) {
-            numOfThreads = numOfThreads / devices.length * devices.length;
-            logger.warn("Number of threads should be multiple of GPU count.");
-        }
         int delay = arguments.getDelay();
         AtomicInteger counter = new AtomicInteger(iteration);
         logger.info("Multithreading inference with {} threads.", numOfThreads);
