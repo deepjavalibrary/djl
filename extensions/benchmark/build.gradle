@@ -51,7 +51,22 @@ dependencies {
         runtimeOnly project(":paddlepaddle:paddlepaddle-model-zoo")
         runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
 
-        runtimeOnly project(":onnxruntime:onnxruntime-engine")
+        ProcessBuilder pb = new ProcessBuilder("nvidia-smi", "-L")
+        def hasGPU = false;
+        try {
+            Process process = pb.start()
+            hasGPU = process.waitFor() == 0
+        } catch (IOException ignore) {
+        }
+
+        if (hasGPU) {
+            runtimeOnly(project(":onnxruntime:onnxruntime-engine")) {
+                exclude group: "com.microsoft.onnxruntime", module: "onnxruntime"
+            }
+            runtimeOnly "com.microsoft.onnxruntime:onnxruntime_gpu:${onnxruntime_version}"
+        } else {
+            runtimeOnly project(":onnxruntime:onnxruntime-engine")
+        }
 
         runtimeOnly project(":dlr:dlr-engine")
         runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
