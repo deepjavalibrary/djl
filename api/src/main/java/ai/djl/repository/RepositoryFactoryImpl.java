@@ -211,6 +211,9 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             RemoteRepository repo =
                     new RemoteRepository(name, URI.create("https://mlrepo.djl.ai/"));
             String groupId = uri.getHost();
+            if (groupId == null) {
+                throw new IllegalArgumentException("Invalid djl URL: " + uri);
+            }
             Path path = parseFilePath(uri);
             int size = path.getNameCount();
             if (size == 0) {

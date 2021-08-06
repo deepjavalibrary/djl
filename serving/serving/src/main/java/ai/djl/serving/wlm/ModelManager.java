@@ -102,6 +102,9 @@ public final class ModelManager {
                                         .optEngine(engineName);
                         if (gpuId != -1) {
                             builder.optDevice(Device.gpu(gpuId));
+                            logger.info("Loading model {} on {}.", modelName, Device.cpu());
+                        } else {
+                            logger.info("Loading model {} on {}.", modelName, Device.gpu(gpuId));
                         }
 
                         ZooModel<Input, Output> model = builder.build().loadModel();
@@ -124,7 +127,6 @@ public final class ModelManager {
                             throw new BadRequestException(
                                     "Model " + modelInfo + " is already registered.");
                         }
-                        logger.info("Model {} loaded.", modelName);
 
                         return modelInfo;
                     } catch (ModelException | IOException e) {
