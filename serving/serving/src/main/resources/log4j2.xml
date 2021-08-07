@@ -12,5 +12,6 @@
         <Logger name="ai.djl" level="${sys:ai.djl.logging.level:-info}" additivity="false">
             <AppenderRef ref="console"/>
         </Logger>
+        <Logger name="ACCESS_LOG" level="off"/>
     </Loggers>
 </Configuration>
