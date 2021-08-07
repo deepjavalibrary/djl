@@ -19,6 +19,7 @@ import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
     /** {@inheritDoc} */
     @Override
     public float[] predict(Arguments arguments, Metrics metrics, int iteration)
-            throws IOException, ModelException {
+            throws IOException, ModelException, TranslateException {
 
         MemoryTrainingListener.collectMemoryInfo(metrics); // Measure memory before loading model
 
@@ -74,7 +75,11 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
 
         int successThreads = 0;
         try {
-            metrics.addMetric("mt_start", System.currentTimeMillis(), "mills");
+            for (PredictorCallable callable : callables) {
+                callable.warmup();
+            }
+
+            metrics.addMetric("start", System.currentTimeMillis(), "mills");
             try {
                 List<Future<float[]>> futures;
                 if (delay > 0) {
@@ -96,6 +101,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
             } catch (InterruptedException | ExecutionException e) {
                 logger.error("", e);
             }
+            metrics.addMetric("end", System.currentTimeMillis(), "mills");
             for (PredictorCallable callable : callables) {
                 callable.close();
             }
@@ -168,6 +174,10 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
             }
             logger.debug("Worker-{}: finished.", workerId);
             return result;
+        }
+
+        public void warmup() throws TranslateException {
+            predictor.predict(null);
         }
 
         public void close() {
