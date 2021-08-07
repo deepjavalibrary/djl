@@ -18,7 +18,6 @@ import ai.djl.ndarray.NDArrayAdapter;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.ndarray.types.SparseFormat;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.UUID;
@@ -93,12 +92,6 @@ public class TfLiteNDArray implements NDArrayAdapter {
     @Override
     public Shape getShape() {
         return shape;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public SparseFormat getSparseFormat() {
-        return SparseFormat.DENSE;
     }
 
     /** {@inheritDoc} */
