@@ -106,6 +106,9 @@ public final class ModelManager {
                         } else {
                             logger.info("Loading model {} on {}.", modelName, Device.cpu());
                         }
+                        if (batchSize > 1) {
+                            builder.optArgument("batchifier", "stack");
+                        }
 
                         ZooModel<Input, Output> model = builder.build().loadModel();
                         ModelInfo modelInfo =

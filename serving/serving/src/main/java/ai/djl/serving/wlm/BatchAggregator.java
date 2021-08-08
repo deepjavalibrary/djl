@@ -18,6 +18,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
 /**
  * abstract class for all BatchAggregators. A batch aggregator check working queue and combines
@@ -28,6 +29,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 abstract class BatchAggregator {
 
     protected int batchSize;
+    protected int maxBatchDelay;
     protected List<Job> jobs;
     protected LinkedBlockingDeque<Job> jobQueue;
 
@@ -39,6 +41,7 @@ abstract class BatchAggregator {
      */
     public BatchAggregator(ModelInfo model, LinkedBlockingDeque<Job> jobQueue) {
         this.batchSize = model.getBatchSize();
+        this.maxBatchDelay = model.getMaxBatchDelay();
         this.jobQueue = jobQueue;
         jobs = new ArrayList<>();
     }
@@ -72,11 +75,8 @@ abstract class BatchAggregator {
 
         int i = 0;
         for (Output output : outputs) {
-            String requestId = output.getRequestId();
             Job job = jobs.get(i++);
-            if (!job.getRequestId().equals(requestId)) {
-                throw new IllegalStateException("Request response mismatched.");
-            }
+            output.setRequestId(job.getRequestId());
             job.sendOutput(output);
         }
         jobs.clear();
@@ -111,4 +111,23 @@ abstract class BatchAggregator {
      *     temporary batch aggregator.
      */
     public abstract boolean isFinished();
+
+    protected void drainTo(List<Job> list, int maxDelay) throws InterruptedException {
+        long begin = System.currentTimeMillis();
+        jobQueue.drainTo(list, batchSize - 1);
+        int remain = batchSize - list.size();
+        for (int i = 0; i < remain; ++i) {
+            Job job = jobQueue.poll(maxDelay, TimeUnit.MILLISECONDS);
+            if (job == null) {
+                break;
+            }
+            long end = System.currentTimeMillis();
+            maxDelay -= end - begin;
+            begin = end;
+            list.add(job);
+            if (maxDelay <= 0) {
+                break;
+            }
+        }
+    }
 }

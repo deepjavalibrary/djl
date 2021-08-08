@@ -50,7 +50,7 @@ public class TemporaryBatchAggregator extends BatchAggregator {
         Job job = jobQueue.poll(maxIdleTime, TimeUnit.SECONDS);
         if (job != null) {
             list.add(job);
-            jobQueue.drainTo(list, batchSize - 1);
+            drainTo(list, maxBatchDelay);
             logger.trace("sending jobs, size: {}", list.size());
             idleSince = System.currentTimeMillis();
         }
