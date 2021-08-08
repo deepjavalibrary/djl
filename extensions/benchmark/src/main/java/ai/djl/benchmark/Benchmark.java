@@ -43,15 +43,21 @@ public final class Benchmark extends AbstractBenchmark {
             return;
         }
         List<String> list = Arrays.asList(args);
-        boolean multithreading = list.contains("-t") || list.contains("--threads");
-        configEngines(multithreading);
         boolean success;
-        if (multithreading) {
-            success = new MultithreadedBenchmark().runBenchmark(args);
+        if (!list.isEmpty() && "ndlist-gen".equals(list.get(0))) {
+            success = NDListGenerator.generate(Arrays.copyOfRange(args, 1, args.length));
         } else {
-            success = new Benchmark().runBenchmark(args);
+            boolean multithreading = list.contains("-t") || list.contains("--threads");
+            configEngines(multithreading);
+            if (multithreading) {
+                success = new MultithreadedBenchmark().runBenchmark(args);
+            } else {
+                success = new Benchmark().runBenchmark(args);
+            }
         }
-        System.exit(success ? 0 : -1); // NOPMD
+        if (!success) {
+            System.exit(-1); // NOPMD
+        }
     }
 
     /** {@inheritDoc} */
