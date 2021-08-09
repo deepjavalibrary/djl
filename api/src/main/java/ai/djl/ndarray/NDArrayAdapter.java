@@ -35,7 +35,7 @@ public interface NDArrayAdapter extends NDArray {
     /** {@inheritDoc} */
     @Override
     default SparseFormat getSparseFormat() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+        return SparseFormat.DENSE;
     }
 
     /** {@inheritDoc} */
