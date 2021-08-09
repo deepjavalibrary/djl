@@ -14,8 +14,10 @@ package ai.djl.serving.wlm;
 
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.ndarray.NDManager;
 import ai.djl.repository.FilenameUtils;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.serving.util.ConfigManager;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -95,8 +97,10 @@ public final class ModelInfo implements AutoCloseable {
      * @return new configured ModelInfo.
      */
     public ModelInfo scaleWorkers(int minWorkers, int maxWorkers) {
-        this.minWorkers = minWorkers;
-        this.maxWorkers = maxWorkers;
+        NDManager manager = model.getNDManager();
+        ConfigManager configManager = ConfigManager.getInstance();
+        this.maxWorkers = configManager.getDefaultWorkers(manager, maxWorkers);
+        this.minWorkers = Math.min(minWorkers, this.maxWorkers);
         return this;
     }
 

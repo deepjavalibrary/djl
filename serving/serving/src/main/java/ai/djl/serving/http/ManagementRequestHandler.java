@@ -14,7 +14,6 @@ package ai.djl.serving.http;
 
 import ai.djl.ModelException;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.serving.util.ConfigManager;
 import ai.djl.serving.util.NettyUtils;
 import ai.djl.serving.wlm.Endpoint;
 import ai.djl.serving.wlm.ModelInfo;
@@ -168,8 +167,7 @@ public class ManagementRequestHandler extends HttpRequestHandler {
         int maxBatchDelay = NettyUtils.getIntParameter(decoder, MAX_BATCH_DELAY_PARAMETER, 100);
         int maxIdleTime = NettyUtils.getIntParameter(decoder, MAX_IDLE_TIME__PARAMETER, 60);
         int minWorkers = NettyUtils.getIntParameter(decoder, MIN_WORKER_PARAMETER, 1);
-        int defaultWorkers = ConfigManager.getInstance().getDefaultWorkers();
-        int maxWorkers = NettyUtils.getIntParameter(decoder, MAX_WORKER_PARAMETER, defaultWorkers);
+        int maxWorkers = NettyUtils.getIntParameter(decoder, MAX_WORKER_PARAMETER, -1);
         boolean synchronous =
                 Boolean.parseBoolean(
                         NettyUtils.getParameter(decoder, SYNCHRONOUS_PARAMETER, "true"));
@@ -247,19 +245,30 @@ public class ManagementRequestHandler extends HttpRequestHandler {
                     NettyUtils.getIntParameter(
                             decoder, MAX_BATCH_DELAY_PARAMETER, modelInfo.getMaxBatchDelay());
 
-            modelInfo
-                    .scaleWorkers(minWorkers, maxWorkers)
-                    .configurePool(maxIdleTime)
-                    .configureModelBatch(batchSize, maxBatchDelay);
-            modelManager.triggerModelUpdated(modelInfo);
+            if (version == null) {
+                // scale all versions
+                Endpoint endpoint = modelManager.getEndpoints().get(modelName);
+                for (ModelInfo model : endpoint.getModels()) {
+                    model.scaleWorkers(minWorkers, maxWorkers)
+                            .configurePool(maxIdleTime)
+                            .configureModelBatch(batchSize, maxBatchDelay);
+                    modelManager.triggerModelUpdated(model);
+                }
+            } else {
+                modelInfo
+                        .scaleWorkers(minWorkers, maxWorkers)
+                        .configurePool(maxIdleTime)
+                        .configureModelBatch(batchSize, maxBatchDelay);
+                modelManager.triggerModelUpdated(modelInfo);
+            }
 
             String msg =
                     "Model \""
                             + modelName
                             + "\" worker scaled. New Worker configuration min workers:"
-                            + minWorkers
+                            + modelInfo.getMinWorkers()
                             + " max workers:"
-                            + maxWorkers;
+                            + modelInfo.getMaxWorkers();
             NettyUtils.sendJsonResponse(ctx, new StatusResponse(msg));
         } catch (NumberFormatException ex) {
             throw new BadRequestException("parameter is invalid number." + ex.getMessage(), ex);

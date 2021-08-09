@@ -178,7 +178,7 @@ public class InferenceRequestHandler extends HttpRequestHandler {
                             ConfigManager.getInstance().getBatchSize(),
                             ConfigManager.getInstance().getMaxBatchDelay(),
                             ConfigManager.getInstance().getMaxIdleTime())
-                    .thenApply(m -> modelManager.triggerModelUpdated(m.scaleWorkers(1, 1)))
+                    .thenApply(m -> modelManager.triggerModelUpdated(m.scaleWorkers(1, -1)))
                     .thenAccept(
                             m -> {
                                 try {

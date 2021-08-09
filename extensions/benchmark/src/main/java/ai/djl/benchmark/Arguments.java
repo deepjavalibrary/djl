@@ -12,6 +12,7 @@
  */
 package ai.djl.benchmark;
 
+import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -27,9 +28,13 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A class represents parsed command line arguments. */
 public class Arguments {
+
+    private static final Logger logger = LoggerFactory.getLogger(Arguments.class);
 
     private String modelUrl;
     private String modelName;
@@ -77,12 +82,6 @@ public class Arguments {
         if (cmd.hasOption("iteration")) {
             iteration = Integer.parseInt(cmd.getOptionValue("iteration"));
         }
-        if (cmd.hasOption("threads")) {
-            threads = Integer.parseInt(cmd.getOptionValue("threads"));
-            if (threads <= 0) {
-                threads = Runtime.getRuntime().availableProcessors();
-            }
-        }
         if (cmd.hasOption("gpus")) {
             maxGpus = Integer.parseInt(cmd.getOptionValue("gpus"));
             if (maxGpus < 0) {
@@ -90,6 +89,31 @@ public class Arguments {
             }
         } else {
             maxGpus = Integer.MAX_VALUE;
+        }
+        if (cmd.hasOption("threads")) {
+            threads = Integer.parseInt(cmd.getOptionValue("threads"));
+            Engine eng = Engine.getEngine(engine);
+            Device[] devices = eng.getDevices(maxGpus);
+            String deviceType = devices[0].getDeviceType();
+            if (Device.Type.GPU.equals(deviceType)) {
+                // one thread per GPU
+                if (threads <= 0) {
+                    threads = devices.length;
+                } else if (threads < devices.length) {
+                    threads = devices.length;
+                    logger.warn(
+                            "Number of threads is less than GPU count, adjust to: {}",
+                            devices.length);
+                } else if ("MXNet".equals(engine) && threads > devices.length) {
+                    threads = devices.length;
+                    logger.warn("MXNet inference can only have one worker per GPU.");
+                } else if (threads % devices.length != 0) {
+                    threads = threads / devices.length * devices.length;
+                    logger.warn("threads should be multiple of GPU count, change to: {}", threads);
+                }
+            } else if (threads <= 0) {
+                threads = Runtime.getRuntime().availableProcessors();
+            }
         }
         if (cmd.hasOption("delay")) {
             delay = Integer.parseInt(cmd.getOptionValue("delay"));

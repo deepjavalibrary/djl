@@ -12,6 +12,8 @@
  */
 package ai.djl.serving.util;
 
+import ai.djl.Device;
+import ai.djl.ndarray.NDManager;
 import ai.djl.serving.Arguments;
 import ai.djl.util.Utils;
 import io.netty.handler.ssl.SslContext;
@@ -46,7 +48,6 @@ public final class ConfigManager {
     private static final String INFERENCE_ADDRESS = "inference_address";
     private static final String MANAGEMENT_ADDRESS = "management_address";
     private static final String LOAD_MODELS = "load_models";
-    private static final String DEFAULT_WORKERS_PER_MODEL = "default_workers_per_model";
     private static final String NUMBER_OF_NETTY_THREADS = "number_of_netty_threads";
     private static final String JOB_QUEUE_SIZE = "job_queue_size";
     private static final String MAX_IDLE_TIME = "max_idle_time";
@@ -189,18 +190,30 @@ public final class ConfigManager {
     /**
      * Returns the default number of workers for a new registered model.
      *
+     * @param manager the {@code NDManager} the model uses
+     * @param target the target number of worker
      * @return the default number of workers for a new registered model
      */
-    public int getDefaultWorkers() {
-        if (isDebug()) {
+    public int getDefaultWorkers(NDManager manager, int target) {
+        if (target == 0) {
+            return 0;
+        } else if (target == -1 && isDebug()) {
             return 1;
         }
-
-        int workers = getIntProperty(DEFAULT_WORKERS_PER_MODEL, 0);
-        if (workers == 0) {
-            workers = Runtime.getRuntime().availableProcessors();
+        if (Device.Type.GPU.equals(manager.getDevice().getDeviceType())) {
+            if ("MXNet".equals(manager.getEngine().getEngineName())) {
+                // FIXME: MXNet GPU Model doesn't support multi-threading
+                return 1;
+            } else if (target == -1) {
+                target = 2; // default to max 2 workers per GPU
+            }
+            return target;
         }
-        return workers;
+
+        if (target > 0) {
+            return target;
+        }
+        return Runtime.getRuntime().availableProcessors();
     }
 
     /**
@@ -391,8 +404,6 @@ public final class ConfigManager {
                 + (getLoadModels() == null ? "N/A" : getLoadModels())
                 + "\nNetty threads: "
                 + getNettyThreads()
-                + "\nDefault workers per model: "
-                + getDefaultWorkers()
                 + "\nMaximum Request Size: "
                 + prop.getProperty(MAX_REQUEST_SIZE, "6553500");
     }

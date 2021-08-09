@@ -337,7 +337,6 @@ public class ModelServer {
                 modelName = ModelInfo.inferModelNameFromUrl(modelUrl);
             }
 
-            int workers = configManager.getDefaultWorkers();
             for (int i = 0; i < gpuIds.length; ++i) {
                 String modelVersion;
                 if (gpuIds.length > 1) {
@@ -360,7 +359,7 @@ public class ModelServer {
                                 configManager.getMaxBatchDelay(),
                                 configManager.getMaxIdleTime());
                 ModelInfo modelInfo = future.join();
-                modelManager.triggerModelUpdated(modelInfo.scaleWorkers(1, workers));
+                modelManager.triggerModelUpdated(modelInfo.scaleWorkers(1, -1));
             }
             startupModels.add(modelName);
         }
