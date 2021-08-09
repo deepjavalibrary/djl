@@ -113,16 +113,14 @@ public abstract class AbstractBenchmark {
             while (!duration.isNegative()) {
                 Metrics metrics = new Metrics(); // Reset Metrics for each test loop.
                 progressBar = new ProgressBar("Iteration", iteration);
-                long begin = System.currentTimeMillis();
                 float[] lastResult = predict(arguments, metrics, iteration);
                 if (lastResult == null) {
                     return false;
                 }
 
-                if (metrics.hasMetric("mt_start")) {
-                    begin = metrics.getMetric("mt_start").get(0).getValue().longValue();
-                }
-                long totalTime = System.currentTimeMillis() - begin;
+                long begin = metrics.getMetric("start").get(0).getValue().longValue();
+                long end = metrics.getMetric("end").get(0).getValue().longValue();
+                long totalTime = end - begin;
 
                 if (lastResult.length > 3) {
                     logger.info(

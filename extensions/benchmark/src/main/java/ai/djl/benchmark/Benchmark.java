@@ -61,15 +61,19 @@ public final class Benchmark extends AbstractBenchmark {
         Device device = Engine.getEngine(arguments.getEngine()).defaultDevice();
         try (ZooModel<Void, float[]> model = loadModel(arguments, metrics, device)) {
             float[] predictResult = null;
-            try (Predictor<Void, float[]> predictor = model.newPredictor()) {
-                predictor.setMetrics(metrics); // Let predictor collect metrics
 
+            try (Predictor<Void, float[]> predictor = model.newPredictor()) {
+                predictor.predict(null); // warmup
+
+                predictor.setMetrics(metrics); // Let predictor collect metrics
+                metrics.addMetric("start", System.currentTimeMillis(), "mills");
                 for (int i = 0; i < iteration; ++i) {
                     predictResult = predictor.predict(null);
 
                     progressBar.update(i);
                     MemoryTrainingListener.collectMemoryInfo(metrics);
                 }
+                metrics.addMetric("end", System.currentTimeMillis(), "mills");
             }
             return predictResult;
         }
