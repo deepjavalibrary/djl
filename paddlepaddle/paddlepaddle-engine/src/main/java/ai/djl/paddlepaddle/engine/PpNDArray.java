@@ -26,6 +26,8 @@ import java.nio.ByteBuffer;
 public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
 
     private PpNDManager manager;
+    // we keep the data to prevent GC from early collecting native memory
+    private ByteBuffer data;
     private Shape shape;
     private DataType dataType;
 
@@ -33,11 +35,13 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
      * Constructs an PpNDArray from a native handle (internal. Use {@link NDManager} instead).
      *
      * @param manager the manager to attach the new array to
+     * @param data bytebuffer that holds the native memory
      * @param handle the pointer to the native MxNDArray memory
      */
-    public PpNDArray(PpNDManager manager, long handle) {
+    public PpNDArray(PpNDManager manager, ByteBuffer data, long handle) {
         super(handle);
         this.manager = manager;
+        this.data = data;
         manager.attachInternal(getUid(), this);
     }
 
@@ -130,7 +134,11 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
-        return JniUtils.getByteBufferFromNd(this);
+        if (data == null) {
+            data = JniUtils.getByteBufferFromNd(this);
+        }
+        data.rewind();
+        return data;
     }
 
     /** {@inheritDoc} */
@@ -148,6 +156,7 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
         Long pointer = handle.getAndSet(null);
         if (pointer != null) {
             JniUtils.deleteNd(pointer);
+            data = null;
         }
     }
 }
