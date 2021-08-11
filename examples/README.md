@@ -19,6 +19,8 @@ The following examples are included for inference:
 - [Instance segmentation example](docs/instance_segmentation.md)
 - [Pose estimation example](docs/pose_estimation.md)
 - [Action recognition example](docs/action_recognition.md)
+- [Image generation with BigGAN example](docs/biggan.md)
+- [Image enhancement with Super-Resolution example](docs/super_resolution.md)
 
 These examples focus on the overall experience of training and inference. We keep components
 that are reusable within separate modules for other users to take advantage of in their own
