@@ -37,7 +37,7 @@ public final class JniUtils {
         long handle =
                 PaddleLibrary.LIB.paddleCreateTensor(
                         data, data.remaining(), intShape, PpDataType.toPaddlePaddle(dtype));
-        return new PpNDArray(manager, handle);
+        return new PpNDArray(manager, data, handle);
     }
 
     public static DataType getDTypeFromNd(PpNDArray array) {
@@ -119,7 +119,7 @@ public final class JniUtils {
         PpNDManager manager = (PpNDManager) inputs[0].getManager();
         PpNDArray[] arrays = new PpNDArray[outputs.length];
         for (int i = 0; i < outputs.length; i++) {
-            arrays[i] = new PpNDArray(manager, outputs[i]);
+            arrays[i] = new PpNDArray(manager, null, outputs[i]);
         }
         return arrays;
     }
