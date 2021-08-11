@@ -134,7 +134,11 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
-        return JniUtils.getByteBufferFromNd(this);
+        if (data == null) {
+            data = JniUtils.getByteBufferFromNd(this);
+        }
+        data.rewind();
+        return data;
     }
 
     /** {@inheritDoc} */
