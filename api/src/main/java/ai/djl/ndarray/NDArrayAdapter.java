@@ -65,7 +65,7 @@ public interface NDArrayAdapter extends NDArray {
     /** {@inheritDoc} */
     @Override
     default boolean hasGradient() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+        return false;
     }
 
     /** {@inheritDoc} */
