@@ -34,7 +34,6 @@ import java.nio.FloatBuffer;
 import java.time.Duration;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -72,7 +71,8 @@ public abstract class AbstractBenchmark {
         Options options = Arguments.getOptions();
         try {
             if (Arguments.hasHelp(args)) {
-                printHelp("djl-bench [-p MODEL-PATH] -s INPUT-SHAPES [OPTIONS]", options);
+                Arguments.printHelp(
+                        "usage: djl-bench [-p MODEL-PATH] -s INPUT-SHAPES [OPTIONS]", options);
                 return true;
             }
             DefaultParser parser = new DefaultParser();
@@ -233,7 +233,7 @@ public abstract class AbstractBenchmark {
             }
             return true;
         } catch (ParseException e) {
-            printHelp(e.getMessage(), options);
+            Arguments.printHelp(e.getMessage(), options);
         } catch (Throwable t) {
             logger.error("Unexpected error", t);
         }
@@ -267,13 +267,6 @@ public abstract class AbstractBenchmark {
             metrics.addMetric("LoadModel", delta);
         }
         return model;
-    }
-
-    private void printHelp(String msg, Options options) {
-        HelpFormatter formatter = new HelpFormatter();
-        formatter.setLeftPadding(1);
-        formatter.setWidth(120);
-        formatter.printHelp(msg, options);
     }
 
     private static final class BenchmarkTranslator implements Translator<Void, float[]> {

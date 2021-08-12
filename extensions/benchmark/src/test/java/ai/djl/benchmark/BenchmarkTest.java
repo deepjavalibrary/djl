@@ -27,7 +27,7 @@ public class BenchmarkTest {
     @Test
     public void testHelp() {
         String[] args = {"-h"};
-        new Benchmark().runBenchmark(args);
+        Benchmark.main(args);
     }
 
     @Test

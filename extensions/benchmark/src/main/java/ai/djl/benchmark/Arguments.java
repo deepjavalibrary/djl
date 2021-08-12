@@ -22,9 +22,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
@@ -67,7 +66,6 @@ public class Arguments {
 
         modelName = cmd.getOptionValue("model-name");
         outputDir = cmd.getOptionValue("output-dir");
-        inputShapes = new PairList<>();
 
         if (cmd.hasOption("engine")) {
             engine = cmd.getOptionValue("engine");
@@ -120,56 +118,7 @@ public class Arguments {
         }
 
         String shape = cmd.getOptionValue("input-shapes");
-        if (shape != null) {
-            if (shape.contains("(")) {
-                Pattern pattern =
-                        Pattern.compile("\\((\\s*(\\d+)([,\\s]+\\d+)*\\s*)\\)([sdubilBfS]?)");
-                Matcher matcher = pattern.matcher(shape);
-                while (matcher.find()) {
-                    String[] tokens = matcher.group(1).split(",");
-                    long[] array = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
-                    DataType dataType;
-                    String dataTypeStr = matcher.group(4);
-                    if (dataTypeStr == null || dataTypeStr.isEmpty()) {
-                        dataType = DataType.FLOAT32;
-                    } else {
-                        switch (dataTypeStr) {
-                            case "s":
-                                dataType = DataType.FLOAT16;
-                                break;
-                            case "d":
-                                dataType = DataType.FLOAT64;
-                                break;
-                            case "u":
-                                dataType = DataType.UINT8;
-                                break;
-                            case "b":
-                                dataType = DataType.INT8;
-                                break;
-                            case "i":
-                                dataType = DataType.INT32;
-                                break;
-                            case "l":
-                                dataType = DataType.INT64;
-                                break;
-                            case "B":
-                                dataType = DataType.BOOLEAN;
-                                break;
-                            case "f":
-                                dataType = DataType.FLOAT32;
-                                break;
-                            default:
-                                throw new IllegalArgumentException("Invalid input-shape: " + shape);
-                        }
-                    }
-                    inputShapes.add(dataType, new Shape(array));
-                }
-            } else {
-                String[] tokens = shape.split(",");
-                long[] shapes = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
-                inputShapes.add(DataType.FLOAT32, new Shape(shapes));
-            }
-        }
+        inputShapes = NDListGenerator.parseShape(shape);
     }
 
     static Options getOptions() {
@@ -263,6 +212,14 @@ public class Arguments {
     static boolean hasHelp(String[] args) {
         List<String> list = Arrays.asList(args);
         return list.contains("-h") || list.contains("help");
+    }
+
+    static void printHelp(String msg, Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.setSyntaxPrefix("");
+        formatter.setLeftPadding(1);
+        formatter.setWidth(120);
+        formatter.printHelp(msg, options);
     }
 
     int getDuration() {
