@@ -181,7 +181,7 @@ public final class Platform {
      * @return true if the platforms match
      */
     public boolean matches(Platform system) {
-        if (!osPrefix.equals(system.osPrefix) || osArch.equals(system.osArch)) {
+        if (!osPrefix.equals(system.osPrefix) || !osArch.equals(system.osArch)) {
             return false;
         }
         // if system Machine is GPU
