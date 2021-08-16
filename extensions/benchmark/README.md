@@ -36,6 +36,15 @@ brew install djl-bench
 
 For Ubuntu
 
+- Install using snap
+
+```
+sudo snap install djlbench --classic
+sudo snap alias djlbench djl-bench
+```
+
+- Or download .deb package from S3
+
 ```
 curl -O https://publish.djl.ai/djl-bench/0.12.0/djl-bench_0.12.0-1_all.deb
 sudo dpkg -i djl-bench_0.12.0-1_all.deb
@@ -43,9 +52,10 @@ sudo dpkg -i djl-bench_0.12.0-1_all.deb
 
 For Windows
 
-We are considering to create a `chocolatey` package for Windows. For the time being, we can run
-benchmark using gradle:
+We are considering to create a `chocolatey` package for Windows. For the time being, you can
+download djl-bench zip file from [here](https://publish.djl.ai/djl-bench/0.12.0/benchmark-0.12.0.zip).
 
+Or you can run benchmark using gradle:
 ```
 cd djl
 
@@ -89,14 +99,14 @@ Similarly, this is for PyTorch
 djl-bench -e PyTorch -u https://alpha-djl-demos.s3.amazonaws.com/model/djl-blockrunner/pytorch_resnet18.zip -n traced_resnet18 -c 10 -s 1,3,224,224
 ```
 
-### Benchmark from ModelZoo
+### Benchmark from ModelZoo (Only available in 0.13.0+)
 
 #### MXNet
 
 Resnet50 image classification model:
 
 ```
-djl-bench -c 2 -s 1,3,224,224 -u djl://ai.djl.mxnet/resnet/0.0.1/resnet50_v2"
+djl-bench -c 2 -s 1,3,224,224 -u djl://ai.djl.mxnet/resnet/0.0.1/resnet50_v2
 ```
 
 #### PyTorch
@@ -104,7 +114,7 @@ djl-bench -c 2 -s 1,3,224,224 -u djl://ai.djl.mxnet/resnet/0.0.1/resnet50_v2"
 SSD object detection model:
 
 ```
-djl-bench -e PyTorch -c 2 -s 1,3,300,300 -u djl://ai.djl.pytorch/ssd/0.0.1/ssd_300_resnet50"
+djl-bench -e PyTorch -c 2 -s 1,3,300,300 -u djl://ai.djl.pytorch/ssd/0.0.1/ssd_300_resnet50
 ```
 
 

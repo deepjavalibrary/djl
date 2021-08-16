@@ -57,8 +57,8 @@ sudo dpkg -i djl-serving_0.12.0-1_all.deb
 
 For Windows
 
-We are considering to create a `chocolatey` package for Windows. For the time being, we can run
-download djl-serving.zip file from [here](https://publish.djl.ai/djl-serving/serving-0.12.0.zip).
+We are considering to create a `chocolatey` package for Windows. For the time being, you can 
+download djl-serving zip file from [here](https://publish.djl.ai/djl-serving/serving-0.12.0.zip).
 
 ### Docker
 

@@ -168,4 +168,3 @@ startScripts {
         unixScript.text = text
     }
 }
-tasks.distZip.enabled = false
