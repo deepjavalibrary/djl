@@ -54,7 +54,7 @@ public class ManagementRequestHandler extends HttpRequestHandler {
     /** HTTP Parameter "max_batch_delay". */
     private static final String MAX_BATCH_DELAY_PARAMETER = "max_batch_delay";
     /** HTTP Parameter "max_idle_time". */
-    private static final String MAX_IDLE_TIME__PARAMETER = "max_idle_time";
+    private static final String MAX_IDLE_TIME_PARAMETER = "max_idle_time";
     /** HTTP Parameter "max_worker". */
     private static final String MAX_WORKER_PARAMETER = "max_worker";
     /** HTTP Parameter "min_worker". */
@@ -165,7 +165,7 @@ public class ManagementRequestHandler extends HttpRequestHandler {
         String engineName = NettyUtils.getParameter(decoder, ENGINE_NAME_PARAMETER, null);
         int batchSize = NettyUtils.getIntParameter(decoder, BATCH_SIZE_PARAMETER, 1);
         int maxBatchDelay = NettyUtils.getIntParameter(decoder, MAX_BATCH_DELAY_PARAMETER, 100);
-        int maxIdleTime = NettyUtils.getIntParameter(decoder, MAX_IDLE_TIME__PARAMETER, 60);
+        int maxIdleTime = NettyUtils.getIntParameter(decoder, MAX_IDLE_TIME_PARAMETER, 60);
         int minWorkers = NettyUtils.getIntParameter(decoder, MIN_WORKER_PARAMETER, 1);
         int maxWorkers = NettyUtils.getIntParameter(decoder, MAX_WORKER_PARAMETER, -1);
         boolean synchronous =
@@ -237,7 +237,7 @@ public class ManagementRequestHandler extends HttpRequestHandler {
 
             int maxIdleTime =
                     NettyUtils.getIntParameter(
-                            decoder, MAX_IDLE_TIME__PARAMETER, modelInfo.getMaxIdleTime());
+                            decoder, MAX_IDLE_TIME_PARAMETER, modelInfo.getMaxIdleTime());
             int batchSize =
                     NettyUtils.getIntParameter(
                             decoder, BATCH_SIZE_PARAMETER, modelInfo.getBatchSize());

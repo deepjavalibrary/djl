@@ -189,7 +189,11 @@ public class ServingTranslatorFactory implements TranslatorFactory {
                 return getSsdTranslator(arguments);
             }
         }
-        return new RawTranslator();
+        String batchifier = (String) arguments.get("batchifier");
+        if (batchifier == null) {
+            return new RawTranslator(null);
+        }
+        return new RawTranslator(Batchifier.fromString(batchifier));
     }
 
     private Translator<Input, Output> getImageClassificationTranslator(Map<String, ?> arguments) {
@@ -239,8 +243,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         /** {@inheritDoc} */
         @Override
         public Output processOutput(TranslatorContext ctx, NDList list) throws Exception {
-            Input input = (Input) ctx.getAttachment("input");
-            Output output = new Output(input.getRequestId(), 200, "OK");
+            Output output = new Output(200, "OK");
             Object obj = translator.processOutput(ctx, list);
             if (obj instanceof JsonSerializable) {
                 output.setContent(((JsonSerializable) obj).toJson() + '\n');
@@ -280,16 +283,21 @@ public class ServingTranslatorFactory implements TranslatorFactory {
 
     private static final class RawTranslator implements Translator<Input, Output> {
 
+        private Batchifier batchifier;
+
+        RawTranslator(Batchifier batchifier) {
+            this.batchifier = batchifier;
+        }
+
         /** {@inheritDoc} */
         @Override
         public Batchifier getBatchifier() {
-            return null;
+            return batchifier;
         }
 
         /** {@inheritDoc} */
         @Override
         public NDList processInput(TranslatorContext ctx, Input input) throws TranslateException {
-            ctx.setAttachment("input", input);
             PairList<String, byte[]> inputs = input.getContent();
             byte[] data = inputs.get("data");
             if (data == null) {
@@ -309,8 +317,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         /** {@inheritDoc} */
         @Override
         public Output processOutput(TranslatorContext ctx, NDList list) {
-            Input input = (Input) ctx.getAttachment("input");
-            Output output = new Output(input.getRequestId(), 200, "OK");
+            Output output = new Output(200, "OK");
             output.setContent(list.encode());
             output.addProperty("Content-Type", "tensor/ndlist");
             return output;

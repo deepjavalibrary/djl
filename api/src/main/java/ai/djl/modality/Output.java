@@ -27,26 +27,24 @@ public class Output {
     private byte[] content;
 
     /**
-     * Constructs a {@code Output} with specified {@code requestId}.
-     *
-     * @param requestId the requestId of the output
-     */
-    public Output(String requestId) {
-        this.requestId = requestId;
-    }
-
-    /**
      * Constructs a {@code Output} with specified {@code requestId}, {@code code} and {@code
      * message}.
      *
-     * @param requestId the requestId of the output
      * @param code the status code of the output
      * @param message the status message of the output
      */
-    public Output(String requestId, int code, String message) {
-        this.requestId = requestId;
+    public Output(int code, String message) {
         this.code = code;
         this.message = message;
+    }
+
+    /**
+     * Sets the requestId of the output.
+     *
+     * @param requestId the requestId of the output
+     */
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 
     /**
