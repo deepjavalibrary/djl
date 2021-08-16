@@ -51,7 +51,7 @@ dependencies {
         }
 
         runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
-        runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}-SNAPSHOT"
+        runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
         runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
     }
 
