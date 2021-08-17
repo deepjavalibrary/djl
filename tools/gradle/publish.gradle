@@ -14,7 +14,6 @@ configure([
         project(':paddlepaddle:paddlepaddle-model-zoo'),
         project(':pytorch:pytorch-engine'),
         project(':pytorch:pytorch-model-zoo'),
-        project(':serving:serving'),
         project(':tensorflow:tensorflow-api'),
         project(':tensorflow:tensorflow-engine'),
         project(':tensorflow:tensorflow-model-zoo'),
