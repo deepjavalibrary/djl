@@ -368,17 +368,6 @@ public final class BertBlock extends AbstractBlock {
         }
 
         /**
-         * Sets the probabilty for attention dropout.
-         *
-         * @param attentionDropoutProbability the probabilty for attention dropout
-         * @return this builder
-         */
-        /*public Builder optAttentionDropoutProbability(float attentionDropoutProbability) {
-            this.attentionDropoutProbability = attentionDropoutProbability;
-            return this;
-        }*/
-
-        /**
          * Sets the maximum sequence length this model can process. Memory and compute requirements
          * of the attention mechanism is O(n²), so large values can easily exhaust your GPU memory!
          *
@@ -389,18 +378,6 @@ public final class BertBlock extends AbstractBlock {
             this.maxSequenceLength = maxSequenceLength;
             return this;
         }
-
-        /**
-         * Sets the initializer range for the truncated normal initialization used for this model.
-         *
-         * @param initializerRange the initializer range for the truncated normal initialization
-         *     used for this model.
-         * @return this builder
-         */
-        /*public Builder optInitializerRange(float initializerRange) {
-            this.initializerRange = initializerRange;
-            return this;
-        }*/
 
         /**
          * Tiny config for testing on laptops.

@@ -34,6 +34,11 @@ public class ParameterStore {
     private boolean copy;
     private ParameterServer parameterServer;
 
+    /** Constructs a new {@code ParameterStore} instance. */
+    public ParameterStore() {
+        this(NDManager.newBaseManager(), false);
+    }
+
     /**
      * Constructs an empty {@code ParameterStore}.
      *
@@ -159,10 +164,6 @@ public class ParameterStore {
         private ParameterData(Parameter parameter) {
             this.parameter = parameter;
             list = Collections.synchronizedList(new ArrayList<>());
-        }
-
-        private List<NDArray> getNDArrays() {
-            return list;
         }
 
         private boolean isEmpty() {

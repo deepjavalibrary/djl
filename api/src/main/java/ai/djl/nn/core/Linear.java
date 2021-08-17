@@ -130,27 +130,31 @@ public class Linear extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void loadMetadata(byte version, DataInputStream is)
+    public void loadMetadata(byte loadVersion, DataInputStream is)
             throws IOException, MalformedModelException {
-        if (version < 1 || version > VERSION) {
-            throw new MalformedModelException("Unsupported encoding version: " + version);
-        }
-        if (version == VERSION) {
-            units = is.readLong();
-            inputFeatures = is.readLong();
-        } else if (version == 2) {
-            if (is.readBoolean()) {
-                throw new IllegalArgumentException("flatten is not supported!");
-            }
-            inputFeatures = is.readLong();
-        } else if (version == 3) {
-            units = is.readLong();
-            if (is.readBoolean()) {
-                throw new IllegalArgumentException("flatten is not supported!");
-            }
-            inputFeatures = is.readLong();
-        } else {
-            inputFeatures = Shape.decode(is).size();
+        switch (loadVersion) {
+            case VERSION:
+                units = is.readLong();
+                inputFeatures = is.readLong();
+                break;
+            case 3:
+                units = is.readLong();
+                if (is.readBoolean()) {
+                    throw new IllegalArgumentException("flatten is not supported!");
+                }
+                inputFeatures = is.readLong();
+                break;
+            case 2:
+                if (is.readBoolean()) {
+                    throw new IllegalArgumentException("flatten is not supported!");
+                }
+                inputFeatures = is.readLong();
+                break;
+            case 1:
+                inputFeatures = Shape.decode(is).size();
+                break;
+            default:
+                throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
         }
         inputShape = Shape.decode(is);
     }

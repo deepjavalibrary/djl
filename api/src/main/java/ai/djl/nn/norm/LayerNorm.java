@@ -56,8 +56,6 @@ import java.util.Arrays;
  */
 public class LayerNorm extends AbstractBlock {
 
-    private static final byte VERSION = 1;
-
     private float epsilon;
     private Shape normalizedShape;
 
@@ -68,7 +66,6 @@ public class LayerNorm extends AbstractBlock {
     private Parameter beta;
 
     LayerNorm(Builder builder) {
-        super(VERSION);
         epsilon = builder.epsilon;
         scale = builder.scale;
         center = builder.center;
@@ -170,10 +167,10 @@ public class LayerNorm extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void loadMetadata(byte version, DataInputStream is)
+    public void loadMetadata(byte loadVersion, DataInputStream is)
             throws IOException, MalformedModelException {
-        if (version != VERSION) {
-            throw new MalformedModelException("Unsupported encoding version: " + version);
+        if (loadVersion != version) {
+            throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
         }
         readInputShapes(is);
         normalizedShape = Shape.decode(is);

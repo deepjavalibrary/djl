@@ -27,7 +27,9 @@ import java.util.Optional;
  * are no pre-trained embeddings available.
  */
 public class TrainableWordEmbedding extends Embedding<String> implements WordEmbedding {
+
     private static final String DEFAULT_UNKNOWN_TOKEN = "<unk>";
+
     private Vocabulary vocabulary;
 
     /**

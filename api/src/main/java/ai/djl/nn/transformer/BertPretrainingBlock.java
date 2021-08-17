@@ -26,8 +26,6 @@ import java.util.Arrays;
 /** Creates a block that performs all bert pretraining tasks (next sentence and masked language). */
 public class BertPretrainingBlock extends AbstractBlock {
 
-    private static final byte VERSION = 1;
-
     private BertBlock bertBlock;
     private BertMaskedLanguageModelBlock mlBlock;
     private BertNextSentenceBlock nsBlock;
@@ -38,7 +36,6 @@ public class BertPretrainingBlock extends AbstractBlock {
      * @param builder a builder with a bert configuration
      */
     public BertPretrainingBlock(final BertBlock.Builder builder) {
-        super(VERSION);
         this.bertBlock = addChildBlock("Bert", builder.build());
         this.mlBlock =
                 addChildBlock(

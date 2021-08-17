@@ -91,9 +91,9 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
         // The following adds the sequence offsets to every index for every sequence.
         // This works, because the single values in the sequence offsets are propagated
         NDArray absoluteIndices =
-                indices.add(sequenceOffsets).reshape(1, batchSize * indicesPerSequence);
+                indices.add(sequenceOffsets).reshape(1, (long) batchSize * indicesPerSequence);
         // Now we create one long sequence by appending all sequences
-        NDArray flattenedSequences = sequences.reshape(batchSize * sequenceLength, width);
+        NDArray flattenedSequences = sequences.reshape((long) batchSize * sequenceLength, width);
         // We use the absolute indices to gather the elements of the flattened sequences
         return MissingOps.gatherNd(flattenedSequences, absoluteIndices);
     }
@@ -148,6 +148,6 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
         int batchSize = (int) inputShapes[0].get(0);
         int indexCount = (int) inputShapes[1].get(1);
         int dictionarySize = (int) inputShapes[2].get(0);
-        return new Shape[] {new Shape(batchSize * indexCount, dictionarySize)};
+        return new Shape[] {new Shape((long) batchSize * indexCount, dictionarySize)};
     }
 }

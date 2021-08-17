@@ -41,6 +41,7 @@ import ai.djl.util.Preconditions;
 public class RNN extends RecurrentBlock {
 
     private Activation activation;
+
     /**
      * Creates a vanilla RNN block.
      *

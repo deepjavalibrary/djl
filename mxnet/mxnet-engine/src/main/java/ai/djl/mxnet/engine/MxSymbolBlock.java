@@ -69,8 +69,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
      * @param symbol the symbol containing the block's symbolic graph
      */
     public MxSymbolBlock(NDManager manager, Symbol symbol) {
-        super(VERSION);
-        this.manager = manager;
+        this(manager);
         this.symbol = symbol;
         initBlock();
     }

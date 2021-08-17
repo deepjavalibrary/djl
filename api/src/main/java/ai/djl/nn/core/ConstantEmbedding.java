@@ -27,8 +27,6 @@ import java.util.Optional;
 @SuppressWarnings("rawtypes")
 public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedEmbedding {
 
-    private static final byte VERSION = 1;
-
     protected NDArray embedding;
 
     /**
@@ -37,7 +35,6 @@ public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedE
      * @param embedding the value to return for all embeddings
      */
     public ConstantEmbedding(NDArray embedding) {
-        super(VERSION);
         this.embedding = embedding;
     }
 

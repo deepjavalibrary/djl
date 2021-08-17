@@ -98,6 +98,11 @@ public abstract class AbstractBlock implements Block {
      */
     protected LinkedHashMap<String, Parameter> parameters = new LinkedHashMap<>();
 
+    /** Constructs a new {@code AbstractBlock} instance. */
+    public AbstractBlock() {
+        this((byte) 1);
+    }
+
     /**
      * Builds an empty block with the given version for parameter serialization.
      *

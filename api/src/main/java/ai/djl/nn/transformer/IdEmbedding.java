@@ -23,7 +23,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * An Embedding from integer ids to float vectors. Output shape is the input shape + one dimension
@@ -32,7 +32,6 @@ import java.util.Arrays;
  */
 public final class IdEmbedding extends AbstractBlock {
 
-    private static final byte VERSION = 1;
     private static final String EMBEDDING_PARAM_NAME = "embedding";
 
     private int dictionarySize;
@@ -41,7 +40,6 @@ public final class IdEmbedding extends AbstractBlock {
     private Parameter embedding;
 
     private IdEmbedding(Builder builder) {
-        super(VERSION);
         this.dictionarySize = builder.dictionarySize;
         this.embeddingSize = builder.embeddingSize;
         this.embedding =
@@ -119,7 +117,7 @@ public final class IdEmbedding extends AbstractBlock {
 
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
-        inputNames = Arrays.asList("tokenIds");
+        inputNames = Collections.singletonList("tokenIds");
         // nothing else to do, we have no child blocks
     }
 

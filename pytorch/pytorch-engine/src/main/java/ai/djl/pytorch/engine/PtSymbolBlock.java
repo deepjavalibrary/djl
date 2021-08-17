@@ -41,8 +41,6 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
 
     private static final Logger logger = LoggerFactory.getLogger(PtSymbolBlock.class);
 
-    private static final byte VERSION = 1;
-
     private AtomicReference<Long> handle;
     private String uid;
     private PtNDManager manager;
@@ -61,14 +59,10 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
      * @param handle the module handle
      */
     public PtSymbolBlock(PtNDManager manager, long handle) {
-        super(VERSION);
+        this(manager);
         this.handle = new AtomicReference<>(handle);
-        this.manager = manager;
         uid = String.valueOf(handle);
         manager.attachInternal(uid, this);
-        // training mode is on by default
-        isTrain = true;
-        first = true;
     }
 
     /**
@@ -77,7 +71,6 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
      * @param manager the manager to use for the block
      */
     public PtSymbolBlock(PtNDManager manager) {
-        super(VERSION);
         this.manager = manager;
         // training mode is on by default
         isTrain = true;
@@ -170,7 +163,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
     /** {@inheritDoc} */
     @Override
     public void saveParameters(DataOutputStream os) throws IOException {
-        os.writeByte(VERSION);
+        os.writeByte(version);
         JniUtils.writeModule(this, os, true);
     }
 
@@ -178,9 +171,9 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
     @Override
     public void loadParameters(NDManager manager, DataInputStream is)
             throws IOException, MalformedModelException {
-        byte version = is.readByte();
-        if (version != VERSION) {
-            throw new MalformedModelException("Unsupported encoding version: " + version);
+        byte loadVersion = is.readByte();
+        if (loadVersion != version) {
+            throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
         }
         long rawHandle = JniUtils.loadModuleHandle(is, manager.getDevice(), true);
         this.handle = new AtomicReference<>(rawHandle);
