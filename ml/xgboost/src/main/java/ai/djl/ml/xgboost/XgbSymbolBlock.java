@@ -25,7 +25,6 @@ import ml.dmlc.xgboost4j.java.JniUtils;
 /** {@code XgbSymbolBlock} is the XGBoost implementation of {@link SymbolBlock}. */
 public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
 
-    private static final byte VERSION = 1;
     private AtomicReference<Long> handle;
     private String uid;
     private XgbNDManager manager;
@@ -42,7 +41,6 @@ public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
      * @param handle the Booster handle
      */
     public XgbSymbolBlock(XgbNDManager manager, long handle) {
-        super(VERSION);
         this.handle = new AtomicReference<>(handle);
         this.manager = manager;
         uid = String.valueOf(handle);

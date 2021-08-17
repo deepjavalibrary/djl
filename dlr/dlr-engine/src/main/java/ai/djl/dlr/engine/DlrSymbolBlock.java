@@ -30,8 +30,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class DlrSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
 
-    private static final byte VERSION = 1;
-
     private AtomicReference<Long> handle;
 
     /**
@@ -43,7 +41,6 @@ public class DlrSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
      * @param handle the handle for native DLR model
      */
     public DlrSymbolBlock(long handle) {
-        super(VERSION);
         this.handle = new AtomicReference<>(handle);
     }
 

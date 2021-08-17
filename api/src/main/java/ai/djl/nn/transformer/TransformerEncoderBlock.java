@@ -28,8 +28,6 @@ import java.util.function.Function;
 /** Self-Attention based transformer encoder block. */
 public class TransformerEncoderBlock extends AbstractBlock {
 
-    private static final byte VERSION = 1;
-
     /** The attention mechanism. */
     private ScaledDotProductAttentionBlock selfAttentionBlock;
     /** Dropout before residual & layer normalization. */
@@ -58,7 +56,6 @@ public class TransformerEncoderBlock extends AbstractBlock {
             int hiddenSize,
             float dropoutProbability,
             Function<NDList, NDList> activationFunction) {
-        super(VERSION);
         this.selfAttentionBlock =
                 addChildBlock(
                         "selfAttention",

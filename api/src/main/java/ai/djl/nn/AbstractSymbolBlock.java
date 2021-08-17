@@ -17,6 +17,9 @@ import ai.djl.ndarray.types.Shape;
 /** {@code AbstractSymbolBlock} is an abstract implementation of {@link SymbolBlock}. */
 public abstract class AbstractSymbolBlock extends AbstractBlock implements SymbolBlock {
 
+    /** Constructs a new {@code AbstractSymbolBlock} instance. */
+    public AbstractSymbolBlock() {}
+
     /**
      * Builds an empty block with the given version for parameter serialization.
      *

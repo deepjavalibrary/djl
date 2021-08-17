@@ -45,8 +45,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
 
-    private static final byte VERSION = 1;
-
     private OrtSession session;
 
     /**
@@ -58,7 +56,6 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
      * @param session the {@link OrtSession} contains the model information
      */
     public OrtSymbolBlock(OrtSession session) {
-        super(VERSION);
         this.session = session;
     }
 

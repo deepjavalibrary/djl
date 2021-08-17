@@ -29,13 +29,10 @@ import org.tensorflow.lite.Interpreter;
  */
 public class TfLiteSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
 
-    private static final byte VERSION = 1;
-
     private TfLiteNDManager manager;
     private Interpreter interpreter;
 
     TfLiteSymbolBlock(Interpreter interpreter, TfLiteNDManager manager) {
-        super(VERSION);
         this.interpreter = interpreter;
         this.manager = manager;
     }

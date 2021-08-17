@@ -44,8 +44,6 @@ import java.io.IOException;
  */
 public abstract class Deconvolution extends AbstractBlock {
 
-    private static final byte VERSION = 1;
-
     protected Shape kernelShape;
     protected Shape stride;
     protected Shape padding;
@@ -64,7 +62,6 @@ public abstract class Deconvolution extends AbstractBlock {
      * @param builder the {@code Builder} that has the necessary configurations
      */
     public Deconvolution(DeconvolutionBuilder<?> builder) {
-        super(VERSION);
         kernelShape = builder.kernelShape;
         stride = builder.stride;
         padding = builder.padding;
@@ -162,12 +159,12 @@ public abstract class Deconvolution extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
-    public void loadMetadata(byte version, DataInputStream is)
+    public void loadMetadata(byte loadVersion, DataInputStream is)
             throws IOException, MalformedModelException {
-        if (version == VERSION) {
+        if (loadVersion == version) {
             readInputShapes(is);
         } else {
-            throw new MalformedModelException("Unsupported encoding version: " + version);
+            throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
         }
     }
 

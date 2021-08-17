@@ -47,8 +47,6 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
 
     private static final Logger logger = LoggerFactory.getLogger(TfSymbolBlock.class);
 
-    private static final byte VERSION = 1;
-
     private SavedModelBundle bundle;
     private TF_Graph graphHandle;
     private TF_Session sessionHandle;
@@ -63,7 +61,6 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
     private TF_Operation[] targetOpHandles;
 
     public TfSymbolBlock(SavedModelBundle bundle, String signatureDefKey) {
-        super(VERSION);
         this.bundle = bundle;
         graphHandle = bundle.getGraph();
         sessionHandle = bundle.getSession();

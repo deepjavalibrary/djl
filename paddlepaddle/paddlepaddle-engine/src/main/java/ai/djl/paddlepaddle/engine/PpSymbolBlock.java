@@ -26,8 +26,6 @@ import java.util.Arrays;
 /** {@code PpSymbolBlock} is the PaddlePaddle implementation of {@link SymbolBlock}. */
 public class PpSymbolBlock extends AbstractSymbolBlock {
 
-    private static final byte VERSION = 1;
-
     private PaddlePredictor predictor;
     private String[] inputNames;
 
@@ -37,7 +35,6 @@ public class PpSymbolBlock extends AbstractSymbolBlock {
      * @param predictor {@link PaddlePredictor} that holds the model information.
      */
     public PpSymbolBlock(PaddlePredictor predictor) {
-        super(VERSION);
         this.predictor = predictor;
         inputNames = JniUtils.getInputNames(predictor);
     }
