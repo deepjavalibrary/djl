@@ -88,6 +88,18 @@ public final class JniUtils {
         PaddleLibrary.LIB.analysisConfigRemovePass(config, pass);
     }
 
+    public static void disableGLog(long config) {
+        PaddleLibrary.LIB.analysisConfigDisableGLog(config);
+    }
+
+    public static void cpuMathLibraryNumThreads(long config, int thread) {
+        PaddleLibrary.LIB.analysisConfigCMLNumThreads(config, thread);
+    }
+
+    public static void switchIrOptim(long config, boolean condition) {
+        PaddleLibrary.LIB.analysisConfigSwitchIrOptim(config, condition);
+    }
+
     public static void useFeedFetchOp(long config) {
         PaddleLibrary.LIB.useFeedFetchOp(config);
     }
