@@ -46,6 +46,12 @@ final class PaddleLibrary {
 
     native void analysisConfigEnableMKLDNN(long handle);
 
+    native void analysisConfigDisableGLog(long handle);
+
+    native void analysisConfigCMLNumThreads(long handle, int threads);
+
+    native void analysisConfigSwitchIrOptim(long handle, boolean condition);
+
     native void analysisConfigRemovePass(long handle, String pass);
 
     native void useFeedFetchOp(long handle);

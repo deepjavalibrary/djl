@@ -74,13 +74,24 @@ public class PpModel extends BaseModel {
             }
         }
         long config = JniUtils.createConfig(modelFiles[0], modelFiles[1], device);
-        if (System.getenv().containsKey("PADDLE_ENABLE_MKLDNN")) {
-            JniUtils.enableMKLDNN(config);
-        }
-        if (options != null && options.containsKey("removePass")) {
-            String[] values = ((String) options.get("removePass")).split(",");
-            for (String value : values) {
-                JniUtils.removePass(config, value);
+        if (options != null) {
+            if (options.containsKey("removePass")) {
+                String[] values = ((String) options.get("removePass")).split(",");
+                for (String value : values) {
+                    JniUtils.removePass(config, value);
+                }
+            }
+            if (options.containsKey("enableMKLDNN")) {
+                JniUtils.enableMKLDNN(config);
+            }
+            if (options.containsKey("DisableGlog")) {
+                JniUtils.disableGLog(config);
+            }
+            if (options.containsKey("CMLNumThreads")) {
+                JniUtils.cpuMathLibraryNumThreads(config, (Integer) options.get("CMLNumThreads"));
+            }
+            if (options.containsKey("SwitchIrOptim")) {
+                JniUtils.switchIrOptim(config, (Boolean) options.get("SwitchIrOptim"));
             }
         }
         paddlePredictor = new PaddlePredictor(JniUtils.createPredictor(config));
