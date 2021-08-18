@@ -88,10 +88,10 @@ public class PpModel extends BaseModel {
                 JniUtils.disableGLog(config);
             }
             if (options.containsKey("CMLNumThreads")) {
-                JniUtils.cpuMathLibraryNumThreads(config, (int) options.get("CMLNumThreads"));
+                JniUtils.cpuMathLibraryNumThreads(config, (Integer) options.get("CMLNumThreads"));
             }
             if (options.containsKey("SwitchIrOptim")) {
-                JniUtils.switchIrOptim(config, (boolean) options.get("SwitchIrOptim"));
+                JniUtils.switchIrOptim(config, (Boolean) options.get("SwitchIrOptim"));
             }
         }
         paddlePredictor = new PaddlePredictor(JniUtils.createPredictor(config));
