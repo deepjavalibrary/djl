@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.inference.cyclegan;
 
+import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
@@ -35,7 +36,7 @@ public final class StyleTransfer {
 
     private StyleTransfer() {}
 
-    private enum Artist {
+    public enum Artist {
         CEZANNE,
         MONET,
         UKIYOE,
@@ -47,8 +48,8 @@ public final class StyleTransfer {
                     TranslateException {
 
         Artist artist = Artist.MONET;
-        String imageUrl = "https://djl-misc.s3.amazonaws.com/test/images/mountains.png";
-        Image input = ImageFactory.getInstance().fromUrl(imageUrl);
+        String imagePath = "src/test/resources/mountains.png";
+        Image input = ImageFactory.getInstance().fromFile(Paths.get(imagePath));
         Image output = transfer(input, artist);
 
         if (output == null) {
@@ -68,10 +69,13 @@ public final class StyleTransfer {
         }
 
         String modelName = "style_" + artist.toString().toLowerCase() + ".zip";
-        String modelUrl = "https://djl-misc.s3.amazonaws.com/test/models/cyclegan/" + modelName;
+        String modelUrl =
+                "https://mlrepo.djl.ai/model/cv/image_generation/ai/djl/pytorch/cyclegan/0.0.1/"
+                        + modelName;
 
         Criteria<Image, Image> criteria =
                 Criteria.builder()
+                        .optApplication(Application.CV.IMAGE_GENERATION)
                         .setTypes(Image.class, Image.class)
                         .optModelUrls(modelUrl)
                         .optProgress(new ProgressBar())
