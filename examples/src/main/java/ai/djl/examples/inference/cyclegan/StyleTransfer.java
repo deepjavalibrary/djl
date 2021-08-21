@@ -14,10 +14,12 @@ package ai.djl.examples.inference.cyclegan;
 
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
+import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
+import ai.djl.modality.cv.translator.StyleTransferTranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
@@ -43,10 +45,7 @@ public final class StyleTransfer {
         VANGOGH
     }
 
-    public static void main(String[] args)
-            throws IOException, ModelNotFoundException, MalformedModelException,
-                    TranslateException {
-
+    public static void main(String[] args) throws IOException, ModelException, TranslateException {
         Artist artist = Artist.MONET;
         String imagePath = "src/test/resources/mountains.png";
         Image input = ImageFactory.getInstance().fromFile(Paths.get(imagePath));
@@ -79,7 +78,7 @@ public final class StyleTransfer {
                         .setTypes(Image.class, Image.class)
                         .optModelUrls(modelUrl)
                         .optProgress(new ProgressBar())
-                        .optTranslator(new StyleTransferTranslator())
+                        .optTranslatorFactory(new StyleTransferTranslatorFactory())
                         .build();
 
         try (ZooModel<Image, Image> model = criteria.loadModel();
