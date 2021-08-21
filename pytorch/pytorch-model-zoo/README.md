@@ -36,6 +36,8 @@ The PyTorch model zoo contains Computer Vision (CV) models. All the models are g
 * CV
   * Image Classification
   * Object Detection
+  * Style Transfer
+  * Image Generation
 
 ### How to find a pre-trained model in model zoo
 

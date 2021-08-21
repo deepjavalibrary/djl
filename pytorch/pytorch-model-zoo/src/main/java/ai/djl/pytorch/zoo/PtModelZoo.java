@@ -53,6 +53,9 @@ public class PtModelZoo extends ModelZoo {
 
         MRL bigGan = REPOSITORY.model(CV.IMAGE_GENERATION, GROUP_ID, "biggan-deep", "0.0.1");
         MODEL_LOADERS.add(new BaseModelLoader(bigGan));
+
+        MRL cyclegan = REPOSITORY.model(CV.IMAGE_GENERATION, GROUP_ID, "cyclegan", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(cyclegan));
     }
 
     /** {@inheritDoc} */

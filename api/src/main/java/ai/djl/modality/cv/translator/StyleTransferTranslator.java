@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference.cyclegan;
+package ai.djl.modality.cv.translator;
 
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
@@ -22,25 +22,30 @@ import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
+/** Built-in {@code Translator} that provides preprocessing and postprocessing for StyleTransfer. */
 public class StyleTransferTranslator implements Translator<Image, Image> {
+
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, Image input) {
         NDArray image = switchFormat(input.toNDArray(ctx.getNDManager())).expandDims(0);
         return new NDList(image.toType(DataType.FLOAT32, false));
     }
 
+    /** {@inheritDoc} */
     @Override
     public Image processOutput(TranslatorContext ctx, NDList list) {
         NDArray output = list.get(0).addi(1).muli(128).toType(DataType.UINT8, false);
         return ImageFactory.getInstance().fromNDArray(output.squeeze());
     }
 
-    private NDArray switchFormat(NDArray array) {
-        return NDArrays.stack(array.split(3, 2)).squeeze();
-    }
-
+    /** {@inheritDoc} */
     @Override
     public Batchifier getBatchifier() {
         return null;
+    }
+
+    private NDArray switchFormat(NDArray array) {
+        return NDArrays.stack(array.split(3, 2)).squeeze();
     }
 }
