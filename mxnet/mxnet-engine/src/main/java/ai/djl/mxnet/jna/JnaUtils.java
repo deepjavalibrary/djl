@@ -345,9 +345,9 @@ public final class JnaUtils {
         int delay = delayedAlloc ? 1 : 0;
 
         PointerByReference ref = REFS.acquire();
-        int[] shapeArray = Arrays.stream(shape.getShape()).mapToInt(Math::toIntExact).toArray();
+        long[] shapeArray = shape.getShape();
         checkCall(
-                LIB.MXNDArrayCreateEx(
+                LIB.MXNDArrayCreateEx64(
                         shapeArray, size, deviceType, deviceId, delay, dtype.ordinal(), ref));
 
         Pointer pointer = ref.getValue();
@@ -363,7 +363,7 @@ public final class JnaUtils {
             DataType[] auxDTypes,
             Shape[] auxShapes,
             boolean delayedAlloc) {
-        int[] shapeArray = Arrays.stream(shape.getShape()).mapToInt(Math::toIntExact).toArray();
+        long[] shapeArray = shape.getShape();
         int deviceType = MxDeviceType.toDeviceType(device);
         int deviceId = device.getDeviceId();
         int delay = delayedAlloc ? 1 : 0;
@@ -372,9 +372,9 @@ public final class JnaUtils {
                 IntBuffer.wrap(Arrays.stream(auxDTypes).mapToInt(DataType::ordinal).toArray());
         IntBuffer auxNDims =
                 IntBuffer.wrap(Arrays.stream(auxShapes).mapToInt(Shape::dimension).toArray());
-        int[] auxShapesInt = Arrays.stream(auxShapes).mapToInt(ele -> (int) ele.head()).toArray();
+        long[] auxShapesInt = Arrays.stream(auxShapes).mapToLong(Shape::head).toArray();
         checkCall(
-                LIB.MXNDArrayCreateSparseEx(
+                LIB.MXNDArrayCreateSparseEx64(
                         fmt.getValue(),
                         shapeArray,
                         shapeArray.length,
@@ -567,15 +567,15 @@ public final class JnaUtils {
         IntBuffer dim = IntBuffer.allocate(1);
         PointerByReference ref = REFS.acquire();
         checkNDArray(ndArray, "get the shape of");
-        checkCall(LIB.MXNDArrayGetShapeEx(ndArray, dim, ref));
+        checkCall(LIB.MXNDArrayGetShapeEx64(ndArray, dim, ref));
         int nDim = dim.get();
         if (nDim == 0) {
             REFS.recycle(ref);
             return new Shape();
         }
-        int[] shape = ref.getValue().getIntArray(0, nDim);
+        long[] shape = ref.getValue().getLongArray(0, nDim);
         REFS.recycle(ref);
-        return new Shape(Arrays.stream(shape).asLongStream().toArray());
+        return new Shape(shape);
     }
 
     public static DataType getDataType(Pointer ndArray) {
