@@ -89,14 +89,20 @@ public abstract class AbstractBenchmark {
                             "Load %s (%s) in %.3f ms.",
                             engineName, version, (loaded - init) / 1_000_000f));
             Duration duration = Duration.ofSeconds(arguments.getDuration());
+            Object devices;
+            if (this instanceof MultithreadedBenchmark) {
+                devices = engine.getDevices(arguments.getMaxGpus());
+            } else {
+                devices = engine.defaultDevice();
+            }
+
             if (arguments.getDuration() != 0) {
                 logger.info(
                         "Running {} on: {}, duration: {} minutes.",
                         getClass().getSimpleName(),
-                        engine.defaultDevice(),
+                        devices,
                         duration.toMinutes());
             } else {
-                Device[] devices = engine.getDevices(arguments.getMaxGpus());
                 logger.info("Running {} on: {}.", getClass().getSimpleName(), devices);
             }
             int numOfThreads = arguments.getThreads();
