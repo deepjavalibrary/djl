@@ -40,12 +40,6 @@ public class StyleTransferTranslatorFactory implements TranslatorFactory {
         if (!isSupported(input, output)) {
             throw new IllegalArgumentException("Unsupported input/output types.");
         }
-        float truncation;
-        if (arguments.containsKey("truncation")) {
-            truncation = Float.parseFloat(arguments.get("truncation").toString());
-        } else {
-            truncation = 0.5f;
-        }
-        return new BigGANTranslator(truncation);
+        return new StyleTransferTranslator();
     }
 }
