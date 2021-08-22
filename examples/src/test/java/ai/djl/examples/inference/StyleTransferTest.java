@@ -13,7 +13,6 @@
 package ai.djl.examples.inference;
 
 import ai.djl.MalformedModelException;
-import ai.djl.examples.inference.cyclegan.StyleTransfer;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.repository.zoo.ModelNotFoundException;
