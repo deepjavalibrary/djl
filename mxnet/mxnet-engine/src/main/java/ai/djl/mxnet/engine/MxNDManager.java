@@ -69,10 +69,7 @@ public class MxNDManager extends BaseNDManager {
      * @return the created array
      */
     public MxNDArray create(Pointer handle) {
-        if (version >= 10700) {
-            return new MxNDArray(this, handle);
-        }
-        return new MxNDArray16(this, handle);
+        return new MxNDArray(this, handle);
     }
 
     /**
@@ -90,10 +87,7 @@ public class MxNDManager extends BaseNDManager {
     @Override
     public MxNDArray create(Shape shape, DataType dataType) {
         Pointer handle = JnaUtils.createNdArray(device, shape, dataType, shape.dimension(), false);
-        if (version >= 10700) {
-            return new MxNDArray(this, handle, device, shape, dataType, false);
-        }
-        return new MxNDArray16(this, handle, device, shape, dataType, false);
+        return new MxNDArray(this, handle, device, shape, dataType, false);
     }
 
     /** {@inheritDoc} */
