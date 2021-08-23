@@ -145,6 +145,7 @@ Then, right click the `log4j2.xml` file and select `Recompile log4j2.xml`.
 
 
 ## 4. How to run DJL using other versions of Apache MXNet?
+
 **Note:** this is not officially supported by DJL, and some functions may not work. 
 If you require features in Apache MXNet not provided by DJL, please submit an [issue](https://github.com/deepjavalibrary/djl/issues).
 
