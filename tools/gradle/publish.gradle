@@ -13,6 +13,7 @@ configure([
         project(':engines:tensorflow:tensorflow-api'),
         project(':engines:tensorflow:tensorflow-engine'),
         project(':engines:tensorflow:tensorflow-model-zoo'),
+        project(':engines:tensorrt'),
         project(':engines:tflite:tflite-engine'),
         project(':extensions:aws-ai'),
         project(':extensions:fasttext'),

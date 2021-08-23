@@ -99,7 +99,7 @@ public class BaseModelLoader implements ModelLoader {
 
             Path modelPath = mrl.getRepository().getResourceDirectory(artifact);
 
-            loadServingProperties(modelPath, arguments);
+            loadServingProperties(modelPath, arguments, options);
             Application application = criteria.getApplication();
             if (application != Application.UNDEFINED) {
                 arguments.put("application", application.getPath());
@@ -244,7 +244,8 @@ public class BaseModelLoader implements ModelLoader {
         return sb.toString();
     }
 
-    private void loadServingProperties(Path modelDir, Map<String, Object> arguments)
+    private void loadServingProperties(
+            Path modelDir, Map<String, Object> arguments, Map<String, String> options)
             throws IOException {
         Path manifestFile = modelDir.resolve("serving.properties");
         if (Files.isRegularFile(manifestFile)) {
@@ -253,7 +254,11 @@ public class BaseModelLoader implements ModelLoader {
                 prop.load(reader);
             }
             for (String key : prop.stringPropertyNames()) {
-                arguments.putIfAbsent(key, prop.getProperty(key));
+                if (key.startsWith("option.")) {
+                    options.putIfAbsent(key.substring(7), prop.getProperty(key));
+                } else {
+                    arguments.putIfAbsent(key, prop.getProperty(key));
+                }
             }
         }
     }
