@@ -18,6 +18,7 @@ If the native resources is no longer used, we allow GC collect it's native memor
 However, there are still some limitations. For example, it may cause OOM(Out of memory) if preprocessing and postprocessing create a large amount of NDArrays in the training loop before GC kicks in.
  
 Here are the rule of thumb:
+
 * The output of the NDArray operation should be attached to the same manager as the input one. The order matters as we use first NDArray's manager on the NDArray operation by default.
 * If intermediate NDArray get into upper level NDManager, e.g from Trainer -> Model, the memory leak will happen.
 * You can use `NDManager.debugDump()` to see if any of NDManager's resource count is keep increasing.

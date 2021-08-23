@@ -28,6 +28,7 @@ Use the following task to build DLR JNI library:
 This task will send a JNI library copy to `dlr-engine` model to test locally.
 
 ## GPU build
+
 * GPU is not supported.
 
 ### Format C++ code
