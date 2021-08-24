@@ -36,7 +36,7 @@ plugins:
   - mknotebooks
   - exclude:
       regex:
-        - '.*\.(symbol|params|pt|jar|gz|zip|txt|json|sh|bat|cmd|puml|g4|java|py|cc|h|pro|properties|xml|gradlew|gradle|Dockerfile|RepositoryFactory|EngineProvider|ZooProvider)$|(docker|integration|testing|tools)/.*$'
+        - '.*\.(symbol|params|pt|jar|gz|zip|txt|json|sh|bat|cmd|puml|g4|java|py|cc|h|pro|properties|xml|gradlew|gradle|Dockerfile|RepositoryFactory|EngineProvider|ZooProvider)$|(docker|integration|testing|tools|docs/demos/apache-spark/notebook)/.*$'
 
 
 nav:
@@ -141,20 +141,19 @@ nav:
         - Java Integrations:
             - DJL Component in Apache Camel: 'docs/demos/camel-djl/README.md'
             - Run TensorFlow model on GraalVM: 'docs/demos/graalvm/README.md'
-            - Spark Image Classification: 'docs/demos/spark/image-classification/README.md'
+            - Spark Image Classification: 'docs/demos/apache-spark/image-classification/README.md'
             - Apache Beam: 'docs/demos/apache-beam/ctr-prediction/README.md'
-            - Apache Flink: 'docs/demos/flink/sentiment-analysis/README.md'
+            - Apache Flink: 'docs/demos/apache-flink/sentiment-analysis/README.md'
             - Quarkus + DJL Demo: 'docs/demos/quarkus/example/README.md'
     - Applications:
         - Footwear Classification: 'docs/demos/footwear_classification/README.md'
         - Live Object Detection: 'docs/demos/live-object-detection/README.md'
         - Pneumonia Detection: 'docs/demos/pneumonia-detection/README.md'
         - MultiEngine on DJL: 'docs/demos/multi-engine/README.md'
-        - Visualizing Training with DJL: 'docs/demos/visualization/README.md'
         - Interactive JShell and Block Runner for DJL: 'docs/demos/web-demo/interactive-console/README.md'
         - Malicious URL Detection: 'docs/demos/malicious-url-detector/README.md'
     - Extensions:
-        - Visualizing Training with DJL: 'docs/demos/visualization/README.md'
+        - Visualizing Training with DJL: 'docs/demos/visualization-vue/README.md'
         - Interactive JShell and Block Runner for DJL: 'docs/demos/web-demo/interactive-console/README.md'
 
 
