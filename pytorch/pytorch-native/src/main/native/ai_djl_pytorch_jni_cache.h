@@ -28,4 +28,4 @@ extern jmethodID ERROR_METHOD;
 // the highest version Android JNI version is 1.6
 static jint JNI_VERSION = JNI_VERSION_1_6;
 
-#endif //DJL_TORCH_AI_DJL_PYTORCH_JNI_CACHE_H
+#endif  // DJL_TORCH_AI_DJL_PYTORCH_JNI_CACHE_H

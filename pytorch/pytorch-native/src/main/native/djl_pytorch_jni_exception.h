@@ -16,9 +16,9 @@
 
 #include "ai_djl_pytorch_jni_cache.h"
 
-#define DJL_CHECK_WITH_MSG(cond, error_msg)                              \
-  if (!cond) {                                                           \
-    env->ThrowNew(ENGINE_EXCEPTION_CLASS, error_msg);                    \
+#define DJL_CHECK_WITH_MSG(cond, error_msg)           \
+  if (!cond) {                                        \
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, error_msg); \
   }
 
 /*
@@ -27,16 +27,15 @@
  * and finishes with API_END()
  */
 #define API_BEGIN() try {
-
-#define API_END()                                                        \
-  }                                                                      \
-  catch (const c10::Error& e) {                                          \
-    Log log(env);                                                        \
-    log.debug(e.what());                                                 \
-    env->ThrowNew(ENGINE_EXCEPTION_CLASS, e.what_without_backtrace());   \
-  }                                                                      \
-  catch (const std::exception& e_) {                                     \
-    env->ThrowNew(ENGINE_EXCEPTION_CLASS, e_.what());                    \
+#define API_END()                                                      \
+  }                                                                    \
+  catch (const c10::Error& e) {                                        \
+    Log log(env);                                                      \
+    log.debug(e.what());                                               \
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, e.what_without_backtrace()); \
+  }                                                                    \
+  catch (const std::exception& e_) {                                   \
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, e_.what());                  \
   }
 
 // TODO refactor all jni functions to c style function which mean

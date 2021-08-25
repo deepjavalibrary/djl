@@ -14,30 +14,30 @@
 #ifndef DJL_PADDLE_DJL_PADDLE_JNI_UTILS_H
 #define DJL_PADDLE_DJL_PADDLE_JNI_UTILS_H
 
+#include <jni.h>
 #include <paddle_api.h>
 
-#include <jni.h>
 #include <iostream>
-#include <vector>
 #include <numeric>
+#include <vector>
 
 namespace utils {
 
-inline void GetZTensorFromTensor(paddle::ZeroCopyTensor* z_tensor, paddle::PaddleTensor* tensor) {
+inline void GetZTensorFromTensor(paddle::ZeroCopyTensor *z_tensor, paddle::PaddleTensor *tensor) {
   z_tensor->Reshape(tensor->shape);
   z_tensor->SetLoD(tensor->lod);
   switch (tensor->dtype) {
     case paddle::PaddleDType::FLOAT32:
-      z_tensor->copy_from_cpu(static_cast<float*>(tensor->data.data()));
+      z_tensor->copy_from_cpu(static_cast<float *>(tensor->data.data()));
       break;
     case paddle::PaddleDType::INT32:
-      z_tensor->copy_from_cpu(static_cast<int32_t*>(tensor->data.data()));
+      z_tensor->copy_from_cpu(static_cast<int32_t *>(tensor->data.data()));
       break;
     case paddle::PaddleDType::INT64:
-      z_tensor->copy_from_cpu(static_cast<int64_t*>(tensor->data.data()));
+      z_tensor->copy_from_cpu(static_cast<int64_t *>(tensor->data.data()));
       break;
     case paddle::PaddleDType::UINT8:
-      z_tensor->copy_from_cpu(static_cast<uint8_t*>(tensor->data.data()));
+      z_tensor->copy_from_cpu(static_cast<uint8_t *>(tensor->data.data()));
       break;
     default:
       // TODO improve the error handling
@@ -75,6 +75,6 @@ inline void GetTensorFromZTensor(paddle::ZeroCopyTensor *z_tensor, paddle::Paddl
   }
 }
 
-}
+}  // namespace utils
 
-#endif //DJL_PADDLE_DJL_PADDLE_JNI_UTILS_H
+#endif  // DJL_PADDLE_DJL_PADDLE_JNI_UTILS_H
