@@ -15,13 +15,12 @@
 
 #include <c10/util/typeid.h>
 #include <c10/util/variant.h>
+#include <djl/utils.h>
+#include <jni.h>
 #include <torch/csrc/api/include/torch/enum.h>
 #include <torch/script.h>
 
-#include <jni.h>
 #include <iostream>
-
-#include <djl/utils.h>
 
 #include "djl_pytorch_jni_log.h"
 
@@ -31,13 +30,9 @@ namespace utils {
 
 #if !defined(__ANDROID__)
 // for image interpolation
-typedef torch::variant<
-  torch::enumtype::kNearest,
-  torch::enumtype::kLinear,
-  torch::enumtype::kBilinear,
-  torch::enumtype::kBicubic,
-  torch::enumtype::kTrilinear,
-  torch::enumtype::kArea> mode_t;
+typedef torch::variant<torch::enumtype::kNearest, torch::enumtype::kLinear, torch::enumtype::kBilinear,
+    torch::enumtype::kBicubic, torch::enumtype::kTrilinear, torch::enumtype::kArea>
+    mode_t;
 #endif
 
 inline jint GetDTypeFromScalarType(const torch::ScalarType& type) {
@@ -101,19 +96,26 @@ inline torch::Device GetDeviceFromJDevice(JNIEnv* env, jintArray jdevice) {
 #if !defined(__ANDROID__)
 inline mode_t GetInterpolationMode(jint jmode) {
   switch (jmode) {
-    case 0: return torch::kNearest;
-    case 1: return torch::kLinear;
-    case 2: return torch::kBilinear;
-    case 3: return torch::kBicubic;
-    case 4: return torch::kTrilinear;
-    case 5: return torch::kArea;
+    case 0:
+      return torch::kNearest;
+    case 1:
+      return torch::kLinear;
+    case 2:
+      return torch::kBilinear;
+    case 3:
+      return torch::kBicubic;
+    case 4:
+      return torch::kTrilinear;
+    case 5:
+      return torch::kArea;
     default:
       throw;
   }
 }
 #endif
 
-inline std::vector<torch::indexing::TensorIndex> CreateTensorIndex(JNIEnv* env, jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {
+inline std::vector<torch::indexing::TensorIndex> CreateTensorIndex(
+    JNIEnv* env, jlongArray jmin_indices, jlongArray jmax_indices, jlongArray jstep_indices) {
   const auto min_indices = djl::utils::jni::GetVecFromJLongArray(env, jmin_indices);
   const auto max_indices = djl::utils::jni::GetVecFromJLongArray(env, jmax_indices);
   const auto step_indices = djl::utils::jni::GetVecFromJLongArray(env, jstep_indices);
@@ -121,7 +123,7 @@ inline std::vector<torch::indexing::TensorIndex> CreateTensorIndex(JNIEnv* env, 
   indices.reserve(min_indices.size());
   for (size_t i = 0; i < min_indices.size(); ++i) {
     indices.emplace_back(
-      torch::indexing::TensorIndex(torch::indexing::Slice(min_indices[i], max_indices[i], step_indices[i])));
+        torch::indexing::TensorIndex(torch::indexing::Slice(min_indices[i], max_indices[i], step_indices[i])));
   }
   return indices;
 }
@@ -131,8 +133,8 @@ inline torch::TensorOptions CreateTensorOptions(
   // it gets the device and collect jdevice memory
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
   auto options = torch::TensorOptions()
-                      // for tensor creation API, MKLDNN layout is not supported
-                      // the workaround is to create with Strided then call to_mkldnn()
+                     // for tensor creation API, MKLDNN layout is not supported
+                     // the workaround is to create with Strided then call to_mkldnn()
                      .layout((jlayout != 1) ? torch::kStrided : torch::kSparse)
                      .memory_format(torch::MemoryFormat::Contiguous)
                      .device(device)

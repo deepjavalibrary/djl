@@ -52,33 +52,33 @@ JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_loadExtraDir(
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_analysisConfigEnableMKLDNN(
-        JNIEnv* env, jobject jthis, jlong jhandle) {
-    auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
-    config_ptr->EnableMKLDNN();
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
+  config_ptr->EnableMKLDNN();
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_analysisConfigDisableGLog(
-        JNIEnv* env, jobject jthis, jlong jhandle) {
-    auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
-    config_ptr->DisableGlogInfo();
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
+  config_ptr->DisableGlogInfo();
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_analysisConfigCMLNumThreads(
-        JNIEnv* env, jobject jthis, jlong jhandle, jint num) {
-    auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
-    config_ptr->SetCpuMathLibraryNumThreads(num);
+    JNIEnv* env, jobject jthis, jlong jhandle, jint num) {
+  auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
+  config_ptr->SetCpuMathLibraryNumThreads(num);
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_analysisConfigSwitchIrOptim(
-        JNIEnv* env, jobject jthis, jlong jhandle, jboolean condition) {
-    auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
-    config_ptr->SwitchIrOptim(condition);
+    JNIEnv* env, jobject jthis, jlong jhandle, jboolean condition) {
+  auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
+  config_ptr->SwitchIrOptim(condition);
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_analysisConfigRemovePass(
-        JNIEnv* env, jobject jthis, jlong jhandle, jstring jpass) {
-    auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
-    config_ptr->pass_builder()->DeletePass(djl::utils::jni::GetStringFromJString(env, jpass));
+    JNIEnv* env, jobject jthis, jlong jhandle, jstring jpass) {
+  auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
+  config_ptr->pass_builder()->DeletePass(djl::utils::jni::GetStringFromJString(env, jpass));
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deleteAnalysisConfig(
