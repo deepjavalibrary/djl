@@ -6,10 +6,10 @@ The community leaders are those who are the most active members of our community
 
 | | | | | |
 |-------|----------------|---------|------------| ----------- |
-| ![](website/img/community_leader/anthony.jpeg) <br>Anthony | ![](website/img/community_leader/christoph.png) <br>Christoph | ![](website/img/community_leader/erik.png) <br>Erik | ![](website/img/community_leader/frank.png) <br>Frank | ![](website/img/community_leader/jake.jpg) <br>Jake |
-| ![](website/img/community_leader/keerthan.jpg) <br>Keerthan | ![](website/img/community_leader/kimi.png) <br>Kimi | ![](website/img/community_leader/lai.jpg) <br>Lai | ![](website/img/community_leader/lu.png) <br>Lu | ![](website/img/community_leader/marat.png) <br>Marat |
-| ![](website/img/community_leader/marcos.png) <br>Marcos | ![](website/img/community_leader/qing.jpeg) <br>Qing | ![](website/img/community_leader/stanislav.png) <br>Stanislav | ![](website/img/community_leader/wei.jpg) <br>Wei | ![](website/img/community_leader/zach.jpeg) <br>Zach 
- | ![](website/img/community_leader/fyz.jpg) <br>fuyingzhi
+| ![](website/img/community_leader/anthony.jpeg) <br>Anthony | ![](website/img/community_leader/aziz.jpg) <br>Aziz | ![](website/img/community_leader/christoph.png) <br>Christoph | ![](website/img/community_leader/erik.png) <br>Erik | ![](website/img/community_leader/frank.png) <br>Frank
+| ![](website/img/community_leader/fyz.jpg) <br>fuyingzhi | ![](website/img/community_leader/jake.jpg) <br>Jake | ![](website/img/community_leader/keerthan.jpg) <br>Keerthan | ![](website/img/community_leader/kimi.png) <br>Kimi | ![](website/img/community_leader/lai.jpg) <br>Lai
+| ![](website/img/community_leader/lu.png) <br>Lu | ![](website/img/community_leader/marat.png) <br>Marat | ![](website/img/community_leader/marcos.png) <br>Marcos | ![](website/img/community_leader/qing.jpeg) <br>Qing | ![](website/img/community_leader/stanislav.png) <br>Stanislav
+| ![](website/img/community_leader/wei.jpg) <br>Wei | ![](website/img/community_leader/zach.jpeg) <br>Zach
 
 #### Anthony Feenster
 
@@ -106,3 +106,9 @@ Zach is one of the core developers at DJL. He is a committer on the Apache MXNet
 [github](https://github.com/fuyz)
 
 Fu is a PC and Mobile web developer from China and working in Ascend International Education Group. He is living and working in Shenzhen. Outside of work, he enjoys playing basketball, swimming and bodybuilding.
+
+#### Aziz Zayed
+
+[github](https://github.com/AzizZayed) [linkedin](https://linkedin.com/in/aziz-zayed-cs)
+
+Aziz is an intern in the DJL team. He is a sophomore at McGill University studying Software Engineering. Other than making software projects on his free time, he plays Basketball and enjoys Boxing. His main interests lie in the applications of Deep Learning in the medical field.
