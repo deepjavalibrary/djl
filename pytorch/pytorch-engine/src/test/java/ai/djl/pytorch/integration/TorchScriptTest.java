@@ -15,10 +15,10 @@ package ai.djl.pytorch.integration;
 
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.pytorch.engine.PtSymbolBlock;
 import ai.djl.pytorch.jni.JniUtils;
@@ -30,7 +30,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -51,7 +51,7 @@ public class TorchScriptTest {
             Path modelFile;
             try (ZooModel<NDList, NDList> model = criteria.loadModel();
                     Predictor<NDList, NDList> predictor = model.newPredictor()) {
-                NDArray array = manager.ones(new Shape(2, 2));
+                PtNDArray array = (PtNDArray) manager.ones(new Shape(2, 2));
                 array.setName("input1.input");
                 NDList output = predictor.predict(new NDList(array));
                 Assert.assertEquals(output.singletonOrThrow(), array);
@@ -73,11 +73,17 @@ public class TorchScriptTest {
     }
 
     @Test
-    public void testInputOutput() throws IOException {
-        URL url =
-                new URL("https://djl-ai.s3.amazonaws.com/resources/test-models/traced_resnet18.pt");
-        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
-            try (InputStream is = url.openStream()) {
+    public void testInputOutput() throws IOException, ModelException {
+        Criteria<NDList, NDList> criteria =
+                Criteria.builder()
+                        .setTypes(NDList.class, NDList.class)
+                        .optModelUrls("djl://ai.djl.pytorch/resnet/0.0.1/traced_resnet18")
+                        .optProgress(new ProgressBar())
+                        .build();
+        try (ZooModel<NDList, NDList> model = criteria.loadModel()) {
+            PtNDManager manager = (PtNDManager) model.getNDManager();
+            Path modelFile = model.getModelPath().resolve("traced_resnet18.pt");
+            try (InputStream is = Files.newInputStream(modelFile)) {
                 PtSymbolBlock block = JniUtils.loadModule(manager, is, manager.getDevice(), false);
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JniUtils.writeModule(block, os, true);

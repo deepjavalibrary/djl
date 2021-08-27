@@ -26,35 +26,120 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromTensor(
   API_END_RETURN()
 }
 
-JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromList(
-    JNIEnv* env, jobject jthis, jlongArray jtensor_ptrs) {
-  jsize len = env->GetArrayLength(jtensor_ptrs);
-  jlong* jptrs = env->GetLongArrayElements(jtensor_ptrs, JNI_FALSE);
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromBool(
+    JNIEnv* env, jobject jthis, jboolean jvalue) {
+  API_BEGIN()
+  const auto* ivalue_ptr = new torch::IValue((bool) jvalue);
+  return reinterpret_cast<uintptr_t>(ivalue_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromLong(
+    JNIEnv* env, jobject jthis, jlong jvalue) {
+  API_BEGIN()
+  const auto* ivalue_ptr = new torch::IValue((int64_t) jvalue);
+  return reinterpret_cast<uintptr_t>(ivalue_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromDouble(
+    JNIEnv* env, jobject jthis, jdouble jvalue) {
+  API_BEGIN()
+  const auto* ivalue_ptr = new torch::IValue(jvalue);
+  return reinterpret_cast<uintptr_t>(ivalue_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromString(
+    JNIEnv* env, jobject jthis, jstring jvalue) {
+  API_BEGIN()
+  const std::string value = djl::utils::jni::GetStringFromJString(env, jvalue);
+  const auto* ivalue_ptr = new torch::IValue(value);
+  return reinterpret_cast<uintptr_t>(ivalue_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromBoolList(
+    JNIEnv* env, jobject jthis, jbooleanArray jvalues) {
+  API_BEGIN()
+  jsize len = env->GetArrayLength(jvalues);
+  jboolean* jptrs = env->GetBooleanArrayElements(jvalues, JNI_FALSE);
+  torch::List<bool> list;
+  list.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    list.emplace_back(jptrs[i]);
+  }
+  env->ReleaseBooleanArrayElements(jvalues, jptrs, JNI_ABORT);
+  const auto* ivalue_ptr = new torch::IValue(list);
+  return reinterpret_cast<uintptr_t>(ivalue_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromLongList(
+    JNIEnv* env, jobject jthis, jlongArray jvalues) {
+  API_BEGIN()
+  jsize len = env->GetArrayLength(jvalues);
+  jlong* jptrs = env->GetLongArrayElements(jvalues, JNI_FALSE);
+  torch::List<int64_t> list;
+  list.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    list.emplace_back(jptrs[i]);
+  }
+  env->ReleaseLongArrayElements(jvalues, jptrs, JNI_ABORT);
+  const auto* ivalue_ptr = new torch::IValue(list);
+  return reinterpret_cast<uintptr_t>(ivalue_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromDoubleList(
+    JNIEnv* env, jobject jthis, jdoubleArray jvalues) {
+  API_BEGIN()
+  jsize len = env->GetArrayLength(jvalues);
+  jdouble* jptrs = env->GetDoubleArrayElements(jvalues, JNI_FALSE);
+  torch::List<double> list;
+  list.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    list.emplace_back(jptrs[i]);
+  }
+  env->ReleaseDoubleArrayElements(jvalues, jptrs, JNI_ABORT);
+  const auto* ivalue_ptr = new torch::IValue(list);
+  return reinterpret_cast<uintptr_t>(ivalue_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromTensorList(
+    JNIEnv* env, jobject jthis, jlongArray jvalues) {
+  API_BEGIN()
+  jsize len = env->GetArrayLength(jvalues);
+  jlong* jptrs = env->GetLongArrayElements(jvalues, JNI_FALSE);
   torch::List<torch::Tensor> list;
   list.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     list.emplace_back(*reinterpret_cast<torch::Tensor*>(jptrs[i]));
   }
-  env->ReleaseLongArrayElements(jtensor_ptrs, jptrs, JNI_ABORT);
-  auto* result_ptr = new torch::IValue(list);
-  return reinterpret_cast<uintptr_t>(result_ptr);
+  env->ReleaseLongArrayElements(jvalues, jptrs, JNI_ABORT);
+  const auto* ivalue_ptr = new torch::IValue(list);
+  return reinterpret_cast<uintptr_t>(ivalue_ptr);
+  API_END_RETURN()
 }
 
-JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromDict(
-    JNIEnv* env, jobject jthis, jlongArray jtensor_ptrs, jobjectArray jnames) {
-  auto len = static_cast<size_t>(env->GetArrayLength(jtensor_ptrs));
-  jlong* jptrs = env->GetLongArrayElements(jtensor_ptrs, JNI_FALSE);
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromStringMap(
+    JNIEnv* env, jobject jthis, jobjectArray jkeys, jlongArray jvalues) {
+  API_BEGIN()
+  auto len = static_cast<size_t>(env->GetArrayLength(jvalues));
+  jlong* jptrs = env->GetLongArrayElements(jvalues, JNI_FALSE);
   torch::Dict<std::string, torch::Tensor> dict;
   dict.reserve(len);
   for (size_t i = 0; i < len; ++i) {
-    auto jname = (jstring) env->GetObjectArrayElement(jnames, i);
+    auto jname = (jstring) env->GetObjectArrayElement(jkeys, i);
     std::string name = djl::utils::jni::GetStringFromJString(env, jname);
     dict.insert(name, *reinterpret_cast<torch::Tensor*>(jptrs[i]));
   }
-  env->ReleaseLongArrayElements(jtensor_ptrs, jptrs, JNI_ABORT);
-  env->DeleteLocalRef(jnames);
-  auto* result_ptr = new torch::IValue(dict);
-  return reinterpret_cast<uintptr_t>(result_ptr);
+  env->ReleaseLongArrayElements(jvalues, jptrs, JNI_ABORT);
+  env->DeleteLocalRef(jkeys);
+  const auto* ivalue_ptr = new torch::IValue(dict);
+  return reinterpret_cast<uintptr_t>(ivalue_ptr);
+  API_END_RETURN()
 }
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToTensor(
@@ -65,12 +150,85 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToTensor(
   API_END_RETURN()
 }
 
-JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToListFromTuple(
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToBool(
     JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
   auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
-  std::vector<torch::IValue> ivalue_vec = ivalue_ptr->toTuple()->elements();
-  return djl::utils::jni::GetPtrArrayFromContainer<std::vector<torch::IValue>, torch::IValue>(env, ivalue_vec);
+  return ivalue_ptr->toBool();
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToLong(JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
+  return ivalue_ptr->toInt();
+  API_END_RETURN()
+}
+
+JNIEXPORT jdouble JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToDouble(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
+  return ivalue_ptr->toDouble();
+  API_END_RETURN()
+}
+
+JNIEXPORT jstring JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToString(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
+  return env->NewStringUTF(ivalue_ptr->toString()->string().c_str());
+  API_END_RETURN()
+}
+
+JNIEXPORT jbooleanArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToBoolList(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
+  torch::List<bool> list = ivalue_ptr->toBoolList();
+  size_t len = list.size();
+  jbooleanArray jarray = env->NewBooleanArray(len);
+  std::vector<jboolean> jptrs;
+  jptrs.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    jptrs[i] = list[i];
+  }
+  env->SetBooleanArrayRegion(jarray, 0, len, jptrs.data());
+  return jarray;
+  API_END_RETURN()
+}
+
+JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToLongList(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
+  torch::List<int64_t> list = ivalue_ptr->toIntList();
+  size_t len = list.size();
+  jlongArray jarray = env->NewLongArray(len);
+  std::vector<jlong> jptrs;
+  jptrs.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    jptrs[i] = list[i];
+  }
+  env->SetLongArrayRegion(jarray, 0, len, jptrs.data());
+  return jarray;
+  API_END_RETURN()
+}
+
+JNIEXPORT jdoubleArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToDoubleList(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
+  torch::List<double> list = ivalue_ptr->toDoubleList();
+  size_t len = list.size();
+  jdoubleArray jarray = env->NewDoubleArray(len);
+  std::vector<jdouble> jptrs;
+  jptrs.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    jptrs[i] = list[i];
+  }
+  env->SetDoubleArrayRegion(jarray, 0, len, jptrs.data());
+  return jarray;
   API_END_RETURN()
 }
 
@@ -83,12 +241,21 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToTens
   API_END_RETURN()
 }
 
-JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToList(
+JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToIValueList(
     JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
   auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
   torch::List<torch::IValue> ivalue_list = ivalue_ptr->toList();
   return djl::utils::jni::GetPtrArrayFromContainer<torch::List<torch::IValue>, torch::IValue>(env, ivalue_list);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToIValueTuple(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
+  std::vector<torch::IValue> ivalue_vec = ivalue_ptr->toTuple()->elements();
+  return djl::utils::jni::GetPtrArrayFromContainer<std::vector<torch::IValue>, torch::IValue>(env, ivalue_vec);
   API_END_RETURN()
 }
 
@@ -113,11 +280,31 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToMap(
   API_END_RETURN()
 }
 
-JNIEXPORT jstring JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToString(
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsTensor(
     JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
-  auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
-  return env->NewStringUTF(ivalue_ptr->toString()->string().c_str());
+  return reinterpret_cast<torch::IValue*>(jhandle)->isTensor();
+  API_END_RETURN()
+}
+
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsBool(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  return reinterpret_cast<torch::IValue*>(jhandle)->isBool();
+  API_END_RETURN()
+}
+
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsLong(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  return reinterpret_cast<torch::IValue*>(jhandle)->isInt();
+  API_END_RETURN()
+}
+
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsDouble(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  return reinterpret_cast<torch::IValue*>(jhandle)->isDouble();
   API_END_RETURN()
 }
 
@@ -128,10 +315,24 @@ JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsString
   API_END_RETURN()
 }
 
-JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsTensor(
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsBoolList(
     JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
-  return reinterpret_cast<torch::IValue*>(jhandle)->isTensor();
+  return reinterpret_cast<torch::IValue*>(jhandle)->isBoolList();
+  API_END_RETURN()
+}
+
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsLongList(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  return reinterpret_cast<torch::IValue*>(jhandle)->isIntList();
+  API_END_RETURN()
+}
+
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsDoubleList(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  return reinterpret_cast<torch::IValue*>(jhandle)->isDoubleList();
   API_END_RETURN()
 }
 
