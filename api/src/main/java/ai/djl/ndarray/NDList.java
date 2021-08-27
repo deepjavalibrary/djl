@@ -139,6 +139,21 @@ public class NDList extends ArrayList<NDArray> implements NDResource {
     }
 
     /**
+     * Returns the first occurrence of the specified element from this NDList if it is present.
+     *
+     * @param name the name of the NDArray
+     * @return the first occurrence
+     */
+    public NDArray get(String name) {
+        for (NDArray array : this) {
+            if (name.equals(array.getName())) {
+                return array;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Removes the first occurrence of the specified element from this NDList if it is present.
      *
      * <p>If this list does not contain the element, it is unchanged. More formally, removes the
