@@ -78,7 +78,7 @@ public class CookingStackExchangeTest {
             String input = "Which baking dish is best to bake a banana bread ?";
             FtModel ftModel = (FtModel) model.getWrappedModel();
             Classifications result = ftModel.classify(input, 8);
-            Assert.assertEquals(result.item(0).getClassName(), "bread");
+            Assert.assertEquals(result.item(0).getClassName(), "__label__bread");
         }
     }
 
