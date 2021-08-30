@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.SymbolBlock;
+import ai.djl.pytorch.jni.IValue;
 import ai.djl.pytorch.jni.IValueUtils;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.ParameterStore;
@@ -86,6 +87,16 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
             manager.detachInternal(uid);
             manager = null;
         }
+    }
+
+    /**
+     * Runs the forward of this PyTorch module.
+     *
+     * @param inputs the input {@link IValue}
+     * @return the result {@link IValue}
+     */
+    public IValue forward(IValue... inputs) {
+        return IValueUtils.forward(this, inputs);
     }
 
     /** {@inheritDoc} */

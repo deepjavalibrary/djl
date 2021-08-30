@@ -491,33 +491,73 @@ final class PyTorchLibrary {
 
     native long iValueFromTensor(long tensorHandle);
 
-    native long iValueFromList(long[] tensorHandles);
+    native long iValueFromBool(boolean value);
 
-    native long iValueFromDict(long[] tensorHandles, String[] names);
+    native long iValueFromLong(long value);
+
+    native long iValueFromDouble(double value);
+
+    native long iValueFromString(String value);
+
+    native long iValueFromBoolList(boolean... value);
+
+    native long iValueFromLongList(long... value);
+
+    native long iValueFromDoubleList(double... value);
+
+    native long iValueFromTensorList(long[] tensorHandles);
+
+    native long iValueFromTuple(long[] ivalueHandles);
+
+    native long iValueFromStringMap(String[] keys, long[] tensorHandles);
 
     native long iValueToTensor(long iValueHandle);
 
-    native long[] iValueToTensorList(long iValueHandle);
+    native boolean iValueToBool(long iValueHandle);
 
-    native long[] iValueToList(long iValueHandle);
+    native long iValueToLong(long iValueHandle);
 
-    native long[] iValueToListFromTuple(long iValueHandle);
-
-    native long[] iValueToMap(long iValueHandle);
+    native double iValueToDouble(long iValueHandle);
 
     native String iValueToString(long iValueHandle);
 
-    native boolean iValueIsString(long iValueHandle);
+    native boolean[] iValueToBoolList(long iValueHandle);
+
+    native long[] iValueToLongList(long iValueHandle);
+
+    native double[] iValueToDoubleList(long iValueHandle);
+
+    native long[] iValueToTensorList(long iValueHandle);
+
+    native long[] iValueToIValueList(long iValueHandle);
+
+    native long[] iValueToIValueTuple(long iValueHandle);
+
+    native long[] iValueToMap(long iValueHandle);
 
     native boolean iValueIsTensor(long iValueHandle);
+
+    native boolean iValueIsBool(long iValueHandle);
+
+    native boolean iValueIsLong(long iValueHandle);
+
+    native boolean iValueIsDouble(long iValueHandle);
+
+    native boolean iValueIsString(long iValueHandle);
+
+    native boolean iValueIsBoolList(long iValueHandle);
+
+    native boolean iValueIsLongList(long iValueHandle);
+
+    native boolean iValueIsDoubleList(long iValueHandle);
 
     native boolean iValueIsTensorList(long iValueHandle);
 
     native boolean iValueIsList(long iValueHandle);
 
-    native boolean iValueIsMap(long iValueHandle);
-
     native boolean iValueIsTuple(long iValueHandle);
+
+    native boolean iValueIsMap(long iValueHandle);
 
     native void zeroGrad(long handle);
 

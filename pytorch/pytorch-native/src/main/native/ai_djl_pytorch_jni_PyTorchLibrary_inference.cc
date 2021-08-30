@@ -183,11 +183,6 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
     JITCallGuard guard;
     return module_ptr->forward(inputs);
   }();
-  // release resource
-  // each IValue is created by new, free the memory after the inference
-  for (auto i = 0; i < len; ++i) {
-    delete reinterpret_cast<torch::IValue*>(jptrs[i]);
-  }
   env->ReleaseLongArrayElements(jivalue_ptrs, jptrs, djl::utils::jni::RELEASE_MODE);
   const auto* result_ptr = new torch::IValue(output);
   return reinterpret_cast<uintptr_t>(result_ptr);
