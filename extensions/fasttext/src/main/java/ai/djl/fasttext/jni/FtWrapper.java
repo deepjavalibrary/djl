@@ -67,11 +67,7 @@ public final class FtWrapper extends NativeResource<Long> {
         List<String> classes = new ArrayList<>(size);
         List<Double> probabilities = new ArrayList<>(size);
         for (int i = 0; i < size; ++i) {
-            String label = labels[i];
-            if (label.startsWith("__label__")) {
-                label = label.substring(9);
-            }
-            classes.add(label);
+            classes.add(labels[i]); // NOPMD
             probabilities.add((double) probs[i]);
         }
         return new Classifications(classes, probabilities);
