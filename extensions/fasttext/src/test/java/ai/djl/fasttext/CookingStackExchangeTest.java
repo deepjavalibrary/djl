@@ -131,7 +131,7 @@ public class CookingStackExchangeTest {
             Classifications result = model.classify(text, 5);
 
             logger.info("{}", result);
-            Assert.assertEquals(result.item(0).getClassName(), "Company");
+            Assert.assertEquals(result.item(0).getClassName(), "__label__Company");
         }
     }
 }
