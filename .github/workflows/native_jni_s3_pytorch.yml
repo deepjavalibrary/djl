@@ -25,12 +25,9 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Workaround for startup run
-        run: ./gradlew jar clean
       - name: Release JNI prep
         run: ./gradlew :pytorch:pytorch-native:releaseJNI
-      - name: Test with Gradle
-        run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
+        run: ./gradlew -Pjni :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -67,12 +64,10 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Workaround for startup run
-        run: ./gradlew jar clean
       - name: Release JNI prep
         run: |
           ./gradlew :pytorch:pytorch-native:releaseJNI
-          ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
+          ./gradlew -Pjni :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

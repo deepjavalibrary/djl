@@ -27,7 +27,7 @@ processResources {
             def file = new File("${jnilibDir}/${entry.key}/${entry.value}")
             if (file.exists()) {
                 project.logger.lifecycle("prebuilt or cached file found for ${entry.value}")
-            } else {
+            } else if (!project.hasProperty("jni")) {
                 project.logger.lifecycle("Downloading ${url}/${entry.key}")
                 file.getParentFile().mkdirs()
                 def downloadPath = new URL("${url}/${entry.key}/${entry.value}")

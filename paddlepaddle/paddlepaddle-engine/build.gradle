@@ -35,7 +35,7 @@ processResources {
                         from jnilibFile
                         into file.getParent()
                     }
-                } else {
+                } else if (!project.hasProperty("jni")) {
                     project.logger.lifecycle("Downloading ${url}/${entry.key}")
                     file.getParentFile().mkdirs()
                     new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }

@@ -21,7 +21,7 @@ jobs:
       - name: Release JNI prep
         run: |
           ./gradlew :extensions:fasttext:compileJNI
-          ./gradlew :extensions:fasttext:test
+          ./gradlew -Pjni :extensions:fasttext:test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -58,7 +58,7 @@ jobs:
       - name: Release JNI prep
         run: |
           ./gradlew :extensions:fasttext:compileJNI
-          ./gradlew :extensions:fasttext:test
+          ./gradlew -Pjni :extensions:fasttext:test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
