@@ -14,6 +14,8 @@ dependencies {
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 
+compileJava.dependsOn(processResources)
+
 processResources {
     outputs.dir file("${project.buildDir}/classes/java/main/native/lib")
     doLast {
@@ -22,37 +24,26 @@ processResources {
                 "linux-x86_64": "libjni_fasttext.so",
                 "osx-x86_64"  : "libjni_fasttext.dylib"
         ]
-        def jniDir = "${project.buildDir}/jnilib"
+        def jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
         files.each { entry ->
-            def downloadPath = new URL("${url}/${entry.key}/${entry.value}")
-            def file = file("${jniDir}/${entry.key}/${entry.value}")
-            if (!file.exists()) {
-                project.logger.lifecycle("${downloadPath}")
+            def file = new File("${jnilibDir}/${entry.key}/${entry.value}")
+            if (file.exists()) {
+                project.logger.lifecycle("prebuilt or cached file found for ${entry.value}")
+            } else {
+                project.logger.lifecycle("Downloading ${url}/${entry.key}")
                 file.getParentFile().mkdirs()
+                def downloadPath = new URL("${url}/${entry.key}/${entry.value}")
                 downloadPath.withInputStream { i -> file.withOutputStream { it << i } }
             }
         }
-        def classDir = "${project.buildDir}/classes/java/main/native/lib"
-        file(classDir).mkdirs()
         copy {
-            from jniDir
-            into classDir
+            from jnilibDir
+            into "${project.buildDir}/classes/java/main/native/lib"
         }
-        // write properties
-        def versionName = "${fasttext_version}"
-        boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
-        if (!isRelease) {
-            versionName += String.format("-%s", new Date().format('yyyyMMdd'))
-        }
-        def propFile = file("${classDir}/fasttext.properties")
-        propFile.text = "version=${versionName}\n"
 
-        // for ci to upload to S3
-        def ciDir = "${project.projectDir}/jnilib/${djl_version}"
-        copy {
-            from jniDir
-            into ciDir
-        }
+        // write properties
+        def propFile = file("${project.buildDir}/classes/java/main/native/lib/fasttext.properties")
+        propFile.text = "version=${fasttext_version}-${version}\n"
     }
 }
 
@@ -81,5 +72,17 @@ task compileJNI {
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
         }
+
+        // for ci to upload to S3
+        def ciDir = "${project.projectDir}/jnilib/${djl_version}"
+        copy {
+            from "${project.buildDir}/jnilib"
+            into ciDir
+        }
+        delete System.getProperty("user.home") + "/.djl.ai/fasttext"
     }
+}
+
+clean.doFirst {
+    delete System.getProperty("user.home") + "/.djl.ai/fasttext"
 }

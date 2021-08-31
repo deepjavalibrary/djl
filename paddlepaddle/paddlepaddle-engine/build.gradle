@@ -10,8 +10,10 @@ dependencies {
     testRuntimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
 }
 
+compileJava.dependsOn(processResources)
+
 processResources {
-    outputs.dir file("${project.buildDir}/jnilib")
+    outputs.dir file("${project.buildDir}/classes/java/main/jnilib")
     doLast {
         def url = "https://publish.djl.ai/paddlepaddle-${paddlepaddle_version}/jnilib"
         def files = [
@@ -19,25 +21,35 @@ processResources {
                 "${djl_version}/osx-x86_64/cpu/libdjl_paddle.dylib"        : "osx-x86_64/cpu/libdjl_paddle.dylib",
                 "${djl_version}/win-x86_64/cpu/djl_paddle.dll"             : "win-x86_64/cpu/djl_paddle.dll"
         ]
-        def classesDir = "${project.buildDir}/jnilib"
+        def jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
         files.each { entry ->
-            project.logger.lifecycle("Downloading ${url}/${entry.key}")
-            def file = new File("${classesDir}/${entry.value}")
+            def file = new File("${jnilibDir}/${entry.value}")
             if (file.exists()) {
                 project.logger.lifecycle("prebuilt or cached file found for ${entry.value}")
             } else {
-                file.getParentFile().mkdirs()
-                new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }
+                def nativeDir = "${project.parent.projectDir}/paddlepaddle-native/jnilib/${djl_version}/"
+                def jnilibFile = new File("${nativeDir}/${entry.value}")
+                if (jnilibFile.exists()) {
+                    project.logger.lifecycle("Copying " + jnilibFile)
+                    copy {
+                        from jnilibFile
+                        into file.getParent()
+                    }
+                } else {
+                    project.logger.lifecycle("Downloading ${url}/${entry.key}")
+                    file.getParentFile().mkdirs()
+                    new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }
+                }
             }
         }
-        // write properties
-        def propFile = file("${classesDir}/paddlepaddle.properties")
-        propFile.text = "version=${version}\n"
-
         copy {
-            from classesDir
+            from jnilibDir
             into "${project.buildDir}/classes/java/main/jnilib"
         }
+
+        // write properties
+        def propFile = file("${project.buildDir}/classes/java/main/jnilib/paddlepaddle.properties")
+        propFile.text = "version=${version}\n"
     }
 }
 
@@ -50,5 +62,11 @@ publishing {
                 url = "http://www.djl.ai/paddlepaddle/${project.name}"
             }
         }
+    }
+}
+
+clean.doFirst {
+    delete fileTree(System.getProperty("user.home") + "/.djl.ai/paddle/") {
+        include '**/*djl_paddle.*'
     }
 }

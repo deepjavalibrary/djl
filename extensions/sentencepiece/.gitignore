@@ -1,2 +1,2 @@
-sentencepiece/
-cmake-build-debug/
+/sentencepiece
+/cmake-build-debug

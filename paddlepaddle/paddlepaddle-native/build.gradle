@@ -17,22 +17,16 @@ def downloadBuild(String os, String flavor) {
             commandLine 'bash', 'build.sh', "${flavor}"
         }
     }
-    def engineDir = "${project.parent.projectDir}/paddlepaddle-engine"
-    def classifier = "${os}-x86_64"
-    def publishDir = "${engineDir}/build/jnilib/${classifier}/${flavor}"
-    copy {
-        def tree = fileTree(project.buildDir)
-        tree.include("**/libdjl_paddle.*", "**/djl_paddle.dll")
-        from tree.files
-        into publishDir
-    }
     // for nightly ci
     // the reason why we duplicate the folder here is to insert djl_version into the path
     // so different versions of JNI wouldn't override each other. We don't also want publishDir
     // to have djl_version as engine would require to know that during the System.load()
+    def classifier = "${os}-x86_64"
     def ciDir = "${project.projectDir}/jnilib/${djl_version}/${classifier}/${flavor}"
     copy {
-        from publishDir
+        def tree = fileTree(project.buildDir)
+        tree.include("**/libdjl_paddle.*", "**/djl_paddle.dll")
+        from tree.files
         into ciDir
     }
 }
@@ -48,20 +42,22 @@ task compileJNI {
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
         }
+        delete fileTree(System.getProperty("user.home") + "/.djl.ai/paddle/") {
+            include '**/*djl_paddle.*'
+        }
     }
 }
-
 
 task prepareNativeLibs() {
     doLast {
         delete "${buildDir}/native"
 
         def files = [
-                "cpu/linux": "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle202/paddle_inference_install_dir-2.0.2-openblas-gcc54-ubuntu.tgz",
+                "cpu/linux"  : "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle202/paddle_inference_install_dir-2.0.2-openblas-gcc54-ubuntu.tgz",
                 "cu101/linux": "https://paddle-inference-lib.bj.bcebos.com/2.0.2-gpu-cuda10.1-cudnn7-avx-mkl/paddle_inference.tgz",
                 "cu102/linux": "https://paddle-inference-lib.bj.bcebos.com/2.0.2-gpu-cuda10.2-cudnn8-avx-mkl/paddle_inference.tgz",
-                "cpu/osx"  : "https://paddle-inference-lib.bj.bcebos.com/mac/2.0.2/cpu_avx_openblas/paddle_inference.tgz",
-                "cpu/win"  : "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-windows-openblas-2.0.2.zip"
+                "cpu/osx"    : "https://paddle-inference-lib.bj.bcebos.com/mac/2.0.2/cpu_avx_openblas/paddle_inference.tgz",
+                "cpu/win"    : "https://alpha-djl-demos.s3.amazonaws.com/temp/paddle_inference_install_dir-windows-openblas-2.0.2.zip"
         ]
 
         def downloadDir = file("${buildDir}/download")
@@ -289,4 +285,9 @@ publishing.repositories {
             url = "build/repo"
         }
     }
+}
+
+clean.doFirst {
+    delete "${project.projectDir}/jnilib"
+    delete "${project.projectDir.getParent()}/paddlepaddle-engine/jnilib"
 }

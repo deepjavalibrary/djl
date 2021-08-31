@@ -11,8 +11,10 @@ dependencies {
     testRuntimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
 }
 
+compileJava.dependsOn(processResources)
+
 processResources {
-    outputs.dir file("${project.buildDir}/jnilib")
+    outputs.dir file("${project.buildDir}/classes/java/main/jnilib")
     doLast {
         def url = "https://publish.djl.ai/pytorch-${pytorch_version}/jnilib"
         def files = [
@@ -25,25 +27,35 @@ processResources {
                 "${djl_version}/win-x86_64/cu102/djl_torch.dll"           : "win-x86_64/cu102/djl_torch.dll",
                 "${djl_version}/win-x86_64/cu111/djl_torch.dll"           : "win-x86_64/cu111/djl_torch.dll"
         ]
-        def classesDir = "${project.buildDir}/jnilib"
+        def jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
         files.each { entry ->
-            def file = new File("${classesDir}/${entry.value}")
+            def file = new File("${jnilibDir}/${entry.value}")
             if (file.exists()) {
                 project.logger.lifecycle("prebuilt or cached file found for ${entry.value}")
             } else {
-                project.logger.lifecycle("Downloading ${url}/${entry.key}")
-                file.getParentFile().mkdirs()
-                new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }
+                def nativeDir = "${project.parent.projectDir}/pytorch-native/jnilib/${djl_version}/"
+                def jnilibFile = new File("${nativeDir}/${entry.value}")
+                if (jnilibFile.exists()) {
+                    project.logger.lifecycle("Copying " + jnilibFile)
+                    copy {
+                        from jnilibFile
+                        into file.getParent()
+                    }
+                } else {
+                    project.logger.lifecycle("Downloading ${url}/${entry.key}")
+                    file.getParentFile().mkdirs()
+                    new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }
+                }
             }
         }
-        // write properties
-        def propFile = file("${classesDir}/pytorch.properties")
-        propFile.text = "version=${version}\n"
-
         copy {
-            from classesDir
+            from jnilibDir
             into "${project.buildDir}/classes/java/main/jnilib"
         }
+
+        // write properties
+        def propFile = file("${project.buildDir}/classes/java/main/jnilib/pytorch.properties")
+        propFile.text = "version=${version}\n"
     }
 }
 
@@ -60,5 +72,11 @@ publishing {
                 url = "http://www.djl.ai/pytorch/${project.name}"
             }
         }
+    }
+}
+
+clean.doFirst {
+    delete fileTree(System.getProperty("user.home") + "/.djl.ai/pytorch/") {
+        include '**/*djl_torch.*'
     }
 }

@@ -1,2 +1,2 @@
-./fastText
-cmake-build-debug/
+/fastText
+/cmake-build-debug
