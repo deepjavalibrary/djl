@@ -43,6 +43,7 @@ task compileJNI {
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
         }
+        delete System.getProperty("user.home") + "/.djl.ai/dlr"
     }
 }
 
@@ -111,8 +112,8 @@ task downloadDlrNativeLib() {
     doLast {
         def url = "https://djl-ai.s3.amazonaws.com/publish/dlr-${dlr_version}/native"
         def files = [
-                "osx/cpu/libdlr.dylib"       : "cpu/osx/native/lib/libdlr.dylib",
-                "linux/cpu/libdlr.so"        : "cpu/linux/native/lib/libdlr.so"
+                "osx/cpu/libdlr.dylib": "cpu/osx/native/lib/libdlr.dylib",
+                "linux/cpu/libdlr.so" : "cpu/linux/native/lib/libdlr.so"
         ]
 
         files.each { entry ->
@@ -215,4 +216,9 @@ flavorNames.each { flavor ->
             }
         }
     }
+}
+
+clean.doFirst {
+    delete "${project.projectDir}/jnilib"
+    delete "${project.projectDir.getParent()}/dlr-engine/jnilib"
 }

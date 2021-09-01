@@ -41,10 +41,6 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: check disk space
         run: df -h
-      - name: Workaround for startup run
-        run: |
-          ./gradlew :pytorch:pytorch-engine:jar :paddlepaddle:paddlepaddle-engine:jar clean
-      # If there are code change on JNI, we need to rebuild to pass tests under pytorch folder
       - name: Compile PyTorch JNI
         run: ./gradlew :pytorch:pytorch-native:compileJNI
       - name: Compile Sentencepiece JNI
@@ -145,9 +141,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Workaround for startup run
-        run: |
-          ./gradlew :pytorch:pytorch-engine:jar :paddlepaddle:paddlepaddle-engine:jar clean
       - name: Compile PyTorch JNI
         run: ./gradlew :pytorch:pytorch-native:compileJNI
       - name: Compile PaddlePaddle JNI
@@ -155,5 +148,5 @@ jobs:
       - name: Integration tests
         # MXNet integration test on Github Action fail due to memory limitation on Windows
         run: |
-          ./gradlew "-Dai.djl.default_engine=PyTorch" test -x examples:test
-          ./gradlew --rerun-tasks "-Dai.djl.default_engine=TensorFlow" test -x examples:test
+          ./gradlew -Pjni "-Dai.djl.default_engine=PyTorch" test -x examples:test
+          ./gradlew -Pjni --rerun-tasks "-Dai.djl.default_engine=TensorFlow" test -x examples:test

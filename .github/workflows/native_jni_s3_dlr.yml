@@ -18,12 +18,10 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Workaround for startup run
-        run: ./gradlew jar clean
       - name: Release JNI prep
         run: ./gradlew :dlr:dlr-native:compileJNI
       - name: Run test
-        run: ./gradlew :dlr:dlr-engine:test
+        run: ./gradlew :dlr:dlr-engine:test -Pjni
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -59,12 +57,10 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Workaround for startup run
-        run: ./gradlew jar clean
       - name: Release JNI prep
         run: |
           ./gradlew :dlr:dlr-native:compileJNI
-          ./gradlew :dlr:dlr-engine:test
+          ./gradlew -Pjni :dlr:dlr-engine:test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

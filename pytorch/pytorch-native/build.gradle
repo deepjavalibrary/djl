@@ -25,22 +25,17 @@ def downloadBuild(String os, String flavor, Boolean isPrecxx11 = false) {
             }
         }
     }
-    def engineDir = "${project.parent.projectDir}/pytorch-engine"
-    def classifier = "${os}-x86_64"
-    def publishDir = "${engineDir}/build/jnilib/${classifier}/${flavor}"
-    copy {
-        def tree = fileTree(project.buildDir)
-        tree.include("**/libdjl_torch.*", "**/djl_torch.dll")
-        from tree.files
-        into publishDir
-    }
+
     // for nightly ci
     // the reason why we duplicate the folder here is to insert djl_version into the path
     // so different versions of JNI wouldn't override each other. We don't also want publishDir
     // to have djl_version as engine would require to know that during the System.load()
+    def classifier = "${os}-x86_64"
     def ciDir = "${project.projectDir}/jnilib/${djl_version}/${classifier}/${flavor}"
     copy {
-        from publishDir
+        def tree = fileTree(project.buildDir)
+        tree.include("**/libdjl_torch.*", "**/djl_torch.dll")
+        from tree.files
         into ciDir
     }
 }
@@ -103,6 +98,10 @@ task releaseJNI {
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'] + (isGPU) ? " GPU" : " CPU")
         }
+
+        delete fileTree(System.getProperty("user.home") + "/.djl.ai/pytorch/") {
+            include '**/*libdjl_torch.*'
+        }
     }
 }
 
@@ -117,6 +116,9 @@ task compileJNI {
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
         }
+        delete fileTree(System.getProperty("user.home") + "/.djl.ai/pytorch/") {
+            include '**/*djl_torch.*'
+        }
     }
 }
 
@@ -128,6 +130,9 @@ task compileJNIGPU {
             downloadBuild("linux", "cu102")
         } else {
             throw new IllegalStateException("Architecture not supported: " + System.properties['os.name'])
+        }
+        delete fileTree(System.getProperty("user.home") + "/.djl.ai/pytorch/") {
+            include '**/*djl_torch.*'
         }
     }
 }
@@ -376,3 +381,7 @@ flavorNames.each { flavor ->
     }
 }
 
+clean.doFirst {
+    delete "${project.projectDir}/jnilib"
+    delete "${project.projectDir.getParent()}/pytorch-engine/jnilib"
+}
