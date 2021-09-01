@@ -135,6 +135,15 @@ public class IValue extends NativeResource<Long> {
     }
 
     /**
+     * Returns if the IValue is a tuple type.
+     *
+     * @return if the IValue is a tuple type
+     */
+    public boolean isTuple() {
+        return PyTorchLibrary.LIB.iValueIsTuple(getHandle());
+    }
+
+    /**
      * Creates a new {@code IValue} of type {@code PtNDArray}.
      *
      * @param value the NDArray value
@@ -362,6 +371,20 @@ public class IValue extends NativeResource<Long> {
     }
 
     /**
+     * Returns the {@code Map&lt;String, IValue&gt;} value of this IValue.
+     *
+     * @return the Map&lt;String, IValue&gt; value of this IValue
+     */
+    public IValue[] toIValueTuple() {
+        long[] handles = PyTorchLibrary.LIB.iValueToIValueTuple(getHandle());
+        IValue[] ret = new IValue[handles.length];
+        for (int i = 0; i < ret.length; ++i) {
+            ret[i] = new IValue(handles[i]);
+        }
+        return ret;
+    }
+
+    /**
      * Returns the {@code NDList} value of this IValue.
      *
      * @param manager the NDManager to create NDArray
@@ -385,6 +408,21 @@ public class IValue extends NativeResource<Long> {
                 value.setName(entry.getKey());
                 list.add(value);
                 iv.close();
+            }
+            return list;
+        } else if (isList()) {
+            NDList list = new NDList();
+            IValue[] tuple = toIValueArray();
+            for (IValue ivalue : tuple) {
+                list.addAll(ivalue.toNDList(manager));
+                ivalue.close();
+            }
+            return list;
+        } else if (isTuple()) {
+            NDList list = new NDList();
+            for (IValue ivalue : toIValueTuple()) {
+                list.addAll(ivalue.toNDList(manager));
+                ivalue.close();
             }
             return list;
         }
