@@ -22,6 +22,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
@@ -38,6 +40,8 @@ public class Arguments {
     private String modelUrl;
     private String modelName;
     private String engine;
+    private String modelOptions;
+    private String modelArguments;
     private String outputDir;
     private int duration;
     private int iteration;
@@ -65,6 +69,8 @@ public class Arguments {
         }
 
         modelName = cmd.getOptionValue("model-name");
+        modelOptions = cmd.getOptionValue("model-options");
+        modelArguments = cmd.getOptionValue("model-arguments");
         outputDir = cmd.getOptionValue("output-dir");
 
         if (cmd.hasOption("engine")) {
@@ -148,6 +154,20 @@ public class Arguments {
                         .hasArg()
                         .argName("MODEL-NAME")
                         .desc("Specify model file name.")
+                        .build());
+        options.addOption(
+                Option.builder()
+                        .longOpt("model-options")
+                        .hasArg()
+                        .argName("MODEL-OPTIONS")
+                        .desc("Specify model loading options.")
+                        .build());
+        options.addOption(
+                Option.builder()
+                        .longOpt("model-arguments")
+                        .hasArg()
+                        .argName("MODEL-ARGUMENTS")
+                        .desc("Specify model loading arguments.")
                         .build());
         options.addOption(
                 Option.builder("e")
@@ -236,6 +256,39 @@ public class Arguments {
 
     String getModelName() {
         return modelName;
+    }
+
+    Map<String, String> getModelOptions() {
+        if (modelOptions == null) {
+            return null;
+        }
+        Map<String, String> map = new ConcurrentHashMap<>();
+        for (String option : modelOptions.split(",")) {
+            String[] tokens = option.split("=", 2);
+            if (tokens.length == 2) {
+                map.put(tokens[0].trim(), tokens[1].trim());
+            } else {
+                map.put(tokens[0].trim(), "");
+            }
+        }
+        return map;
+    }
+
+    Map<String, Object> getModelArguments() {
+        if (modelArguments == null) {
+            return null;
+        }
+
+        Map<String, Object> map = new ConcurrentHashMap<>();
+        for (String option : modelArguments.split(",")) {
+            String[] tokens = option.split("=", 2);
+            if (tokens.length == 2) {
+                map.put(tokens[0].trim(), tokens[1].trim());
+            } else {
+                map.put(tokens[0].trim(), "");
+            }
+        }
+        return map;
     }
 
     int getIteration() {
