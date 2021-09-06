@@ -12,9 +12,15 @@
  */
 package ai.djl.tensorrt.integration;
 
+import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
+import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
+import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.ndarray.NDList;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
@@ -25,7 +31,11 @@ import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
@@ -34,10 +44,14 @@ public class TrtTest {
 
     @Test
     public void testTrtOnnx() throws ModelException, IOException, TranslateException {
+        Engine engine;
         try {
-            Engine.getEngine("TensorRT");
+            engine = Engine.getEngine("TensorRT");
         } catch (Exception ignore) {
             throw new SkipException("Your os configuration doesn't support TensorRT.");
+        }
+        if (!Device.Type.GPU.equals(engine.defaultDevice().getDeviceType())) {
+            throw new SkipException("TensorRT only support GPU.");
         }
         Criteria<float[], float[]> criteria =
                 Criteria.builder()
@@ -51,6 +65,43 @@ public class TrtTest {
             float[] data = new float[] {1, 2, 3, 4};
             float[] ret = predictor.predict(data);
             Assert.assertEquals(ret, data);
+        }
+    }
+
+    @Test
+    public void testTrtUff() throws ModelException, IOException, TranslateException {
+        Engine engine;
+        try {
+            engine = Engine.getEngine("TensorRT");
+        } catch (Exception ignore) {
+            throw new SkipException("Your os configuration doesn't support TensorRT.");
+        }
+        if (!Device.Type.GPU.equals(engine.defaultDevice().getDeviceType())) {
+            throw new SkipException("TensorRT only support GPU.");
+        }
+        List<String> synset =
+                IntStream.range(0, 10).mapToObj(String::valueOf).collect(Collectors.toList());
+        ImageClassificationTranslator translator =
+                ImageClassificationTranslator.builder()
+                        .optFlag(Image.Flag.GRAYSCALE)
+                        .optSynset(synset)
+                        .optApplySoftmax(true)
+                        .addTransform(new ToTensor())
+                        .optBatchifier(null)
+                        .build();
+        Criteria<Image, Classifications> criteria =
+                Criteria.builder()
+                        .setTypes(Image.class, Classifications.class)
+                        .optModelUrls("https://resources.djl.ai/test-models/tensorrt/lenet5.zip")
+                        .optTranslator(translator)
+                        .optEngine("TensorRT")
+                        .build();
+        try (ZooModel<Image, Classifications> model = criteria.loadModel();
+                Predictor<Image, Classifications> predictor = model.newPredictor()) {
+            Path path = Paths.get("../../examples/src/test/resources/0.png");
+            Image image = ImageFactory.getInstance().fromFile(path);
+            Classifications ret = predictor.predict(image);
+            Assert.assertEquals(ret.best().getClassName(), "0");
         }
     }
 

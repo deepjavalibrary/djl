@@ -21,13 +21,13 @@ public class TrtEngineTest {
 
     @Test
     public void getVersion() {
+        String version;
         try {
-            Engine.getEngine("TensorRT");
+            Engine engine = Engine.getEngine("TensorRT");
+            version = engine.getVersion();
         } catch (Exception ignore) {
             throw new SkipException("Your os configuration doesn't support TensorRT.");
         }
-        Engine engine = Engine.getEngine("TensorRT");
-        String version = engine.getVersion();
         Assert.assertEquals(version, "8.0.1");
     }
 }
