@@ -211,7 +211,7 @@ public class Arguments {
 
     static boolean hasHelp(String[] args) {
         List<String> list = Arrays.asList(args);
-        return list.contains("-h") || list.contains("help");
+        return list.contains("-h") || list.contains("--help");
     }
 
     static void printHelp(String msg, Options options) {
