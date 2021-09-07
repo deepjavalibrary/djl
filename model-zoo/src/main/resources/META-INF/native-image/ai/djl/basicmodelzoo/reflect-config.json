@@ -1,6 +1,6 @@
 [
   {
-    "name": "ai.djl.basicmodelzoo.ZooProvider",
+    "name": "ai.djl.basicmodelzoo.BasicZooProvider",
     "allDeclaredConstructors": true,
     "allPublicConstructors": true,
     "allDeclaredMethods": true,
