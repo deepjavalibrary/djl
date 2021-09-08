@@ -507,6 +507,8 @@ final class PyTorchLibrary {
 
     native long iValueFromTensorList(long[] tensorHandles);
 
+    native long iValueFromList(long[] ivalueHandles);
+
     native long iValueFromTuple(long[] ivalueHandles);
 
     native long iValueFromStringMap(String[] keys, long[] tensorHandles);
@@ -534,6 +536,8 @@ final class PyTorchLibrary {
     native long[] iValueToIValueTuple(long iValueHandle);
 
     native long[] iValueToMap(long iValueHandle);
+
+    native String iValueGetType(long iValueHandle);
 
     native boolean iValueIsTensor(long iValueHandle);
 

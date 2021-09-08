@@ -32,6 +32,15 @@ public class IValue extends NativeResource<Long> {
     }
 
     /**
+     * Returns the type of the IValue.
+     *
+     * @return the type of the IValue
+     */
+    public String getType() {
+        return PyTorchLibrary.LIB.iValueGetType(getHandle());
+    }
+
+    /**
      * Returns if the IValue is a {@code Tensor} type.
      *
      * @return if the IValue is a Tensor type
@@ -235,6 +244,28 @@ public class IValue extends NativeResource<Long> {
     }
 
     /**
+     * Creates a new {@code IValue} of type {@code NDArray[]}.
+     *
+     * @param list the NDArray[] value
+     * @return a new {@code IValue} of type {@code NDArray[]}
+     */
+    public static IValue listFrom(IValue... list) {
+        long[] tensors = Arrays.stream(list).mapToLong(IValue::getHandle).toArray();
+        return new IValue(PyTorchLibrary.LIB.iValueFromList(tensors));
+    }
+
+    /**
+     * Creates a new {@code IValue} of type {@code NDArray[]}.
+     *
+     * @param list the NDArray[] value
+     * @return a new {@code IValue} of type {@code NDArray[]}
+     */
+    public static IValue tupleFrom(IValue... list) {
+        long[] tensors = Arrays.stream(list).mapToLong(IValue::getHandle).toArray();
+        return new IValue(PyTorchLibrary.LIB.iValueFromTuple(tensors));
+    }
+
+    /**
      * Creates a new {@code IValue} of type {@code Map[String, PtNDArray]}.
      *
      * @param map the Map[String, IValue] value
@@ -412,8 +443,7 @@ public class IValue extends NativeResource<Long> {
             return list;
         } else if (isList()) {
             NDList list = new NDList();
-            IValue[] tuple = toIValueArray();
-            for (IValue ivalue : tuple) {
+            for (IValue ivalue : toIValueArray()) {
                 list.addAll(ivalue.toNDList(manager));
                 ivalue.close();
             }
