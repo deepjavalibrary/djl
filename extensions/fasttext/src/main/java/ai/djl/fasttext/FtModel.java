@@ -84,6 +84,11 @@ public class FtModel implements Model {
         }
         fta.loadModel(modelFilePath);
 
+        if (options != null) {
+            for (Map.Entry<String, ?> entry : options.entrySet()) {
+                properties.put(entry.getKey(), entry.getValue().toString());
+            }
+        }
         properties.put("model-type", fta.getModelType());
     }
 
@@ -126,7 +131,8 @@ public class FtModel implements Model {
      * @return classifications of the input text
      */
     public Classifications classify(String text, int topK) {
-        return fta.predictProba(text, topK);
+        String labelPrefix = properties.getOrDefault("label-prefix", "__label__");
+        return fta.predictProba(text, topK, labelPrefix);
     }
 
     /**

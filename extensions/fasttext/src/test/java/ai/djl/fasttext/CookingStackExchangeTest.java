@@ -73,12 +73,13 @@ public class CookingStackExchangeTest {
                 Criteria.builder()
                         .setTypes(String.class, Classifications.class)
                         .optArtifactId("ai.djl.fasttext:cooking_stackexchange")
+                        .optOption("label-prefix", "__label")
                         .build();
         try (ZooModel<String, Classifications> model = criteria.loadModel()) {
             String input = "Which baking dish is best to bake a banana bread ?";
             FtModel ftModel = (FtModel) model.getWrappedModel();
             Classifications result = ftModel.classify(input, 8);
-            Assert.assertEquals(result.item(0).getClassName(), "__label__bread");
+            Assert.assertEquals(result.item(0).getClassName(), "__bread");
         }
     }
 
@@ -131,7 +132,7 @@ public class CookingStackExchangeTest {
             Classifications result = model.classify(text, 5);
 
             logger.info("{}", result);
-            Assert.assertEquals(result.item(0).getClassName(), "__label__Company");
+            Assert.assertEquals(result.item(0).getClassName(), "Company");
         }
     }
 }
