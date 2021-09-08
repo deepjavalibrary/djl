@@ -123,6 +123,40 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromTensorL
   API_END_RETURN()
 }
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromList(
+    JNIEnv* env, jobject jthis, jlongArray jvalues) {
+  API_BEGIN()
+  jsize len = env->GetArrayLength(jvalues);
+  jlong* jptrs = env->GetLongArrayElements(jvalues, JNI_FALSE);
+  auto* head = reinterpret_cast<torch::IValue*>(jptrs[0]);
+  c10::impl::GenericList list{c10::unshapedType(head->type())};
+  list.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    list.emplace_back(*reinterpret_cast<torch::IValue*>(jptrs[i]));
+  }
+  env->ReleaseLongArrayElements(jvalues, jptrs, JNI_ABORT);
+  const auto* ivalue_ptr = new torch::IValue{list};
+  return reinterpret_cast<uintptr_t>(ivalue_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromTuple(
+    JNIEnv* env, jobject jthis, jlongArray jvalues) {
+  API_BEGIN()
+  jsize len = env->GetArrayLength(jvalues);
+  jlong* jptrs = env->GetLongArrayElements(jvalues, JNI_FALSE);
+  std::vector<torch::IValue> elements;
+  elements.reserve(len);
+  for (auto i = 0; i < len; ++i) {
+    elements.emplace_back(*reinterpret_cast<torch::IValue*>(jptrs[i]));
+  }
+  c10::intrusive_ptr<c10::ivalue::Tuple> tuple = c10::ivalue::Tuple::create(std::move(elements));
+  env->ReleaseLongArrayElements(jvalues, jptrs, JNI_ABORT);
+  const auto* ivalue_ptr = new torch::IValue{tuple};
+  return reinterpret_cast<uintptr_t>(ivalue_ptr);
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromStringMap(
     JNIEnv* env, jobject jthis, jobjectArray jkeys, jlongArray jvalues) {
   API_BEGIN()
@@ -284,6 +318,14 @@ JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueIsTensor
     JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
   return reinterpret_cast<torch::IValue*>(jhandle)->isTensor();
+  API_END_RETURN()
+}
+
+JNIEXPORT jstring JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueGetType(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  std::string type = reinterpret_cast<torch::IValue*>(jhandle)->type()->str();
+  return env->NewStringUTF(type.c_str());
   API_END_RETURN()
 }
 
