@@ -13,11 +13,9 @@
 
 package ai.djl.modality.cv.translator;
 
-import ai.djl.Model;
 import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.util.List;
@@ -44,9 +42,9 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(NDManager manager, Model model) throws IOException {
+    public void prepare(TranslatorContext ctx) throws IOException {
         if (classes == null) {
-            classes = synsetLoader.load(model);
+            classes = synsetLoader.load(ctx.getModel());
         }
     }
 

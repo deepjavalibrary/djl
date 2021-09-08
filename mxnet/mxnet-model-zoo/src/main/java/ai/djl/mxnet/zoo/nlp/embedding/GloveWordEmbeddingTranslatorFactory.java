@@ -14,7 +14,6 @@ package ai.djl.mxnet.zoo.nlp.embedding;
 
 import ai.djl.Model;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.nn.core.Embedding;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
@@ -60,9 +59,9 @@ public class GloveWordEmbeddingTranslatorFactory implements TranslatorFactory {
         /** {@inheritDoc} */
         @Override
         @SuppressWarnings("unchecked")
-        public void prepare(NDManager manager, Model model) {
+        public void prepare(TranslatorContext ctx) {
             try {
-                embedding = (Embedding<String>) model.getBlock();
+                embedding = (Embedding<String>) ctx.getBlock();
             } catch (ClassCastException e) {
                 throw new IllegalArgumentException("The model was not an embedding", e);
             }

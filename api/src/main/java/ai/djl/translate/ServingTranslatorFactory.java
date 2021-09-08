@@ -276,8 +276,8 @@ public class ServingTranslatorFactory implements TranslatorFactory {
 
         /** {@inheritDoc} */
         @Override
-        public void prepare(NDManager manager, Model model) throws IOException {
-            translator.prepare(manager, model);
+        public void prepare(TranslatorContext ctx) throws Exception {
+            translator.prepare(ctx);
         }
     }
 

@@ -13,7 +13,6 @@
 package ai.djl.examples.inference;
 
 import ai.djl.Application;
-import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
@@ -25,7 +24,6 @@ import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
@@ -165,6 +163,7 @@ public final class ObjectDetectionWithTensorflowSavedModel {
             threshold = 0.7f;
         }
 
+        /** {@inheritDoc} */
         @Override
         public NDList processInput(TranslatorContext ctx, Image input) {
             // input to tf object-detection models is a list of tensors, hence NDList
@@ -177,13 +176,15 @@ public final class ObjectDetectionWithTensorflowSavedModel {
             return new NDList(array);
         }
 
+        /** {@inheritDoc} */
         @Override
-        public void prepare(NDManager manager, Model model) throws IOException {
+        public void prepare(TranslatorContext ctx) throws IOException {
             if (classes == null) {
                 classes = loadSynset();
             }
         }
 
+        /** {@inheritDoc} */
         @Override
         public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
             // output of tf object-detection models is a list of tensors, hence NDList in djl
@@ -232,6 +233,7 @@ public final class ObjectDetectionWithTensorflowSavedModel {
             return new DetectedObjects(retNames, retProbs, retBB);
         }
 
+        /** {@inheritDoc} */
         @Override
         public Batchifier getBatchifier() {
             return null;

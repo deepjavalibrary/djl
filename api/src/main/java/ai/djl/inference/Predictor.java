@@ -13,7 +13,6 @@
 package ai.djl.inference;
 
 import ai.djl.Model;
-import ai.djl.engine.EngineException;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.LazyNDArray;
 import ai.djl.ndarray.NDArray;
@@ -135,7 +134,7 @@ public class Predictor<I, O> implements AutoCloseable {
         long begin = System.nanoTime();
         try (PredictorContext context = new PredictorContext()) {
             if (!prepared) {
-                translator.prepare(manager, model);
+                translator.prepare(context);
                 prepared = true;
             }
             Batchifier batchifier = translator.getBatchifier();
@@ -166,9 +165,7 @@ public class Predictor<I, O> implements AutoCloseable {
             List<O> ret = processOutputs(context, result);
             postProcessEnd(begin);
             return ret;
-        } catch (EngineException e) {
-            throw new TranslateException(e);
-        } catch (TranslateException | RuntimeException e) {
+        } catch (TranslateException e) {
             throw e;
         } catch (Exception e) {
             throw new TranslateException(e);
@@ -282,6 +279,18 @@ public class Predictor<I, O> implements AutoCloseable {
         @Override
         public NDManager getNDManager() {
             return ctxManager;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public NDManager getPredictorManager() {
+            return manager;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Block getBlock() {
+            return block;
         }
 
         /** {@inheritDoc} */

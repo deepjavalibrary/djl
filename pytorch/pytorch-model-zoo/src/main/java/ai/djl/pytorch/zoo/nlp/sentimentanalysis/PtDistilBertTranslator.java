@@ -21,7 +21,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
-import ai.djl.translate.StackBatchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
@@ -38,12 +37,13 @@ public class PtDistilBertTranslator implements Translator<String, Classification
     /** {@inheritDoc} */
     @Override
     public Batchifier getBatchifier() {
-        return new StackBatchifier();
+        return Batchifier.STACK;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(NDManager manager, Model model) throws IOException {
+    public void prepare(TranslatorContext ctx) throws IOException {
+        Model model = ctx.getModel();
         URL url = model.getArtifact("distilbert-base-uncased-finetuned-sst-2-english-vocab.txt");
         vocabulary =
                 SimpleVocabulary.builder()

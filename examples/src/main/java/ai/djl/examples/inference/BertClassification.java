@@ -13,7 +13,6 @@
 package ai.djl.examples.inference;
 
 import ai.djl.MalformedModelException;
-import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
@@ -115,7 +114,7 @@ public final class BertClassification {
 
         /** {@inheritDoc} */
         @Override
-        public void prepare(NDManager manager, Model model) throws IOException {
+        public void prepare(TranslatorContext ctx) throws IOException {
             SimpleVocabulary vocabulary =
                     SimpleVocabulary.builder()
                             .optMinFrequency(1)

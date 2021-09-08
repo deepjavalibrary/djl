@@ -12,11 +12,9 @@
  */
 package ai.djl.modality.cv.translator;
 
-import ai.djl.Model;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDManager;
-import java.io.IOException;
+import ai.djl.translate.TranslatorContext;
 import java.util.List;
 import java.util.Map;
 
@@ -47,9 +45,9 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(NDManager manager, Model model) throws IOException {
+    public void prepare(TranslatorContext ctx) throws Exception {
         if (classes == null) {
-            classes = synsetLoader.load(model);
+            classes = synsetLoader.load(ctx.getModel());
         }
     }
 
