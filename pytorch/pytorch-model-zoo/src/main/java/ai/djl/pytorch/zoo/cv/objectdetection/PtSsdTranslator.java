@@ -12,7 +12,6 @@
  */
 package ai.djl.pytorch.zoo.cv.objectdetection;
 
-import ai.djl.Model;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
@@ -23,7 +22,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.translate.TranslatorContext;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,9 +57,10 @@ public class PtSsdTranslator extends ObjectDetectionTranslator {
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(NDManager manager, Model model) throws IOException {
-        super.prepare(manager, model);
-        boxRecover = boxRecover(model.getNDManager(), figSize, featSize, steps, scale, aspectRatio);
+    public void prepare(TranslatorContext ctx) throws Exception {
+        super.prepare(ctx);
+        NDManager manager = ctx.getPredictorManager();
+        boxRecover = boxRecover(manager, figSize, featSize, steps, scale, aspectRatio);
     }
 
     /** {@inheritDoc} */

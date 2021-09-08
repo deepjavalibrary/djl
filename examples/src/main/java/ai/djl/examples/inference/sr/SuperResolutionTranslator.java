@@ -24,18 +24,21 @@ import ai.djl.translate.TranslatorContext;
 
 public class SuperResolutionTranslator implements Translator<Image, Image> {
 
+    /** {@inheritDoc} */
     @Override
-    public NDList processInput(TranslatorContext ctx, Image input) throws Exception {
+    public NDList processInput(TranslatorContext ctx, Image input) {
         NDManager manager = ctx.getNDManager();
         return new NDList(input.toNDArray(manager).toType(DataType.FLOAT32, false));
     }
 
+    /** {@inheritDoc} */
     @Override
-    public Image processOutput(TranslatorContext ctx, NDList list) throws Exception {
+    public Image processOutput(TranslatorContext ctx, NDList list) {
         NDArray output = list.get(0).clip(0, 255).toType(DataType.UINT8, false);
         return ImageFactory.getInstance().fromNDArray(output.squeeze());
     }
 
+    /** {@inheritDoc} */
     @Override
     public Batchifier getBatchifier() {
         return Batchifier.STACK;

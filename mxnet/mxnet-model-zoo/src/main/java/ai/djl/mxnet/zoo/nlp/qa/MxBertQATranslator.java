@@ -53,7 +53,8 @@ public class MxBertQATranslator extends QATranslator {
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(NDManager manager, Model model) throws IOException {
+    public void prepare(TranslatorContext ctx) throws IOException {
+        Model model = ctx.getModel();
         vocabulary =
                 SimpleVocabulary.builder()
                         .optMinFrequency(1)

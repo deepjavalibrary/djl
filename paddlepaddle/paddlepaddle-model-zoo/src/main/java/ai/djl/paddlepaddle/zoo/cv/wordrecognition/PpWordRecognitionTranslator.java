@@ -13,12 +13,10 @@
 
 package ai.djl.paddlepaddle.zoo.cv.wordrecognition;
 
-import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
@@ -37,8 +35,9 @@ public class PpWordRecognitionTranslator implements Translator<Image, String> {
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(NDManager manager, Model model) throws IOException {
-        try (InputStream is = model.getArtifact("rec_crnn/ppocr_keys_v1.txt").openStream()) {
+    public void prepare(TranslatorContext ctx) throws IOException {
+        try (InputStream is =
+                ctx.getModel().getArtifact("rec_crnn/ppocr_keys_v1.txt").openStream()) {
             table = Utils.readLines(is, true);
             table.add(0, "blank");
             table.add("");
@@ -47,7 +46,7 @@ public class PpWordRecognitionTranslator implements Translator<Image, String> {
 
     /** {@inheritDoc} */
     @Override
-    public String processOutput(TranslatorContext ctx, NDList list) throws IOException {
+    public String processOutput(TranslatorContext ctx, NDList list) {
         StringBuilder sb = new StringBuilder();
         NDArray tokens = list.singletonOrThrow();
         long[] indices = tokens.get(0).argMax(1).toLongArray();

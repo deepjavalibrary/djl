@@ -19,7 +19,6 @@ import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.translator.ObjectDetectionTranslator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,12 +60,6 @@ public class TfSsdTranslator extends ObjectDetectionTranslator {
         // remove batchifier and manually batch input in preprocess. See:
         // https://tfhub.dev/google/openimages_v4/ssd/mobilenet_v2/1
         return new NDList(super.processInput(ctx, input).get(0).expandDims(0));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Batchifier getBatchifier() {
-        return null;
     }
 
     /** {@inheritDoc} */
@@ -226,6 +219,7 @@ public class TfSsdTranslator extends ObjectDetectionTranslator {
         @Override
         protected void configPreProcess(Map<String, ?> arguments) {
             super.configPreProcess(arguments);
+            optBatchifier(null); // override parent batchifier
         }
 
         /** {@inheritDoc} */

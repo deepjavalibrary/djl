@@ -71,13 +71,7 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
         return pipeline;
     }
 
-    /**
-     * Processes the {@link Image} input and converts it to NDList.
-     *
-     * @param ctx the toolkit that helps create the input NDArray
-     * @param input the {@link Image} input
-     * @return a {@link NDList}
-     */
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, Image input) {
         NDArray array = input.toNDArray(ctx.getNDManager(), flag);

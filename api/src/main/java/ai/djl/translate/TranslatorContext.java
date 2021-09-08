@@ -16,6 +16,7 @@ import ai.djl.Model;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.Block;
 
 /**
  * The {@code TranslatorContext} interface provides a toolkit for pre-processing and postprocessing
@@ -38,6 +39,20 @@ public interface TranslatorContext extends AutoCloseable {
      * @return the {@link NDManager}
      */
     NDManager getNDManager();
+
+    /**
+     * Returns the Predictor's {@link NDManager}.
+     *
+     * @return the Predictor's {@link NDManager}
+     */
+    NDManager getPredictorManager();
+
+    /**
+     * Returns the block from the {@code TranslatorContext}.
+     *
+     * @return the block from the {@code TranslatorContext}
+     */
+    Block getBlock();
 
     /**
      * Returns the Metric tool to do benchmark.

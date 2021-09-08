@@ -12,7 +12,6 @@
  */
 package ai.djl.modality.cv.translator;
 
-import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
@@ -20,7 +19,6 @@ import ai.djl.modality.cv.output.Mask;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Transform;
@@ -68,9 +66,9 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(NDManager manager, Model model) throws IOException {
+    public void prepare(TranslatorContext ctx) throws IOException {
         if (classes == null) {
-            classes = synsetLoader.load(model);
+            classes = synsetLoader.load(ctx.getModel());
         }
     }
 
