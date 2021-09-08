@@ -65,7 +65,7 @@ public class TextClassificationModelLoader extends BaseModelLoader {
         }
         Model model = new FtModel(modelName);
         Path modelPath = mrl.getRepository().getResourceDirectory(artifact);
-        model.load(modelPath);
+        model.load(modelPath, modelName, criteria.getOptions());
         return new ZooModel<>(model, null);
     }
 }
