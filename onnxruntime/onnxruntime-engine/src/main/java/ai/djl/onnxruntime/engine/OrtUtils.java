@@ -12,8 +12,7 @@
  */
 package ai.djl.onnxruntime.engine;
 
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDManager;
+import ai.djl.engine.EngineException;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.onnxruntime.OnnxJavaType;
@@ -22,7 +21,6 @@ import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -32,38 +30,38 @@ final class OrtUtils {
 
     private OrtUtils() {}
 
-    public static OnnxTensor toTensor(OrtEnvironment env, NDArray array) throws OrtException {
-        ByteBuffer bb = array.toByteBuffer();
-        DataType dataType = array.getDataType();
-        Buffer buf = dataType.asDataType(bb);
-        return toTensor(env, buf, array.getShape(), dataType);
-    }
-
     public static OnnxTensor toTensor(
-            OrtEnvironment env, Buffer data, Shape shape, DataType dataType) throws OrtException {
+            OrtEnvironment env, Buffer data, Shape shape, DataType dataType) {
         if (shape.size() == 0) {
             throw new UnsupportedOperationException("OnnxRuntime doesn't support 0 length tensor.");
         }
+        if (data instanceof ByteBuffer) {
+            data = dataType.asDataType((ByteBuffer) data);
+        }
         long[] sh = shape.getShape();
-        switch (dataType) {
-            case FLOAT32:
-                return OnnxTensor.createTensor(env, (FloatBuffer) data, sh);
-            case FLOAT64:
-                return OnnxTensor.createTensor(env, (DoubleBuffer) data, sh);
-            case INT32:
-                return OnnxTensor.createTensor(env, (IntBuffer) data, sh);
-            case INT64:
-                return OnnxTensor.createTensor(env, (LongBuffer) data, sh);
-            case INT8:
-            case UINT8:
-                return OnnxTensor.createTensor(env, (ByteBuffer) data, sh, OnnxJavaType.INT8);
-            case STRING:
-                throw new UnsupportedOperationException(
-                        "Use toTensor(OrtEnvironment env, String[] inputs, Shape shape) instead.");
-            case BOOLEAN:
-            case FLOAT16:
-            default:
-                throw new UnsupportedOperationException("Data type not supported: " + dataType);
+        try {
+            switch (dataType) {
+                case FLOAT32:
+                    return OnnxTensor.createTensor(env, (FloatBuffer) data, sh);
+                case FLOAT64:
+                    return OnnxTensor.createTensor(env, (DoubleBuffer) data, sh);
+                case INT32:
+                    return OnnxTensor.createTensor(env, (IntBuffer) data, sh);
+                case INT64:
+                    return OnnxTensor.createTensor(env, (LongBuffer) data, sh);
+                case INT8:
+                case UINT8:
+                    return OnnxTensor.createTensor(env, (ByteBuffer) data, sh, OnnxJavaType.INT8);
+                case STRING:
+                    throw new UnsupportedOperationException(
+                            "Use toTensor(OrtEnvironment env, String[] inputs, Shape shape) instead.");
+                case BOOLEAN:
+                case FLOAT16:
+                default:
+                    throw new UnsupportedOperationException("Data type not supported: " + dataType);
+            }
+        } catch (OrtException e) {
+            throw new EngineException(e);
         }
     }
 
@@ -71,19 +69,6 @@ final class OrtUtils {
             throws OrtException {
         long[] sh = shape.getShape();
         return OnnxTensor.createTensor(env, inputs, sh);
-    }
-
-    public static NDArray toNDArray(NDManager manager, OnnxTensor tensor) {
-        if (manager instanceof OrtNDManager) {
-            return ((OrtNDManager) manager).create(tensor);
-        }
-        ByteBuffer bb = tensor.getByteBuffer();
-        bb.order(ByteOrder.nativeOrder());
-        DataType dataType = OrtUtils.toDataType(tensor.getInfo().type);
-        Shape shape = new Shape(tensor.getInfo().getShape());
-        Buffer buf = dataType.asDataType(bb);
-        tensor.close();
-        return manager.create(buf, shape, dataType);
     }
 
     public static DataType toDataType(OnnxJavaType javaType) {

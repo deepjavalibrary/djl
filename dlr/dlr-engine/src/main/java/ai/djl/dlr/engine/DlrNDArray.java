@@ -12,7 +12,6 @@
  */
 package ai.djl.dlr.engine;
 
-import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrayAdapter;
 import ai.djl.ndarray.NDManager;
@@ -22,90 +21,23 @@ import java.nio.ByteBuffer;
 import java.util.UUID;
 
 /** {@code DlrNDArray} is the DLR implementation of {@link NDArray}. */
-public class DlrNDArray implements NDArrayAdapter {
+public class DlrNDArray extends NDArrayAdapter {
 
-    private DlrNDManager manager;
     private ByteBuffer data;
-    private Shape shape;
-    private String name;
-    private boolean isClosed;
-    private String uid;
 
     /**
      * Constructs an DLR NDArray from a {@link DlrNDManager} (internal. Use {@link NDManager}
      * instead).
      *
      * @param manager the manager to attach the new array to
+     * @param alternativeManager the alternative manager to execute unsupported operation
      * @param data the underlying data
      * @param shape the shape of {@code DlrNDArray}
      */
-    DlrNDArray(DlrNDManager manager, ByteBuffer data, Shape shape) {
-        this.manager = manager;
+    DlrNDArray(DlrNDManager manager, NDManager alternativeManager, ByteBuffer data, Shape shape) {
+        super(manager, alternativeManager, shape, DataType.FLOAT32, UUID.randomUUID().toString());
         this.data = data;
-        this.shape = shape;
-        uid = UUID.randomUUID().toString();
         manager.attachInternal(uid, this);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDManager getManager() {
-        return manager;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getUid() {
-        return uid;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public DataType getDataType() {
-        // DLR only supports float32
-        return DataType.FLOAT32;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Device getDevice() {
-        // TODO: support GPU
-        return Device.cpu();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getShape() {
-        return shape;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attach(NDManager manager) {
-        detach();
-        this.manager = (DlrNDManager) manager;
-        manager.attachInternal(getUid(), this);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void tempAttach(NDManager manager) {
-        detach();
-        NDManager original = this.manager;
-        this.manager = (DlrNDManager) manager;
-        manager.tempAttachInternal(original, getUid(), this);
     }
 
     /** {@inheritDoc} */
@@ -120,20 +52,5 @@ public class DlrNDArray implements NDArrayAdapter {
     public ByteBuffer toByteBuffer() {
         data.rewind();
         return data;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        if (isClosed) {
-            return "This array is already closed";
-        }
-        return toDebugString();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void close() {
-        isClosed = true;
     }
 }

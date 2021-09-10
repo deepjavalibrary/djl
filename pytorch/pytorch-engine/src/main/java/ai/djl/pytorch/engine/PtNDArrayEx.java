@@ -28,8 +28,7 @@ import java.util.List;
 /** {@code PtNDArrayEx} is the PyTorch implementation of the {@link NDArrayEx}. */
 public class PtNDArrayEx implements NDArrayEx {
 
-    private static final NDArrayIndexer INDEXER = new PtNDArrayIndexer();
-
+    private NDArrayIndexer indexer;
     private PtNDArray array;
 
     /**
@@ -39,6 +38,7 @@ public class PtNDArrayEx implements NDArrayEx {
      */
     PtNDArrayEx(PtNDArray parent) {
         this.array = parent;
+        indexer = new PtNDArrayIndexer(array.getManager());
     }
 
     /** {@inheritDoc} */
@@ -615,7 +615,7 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArrayIndexer getIndexer() {
-        return INDEXER;
+        return indexer;
     }
 
     /** {@inheritDoc} */

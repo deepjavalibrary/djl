@@ -41,13 +41,13 @@ public class TfLiteTest {
                         .optEngine("TFLite")
                         .optFilter("dataset", "aiyDish")
                         .build();
-        ZooModel<Image, Classifications> model = criteria.loadModel();
-        Predictor<Image, Classifications> predictor = model.newPredictor();
-
-        Image image =
-                ImageFactory.getInstance()
-                        .fromUrl("https://resources.djl.ai/images/sachertorte.jpg");
-        Classifications prediction = predictor.predict(image);
-        Assert.assertEquals(prediction.best().getClassName(), "Sachertorte");
+        try (ZooModel<Image, Classifications> model = criteria.loadModel();
+                Predictor<Image, Classifications> predictor = model.newPredictor()) {
+            Image image =
+                    ImageFactory.getInstance()
+                            .fromUrl("https://resources.djl.ai/images/sachertorte.jpg");
+            Classifications prediction = predictor.predict(image);
+            Assert.assertEquals(prediction.best().getClassName(), "Sachertorte");
+        }
     }
 }

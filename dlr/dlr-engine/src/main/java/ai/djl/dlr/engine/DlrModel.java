@@ -13,7 +13,6 @@
 package ai.djl.dlr.engine;
 
 import ai.djl.BaseModel;
-import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
@@ -33,22 +32,18 @@ import java.util.Map;
  */
 public class DlrModel extends BaseModel {
 
-    private Device predictorDevice;
-
     /**
      * Constructs a new Model on a given device.
      *
      * @param name the model name
      * @param manager the {@link NDManager} to holds the NDArray
-     * @param device the {@link Device} to create DlrModel on
      */
-    DlrModel(String name, NDManager manager, Device device) {
+    DlrModel(String name, NDManager manager) {
         super(name);
         this.manager = manager;
         this.manager.setName("dlrModel");
         // DLR only support float32
         dataType = DataType.FLOAT32;
-        this.predictorDevice = device;
     }
 
     /** {@inheritDoc} */
@@ -67,7 +62,7 @@ public class DlrModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new DlrPredictor<>(this, modelDir.toString(), predictorDevice, translator);
+        return new DlrPredictor<>(this, modelDir.toString(), manager.getDevice(), translator);
     }
 
     private void checkModelFiles(String prefix) throws IOException {

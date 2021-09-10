@@ -32,8 +32,11 @@ public class XgbNDManager extends BaseNDManager {
 
     private static final XgbNDManager SYSTEM_MANAGER = new SystemManager();
 
+    private NDManager alternativeManager;
+
     private XgbNDManager(NDManager parent, Device device) {
         super(parent, device);
+        alternativeManager = getAlternativeManager();
     }
 
     static XgbNDManager getSystemManager() {
@@ -44,6 +47,15 @@ public class XgbNDManager extends BaseNDManager {
     @Override
     public ByteBuffer allocateDirect(int capacity) {
         return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public XgbNDArray adopt(NDArray array) {
+        if (array instanceof XgbNDArray) {
+            return (XgbNDArray) array;
+        }
+        return createDirect(array.toByteBuffer(), array.getShape(), DataType.FLOAT32);
     }
 
     /** {@inheritDoc} */
@@ -60,75 +72,82 @@ public class XgbNDManager extends BaseNDManager {
         return Engine.getEngine(XgbEngine.ENGINE_NAME);
     }
 
+    /**
+     * Creates a new instance of {@code XgbNDArray}.
+     *
+     * <p>For internal use only. The created instance cannot be used as input to XGBoost engine.
+     *
+     * @param data the data to initialize the {@code XgbNDArray}
+     * @param shape the {@link Shape} of the {@code XgbNDArray}
+     * @return a new instance of {@code XgbNDArray}
+     */
+    public XgbNDArray createForOutput(ByteBuffer data, Shape shape) {
+        return new XgbNDArray(this, alternativeManager, data, shape);
+    }
+
     /** {@inheritDoc} */
     @Override
-    public XgbNDArray create(Buffer data, Shape shape, DataType dataType) {
+    public XgbNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
         if (shape.dimension() != 2) {
             throw new UnsupportedOperationException("Shape must be in two dimension");
         }
+        if (dataType != DataType.FLOAT32) {
+            throw new UnsupportedOperationException("Only float32 supported");
+        }
+
+        if (data.isDirect() && data instanceof ByteBuffer) {
+            // TODO: allow user to set missing value
+            long handle = JniUtils.createDMatrix(data, shape, 0.0f);
+            return new XgbNDArray(this, alternativeManager, handle, shape, SparseFormat.DENSE);
+        }
+
         DataType inputType = DataType.fromBuffer(data);
         if (inputType != DataType.FLOAT32) {
             throw new UnsupportedOperationException(
                     "Only Float32 data type supported, actual " + inputType);
         }
-        if (data.isDirect() && data instanceof ByteBuffer) {
-            // TODO: allow user to set missing value
-            long handle = JniUtils.createDMatrix(data, shape, 0.0f);
-            return new XgbNDArray(this, handle, shape, SparseFormat.DENSE);
-        }
 
-        int size = data.remaining();
-        int numOfBytes = inputType.getNumOfBytes();
-        ByteBuffer buf = allocateDirect(size * numOfBytes);
+        int size = Math.toIntExact(shape.size() * DataType.FLOAT32.getNumOfBytes());
+        ByteBuffer buf = allocateDirect(size);
         buf.asFloatBuffer().put((FloatBuffer) data);
         buf.rewind();
         long handle = JniUtils.createDMatrix(buf, shape, 0.0f);
-        return new XgbNDArray(this, handle, shape, SparseFormat.DENSE);
+        return new XgbNDArray(this, alternativeManager, handle, shape, SparseFormat.DENSE);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray createCSR(
-            float[] data, long[] indptr, long[] indices, Shape shape, Device device) {
+    public NDArray create(Buffer data, Shape shape, DataType dataType) {
+        if (alternativeManager != null) {
+            return alternativeManager.create(data, shape, dataType);
+        }
+        return createDirect(data, shape, DataType.FLOAT32);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray createCSR(Buffer buffer, long[] indptr, long[] indices, Shape shape) {
         if (shape.dimension() != 2) {
             throw new UnsupportedOperationException("Shape must be in two dimension");
         }
         int[] intIndices = Arrays.stream(indices).mapToInt(Math::toIntExact).toArray();
+        float[] data = new float[buffer.remaining()];
+        ((FloatBuffer) buffer).get(data);
         long handle = JniUtils.createDMatrixCSR(indptr, intIndices, data);
-        return new XgbNDArray(this, handle, shape, SparseFormat.CSR);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray createCSR(
-            Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
-        throw new UnsupportedOperationException(
-                "Create from Buffer is not supported, please use create from float[] instead");
+        return new XgbNDArray(this, alternativeManager, handle, shape, SparseFormat.CSR);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray zeros(Shape shape, DataType dataType) {
-        if (dataType != DataType.FLOAT32) {
-            throw new UnsupportedOperationException("Only float32 supported");
-        }
-        if (shape.dimension() != 2) {
-            throw new UnsupportedOperationException("Shape must be in two dimension");
-        }
         int size = Math.toIntExact(4 * shape.size());
         ByteBuffer buffer = allocateDirect(size);
-        return create(dataType.asDataType(buffer), shape, dataType);
+        return createDirect(buffer, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray ones(Shape shape, DataType dataType) {
-        if (dataType != DataType.FLOAT32) {
-            throw new UnsupportedOperationException("Only float32 supported");
-        }
-        if (shape.dimension() != 2) {
-            throw new UnsupportedOperationException("Shape must be in two dimension");
-        }
         long size = shape.size();
         int bytes = Math.toIntExact(4 * size);
         ByteBuffer buffer = allocateDirect(bytes);
@@ -136,7 +155,7 @@ public class XgbNDManager extends BaseNDManager {
             buffer.putFloat(1f);
         }
         buffer.rewind();
-        return create(dataType.asDataType(buffer), shape, dataType);
+        return createDirect(buffer, shape, dataType);
     }
 
     /** The SystemManager is the root {@link XgbNDManager} of which all others are children. */

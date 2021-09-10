@@ -12,7 +12,6 @@
  */
 package ai.djl.ml.xgboost;
 
-import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrayAdapter;
 import ai.djl.ndarray.NDManager;
@@ -25,80 +24,34 @@ import java.util.concurrent.atomic.AtomicLong;
 import ml.dmlc.xgboost4j.java.JniUtils;
 
 /** {@code XgbNDArray} is the XGBoost implementation of {@link NDArray}. */
-public class XgbNDArray implements NDArrayAdapter {
+public class XgbNDArray extends NDArrayAdapter {
 
     private AtomicLong handle;
-    private String name;
-    private String uid;
     private ByteBuffer data;
-    private XgbNDManager manager;
-    private Shape shape;
-    private boolean isClosed;
     private SparseFormat format;
 
-    XgbNDArray(XgbNDManager manager, long handle, Shape shape, SparseFormat format) {
+    XgbNDArray(
+            NDManager manager,
+            NDManager alternativeManager,
+            long handle,
+            Shape shape,
+            SparseFormat format) {
+        super(manager, alternativeManager, shape, DataType.FLOAT32, String.valueOf(handle));
         this.handle = new AtomicLong(handle);
-        this.uid = String.valueOf(handle);
-        this.manager = manager;
-        this.manager.attachInternal(uid, this);
-        this.shape = shape;
         this.format = format;
+        manager.attachInternal(uid, this);
     }
 
-    XgbNDArray(XgbNDManager manager, ByteBuffer data, Shape shape) {
-        this.manager = manager;
-        this.uid = UUID.randomUUID().toString();
-        this.manager.attachInternal(uid, this);
-        this.shape = shape;
+    XgbNDArray(NDManager manager, NDManager alternativeManager, ByteBuffer data, Shape shape) {
+        super(manager, alternativeManager, shape, DataType.FLOAT32, UUID.randomUUID().toString());
         this.data = data;
         this.format = SparseFormat.DENSE;
+        manager.attachInternal(uid, this);
     }
 
     /** {@inheritDoc} */
     public long getHandle() {
         return handle.get();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public XgbNDManager getManager() {
-        return manager;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getUid() {
-        return uid;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public DataType getDataType() {
-        return DataType.FLOAT32;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Device getDevice() {
-        return Device.cpu();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getShape() {
-        return shape;
     }
 
     /** {@inheritDoc} */
@@ -118,23 +71,6 @@ public class XgbNDArray implements NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public void attach(NDManager manager) {
-        detach();
-        this.manager = (XgbNDManager) manager;
-        manager.attachInternal(getUid(), this);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void tempAttach(NDManager manager) {
-        detach();
-        NDManager original = this.manager;
-        this.manager = (XgbNDManager) manager;
-        manager.tempAttachInternal(original, getUid(), this);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void detach() {
         manager.detachInternal(getUid());
         manager = XgbNDManager.getSystemManager();
@@ -142,24 +78,11 @@ public class XgbNDArray implements NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public String toString() {
-        if (isClosed) {
-            return "This array is already closed";
-        }
-        return toDebugString();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void close() {
+        super.close();
         if (handle != null && handle.get() != 0L) {
             long pointer = handle.getAndSet(0L);
             JniUtils.deleteDMatrix(pointer);
         }
-        if (data != null) {
-            data = null;
-        }
-        manager.detachInternal(getUid());
-        isClosed = true;
     }
 }

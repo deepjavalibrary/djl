@@ -33,6 +33,7 @@ public final class TfLiteEngine extends Engine {
     static final int RANK = 10;
 
     private Engine alternativeEngine;
+    private boolean initialized;
 
     private TfLiteEngine() {
         LibUtils.loadLibrary();
@@ -40,6 +41,20 @@ public final class TfLiteEngine extends Engine {
 
     static Engine newInstance() {
         return new TfLiteEngine();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Engine getAlternativeEngine() {
+        if (!initialized && !Boolean.getBoolean("ai.djl.tflite.disable_alternative")) {
+            Engine engine = Engine.getInstance();
+            if (engine.getRank() < getRank()) {
+                // alternativeEngine should not have the same rank as TFLite
+                alternativeEngine = engine;
+            }
+            initialized = true;
+        }
+        return alternativeEngine;
     }
 
     /** {@inheritDoc} */
@@ -52,20 +67,6 @@ public final class TfLiteEngine extends Engine {
     @Override
     public int getRank() {
         return RANK;
-    }
-
-    private Engine getAlternativeEngine() {
-        if (Boolean.getBoolean("ai.djl.tflite.disable_alternative")) {
-            return null;
-        }
-        if (alternativeEngine == null) {
-            Engine engine = Engine.getInstance();
-            if (engine.getRank() < getRank()) {
-                // alternativeEngine should not have the same rank as ORT
-                alternativeEngine = engine;
-            }
-        }
-        return alternativeEngine;
     }
 
     /** {@inheritDoc} */
@@ -103,9 +104,6 @@ public final class TfLiteEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager(Device device) {
-        if (getAlternativeEngine() != null) {
-            return alternativeEngine.newBaseManager(device);
-        }
         return TfLiteNDManager.getSystemManager().newSubManager(device);
     }
 
@@ -124,13 +122,6 @@ public final class TfLiteEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append(getEngineName()).append(':').append(getVersion()).append(", ");
-        if (alternativeEngine != null) {
-            sb.append("Alternative engine: ").append(alternativeEngine.getEngineName());
-        } else {
-            sb.append("No alternative engine found");
-        }
-        return sb.toString();
+        return getEngineName() + ':' + getVersion();
     }
 }

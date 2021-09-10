@@ -70,13 +70,15 @@ public class OrtModel extends BaseModel {
 
         try {
             Device device = manager.getDevice();
+            OrtSession session;
             if (Device.Type.GPU.equals(device.getDeviceType())) {
                 OrtSession.SessionOptions sessionOptions = new OrtSession.SessionOptions();
                 sessionOptions.addCUDA(manager.getDevice().getDeviceId());
-                block = new OrtSymbolBlock(env.createSession(modelFile.toString(), sessionOptions));
+                session = env.createSession(modelFile.toString(), sessionOptions);
             } else {
-                block = new OrtSymbolBlock(env.createSession(modelFile.toString()));
+                session = env.createSession(modelFile.toString());
             }
+            block = new OrtSymbolBlock(session, (OrtNDManager) manager);
         } catch (OrtException e) {
             throw new MalformedModelException("ONNX Model cannot be loaded", e);
         }
@@ -108,12 +110,5 @@ public class OrtModel extends BaseModel {
             }
         }
         return modelFile;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void close() {
-        ((OrtSymbolBlock) block).close();
-        super.close();
     }
 }

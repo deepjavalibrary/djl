@@ -19,6 +19,7 @@ import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.onnxruntime.zoo.tabular.softmax_regression.IrisFlower;
 import ai.djl.repository.zoo.Criteria;
@@ -65,6 +66,26 @@ public class OrtTest {
              * to djl cache directory.
              */
             throw new SkipException("Ignore missing libgomp.so.1 error.");
+        }
+    }
+
+    @Test
+    public void testNDArray() {
+        try (NDManager manager = OrtNDManager.getSystemManager().newSubManager()) {
+            NDArray zeros = manager.zeros(new Shape(1, 2));
+            float[] data = zeros.toFloatArray();
+            Assert.assertEquals(data[0], 0);
+
+            NDArray ones = manager.ones(new Shape(1, 2));
+            data = ones.toFloatArray();
+            Assert.assertEquals(data[0], 1);
+
+            float[] buf = {0f, 1f, 2f, 3f};
+            NDArray array = manager.create(buf);
+            Assert.assertEquals(array.toFloatArray(), buf);
+
+            array = manager.create("string");
+            Assert.assertEquals(array.toStringArray()[0], "string");
         }
     }
 

@@ -96,7 +96,7 @@ public class PpModel extends BaseModel {
         }
         paddlePredictor = new PaddlePredictor(JniUtils.createPredictor(config));
         JniUtils.deleteConfig(config);
-        setBlock(new PpSymbolBlock(paddlePredictor));
+        setBlock(new PpSymbolBlock(paddlePredictor, (PpNDManager) manager));
     }
 
     private String[] findModelFile(Path dir) {

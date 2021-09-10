@@ -20,6 +20,8 @@ import java.nio.ShortBuffer;
 @SuppressWarnings("PMD.AvoidUsingShortType")
 public final class Float16Utils {
 
+    public static final short ONE = floatToHalf(1);
+
     private Float16Utils() {}
 
     /**

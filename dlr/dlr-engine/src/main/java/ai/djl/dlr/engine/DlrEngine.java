@@ -35,6 +35,7 @@ public final class DlrEngine extends Engine {
     static final int RANK = 10;
 
     private Engine alternativeEngine;
+    private boolean initialized;
 
     private DlrEngine() {}
 
@@ -47,16 +48,16 @@ public final class DlrEngine extends Engine {
         }
     }
 
-    private Engine getAlternativeEngine() {
-        if (Boolean.getBoolean("ai.djl.dlr.disable_alternative")) {
-            return null;
-        }
-        if (alternativeEngine == null) {
+    /** {@inheritDoc} */
+    @Override
+    public Engine getAlternativeEngine() {
+        if (!initialized && !Boolean.getBoolean("ai.djl.dlr.disable_alternative")) {
             Engine engine = Engine.getInstance();
             if (engine.getRank() < getRank()) {
                 // alternativeEngine should not have the same rank as DLR
                 alternativeEngine = engine;
             }
+            initialized = true;
         }
         return alternativeEngine;
     }
@@ -98,7 +99,7 @@ public final class DlrEngine extends Engine {
         if (device != null && device != Device.cpu()) {
             throw new IllegalArgumentException("DLR only support CPU");
         }
-        return new DlrModel(name, newBaseManager(Device.cpu()), Device.cpu());
+        return new DlrModel(name, newBaseManager(Device.cpu()));
     }
 
     /** {@inheritDoc} */
@@ -110,9 +111,6 @@ public final class DlrEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager(Device device) {
-        if (getAlternativeEngine() != null) {
-            return alternativeEngine.newBaseManager(device);
-        }
         return DlrNDManager.getSystemManager().newSubManager(device);
     }
 
@@ -131,13 +129,6 @@ public final class DlrEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append(getEngineName()).append(':').append(getVersion()).append(", ");
-        if (alternativeEngine != null) {
-            sb.append("Alternative engine: ").append(alternativeEngine.getEngineName());
-        } else {
-            sb.append("No alternative engine found");
-        }
-        return sb.toString();
+        return getEngineName() + ':' + getVersion();
     }
 }

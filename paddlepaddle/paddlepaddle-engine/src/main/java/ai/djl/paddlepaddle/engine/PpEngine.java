@@ -34,6 +34,8 @@ public final class PpEngine extends Engine {
     static final int RANK = 10;
 
     private Engine alternativeEngine;
+    private boolean initialized;
+
     private String version;
 
     private PpEngine() {
@@ -47,6 +49,20 @@ public final class PpEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
+    public Engine getAlternativeEngine() {
+        if (!initialized && !Boolean.getBoolean("ai.djl.paddlepaddle.disable_alternative")) {
+            Engine engine = Engine.getInstance();
+            if (engine.getRank() < getRank()) {
+                // alternativeEngine should not have the same rank as PaddlePaddle
+                alternativeEngine = engine;
+            }
+            initialized = true;
+        }
+        return alternativeEngine;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getEngineName() {
         return ENGINE_NAME;
     }
@@ -55,20 +71,6 @@ public final class PpEngine extends Engine {
     @Override
     public int getRank() {
         return RANK;
-    }
-
-    Engine getAlternativeEngine() {
-        if (Boolean.getBoolean("ai.djl.paddlepaddle.disable_alternative")) {
-            return null;
-        }
-        if (alternativeEngine == null) {
-            Engine engine = Engine.getInstance();
-            if (engine.getRank() < getRank()) {
-                // alternativeEngine should not have the same rank as Paddle
-                alternativeEngine = engine;
-            }
-        }
-        return alternativeEngine;
     }
 
     /** {@inheritDoc} */
@@ -105,10 +107,6 @@ public final class PpEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager(Device device) {
-        if (getAlternativeEngine() != null) {
-            // use CPU as a default to achieve best performance
-            return alternativeEngine.newBaseManager(Device.cpu());
-        }
         return PpNDManager.getSystemManager().newSubManager(device);
     }
 
@@ -127,13 +125,6 @@ public final class PpEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append(getEngineName()).append(':').append(getVersion()).append(", ");
-        if (alternativeEngine != null) {
-            sb.append("Alternative engine: ").append(alternativeEngine.getEngineName());
-        } else {
-            sb.append("No alternative engine found");
-        }
-        return sb.toString();
+        return getEngineName() + ':' + getVersion();
     }
 }

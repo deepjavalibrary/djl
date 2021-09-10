@@ -88,6 +88,13 @@ public abstract class Engine {
     }
 
     /**
+     * Returns the alternative {@code engine} if available.
+     *
+     * @return the alternative {@code engine}
+     */
+    public abstract Engine getAlternativeEngine();
+
+    /**
      * Returns the name of the Engine.
      *
      * @return the name of the engine

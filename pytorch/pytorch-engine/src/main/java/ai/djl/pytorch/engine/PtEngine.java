@@ -80,6 +80,12 @@ public final class PtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
+    public Engine getAlternativeEngine() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getEngineName() {
         return ENGINE_NAME;
     }

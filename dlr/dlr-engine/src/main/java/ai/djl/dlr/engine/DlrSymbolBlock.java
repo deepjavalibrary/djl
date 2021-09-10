@@ -15,7 +15,6 @@ package ai.djl.dlr.engine;
 
 import ai.djl.dlr.jni.JniUtils;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
@@ -52,7 +51,6 @@ public class DlrSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
             boolean training,
             PairList<String, Object> params) {
         long modelHandle = handle.get();
-        NDManager manager = inputs.head().getManager();
         // TODO maybe verify the number of inputs
         // currently we assume the order of the input NDList is the same
         // as the model input
@@ -60,7 +58,7 @@ public class DlrSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
             JniUtils.setDlrInput(modelHandle, inputs.get(i), i);
         }
         JniUtils.runDlrModel(modelHandle);
-        return JniUtils.getDlrOutputs(modelHandle, manager);
+        return JniUtils.getDlrOutputs(modelHandle, inputs.head().getManager());
     }
 
     /** {@inheritDoc} */

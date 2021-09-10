@@ -20,6 +20,12 @@ import ai.djl.ndarray.index.full.NDIndexFullSlice;
 /** The {@link NDArrayIndexer} used by the {@link TfNDArray}. */
 public class TfNDArrayIndexer extends NDArrayIndexer {
 
+    private TfNDManager manager;
+
+    TfNDArrayIndexer(TfNDManager manager) {
+        this.manager = manager;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray get(NDArray array, NDIndexFullPick fullPick) {
@@ -29,13 +35,15 @@ public class TfNDArrayIndexer extends NDArrayIndexer {
     /** {@inheritDoc} */
     @Override
     public NDArray get(NDArray array, NDIndexFullSlice fullSlice) {
-        TfNDManager manager = (TfNDManager) array.getManager();
+        array = manager.adopt(array);
+        TfNDManager tfManager = (TfNDManager) array.getManager();
         int[] toSqueeze = fullSlice.getToSqueeze();
-        try (NDArray begin = manager.create(fullSlice.getMin());
-                NDArray end = manager.create(fullSlice.getMax());
-                NDArray step = manager.create(fullSlice.getStep())) {
+        try (NDArray begin = tfManager.create(fullSlice.getMin());
+                NDArray end = tfManager.create(fullSlice.getMax());
+                NDArray step = tfManager.create(fullSlice.getStep())) {
             NDArray result =
-                    manager.opExecutor("StridedSlice")
+                    tfManager
+                            .opExecutor("StridedSlice")
                             .addInput(array)
                             .addInput(begin)
                             .addInput(end)

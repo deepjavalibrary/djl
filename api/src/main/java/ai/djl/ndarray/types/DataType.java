@@ -19,6 +19,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.nio.ShortBuffer;
 
 /** An enum representing the underlying {@link NDArray}'s data type. */
 public enum DataType {
@@ -96,6 +97,8 @@ public enum DataType {
     public static DataType fromBuffer(Buffer data) {
         if (data instanceof FloatBuffer) {
             return DataType.FLOAT32;
+        } else if (data instanceof ShortBuffer) {
+            return DataType.FLOAT16;
         } else if (data instanceof DoubleBuffer) {
             return DataType.FLOAT64;
         } else if (data instanceof IntBuffer) {
@@ -149,6 +152,8 @@ public enum DataType {
      */
     public Buffer asDataType(ByteBuffer data) {
         switch (this) {
+            case FLOAT16:
+                return data.asShortBuffer();
             case FLOAT32:
                 return data.asFloatBuffer();
             case FLOAT64:
@@ -159,7 +164,6 @@ public enum DataType {
                 return data.asLongBuffer();
             case UINT8:
             case INT8:
-            case FLOAT16:
             case UNKNOWN:
             default:
                 return data;

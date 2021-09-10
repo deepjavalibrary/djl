@@ -27,7 +27,7 @@ import org.tensorflow.internal.c_api.TFE_TensorHandle;
 
 public class TfNDArrayEx implements NDArrayEx {
 
-    private static final NDArrayIndexer INDEXER = new TfNDArrayIndexer();
+    private NDArrayIndexer indexer;
 
     private TfNDArray array;
     private TfNDManager manager;
@@ -40,6 +40,7 @@ public class TfNDArrayEx implements NDArrayEx {
     TfNDArrayEx(TfNDArray array) {
         this.array = array;
         this.manager = array.getManager();
+        indexer = new TfNDArrayIndexer(manager);
     }
 
     /** {@inheritDoc} */
@@ -544,7 +545,7 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArrayIndexer getIndexer() {
-        return INDEXER;
+        return indexer;
     }
 
     /** {@inheritDoc} */

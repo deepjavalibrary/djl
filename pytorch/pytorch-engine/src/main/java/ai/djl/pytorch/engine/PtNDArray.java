@@ -13,6 +13,7 @@
 package ai.djl.pytorch.engine;
 
 import ai.djl.Device;
+import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -23,10 +24,6 @@ import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.util.NativeResource;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -211,13 +208,9 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public void set(Buffer data) {
         int size = Math.toIntExact(size());
-        if (data.remaining() < size) {
-            throw new IllegalArgumentException(
-                    "The NDArray size is: " + size + ", but buffer size is: " + data.remaining());
-        }
+        BaseNDManager.validateBufferSize(data, getDataType(), size);
         // TODO how do we handle the exception happened in the middle
         dataRef = null;
-        data.limit(size);
         if (data.isDirect() && data instanceof ByteBuffer) {
             // If NDArray is on the GPU, it is native code responsibility to control the data life
             // cycle
@@ -229,32 +222,9 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         }
         // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
         DataType inputType = DataType.fromBuffer(data);
+        ByteBuffer buf = manager.allocateDirect(size * inputType.getNumOfBytes());
+        BaseNDManager.copyBuffer(data, buf);
 
-        int numOfBytes = inputType.getNumOfBytes();
-        ByteBuffer buf = manager.allocateDirect(size * numOfBytes);
-        switch (inputType) {
-            case FLOAT32:
-                buf.asFloatBuffer().put((FloatBuffer) data);
-                break;
-            case FLOAT64:
-                buf.asDoubleBuffer().put((DoubleBuffer) data);
-                break;
-            case UINT8:
-            case INT8:
-            case BOOLEAN:
-                buf.put((ByteBuffer) data);
-                break;
-            case INT32:
-                buf.asIntBuffer().put((IntBuffer) data);
-                break;
-            case INT64:
-                buf.asLongBuffer().put((LongBuffer) data);
-                break;
-            case FLOAT16:
-            default:
-                throw new UnsupportedOperationException("data type is not supported!");
-        }
-        buf.rewind();
         // If NDArray is on the GPU, it is native code responsibility to control the data life cycle
         if (!Device.Type.GPU.equals(getDevice().getDeviceType())) {
             dataRef = buf;

@@ -81,6 +81,12 @@ public final class MxEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
+    public Engine getAlternativeEngine() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getEngineName() {
         return ENGINE_NAME;
     }

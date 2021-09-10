@@ -27,7 +27,6 @@ import ai.onnxruntime.OnnxJavaType;
 import ai.onnxruntime.OnnxSequence;
 import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OnnxValue;
-import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
 import ai.onnxruntime.SequenceInfo;
@@ -35,6 +34,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -46,6 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
 
     private OrtSession session;
+    private OrtNDManager manager;
 
     /**
      * Constructs a {@code OrtSymbolBlock}.
@@ -54,9 +55,12 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
      * String)}.
      *
      * @param session the {@link OrtSession} contains the model information
+     * @param manager the {@link NDManager} to holds the NDArray
      */
-    public OrtSymbolBlock(OrtSession session) {
+    public OrtSymbolBlock(OrtSession session, OrtNDManager manager) {
         this.session = session;
+        this.manager = manager;
+        manager.attachInternal(UUID.randomUUID().toString(), this);
     }
 
     /** {@inheritDoc} */
@@ -72,46 +76,37 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        NDManager inputManager = inputs.head().getManager();
-        boolean foreignEngine =
-                !OrtEngine.ENGINE_NAME.equals(inputManager.getEngine().getEngineName());
         List<String> inputNames = new ArrayList<>(session.getInputNames());
         if (inputs.size() != inputNames.size()) {
             throw new IllegalArgumentException("Input mismatch, looking for: " + inputNames);
         }
+
         Map<String, OnnxTensor> container = new ConcurrentHashMap<>();
         // feed data in to match names
-        try (OrtEnvironment env = OrtEnvironment.getEnvironment()) {
-            for (int i = 0; i < inputNames.size(); ++i) {
-                OnnxTensor tensor;
-                if (foreignEngine) {
-                    tensor = OrtUtils.toTensor(env, inputs.get(i));
-                } else {
-                    tensor = ((OrtNDArray) inputs.get(i)).getTensor();
-                }
-                container.put(inputNames.get(i), tensor);
-            }
-            // forward
+        for (int i = 0; i < inputNames.size(); ++i) {
+            OrtNDArray ortNDArray = manager.adopt(inputs.get(i));
+            container.put(inputNames.get(i), ortNDArray.getTensor());
+        }
+        // forward
+        try {
             OrtSession.Result results = session.run(container);
-            return evaluateOutput(results, inputManager);
+            NDList ret = evaluateOutput(results);
+            ret.attach(inputs.head().getManager());
+            return ret;
         } catch (OrtException e) {
             throw new EngineException(e);
-        } finally {
-            if (foreignEngine) {
-                container.values().forEach(OnnxTensor::close);
-            }
         }
     }
 
-    private NDList evaluateOutput(OrtSession.Result results, NDManager inputManager) {
+    private NDList evaluateOutput(OrtSession.Result results) {
         NDList output = new NDList();
         for (Map.Entry<String, OnnxValue> r : results) {
             OnnxValue value = r.getValue();
             if ((value instanceof OnnxTensor)) {
-                output.add(OrtUtils.toNDArray(inputManager, (OnnxTensor) value));
+                output.add(manager.createInternal((OnnxTensor) value));
             } else if (value instanceof OnnxSequence) {
                 // TODO: avoid memory copying to heap
-                output.add(seq2Nd((OnnxSequence) value, inputManager));
+                output.add(seq2Nd((OnnxSequence) value));
             } else {
                 throw new UnsupportedOperationException("Unsupported output type! " + r.getKey());
             }
@@ -120,7 +115,7 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
     }
 
     @SuppressWarnings("unchecked")
-    private NDArray seq2Nd(OnnxSequence seq, NDManager manager) {
+    private NDArray seq2Nd(OnnxSequence seq) {
         try {
             List<Object> values = seq.getValue();
             OnnxJavaType type = seq.getInfo().sequenceType;

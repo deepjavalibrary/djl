@@ -24,10 +24,6 @@ import ai.djl.util.Pair;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
 import org.tensorflow.internal.c_api.TFE_Context;
 import org.tensorflow.internal.c_api.TFE_TensorHandle;
 import org.tensorflow.internal.c_api.TF_Tensor;
@@ -53,6 +49,27 @@ public class TfNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public TfNDArray adopt(NDArray array) {
+        if (array instanceof TfNDArray) {
+            return (TfNDArray) array;
+        }
+        return create(array.toByteBuffer(), array.getShape(), array.getDataType());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public TfNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
+        int size = Math.toIntExact(shape.size());
+        BaseNDManager.validateBufferSize(data, dataType, size);
+        ByteBuffer buf = allocateDirect(size * dataType.getNumOfBytes());
+        copyBuffer(data, buf);
+        // TODO(improvement): avoid data copy by creating directByteBuffer on tensor data pointer
+        TFE_TensorHandle handle = JavacppUtils.createTFETensorFromByteBuffer(buf, shape, dataType);
+        return new TfNDArray(this, handle);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray create(Shape shape, DataType dataType) {
         if (shape.dimension() == 0) {
             // TensorFlow does not support empty scalar(emtpy NDArray with 0 dimension)
@@ -66,38 +83,7 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public TfNDArray create(Buffer data, Shape shape, DataType dataType) {
-        int size = data.remaining();
-        // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
-        DataType inputType = DataType.fromBuffer(data);
-        int numOfBytes = inputType.getNumOfBytes();
-
-        ByteBuffer buf = allocateDirect(size * numOfBytes);
-        switch (inputType) {
-            case FLOAT32:
-                buf.asFloatBuffer().put((FloatBuffer) data);
-                break;
-            case FLOAT64:
-                buf.asDoubleBuffer().put((DoubleBuffer) data);
-                break;
-            case UINT8:
-            case INT8:
-            case BOOLEAN:
-                buf.put((ByteBuffer) data);
-                break;
-            case INT32:
-                buf.asIntBuffer().put((IntBuffer) data);
-                break;
-            case INT64:
-                buf.asLongBuffer().put((LongBuffer) data);
-                break;
-            case FLOAT16:
-            default:
-                throw new AssertionError("Show never happen");
-        }
-        buf.rewind();
-        // TODO(improvement): avoid data copy by creating directByteBuffer on tensor data pointer
-        TFE_TensorHandle handle = JavacppUtils.createTFETensorFromByteBuffer(buf, shape, dataType);
-        return new TfNDArray(this, handle);
+        return createDirect(data, shape, dataType);
     }
 
     /** {@inheritDoc} */

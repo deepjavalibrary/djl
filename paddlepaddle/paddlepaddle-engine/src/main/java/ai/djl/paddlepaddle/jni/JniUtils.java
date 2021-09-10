@@ -13,6 +13,7 @@
 package ai.djl.paddlepaddle.jni;
 
 import ai.djl.Device;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.paddlepaddle.engine.PaddlePredictor;
@@ -29,6 +30,7 @@ import java.util.Arrays;
  */
 @SuppressWarnings("MissingJavadocMethod")
 public final class JniUtils {
+
     private JniUtils() {}
 
     public static PpNDArray createNdArray(
@@ -37,7 +39,7 @@ public final class JniUtils {
         long handle =
                 PaddleLibrary.LIB.paddleCreateTensor(
                         data, data.remaining(), intShape, PpDataType.toPaddlePaddle(dtype));
-        return new PpNDArray(manager, data, handle);
+        return manager.createInternal(data, handle);
     }
 
     public static DataType getDTypeFromNd(PpNDArray array) {
@@ -120,7 +122,7 @@ public final class JniUtils {
         PaddleLibrary.LIB.deletePredictor(predictor.getHandle());
     }
 
-    public static PpNDArray[] predictorForward(
+    public static NDList predictorForward(
             PaddlePredictor predictor, PpNDArray[] inputs, String[] inputNames) {
         long[] inputHandles = new long[inputs.length];
         for (int i = 0; i < inputs.length; i++) {
@@ -131,9 +133,9 @@ public final class JniUtils {
         PpNDManager manager = (PpNDManager) inputs[0].getManager();
         PpNDArray[] arrays = new PpNDArray[outputs.length];
         for (int i = 0; i < outputs.length; i++) {
-            arrays[i] = new PpNDArray(manager, null, outputs[i]);
+            arrays[i] = manager.createInternal(null, outputs[i]);
         }
-        return arrays;
+        return new NDList(arrays);
     }
 
     public static String[] getInputNames(PaddlePredictor predictor) {

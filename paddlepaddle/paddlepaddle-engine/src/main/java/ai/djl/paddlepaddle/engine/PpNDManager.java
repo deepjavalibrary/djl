@@ -23,18 +23,17 @@ import ai.djl.paddlepaddle.jni.JniUtils;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
 
 /** {@code PpNDManager} is the PaddlePaddle implementation of {@link NDManager}. */
 public class PpNDManager extends BaseNDManager {
 
     private static final PpNDManager SYSTEM_MANAGER = new SystemManager();
 
+    private NDManager alternativeManager;
+
     private PpNDManager(NDManager parent, Device device) {
         super(parent, device);
+        alternativeManager = getAlternativeManager();
     }
 
     static PpNDManager getSystemManager() {
@@ -69,82 +68,56 @@ public class PpNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public PpNDArray create(Buffer data, Shape shape, DataType dataType) {
+    public PpNDArray adopt(NDArray array) {
+        if (array instanceof PpNDArray) {
+            return (PpNDArray) array;
+        }
+        return createDirect(array.toByteBuffer(), array.getShape(), array.getDataType());
+    }
+
+    /**
+     * Creates a new instance of {@code PpNDArray}.
+     *
+     * <p>For internal use only.
+     *
+     * @param data bytebuffer that holds the native memory
+     * @param handle the pointer to the native MxNDArray memory
+     * @return a new instance of {@code PpNDArray}
+     */
+    public PpNDArray createInternal(ByteBuffer data, long handle) {
+        return new PpNDArray(this, alternativeManager, data, handle);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PpNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
+        int size = Math.toIntExact(shape.size());
+        BaseNDManager.validateBufferSize(data, dataType, size);
         if (data.isDirect() && data instanceof ByteBuffer) {
             return JniUtils.createNdArray(this, (ByteBuffer) data, shape, dataType);
         }
-        int size = data.remaining();
-        // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
-        DataType inputType = DataType.fromBuffer(data);
-
-        int numOfBytes = inputType.getNumOfBytes();
-        ByteBuffer buf = allocateDirect(size * numOfBytes);
-
-        switch (inputType) {
-            case FLOAT32:
-                buf.asFloatBuffer().put((FloatBuffer) data);
-                break;
-            case FLOAT64:
-                buf.asDoubleBuffer().put((DoubleBuffer) data);
-                break;
-            case UINT8:
-            case INT8:
-            case BOOLEAN:
-                buf.put((ByteBuffer) data);
-                break;
-            case INT32:
-                buf.asIntBuffer().put((IntBuffer) data);
-                break;
-            case INT64:
-                buf.asLongBuffer().put((LongBuffer) data);
-                break;
-            case FLOAT16:
-            default:
-                throw new AssertionError("Show never happen");
-        }
-        buf.rewind();
+        ByteBuffer buf = allocateDirect(size * dataType.getNumOfBytes());
+        copyBuffer(data, buf);
         return JniUtils.createNdArray(this, buf, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zeros(Shape shape, DataType dataType) {
-        int size = (int) shape.size();
-        ByteBuffer bb = allocateDirect(size * dataType.getNumOfBytes());
-        return create(bb, shape, dataType);
+    public NDArray create(Buffer data, Shape shape, DataType dataType) {
+        if (alternativeManager != null) {
+            return alternativeManager.create(data, shape, dataType);
+        }
+        return createDirect(data, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ones(Shape shape, DataType dataType) {
-        int size = (int) shape.size();
-        ByteBuffer bb = allocateDirect(size * dataType.getNumOfBytes());
-        for (int i = 0; i < size; ++i) {
-            switch (dataType) {
-                case FLOAT32:
-                    bb.putFloat(1f);
-                    break;
-                case FLOAT64:
-                    bb.putDouble(1d);
-                    break;
-                case INT32:
-                    bb.putInt(1);
-                    break;
-                case INT64:
-                    bb.putLong(1);
-                    break;
-                case UINT8:
-                case INT8:
-                    bb.put((byte) 1);
-                    break;
-                case FLOAT16:
-                case UNKNOWN:
-                default:
-                    break;
-            }
+    public void close() {
+        super.close();
+        if (alternativeManager != null) {
+            alternativeManager.close();
+            alternativeManager = null;
         }
-        bb.rewind();
-        return create(bb, shape, dataType);
     }
 
     /** The SystemManager is the root {@link PpNDManager} of which all others are children. */

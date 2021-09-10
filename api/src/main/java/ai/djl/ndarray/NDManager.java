@@ -162,6 +162,14 @@ public interface NDManager extends AutoCloseable {
     ByteBuffer allocateDirect(int capacity);
 
     /**
+     * Converts an external engine's {@link NDArray} to current engine.
+     *
+     * @param array the input {@code NDArray}
+     * @return a new if the input {@code NDArray} is from external engine
+     */
+    NDArray adopt(NDArray array);
+
+    /**
      * Creates an uninitialized instance of {@link DataType#FLOAT32} {@link NDArray} with specified
      * {@link Shape}.
      *

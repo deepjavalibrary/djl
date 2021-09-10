@@ -35,7 +35,7 @@ public class PpPredictor<I, O> extends Predictor<I, O> {
     public PpPredictor(Model model, PaddlePredictor predictor, Translator<I, O> translator) {
         super(model, translator, false);
         this.predictor = predictor;
-        block = new PpSymbolBlock(predictor);
+        block = new PpSymbolBlock(predictor, (PpNDManager) model.getNDManager());
     }
 
     /** {@inheritDoc} */

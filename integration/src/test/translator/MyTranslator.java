@@ -56,9 +56,9 @@ public class MyTranslator implements ServingTranslator {
     }
 
     @Override
-    public void prepare(NDManager manager, Model model) throws IOException {
+    public void prepare(TranslatorContext ctx) throws IOException {
         if (classes == null) {
-            classes = model.getArtifact("synset.txt", Utils::readLines);
+            classes = ctx.getModel().getArtifact("synset.txt", Utils::readLines);
         }
     }
 

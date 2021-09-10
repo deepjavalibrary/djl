@@ -62,6 +62,25 @@ public class MxNDManager extends BaseNDManager {
         return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public MxNDArray adopt(NDArray array) {
+        if (array instanceof MxNDArray) {
+            return (MxNDArray) array;
+        }
+        MxNDArray ret = create(array.getShape(), array.getDataType());
+        ret.set(array.toByteBuffer());
+        return ret;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public MxNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
+        MxNDArray ret = create(shape, dataType);
+        ret.set(data);
+        return ret;
+    }
+
     /**
      * Creates an MxNDArray with the given Native Memory Pointer and attaches to this manager.
      *

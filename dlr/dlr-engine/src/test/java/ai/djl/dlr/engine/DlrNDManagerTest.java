@@ -13,8 +13,9 @@
 package ai.djl.dlr.engine;
 
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import java.nio.ByteBuffer;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
@@ -26,7 +27,8 @@ public class DlrNDManagerTest {
         if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
             throw new SkipException("test only work on mac and Linux");
         }
-        try (NDManager manager = DlrNDManager.getSystemManager().newSubManager()) {
+        try (DlrNDManager manager =
+                (DlrNDManager) DlrNDManager.getSystemManager().newSubManager()) {
             NDArray zeros = manager.zeros(new Shape(1, 2));
             float[] data = zeros.toFloatArray();
             Assert.assertEquals(data[0], 0);
@@ -35,9 +37,16 @@ public class DlrNDManagerTest {
             data = ones.toFloatArray();
             Assert.assertEquals(data[0], 1);
 
-            NDArray array = manager.create(new float[] {0f, 1f, 2f, 3f});
-            float[] expected = new float[] {0f, 1f, 2f, 3f};
-            Assert.assertEquals(array.toFloatArray(), expected);
+            float[] buf = {0f, 1f, 2f, 3f};
+            NDArray array = manager.create(buf);
+            Assert.assertEquals(array.toFloatArray(), buf);
+
+            ByteBuffer bb = ByteBuffer.allocate(4 * buf.length);
+            bb.asFloatBuffer().put(buf);
+            bb.rewind();
+
+            NDArray dlrArray = manager.createDirect(bb, new Shape(4), DataType.FLOAT32);
+            Assert.assertEquals(dlrArray.toFloatArray(), buf);
         }
     }
 }

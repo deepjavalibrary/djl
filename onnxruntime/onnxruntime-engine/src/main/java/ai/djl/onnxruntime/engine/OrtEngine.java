@@ -36,8 +36,9 @@ public final class OrtEngine extends Engine {
     public static final String ENGINE_NAME = "OnnxRuntime";
     static final int RANK = 10;
 
-    private Engine alternativeEngine;
     private OrtEnvironment env;
+    private Engine alternativeEngine;
+    private boolean initialized;
 
     private OrtEngine() {
         // init OrtRuntime
@@ -50,6 +51,20 @@ public final class OrtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
+    public Engine getAlternativeEngine() {
+        if (!initialized && !Boolean.getBoolean("ai.djl.onnx.disable_alternative")) {
+            Engine engine = Engine.getInstance();
+            if (engine.getRank() < getRank()) {
+                // alternativeEngine should not have the same rank as OnnxRuntime
+                alternativeEngine = engine;
+            }
+            initialized = true;
+        }
+        return alternativeEngine;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getEngineName() {
         return ENGINE_NAME;
     }
@@ -58,20 +73,6 @@ public final class OrtEngine extends Engine {
     @Override
     public int getRank() {
         return RANK;
-    }
-
-    private Engine getAlternativeEngine() {
-        if (Boolean.getBoolean("ai.djl.onnx.disable_alternative")) {
-            return null;
-        }
-        if (alternativeEngine == null) {
-            Engine engine = Engine.getInstance();
-            if (engine.getRank() < getRank()) {
-                // alternativeEngine should not have the same rank as ORT
-                alternativeEngine = engine;
-            }
-        }
-        return alternativeEngine;
     }
 
     /** {@inheritDoc} */
@@ -118,9 +119,6 @@ public final class OrtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager(Device device) {
-        if (getAlternativeEngine() != null) {
-            return alternativeEngine.newBaseManager(device);
-        }
         return OrtNDManager.getSystemManager().newSubManager(device);
     }
 
@@ -147,11 +145,6 @@ public final class OrtEngine extends Engine {
                 .append(", capabilities: [\n\t" + StandardCapabilities.MKL + ",\n");
         if (hasCapability(StandardCapabilities.CUDA)) {
             sb.append("\t").append(StandardCapabilities.CUDA).append(",\n"); // NOPMD
-        }
-        if (alternativeEngine != null) {
-            sb.append("]\nAlternative engine: ").append(alternativeEngine.getEngineName());
-        } else {
-            sb.append("]\nNo alternative engine found");
         }
         return sb.toString();
     }
