@@ -42,19 +42,19 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 
 ## Engine Documentation
 
-### [Apache MXNet](../mxnet/README.md)
+### [Apache MXNet](../engines/mxnet/README.md)
 
 - [Apache MXNet Gluon Importing](mxnet/how_to_convert_your_model_to_symbol.md) - Apache MXNet Gluon Importing
 
-### [PyTorch](../pytorch/README.md)
+### [PyTorch](../engines/pytorch/README.md)
 
 - [PyTorch Importing](pytorch/how_to_convert_your_model_to_torchscript.md) - Import TorchScript model
 
-### [TensorFlow](../tensorflow/README.md)
+### [TensorFlow](../engines/tensorflow/README.md)
 
 - [TensorFlow Importing](tensorflow/how_to_import_tensorflow_models_in_DJL.md)
 
-### [ONNX Runtime](../onnxruntime/onnxruntime-engine/README.md)
+### [ONNX Runtime](../engines/onnxruntime/onnxruntime-engine/README.md)
 
 - [Hybrid Engine Operations](hybrid_engine.md) - Using a second Engine for supplemental API support
 

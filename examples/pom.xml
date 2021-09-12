@@ -84,7 +84,7 @@
         </dependency>
         <dependency>
             <!--
-                See https://github.com/deepjavalibrary/djl/blob/master/pytorch/README.md for more PyTorch library selection options
+                See https://github.com/deepjavalibrary/djl/blob/master/engines/pytorch/README.md for more PyTorch library selection options
             -->
             <groupId>ai.djl.pytorch</groupId>
             <artifactId>pytorch-native-auto</artifactId>

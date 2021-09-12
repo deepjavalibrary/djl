@@ -26,13 +26,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
-        run: ./gradlew :paddlepaddle:paddlepaddle-native:compileJNI
+        run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
       - name: Upload compiled jni library
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: jnilib-${{ runner.os }}
-          path: paddlepaddle/paddlepaddle-native/jnilib
+          path: engines/paddlepaddle/paddlepaddle-native/jnilib
 
   # A few things tried to build GPU jni (2.0.2) shared library:
   # 1. cpu JNI .so file works fine with cu101 and cu102
@@ -66,13 +66,13 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: |
-          ./gradlew :paddlepaddle:paddlepaddle-native:compileJNI
+          ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
       - name: Upload compiled jni library
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: jnilib-${{ runner.os }}
-          path: paddlepaddle/paddlepaddle-native/jnilib
+          path: engines/paddlepaddle/paddlepaddle-native/jnilib
 
   publish:
     if: github.repository == 'deepjavalibrary/djl'

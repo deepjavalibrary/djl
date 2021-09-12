@@ -1,0 +1,50 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "googlenet",
+  "name": "GoogLeNet",
+  "description": "GoogLeNet image classification model",
+  "website": "http://www.djl.ai/engines/mxnet/model-zoo",
+  "licenses": {
+    "apache": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "googlenet",
+      "properties": {
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "googlenet/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "googlenet/0.0.1/googlenet-symbol.json.gz",
+          "sha1Hash": "c7a8a12061c991bc52819c629561241b15894aa6",
+          "size": 7133
+        },
+        "parameters": {
+          "uri": "googlenet/0.0.1/googlenet-0000.params.gz",
+          "sha1Hash": "392f68e17fdecd09bf1c3d6688d2d61c7e07dcad",
+          "size": 15177884
+        }
+      }
+    }
+  ]
+}

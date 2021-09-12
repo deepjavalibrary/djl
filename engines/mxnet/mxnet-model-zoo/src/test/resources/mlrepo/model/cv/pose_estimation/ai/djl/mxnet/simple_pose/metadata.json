@@ -1,0 +1,168 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/pose_estimation",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "simple_pose",
+  "name": "Simple pose",
+  "description": "Simple pose Pose Estimation",
+  "website": "http://www.djl.ai/engines/mxnet/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "simple_pose_resnet18_v1b",
+      "properties": {
+        "backbone": "resnet18",
+        "flavor": "v1b",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 192,
+        "height": 256,
+        "resize": true,
+        "normalize": true,
+        "threshold": 0.2,
+        "translatorFactory": "ai.djl.modality.cv.translator.SimplePoseTranslatorFactory"
+      },
+      "files": {
+        "symbol": {
+          "uri": "0.0.1/simple_pose_resnet18_v1b-symbol.json",
+          "sha1Hash": "c3368ee7a6761a91eafc1673f00229c47971143f",
+          "size": 71477
+        },
+        "parameters": {
+          "uri": "0.0.1/simple_pose_resnet18_v1b-0000.params.gz",
+          "sha1Hash": "c87b980393ee2cd2948f67aa7f46075872829a3f",
+          "size": 57101274
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "simple_pose_resnet50_v1b",
+      "properties": {
+        "backbone": "resnet50",
+        "flavor": "v1b",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 192,
+        "height": 256,
+        "resize": true,
+        "normalize": true,
+        "threshold": 0.2,
+        "translatorFactory": "ai.djl.modality.cv.translator.SimplePoseTranslatorFactory"
+      },
+      "files": {
+        "symbol": {
+          "uri": "0.0.1/simple_pose_resnet50_v1b-symbol.json",
+          "sha1Hash": "a899df3fb209983b390ab85fa866792ce8c228e2",
+          "size": 172142
+        },
+        "parameters": {
+          "uri": "0.0.1/simple_pose_resnet50_v1b-0000.params.gz",
+          "sha1Hash": "003290207c2fcf12797f1f36dbf7145d516a810f",
+          "size": 126438404
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "simple_pose_resnet101_v1d",
+      "properties": {
+        "backbone": "resnet101",
+        "flavor": "v1d",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 192,
+        "height": 256,
+        "resize": true,
+        "normalize": true,
+        "threshold": 0.2,
+        "translatorFactory": "ai.djl.modality.cv.translator.SimplePoseTranslatorFactory"
+      },
+      "files": {
+        "symbol": {
+          "uri": "0.0.1/simple_pose_resnet101_v1d-symbol.json",
+          "sha1Hash": "81f4a2f34ff0d4a475f714a4df7dc404f8fc8b01",
+          "size": 337307
+        },
+        "parameters": {
+          "uri": "0.0.1/simple_pose_resnet101_v1d-0000.params.gz",
+          "sha1Hash": "aa171dac332af524387b9248d9dfaa2e7cb4ec14",
+          "size": 197174872
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "simple_pose_resnet152_v1b",
+      "properties": {
+        "backbone": "resnet152",
+        "flavor": "v1b",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 192,
+        "height": 256,
+        "resize": true,
+        "normalize": true,
+        "threshold": 0.2,
+        "translatorFactory": "ai.djl.modality.cv.translator.SimplePoseTranslatorFactory"
+      },
+      "files": {
+        "symbol": {
+          "uri": "0.0.1/simple_pose_resnet152_v1b-symbol.json",
+          "sha1Hash": "081f7d4b6593a55f6c5cab9231432db0f7241b00",
+          "size": 488105
+        },
+        "parameters": {
+          "uri": "0.0.1/simple_pose_resnet152_v1b-0000.params.gz",
+          "sha1Hash": "9aaff7e2419c554d3a88496714858e2df6f75571",
+          "size": 255475129
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "simple_pose_resnet152_v1d",
+      "properties": {
+        "backbone": "resnet152",
+        "flavor": "v1d",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 192,
+        "height": 256,
+        "resize": true,
+        "normalize": true,
+        "threshold": 0.2,
+        "translatorFactory": "ai.djl.modality.cv.translator.SimplePoseTranslatorFactory"
+      },
+      "files": {
+        "symbol": {
+          "uri": "0.0.1/simple_pose_resnet152_v1d-symbol.json",
+          "sha1Hash": "453129327f26a05d5fd7093baea7ce52d939936c",
+          "size": 495766
+        },
+        "parameters": {
+          "uri": "0.0.1/simple_pose_resnet152_v1d-0000.params.gz",
+          "sha1Hash": "6069a3036776f1c237c2692297b9c97645426273",
+          "size": 255520220
+        }
+      }
+    }
+  ]
+}

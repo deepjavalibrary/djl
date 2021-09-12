@@ -1,0 +1,286 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "vgg",
+  "name": "VGG",
+  "description": "VGG image classification model",
+  "website": "http://www.djl.ai/engines/mxnet/model-zoo",
+  "licenses": {
+    "apache": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "vgg11",
+      "properties": {
+        "layers": "11",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "vgg11/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "vgg11/0.0.1/vgg11-symbol.json.gz",
+          "sha1Hash": "85b205ace4d04eea3daeb855f181bdb27cf0e81e",
+          "size": 1270
+        },
+        "parameters": {
+          "uri": "vgg11/0.0.1/vgg11-0000.params.gz",
+          "sha1Hash": "d98e8c2784531c58c042694f047c93aa8e0e1fb5",
+          "size": 493412555
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "vgg13",
+      "properties": {
+        "layers": "13",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "vgg13/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "vgg13/0.0.1/vgg13-symbol.json.gz",
+          "sha1Hash": "94b61ae5502545139371a1405904567c58cd11ad",
+          "size": 1378
+        },
+        "parameters": {
+          "uri": "vgg13/0.0.1/vgg13-0000.params.gz",
+          "sha1Hash": "48871102c43384d7cd1a8474a405c5b855dca2c6",
+          "size": 494114521
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "vgg16",
+      "properties": {
+        "layers": "16",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "vgg16/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "vgg16/0.0.1/vgg16-symbol.json.gz",
+          "sha1Hash": "9fa251f9fb56cb982e13e2fc83cbb7bccdc19685",
+          "size": 1533
+        },
+        "parameters": {
+          "uri": "vgg16/0.0.1/vgg16-0000.params.gz",
+          "sha1Hash": "ecb827dea70df5f06625257bb39dce1155b48471",
+          "size": 512163933
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "vgg19",
+      "properties": {
+        "layers": "19",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "vgg19/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "vgg19/0.0.1/vgg19-symbol.json.gz",
+          "sha1Hash": "99f08d3a75dea78819417195132c95810aa5df0a",
+          "size": 1682
+        },
+        "parameters": {
+          "uri": "vgg19/0.0.1/vgg19-0000.params.gz",
+          "sha1Hash": "4472537c47d827ebf253bef7a9d878786f8382a2",
+          "size": 531641606
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "vgg11_bn",
+      "properties": {
+        "flavor": "batch_norm",
+        "layers": "11",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "vgg11_bn/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "vgg11_bn/0.0.1/vgg11_bn-symbol.json.gz",
+          "sha1Hash": "4961ab51d985deb780bf279d4806852a18d7cff8",
+          "size": 1874
+        },
+        "parameters": {
+          "uri": "vgg11_bn/0.0.1/vgg11_bn-0000.params.gz",
+          "sha1Hash": "f0c3cf8dfca61a33afa2824ba8e7f213eb467515",
+          "size": 493727604
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "vgg13_bn",
+      "properties": {
+        "flavor": "batch_norm",
+        "layers": "13",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "vgg13_bn/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "vgg13_bn/0.0.1/vgg13_bn-symbol.json.gz",
+          "sha1Hash": "c95b4f8ead5f952223de539cb8d90d44e6aba53d",
+          "size": 2113
+        },
+        "parameters": {
+          "uri": "vgg13_bn/0.0.1/vgg13_bn-0000.params.gz",
+          "sha1Hash": "738f01e38c5e21400e2d2fb12997e69d3a0ade09",
+          "size": 494371486
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "vgg16_bn",
+      "properties": {
+        "flavor": "batch_norm",
+        "layers": "16",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "vgg16_bn/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "vgg16_bn/0.0.1/vgg16_bn-symbol.json.gz",
+          "sha1Hash": "2ad49fc44a678e4761d7b6d42baefa811590c926",
+          "size": 2473
+        },
+        "parameters": {
+          "uri": "vgg16_bn/0.0.1/vgg16_bn-0000.params.gz",
+          "sha1Hash": "f0894fa258b8451f9571fa65d1d5845a08cc98fc",
+          "size": 512321355
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "vgg19_bn",
+      "properties": {
+        "flavor": "batch_norm",
+        "layers": "19",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "vgg19_bn/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "vgg19_bn/0.0.1/vgg19_bn-symbol.json.gz",
+          "sha1Hash": "157fbaf6e777b0235546d714ed2d97c07b32c84a",
+          "size": 2847
+        },
+        "parameters": {
+          "uri": "vgg19_bn/0.0.1/vgg19_bn-0000.params.gz",
+          "sha1Hash": "95287befcaad508bbea5b958c41e7311c4e01a50",
+          "size": 531740290
+        }
+      }
+    }
+  ]
+}

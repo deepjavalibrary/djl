@@ -1,0 +1,37 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "nlp/text_classification",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "bert",
+  "name": "bert_token_classification_coll03_english",
+  "description": "A BERT-based Token classification model on Coll dataset",
+  "website": "http://www.djl.ai/engines/pytorch/model-zoo",
+  "licenses": {
+    "apache": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "bert_token_classification_coll03_english",
+      "properties": {},
+      "arguments": {},
+      "files": {
+        "vocab": {
+          "uri": "bert_token_classification_coll03_english/0.0.1/vocab.txt.gz",
+          "sha1Hash": "42dc39e00cea6e5e67f83272df5201faa0a8f97d",
+          "size": 107934
+        },
+        "model": {
+          "uri": "bert_token_classification_coll03_english/0.0.1/bert_token_classification_coll03_english.pt.gz",
+          "sha1Hash": "1fd285471da11aa3c7f60eb3f37a6a0866f49c9a",
+          "size": 402243728
+        }
+      }
+    }
+  ]
+}

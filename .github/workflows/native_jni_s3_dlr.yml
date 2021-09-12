@@ -19,9 +19,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
-        run: ./gradlew :dlr:dlr-native:compileJNI
+        run: ./gradlew :extensions:dlr:dlr-native:compileJNI
       - name: Run test
-        run: ./gradlew :dlr:dlr-engine:test -Pjni
+        run: ./gradlew :extensions:dlr:dlr-engine:test -Pjni
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -32,7 +32,7 @@ jobs:
         run: |
           DLR_VERSION="$(cat gradle.properties | awk -F '=' '/dlr_version/ {print $2}')"
           DJL_VERSION="$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')"
-          aws s3 cp dlr/dlr-native/build/*djl_dlr* s3://djl-ai/publish/dlr-${DLR_VERSION}/jnilib/${DJL_VERSION}/osx-x86_64/
+          aws s3 cp engines/dlr/dlr-native/build/*djl_dlr* s3://djl-ai/publish/dlr-${DLR_VERSION}/jnilib/${DJL_VERSION}/osx-x86_64/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/dlr-${DLR_VERSION}/jnilib*"
 
   build-dlr-jni-linux-cpu:
@@ -59,8 +59,8 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: |
-          ./gradlew :dlr:dlr-native:compileJNI
-          ./gradlew -Pjni :dlr:dlr-engine:test
+          ./gradlew :extensions:dlr:dlr-native:compileJNI
+          ./gradlew -Pjni :extensions:dlr:dlr-engine:test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -71,5 +71,5 @@ jobs:
         run: |
           DLR_VERSION="$(cat gradle.properties | awk -F '=' '/dlr_version/ {print $2}')"
           DJL_VERSION="$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')"
-          aws s3 cp dlr/dlr-native/build/*djl_dlr* s3://djl-ai/publish/dlr-${DLR_VERSION}/jnilib/${DJL_VERSION}/linux-x86_64/
+          aws s3 cp engines/dlr/dlr-native/build/*djl_dlr* s3://djl-ai/publish/dlr-${DLR_VERSION}/jnilib/${DJL_VERSION}/linux-x86_64/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/dlr-${DLR_VERSION}/jnilib*"

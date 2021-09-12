@@ -1,0 +1,92 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "nlp/question_answer",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "bertqa",
+  "name": "Question and Answer model",
+  "description": "BERT QA model",
+  "website": "http://www.djl.ai/engines/pytorch/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "trace_bertqa",
+      "properties": {
+        "backbone": "bert",
+        "dataset": "SQuAD"
+      },
+      "arguments": {
+        "translatorFactory": "ai.djl.pytorch.zoo.nlp.qa.PtBertQATranslatorFactory"
+      },
+      "files": {
+        "vocabulary": {
+          "uri": "0.0.1/bert-base-uncased-vocab.txt.gz",
+          "sha1Hash": "378bbf7dba96fac9f9223fbaf7dd0b879cd48abd",
+          "size": 109822
+        },
+        "model": {
+          "uri": "0.0.1/trace_bertqa.pt.gz",
+          "sha1Hash": "006ab2312561f7e7898399a50b763c9645d5e8d0",
+          "size": 1244419604
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "trace_cased_bertqa",
+      "properties": {
+        "backbone": "bert",
+        "dataset": "SQuAD",
+        "cased": "true"
+      },
+      "arguments": {
+        "translatorFactory": "ai.djl.pytorch.zoo.nlp.qa.PtBertQATranslatorFactory"
+      },
+      "files": {
+        "bert-base-cased-vocab": {
+          "uri": "trace_cased_bertqa/0.0.1/bert-base-cased-vocab.txt.gz",
+          "sha1Hash": "42dc39e00cea6e5e67f83272df5201faa0a8f97d",
+          "size": 107934
+        },
+        "model": {
+          "uri": "trace_cased_bertqa/0.0.1/trace_cased_bertqa.pt.gz",
+          "sha1Hash": "3e25d9e51f9f9f5856ded8320bfeb3c65496fb7c",
+          "size": 1239654718
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "trace_distilbertqa",
+      "properties": {
+        "backbone": "distilbert",
+        "dataset": "SQuAD",
+        "cased": "true"
+      },
+      "arguments": {
+        "translatorFactory": "ai.djl.pytorch.zoo.nlp.qa.PtBertQATranslatorFactory"
+      },
+      "files": {
+        "bert-base-cased-vocab": {
+          "uri": "trace_distilbertqa/0.0.1/bert-base-cased-vocab.txt.gz",
+          "sha1Hash": "42dc39e00cea6e5e67f83272df5201faa0a8f97d",
+          "size": 107934
+        },
+        "model": {
+          "uri": "trace_distilbertqa/0.0.1/trace_distilbertqa.pt.gz",
+          "sha1Hash": "31bcf30784ac201b52225c4257d35fbd9b7293ef",
+          "size": 241458852
+        }
+      }
+    }
+  ]
+}

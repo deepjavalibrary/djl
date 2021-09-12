@@ -1,7 +1,7 @@
 apply plugin: 'jacoco'
 
 def jacocoProjects = subprojects.findAll {
-    if ([":mxnet:jnarator"].contains(it.getPath())) {
+    if ([":engines:mxnet:jnarator"].contains(it.getPath())) {
         return false
     }
     return new File(it.projectDir, "src/test/java").exists()

@@ -70,37 +70,37 @@ jobs:
         if: always()
         with:
           name: mxnet-engine
-          path: mxnet/mxnet-engine/build/reports
+          path: engines/mxnet/mxnet-engine/build/reports
       - name: mxnet-model-zoo test results
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: mxnet-model-zoo
-          path: mxnet/mxnet-model-zoo/build/reports
+          path: engines/mxnet/mxnet-model-zoo/build/reports
       - name: onnxruntime/onnxruntime-engine test results
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: onnxruntime
-          path: onnxruntime/onnxruntime-engine/build/reports
+          path: engines/onnxruntime/onnxruntime-engine/build/reports
       - name: pytorch-engine test results
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: pytorch-engine
-          path: pytorch/pytorch-engine/build/reports
+          path: engines/pytorch/pytorch-engine/build/reports
       - name: tensorflow-engine test results
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: tensorflow-engine
-          path: tensorflow/tensorflow-engine/build/reports
+          path: engines/tensorflow/tensorflow-engine/build/reports
       - name: tensorflow-model-zoo test results
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: tensorflow-model-zoo
-          path: tensorflow/tensorflow-model-zoo/build/reports
+          path: engines/tensorflow/tensorflow-model-zoo/build/reports
 
   test-pytorch:
     if: github.repository == 'deepjavalibrary/djl'

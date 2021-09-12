@@ -30,9 +30,9 @@ For examples and references on building models and translators, look in our
 [basic model zoo](https://github.com/deepjavalibrary/djl/tree/master/model-zoo).
 
 You may be able to find more translator examples in our engine specific model zoos:
-[Apache MXNet](https://github.com/deepjavalibrary/djl/tree/master/mxnet/mxnet-model-zoo),
-[PyTorch](https://github.com/deepjavalibrary/djl/tree/master/pytorch/pytorch-model-zoo),
-and [TensorFlow](https://github.com/deepjavalibrary/djl/tree/master/tensorflow/tensorflow-model-zoo).
+[Apache MXNet](https://github.com/deepjavalibrary/djl/tree/master/engines/mxnet/mxnet-model-zoo),
+[PyTorch](https://github.com/deepjavalibrary/djl/tree/master/engines/pytorch/pytorch-model-zoo),
+and [TensorFlow](https://github.com/deepjavalibrary/djl/tree/master/engines/tensorflow/tensorflow-model-zoo).
 
 More examples and demos of applications featuring DJL are located in our [demo repository](https://github.com/aws-samples/djl-demo).
 
@@ -105,7 +105,7 @@ Activate the automatic selection by adding `ai.djl.mxnet:mxnet-native-auto:1.8.0
 for Apache MXNet, and `ai.djl.pytorch:pytorch-native-auto:1.8.1` for PyTorch as a dependency.
 You can also see:
 
-- [MXNet Engine](../mxnet/mxnet-engine/README.md)
-- [PyTorch Engine](../pytorch/pytorch-engine/README.md)
-- [TensorFlow Engine](../tensorflow/tensorflow-engine/README.md)
-- [ONNX Runtime Engine](../onnxruntime/onnxruntime-engine/README.md)
+- [MXNet Engine](../engines/mxnet/mxnet-engine/README.md)
+- [PyTorch Engine](../engines/pytorch/pytorch-engine/README.md)
+- [TensorFlow Engine](../engines/tensorflow/tensorflow-engine/README.md)
+- [ONNX Runtime Engine](../engines/onnxruntime/onnxruntime-engine/README.md)

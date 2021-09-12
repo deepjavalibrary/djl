@@ -55,13 +55,13 @@ nav:
       - 'docs/roadmap.md'
       - 'docs/faq.md'
   - Tutorials:
-    - Beginner Tutorial:
-        - 'jupyter/tutorial/01_create_your_first_network.ipynb'
-        - 'jupyter/tutorial/02_train_your_first_model.ipynb'
-        - 'jupyter/tutorial/03_image_classification_with_your_model.ipynb'
-    - 'docs/d2l.md'
-    - 'jupyter/rank_classification_using_BERT_on_Amazon_Review.ipynb'
-    - 'jupyter/transfer_learning_on_cifar10.ipynb'
+      - Beginner Tutorial:
+          - 'jupyter/tutorial/01_create_your_first_network.ipynb'
+          - 'jupyter/tutorial/02_train_your_first_model.ipynb'
+          - 'jupyter/tutorial/03_image_classification_with_your_model.ipynb'
+      - 'docs/d2l.md'
+      - 'jupyter/rank_classification_using_BERT_on_Amazon_Review.ipynb'
+      - 'jupyter/transfer_learning_on_cifar10.ipynb'
   - Guides:
       - 'docs/engine.md'
       - Models:
@@ -81,79 +81,83 @@ nav:
       - 'docs/forums.md'
       - 'leaders.md'
   - Apache MXNet:
-      - Overview: 'mxnet/README.md'
+      - Overview: 'engines/mxnet/README.md'
       - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
       - Load a MXNet Model: 'jupyter/load_mxnet_model.ipynb'
       - Backend Optimizer for MXNet: 'docs/mxnet/mxnet_backend_optimizer.md'
       - Modules:
-        - MXNet Engine: 'mxnet/mxnet-engine/README.md'
-        - MXNet Model Zoo: 'mxnet/mxnet-model-zoo/README.md'
-        - MXNet native library: 'mxnet/native/README.md'
+          - MXNet Engine: 'engines/mxnet/mxnet-engine/README.md'
+          - MXNet Model Zoo: 'engines/mxnet/mxnet-model-zoo/README.md'
+          - MXNet native library: 'engines/mxnet/native/README.md'
   - ONNX Runtime:
       - ONNX runtime Hybrid Engine: 'docs/hybrid_engine.md'
       - Load a ONNX Model: 'jupyter/onnxruntime/machine_learning_with_ONNXRuntime.ipynb'
-      - Module: 'onnxruntime/onnxruntime-engine/README.md'
+      - Module: 'engines/onnxruntime/onnxruntime-engine/README.md'
   - PyTorch:
-      - Overview: 'pytorch/README.md'
+      - Overview: 'engines/pytorch/README.md'
       - Importing from PyTorch:
-        - Converting the Model: 'docs/pytorch/how_to_convert_your_model_to_torchscript.md'
-        - Loading the Model: 'jupyter/load_pytorch_model.ipynb'
+          - Converting the Model: 'docs/pytorch/how_to_convert_your_model_to_torchscript.md'
+          - Loading the Model: 'jupyter/load_pytorch_model.ipynb'
       - Modules:
-        - PyTorch Engine: 'pytorch/pytorch-engine/README.md'
-        - PyTorch Model Zoo: 'pytorch/pytorch-model-zoo/README.md'
-        - Pytorch native library: 'pytorch/pytorch-native/README.md'
+          - PyTorch Engine: 'engines/pytorch/pytorch-engine/README.md'
+          - PyTorch Model Zoo: 'engines/pytorch/pytorch-model-zoo/README.md'
+          - Pytorch native library: 'engines/pytorch/pytorch-native/README.md'
   - TensorFlow:
-      - Overview: 'tensorflow/README.md'
+      - Overview: 'engines/tensorflow/README.md'
       - Import TensorFlow Model: 'docs/tensorflow/how_to_import_tensorflow_models_in_DJL.md'
       - Load a TensorFlow Model: 'jupyter/tensorflow/pneumonia_detection.ipynb'
       - Modules:
-        - TensorFlow Engine: 'tensorflow/tensorflow-engine/README.md'
-        - TensorFlow Model Zoo: 'tensorflow/tensorflow-model-zoo/README.md'
-  - PaddlePaddle:
-      - Overview: 'paddlepaddle/README.md'
-      - Import your Paddle model:
-          - English: 'docs/paddlepaddle/how_to_create_paddlepaddle_model.md'
-          - 中文: 'docs/paddlepaddle/how_to_create_paddlepaddle_model_zh.md'
-      - Facemask detection using PaddlePaddle:
-          - English: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
-          - 中文: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle_zh.ipynb'
-      - PaddleOCR example:
-          - English: 'jupyter/paddlepaddle/paddle_ocr_java.ipynb'
-          - 中文: 'jupyter/paddlepaddle/paddle_ocr_java_zh.ipynb'
-      - Modules:
-          - PaddlePaddle Engine: 'paddlepaddle/paddlepaddle-engine/README.md'
-          - PaddlePaddle Model Zoo: 'paddlepaddle/paddlepaddle-model-zoo/README.md'
+          - TensorFlow Engine: 'engines/tensorflow/tensorflow-engine/README.md'
+          - TensorFlow Model Zoo: 'engines/tensorflow/tensorflow-model-zoo/README.md'
+  - Engines:
+      - PaddlePaddle:
+          - Overview: 'engines/paddlepaddle/README.md'
+          - Import your Paddle model:
+              - English: 'docs/paddlepaddle/how_to_create_paddlepaddle_model.md'
+              - 中文: 'docs/paddlepaddle/how_to_create_paddlepaddle_model_zh.md'
+          - Facemask detection using PaddlePaddle:
+              - English: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
+              - 中文: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle_zh.ipynb'
+          - PaddleOCR example:
+              - English: 'jupyter/paddlepaddle/paddle_ocr_java.ipynb'
+              - 中文: 'jupyter/paddlepaddle/paddle_ocr_java_zh.ipynb'
+          - Modules:
+              - PaddlePaddle Engine: 'engines/paddlepaddle/paddlepaddle-engine/README.md'
+              - PaddlePaddle Model Zoo: 'engines/paddlepaddle/paddlepaddle-model-zoo/README.md'
+      - TensorFlow Lite: 'engines/tflite/tflite-engine/README.md'
+      - XGBoost: 'engines/ml/xgboost/README.md'
+      - Neo DLR: 'engines/dlr/dlr-engine/README.md'
   - Extensions:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'
       - Hadoop support: 'extensions/hadoop/README.md'
   - Demos:
-    - Demos: 'docs/demos/README.md'
-    - AWS:
-        - AWS-kinesis-video-streams: 'docs/demos/aws/aws-kinesis-video-streams/README.md'
-        - Model Serving on AWS BeanStalk EC2: 'docs/demos/aws/beanstalk-model-serving/README.md'
-        - Serverless Model Serving with DJL: 'docs/demos/aws/lambda-model-serving/README.md'
-        - Distributed inference with AWS EMR: 'docs/demos/aws/emr-distributed-inference/dataprocess/README.md'
-        - Start with SageMaker: 'docs/demos/aws/sagemaker/README.md'
-    - Android:
-        - Doodledraw Applications with Android: 'docs/demos/android/pytorch_android/README.md'
-    - EcoSystem:
-        - Java Integrations:
-            - DJL Component in Apache Camel: 'docs/demos/camel-djl/README.md'
-            - Run TensorFlow model on GraalVM: 'docs/demos/graalvm/README.md'
-            - Spark Image Classification: 'docs/demos/apache-spark/image-classification/README.md'
-            - Apache Beam: 'docs/demos/apache-beam/ctr-prediction/README.md'
-            - Apache Flink: 'docs/demos/apache-flink/sentiment-analysis/README.md'
-            - Quarkus + DJL Demo: 'docs/demos/quarkus/example/README.md'
-    - Applications:
-        - Footwear Classification: 'docs/demos/footwear_classification/README.md'
-        - Live Object Detection: 'docs/demos/live-object-detection/README.md'
-        - Pneumonia Detection: 'docs/demos/pneumonia-detection/README.md'
-        - MultiEngine on DJL: 'docs/demos/multi-engine/README.md'
-        - Interactive JShell and Block Runner for DJL: 'docs/demos/web-demo/interactive-console/README.md'
-        - Malicious URL Detection: 'docs/demos/malicious-url-detector/README.md'
-    - Extensions:
-        - Visualizing Training with DJL: 'docs/demos/visualization-vue/README.md'
-        - Interactive JShell and Block Runner for DJL: 'docs/demos/web-demo/interactive-console/README.md'
+      - Demos: 'docs/demos/README.md'
+      - AWS:
+          - AWS-kinesis-video-streams: 'docs/demos/aws/aws-kinesis-video-streams/README.md'
+          - Model Serving on AWS BeanStalk EC2: 'docs/demos/aws/beanstalk-model-serving/README.md'
+          - Serverless Model Serving with DJL: 'docs/demos/aws/lambda-model-serving/README.md'
+          - Distributed inference with AWS EMR: 'docs/demos/aws/emr-distributed-inference/dataprocess/README.md'
+          - Start with SageMaker: 'docs/demos/aws/sagemaker/README.md'
+      - Android:
+          - Doodledraw Applications with Android: 'docs/demos/android/pytorch_android/README.md'
+      - EcoSystem:
+          - Java Integrations:
+              - DJL Component in Apache Camel: 'docs/demos/camel-djl/README.md'
+              - Run TensorFlow model on GraalVM: 'docs/demos/graalvm/README.md'
+              - Spark Image Classification: 'docs/demos/apache-spark/image-classification/README.md'
+              - Apache Beam: 'docs/demos/apache-beam/ctr-prediction/README.md'
+              - Apache Flink: 'docs/demos/apache-flink/sentiment-analysis/README.md'
+              - Quarkus + DJL Demo: 'docs/demos/quarkus/example/README.md'
+      - Applications:
+          - Footwear Classification: 'docs/demos/footwear_classification/README.md'
+          - Live Object Detection: 'docs/demos/live-object-detection/README.md'
+          - Pneumonia Detection: 'docs/demos/pneumonia-detection/README.md'
+          - MultiEngine on DJL: 'docs/demos/multi-engine/README.md'
+          - Interactive JShell and Block Runner for DJL: 'docs/demos/web-demo/interactive-console/README.md'
+          - Malicious URL Detection: 'docs/demos/malicious-url-detector/README.md'
+      - Extensions:
+          - Visualizing Training with DJL: 'docs/demos/visualization-vue/README.md'
+          - Interactive JShell and Block Runner for DJL: 'docs/demos/web-demo/interactive-console/README.md'
 
 

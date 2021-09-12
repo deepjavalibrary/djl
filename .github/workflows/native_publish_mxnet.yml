@@ -26,9 +26,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Download native binaries
-        run: ./gradlew :mxnet:native:dMNL
+        run: ./gradlew :engines:mxnet:native:dMNL
       - name: Publish to snapshot/staging repository
-        working-directory: mxnet/native
+        working-directory: engine/mxnet/native
         run: ./gradlew publish -P${{ github.event.inputs.mode }}
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}

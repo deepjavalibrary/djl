@@ -1,0 +1,387 @@
+plugins {
+    id 'maven-publish'
+    id 'signing'
+}
+
+group = "ai.djl.pytorch"
+apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
+
+def VERSION = "${pytorch_version}"
+boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
+boolean isPrecxx11 = project.hasProperty("precxx11")
+boolean isGPU = project.hasProperty("gpu")
+version = VERSION + (isRelease ? "" : "-SNAPSHOT")
+def BINARY_ROOT = "${project.buildDir}/download"
+
+def downloadBuild(String os, String flavor, Boolean isPrecxx11 = false) {
+    exec {
+        if (os == "win") {
+            commandLine "${project.projectDir}/build.cmd", "${flavor}"
+        } else {
+            if (isPrecxx11) {
+                commandLine 'bash', 'build.sh', "${flavor}", "precxx11"
+            } else {
+                commandLine 'bash', 'build.sh', "${flavor}"
+            }
+        }
+    }
+
+    // for nightly ci
+    // the reason why we duplicate the folder here is to insert djl_version into the path
+    // so different versions of JNI wouldn't override each other. We don't also want publishDir
+    // to have djl_version as engine would require to know that during the System.load()
+    def classifier = "${os}-x86_64"
+    def ciDir = "${project.projectDir}/jnilib/${djl_version}/${classifier}/${flavor}"
+    copy {
+        def tree = fileTree(project.buildDir)
+        tree.include("**/libdjl_torch.*", "**/djl_torch.dll")
+        from tree.files
+        into ciDir
+    }
+}
+
+def downloadBuildAndroid() {
+    def LIST_ABI = ["armeabi-v7a", "arm64-v8a", "x86", "x86_64"]
+    LIST_ABI.each {
+        abi ->
+            exec {
+                commandLine 'bash', 'build_android.sh', "${abi}"
+            }
+            def ciDir = "${project.projectDir}/jnilib/${djl_version}/android/${abi}"
+            copy {
+                from "${project.buildDir}/libdjl_torch.so"
+                into ciDir
+            }
+            cleanBuild()
+    }
+}
+
+def cleanBuild() {
+    delete "${project.projectDir}/build"
+    delete "${project.projectDir}/libtorch"
+    delete "${project.projectDir}/libtorch_android"
+    delete fileTree(dir: '${project.projectDir}', include: '**.zip')
+}
+
+task compileAndroidJNI {
+    doFirst {
+        downloadBuildAndroid()
+    }
+}
+
+task releaseJNI {
+    doFirst {
+        // You have to use an environment with CUDA persets for Linux and Windows
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
+            if (!isGPU) {
+                downloadBuild("win", "cpu")
+                cleanBuild()
+            } else {
+                downloadBuild("win", "cu102")
+                cleanBuild()
+                downloadBuild("win", "cu111")
+                cleanBuild()
+            }
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac") && !isGPU) {
+            downloadBuild("osx", "cpu")
+            cleanBuild()
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            if (!isGPU) {
+                downloadBuild("linux", "cpu", isPrecxx11)
+                cleanBuild()
+            } else {
+                downloadBuild("linux", "cu102", isPrecxx11)
+                cleanBuild()
+                downloadBuild("linux", "cu111", isPrecxx11)
+                cleanBuild()
+            }
+        } else {
+            throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'] + (isGPU) ? " GPU" : " CPU")
+        }
+
+        delete fileTree(System.getProperty("user.home") + "/.djl.ai/pytorch/") {
+            include '**/*libdjl_torch.*'
+        }
+    }
+}
+
+task compileJNI {
+    doFirst {
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
+            downloadBuild("win", "cpu")
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
+            downloadBuild("osx", "cpu")
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            downloadBuild("linux", "cpu")
+        } else {
+            throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
+        }
+        delete fileTree(System.getProperty("user.home") + "/.djl.ai/pytorch/") {
+            include '**/*djl_torch.*'
+        }
+    }
+}
+
+task compileJNIGPU {
+    doFirst {
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
+            downloadBuild("win", "cu102")
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            downloadBuild("linux", "cu102")
+        } else {
+            throw new IllegalStateException("Architecture not supported: " + System.properties['os.name'])
+        }
+        delete fileTree(System.getProperty("user.home") + "/.djl.ai/pytorch/") {
+            include '**/*djl_torch.*'
+        }
+    }
+}
+
+// Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
+jar {
+    def placeholder = "${project.buildDir}/placeholder"
+    // this line is to enforce gradle to build the jar
+    // otherwise it don't generate the placeholder jar at times
+    // when there is no java code inside src/main
+    outputs.dir file("build/libs")
+    doFirst {
+        def versionName = project.version
+        if (!isRelease) {
+            versionName += String.format("-%s", new Date().format('yyyyMMdd'))
+        }
+        def dir = file("${placeholder}/native/lib")
+        dir.mkdirs()
+        def propFile = file("${placeholder}/native/lib/pytorch.properties")
+        propFile.text = "placeholder=true\nversion=${versionName}\n"
+    }
+
+    from placeholder
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+project.tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+
+signing {
+    required(project.hasProperty("staging") || project.hasProperty("snapshot"))
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications
+}
+
+publishing.repositories {
+    maven {
+        if (project.hasProperty("snapshot")) {
+            name = "snapshot"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+            credentials {
+                username = findProperty("ossrhUsername")
+                password = findProperty("ossrhPassword")
+            }
+        } else if (project.hasProperty("staging")) {
+            name = "staging"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = findProperty("ossrhUsername")
+                password = findProperty("ossrhPassword")
+            }
+        } else {
+            name = "local"
+            url = "build/repo"
+        }
+    }
+}
+
+task downloadPyTorchNativeLib() {
+    doLast {
+        def url = "https://download.pytorch.org/libtorch"
+        def files = [
+                "cpu/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcpu.zip"    : "cpu/linux",
+                "cpu/libtorch-macos-${VERSION}.zip"                               : "cpu/osx",
+                "cpu/libtorch-win-shared-with-deps-${VERSION}%2Bcpu.zip"          : "cpu/win",
+                "cu102/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu102.zip": "cu102/linux",
+                "cu111/libtorch-cxx11-abi-shared-with-deps-${VERSION}%2Bcu111.zip": "cu111/linux",
+                "cu102/libtorch-win-shared-with-deps-${VERSION}%2Bcu102.zip"      : "cu102/win",
+                "cu111/libtorch-win-shared-with-deps-${VERSION}%2Bcu111.zip"      : "cu111/win"
+        ]
+        if (isPrecxx11) {
+            // precxx11 only support cpu for now
+            files = [
+                    "cpu/libtorch-shared-with-deps-${VERSION}%2Bcpu.zip": "cpu/linux",
+            ]
+        }
+        files.each { entry ->
+            project.logger.lifecycle("Downloading ${url}/${entry.key}")
+            def outputDir = new File("${BINARY_ROOT}/${entry.value}")
+            def file = new File("${outputDir}/libtorch.zip")
+            file.getParentFile().mkdirs()
+            new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }
+            copy {
+                from zipTree(file)
+                into outputDir
+            }
+            // CPU dependencies
+            copy {
+                from("${outputDir}/libtorch/lib/") {
+                    include "libc10.*", "c10.dll", "libiomp5*.*", "libgomp*.*", "libtorch.*", "libtorch_cpu.*", "torch.dll", "torch_cpu.dll", "fbgemm.dll", "asmjit.dll"
+                }
+                into("${outputDir}/native/lib")
+            }
+            // GPU dependencies
+            copy {
+                from("${outputDir}/libtorch/lib/") {
+                    include "libtorch_cuda*.so", "torch_cuda*.dll", "libc10_cuda.so", "c10_cuda.dll", "libcaffe2_nvrtc.so", "libnvrtc*.so.*", "libcudart*.*", "*nvToolsExt*.*", "cudnn*.dll", "caffe2_nvrtc.dll", "nvrtc64*.dll"
+                }
+                into("${outputDir}/native/lib")
+            }
+            if (isPrecxx11) {
+                def libstd = new File("${outputDir}/native/lib/libstdc++.so.6")
+                new URL("https://publish.djl.ai/extra/libstdc%2B%2B.so.6").withInputStream {
+                    i -> libstd.withOutputStream { it << i }
+                }
+            }
+            delete(file)
+            delete("${outputDir}/libtorch")
+        }
+        if (!isPrecxx11) {
+            new File("${BINARY_ROOT}/auto").mkdirs()
+        }
+    }
+}
+
+task uploadS3 {
+    doLast {
+        exec {
+            commandLine "sh", "-c", "find ${BINARY_ROOT} -type f | xargs gzip"
+        }
+        def f = new File("${BINARY_ROOT}/files.txt")
+        def uploadDirs = [
+                "${BINARY_ROOT}/cpu/linux/native/lib/",
+                "${BINARY_ROOT}/cpu/osx/native/lib/",
+                "${BINARY_ROOT}/cpu/win/native/lib/",
+                "${BINARY_ROOT}/cu102/linux/native/lib/",
+                "${BINARY_ROOT}/cu102/win/native/lib/",
+                "${BINARY_ROOT}/cu111/linux/native/lib/",
+                "${BINARY_ROOT}/cu111/win/native/lib/"
+        ]
+        uploadDirs.each { item ->
+            fileTree(item).files.name.each {
+                def out = item - "${BINARY_ROOT}/"
+                f << out + it
+                f << "\n"
+            }
+        }
+        exec {
+            commandLine "aws", "s3", "sync", "${BINARY_ROOT}", "s3://djl-ai/publish/pytorch-${VERSION}/"
+        }
+    }
+}
+
+
+def flavorNames = file(BINARY_ROOT).list() ?: []
+flavorNames.each { flavor ->
+
+    def platformNames = file("${BINARY_ROOT}/${flavor}").list() ?: []
+
+    def artifactsNames = []
+
+    platformNames.each { osName ->
+        tasks.create(name: "${flavor}-${osName}Jar", type: Jar) {
+            doFirst {
+                def propFile = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib/pytorch.properties")
+                propFile.delete()
+                def dsStore = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib/.DS_Store")
+                dsStore.delete()
+
+                def versionName = String.format("${version}-%s", new Date().format('yyyyMMdd'))
+                def dir = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib")
+                def sb = new StringBuilder()
+                sb.append("version=${versionName}\nclassifier=${flavor}-${osName}-x86_64\nlibraries=")
+                def first = true
+                for (String name : dir.list().sort()) {
+                    if (first) {
+                        first = false
+                    } else {
+                        sb.append(',')
+                    }
+                    sb.append(name)
+                }
+                propFile.text = sb.toString()
+                def metaInf = new File("${BINARY_ROOT}/${flavor}/${osName}/META-INF")
+                metaInf.mkdirs()
+                def licenseFile = new File(metaInf, "LICENSE")
+                licenseFile.text = new URL("https://raw.githubusercontent.com/pytorch/pytorch/master/LICENSE").text
+
+                def binaryLicenseFile = new File(metaInf, "NOTICE")
+                binaryLicenseFile.text = new URL("https://raw.githubusercontent.com/pytorch/pytorch/master/NOTICE").text
+
+                if (isPrecxx11) {
+                    def libstd = new File(metaInf, "ATTRIBUTION")
+                    libstd.text = new URL("https://publish.djl.ai/extra/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt").text
+                }
+            }
+            from file("${BINARY_ROOT}/${flavor}/${osName}")
+            from file("src/main/resources")
+            archiveClassifier = "${osName}-x86_64"
+
+            manifest {
+                attributes("Automatic-Module-Name": "ai.djl.pytorch_native_${flavor}_${osName}")
+            }
+        }
+        artifactsNames.add(tasks["${flavor}-${osName}Jar"])
+    }
+
+    // Only publish if the project directory equals the current directory
+    // This means that publishing from the main project does not publish the native jars
+    // and the native jars have to be published separately
+    if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
+        publishing.publications.create("${flavor}", MavenPublication) {
+            artifactId "pytorch-native-${flavor}" + (isPrecxx11 ? "-precxx11" : "")
+            from components.java
+            artifacts = artifactsNames
+            artifact jar
+            artifact javadocJar
+            artifact sourcesJar
+            pom {
+                name = "DJL release for PyTorch native binaries"
+                description = "Deep Java Library (DJL) provided PyTorch native library binary distribution"
+                url = "http://www.djl.ai/engines/pytorch/pytorch-native"
+                packaging = "jar"
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                    }
+                }
+
+                scm {
+                    connection = "scm:git:git@github.com:deepjavalibrary/djl.git"
+                    developerConnection = "scm:git:git@github.com:deepjavalibrary/djl.git"
+                    url = "https://github.com/deepjavalibrary/djl"
+                    tag = "HEAD"
+                }
+
+                developers {
+                    developer {
+                        name = "DJL.AI Team"
+                        email = "djl-dev@amazon.com"
+                        organization = "Amazon AI"
+                        organizationUrl = "https://amazon.com"
+                    }
+                }
+            }
+        }
+    }
+}
+
+clean.doFirst {
+    delete "${project.projectDir}/jnilib"
+    delete "${project.projectDir.getParent()}/pytorch-engine/jnilib"
+}

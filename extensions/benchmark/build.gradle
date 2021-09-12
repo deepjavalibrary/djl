@@ -36,19 +36,19 @@ dependencies {
     } else {
         implementation project(":model-zoo")
 
-        runtimeOnly project(":pytorch:pytorch-model-zoo")
+        runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
         runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
 
-        runtimeOnly project(":tensorflow:tensorflow-model-zoo")
+        runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
         runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
 
-        runtimeOnly project(":mxnet:mxnet-model-zoo")
+        runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
         runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
 
-        runtimeOnly project(":tflite:tflite-engine")
+        runtimeOnly project(":engines:tflite:tflite-engine")
         runtimeOnly "ai.djl.tflite:tflite-native-auto:${tflite_version}"
 
-        runtimeOnly project(":paddlepaddle:paddlepaddle-model-zoo")
+        runtimeOnly project(":engines:paddlepaddle:paddlepaddle-model-zoo")
         runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
 
         ProcessBuilder pb = new ProcessBuilder("nvidia-smi", "-L")
@@ -60,18 +60,18 @@ dependencies {
         }
 
         if (hasGPU) {
-            runtimeOnly(project(":onnxruntime:onnxruntime-engine")) {
+            runtimeOnly(project(":engines:onnxruntime:onnxruntime-engine")) {
                 exclude group: "com.microsoft.onnxruntime", module: "onnxruntime"
             }
             runtimeOnly "com.microsoft.onnxruntime:onnxruntime_gpu:${onnxruntime_version}"
         } else {
-            runtimeOnly project(":onnxruntime:onnxruntime-engine")
+            runtimeOnly project(":engines:onnxruntime:onnxruntime-engine")
         }
 
-        runtimeOnly project(":dlr:dlr-engine")
+        runtimeOnly project(":engines:dlr:dlr-engine")
         runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
 
-        runtimeOnly(project(":ml:xgboost")) {
+        runtimeOnly(project(":engines:ml:xgboost")) {
             exclude group: "ml.dmlc", module: "xgboost4j_2.12"
         }
     }

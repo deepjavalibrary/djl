@@ -1,0 +1,52 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "resnext",
+  "name": "Resnext",
+  "description": "Resnext image classification",
+  "website": "http://www.djl.ai/engines/mxnet/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnext101_64x4d",
+      "properties": {
+        "layers": "101",
+        "flavor": "64x4d",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "size": 31675
+        },
+        "symbol": {
+          "uri": "0.0.1/resnext101_64x4d-symbol.json",
+          "sha1Hash": "9cbbc9f92e0b973c76637d9f7b957343cd44d867",
+          "size": 312182
+        },
+        "parameters": {
+          "uri": "0.0.1/resnext101_64x4d-0000.params.gz",
+          "sha1Hash": "855502721fad8d78932342bf6b4a04f76afb00b6",
+          "size": 193364535
+        }
+      }
+    }
+  ]
+}
