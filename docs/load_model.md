@@ -37,14 +37,14 @@ The criteria accept the following optional information:
 - Application: defines model application
 - Input/Output data type: defines desired input and output data type
 - artifact id: defines the artifact id of the model you want to load, you can use fully-qualified name that includes group id
-- group id: defines the group id of the pre loaded ModelZoo that the model belongs to
+- group id: defines the group id of the pre-loaded ModelZoo that the model belongs to
 - ModelZoo: specifies a ModelZoo in which to search model
 - model urls: a comma delimited string defines at where the models are stored 
 - Translator: defines custom data processing functionality to be used to ZooModel
 - Progress: specifies model loading progress
 - filters: defines search filters that must match the properties of the model
 - options: defines engine/model specific options to load the model
-- arguments: defines model specific arguments to load the model
+- arguments: defines model specific arguments to customize the behavior of Translator
 
 *Note:* If multiple models match the criteria you specified, the first one will be returned. The result is not deterministic.
 
@@ -71,8 +71,8 @@ The following shows how to load a pre-trained model from a file path:
 Criteria<Image, Classifications> criteria = Criteria.builder()
         .setTypes(Image.class, Classifications.class) // defines input and output data type
         .optTranslator(ImageClassificationTranslator.builder().setSynsetArtifactName("synset.txt").build())
-        .optModelUrls("file:///var/models/my_resnet50") // search models in specified path
-        .optModelName("resnet50") // specify model file prefix
+        .optModelPath(Paths.get("/var/models/my_resnet50")) // search models in specified path
+        .optModelName("model/resnet50") // specify model file prefix
         .build();
 
 ZooModel<Image, Classifications> model = criteria.loadModel();
@@ -86,27 +86,24 @@ DJL supports loading a pre-trained model from a local directory or an [archive f
 - .tar
 - .tar.gz, .tgz, .tar.z
 
-#### Customize artifactId and modelName
+#### Customize modelName
 
-By default, DJL will use the directory/file name of the URL as the model's `artifactId` and `modelName`.
-Some engines (MXNet, PyTorch) are sensitive to the model name, you usually need name the directory or archive
-file to be the same as model. You can use the URL query string to tell DJL how to load model if the model name are
-different from the directory or archive file:
+By default, DJL will use the directory/file name of the URL as the model's `modelName`.
+DJL uses `modelName` as model file's prefix to load model file in the directory. We recommend
+naming the model file name to be the same as the directory or archive file.
 
-- model_name: the file name (or prefix) of the model. You need to include the relative path to the model file if it's in a sub folder of the archive file. 
-- artifact_id: define a `artifactId` other than the file name
-
-For example:
+If your model file located in a sub-folder of the model directory or has a different name,
+you can specify modelName by `.optModelName()` in criteria:
 
 ```
-file:///var/models/resnet.zip?artifact_id=resenet-18&model_name=resnet-18v1
+Criteria<Image, Classifications> criteria = Criteria.builder()
+        .optModelName("traced_model/resnet18.pt") // specify model file prefix
 ```
 
-If your the directory or archive file has nested folder, are include the folder name in url to let DJL know where
-to find model files:
+You can also use the URL query string to tell DJL how to load model:
 
 ```
-file:///var/models/resnet.zip?artifact_id=resenet-18&model_name=saved_model/resnet-18
+file:///var/models/resnet.zip?model_name=saved_model/resnet-18
 ```
 
 ### Load model from a URL
@@ -119,6 +116,9 @@ Current supported URL scheme:
 - file:// load a model from local directory or archive file
 - http(s):// load a model from an archive file from web server  
 - jar:// load a model from an archive file in the class path
+- djl:// load a model from the model zoo
+- s3:// load a model from S3 bucket (requires [djl aws extension](https://github.com/deepjavalibrary/djl/tree/master/extensions/aws-ai))
+- hdfs:// load a model from HDFS file system (requires [djl hadoop extension](https://github.com/deepjavalibrary/djl/tree/master/extensions/hadoop))
 
 ```java
 Criteria<Image, Classifications> criteria = Criteria.builder()
