@@ -27,15 +27,18 @@ import java.util.Arrays;
 public class PpSymbolBlock extends AbstractSymbolBlock {
 
     private PaddlePredictor predictor;
+    private PpNDManager manager;
     private String[] inputNames;
 
     /**
      * Constructs a new {@code PpSymbolBlock} instance.
      *
      * @param predictor {@link PaddlePredictor} that holds the model information.
+     * @param manager the {@link NDManager} to holds the NDArray
      */
-    public PpSymbolBlock(PaddlePredictor predictor) {
+    public PpSymbolBlock(PaddlePredictor predictor, PpNDManager manager) {
         this.predictor = predictor;
+        this.manager = manager;
         inputNames = JniUtils.getInputNames(predictor);
     }
 
@@ -50,47 +53,21 @@ public class PpSymbolBlock extends AbstractSymbolBlock {
             throw new IllegalArgumentException(
                     "Input number mismatch, requires: " + Arrays.toString(inputNames));
         }
+        NDList output = JniUtils.predictorForward(predictor, getInputs(inputs), inputNames);
         NDManager inputManager = inputs.head().getManager();
-        try (PpNDManager tempManager = PpNDManager.getSystemManager().newSubManager()) {
-            boolean foreignEngine =
-                    !PpEngine.ENGINE_NAME.equals(inputManager.getEngine().getEngineName());
-            PpNDArray[] result =
-                    JniUtils.predictorForward(
-                            predictor, getInputs(inputs, foreignEngine, tempManager), inputNames);
-            return getOutputs(result, foreignEngine, inputManager);
+        NDList ret = new NDList();
+        for (NDArray array : output) {
+            ret.add(inputManager.adopt(array));
         }
+        return ret;
     }
 
-    private PpNDArray[] getInputs(NDList inputs, boolean foreignEngine, PpNDManager tempManager) {
+    private PpNDArray[] getInputs(NDList inputs) {
         PpNDArray[] inputArray = new PpNDArray[inputs.size()];
         for (int i = 0; i < inputArray.length; i++) {
-            if (foreignEngine) {
-                NDArray array = inputs.get(i);
-                inputArray[i] =
-                        tempManager.create(
-                                array.toByteBuffer(), array.getShape(), array.getDataType());
-            } else {
-                inputArray[i] = (PpNDArray) inputs.get(i);
-            }
+            inputArray[i] = manager.adopt(inputs.get(i));
         }
         return inputArray;
-    }
-
-    private NDList getOutputs(PpNDArray[] outputs, boolean foreignEngine, NDManager inputManager) {
-        NDList list = new NDList(outputs.length);
-        for (PpNDArray output : outputs) {
-
-            if (foreignEngine) {
-                list.add(
-                        inputManager.create(
-                                output.getDataType().asDataType(output.toByteBuffer()),
-                                output.getShape(),
-                                output.getDataType()));
-            } else {
-                list.add(output);
-            }
-        }
-        return list;
     }
 
     /** {@inheritDoc} */

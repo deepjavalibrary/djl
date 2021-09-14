@@ -12,7 +12,6 @@
  */
 package ai.djl.onnxruntime.engine;
 
-import ai.djl.Device;
 import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrayAdapter;
@@ -26,56 +25,26 @@ import java.nio.ByteOrder;
 import java.util.UUID;
 
 /** {@code OrtNDArray} is the ONNX Runtime implementation of {@link NDArray}. */
-public class OrtNDArray implements NDArrayAdapter {
+public class OrtNDArray extends NDArrayAdapter {
 
-    private OrtNDManager manager;
     private OnnxTensor tensor;
-    private Shape shape;
-    private DataType dataType;
-    private String name;
-    private boolean isClosed;
-    private String uid;
 
     /**
      * Constructs an ONNX Runtime NDArray from a {@link OnnxTensor} (internal. Use {@link NDManager}
      * instead).
      *
      * @param manager the manager to attach the new array to
+     * @param alternativeManager the alternative manager to execute unsupported operation
      * @param tensor the {@link OnnxTensor} to the ONNX Runtime
      */
-    OrtNDArray(OrtNDManager manager, OnnxTensor tensor) {
-        this.manager = manager;
+    OrtNDArray(OrtNDManager manager, NDManager alternativeManager, OnnxTensor tensor) {
+        super(manager, alternativeManager, null, null, UUID.randomUUID().toString());
         this.tensor = tensor;
-        uid = UUID.randomUUID().toString();
         manager.attachInternal(uid, this);
     }
 
     OnnxTensor getTensor() {
         return tensor;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDManager getManager() {
-        return manager;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getUid() {
-        return uid;
     }
 
     /** {@inheritDoc} */
@@ -89,35 +58,11 @@ public class OrtNDArray implements NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public Device getDevice() {
-        // TODO: Support on multiple devices
-        return Device.cpu();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Shape getShape() {
         if (shape == null) {
             shape = new Shape(tensor.getInfo().getShape());
         }
         return shape;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attach(NDManager manager) {
-        detach();
-        this.manager = (OrtNDManager) manager;
-        manager.attachInternal(getUid(), this);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void tempAttach(NDManager manager) {
-        detach();
-        NDManager original = this.manager;
-        this.manager = (OrtNDManager) manager;
-        manager.tempAttachInternal(original, getUid(), this);
     }
 
     /** {@inheritDoc} */
@@ -145,17 +90,10 @@ public class OrtNDArray implements NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public String toString() {
-        if (isClosed) {
-            return "This array is already closed";
-        }
-        return toDebugString();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void close() {
-        tensor.close();
-        isClosed = true;
+        if (!isClosed) {
+            tensor.close();
+            super.close();
+        }
     }
 }

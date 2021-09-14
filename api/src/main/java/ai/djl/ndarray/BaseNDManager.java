@@ -13,11 +13,19 @@
 package ai.djl.ndarray;
 
 import ai.djl.Device;
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.util.Float16Utils;
 import ai.djl.util.PairList;
 import ai.djl.util.RandomUtils;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.nio.ShortBuffer;
 import java.nio.file.Path;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,6 +59,16 @@ public abstract class BaseNDManager implements NDManager {
     public final Device defaultDevice() {
         return getEngine().defaultDevice();
     }
+
+    /**
+     * Creates a new instance of {@link NDArray} of current engine.
+     *
+     * @param data the data to initialize the {@code NDArray}
+     * @param shape the {@link Shape} of the {@code NDArray}
+     * @param dataType the {@link DataType} of the {@code NDArray}
+     * @return a new instance of {@code NDArray}
+     */
+    public abstract NDArray createDirect(Buffer data, Shape shape, DataType dataType);
 
     /** {@inheritDoc} */
     @Override
@@ -109,13 +127,44 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray zeros(Shape shape, DataType dataType) {
-        throw new UnsupportedOperationException("Not supported!");
+        int size = (int) shape.size();
+        ByteBuffer bb = allocateDirect(size * dataType.getNumOfBytes());
+        return createDirect(bb, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray ones(Shape shape, DataType dataType) {
-        throw new UnsupportedOperationException("Not supported!");
+        int size = (int) shape.size();
+        ByteBuffer bb = allocateDirect(size * dataType.getNumOfBytes());
+        for (int i = 0; i < size; ++i) {
+            switch (dataType) {
+                case FLOAT16:
+                    bb.putShort(Float16Utils.ONE);
+                    break;
+                case FLOAT32:
+                    bb.putFloat(1f);
+                    break;
+                case FLOAT64:
+                    bb.putDouble(1d);
+                    break;
+                case INT32:
+                    bb.putInt(1);
+                    break;
+                case INT64:
+                    bb.putLong(1);
+                    break;
+                case UINT8:
+                case INT8:
+                    bb.put((byte) 1);
+                    break;
+                case UNKNOWN:
+                default:
+                    break;
+            }
+        }
+        bb.rewind();
+        return createDirect(bb, shape, dataType);
     }
 
     /** {@inheritDoc} */
@@ -332,6 +381,73 @@ public abstract class BaseNDManager implements NDManager {
                 ((BaseNDManager) c).debugDump(level + 1);
             }
         }
+    }
+
+    protected NDManager getAlternativeManager() {
+        Engine engine = getEngine().getAlternativeEngine();
+        if (engine != null) {
+            return engine.newBaseManager(Device.cpu());
+        }
+        return null;
+    }
+
+    /**
+     * Checks if the input buffer size is match expected data type.
+     *
+     * @param buffer the input buffer
+     * @param dataType the desired {@code DataType}
+     * @param expected the expected size
+     * @throws IllegalArgumentException if buffer size is invalid
+     */
+    public static void validateBufferSize(Buffer buffer, DataType dataType, int expected) {
+        int remaining = buffer.remaining();
+        int expectedSize =
+                buffer instanceof ByteBuffer ? dataType.getNumOfBytes() * expected : expected;
+        if (remaining < expectedSize) {
+            throw new IllegalArgumentException(
+                    "The NDArray size is: " + expected + ", but buffer size is: " + remaining);
+        }
+        if (remaining > expectedSize) {
+            logger.warn(
+                    "Input buffer size is greater than the NDArray size, please set limit explicitly.");
+            buffer.limit(expectedSize);
+        }
+    }
+
+    /**
+     * Copies data from the source {@code Buffer} to the target {@code ByteBuffer}.
+     *
+     * @param src the source {@code Buffer}
+     * @param target the target {@code ByteBuffer}
+     */
+    public static void copyBuffer(Buffer src, ByteBuffer target) {
+        target.rewind();
+        DataType inputType = DataType.fromBuffer(src);
+        switch (inputType) {
+            case FLOAT16:
+                target.asShortBuffer().put((ShortBuffer) src);
+                break;
+            case FLOAT32:
+                target.asFloatBuffer().put((FloatBuffer) src);
+                break;
+            case FLOAT64:
+                target.asDoubleBuffer().put((DoubleBuffer) src);
+                break;
+            case UINT8:
+            case INT8:
+            case BOOLEAN:
+                target.put((ByteBuffer) src);
+                break;
+            case INT32:
+                target.asIntBuffer().put((IntBuffer) src);
+                break;
+            case INT64:
+                target.asLongBuffer().put((LongBuffer) src);
+                break;
+            default:
+                throw new AssertionError("Unsupported datatype: " + inputType);
+        }
+        target.rewind();
     }
 
     protected static final class TempResource {

@@ -22,18 +22,18 @@ import ai.djl.ndarray.types.Shape;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
+import org.tensorflow.lite.Tensor;
 
 /** {@code TfLiteNDManager} is the TFLite implementation of {@link NDManager}. */
 public class TfLiteNDManager extends BaseNDManager {
 
     private static final TfLiteNDManager SYSTEM_MANAGER = new SystemManager();
 
+    private NDManager alternativeManager;
+
     private TfLiteNDManager(NDManager parent, Device device) {
         super(parent, device);
+        alternativeManager = getAlternativeManager();
     }
 
     static TfLiteNDManager getSystemManager() {
@@ -48,84 +48,38 @@ public class TfLiteNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public TfLiteNDArray create(Buffer data, Shape shape, DataType dataType) {
+    public TfLiteNDArray adopt(NDArray array) {
+        if (array instanceof TfLiteNDArray) {
+            return (TfLiteNDArray) array;
+        }
+        return createDirect(array.toByteBuffer(), array.getShape(), array.getDataType());
+    }
+
+    TfLiteNDArray createInternal(Tensor tensor) {
+        return new TfLiteNDArray(this, alternativeManager, tensor);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public TfLiteNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
+        int size = Math.toIntExact(shape.size());
+        BaseNDManager.validateBufferSize(data, dataType, size);
         if (data.isDirect() && data instanceof ByteBuffer) {
-            return new TfLiteNDArray(this, (ByteBuffer) data, shape, dataType);
+            return new TfLiteNDArray(this, alternativeManager, (ByteBuffer) data, shape, dataType);
         }
 
-        int size = data.remaining();
-        // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
-        DataType inputType = DataType.fromBuffer(data);
-
-        int numOfBytes = inputType.getNumOfBytes();
-        ByteBuffer buf = allocateDirect(size * numOfBytes);
-
-        switch (inputType) {
-            case FLOAT32:
-                buf.asFloatBuffer().put((FloatBuffer) data);
-                break;
-            case FLOAT64:
-                buf.asDoubleBuffer().put((DoubleBuffer) data);
-                break;
-            case UINT8:
-            case INT8:
-            case BOOLEAN:
-                buf.put((ByteBuffer) data);
-                break;
-            case INT32:
-                buf.asIntBuffer().put((IntBuffer) data);
-                break;
-            case INT64:
-                buf.asLongBuffer().put((LongBuffer) data);
-                break;
-            case FLOAT16:
-            default:
-                throw new AssertionError("Show never happen");
-        }
-        buf.rewind();
-        return new TfLiteNDArray(this, buf, shape, dataType);
+        ByteBuffer buf = allocateDirect(size * dataType.getNumOfBytes());
+        copyBuffer(data, buf);
+        return new TfLiteNDArray(this, alternativeManager, buf, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zeros(Shape shape, DataType dataType) {
-        int bytes = dataType.getNumOfBytes();
-        int size = Math.toIntExact(bytes * shape.size());
-        ByteBuffer buffer = allocateDirect(size);
-        return create(dataType.asDataType(buffer), shape, dataType);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ones(Shape shape, DataType dataType) {
-        long size = shape.size();
-        int bytes = Math.toIntExact(dataType.getNumOfBytes() * size);
-        ByteBuffer buffer = allocateDirect(bytes);
-        for (int i = 0; i < size; ++i) {
-            switch (dataType) {
-                case BOOLEAN:
-                case INT8:
-                case UINT8:
-                    buffer.put((byte) 1);
-                    break;
-                case FLOAT32:
-                    buffer.putFloat(1f);
-                    break;
-                case FLOAT64:
-                    buffer.putDouble(1);
-                    break;
-                case INT32:
-                    buffer.putInt(1);
-                    break;
-                case INT64:
-                    buffer.putLong(1);
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Unsupported dataType: " + dataType);
-            }
+    public NDArray create(Buffer data, Shape shape, DataType dataType) {
+        if (alternativeManager != null) {
+            return alternativeManager.create(data, shape, dataType);
         }
-        buffer.rewind();
-        return create(dataType.asDataType(buffer), shape, dataType);
+        return createDirect(data, shape, dataType);
     }
 
     /** {@inheritDoc} */

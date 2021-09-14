@@ -24,11 +24,17 @@ import java.util.Stack;
 /** The {@link NDArrayIndexer} used by the {@link PtNDArray}. */
 public class PtNDArrayIndexer extends NDArrayIndexer {
 
+    private PtNDManager manager;
+
+    PtNDArrayIndexer(PtNDManager manager) {
+        this.manager = manager;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray get(NDArray array, NDIndexFullPick fullPick) {
         return JniUtils.pick(
-                (PtNDArray) array, (PtNDArray) fullPick.getIndices(), fullPick.getAxis());
+                manager.adopt(array), manager.adopt(fullPick.getIndices()), fullPick.getAxis());
     }
 
     /** {@inheritDoc} */
@@ -37,7 +43,7 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
         long[] min = fullSlice.getMin();
         long[] max = fullSlice.getMax();
         long[] step = fullSlice.getStep();
-        try (PtNDArray res = JniUtils.index((PtNDArray) array, min, max, step)) {
+        try (PtNDArray res = JniUtils.index(manager.adopt(array), min, max, step)) {
             return res.squeeze(fullSlice.getToSqueeze());
         }
     }
@@ -57,8 +63,8 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
         prepareValue.add(prepareValue.peek().reshape(targetShape));
         prepareValue.add(prepareValue.peek().broadcast(fullSlice.getShape()));
         JniUtils.indexSet(
-                (PtNDArray) array,
-                (PtNDArray) prepareValue.peek(),
+                manager.adopt(array),
+                manager.adopt(prepareValue.peek()),
                 fullSlice.getMin(),
                 fullSlice.getMax(),
                 fullSlice.getStep());
@@ -73,7 +79,8 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
     @Override
     public void set(NDArray array, NDIndexBooleans indices, NDArray value) {
         try (NDArray mask = indices.getIndex()) {
-            JniUtils.booleanMaskSet((PtNDArray) array, (PtNDArray) value, (PtNDArray) mask);
+            JniUtils.booleanMaskSet(
+                    manager.adopt(array), manager.adopt(value), manager.adopt(mask));
         }
     }
 

@@ -12,37 +12,37 @@
  */
 package ai.djl.paddlepaddle.engine;
 
-import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrayAdapter;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.paddlepaddle.jni.JniUtils;
-import ai.djl.util.NativeResource;
+import com.sun.jna.Pointer;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicReference;
 
 /** {@code PpNDArray} is the PaddlePaddle implementation of {@link NDArray}. */
-public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
+public class PpNDArray extends NDArrayAdapter {
 
-    private PpNDManager manager;
     // we keep the data to prevent GC from early collecting native memory
     private ByteBuffer data;
-    private Shape shape;
-    private DataType dataType;
+
+    private AtomicReference<Long> handle;
 
     /**
      * Constructs an PpNDArray from a native handle (internal. Use {@link NDManager} instead).
      *
      * @param manager the manager to attach the new array to
+     * @param alternativeManager the alternative manager if available
      * @param data bytebuffer that holds the native memory
      * @param handle the pointer to the native MxNDArray memory
      */
-    public PpNDArray(PpNDManager manager, ByteBuffer data, long handle) {
-        super(handle);
-        this.manager = manager;
+    PpNDArray(NDManager manager, NDManager alternativeManager, ByteBuffer data, long handle) {
+        super(manager, alternativeManager, null, null, String.valueOf(handle));
         this.data = data;
-        manager.attachInternal(getUid(), this);
+        this.handle = new AtomicReference<>(handle);
+        manager.attachInternal(uid, this);
     }
 
     /**
@@ -63,12 +63,6 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
      */
     public long[][] getLoD() {
         return JniUtils.getNdLoD(this);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDManager getManager() {
-        return manager;
     }
 
     /** {@inheritDoc} */
@@ -94,34 +88,11 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public Device getDevice() {
-        return Device.cpu();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Shape getShape() {
         if (shape == null) {
             shape = JniUtils.getShapeFromNd(this);
         }
         return shape;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attach(NDManager manager) {
-        detach();
-        this.manager = (PpNDManager) manager;
-        manager.attachInternal(getUid(), this);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void tempAttach(NDManager manager) {
-        detach();
-        NDManager original = this.manager;
-        this.manager = (PpNDManager) manager;
-        manager.tempAttachInternal(original, getUid(), this);
     }
 
     /** {@inheritDoc} */
@@ -141,18 +112,23 @@ public class PpNDArray extends NativeResource<Long> implements NDArrayAdapter {
         return data;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        if (isReleased()) {
-            return "This array is already closed";
+    /**
+     * Gets the {@link Pointer} to this resource.
+     *
+     * @return the {@link Pointer} to this resource
+     */
+    public long getHandle() {
+        Long reference = handle.get();
+        if (reference == null) {
+            throw new IllegalStateException("Native resource has been release already.");
         }
-        return toDebugString();
+        return reference;
     }
 
     /** {@inheritDoc} */
     @Override
     public void close() {
+        super.close();
         Long pointer = handle.getAndSet(null);
         if (pointer != null) {
             JniUtils.deleteNd(pointer);

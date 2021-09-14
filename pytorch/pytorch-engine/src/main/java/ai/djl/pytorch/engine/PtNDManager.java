@@ -24,10 +24,6 @@ import ai.djl.pytorch.jni.JniUtils;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
 
 /** {@code PtNDManager} is the PyTorch implementation of {@link NDManager}. */
 public class PtNDManager extends BaseNDManager {
@@ -50,6 +46,30 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public PtNDArray adopt(NDArray array) {
+        if (array instanceof PtNDArray) {
+            return (PtNDArray) array;
+        }
+        return create(array.toByteBuffer(), array.getShape(), array.getDataType());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PtNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
+        int size = Math.toIntExact(shape.size());
+        BaseNDManager.validateBufferSize(data, dataType, size);
+        if (data.isDirect() && data instanceof ByteBuffer) {
+            return JniUtils.createNdFromByteBuffer(
+                    this, (ByteBuffer) data, shape, dataType, SparseFormat.DENSE, device);
+        }
+        ByteBuffer buf = allocateDirect(size * dataType.getNumOfBytes());
+        copyBuffer(data, buf);
+        return JniUtils.createNdFromByteBuffer(
+                this, buf, shape, dataType, SparseFormat.DENSE, device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray create(Shape shape, DataType dataType) {
         return JniUtils.createEmptyNdArray(this, shape, dataType, device, SparseFormat.DENSE);
     }
@@ -57,42 +77,7 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public PtNDArray create(Buffer data, Shape shape, DataType dataType) {
-        if (data.isDirect() && data instanceof ByteBuffer) {
-            return JniUtils.createNdFromByteBuffer(
-                    this, (ByteBuffer) data, shape, dataType, SparseFormat.DENSE, device);
-        }
-        int size = data.remaining();
-        // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
-        DataType inputType = DataType.fromBuffer(data);
-
-        int numOfBytes = inputType.getNumOfBytes();
-        ByteBuffer buf = allocateDirect(size * numOfBytes);
-
-        switch (inputType) {
-            case FLOAT32:
-                buf.asFloatBuffer().put((FloatBuffer) data);
-                break;
-            case FLOAT64:
-                buf.asDoubleBuffer().put((DoubleBuffer) data);
-                break;
-            case UINT8:
-            case INT8:
-            case BOOLEAN:
-                buf.put((ByteBuffer) data);
-                break;
-            case INT32:
-                buf.asIntBuffer().put((IntBuffer) data);
-                break;
-            case INT64:
-                buf.asLongBuffer().put((LongBuffer) data);
-                break;
-            case FLOAT16:
-            default:
-                throw new AssertionError("Show never happen");
-        }
-        buf.rewind();
-        return JniUtils.createNdFromByteBuffer(
-                this, buf, shape, dataType, SparseFormat.DENSE, device);
+        return createDirect(data, shape, dataType);
     }
 
     /** {@inheritDoc} */

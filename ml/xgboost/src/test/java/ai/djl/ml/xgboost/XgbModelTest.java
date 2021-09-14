@@ -19,14 +19,19 @@ import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.training.util.DownloadUtils;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -53,6 +58,37 @@ public class XgbModelTest {
                     Assert.assertEquals(output.singletonOrThrow().toFloatArray().length, 10);
                 }
             }
+        }
+    }
+
+    @Test
+    public void testNDArray() {
+        if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+            throw new SkipException("test only work on mac and Linux");
+        }
+        try (XgbNDManager manager =
+                (XgbNDManager) XgbNDManager.getSystemManager().newSubManager()) {
+            NDArray zeros = manager.zeros(new Shape(1, 2));
+            Assert.expectThrows(UnsupportedOperationException.class, zeros::toFloatArray);
+
+            NDArray ones = manager.ones(new Shape(1, 2));
+            Assert.expectThrows(UnsupportedOperationException.class, ones::toFloatArray);
+
+            float[] buf = {0f, 1f, 2f, 3f};
+
+            ByteBuffer bb = ByteBuffer.allocateDirect(4 * buf.length);
+            bb.asFloatBuffer().put(buf);
+            NDArray dlrArray = manager.createForOutput(bb, new Shape(4));
+            Assert.assertEquals(dlrArray.toFloatArray(), buf);
+
+            NDArray array = manager.create(buf, new Shape(2, 2));
+            Assert.assertEquals(array.getDataType(), DataType.FLOAT32);
+
+            long[] indptr = {0, 2, 2, 3};
+            long[] indices = {0, 2, 1};
+            FloatBuffer fb = FloatBuffer.wrap(new float[] {7, 8, 9});
+            array = manager.createCSR(fb, indptr, indices, new Shape(3, 4));
+            Assert.assertEquals(array.getSparseFormat(), SparseFormat.CSR);
         }
     }
 }

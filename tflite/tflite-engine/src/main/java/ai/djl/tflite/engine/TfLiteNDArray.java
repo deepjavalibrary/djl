@@ -12,7 +12,6 @@
  */
 package ai.djl.tflite.engine;
 
-import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrayAdapter;
 import ai.djl.ndarray.NDManager;
@@ -24,91 +23,31 @@ import java.util.UUID;
 import org.tensorflow.lite.Tensor;
 
 /** {@code TfLiteNDArray} is the TFLite implementation of {@link NDArray}. */
-public class TfLiteNDArray implements NDArrayAdapter {
+public class TfLiteNDArray extends NDArrayAdapter {
 
-    private TfLiteNDManager manager;
     private Tensor tensor;
     private ByteBuffer data;
-    private Shape shape;
-    private DataType dataType;
-    private String name;
-    private boolean isClosed;
-    private String uid;
 
-    TfLiteNDArray(TfLiteNDManager manager, Tensor tensor) {
-        this.manager = manager;
-        uid = UUID.randomUUID().toString();
-        manager.attachInternal(uid, this);
+    TfLiteNDArray(NDManager manager, NDManager alternativeManager, Tensor tensor) {
+        super(
+                manager,
+                alternativeManager,
+                new Shape(Arrays.stream(tensor.shape()).mapToLong(i -> i).toArray()),
+                TfLiteDataType.fromTf(tensor.dataType()),
+                UUID.randomUUID().toString());
         this.tensor = tensor;
-        shape = new Shape(Arrays.stream(tensor.shape()).mapToLong(i -> i).toArray());
-        dataType = TfLiteDataType.fromTf(tensor.dataType());
+        manager.attachInternal(uid, this);
     }
 
-    TfLiteNDArray(TfLiteNDManager manager, ByteBuffer data, Shape shape, DataType dataType) {
-        this.manager = manager;
+    TfLiteNDArray(
+            NDManager manager,
+            NDManager alternativeManager,
+            ByteBuffer data,
+            Shape shape,
+            DataType dataType) {
+        super(manager, alternativeManager, shape, dataType, UUID.randomUUID().toString());
         this.data = data;
-        this.shape = shape;
-        this.dataType = dataType;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDManager getManager() {
-        return manager;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getUid() {
-        return uid;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public DataType getDataType() {
-        return dataType;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Device getDevice() {
-        // TODO: Support on multiple devices
-        return Device.cpu();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape getShape() {
-        return shape;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void attach(NDManager manager) {
-        detach();
-        this.manager = (TfLiteNDManager) manager;
-        manager.attachInternal(getUid(), this);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void tempAttach(NDManager manager) {
-        detach();
-        NDManager original = this.manager;
-        this.manager = (TfLiteNDManager) manager;
-        manager.tempAttachInternal(original, getUid(), this);
+        manager.attachInternal(uid, this);
     }
 
     /** {@inheritDoc} */
@@ -122,11 +61,11 @@ public class TfLiteNDArray implements NDArrayAdapter {
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
         if (dataType.equals(this.dataType)) {
-            if (copy) {
-                return new TfLiteNDArray(manager, toByteBuffer().duplicate(), shape, dataType);
-            } else {
+            if (!copy) {
                 return this;
             }
+            return new TfLiteNDArray(
+                    manager, alternativeManager, toByteBuffer().duplicate(), shape, dataType);
         }
         Number[] array = toArray();
         switch (dataType) {
@@ -178,22 +117,7 @@ public class TfLiteNDArray implements NDArrayAdapter {
                 throw new UnsupportedOperationException(
                         "Negative shape is not supported for TFLite");
             }
-            return new TfLiteNDArray(manager, data, shape, dataType);
+            return new TfLiteNDArray(manager, alternativeManager, data, shape, dataType);
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        if (isClosed) {
-            return "This array is already closed";
-        }
-        return toDebugString();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void close() {
-        isClosed = true;
     }
 }

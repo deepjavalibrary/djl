@@ -23,9 +23,16 @@ import java.util.Stack;
 /** The {@link NDArrayIndexer} used by the {@link MxNDArray}. */
 public class MxNDArrayIndexer extends NDArrayIndexer {
 
+    private MxNDManager manager;
+
+    MxNDArrayIndexer(MxNDManager manager) {
+        this.manager = manager;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray get(NDArray array, NDIndexFullPick fullPick) {
+        array = manager.adopt(array);
         MxOpParams params = new MxOpParams();
         params.addParam("axis", fullPick.getAxis());
         params.addParam("keepdims", true);
@@ -38,6 +45,7 @@ public class MxNDArrayIndexer extends NDArrayIndexer {
     /** {@inheritDoc} */
     @Override
     public NDArray get(NDArray array, NDIndexFullSlice fullSlice) {
+        array = manager.adopt(array);
         MxOpParams params = new MxOpParams();
         params.addTupleParam("begin", fullSlice.getMin());
         params.addTupleParam("end", fullSlice.getMax());
@@ -56,6 +64,7 @@ public class MxNDArrayIndexer extends NDArrayIndexer {
     /** {@inheritDoc} */
     @Override
     public void set(NDArray array, NDIndexFullSlice fullSlice, NDArray value) {
+        array = manager.adopt(array);
         MxOpParams params = new MxOpParams();
         params.addTupleParam("begin", fullSlice.getMin());
         params.addTupleParam("end", fullSlice.getMax());
@@ -90,6 +99,7 @@ public class MxNDArrayIndexer extends NDArrayIndexer {
     /** {@inheritDoc} */
     @Override
     public void set(NDArray array, NDIndexFullSlice fullSlice, Number value) {
+        array = manager.adopt(array);
         MxOpParams params = new MxOpParams();
         params.addTupleParam("begin", fullSlice.getMin());
         params.addTupleParam("end", fullSlice.getMax());

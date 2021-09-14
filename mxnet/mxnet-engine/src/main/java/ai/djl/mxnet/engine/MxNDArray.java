@@ -14,6 +14,7 @@ package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
 import ai.djl.mxnet.jna.JnaUtils;
+import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.LazyNDArray;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -27,10 +28,7 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.nio.LongBuffer;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
@@ -295,46 +293,18 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     @Override
     public void set(Buffer data) {
         int size = Math.toIntExact(size());
-        if (data.remaining() < size) {
-            throw new IllegalArgumentException(
-                    "The NDArray size is: " + size + ", but buffer size is: " + data.remaining());
-        }
+        BaseNDManager.validateBufferSize(data, getDataType(), size);
         if (data.isDirect()) {
             JnaUtils.syncCopyFromCPU(getHandle(), data, size);
             return;
         }
 
-        data.limit(size);
         // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
         DataType inputType = DataType.fromBuffer(data);
         validate(inputType);
 
-        int numOfBytes = inputType.getNumOfBytes();
-        ByteBuffer buf = manager.allocateDirect(size * numOfBytes);
-
-        switch (inputType) {
-            case FLOAT32:
-                buf.asFloatBuffer().put((FloatBuffer) data);
-                break;
-            case FLOAT64:
-                buf.asDoubleBuffer().put((DoubleBuffer) data);
-                break;
-            case UINT8:
-            case INT8:
-            case BOOLEAN:
-                buf.put((ByteBuffer) data);
-                break;
-            case INT32:
-                buf.asIntBuffer().put((IntBuffer) data);
-                break;
-            case INT64:
-                buf.asLongBuffer().put((LongBuffer) data);
-                break;
-            case FLOAT16:
-            default:
-                throw new UnsupportedOperationException("data type is not supported!");
-        }
-        buf.rewind();
+        ByteBuffer buf = manager.allocateDirect(size * inputType.getNumOfBytes());
+        BaseNDManager.copyBuffer(data, buf);
         JnaUtils.syncCopyFromCPU(getHandle(), buf, size);
     }
 

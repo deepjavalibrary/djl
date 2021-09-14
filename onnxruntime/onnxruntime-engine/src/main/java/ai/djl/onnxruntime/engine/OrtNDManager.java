@@ -33,10 +33,12 @@ public class OrtNDManager extends BaseNDManager {
     private static final OrtNDManager SYSTEM_MANAGER = new SystemManager();
 
     private OrtEnvironment env;
+    private NDManager alternativeManager;
 
     private OrtNDManager(NDManager parent, Device device, OrtEnvironment env) {
         super(parent, device);
         this.env = env;
+        alternativeManager = getAlternativeManager();
     }
 
     static OrtNDManager getSystemManager() {
@@ -49,24 +51,41 @@ public class OrtNDManager extends BaseNDManager {
         return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     }
 
-    OrtNDArray create(OnnxTensor tensor) {
-        return new OrtNDArray(this, tensor);
+    /** {@inheritDoc} */
+    @Override
+    public OrtNDArray adopt(NDArray array) {
+        if (array instanceof OrtNDArray) {
+            return (OrtNDArray) array;
+        }
+        return createDirect(array.toByteBuffer(), array.getShape(), array.getDataType());
+    }
+
+    OrtNDArray createInternal(OnnxTensor tensor) {
+        return new OrtNDArray(this, alternativeManager, tensor);
     }
 
     /** {@inheritDoc} */
     @Override
-    public OrtNDArray create(Buffer data, Shape shape, DataType dataType) {
-        try {
-            return new OrtNDArray(this, OrtUtils.toTensor(env, data, shape, dataType));
-        } catch (OrtException e) {
-            throw new EngineException(e);
+    public OrtNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
+        int size = Math.toIntExact(shape.size());
+        BaseNDManager.validateBufferSize(data, dataType, size);
+        OnnxTensor tensor = OrtUtils.toTensor(env, data, shape, dataType);
+        return new OrtNDArray(this, alternativeManager, tensor);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(Buffer data, Shape shape, DataType dataType) {
+        if (alternativeManager != null) {
+            return alternativeManager.create(data, shape, dataType);
         }
+        return createDirect(data, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray create(String data) {
-        return create(new String[] {data}, new Shape(1));
+        return create(new String[] {data});
     }
 
     /** {@inheritDoc} */
@@ -84,52 +103,10 @@ public class OrtNDManager extends BaseNDManager {
      */
     public NDArray create(String[] data, Shape shape) {
         try {
-            return new OrtNDArray(this, OrtUtils.toTensor(env, data, shape));
+            return new OrtNDArray(this, alternativeManager, OrtUtils.toTensor(env, data, shape));
         } catch (OrtException e) {
             throw new EngineException(e);
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray zeros(Shape shape, DataType dataType) {
-        int bytes = dataType.getNumOfBytes();
-        int size = Math.toIntExact(bytes * shape.size());
-        ByteBuffer buffer = allocateDirect(size);
-        return create(dataType.asDataType(buffer), shape, dataType);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ones(Shape shape, DataType dataType) {
-        long size = shape.size();
-        int bytes = Math.toIntExact(dataType.getNumOfBytes() * size);
-        ByteBuffer buffer = allocateDirect(bytes);
-        for (int i = 0; i < size; ++i) {
-            switch (dataType) {
-                case BOOLEAN:
-                case INT8:
-                case UINT8:
-                    buffer.put((byte) 1);
-                    break;
-                case FLOAT32:
-                    buffer.putFloat(1f);
-                    break;
-                case FLOAT64:
-                    buffer.putDouble(1);
-                    break;
-                case INT32:
-                    buffer.putInt(1);
-                    break;
-                case INT64:
-                    buffer.putLong(1);
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Unsupported dataType: " + dataType);
-            }
-        }
-        buffer.rewind();
-        return create(dataType.asDataType(buffer), shape, dataType);
     }
 
     /** {@inheritDoc} */
@@ -144,6 +121,16 @@ public class OrtNDManager extends BaseNDManager {
     @Override
     public final Engine getEngine() {
         return Engine.getEngine(OrtEngine.ENGINE_NAME);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        super.close();
+        if (alternativeManager != null) {
+            alternativeManager.close();
+            alternativeManager = null;
+        }
     }
 
     /** The SystemManager is the root {@link OrtNDManager} of which all others are children. */

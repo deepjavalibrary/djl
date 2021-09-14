@@ -50,8 +50,9 @@ public class TfLiteSymbolBlock extends AbstractSymbolBlock implements AutoClosea
         int outputSize = interpreter.getOutputTensorCount();
         NDList result = new NDList(outputSize);
         for (int i = 0; i < outputSize; i++) {
-            result.add(new TfLiteNDArray(manager, interpreter.getOutputTensor(i)));
+            result.add(manager.createInternal(interpreter.getOutputTensor(i)));
         }
+        result.attach(inputs.head().getManager());
         return result;
     }
 

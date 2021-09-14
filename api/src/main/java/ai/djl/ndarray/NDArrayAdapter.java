@@ -18,6 +18,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import java.nio.Buffer;
+import java.util.Arrays;
 
 /**
  * A base implementation of the {@link NDArray} that does nothing. This can be used for overriding
@@ -27,908 +28,1029 @@ import java.nio.Buffer;
  * implement a large portion of the interface. For the ones that do, they should directly implement
  * {@link NDArray} so that the unsupported operations are better highlighted in the code.
  */
-public interface NDArrayAdapter extends NDArray {
+public abstract class NDArrayAdapter implements NDArray {
 
-    String UNSUPPORTED_MSG =
+    private static final String UNSUPPORTED_MSG =
             "This NDArray implementation does not currently support this operation";
+
+    protected NDManager manager;
+    protected NDManager alternativeManager;
+    private NDArray alternativeArray;
+
+    protected Shape shape;
+    protected DataType dataType;
+    protected String name;
+    protected boolean isClosed;
+    protected String uid;
+
+    protected NDArrayAdapter(
+            NDManager manager,
+            NDManager alternativeManager,
+            Shape shape,
+            DataType dataType,
+            String uid) {
+        this.manager = manager;
+        this.alternativeManager = alternativeManager;
+        this.shape = shape;
+        this.dataType = dataType;
+        this.uid = uid;
+    }
 
     /** {@inheritDoc} */
     @Override
-    default SparseFormat getSparseFormat() {
+    public NDManager getManager() {
+        return manager;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void attach(NDManager manager) {
+        detach();
+        this.manager = manager;
+        manager.attachInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
+        detach();
+        NDManager original = this.manager;
+        this.manager = manager;
+        manager.tempAttachInternal(original, getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public SparseFormat getSparseFormat() {
         return SparseFormat.DENSE;
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray toDevice(Device device, boolean copy) {
+    public String getName() {
+        return name;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getUid() {
+        return uid;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Device getDevice() {
+        return manager.getDevice();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public DataType getDataType() {
+        return dataType;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape getShape() {
+        return shape;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray toDevice(Device device, boolean copy) {
+        if (device.equals(getDevice()) && !copy) {
+            return this;
+        }
+        return duplicate();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray toType(DataType dataType, boolean copy) {
+        if (dataType.equals(getDataType()) && !copy) {
+            return this;
+        }
+        return duplicate();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setRequiresGradient(boolean requiresGrad) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray toType(DataType dataType, boolean copy) {
+    public NDArray getGradient() {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
-    default void setRequiresGradient(boolean requiresGrad) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default NDArray getGradient() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    default boolean hasGradient() {
+    public boolean hasGradient() {
         return false;
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray stopGradient() {
+    public NDArray stopGradient() {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
-    default String[] toStringArray() {
+    public String[] toStringArray() {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
-    default void set(Buffer data) {
+    public void set(Buffer data) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
-    default void copyTo(NDArray array) {
+    public void copyTo(NDArray array) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray booleanMask(NDArray index, int axis) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray booleanMask(NDArray index, int axis) {
+        return getAlternativeArray().booleanMask(index, axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray sequenceMask(NDArray sequenceLength, float value) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray sequenceMask(NDArray sequenceLength, float value) {
+        return getAlternativeArray().sequenceMask(sequenceLength, value);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray sequenceMask(NDArray sequenceLength) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray sequenceMask(NDArray sequenceLength) {
+        return sequenceMask(sequenceLength, 0);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray zerosLike() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray zerosLike() {
+        return getManager().zeros(getShape(), getDataType(), getDevice());
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray onesLike() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray onesLike() {
+        return getManager().ones(getShape(), getDataType(), getDevice());
     }
 
     /** {@inheritDoc} */
     @Override
-    default boolean contentEquals(Number number) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public boolean contentEquals(Number number) {
+        return number.equals(toArray()[0]);
     }
 
     /** {@inheritDoc} */
     @Override
-    default boolean contentEquals(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public boolean contentEquals(NDArray other) {
+        return Arrays.equals(toByteArray(), other.toByteArray());
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray eq(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray eq(Number n) {
+        return getAlternativeArray().eq(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray eq(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray eq(NDArray other) {
+        return getAlternativeArray().eq(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray neq(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray neq(Number n) {
+        return getAlternativeArray().neq(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray neq(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray neq(NDArray other) {
+        return getAlternativeArray().neq(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray gt(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray gt(Number n) {
+        return getAlternativeArray().gt(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray gt(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray gt(NDArray other) {
+        return getAlternativeArray().gt(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray gte(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray gte(Number n) {
+        return getAlternativeArray().gte(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray gte(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray gte(NDArray other) {
+        return getAlternativeArray().gte(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray lt(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray lt(Number n) {
+        return getAlternativeArray().lt(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray lt(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray lt(NDArray other) {
+        return getAlternativeArray().lt(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray lte(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray lte(Number n) {
+        return getAlternativeArray().lte(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray lte(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray lte(NDArray other) {
+        return getAlternativeArray().lte(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray add(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray add(Number n) {
+        return getAlternativeArray().add(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray add(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray add(NDArray other) {
+        return getAlternativeArray().add(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray sub(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray sub(Number n) {
+        return getAlternativeArray().sub(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray sub(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray sub(NDArray other) {
+        return getAlternativeArray().sub(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray mul(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray mul(Number n) {
+        return getAlternativeArray().mul(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray mul(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray mul(NDArray other) {
+        return getAlternativeArray().mul(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray div(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray div(Number n) {
+        return getAlternativeArray().div(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray div(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray div(NDArray other) {
+        return getAlternativeArray().div(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray mod(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray mod(Number n) {
+        return getAlternativeArray().mod(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray mod(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray mod(NDArray other) {
+        return getAlternativeArray().mod(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray pow(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray pow(Number n) {
+        return getAlternativeArray().pow(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray pow(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray pow(NDArray other) {
+        return getAlternativeArray().pow(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray addi(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray addi(Number n) {
+        return getAlternativeArray().addi(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray addi(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray addi(NDArray other) {
+        return getAlternativeArray().addi(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray subi(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray subi(Number n) {
+        return getAlternativeArray().subi(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray subi(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray subi(NDArray other) {
+        return getAlternativeArray().subi(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray muli(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray muli(Number n) {
+        return getAlternativeArray().muli(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray muli(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray muli(NDArray other) {
+        return getAlternativeArray().muli(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray divi(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray divi(Number n) {
+        return getAlternativeArray().divi(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray divi(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray divi(NDArray other) {
+        return getAlternativeArray().divi(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray modi(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray modi(Number n) {
+        return getAlternativeArray().modi(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray modi(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray modi(NDArray other) {
+        return getAlternativeArray().modi(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray powi(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray powi(Number n) {
+        return getAlternativeArray().powi(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray powi(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray powi(NDArray other) {
+        return getAlternativeArray().powi(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray sign() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray sign() {
+        return getAlternativeArray().sign();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray signi() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray signi() {
+        return getAlternativeArray().signi();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray maximum(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray maximum(Number n) {
+        return getAlternativeArray().maximum(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray maximum(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray maximum(NDArray other) {
+        return getAlternativeArray().maximum(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray minimum(Number n) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray minimum(Number n) {
+        return getAlternativeArray().minimum(n);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray minimum(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray minimum(NDArray other) {
+        return getAlternativeArray().minimum(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray neg() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray neg() {
+        return getAlternativeArray().neg();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray negi() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray negi() {
+        return getAlternativeArray().negi();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray abs() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray abs() {
+        return getAlternativeArray().abs();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray square() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray square() {
+        return getAlternativeArray().square();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray sqrt() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray sqrt() {
+        return getAlternativeArray().sqrt();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray cbrt() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray cbrt() {
+        return getAlternativeArray().cbrt();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray floor() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray floor() {
+        return getAlternativeArray().floor();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray ceil() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray ceil() {
+        return getAlternativeArray().ceil();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray round() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray round() {
+        return getAlternativeArray().round();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray trunc() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray trunc() {
+        return getAlternativeArray().trunc();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray exp() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray exp() {
+        return getAlternativeArray().exp();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray log() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray log() {
+        return getAlternativeArray().log();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray log10() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray log10() {
+        return getAlternativeArray().log10();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray log2() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray log2() {
+        return getAlternativeArray().log2();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray sin() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray sin() {
+        return getAlternativeArray().sin();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray cos() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray cos() {
+        return getAlternativeArray().cos();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray tan() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray tan() {
+        return getAlternativeArray().tan();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray asin() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray asin() {
+        return getAlternativeArray().asin();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray acos() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray acos() {
+        return getAlternativeArray().acos();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray atan() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray atan() {
+        return getAlternativeArray().atan();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray sinh() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray sinh() {
+        return getAlternativeArray().sinh();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray cosh() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray cosh() {
+        return getAlternativeArray().cosh();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray tanh() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray tanh() {
+        return getAlternativeArray().tanh();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray asinh() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray asinh() {
+        return getAlternativeArray().asinh();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray acosh() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray acosh() {
+        return getAlternativeArray().acosh();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray atanh() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray atanh() {
+        return getAlternativeArray().atanh();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray toDegrees() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray toDegrees() {
+        return getAlternativeArray().toDegrees();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray toRadians() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray toRadians() {
+        return getAlternativeArray().toRadians();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray max() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray max() {
+        return getAlternativeArray().max();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray max(int[] axes, boolean keepDims) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray max(int[] axes, boolean keepDims) {
+        return getAlternativeArray().max(axes, keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray min() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray min() {
+        return getAlternativeArray().min();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray min(int[] axes, boolean keepDims) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray min(int[] axes, boolean keepDims) {
+        return getAlternativeArray().min(axes, keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray sum() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray sum() {
+        return getAlternativeArray().sum();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray sum(int[] axes, boolean keepDims) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray sum(int[] axes, boolean keepDims) {
+        return getAlternativeArray().sum(axes, keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray prod() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray prod() {
+        return getAlternativeArray().prod();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray prod(int[] axes, boolean keepDims) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray prod(int[] axes, boolean keepDims) {
+        return getAlternativeArray().prod(axes, keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray mean() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray mean() {
+        return getAlternativeArray().mean();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray mean(int[] axes, boolean keepDims) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray mean(int[] axes, boolean keepDims) {
+        return getAlternativeArray().mean(axes, keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray rotate90(int times, int[] axes) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray rotate90(int times, int[] axes) {
+        return getAlternativeArray().rotate90(times, axes);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray trace(int offset, int axis1, int axis2) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray trace(int offset, int axis1, int axis2) {
+        return getAlternativeArray().trace(offset, axis1, axis2);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDList split(long[] indices, int axis) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDList split(long[] indices, int axis) {
+        return getAlternativeArray().split(indices, axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray flatten() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray flatten() {
+        return getAlternativeArray().flatten();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray reshape(Shape shape) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray reshape(Shape shape) {
+        return getAlternativeArray().reshape(shape);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray expandDims(int axis) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray expandDims(int axis) {
+        return getAlternativeArray().expandDims(axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray squeeze(int[] axes) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray squeeze(int[] axes) {
+        return getAlternativeArray().squeeze(axes);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray logicalAnd(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray logicalAnd(NDArray other) {
+        return getAlternativeArray().logicalAnd(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray logicalOr(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray logicalOr(NDArray other) {
+        return getAlternativeArray().logicalOr(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray logicalXor(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray logicalXor(NDArray other) {
+        return getAlternativeArray().logicalXor(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray logicalNot() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray logicalNot() {
+        return getAlternativeArray().logicalNot();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray argSort(int axis, boolean ascending) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray argSort(int axis, boolean ascending) {
+        return getAlternativeArray().argSort(axis, ascending);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray sort() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray sort() {
+        return getAlternativeArray().sort();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray sort(int axis) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray sort(int axis) {
+        return getAlternativeArray().sort(axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray softmax(int axis) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray softmax(int axis) {
+        return getAlternativeArray().softmax(axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray logSoftmax(int axis) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray logSoftmax(int axis) {
+        return getAlternativeArray().logSoftmax(axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray cumSum() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray cumSum() {
+        return getAlternativeArray().cumSum();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray cumSum(int axis) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray cumSum(int axis) {
+        return getAlternativeArray().cumSum(axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    default void intern(NDArray replaced) {
+    public void intern(NDArray replaced) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray isInfinite() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray isInfinite() {
+        return getAlternativeArray().isInfinite();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray isNaN() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray isNaN() {
+        return getAlternativeArray().isNaN();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray tile(long repeats) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray tile(long repeats) {
+        return getAlternativeArray().tile(repeats);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray tile(int axis, long repeats) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray tile(int axis, long repeats) {
+        return getAlternativeArray().tile(axis, repeats);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray tile(long[] repeats) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray tile(long[] repeats) {
+        return getAlternativeArray().tile(repeats);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray tile(Shape desiredShape) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray tile(Shape desiredShape) {
+        return getAlternativeArray().tile(desiredShape);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray repeat(long repeats) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray repeat(long repeats) {
+        return getAlternativeArray().repeat(repeats);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray repeat(int axis, long repeats) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray repeat(int axis, long repeats) {
+        return getAlternativeArray().repeat(axis, repeats);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray repeat(long[] repeats) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray repeat(long[] repeats) {
+        return getAlternativeArray().repeat(repeats);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray repeat(Shape desiredShape) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray repeat(Shape desiredShape) {
+        return getAlternativeArray().repeat(desiredShape);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray dot(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray dot(NDArray other) {
+        return getAlternativeArray().dot(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray matMul(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray matMul(NDArray other) {
+        return getAlternativeArray().matMul(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray clip(Number min, Number max) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray clip(Number min, Number max) {
+        return getAlternativeArray().clip(min, max);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray flip(int... axes) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray flip(int... axes) {
+        return getAlternativeArray().flip(axes);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray transpose() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray transpose() {
+        return getAlternativeArray().transpose();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray transpose(int... axes) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray transpose(int... axes) {
+        return getAlternativeArray().transpose(axes);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray broadcast(Shape shape) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray broadcast(Shape shape) {
+        return getAlternativeArray().broadcast(shape);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray argMax() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray argMax() {
+        return getAlternativeArray().argMax();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray argMax(int axis) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray argMax(int axis) {
+        return getAlternativeArray().argMax(axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray argMin() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray argMin() {
+        return getAlternativeArray().argMin();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray argMin(int axis) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray argMin(int axis) {
+        return getAlternativeArray().argMin(axis);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray percentile(Number percentile) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray percentile(Number percentile) {
+        return getAlternativeArray().percentile(percentile);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray percentile(Number percentile, int[] axes) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray percentile(Number percentile, int[] axes) {
+        return getAlternativeArray().percentile(percentile, axes);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray median() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray median() {
+        return getAlternativeArray().median();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray median(int[] axes) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray median(int[] axes) {
+        return getAlternativeArray().median(axes);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray toDense() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray toDense() {
+        return getAlternativeArray().toDense();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray toSparse(SparseFormat fmt) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray toSparse(SparseFormat fmt) {
+        return getAlternativeArray().toSparse(fmt);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray nonzero() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray nonzero() {
+        return getAlternativeArray().nonzero();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray erfinv() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray erfinv() {
+        return getAlternativeArray().erfinv();
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray norm(boolean keepDims) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray norm(boolean keepDims) {
+        return getAlternativeArray().norm(keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray norm(int ord, int[] axes, boolean keepDims) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray norm(int ord, int[] axes, boolean keepDims) {
+        return getAlternativeArray().norm(ord, axes, keepDims);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray oneHot(int depth, float onValue, float offValue, DataType dataType) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray oneHot(int depth, float onValue, float offValue, DataType dataType) {
+        return getAlternativeArray().oneHot(depth, onValue, offValue, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArray batchDot(NDArray other) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArray batchDot(NDArray other) {
+        return getAlternativeArray().batchDot(other);
     }
 
     /** {@inheritDoc} */
     @Override
-    default NDArrayEx getNDArrayInternal() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    public NDArrayEx getNDArrayInternal() {
+        return getAlternativeArray().getNDArrayInternal();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        if (!isClosed) {
+            manager.detachInternal(getUid());
+            if (alternativeArray != null) {
+                alternativeArray.close();
+                alternativeArray = null;
+            }
+            isClosed = true;
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        if (isClosed) {
+            return "This array is already closed";
+        }
+        return toDebugString();
+    }
+
+    private NDArray getAlternativeArray() {
+        if (alternativeManager == null) {
+            throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+        }
+        if (alternativeArray == null) {
+            alternativeArray = alternativeManager.adopt(this);
+        }
+        alternativeArray.set(getDataType().asDataType(toByteBuffer()));
+        return alternativeArray;
     }
 }

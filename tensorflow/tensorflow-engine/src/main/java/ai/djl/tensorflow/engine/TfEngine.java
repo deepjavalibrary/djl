@@ -79,6 +79,12 @@ public final class TfEngine extends Engine implements AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
+    public Engine getAlternativeEngine() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getEngineName() {
         return ENGINE_NAME;
     }

@@ -12,6 +12,7 @@
  */
 package ai.djl.ml.xgboost;
 
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
@@ -56,12 +57,17 @@ public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        XgbNDArray array = (XgbNDArray) inputs.singletonOrThrow();
-        float[] result = JniUtils.inference(this, array, treeLimit, mode);
-        ByteBuffer buf = XgbNDManager.getSystemManager().allocateDirect(result.length * 4);
+        NDArray array = inputs.singletonOrThrow();
+        XgbNDArray xgbNDArray = manager.adopt(array);
+        // TODO: return DirectBuffer from JNI to avoid copy
+        float[] result = JniUtils.inference(this, xgbNDArray, treeLimit, mode);
+        ByteBuffer buf = manager.allocateDirect(result.length * 4);
         buf.asFloatBuffer().put(result);
         buf.rewind();
-        return new NDList(new XgbNDArray(array.getManager(), buf, new Shape(result.length)));
+
+        NDArray ret = manager.createForOutput(buf, new Shape(result.length));
+        ret.attach(array.getManager());
+        return new NDList(ret);
     }
 
     /** {@inheritDoc} */

@@ -32,11 +32,28 @@ public final class XgbEngine extends Engine {
     public static final String ENGINE_NAME = "XGBoost";
     static final int RANK = 10;
 
+    private Engine alternativeEngine;
+    private boolean initialized;
+
     private XgbEngine() {}
 
     static Engine newInstance() {
         JniUtils.checkCall(0); // Load the native
         return new XgbEngine();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Engine getAlternativeEngine() {
+        if (!initialized && !Boolean.getBoolean("ai.djl.xgboost.disable_alternative")) {
+            Engine engine = Engine.getInstance();
+            if (engine.getRank() < getRank()) {
+                // alternativeEngine should not have the same rank as OnnxRuntime
+                alternativeEngine = engine;
+            }
+            initialized = true;
+        }
+        return alternativeEngine;
     }
 
     /** {@inheritDoc} */
@@ -97,5 +114,11 @@ public final class XgbEngine extends Engine {
     @Override
     public void setRandomSeed(int seed) {
         throw new UnsupportedOperationException("Not supported for XGBoost");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return getEngineName() + ':' + getVersion();
     }
 }

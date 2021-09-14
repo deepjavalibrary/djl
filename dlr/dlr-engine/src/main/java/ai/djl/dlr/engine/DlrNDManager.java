@@ -30,8 +30,11 @@ public class DlrNDManager extends BaseNDManager {
 
     private static final DlrNDManager SYSTEM_MANAGER = new SystemManager();
 
+    private NDManager alternativeManager;
+
     private DlrNDManager(NDManager parent, Device device) {
         super(parent, device);
+        alternativeManager = getAlternativeManager();
     }
 
     static DlrNDManager getSystemManager() {
@@ -52,6 +55,15 @@ public class DlrNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public DlrNDArray adopt(NDArray array) {
+        if (array instanceof DlrNDArray) {
+            return (DlrNDArray) array;
+        }
+        return createDirect(array.toByteBuffer(), array.getShape(), DataType.FLOAT32);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public DlrNDManager newSubManager(Device dev) {
         DlrNDManager manager = new DlrNDManager(this, dev);
         attachInternal(manager.uid, manager);
@@ -60,27 +72,36 @@ public class DlrNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public DlrNDArray create(Buffer data, Shape shape, DataType dataType) {
-        if (dataType != DataType.FLOAT32 && !(data instanceof FloatBuffer)) {
+    public DlrNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
+        if (dataType != DataType.FLOAT32) {
             throw new UnsupportedOperationException("DLR only supports float32");
         }
-        int size = data.remaining();
-        int numOfBytes = dataType.getNumOfBytes();
-        ByteBuffer bb = ByteBuffer.allocate(size * numOfBytes);
+        int size = Math.toIntExact(shape.size());
+        BaseNDManager.validateBufferSize(data, dataType, size);
+        if (data instanceof ByteBuffer) {
+            return new DlrNDArray(this, alternativeManager, (ByteBuffer) data, shape);
+        }
+        ByteBuffer bb = ByteBuffer.allocate(size * dataType.getNumOfBytes());
         bb.asFloatBuffer().put((FloatBuffer) data);
         bb.rewind();
-        return new DlrNDArray(this, bb, shape);
+        return new DlrNDArray(this, alternativeManager, bb, shape);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(Buffer data, Shape shape, DataType dataType) {
+        if (alternativeManager != null) {
+            return alternativeManager.create(data, shape, dataType);
+        }
+        return createDirect(data, shape, dataType);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray zeros(Shape shape, DataType dataType) {
-        if (dataType != DataType.FLOAT32) {
-            throw new UnsupportedOperationException("DLR only supports float32");
-        }
         int size = Math.toIntExact(shape.size());
-        float[] data = new float[size];
-        return create(data, shape);
+        FloatBuffer fb = FloatBuffer.allocate(size);
+        return createDirect(fb, shape, dataType);
     }
 
     /** {@inheritDoc} */
@@ -93,7 +114,17 @@ public class DlrNDManager extends BaseNDManager {
         float[] data = new float[size];
         Arrays.fill(data, 1f);
 
-        return create(data, shape);
+        return createDirect(FloatBuffer.wrap(data), shape, dataType);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        super.close();
+        if (alternativeManager != null) {
+            alternativeManager.close();
+            alternativeManager = null;
+        }
     }
 
     /** The SystemManager is the root {@link DlrNDManager} of which all others are children. */
