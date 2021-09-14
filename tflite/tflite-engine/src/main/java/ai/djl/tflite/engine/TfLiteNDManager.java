@@ -48,7 +48,7 @@ public class TfLiteNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public TfLiteNDArray adopt(NDArray array) {
+    public TfLiteNDArray from(NDArray array) {
         if (array instanceof TfLiteNDArray) {
             return (TfLiteNDArray) array;
         }

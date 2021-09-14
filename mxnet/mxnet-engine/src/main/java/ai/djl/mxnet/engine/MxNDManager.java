@@ -64,7 +64,7 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public MxNDArray adopt(NDArray array) {
+    public MxNDArray from(NDArray array) {
         if (array instanceof MxNDArray) {
             return (MxNDArray) array;
         }

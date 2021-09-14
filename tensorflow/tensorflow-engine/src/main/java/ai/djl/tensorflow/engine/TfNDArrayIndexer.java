@@ -35,7 +35,7 @@ public class TfNDArrayIndexer extends NDArrayIndexer {
     /** {@inheritDoc} */
     @Override
     public NDArray get(NDArray array, NDIndexFullSlice fullSlice) {
-        array = manager.adopt(array);
+        array = manager.from(array);
         TfNDManager tfManager = (TfNDManager) array.getManager();
         int[] toSqueeze = fullSlice.getToSqueeze();
         try (NDArray begin = tfManager.create(fullSlice.getMin());

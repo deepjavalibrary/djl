@@ -265,18 +265,6 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zerosLike() {
-        return manager.opExecutor("ZerosLike").addInput(this).buildSingletonOrThrow();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray onesLike() {
-        return manager.opExecutor("OnesLike").addInput(this).buildSingletonOrThrow();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public boolean contentEquals(Number number) {
         if (number == null) {
             return false;

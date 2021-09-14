@@ -41,7 +41,7 @@ public class BertMaskedLanguageModelLoss extends Loss {
 
     @Override
     public NDArray evaluate(NDList labels, NDList predictions) {
-        try (NDManager scope = NDManager.from(labels)) {
+        try (NDManager scope = NDManager.subManagerOf(labels)) {
             scope.tempAttachAll(labels, predictions);
 
             NDArray logProbs = predictions.get(logProbsIdx); // (B * I, D)
@@ -75,7 +75,7 @@ public class BertMaskedLanguageModelLoss extends Loss {
      * @return the percentage of correctly predicted masked tokens
      */
     public NDArray accuracy(NDList labels, NDList predictions) {
-        try (NDManager scope = NDManager.from(labels)) {
+        try (NDManager scope = NDManager.subManagerOf(labels)) {
             scope.tempAttachAll(labels, predictions);
 
             NDArray mask = labels.get(maskIdx).flatten(); // (B * I)

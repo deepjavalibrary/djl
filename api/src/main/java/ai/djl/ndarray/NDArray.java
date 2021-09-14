@@ -732,7 +732,9 @@ public interface NDArray extends NDResource {
      *
      * @return a {@code NDArray} filled with zeros
      */
-    NDArray zerosLike();
+    default NDArray zerosLike() {
+        return getManager().zeros(getShape(), getDataType(), getDevice());
+    }
 
     /**
      * Returns an {@code NDArray} of ones with the same {@link Shape}, {@link DataType} and {@link
@@ -756,7 +758,9 @@ public interface NDArray extends NDResource {
      *
      * @return a {@code NDArray} filled with ones
      */
-    NDArray onesLike();
+    default NDArray onesLike() {
+        return getManager().ones(getShape(), getDataType(), getDevice());
+    }
 
     /**
      * Returns an uninitialized {@code NDArray} with the same {@link Shape}, {@link DataType} and

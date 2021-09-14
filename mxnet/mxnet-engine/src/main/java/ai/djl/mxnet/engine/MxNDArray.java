@@ -376,22 +376,6 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zerosLike() {
-        MxOpParams params = new MxOpParams();
-        params.addParam("fill_value", 0);
-        return manager.invoke("_npi_full_like", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray onesLike() {
-        MxOpParams params = new MxOpParams();
-        params.addParam("fill_value", 1);
-        return manager.invoke("_npi_full_like", this, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public boolean contentEquals(Number number) {
         if (number == null) {
             return false;

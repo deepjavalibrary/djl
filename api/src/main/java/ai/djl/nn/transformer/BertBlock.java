@@ -213,7 +213,7 @@ public final class BertBlock extends AbstractBlock {
         NDArray typeIds = inputs.get(1);
         // Third are the masks for the input
         NDArray masks = inputs.get(2);
-        NDManager initScope = NDManager.from(tokenIds);
+        NDManager initScope = NDManager.subManagerOf(tokenIds);
         initScope.tempAttachAll(inputs);
         // Create embeddings for inputs
         NDArray embeddedTokens =
@@ -247,7 +247,7 @@ public final class BertBlock extends AbstractBlock {
         initScope.close();
         for (final TransformerEncoderBlock block : transformerEncoderBlocks) {
             NDList input = new NDList(lastOutput.head(), offsetMask);
-            try (NDManager innerScope = NDManager.from(input)) {
+            try (NDManager innerScope = NDManager.subManagerOf(input)) {
                 innerScope.tempAttachAll(input);
                 lastOutput = innerScope.ret(block.forward(ps, input, training));
             }

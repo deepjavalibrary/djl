@@ -46,7 +46,7 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray adopt(NDArray array) {
+    public PtNDArray from(NDArray array) {
         if (array instanceof PtNDArray) {
             return (PtNDArray) array;
         }

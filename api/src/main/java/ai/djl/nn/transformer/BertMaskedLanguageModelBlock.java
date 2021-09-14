@@ -114,7 +114,7 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
         NDArray sequenceOutput = inputs.get(0); // (B, S, E)
         NDArray maskedIndices = inputs.get(1); // (B, I)
         NDArray embeddingTable = inputs.get(2); // (D, E)
-        try (NDManager scope = NDManager.from(sequenceOutput)) {
+        try (NDManager scope = NDManager.subManagerOf(sequenceOutput)) {
             scope.tempAttachAll(sequenceOutput, maskedIndices);
             NDArray gatheredTokens = gatherFromIndices(sequenceOutput, maskedIndices); // (B * I, E)
             NDArray projectedTokens =

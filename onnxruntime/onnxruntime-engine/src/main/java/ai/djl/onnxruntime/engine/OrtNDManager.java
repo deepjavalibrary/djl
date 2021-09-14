@@ -53,7 +53,7 @@ public class OrtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public OrtNDArray adopt(NDArray array) {
+    public OrtNDArray from(NDArray array) {
         if (array instanceof OrtNDArray) {
             return (OrtNDArray) array;
         }

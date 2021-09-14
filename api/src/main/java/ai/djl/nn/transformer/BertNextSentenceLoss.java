@@ -39,7 +39,7 @@ public class BertNextSentenceLoss extends Loss {
 
     @Override
     public NDArray evaluate(NDList labels, NDList predictions) {
-        try (NDManager scope = NDManager.from(labels)) {
+        try (NDManager scope = NDManager.subManagerOf(labels)) {
             scope.tempAttachAll(labels, predictions);
             NDArray label = labels.get(labelIdx).toType(DataType.FLOAT32, false);
             // predictions are log(softmax)
@@ -64,7 +64,7 @@ public class BertNextSentenceLoss extends Loss {
      * @return the fraction of correct predictions.
      */
     public NDArray accuracy(NDList labels, NDList predictions) {
-        try (NDManager scope = NDManager.from(labels)) {
+        try (NDManager scope = NDManager.subManagerOf(labels)) {
             scope.tempAttachAll(labels, predictions);
             NDArray label = labels.get(labelIdx);
             NDArray predictionLogProbs = predictions.get(nextSentencePredictionIdx);

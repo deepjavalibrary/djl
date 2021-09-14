@@ -84,7 +84,7 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
         Map<String, OnnxTensor> container = new ConcurrentHashMap<>();
         // feed data in to match names
         for (int i = 0; i < inputNames.size(); ++i) {
-            OrtNDArray ortNDArray = manager.adopt(inputs.get(i));
+            OrtNDArray ortNDArray = manager.from(inputs.get(i));
             container.put(inputNames.get(i), ortNDArray.getTensor());
         }
         // forward

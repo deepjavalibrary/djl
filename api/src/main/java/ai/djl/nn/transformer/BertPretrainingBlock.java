@@ -67,7 +67,7 @@ public class BertPretrainingBlock extends AbstractBlock {
         NDArray typeIds = inputs.get(1);
         NDArray sequenceMasks = inputs.get(2);
         NDArray maskedIndices = inputs.get(3);
-        try (NDManager scope = NDManager.from(tokenIds)) {
+        try (NDManager scope = NDManager.subManagerOf(tokenIds)) {
             scope.tempAttachAll(inputs);
             // run the core bert model
             NDList bertResult =

@@ -58,7 +58,7 @@ public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
             boolean training,
             PairList<String, Object> params) {
         NDArray array = inputs.singletonOrThrow();
-        XgbNDArray xgbNDArray = manager.adopt(array);
+        XgbNDArray xgbNDArray = manager.from(array);
         // TODO: return DirectBuffer from JNI to avoid copy
         float[] result = JniUtils.inference(this, xgbNDArray, treeLimit, mode);
         ByteBuffer buf = manager.allocateDirect(result.length * 4);

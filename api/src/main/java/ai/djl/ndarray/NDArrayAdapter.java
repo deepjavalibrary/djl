@@ -201,20 +201,8 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray zerosLike() {
-        return getManager().zeros(getShape(), getDataType(), getDevice());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray onesLike() {
-        return getManager().ones(getShape(), getDataType(), getDevice());
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public boolean contentEquals(Number number) {
-        return number.equals(toArray()[0]);
+        return Arrays.stream(toArray()).allMatch(n -> n.equals(number));
     }
 
     /** {@inheritDoc} */
@@ -1048,7 +1036,7 @@ public abstract class NDArrayAdapter implements NDArray {
             throw new UnsupportedOperationException(UNSUPPORTED_MSG);
         }
         if (alternativeArray == null) {
-            alternativeArray = alternativeManager.adopt(this);
+            alternativeArray = alternativeManager.from(this);
         }
         alternativeArray.set(getDataType().asDataType(toByteBuffer()));
         return alternativeArray;
