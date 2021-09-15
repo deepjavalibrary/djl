@@ -1,24 +1,24 @@
 configure([
         project(':api'),
         project(':basicdataset'),
-        project(':dlr:dlr-engine'),
+        project(':engines:dlr:dlr-engine'),
+        project(':engines:ml:xgboost'),
+        project(':engines:mxnet:mxnet-engine'),
+        project(':engines:mxnet:mxnet-model-zoo'),
+        project(':engines:onnxruntime:onnxruntime-engine'),
+        project(':engines:paddlepaddle:paddlepaddle-engine'),
+        project(':engines:paddlepaddle:paddlepaddle-model-zoo'),
+        project(':engines:pytorch:pytorch-engine'),
+        project(':engines:pytorch:pytorch-model-zoo'),
+        project(':engines:tensorflow:tensorflow-api'),
+        project(':engines:tensorflow:tensorflow-engine'),
+        project(':engines:tensorflow:tensorflow-model-zoo'),
+        project(':engines:tflite:tflite-engine'),
         project(':extensions:aws-ai'),
         project(':extensions:fasttext'),
         project(':extensions:hadoop'),
         project(':extensions:sentencepiece'),
-        project(':model-zoo'),
-        project(':mxnet:mxnet-engine'),
-        project(':mxnet:mxnet-model-zoo'),
-        project(':onnxruntime:onnxruntime-engine'),
-        project(':paddlepaddle:paddlepaddle-engine'),
-        project(':paddlepaddle:paddlepaddle-model-zoo'),
-        project(':pytorch:pytorch-engine'),
-        project(':pytorch:pytorch-model-zoo'),
-        project(':tensorflow:tensorflow-api'),
-        project(':tensorflow:tensorflow-engine'),
-        project(':tensorflow:tensorflow-model-zoo'),
-        project(':tflite:tflite-engine'),
-        project(':ml:xgboost')]) {
+        project(':model-zoo')]) {
     apply plugin: "maven-publish"
     apply plugin: "signing"
 
@@ -41,7 +41,7 @@ configure([
 
     task uploadJavadoc(type: Exec) {
         dependsOn javadoc
-        enabled = (project.name != ":mxnet:native" && project.name != ":examples")
+        enabled = (project.name != ":engines:mxnet:native" && project.name != ":examples")
         commandLine "sh", "-c", "find . -name .DS_Store | xargs rm && aws s3 sync build/docs/javadoc s3://javadoc-djl-ai/${project.name}/${version} > build/upload.log"
     }
 

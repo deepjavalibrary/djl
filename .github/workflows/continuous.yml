@@ -42,13 +42,13 @@ jobs:
       - name: check disk space
         run: df -h
       - name: Compile PyTorch JNI
-        run: ./gradlew :pytorch:pytorch-native:compileJNI
+        run: ./gradlew :engines:pytorch:pytorch-native:compileJNI
       - name: Compile Sentencepiece JNI
         run: ./gradlew :extension:sentencepiece:compileJNI
       - name: Compile fastText JNI
         run: ./gradlew :extension:fasttext:compileJNI
       - name: Compile PaddlePaddle JNI
-        run: ./gradlew :paddlepaddle:paddlepaddle-native:compileJNI
+        run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
       - name: Build with Gradle
         run: ./gradlew build jRR jRV
       - name: API test results
@@ -86,37 +86,37 @@ jobs:
         if: always()
         with:
           name: mxnet-engine
-          path: mxnet/mxnet-engine/build/reports
+          path: engines/mxnet/mxnet-engine/build/reports
       - name: mxnet-model-zoo test results
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: mxnet-model-zoo
-          path: mxnet/mxnet-model-zoo/build/reports
+          path: engines/mxnet/mxnet-model-zoo/build/reports
       - name: pytorch-engine test results
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: pytorch-engine
-          path: pytorch/pytorch-engine/build/reports
+          path: engines/pytorch/pytorch-engine/build/reports
       - name: pytorch-model-zoo test results
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: pytorch-model-zoo
-          path: pytorch/pytorch-model-zoo/build/reports
+          path: engines/pytorch/pytorch-model-zoo/build/reports
       - name: tensorflow-engine test results
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: tensorflow-engine
-          path: tensorflow/tensorflow-engine/build/reports
+          path: engines/tensorflow/tensorflow-engine/build/reports
       - name: tensorflow-model-zoo test results
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: tensorflow-model-zoo
-          path: tensorflow/tensorflow-model-zoo/build/reports
+          path: engines/tensorflow/tensorflow-model-zoo/build/reports
       - name: upload to codecov
         uses: codecov/codecov-action@v1.5.0
         with:
@@ -142,9 +142,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Compile PyTorch JNI
-        run: ./gradlew :pytorch:pytorch-native:compileJNI
+        run: ./gradlew :engines:pytorch:pytorch-native:compileJNI
       - name: Compile PaddlePaddle JNI
-        run: ./gradlew :paddlepaddle:paddlepaddle-native:compileJNI
+        run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
       - name: Integration tests
         # MXNet integration test on Github Action fail due to memory limitation on Windows
         run: |

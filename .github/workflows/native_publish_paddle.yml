@@ -26,7 +26,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Download native binaries
-        run: ./gradlew :paddlepaddle:paddlepaddle-native:pNL
+        run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:pNL
       - name: Publish to snapshot repository
         working-directory: paddlepaddle/paddlepaddle-native
         run: ./gradlew publish -P${{ github.event.inputs.mode }}

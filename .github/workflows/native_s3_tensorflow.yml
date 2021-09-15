@@ -26,4 +26,4 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - name: Upload tensorflow native binaries to s3
-        run: ./gradlew :tensorflow:tensorflow-native-auto:uTNL
+        run: ./gradlew :engines:tensorflow:tensorflow-native-auto:uTNL

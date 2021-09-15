@@ -1,0 +1,24 @@
+group "ai.djl.tensorflow"
+
+dependencies {
+    api project(":api")
+    api project(":engines:tensorflow:tensorflow-api")
+
+    testImplementation(project(":testing"))
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "DJL Engine Adapter for TensorFlow"
+                description = "Deep Java Library (DJL) Engine Adapter for TensorFlow"
+                url = "http://www.djl.ai/engines/tensorflow/${project.name}"
+            }
+        }
+    }
+}

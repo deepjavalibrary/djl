@@ -1,0 +1,82 @@
+group "ai.djl.pytorch"
+
+dependencies {
+    api project(":api")
+
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
+    testRuntimeOnly project(":engines:pytorch:pytorch-model-zoo")
+    testRuntimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
+}
+
+compileJava.dependsOn(processResources)
+
+processResources {
+    outputs.dir file("${project.buildDir}/classes/java/main/jnilib")
+    doLast {
+        def url = "https://publish.djl.ai/pytorch-${pytorch_version}/jnilib"
+        def files = [
+                "${djl_version}/linux-x86_64/cpu/libdjl_torch.so"         : "linux-x86_64/cpu/libdjl_torch.so",
+                "${djl_version}/linux-x86_64/cu102/libdjl_torch.so"       : "linux-x86_64/cu102/libdjl_torch.so",
+                "${djl_version}/linux-x86_64/cu111/libdjl_torch.so"       : "linux-x86_64/cu111/libdjl_torch.so",
+                "precxx11/${djl_version}/linux-x86_64/cpu/libdjl_torch.so": "linux-x86_64/cpu-precxx11/libdjl_torch.so",
+                "${djl_version}/osx-x86_64/cpu/libdjl_torch.dylib"        : "osx-x86_64/cpu/libdjl_torch.dylib",
+                "${djl_version}/win-x86_64/cpu/djl_torch.dll"             : "win-x86_64/cpu/djl_torch.dll",
+                "${djl_version}/win-x86_64/cu102/djl_torch.dll"           : "win-x86_64/cu102/djl_torch.dll",
+                "${djl_version}/win-x86_64/cu111/djl_torch.dll"           : "win-x86_64/cu111/djl_torch.dll"
+        ]
+        def jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
+        files.each { entry ->
+            def file = new File("${jnilibDir}/${entry.value}")
+            if (file.exists()) {
+                project.logger.lifecycle("prebuilt or cached file found for ${entry.value}")
+            } else {
+                def nativeDir = "${project.parent.projectDir}/pytorch-native/jnilib/${djl_version}/"
+                def jnilibFile = new File("${nativeDir}/${entry.value}")
+                if (jnilibFile.exists()) {
+                    project.logger.lifecycle("Copying " + jnilibFile)
+                    copy {
+                        from jnilibFile
+                        into file.getParent()
+                    }
+                } else if (!project.hasProperty("jni")) {
+                    project.logger.lifecycle("Downloading ${url}/${entry.key}")
+                    file.getParentFile().mkdirs()
+                    new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }
+                }
+            }
+        }
+        copy {
+            from jnilibDir
+            into "${project.buildDir}/classes/java/main/jnilib"
+        }
+
+        // write properties
+        def propFile = file("${project.buildDir}/classes/java/main/jnilib/pytorch.properties")
+        propFile.text = "version=${version}\n"
+    }
+}
+
+test {
+    environment "PATH", "src/test/bin:${environment.PATH}"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "DJL Engine Adapter for PyTorch"
+                description = "Deep Java Library (DJL) Engine Adapter for PyTorch"
+                url = "http://www.djl.ai/engines/pytorch/${project.name}"
+            }
+        }
+    }
+}
+
+clean.doFirst {
+    delete fileTree(System.getProperty("user.home") + "/.djl.ai/pytorch/") {
+        include '**/*djl_torch.*'
+    }
+}

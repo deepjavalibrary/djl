@@ -12,13 +12,13 @@ For training in DJL, the choice of engine is less important. Any engine that ful
 
 Currently, the engines that are supported by DJL are:
 
-- [MXNet](../mxnet/README.md) - **Recommended Engine** with full support
-- [PyTorch](../pytorch/README.md) - full support
-- [TensorFlow](../tensorflow/README.md) - supports inference and some NDArray operations
-- [ONNX Runtime](../onnxruntime/onnxruntime-engine/README.md) - supports basic inference
-- [DLR](../dlr/README.md) - supports basic inference
-- [TFLite](../tflite/tflite-engine/README.md) - supports basic inference
-- [PaddlePaddle](../paddlepaddle/README.md) - supports basic inference
+- [MXNet](../engines/mxnet/README.md) - **Recommended Engine** with full support
+- [PyTorch](../engines/pytorch/README.md) - full support
+- [TensorFlow](../engines/tensorflow/README.md) - supports inference and some NDArray operations
+- [ONNX Runtime](../engines/onnxruntime/onnxruntime-engine/README.md) - supports basic inference
+- [DLR](../engines/dlr/README.md) - supports basic inference
+- [TFLite](../engines/tflite/tflite-engine/README.md) - supports basic inference
+- [PaddlePaddle](../engines/paddlepaddle/README.md) - supports basic inference
 
 ## Setup
 

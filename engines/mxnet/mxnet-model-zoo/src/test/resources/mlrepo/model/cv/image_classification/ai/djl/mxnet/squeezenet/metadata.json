@@ -1,0 +1,51 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "squeezenet",
+  "name": "Squeezenet",
+  "description": "Squeezenet image classification",
+  "website": "http://www.djl.ai/engines/mxnet/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "squeezenet1.0",
+      "properties": {
+        "flavor": "1.0",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "size": 31675
+        },
+        "symbol": {
+          "uri": "0.0.1/squeezenet1.0-symbol.json",
+          "sha1Hash": "dad808fc89bc218e8e02fc3377b79be32d71712f",
+          "size": 40278
+        },
+        "parameters": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/squeezenet/0.0.1/squeezenet1.0-0000.params.gz",
+          "sha1Hash": "b86391b078ac73f5461bbaed244724f4c7e9df23",
+          "size": 4651608
+        }
+      }
+    }
+  ]
+}

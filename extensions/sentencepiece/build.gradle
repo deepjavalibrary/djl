@@ -7,7 +7,7 @@ dependencies {
         exclude group: "junit", module: "junit"
     }
 
-    testImplementation project(":pytorch:pytorch-engine")
+    testImplementation project(":engines:pytorch:pytorch-engine")
     testImplementation "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
@@ -51,7 +51,7 @@ publishing {
             pom {
                 name = "DJL NLP utilities for SentencePiece"
                 description = "Deep Java Library (DJL) NLP utilities for SentencePiece"
-                url = "http://www.djl.ai/sentencepiece/${project.name}"
+                url = "http://www.djl.ai/extensions/${project.name}"
             }
         }
     }

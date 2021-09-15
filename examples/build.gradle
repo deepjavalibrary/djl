@@ -9,13 +9,13 @@ dependencies {
     implementation project(":model-zoo")
 
     if (System.getProperty("ai.djl.default_engine") == "PyTorch") {
-        runtimeOnly project(":pytorch:pytorch-model-zoo")
+        runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
         runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
     } else if (System.getProperty("ai.djl.default_engine") == "TensorFlow") {
         runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
-        runtimeOnly project(":tensorflow:tensorflow-model-zoo")
+        runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
     } else {
-        runtimeOnly project(":mxnet:mxnet-model-zoo")
+        runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
         runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
     }
 

@@ -38,12 +38,12 @@ public final class RequireZoo {
         if (!ModelZoo.hasModelZoo("ai.djl.mxnet")) {
             throw new IllegalStateException(
                     "The MXNet model zoo is required, but not found."
-                            + "Please install it by following http://docs.djl.ai/mxnet/mxnet-model-zoo/index.html#installation");
+                            + "Please install it by following http://docs.djl.ai/engines/mxnet/mxnet-model-zoo/index.html#installation");
         }
         if (!Engine.hasEngine("MXNet")) {
             throw new IllegalStateException(
                     "The MXNet engine is required, but not found."
-                            + "Please install it by following http://docs.djl.ai/mxnet/mxnet-engine/index.html#installation");
+                            + "Please install it by following http://docs.djl.ai/engines/mxnet/mxnet-engine/index.html#installation");
         }
     }
 
@@ -66,12 +66,12 @@ public final class RequireZoo {
         if (!ModelZoo.hasModelZoo("ai.djl.tensorflow")) {
             throw new IllegalStateException(
                     "The TensorFlow model zoo is required, but not found."
-                            + "Please install it by following http://docs.djl.ai/tensorflow/tensorflow-model-zoo/index.html#installation");
+                            + "Please install it by following http://docs.djl.ai/engines/tensorflow/tensorflow-model-zoo/index.html#installation");
         }
         if (!Engine.hasEngine("TensorFlow")) {
             throw new IllegalStateException(
                     "The TensorFlow engine is required, but not found."
-                            + "Please install it by following http://docs.djl.ai/tensorflow/tensorflow-engine/index.html#installation");
+                            + "Please install it by following http://docs.djl.ai/engines/tensorflow/tensorflow-engine/index.html#installation");
         }
     }
 }

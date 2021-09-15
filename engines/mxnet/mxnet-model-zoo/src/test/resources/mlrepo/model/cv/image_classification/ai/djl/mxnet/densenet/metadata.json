@@ -1,0 +1,150 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "densenet",
+  "name": "DenseNet",
+  "description": "DenseNet image classification model",
+  "website": "http://www.djl.ai/engines/mxnet/model-zoo",
+  "licenses": {
+    "apache": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "densenet121",
+      "properties": {
+        "layers": "121",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "densenet121/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "densenet121/0.0.1/densenet121-symbol.json.gz",
+          "sha1Hash": "7bf27148a4bc7514be276dd025b623ff59f5ec71",
+          "size": 14768
+        },
+        "parameters": {
+          "uri": "densenet121/0.0.1/densenet121-0000.params.gz",
+          "sha1Hash": "fcc6650015566b712689ffcba8adc2342c82aecc",
+          "size": 30314845
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "densenet161",
+      "properties": {
+        "layers": "161",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "densenet161/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "densenet161/0.0.1/densenet161-symbol.json.gz",
+          "sha1Hash": "4732ec2655fd0f07ad02904a757fdc119c674866",
+          "size": 19280
+        },
+        "parameters": {
+          "uri": "densenet161/0.0.1/densenet161-0000.params.gz",
+          "sha1Hash": "0f8ef532d3354e2c29adae954555688addbf3a35",
+          "size": 110702124
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "densenet169",
+      "properties": {
+        "layers": "169",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "densenet169/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "densenet169/0.0.1/densenet169-symbol.json.gz",
+          "sha1Hash": "519a8641cececebad07cf4dd7c2974aeea49a31c",
+          "size": 20199
+        },
+        "parameters": {
+          "uri": "densenet169/0.0.1/densenet169-0000.params.gz",
+          "sha1Hash": "dd4a976024ef13b40340af8d4b63632ba44bc703",
+          "size": 54046653
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "densenet201",
+      "properties": {
+        "layers": "201",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "densenet201/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "densenet201/0.0.1/densenet201-symbol.json.gz",
+          "sha1Hash": "f54ea38848b1636a9109265aac6c73ab8f065c23",
+          "size": 23795
+        },
+        "parameters": {
+          "uri": "densenet201/0.0.1/densenet201-0000.params.gz",
+          "sha1Hash": "77430ee208ed13f4ae376c4d81d439d354f20f11",
+          "size": 76574691
+        }
+      }
+    }
+  ]
+}

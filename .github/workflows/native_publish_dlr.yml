@@ -26,9 +26,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Download native binaries
-        run: ./gradlew :dlr:dlr-native:dDNL
+        run: ./gradlew :engines:dlr:dlr-native:dDNL
       - name: Publish to snapshot/staging repository
-        working-directory: dlr/dlr-native
+        working-directory: engines/dlr/dlr-native
         run: ./gradlew publish -P${{ github.event.inputs.mode }}
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}

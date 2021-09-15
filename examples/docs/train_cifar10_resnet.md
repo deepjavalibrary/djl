@@ -14,7 +14,7 @@ Follow [setup](../../docs/development/setup.md) to configure your development en
 
 ## Run CIFAR-10 training using ResNet50
 
-The models you use are available in the [DJL Model Zoo](../../model-zoo/README.md) and [MXNet Model Zoo](../../mxnet/mxnet-model-zoo/README.md). 
+The models you use are available in the [DJL Model Zoo](../../model-zoo/README.md) and [MXNet Model Zoo](../../engines/mxnet/mxnet-model-zoo/README.md). 
 We can simply load and use them as follows:
 
 ### Using a DJL model from Model Zoo

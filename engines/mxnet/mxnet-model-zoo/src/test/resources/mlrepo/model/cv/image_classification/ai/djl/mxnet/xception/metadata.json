@@ -1,0 +1,51 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "xception",
+  "name": "Xception",
+  "description": "Xception image classification model",
+  "website": "http://www.djl.ai/engines/mxnet/model-zoo",
+  "licenses": {
+    "apache": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "xception",
+      "properties": {
+        "flavor": "65",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "xception/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "xception/0.0.1/xception-symbol.json.gz",
+          "sha1Hash": "363a76a60b7601137725abfc6fa6f42dbe92f8ea",
+          "size": 14183
+        },
+        "parameters": {
+          "uri": "xception/0.0.1/xception-0000.params.gz",
+          "sha1Hash": "5c64294e5a85edda71966744a7fb41bc66fd6417",
+          "size": 148963660
+        }
+      }
+    }
+  ]
+}

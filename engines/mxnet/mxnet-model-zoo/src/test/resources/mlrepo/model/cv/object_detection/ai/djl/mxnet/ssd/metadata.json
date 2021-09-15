@@ -1,0 +1,173 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/object_detection",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "ssd",
+  "name": "SSD",
+  "description": "Single-shot object detection",
+  "website": "http://www.djl.ai/engines/mxnet/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_512_resnet50_v1_voc",
+      "properties": {
+        "size": "512",
+        "backbone": "resnet50",
+        "flavor": "v1",
+        "dataset": "voc"
+      },
+      "arguments": {
+        "width": 512,
+        "height": 512,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.SingleShotDetectionTranslatorFactory"
+      },
+      "files": {
+        "classes": {
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "name": "classes.txt",
+          "size": 134
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_resnet50_v1-symbol.json",
+          "sha1Hash": "470d2cce5abec637163daa50a4fd262943caf2c5",
+          "name": "ssd_512_resnet50_v1_voc-symbol.json",
+          "size": 255172
+        },
+        "parameters": {
+          "uri": "0.0.1/ssd_512_resnet50_v1_voc-0000.params.gz",
+          "sha1Hash": "d830eb4d786776577eaf0b0198125a932f055262",
+          "size": 135903212
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_512_vgg16_atrous_coco",
+      "properties": {
+        "size": "512",
+        "backbone": "vgg16",
+        "flavor": "atrous",
+        "dataset": "coco"
+      },
+      "arguments": {
+        "width": 512,
+        "height": 512,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.SingleShotDetectionTranslatorFactory"
+      },
+      "files": {
+        "classes": {
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/classes_coco.txt",
+          "sha1Hash": "1febf3c237fb06e472a001fd8e03f16cc6174090",
+          "name": "classes.txt",
+          "size": 620
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_vgg16_atrous-symbol.json",
+          "sha1Hash": "e7b5f8f000fed56cbeb8d8d0f0d4a8d35094600a",
+          "name": "ssd_512_vgg16_atrous_coco-symbol.json",
+          "size": 188979
+        },
+        "parameters": {
+          "uri": "0.0.1/ssd_512_vgg16_atrous_coco-0000.params.gz",
+          "sha1Hash": "491ed6ac57d252bee0721744176cdab93b6f8296",
+          "size": 134511624
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_512_mobilenet1.0_voc",
+      "properties": {
+        "size": "512",
+        "backbone": "mobilenet1.0",
+        "dataset": "voc"
+      },
+      "arguments": {
+        "width": 512,
+        "height": 512,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.SingleShotDetectionTranslatorFactory"
+      },
+      "files": {
+        "classes": {
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "name": "classes.txt",
+          "size": 134
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_512_mobilenet1.0-symbol.json",
+          "sha1Hash": "42fc3b27bff6431a7107eef728f984acf3c1afad",
+          "name": "ssd_512_mobilenet1.0_voc-symbol.json",
+          "size": 161649
+        },
+        "parameters": {
+          "uri": "0.0.1/ssd_512_mobilenet1.0_voc-0000.params.gz",
+          "sha1Hash": "0d21b49f15e202b89cd1f2b5ca274c771e5bf6c3",
+          "size": 51415054
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "ssd_300_vgg16_atrous_voc",
+      "properties": {
+        "size": "300",
+        "backbone": "vgg16",
+        "flavor": "atrous",
+        "dataset": "voc"
+      },
+      "arguments": {
+        "width": 300,
+        "height": 300,
+        "resize": true,
+        "rescale": true,
+        "threshold": 0.2,
+        "synsetFileName": "classes.txt",
+        "translatorFactory": "ai.djl.modality.cv.translator.SingleShotDetectionTranslatorFactory"
+      },
+      "files": {
+        "classes": {
+          "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/mxnet/classes_voc.txt",
+          "sha1Hash": "c6796ef8b46238f33366d94f3e16801cbda9e7f8",
+          "name": "classes.txt",
+          "size": 134
+        },
+        "symbol": {
+          "uri": "0.0.1/ssd_300_vgg16_atrous-symbol.json",
+          "sha1Hash": "2907f14ec41ff6d73f59ffd3f94c43a0d54c2db3",
+          "name": "ssd_300_vgg16_atrous_voc-symbol.json",
+          "size": 106291
+        },
+        "parameters": {
+          "uri": "0.0.1/ssd_300_vgg16_atrous_voc-0000.params.gz",
+          "sha1Hash": "abfcfb20b155f2da8b94a17276cec47529dd6d7f",
+          "size": 97855902
+        }
+      }
+    }
+  ]
+}

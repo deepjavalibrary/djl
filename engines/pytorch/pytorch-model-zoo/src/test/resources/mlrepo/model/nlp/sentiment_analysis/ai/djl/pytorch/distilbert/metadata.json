@@ -1,0 +1,42 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "nlp/sentiment_analysis",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "distilbert",
+  "name": "traced_distilbert_sst_english",
+  "description": "A distil BERT-based Sentiment Analysis model trained on SST",
+  "website": "http://www.djl.ai/engines/pytorch/model-zoo",
+  "licenses": {
+    "apache": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "traced_distilbert_sst_english",
+      "properties": {
+        "backbone": "distilbert",
+        "dataset": "sst"
+      },
+      "arguments": {
+        "translatorFactory": "ai.djl.pytorch.zoo.nlp.sentimentanalysis.PtDistilBertTranslatorFactory"
+      },
+      "files": {
+        "distilbert-base-uncased-vocab": {
+          "uri": "traced_distilbert_sentiment/0.0.1/distilbert-base-uncased-finetuned-sst-2-english-vocab.txt.gz",
+          "sha1Hash": "b2d7e7d5dfc42c28ef359e310181d9e5f819d03d",
+          "size": 110747
+        },
+        "model": {
+          "uri": "traced_distilbert_sentiment/0.0.1/traced_distilbert_sst_english.pt.gz",
+          "sha1Hash": "1a31601e143651a48bc46cbf1e4cfc0ca3bbff9b",
+          "size": 247030752
+        }
+      }
+    }
+  ]
+}

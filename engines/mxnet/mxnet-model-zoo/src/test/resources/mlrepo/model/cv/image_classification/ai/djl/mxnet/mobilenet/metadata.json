@@ -1,0 +1,358 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "mobilenet",
+  "name": "MobileNet",
+  "description": "MobileNet image classification model",
+  "website": "http://www.djl.ai/engines/mxnet/model-zoo",
+  "licenses": {
+    "apache": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "mobilenet0.25",
+      "properties": {
+        "flavor": "v1",
+        "multiplier": "0.25",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "mobilenet0.25/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "mobilenet0.25/0.0.1/mobilenet0.25-symbol.json.gz",
+          "sha1Hash": "c9ee3a421efdd572f5b2cdc69d438ba37ed4c558",
+          "size": 3494
+        },
+        "parameters": {
+          "uri": "mobilenet0.25/0.0.1/mobilenet0.25-0000.params.gz",
+          "sha1Hash": "b4dd667cb7e3ebbc6832a69f4c8b94381c944f0c",
+          "size": 1120435
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "mobilenet0.5",
+      "properties": {
+        "flavor": "v1",
+        "multiplier": "0.5",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "mobilenet0.5/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "mobilenet0.5/0.0.1/mobilenet0.5-symbol.json.gz",
+          "sha1Hash": "0d4d2cdb50e79335c0f1852af8daafde64a64cbe",
+          "size": 3499
+        },
+        "parameters": {
+          "uri": "mobilenet0.5/0.0.1/mobilenet0.5-0000.params.gz",
+          "sha1Hash": "748146e01a6853d013e28fd234b6e04ffeb0e436",
+          "size": 3129236
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "mobilenet0.75",
+      "properties": {
+        "flavor": "v1",
+        "multiplier": "0.75",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "mobilenet0.75/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "mobilenet0.75/0.0.1/mobilenet0.75-symbol.json.gz",
+          "sha1Hash": "ca7b3f4a38d9f1e2cde31d439c06d38e6c8c6fa2",
+          "size": 3501
+        },
+        "parameters": {
+          "uri": "mobilenet0.75/0.0.1/mobilenet0.75-0000.params.gz",
+          "sha1Hash": "4d537e97f6203e53102e05c8e96a3513052aaf0b",
+          "size": 6036676
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "mobilenet1.0",
+      "properties": {
+        "flavor": "v1",
+        "multiplier": "1.0",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "mobilenet1.0/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "mobilenet1.0/0.0.1/mobilenet1.0-symbol.json.gz",
+          "sha1Hash": "87f68f63d508b539eedd9aa3396c15b50e4ad8d6",
+          "size": 3502
+        },
+        "parameters": {
+          "uri": "mobilenet1.0/0.0.1/mobilenet1.0-0000.params.gz",
+          "sha1Hash": "05bb940b75b954771d8d794a582fc861ed8b185a",
+          "size": 9859110
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "mobilenetv2_0.25",
+      "properties": {
+        "flavor": "v2",
+        "multiplier": "0.25",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "mobilenetv2_0.25/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "mobilenetv2_0.25/0.0.1/mobilenetv2_0.25-symbol.json.gz",
+          "sha1Hash": "7f77190ada1dda3eb78f92c7e81e023c94629687",
+          "size": 5875
+        },
+        "parameters": {
+          "uri": "mobilenetv2_0.25/0.0.1/mobilenetv2_0.25-0000.params.gz",
+          "sha1Hash": "f6ab1ce30f013f51201dc40cef1b44ac1c2505cf",
+          "size": 5672172
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "mobilenetv2_0.5",
+      "properties": {
+        "flavor": "v2",
+        "multiplier": "0.5",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "mobilenetv2_0.5/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "mobilenetv2_0.5/0.0.1/mobilenetv2_0.5-symbol.json.gz",
+          "sha1Hash": "49bf2ee0dcd16149351b044729541be648028357",
+          "size": 5894
+        },
+        "parameters": {
+          "uri": "mobilenetv2_0.5/0.0.1/mobilenetv2_0.5-0000.params.gz",
+          "sha1Hash": "7c60bd91446c832787e5fe097029a77079ce781e",
+          "size": 7365617
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "mobilenetv2_0.75",
+      "properties": {
+        "flavor": "v2",
+        "multiplier": "0.75",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "mobilenetv2_0.75/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "mobilenetv2_0.75/0.0.1/mobilenetv2_0.75-symbol.json.gz",
+          "sha1Hash": "58acc830caecd48f1c4ecf29230fa81fe18618ae",
+          "size": 5917
+        },
+        "parameters": {
+          "uri": "mobilenetv2_0.75/0.0.1/mobilenetv2_0.75-0000.params.gz",
+          "sha1Hash": "672db8ba4f6b5cdcb34aeb62cd19046cc582ce92",
+          "size": 9852674
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "mobilenetv2_1.0",
+      "properties": {
+        "flavor": "v2",
+        "multiplier": "1.0",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "mobilenetv2_1.0/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "mobilenetv2_1.0/0.0.1/mobilenetv2_1.0-symbol.json.gz",
+          "sha1Hash": "6b2c1898309ed6b638a638d4749777030811ff8d",
+          "size": 5931
+        },
+        "parameters": {
+          "uri": "mobilenetv2_1.0/0.0.1/mobilenetv2_1.0-0000.params.gz",
+          "sha1Hash": "3f6bd60e410dbe509e2c38a938f7af8e99c70fe4",
+          "size": 13135175
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "mobilenetv3_small",
+      "properties": {
+        "flavor": "v3_small",
+        "multiplier": "1.0",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "mobilenetv3_small/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "mobilenetv3_small/0.0.1/mobilenetv3_small-symbol.json.gz",
+          "sha1Hash": "361154ade4cdcaad282a43eddb08574457afb210",
+          "size": 7011
+        },
+        "parameters": {
+          "uri": "mobilenetv3_small/0.0.1/mobilenetv3_small-0000.params.gz",
+          "sha1Hash": "4af84e8a2905fcccbce7258f8edc996717b620df",
+          "size": 6749336
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "mobilenetv3_large",
+      "properties": {
+        "flavor": "v3_large",
+        "multiplier": "1.0",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "mobilenetv3_large/0.0.1/synset.txt.gz",
+          "sha1Hash": "1af57d9e5ebc838f17ce028c3559ad33f1bc1e37",
+          "size": 14645
+        },
+        "symbol": {
+          "uri": "mobilenetv3_large/0.0.1/mobilenetv3_large-symbol.json.gz",
+          "sha1Hash": "abccec851c3d97dcc2673f7a7d1c2c6393a5adfc",
+          "size": 8267
+        },
+        "parameters": {
+          "uri": "mobilenetv3_large/0.0.1/mobilenetv3_large-0000.params.gz",
+          "sha1Hash": "814a31e35d301901c767409f466827ae157ff007",
+          "size": 12662139
+        }
+      }
+    }
+  ]
+}

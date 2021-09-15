@@ -9,7 +9,7 @@ dependencies {
     }
 
     // ModelZoo requires at least one engine in the class path
-    testImplementation project(":pytorch:pytorch-engine")
+    testImplementation project(":engines:pytorch:pytorch-engine")
     testImplementation "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
@@ -54,7 +54,7 @@ publishing {
                 artifactId "fasttext-engine"
                 name = "Fasttext Engine Adapter"
                 description = "Fasttext Engine Adapter for DJL"
-                url = "http://www.djl.ai/fasttext/${project.name}"
+                url = "http://www.djl.ai/extensions/${project.name}"
             }
         }
     }

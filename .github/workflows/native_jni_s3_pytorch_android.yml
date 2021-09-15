@@ -26,13 +26,13 @@ jobs:
       - name: build android
         run: |
           export ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}
-          ./gradlew :pytorch:pytorch-native:compileAndroidJNI
+          ./gradlew :engines:pytorch:pytorch-native:compileAndroidJNI
       - name: Upload compiled jni library
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: jnilib-Android
-          path: pytorch/pytorch-native/jnilib
+          path: engines/pytorch/pytorch-native/jnilib
 
   publish:
     runs-on: ubuntu-18.04

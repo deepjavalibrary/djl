@@ -29,7 +29,7 @@ Gradle:
 
 ```
 implementation "ai.djl.mxnet:mxnet-engine:0.12.0"
-// See https://github.com/deepjavalibrary/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
+// See https://github.com/deepjavalibrary/djl/blob/master/engines/mxnet/mxnet-engine/README.md for more MXNet library selection options
 runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.8.0"
 ```
 
@@ -43,7 +43,7 @@ Maven:
 </dependency>
 <dependency>
     <!--
-        See https://github.com/deepjavalibrary/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
+        See https://github.com/deepjavalibrary/djl/blob/master/engines/mxnet/mxnet-engine/README.md for more MXNet library selection options
     -->
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-native-auto</artifactId>
@@ -149,7 +149,7 @@ Then, right click the `log4j2.xml` file and select `Recompile log4j2.xml`.
 **Note:** this is not officially supported by DJL, and some functions may not work. 
 If you require features in Apache MXNet not provided by DJL, please submit an [issue](https://github.com/deepjavalibrary/djl/issues).
 
-By default, DJL is running on the [MXNet engine](https://github.com/deepjavalibrary/djl/tree/master/mxnet/mxnet-engine).
+By default, DJL is running on the [MXNet engine](https://github.com/deepjavalibrary/djl/tree/master/engines/mxnet/mxnet-engine).
 We use `mxnet-mkl` on CPU machines and `mxnet-cu102mkl` on GPU machines.
 `mkl` means [Intel-MKLDNN](https://github.com/intel/mkl-dnn) is enabled.
 `cu102` means [Nvidia CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit) version 10.2 is enabled.
@@ -221,7 +221,7 @@ ensorflow.so: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `CXXABI_1.3.11' 
 nsorflow/cache/2.3.1-cu101-linux-x86_64/libtensorflow.so.2)
 ```
 
-Please upgrade gcc version according to the steps on [TensorFlow install page](https://docs.djl.ai/tensorflow/index.html#note)
+Please upgrade gcc version according to the steps on [TensorFlow install page](https://docs.djl.ai/engines/tensorflow/index.html#note)
 
 ## 9. X11 error when running object detection notebooks on EC2 instances.
 

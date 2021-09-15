@@ -1,0 +1,86 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "se_resnext",
+  "name": "Senet and Resnext",
+  "description": "Senet and Resnext image classification",
+  "website": "http://www.djl.ai/engines/mxnet/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "se_resnext101_32x4d",
+      "properties": {
+        "layers": "101",
+        "flavor": "32x4d",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "size": 31675
+        },
+        "symbol": {
+          "uri": "0.0.1/se_resnext101_32x4d-symbol.json",
+          "sha1Hash": "8392531d32fa03c848901e72408d03771a3a0eba",
+          "size": 421554
+        },
+        "parameters": {
+          "uri": "0.0.1/se_resnext101_32x4d-0000.params.gz",
+          "sha1Hash": "66678545f940331f7cbd1b11ceea89ec8bd1655c",
+          "size": 181398742
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "se_resnext101_64x4d",
+      "properties": {
+        "layers": "101",
+        "flavor": "64x4d",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "size": 31675
+        },
+        "symbol": {
+          "uri": "0.0.1/se_resnext101_64x4d-symbol.json",
+          "sha1Hash": "e63b19cdf422088abdbe8bab9921fd65f93f2e6d",
+          "size": 421853
+        },
+        "parameters": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/se_resnext/0.0.1/se_resnext101_64x4d-0000.params.gz",
+          "sha1Hash": "3cba46daf11e882005103676497e407a93341397",
+          "size": 327694318
+        }
+      }
+    }
+  ]
+}

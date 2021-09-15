@@ -1,0 +1,156 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "resnet",
+  "name": "Resnet",
+  "description": "Resnet image classification",
+  "website": "http://www.djl.ai/engines/mxnet/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet18_v1",
+      "properties": {
+        "layers": "18",
+        "flavor": "v1",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "size": 31675
+        },
+        "symbol": {
+          "uri": "0.0.1/resnet18_v1-symbol.json",
+          "sha1Hash": "c642e3b97eb59ca580a4ae4098c3d93658b4178a",
+          "size": 61264
+        },
+        "parameters": {
+          "uri": "0.0.1/resnet18_v1-0000.params.gz",
+          "sha1Hash": "b669e1475b7a9368e9b3bc9869cc65a560387820",
+          "size": 43452245
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet50_v2",
+      "properties": {
+        "layers": "50",
+        "flavor": "v2",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "size": 31675
+        },
+        "symbol": {
+          "uri": "0.0.1/resnet50_v2-symbol.json",
+          "sha1Hash": "ec0b80c19146a86b3f356ce051654832edfbe734",
+          "size": 155869
+        },
+        "parameters": {
+          "uri": "0.0.1/resnet50_v2-0000.params.gz",
+          "sha1Hash": "158ce9eefe23ccf02c36320a540d99d3028c60e1",
+          "size": 95092152
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet152_v1d",
+      "properties": {
+        "layers": "152",
+        "flavor": "v1d",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset.txt",
+          "sha1Hash": "e03a09a8336d75b7bb008748eadee253a30cb2c2",
+          "size": 31675
+        },
+        "symbol": {
+          "uri": "0.0.1/resnet152_v1d-symbol.json",
+          "sha1Hash": "83186e6c79b5c46d37236867caf2fd35132ce903",
+          "size": 476437
+        },
+        "parameters": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet152_v1d-0000.params.gz",
+          "sha1Hash": "5fb89642f5c3d7764c68811f85b0feabb656f9f9",
+          "size": 224073866
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet50_v1_cifar10",
+      "properties": {
+        "layers": "50",
+        "flavor": "v1",
+        "dataset": "cifar10"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "centerCrop": true,
+        "resize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "synset": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset_cifar10.txt",
+          "sha1Hash": "107a31d7b87d44ff07d50cfceb176add6d8b9518",
+          "name": "synset.txt",
+          "size": 60
+        },
+        "symbol": {
+          "uri": "0.0.1/resnet50_v1-symbol.json",
+          "sha1Hash": "a326bd546630fa171398ea33d0136f8e43530748",
+          "name": "resnet50_v1_cifar10-symbol.json",
+          "size": 31675
+        },
+        "parameters": {
+          "uri": "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/resnet/0.0.1/resnet50_v1_cifar10-0000.params.gz",
+          "sha1Hash": "cf1f6660d73cd324c25ab04405b8b07c3a35fad3",
+          "size": 87352464
+        }
+      }
+    }
+  ]
+}
