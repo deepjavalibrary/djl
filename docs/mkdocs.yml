@@ -82,37 +82,33 @@ nav:
       - 'leaders.md'
   - Apache MXNet:
       - Overview: 'engines/mxnet/README.md'
+      - MXNet Engine: 'engines/mxnet/mxnet-engine/README.md'
+      - MXNet Model Zoo: 'engines/mxnet/mxnet-model-zoo/README.md'
       - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
       - Load a MXNet Model: 'jupyter/load_mxnet_model.ipynb'
       - Backend Optimizer for MXNet: 'docs/mxnet/mxnet_backend_optimizer.md'
-      - Modules:
-          - MXNet Engine: 'engines/mxnet/mxnet-engine/README.md'
-          - MXNet Model Zoo: 'engines/mxnet/mxnet-model-zoo/README.md'
-          - MXNet native library: 'engines/mxnet/native/README.md'
-  - ONNX Runtime:
-      - ONNX runtime Hybrid Engine: 'docs/hybrid_engine.md'
-      - Load a ONNX Model: 'jupyter/onnxruntime/machine_learning_with_ONNXRuntime.ipynb'
-      - Module: 'engines/onnxruntime/onnxruntime-engine/README.md'
   - PyTorch:
       - Overview: 'engines/pytorch/README.md'
-      - Importing from PyTorch:
-          - Converting the Model: 'docs/pytorch/how_to_convert_your_model_to_torchscript.md'
-          - Loading the Model: 'jupyter/load_pytorch_model.ipynb'
-      - Modules:
-          - PyTorch Engine: 'engines/pytorch/pytorch-engine/README.md'
-          - PyTorch Model Zoo: 'engines/pytorch/pytorch-model-zoo/README.md'
-          - Pytorch native library: 'engines/pytorch/pytorch-native/README.md'
+      - PyTorch Engine: 'engines/pytorch/pytorch-engine/README.md'
+      - PyTorch Model Zoo: 'engines/pytorch/pytorch-model-zoo/README.md'
+      - Import PyTorch Model: 'docs/pytorch/how_to_convert_your_model_to_torchscript.md'
+      - Load a PyTorch Model: 'jupyter/load_pytorch_model.ipynb'
   - TensorFlow:
       - Overview: 'engines/tensorflow/README.md'
+      - TensorFlow Engine: 'engines/tensorflow/tensorflow-engine/README.md'
+      - TensorFlow Model Zoo: 'engines/tensorflow/tensorflow-model-zoo/README.md'
       - Import TensorFlow Model: 'docs/tensorflow/how_to_import_tensorflow_models_in_DJL.md'
       - Load a TensorFlow Model: 'jupyter/tensorflow/pneumonia_detection.ipynb'
-      - Modules:
-          - TensorFlow Engine: 'engines/tensorflow/tensorflow-engine/README.md'
-          - TensorFlow Model Zoo: 'engines/tensorflow/tensorflow-model-zoo/README.md'
-  - Engines:
+  - Hybrid engines:
+      - Hybrid engine overview: 'docs/hybrid_engine.md'
+      - ONNX Runtime:
+          - Overview: 'engines/onnxruntime/onnxruntime-engine/README.md'
+          - Load a ONNX Model: 'jupyter/onnxruntime/machine_learning_with_ONNXRuntime.ipynb'
       - PaddlePaddle:
           - Overview: 'engines/paddlepaddle/README.md'
-          - Import your Paddle model:
+          - PaddlePaddle Engine: 'engines/paddlepaddle/paddlepaddle-engine/README.md'
+          - PaddlePaddle Model Zoo: 'engines/paddlepaddle/paddlepaddle-model-zoo/README.md'
+          - Import Paddle model:
               - English: 'docs/paddlepaddle/how_to_create_paddlepaddle_model.md'
               - 中文: 'docs/paddlepaddle/how_to_create_paddlepaddle_model_zh.md'
           - Facemask detection using PaddlePaddle:
@@ -121,12 +117,10 @@ nav:
           - PaddleOCR example:
               - English: 'jupyter/paddlepaddle/paddle_ocr_java.ipynb'
               - 中文: 'jupyter/paddlepaddle/paddle_ocr_java_zh.ipynb'
-          - Modules:
-              - PaddlePaddle Engine: 'engines/paddlepaddle/paddlepaddle-engine/README.md'
-              - PaddlePaddle Model Zoo: 'engines/paddlepaddle/paddlepaddle-model-zoo/README.md'
+      - TensorRT: 'engines/tensorrt/README.md'
       - TensorFlow Lite: 'engines/tflite/tflite-engine/README.md'
-      - XGBoost: 'engines/ml/xgboost/README.md'
       - Neo DLR: 'engines/dlr/dlr-engine/README.md'
+      - XGBoost: 'engines/ml/xgboost/README.md'
   - Extensions:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'
