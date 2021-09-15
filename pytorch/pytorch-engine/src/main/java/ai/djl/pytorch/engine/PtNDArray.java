@@ -312,18 +312,6 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray zerosLike() {
-        return JniUtils.zerosLike(this, getDataType(), getDevice(), SparseFormat.DENSE);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray onesLike() {
-        return JniUtils.onesLike(this, getDataType(), getDevice(), SparseFormat.DENSE);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public boolean contentEquals(Number number) {
         return JniUtils.contentEqual(this, (PtNDArray) manager.create(number));
     }

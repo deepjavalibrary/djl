@@ -49,7 +49,7 @@ public class TfNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public TfNDArray adopt(NDArray array) {
+    public TfNDArray from(NDArray array) {
         if (array instanceof TfNDArray) {
             return (TfNDArray) array;
         }

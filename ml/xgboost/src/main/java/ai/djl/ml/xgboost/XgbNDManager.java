@@ -51,7 +51,7 @@ public class XgbNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public XgbNDArray adopt(NDArray array) {
+    public XgbNDArray from(NDArray array) {
         if (array instanceof XgbNDArray) {
             return (XgbNDArray) array;
         }

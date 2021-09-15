@@ -57,7 +57,7 @@ public class PpSymbolBlock extends AbstractSymbolBlock {
         NDManager inputManager = inputs.head().getManager();
         NDList ret = new NDList();
         for (NDArray array : output) {
-            ret.add(inputManager.adopt(array));
+            ret.add(inputManager.from(array));
         }
         return ret;
     }
@@ -65,7 +65,7 @@ public class PpSymbolBlock extends AbstractSymbolBlock {
     private PpNDArray[] getInputs(NDList inputs) {
         PpNDArray[] inputArray = new PpNDArray[inputs.size()];
         for (int i = 0; i < inputArray.length; i++) {
-            inputArray[i] = manager.adopt(inputs.get(i));
+            inputArray[i] = manager.from(inputs.get(i));
         }
         return inputArray;
     }
