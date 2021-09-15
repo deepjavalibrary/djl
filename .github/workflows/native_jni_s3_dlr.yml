@@ -19,9 +19,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
-        run: ./gradlew :extensions:dlr:dlr-native:compileJNI
+        run: ./gradlew :engines:dlr:dlr-native:compileJNI
       - name: Run test
-        run: ./gradlew :extensions:dlr:dlr-engine:test -Pjni
+        run: ./gradlew :engines:dlr:dlr-engine:test -Pjni
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -59,8 +59,8 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: |
-          ./gradlew :extensions:dlr:dlr-native:compileJNI
-          ./gradlew -Pjni :extensions:dlr:dlr-engine:test
+          ./gradlew :engines:dlr:dlr-native:compileJNI
+          ./gradlew -Pjni :engines:dlr:dlr-engine:test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
