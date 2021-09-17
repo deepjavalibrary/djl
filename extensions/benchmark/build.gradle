@@ -51,6 +51,8 @@ dependencies {
         runtimeOnly project(":engines:paddlepaddle:paddlepaddle-model-zoo")
         runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
 
+        runtimeOnly project(":engines:tensorrt")
+
         ProcessBuilder pb = new ProcessBuilder("nvidia-smi", "-L")
         def hasGPU = false;
         try {

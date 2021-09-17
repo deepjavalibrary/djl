@@ -106,5 +106,8 @@ public final class Benchmark extends AbstractBenchmark {
         if (System.getProperty("ai.djl.onnx.disable_alternative") == null) {
             System.setProperty("ai.djl.onnx.disable_alternative", "true");
         }
+        if (System.getProperty("ai.djl.tensorrt.disable_alternative") == null) {
+            System.setProperty("ai.djl.tensorrt.disable_alternative", "true");
+        }
     }
 }

@@ -258,6 +258,8 @@ public abstract class AbstractBenchmark {
                         .optModelUrls(arguments.getModelUrl())
                         .optModelName(arguments.getModelName())
                         .optEngine(arguments.getEngine())
+                        .optOptions(arguments.getModelOptions())
+                        .optArguments(arguments.getModelArguments())
                         .optDevice(device)
                         .optTranslator(translator)
                         .optProgress(new ProgressBar())
@@ -290,7 +292,7 @@ public abstract class AbstractBenchmark {
             for (Pair<DataType, Shape> pair : shapes) {
                 DataType dataType = pair.getKey();
                 Shape shape = pair.getValue();
-                list.add(ctx.getNDManager().ones(shape, dataType));
+                list.add(ctx.getNDManager().zeros(shape, dataType));
             }
             return list;
         }

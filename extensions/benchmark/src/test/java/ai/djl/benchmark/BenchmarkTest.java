@@ -15,6 +15,7 @@ package ai.djl.benchmark;
 import ai.djl.ndarray.types.DataType;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
@@ -36,7 +37,14 @@ public class BenchmarkTest {
         DefaultParser parser = new DefaultParser();
 
         String[] args = {
-            "-p", "/opt/ml/resnet18_v1", "-s", "(1)s,(1)d,(1)u,(1)b,(1)i,(1)l,(1)B,(1)"
+            "-p",
+            "/opt/ml/resnet18_v1",
+            "-s",
+            "(1)s,(1)d,(1)u,(1)b,(1)i,(1)l,(1)B,(1)",
+            "--model-options",
+            "fp16,dlaCore=1",
+            "--model-arguments",
+            "width=28"
         };
         CommandLine cmd = parser.parse(options, args, null, false);
         Arguments arguments = new Arguments(cmd);
@@ -59,6 +67,13 @@ public class BenchmarkTest {
                     CommandLine commandLine = parser.parse(options, arg, null, false);
                     new Arguments(commandLine);
                 });
+
+        Map<String, String> map = arguments.getModelOptions();
+        Assert.assertEquals(map.get("dlaCore"), "1");
+        Assert.assertTrue(map.containsKey("fp16"));
+
+        Map<String, Object> modelArguments = arguments.getModelArguments();
+        Assert.assertEquals(modelArguments.get("width"), "28");
     }
 
     @Test
