@@ -12,6 +12,7 @@
  */
 package ai.djl.tensorrt.engine;
 
+import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
@@ -24,10 +25,14 @@ public class TrtNDManagerTest {
 
     @Test(enabled = false)
     public void testNDArray() {
+        Engine engine;
         try {
-            Engine.getEngine("TensorRT");
+            engine = Engine.getEngine("TensorRT");
         } catch (Exception ignore) {
             throw new SkipException("Your os configuration doesn't support TensorRT.");
+        }
+        if (!Device.Type.GPU.equals(engine.defaultDevice().getDeviceType())) {
+            throw new SkipException("TensorRT only support GPU.");
         }
         try (NDManager manager = TrtNDManager.getSystemManager().newSubManager()) {
             NDArray zeros = manager.zeros(new Shape(1, 2));
