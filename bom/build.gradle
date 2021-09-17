@@ -39,6 +39,7 @@ dependencies {
         api "ai.djl.tensorflow:tensorflow-engine:${version}"
         api "ai.djl.tensorflow:tensorflow-model-zoo:${version}"
         api "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
+        api "ai.djl.tensorrt:tensorrt:${version}"
         api "ai.djl.tflite:tflite-engine:${version}"
         api "ai.djl.tflite:tflite-native-auto:${tflite_version}"
         api "ai.djl.ml.xgboost:xgboost:${version}"
