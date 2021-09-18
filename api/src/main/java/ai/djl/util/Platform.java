@@ -97,7 +97,7 @@ public final class Platform {
             platform.flavor = "cu" + CudaUtils.getCudaVersionString();
             platform.cudaArch = CudaUtils.getComputeCapability(0);
         } else {
-            platform.flavor = "";
+            platform.flavor = "cpu";
         }
         return platform;
     }
@@ -181,17 +181,28 @@ public final class Platform {
      * @return true if the platforms match
      */
     public boolean matches(Platform system) {
+        return matches(system, true);
+    }
+
+    /**
+     * Returns true the platforms match (os and flavor).
+     *
+     * @param system the platform to compare it to
+     * @param strictModel cuda minor version must match
+     * @return true if the platforms match
+     */
+    public boolean matches(Platform system, boolean strictModel) {
         if (!osPrefix.equals(system.osPrefix) || !osArch.equals(system.osArch)) {
             return false;
         }
         // if system Machine is GPU
         if (system.flavor.startsWith("cu")) {
             // system flavor doesn't contain mkl, but MXNet has: cu110mkl
-            return "".equals(flavor)
-                    || "cpu".equals(flavor)
+            return "cpu".equals(flavor)
                     || "mkl".equals(flavor)
-                    || flavor.startsWith(system.flavor);
+                    || flavor.startsWith(system.flavor)
+                    || (!strictModel && flavor.compareTo(system.flavor) <= 0);
         }
-        return "".equals(flavor) || "cpu".equals(flavor) || "mkl".equals(flavor);
+        return "cpu".equals(flavor) || "mkl".equals(flavor);
     }
 }

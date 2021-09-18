@@ -189,9 +189,6 @@ public final class LibUtils {
         Platform platform = Platform.fromSystem();
         String classifier = platform.getClassifier();
         String flavor = platform.getFlavor();
-        if (flavor.isEmpty()) {
-            flavor = "cpu";
-        }
         Properties prop = new Properties();
         try (InputStream stream = LibUtils.class.getResourceAsStream("/jnilib/dlr.properties")) {
             prop.load(stream);
@@ -226,9 +223,6 @@ public final class LibUtils {
     private static String downloadDlr(Platform platform) throws IOException {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
-        if (flavor.isEmpty()) {
-            flavor = "cpu";
-        }
         String os = platform.getOsPrefix();
 
         String libName = System.mapLibraryName(NATIVE_LIB_NAME);
@@ -286,9 +280,6 @@ public final class LibUtils {
     private static Path getCacheDir(Platform platform) {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
-        if (flavor.isEmpty()) {
-            flavor = "cpu";
-        }
         String classifier = platform.getClassifier();
         Path cacheDir = Utils.getEngineCacheDir("dlr");
         logger.debug("Using cache dir: {}", cacheDir);
