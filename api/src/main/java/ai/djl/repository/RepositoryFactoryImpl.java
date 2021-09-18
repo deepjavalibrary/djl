@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -57,6 +58,23 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             uri.toURL();
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Malformed URL: " + uri, e);
+        }
+
+        if ("tfhub.dev".equals(uri.getHost().toLowerCase(Locale.ROOT))) {
+            // Handle tfhub case
+            String path = uri.getPath();
+            if (path.endsWith("/")) {
+                path = path.substring(0, path.length() - 1);
+            }
+            path = "/tfhub-modules" + path + ".tar.gz";
+            try {
+                uri = new URI("https", null, "storage.googleapis.com", -1, path, null, null);
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("Failed to append query string: " + uri, e);
+            }
+            String[] tokens = path.split("/");
+            String modelName = tokens[tokens.length - 2];
+            return new SimpleUrlRepository(name, uri, modelName);
         }
 
         Path path = parseFilePath(uri);
