@@ -21,6 +21,7 @@ djl-bench currently support benchmark the following type of models:
 - ONNX model
 - PaddlePaddle model
 - TFLite model
+- TensorRT model
 - Neo DLR (TVM) model
 - XGBoost model
 
@@ -50,12 +51,24 @@ curl -O https://publish.djl.ai/djl-bench/0.12.0/djl-bench_0.12.0-1_all.deb
 sudo dpkg -i djl-bench_0.12.0-1_all.deb
 ```
 
+For centOS or Amazon Linux 2
+
+You can download djl-bench zip file from [here](https://publish.djl.ai/djl-bench/0.12.0/benchmark-0.12.0.zip).
+
+```
+curl -O https://publish.djl.ai/djl-bench/0.12.0/benchmark-0.12.0.zip
+unzip benchmark-0.12.0.zip
+rm benchmark-0.12.0.zip
+sudo ln -s $PWD/benchmark-0.12.0/bin/benchmark /usr/bin/djl-bench
+```
+
 For Windows
 
 We are considering to create a `chocolatey` package for Windows. For the time being, you can
 download djl-bench zip file from [here](https://publish.djl.ai/djl-bench/0.12.0/benchmark-0.12.0.zip).
 
 Or you can run benchmark using gradle:
+
 ```
 cd djl
 
@@ -87,16 +100,22 @@ they have different CUDA version to support. Please check the individual Engine 
 Here is a few sample benchmark script for you to refer. You can also skip this and directly follow
 the 4-step instructions for your own model.
 
-Benchmark on a Tensorflow model from http url with all-ones NDArray input for 10 times:
+Benchmark on a Tensorflow model from [tfhub](https://tfhub.dev/) url with all-zeros NDArray input for 10 times:
 
 ```
-djl-bench -e TensorFlow -u https://storage.googleapis.com/tfhub-modules/tensorflow/resnet_50/classification/1.tar.gz -c 10 -s 1,224,224,3
+djl-bench -e TensorFlow -u https://tfhub.dev/tensorflow/resnet_50/classification/1 -c 10 -s 1,224,224,3
 ```
 
 Similarly, this is for PyTorch
 
 ```
 djl-bench -e PyTorch -u https://alpha-djl-demos.s3.amazonaws.com/model/djl-blockrunner/pytorch_resnet18.zip -n traced_resnet18 -c 10 -s 1,3,224,224
+```
+
+Benchmark a model from [ONNX Model Zoo](https://github.com/onnx/models)
+
+```
+djl-bench -e OnnxRuntime -u https://s3.amazonaws.com/onnx-model-zoo/resnet/resnet18v1/resnet18v1.tar.gz -s 1,3,224,224 -n resnet18v1/resnet18v1 -c 10
 ```
 
 ### Benchmark from ModelZoo (Only available in 0.13.0+)
@@ -116,7 +135,6 @@ SSD object detection model:
 ```
 djl-bench -e PyTorch -c 2 -s 1,3,300,300 -u djl://ai.djl.pytorch/ssd/0.0.1/ssd_300_resnet50
 ```
-
 
 ## Configuration of Benchmark script
 
@@ -140,18 +158,20 @@ This will print out the possible arguments to pass in:
 
 ```
 usage: djl-bench [-p MODEL-PATH] -s INPUT-SHAPES [OPTIONS]
- -c,--iteration <ITERATION>         Number of total iterations (per thread).
- -d,--duration <DURATION>           Duration of the test in minutes.
- -e,--engine <ENGINE-NAME>          Choose an Engine for the benchmark.
- -g,--gpus <NUMBER_GPUS>            Number of GPUS to run multithreading inference.
- -h,--help                          Print this help.
- -l,--delay <DELAY>                 Delay of incremental threads.
- -n,--model-name <MODEL-NAME>       Specify model file name.
- -o,--output-dir <OUTPUT-DIR>       Directory for output logs.
- -p,--model-path <MODEL-PATH>       Model directory file path.
- -s,--input-shapes <INPUT-SHAPES>   Input data shapes for the model.
- -t,--threads <NUMBER_THREADS>      Number of inference threads.
- -u,--model-url <MODEL-URL>         Model archive file URL.
+ -c,--iteration <ITERATION>               Number of total iterations.
+ -d,--duration <DURATION>                 Duration of the test in minutes.
+ -e,--engine <ENGINE-NAME>                Choose an Engine for the benchmark.
+ -g,--gpus <NUMBER_GPUS>                  Number of GPUS to run multithreading inference.
+ -h,--help                                Print this help.
+ -l,--delay <DELAY>                       Delay of incremental threads.
+    --model-arguments <MODEL-ARGUMENTS>   Specify model loading arguments.
+    --model-options <MODEL-OPTIONS>       Specify model loading options.
+ -n,--model-name <MODEL-NAME>             Specify model file name.
+ -o,--output-dir <OUTPUT-DIR>             Directory for output logs.
+ -p,--model-path <MODEL-PATH>             Model directory file path.
+ -s,--input-shapes <INPUT-SHAPES>         Input data shapes for the model.
+ -t,--threads <NUMBER_THREADS>            Number of inference threads.
+ -u,--model-url <MODEL-URL>               Model archive file URL.
 ```
 
 ### Step 1: Pick your deep engine
@@ -165,6 +185,7 @@ By default, the above script will use MXNet as the default Engine, but you can a
 -e PaddlePaddle # PaddlePaddle
 -e OnnxRuntime # pytorch
 -e TFLite # TFLite
+-e TensorRT # TensorRT
 -e DLR # Neo DLR
 -e XGBoost # XGBoost
 ```
