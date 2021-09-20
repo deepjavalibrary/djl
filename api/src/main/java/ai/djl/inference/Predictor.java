@@ -117,7 +117,7 @@ public class Predictor<I, O> implements AutoCloseable {
         return batchPredict(Collections.singletonList(input)).get(0);
     }
 
-    private NDList predict(NDList ndList) {
+    protected NDList predictInternal(NDList ndList) {
         logger.trace("Predictor input data: {}", ndList);
         return block.forward(parameterStore, ndList, false);
     }
@@ -146,7 +146,7 @@ public class Predictor<I, O> implements AutoCloseable {
                     NDList ndList = translator.processInput(context, input);
                     preprocessEnd(ndList);
 
-                    NDList result = predict(ndList);
+                    NDList result = predictInternal(ndList);
                     predictEnd(result);
 
                     ret.add(translator.processOutput(context, result));
@@ -159,7 +159,7 @@ public class Predictor<I, O> implements AutoCloseable {
             NDList inputBatch = processInputs(context, inputs);
             preprocessEnd(inputBatch);
 
-            NDList result = predict(inputBatch);
+            NDList result = predictInternal(inputBatch);
             predictEnd(result);
 
             List<O> ret = processOutputs(context, result);
