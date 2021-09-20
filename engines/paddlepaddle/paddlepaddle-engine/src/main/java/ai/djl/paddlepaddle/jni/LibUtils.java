@@ -138,7 +138,7 @@ public final class LibUtils {
         Platform platform = Platform.fromSystem();
         String classifier = platform.getClassifier();
         String flavor = platform.getFlavor();
-        if (fallback || flavor.isEmpty()) {
+        if (fallback) {
             flavor = "cpu";
         }
         Properties prop = new Properties();
@@ -211,7 +211,7 @@ public final class LibUtils {
             if (matching != null) {
                 // in case using native-cpu package on GPU machine, force set fallback to true
                 String flavor = matching.getFlavor();
-                if (flavor.isEmpty() || "cpu".equals(flavor)) {
+                if ("cpu".equals(flavor)) {
                     fallback.set(true);
                 }
                 return loadLibraryFromClasspath(matching);
@@ -241,9 +241,6 @@ public final class LibUtils {
             Path cacheFolder = Utils.getEngineCacheDir("paddle");
             String version = platform.getVersion();
             String flavor = platform.getFlavor();
-            if (flavor.isEmpty()) {
-                flavor = "cpu";
-            }
             String classifier = platform.getClassifier();
             Path dir = cacheFolder.resolve(version + '-' + flavor + '-' + classifier);
             logger.debug("Using cache dir: {}", dir);
@@ -306,9 +303,6 @@ public final class LibUtils {
             throws IOException {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
-        if (flavor.isEmpty()) {
-            flavor = "cpu";
-        }
         String classifier = platform.getClassifier();
         String os = platform.getOsPrefix();
 

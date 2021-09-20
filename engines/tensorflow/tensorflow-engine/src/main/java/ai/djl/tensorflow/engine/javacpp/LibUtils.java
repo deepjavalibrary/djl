@@ -152,9 +152,6 @@ public final class LibUtils {
             Path cacheFolder = Utils.getEngineCacheDir("tensorflow");
             String version = platform.getVersion();
             String flavor = platform.getFlavor();
-            if (flavor.isEmpty()) {
-                flavor = "cpu";
-            }
             String classifier = platform.getClassifier();
             Path dir = cacheFolder.resolve(version + '-' + flavor + '-' + classifier);
             logger.debug("Using cache dir: {}", dir);
@@ -214,9 +211,6 @@ public final class LibUtils {
         String classifier = platform.getClassifier();
         String cudaArch = platform.getCudaArch();
         String flavor = platform.getFlavor();
-        if (flavor.isEmpty()) {
-            flavor = "cpu";
-        }
 
         String libName = System.mapLibraryName(LIB_NAME);
         Path cacheDir = Utils.getEngineCacheDir("tensorflow");

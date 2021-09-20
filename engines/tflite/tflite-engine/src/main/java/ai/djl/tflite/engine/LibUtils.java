@@ -119,9 +119,6 @@ public final class LibUtils {
             Path cacheFolder = Utils.getEngineCacheDir("tflite");
             String version = platform.getVersion();
             String flavor = platform.getFlavor();
-            if (flavor.isEmpty()) {
-                flavor = "cpu";
-            }
             String classifier = platform.getClassifier();
             Path dir = cacheFolder.resolve(version + '-' + flavor + '-' + classifier);
             logger.debug("Using cache dir: {}", dir);
@@ -157,9 +154,6 @@ public final class LibUtils {
     private static String downloadTfLite(Platform platform) throws IOException {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
-        if (flavor.isEmpty()) {
-            flavor = "cpu";
-        }
         String classifier = platform.getClassifier();
         String os = platform.getOsPrefix();
 

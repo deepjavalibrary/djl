@@ -161,7 +161,7 @@ public final class LibUtils {
             Path cacheFolder = Utils.getEngineCacheDir("mxnet");
             String version = platform.getVersion();
             String flavor = platform.getFlavor();
-            if (flavor.isEmpty()) {
+            if ("cpu".equals(flavor)) {
                 flavor = "mkl";
             } else if (!flavor.endsWith("mkl")) {
                 flavor += "mkl"; // NOPMD
@@ -229,7 +229,7 @@ public final class LibUtils {
     private static String downloadMxnet(Platform platform) throws IOException {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
-        if (flavor.isEmpty()) {
+        if ("cpu".equals(flavor)) {
             flavor = "mkl";
         } else if (!flavor.endsWith("mkl")) {
             flavor += "mkl"; // NOPMD

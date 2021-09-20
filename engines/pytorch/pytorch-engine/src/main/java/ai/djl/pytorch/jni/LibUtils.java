@@ -201,7 +201,7 @@ public final class LibUtils {
         Platform platform = Platform.fromSystem();
         String classifier = platform.getClassifier();
         String flavor = platform.getFlavor();
-        if (fallback || flavor.isEmpty()) {
+        if (fallback) {
             flavor = "cpu";
         }
         Path precxx11Lib = nativeDir.resolve("libstdc++.so.6");
@@ -266,7 +266,7 @@ public final class LibUtils {
                 Platform platform = Platform.fromUrl(url);
                 if (platform.isPlaceholder()) {
                     placeholder = platform;
-                } else if (platform.matches(systemPlatform)) {
+                } else if (platform.matches(systemPlatform, false)) {
                     matching = platform;
                     break;
                 }
@@ -355,9 +355,6 @@ public final class LibUtils {
             throws IOException {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
-        if (flavor.isEmpty()) {
-            flavor = "cpu";
-        }
         String classifier = platform.getClassifier();
         String os = platform.getOsPrefix();
 
