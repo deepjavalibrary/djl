@@ -57,9 +57,10 @@ void TrtModel::buildModel() {
   }
 
   TrtUniquePtr<nvuffparser::IUffParser> uffParser;  // must in outer scope
+  TrtUniquePtr<nvonnxparser::IParser> onnxParser;   // must in outer scope
   if (mParams.modelType == 0) {
     // ONNX model
-    auto onnxParser = TrtUniquePtr<nvonnxparser::IParser>(nvonnxparser::createParser(*network, gLogger.getTrtLogger()));
+    onnxParser = TrtUniquePtr<nvonnxparser::IParser>(nvonnxparser::createParser(*network, gLogger.getTrtLogger()));
     if (!onnxParser) {
       throw std::invalid_argument("Failed create ONNX Parser.");
     }
