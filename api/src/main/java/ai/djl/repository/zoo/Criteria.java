@@ -494,11 +494,14 @@ public class Criteria<I, O> {
          *
          * @param modelPath the path to the model folder/files
          * @return this {@code Builder}
-         * @throws MalformedURLException wrong path format
          */
-        public Builder<I, O> optModelPath(Path modelPath) throws MalformedURLException {
+        public Builder<I, O> optModelPath(Path modelPath) {
             if (modelPath != null) {
-                this.modelZoo = new DefaultModelZoo(modelPath.toUri().toURL().toString());
+                try {
+                    this.modelZoo = new DefaultModelZoo(modelPath.toUri().toURL().toString());
+                } catch (MalformedURLException e) {
+                    throw new AssertionError("Invalid model path: " + modelPath, e);
+                }
             }
             return this;
         }
