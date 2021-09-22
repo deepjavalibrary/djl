@@ -71,8 +71,6 @@ ZooModel<Image, Classifications> model = criteria.loadModel();
 
 ### List of search criteria for each model
 
-See: [List available model](../../model-zoo/README.md#list-available-models).
-
 The following table illustrates the possible search criteria for all models in the model zoo:
 
 | Category | Application           | Model Family      | Criteria | Possible values                                            |
@@ -109,4 +107,4 @@ in the `src/test/resources/mlrepo/model` folder.
 
 ## Contributor Guides and Documentation
 
-### [How to add new models to the model zoo](../../docs/development/add_model_to_model-zoo.md)
+### [How to add new models to the model zoo](../../../docs/development/add_model_to_model-zoo.md)

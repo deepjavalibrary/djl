@@ -44,7 +44,7 @@ Choose a native library based on your platform and needs:
 
 ### Automatic (Recommended)
 
-We offer an automatic option that will download the native libraries into [cache folder](../../docs/development/cache_management.md) the first time you run DJL.
+We offer an automatic option that will download the native libraries into [cache folder](../../../docs/development/cache_management.md) the first time you run DJL.
 It will automatically determine the appropriate jars for your system based on the platform and GPU support.
 
 - ai.djl.tensorflow:tensorflow-native-auto:2.4.1
@@ -133,6 +133,6 @@ For the Windows platform, you can choose between CPU and GPU.
     <artifactId>tensorflow-native-cpu</artifactId>
     <classifier>win-x86_64</classifier>
     <scope>runtime</scope>
-    <version>2.4.1/version>
+    <version>2.4.1</version>
 </dependency>
 ```

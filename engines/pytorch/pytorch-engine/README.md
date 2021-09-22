@@ -55,13 +55,13 @@ The following table illustrates which pytorch version that DJL supports:
 | pytorch-engine:0.5.0   | pytorch-native-auto:1.4.0                |
 | pytorch-engine:0.4.0   | pytorch-native-auto:1.4.0                |
 
-We strongly recommend you to use [Bill of Materials (BOM)](../../bom/README.md) to manage your dependencies.
+We strongly recommend you to use [Bill of Materials (BOM)](../../../bom/README.md) to manage your dependencies.
 
 Choose a native library based on your platform and needs:
 
 ### Automatic (Recommended)
 
-We offer an automatic option that will download the native libraries into [cache folder](../../docs/development/cache_management.md) the first time you run DJL.
+We offer an automatic option that will download the native libraries into [cache folder](../../../docs/development/cache_management.md) the first time you run DJL.
 It will automatically determine the appropriate jars for your system based on the platform and GPU support.
 
 - ai.djl.pytorch:pytorch-native-auto:1.8.1
@@ -193,6 +193,6 @@ For the Windows platform, you can choose between CPU and GPU.
     <artifactId>pytorch-native-cpu</artifactId>
     <classifier>win-x86_64</classifier>
     <scope>runtime</scope>
-    <version>1.8.1/version>
+    <version>1.8.1</version>
 </dependency>
 ```
