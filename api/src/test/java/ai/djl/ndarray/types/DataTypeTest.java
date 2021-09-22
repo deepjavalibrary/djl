@@ -23,6 +23,6 @@ public class DataTypeTest {
         Assert.assertEquals(DataType.STRING, DataType.fromNumpy("|S1"));
 
         Assert.expectThrows(IllegalArgumentException.class, DataType.UNKNOWN::asNumpy);
-        Assert.expectThrows(IllegalArgumentException.class, () -> DataType.fromNumpy(">i8"));
+        Assert.expectThrows(IllegalArgumentException.class, () -> DataType.fromNumpy("|i8"));
     }
 }

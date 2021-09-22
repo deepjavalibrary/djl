@@ -15,6 +15,7 @@ package ai.djl.ndarray.types;
 import ai.djl.ndarray.NDArray;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -122,18 +123,28 @@ public enum DataType {
     public static DataType fromNumpy(String dtype) {
         switch (dtype) {
             case "<f4":
+            case ">f4":
+            case "=f4":
                 return FLOAT32;
             case "<f8":
+            case ">f8":
+            case "=f8":
                 return FLOAT64;
             case "<f2":
+            case ">f2":
+            case "=f2":
                 return FLOAT16;
             case "|u1":
                 return UINT8;
             case "<i4":
+            case ">i4":
+            case "=i4":
                 return INT32;
             case "|i1":
                 return INT8;
             case "<i8":
+            case ">i8":
+            case "=i8":
                 return INT64;
             case "|b1":
                 return BOOLEAN;
@@ -176,17 +187,18 @@ public enum DataType {
      * @return a numpy string value
      */
     public String asNumpy() {
+        char order = ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN ? '>' : '<';
         switch (this) {
             case FLOAT32:
-                return "<f4";
+                return order + "f4";
             case FLOAT64:
-                return "<f8";
+                return order + "f8";
             case FLOAT16:
-                return "<f2";
+                return order + "f2";
             case UINT8:
                 return "|u1";
             case INT32:
-                return "<i4";
+                return order + "i4";
             case INT8:
                 return "|i1";
             case INT64:
