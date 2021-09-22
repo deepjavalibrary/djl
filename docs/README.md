@@ -56,7 +56,7 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 
 ### [ONNX Runtime](../engines/onnxruntime/onnxruntime-engine/README.md)
 
-- [Hybrid Engine Operations](hybrid_engine.md) - Using a second Engine for supplemental API support
+- [Hybrid Engine Operations](hybrid_engine.md) - Using an alternative full Engine for supplemental API support
 
 ## Extensions and utilities
 

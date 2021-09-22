@@ -43,4 +43,4 @@ The PaddlePaddle model zoo contains Computer Vision (CV) models.
 
 ### How to find a pre-trained model in model zoo
 
-Please see [DJL Model Zoo](../../model-zoo/README.md)
+Please see [DJL Model Zoo](../../../model-zoo/README.md)

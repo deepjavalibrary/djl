@@ -64,7 +64,7 @@ The following is an example of the criteria to find a Resnet50-v1 model that has
     ZooModel<Image, Classifications> ssd = criteria.loadModel());
 ```
 
-If you already known which `ModelLoader` to use, you can simply do the following:
+If you already know which `ModelLoader` to use, you can simply do the following:
 
 ```java
     Map<String, String> filter = new HashMap<>();

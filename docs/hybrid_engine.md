@@ -1,22 +1,23 @@
-# Hybrid Engine for ONNX Runtime and DLR
+# Hybrid Engine
 
 ## Introduction
 
-ONNX Runtime and DLR are a DL library with limited support for NDArray operations.
-Currently, it only covers the basic NDArray creation methods. To better support the necessary preprocessing and postprocessing,
-you can use one of the other Engine along with it to run in a hybrid mode.
+Many of DJL engines only has limited support for NDArray operations. Here is a list of such engines:
 
-The minimum dependencies for the ONNX Runtime Engine are:
+- [ONNX Runtime](../engines/onnxruntime/onnxruntime-engine/README.md)
+- [PaddlePaddle](../engines/paddlepaddle/README.md)
+- [TFLite](../engines/tflite/tflite-engine/README.md)
+- [TensorRT](../engines/tensorrt/README.md)
+- [DLR](../engines/dlr/README.md)
 
-#### gradle
+Currently, those engines only covers the basic NDArray creation methods. To better support the
+necessary preprocessing and postprocessing, you can use one of the full Engines along with it
+to run in a hybrid mode:
 
-```
-runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine:0.12.0"
-```
+- [MXNet](../engines/mxnet/README.md) - full NDArray support
+- [PyTorch](../engines/pytorch/README.md) - support most of NDArray operations
+- [TensorFlow](../engines/tensorflow/README.md) - support most of NDArray operations
 
-```
-runtimeOnly "ai.djl.dlr:dlr-engine:0.12.0"
-```
 
 To use it along with Apache MXNet for additional API support, add the following two dependencies:
 
@@ -27,11 +28,41 @@ runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.8.0"
 
 You can also use PyTorch or TensorFlow Engine as the supplemental engine by adding their corresponding dependencies.
 
+```
+runtimeOnly "ai.djl.pytorch:pytorch-engine:0.12.0"
+runtimeOnly "ai.djl.pytorch:pytorch-native-auto:1.9.0"
+```
+
+```
+runtimeOnly "ai.djl.tensorflow:tensorflow-engine:0.12.0"
+runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:2.4.1"
+```
+
 ## How Hybrid works
 
-Internally, DJL will find two or more engines available. When you start using the ONNX Runtime Engine,
-the engine will search for additional Engines. If it finds any, all NDArrays will be created in
-the supplemental engine. After that, the NDArrays will only be converted to ONNX Runtime NDArrays right before inference.
+Internally, DJL will find two or more engines available. When you start using the hybrid engine,
+DJL will search for additional full Engines. Whenever an unsupported NDArray operation is invoked,
+it will delegate to alternative full engine to run the operation. By default, the NDArray is
+created in alternative engine if possible. You can use `NDManager.createDirect()` to force and
+NDArray to be created in hybrid engine. If you don't need preprocessing/postprocessing and trying
+to avoid accidentally memory copy, you can disable this behavior by setting the following system
+properties:
 
-If a second Engine is not found, the ONNX Runtime Engine will use its own NDManager and NDArray class to support
-limited NDArray creation methods.
+```
+# disable hybrid engine for OnnxRuntime
+System.setProperty("ai.djl.onnx.disable_alternative", "true");
+
+# disable hybrid engine for PaddlePaddle
+System.setProperty("ai.djl.paddlepaddle.disable_alternative", "true");
+
+# disable hybrid engine for TensorFlow Lite
+System.setProperty("ai.djl.tflite.disable_alternative", "true");
+
+# disable hybrid engine for TensorRT
+System.setProperty("ai.djl.tensorrt.disable_alternative", "true");
+
+# disable hybrid engine for Neo DLR
+System.setProperty("ai.djl.dlr.disable_alternative", "false");
+```
+
+
