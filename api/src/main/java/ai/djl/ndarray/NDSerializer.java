@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 /** A class contains encoding and decoding logic for NDArray. */
 final class NDSerializer {
 
-    private static final int VERSION = 2;
+    private static final int VERSION = 3;
 
     private static final int BUFFER_SIZE = 1024 * 1024;
     private static final String MAGIC_NUMBER = "NDAR";
@@ -77,6 +77,7 @@ final class NDSerializer {
         dos.write(shape.getEncoded());
 
         ByteBuffer bb = array.toByteBuffer();
+        dos.write(bb.order() == ByteOrder.BIG_ENDIAN ? '>' : '<');
         int length = bb.remaining();
         dos.writeInt(length);
 
@@ -164,15 +165,22 @@ final class NDSerializer {
 
         dis.readUTF(); // ignore SparseFormat
 
-        // DataType - 1 byte
+        // DataType
         DataType dataType = DataType.valueOf(dis.readUTF());
 
         // Shape
         Shape shape = Shape.decode(dis);
 
         // Data
+        ByteOrder order;
+        if (version > 2) {
+            order = dis.readByte() == '>' ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
+        } else {
+            order = ByteOrder.nativeOrder();
+        }
         int length = dis.readInt();
         ByteBuffer data = manager.allocateDirect(length);
+        data.order(order);
         readData(dis, data, length);
 
         NDArray array = manager.create(dataType.asDataType(data), shape, dataType);
@@ -214,7 +222,8 @@ final class NDSerializer {
         if (!m.find()) {
             throw new IllegalArgumentException("Invalid numpy header: " + header);
         }
-        DataType dataType = DataType.fromNumpy(m.group(1));
+        String typeStr = m.group(1);
+        DataType dataType = DataType.fromNumpy(typeStr);
         String shapeStr = m.group(2);
         long[] longs;
         if (shapeStr.isEmpty()) {
@@ -226,6 +235,12 @@ final class NDSerializer {
         Shape shape = new Shape(longs);
         len = Math.toIntExact(shape.size() * dataType.getNumOfBytes());
         ByteBuffer data = manager.allocateDirect(len);
+        char order = typeStr.charAt(0);
+        if (order == '>') {
+            data.order(ByteOrder.BIG_ENDIAN);
+        } else if (order == '<') {
+            data.order(ByteOrder.LITTLE_ENDIAN);
+        }
         readData(dis, data, len);
 
         return manager.create(dataType.asDataType(data), shape, dataType);
