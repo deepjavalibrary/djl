@@ -66,6 +66,7 @@ public class XgbNDArray extends NDArrayAdapter {
         if (data == null) {
             throw new UnsupportedOperationException("Cannot obtain value from DMatrix");
         }
+        data.rewind();
         return data;
     }
 
