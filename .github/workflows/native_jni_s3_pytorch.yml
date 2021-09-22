@@ -39,7 +39,7 @@ jobs:
         shell: bash
         run: |
           PYTORCH_VERSION="$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')"
-          aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
+          aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-${PYTORCH_VERSION}/jnilib*"
 
   build-pytorch-jni-linux-cpu:
@@ -78,7 +78,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           PYTORCH_VERSION="$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')"
-          aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
+          aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-${PYTORCH_VERSION}/jnilib*"
 
   build-pytorch-jni-linux-gpu:
@@ -108,7 +108,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           PYTORCH_VERSION="$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')"
-          aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
+          aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-${PYTORCH_VERSION}/jnilib*"
 
   build-pytorch-jni-precxx11:
@@ -147,7 +147,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           PYTORCH_VERSION="$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')"
-          aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib/precxx11
+          aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib/precxx11
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-${PYTORCH_VERSION}/jnilib/precxx11*"
 
   build-pytorch-jni-windows-gpu:
@@ -203,5 +203,5 @@ jobs:
         shell: bash
         run: |
           PYTORCH_VERSION="$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')"
-          aws s3 sync pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
+          aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-${PYTORCH_VERSION}/jnilib*"
