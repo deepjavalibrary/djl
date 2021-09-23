@@ -28,9 +28,8 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.Batchifier;
+import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslateException;
-import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
 import com.google.gson.annotations.SerializedName;
@@ -152,7 +151,8 @@ public final class ObjectDetectionWithTensorflowSavedModel {
         String displayName;
     }
 
-    private static final class MyTranslator implements Translator<Image, DetectedObjects> {
+    private static final class MyTranslator
+            implements NoBatchifyTranslator<Image, DetectedObjects> {
 
         private Map<Integer, String> classes;
         private int maxBoxes;
@@ -231,12 +231,6 @@ public final class ObjectDetectionWithTensorflowSavedModel {
             }
 
             return new DetectedObjects(retNames, retProbs, retBB);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Batchifier getBatchifier() {
-            return null;
         }
     }
 }

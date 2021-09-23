@@ -23,9 +23,8 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.Batchifier;
+import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslateException;
-import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
@@ -277,7 +276,7 @@ public abstract class AbstractBenchmark {
         return model;
     }
 
-    private static final class BenchmarkTranslator implements Translator<Void, float[]> {
+    private static final class BenchmarkTranslator implements NoBatchifyTranslator<Void, float[]> {
 
         private PairList<DataType, Shape> shapes;
 
@@ -304,12 +303,6 @@ public abstract class AbstractBenchmark {
             float[] ret = new float[fb.remaining()];
             fb.get(ret);
             return ret;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Batchifier getBatchifier() {
-            return null;
         }
     }
 }

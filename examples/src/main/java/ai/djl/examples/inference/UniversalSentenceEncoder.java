@@ -25,9 +25,8 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.Batchifier;
+import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslateException;
-import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -88,7 +87,7 @@ public final class UniversalSentenceEncoder {
         }
     }
 
-    private static final class MyTranslator implements Translator<String[], float[][]> {
+    private static final class MyTranslator implements NoBatchifyTranslator<String[], float[][]> {
 
         MyTranslator() {}
 
@@ -112,11 +111,6 @@ public final class UniversalSentenceEncoder {
                 result.add(list.singletonOrThrow().get(i));
             }
             return result.stream().map(NDArray::toFloatArray).toArray(float[][]::new);
-        }
-
-        @Override
-        public Batchifier getBatchifier() {
-            return null;
         }
     }
 }

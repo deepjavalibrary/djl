@@ -67,7 +67,7 @@ public class MxBertQATranslator extends QATranslator {
     /** {@inheritDoc} */
     @Override
     public Batchifier getBatchifier() {
-        // MXNet BertQA model doesn't support batch
+        // MXNet BertQA model doesn't support batch. See NoBatchifyTranslator.
         return null;
     }
 

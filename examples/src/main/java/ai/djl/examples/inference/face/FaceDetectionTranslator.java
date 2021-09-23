@@ -24,7 +24,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
@@ -205,11 +204,5 @@ public class FaceDetectionTranslator implements Translator<Image, DetectedObject
         NDArray point5 =
                 pre.get(":, 8:10").mul(scaleXY).mul(priors.get(":, 2:")).add(priors.get(":, :2"));
         return NDArrays.concat(new NDList(point1, point2, point3, point4, point5), 1);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Batchifier getBatchifier() {
-        return Batchifier.STACK;
     }
 }

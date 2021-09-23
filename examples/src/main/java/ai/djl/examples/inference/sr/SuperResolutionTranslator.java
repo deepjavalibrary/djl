@@ -18,7 +18,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
-import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
@@ -36,11 +35,5 @@ public class SuperResolutionTranslator implements Translator<Image, Image> {
     public Image processOutput(TranslatorContext ctx, NDList list) {
         NDArray output = list.get(0).clip(0, 255).toType(DataType.UINT8, false);
         return ImageFactory.getInstance().fromNDArray(output.squeeze());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Batchifier getBatchifier() {
-        return Batchifier.STACK;
     }
 }
