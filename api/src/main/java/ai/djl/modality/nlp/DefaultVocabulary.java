@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -39,7 +39,7 @@ public class DefaultVocabulary implements Vocabulary {
     private String unknownToken;
 
     /**
-     * Create a {@code DefaultVocabulary} object with the given list of tokens.
+     * Creates a {@code DefaultVocabulary} object with the given list of tokens.
      *
      * @param tokens the {@link List} of tokens to build the vocabulary with
      */
@@ -48,7 +48,7 @@ public class DefaultVocabulary implements Vocabulary {
     }
 
     /**
-     * Create a {@code DefaultVocabulary} object with a {@link Builder}.
+     * Creates a {@code DefaultVocabulary} object with a {@link Builder}.
      *
      * @param builder the {@link Builder} to build the vocabulary with
      */
@@ -376,7 +376,5 @@ public class DefaultVocabulary implements Vocabulary {
     private static final class TokenInfo {
         int frequency;
         long index = -1;
-
-        public TokenInfo() {}
     }
 }
