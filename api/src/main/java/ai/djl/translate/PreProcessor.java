@@ -22,15 +22,6 @@ import ai.djl.ndarray.NDList;
 public interface PreProcessor<I> {
 
     /**
-     * Gets the {@link Pipeline} applied to the input.
-     *
-     * @return the {@link Pipeline}
-     */
-    default Pipeline getPipeline() {
-        throw new UnsupportedOperationException("Not implemented.");
-    }
-
-    /**
      * Processes the input and converts it to NDList.
      *
      * @param ctx the toolkit for creating the input NDArray
