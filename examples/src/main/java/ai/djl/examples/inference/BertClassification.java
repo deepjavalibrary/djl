@@ -17,7 +17,7 @@ import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
-import ai.djl.modality.nlp.SimpleVocabulary;
+import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.modality.nlp.bert.BertFullTokenizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -115,9 +115,8 @@ public final class BertClassification {
         /** {@inheritDoc} */
         @Override
         public void prepare(TranslatorContext ctx) throws IOException {
-            SimpleVocabulary vocabulary =
-                    SimpleVocabulary.builder()
-                            .optMinFrequency(1)
+            DefaultVocabulary vocabulary =
+                    DefaultVocabulary.builder()
                             .addFromTextFile(Paths.get(vocabularyPath))
                             .optUnknownToken("[UNK]")
                             .build();

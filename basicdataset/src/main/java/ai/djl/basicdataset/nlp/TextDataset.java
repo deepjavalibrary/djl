@@ -16,7 +16,7 @@ import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.utils.TextData;
 import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.engine.Engine;
-import ai.djl.modality.nlp.SimpleVocabulary;
+import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
@@ -82,10 +82,10 @@ public abstract class TextDataset extends RandomAccessDataset {
     }
 
     /**
-     * Gets the {@link SimpleVocabulary} built while preprocessing the text data.
+     * Gets the {@link DefaultVocabulary} built while preprocessing the text data.
      *
      * @param source whether to get source or target vocabulary
-     * @return the {@link SimpleVocabulary}
+     * @return the {@link DefaultVocabulary}
      */
     public Vocabulary getVocabulary(boolean source) {
         TextData textData = source ? sourceTextData : targetTextData;

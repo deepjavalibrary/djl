@@ -73,10 +73,12 @@ public final class TrainBertOnCode {
         }
     }
 
-    private static Model createBertPretrainingModel(int dictionarySize) {
+    private static Model createBertPretrainingModel(long vocabularySize) {
         Block block =
                 new BertPretrainingBlock(
-                        BertBlock.builder().micro().setTokenDictionarySize(dictionarySize));
+                        BertBlock.builder()
+                                .micro()
+                                .setTokenDictionarySize(Math.toIntExact(vocabularySize)));
         block.setInitializer(new TruncatedNormalInitializer(0.02f), Parameter.Type.WEIGHT);
 
         Model model = Model.newInstance("Bert Pretraining");

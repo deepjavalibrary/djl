@@ -12,7 +12,7 @@
  */
 package ai.djl.pytorch.zoo.nlp.qa;
 
-import ai.djl.modality.nlp.SimpleVocabulary;
+import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.bert.BertToken;
 import ai.djl.modality.nlp.bert.BertTokenizer;
@@ -40,8 +40,7 @@ public class PtBertQATranslator extends QATranslator {
     @Override
     public void prepare(TranslatorContext ctx) throws IOException {
         vocabulary =
-                SimpleVocabulary.builder()
-                        .optMinFrequency(1)
+                DefaultVocabulary.builder()
                         .addFromTextFile(ctx.getModel().getArtifact("bert-base-uncased-vocab.txt"))
                         .optUnknownToken("[UNK]")
                         .build();

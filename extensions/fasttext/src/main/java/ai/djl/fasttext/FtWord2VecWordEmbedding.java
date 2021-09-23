@@ -12,6 +12,7 @@
  */
 package ai.djl.fasttext;
 
+import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.WordEmbedding;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
@@ -20,15 +21,15 @@ import ai.djl.ndarray.NDManager;
 public class FtWord2VecWordEmbedding implements WordEmbedding {
 
     private FtModel model;
-    private FtVocabulary vocabulary;
+    private Vocabulary vocabulary;
 
     /**
      * Constructs a {@link FtWord2VecWordEmbedding}.
      *
      * @param model a loaded FastText model
-     * @param vocabulary the {@link FtVocabulary} to get indices from
+     * @param vocabulary the {@link Vocabulary} to get indices from
      */
-    public FtWord2VecWordEmbedding(FtModel model, FtVocabulary vocabulary) {
+    public FtWord2VecWordEmbedding(FtModel model, Vocabulary vocabulary) {
         this.model = model;
         this.vocabulary = vocabulary;
     }

@@ -42,7 +42,7 @@ public class WordEmbeddingTest {
                 NDList result =
                         new NDList(
                                 wordEmbedding.embedText(manager, Collections.singletonList("the")));
-                Assert.assertEquals(result.singletonOrThrow().sum().getFloat(), -5.24, .01);
+                Assert.assertEquals(result.singletonOrThrow().sum().getFloat(), 0.0, .01);
             }
         }
     }

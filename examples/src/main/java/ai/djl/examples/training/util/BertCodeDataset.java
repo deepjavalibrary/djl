@@ -12,6 +12,8 @@
  */
 package ai.djl.examples.training.util;
 
+import ai.djl.modality.nlp.DefaultVocabulary;
+import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.preprocess.UnicodeNormalizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -29,13 +31,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -51,13 +49,12 @@ public class BertCodeDataset implements Dataset {
     private static final List<String> RESERVED_TOKENS =
             Collections.unmodifiableList(Arrays.asList(UNK, CLS, SEP, MSK));
 
-    private static final int UNK_ID = RESERVED_TOKENS.indexOf(UNK);
-
+    private static final int MAX_VOCABULARY_SIZE = 35000;
     private static final int MAX_SEQUENCE_LENGTH = 128;
     private static final int MAX_MASKING_PER_INSTANCE = 20;
 
     List<ParsedFile> parsedFiles;
-    Dictionary dictionary;
+    Vocabulary vocabulary;
     Random rand;
     int batchSize;
     long epochLimit;
@@ -84,12 +81,11 @@ public class BertCodeDataset implements Dataset {
         // read & tokenize them
         parsedFiles = files.stream().map(BertCodeDataset::parseFile).collect(Collectors.toList());
         // determine dictionary
-        Map<String, Long> countedTokens = countTokens(parsedFiles);
-        dictionary = buildDictionary(countedTokens, 35000);
+        vocabulary = buildVocabulary();
     }
 
-    public int getDictionarySize() {
-        return dictionary.tokens.size();
+    public long getDictionarySize() {
+        return vocabulary.size();
     }
 
     public int getMaxSequenceLength() {
@@ -113,7 +109,7 @@ public class BertCodeDataset implements Dataset {
                         sentencePair ->
                                 new MaskedInstance(
                                         rand,
-                                        dictionary,
+                                        vocabulary,
                                         sentencePair,
                                         MAX_SEQUENCE_LENGTH,
                                         MAX_MASKING_PER_INSTANCE))
@@ -244,23 +240,6 @@ public class BertCodeDataset implements Dataset {
         return result;
     }
 
-    private static Map<String, Long> countTokens(List<ParsedFile> parsedFiles) {
-        Map<String, Long> result = new ConcurrentHashMap<>(50000);
-        parsedFiles.forEach(parsedFile -> countTokens(parsedFile, result));
-        return result;
-    }
-
-    private static void countTokens(ParsedFile parsedFile, Map<String, Long> result) {
-        parsedFile.tokenizedLines.forEach(tokens -> countTokens(tokens, result));
-    }
-
-    private static void countTokens(List<String> tokenizedLine, Map<String, Long> result) {
-        for (String token : tokenizedLine) {
-            long count = result.getOrDefault(token, 0L);
-            result.put(token, count + 1);
-        }
-    }
-
     private static ParsedFile parseFile(Path file) {
         List<String> normalizedLines =
                 fileToLines(file)
@@ -276,28 +255,17 @@ public class BertCodeDataset implements Dataset {
         return new ParsedFile(tokens);
     }
 
-    private static Dictionary buildDictionary(Map<String, Long> countedTokens, int maxSize) {
-        if (maxSize < RESERVED_TOKENS.size()) {
-            throw new IllegalArgumentException(
-                    "Dictionary needs at least size "
-                            + RESERVED_TOKENS.size()
-                            + " to account for reserved tokens.");
+    private Vocabulary buildVocabulary() {
+        DefaultVocabulary.Builder vocabBuilder =
+                DefaultVocabulary.builder()
+                        .optMaxTokens(MAX_VOCABULARY_SIZE)
+                        .optReservedTokens(RESERVED_TOKENS);
+
+        for (ParsedFile file : parsedFiles) {
+            vocabBuilder.addAll(file.tokenizedLines);
         }
-        ArrayList<String> result = new ArrayList<>(maxSize);
-        result.addAll(RESERVED_TOKENS);
-        List<String> sortedByFrequency =
-                countedTokens
-                        .entrySet()
-                        .stream()
-                        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                        .map(Map.Entry::getKey)
-                        .collect(Collectors.toList());
-        int idx = 0;
-        while (result.size() < maxSize && idx < sortedByFrequency.size()) {
-            result.add(sortedByFrequency.get(idx));
-            idx++;
-        }
-        return new Dictionary(result);
+
+        return vocabBuilder.build();
     }
 
     private final class EpochIterable implements Iterable<Batch>, Iterator<Batch> {
@@ -391,7 +359,7 @@ public class BertCodeDataset implements Dataset {
 
     /** A single bert pretraining instance. Applies masking to a given sentence pair. */
     private static final class MaskedInstance {
-        final Dictionary dictionary;
+        final Vocabulary vocabulary;
         final SentencePair originalSentencePair;
         final List<String> label;
         final List<String> masked;
@@ -403,11 +371,11 @@ public class BertCodeDataset implements Dataset {
 
         public MaskedInstance(
                 Random rand,
-                Dictionary dictionary,
+                Vocabulary vocabulary,
                 SentencePair originalSentencePair,
                 int maxSequenceLength,
                 int maxMasking) {
-            this.dictionary = dictionary;
+            this.vocabulary = vocabulary;
             this.originalSentencePair = originalSentencePair;
             this.maxSequenceLength = maxSequenceLength;
             this.maxMasking = maxMasking;
@@ -446,15 +414,19 @@ public class BertCodeDataset implements Dataset {
                 if (r < 0.8f) { // 80% probability -> mask
                     masked.set(maskedIdx, MSK);
                 } else if (r < 0.9f) { // 10% probability -> random token
-                    masked.set(maskedIdx, dictionary.getRandomToken(rand));
+                    masked.set(maskedIdx, getRandomToken(rand));
                 } // 10% probability: leave token as-is
             }
+        }
+
+        private String getRandomToken(Random rand) {
+            return vocabulary.getToken(rand.nextInt(Math.toIntExact(vocabulary.size())));
         }
 
         public int[] getTokenIds() {
             int[] result = new int[maxSequenceLength];
             for (int idx = 0; idx < masked.size(); ++idx) {
-                result[idx] = dictionary.getId(masked.get(idx));
+                result[idx] = Math.toIntExact(vocabulary.getIndex(masked.get(idx)));
             }
             return result;
         }
@@ -490,7 +462,8 @@ public class BertCodeDataset implements Dataset {
         public int[] getMaskedIds() {
             int[] result = new int[maxMasking];
             for (int idx = 0; idx < maskedIndices.size(); ++idx) {
-                result[idx] = dictionary.getId(label.get(maskedIndices.get(idx)));
+                result[idx] =
+                        Math.toIntExact(vocabulary.getIndex(label.get(maskedIndices.get(idx))));
             }
             return result;
         }
@@ -501,41 +474,6 @@ public class BertCodeDataset implements Dataset {
                 result[idx] = 1;
             }
             return result;
-        }
-    }
-
-    /** Helper class to create a token to id mapping. */
-    private static final class Dictionary {
-
-        private List<String> tokens;
-        private Map<String, Integer> tokenToId;
-
-        private Dictionary(List<String> tokens) {
-            this.tokens = tokens;
-            this.tokenToId = new HashMap<>(tokens.size());
-            for (int idx = 0; idx < tokens.size(); ++idx) {
-                tokenToId.put(tokens.get(idx), idx);
-            }
-        }
-
-        public String getToken(int id) {
-            return id >= 0 && id < tokens.size() ? tokens.get(id) : UNK;
-        }
-
-        public int getId(String token) {
-            return tokenToId.getOrDefault(token, UNK_ID);
-        }
-
-        public List<Integer> toIds(final List<String> tokens) {
-            return tokens.stream().map(this::getId).collect(Collectors.toList());
-        }
-
-        public List<String> toTokens(final List<Integer> ids) {
-            return ids.stream().map(this::getToken).collect(Collectors.toList());
-        }
-
-        public String getRandomToken(Random rand) {
-            return tokens.get(rand.nextInt(tokens.size()));
         }
     }
 }
