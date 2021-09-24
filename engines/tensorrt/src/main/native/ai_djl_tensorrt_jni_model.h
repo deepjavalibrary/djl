@@ -42,8 +42,8 @@ struct ModelParams {
 
 class TrtSession {
  public:
-  explicit TrtSession(std::shared_ptr<nvinfer1::ICudaEngine> engine, int batchSize)
-      : mEngine(std::move(engine)), mBatchSize(batchSize), mContext(nullptr) {}
+  explicit TrtSession(std::shared_ptr<nvinfer1::ICudaEngine> engine, int deviceId, int batchSize)
+      : mEngine(std::move(engine)), mDeviceId(deviceId), mBatchSize(batchSize), mContext(nullptr) {}
 
   void init();
   nvinfer1::Dims getShape(const char* name);
@@ -58,6 +58,7 @@ class TrtSession {
 
  private:
   std::shared_ptr<nvinfer1::ICudaEngine> mEngine;
+  int mDeviceId;
   nvinfer1::IExecutionContext* mContext;
   int32_t mBatchSize;
   std::vector<size_t> mBufferSizes;
