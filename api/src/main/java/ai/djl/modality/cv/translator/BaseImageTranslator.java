@@ -44,8 +44,9 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
     private static final float[] MEAN = {0.485f, 0.456f, 0.406f};
     private static final float[] STD = {0.229f, 0.224f, 0.225f};
 
+    protected Pipeline pipeline;
+
     private Image.Flag flag;
-    private Pipeline pipeline;
     private Batchifier batchifier;
 
     /**
@@ -63,12 +64,6 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
     @Override
     public Batchifier getBatchifier() {
         return batchifier;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Pipeline getPipeline() {
-        return pipeline;
     }
 
     /** {@inheritDoc} */
