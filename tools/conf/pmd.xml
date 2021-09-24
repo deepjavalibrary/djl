@@ -372,6 +372,7 @@
         <exclude name="AvoidDeeplyNestedIfStmts"/>
         <exclude name="AvoidThrowingNullPointerException"/>
         <exclude name="CollapsibleIfStatements"/>
+        <exclude name="CognitiveComplexity"/>
         <exclude name="CyclomaticComplexity"/>
         <exclude name="DataClass"/>
         <exclude name="ExcessiveClassLength"/>
