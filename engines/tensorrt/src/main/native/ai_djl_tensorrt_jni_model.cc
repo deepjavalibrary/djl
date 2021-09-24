@@ -151,15 +151,15 @@ void TrtModel::buildModel() {
 }
 
 TrtSession *TrtModel::createSession() {
-  auto *session = new TrtSession(mEngine, mParams.maxBatchSize);
-
-  CHECK(cudaSetDevice(mParams.device));
+  auto *session = new TrtSession(mEngine, mParams.device, mParams.maxBatchSize);
 
   session->init();
   return session;
 }
 
 void TrtSession::init() {
+  CHECK(cudaSetDevice(mDeviceId));
+
   mContext = mEngine->createExecutionContext();
   int bindings = mEngine->getNbBindings();
   mBufferSizes.reserve(bindings);
@@ -221,6 +221,8 @@ void TrtSession::copyOutputs() {
 }
 
 void TrtSession::predict() {
+  CHECK(cudaSetDevice(mDeviceId));
+
   copyInputs();
 
   bool status;
