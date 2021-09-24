@@ -24,10 +24,10 @@ pmd {
     ruleSets = [] // workaround pmd gradle plugin bug
     ruleSetFiles = files("${rootProject.projectDir}/tools/conf/pmd.xml")
 }
-tasks.withType(Pmd){
-    reports{
-        xml.enabled=true
-        html.enabled=true
+tasks.withType(Pmd) {
+    reports {
+        xml.required = true
+        html.required = true
     }
 }
 
@@ -38,8 +38,8 @@ checkstyle {
     checkstyleTest.enabled = true
     configProperties = [
             "checkstyle.suppressions.file" : file("${rootProject.projectDir}/tools/conf/suppressions.xml"),
-            "checkstyle.licenseHeader.file" : file("${rootProject.projectDir}/tools/conf/licenseHeader.java")
-            ]
+            "checkstyle.licenseHeader.file": file("${rootProject.projectDir}/tools/conf/licenseHeader.java")
+    ]
     configFile = file("${rootProject.projectDir}/tools/conf/checkstyle.xml")
 }
 checkstyleMain {
@@ -47,8 +47,8 @@ checkstyleMain {
 }
 tasks.withType(Checkstyle) {
     reports {
-        xml.enabled false
-        html.enabled true
+        xml.required = false
+        html.required = true
     }
 }
 
@@ -58,8 +58,8 @@ jacoco {
 }
 jacocoTestReport {
     reports {
-        xml.enabled true
-        csv.enabled false
+        xml.required = true
+        csv.required = false
     }
 }
 

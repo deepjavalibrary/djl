@@ -42,7 +42,7 @@ task copyDependencies(type: Copy) {
 }
 
 application {
-    getMainClass().set(System.getProperty("main", "ai.djl.integration.IntegrationTest"))
+    mainClass = System.getProperty("main", "ai.djl.integration.IntegrationTest")
 }
 
 run {
@@ -70,8 +70,8 @@ jacocoTestReport {
     }
 
     reports {
-        xml.enabled true
-        csv.enabled false
+        xml.required = true
+        csv.required = false
     }
 
     // Work-around to allow us to build list of executionData files in doFirst
@@ -85,7 +85,7 @@ task debugEnv(type: JavaExec) {
     systemProperties System.getProperties()
     systemProperties.remove("user.dir")
     systemProperties.put("ai.djl.logging.level", "debug")
-    main = "ai.djl.integration.util.DebugEnvironment"
+    mainClass = "ai.djl.integration.util.DebugEnvironment"
 }
 
 tasks.distTar.enabled = false

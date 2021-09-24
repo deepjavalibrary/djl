@@ -25,7 +25,7 @@ dependencies {
 }
 
 application {
-    getMainClass().set(System.getProperty("main", "ai.djl.examples.inference.ObjectDetection"))
+    mainClass = System.getProperty("main", "ai.djl.examples.inference.ObjectDetection")
 }
 
 run {
@@ -40,7 +40,7 @@ task listmodels(type: JavaExec) {
     systemProperties.remove("user.dir")
     systemProperty("file.encoding", "UTF-8")
     classpath = sourceSets.main.runtimeClasspath
-    main = "ai.djl.examples.inference.ListModels"
+    mainClass = "ai.djl.examples.inference.ListModels"
 }
 tasks.distTar.enabled = false
 tasks.distZip.enabled = false

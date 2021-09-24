@@ -84,7 +84,7 @@ dependencies {
 }
 
 application {
-    getMainClass().set(System.getProperty("main", "ai.djl.benchmark.Benchmark"))
+    mainClass = System.getProperty("main", "ai.djl.benchmark.Benchmark")
 }
 
 run {
@@ -129,7 +129,7 @@ task benchmark(type: JavaExec) {
             jvmArgs += ["-Xlog:gc*=debug:file=build/gc.log"]
         }
     }
-    main = "ai.djl.benchmark.Benchmark"
+    mainClass = "ai.djl.benchmark.Benchmark"
 }
 
 task createDeb(type: Deb, dependsOn: distTar) {
