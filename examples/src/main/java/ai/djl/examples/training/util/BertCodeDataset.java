@@ -53,12 +53,12 @@ public class BertCodeDataset implements Dataset {
     private static final int MAX_SEQUENCE_LENGTH = 128;
     private static final int MAX_MASKING_PER_INSTANCE = 20;
 
-    List<ParsedFile> parsedFiles;
-    Vocabulary vocabulary;
-    Random rand;
-    int batchSize;
-    long epochLimit;
-    NDManager manager;
+    private List<ParsedFile> parsedFiles;
+    private Vocabulary vocabulary;
+    private Random rand;
+    private int batchSize;
+    private long epochLimit;
+    private NDManager manager;
 
     public BertCodeDataset(int batchSize, long epochLimit) {
         this.batchSize = batchSize;
@@ -79,89 +79,17 @@ public class BertCodeDataset implements Dataset {
         // get all applicable files
         List<Path> files = listSourceFiles(new File(".").toPath());
         // read & tokenize them
-        parsedFiles = files.stream().map(BertCodeDataset::parseFile).collect(Collectors.toList());
-        // determine dictionary
+        parsedFiles = files.stream().map(ParsedFile::parse).collect(Collectors.toList());
+        // determine vocabulary
         vocabulary = buildVocabulary();
     }
 
-    public long getDictionarySize() {
+    public long getVocabularySize() {
         return vocabulary.size();
     }
 
     public int getMaxSequenceLength() {
         return MAX_SEQUENCE_LENGTH;
-    }
-
-    private List<MaskedInstance> createEpochData() {
-        // turn data into sentence pairs containing consecutive lines
-        List<SentencePair> sentencePairs = new ArrayList<>();
-        parsedFiles.forEach(parsedFile -> parsedFile.addToSentencePairs(sentencePairs));
-        Collections.shuffle(sentencePairs, rand);
-        // swap sentences with 50% probability for next sentence task
-        for (int idx = 1; idx < sentencePairs.size(); idx += 2) {
-            sentencePairs.get(idx - 1).maybeSwap(rand, sentencePairs.get(idx));
-        }
-        // Create masked instances for training
-        return sentencePairs
-                .stream()
-                .limit(epochLimit)
-                .map(
-                        sentencePair ->
-                                new MaskedInstance(
-                                        rand,
-                                        vocabulary,
-                                        sentencePair,
-                                        MAX_SEQUENCE_LENGTH,
-                                        MAX_MASKING_PER_INSTANCE))
-                .collect(Collectors.toList());
-    }
-
-    private static Batch createBatch(
-            NDManager ndManager, List<MaskedInstance> instances, int idx, int dataSize) {
-        NDList inputs =
-                new NDList(
-                        batchFromList(ndManager, instances, MaskedInstance::getTokenIds),
-                        batchFromList(ndManager, instances, MaskedInstance::getTypeIds),
-                        batchFromList(ndManager, instances, MaskedInstance::getInputMask),
-                        batchFromList(ndManager, instances, MaskedInstance::getMaskedPositions));
-        NDList labels =
-                new NDList(
-                        nextSentenceLabelsFromList(ndManager, instances),
-                        batchFromList(ndManager, instances, MaskedInstance::getMaskedIds),
-                        batchFromList(ndManager, instances, MaskedInstance::getLabelMask));
-        return new Batch(
-                ndManager,
-                inputs,
-                labels,
-                instances.size(),
-                Batchifier.STACK,
-                Batchifier.STACK,
-                idx,
-                dataSize);
-    }
-
-    private static NDArray batchFromList(NDManager ndManager, List<int[]> batchData) {
-        int[][] arrays = new int[batchData.size()][];
-        for (int idx = 0; idx < batchData.size(); ++idx) {
-            arrays[idx] = batchData.get(idx);
-        }
-        return ndManager.create(arrays);
-    }
-
-    private static NDArray batchFromList(
-            NDManager ndManager,
-            List<MaskedInstance> instances,
-            Function<MaskedInstance, int[]> f) {
-        return batchFromList(ndManager, instances.stream().map(f).collect(Collectors.toList()));
-    }
-
-    private static NDArray nextSentenceLabelsFromList(
-            NDManager ndManager, List<MaskedInstance> instances) {
-        int[] nextSentenceLabels = new int[instances.size()];
-        for (int idx = 0; idx < nextSentenceLabels.length; ++idx) {
-            nextSentenceLabels[idx] = instances.get(idx).getNextSentenceLabel();
-        }
-        return ndManager.create(nextSentenceLabels);
     }
 
     private static List<Path> listSourceFiles(Path root) {
@@ -175,87 +103,13 @@ public class BertCodeDataset implements Dataset {
         }
     }
 
-    private static String normalizeLine(String line) {
-        if (line.isEmpty()) {
-            return line;
-        }
-        // in source code, preceding whitespace is relevant, trailing ws is not
-        // so we get the index of the last non ws char
-        String unicodeNormalized = UnicodeNormalizer.normalizeDefault(line);
-        int endIdx = line.length() - 1;
-        while (endIdx >= 0 && Character.isWhitespace(unicodeNormalized.charAt(endIdx))) {
-            endIdx--;
-        }
-        return line.substring(0, endIdx + 1);
-    }
-
-    private static List<String> fileToLines(Path file) {
-        try {
-            return Files.lines(file, StandardCharsets.UTF_8)
-                    .map(BertCodeDataset::normalizeLine)
-                    .filter(line -> !line.trim().isEmpty())
-                    .collect(Collectors.toList());
-        } catch (IOException ioe) {
-            throw new IllegalStateException("Could not read file " + file, ioe);
-        }
-    }
-
-    private static List<String> tokenizeLine(String normalizedLine) {
-        // note: we work on chars, as this is a quick'n'dirty example - in the real world,
-        // we should work on codepoints.
-        if (normalizedLine.isEmpty()) {
-            return Collections.emptyList();
-        }
-        if (normalizedLine.length() == 1) {
-            return Collections.singletonList(normalizedLine);
-        }
-        List<String> result = new ArrayList<>();
-        final int length = normalizedLine.length();
-        final StringBuilder currentToken = new StringBuilder();
-        for (int idx = 0; idx <= length; ++idx) {
-            char c = idx < length ? normalizedLine.charAt(idx) : 0;
-            boolean isAlphabetic = Character.isAlphabetic(c);
-            boolean isUpperCase = Character.isUpperCase(c);
-            if (c == 0 || !isAlphabetic || isUpperCase) {
-                // we have reached the end of the string, encountered something other than a letter
-                // or reached a new part of a camel-cased word - emit a new token
-                if (currentToken.length() > 0) {
-                    result.add(currentToken.toString().toLowerCase());
-                    currentToken.setLength(0);
-                }
-                // if we haven't reached the end, we need to use the char
-                if (c != 0) {
-                    if (!isAlphabetic) {
-                        // the char is not alphabetic, turn it into a separate token
-                        result.add(Character.toString(c));
-                    } else {
-                        currentToken.append(c);
-                    }
-                }
-            } else {
-                // we have a new char to append to the current token
-                currentToken.append(c);
-            }
-        }
-        return result;
-    }
-
-    private static ParsedFile parseFile(Path file) {
-        List<String> normalizedLines =
-                fileToLines(file)
-                        .stream()
-                        .map(BertCodeDataset::normalizeLine)
-                        .filter(line -> !line.isEmpty())
-                        .collect(Collectors.toList());
-        List<List<String>> tokens =
-                normalizedLines
-                        .stream()
-                        .map(BertCodeDataset::tokenizeLine)
-                        .collect(Collectors.toList());
-        return new ParsedFile(tokens);
-    }
-
     private Vocabulary buildVocabulary() {
+        if (MAX_VOCABULARY_SIZE < RESERVED_TOKENS.size()) {
+            throw new IllegalArgumentException(
+                    "maxSize must be at least size "
+                            + RESERVED_TOKENS.size()
+                            + " to account for reserved tokens.");
+        }
         DefaultVocabulary.Builder vocabBuilder =
                 DefaultVocabulary.builder()
                         .optMaxTokens(MAX_VOCABULARY_SIZE)
@@ -274,7 +128,28 @@ public class BertCodeDataset implements Dataset {
         int idx;
 
         public EpochIterable() {
-            maskedInstances = createEpochData();
+            // turn data into sentence pairs containing consecutive lines
+            List<SentencePair> sentencePairs = new ArrayList<>();
+            parsedFiles.forEach(parsedFile -> parsedFile.addToSentencePairs(sentencePairs));
+            Collections.shuffle(sentencePairs, rand);
+            // swap sentences with 50% probability for next sentence task
+            for (int i = 1; i < sentencePairs.size(); i += 2) {
+                sentencePairs.get(i - 1).maybeSwap(rand, sentencePairs.get(i));
+            }
+            // Create masked instances for training
+            maskedInstances =
+                    sentencePairs
+                            .stream()
+                            .limit(epochLimit)
+                            .map(
+                                    sentencePair ->
+                                            new MaskedInstance(
+                                                    rand,
+                                                    vocabulary,
+                                                    sentencePair,
+                                                    MAX_SEQUENCE_LENGTH,
+                                                    MAX_MASKING_PER_INSTANCE))
+                            .collect(Collectors.toList());
             idx = batchSize;
         }
 
@@ -294,19 +169,150 @@ public class BertCodeDataset implements Dataset {
         @Override
         public Batch next() {
             NDManager ndManager = manager.newSubManager();
-            List<MaskedInstance> batchData = maskedInstances.subList(idx - batchSize, idx);
-            Batch batch = createBatch(ndManager, batchData, idx, maskedInstances.size());
+            List<MaskedInstance> instances = maskedInstances.subList(idx - batchSize, idx);
             idx++;
-            return batch;
+            NDList inputs =
+                    new NDList(
+                            batchFromList(ndManager, instances, MaskedInstance::getTokenIds),
+                            batchFromList(ndManager, instances, MaskedInstance::getTypeIds),
+                            batchFromList(ndManager, instances, MaskedInstance::getInputMask),
+                            batchFromList(
+                                    ndManager, instances, MaskedInstance::getMaskedPositions));
+            NDList labels =
+                    new NDList(
+                            nextSentenceLabelsFromList(ndManager, instances),
+                            batchFromList(ndManager, instances, MaskedInstance::getMaskedIds),
+                            batchFromList(ndManager, instances, MaskedInstance::getLabelMask));
+            return new Batch(
+                    ndManager,
+                    inputs,
+                    labels,
+                    instances.size(),
+                    Batchifier.STACK,
+                    Batchifier.STACK,
+                    idx,
+                    instances.size());
+        }
+
+        private NDArray batchFromList(NDManager ndManager, List<int[]> batchData) {
+            return ndManager.create(batchData.toArray(new int[0][]));
+        }
+
+        private NDArray batchFromList(
+                NDManager ndManager,
+                List<MaskedInstance> instances,
+                Function<MaskedInstance, int[]> f) {
+            return batchFromList(ndManager, instances.stream().map(f).collect(Collectors.toList()));
+        }
+
+        private NDArray nextSentenceLabelsFromList(
+                NDManager ndManager, List<MaskedInstance> instances) {
+            return ndManager.create(
+                    instances.stream().mapToInt(MaskedInstance::getNextSentenceLabel).toArray());
         }
     }
 
     private static final class ParsedFile {
+        final Path sourceFile;
+        final List<String> normalizedLines;
+        final List<List<String>> tokenizedLines;
 
-        private List<List<String>> tokenizedLines;
-
-        private ParsedFile(List<List<String>> tokenizedLines) {
+        private ParsedFile(
+                Path sourceFile, List<String> normalizedLines, List<List<String>> tokenizedLines) {
+            this.sourceFile = sourceFile;
+            this.normalizedLines = normalizedLines;
             this.tokenizedLines = tokenizedLines;
+        }
+
+        private static ParsedFile parse(Path file) {
+            List<String> normalizedLines =
+                    fileToLines(file)
+                            .stream()
+                            .map(ParsedFile::normalizeLine)
+                            .filter(line -> !line.isEmpty())
+                            .collect(Collectors.toList());
+            List<List<String>> tokens =
+                    normalizedLines
+                            .stream()
+                            .map(ParsedFile::tokenizeLine)
+                            .collect(Collectors.toList());
+            return new ParsedFile(file, normalizedLines, tokens);
+        }
+
+        private static String normalizeLine(String line) {
+            if (line.isEmpty()) {
+                return line;
+            }
+            // in source code, preceding whitespace is relevant, trailing ws is not
+            // so we get the index of the last non ws char
+            String unicodeNormalized = UnicodeNormalizer.normalizeDefault(line);
+            int endIdx = line.length() - 1;
+            while (endIdx >= 0 && Character.isWhitespace(unicodeNormalized.charAt(endIdx))) {
+                endIdx--;
+            }
+            return line.substring(0, endIdx + 1);
+        }
+
+        private static List<String> fileToLines(Path file) {
+            try {
+                return Files.lines(file, StandardCharsets.UTF_8)
+                        .map(ParsedFile::normalizeLine)
+                        .filter(line -> !line.trim().isEmpty())
+                        .collect(Collectors.toList());
+            } catch (IOException ioe) {
+                throw new IllegalArgumentException("Could not read file " + file, ioe);
+            }
+        }
+
+        private static List<String> tokenizeLine(String normalizedLine) {
+            // note: we work on chars, as this is a quick'n'dirty example - in the real world,
+            // we should work on codepoints.
+            if (normalizedLine.isEmpty()) {
+                return Collections.emptyList();
+            }
+            if (normalizedLine.length() == 1) {
+                return Collections.singletonList(normalizedLine);
+            }
+            List<String> result = new ArrayList<>();
+            final int length = normalizedLine.length();
+            final StringBuilder currentToken = new StringBuilder();
+            for (int idx = 0; idx <= length; ++idx) {
+                char c = idx < length ? normalizedLine.charAt(idx) : 0;
+                boolean isAlphabetic = Character.isAlphabetic(c);
+                boolean isUpperCase = Character.isUpperCase(c);
+                if (c == 0 || !isAlphabetic || isUpperCase) {
+                    // we have reached the end of the string, encountered something other than a
+                    // letter
+                    // or reached a new part of a camel-cased word - emit a new token
+                    if (currentToken.length() > 0) {
+                        result.add(currentToken.toString().toLowerCase());
+                        currentToken.setLength(0);
+                    }
+                    // if we haven't reached the end, we need to use the char
+                    if (c != 0) {
+                        if (!isAlphabetic) {
+                            // the char is not alphabetic, turn it into a separate token
+                            result.add(Character.toString(c));
+                        } else {
+                            currentToken.append(c);
+                        }
+                    }
+                } else {
+                    // we have a new char to append to the current token
+                    currentToken.append(c);
+                }
+            }
+            return result;
+        }
+
+        public String toDebugString() {
+            return sourceFile
+                    + "\n"
+                    + "=======================\n"
+                    + tokenizedLines
+                            .stream()
+                            .map(tokens -> String.join("|", tokens))
+                            .collect(Collectors.joining("\n"));
         }
 
         public void addToSentencePairs(List<SentencePair> sentencePairs) {
@@ -474,6 +480,14 @@ public class BertCodeDataset implements Dataset {
                 result[idx] = 1;
             }
             return result;
+        }
+
+        public String toDebugString() {
+            return originalSentencePair.consecutive
+                    + "\n"
+                    + String.join("", label)
+                    + "\n"
+                    + String.join("", masked);
         }
     }
 }
