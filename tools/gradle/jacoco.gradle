@@ -31,8 +31,8 @@ task jacocoRootReport(type: JacocoReport) {
     executionData.from = files(jacocoProjects.jacocoTestReport.executionData).filter { f -> f.exists() }
 
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml.required = true
+        html.required = true
     }
 }
 
