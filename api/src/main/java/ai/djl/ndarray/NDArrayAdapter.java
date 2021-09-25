@@ -18,6 +18,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import java.nio.Buffer;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
@@ -165,7 +166,7 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public String[] toStringArray() {
+    public String[] toStringArray(Charset charset) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 

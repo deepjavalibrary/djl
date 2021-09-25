@@ -54,8 +54,8 @@ public class OrtTest {
                 Assert.assertThrows(() -> m.load(path, null));
                 Assert.assertThrows(() -> m.load(path, "invalid.onnx"));
 
-                Path modleFile = path.resolve(model.getName() + ".onnx");
-                m.load(modleFile);
+                Path modelFile = path.resolve(model.getName() + ".onnx");
+                m.load(modelFile);
 
                 m.close();
             }
@@ -86,6 +86,11 @@ public class OrtTest {
 
             array = manager.create("string");
             Assert.assertEquals(array.toStringArray()[0], "string");
+            final NDArray a = array;
+            Assert.assertThrows(IllegalArgumentException.class, a::toByteBuffer);
+
+            array = manager.create(new String[] {"string1", "string2"});
+            Assert.assertEquals(array.toStringArray()[1], "string2");
         }
     }
 

@@ -24,6 +24,7 @@ import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.util.NativeResource;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -200,7 +201,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public String[] toStringArray() {
+    public String[] toStringArray(Charset charset) {
         throw new UnsupportedOperationException("String NDArray is not supported!");
     }
 

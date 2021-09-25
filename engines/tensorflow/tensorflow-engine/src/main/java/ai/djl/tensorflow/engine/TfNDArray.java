@@ -13,6 +13,7 @@
 package ai.djl.tensorflow.engine;
 
 import ai.djl.Device;
+import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -26,7 +27,7 @@ import ai.djl.util.NativeResource;
 import ai.djl.util.Preconditions;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -173,21 +174,32 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
-    public String[] toStringArray() {
+    public String[] toStringArray(Charset charset) {
         int size = Math.toIntExact(getShape().size());
-        return JavacppUtils.getString(getHandle(), size, StandardCharsets.UTF_8);
+        return JavacppUtils.getString(getHandle(), size, charset);
     }
 
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
+        if (getDataType() == DataType.STRING) {
+            throw new IllegalArgumentException("Please use toStringArray() for String NDArray.");
+        }
         return JavacppUtils.getByteBuffer(getHandle());
     }
 
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
-        throw new UnsupportedOperationException("Tensor cannot be modified after creation");
+        int size = Math.toIntExact(getShape().size());
+        BaseNDManager.validateBufferSize(data, getDataType(), size);
+        if (data instanceof ByteBuffer) {
+            JavacppUtils.setByteBuffer(getHandle(), (ByteBuffer) data);
+            return;
+        }
+        ByteBuffer buf = getManager().allocateDirect(size * getDataType().getNumOfBytes());
+        BaseNDManager.copyBuffer(data, buf);
+        JavacppUtils.setByteBuffer(getHandle(), buf);
     }
 
     /** {@inheritDoc} */

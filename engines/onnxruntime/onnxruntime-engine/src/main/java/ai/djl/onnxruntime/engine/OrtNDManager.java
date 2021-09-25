@@ -26,6 +26,7 @@ import ai.onnxruntime.OrtException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 
 /** {@code OrtNDManager} is the ONNX Runtime implementation of {@link NDManager}. */
 public class OrtNDManager extends BaseNDManager {
@@ -67,6 +68,10 @@ public class OrtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public OrtNDArray create(Buffer data, Shape shape, DataType dataType) {
+        if (dataType == DataType.STRING) {
+            throw new IllegalArgumentException(
+                    "Use NDManager.create(String[], Shape) to create String NDArray.");
+        }
         int size = Math.toIntExact(shape.size());
         BaseNDManager.validateBufferSize(data, dataType, size);
         OnnxTensor tensor = OrtUtils.toTensor(env, data, shape, dataType);
@@ -85,14 +90,9 @@ public class OrtNDManager extends BaseNDManager {
         return create(data, new Shape(data.length));
     }
 
-    /**
-     * Create A String tensor based on the provided shape.
-     *
-     * @param data the flattened String array
-     * @param shape the shape of the String NDArray
-     * @return a new instance of {@link NDArray}
-     */
-    public NDArray create(String[] data, Shape shape) {
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(String[] data, Charset charset, Shape shape) {
         try {
             return new OrtNDArray(this, alternativeManager, OrtUtils.toTensor(env, data, shape));
         } catch (OrtException e) {
