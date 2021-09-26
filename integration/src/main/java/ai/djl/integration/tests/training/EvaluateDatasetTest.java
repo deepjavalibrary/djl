@@ -49,33 +49,33 @@ public class EvaluateDatasetTest {
 
             Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation::relu);
 
-            Model model = Model.newInstance("lin-reg");
-            model.setBlock(mlpModel);
+            try (Model model = Model.newInstance("lin-reg")) {
+                model.setBlock(mlpModel);
 
-            Loss l2loss = Loss.l2Loss();
+                Loss l2loss = Loss.l2Loss();
 
-            Tracker lrt = Tracker.fixed(0.5f);
-            Optimizer sgd = Optimizer.sgd().setLearningRateTracker(lrt).build();
+                Tracker lrt = Tracker.fixed(0.5f);
+                Optimizer sgd = Optimizer.sgd().setLearningRateTracker(lrt).build();
 
-            DefaultTrainingConfig config =
-                    new DefaultTrainingConfig(l2loss)
-                            .optOptimizer(sgd) // Optimizer (loss function)
-                            .addTrainingListeners(TrainingListener.Defaults.logging()); // Logging
+                DefaultTrainingConfig config =
+                        new DefaultTrainingConfig(l2loss)
+                                .optOptimizer(sgd) // Optimizer (loss function)
+                                .addTrainingListeners(
+                                        TrainingListener.Defaults.logging()); // Logging
 
-            try (Trainer trainer = model.newTrainer(config)) {
-                trainer.initialize(new Shape(1, 784));
+                try (Trainer trainer = model.newTrainer(config)) {
+                    trainer.initialize(new Shape(1, 784));
 
-                Metrics metrics = new Metrics();
-                trainer.setMetrics(metrics);
+                    Metrics metrics = new Metrics();
+                    trainer.setMetrics(metrics);
 
-                EasyTrain.evaluateDataset(trainer, testMnistDataset);
+                    EasyTrain.evaluateDataset(trainer, testMnistDataset);
 
-                Assert.assertTrue(
-                        l2loss.getAccumulator(EvaluatorTrainingListener.VALIDATE_EPOCH) < 25.0f,
-                        "dataset L2 loss is more than expected.");
+                    Assert.assertTrue(
+                            l2loss.getAccumulator(EvaluatorTrainingListener.VALIDATE_EPOCH) < 25.0f,
+                            "dataset L2 loss is more than expected.");
+                }
             }
-
-            model.close();
         }
     }
 }

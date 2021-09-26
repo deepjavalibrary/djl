@@ -185,7 +185,10 @@ public class TfModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        ((TfSymbolBlock) block).close();
+        if (block != null) {
+            ((TfSymbolBlock) block).close();
+            block = null;
+        }
         super.close();
     }
 }

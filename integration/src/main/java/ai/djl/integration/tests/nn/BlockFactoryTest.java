@@ -76,8 +76,8 @@ public class BlockFactoryTest {
     private Path prepareModel(Path savedDir)
             throws IOException, ModelNotFoundException, MalformedModelException {
         TestBlockFactory factory = new TestBlockFactory();
-        Model model = factory.getRemoveLastBlockModel();
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (Model model = factory.getRemoveLastBlockModel();
+                NDManager manager = NDManager.newBaseManager()) {
             Block block = model.getBlock();
             block.forward(
                     new ParameterStore(manager, true),
@@ -85,7 +85,6 @@ public class BlockFactoryTest {
                     true);
             model.save(savedDir, "exported");
         }
-        model.close();
         Path classDir = savedDir.resolve("classes/ai/djl/integration/tests/nn");
         Files.createDirectories(classDir);
         Files.copy(

@@ -101,47 +101,51 @@ public class VGGTest {
 
     @Test
     public void testOutputShapes() {
-        NDManager manager = NDManager.newBaseManager();
-        int batchSize = 1;
-        NDArray x = manager.ones(new Shape(batchSize, 1, 224, 224));
-        Shape currentShape = x.getShape();
+        try (NDManager manager = NDManager.newBaseManager()) {
+            int batchSize = 1;
+            NDArray x = manager.ones(new Shape(batchSize, 1, 224, 224));
+            Shape currentShape = x.getShape();
 
-        Block vgg = VGG.builder().build();
-        vgg.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
-        vgg.initialize(manager, DataType.FLOAT32, currentShape);
+            Block vgg = VGG.builder().build();
+            vgg.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+            vgg.initialize(manager, DataType.FLOAT32, currentShape);
 
-        Map<String, Shape> shapeMap = new ConcurrentHashMap<>();
-        for (int i = 0; i < vgg.getChildren().size(); i++) {
+            Map<String, Shape> shapeMap = new ConcurrentHashMap<>();
+            for (int i = 0; i < vgg.getChildren().size(); i++) {
+                Shape[] newShape =
+                        vgg.getChildren()
+                                .get(i)
+                                .getValue()
+                                .getOutputShapes(new Shape[] {currentShape});
+                currentShape = newShape[0];
+                shapeMap.put(vgg.getChildren().get(i).getKey(), currentShape);
+            }
 
-            Shape[] newShape =
-                    vgg.getChildren().get(i).getValue().getOutputShapes(new Shape[] {currentShape});
-            currentShape = newShape[0];
-            shapeMap.put(vgg.getChildren().get(i).getKey(), currentShape);
+            Assert.assertEquals(
+                    shapeMap.get("01SequentialBlock"), new Shape(batchSize, 64, 112, 112));
+            Assert.assertEquals(
+                    shapeMap.get("02SequentialBlock"), new Shape(batchSize, 128, 56, 56));
+            Assert.assertEquals(
+                    shapeMap.get("03SequentialBlock"), new Shape(batchSize, 256, 28, 28));
+            Assert.assertEquals(
+                    shapeMap.get("04SequentialBlock"), new Shape(batchSize, 512, 14, 14));
+            Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(batchSize, 512, 7, 7));
+            Assert.assertEquals(shapeMap.get("07Linear"), new Shape(batchSize, 4096));
         }
-
-        Assert.assertEquals(shapeMap.get("01SequentialBlock"), new Shape(batchSize, 64, 112, 112));
-        Assert.assertEquals(shapeMap.get("02SequentialBlock"), new Shape(batchSize, 128, 56, 56));
-        Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(batchSize, 256, 28, 28));
-        Assert.assertEquals(shapeMap.get("04SequentialBlock"), new Shape(batchSize, 512, 14, 14));
-        Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(batchSize, 512, 7, 7));
-        Assert.assertEquals(shapeMap.get("07Linear"), new Shape(batchSize, 4096));
-        manager.close();
     }
 
     @Test
     public void testForwardMethod() {
-        NDManager manager = NDManager.newBaseManager();
-        Block vgg = VGG.builder().build();
-        int batchSize = 1;
-        NDArray x = manager.ones(new Shape(batchSize, 1, 224, 224));
-        vgg.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
-        vgg.initialize(manager, DataType.FLOAT32, x.getShape());
+        try (NDManager manager = NDManager.newBaseManager()) {
+            Block vgg = VGG.builder().build();
+            int batchSize = 1;
+            NDArray x = manager.ones(new Shape(batchSize, 1, 224, 224));
+            vgg.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+            vgg.initialize(manager, DataType.FLOAT32, x.getShape());
+            ParameterStore ps = new ParameterStore(manager, true);
+            NDArray xHat = vgg.forward(ps, new NDList(x), false).singletonOrThrow();
 
-        NDArray xHat =
-                vgg.forward(new ParameterStore(manager, true), new NDList(x), false)
-                        .singletonOrThrow();
-
-        Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
-        manager.close();
+            Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
+        }
     }
 }

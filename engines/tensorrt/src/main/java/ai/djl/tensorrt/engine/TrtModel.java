@@ -128,6 +128,7 @@ public class TrtModel extends BaseModel {
     public void close() {
         if (block != null) {
             ((TrtSymbolBlock) block).close();
+            block = null;
         }
         super.close();
     }

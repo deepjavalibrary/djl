@@ -101,7 +101,10 @@ public class XgbModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        ((XgbSymbolBlock) block).close();
+        if (block != null) {
+            ((XgbSymbolBlock) block).close();
+            block = null;
+        }
         super.close();
     }
 }
