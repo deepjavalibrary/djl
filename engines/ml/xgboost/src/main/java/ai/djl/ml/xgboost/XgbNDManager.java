@@ -55,7 +55,7 @@ public class XgbNDManager extends BaseNDManager {
         if (array instanceof XgbNDArray) {
             return (XgbNDArray) array;
         }
-        return createDirect(array.toByteBuffer(), array.getShape(), DataType.FLOAT32);
+        return (XgbNDArray) create(array.toByteBuffer(), array.getShape(), array.getDataType());
     }
 
     /** {@inheritDoc} */
@@ -72,27 +72,28 @@ public class XgbNDManager extends BaseNDManager {
         return Engine.getEngine(XgbEngine.ENGINE_NAME);
     }
 
-    /**
-     * Creates a new instance of {@code XgbNDArray}.
-     *
-     * <p>For internal use only. The created instance cannot be used as input to XGBoost engine.
-     *
-     * @param data the data to initialize the {@code XgbNDArray}
-     * @param shape the {@link Shape} of the {@code XgbNDArray}
-     * @return a new instance of {@code XgbNDArray}
-     */
-    public XgbNDArray createForOutput(ByteBuffer data, Shape shape) {
-        return new XgbNDArray(this, alternativeManager, data, shape);
-    }
-
     /** {@inheritDoc} */
     @Override
-    public XgbNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
+    public NDArray create(Buffer data, Shape shape, DataType dataType) {
         if (shape.dimension() != 2) {
-            throw new UnsupportedOperationException("Shape must be in two dimension");
+            if (data instanceof ByteBuffer) {
+                // output only NDArray
+                return new XgbNDArray(this, alternativeManager, (ByteBuffer) data, shape, dataType);
+            }
+            if (alternativeManager != null) {
+                return alternativeManager.create(data, shape, dataType);
+            }
+            throw new UnsupportedOperationException("XgbNDArray shape must be in two dimension.");
         }
         if (dataType != DataType.FLOAT32) {
-            throw new UnsupportedOperationException("Only float32 supported");
+            if (data instanceof ByteBuffer) {
+                // output only NDArray
+                return new XgbNDArray(this, alternativeManager, (ByteBuffer) data, shape, dataType);
+            }
+            if (alternativeManager != null) {
+                return alternativeManager.create(data, shape, dataType);
+            }
+            throw new UnsupportedOperationException("XgbNDArray only supports float32.");
         }
 
         if (data.isDirect() && data instanceof ByteBuffer) {
@@ -117,15 +118,6 @@ public class XgbNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray create(Buffer data, Shape shape, DataType dataType) {
-        if (alternativeManager != null) {
-            return alternativeManager.create(data, shape, dataType);
-        }
-        return createDirect(data, shape, DataType.FLOAT32);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray createCSR(Buffer buffer, long[] indptr, long[] indices, Shape shape) {
         if (shape.dimension() != 2) {
             throw new UnsupportedOperationException("Shape must be in two dimension");
@@ -135,27 +127,6 @@ public class XgbNDManager extends BaseNDManager {
         ((FloatBuffer) buffer).get(data);
         long handle = JniUtils.createDMatrixCSR(indptr, intIndices, data);
         return new XgbNDArray(this, alternativeManager, handle, shape, SparseFormat.CSR);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray zeros(Shape shape, DataType dataType) {
-        int size = Math.toIntExact(4 * shape.size());
-        ByteBuffer buffer = allocateDirect(size);
-        return createDirect(buffer, shape, dataType);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ones(Shape shape, DataType dataType) {
-        long size = shape.size();
-        int bytes = Math.toIntExact(4 * size);
-        ByteBuffer buffer = allocateDirect(bytes);
-        for (int i = 0; i < size; ++i) {
-            buffer.putFloat(1f);
-        }
-        buffer.rewind();
-        return createDirect(buffer, shape, dataType);
     }
 
     /** The SystemManager is the root {@link XgbNDManager} of which all others are children. */

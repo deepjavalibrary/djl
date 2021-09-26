@@ -14,6 +14,7 @@ package ai.djl.ml.xgboost;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.SymbolBlock;
@@ -58,16 +59,18 @@ public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
             boolean training,
             PairList<String, Object> params) {
         NDArray array = inputs.singletonOrThrow();
-        XgbNDArray xgbNDArray = manager.from(array);
-        // TODO: return DirectBuffer from JNI to avoid copy
-        float[] result = JniUtils.inference(this, xgbNDArray, treeLimit, mode);
-        ByteBuffer buf = manager.allocateDirect(result.length * 4);
-        buf.asFloatBuffer().put(result);
-        buf.rewind();
+        try (XgbNDManager sub = (XgbNDManager) manager.newSubManager()) {
+            XgbNDArray xgbNDArray = sub.from(array);
+            // TODO: return DirectBuffer from JNI to avoid copy
+            float[] result = JniUtils.inference(this, xgbNDArray, treeLimit, mode);
+            ByteBuffer buf = manager.allocateDirect(result.length * 4);
+            buf.asFloatBuffer().put(result);
+            buf.rewind();
 
-        NDArray ret = manager.createForOutput(buf, new Shape(result.length));
-        ret.attach(array.getManager());
-        return new NDList(ret);
+            NDArray ret = manager.create(buf, new Shape(result.length), DataType.FLOAT32);
+            ret.attach(array.getManager());
+            return new NDList(ret);
+        }
     }
 
     /** {@inheritDoc} */

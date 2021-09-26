@@ -57,7 +57,7 @@ public class OrtNDManager extends BaseNDManager {
         if (array instanceof OrtNDArray) {
             return (OrtNDArray) array;
         }
-        return createDirect(array.toByteBuffer(), array.getShape(), array.getDataType());
+        return create(array.toByteBuffer(), array.getShape(), array.getDataType());
     }
 
     OrtNDArray createInternal(OnnxTensor tensor) {
@@ -66,20 +66,11 @@ public class OrtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public OrtNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
+    public OrtNDArray create(Buffer data, Shape shape, DataType dataType) {
         int size = Math.toIntExact(shape.size());
         BaseNDManager.validateBufferSize(data, dataType, size);
         OnnxTensor tensor = OrtUtils.toTensor(env, data, shape, dataType);
         return new OrtNDArray(this, alternativeManager, tensor);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(Buffer data, Shape shape, DataType dataType) {
-        if (alternativeManager != null) {
-            return alternativeManager.create(data, shape, dataType);
-        }
-        return createDirect(data, shape, dataType);
     }
 
     /** {@inheritDoc} */

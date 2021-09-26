@@ -55,6 +55,7 @@ public class XgbModelTest {
                 try (NDManager manager = NDManager.newBaseManager()) {
                     NDArray array = manager.ones(new Shape(10, 13));
                     NDList output = predictor.predict(new NDList(array));
+                    Assert.assertEquals(output.singletonOrThrow().getDataType(), DataType.FLOAT32);
                     Assert.assertEquals(output.singletonOrThrow().toFloatArray().length, 10);
                 }
             }
@@ -78,8 +79,23 @@ public class XgbModelTest {
 
             ByteBuffer bb = ByteBuffer.allocateDirect(4 * buf.length);
             bb.asFloatBuffer().put(buf);
-            NDArray dlrArray = manager.createForOutput(bb, new Shape(4));
-            Assert.assertEquals(dlrArray.toFloatArray(), buf);
+            // output only NDArray
+            XgbNDArray xgbArray = (XgbNDArray) manager.create(bb, new Shape(4), DataType.FLOAT32);
+            Assert.assertEquals(xgbArray.toFloatArray(), buf);
+            final XgbNDArray a = xgbArray;
+            Assert.assertThrows(UnsupportedOperationException.class, a::getHandle);
+            Assert.assertThrows(
+                    UnsupportedOperationException.class,
+                    () -> manager.create(bb.asFloatBuffer(), new Shape(4)));
+
+            int[] expected = {0, 1, 2, 3};
+            bb.rewind();
+            bb.asIntBuffer().put(expected);
+            xgbArray = (XgbNDArray) manager.create(bb, new Shape(2, 2), DataType.INT32);
+            Assert.assertEquals(xgbArray.toIntArray(), expected);
+            Assert.assertThrows(
+                    UnsupportedOperationException.class,
+                    () -> manager.create(bb.asIntBuffer(), new Shape(2, 24), DataType.INT32));
 
             NDArray array = manager.create(buf, new Shape(2, 2));
             Assert.assertEquals(array.getDataType(), DataType.FLOAT32);

@@ -49,7 +49,7 @@ public class TrtSession extends AbstractBlock implements AutoCloseable {
             int size = Math.toIntExact(inputShapes[i].size() * inputTypes[i].getNumOfBytes());
             ByteBuffer bb = manager.allocateDirect(size);
             JniUtils.bind(session, inputName, bb);
-            NDArray array = manager.createDirect(bb, inputShapes[i], inputTypes[i]);
+            NDArray array = manager.create(bb, inputShapes[i], inputTypes[i]);
             array.setName(inputName);
             inputBindings.add(array);
         }
@@ -63,7 +63,7 @@ public class TrtSession extends AbstractBlock implements AutoCloseable {
             int size = Math.toIntExact(outputShapes[i].size() * outputTypes[i].getNumOfBytes());
             ByteBuffer bb = manager.allocateDirect(size);
             JniUtils.bind(session, outputNames[i], bb);
-            NDArray array = manager.createDirect(bb, outputShapes[i], outputTypes[i]);
+            NDArray array = manager.create(bb, outputShapes[i], outputTypes[i]);
             array.setName(outputNames[i]);
             outputBindings.add(array);
         }

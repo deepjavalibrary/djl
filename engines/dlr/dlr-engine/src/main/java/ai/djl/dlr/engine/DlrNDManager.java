@@ -23,7 +23,6 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.Arrays;
 
 /** {@code DlrNDManager} is the DLR implementation of {@link NDManager}. */
 public class DlrNDManager extends BaseNDManager {
@@ -59,7 +58,7 @@ public class DlrNDManager extends BaseNDManager {
         if (array instanceof DlrNDArray) {
             return (DlrNDArray) array;
         }
-        return createDirect(array.toByteBuffer(), array.getShape(), DataType.FLOAT32);
+        return (DlrNDArray) create(array.toByteBuffer(), array.getShape(), array.getDataType());
     }
 
     /** {@inheritDoc} */
@@ -72,49 +71,25 @@ public class DlrNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public DlrNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
+    public NDArray create(Buffer data, Shape shape, DataType dataType) {
         if (dataType != DataType.FLOAT32) {
-            throw new UnsupportedOperationException("DLR only supports float32");
+            if (data instanceof ByteBuffer) {
+                return new DlrNDArray(this, alternativeManager, (ByteBuffer) data, shape, dataType);
+            }
+            if (alternativeManager != null) {
+                return alternativeManager.create(data, shape, dataType);
+            }
+            throw new UnsupportedOperationException("DlrNDArray only supports float32.");
         }
         int size = Math.toIntExact(shape.size());
         BaseNDManager.validateBufferSize(data, dataType, size);
         if (data instanceof ByteBuffer) {
-            return new DlrNDArray(this, alternativeManager, (ByteBuffer) data, shape);
+            return new DlrNDArray(this, alternativeManager, (ByteBuffer) data, shape, dataType);
         }
         ByteBuffer bb = ByteBuffer.allocate(size * dataType.getNumOfBytes());
         bb.asFloatBuffer().put((FloatBuffer) data);
         bb.rewind();
-        return new DlrNDArray(this, alternativeManager, bb, shape);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(Buffer data, Shape shape, DataType dataType) {
-        if (alternativeManager != null) {
-            return alternativeManager.create(data, shape, dataType);
-        }
-        return createDirect(data, shape, dataType);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray zeros(Shape shape, DataType dataType) {
-        int size = Math.toIntExact(shape.size());
-        FloatBuffer fb = FloatBuffer.allocate(size);
-        return createDirect(fb, shape, dataType);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ones(Shape shape, DataType dataType) {
-        if (dataType != DataType.FLOAT32) {
-            throw new UnsupportedOperationException("DLR only supports float32");
-        }
-        int size = Math.toIntExact(shape.size());
-        float[] data = new float[size];
-        Arrays.fill(data, 1f);
-
-        return createDirect(FloatBuffer.wrap(data), shape, dataType);
+        return new DlrNDArray(this, alternativeManager, bb, shape, dataType);
     }
 
     /** {@inheritDoc} */

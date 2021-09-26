@@ -60,16 +60,6 @@ public abstract class BaseNDManager implements NDManager {
         return getEngine().defaultDevice();
     }
 
-    /**
-     * Creates a new instance of {@link NDArray} of current engine.
-     *
-     * @param data the data to initialize the {@code NDArray}
-     * @param shape the {@link Shape} of the {@code NDArray}
-     * @param dataType the {@link DataType} of the {@code NDArray}
-     * @return a new instance of {@code NDArray}
-     */
-    public abstract NDArray createDirect(Buffer data, Shape shape, DataType dataType);
-
     /** {@inheritDoc} */
     @Override
     public NDArray create(String data) {
@@ -129,7 +119,7 @@ public abstract class BaseNDManager implements NDManager {
     public NDArray zeros(Shape shape, DataType dataType) {
         int size = (int) shape.size();
         ByteBuffer bb = allocateDirect(size * dataType.getNumOfBytes());
-        return createDirect(bb, shape, dataType);
+        return create(bb, shape, dataType);
     }
 
     /** {@inheritDoc} */
@@ -164,7 +154,7 @@ public abstract class BaseNDManager implements NDManager {
             }
         }
         bb.rewind();
-        return createDirect(bb, shape, dataType);
+        return create(bb, shape, dataType);
     }
 
     /** {@inheritDoc} */

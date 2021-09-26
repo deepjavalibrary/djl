@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DlrSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {
 
     private AtomicReference<Long> handle;
+    private DlrNDManager manager;
 
     /**
      * Constructs a {@code DlrSymbolBlock}.
@@ -37,10 +38,12 @@ public class DlrSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
      * <p>You can create a {@code DlrSymbolBlock} using {@link ai.djl.Model#load(java.nio.file.Path,
      * String)}.
      *
+     * @param manager the manager to use for the block
      * @param handle the handle for native DLR model
      */
-    public DlrSymbolBlock(long handle) {
+    public DlrSymbolBlock(DlrNDManager manager, long handle) {
         this.handle = new AtomicReference<>(handle);
+        this.manager = manager;
     }
 
     /** {@inheritDoc} */
@@ -54,8 +57,11 @@ public class DlrSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
         // TODO maybe verify the number of inputs
         // currently we assume the order of the input NDList is the same
         // as the model input
-        for (int i = 0; i < inputs.size(); ++i) {
-            JniUtils.setDlrInput(modelHandle, inputs.get(i), i);
+        try (DlrNDManager sub = (DlrNDManager) manager.newSubManager()) {
+            for (int i = 0; i < inputs.size(); ++i) {
+                DlrNDArray array = sub.from(inputs.get(i));
+                JniUtils.setDlrInput(modelHandle, array, i);
+            }
         }
         JniUtils.runDlrModel(modelHandle);
         return JniUtils.getDlrOutputs(modelHandle, inputs.head().getManager());

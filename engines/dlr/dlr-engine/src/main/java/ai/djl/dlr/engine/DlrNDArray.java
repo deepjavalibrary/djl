@@ -33,9 +33,15 @@ public class DlrNDArray extends NDArrayAdapter {
      * @param alternativeManager the alternative manager to execute unsupported operation
      * @param data the underlying data
      * @param shape the shape of {@code DlrNDArray}
+     * @param dataType the {@link DataType} of the {@link NDArray}
      */
-    DlrNDArray(DlrNDManager manager, NDManager alternativeManager, ByteBuffer data, Shape shape) {
-        super(manager, alternativeManager, shape, DataType.FLOAT32, UUID.randomUUID().toString());
+    DlrNDArray(
+            DlrNDManager manager,
+            NDManager alternativeManager,
+            ByteBuffer data,
+            Shape shape,
+            DataType dataType) {
+        super(manager, alternativeManager, shape, dataType, UUID.randomUUID().toString());
         this.data = data;
         manager.attachInternal(uid, this);
     }

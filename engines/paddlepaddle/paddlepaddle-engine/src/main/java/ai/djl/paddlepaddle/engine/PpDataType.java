@@ -29,9 +29,9 @@ public final class PpDataType {
         map.put(DataType.FLOAT32, 0);
         map.put(DataType.INT64, 1);
         map.put(DataType.INT32, 2);
-        map.put(DataType.INT8, 3);
         map.put(DataType.UINT8, 3);
-        map.put(DataType.UNKNOWN, 4);
+        map.put(DataType.INT8, 4);
+        map.put(DataType.FLOAT16, 5);
         return map;
     }
 
@@ -40,8 +40,9 @@ public final class PpDataType {
         map.put(0, DataType.FLOAT32);
         map.put(1, DataType.INT64);
         map.put(2, DataType.INT32);
-        map.put(3, DataType.INT8);
-        map.put(4, DataType.UNKNOWN);
+        map.put(3, DataType.UINT8);
+        map.put(4, DataType.INT8);
+        map.put(5, DataType.FLOAT16);
         return map;
     }
 

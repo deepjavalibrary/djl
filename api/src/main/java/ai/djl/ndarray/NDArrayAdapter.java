@@ -1037,8 +1037,9 @@ public abstract class NDArrayAdapter implements NDArray {
         }
         if (alternativeArray == null) {
             alternativeArray = alternativeManager.from(this);
+        } else {
+            alternativeArray.set(getDataType().asDataType(toByteBuffer()));
         }
-        alternativeArray.set(getDataType().asDataType(toByteBuffer()));
         return alternativeArray;
     }
 }

@@ -42,11 +42,9 @@ runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:2.4.1"
 
 Internally, DJL will find two or more engines available. When you start using the hybrid engine,
 DJL will search for additional full Engines. Whenever an unsupported NDArray operation is invoked,
-it will delegate to alternative full engine to run the operation. By default, the NDArray is
-created in alternative engine if possible. You can use `NDManager.createDirect()` to force and
-NDArray to be created in hybrid engine. If you don't need preprocessing/postprocessing and trying
-to avoid accidentally memory copy, you can disable this behavior by setting the following system
-properties:
+it will delegate to alternative full engine to run the operation.
+If you don't need preprocessing/postprocessing and trying to avoid loading another engine
+at runtime, you can disable this behavior by setting the following system properties:
 
 ```
 # disable hybrid engine for OnnxRuntime

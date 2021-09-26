@@ -82,13 +82,14 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
         }
 
         Map<String, OnnxTensor> container = new ConcurrentHashMap<>();
-        // feed data in to match names
-        for (int i = 0; i < inputNames.size(); ++i) {
-            OrtNDArray ortNDArray = manager.from(inputs.get(i));
-            container.put(inputNames.get(i), ortNDArray.getTensor());
-        }
         // forward
-        try {
+        try (OrtNDManager sub = (OrtNDManager) manager.newSubManager()) {
+            // feed data in to match names
+            for (int i = 0; i < inputNames.size(); ++i) {
+                OrtNDArray ortNDArray = sub.from(inputs.get(i));
+                container.put(inputNames.get(i), ortNDArray.getTensor());
+            }
+
             OrtSession.Result results = session.run(container);
             NDList ret = evaluateOutput(results);
             ret.attach(inputs.head().getManager());

@@ -299,10 +299,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
             return;
         }
 
-        // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
         DataType inputType = DataType.fromBuffer(data);
-        validate(inputType);
-
         ByteBuffer buf = manager.allocateDirect(size * inputType.getNumOfBytes());
         BaseNDManager.copyBuffer(data, buf);
         JnaUtils.syncCopyFromCPU(getHandle(), buf, size);
@@ -1514,17 +1511,6 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     private int withAxis(int axis) {
         return Math.floorMod(axis, getShape().dimension());
-    }
-
-    private void validate(DataType inputType) {
-        if (getDataType() != inputType
-                && ((dataType != DataType.UINT8 && dataType != DataType.BOOLEAN)
-                        || inputType != DataType.INT8)) {
-            // Infer DataType from Buffer always return INT8, make this two special case that
-            // allows set UINT8 and BOOL array with regular ByteBuffer.
-            throw new IllegalStateException(
-                    "DataType mismatch, required: " + dataType + ", actual: " + inputType);
-        }
     }
 
     /** {@inheritDoc} */
