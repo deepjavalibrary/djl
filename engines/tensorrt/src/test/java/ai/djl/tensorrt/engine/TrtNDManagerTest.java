@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 
 public class TrtNDManagerTest {
 
-    @Test(enabled = false)
+    @Test
     public void testNDArray() {
         Engine engine;
         try {

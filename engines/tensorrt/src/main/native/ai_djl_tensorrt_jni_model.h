@@ -87,6 +87,8 @@ class TrtModel {
   std::vector<nvinfer1::DataType> mOutputTypes;
   std::vector<std::string> mInputNames;
   std::vector<std::string> mOutputNames;
+
+  void loadSerializedEngine();
 };
 }  // namespace djl_trt
 
