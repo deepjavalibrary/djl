@@ -53,19 +53,22 @@ public class PpSymbolBlock extends AbstractSymbolBlock {
             throw new IllegalArgumentException(
                     "Input number mismatch, requires: " + Arrays.toString(inputNames));
         }
-        NDList output = JniUtils.predictorForward(predictor, getInputs(inputs), inputNames);
-        NDManager inputManager = inputs.head().getManager();
-        NDList ret = new NDList();
-        for (NDArray array : output) {
-            ret.add(inputManager.from(array));
+        try (PpNDManager sub = manager.newSubManager()) {
+            NDList output =
+                    JniUtils.predictorForward(predictor, getInputs(sub, inputs), inputNames);
+            NDManager inputManager = inputs.head().getManager();
+            NDList ret = new NDList();
+            for (NDArray array : output) {
+                ret.add(inputManager.from(array));
+            }
+            return ret;
         }
-        return ret;
     }
 
-    private PpNDArray[] getInputs(NDList inputs) {
+    private PpNDArray[] getInputs(PpNDManager sub, NDList inputs) {
         PpNDArray[] inputArray = new PpNDArray[inputs.size()];
         for (int i = 0; i < inputArray.length; i++) {
-            inputArray[i] = manager.from(inputs.get(i));
+            inputArray[i] = sub.from(inputs.get(i));
         }
         return inputArray;
     }

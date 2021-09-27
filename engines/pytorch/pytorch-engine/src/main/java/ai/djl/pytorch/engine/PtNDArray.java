@@ -172,7 +172,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         // To align with MXNet's behavior, we will create a zeros NDArray.
         // TODO should we access the grad NDArray after we close the parameter NDArray?
         if (res == null) {
-            res = (PtNDArray) getManager().zeros(getShape());
+            res = (PtNDArray) manager.zeros(getShape());
         }
         return res;
     }
@@ -280,10 +280,10 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         Shape indexShape = index.getShape();
         if (indexShape.equals(getShape())) {
             // Result is flattened since shape is undetermined
-            return JniUtils.booleanMask(this, (PtNDArray) index);
+            return JniUtils.booleanMask(this, manager.from(index));
         } else if (indexShape.equals(getShape().slice(axis))) {
             // index will be broadcasted by default
-            try (PtNDArray flattedResult = JniUtils.booleanMask(this, (PtNDArray) index)) {
+            try (PtNDArray flattedResult = JniUtils.booleanMask(this, manager.from(index))) {
                 // Shape recovery
                 Shape remainder = getShape().slice(0, axis);
                 long selectedSize = flattedResult.getShape().size() / remainder.size();
@@ -325,7 +325,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         if (getDataType() != other.getDataType()) {
             return false;
         }
-        return JniUtils.contentEqual(this, (PtNDArray) other);
+        return JniUtils.contentEqual(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -339,7 +339,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray eq(NDArray other) {
-        return JniUtils.eq(this, (PtNDArray) other);
+        return JniUtils.eq(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -353,7 +353,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray neq(NDArray other) {
-        return JniUtils.neq(this, (PtNDArray) other);
+        return JniUtils.neq(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -367,7 +367,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray gt(NDArray other) {
-        return JniUtils.gt(this, (PtNDArray) other);
+        return JniUtils.gt(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -381,7 +381,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray gte(NDArray other) {
-        return JniUtils.gte(this, (PtNDArray) other);
+        return JniUtils.gte(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -395,7 +395,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray lt(NDArray other) {
-        return JniUtils.lt(this, (PtNDArray) other);
+        return JniUtils.lt(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -409,7 +409,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray lte(NDArray other) {
-        return JniUtils.lte(this, (PtNDArray) other);
+        return JniUtils.lte(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -423,7 +423,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray add(NDArray other) {
-        return JniUtils.add(this, (PtNDArray) other);
+        return JniUtils.add(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -437,7 +437,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray sub(NDArray other) {
-        return JniUtils.sub(this, (PtNDArray) other);
+        return JniUtils.sub(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -451,7 +451,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray mul(NDArray other) {
-        return JniUtils.mul(this, (PtNDArray) other);
+        return JniUtils.mul(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -465,7 +465,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray div(NDArray other) {
-        return JniUtils.div(this, (PtNDArray) other);
+        return JniUtils.div(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -479,7 +479,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray mod(NDArray other) {
-        return JniUtils.remainder(this, (PtNDArray) other);
+        return JniUtils.remainder(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -493,7 +493,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray pow(NDArray other) {
-        return JniUtils.pow(this, (PtNDArray) other);
+        return JniUtils.pow(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -507,7 +507,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray addi(NDArray other) {
-        JniUtils.addi(this, (PtNDArray) other);
+        JniUtils.addi(this, manager.from(other));
         return this;
     }
 
@@ -522,7 +522,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray subi(NDArray other) {
-        JniUtils.subi(this, (PtNDArray) other);
+        JniUtils.subi(this, manager.from(other));
         return this;
     }
 
@@ -537,7 +537,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray muli(NDArray other) {
-        JniUtils.muli(this, (PtNDArray) other);
+        JniUtils.muli(this, manager.from(other));
         return this;
     }
 
@@ -552,7 +552,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray divi(NDArray other) {
-        JniUtils.divi(this, (PtNDArray) other);
+        JniUtils.divi(this, manager.from(other));
         return this;
     }
 
@@ -567,7 +567,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray modi(NDArray other) {
-        JniUtils.remainderi(this, (PtNDArray) other);
+        JniUtils.remainderi(this, manager.from(other));
         return this;
     }
 
@@ -582,7 +582,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray powi(NDArray other) {
-        JniUtils.powi(this, (PtNDArray) other);
+        JniUtils.powi(this, manager.from(other));
         return this;
     }
 
@@ -610,7 +610,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray maximum(NDArray other) {
-        return JniUtils.max(this, (PtNDArray) other);
+        return JniUtils.max(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -624,7 +624,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray minimum(NDArray other) {
-        return JniUtils.min(this, (PtNDArray) other);
+        return JniUtils.min(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -685,7 +685,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray cbrt() {
-        return JniUtils.pow(this, (PtNDArray) getManager().create(1.0 / 3));
+        return JniUtils.pow(this, (PtNDArray) manager.create(1.0 / 3));
     }
 
     /** {@inheritDoc} */
@@ -994,19 +994,19 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray logicalAnd(NDArray other) {
-        return JniUtils.logicalAnd(this, (PtNDArray) other);
+        return JniUtils.logicalAnd(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray logicalOr(NDArray other) {
-        return JniUtils.logicalOr(this, (PtNDArray) other);
+        return JniUtils.logicalOr(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray logicalXor(NDArray other) {
-        return JniUtils.logicalXor(this, (PtNDArray) other);
+        return JniUtils.logicalXor(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -1191,7 +1191,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             throw new UnsupportedOperationException(
                     "Dimension mismatch or high dimensional dot operation is not supported. Please use .matMul instead.");
         }
-        return JniUtils.dot(this, (PtNDArray) other);
+        return JniUtils.dot(this, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -1200,7 +1200,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         if (isScalar() || other.isScalar()) {
             throw new IllegalArgumentException("scalar is not allowed for matMul()");
         }
-        return JniUtils.matmul(this, (PtNDArray) other);
+        return JniUtils.matmul(this, manager.from(other));
     }
 
     /** {@inheritDoc} */

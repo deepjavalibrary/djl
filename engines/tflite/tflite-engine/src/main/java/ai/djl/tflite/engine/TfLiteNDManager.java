@@ -52,7 +52,7 @@ public class TfLiteNDManager extends BaseNDManager {
         if (array instanceof TfLiteNDArray) {
             return (TfLiteNDArray) array;
         }
-        return createDirect(array.toByteBuffer(), array.getShape(), array.getDataType());
+        return create(array.toByteBuffer(), array.getShape(), array.getDataType());
     }
 
     TfLiteNDArray createInternal(Tensor tensor) {
@@ -61,7 +61,7 @@ public class TfLiteNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public TfLiteNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
+    public TfLiteNDArray create(Buffer data, Shape shape, DataType dataType) {
         int size = Math.toIntExact(shape.size());
         BaseNDManager.validateBufferSize(data, dataType, size);
         if (data.isDirect() && data instanceof ByteBuffer) {
@@ -71,15 +71,6 @@ public class TfLiteNDManager extends BaseNDManager {
         ByteBuffer buf = allocateDirect(size * dataType.getNumOfBytes());
         copyBuffer(data, buf);
         return new TfLiteNDArray(this, alternativeManager, buf, shape, dataType);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(Buffer data, Shape shape, DataType dataType) {
-        if (alternativeManager != null) {
-            return alternativeManager.create(data, shape, dataType);
-        }
-        return createDirect(data, shape, dataType);
     }
 
     /** {@inheritDoc} */

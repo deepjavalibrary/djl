@@ -45,7 +45,7 @@ public class DlrNDManagerTest {
             bb.asFloatBuffer().put(buf);
             bb.rewind();
 
-            NDArray dlrArray = manager.createDirect(bb, new Shape(4), DataType.FLOAT32);
+            NDArray dlrArray = manager.create(bb, new Shape(4), DataType.FLOAT32);
             Assert.assertEquals(dlrArray.toFloatArray(), buf);
         }
     }

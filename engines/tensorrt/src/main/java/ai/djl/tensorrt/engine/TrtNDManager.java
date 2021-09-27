@@ -58,7 +58,7 @@ public class TrtNDManager extends BaseNDManager {
         if (array instanceof TrtNDArray) {
             return (TrtNDArray) array;
         }
-        return createDirect(array.toByteBuffer(), array.getShape(), array.getDataType());
+        return create(array.toByteBuffer(), array.getShape(), array.getDataType());
     }
 
     /** {@inheritDoc} */
@@ -69,16 +69,9 @@ public class TrtNDManager extends BaseNDManager {
         return manager;
     }
 
-    /**
-     * Creates a new instance of {@link TrtNDArray}.
-     *
-     * @param data the data to initialize the {@code TrtNDArray}
-     * @param shape the {@link Shape} of the {@code TrtNDArray}
-     * @param dataType the {@link DataType} of the {@code TrtNDArray}
-     * @return a new instance of {@code TrtNDArray}
-     */
+    /** {@inheritDoc} */
     @Override
-    public TrtNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
+    public TrtNDArray create(Buffer data, Shape shape, DataType dataType) {
         int size = Math.toIntExact(shape.size());
         BaseNDManager.validateBufferSize(data, dataType, size);
         if (data.isDirect() && data instanceof ByteBuffer) {
@@ -92,19 +85,10 @@ public class TrtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray create(Buffer data, Shape shape, DataType dataType) {
-        if (alternativeManager != null) {
-            return alternativeManager.create(data, shape, dataType);
-        }
-        return createDirect(data, shape, dataType);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray zeros(Shape shape, DataType dataType) {
         int size = Math.toIntExact(dataType.getNumOfBytes() * shape.size());
         ByteBuffer bb = allocateDirect(size);
-        return createDirect(bb, shape, dataType);
+        return create(bb, shape, dataType);
     }
 
     /** {@inheritDoc} */
@@ -139,7 +123,7 @@ public class TrtNDManager extends BaseNDManager {
             }
         }
         bb.rewind();
-        return createDirect(bb, shape, dataType);
+        return create(bb, shape, dataType);
     }
 
     /** The SystemManager is the root {@link TrtNDManager} of which all others are children. */

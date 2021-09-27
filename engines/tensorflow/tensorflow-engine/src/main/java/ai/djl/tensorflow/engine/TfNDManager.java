@@ -58,18 +58,6 @@ public class TfNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
-    public TfNDArray createDirect(Buffer data, Shape shape, DataType dataType) {
-        int size = Math.toIntExact(shape.size());
-        BaseNDManager.validateBufferSize(data, dataType, size);
-        ByteBuffer buf = allocateDirect(size * dataType.getNumOfBytes());
-        copyBuffer(data, buf);
-        // TODO(improvement): avoid data copy by creating directByteBuffer on tensor data pointer
-        TFE_TensorHandle handle = JavacppUtils.createTFETensorFromByteBuffer(buf, shape, dataType);
-        return new TfNDArray(this, handle);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray create(Shape shape, DataType dataType) {
         if (shape.dimension() == 0) {
             // TensorFlow does not support empty scalar(emtpy NDArray with 0 dimension)
@@ -83,7 +71,17 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public TfNDArray create(Buffer data, Shape shape, DataType dataType) {
-        return createDirect(data, shape, dataType);
+        int size = Math.toIntExact(shape.size());
+        BaseNDManager.validateBufferSize(data, dataType, size);
+        if (data.isDirect() && data instanceof ByteBuffer) {
+            TFE_TensorHandle handle =
+                    JavacppUtils.createTFETensorFromByteBuffer((ByteBuffer) data, shape, dataType);
+            return new TfNDArray(this, handle);
+        }
+        ByteBuffer buf = allocateDirect(size * dataType.getNumOfBytes());
+        copyBuffer(data, buf);
+        TFE_TensorHandle handle = JavacppUtils.createTFETensorFromByteBuffer(buf, shape, dataType);
+        return new TfNDArray(this, handle);
     }
 
     /** {@inheritDoc} */

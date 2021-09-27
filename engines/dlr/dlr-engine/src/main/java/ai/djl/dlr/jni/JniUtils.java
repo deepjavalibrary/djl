@@ -13,7 +13,7 @@
 package ai.djl.dlr.jni;
 
 import ai.djl.Device;
-import ai.djl.ndarray.NDArray;
+import ai.djl.dlr.engine.DlrNDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
@@ -27,7 +27,7 @@ public final class JniUtils {
 
     private JniUtils() {}
 
-    public static void setDlrInput(long modelHandle, NDArray input, int index) {
+    public static void setDlrInput(long modelHandle, DlrNDArray input, int index) {
         long[] shape = input.getShape().getShape();
         float[] data = input.toFloatArray();
         String name = DlrLibrary.LIB.getDlrInputName(modelHandle, index);
