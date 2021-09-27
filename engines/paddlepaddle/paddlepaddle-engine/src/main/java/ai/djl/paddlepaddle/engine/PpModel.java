@@ -131,7 +131,10 @@ public class PpModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        JniUtils.deletePredictor(paddlePredictor);
+        if (paddlePredictor != null) {
+            JniUtils.deletePredictor(paddlePredictor);
+            paddlePredictor = null;
+        }
         super.close();
     }
 }

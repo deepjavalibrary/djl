@@ -153,48 +153,47 @@ public class AlexNetTest {
 
     @Test
     public void testOutputShapes() {
-        NDManager manager = NDManager.newBaseManager();
-        int batchSize = 2;
-        NDArray x = manager.ones(new Shape(batchSize, 1, 224, 224));
-        Shape currentShape = x.getShape();
+        try (NDManager manager = NDManager.newBaseManager()) {
+            int batchSize = 2;
+            NDArray x = manager.ones(new Shape(batchSize, 1, 224, 224));
+            Shape currentShape = x.getShape();
 
-        Block alexNet = AlexNet.builder().build();
-        alexNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
-        alexNet.initialize(manager, DataType.FLOAT32, currentShape);
+            Block alexNet = AlexNet.builder().build();
+            alexNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+            alexNet.initialize(manager, DataType.FLOAT32, currentShape);
 
-        Map<String, Shape> shapeMap = new ConcurrentHashMap<>();
-        for (int i = 0; i < alexNet.getChildren().size(); i++) {
+            Map<String, Shape> shapeMap = new ConcurrentHashMap<>();
+            for (int i = 0; i < alexNet.getChildren().size(); i++) {
 
-            Shape[] newShape =
-                    alexNet.getChildren()
-                            .get(i)
-                            .getValue()
-                            .getOutputShapes(new Shape[] {currentShape});
-            currentShape = newShape[0];
-            shapeMap.put(alexNet.getChildren().get(i).getKey(), currentShape);
+                Shape[] newShape =
+                        alexNet.getChildren()
+                                .get(i)
+                                .getValue()
+                                .getOutputShapes(new Shape[] {currentShape});
+                currentShape = newShape[0];
+                shapeMap.put(alexNet.getChildren().get(i).getKey(), currentShape);
+            }
+
+            Assert.assertEquals(shapeMap.get("01Conv2d"), new Shape(batchSize, 96, 54, 54));
+            Assert.assertEquals(shapeMap.get("04Conv2d"), new Shape(batchSize, 256, 26, 26));
+            Assert.assertEquals(shapeMap.get("07Conv2d"), new Shape(batchSize, 384, 12, 12));
+            Assert.assertEquals(shapeMap.get("13LambdaBlock"), new Shape(batchSize, 256, 5, 5));
+            Assert.assertEquals(shapeMap.get("17Dropout"), new Shape(batchSize, 4096));
         }
-
-        Assert.assertEquals(shapeMap.get("01Conv2d"), new Shape(batchSize, 96, 54, 54));
-        Assert.assertEquals(shapeMap.get("04Conv2d"), new Shape(batchSize, 256, 26, 26));
-        Assert.assertEquals(shapeMap.get("07Conv2d"), new Shape(batchSize, 384, 12, 12));
-        Assert.assertEquals(shapeMap.get("13LambdaBlock"), new Shape(batchSize, 256, 5, 5));
-        Assert.assertEquals(shapeMap.get("17Dropout"), new Shape(batchSize, 4096));
-        manager.close();
     }
 
     @Test
     public void testForwardMethod() {
-        NDManager manager = NDManager.newBaseManager();
-        Block alexNet = AlexNet.builder().build();
-        int batchSize = 1;
-        NDArray x = manager.ones(new Shape(batchSize, 1, 224, 224));
-        alexNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
-        alexNet.initialize(manager, DataType.FLOAT32, x.getShape());
-        NDArray xHat =
-                alexNet.forward(new ParameterStore(manager, true), new NDList(x), false)
-                        .singletonOrThrow();
+        try (NDManager manager = NDManager.newBaseManager()) {
+            Block alexNet = AlexNet.builder().build();
+            int batchSize = 1;
+            NDArray x = manager.ones(new Shape(batchSize, 1, 224, 224));
+            alexNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+            alexNet.initialize(manager, DataType.FLOAT32, x.getShape());
+            ParameterStore ps = new ParameterStore(manager, true);
+            NDArray xHat = alexNet.forward(ps, new NDList(x), false).singletonOrThrow();
 
-        Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
-        manager.close();
+            Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
+        }
     }
 }

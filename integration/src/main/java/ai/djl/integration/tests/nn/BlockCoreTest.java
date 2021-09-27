@@ -658,7 +658,6 @@ public class BlockCoreTest {
     @SuppressWarnings("try")
     @Test
     public void testGRU() throws IOException, MalformedModelException {
-
         Loss loss = new SoftmaxCrossEntropyLoss("SmCeLoss", 1, -1, false, true);
         TrainingConfig config =
                 new DefaultTrainingConfig(loss)

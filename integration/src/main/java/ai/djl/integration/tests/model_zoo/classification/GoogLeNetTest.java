@@ -94,50 +94,49 @@ public class GoogLeNetTest {
 
     @Test
     public void testOutputShapes() {
-        NDManager manager = NDManager.newBaseManager();
-        int batchSize = 1;
-        NDArray x = manager.ones(new Shape(batchSize, 1, 96, 96));
-        Shape currentShape = x.getShape();
+        try (NDManager manager = NDManager.newBaseManager()) {
+            int batchSize = 1;
+            NDArray x = manager.ones(new Shape(batchSize, 1, 96, 96));
+            Shape currentShape = x.getShape();
 
-        Block googLeNet = GoogLeNet.builder().build();
-        googLeNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
-        googLeNet.initialize(manager, DataType.FLOAT32, currentShape);
+            Block googLeNet = GoogLeNet.builder().build();
+            googLeNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+            googLeNet.initialize(manager, DataType.FLOAT32, currentShape);
 
-        Map<String, Shape> shapeMap = new ConcurrentHashMap<>();
-        for (int i = 0; i < googLeNet.getChildren().size(); i++) {
+            Map<String, Shape> shapeMap = new ConcurrentHashMap<>();
+            for (int i = 0; i < googLeNet.getChildren().size(); i++) {
+                Shape[] newShape =
+                        googLeNet
+                                .getChildren()
+                                .get(i)
+                                .getValue()
+                                .getOutputShapes(new Shape[] {currentShape});
+                currentShape = newShape[0];
+                shapeMap.put(googLeNet.getChildren().get(i).getKey(), currentShape);
+            }
 
-            Shape[] newShape =
-                    googLeNet
-                            .getChildren()
-                            .get(i)
-                            .getValue()
-                            .getOutputShapes(new Shape[] {currentShape});
-            currentShape = newShape[0];
-            shapeMap.put(googLeNet.getChildren().get(i).getKey(), currentShape);
+            Assert.assertEquals(
+                    shapeMap.get("01SequentialBlock"), new Shape(batchSize, 64, 24, 24));
+            Assert.assertEquals(
+                    shapeMap.get("02SequentialBlock"), new Shape(batchSize, 192, 12, 12));
+            Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(batchSize, 480, 6, 6));
+            Assert.assertEquals(shapeMap.get("04SequentialBlock"), new Shape(batchSize, 832, 3, 3));
+            Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(batchSize, 1024));
         }
-
-        Assert.assertEquals(shapeMap.get("01SequentialBlock"), new Shape(batchSize, 64, 24, 24));
-        Assert.assertEquals(shapeMap.get("02SequentialBlock"), new Shape(batchSize, 192, 12, 12));
-        Assert.assertEquals(shapeMap.get("03SequentialBlock"), new Shape(batchSize, 480, 6, 6));
-        Assert.assertEquals(shapeMap.get("04SequentialBlock"), new Shape(batchSize, 832, 3, 3));
-        Assert.assertEquals(shapeMap.get("05SequentialBlock"), new Shape(batchSize, 1024));
-        manager.close();
     }
 
     @Test
     public void testForwardMethod() {
-        NDManager manager = NDManager.newBaseManager();
-        Block googLeNet = GoogLeNet.builder().build();
-        int batchSize = 1;
-        NDArray x = manager.ones(new Shape(batchSize, 1, 28, 28));
-        googLeNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
-        googLeNet.initialize(manager, DataType.FLOAT32, x.getShape());
-        NDArray xHat =
-                googLeNet
-                        .forward(new ParameterStore(manager, true), new NDList(x), true)
-                        .singletonOrThrow();
+        try (NDManager manager = NDManager.newBaseManager()) {
+            Block googLeNet = GoogLeNet.builder().build();
+            int batchSize = 1;
+            NDArray x = manager.ones(new Shape(batchSize, 1, 28, 28));
+            googLeNet.setInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+            googLeNet.initialize(manager, DataType.FLOAT32, x.getShape());
+            ParameterStore ps = new ParameterStore(manager, true);
+            NDArray xHat = googLeNet.forward(ps, new NDList(x), true).singletonOrThrow();
 
-        Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
-        manager.close();
+            Assert.assertEquals(xHat.getShape(), new Shape(batchSize, 10));
+        }
     }
 }

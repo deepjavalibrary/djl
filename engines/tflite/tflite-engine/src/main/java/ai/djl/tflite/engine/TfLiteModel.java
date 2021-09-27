@@ -99,7 +99,10 @@ public class TfLiteModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        ((TfLiteSymbolBlock) block).close();
+        if (block != null) {
+            ((TfLiteSymbolBlock) block).close();
+            block = null;
+        }
         super.close();
     }
 }
