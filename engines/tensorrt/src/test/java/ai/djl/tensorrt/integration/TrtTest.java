@@ -105,6 +105,32 @@ public class TrtTest {
         }
     }
 
+    @Test
+    public void testSerializedEngine() throws ModelException, IOException, TranslateException {
+        Engine engine;
+        try {
+            engine = Engine.getEngine("TensorRT");
+        } catch (Exception ignore) {
+            throw new SkipException("Your os configuration doesn't support TensorRT.");
+        }
+        if (!Device.Type.GPU.equals(engine.defaultDevice().getDeviceType())) {
+            throw new SkipException("TensorRT only support GPU.");
+        }
+        Criteria<float[], float[]> criteria =
+                Criteria.builder()
+                        .setTypes(float[].class, float[].class)
+                        .optModelPath(Paths.get("src/test/resources/identity.trt"))
+                        .optTranslator(new MyTranslator())
+                        .optEngine("TensorRT")
+                        .build();
+        try (ZooModel<float[], float[]> model = criteria.loadModel();
+                Predictor<float[], float[]> predictor = model.newPredictor()) {
+            float[] data = new float[] {1, 2, 3, 4};
+            float[] ret = predictor.predict(data);
+            Assert.assertEquals(ret, data);
+        }
+    }
+
     private static final class MyTranslator implements Translator<float[], float[]> {
 
         private TrtSession session;

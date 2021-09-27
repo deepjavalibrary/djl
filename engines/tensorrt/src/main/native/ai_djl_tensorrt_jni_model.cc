@@ -34,6 +34,11 @@ struct UffBufferShutter {
 };
 
 void TrtModel::buildModel() {
+  if (mParams.modelType == 2) {
+    loadSerializedEngine();
+    return;
+  }
+
   auto builder = TrtUniquePtr<nvinfer1::IBuilder>(nvinfer1::createInferBuilder(gLogger.getTrtLogger()));
   if (!builder) {
     throw std::invalid_argument("Failed to call createInferBuilder.");
@@ -147,6 +152,40 @@ void TrtModel::buildModel() {
     ITensor *tensor = network->getOutput(i);
     mOutputNames.emplace_back(tensor->getName());
     mOutputTypes.emplace_back(tensor->getType());
+  }
+}
+
+void TrtModel::loadSerializedEngine() {
+  std::ifstream engineFile(mParams.modelPath, std::ios::binary);
+  if (!engineFile) {
+    throw std::invalid_argument("Error opening engine file: " + mParams.modelPath);
+  }
+
+  engineFile.seekg(0, std::ifstream::end);
+  long int fsize = engineFile.tellg();
+  engineFile.seekg(0, std::ifstream::beg);
+
+  std::vector<char> engineData(fsize);
+  engineFile.read(engineData.data(), fsize);
+  if (!engineFile) {
+    throw std::invalid_argument("Error read: " + mParams.modelPath);
+  }
+
+  TrtUniquePtr<IRuntime> runtime{createInferRuntime(gLogger.getTrtLogger())};
+  if (mParams.dlaCore != -1) {
+    runtime->setDLACore(mParams.dlaCore);
+  }
+
+  mEngine = std::shared_ptr<nvinfer1::ICudaEngine>(runtime->deserializeCudaEngine(engineData.data(), fsize));
+
+  for (int i = 0; i < mEngine->getNbBindings(); ++i) {
+    if (mEngine->bindingIsInput(i)) {
+      mInputNames.emplace_back(mEngine->getBindingName(i));
+      mInputTypes.emplace_back(mEngine->getBindingDataType(i));
+    } else {
+      mOutputNames.emplace_back(mEngine->getBindingName(i));
+      mOutputTypes.emplace_back(mEngine->getBindingDataType(i));
+    }
   }
 }
 

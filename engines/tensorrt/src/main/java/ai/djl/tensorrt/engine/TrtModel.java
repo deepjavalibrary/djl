@@ -64,10 +64,12 @@ public class TrtModel extends BaseModel {
         }
         String filePath = modelFile.toString();
         int modelType;
-        if (filePath.endsWith("onnx")) {
+        if (filePath.endsWith(".onnx")) {
             modelType = 0;
-        } else {
+        } else if (filePath.endsWith(".uff")) {
             modelType = 1;
+        } else {
+            modelType = 2;
         }
 
         long modelHandle = JniUtils.loadModel(modelType, filePath, manager.getDevice(), options);
@@ -91,8 +93,6 @@ public class TrtModel extends BaseModel {
                 modelName = fileName.substring(0, fileName.length() - 5);
             } else if (fileName.endsWith(".trt") || fileName.endsWith(".uff")) {
                 modelName = fileName.substring(0, fileName.length() - 4);
-            } else if (fileName.endsWith(".pb")) {
-                modelName = fileName.substring(0, fileName.length() - 3);
             } else {
                 modelName = fileName;
             }
@@ -100,10 +100,7 @@ public class TrtModel extends BaseModel {
         }
         Path modelFile = modelDir.resolve(prefix);
         if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
-            if (prefix.endsWith(".onnx")
-                    || prefix.endsWith(".trt")
-                    || prefix.endsWith(".uff")
-                    || prefix.endsWith(".pb")) {
+            if (prefix.endsWith(".onnx") || prefix.endsWith(".trt") || prefix.endsWith(".uff")) {
                 return null;
             }
             modelFile = modelDir.resolve(prefix + ".onnx");
@@ -112,10 +109,7 @@ public class TrtModel extends BaseModel {
                 if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
                     modelFile = modelDir.resolve(prefix + ".uff");
                     if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
-                        modelFile = modelDir.resolve(prefix + ".pb");
-                        if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
-                            return null;
-                        }
+                        return null;
                     }
                 }
             }
