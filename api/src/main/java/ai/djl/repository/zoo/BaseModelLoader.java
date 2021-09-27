@@ -98,8 +98,12 @@ public class BaseModelLoader implements ModelLoader {
             }
 
             Path modelPath = mrl.getRepository().getResourceDirectory(artifact);
+            Path modelDir = Files.isRegularFile(modelPath) ? modelPath.getParent() : modelPath;
+            if (modelDir == null) {
+                throw new AssertionError("Directory should not be null.");
+            }
 
-            loadServingProperties(modelPath, arguments, options);
+            loadServingProperties(modelDir, arguments, options);
             Application application = criteria.getApplication();
             if (application != Application.UNDEFINED) {
                 arguments.put("application", application.getPath());
@@ -143,7 +147,7 @@ public class BaseModelLoader implements ModelLoader {
 
             Model model =
                     createModel(
-                            modelPath,
+                            modelDir,
                             modelName,
                             criteria.getDevice(),
                             criteria.getBlock(),
