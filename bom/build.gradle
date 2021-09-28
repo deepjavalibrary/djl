@@ -31,6 +31,7 @@ dependencies {
         api "ai.djl.paddlepaddle:paddlepaddle-engine:${version}"
         api "ai.djl.paddlepaddle:paddlepaddle-model-zoo:${version}"
         api "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
+        api "ai.djl.python:python:${version}"
         api "ai.djl.pytorch:pytorch-engine:${version}"
         api "ai.djl.pytorch:pytorch-model-zoo:${version}"
         api "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
