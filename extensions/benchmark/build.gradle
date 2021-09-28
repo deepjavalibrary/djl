@@ -33,6 +33,10 @@ dependencies {
         runtimeOnly "ai.djl.dlr:dlr-native-auto"
 
         runtimeOnly "ai.djl.ml.xgboost:xgboost"
+
+        runtimeOnly "ai.djl.python:python"
+
+        runtimeOnly "ai.djl.tensorrt:tensorrt"
     } else {
         implementation project(":model-zoo")
 
