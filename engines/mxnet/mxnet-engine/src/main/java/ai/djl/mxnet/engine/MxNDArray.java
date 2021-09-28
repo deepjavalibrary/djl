@@ -29,6 +29,7 @@ import com.sun.jna.Pointer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
@@ -269,7 +270,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
-    public String[] toStringArray() {
+    public String[] toStringArray(Charset charset) {
         throw new UnsupportedOperationException("String NDArray is not supported!");
     }
 
@@ -293,14 +294,14 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     @Override
     public void set(Buffer data) {
         int size = Math.toIntExact(size());
-        BaseNDManager.validateBufferSize(data, getDataType(), size);
+        DataType type = getDataType();
+        BaseNDManager.validateBufferSize(data, type, size);
         if (data.isDirect()) {
             JnaUtils.syncCopyFromCPU(getHandle(), data, size);
             return;
         }
 
-        DataType inputType = DataType.fromBuffer(data);
-        ByteBuffer buf = manager.allocateDirect(size * inputType.getNumOfBytes());
+        ByteBuffer buf = manager.allocateDirect(size * type.getNumOfBytes());
         BaseNDManager.copyBuffer(data, buf);
         JnaUtils.syncCopyFromCPU(getHandle(), buf, size);
     }

@@ -26,6 +26,8 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.IntStream;
@@ -346,7 +348,19 @@ public interface NDArray extends NDResource {
      *
      * @return Array of Strings
      */
-    String[] toStringArray();
+    default String[] toStringArray() {
+        return toStringArray(StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Converts this {@code NDArray} to a String array with the specified charset.
+     *
+     * <p>This method is only applicable to the String typed NDArray and not for printing purpose
+     *
+     * @param charset to charset for the string
+     * @return Array of Strings
+     */
+    String[] toStringArray(Charset charset);
 
     /**
      * Converts this {@code NDArray} to a Number array based on its {@link DataType}.

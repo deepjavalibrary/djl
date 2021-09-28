@@ -271,10 +271,10 @@ public final class JavacppUtils {
     }
 
     @SuppressWarnings({"unchecked", "try"})
-    public static Pair<TF_Tensor, TFE_TensorHandle> createStringTensor(String src) {
+    public static Pair<TF_Tensor, TFE_TensorHandle> createStringTensor(
+            long[] dims, ByteBuffer[] src) {
         int dType = TfDataType.toTf(DataType.STRING);
-        long[] dims = {};
-        long numBytes = Loader.sizeof(TF_TString.class);
+        long numBytes = (long) Loader.sizeof(TF_TString.class) * src.length;
         try (PointerScope ignored = new PointerScope()) {
             /*
              * String tensor allocates a separate TF_TString memory. The TF_TString will
@@ -285,9 +285,12 @@ public final class JavacppUtils {
              */
             TF_Tensor tensor = AbstractTF_Tensor.allocateTensor(dType, dims, numBytes);
             Pointer pointer = tensorflow.TF_TensorData(tensor).capacity(numBytes);
-            TF_TString data = new TF_TString(pointer).capacity(pointer.position() + 1);
-            byte[] buf = src.getBytes(StandardCharsets.UTF_8);
-            tensorflow.TF_TString_Copy(data, new BytePointer(buf), buf.length);
+            TF_TString data = new TF_TString(pointer).capacity(pointer.position() + src.length);
+            for (int i = 0; i < src.length; ++i) {
+                TF_TString tstring = data.getPointer(i);
+                tensorflow.TF_TString_Copy(tstring, new BytePointer(src[i]), src[i].remaining());
+            }
+
             TF_Status status = TF_Status.newStatus();
             TFE_TensorHandle handle = AbstractTFE_TensorHandle.newTensor(tensor, status);
             status.throwExceptionIfNotOK();
@@ -364,6 +367,19 @@ public final class JavacppUtils {
 
             tensorflow.TF_DeleteTensor(tensor); // manually delete tensor
             return ret;
+        }
+    }
+
+    @SuppressWarnings({"unchecked", "try"})
+    public static void setByteBuffer(TFE_TensorHandle handle, ByteBuffer data) {
+        try (PointerScope ignored = new PointerScope()) {
+            // convert to TF_Tensor
+            TF_Status status = TF_Status.newStatus();
+            TF_Tensor tensor = tensorflow.TFE_TensorHandleResolve(handle, status).withDeallocator();
+            status.throwExceptionIfNotOK();
+            Pointer pointer =
+                    tensorflow.TF_TensorData(tensor).capacity(tensorflow.TF_TensorByteSize(tensor));
+            pointer.asByteBuffer().put(data);
         }
     }
 

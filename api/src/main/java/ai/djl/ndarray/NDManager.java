@@ -30,6 +30,8 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 /**
@@ -268,7 +270,9 @@ public interface NDManager extends AutoCloseable {
      * @param data the String data that needs to be set
      * @return a new instance of {@link NDArray}
      */
-    NDArray create(String data);
+    default NDArray create(String data) {
+        return create(new String[] {data}, StandardCharsets.UTF_8, new Shape());
+    }
 
     /**
      * Creates and initializes 1D {@link NDArray}.
@@ -276,7 +280,41 @@ public interface NDManager extends AutoCloseable {
      * @param data the String data that needs to be set
      * @return a new instance of {@link NDArray}
      */
-    NDArray create(String[] data);
+    default NDArray create(String[] data) {
+        return create(data, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Creates and initializes 1D {@link NDArray}.
+     *
+     * @param data the String data that needs to be set
+     * @param charset the charset to decode the string
+     * @return a new instance of {@link NDArray}
+     */
+    default NDArray create(String[] data, Charset charset) {
+        return create(data, charset, new Shape(data.length));
+    }
+
+    /**
+     * Creates a String {@link NDArray} based on the provided shape.
+     *
+     * @param data the flattened String array
+     * @param shape the shape of the String NDArray
+     * @return a new instance of {@code NDArray}
+     */
+    default NDArray create(String[] data, Shape shape) {
+        return create(data, StandardCharsets.UTF_8, shape);
+    }
+
+    /**
+     * Creates a String {@link NDArray} based on the provided shape.
+     *
+     * @param data the flattened String array
+     * @param charset the charset to decode the string
+     * @param shape the shape of the String NDArray
+     * @return a new instance of {@code NDArray}
+     */
+    NDArray create(String[] data, Charset charset, Shape shape);
 
     /**
      * Creates and initializes a 1D {@link NDArray}.
