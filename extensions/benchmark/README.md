@@ -22,8 +22,9 @@ djl-bench currently support benchmark the following type of models:
 - PaddlePaddle model
 - TFLite model
 - TensorRT model
-- Neo DLR (TVM) model
 - XGBoost model
+- Python script model
+- Neo DLR (TVM) model
 
 You can build djl-bench from source if you need to benchmark fastText/BlazingText/Sentencepiece models.
 
@@ -188,6 +189,7 @@ By default, the above script will use MXNet as the default Engine, but you can a
 -e TensorRT # TensorRT
 -e DLR # Neo DLR
 -e XGBoost # XGBoost
+-e Python # Python script
 ```
 
 ### Step 2: Identify the source of your model
