@@ -215,7 +215,11 @@ public class Input {
      * @return the value as {@code byte[]} for the first key found in the {@code Input}
      */
     public byte[] getAsBytes(String key) {
-        return content.get(key).getAsBytes();
+        BytesSupplier data = content.get(key);
+        if (data == null) {
+            return null;
+        }
+        return data.getAsBytes();
     }
 
     /**
@@ -235,7 +239,11 @@ public class Input {
      * @return the value as {@code byte[]} for the first key found in the {@code Input}
      */
     public String getAsString(String key) {
-        return content.get(key).getAsString();
+        BytesSupplier data = content.get(key);
+        if (data == null) {
+            return null;
+        }
+        return data.getAsString();
     }
 
     /**
@@ -257,6 +265,9 @@ public class Input {
      */
     public NDArray getAsNDArray(NDManager manager, String key) {
         int index = content.indexOf(key);
+        if (index < 0) {
+            return null;
+        }
         return getAsNDArray(manager, index);
     }
 
@@ -284,6 +295,9 @@ public class Input {
      */
     public NDList getAsNDList(NDManager manager, String key) {
         int index = content.indexOf(key);
+        if (index < 0) {
+            return null;
+        }
         return getAsNDList(manager, index);
     }
 

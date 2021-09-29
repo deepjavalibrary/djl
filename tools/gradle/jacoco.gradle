@@ -14,7 +14,7 @@ task jacocoMergeTestData(type: JacocoMerge) {
     }
 }
 
-def exclusions = [":examples", ":integration"]
+def exclusions = [":examples", ":integration", ":engines:tensorrt", ":djl-zero"]
 
 task jacocoRootReport(type: JacocoReport) {
     dependsOn jacocoMergeTestData

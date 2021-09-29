@@ -33,5 +33,7 @@ public class DeviceTest {
         Assert.assertNotEquals(Device.cpu(), Device.gpu());
         Device dev = Device.of("myDevice", 1);
         Assert.assertEquals(dev.getDeviceType(), "myDevice");
+
+        Engine.debugEnvironment();
     }
 }
