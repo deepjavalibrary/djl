@@ -20,6 +20,7 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.translator.SingleShotDetectionTranslator;
+import ai.djl.ndarray.BytesSupplier;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.util.JsonSerializable;
@@ -246,9 +247,9 @@ public class ServingTranslatorFactory implements TranslatorFactory {
             Output output = new Output(200, "OK");
             Object obj = translator.processOutput(ctx, list);
             if (obj instanceof JsonSerializable) {
-                output.setContent(((JsonSerializable) obj).toJson() + '\n');
+                output.add(((JsonSerializable) obj).toJson() + '\n');
             } else {
-                output.setContent(JsonUtils.GSON_PRETTY.toJson(obj) + '\n');
+                output.add(JsonUtils.GSON_PRETTY.toJson(obj) + '\n');
             }
             output.addProperty("Content-Type", "application/json");
             return output;
@@ -258,8 +259,8 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         @Override
         public NDList processInput(TranslatorContext ctx, Input input) throws Exception {
             ctx.setAttachment("input", input);
-            PairList<String, byte[]> inputs = input.getContent();
-            byte[] data = inputs.get("data");
+            PairList<String, BytesSupplier> inputs = input.getContent();
+            BytesSupplier data = inputs.get("data");
             if (data == null) {
                 data = inputs.get("body");
             }
@@ -267,7 +268,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
                 data = input.getContent().valueAt(0);
             }
             try {
-                Image image = factory.fromInputStream(new ByteArrayInputStream(data));
+                Image image = factory.fromInputStream(new ByteArrayInputStream(data.getAsBytes()));
                 return translator.processInput(ctx, image);
             } catch (IOException e) {
                 throw new TranslateException("Input is not an Image data type", e);
@@ -298,17 +299,9 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         /** {@inheritDoc} */
         @Override
         public NDList processInput(TranslatorContext ctx, Input input) throws TranslateException {
-            PairList<String, byte[]> inputs = input.getContent();
-            byte[] data = inputs.get("data");
-            if (data == null) {
-                data = inputs.get("body");
-            }
-            if (data == null) {
-                data = input.getContent().valueAt(0);
-            }
             NDManager manager = ctx.getNDManager();
             try {
-                return NDList.decode(manager, data);
+                return input.getDataAsNDList(manager);
             } catch (IllegalArgumentException e) {
                 throw new TranslateException("Input is not a NDList data type", e);
             }
@@ -318,7 +311,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         @Override
         public Output processOutput(TranslatorContext ctx, NDList list) {
             Output output = new Output(200, "OK");
-            output.setContent(list.encode());
+            output.add(list);
             output.addProperty("Content-Type", "tensor/ndlist");
             return output;
         }

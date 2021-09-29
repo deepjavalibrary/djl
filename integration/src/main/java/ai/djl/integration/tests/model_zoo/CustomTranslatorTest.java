@@ -32,6 +32,7 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
+import ai.djl.translate.Translator;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
 import ai.djl.util.ZipUtils;
@@ -41,7 +42,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -118,7 +118,8 @@ public class CustomTranslatorTest {
         arguments.put("height", "28");
         arguments.put("flag", Image.Flag.GRAYSCALE.name());
         arguments.put("applySoftmax", "true");
-        runImageClassification(Application.CV.IMAGE_CLASSIFICATION, arguments);
+        runImageClassification(
+                Application.CV.IMAGE_CLASSIFICATION, arguments, "ImageServingTranslator");
 
         Path libDir = modelDir.resolve("lib");
         Path classesDir = libDir.resolve("classes");
@@ -134,7 +135,7 @@ public class CustomTranslatorTest {
         try (Writer writer = Files.newBufferedWriter(confFile)) {
             prop.store(writer, "");
         }
-        runImageClassification(Application.UNDEFINED, null);
+        runImageClassification(Application.UNDEFINED, null, "ImageServingTranslator");
 
         Path libsDir = modelDir.resolve("libs");
         Files.move(libDir, libsDir, StandardCopyOption.REPLACE_EXISTING);
@@ -144,14 +145,14 @@ public class CustomTranslatorTest {
         Files.copy(srcFile, destFile, StandardCopyOption.REPLACE_EXISTING);
 
         // load translator from classes folder
-        runImageClassification(Application.UNDEFINED, null);
+        runImageClassification(Application.UNDEFINED, null, "MyTranslator");
 
         Path jarFile = libsDir.resolve("example.jar");
         ZipUtils.zip(classesDir, jarFile, false);
         Utils.deleteQuietly(classesDir);
 
         // load translator from jar file
-        runImageClassification(Application.UNDEFINED, null);
+        runImageClassification(Application.UNDEFINED, null, "MyTranslator");
     }
 
     @Test
@@ -191,18 +192,19 @@ public class CustomTranslatorTest {
 
         try (ZooModel<Input, Output> model = criteria.loadModel();
                 Predictor<Input, Output> predictor = model.newPredictor()) {
-            Input input = new Input("1");
-            input.addData(buf);
+            Input input = new Input();
+            input.add(buf);
             Output output = predictor.predict(input);
             Assert.assertEquals(output.getCode(), 200);
-            String content = new String(output.getContent(), StandardCharsets.UTF_8);
+            String content = output.getAsString(0);
             Type type = new TypeToken<List<Classification>>() {}.getType();
             List<Classification> result = JsonUtils.GSON.fromJson(content, type);
             Assert.assertEquals(result.get(0).getClassName(), "car");
         }
     }
 
-    private void runImageClassification(Application application, Map<String, Object> arguments)
+    private void runImageClassification(
+            Application application, Map<String, Object> arguments, String translatorName)
             throws IOException, ModelException, TranslateException {
         Criteria<Input, Output> criteria =
                 Criteria.builder()
@@ -214,11 +216,14 @@ public class CustomTranslatorTest {
 
         try (ZooModel<Input, Output> model = criteria.loadModel();
                 Predictor<Input, Output> predictor = model.newPredictor()) {
-            Input input = new Input("1");
-            input.addData("body", data);
+            Translator<Input, Output> translator = model.getTranslator();
+            Assert.assertEquals(translator.getClass().getSimpleName(), translatorName);
+
+            Input input = new Input();
+            input.add("data", data);
             Output output = predictor.predict(input);
             Assert.assertEquals(output.getCode(), 200);
-            String content = new String(output.getContent(), StandardCharsets.UTF_8);
+            String content = output.getAsString(0);
             Type type = new TypeToken<List<Classification>>() {}.getType();
             List<Classification> result = JsonUtils.GSON.fromJson(content, type);
             Assert.assertEquals(result.get(0).getClassName(), "0");
@@ -243,13 +248,13 @@ public class CustomTranslatorTest {
             array = NDImageUtils.toTensor(array).expandDims(0);
             NDList list = new NDList(array);
 
-            Input input = new Input("1");
-            input.addData(0, list.encode());
+            Input input = new Input();
+            input.add(list);
             Output output = predictor.predict(input);
             Assert.assertEquals(output.getCode(), 200);
 
             // manually post process
-            list = NDList.decode(manager, output.getContent());
+            list = output.getDataAsNDList(manager);
             NDArray probabilities = list.singletonOrThrow().get(0).softmax(0);
 
             List<String> classes = model.getArtifact("synset.txt", Utils::readLines);

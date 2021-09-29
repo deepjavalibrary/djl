@@ -12,19 +12,11 @@
  */
 package ai.djl.modality;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /** A class stores the generic inference results. */
-public class Output {
+public class Output extends Input {
 
-    private String requestId;
     private int code;
     private String message;
-    private Map<String, String> properties;
-    private byte[] content;
 
     /**
      * Constructs a {@code Output} with specified {@code requestId}, {@code code} and {@code
@@ -36,24 +28,6 @@ public class Output {
     public Output(int code, String message) {
         this.code = code;
         this.message = message;
-    }
-
-    /**
-     * Sets the requestId of the output.
-     *
-     * @param requestId the requestId of the output
-     */
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
-
-    /**
-     * Returns the requestId of the output.
-     *
-     * @return the requestId of the output
-     */
-    public String getRequestId() {
-        return requestId;
     }
 
     /**
@@ -90,66 +64,5 @@ public class Output {
      */
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    /**
-     * Returns the properties of the output.
-     *
-     * @return the properties of the output
-     */
-    public Map<String, String> getProperties() {
-        if (properties == null) {
-            return Collections.emptyMap();
-        }
-        return properties;
-    }
-
-    /**
-     * Sets the properties of the output.
-     *
-     * @param properties the properties of the output
-     */
-    public void setProperties(Map<String, String> properties) {
-        this.properties = properties;
-    }
-
-    /**
-     * Adds a property to the output.
-     *
-     * @param key key with which the specified value is to be added
-     * @param value value to be added with the specified key
-     */
-    public void addProperty(String key, String value) {
-        if (properties == null) {
-            properties = new ConcurrentHashMap<>();
-        }
-        properties.put(key, value);
-    }
-
-    /**
-     * Returns the content of the input.
-     *
-     * @return the content of the input
-     */
-    public byte[] getContent() {
-        return content;
-    }
-
-    /**
-     * Sets the content of the input.
-     *
-     * @param content the content of the input
-     */
-    public void setContent(byte[] content) {
-        this.content = content;
-    }
-
-    /**
-     * Sets the content of the input with string value.
-     *
-     * @param content the content of the input in string
-     */
-    public void setContent(String content) {
-        this.content = content.getBytes(StandardCharsets.UTF_8);
     }
 }

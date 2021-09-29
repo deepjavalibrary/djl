@@ -181,6 +181,18 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
     }
 
     /**
+     * Returns the index of the first occurrence of the specified element in this list, or -1 if
+     * this list does not contain the element.
+     *
+     * @param key – element to search for
+     * @return the index of the first occurrence of the specified element in this list, or -1 if
+     *     this list does not contain the element
+     */
+    public int indexOf(K key) {
+        return keys.indexOf(key);
+    }
+
+    /**
      * Returns the key at the specified position in this list.
      *
      * @param index the index of the element to return

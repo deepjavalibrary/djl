@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,7 +38,7 @@ import java.util.zip.ZipOutputStream;
  *
  * @see NDArray
  */
-public class NDList extends ArrayList<NDArray> implements NDResource {
+public class NDList extends ArrayList<NDArray> implements NDResource, BytesSupplier {
 
     private static final long serialVersionUID = 1L;
 
@@ -341,6 +342,18 @@ public class NDList extends ArrayList<NDArray> implements NDResource {
             dos.write(nd.encode());
         }
         dos.flush();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public byte[] getAsBytes() {
+        return encode();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ByteBuffer toByteBuffer() {
+        return ByteBuffer.wrap(encode());
     }
 
     /**
