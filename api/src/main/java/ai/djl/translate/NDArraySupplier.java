@@ -22,11 +22,10 @@ import ai.djl.ndarray.NDManager;
  * invoked.
  *
  * <p>This is a functional interface whose functional method is {@link #get(NDManager)}.
- *
- * @since 1.8
  */
 @FunctionalInterface
 public interface NDArraySupplier {
+
     /**
      * Gets an {@link NDArray} from the given {@link NDManager}.
      *

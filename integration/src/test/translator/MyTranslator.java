@@ -28,7 +28,7 @@ public class MyTranslator implements ServingTranslator {
 
     @Override
     public NDList processInput(TranslatorContext ctx, Input input) throws Exception {
-        byte[] data = input.getContent().valueAt(0);
+        byte[] data = input.getAsBytes(0);
         ImageFactory factory = ImageFactory.getInstance();
         Image image = factory.fromInputStream(new ByteArrayInputStream(data));
 
@@ -47,7 +47,7 @@ public class MyTranslator implements ServingTranslator {
         Classifications classifications = new Classifications(classes, probabilitiesNd);
 
         Output output = new Output(200, "OK");
-        output.setContent(classifications.toJson());
+        output.add(classifications.toJson());
         return output;
     }
 

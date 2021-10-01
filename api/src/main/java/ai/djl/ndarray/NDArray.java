@@ -43,7 +43,7 @@ import java.util.stream.LongStream;
  * href="https://github.com/deepjavalibrary/djl/blob/master/docs/development/memory_management.md">NDArray
  * Memory Management Guide</a>
  */
-public interface NDArray extends NDResource {
+public interface NDArray extends NDResource, BytesSupplier {
 
     /**
      * Decodes {@code NDArray} from bytes.
@@ -395,13 +395,6 @@ public interface NDArray extends NDResource {
                 throw new IllegalStateException("Unsupported DataType: " + getDataType());
         }
     }
-
-    /**
-     * Converts this {@code NDArray} to a ByteBuffer.
-     *
-     * @return a ByteBuffer
-     */
-    ByteBuffer toByteBuffer();
 
     /**
      * Sets this {@code NDArray} value from {@link Buffer}.
