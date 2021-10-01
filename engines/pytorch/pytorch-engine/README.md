@@ -135,7 +135,7 @@ installed on your GPU machine, you can use one of the following library:
 
 ### For Pre-CXX11 build
 
-We also provide packages for the system like CentOS 7/Ubuntu 14.04 with GLIBC > 2.17.
+We also provide packages for the system like CentOS 7/Ubuntu 14.04 with GLIBC >= 2.17.
 All the package were built with GCC 7, we provided a newer `libstdc++.so.6.24` in the package that contains `CXXABI_1.3.9` to use the package successfully.
 
 - ai.djl.pytorch:pytorch-native-cpu-precxx11:1.8.1:linux-x86_64
