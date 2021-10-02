@@ -311,7 +311,8 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         @Override
         public Output processOutput(TranslatorContext ctx, NDList list) {
             Output output = new Output(200, "OK");
-            output.add(list);
+            // TODO: find a way to pass NDList out
+            output.add(list.getAsBytes());
             output.addProperty("Content-Type", "tensor/ndlist");
             return output;
         }
