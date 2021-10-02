@@ -84,7 +84,7 @@ public class Predictor<I, O> implements AutoCloseable {
     private boolean prepared;
     private Model model;
     protected NDManager manager;
-    Metrics metrics;
+    protected Metrics metrics;
     protected Block block;
     protected ParameterStore parameterStore;
 
