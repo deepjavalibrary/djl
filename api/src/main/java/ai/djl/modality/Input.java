@@ -18,9 +18,8 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.util.PairList;
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.TreeMap;
 
 /** A class stores the generic input data for inference. */
 public class Input {
@@ -30,7 +29,7 @@ public class Input {
 
     /** Constructs a new {@code Input} instance. */
     public Input() {
-        properties = new ConcurrentHashMap<>();
+        properties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         content = new PairList<>();
     }
 
@@ -70,7 +69,7 @@ public class Input {
      * @return the value to which the specified key is mapped
      */
     public String getProperty(String key, String defaultValue) {
-        return properties.getOrDefault(key.toLowerCase(Locale.ROOT), defaultValue);
+        return properties.getOrDefault(key, defaultValue);
     }
 
     /**
@@ -167,6 +166,10 @@ public class Input {
      * @return the default data item
      */
     public BytesSupplier getData() {
+        if (content.isEmpty()) {
+            return null;
+        }
+
         BytesSupplier data = get("data");
         if (data == null) {
             return get(0);
@@ -181,6 +184,10 @@ public class Input {
      * @return the default data as {@code NDList}
      */
     public NDList getDataAsNDList(NDManager manager) {
+        if (content.isEmpty()) {
+            return null;
+        }
+
         int index = content.indexOf("data");
         if (index < 0) {
             index = 0;
