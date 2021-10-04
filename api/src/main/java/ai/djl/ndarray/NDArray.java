@@ -3490,8 +3490,8 @@ public interface NDArray extends NDResource, BytesSupplier {
      * ]
      * jshell&gt; array.sort(0); // sort along the first axis
      * ND: (2, 2) cpu() float32
-     * [[1., 4.],
-     *  [1., 3.],
+     * [[1., 1.],
+     *  [3., 4.],
      * ]
      * </pre>
      *
