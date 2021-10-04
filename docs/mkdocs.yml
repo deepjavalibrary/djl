@@ -51,6 +51,7 @@ nav:
           - 'docs/development/setup.md'
           - 'docs/development/development_guideline.md'
           - 'docs/development/troubleshooting.md'
+          - 'docs/development/dependency_management.md'
           - 'docs/development/add_model_to_model-zoo.md'
       - 'docs/roadmap.md'
       - 'docs/faq.md'
@@ -62,6 +63,9 @@ nav:
       - 'docs/d2l.md'
       - 'jupyter/rank_classification_using_BERT_on_Amazon_Review.ipynb'
       - 'jupyter/transfer_learning_on_cifar10.ipynb'
+      - Load your own BERT:
+          - BERT with MXNet: 'jupyter/mxnet/load_your_own_mxnet_bert.ipynb'
+          - BERT with PyTorch: 'jupyter/pytorch/load_your_own_pytorch.ipynb'
   - Guides:
       - 'docs/engine.md'
       - Models:
@@ -70,13 +74,16 @@ nav:
       - Datasets:
           - 'docs/dataset.md'
           - 'docs/development/how_to_use_dataset.md'
-      - 'docs/development/configure_logging.md'
-      - 'docs/how_to_collect_metrics.md'
+      - Inference and Production:
+        - 'docs/create_serving_ready_model.md'
+        - 'docs/development/configure_logging.md'
+        - 'docs/how_to_collect_metrics.md'
+        - 'docs/development/inference_performance_optimization.md'
+        - 'extensions/benchmark/README.md'
+        - 'docs/development/profiler.md'
       - 'docs/development/cache_management.md'
       - 'docs/development/memory_management.md'
-      - 'docs/development/inference_performance_optimization.md'
-      - 'extensions/benchmark/README.md'
-      - 'docs/development/profiler.md'
+      - 'docs/cv_utils.md'
   - DJL Community:
       - 'docs/forums.md'
       - 'leaders.md'
@@ -125,24 +132,40 @@ nav:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'
       - Hadoop support: 'extensions/hadoop/README.md'
+      - fastText: 'extensions/fasttext/README.md'
+      - SentencePiece: 'extensions/sentencepiece/README.md'
   - Demos:
       - Demos: 'docs/demos/README.md'
       - AWS:
+          - Amazon SageMaker:
+              - Start with SageMaker: 'docs/demos/aws/sagemaker/README.md'
+              - SageMaker Notebook: 'docs/demos/aws/sagemaker/notebook/README.md'
+              - SageMaker Studio: 'docs/demos/aws/sagemaker/studio/README.md'
           - AWS-kinesis-video-streams: 'docs/demos/aws/aws-kinesis-video-streams/README.md'
           - Model Serving on AWS BeanStalk EC2: 'docs/demos/aws/beanstalk-model-serving/README.md'
-          - Serverless Model Serving with DJL: 'docs/demos/aws/lambda-model-serving/README.md'
-          - Distributed inference with AWS EMR: 'docs/demos/aws/emr-distributed-inference/dataprocess/README.md'
-          - Start with SageMaker: 'docs/demos/aws/sagemaker/README.md'
+          - AWS Lambda Serverless Model Serving with DJL: 'docs/demos/aws/lambda-model-serving/README.md'
+          - AWS EMR:
+              - Distributed inference: 'docs/demos/aws/emr-distributed-inference/dataprocess/README.md'
+              - GPU Image Classification: 'docs/demos/aws/emr-distributed-inference/image-classification-gpu/README.md'
+          - AWS Inferentia: 'docs/demos/aws/inferentia/README.md'
       - Android:
-          - Doodledraw Applications with Android: 'docs/demos/android/pytorch_android/README.md'
+          - Doodledraw (PyTorch): 'docs/demos/android/pytorch_android/quickdraw_recognition/README.md'
+          - Style Transfer (PyTorch): 'docs/demos/android/pytorch_android/style_transfer_cyclegan/README.md'
+          - Face Detection (PyTorch): 'docs/demos/android/face_detection/README.md'
+          - MXNet Android Template: 'docs/demos/android/mxnet-android/README.md'
       - EcoSystem:
           - Java Integrations:
               - DJL Component in Apache Camel: 'docs/demos/camel-djl/README.md'
               - Run TensorFlow model on GraalVM: 'docs/demos/graalvm/README.md'
-              - Spark Image Classification: 'docs/demos/apache-spark/image-classification/README.md'
-              - Apache Beam: 'docs/demos/apache-beam/ctr-prediction/README.md'
-              - Apache Flink: 'docs/demos/apache-flink/sentiment-analysis/README.md'
-              - Quarkus + DJL Demo: 'docs/demos/quarkus/example/README.md'
+              - Apache Spark Image Classification: 'docs/demos/apache-spark/image-classification/README.md'
+              - Apache Beam CTR Prediction: 'docs/demos/apache-beam/ctr-prediction/README.md'
+              - Apache Flink:
+                  - Sentiment Analysis: 'docs/demos/apache-flink/sentiment-analysis/README.md'
+                  - Sentence Encoding: 'docs/demos/apache-flink/sentence_embedding/README.md'
+              - Apache Kafka Twitter Sentiment Analysis: 'docs/demos/apache-kafka/README.md'
+              - Quarkus:
+                  - DJL Extension for Quarkus: 'docs/demos/quarkus/extension/README.md'
+                  - Integration without the Extension: 'docs/demos/quarkus/example/README.md'
       - Applications:
           - Footwear Classification: 'docs/demos/footwear_classification/README.md'
           - Live Object Detection: 'docs/demos/live-object-detection/README.md'
