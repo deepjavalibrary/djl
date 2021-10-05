@@ -55,7 +55,7 @@ public class OrtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public OrtNDArray from(NDArray array) {
-        if (array instanceof OrtNDArray) {
+        if (array == null || array instanceof OrtNDArray) {
             return (OrtNDArray) array;
         }
         return create(array.toByteBuffer(), array.getShape(), array.getDataType());
