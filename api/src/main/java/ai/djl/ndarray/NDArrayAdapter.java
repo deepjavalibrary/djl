@@ -706,6 +706,12 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDList split(long sections, int axis) {
+        return getAlternativeArray().split(sections, axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDList split(long[] indices, int axis) {
         return getAlternativeArray().split(indices, axis);
     }
