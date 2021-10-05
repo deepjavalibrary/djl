@@ -184,11 +184,20 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
             if (arguments.containsKey("flag")) {
                 flag = Image.Flag.valueOf(arguments.get("flag").toString());
             }
-            if (getBooleanValue(arguments, "centerCrop", false)) {
-                addTransform(new CenterCrop());
-            }
-            if (getBooleanValue(arguments, "resize", false)) {
+            String resize = getStringValue(arguments, "resize", "false");
+            if ("true".equals(resize)) {
                 addTransform(new Resize(width, height));
+            } else if (!"false".equals(resize)) {
+                String[] tokens = resize.split("\\s*,\\s*");
+                if (tokens.length > 1) {
+                    addTransform(
+                            new Resize(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1])));
+                } else {
+                    addTransform(new Resize(Integer.parseInt(tokens[0])));
+                }
+            }
+            if (getBooleanValue(arguments, "centerCrop", false)) {
+                addTransform(new CenterCrop(width, height));
             }
             if (getBooleanValue(arguments, "toTensor", true)) {
                 addTransform(new ToTensor());
