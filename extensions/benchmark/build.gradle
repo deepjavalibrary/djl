@@ -80,6 +80,8 @@ dependencies {
         runtimeOnly(project(":engines:ml:xgboost")) {
             exclude group: "ml.dmlc", module: "xgboost4j_2.12"
         }
+
+        runtimeOnly "ai.djl.python:python:${version}"
     }
 
     testImplementation("org.testng:testng:${testng_version}") {
