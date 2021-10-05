@@ -49,7 +49,7 @@ public class TfLiteNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public TfLiteNDArray from(NDArray array) {
-        if (array instanceof TfLiteNDArray) {
+        if (array == null || array instanceof TfLiteNDArray) {
             return (TfLiteNDArray) array;
         }
         return create(array.toByteBuffer(), array.getShape(), array.getDataType());

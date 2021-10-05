@@ -51,7 +51,7 @@ public class TfNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public TfNDArray from(NDArray array) {
-        if (array instanceof TfNDArray) {
+        if (array == null || array instanceof TfNDArray) {
             return (TfNDArray) array;
         }
         return create(array.toByteBuffer(), array.getShape(), array.getDataType());

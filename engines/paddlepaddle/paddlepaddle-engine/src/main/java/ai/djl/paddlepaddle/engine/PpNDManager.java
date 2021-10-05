@@ -69,7 +69,7 @@ public class PpNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public PpNDArray from(NDArray array) {
-        if (array instanceof PpNDArray) {
+        if (array == null || array instanceof PpNDArray) {
             return (PpNDArray) array;
         }
         return create(array.toByteBuffer(), array.getShape(), array.getDataType());

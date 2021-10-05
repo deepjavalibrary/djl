@@ -55,7 +55,7 @@ public class TrtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public TrtNDArray from(NDArray array) {
-        if (array instanceof TrtNDArray) {
+        if (array == null || array instanceof TrtNDArray) {
             return (TrtNDArray) array;
         }
         return create(array.toByteBuffer(), array.getShape(), array.getDataType());

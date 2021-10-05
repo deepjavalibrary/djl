@@ -65,7 +65,7 @@ public class MxNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public MxNDArray from(NDArray array) {
-        if (array instanceof MxNDArray) {
+        if (array == null || array instanceof MxNDArray) {
             return (MxNDArray) array;
         }
         MxNDArray ret = create(array.getShape(), array.getDataType());

@@ -30,6 +30,7 @@ public class PtNDArrayEx implements NDArrayEx {
 
     private NDArrayIndexer indexer;
     private PtNDArray array;
+    private PtNDManager manager;
 
     /**
      * Constructs an {@code PtNDArrayEx} given a {@link NDArray}.
@@ -38,13 +39,14 @@ public class PtNDArrayEx implements NDArrayEx {
      */
     PtNDArrayEx(PtNDArray parent) {
         this.array = parent;
-        indexer = new PtNDArrayIndexer(array.getManager());
+        this.manager = array.getManager();
+        indexer = new PtNDArrayIndexer(manager);
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray rdiv(Number n) {
-        return rdiv(array.getManager().create(n));
+        return rdiv(manager.create(n));
     }
 
     /** {@inheritDoc} */
@@ -276,10 +278,10 @@ public class PtNDArrayEx implements NDArrayEx {
             boolean lazyUpdate) {
         // TODO: Lazy update not used
         JniUtils.adamUpdate(
-                (PtNDArray) inputs.get(0),
-                (PtNDArray) inputs.get(1),
-                (PtNDArray) inputs.get(2),
-                (PtNDArray) inputs.get(3),
+                manager.from(inputs.get(0)),
+                manager.from(inputs.get(1)),
+                manager.from(inputs.get(2)),
+                manager.from(inputs.get(3)),
                 learningRate,
                 weightDecay,
                 rescaleGrad,
@@ -288,7 +290,7 @@ public class PtNDArrayEx implements NDArrayEx {
                 beta2,
                 epsilon);
         // call zero-grad
-        JniUtils.zeroGrad((PtNDArray) weights.singletonOrThrow());
+        JniUtils.zeroGrad(manager.from(weights.singletonOrThrow()));
     }
 
     /** {@inheritDoc} */
@@ -333,16 +335,16 @@ public class PtNDArrayEx implements NDArrayEx {
             boolean lazyUpdate) {
         // TODO: Lazy update not used
         JniUtils.sgdUpdate(
-                (PtNDArray) inputs.get(0),
-                (PtNDArray) inputs.get(1),
-                (momentum == 0f) ? null : (PtNDArray) inputs.get(2),
+                manager.from(inputs.get(0)),
+                manager.from(inputs.get(1)),
+                (momentum == 0f) ? null : manager.from(inputs.get(2)),
                 learningRate,
                 weightDecay,
                 rescaleGrad,
                 clipGrad,
                 momentum);
         // call zero-grad
-        JniUtils.zeroGrad((PtNDArray) weights.singletonOrThrow());
+        JniUtils.zeroGrad(manager.from(weights.singletonOrThrow()));
     }
 
     /** {@inheritDoc} */
@@ -357,9 +359,9 @@ public class PtNDArrayEx implements NDArrayEx {
             int groups) {
         return new NDList(
                 JniUtils.convolution(
-                        (PtNDArray) input,
-                        (PtNDArray) weight,
-                        (PtNDArray) bias,
+                        manager.from(input),
+                        manager.from(weight),
+                        manager.from(bias),
                         stride,
                         padding,
                         dilation,
@@ -383,7 +385,8 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDList linear(NDArray input, NDArray weight, NDArray bias) {
-        return new NDList(JniUtils.linear((PtNDArray) input, (PtNDArray) weight, (PtNDArray) bias));
+        return new NDList(
+                JniUtils.linear(manager.from(input), manager.from(weight), manager.from(bias)));
     }
 
     /** {@inheritDoc} */
@@ -394,8 +397,8 @@ public class PtNDArrayEx implements NDArrayEx {
         }
         return new NDList(
                 JniUtils.embedding(
-                        (PtNDArray) input,
-                        (PtNDArray) weight,
+                        manager.from(input),
+                        manager.from(weight),
                         sparseFormat.equals(SparseFormat.COO)));
     }
 
@@ -408,7 +411,7 @@ public class PtNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDList dropout(NDArray input, float rate, boolean training) {
-        return new NDList(JniUtils.dropout((PtNDArray) input, rate, training));
+        return new NDList(JniUtils.dropout(manager.from(input), rate, training));
     }
 
     /** {@inheritDoc} */
@@ -417,10 +420,10 @@ public class PtNDArrayEx implements NDArrayEx {
             NDArray input, Shape normalizedShape, NDArray gamma, NDArray beta, float eps) {
         return new NDList(
                 JniUtils.layerNorm(
-                        (PtNDArray) input,
+                        manager.from(input),
                         normalizedShape,
-                        (PtNDArray) gamma,
-                        (PtNDArray) beta,
+                        manager.from(gamma),
+                        manager.from(beta),
                         eps));
     }
     /** {@inheritDoc} */
@@ -440,11 +443,11 @@ public class PtNDArrayEx implements NDArrayEx {
         if (axis == -1) {
             return new NDList(
                     JniUtils.batchNorm(
-                            (PtNDArray) input,
-                            (PtNDArray) runningMean,
-                            (PtNDArray) runningVar,
-                            (PtNDArray) gamma,
-                            (PtNDArray) beta,
+                            manager.from(input),
+                            manager.from(runningMean),
+                            manager.from(runningVar),
+                            manager.from(gamma),
+                            manager.from(beta),
                             training,
                             // momentum is defined differently in PyTorch
                             1f - momentum,
@@ -457,11 +460,11 @@ public class PtNDArrayEx implements NDArrayEx {
             result = result.swapAxes(1, axis);
             result =
                     JniUtils.batchNorm(
-                            (PtNDArray) result,
-                            (PtNDArray) runningMean,
-                            (PtNDArray) runningVar,
-                            (PtNDArray) gamma,
-                            (PtNDArray) beta,
+                            manager.from(result),
+                            manager.from(runningMean),
+                            manager.from(runningVar),
+                            manager.from(gamma),
+                            manager.from(beta),
                             training,
                             // momentum is defined differently in PyTorch
                             1f - momentum,
@@ -487,8 +490,8 @@ public class PtNDArrayEx implements NDArrayEx {
             boolean bidirectional,
             boolean batchFirst) {
         return JniUtils.rnn(
-                (PtNDArray) input,
-                (PtNDArray) state,
+                manager.from(input),
+                manager.from(state),
                 params,
                 hasBiases,
                 numLayers,
@@ -512,8 +515,8 @@ public class PtNDArrayEx implements NDArrayEx {
             boolean bidirectional,
             boolean batchFirst) {
         return JniUtils.gru(
-                (PtNDArray) input,
-                (PtNDArray) state,
+                manager.from(input),
+                manager.from(state),
                 params,
                 hasBiases,
                 numLayers,
@@ -536,7 +539,7 @@ public class PtNDArrayEx implements NDArrayEx {
             boolean bidirectional,
             boolean batchFirst) {
         return JniUtils.lstm(
-                (PtNDArray) input,
+                manager.from(input),
                 states,
                 params,
                 hasBiases,
@@ -551,7 +554,7 @@ public class PtNDArrayEx implements NDArrayEx {
     @Override
     public PtNDArray resize(int width, int height, int interpolation) {
         // create subManager to help close intermediate NDArray
-        try (NDManager subManager = array.getManager().newSubManager()) {
+        try (NDManager subManager = manager.newSubManager()) {
             array.attach(subManager);
             NDArray result = array;
             if (result.isEmpty()) {
@@ -567,7 +570,7 @@ public class PtNDArrayEx implements NDArrayEx {
             result = result.transpose(0, 3, 1, 2);
             result =
                     JniUtils.interpolate(
-                                    (PtNDArray) result,
+                                    manager.from(result),
                                     new long[] {height, width},
                                     getInterpolationMode(interpolation),
                                     false)
@@ -626,7 +629,7 @@ public class PtNDArrayEx implements NDArrayEx {
             throw new UnsupportedOperationException(
                     "condition and self shape mismatch, broadcast is not supported");
         }
-        return JniUtils.where((PtNDArray) condition, array, (PtNDArray) other);
+        return JniUtils.where(manager.from(condition), array, manager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -634,7 +637,10 @@ public class PtNDArrayEx implements NDArrayEx {
     public PtNDArray stack(NDList arrays, int axis) {
         PtNDArray[] srcArray = new PtNDArray[arrays.size() + 1];
         srcArray[0] = array;
-        System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
+        int i = 1;
+        for (NDArray arr : arrays) {
+            srcArray[i++] = manager.from(arr);
+        }
         return JniUtils.stack(srcArray, axis);
     }
 
@@ -645,7 +651,10 @@ public class PtNDArrayEx implements NDArrayEx {
 
         PtNDArray[] srcArray = new PtNDArray[list.size() + 1];
         srcArray[0] = array;
-        System.arraycopy(list.toArray(new NDArray[0]), 0, srcArray, 1, list.size());
+        int i = 1;
+        for (NDArray arr : list) {
+            srcArray[i++] = manager.from(arr);
+        }
         return JniUtils.cat(srcArray, axis);
     }
 

@@ -55,7 +55,7 @@ public class DlrNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public DlrNDArray from(NDArray array) {
-        if (array instanceof DlrNDArray) {
+        if (array == null || array instanceof DlrNDArray) {
             return (DlrNDArray) array;
         }
         return (DlrNDArray) create(array.toByteBuffer(), array.getShape(), array.getDataType());

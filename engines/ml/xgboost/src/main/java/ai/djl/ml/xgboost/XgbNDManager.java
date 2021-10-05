@@ -52,7 +52,7 @@ public class XgbNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public XgbNDArray from(NDArray array) {
-        if (array instanceof XgbNDArray) {
+        if (array == null || array instanceof XgbNDArray) {
             return (XgbNDArray) array;
         }
         return (XgbNDArray) create(array.toByteBuffer(), array.getShape(), array.getDataType());

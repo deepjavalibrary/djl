@@ -47,7 +47,7 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public PtNDArray from(NDArray array) {
-        if (array instanceof PtNDArray) {
+        if (array == null || array instanceof PtNDArray) {
             return (PtNDArray) array;
         }
         return create(array.toByteBuffer(), array.getShape(), array.getDataType());
