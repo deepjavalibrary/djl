@@ -12,6 +12,7 @@
  */
 package ai.djl.onnxruntime.zoo;
 
+import ai.djl.Application.CV;
 import ai.djl.Application.Tabular;
 import ai.djl.onnxruntime.engine.OrtEngine;
 import ai.djl.repository.MRL;
@@ -34,6 +35,9 @@ public class OrtModelZoo extends ModelZoo {
     private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
 
     static {
+        MRL resnet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(resnet));
+
         MRL irisFlower =
                 REPOSITORY.model(Tabular.SOFTMAX_REGRESSION, GROUP_ID, "iris_flowers", "0.0.1");
         MODEL_LOADERS.add(new BaseModelLoader(irisFlower));

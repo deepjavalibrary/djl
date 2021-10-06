@@ -1,0 +1,68 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/image_classification",
+  "groupId": "ai.djl.onnxruntime",
+  "artifactId": "resnet",
+  "name": "Resnet",
+  "description": "Resnet image classification",
+  "website": "http://www.djl.ai/engines/onnxruntime/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet18_v1-7",
+      "properties": {
+        "layers": "18",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "resize": 256,
+        "centerCrop": true,
+        "normalize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/resnet18_v1-7.tar.gz",
+          "name": "",
+          "sha1Hash": "12159f62b06d303097bccf4362b0355863b68213",
+          "size": 43287819
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet101_v1",
+      "properties": {
+        "layers": "101",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "resize": 256,
+        "centerCrop": true,
+        "normalize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/resnet101_v1.tar.gz",
+          "name": "",
+          "sha1Hash": "7d5a2c748386a94af868a95da38728ff3b6ea8b1",
+          "size": 165675340
+        }
+      }
+    }
+  ]
+}

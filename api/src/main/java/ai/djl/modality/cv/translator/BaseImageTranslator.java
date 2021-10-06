@@ -191,9 +191,11 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
                 String[] tokens = resize.split("\\s*,\\s*");
                 if (tokens.length > 1) {
                     addTransform(
-                            new Resize(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1])));
+                            new Resize(
+                                    (int) Double.parseDouble(tokens[0]),
+                                    (int) Double.parseDouble(tokens[1])));
                 } else {
-                    addTransform(new Resize(Integer.parseInt(tokens[0])));
+                    addTransform(new Resize((int) Double.parseDouble(tokens[0])));
                 }
             }
             if (getBooleanValue(arguments, "centerCrop", false)) {
