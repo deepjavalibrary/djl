@@ -26,8 +26,8 @@
       "arguments": {
         "width": 224,
         "height": 224,
+        "resize": 256,
         "centerCrop": true,
-        "resize": true,
         "applySoftmax": true
       },
       "files": {
@@ -60,8 +60,8 @@
       "arguments": {
         "width": 224,
         "height": 224,
+        "resize": 256,
         "centerCrop": true,
-        "resize": true,
         "applySoftmax": true
       },
       "files": {
@@ -85,6 +85,31 @@
     {
       "version": "0.0.1",
       "snapshot": false,
+      "name": "resnet101_v1",
+      "properties": {
+        "layers": "101",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "resize": 256,
+        "centerCrop": true,
+        "normalize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/resnet101_v1.tar.gz",
+          "name": "",
+          "sha1Hash": "3f2f3a216520311388d17d24c798b0c87740024a",
+          "size": 102734558
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
       "name": "resnet152_v1d",
       "properties": {
         "layers": "152",
@@ -94,8 +119,8 @@
       "arguments": {
         "width": 224,
         "height": 224,
+        "resize": 256,
         "centerCrop": true,
-        "resize": true,
         "applySoftmax": true
       },
       "files": {
@@ -128,8 +153,8 @@
       "arguments": {
         "width": 224,
         "height": 224,
+        "resize": 256,
         "centerCrop": true,
-        "resize": true,
         "applySoftmax": true
       },
       "files": {

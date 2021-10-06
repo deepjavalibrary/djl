@@ -37,6 +37,7 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.utils.CloseShieldFilterInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,6 +239,7 @@ public abstract class AbstractRepository implements Repository {
         } else {
             bis = new BufferedInputStream(is);
         }
+        bis = new CloseShieldFilterInputStream(bis);
         try (TarArchiveInputStream tis = new TarArchiveInputStream(bis)) {
             TarArchiveEntry entry;
             while ((entry = tis.getNextTarEntry()) != null) {

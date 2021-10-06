@@ -25,7 +25,8 @@
       "arguments": {
         "width": 224,
         "height": 224,
-        "resize": true,
+        "resize": 256,
+        "centerCrop": true,
         "normalize": true,
         "applySoftmax": true
       },
@@ -53,7 +54,8 @@
       "arguments": {
         "width": 224,
         "height": 224,
-        "resize": true,
+        "resize": 256,
+        "centerCrop": true,
         "normalize": true,
         "applySoftmax": true
       },
@@ -67,6 +69,31 @@
           "uri": "0.0.1/traced_resnet18.pt.gz",
           "sha1Hash": "5f2090128b4dd2aac5bc7394ba4d46fe4a608a89",
           "size": 43482267
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet101_v1",
+      "properties": {
+        "layers": "101",
+        "dataset": "imagenet"
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "resize": 256,
+        "centerCrop": true,
+        "normalize": true,
+        "applySoftmax": true
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/resnet101_v1.tar.gz",
+          "name": "",
+          "sha1Hash": "e3d85c47c751ab23662b6f3eb04cc6215727994c",
+          "size": 166376847
         }
       }
     }
