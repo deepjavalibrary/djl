@@ -84,6 +84,7 @@ When the first inference is made on a new batch size, torchscript generates an o
 This optimization can take some time and is done for each batch size you use. To disable this feature, you can use the following code:
 
 ```
+Engine.getEngine("PyTorch"); // Make sure PyTorch engine is loaded
 JniUtils.setGraphExecutorOptimize(false);
 ```
 
@@ -103,7 +104,7 @@ You can refer to our [Multithreading Benchmark](https://github.com/deepjavalibra
 here is how to run it using TensorFlow engine.
 
 ```bash
-./gradlew benchmark -Dai.djl.default_engine=TensorFlow --args='-c 100 -r {"layers":"50"}'
+./gradlew benchmark --args='-e TensorFlow -c 100 -t -1 -u djl://ai.djl.tensorflow/resnet/0.0.1/resnet50 -s 1,224,224,3'
 ```
 
 #### oneDNN(MKLDNN) acceleration
