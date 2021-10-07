@@ -10,7 +10,7 @@ dependencies {
 
     // ModelZoo requires at least one engine in the class path
     testImplementation project(":engines:pytorch:pytorch-engine")
-    testImplementation "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
+    testImplementation "ai.djl.pytorch:pytorch-native-auto:${pytorch_native_version}"
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 

@@ -11,7 +11,7 @@ elif [[ -n $(command -v sysctl) ]]; then
 fi
 
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
-VERSION=1.9.0
+VERSION=1.9.1
 CXX11ABI="-cxx11-abi"
 if [[ $2 == "precxx11" ]]; then
   CXX11ABI=""

@@ -41,7 +41,7 @@ dependencies {
         implementation project(":model-zoo")
 
         runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
-        runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
+        runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_native_version}"
 
         runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
         runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
