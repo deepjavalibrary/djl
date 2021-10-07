@@ -173,6 +173,8 @@ startScripts {
 
         String text = unixScript.text.replaceAll('CLASSPATH=\\$APP_HOME/lib/.*', replacement)
         text = text.replaceAll("/usr/bin/env sh", "/usr/bin/env bash")
+        text = text.replaceAll("#!/bin/sh", "#!/bin/bash")
+
         unixScript.text = text
     }
 }

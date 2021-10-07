@@ -1,5 +1,5 @@
 name: djlbench
-version: '0.12.0'
+version: '0.13.0'
 title: DJL Benhmark
 license: Apache-2.0
 summary: A machine learning benchmarking toolkit
@@ -14,9 +14,11 @@ description: |
   - Apachmark MXNet
   - PaddlePaddle
   - ONNXRuntime
+  - TensorRT
   - TensorFlow Lite
   - Neo DLR
   - XGBoost
+  - Python
 
 base: core18
 grade: stable
@@ -33,7 +35,7 @@ parts:
   djlbench:
     plugin: gradle
     source: https://github.com/deepjavalibrary/djl.git
-    # source-tag: v$SNAPCRAFT_PROJECT_VERSION
+    source-tag: v$SNAPCRAFT_PROJECT_VERSION
     gradle-output-dir: extensions/benchmark/build/libs
     gradle-options: [ -Pstaging, ':extensions:benchmark:dT' ]
     override-build: |
