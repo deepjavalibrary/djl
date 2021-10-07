@@ -319,13 +319,14 @@ public class Artifact {
         StringBuilder sb = new StringBuilder(100);
         if (metadata != null) {
             sb.append(metadata.getGroupId())
-                    .append(':')
+                    .append('/')
                     .append(metadata.getArtifactId())
-                    .append(':');
-        } else {
-            sb.append(name).append(':');
+                    .append('/');
         }
-        sb.append(version == null ? "N/A" : version);
+        if (version != null) {
+            sb.append(version).append('/');
+        }
+        sb.append(name);
         if (properties != null) {
             sb.append(' ').append(JsonUtils.GSON.toJson(properties));
         } else {
