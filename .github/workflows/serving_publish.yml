@@ -7,6 +7,10 @@ on:
         description: 'staging/snapshot, default is snapshot'
         required: true
         default: 'snapshot'
+      repo-id:
+        description: 'staging repository id for djl api packages'
+        required: false
+        default: ''
 
 jobs:
   publish:
@@ -34,3 +38,5 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
           ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
           ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
+          DJL_STAGING: ${{ github.event.inputs.repo-id }}
+
