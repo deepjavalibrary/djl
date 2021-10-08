@@ -69,7 +69,8 @@ public class TfNDManager extends BaseNDManager {
             // initialize with scalar 0
             return create(0f).toType(dataType, false);
         }
-        TFE_TensorHandle handle = JavacppUtils.createEmptyTFETensor(shape, dataType);
+        TFE_TensorHandle handle =
+                JavacppUtils.createEmptyTFETensor(shape, dataType, getEagerSession(), device);
         return new TfNDArray(this, handle);
     }
 
@@ -84,12 +85,15 @@ public class TfNDManager extends BaseNDManager {
         BaseNDManager.validateBufferSize(data, dataType, size);
         if (data.isDirect() && data instanceof ByteBuffer) {
             TFE_TensorHandle handle =
-                    JavacppUtils.createTFETensorFromByteBuffer((ByteBuffer) data, shape, dataType);
+                    JavacppUtils.createTFETensorFromByteBuffer(
+                            (ByteBuffer) data, shape, dataType, getEagerSession(), device);
             return new TfNDArray(this, handle);
         }
         ByteBuffer buf = allocateDirect(size * dataType.getNumOfBytes());
         copyBuffer(data, buf);
-        TFE_TensorHandle handle = JavacppUtils.createTFETensorFromByteBuffer(buf, shape, dataType);
+        TFE_TensorHandle handle =
+                JavacppUtils.createTFETensorFromByteBuffer(
+                        buf, shape, dataType, getEagerSession(), device);
         return new TfNDArray(this, handle);
     }
 

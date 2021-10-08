@@ -215,7 +215,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         if (data.isDirect() && data instanceof ByteBuffer) {
             // If NDArray is on the GPU, it is native code responsibility to control the data life
             // cycle
-            if (!Device.Type.GPU.equals(getDevice().getDeviceType())) {
+            if (!getDevice().isGpu()) {
                 dataRef = (ByteBuffer) data;
             }
             JniUtils.set(this, (ByteBuffer) data);
@@ -227,7 +227,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         BaseNDManager.copyBuffer(data, buf);
 
         // If NDArray is on the GPU, it is native code responsibility to control the data life cycle
-        if (!Device.Type.GPU.equals(getDevice().getDeviceType())) {
+        if (!getDevice().isGpu()) {
             dataRef = buf;
         }
         JniUtils.set(this, buf);

@@ -71,7 +71,7 @@ public class OrtModel extends BaseModel {
         try {
             Device device = manager.getDevice();
             OrtSession session;
-            if (Device.Type.GPU.equals(device.getDeviceType())) {
+            if (device.isGpu()) {
                 OrtSession.SessionOptions sessionOptions = new OrtSession.SessionOptions();
                 sessionOptions.addCUDA(manager.getDevice().getDeviceId());
                 session = env.createSession(modelFile.toString(), sessionOptions);

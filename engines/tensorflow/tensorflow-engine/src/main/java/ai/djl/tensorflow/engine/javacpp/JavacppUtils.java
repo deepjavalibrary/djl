@@ -248,7 +248,7 @@ public final class JavacppUtils {
         }
     }
 
-    public static TF_Tensor createEmptyTFTensor(Shape shape, DataType dataType) {
+    private static TF_Tensor createEmptyTFTensor(Shape shape, DataType dataType) {
         int dType = TfDataType.toTf(dataType);
         long[] dims = shape.getShape();
         long numBytes = dataType.getNumOfBytes() * shape.size();
@@ -260,12 +260,16 @@ public final class JavacppUtils {
     }
 
     @SuppressWarnings({"unchecked", "try"})
-    public static TFE_TensorHandle createEmptyTFETensor(Shape shape, DataType dataType) {
+    public static TFE_TensorHandle createEmptyTFETensor(
+            Shape shape, DataType dataType, TFE_Context eagerSessionHandle, Device device) {
         try (PointerScope ignored = new PointerScope()) {
             TF_Tensor tensor = createEmptyTFTensor(shape, dataType);
             TF_Status status = TF_Status.newStatus();
             TFE_TensorHandle handle = AbstractTFE_TensorHandle.newTensor(tensor, status);
             status.throwExceptionIfNotOK();
+            if (device.isGpu()) {
+                return toDevice(handle, eagerSessionHandle, device);
+            }
             return handle.retainReference();
         }
     }
@@ -303,7 +307,11 @@ public final class JavacppUtils {
 
     @SuppressWarnings({"unchecked", "try"})
     public static TFE_TensorHandle createTFETensorFromByteBuffer(
-            ByteBuffer buf, Shape shape, DataType dataType) {
+            ByteBuffer buf,
+            Shape shape,
+            DataType dataType,
+            TFE_Context eagerSessionHandle,
+            Device device) {
         int dType = TfDataType.toTf(dataType);
         long[] dims = shape.getShape();
         long numBytes;
@@ -320,6 +328,9 @@ public final class JavacppUtils {
             TF_Status status = TF_Status.newStatus();
             TFE_TensorHandle handle = AbstractTFE_TensorHandle.newTensor(tensor, status);
             status.throwExceptionIfNotOK();
+            if (device.isGpu()) {
+                return toDevice(handle, eagerSessionHandle, device);
+            }
             return handle.retainReference();
         }
     }

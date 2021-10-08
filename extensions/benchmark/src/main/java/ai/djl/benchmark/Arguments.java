@@ -98,8 +98,7 @@ public class Arguments {
             threads = Integer.parseInt(cmd.getOptionValue("threads"));
             Engine eng = Engine.getEngine(engine);
             Device[] devices = eng.getDevices(maxGpus);
-            String deviceType = devices[0].getDeviceType();
-            if (Device.Type.GPU.equals(deviceType)) {
+            if (devices[0].isGpu()) {
                 // one thread per GPU
                 if (threads <= 0) {
                     threads = devices.length;

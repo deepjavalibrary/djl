@@ -191,6 +191,10 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
+        if (getDevice().isGpu()) {
+            // TODO: Implement set for GPU
+            throw new UnsupportedOperationException("GPU Tensor cannot be modified after creation");
+        }
         int size = Math.toIntExact(getShape().size());
         BaseNDManager.validateBufferSize(data, getDataType(), size);
         if (data instanceof ByteBuffer) {

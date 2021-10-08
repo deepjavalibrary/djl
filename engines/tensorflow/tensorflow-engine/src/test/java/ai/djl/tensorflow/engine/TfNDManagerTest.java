@@ -42,9 +42,14 @@ public class TfNDManagerTest {
                     array.toStringArray()[1].getBytes(StandardCharsets.UTF_8), buf2.array());
 
             array = manager.zeros(new Shape(2));
+            final NDArray b = array;
             float[] expected = {2, 3};
-            array.set(expected);
-            Assert.assertEquals(array.toFloatArray(), expected);
+            if (array.getDevice().isGpu()) {
+                Assert.assertThrows(UnsupportedOperationException.class, () -> b.set(expected));
+            } else {
+                array.set(expected);
+                Assert.assertEquals(array.toFloatArray(), expected);
+            }
 
             Assert.assertThrows(
                     IllegalArgumentException.class,

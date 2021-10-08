@@ -81,6 +81,15 @@ public final class Device {
         return deviceId;
     }
 
+    /**
+     * Returns if the {@code Device} is GPU.
+     *
+     * @return if the {@code Device} is GPU.
+     */
+    public boolean isGpu() {
+        return Type.GPU.equals(deviceType);
+    }
+
     /** {@inheritDoc} */
     @Override
     public String toString() {
