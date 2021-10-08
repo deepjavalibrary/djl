@@ -12,7 +12,6 @@
  */
 package ai.djl.tensorrt.engine;
 
-import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
@@ -31,7 +30,7 @@ public class TrtNDManagerTest {
         } catch (Exception ignore) {
             throw new SkipException("Your os configuration doesn't support TensorRT.");
         }
-        if (!Device.Type.GPU.equals(engine.defaultDevice().getDeviceType())) {
+        if (!engine.defaultDevice().isGpu()) {
             throw new SkipException("TensorRT only support GPU.");
         }
         try (NDManager manager = TrtNDManager.getSystemManager().newSubManager()) {

@@ -196,7 +196,7 @@ public final class JnaUtils {
     }
 
     public static long[] getGpuMemory(Device device) {
-        if (!Device.Type.GPU.equals(device.getDeviceType())) {
+        if (!device.isGpu()) {
             throw new IllegalArgumentException("Only GPU device is allowed.");
         }
 

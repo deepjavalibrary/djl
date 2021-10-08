@@ -40,7 +40,6 @@ public class PlatformTest {
         Assert.assertEquals(system.getClassifier(), "linux-x86_64");
         Assert.assertEquals(system.getOsPrefix(), "linux");
         Assert.assertEquals(system.getOsArch(), "x86_64");
-        Assert.assertNull(system.getCudaArch());
 
         url = createPropertyFile("version=1.8.0\nplaceholder=true");
         Platform platform = Platform.fromUrl(url);

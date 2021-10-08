@@ -141,7 +141,7 @@ public final class JniUtils {
                         new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
                         false);
 
-        if (layout == 1 || layout == 2 || Device.Type.GPU.equals(device.getDeviceType())) {
+        if (layout == 1 || layout == 2 || device.isGpu()) {
             // MKLDNN & COO & GPU device will explicitly make a copy in native code
             // so we don't want to hold a reference on Java side
             return new PtNDArray(manager, handle);

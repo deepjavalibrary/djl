@@ -130,7 +130,7 @@ public final class TrtEngine extends Engine {
     public TrtNDManager newBaseManager(Device device) {
         // Only support GPU for now
         device = device == null ? defaultDevice() : device;
-        if (!Device.Type.GPU.equals(device.getDeviceType())) {
+        if (!device.isGpu()) {
             throw new IllegalArgumentException("TensorRT only support GPU");
         }
         return TrtNDManager.getSystemManager().newSubManager(device);

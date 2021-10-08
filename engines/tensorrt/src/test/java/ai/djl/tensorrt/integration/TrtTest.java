@@ -12,7 +12,6 @@
  */
 package ai.djl.tensorrt.integration;
 
-import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
@@ -50,7 +49,7 @@ public class TrtTest {
         } catch (Exception ignore) {
             throw new SkipException("Your os configuration doesn't support TensorRT.");
         }
-        if (!Device.Type.GPU.equals(engine.defaultDevice().getDeviceType())) {
+        if (!engine.defaultDevice().isGpu()) {
             throw new SkipException("TensorRT only support GPU.");
         }
         Criteria<float[], float[]> criteria =
@@ -76,7 +75,7 @@ public class TrtTest {
         } catch (Exception ignore) {
             throw new SkipException("Your os configuration doesn't support TensorRT.");
         }
-        if (!Device.Type.GPU.equals(engine.defaultDevice().getDeviceType())) {
+        if (!engine.defaultDevice().isGpu()) {
             throw new SkipException("TensorRT only support GPU.");
         }
         List<String> synset =
@@ -113,7 +112,7 @@ public class TrtTest {
         } catch (Exception ignore) {
             throw new SkipException("Your os configuration doesn't support TensorRT.");
         }
-        if (!Device.Type.GPU.equals(engine.defaultDevice().getDeviceType())) {
+        if (!engine.defaultDevice().isGpu()) {
             throw new SkipException("TensorRT only support GPU.");
         }
         Criteria<float[], float[]> criteria =
