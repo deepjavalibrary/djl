@@ -12,6 +12,7 @@
  */
 package ai.djl.ndarray;
 
+import ai.djl.util.JsonUtils;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
@@ -19,6 +20,7 @@ class BytesSupplierImpl implements BytesSupplier {
 
     private byte[] buf;
     private String value;
+    private Object obj;
 
     BytesSupplierImpl(byte[] buf) {
         this.buf = buf;
@@ -28,10 +30,17 @@ class BytesSupplierImpl implements BytesSupplier {
         this.value = value;
     }
 
+    BytesSupplierImpl(Object obj) {
+        this.obj = obj;
+    }
+
     /** {@inheritDoc} */
     @Override
     public byte[] getAsBytes() {
         if (buf == null) {
+            if (value == null) {
+                value = JsonUtils.GSON_PRETTY.toJson(obj) + '\n';
+            }
             buf = value.getBytes(StandardCharsets.UTF_8);
         }
         return buf;
@@ -41,9 +50,24 @@ class BytesSupplierImpl implements BytesSupplier {
     @Override
     public String getAsString() {
         if (value == null) {
-            value = new String(buf, StandardCharsets.UTF_8);
+            if (obj != null) {
+                value = JsonUtils.GSON_PRETTY.toJson(obj) + '\n';
+            } else {
+                value = new String(buf, StandardCharsets.UTF_8);
+            }
         }
         return value;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Object getAsObject() {
+        if (obj != null) {
+            return obj;
+        } else if (value != null) {
+            return value;
+        }
+        return buf;
     }
 
     /** {@inheritDoc} */

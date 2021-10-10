@@ -68,7 +68,7 @@ public class DetectedObjects extends Classifications {
     /** {@inheritDoc} */
     @Override
     public String toJson() {
-        return GSON.toJson(this);
+        return GSON.toJson(this) + '\n';
     }
 
     /** A {@code DetectedObject} represents a single potential detected Object for an image. */

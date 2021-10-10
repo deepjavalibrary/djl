@@ -12,12 +12,13 @@
  */
 package ai.djl.util;
 
+import ai.djl.ndarray.BytesSupplier;
 import java.io.Serializable;
 
 /**
  * A class implements {@code JsonSerializable} indicates it can be serialized into a json string.
  */
-public interface JsonSerializable extends Serializable {
+public interface JsonSerializable extends Serializable, BytesSupplier {
 
     /**
      * Returns a json presentation of the object.
