@@ -177,6 +177,9 @@ void TrtModel::loadSerializedEngine() {
   }
 
   mEngine = std::shared_ptr<nvinfer1::ICudaEngine>(runtime->deserializeCudaEngine(engineData.data(), fsize));
+  if (mEngine == nullptr) {
+    throw std::invalid_argument("Error deserializeCudaEngine: " + mParams.modelPath);
+  }
 
   for (int i = 0; i < mEngine->getNbBindings(); ++i) {
     if (mEngine->bindingIsInput(i)) {
