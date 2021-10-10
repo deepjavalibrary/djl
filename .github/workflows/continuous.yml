@@ -1,14 +1,6 @@
 name: Continuous
 
 on:
-  push:
-    paths-ignore:
-      - "**.md"
-      - "**.ipynb"
-      - "**.json"
-      - "**.html"
-      - "**.js"
-      - "**.css"
   pull_request:
     paths-ignore:
       - "**.md"
