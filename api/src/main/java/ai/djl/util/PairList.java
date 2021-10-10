@@ -260,6 +260,12 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
         return values.toArray(target);
     }
 
+    /** Removes all the elements from this pair list. */
+    public void clear() {
+        keys.clear();
+        values.clear();
+    }
+
     /**
      * Removes the key-value pair for the first key found in the list.
      *
