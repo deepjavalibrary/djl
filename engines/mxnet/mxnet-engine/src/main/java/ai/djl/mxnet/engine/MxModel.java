@@ -90,11 +90,20 @@ public class MxModel extends BaseModel {
         if (prefix == null) {
             prefix = modelName;
         }
+        boolean hasParameter = true;
+        String optimization = null;
+        if (options != null) {
+            String paramOption = (String) options.get("hasParameter");
+            if (paramOption != null) {
+                hasParameter = Boolean.parseBoolean(paramOption);
+            }
+            optimization = (String) options.get("MxOptimizeFor");
+        }
         Path paramFile = paramPathResolver(prefix, options);
-        if (paramFile == null) {
+        if (hasParameter && paramFile == null) {
             prefix = modelDir.toFile().getName();
             paramFile = paramPathResolver(prefix, options);
-            if (paramFile == null) {
+            if (paramFile == null && block == null) {
                 throw new FileNotFoundException(
                         "Parameter file with prefix: " + prefix + " not found in: " + modelDir);
             }
@@ -114,10 +123,11 @@ public class MxModel extends BaseModel {
             // TODO: change default name "data" to model-specific one
             block = new MxSymbolBlock(manager, symbol);
         }
-        loadParameters(paramFile, options);
+        if (hasParameter) {
+            loadParameters(paramFile, options);
+        }
         // TODO: Check if Symbol has all names that params file have
-        if (options != null && options.containsKey("MxOptimizeFor")) {
-            String optimization = (String) options.get("MxOptimizeFor");
+        if (optimization != null) {
             ((MxSymbolBlock) block).optimizeFor(optimization);
         }
     }
