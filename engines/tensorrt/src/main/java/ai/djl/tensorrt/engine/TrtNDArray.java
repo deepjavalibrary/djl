@@ -41,6 +41,12 @@ public class TrtNDArray extends NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
+    public void intern(NDArray replaced) {
+        data = ((TrtNDArray) replaced).data;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void detach() {
         manager.detachInternal(getUid());
         manager = TrtNDManager.getSystemManager();

@@ -97,6 +97,17 @@ public class PpNDArray extends NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
+    public void intern(NDArray replaced) {
+        Long pointer = handle.getAndSet(null);
+        if (pointer != null) {
+            JniUtils.deleteNd(pointer);
+        }
+        this.data = ((PpNDArray) replaced).data;
+        this.handle = ((PpNDArray) replaced).handle;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void detach() {
         manager.detachInternal(getUid());
         manager = PpNDManager.getSystemManager();

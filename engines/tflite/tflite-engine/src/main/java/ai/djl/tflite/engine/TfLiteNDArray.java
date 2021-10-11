@@ -52,6 +52,16 @@ public class TfLiteNDArray extends NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
+    public void intern(NDArray replaced) {
+        if (tensor != null) {
+            tensor.close();
+        }
+        this.data = ((TfLiteNDArray) replaced).data;
+        this.tensor = ((TfLiteNDArray) replaced).tensor;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void detach() {
         manager.detachInternal(getUid());
         manager = TfLiteNDManager.getSystemManager();
@@ -118,6 +128,15 @@ public class TfLiteNDArray extends NDArrayAdapter {
                         "Negative shape is not supported for TFLite");
             }
             return new TfLiteNDArray(manager, alternativeManager, data, shape, dataType);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        super.close();
+        if (tensor != null) {
+            tensor.close();
         }
     }
 }

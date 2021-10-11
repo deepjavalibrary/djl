@@ -68,6 +68,13 @@ public class OrtNDArray extends NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
+    public void intern(NDArray replaced) {
+        tensor.close();
+        tensor = ((OrtNDArray) replaced).tensor;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void detach() {
         manager.detachInternal(getUid());
         manager = OrtNDManager.getSystemManager();
