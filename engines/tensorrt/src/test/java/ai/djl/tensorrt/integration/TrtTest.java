@@ -12,6 +12,7 @@
  */
 package ai.djl.tensorrt.integration;
 
+import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
@@ -28,6 +29,7 @@ import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.cuda.CudaUtils;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
@@ -112,13 +114,15 @@ public class TrtTest {
         } catch (Exception ignore) {
             throw new SkipException("Your os configuration doesn't support TensorRT.");
         }
-        if (!engine.defaultDevice().isGpu()) {
+        Device device = engine.defaultDevice();
+        if (!device.isGpu()) {
             throw new SkipException("TensorRT only support GPU.");
         }
+        String sm = CudaUtils.getComputeCapability(device.getDeviceId());
         Criteria<float[], float[]> criteria =
                 Criteria.builder()
                         .setTypes(float[].class, float[].class)
-                        .optModelPath(Paths.get("src/test/resources/identity.trt"))
+                        .optModelPath(Paths.get("src/test/resources/identity_" + sm + ".trt"))
                         .optTranslator(new MyTranslator())
                         .optEngine("TensorRT")
                         .build();
