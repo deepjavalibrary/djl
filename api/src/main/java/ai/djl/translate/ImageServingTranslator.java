@@ -19,7 +19,6 @@ import ai.djl.modality.cv.ImageFactory;
 import ai.djl.ndarray.BytesSupplier;
 import ai.djl.ndarray.NDList;
 import ai.djl.util.JsonSerializable;
-import ai.djl.util.JsonUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -51,9 +50,9 @@ public class ImageServingTranslator implements Translator<Input, Output> {
         Output output = new Output(200, "OK");
         Object obj = translator.processOutput(ctx, list);
         if (obj instanceof JsonSerializable) {
-            output.add(((JsonSerializable) obj).toJson() + '\n');
+            output.add((JsonSerializable) obj);
         } else {
-            output.add(JsonUtils.GSON_PRETTY.toJson(obj) + '\n');
+            output.add(BytesSupplier.wrapAsJson(obj));
         }
         output.addProperty("Content-Type", "application/json");
         return output;

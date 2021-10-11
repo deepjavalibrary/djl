@@ -43,6 +43,15 @@ public interface BytesSupplier {
     }
 
     /**
+     * Returns the object that backs this {@code BytesSupplier}.
+     *
+     * @return the object that backs this {@code BytesSupplier}
+     */
+    default Object getAsObject() {
+        return this;
+    }
+
+    /**
      * Returns the {@code ByteBuffer} presentation of the object.
      *
      * @return the {@code ByteBuffer} presentation of the object
@@ -53,7 +62,7 @@ public interface BytesSupplier {
      * Wraps a byte array into a {code BytesSupplier}.
      *
      * @param buf the byte array that will back this {code BytesSupplier}
-     * @return a {@code ByteBuffer}
+     * @return a {@code BytesSupplier}
      */
     static BytesSupplier wrap(byte[] buf) {
         return new BytesSupplierImpl(buf);
@@ -63,9 +72,19 @@ public interface BytesSupplier {
      * Wraps a string into a {code BytesSupplier}.
      *
      * @param value the string that will back this {code BytesSupplier}
-     * @return a {@code ByteBuffer}
+     * @return a {@code BytesSupplier}
      */
     static BytesSupplier wrap(String value) {
         return new BytesSupplierImpl(value);
+    }
+
+    /**
+     * Wraps an object as json into a {code BytesSupplier}.
+     *
+     * @param object the object that will back this {code BytesSupplier}
+     * @return a {@code BytesSupplier}
+     */
+    static BytesSupplier wrapAsJson(Object object) {
+        return new BytesSupplierImpl(object);
     }
 }
