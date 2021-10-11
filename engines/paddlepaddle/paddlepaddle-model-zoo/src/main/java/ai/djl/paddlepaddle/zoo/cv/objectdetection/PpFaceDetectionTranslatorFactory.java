@@ -13,12 +13,15 @@
 package ai.djl.paddlepaddle.zoo.cv.objectdetection;
 
 import ai.djl.Model;
+import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.translator.ObjectDetectionTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.FileTranslator;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslator;
 import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
+import ai.djl.translate.ImageServingTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import java.io.InputStream;
@@ -41,6 +44,8 @@ public class PpFaceDetectionTranslatorFactory extends ObjectDetectionTranslatorF
             return new UrlTranslator<>(new PpFaceDetectionTranslator(arguments));
         } else if (input == InputStream.class && output == DetectedObjects.class) {
             return new InputStreamTranslator<>(new PpFaceDetectionTranslator(arguments));
+        } else if (input == Input.class && output == Output.class) {
+            return new ImageServingTranslator(new PpFaceDetectionTranslator(arguments));
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

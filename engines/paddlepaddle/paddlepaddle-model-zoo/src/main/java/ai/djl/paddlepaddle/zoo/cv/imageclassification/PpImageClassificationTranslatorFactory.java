@@ -14,6 +14,8 @@ package ai.djl.paddlepaddle.zoo.cv.imageclassification;
 
 import ai.djl.Model;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
@@ -23,6 +25,7 @@ import ai.djl.modality.cv.translator.ImageClassificationTranslatorFactory;
 import ai.djl.modality.cv.translator.wrapper.FileTranslator;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslator;
 import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
+import ai.djl.translate.ImageServingTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import java.io.InputStream;
@@ -58,6 +61,8 @@ public class PpImageClassificationTranslatorFactory extends ImageClassificationT
             return new UrlTranslator<>(translator);
         } else if (input == InputStream.class && output == Classifications.class) {
             return new InputStreamTranslator<>(translator);
+        } else if (input == Input.class && output == Output.class) {
+            return new ImageServingTranslator(translator);
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

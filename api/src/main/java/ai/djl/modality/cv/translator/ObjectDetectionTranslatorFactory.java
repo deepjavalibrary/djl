@@ -12,6 +12,8 @@
  */
 package ai.djl.modality.cv.translator;
 
+import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.translate.TranslatorFactory;
@@ -35,6 +37,7 @@ public abstract class ObjectDetectionTranslatorFactory implements TranslatorFact
         SUPPORTED_TYPES.add(new Pair<>(Path.class, DetectedObjects.class));
         SUPPORTED_TYPES.add(new Pair<>(URL.class, DetectedObjects.class));
         SUPPORTED_TYPES.add(new Pair<>(InputStream.class, DetectedObjects.class));
+        SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
     }
 
     /** {@inheritDoc} */

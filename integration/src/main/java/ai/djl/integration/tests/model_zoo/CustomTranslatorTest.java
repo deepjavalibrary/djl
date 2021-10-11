@@ -174,13 +174,15 @@ public class CustomTranslatorTest {
         Criteria<Input, Output> criteria =
                 Criteria.builder()
                         .setTypes(Input.class, Output.class)
-                        .optApplication(Application.CV.OBJECT_DETECTION)
                         .optModelUrls(modelUrl)
                         .optArgument("width", 512)
                         .optArgument("height", 512)
                         .optArgument("resize", true)
                         .optArgument("rescale", true)
                         .optArgument("synsetFileName", "classes.txt")
+                        .optArgument(
+                                "translatorFactory",
+                                "ai.djl.modality.cv.translator.SingleShotDetectionTranslatorFactory")
                         .optModelName("ssd_512_resnet50_v1_voc")
                         .build();
 

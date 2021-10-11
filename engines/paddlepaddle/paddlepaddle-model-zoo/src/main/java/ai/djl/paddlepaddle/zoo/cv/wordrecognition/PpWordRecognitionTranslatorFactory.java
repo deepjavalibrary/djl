@@ -13,10 +13,13 @@
 package ai.djl.paddlepaddle.zoo.cv.wordrecognition;
 
 import ai.djl.Model;
+import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.translator.wrapper.FileTranslator;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslator;
 import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
+import ai.djl.translate.ImageServingTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -58,6 +61,8 @@ public class PpWordRecognitionTranslatorFactory implements TranslatorFactory {
             return new UrlTranslator<>(new PpWordRecognitionTranslator());
         } else if (input == InputStream.class && output == String.class) {
             return new InputStreamTranslator<>(new PpWordRecognitionTranslator());
+        } else if (input == Input.class && output == Output.class) {
+            return new ImageServingTranslator(new PpWordRecognitionTranslator());
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

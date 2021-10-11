@@ -13,23 +13,33 @@
 package ai.djl.modality.cv.translator;
 
 import ai.djl.Model;
+import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.Joints;
+import ai.djl.translate.ImageServingTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
 import java.lang.reflect.Type;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 /** An {@link TranslatorFactory} that creates a {@link SimplePoseTranslator} instance. */
 public class SimplePoseTranslatorFactory implements TranslatorFactory {
 
+    private static final Set<Pair<Type, Type>> SUPPORTED_TYPES = new HashSet<>();
+
+    static {
+        SUPPORTED_TYPES.add(new Pair<>(Image.class, Joints.class));
+        SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
+    }
+
     /** {@inheritDoc} */
     @Override
     public Set<Pair<Type, Type>> getSupportedTypes() {
-        return Collections.singleton(new Pair<>(Image.class, Joints.class));
+        return SUPPORTED_TYPES;
     }
 
     /** {@inheritDoc} */
@@ -38,6 +48,9 @@ public class SimplePoseTranslatorFactory implements TranslatorFactory {
             Class<?> input, Class<?> output, Model model, Map<String, ?> arguments) {
         if (!isSupported(input, output)) {
             throw new IllegalArgumentException("Unsupported input/output types.");
+        }
+        if (input == Input.class && output == Output.class) {
+            return new ImageServingTranslator(SimplePoseTranslator.builder(arguments).build());
         }
         return SimplePoseTranslator.builder(arguments).build();
     }

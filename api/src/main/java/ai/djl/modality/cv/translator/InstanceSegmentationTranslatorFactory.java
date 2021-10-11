@@ -13,11 +13,14 @@
 package ai.djl.modality.cv.translator;
 
 import ai.djl.Model;
+import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.translator.wrapper.FileTranslator;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslator;
 import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
+import ai.djl.translate.ImageServingTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import java.io.InputStream;
@@ -40,6 +43,9 @@ public class InstanceSegmentationTranslatorFactory extends ObjectDetectionTransl
             return new UrlTranslator<>(InstanceSegmentationTranslator.builder(arguments).build());
         } else if (input == InputStream.class && output == DetectedObjects.class) {
             return new InputStreamTranslator<>(
+                    InstanceSegmentationTranslator.builder(arguments).build());
+        } else if (input == Input.class && output == Output.class) {
+            return new ImageServingTranslator(
                     InstanceSegmentationTranslator.builder(arguments).build());
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
