@@ -86,12 +86,12 @@ public class RemoteRepository extends AbstractRepository {
         try (InputStream is = new BufferedInputStream(file.toURL().openStream())) {
             String json = Utils.toString(is);
             Metadata metadata = JsonUtils.GSON_PRETTY.fromJson(json, Metadata.class);
-            metadata.init(arguments);
             metadata.setLastUpdated(new Date());
             try (Writer writer = Files.newBufferedWriter(tmp)) {
                 writer.write(JsonUtils.GSON_PRETTY.toJson(metadata));
             }
             Utils.moveQuietly(tmp, cacheFile);
+            metadata.init(arguments);
             metadata.setRepositoryUri(mrlUri);
             return metadata;
         } finally {
