@@ -48,6 +48,12 @@ public class DlrNDArray extends NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
+    public void intern(NDArray replaced) {
+        this.data = ((DlrNDArray) replaced).data;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void detach() {
         manager.detachInternal(getUid());
         manager = DlrNDManager.getSystemManager();

@@ -81,6 +81,19 @@ public class XgbNDArray extends NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
+    public void intern(NDArray replaced) {
+        if (handle != null && handle.get() != 0L) {
+            long pointer = handle.getAndSet(0L);
+            JniUtils.deleteDMatrix(pointer);
+        }
+        XgbNDArray array = (XgbNDArray) replaced;
+        data = array.data;
+        handle = array.handle;
+        format = array.format;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void detach() {
         manager.detachInternal(getUid());
         manager = XgbNDManager.getSystemManager();
