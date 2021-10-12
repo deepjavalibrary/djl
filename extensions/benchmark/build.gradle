@@ -163,7 +163,7 @@ startScripts {
     defaultJvmOpts = []
     doLast {
         String replacement = 'CLASSPATH=\\$APP_HOME/lib/*\n\n' +
-                'if [[ "\\$*" == *-t* || "\\$*" == *--threads* ]]\n' +
+                'if [ "\\$*" == *-t* || "\\$*" == *--threads* ]\n' +
                 'then\n' +
                 '    export TF_CPP_MIN_LOG_LEVEL=1\n' +
                 '    export MXNET_ENGINE_TYPE=NaiveEngine\n' +
