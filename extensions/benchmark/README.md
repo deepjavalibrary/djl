@@ -61,7 +61,6 @@ curl -O https://publish.djl.ai/djl-bench/0.13.0/benchmark-0.13.0.zip
 unzip benchmark-0.13.0.zip
 rm benchmark-0.13.0.zip
 sudo ln -s $PWD/benchmark-0.13.0/bin/benchmark /usr/bin/djl-bench
->>>>>>> 28f145c72 (Update benchmark README for 0.13.0 release)
 ```
 
 For Windows
@@ -120,7 +119,7 @@ Benchmark a model from [ONNX Model Zoo](https://github.com/onnx/models)
 djl-bench -e OnnxRuntime -u https://s3.amazonaws.com/onnx-model-zoo/resnet/resnet18v1/resnet18v1.tar.gz -s 1,3,224,224 -n resnet18v1/resnet18v1 -c 10
 ```
 
-### Benchmark from ModelZoo (Only available in 0.13.0+)
+### Benchmark from ModelZoo
 
 #### MXNet
 

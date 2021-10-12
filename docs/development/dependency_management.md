@@ -103,6 +103,15 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [tflite-native-cpu(osx-x86_64)](../../engines/tflite/tflite-engine/README.md#macos) | Contains TensorFlow Lite native library for macOS |
 | | [tflite-native-cpu(linux-x86_64)](../../engines/tflite/tflite-engine/README.md#linux) | Contains TensorFlow Lite native library for Linux |
 | | | |
+| [ai.djl.tensorrt](https://search.maven.org/search?q=g:ai.djl.tensorrt) | [tensorrt](../../engines/tensorrt/README.md#installation) | TensorRT engine adapter |
+| | | |
+| [ai.djl.python](https://search.maven.org/search?q=g:ai.djl.python) | [python](https://github.com/deepjavalibrary/djl-serving/tree/master/engines/python/README.md#installation) | Python engine adapter |
+| | | |
+| [ai.djl.tflite](https://search.maven.org/search?q=g:ai.djl.tflite) | [tflite-engine](../../engines/tflite/tflite-engine/README.md#installation) | TensorFlow Lite engine adapter |
+| | [tflite-native-auto](../../engines/tflite/tflite-engine/README.md#automatic-recommended) | A placeholder package to automatically download native libraries for your platform |
+| | [tflite-native-cpu(osx-x86_64)](../../engines/tflite/tflite-engine/README.md#macos) | Contains TensorFlow Lite native library for macOS |
+| | [tflite-native-cpu(linux-x86_64)](../../engines/tflite/tflite-engine/README.md#linux) | Contains TensorFlow Lite native library for Linux |
+| | | |
 | [ai.djl.ml.xgboost](https://search.maven.org/search?q=g:ai.djl.ml.xgboost) | [xgboost](../../engines/ml/xgboost/README.md#installation) | XGBoost engine adapter |
 | | | |
 | [ai.djl.android](https://search.maven.org/search?q=g:ai.djl.android) | [core](../../android/README.md#installation) | Contains Android specific utilities (e.g. ImageFactory) for DJL |
