@@ -88,6 +88,7 @@ The following pseudocode demonstrates running training:
 
 ## Release Notes
 
+* [0.13.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.13.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.13.0))
 * [0.12.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.12.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.12.0))
 * [0.11.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.11.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.11.0))
 * [0.10.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.10.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.10.0))
