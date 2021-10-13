@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-def pytorch_version = "1.9.0"
+def pytorch_version = "1.9.1"
 
 android {
     compileSdkVersion 29

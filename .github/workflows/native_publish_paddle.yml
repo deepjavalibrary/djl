@@ -28,7 +28,7 @@ jobs:
       - name: Download native binaries
         run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:pNL
       - name: Publish to snapshot repository
-        working-directory: paddlepaddle/paddlepaddle-native
+        working-directory: engines/paddlepaddle/paddlepaddle-native
         run: ./gradlew publish -P${{ github.event.inputs.mode }}
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
