@@ -30,10 +30,10 @@ You can build djl-bench from source if you need to benchmark fastText/BlazingTex
 
 ## Installation
 
-For macOS (Working in progress)
+For macOS
 
 ```
-brew install djl-bench
+brew install cask djl-bench
 ```
 
 For Ubuntu
