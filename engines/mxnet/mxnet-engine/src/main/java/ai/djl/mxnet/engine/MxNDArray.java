@@ -244,8 +244,8 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     public NDArray getGradient() {
         if (!hasGradient()) {
             throw new IllegalStateException(
-                    "No gradient attached to this NDArray, please call array.requiredGradient()"
-                            + "on your NDArray or block.setInitializer() on your Block");
+                    "No gradient attached to this NDArray, please call array.setRequiresGradient()"
+                            + " on your NDArray or block.setInitializer() on your Block");
         }
         Pointer pointer = JnaUtils.getGradient(getHandle());
         return manager.create(pointer);
