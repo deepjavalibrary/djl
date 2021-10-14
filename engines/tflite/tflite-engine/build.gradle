@@ -2,7 +2,7 @@ group "ai.djl.tflite"
 
 dependencies {
     api project(":api")
-    api "ai.djl.tflite:tflite-native-auto:${tflite_version}"
+    implementation "ai.djl.tflite:tflite-native-auto:${tflite_version}"
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
@@ -19,6 +19,15 @@ publishing {
                 name = "DJL Engine Adapter for TFLite"
                 description = "Deep Java Library (DJL) Engine Adapter for TFLite"
                 url = "http://www.djl.ai/engines/tflite/${project.name}"
+
+                withXml {
+                    Node pomNode = asNode()
+                    pomNode.dependencies."*".findAll() {
+                        it.artifactId.text().startsWith("tflite-native-auto")
+                    }.each() {
+                        it.parent().remove(it)
+                    }
+                }
             }
         }
     }
