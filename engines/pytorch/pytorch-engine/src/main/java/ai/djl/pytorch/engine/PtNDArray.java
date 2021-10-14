@@ -164,8 +164,8 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     public PtNDArray getGradient() {
         if (!hasGradient()) {
             throw new IllegalStateException(
-                    "No gradient attached to this NDArray, please call array.requiredGradient()"
-                            + "on your NDArray or block.setInitializer() on your Block");
+                    "No gradient attached to this NDArray, please call array.setRequiresGradient()"
+                            + " on your NDArray or block.setInitializer() on your Block");
         }
         PtNDArray res = JniUtils.getGradient(this);
         // If you call getGradient() before you run the backward,
