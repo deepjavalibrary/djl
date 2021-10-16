@@ -37,7 +37,8 @@ Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3I_3Ljava
     auto name = djl::utils::jni::GetStringFromJString(env, jname);
     map[name] = "";
   }
-  const torch::jit::script::Module module = torch::jit::load(path, device, map);
+  torch::jit::script::Module module = torch::jit::load(path, torch::nullopt, map);
+  module.to(device);
   const auto* module_ptr = new torch::jit::script::Module(module);
   for (size_t i = 0; i < len; ++i) {
     auto jname = (jstring) env->GetObjectArrayElement(jefnames, i);
@@ -88,8 +89,9 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava
 
   std::istringstream in(os.str());
   const torch::Device device = utils::GetDeviceFromJDevice(env, jarray);
-  const torch::jit::script::Module module = torch::jit::load(in, device);
-  const auto* module_ptr = new torch::jit::script::Module(module);
+  const torch::jit::script::Module module = torch::jit::load(in);
+  auto* module_ptr = new torch::jit::script::Module(module);
+  module_ptr->to(device);
   return reinterpret_cast<uintptr_t>(module_ptr);
   API_END_RETURN()
 }
