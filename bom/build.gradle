@@ -34,7 +34,7 @@ dependencies {
         api "ai.djl.python:python:${version}"
         api "ai.djl.pytorch:pytorch-engine:${version}"
         api "ai.djl.pytorch:pytorch-model-zoo:${version}"
-        api "ai.djl.pytorch:pytorch-native-auto:${pytorch_version}"
+        api "ai.djl.pytorch:pytorch-native-auto:${pytorch_native_version}"
         api "ai.djl.sentencepiece:sentencepiece:${version}"
         api "ai.djl.tensorflow:tensorflow-api:${version}"
         api "ai.djl.tensorflow:tensorflow-engine:${version}"
