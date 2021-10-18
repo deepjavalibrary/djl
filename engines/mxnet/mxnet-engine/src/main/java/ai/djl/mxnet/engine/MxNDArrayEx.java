@@ -32,7 +32,6 @@ import java.util.List;
 /** {@code MxNDArrayEx} is the MXNet implementation of the {@link NDArrayEx}. */
 class MxNDArrayEx implements NDArrayEx {
 
-    private NDArrayIndexer indexer;
     private MxNDArray array;
 
     /**
@@ -42,7 +41,6 @@ class MxNDArrayEx implements NDArrayEx {
      */
     MxNDArrayEx(MxNDArray parent) {
         this.array = parent;
-        indexer = new MxNDArrayIndexer(array.getManager());
     }
 
     // TODO only used to calculate zero-dim numpy shape
@@ -962,7 +960,7 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArrayIndexer getIndexer() {
-        return indexer;
+        return new MxNDArrayIndexer(array.getManager());
     }
 
     ////////////////////////////////////////

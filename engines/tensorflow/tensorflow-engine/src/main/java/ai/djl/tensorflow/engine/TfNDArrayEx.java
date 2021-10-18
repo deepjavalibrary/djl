@@ -27,10 +27,7 @@ import org.tensorflow.internal.c_api.TFE_TensorHandle;
 
 public class TfNDArrayEx implements NDArrayEx {
 
-    private NDArrayIndexer indexer;
-
     private TfNDArray array;
-    private TfNDManager manager;
 
     /**
      * Constructs an {@code MxNDArrayEx} given a {@link NDArray}.
@@ -39,14 +36,12 @@ public class TfNDArrayEx implements NDArrayEx {
      */
     TfNDArrayEx(TfNDArray array) {
         this.array = array;
-        this.manager = array.getManager();
-        indexer = new TfNDArrayIndexer(manager);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rdiv(Number n) {
-        return rdiv(manager.create(n).toType(array.getDataType(), false));
+        return rdiv(array.getManager().create(n).toType(array.getDataType(), false));
     }
 
     /** {@inheritDoc} */
@@ -58,14 +53,18 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rdivi(Number n) {
-        return rdivi(manager.create(n).toType(array.getDataType(), false));
+        return rdivi(array.getManager().create(n).toType(array.getDataType(), false));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rdivi(NDArray b) {
         TFE_TensorHandle newHandle =
-                manager.opExecutor("Div").addInput(b).addInput(array).buildRawPointer(1)[0];
+                array.getManager()
+                        .opExecutor("Div")
+                        .addInput(b)
+                        .addInput(array)
+                        .buildRawPointer(1)[0];
         array.setHandle(newHandle);
         return array;
     }
@@ -73,7 +72,7 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rsub(Number n) {
-        return rsub(manager.create(n).toType(array.getDataType(), false));
+        return rsub(array.getManager().create(n).toType(array.getDataType(), false));
     }
 
     /** {@inheritDoc} */
@@ -85,14 +84,18 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rsubi(Number n) {
-        return rsubi(manager.create(n).toType(array.getDataType(), false));
+        return rsubi(array.getManager().create(n).toType(array.getDataType(), false));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rsubi(NDArray b) {
         TFE_TensorHandle newHandle =
-                manager.opExecutor("Sub").addInput(b).addInput(array).buildRawPointer(1)[0];
+                array.getManager()
+                        .opExecutor("Sub")
+                        .addInput(b)
+                        .addInput(array)
+                        .buildRawPointer(1)[0];
         array.setHandle(newHandle);
         return array;
     }
@@ -100,7 +103,7 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rmod(Number n) {
-        return rmod(manager.create(n).toType(array.getDataType(), false));
+        return rmod(array.getManager().create(n).toType(array.getDataType(), false));
     }
 
     /** {@inheritDoc} */
@@ -112,14 +115,18 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rmodi(Number n) {
-        return rmodi(manager.create(n).toType(array.getDataType(), false));
+        return rmodi(array.getManager().create(n).toType(array.getDataType(), false));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rmodi(NDArray b) {
         TFE_TensorHandle newHandle =
-                manager.opExecutor("Mod").addInput(b).addInput(array).buildRawPointer(1)[0];
+                array.getManager()
+                        .opExecutor("Mod")
+                        .addInput(b)
+                        .addInput(array)
+                        .buildRawPointer(1)[0];
         array.setHandle(newHandle);
         return array;
     }
@@ -127,12 +134,13 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rpow(Number n) {
-        return manager.create(n).toType(array.getDataType(), false).pow(array);
+        return array.getManager().create(n).toType(array.getDataType(), false).pow(array);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray rpowi(Number n) {
+        TfNDManager manager = array.getManager();
         try (NDArray temp = manager.create(n);
                 NDArray casted = temp.toType(array.getDataType(), false)) {
             TFE_TensorHandle newHandle =
@@ -148,13 +156,13 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray relu() {
-        return manager.opExecutor("Relu").addInput(array).buildSingletonOrThrow();
+        return array.getManager().opExecutor("Relu").addInput(array).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sigmoid() {
-        return manager.opExecutor("Sigmoid").addInput(array).buildSingletonOrThrow();
+        return array.getManager().opExecutor("Sigmoid").addInput(array).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -173,7 +181,7 @@ public class TfNDArrayEx implements NDArrayEx {
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public NDArray softSign() {
-        return manager.opExecutor("Softsign").addInput(array).buildSingletonOrThrow();
+        return array.getManager().opExecutor("Softsign").addInput(array).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -192,7 +200,7 @@ public class TfNDArrayEx implements NDArrayEx {
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public NDArray selu() {
-        return manager.opExecutor("Selu").addInput(array).buildSingletonOrThrow();
+        return array.getManager().opExecutor("Selu").addInput(array).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -454,6 +462,7 @@ public class TfNDArrayEx implements NDArrayEx {
         // https://github.com/tensorflow/tensorflow/issues/26411
         int dim = getArray().getShape().dimension();
         Shape shape = (dim == 3) ? new Shape(1, 1, 3) : new Shape(1, 1, 1, 3);
+        TfNDManager manager = array.getManager();
         try (NDArray meanArr = manager.create(mean, shape);
                 NDArray stdArr = manager.create(std, shape)) {
             return getArray().sub(meanArr).divi(stdArr);
@@ -466,7 +475,8 @@ public class TfNDArrayEx implements NDArrayEx {
         // TODO: TensorFlow does not support channels first on CPU for conv2d
         // https://github.com/tensorflow/tensorflow/issues/32691
         // https://github.com/tensorflow/tensorflow/issues/26411
-        try (TfNDManager subManager = (TfNDManager) array.getManager().newSubManager()) {
+        TfNDManager manager = array.getManager();
+        try (TfNDManager subManager = (TfNDManager) manager.newSubManager()) {
             array.attach(subManager);
             NDArray input = array;
             int dim = input.getShape().dimension();
@@ -482,8 +492,8 @@ public class TfNDArrayEx implements NDArrayEx {
                     (!input.getDataType().equals(DataType.FLOAT32))
                             ? input.toType(DataType.FLOAT32, false)
                             : input;
-            array.attach(subManager.getParentManager());
-            output.attach(subManager.getParentManager());
+            array.attach(manager);
+            output.attach(manager);
             return output;
         }
     }
@@ -495,6 +505,7 @@ public class TfNDArrayEx implements NDArrayEx {
             throw new IllegalArgumentException("Can't resize image with 0 dims.");
         }
         String op = getResizeOpName(interpolation);
+        TfNDManager manager = array.getManager();
         if (array.getShape().dimension() == 3) {
             try (NDArray temp = array.expandDims(0);
                     NDArray size = manager.create(new int[] {height, width});
@@ -545,7 +556,7 @@ public class TfNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArrayIndexer getIndexer() {
-        return indexer;
+        return new TfNDArrayIndexer(array.getManager());
     }
 
     /** {@inheritDoc} */
@@ -566,7 +577,8 @@ public class TfNDArrayEx implements NDArrayEx {
         NDArray[] srcArray = new NDArray[arrays.size() + 1];
         srcArray[0] = array;
         System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
-        return manager.opExecutor("Pack")
+        return array.getManager()
+                .opExecutor("Pack")
                 .addInputList(srcArray)
                 .addParam("axis", axis)
                 .buildSingletonOrThrow();
@@ -579,6 +591,7 @@ public class TfNDArrayEx implements NDArrayEx {
         NDArray[] srcArray = new NDArray[arrays.size() + 1];
         srcArray[0] = array;
         System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
+        TfNDManager manager = array.getManager();
         try (NDArray axisArr = manager.create(axis)) {
             return manager.opExecutor("ConcatV2")
                     .addInputList(srcArray)
