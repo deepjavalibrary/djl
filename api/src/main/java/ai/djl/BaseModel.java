@@ -99,8 +99,8 @@ public abstract class BaseModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new Predictor<>(this, translator, false);
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
+        return new Predictor<>(this, translator, device, false);
     }
 
     /** {@inheritDoc} */

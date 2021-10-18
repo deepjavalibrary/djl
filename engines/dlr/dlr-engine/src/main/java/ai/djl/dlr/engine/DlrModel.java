@@ -13,6 +13,7 @@
 package ai.djl.dlr.engine;
 
 import ai.djl.BaseModel;
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
@@ -61,8 +62,8 @@ public class DlrModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new DlrPredictor<>(this, modelDir.toString(), manager.getDevice(), translator);
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
+        return new DlrPredictor<>(this, modelDir.toString(), device, translator);
     }
 
     private void checkModelFiles(String prefix) throws IOException {

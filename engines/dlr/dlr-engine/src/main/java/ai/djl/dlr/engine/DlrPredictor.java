@@ -34,7 +34,7 @@ public class DlrPredictor<I, O> extends Predictor<I, O> {
      */
     public DlrPredictor(
             DlrModel model, String modelDir, Device device, Translator<I, O> translator) {
-        super(model, translator, false);
+        super(model, translator, device, false);
         long modelHandle = JniUtils.createDlrModel(modelDir, device);
         block = new DlrSymbolBlock((DlrNDManager) manager, modelHandle);
         // disable cpu affinity by default

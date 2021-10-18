@@ -12,13 +12,14 @@
  */
 package ai.djl.tensorrt.engine;
 
+import ai.djl.Device;
 import ai.djl.inference.Predictor;
 import ai.djl.translate.Translator;
 
 class TrtPredictor<I, O> extends Predictor<I, O> {
 
-    TrtPredictor(TrtModel model, Translator<I, O> translator, TrtSession session) {
-        super(model, translator, false);
+    TrtPredictor(TrtModel model, Translator<I, O> translator, Device device, TrtSession session) {
+        super(model, translator, device, false);
         block = session;
     }
 
