@@ -3,10 +3,10 @@ name: Native Publish Tensorflow
 on:
   workflow_dispatch:
     inputs:
-        mode:
-          description: 'staging/snapshot, default is snapshot'
-          required: true
-          default: 'snapshot'
+      mode:
+        description: 'staging/snapshot, default is snapshot'
+        required: true
+        default: 'snapshot'
 
 jobs:
   build:
