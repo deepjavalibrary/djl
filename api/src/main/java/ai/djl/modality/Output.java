@@ -18,6 +18,11 @@ public class Output extends Input {
     private int code;
     private String message;
 
+    /** Constructs a {@code Output} instance. */
+    public Output() {
+        this(200, "OK");
+    }
+
     /**
      * Constructs a {@code Output} with specified {@code requestId}, {@code code} and {@code
      * message}.

@@ -13,23 +13,34 @@
 package ai.djl.pytorch.zoo.nlp.qa;
 
 import ai.djl.Model;
+import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.modality.nlp.qa.QAInput;
+import ai.djl.modality.nlp.translator.QATranslator;
+import ai.djl.modality.nlp.translator.QaServingTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
 import java.lang.reflect.Type;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 /** An {@link TranslatorFactory} that creates a {@link PtBertQATranslator} instance. */
 public class PtBertQATranslatorFactory implements TranslatorFactory {
 
+    private static final Set<Pair<Type, Type>> SUPPORTED_TYPES = new HashSet<>();
+
+    static {
+        SUPPORTED_TYPES.add(new Pair<>(QAInput.class, String.class));
+        SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
+    }
+
     /** {@inheritDoc} */
     @Override
     public Set<Pair<Type, Type>> getSupportedTypes() {
-        return Collections.singleton(new Pair<>(QAInput.class, String.class));
+        return SUPPORTED_TYPES;
     }
 
     /** {@inheritDoc} */
@@ -40,6 +51,10 @@ public class PtBertQATranslatorFactory implements TranslatorFactory {
         if (!isSupported(input, output)) {
             throw new IllegalArgumentException("Unsupported input/output types.");
         }
-        return PtBertQATranslator.builder().build();
+        QATranslator translator = PtBertQATranslator.builder().build();
+        if (input == Input.class && output == Output.class) {
+            return new QaServingTranslator(translator);
+        }
+        return translator;
     }
 }
