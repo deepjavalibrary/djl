@@ -1,6 +1,8 @@
 name: Serving publish
 
 on:
+  schedule:
+    - cron: '0 12 * * *'
   workflow_dispatch:
     inputs:
       mode:
