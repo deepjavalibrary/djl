@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.translate;
+package ai.djl.modality.cv.translator;
 
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
@@ -18,6 +18,10 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.ndarray.BytesSupplier;
 import ai.djl.ndarray.NDList;
+import ai.djl.translate.Batchifier;
+import ai.djl.translate.TranslateException;
+import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonSerializable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -47,7 +51,7 @@ public class ImageServingTranslator implements Translator<Input, Output> {
     /** {@inheritDoc} */
     @Override
     public Output processOutput(TranslatorContext ctx, NDList list) throws Exception {
-        Output output = new Output(200, "OK");
+        Output output = new Output();
         Object obj = translator.processOutput(ctx, list);
         if (obj instanceof JsonSerializable) {
             output.add((JsonSerializable) obj);

@@ -26,7 +26,7 @@ public class InputOutputTest {
     @Test
     public void testOutput() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            Output output = new Output(200, "OK");
+            Output output = new Output();
             output.addProperty("content-type", "tensor/ndlist");
             output.add("bytes".getBytes(StandardCharsets.UTF_8));
             output.add("str");
@@ -65,7 +65,7 @@ public class InputOutputTest {
             data = output.get(3);
             Assert.assertTrue(data instanceof NDArray);
 
-            output = new Output(200, "OK");
+            output = new Output();
             output.add(manager.zeros(new Shape(1)));
             NDList ndlist = output.getDataAsNDList(manager);
             Assert.assertEquals(ndlist.size(), 1);

@@ -17,6 +17,7 @@ import ai.djl.Model;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
+import ai.djl.modality.cv.translator.ImageServingTranslator;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.util.Pair;
@@ -261,7 +262,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         /** {@inheritDoc} */
         @Override
         public Output processOutput(TranslatorContext ctx, NDList list) {
-            Output output = new Output(200, "OK");
+            Output output = new Output();
             // TODO: find a way to pass NDList out
             output.add(list.getAsBytes());
             output.addProperty("Content-Type", "tensor/ndlist");
