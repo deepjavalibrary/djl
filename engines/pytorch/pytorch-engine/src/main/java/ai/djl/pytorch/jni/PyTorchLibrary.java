@@ -471,7 +471,11 @@ final class PyTorchLibrary {
             long inputHandle, long gradHandle, boolean keepGraph, boolean createGraph);
 
     native long moduleLoad(
-            String path, int[] device, String[] extraFileNames, String[] extraFileValues);
+            String path,
+            int[] device,
+            boolean mapLocation,
+            String[] extraFileNames,
+            String[] extraFileValues);
 
     native long moduleLoad(InputStream is, int[] device, byte[] buffer, long size);
 

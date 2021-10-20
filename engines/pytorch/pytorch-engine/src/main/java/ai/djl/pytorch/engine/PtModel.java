@@ -76,16 +76,21 @@ public class PtModel extends BaseModel {
             }
             String[] extraFileKeys = new String[0];
             String[] extraFileValues = new String[0];
+            boolean mapLocation = false;
             // load jit extra files
-            if (options != null && options.containsKey("extraFiles")) {
-                extraFileKeys = ((String) options.get("extraFiles")).split(",");
-                extraFileValues = new String[extraFileKeys.length];
+            if (options != null) {
+                if (options.containsKey("extraFiles")) {
+                    extraFileKeys = ((String) options.get("extraFiles")).split(",");
+                    extraFileValues = new String[extraFileKeys.length];
+                }
+                mapLocation = Boolean.parseBoolean((String) options.get("mapLocation"));
             }
             block =
                     JniUtils.loadModule(
                             (PtNDManager) manager,
                             modelFile,
                             manager.getDevice(),
+                            mapLocation,
                             extraFileKeys,
                             extraFileValues);
             for (int i = 0; i < extraFileKeys.length; i++) {

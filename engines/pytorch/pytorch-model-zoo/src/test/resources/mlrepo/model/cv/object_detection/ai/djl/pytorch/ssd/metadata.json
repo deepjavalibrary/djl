@@ -82,6 +82,9 @@
           ]
         ]
       },
+      "options": {
+        "mapLocation": "true"
+      },
       "files": {
         "classes": {
           "uri": "https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/pytorch/classes_coco.txt",
