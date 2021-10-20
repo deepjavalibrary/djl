@@ -17,7 +17,7 @@ import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.translate.Batchifier;
+import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.translate.TranslatorFactory;
@@ -49,7 +49,8 @@ public class IrisClassificationTranslatorFactory implements TranslatorFactory {
         return new IrisTranslator();
     }
 
-    private static final class IrisTranslator implements Translator<IrisFlower, Classifications> {
+    private static final class IrisTranslator
+            implements NoBatchifyTranslator<IrisFlower, Classifications> {
 
         private List<String> synset;
 
@@ -80,12 +81,6 @@ public class IrisClassificationTranslatorFactory implements TranslatorFactory {
                 probabilities.add((double) f);
             }
             return new Classifications(synset, probabilities);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Batchifier getBatchifier() {
-            return null;
         }
     }
 }

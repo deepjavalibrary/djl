@@ -15,7 +15,6 @@ package ai.djl.mxnet.zoo.nlp.embedding;
 import ai.djl.Model;
 import ai.djl.ndarray.NDList;
 import ai.djl.nn.core.Embedding;
-import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
@@ -80,12 +79,6 @@ public class GloveWordEmbeddingTranslatorFactory implements TranslatorFactory {
                 return new NDList(ctx.getNDManager().create(embedding.embed(input)));
             }
             return new NDList(ctx.getNDManager().create(embedding.embed(unknownToken)));
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Batchifier getBatchifier() {
-            return Batchifier.STACK;
         }
     }
 }

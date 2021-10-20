@@ -20,7 +20,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.translate.Batchifier;
+import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ import java.util.stream.IntStream;
  * A {@link Translator} that post-process the {@link NDArray} into {@link DetectedObjects} with
  * boundaries.
  */
-public class PpWordDetectionTranslator implements Translator<Image, DetectedObjects> {
+public class PpWordDetectionTranslator implements NoBatchifyTranslator<Image, DetectedObjects> {
 
     private final int maxLength;
 
@@ -89,12 +89,6 @@ public class PpWordDetectionTranslator implements Translator<Image, DetectedObje
                         new float[] {0.229f, 0.224f, 0.225f});
         img = img.expandDims(0);
         return new NDList(img);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Batchifier getBatchifier() {
-        return null;
     }
 
     private int[] scale(int h, int w, int max) {

@@ -17,8 +17,15 @@ import ai.djl.inference.Predictor;
 /**
  * The {@code Translator} interface provides model pre-processing and postprocessing functionality.
  *
- * <p>Users can use this in {@link Predictor} with input and output objects specified. The following
- * is an example of processing an image and creating classification output:
+ * <p>Users can use this in {@link Predictor} with input and output objects specified. The
+ * recommended flow is to use the Translator to translate only a single data item at a time ({@link
+ * ai.djl.training.dataset.Record}) rather than a Batch. For example, the input parameter would then
+ * be {@code Image} rather than {@code Image[]}. The {@link ai.djl.training.dataset.Record}s will
+ * then be combined using a {@link Batchifier}. If it is easier in your use case to work with
+ * batches directly or your model uses records instead of batches, you can use the {@link
+ * NoBatchifyTranslator}.
+ *
+ * <p>The following is an example of processing an image and creating classification output:
  *
  * <pre>
  * private static final class MyTranslator implements Translator&lt;Image, Classification&gt; {
@@ -72,7 +79,9 @@ public interface Translator<I, O> extends PreProcessor<I>, PostProcessor<O> {
      *
      * @return the {@link Batchifier}
      */
-    Batchifier getBatchifier();
+    default Batchifier getBatchifier() {
+        return Batchifier.STACK;
+    }
 
     /**
      * Prepares the translator with the manager and model to use.

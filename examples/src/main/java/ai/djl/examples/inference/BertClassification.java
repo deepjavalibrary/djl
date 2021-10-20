@@ -27,9 +27,8 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.Batchifier;
+import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslateException;
-import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -94,7 +93,8 @@ public final class BertClassification {
         }
     }
 
-    private static final class MyTranslator implements Translator<String[], Classifications[]> {
+    private static final class MyTranslator
+            implements NoBatchifyTranslator<String[], Classifications[]> {
         private final List<String> classes =
                 Arrays.asList("class1", "class2", "class3", "class4", "class5");
         private BertFullTokenizer tokenizer;
@@ -104,12 +104,6 @@ public final class BertClassification {
         MyTranslator(String vocabularyPath, int maxSequenceLength) {
             this.maxSequenceLength = maxSequenceLength;
             this.vocabularyPath = vocabularyPath;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Batchifier getBatchifier() {
-            return null;
         }
 
         /** {@inheritDoc} */

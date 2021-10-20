@@ -20,7 +20,6 @@ import ai.djl.modality.nlp.bert.BertTokenizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
@@ -33,12 +32,6 @@ public class PtDistilBertTranslator implements Translator<String, Classification
 
     private Vocabulary vocabulary;
     private BertTokenizer tokenizer;
-
-    /** {@inheritDoc} */
-    @Override
-    public Batchifier getBatchifier() {
-        return Batchifier.STACK;
-    }
 
     /** {@inheritDoc} */
     @Override

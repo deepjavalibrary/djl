@@ -19,12 +19,11 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.translate.Batchifier;
-import ai.djl.translate.Translator;
+import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslatorContext;
 
 /** Built-in {@code Translator} that provides preprocessing and postprocessing for BigGAN. */
-public final class BigGANTranslator implements Translator<int[], Image[]> {
+public final class BigGANTranslator implements NoBatchifyTranslator<int[], Image[]> {
 
     private static final int NUMBER_OF_CATEGORIES = 1000;
     private static final int SEED_COLUMN_SIZE = 128;
@@ -64,11 +63,5 @@ public final class BigGANTranslator implements Translator<int[], Image[]> {
                 manager.truncatedNormal(new Shape(input.length, SEED_COLUMN_SIZE)).muli(truncation);
 
         return new NDList(seed, classes, manager.create(truncation));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Batchifier getBatchifier() {
-        return null;
     }
 }

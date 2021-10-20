@@ -18,12 +18,11 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
-import ai.djl.translate.Batchifier;
-import ai.djl.translate.Translator;
+import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslatorContext;
 
 /** Built-in {@code Translator} that provides preprocessing and postprocessing for StyleTransfer. */
-public class StyleTransferTranslator implements Translator<Image, Image> {
+public class StyleTransferTranslator implements NoBatchifyTranslator<Image, Image> {
 
     /** {@inheritDoc} */
     @Override
@@ -37,12 +36,6 @@ public class StyleTransferTranslator implements Translator<Image, Image> {
     public Image processOutput(TranslatorContext ctx, NDList list) {
         NDArray output = list.get(0).addi(1).muli(128).toType(DataType.UINT8, false);
         return ImageFactory.getInstance().fromNDArray(output.squeeze());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Batchifier getBatchifier() {
-        return null;
     }
 
     private NDArray switchFormat(NDArray array) {

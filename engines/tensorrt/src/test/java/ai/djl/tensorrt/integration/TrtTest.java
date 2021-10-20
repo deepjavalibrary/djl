@@ -25,9 +25,8 @@ import ai.djl.ndarray.NDList;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.tensorrt.engine.TrtSession;
-import ai.djl.translate.Batchifier;
+import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslateException;
-import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.cuda.CudaUtils;
 import java.io.IOException;
@@ -134,15 +133,9 @@ public class TrtTest {
         }
     }
 
-    private static final class MyTranslator implements Translator<float[], float[]> {
+    private static final class MyTranslator implements NoBatchifyTranslator<float[], float[]> {
 
         private TrtSession session;
-
-        /** {@inheritDoc} */
-        @Override
-        public Batchifier getBatchifier() {
-            return null;
-        }
 
         /** {@inheritDoc} */
         @Override

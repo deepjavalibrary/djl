@@ -17,14 +17,13 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.translate.Batchifier;
-import ai.djl.translate.Translator;
+import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslatorContext;
 import java.util.Arrays;
 import java.util.List;
 
 /** A {@link PpWordRotateTranslator} that classify the words and rotate 90 degree if necessary. */
-public class PpWordRotateTranslator implements Translator<Image, Classifications> {
+public class PpWordRotateTranslator implements NoBatchifyTranslator<Image, Classifications> {
 
     List<String> classes;
 
@@ -49,12 +48,6 @@ public class PpWordRotateTranslator implements Translator<Image, Classifications
         img = NDImageUtils.toTensor(img).sub(0.5f).div(0.5f);
         img = img.expandDims(0);
         return new NDList(img);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Batchifier getBatchifier() {
-        return null;
     }
 
     private int[] resize32(double h, double w) {
