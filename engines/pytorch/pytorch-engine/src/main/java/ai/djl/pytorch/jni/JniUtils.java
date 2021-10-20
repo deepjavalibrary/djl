@@ -1353,12 +1353,14 @@ public final class JniUtils {
             PtNDManager manager,
             Path path,
             Device device,
+            boolean mapLocation,
             String[] extraFileKeys,
             String[] extraFileValues) {
         long handle =
                 PyTorchLibrary.LIB.moduleLoad(
                         path.toString(),
                         new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        mapLocation,
                         extraFileKeys,
                         extraFileValues);
         return new PtSymbolBlock(manager, handle);
