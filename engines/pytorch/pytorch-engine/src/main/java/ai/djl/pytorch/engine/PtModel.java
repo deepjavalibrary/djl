@@ -89,7 +89,6 @@ public class PtModel extends BaseModel {
                     JniUtils.loadModule(
                             (PtNDManager) manager,
                             modelFile,
-                            manager.getDevice(),
                             mapLocation,
                             extraFileKeys,
                             extraFileValues);
@@ -118,7 +117,18 @@ public class PtModel extends BaseModel {
      * @throws IOException model loading error
      */
     public void load(InputStream modelStream) throws IOException {
-        block = JniUtils.loadModule((PtNDManager) manager, modelStream, manager.getDevice(), false);
+        load(modelStream, true);
+    }
+
+    /**
+     * Load PyTorch model from {@link InputStream}.
+     *
+     * @param modelStream the stream of the model file
+     * @param mapLocation force load to specified device if true
+     * @throws IOException model loading error
+     */
+    public void load(InputStream modelStream, boolean mapLocation) throws IOException {
+        block = JniUtils.loadModule((PtNDManager) manager, modelStream, mapLocation, false);
     }
 
     private Path findModelFile(String prefix) {

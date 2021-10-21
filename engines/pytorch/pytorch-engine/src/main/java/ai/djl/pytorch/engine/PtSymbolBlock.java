@@ -186,7 +186,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         if (loadVersion != version) {
             throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
         }
-        long rawHandle = JniUtils.loadModuleHandle(is, manager.getDevice(), true);
+        long rawHandle = JniUtils.loadModuleHandle(is, manager.getDevice(), true, true);
         this.handle = new AtomicReference<>(rawHandle);
         uid = String.valueOf(rawHandle);
         manager.attachInternal(uid, this);

@@ -1352,10 +1352,10 @@ public final class JniUtils {
     public static PtSymbolBlock loadModule(
             PtNDManager manager,
             Path path,
-            Device device,
             boolean mapLocation,
             String[] extraFileKeys,
             String[] extraFileValues) {
+        Device device = manager.getDevice();
         long handle =
                 PyTorchLibrary.LIB.moduleLoad(
                         path.toString(),
@@ -1367,13 +1367,14 @@ public final class JniUtils {
     }
 
     public static PtSymbolBlock loadModule(
-            PtNDManager manager, InputStream is, Device device, boolean hasSize)
+            PtNDManager manager, InputStream is, boolean mapLocation, boolean hasSize)
             throws IOException {
-        long handle = loadModuleHandle(is, device, hasSize);
+        long handle = loadModuleHandle(is, manager.getDevice(), mapLocation, hasSize);
         return new PtSymbolBlock(manager, handle);
     }
 
-    public static long loadModuleHandle(InputStream is, Device device, boolean hasSize)
+    public static long loadModuleHandle(
+            InputStream is, Device device, boolean mapLocation, boolean hasSize)
             throws IOException {
         byte[] buf = new byte[BYTE_LENGTH];
         long size = -1;
@@ -1381,7 +1382,11 @@ public final class JniUtils {
             size = new DataInputStream(is).readLong();
         }
         return PyTorchLibrary.LIB.moduleLoad(
-                is, new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()}, buf, size);
+                is,
+                new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                mapLocation,
+                buf,
+                size);
     }
 
     public static void writeModule(PtSymbolBlock block, OutputStream os, boolean writeSize) {
