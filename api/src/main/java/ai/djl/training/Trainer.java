@@ -336,28 +336,19 @@ public class Trainer implements AutoCloseable {
                                                 .getValue(param, devices[0], true)
                                                 .getGradient()));
 
-        NDList list = new NDList(grads.stream().map(NDArray::sum).toArray(NDArray[]::new));
-        NDArray gradSum = NDArrays.stack(list);
-        list.close();
+        try (NDManager scoped = manager.newSubManager()) {
+            scoped.tempAttachAll(new NDList(grads));
+            NDList list = new NDList(grads.stream().map(NDArray::sum).toArray(NDArray[]::new));
+            float gradSum = NDArrays.stack(list).sum().getFloat();
 
-        NDArray array = gradSum.sum();
+            if (gradSum == 0f) {
+                throw new IllegalStateException(
+                        "Gradient values are all zeros, please call gradientCollector.backward() on"
+                                + "your target NDArray (usually loss), before calling step() ");
+            }
 
-        float[] sums = array.toFloatArray();
-
-        array.close();
-        gradSum.close();
-
-        float sum = 0f;
-        for (float num : sums) {
-            sum += num;
+            gradientsChecked = true;
         }
-        if (sum == 0f) {
-            throw new IllegalStateException(
-                    "Gradient values are all zeros, please call gradientCollector.backward() on"
-                            + "your target NDArray (usually loss), before calling step() ");
-        }
-
-        gradientsChecked = true;
     }
 
     /**
