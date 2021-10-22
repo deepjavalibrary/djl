@@ -55,8 +55,8 @@ Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljav
   API_END_RETURN()
 }
 
-JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_io_InputStream_2_3I_3BJ(
-    JNIEnv* env, jobject jthis, jobject jis, jintArray jarray, jbyteArray arr, jlong size) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_io_InputStream_2_3IZ_3BJ(
+    JNIEnv* env, jobject jthis, jobject jis, jintArray jarray, jboolean jmap_location, jbyteArray arr, jlong size) {
   API_BEGIN()
   jclass is_class = env->GetObjectClass(jis);
   if (is_class == nullptr) {
@@ -95,9 +95,14 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava
 
   std::istringstream in(os.str());
   const torch::Device device = utils::GetDeviceFromJDevice(env, jarray);
-  const torch::jit::script::Module module = torch::jit::load(in);
+  torch::jit::script::Module module;
+  if (jmap_location) {
+    module = torch::jit::load(in, device);
+  } else {
+    module = torch::jit::load(in);
+    module.to(device);
+  }
   auto* module_ptr = new torch::jit::script::Module(module);
-  module_ptr->to(device);
   return reinterpret_cast<uintptr_t>(module_ptr);
   API_END_RETURN()
 }

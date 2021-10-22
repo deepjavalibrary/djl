@@ -84,11 +84,11 @@ public class TorchScriptTest {
             PtNDManager manager = (PtNDManager) model.getNDManager();
             Path modelFile = model.getModelPath().resolve("traced_resnet18.pt");
             try (InputStream is = Files.newInputStream(modelFile)) {
-                PtSymbolBlock block = JniUtils.loadModule(manager, is, manager.getDevice(), false);
+                PtSymbolBlock block = JniUtils.loadModule(manager, is, true, false);
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JniUtils.writeModule(block, os, true);
                 ByteArrayInputStream bis = new ByteArrayInputStream(os.toByteArray());
-                JniUtils.loadModule(manager, bis, manager.getDevice(), true);
+                JniUtils.loadModule(manager, bis, true, true);
                 bis.close();
                 os.close();
             }
