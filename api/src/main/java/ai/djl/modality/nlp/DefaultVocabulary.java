@@ -59,12 +59,16 @@ public class DefaultVocabulary implements Vocabulary {
         if (unknownToken != null) {
             reservedTokens.add(unknownToken);
         }
-        addReservedTokens(reservedTokens);
         for (List<String> sentence : builder.sentences) {
             for (String token : sentence) {
                 addToken(token);
             }
         }
+        // Preserve order in vocab file, add reservedTokens after original vocab
+        for (String token : reservedTokens) {
+            addToken(token);
+        }
+
         boolean pruned = pruneTokens(builder.minFrequency, builder.maxTokens);
         if (pruned) {
             initializeIndexToTokenReplacingIndices();
@@ -74,26 +78,24 @@ public class DefaultVocabulary implements Vocabulary {
     }
 
     private void addToken(String token) {
-        if (reservedTokens.contains(token)) {
-            return;
-        }
         int index = tokens.size();
-
-        tokens.computeIfAbsent(
+        tokens.compute(
                 token,
-                k -> {
-                    TokenInfo tokenInfo = new TokenInfo();
+                (k, v) -> {
+                    if (v == null) {
+                        v = new TokenInfo();
+                        // Set index only when adding a new token
+                        v.index = index;
+                    }
 
-                    // Set index only when adding a new token
-                    tokenInfo.index = index;
-                    return tokenInfo;
+                    // Update the frequency for both old and new tokens
+                    if (reservedTokens.contains(k)) {
+                        v.frequency = Integer.MAX_VALUE;
+                    } else if (v.frequency < Integer.MAX_VALUE) {
+                        ++v.frequency;
+                    }
+                    return v;
                 });
-
-        // Update the frequency for both old and new tokens
-        TokenInfo tokenInfo = tokens.get(token);
-        if (tokenInfo.frequency < Integer.MAX_VALUE) {
-            tokenInfo.frequency++;
-        }
     }
 
     /**
@@ -131,16 +133,6 @@ public class DefaultVocabulary implements Vocabulary {
             pruned = true;
         }
         return pruned;
-    }
-
-    private void addReservedTokens(Collection<String> newTokens) {
-        for (String token : newTokens) {
-            int index = tokens.size();
-            TokenInfo tokenInfo = new TokenInfo();
-            tokenInfo.frequency = Integer.MAX_VALUE;
-            tokenInfo.index = index;
-            this.tokens.put(token, tokenInfo);
-        }
     }
 
     /**

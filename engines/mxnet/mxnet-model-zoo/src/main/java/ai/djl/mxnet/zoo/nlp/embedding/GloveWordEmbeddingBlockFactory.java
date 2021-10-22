@@ -17,6 +17,7 @@ import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.nn.Block;
 import ai.djl.nn.BlockFactory;
+import ai.djl.translate.ArgumentsUtil;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -33,8 +34,8 @@ public class GloveWordEmbeddingBlockFactory implements BlockFactory {
     public Block newBlock(Model model, Path modelPath, Map<String, ?> arguments)
             throws IOException {
         List<String> idxToToken = Utils.readLines(modelPath.resolve("idx_to_token.txt"));
-        String dimension = (String) arguments.get("dimensions");
-        String unknownToken = (String) arguments.get("unknownToken");
+        String dimension = ArgumentsUtil.stringValue(arguments, "dimensions");
+        String unknownToken = ArgumentsUtil.stringValue(arguments, "unknownToken");
         TrainableWordEmbedding wordEmbedding =
                 TrainableWordEmbedding.builder()
                         .setEmbeddingSize(Integer.parseInt(dimension))

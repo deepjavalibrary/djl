@@ -51,7 +51,7 @@ public class PtBertQATranslatorFactory implements TranslatorFactory {
         if (!isSupported(input, output)) {
             throw new IllegalArgumentException("Unsupported input/output types.");
         }
-        QATranslator translator = PtBertQATranslator.builder().build();
+        QATranslator translator = PtBertQATranslator.builder(arguments).build();
         if (input == Input.class && output == Output.class) {
             return new QaServingTranslator(translator);
         }

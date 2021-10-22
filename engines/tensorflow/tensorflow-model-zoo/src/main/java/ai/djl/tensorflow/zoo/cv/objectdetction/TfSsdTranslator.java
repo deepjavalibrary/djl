@@ -19,6 +19,7 @@ import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.translator.ObjectDetectionTranslator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -226,15 +227,19 @@ public class TfSsdTranslator extends ObjectDetectionTranslator {
         @Override
         protected void configPostProcess(Map<String, ?> arguments) {
             super.configPostProcess(arguments);
-            maxBoxes = getIntValue(arguments, "maxBoxes", 10);
-            threshold = getFloatValue(arguments, "threshold", 0.4f);
+            maxBoxes = ArgumentsUtil.intValue(arguments, "maxBoxes", 10);
+            threshold = ArgumentsUtil.floatValue(arguments, "threshold", 0.4f);
             numDetectionsOutputName =
-                    getStringValue(arguments, "numDetectionsOutputName", "num_detections");
+                    ArgumentsUtil.stringValue(
+                            arguments, "numDetectionsOutputName", "num_detections");
             boundingBoxOutputName =
-                    getStringValue(arguments, "boundingBoxOutputName", "detection_boxes");
-            scoresOutputName = getStringValue(arguments, "scoresOutputName", "detection_scores");
+                    ArgumentsUtil.stringValue(
+                            arguments, "boundingBoxOutputName", "detection_boxes");
+            scoresOutputName =
+                    ArgumentsUtil.stringValue(arguments, "scoresOutputName", "detection_scores");
             classLabelOutputName =
-                    getStringValue(arguments, "classLabelOutputName", "detection_class_labels");
+                    ArgumentsUtil.stringValue(
+                            arguments, "classLabelOutputName", "detection_class_labels");
         }
 
         /**

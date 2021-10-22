@@ -16,6 +16,7 @@ import ai.djl.Model;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.BlockFactory;
+import ai.djl.translate.ArgumentsUtil;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,9 @@ public class ResnetBlockFactory implements BlockFactory {
     /** {@inheritDoc} */
     @Override
     public Block newBlock(Model model, Path modelPath, Map<String, ?> arguments) {
+        int numLayers = ArgumentsUtil.intValue(arguments, "numLayers");
+        long outSize = ArgumentsUtil.longValue(arguments, "outSize");
+
         @SuppressWarnings("unchecked")
         Shape shape =
                 new Shape(
@@ -36,12 +40,9 @@ public class ResnetBlockFactory implements BlockFactory {
                                 .mapToLong(Double::longValue)
                                 .toArray());
         ResNetV1.Builder blockBuilder =
-                ResNetV1.builder()
-                        .setNumLayers(((Double) arguments.get("numLayers")).intValue())
-                        .setOutSize(((Double) arguments.get("outSize")).longValue())
-                        .setImageShape(shape);
+                ResNetV1.builder().setNumLayers(numLayers).setOutSize(outSize).setImageShape(shape);
         if (arguments.containsKey("batchNormMomentum")) {
-            float batchNormMomentum = ((Double) arguments.get("batchNormMomentum")).floatValue();
+            float batchNormMomentum = ArgumentsUtil.floatValue(arguments, "batchNormMomentum");
             blockBuilder.optBatchNormMomentum(batchNormMomentum);
         }
         return blockBuilder.build();

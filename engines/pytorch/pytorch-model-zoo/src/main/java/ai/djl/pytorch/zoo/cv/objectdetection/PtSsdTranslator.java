@@ -21,6 +21,7 @@ import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.List;
@@ -245,8 +246,8 @@ public class PtSsdTranslator extends ObjectDetectionTranslator {
         protected void configPostProcess(Map<String, ?> arguments) {
             super.configPostProcess(arguments);
 
-            threshold = getFloatValue(arguments, "threshold", 0.4f);
-            figSize = getIntValue(arguments, "size", 300);
+            threshold = ArgumentsUtil.floatValue(arguments, "threshold", 0.4f);
+            figSize = ArgumentsUtil.intValue(arguments, "size", 300);
             List<Double> list = (List<Double>) arguments.get("featSize");
             if (list == null) {
                 featSize = new int[] {38, 19, 10, 5, 3, 1};

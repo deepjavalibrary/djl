@@ -65,7 +65,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         }
 
         Path modelDir = model.getModelPath();
-        String factoryClass = (String) arguments.get("translatorFactory");
+        String factoryClass = ArgumentsUtil.stringValue(arguments, "translatorFactory");
         if (factoryClass != null && !factoryClass.isEmpty()) {
             TranslatorFactory factory = loadTranslatorFactory(factoryClass);
             if (factory != null
@@ -196,17 +196,14 @@ public class ServingTranslatorFactory implements TranslatorFactory {
     }
 
     private Translator<Input, Output> loadDefaultTranslator(Map<String, ?> arguments) {
-        String appName = (String) arguments.get("application");
+        String appName = ArgumentsUtil.stringValue(arguments, "application");
         if (appName != null) {
             Application application = Application.of(appName);
             if (application == Application.CV.IMAGE_CLASSIFICATION) {
                 return getImageClassificationTranslator(arguments);
             }
         }
-        String batchifier = (String) arguments.get("batchifier");
-        if (batchifier == null) {
-            return new RawTranslator(null);
-        }
+        String batchifier = ArgumentsUtil.stringValue(arguments, "batchifier", "none");
         return new RawTranslator(Batchifier.fromString(batchifier));
     }
 

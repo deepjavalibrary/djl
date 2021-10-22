@@ -44,6 +44,16 @@ public class BertTokenizer extends SimpleTokenizer {
     }
 
     /**
+     * Returns a string presentation of the tokens.
+     *
+     * @param tokens a list of tokens
+     * @return a string presentation of the tokens
+     */
+    public String tokenToString(List<String> tokens) {
+        return String.join(" ", tokens);
+    }
+
+    /**
      * Pads the tokens to the required length.
      *
      * @param <E> the type of the List

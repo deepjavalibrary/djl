@@ -15,6 +15,7 @@ package ai.djl.basicmodelzoo.basic;
 import ai.djl.Model;
 import ai.djl.nn.Block;
 import ai.djl.nn.BlockFactory;
+import ai.djl.translate.ArgumentsUtil;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -28,16 +29,10 @@ public class MlpBlockFactory implements BlockFactory {
     @Override
     @SuppressWarnings("unchecked")
     public Block newBlock(Model model, Path modelPath, Map<String, ?> arguments) {
-        Double width = (Double) arguments.get("width");
-        if (width == null) {
-            width = 28d;
-        }
-        Double height = (Double) arguments.get("height");
-        if (height == null) {
-            height = 28d;
-        }
-        int input = width.intValue() * height.intValue();
-        int output = ((Double) arguments.get("output")).intValue();
+        int width = ArgumentsUtil.intValue(arguments, "width", 28);
+        int height = ArgumentsUtil.intValue(arguments, "height", 28);
+        int output = ArgumentsUtil.intValue(arguments, "output", 10);
+        int input = width * height;
         int[] hidden =
                 ((List<Double>) arguments.get("hidden"))
                         .stream()

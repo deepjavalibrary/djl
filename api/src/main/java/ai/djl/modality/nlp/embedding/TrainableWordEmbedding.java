@@ -155,10 +155,10 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
     /** {@inheritDoc} */
     @Override
     public Optional<String> unembed(long index) {
-        if (index == 0) {
+        if (index == -1) {
             if (fallthroughEmbedding == null) {
                 throw new IllegalArgumentException(
-                        "Index 0 is reserved for the fallThrough but no fallThrough is found");
+                        "Index -1 is reserved for the fallThrough but no fallThrough is found");
             }
             return fallthroughEmbedding.unembed(index);
         }

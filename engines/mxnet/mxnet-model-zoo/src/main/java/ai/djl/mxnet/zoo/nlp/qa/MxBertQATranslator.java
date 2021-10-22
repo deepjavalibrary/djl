@@ -23,6 +23,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
@@ -36,6 +37,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /** The translator for MXNet BERT QA model. */
@@ -121,8 +123,23 @@ public class MxBertQATranslator extends QATranslator {
         return new Builder();
     }
 
+    /**
+     * Creates a builder to build a {@code MxBertQATranslator}.
+     *
+     * @param arguments the models' arguments
+     * @return a new builder
+     */
+    public static Builder builder(Map<String, ?> arguments) {
+        Builder builder = new Builder();
+        builder.configure(arguments);
+        builder.setSeqLength(ArgumentsUtil.intValue(arguments, "seqLength", 384));
+
+        return builder;
+    }
+
     /** The builder for Bert QA translator. */
     public static class Builder extends BaseBuilder<Builder> {
+
         private int seqLength;
 
         /**

@@ -16,6 +16,7 @@ package ai.djl.modality.cv.translator;
 import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.util.List;
@@ -109,7 +110,7 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
         @Override
         protected void configPostProcess(Map<String, ?> arguments) {
             super.configPostProcess(arguments);
-            applySoftmax = getBooleanValue(arguments, "applySoftmax", false);
+            applySoftmax = ArgumentsUtil.booleanValue(arguments, "applySoftmax");
         }
 
         /**

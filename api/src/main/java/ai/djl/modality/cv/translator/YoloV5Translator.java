@@ -17,6 +17,7 @@ import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.TranslatorContext;
 import java.util.ArrayList;
 import java.util.List;
@@ -247,9 +248,9 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
         @Override
         protected void configPostProcess(Map<String, ?> arguments) {
             super.configPostProcess(arguments);
-            String type = getStringValue(arguments, "outputType", "AUTO");
+            String type = ArgumentsUtil.stringValue(arguments, "outputType", "AUTO");
             outputType = YoloOutputType.valueOf(type.toUpperCase(Locale.ENGLISH));
-            nmsThreshold = getFloatValue(arguments, "nmsThreshold", 0.4f);
+            nmsThreshold = ArgumentsUtil.floatValue(arguments, "nmsThreshold", 0.4f);
         }
 
         /**

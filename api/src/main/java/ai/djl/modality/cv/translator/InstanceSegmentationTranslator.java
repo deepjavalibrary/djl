@@ -20,6 +20,7 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Transform;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
@@ -222,9 +223,9 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
         @Override
         protected void configPostProcess(Map<String, ?> arguments) {
             super.configPostProcess(arguments);
-            threshold = getFloatValue(arguments, "threshold", 0.3f);
-            shortEdge = getIntValue(arguments, "shortEdge", 600);
-            maxEdge = getIntValue(arguments, "maxEdge", 1000);
+            threshold = ArgumentsUtil.floatValue(arguments, "threshold", 0.3f);
+            shortEdge = ArgumentsUtil.intValue(arguments, "shortEdge", 600);
+            maxEdge = ArgumentsUtil.intValue(arguments, "maxEdge", 1000);
         }
 
         /**
