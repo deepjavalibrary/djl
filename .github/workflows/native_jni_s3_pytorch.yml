@@ -2,6 +2,10 @@ name: Native JNI S3 PyTorch
 
 on:
   workflow_dispatch:
+    inputs:
+      pt_version:
+        description: 'pytorch version'
+        required: false
   schedule:
     - cron: '0 5 * * *'
 
@@ -27,8 +31,8 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: |
-          ./gradlew :engines:pytorch:pytorch-native:releaseJNI
-          ./gradlew -Pjni :integration:test "-Dai.djl.default_engine=PyTorch"
+          ./gradlew :engines:pytorch:pytorch-native:releaseJNI -Ppt_version=${{ github.event.inputs.pt_version }}
+          ./gradlew -Pjni :integration:test "-Dai.djl.default_engine=PyTorch" -Ppt_version=${{ github.event.inputs.pt_version }}
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -38,7 +42,8 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         shell: bash
         run: |
-          PYTORCH_VERSION="$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')"
+          PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
+          PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-${PYTORCH_VERSION}/jnilib*"
 
@@ -59,7 +64,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
-        run: ./gradlew :engines:pytorch:pytorch-native:releaseJNI -Pgpu
+        run: ./gradlew :engines:pytorch:pytorch-native:releaseJNI -Pgpu -Ppt_version=${{ github.event.inputs.pt_version }}
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -68,7 +73,8 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          PYTORCH_VERSION="$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')"
+          PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
+          PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-${PYTORCH_VERSION}/jnilib*"
 
@@ -98,7 +104,7 @@ jobs:
       - name: Release JNI prep
         run: |
           source scl_source enable devtoolset-7 rh-git218 || true
-          ./gradlew :engines:pytorch:pytorch-native:releaseJNI -Pprecxx11
+          ./gradlew :engines:pytorch:pytorch-native:releaseJNI -Pprecxx11 -Ppt_version=${{ github.event.inputs.pt_version }}
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -107,7 +113,8 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          PYTORCH_VERSION="$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')"
+          PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
+          PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib/precxx11
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-${PYTORCH_VERSION}/jnilib/precxx11*"
 
@@ -153,7 +160,7 @@ jobs:
           set "CUDA_PATH_V10_2=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.2"
           set "CUDA_PATH_V11_1=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.1"
           set "PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.2\bin;%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v10.2\libnvvp;%PATH%"
-          gradlew :engines:pytorch:pytorch-native:releaseJNI -Pgpu
+          gradlew :engines:pytorch:pytorch-native:releaseJNI -Pgpu -Ppt_version=${{ github.event.inputs.pt_version }}
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -163,6 +170,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         shell: bash
         run: |
-          PYTORCH_VERSION="$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')"
+          PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
+          PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch-${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch-${PYTORCH_VERSION}/jnilib*"

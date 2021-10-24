@@ -3,6 +3,11 @@ plugins {
     id 'jacoco'
 }
 
+String pt_version = "${pytorch_native_version}"
+if (project.hasProperty("pt_version")) {
+    pt_version = project.property("pt_version")
+}
+
 dependencies {
     api "commons-cli:commons-cli:${commons_cli_version}"
     api "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
@@ -16,7 +21,7 @@ dependencies {
     runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
     runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
     runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
-    runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_native_version}"
+    runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pt_version}"
     runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
     runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
     runtimeOnly project(":engines:ml:xgboost")

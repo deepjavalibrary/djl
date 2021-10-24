@@ -6,22 +6,26 @@ plugins {
 group = "ai.djl.pytorch"
 apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
-def VERSION = "${pytorch_version}"
+String VERSION = "${pytorch_version}"
+if (project.hasProperty("pt_version")) {
+    VERSION = project.property("pt_version")
+}
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 boolean isPrecxx11 = project.hasProperty("precxx11")
 boolean isGPU = project.hasProperty("gpu")
-version = VERSION + (isRelease ? "" : "-SNAPSHOT")
-def BINARY_ROOT = "${project.buildDir}/download"
+String BINARY_ROOT = "${project.buildDir}/download"
 
-def downloadBuild(String os, String flavor, Boolean isPrecxx11 = false) {
+version = VERSION + (isRelease ? "" : "-SNAPSHOT")
+
+def downloadBuild(String ver, String os, String flavor, Boolean isPrecxx11 = false) {
     exec {
         if (os == "win") {
-            commandLine "${project.projectDir}/build.cmd", "${flavor}"
+            commandLine "${project.projectDir}/build.cmd", "${ver}", "${flavor}"
         } else {
             if (isPrecxx11) {
-                commandLine 'bash', 'build.sh', "${flavor}", "precxx11"
+                commandLine 'bash', 'build.sh', "${ver}", "${flavor}", "precxx11"
             } else {
-                commandLine 'bash', 'build.sh', "${flavor}"
+                commandLine 'bash', 'build.sh', "${ver}", "${flavor}"
             }
         }
     }
@@ -30,8 +34,8 @@ def downloadBuild(String os, String flavor, Boolean isPrecxx11 = false) {
     // the reason why we duplicate the folder here is to insert djl_version into the path
     // so different versions of JNI wouldn't override each other. We don't also want publishDir
     // to have djl_version as engine would require to know that during the System.load()
-    def classifier = "${os}-x86_64"
-    def ciDir = "${project.projectDir}/jnilib/${djl_version}/${classifier}/${flavor}"
+    String classifier = "${os}-x86_64"
+    String ciDir = "${project.projectDir}/jnilib/${djl_version}/${classifier}/${flavor}"
     copy {
         def tree = fileTree(project.buildDir)
         tree.include("**/libdjl_torch.*", "**/djl_torch.dll")
@@ -40,14 +44,14 @@ def downloadBuild(String os, String flavor, Boolean isPrecxx11 = false) {
     }
 }
 
-def downloadBuildAndroid() {
+def downloadBuildAndroid(String ver) {
     def LIST_ABI = ["armeabi-v7a", "arm64-v8a", "x86", "x86_64"]
     LIST_ABI.each {
         abi ->
             exec {
-                commandLine 'bash', 'build_android.sh', "${abi}"
+                commandLine 'bash', 'build_android.sh', "${ver}", "${abi}"
             }
-            def ciDir = "${project.projectDir}/jnilib/${djl_version}/android/${abi}"
+            String ciDir = "${project.projectDir}/jnilib/${djl_version}/android/${abi}"
             copy {
                 from "${project.buildDir}/libdjl_torch.so"
                 into ciDir
@@ -118,7 +122,7 @@ def cleanBuild() {
 
 task compileAndroidJNI {
     doFirst {
-        downloadBuildAndroid()
+        downloadBuildAndroid("${VERSION}")
     }
 }
 
@@ -127,25 +131,25 @@ task releaseJNI {
         // You have to use an environment with CUDA persets for Linux and Windows
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
             if (!isGPU) {
-                downloadBuild("win", "cpu")
+                downloadBuild("${VERSION}", "win", "cpu")
                 cleanBuild()
             } else {
-                downloadBuild("win", "cu102")
+                downloadBuild("${VERSION}", "win", "cu102")
                 cleanBuild()
-                downloadBuild("win", "cu111")
+                downloadBuild("${VERSION}", "win", "cu111")
                 cleanBuild()
             }
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac") && !isGPU) {
-            downloadBuild("osx", "cpu")
+            downloadBuild("${VERSION}", "osx", "cpu")
             cleanBuild()
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
             if (!isGPU) {
-                downloadBuild("linux", "cpu", isPrecxx11)
+                downloadBuild("${VERSION}", "linux", "cpu", isPrecxx11)
                 cleanBuild()
             } else {
-                downloadBuild("linux", "cu102", isPrecxx11)
+                downloadBuild("${VERSION}", "linux", "cu102", isPrecxx11)
                 cleanBuild()
-                downloadBuild("linux", "cu111", isPrecxx11)
+                downloadBuild("${VERSION}", "linux", "cu111", isPrecxx11)
                 cleanBuild()
             }
         } else {
@@ -161,11 +165,11 @@ task releaseJNI {
 task compileJNI {
     doFirst {
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
-            downloadBuild("win", "cpu")
+            downloadBuild("${VERSION}", "win", "cpu")
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
-            downloadBuild("osx", "cpu")
+            downloadBuild("${VERSION}", "osx", "cpu")
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
-            downloadBuild("linux", "cpu")
+            downloadBuild("${VERSION}", "linux", "cpu")
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
         }
@@ -178,9 +182,9 @@ task compileJNI {
 task compileJNIGPU {
     doFirst {
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
-            downloadBuild("win", "cu102")
+            downloadBuild("${VERSION}", "win", "cu102")
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
-            downloadBuild("linux", "cu102")
+            downloadBuild("${VERSION}", "linux", "cu102")
         } else {
             throw new IllegalStateException("Architecture not supported: " + System.properties['os.name'])
         }
