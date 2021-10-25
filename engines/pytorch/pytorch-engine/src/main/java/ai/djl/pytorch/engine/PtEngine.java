@@ -99,7 +99,7 @@ public final class PtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "1.9.1";
+        return LibUtils.getVersion();
     }
 
     /** {@inheritDoc} */
@@ -154,7 +154,7 @@ public final class PtEngine extends Engine {
         for (String feature : JniUtils.getFeatures()) {
             sb.append("\t").append(feature).append(",\n"); // NOPMD
         }
-        sb.append("]\nPyTorch Library: ").append(LibUtils.getLibName());
+        sb.append("]\nPyTorch Library: ").append(LibUtils.getLibtorchPath());
         return sb.toString();
     }
 }
