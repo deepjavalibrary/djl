@@ -61,35 +61,61 @@ public final class LibUtils {
     private static final Pattern VERSION_PATTERN =
             Pattern.compile("(\\d+\\.\\d+\\.\\d+(-[a-z]+)?)(-SNAPSHOT)?(-\\d+)?");
 
+    private static String version;
+    private static String libtorchPath;
+
     private LibUtils() {}
 
     public static void loadLibrary() {
+        Properties prop = new Properties();
+        try (InputStream stream =
+                LibUtils.class.getResourceAsStream("/jnilib/pytorch.properties")) {
+            prop.load(stream);
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot find pytorch property file", e);
+        }
+        String djlVersion = prop.getProperty("version");
+        String jniVersion = prop.getProperty("jni_version");
+
+        version = jniVersion; // default to bundled jni version
+
         // TODO workaround to make it work on Android Studio
         // It should search for several places to find the native library
         if ("http://www.android.com/".equals(System.getProperty("java.vendor.url"))) {
             System.loadLibrary(LIB_NAME); // NOPMD
             return;
         }
-        String libName = getLibName();
-        logger.debug("Loading pytorch library from: {}", libName);
+        libtorchPath = getLibName(djlVersion, jniVersion);
+        logger.debug("Loading pytorch library from: {}", libtorchPath);
         if (System.getProperty("os.name").startsWith("Win")) {
-            loadWinDependencies(libName);
+            loadWinDependencies(libtorchPath);
         }
-        loadNativeLibrary(libName);
+        loadNativeLibrary(libtorchPath);
     }
 
-    public static String getLibName() {
+    public static String getLibName(String djlVersion, String jniVersion) {
         String libName = findOverrideLibrary();
         if (libName == null) {
             AtomicBoolean fallback = new AtomicBoolean(false);
             String nativeLibDir = findNativeLibrary(fallback);
             if (nativeLibDir != null) {
-                libName = copyJniLibraryFromClasspath(Paths.get(nativeLibDir), fallback.get());
+                Path nativeDir = Paths.get(nativeLibDir);
+                libName =
+                        copyJniLibraryFromClasspath(
+                                nativeDir, djlVersion, jniVersion, fallback.get());
             } else {
                 throw new IllegalStateException("Native library not found");
             }
         }
         return libName;
+    }
+
+    public static String getVersion() {
+        return version;
+    }
+
+    public static String getLibtorchPath() {
+        return libtorchPath;
     }
 
     private static void loadWinDependencies(String libName) {
@@ -197,7 +223,8 @@ public final class LibUtils {
         return null;
     }
 
-    private static String copyJniLibraryFromClasspath(Path nativeDir, boolean fallback) {
+    private static String copyJniLibraryFromClasspath(
+            Path nativeDir, String djlVersion, String jniVersion, boolean fallback) {
         String name = System.mapLibraryName(LIB_NAME);
         Platform platform = Platform.fromSystem();
         String classifier = platform.getClassifier();
@@ -211,16 +238,13 @@ public final class LibUtils {
             logger.info("Using precxx11 jnilib.");
         }
 
-        Properties prop = new Properties();
-        try (InputStream stream =
-                LibUtils.class.getResourceAsStream("/jnilib/pytorch.properties")) {
-            prop.load(stream);
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot find pytorch property file", e);
-        }
-        String version = prop.getProperty("version");
-        Path path = nativeDir.resolve(version + '-' + flavor + '-' + name);
+        Path path = nativeDir.resolve(djlVersion + '-' + flavor + '-' + name);
         if (Files.exists(path)) {
+            return path.toAbsolutePath().toString();
+        }
+
+        if (!version.startsWith(jniVersion)) {
+            downloadJniLib(nativeDir, path, djlVersion, classifier, flavor, name);
             return path.toAbsolutePath().toString();
         }
 
@@ -299,7 +323,7 @@ public final class LibUtils {
 
     private static String copyNativeLibraryFromClasspath(Platform platform) {
         Path tmp = null;
-        String version = platform.getVersion();
+        version = platform.getVersion();
         String flavor = platform.getFlavor();
         // TODO: include precxx11 into native jar's flavor property
         if (Arrays.asList(platform.getLibraries()).contains("libstdc++.so.6")) {
@@ -356,7 +380,7 @@ public final class LibUtils {
 
     private static String downloadPyTorch(Platform platform, AtomicBoolean fallback)
             throws IOException {
-        String version = platform.getVersion();
+        version = platform.getVersion();
         String flavor = platform.getFlavor();
         String classifier = platform.getClassifier();
         String os = platform.getOsPrefix();
@@ -384,18 +408,21 @@ public final class LibUtils {
         Path tmp = null;
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             List<String> lines = Utils.readLines(is);
-            if (flavor.startsWith("cu")
-                    && !lines.contains(flavor + '/' + os + "/native/lib/" + libName + ".gz")) {
-                logger.warn("No matching cuda flavor for {} found: {}.", os, flavor);
-                // fallback to CPU
-                flavor = "cpu";
-                fallback.set(true);
+            if (!lines.contains(flavor + '/' + os + "/native/lib/" + libName + ".gz")) {
+                if (flavor.startsWith("cu")) {
+                    logger.warn("No matching cuda flavor for {} found: {}.", os, flavor);
+                    // fallback to CPU
+                    flavor = "cpu";
+                    fallback.set(true);
 
-                // check again
-                dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
-                path = dir.resolve(libName);
-                if (Files.exists(path)) {
-                    return dir.toAbsolutePath().toString();
+                    // check again
+                    dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
+                    path = dir.resolve(libName);
+                    if (Files.exists(path)) {
+                        return dir.toAbsolutePath().toString();
+                    }
+                } else {
+                    throw new IOException("No matching flavor for " + os + " found: " + flavor);
                 }
             }
 
@@ -414,6 +441,51 @@ public final class LibUtils {
 
             Utils.moveQuietly(tmp, dir);
             return dir.toAbsolutePath().toString();
+        } finally {
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
+        }
+    }
+
+    private static void downloadJniLib(
+            Path nativeDir,
+            Path path,
+            String djlVersion,
+            String classifier,
+            String flavor,
+            String name) {
+        Matcher matcher = VERSION_PATTERN.matcher(djlVersion);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Unexpected djl version: " + djlVersion);
+        }
+        djlVersion = matcher.group(1);
+        matcher = VERSION_PATTERN.matcher(version);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Unexpected pytorch version: " + version);
+        }
+
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("https://publish.djl.ai/pytorch-").append(matcher.group(1)).append("/jnilib/");
+        if (flavor.contains("-precxx11")) {
+            flavor = flavor.substring(0, flavor.length() - 9);
+            sb.append("precxx11/");
+        }
+        sb.append(djlVersion)
+                .append('/')
+                .append(classifier)
+                .append('/')
+                .append(flavor)
+                .append('/')
+                .append(name);
+        logger.info("Downloading jni {} to cache ...", sb);
+        Path tmp = null;
+        try (InputStream is = new URL(sb.toString()).openStream()) {
+            tmp = Files.createTempFile(nativeDir, "jni", "tmp");
+            Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
+            Utils.moveQuietly(tmp, path);
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot download jni files", e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);
