@@ -83,14 +83,6 @@
             <artifactId>pytorch-engine</artifactId>
         </dependency>
         <dependency>
-            <!--
-                See https://github.com/deepjavalibrary/djl/blob/master/engines/pytorch/README.md for more PyTorch library selection options
-            -->
-            <groupId>ai.djl.pytorch</groupId>
-            <artifactId>pytorch-native-auto</artifactId>
-            <version>1.7.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>6.8.1</version>

@@ -73,6 +73,18 @@ public final class Platform {
     }
 
     /**
+     * Returns the platform for the current system with the specified version.
+     *
+     * @param version the engine version
+     * @return the platform for the current system
+     */
+    public static Platform fromSystem(String version) {
+        Platform platform = fromSystem();
+        platform.version = version;
+        return platform;
+    }
+
+    /**
      * Returns the platform for the current system.
      *
      * @return the platform for the current system

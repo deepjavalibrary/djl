@@ -10,7 +10,6 @@ dependencies {
 
     if (System.getProperty("ai.djl.default_engine") == "PyTorch") {
         runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
-        runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_native_version}"
     } else if (System.getProperty("ai.djl.default_engine") == "TensorFlow") {
         runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
         runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")

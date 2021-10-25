@@ -77,5 +77,4 @@ will need to mention the type as pom and the scope as import) as the following:
 
 ```
     implementation "ai.djl.pytorch:pytorch-model-zoo" // No version required
-    implementation "ai.djl.pytorch:pytorch-native-auto"  // No version required
 ```
