@@ -14,6 +14,7 @@ package ai.djl.pytorch.zoo.nlp.qa;
 
 import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
+import ai.djl.modality.nlp.bert.BertFullTokenizer;
 import ai.djl.modality.nlp.bert.BertToken;
 import ai.djl.modality.nlp.bert.BertTokenizer;
 import ai.djl.modality.nlp.qa.QAInput;
@@ -24,6 +25,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.translate.TranslatorContext;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /** The {@link ai.djl.translate.Translator} for PyTorch Question Answering model. */
 public class PtBertQATranslator extends QATranslator {
@@ -41,27 +43,38 @@ public class PtBertQATranslator extends QATranslator {
     public void prepare(TranslatorContext ctx) throws IOException {
         vocabulary =
                 DefaultVocabulary.builder()
-                        .addFromTextFile(ctx.getModel().getArtifact("bert-base-uncased-vocab.txt"))
+                        .addFromTextFile(ctx.getModel().getArtifact(vocab))
                         .optUnknownToken("[UNK]")
                         .build();
-        tokenizer = new BertTokenizer();
+        if (tokenizerName == null) {
+            tokenizer = new BertTokenizer();
+        } else {
+            tokenizer = new BertFullTokenizer(vocabulary, true);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, QAInput input) {
-        BertToken token =
-                tokenizer.encode(
-                        input.getQuestion().toLowerCase(), input.getParagraph().toLowerCase());
+        String question = input.getQuestion();
+        String paragraph = input.getParagraph();
+        if (toLowerCase) {
+            question = question.toLowerCase(locale);
+            paragraph = paragraph.toLowerCase(locale);
+        }
+        BertToken token = tokenizer.encode(question, paragraph);
         tokens = token.getTokens();
         NDManager manager = ctx.getNDManager();
         long[] indices = tokens.stream().mapToLong(vocabulary::getIndex).toArray();
         long[] attentionMask = token.getAttentionMask().stream().mapToLong(i -> i).toArray();
-        long[] tokenType = token.getTokenTypes().stream().mapToLong(i -> i).toArray();
-        NDArray indicesArray = manager.create(indices);
-        NDArray attentionMaskArray = manager.create(attentionMask);
-        NDArray tokenTypeArray = manager.create(tokenType);
-        return new NDList(indicesArray, attentionMaskArray, tokenTypeArray);
+        NDList ndList = new NDList(3);
+        ndList.add(manager.create(indices));
+        ndList.add(manager.create(attentionMask));
+        if (includeTokenTypes) {
+            long[] tokenTypes = token.getTokenTypes().stream().mapToLong(i -> i).toArray();
+            ndList.add(manager.create(tokenTypes));
+        }
+        return ndList;
     }
 
     /** {@inheritDoc} */
@@ -71,7 +84,10 @@ public class PtBertQATranslator extends QATranslator {
         NDArray endLogits = list.get(1);
         int startIdx = (int) startLogits.argMax().getLong();
         int endIdx = (int) endLogits.argMax().getLong();
-        return tokens.subList(startIdx, endIdx + 1).toString();
+        if (startIdx >= endIdx) {
+            return "";
+        }
+        return tokenizer.tokenToString(tokens.subList(startIdx, endIdx + 1));
     }
 
     /**
@@ -81,6 +97,18 @@ public class PtBertQATranslator extends QATranslator {
      */
     public static Builder builder() {
         return new Builder();
+    }
+
+    /**
+     * Creates a builder to build a {@code PtSSDTranslatorBuilder} with specified arguments.
+     *
+     * @param arguments arguments to specify builder options
+     * @return a new builder
+     */
+    public static Builder builder(Map<String, ?> arguments) {
+        Builder builder = new Builder();
+        builder.configure(arguments);
+        return builder;
     }
 
     /** The builder for Bert QA translator. */

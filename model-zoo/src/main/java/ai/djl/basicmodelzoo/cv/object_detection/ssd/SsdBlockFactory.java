@@ -16,6 +16,7 @@ import ai.djl.Model;
 import ai.djl.nn.Block;
 import ai.djl.nn.BlockFactory;
 import ai.djl.nn.SequentialBlock;
+import ai.djl.translate.ArgumentsUtil;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +32,9 @@ public class SsdBlockFactory implements BlockFactory {
     @Override
     @SuppressWarnings("unchecked")
     public Block newBlock(Model model, Path modelPath, Map<String, ?> arguments) {
-        int numClasses = ((Double) arguments.get("outSize")).intValue();
-        int numFeatures = ((Double) arguments.get("numFeatures")).intValue();
-        boolean globalPool = (Boolean) arguments.get("globalPool");
+        int numClasses = ArgumentsUtil.intValue(arguments, "outSize");
+        int numFeatures = ArgumentsUtil.intValue(arguments, "numFeatures");
+        boolean globalPool = ArgumentsUtil.booleanValue(arguments, "globalPool");
         int[] numFilters =
                 ((List<Double>) arguments.get("numFilters"))
                         .stream()

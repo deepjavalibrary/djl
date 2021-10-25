@@ -20,6 +20,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
@@ -42,10 +43,7 @@ public class PpWordDetectionTranslator implements NoBatchifyTranslator<Image, De
      * @param arguments the arguments for the translator
      */
     public PpWordDetectionTranslator(Map<String, ?> arguments) {
-        maxLength =
-                arguments.containsKey("maxLength")
-                        ? Integer.parseInt(arguments.get("maxLength").toString())
-                        : 960;
+        maxLength = ArgumentsUtil.intValue(arguments, "maxLength", 960);
     }
 
     /** {@inheritDoc} */

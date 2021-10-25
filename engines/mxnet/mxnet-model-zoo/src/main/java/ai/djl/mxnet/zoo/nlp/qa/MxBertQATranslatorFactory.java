@@ -51,15 +51,7 @@ public class MxBertQATranslatorFactory implements TranslatorFactory {
         if (!isSupported(input, output)) {
             throw new IllegalArgumentException("Unsupported input/output types.");
         }
-        int seqLength;
-        Object value = arguments.get("seqLength");
-        if (value == null) {
-            seqLength = 384;
-        } else {
-            seqLength = Integer.parseInt(value.toString());
-        }
-
-        QATranslator translator = MxBertQATranslator.builder().setSeqLength(seqLength).build();
+        QATranslator translator = MxBertQATranslator.builder(arguments).build();
         if (input == Input.class && output == Output.class) {
             return new QaServingTranslator(translator);
         }

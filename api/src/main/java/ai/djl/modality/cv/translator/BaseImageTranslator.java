@@ -20,6 +20,7 @@ import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Transform;
@@ -71,38 +72,6 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
     public NDList processInput(TranslatorContext ctx, Image input) {
         NDArray array = input.toNDArray(ctx.getNDManager(), flag);
         return pipeline.transform(new NDList(array));
-    }
-
-    protected static String getStringValue(Map<String, ?> arguments, String key, String def) {
-        Object value = arguments.get(key);
-        if (value == null) {
-            return def;
-        }
-        return value.toString();
-    }
-
-    protected static int getIntValue(Map<String, ?> arguments, String key, int def) {
-        Object value = arguments.get(key);
-        if (value == null) {
-            return def;
-        }
-        return (int) Double.parseDouble(value.toString());
-    }
-
-    protected static float getFloatValue(Map<String, ?> arguments, String key, float def) {
-        Object value = arguments.get(key);
-        if (value == null) {
-            return def;
-        }
-        return (float) Double.parseDouble(value.toString());
-    }
-
-    protected static boolean getBooleanValue(Map<String, ?> arguments, String key, boolean def) {
-        Object value = arguments.get(key);
-        if (value == null) {
-            return def;
-        }
-        return Boolean.parseBoolean(value.toString());
     }
 
     /**
@@ -179,12 +148,12 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
             if (pipeline == null) {
                 pipeline = new Pipeline();
             }
-            width = getIntValue(arguments, "width", 224);
-            height = getIntValue(arguments, "height", 224);
+            width = ArgumentsUtil.intValue(arguments, "width", 224);
+            height = ArgumentsUtil.intValue(arguments, "height", 224);
             if (arguments.containsKey("flag")) {
                 flag = Image.Flag.valueOf(arguments.get("flag").toString());
             }
-            String resize = getStringValue(arguments, "resize", "false");
+            String resize = ArgumentsUtil.stringValue(arguments, "resize", "false");
             if ("true".equals(resize)) {
                 addTransform(new Resize(width, height));
             } else if (!"false".equals(resize)) {
@@ -198,13 +167,13 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
                     addTransform(new Resize((int) Double.parseDouble(tokens[0])));
                 }
             }
-            if (getBooleanValue(arguments, "centerCrop", false)) {
+            if (ArgumentsUtil.booleanValue(arguments, "centerCrop", false)) {
                 addTransform(new CenterCrop(width, height));
             }
-            if (getBooleanValue(arguments, "toTensor", true)) {
+            if (ArgumentsUtil.booleanValue(arguments, "toTensor", true)) {
                 addTransform(new ToTensor());
             }
-            String normalize = getStringValue(arguments, "normalize", "false");
+            String normalize = ArgumentsUtil.stringValue(arguments, "normalize", "false");
             if ("true".equals(normalize)) {
                 addTransform(new Normalize(MEAN, STD));
             } else if (!"false".equals(normalize)) {

@@ -12,7 +12,7 @@
  */
 package ai.djl.modality.nlp.bert;
 
-import ai.djl.modality.nlp.DefaultVocabulary;
+import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class WordpieceTokenizer extends SimpleTokenizer {
 
     private String unknown;
     private int maxInputChars;
-    private DefaultVocabulary vocabulary;
+    private Vocabulary vocabulary;
 
     /**
      * Creates an instance of {@code WordpieceTokenizer}.
@@ -46,7 +46,7 @@ public class WordpieceTokenizer extends SimpleTokenizer {
      * @param unknown String that represent unknown token
      * @param maxInputChars maximum number of input characters
      */
-    public WordpieceTokenizer(DefaultVocabulary vocabulary, String unknown, int maxInputChars) {
+    public WordpieceTokenizer(Vocabulary vocabulary, String unknown, int maxInputChars) {
         this.unknown = unknown;
         this.maxInputChars = maxInputChars;
         this.vocabulary = vocabulary;

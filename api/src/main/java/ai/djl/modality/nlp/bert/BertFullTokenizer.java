@@ -12,8 +12,8 @@
  */
 package ai.djl.modality.nlp.bert;
 
-import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.modality.nlp.NlpUtils;
+import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.preprocess.LambdaProcessor;
 import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
 import ai.djl.modality.nlp.preprocess.PunctuationSeparator;
@@ -36,9 +36,9 @@ import java.util.List;
  * href="https://github.com/google-research/bert/blob/master/tokenization.py#L161">Google Research
  * Bert Tokenizer</a>
  */
-public class BertFullTokenizer extends SimpleTokenizer {
+public class BertFullTokenizer extends BertTokenizer {
 
-    private DefaultVocabulary vocabulary;
+    private Vocabulary vocabulary;
     private List<TextProcessor> basicBertPreprocessors;
     private WordpieceTokenizer wordpieceTokenizer;
 
@@ -48,18 +48,18 @@ public class BertFullTokenizer extends SimpleTokenizer {
      * @param vocabulary the BERT vocabulary
      * @param lowerCase whether to convert tokens to lowercase
      */
-    public BertFullTokenizer(DefaultVocabulary vocabulary, boolean lowerCase) {
+    public BertFullTokenizer(Vocabulary vocabulary, boolean lowerCase) {
         this.vocabulary = vocabulary;
         basicBertPreprocessors = getPreprocessors(lowerCase);
         wordpieceTokenizer = new WordpieceTokenizer(vocabulary, "[UNK]", 200);
     }
 
     /**
-     * Returns the {@link DefaultVocabulary} used for tokenization.
+     * Returns the {@link Vocabulary} used for tokenization.
      *
-     * @return the {@link DefaultVocabulary} used for tokenization
+     * @return the {@link Vocabulary} used for tokenization
      */
-    public DefaultVocabulary getVocabulary() {
+    public Vocabulary getVocabulary() {
         return vocabulary;
     }
 
@@ -71,6 +71,12 @@ public class BertFullTokenizer extends SimpleTokenizer {
             tokens = processor.preprocess(tokens);
         }
         return wordpieceTokenizer.preprocess(tokens);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String tokenToString(List<String> tokens) {
+        return String.join(" ", tokens).replace(" ##", "").trim();
     }
 
     /**
