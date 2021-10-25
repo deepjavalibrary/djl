@@ -55,7 +55,7 @@ processResources {
 
         // write properties
         def propFile = file("${project.buildDir}/classes/java/main/jnilib/pytorch.properties")
-        propFile.text = "version=${version}\n"
+        propFile.text = "version=${version}\npytorch_version=${pytorch_version}"
     }
 }
 
