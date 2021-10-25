@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -207,7 +208,9 @@ public final class LibUtils {
         Path precxx11Lib = nativeDir.resolve("libstdc++.so.6");
         if (Files.exists(precxx11Lib)) {
             flavor += "-precxx11"; // NOPMD
+            logger.info("Using precxx11 jnilib.");
         }
+
         Properties prop = new Properties();
         try (InputStream stream =
                 LibUtils.class.getResourceAsStream("/jnilib/pytorch.properties")) {
@@ -357,11 +360,15 @@ public final class LibUtils {
         String flavor = platform.getFlavor();
         String classifier = platform.getClassifier();
         String os = platform.getOsPrefix();
+        if (Boolean.getBoolean("PYTORCH_PRECXX11")
+                || Boolean.parseBoolean(System.getenv("PYTORCH_PRECXX11"))) {
+            flavor += "-precxx11";
+        }
 
         String libName = System.mapLibraryName(NATIVE_LIB_NAME);
         Path cacheDir = Utils.getEngineCacheDir("pytorch");
-        logger.debug("Using cache dir: {}", cacheDir);
         Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
+        logger.debug("Using cache dir: {}", dir);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {
             return dir.toAbsolutePath().toString();
@@ -397,6 +404,7 @@ public final class LibUtils {
                 if (line.startsWith(flavor + '/' + os + '/')) {
                     URL url = new URL(link + '/' + line);
                     String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
+                    fileName = URLDecoder.decode(fileName, "UTF-8");
                     logger.info("Downloading {} ...", url);
                     try (InputStream fis = new GZIPInputStream(url.openStream())) {
                         Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
