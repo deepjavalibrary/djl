@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -102,6 +103,15 @@ public final class LibUtils {
     }
 
     private static synchronized String findLibraryInClasspath() {
+        String overrideVersion = System.getenv("MXNET_VERSION");
+        if (overrideVersion == null) {
+            overrideVersion = System.getProperty("MXNET_VERSION");
+        }
+        if (overrideVersion != null) {
+            Platform platform = Platform.fromSystem(overrideVersion);
+            return downloadMxnet(platform);
+        }
+
         Enumeration<URL> urls;
         try {
             urls =
@@ -115,8 +125,16 @@ public final class LibUtils {
 
         // No native jars
         if (!urls.hasMoreElements()) {
-            logger.debug("mxnet.properties not found in class path.");
-            return null;
+            String preferredVersion;
+            try (InputStream is = LibUtils.class.getResourceAsStream("/mxnet-engine.properties")) {
+                Properties prop = new Properties();
+                prop.load(is);
+                preferredVersion = prop.getProperty("mxnet_version");
+            } catch (IOException e) {
+                throw new IllegalStateException("mxnet-engine.properties not found.", e);
+            }
+            Platform platform = Platform.fromSystem(preferredVersion);
+            return downloadMxnet(platform);
         }
 
         Platform systemPlatform = Platform.fromSystem();
@@ -139,11 +157,7 @@ public final class LibUtils {
             }
 
             if (placeholder != null) {
-                try {
-                    return downloadMxnet(placeholder);
-                } catch (IOException e) {
-                    throw new IllegalStateException("Failed to download MXNet native library", e);
-                }
+                return downloadMxnet(placeholder);
             }
         } catch (IOException e) {
             throw new IllegalStateException(
@@ -226,7 +240,7 @@ public final class LibUtils {
         return null;
     }
 
-    private static String downloadMxnet(Platform platform) throws IOException {
+    private static String downloadMxnet(Platform platform) {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
         if ("cpu".equals(flavor)) {
@@ -247,16 +261,17 @@ public final class LibUtils {
             return path.toAbsolutePath().toString();
         }
 
-        Files.createDirectories(cacheFolder);
-
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Unexpected version: " + version);
         }
 
-        Path tmp = Files.createTempDirectory(cacheFolder, "tmp");
+        Path tmp = null;
         String link = "https://publish.djl.ai/mxnet-" + matcher.group(1);
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
+            Files.createDirectories(cacheFolder);
+            tmp = Files.createTempDirectory(cacheFolder, "tmp");
+
             List<String> lines = Utils.readLines(is);
             if (cudaArch != null) {
                 // has CUDA
@@ -318,8 +333,12 @@ public final class LibUtils {
 
             Utils.moveQuietly(tmp, dir);
             return path.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to download MXNet native library", e);
         } finally {
-            Utils.deleteQuietly(tmp);
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
         }
     }
 

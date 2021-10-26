@@ -189,8 +189,17 @@ public final class LibUtils {
 
         // No native jars
         if (!urls.hasMoreElements()) {
-            logger.debug("paddlepaddle.properties not found in class path.");
-            return null;
+            String preferredVersion;
+            try (InputStream is =
+                    LibUtils.class.getResourceAsStream("/jnilib/paddlepaddle.properties")) {
+                Properties prop = new Properties();
+                prop.load(is);
+                preferredVersion = prop.getProperty("paddlepaddle_version");
+            } catch (IOException e) {
+                throw new IllegalStateException("paddlepaddle.properties not found.", e);
+            }
+            Platform platform = Platform.fromSystem(preferredVersion);
+            return downloadLibrary(platform, fallback);
         }
 
         Platform systemPlatform = Platform.fromSystem();
@@ -218,12 +227,7 @@ public final class LibUtils {
             }
 
             if (placeholder != null) {
-                try {
-                    return downloadLibrary(placeholder, fallback);
-                } catch (IOException e) {
-                    throw new IllegalStateException(
-                            "Failed to download PaddlePaddle native library", e);
-                }
+                return downloadLibrary(placeholder, fallback);
             }
         } catch (IOException e) {
             throw new IllegalStateException(
@@ -299,8 +303,7 @@ public final class LibUtils {
         return null;
     }
 
-    private static String downloadLibrary(Platform platform, AtomicBoolean fallback)
-            throws IOException {
+    private static String downloadLibrary(Platform platform, AtomicBoolean fallback) {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
         String classifier = platform.getClassifier();
@@ -315,7 +318,6 @@ public final class LibUtils {
             return path.toAbsolutePath().toString();
         }
 
-        Files.createDirectories(cacheDir);
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Unexpected version: " + version);
@@ -324,6 +326,8 @@ public final class LibUtils {
         Path tmp = null;
         String link = "https://publish.djl.ai/paddlepaddle-" + matcher.group(1);
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
+            Files.createDirectories(cacheDir);
+
             List<String> lines = Utils.readLines(is);
             if (flavor.startsWith("cu")
                     && !lines.contains(flavor + '/' + os + "/native/lib/" + libName + ".gz")) {
@@ -353,6 +357,8 @@ public final class LibUtils {
 
             Utils.moveQuietly(tmp, dir);
             return path.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to download PaddlePaddle native library", e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);

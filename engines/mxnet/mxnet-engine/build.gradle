@@ -3,7 +3,6 @@ group "ai.djl.mxnet"
 dependencies {
     api project(":api")
 
-    testRuntimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
     testImplementation project(":basicdataset")
     testImplementation project(":model-zoo")
     testImplementation(project(":testing"))
@@ -22,6 +21,15 @@ sourceSets {
     }
 }
 
+processResources {
+    doFirst {
+        def classesDir = file("${project.buildDir}/classes/java/main/")
+        classesDir.mkdirs()
+        def file = new File(classesDir, "mxnet-engine.properties")
+        file.text = "mxnet_version=${mxnet_version}"
+    }
+}
+
 checkstyleMain.source = 'src/main/java'
 pmdMain.source = 'src/main/java'
 
@@ -30,7 +38,7 @@ task jnarator(dependsOn: ":engines:mxnet:jnarator:jar") {
     doLast {
         File jnaGenerator = project(":engines:mxnet:jnarator").jar.outputs.files.singleFile
         javaexec {
-            main = "-jar"
+            mainClass = "-jar"
             args = [
                     jnaGenerator.absolutePath,
                     "-l",

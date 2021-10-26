@@ -32,7 +32,7 @@ jobs:
       - name: Release JNI prep
         run: |
           ./gradlew :engines:pytorch:pytorch-native:releaseJNI -Ppt_version=${{ github.event.inputs.pt_version }}
-          ./gradlew -Pjni :integration:test "-Dai.djl.default_engine=PyTorch" -Ppt_version=${{ github.event.inputs.pt_version }}
+          PYTORCH_VERSION=${{ github.event.inputs.pt_version }} ./gradlew -Pjni :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

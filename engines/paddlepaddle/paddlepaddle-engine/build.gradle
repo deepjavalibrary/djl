@@ -7,7 +7,6 @@ dependencies {
         exclude group: "junit", module: "junit"
     }
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
-    testRuntimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
 }
 
 compileJava.dependsOn(processResources)
@@ -49,7 +48,7 @@ processResources {
 
         // write properties
         def propFile = file("${project.buildDir}/classes/java/main/jnilib/paddlepaddle.properties")
-        propFile.text = "version=${version}\n"
+        propFile.text = "version=${version}\npaddlepaddle_version=${paddlepaddle_version}"
     }
 }
 

@@ -13,24 +13,19 @@ dependencies {
 
         implementation "ai.djl:model-zoo"
         runtimeOnly "ai.djl.pytorch:pytorch-model-zoo"
-        runtimeOnly "ai.djl.pytorch:pytorch-native-auto"
 
         runtimeOnly "ai.djl.tensorflow:tensorflow-model-zoo"
-        runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto"
 
         runtimeOnly "ai.djl.mxnet:mxnet-model-zoo"
-        runtimeOnly "ai.djl.mxnet:mxnet-native-auto"
 
         runtimeOnly "ai.djl.tflite:tflite-engine"
         runtimeOnly "ai.djl.tflite:tflite-native-auto"
 
         runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-model-zoo"
-        runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto"
 
         runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine"
 
         runtimeOnly "ai.djl.dlr:dlr-engine"
-        runtimeOnly "ai.djl.dlr:dlr-native-auto"
 
         runtimeOnly "ai.djl.ml.xgboost:xgboost"
 
@@ -41,19 +36,15 @@ dependencies {
         implementation project(":model-zoo")
 
         runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
-        runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_native_version}"
 
         runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
-        runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
 
         runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
-        runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
 
         runtimeOnly project(":engines:tflite:tflite-engine")
         runtimeOnly "ai.djl.tflite:tflite-native-auto:${tflite_version}"
 
         runtimeOnly project(":engines:paddlepaddle:paddlepaddle-model-zoo")
-        runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
 
         runtimeOnly project(":engines:tensorrt")
 
@@ -75,7 +66,6 @@ dependencies {
         }
 
         runtimeOnly project(":engines:dlr:dlr-engine")
-        runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
 
         runtimeOnly(project(":engines:ml:xgboost")) {
             exclude group: "ml.dmlc", module: "xgboost4j_2.12"

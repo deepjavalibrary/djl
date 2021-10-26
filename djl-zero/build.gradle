@@ -12,12 +12,9 @@ dependencies {
     // Current engines and model zoos used for inference
     // runtimeOnly project(":engines:pytorch:pytorch-engine")
     // runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
-    // runtimeOnly "ai.djl.pytorch:pytorch-native-auto:${pytorch_native_version}"
     // runtimeOnly project(":engines:tensorflow:tensorflow-engine")
-    // runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
     // runtimeOnly project(":engines:onnxruntime:onnxruntime-engine")
     // runtimeOnly "com.microsoft.onnxruntime:onnxruntime:${onnxruntime_version}"
     runtimeOnly project(":engines:mxnet:mxnet-engine")
     runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
-    runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
 }

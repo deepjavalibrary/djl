@@ -269,6 +269,15 @@ public final class LibUtils {
     }
 
     private static synchronized String findNativeLibrary(AtomicBoolean fallback) {
+        String overrideVersion = System.getenv("PYTORCH_VERSION");
+        if (overrideVersion == null) {
+            overrideVersion = System.getProperty("PYTORCH_VERSION");
+        }
+        if (overrideVersion != null) {
+            version = overrideVersion;
+            Platform auto = Platform.fromSystem(overrideVersion);
+            return downloadPyTorch(auto, fallback);
+        }
         Enumeration<URL> urls;
         try {
             urls =
@@ -281,7 +290,8 @@ public final class LibUtils {
         }
         // No native jars
         if (!urls.hasMoreElements()) {
-            return null;
+            Platform auto = Platform.fromSystem(version);
+            return downloadPyTorch(auto, fallback);
         }
 
         Platform systemPlatform = Platform.fromSystem();
@@ -307,11 +317,7 @@ public final class LibUtils {
             }
 
             if (placeholder != null) {
-                try {
-                    return downloadPyTorch(placeholder, fallback);
-                } catch (IOException e) {
-                    throw new IllegalStateException("Failed to download PyTorch native library", e);
-                }
+                return downloadPyTorch(placeholder, fallback);
             }
         } catch (IOException e) {
             throw new IllegalStateException(
@@ -378,8 +384,7 @@ public final class LibUtils {
         System.load(path); // NOPMD
     }
 
-    private static String downloadPyTorch(Platform platform, AtomicBoolean fallback)
-            throws IOException {
+    private static String downloadPyTorch(Platform platform, AtomicBoolean fallback) {
         version = platform.getVersion();
         String flavor = platform.getFlavor();
         String classifier = platform.getClassifier();
@@ -397,8 +402,6 @@ public final class LibUtils {
         if (Files.exists(path)) {
             return dir.toAbsolutePath().toString();
         }
-        // if files not found
-        Files.createDirectories(cacheDir);
 
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
@@ -407,6 +410,9 @@ public final class LibUtils {
         String link = "https://publish.djl.ai/pytorch-" + matcher.group(1);
         Path tmp = null;
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
+            // if files not found
+            Files.createDirectories(cacheDir);
+
             List<String> lines = Utils.readLines(is);
             if (!lines.contains(flavor + '/' + os + "/native/lib/" + libName + ".gz")) {
                 if (flavor.startsWith("cu")) {
@@ -441,6 +447,8 @@ public final class LibUtils {
 
             Utils.moveQuietly(tmp, dir);
             return dir.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to download PyTorch native library", e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);
