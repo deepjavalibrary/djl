@@ -15,7 +15,6 @@ dependencies {
         runtimeOnly "ai.djl.pytorch:pytorch-model-zoo"
 
         runtimeOnly "ai.djl.tensorflow:tensorflow-model-zoo"
-        runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto"
 
         runtimeOnly "ai.djl.mxnet:mxnet-model-zoo"
 
@@ -41,7 +40,6 @@ dependencies {
         runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
 
         runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
-        runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
 
         runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
 

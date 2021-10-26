@@ -6,7 +6,6 @@ dependencies {
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
-    testRuntimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 

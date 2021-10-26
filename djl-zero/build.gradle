@@ -13,7 +13,6 @@ dependencies {
     // runtimeOnly project(":engines:pytorch:pytorch-engine")
     // runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
     // runtimeOnly project(":engines:tensorflow:tensorflow-engine")
-    // runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
     // runtimeOnly project(":engines:onnxruntime:onnxruntime-engine")
     // runtimeOnly "com.microsoft.onnxruntime:onnxruntime:${onnxruntime_version}"
     runtimeOnly project(":engines:mxnet:mxnet-engine")

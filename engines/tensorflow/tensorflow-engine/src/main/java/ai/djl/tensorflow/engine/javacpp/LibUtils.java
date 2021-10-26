@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -82,18 +83,9 @@ public final class LibUtils {
     }
 
     private static synchronized String findLibraryInClasspath() {
+        // TensorFlow doesn't support native library override
         Enumeration<URL> urls;
         try {
-            URL url =
-                    Thread.currentThread()
-                            .getContextClassLoader()
-                            .getResource("native/lib/tensorflow.properties");
-            if (url == null) {
-                // defer to tensorflow-core-api to handle loading native library.
-                logger.debug("tensorflow.properties not found in class path.");
-                return null;
-            }
-
             urls =
                     Thread.currentThread()
                             .getContextClassLoader()
@@ -105,8 +97,17 @@ public final class LibUtils {
 
         // No native jars
         if (!urls.hasMoreElements()) {
-            logger.debug("tensorflow.properties not found in class path.");
-            return null;
+            String preferredVersion;
+            try (InputStream is =
+                    LibUtils.class.getResourceAsStream("/tensorflow-engine.properties")) {
+                Properties prop = new Properties();
+                prop.load(is);
+                preferredVersion = prop.getProperty("tensorflow_version");
+            } catch (IOException e) {
+                throw new IllegalStateException("tensorflow-engine.properties not found.", e);
+            }
+            Platform platform = Platform.fromSystem(preferredVersion);
+            return downloadTensorFlow(platform);
         }
 
         Platform systemPlatform = Platform.fromSystem();
@@ -129,12 +130,7 @@ public final class LibUtils {
             }
 
             if (placeholder != null) {
-                try {
-                    return downloadTensorFlow(placeholder);
-                } catch (IOException e) {
-                    throw new IllegalStateException(
-                            "Failed to download Tensorflow native library", e);
-                }
+                return downloadTensorFlow(placeholder);
             }
         } catch (IOException e) {
             throw new IllegalStateException(
@@ -205,7 +201,7 @@ public final class LibUtils {
         return null;
     }
 
-    private static String downloadTensorFlow(Platform platform) throws IOException {
+    private static String downloadTensorFlow(Platform platform) {
         String version = platform.getVersion();
         String os = platform.getOsPrefix();
         String classifier = platform.getClassifier();
@@ -221,15 +217,17 @@ public final class LibUtils {
             return path.toAbsolutePath().toString();
         }
 
-        Files.createDirectories(cacheDir);
-        Path tmp = Files.createTempDirectory(cacheDir, "tmp");
-
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Unexpected version: " + version);
         }
+
+        Path tmp = null;
         String link = "https://publish.djl.ai/tensorflow-" + matcher.group(1);
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
+            Files.createDirectories(cacheDir);
+            tmp = Files.createTempDirectory(cacheDir, "tmp");
+
             List<String> lines = Utils.readLines(is);
             boolean found = downloadFiles(lines, link, os, flavor, tmp);
             if (!found && cudaArch != null) {
@@ -255,6 +253,8 @@ public final class LibUtils {
 
             Utils.moveQuietly(tmp, dir);
             return path.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to download Tensorflow native library", e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);
