@@ -29,7 +29,6 @@ dependencies {
         runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
     } else if (System.getProperty("ai.djl.default_engine") == "PaddlePaddle") {
         runtimeOnly project(":engines:paddlepaddle:paddlepaddle-model-zoo")
-        runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
     }
 }
 

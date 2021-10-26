@@ -22,7 +22,6 @@ dependencies {
         runtimeOnly "ai.djl.tflite:tflite-native-auto"
 
         runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-model-zoo"
-        runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto"
 
         runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine"
 
@@ -47,7 +46,6 @@ dependencies {
         runtimeOnly "ai.djl.tflite:tflite-native-auto:${tflite_version}"
 
         runtimeOnly project(":engines:paddlepaddle:paddlepaddle-model-zoo")
-        runtimeOnly "ai.djl.paddlepaddle:paddlepaddle-native-auto:${paddlepaddle_version}"
 
         runtimeOnly project(":engines:tensorrt")
 
