@@ -26,7 +26,6 @@ dependencies {
         runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine"
 
         runtimeOnly "ai.djl.dlr:dlr-engine"
-        runtimeOnly "ai.djl.dlr:dlr-native-auto"
 
         runtimeOnly "ai.djl.ml.xgboost:xgboost"
 
@@ -67,7 +66,6 @@ dependencies {
         }
 
         runtimeOnly project(":engines:dlr:dlr-engine")
-        runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
 
         runtimeOnly(project(":engines:ml:xgboost")) {
             exclude group: "ml.dmlc", module: "xgboost4j_2.12"

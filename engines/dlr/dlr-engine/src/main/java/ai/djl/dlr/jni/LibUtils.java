@@ -54,54 +54,70 @@ public final class LibUtils {
     private LibUtils() {}
 
     public static void loadLibrary() {
-        String nativePath = findNativeOverrideLibrary();
-        Path cacheDir;
-        if (nativePath == null) {
-            String nativeLibDir = findNativeLibrary();
-            if (nativeLibDir != null) {
-                cacheDir = Paths.get(nativeLibDir);
-                nativePath = nativeLibDir + "/" + System.mapLibraryName(NATIVE_LIB_NAME);
-            } else {
+        String libName = findNativeOverrideLibrary();
+        if (libName == null) {
+            libName = findNativeLibrary();
+            if (libName == null) {
                 throw new IllegalStateException("Native library not found");
             }
-        } else {
-            Platform platform;
-            try {
-                platform = getPlatformFromProperties();
-            } catch (IOException e) {
-                throw new IllegalStateException(
-                        "Failed to read DLR native library jar properties", e);
-            }
-            if (platform == null) {
-                throw new IllegalStateException(
-                        "Your DLR native library jar does not match your operating system. Make sure the Maven Dependency Classifier matches your system type.");
-            }
-            cacheDir = getCacheDir(platform);
         }
-        String jniPath = copyJniLibraryFromClasspath(cacheDir);
-        System.load(nativePath); // NOPMD
-        logger.debug("Loading DLR native library from: {}", nativePath);
+
+        Path nativeLibDir = Paths.get(libName).getParent();
+        if (nativeLibDir == null || !nativeLibDir.toFile().isDirectory()) {
+            throw new IllegalStateException("Native folder cannot be found");
+        }
+        String jniPath = copyJniLibraryFromClasspath(nativeLibDir);
+        System.load(libName); // NOPMD
+        logger.debug("Loading DLR native library from: {}", libName);
         System.load(jniPath); // NOPMD
         logger.debug("Loading DLR JNI library from: {}", jniPath);
     }
 
     private static synchronized String findNativeLibrary() {
+        Enumeration<URL> urls;
         try {
-            Platform platform = getPlatformFromProperties();
-            Platform systemPlatform = Platform.fromSystem();
+            urls =
+                    Thread.currentThread()
+                            .getContextClassLoader()
+                            .getResources("native/lib/dlr.properties");
+        } catch (IOException e) {
+            logger.warn("", e);
+            return null;
+        }
+        // No native jars
+        if (!urls.hasMoreElements()) {
+            try (InputStream is = LibUtils.class.getResourceAsStream("/jnilib/dlr.properties")) {
+                Properties prop = new Properties();
+                prop.load(is);
+                String preferredVersion = prop.getProperty("dlr_version");
+                Platform platform = Platform.fromSystem(preferredVersion);
+                return downloadDlr(platform);
+            } catch (IOException e) {
+                throw new IllegalStateException("Cannot find DLR property file", e);
+            }
+        }
 
-            if (platform != null && platform.isPlaceholder()) {
-                try {
-                    return downloadDlr(platform);
-                } catch (IOException e) {
-                    throw new IllegalStateException("Failed to download DLR native library", e);
+        Platform systemPlatform = Platform.fromSystem();
+        try {
+            Platform matching = null;
+            Platform placeholder = null;
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                Platform platform = Platform.fromUrl(url);
+                if (platform.isPlaceholder()) {
+                    placeholder = platform;
+                } else if (platform.matches(systemPlatform)) {
+                    matching = platform;
+                }
+
+                if (matching != null) {
+                    return copyNativeLibraryFromClasspath(matching);
+                }
+
+                if (placeholder != null) {
+                    return downloadDlr(placeholder);
                 }
             }
-
-            if (platform != null && platform.matches(systemPlatform)) {
-                return copyNativeLibraryFromClasspath(platform);
-            }
-
         } catch (IOException e) {
             throw new IllegalStateException("Failed to read DLR native library jar properties", e);
         }
@@ -116,7 +132,7 @@ public final class LibUtils {
             Path cacheDir = getCacheDir(platform);
             Path path = cacheDir.resolve(libName);
             if (Files.exists(path)) {
-                return cacheDir.toAbsolutePath().toString();
+                return path.toAbsolutePath().toString();
             }
 
             Path dlrCacheRoot = Utils.getEngineCacheDir("dlr");
@@ -134,7 +150,7 @@ public final class LibUtils {
             }
 
             Utils.moveQuietly(tmp, cacheDir);
-            return cacheDir.toAbsolutePath().toString();
+            return path.toAbsolutePath().toString();
         } catch (IOException e) {
             throw new IllegalStateException("Failed to extract DLR native library", e);
         } finally {
@@ -220,7 +236,7 @@ public final class LibUtils {
         }
     }
 
-    private static String downloadDlr(Platform platform) throws IOException {
+    private static String downloadDlr(Platform platform) {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
         String os = platform.getOsPrefix();
@@ -229,11 +245,10 @@ public final class LibUtils {
         Path cacheDir = getCacheDir(platform);
         Path path = cacheDir.resolve(libName);
         if (Files.exists(path)) {
-            return cacheDir.toAbsolutePath().toString();
+            return path.toAbsolutePath().toString();
         }
         // if files not found
         Path dlrCacheRoot = Utils.getEngineCacheDir("dlr");
-        Files.createDirectories(dlrCacheRoot);
 
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
@@ -242,6 +257,7 @@ public final class LibUtils {
         String link = "https://publish.djl.ai/dlr-" + matcher.group(1) + "/native";
         Path tmp = null;
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
+            Files.createDirectories(dlrCacheRoot);
             List<String> lines = Utils.readLines(is);
             if (flavor.startsWith("cu")
                     && !lines.contains(flavor + '/' + os + "/native/lib/" + libName)) {
@@ -252,7 +268,7 @@ public final class LibUtils {
                 // check again
                 path = cacheDir.resolve(libName);
                 if (Files.exists(path)) {
-                    return cacheDir.toAbsolutePath().toString();
+                    return path.toAbsolutePath().toString();
                 }
             }
 
@@ -269,7 +285,9 @@ public final class LibUtils {
             }
 
             Utils.moveQuietly(tmp, cacheDir);
-            return cacheDir.toAbsolutePath().toString();
+            return path.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to download DLR native library", e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);
@@ -284,35 +302,5 @@ public final class LibUtils {
         Path cacheDir = Utils.getEngineCacheDir("dlr");
         logger.debug("Using cache dir: {}", cacheDir);
         return cacheDir.resolve(version + '-' + flavor + '-' + classifier);
-    }
-
-    private static Platform getPlatformFromProperties() throws IOException {
-        Enumeration<URL> urls;
-        try {
-            urls =
-                    Thread.currentThread()
-                            .getContextClassLoader()
-                            .getResources("native/lib/dlr.properties");
-        } catch (IOException e) {
-            logger.warn("", e);
-            return null;
-        }
-        // No native jars
-        if (!urls.hasMoreElements()) {
-            return null;
-        }
-
-        Platform systemPlatform = Platform.fromSystem();
-        Platform placeholder = null;
-        while (urls.hasMoreElements()) {
-            URL url = urls.nextElement();
-            Platform platform = Platform.fromUrl(url);
-            if (platform.isPlaceholder()) {
-                placeholder = platform;
-            } else if (platform.matches(systemPlatform)) {
-                return platform;
-            }
-        }
-        return placeholder;
     }
 }

@@ -26,7 +26,6 @@ dependencies {
         runtimeOnly "ai.djl.tflite:tflite-native-auto:${tflite_version}"
     } else if (System.getProperty("ai.djl.default_engine") == "DLR") {
         runtimeOnly project(":engines:dlr:dlr-engine")
-        runtimeOnly "ai.djl.dlr:dlr-native-auto:${dlr_version}"
     } else if (System.getProperty("ai.djl.default_engine") == "PaddlePaddle") {
         runtimeOnly project(":engines:paddlepaddle:paddlepaddle-model-zoo")
     }
