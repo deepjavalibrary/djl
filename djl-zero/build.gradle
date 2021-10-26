@@ -18,5 +18,4 @@ dependencies {
     // runtimeOnly "com.microsoft.onnxruntime:onnxruntime:${onnxruntime_version}"
     runtimeOnly project(":engines:mxnet:mxnet-engine")
     runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
-    runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
 }

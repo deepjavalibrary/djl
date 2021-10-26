@@ -18,7 +18,6 @@ dependencies {
         runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto"
 
         runtimeOnly "ai.djl.mxnet:mxnet-model-zoo"
-        runtimeOnly "ai.djl.mxnet:mxnet-native-auto"
 
         runtimeOnly "ai.djl.tflite:tflite-engine"
         runtimeOnly "ai.djl.tflite:tflite-native-auto"
@@ -45,7 +44,6 @@ dependencies {
         runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:${tensorflow_version}"
 
         runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
-        runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
 
         runtimeOnly project(":engines:tflite:tflite-engine")
         runtimeOnly "ai.djl.tflite:tflite-native-auto:${tflite_version}"

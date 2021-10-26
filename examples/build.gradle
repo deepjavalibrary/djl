@@ -15,7 +15,6 @@ dependencies {
         runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
     } else {
         runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
-        runtimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
     }
 
     testImplementation("org.testng:testng:${testng_version}") {

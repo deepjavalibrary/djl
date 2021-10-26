@@ -11,8 +11,6 @@ dependencies {
 
     testImplementation project(":testing")
     testImplementation project(":engines:mxnet:mxnet-engine")
-    testRuntimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
-
 }
 
 task syncS3(type: Exec) {

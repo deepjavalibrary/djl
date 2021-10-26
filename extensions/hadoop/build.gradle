@@ -5,7 +5,6 @@ dependencies {
     api "org.apache.hadoop:hadoop-client:${hadoop_version}"
 
     testImplementation project(":engines:mxnet:mxnet-engine")
-    testImplementation "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
     testImplementation "org.apache.hadoop:hadoop-minicluster:${hadoop_version}"
 
     testImplementation("org.testng:testng:${testng_version}");
