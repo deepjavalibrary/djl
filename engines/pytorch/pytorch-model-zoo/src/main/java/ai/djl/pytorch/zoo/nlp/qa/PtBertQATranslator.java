@@ -62,7 +62,12 @@ public class PtBertQATranslator extends QATranslator {
             question = question.toLowerCase(locale);
             paragraph = paragraph.toLowerCase(locale);
         }
-        BertToken token = tokenizer.encode(question, paragraph);
+        BertToken token;
+        if (padding) {
+            token = tokenizer.encode(question, paragraph, maxLength);
+        } else {
+            token = tokenizer.encode(question, paragraph);
+        }
         tokens = token.getTokens();
         NDManager manager = ctx.getNDManager();
         long[] indices = tokens.stream().mapToLong(vocabulary::getIndex).toArray();
