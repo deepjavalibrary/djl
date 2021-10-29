@@ -13,33 +13,23 @@
 package ai.djl.android.core;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.output.BoundingBox;
-import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -73,7 +63,7 @@ public class BitmapWrapperTest {
             ImageFactory factory = ImageFactory.getInstance();
             Image img = factory.fromUrl("https://github.com/deepjavalibrary/djl/raw/master/examples/src/test/resources/dog_bike_car.jpg");
             NDArray array = img.toNDArray(manager);
-            Image subImg = img.getSubimage(10, 20, 30, 40);
+            Image subImg = img.getSubImage(10, 20, 30, 40);
             NDArray subArray = subImg.toNDArray(manager);
             assertEquals(array.get("20:60,10:40,:"), subArray);
         }
@@ -85,7 +75,7 @@ public class BitmapWrapperTest {
             ImageFactory factory = ImageFactory.getInstance();
             Image img = factory.fromUrl("https://github.com/deepjavalibrary/djl/raw/master/examples/src/test/resources/dog_bike_car.jpg");
             NDArray array = img.toNDArray(manager);
-            NDArray duplicate = img.duplicate(Image.Type.TYPE_INT_ARGB).toNDArray(manager);
+            NDArray duplicate = img.duplicate().toNDArray(manager);
             assertEquals(array, duplicate);
         }
     }

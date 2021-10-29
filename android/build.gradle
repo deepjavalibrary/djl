@@ -1,15 +1,12 @@
 buildscript {
 
     repositories {
-        maven {
-            url "https://mlrepo.djl.ai/maven/"
-        }
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.3'
+        classpath 'com.android.tools.build:gradle:4.2.2'
     }
 }
 

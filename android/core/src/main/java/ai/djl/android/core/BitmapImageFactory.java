@@ -140,14 +140,15 @@ public class BitmapImageFactory extends ImageFactory {
 
         /** {@inheritDoc} */
         @Override
-        public Image getSubimage(int x, int y, int w, int h) {
+        public Image getSubImage(int x, int y, int w, int h) {
             return new BitMapWrapper(Bitmap.createBitmap(bitmap, x, y, w, h));
         }
 
         /** {@inheritDoc} */
         @Override
-        public Image duplicate(Type type) {
-            return new BitMapWrapper(bitmap.copy(getType(type), true));
+        public Image duplicate() {
+            Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+            return new BitMapWrapper(mutableBitmap);
         }
 
         /** {@inheritDoc} */
@@ -253,13 +254,6 @@ public class BitmapImageFactory extends ImageFactory {
             Bitmap oldBitmap = bitmap;
             bitmap = mutableBitmap;
             oldBitmap.recycle();
-        }
-
-        private Bitmap.Config getType(Type type) {
-            if (type == Type.TYPE_INT_ARGB) {
-                return Bitmap.Config.ARGB_8888;
-            }
-            throw new IllegalArgumentException("the type is not supported!");
         }
 
         private int randomColor() {
