@@ -47,6 +47,7 @@ public class Arguments {
     private int iteration;
     private int threads;
     private int maxGpus;
+    private int neuronCores;
     private int delay;
     private PairList<DataType, Shape> inputShapes;
 
@@ -93,6 +94,9 @@ public class Arguments {
             }
         } else {
             maxGpus = Integer.MAX_VALUE;
+        }
+        if (cmd.hasOption("neuron-cores")) {
+            neuronCores = Integer.parseInt(cmd.getOptionValue("neuron-cores"));
         }
         if (cmd.hasOption("threads")) {
             threads = Integer.parseInt(cmd.getOptionValue("threads"));
@@ -204,13 +208,23 @@ public class Arguments {
                         .argName("NUMBER_THREADS")
                         .desc("Number of inference threads.")
                         .build());
-        options.addOption(
+        OptionGroup deviceGroup = new OptionGroup();
+        deviceGroup.addOption(
                 Option.builder("g")
                         .longOpt("gpus")
                         .hasArg()
                         .argName("NUMBER_GPUS")
                         .desc("Number of GPUS to run multithreading inference.")
                         .build());
+        deviceGroup.addOption(
+                Option.builder()
+                        .longOpt("neuron-cores")
+                        .hasArg()
+                        .argName("NEURON-CORES")
+                        .desc(
+                                "Number of neuron cores to run multithreading inference, See https://awsdocs-neuron.readthedocs-hosted.com.")
+                        .build());
+        options.addOptionGroup(deviceGroup);
         options.addOption(
                 Option.builder("l")
                         .longOpt("delay")
@@ -300,6 +314,10 @@ public class Arguments {
 
     int getMaxGpus() {
         return maxGpus;
+    }
+
+    int getNeuronCores() {
+        return neuronCores;
     }
 
     String getOutputDir() {

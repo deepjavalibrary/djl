@@ -168,6 +168,8 @@ usage: djl-bench [-p MODEL-PATH] -s INPUT-SHAPES [OPTIONS]
     --model-arguments <MODEL-ARGUMENTS>   Specify model loading arguments.
     --model-options <MODEL-OPTIONS>       Specify model loading options.
  -n,--model-name <MODEL-NAME>             Specify model file name.
+    --neuron-cores <NEURON-CORES>         Number of neuron cores to run multithreading inference, See
+                                          https://awsdocs-neuron.readthedocs-hosted.com.
  -o,--output-dir <OUTPUT-DIR>             Directory for output logs.
  -p,--model-path <MODEL-PATH>             Model directory file path.
  -s,--input-shapes <INPUT-SHAPES>         Input data shapes for the model.
