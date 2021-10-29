@@ -94,7 +94,7 @@ public final class PoseEstimation {
                 Rectangle rect = item.getBoundingBox().getBounds();
                 int width = img.getWidth();
                 int height = img.getHeight();
-                return img.getSubimage(
+                return img.getSubImage(
                         (int) (rect.getX() * width),
                         (int) (rect.getY() * height),
                         (int) (rect.getWidth() * width),

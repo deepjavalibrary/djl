@@ -55,15 +55,7 @@ public interface Image {
      * @param h the height of the specified rectangular region
      * @return subimage of this image
      */
-    Image getSubimage(int x, int y, int w, int h);
-
-    /**
-     * Gets a deep copy of the original image given the type.
-     *
-     * @param type the type of the copied image
-     * @return the copy of the original image.
-     */
-    Image duplicate(Type type);
+    Image getSubImage(int x, int y, int w, int h);
 
     /**
      * Converts image to a RGB {@link NDArray}.
@@ -127,11 +119,6 @@ public interface Image {
                     throw new IllegalArgumentException("Invalid FLAG");
             }
         }
-    }
-
-    /** Type indicates the type options for images. */
-    enum Type {
-        TYPE_INT_ARGB
     }
 
     /** Interpolation indicates the Interpolation options for resizinig an image. */

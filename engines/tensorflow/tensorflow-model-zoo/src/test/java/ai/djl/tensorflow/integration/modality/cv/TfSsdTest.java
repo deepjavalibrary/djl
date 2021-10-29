@@ -83,12 +83,10 @@ public class TfSsdTest {
         Path outputDir = Paths.get("build/output");
         Files.createDirectories(outputDir);
 
-        // Make image copy with alpha channel because original image was jpg
-        Image newImage = img.duplicate(Image.Type.TYPE_INT_ARGB);
-        newImage.drawBoundingBoxes(detection);
+        img.drawBoundingBoxes(detection);
 
         Path imagePath = outputDir.resolve("detected-dog_bike_car.png");
         // OpenJDK can't save jpg with alpha channel
-        newImage.save(Files.newOutputStream(imagePath), "png");
+        img.save(Files.newOutputStream(imagePath), "png");
     }
 }

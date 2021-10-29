@@ -19,6 +19,8 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@code ImageFactory} contains image creation mechanism on top of different platforms like PC and
@@ -26,20 +28,31 @@ import java.nio.file.Paths;
  */
 public abstract class ImageFactory {
 
+    private static final Logger logger = LoggerFactory.getLogger(ImageFactory.class);
+
+    private static final String[] FACTORIES = {
+        "ai.djl.opencv.OpenCVImageFactory",
+        "ai.djl.modality.cv.BufferedImageFactory",
+        "ai.djl.android.core.BitmapImageFactory"
+    };
+
     private static ImageFactory factory = newInstance();
 
     private static ImageFactory newInstance() {
-        String className = "ai.djl.modality.cv.BufferedImageFactory";
+        int index = 0;
         if ("http://www.android.com/".equals(System.getProperty("java.vendor.url"))) {
-            className = "ai.djl.android.core.BitmapImageFactory";
+            index = 2;
         }
-        try {
-            Class<? extends ImageFactory> clazz =
-                    Class.forName(className).asSubclass(ImageFactory.class);
-            return clazz.getConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Create new ImageFactory failed!", e);
+        for (int i = index; i < FACTORIES.length; ++i) {
+            try {
+                Class<? extends ImageFactory> clazz =
+                        Class.forName(FACTORIES[i]).asSubclass(ImageFactory.class);
+                return clazz.getConstructor().newInstance();
+            } catch (ReflectiveOperationException e) {
+                logger.trace("", e);
+            }
         }
+        throw new IllegalStateException("Create new ImageFactory failed!");
     }
 
     /**
@@ -76,7 +89,11 @@ public abstract class ImageFactory {
      * @return {@link Image}
      * @throws IOException URL is not valid.
      */
-    public abstract Image fromUrl(URL url) throws IOException;
+    public Image fromUrl(URL url) throws IOException {
+        try (InputStream is = url.openStream()) {
+            return fromInputStream(is);
+        }
+    }
 
     /**
      * Gets {@link Image} from URL.
