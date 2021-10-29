@@ -16,12 +16,12 @@ package ai.djl.examples.inference;
 import ai.djl.ModelException;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class ObjectDetectionWithTensorflowSavedModelTest {
@@ -30,19 +30,16 @@ public class ObjectDetectionWithTensorflowSavedModelTest {
     public void testObjectDetection() throws ModelException, TranslateException, IOException {
         // Only run nightly, this example download the synset file from github, this can cause
         // throttling and will fail the test.
-        if (Boolean.getBoolean("nightly")) {
-            DetectedObjects result = ObjectDetectionWithTensorflowSavedModel.predict();
-            // only works for TensorFlow
-            if (result == null) {
-                throw new SkipException("Only works for TensorFlow engine.");
-            }
+        TestRequirements.nightly();
+        TestRequirements.engine("TensorFlow");
 
-            Assert.assertEquals(result.getNumberOfObjects(), 3);
-            List<String> objects = Arrays.asList("dog", "bicycle", "car");
-            for (Classifications.Classification obj : result.items()) {
-                Assert.assertTrue(objects.contains(obj.getClassName()));
-                Assert.assertTrue(Double.compare(obj.getProbability(), 0.7) > 0);
-            }
+        DetectedObjects result = ObjectDetectionWithTensorflowSavedModel.predict();
+
+        Assert.assertEquals(result.getNumberOfObjects(), 3);
+        List<String> objects = Arrays.asList("dog", "bicycle", "car");
+        for (Classifications.Classification obj : result.items()) {
+            Assert.assertTrue(objects.contains(obj.getClassName()));
+            Assert.assertTrue(Double.compare(obj.getProbability(), 0.7) > 0);
         }
     }
 }

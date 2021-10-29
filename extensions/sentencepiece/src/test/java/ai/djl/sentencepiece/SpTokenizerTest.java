@@ -13,6 +13,7 @@
 
 package ai.djl.sentencepiece;
 
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,7 +22,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -39,9 +39,8 @@ public class SpTokenizerTest {
 
     @Test
     public void testTokenize() throws IOException {
-        if (System.getProperty("os.name").startsWith("Win")) {
-            throw new SkipException("Skip windows test.");
-        }
+        TestRequirements.notWindows();
+
         Path modelPath = Paths.get("build/test/models/sententpiece_test_model.model");
         try (SpTokenizer tokenizer = new SpTokenizer(modelPath)) {
             String original = "Hello World";
@@ -56,9 +55,8 @@ public class SpTokenizerTest {
     @Test
     @SuppressWarnings("AvoidEscapedUnicodeCharacters")
     public void testUtf16Tokenize() throws IOException {
-        if (System.getProperty("os.name").startsWith("Win")) {
-            throw new SkipException("Skip windows test.");
-        }
+        TestRequirements.notWindows();
+
         Path modelPath = Paths.get("build/test/models/sententpiece_test_model.model");
         try (SpTokenizer tokenizer = new SpTokenizer(modelPath)) {
             String original = "\uD83D\uDC4B\uD83D\uDC4B";
@@ -70,9 +68,8 @@ public class SpTokenizerTest {
 
     @Test
     public void testEncodeDecode() throws IOException {
-        if (System.getProperty("os.name").startsWith("Win")) {
-            throw new SkipException("Skip windows test.");
-        }
+        TestRequirements.notWindows();
+
         Path modelPath = Paths.get("build/test/models");
         String prefix = "sententpiece_test_model";
         try (SpTokenizer tokenizer = new SpTokenizer(modelPath, prefix)) {

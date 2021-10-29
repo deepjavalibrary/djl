@@ -13,25 +13,20 @@
 package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
-import ai.djl.engine.Engine;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class UniversalSentenceEncoderTest {
 
     @Test
     public void testSentimentAnalysis() throws ModelException, TranslateException, IOException {
-        if (!Boolean.getBoolean("nightly")) {
-            throw new SkipException("Nightly only");
-        }
-        if (!"TensorFlow".equals(Engine.getInstance().getEngineName())) {
-            throw new SkipException("Only works for TensorFlow engine.");
-        }
+        TestRequirements.nightly();
+        TestRequirements.engine("TensorFlow");
 
         List<String> inputs = new ArrayList<>();
         inputs.add("The quick brown fox jumps over the lazy dog.");

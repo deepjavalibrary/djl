@@ -13,24 +13,19 @@
 package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
-import ai.djl.engine.Engine;
 import ai.djl.modality.Classifications;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class SentimentAnalysisTest {
 
     @Test
     public void testSentimentAnalysis() throws ModelException, TranslateException, IOException {
-        if (!Boolean.getBoolean("nightly")) {
-            throw new SkipException("Nightly only");
-        }
-        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
-            throw new SkipException("Only works for PyTorch engine.");
-        }
+        TestRequirements.nightly();
+        TestRequirements.engine("PyTorch");
 
         Classifications result = SentimentAnalysis.predict();
         Assert.assertEquals(result.best().getClassName(), "Positive");

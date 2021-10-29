@@ -13,11 +13,10 @@
 package ai.djl.examples.training;
 
 import ai.djl.MalformedModelException;
-import ai.djl.engine.Engine;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class TrainSentimentAnalysisTest {
@@ -26,13 +25,8 @@ public class TrainSentimentAnalysisTest {
     public void testTrainSentimentAnalysis()
             throws MalformedModelException, ModelNotFoundException, TranslateException,
                     IOException {
-        // this is nightly test
-        if (!Boolean.getBoolean("nightly")) {
-            throw new SkipException("Nightly only");
-        }
-        if (Engine.getInstance().getGpuCount() == 0) {
-            throw new SkipException("GPU only");
-        }
+        TestRequirements.nightly();
+        TestRequirements.gpu();
 
         String[] args = new String[] {"-e", "1", "-g", "1"};
         TrainSentimentAnalysis.runExample(args);

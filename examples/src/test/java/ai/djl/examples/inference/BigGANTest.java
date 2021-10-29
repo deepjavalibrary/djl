@@ -14,21 +14,19 @@ package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
 import ai.djl.modality.cv.Image;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class BigGANTest {
 
     @Test
     public void testBigGAN() throws ModelException, TranslateException, IOException {
-        Image[] generatedImages = BigGAN.generate();
+        TestRequirements.engine("PyTorch");
 
-        if (generatedImages == null) {
-            throw new SkipException("Only works for PyTorch engine.");
-        }
+        Image[] generatedImages = BigGAN.generate();
 
         Assert.assertEquals(generatedImages.length, 5);
         for (Image img : generatedImages) {

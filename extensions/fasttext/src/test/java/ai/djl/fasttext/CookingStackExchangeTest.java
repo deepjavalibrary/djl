@@ -23,6 +23,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +36,6 @@ import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class CookingStackExchangeTest {
@@ -44,9 +44,8 @@ public class CookingStackExchangeTest {
 
     @Test
     public void testTrainTextClassification() throws IOException {
-        if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            throw new SkipException("fastText is not supported on windows");
-        }
+        TestRequirements.notWindows(); // fastText is not supported on windows
+
         try (FtModel model = new FtModel("cooking")) {
             CookingStackExchange dataset = CookingStackExchange.builder().build();
 
@@ -68,9 +67,8 @@ public class CookingStackExchangeTest {
     @Test
     public void testTextClassification()
             throws IOException, MalformedModelException, ModelNotFoundException {
-        if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            throw new SkipException("fastText is not supported on windows");
-        }
+        TestRequirements.notWindows(); // fastText is not supported on windows
+
         Criteria<String, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(String.class, Classifications.class)
@@ -87,9 +85,8 @@ public class CookingStackExchangeTest {
 
     @Test
     public void testWord2Vec() throws IOException, MalformedModelException, ModelNotFoundException {
-        if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            throw new SkipException("fastText is not supported on windows");
-        }
+        TestRequirements.notWindows(); // fastText is not supported on windows
+
         Criteria<String, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(String.class, Classifications.class)
@@ -111,12 +108,8 @@ public class CookingStackExchangeTest {
 
     @Test
     public void testBlazingText() throws IOException, ModelException {
-        if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            throw new SkipException("fastText is not supported on windows");
-        }
-        if (!Boolean.getBoolean("nightly")) {
-            throw new SkipException("Nightly only");
-        }
+        TestRequirements.notWindows(); // fastText is not supported on windows
+        TestRequirements.nightly();
 
         URL url = new URL("https://resources.djl.ai/test-models/blazingtext_classification.bin");
         Path path = Paths.get("build/tmp/model");

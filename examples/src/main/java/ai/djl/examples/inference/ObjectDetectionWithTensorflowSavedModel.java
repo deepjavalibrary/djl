@@ -69,18 +69,16 @@ public final class ObjectDetectionWithTensorflowSavedModel {
     private ObjectDetectionWithTensorflowSavedModel() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        DetectedObjects detection = ObjectDetectionWithTensorflowSavedModel.predict();
-        if (detection == null) {
+        if (!"TensorFlow".equals(Engine.getInstance().getEngineName())) {
             logger.info("This example only works for TensorFlow Engine");
-        } else {
-            logger.info("{}", detection);
+            return;
         }
+
+        DetectedObjects detection = ObjectDetectionWithTensorflowSavedModel.predict();
+        logger.info("{}", detection);
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
-        if (!"TensorFlow".equals(Engine.getInstance().getEngineName())) {
-            return null;
-        }
 
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);

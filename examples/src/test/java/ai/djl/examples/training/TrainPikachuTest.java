@@ -14,21 +14,19 @@ package ai.djl.examples.training;
 
 import ai.djl.MalformedModelException;
 import ai.djl.engine.Engine;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class TrainPikachuTest {
 
     @Test
     public void testDetection() throws IOException, MalformedModelException, TranslateException {
-        // this is nightly test
-        if (!Boolean.getBoolean("nightly")) {
-            throw new SkipException("Nightly only");
-        }
+        TestRequirements.nightly();
+
         String[] args;
         float expectedLoss = 0;
         int expectedMinNumber = 0;

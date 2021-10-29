@@ -41,6 +41,7 @@ import ai.djl.nn.recurrent.GRU;
 import ai.djl.nn.recurrent.LSTM;
 import ai.djl.nn.recurrent.RNN;
 import ai.djl.testing.Assertions;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
@@ -56,7 +57,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class BlockCoreTest {
@@ -207,9 +207,7 @@ public class BlockCoreTest {
     @SuppressWarnings("try")
     @Test
     public void testLayerNorm() throws IOException, MalformedModelException {
-        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
-            throw new SkipException("Only works for PyTorch engine.");
-        }
+        TestRequirements.engine("PyTorch");
 
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
@@ -238,9 +236,7 @@ public class BlockCoreTest {
     @SuppressWarnings("try")
     @Test
     public void test2LayerNorm() throws IOException, MalformedModelException {
-        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
-            throw new SkipException("Only works for PyTorch engine.");
-        }
+        TestRequirements.engine("PyTorch");
 
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())

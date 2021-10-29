@@ -16,11 +16,11 @@ import ai.djl.MalformedModelException;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class StyleTransferTest {
@@ -29,13 +29,11 @@ public class StyleTransferTest {
     public void testStyleTransfer()
             throws IOException, ModelNotFoundException, MalformedModelException,
                     TranslateException {
+        TestRequirements.engine("PyTorch");
+
         String imagePath = "src/test/resources/mountains.png";
         Image input = ImageFactory.getInstance().fromFile(Paths.get(imagePath));
         Image generatedImage = StyleTransfer.transfer(input, StyleTransfer.Artist.MONET);
-
-        if (generatedImage == null) {
-            throw new SkipException("Only works for PyTorch engine.");
-        }
 
         Assert.assertEquals(generatedImage.getWidth(), input.getWidth());
         Assert.assertEquals(generatedImage.getHeight(), input.getHeight());

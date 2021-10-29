@@ -16,6 +16,7 @@ import ai.djl.Application;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
+import ai.djl.testing.TestRequirements;
 import ai.djl.util.Utils;
 import ai.djl.util.ZipUtils;
 import java.io.IOException;
@@ -28,7 +29,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -39,9 +39,7 @@ public class HdfsRepositoryTest {
 
     @BeforeClass
     public void setup() throws IOException {
-        if (System.getProperty("os.name").startsWith("Win")) {
-            throw new SkipException("MiniDFSCluster doesn't wupport windows.");
-        }
+        TestRequirements.notWindows(); // MiniDFSCluster doesn't wupport windows.
 
         System.setProperty("DJL_CACHE_DIR", "build/cache");
         String userHome = System.getProperty("user.home");

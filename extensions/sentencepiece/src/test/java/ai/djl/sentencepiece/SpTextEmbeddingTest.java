@@ -12,6 +12,7 @@
  */
 package ai.djl.sentencepiece;
 
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,7 +20,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -36,9 +36,8 @@ public class SpTextEmbeddingTest {
 
     @Test
     public void testEmbedding() throws IOException {
-        if (System.getProperty("os.name").startsWith("Win")) {
-            throw new SkipException("Skip windows test.");
-        }
+        TestRequirements.notWindows();
+
         Path modelPath = Paths.get("build/test/models/sententpiece_test_model.model");
         try (SpTokenizer tokenizer = new SpTokenizer(modelPath)) {
             SpTextEmbedding embedding = SpTextEmbedding.from(tokenizer);

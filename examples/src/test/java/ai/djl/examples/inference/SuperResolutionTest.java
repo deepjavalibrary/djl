@@ -16,28 +16,26 @@ import ai.djl.ModelException;
 import ai.djl.examples.inference.sr.SuperResolution;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class SuperResolutionTest {
 
     @Test
     public void testSuperResolution() throws ModelException, TranslateException, IOException {
+        TestRequirements.engine("TensorFlow");
+
         String imagePath = "src/test/resources/";
         Image fox = ImageFactory.getInstance().fromFile(Paths.get(imagePath + "fox.png"));
         List<Image> inputImages = Arrays.asList(fox, fox);
 
         List<Image> enhancedImages = SuperResolution.enhance(inputImages);
-
-        if (enhancedImages == null) {
-            throw new SkipException("Only works for TensorFlow engine.");
-        }
 
         Assert.assertEquals(enhancedImages.size(), 2);
         int size = 4 * fox.getWidth();

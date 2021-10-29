@@ -45,6 +45,10 @@ public final class SuperResolution {
     private SuperResolution() {}
 
     public static void main(String[] args) throws ModelException, TranslateException, IOException {
+        if (!"TensorFlow".equals(Engine.getInstance().getEngineName())) {
+            logger.info("This example only works for TensorFlow Engine");
+            return;
+        }
         String imagePath = "src/test/resources/";
         ImageFactory imageFactory = ImageFactory.getInstance();
 
@@ -53,12 +57,8 @@ public final class SuperResolution {
 
         List<Image> enhancedImages = enhance(inputImages);
 
-        if (enhancedImages == null) {
-            logger.info("This example only works for TensorFlow Engine");
-        } else {
-            logger.info("Using TensorFlow Engine. {} images generated.", enhancedImages.size());
-            saveImages(inputImages, enhancedImages);
-        }
+        logger.info("Using TensorFlow Engine. {} images generated.", enhancedImages.size());
+        saveImages(inputImages, enhancedImages);
     }
 
     private static void saveImages(List<Image> input, List<Image> generated) throws IOException {
@@ -105,10 +105,6 @@ public final class SuperResolution {
 
     public static List<Image> enhance(List<Image> inputImages)
             throws IOException, ModelException, TranslateException {
-
-        if (!"TensorFlow".equals(Engine.getInstance().getEngineName())) {
-            return null;
-        }
 
         String modelUrl =
                 "https://storage.googleapis.com/tfhub-modules/captain-pool/esrgan-tf2/1.tar.gz";

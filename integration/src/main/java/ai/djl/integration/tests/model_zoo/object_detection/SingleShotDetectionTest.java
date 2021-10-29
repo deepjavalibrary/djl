@@ -19,7 +19,6 @@ import ai.djl.basicdataset.cv.PikachuDetection;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
-import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.MultiBoxDetection;
@@ -34,6 +33,7 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
@@ -49,7 +49,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class SingleShotDetectionTest {
@@ -129,9 +128,7 @@ public class SingleShotDetectionTest {
 
     private ZooModel<Image, DetectedObjects> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        if (!TestUtils.isMxnet()) {
-            throw new SkipException("SSD-pikachu model only available in MXNet");
-        }
+        TestRequirements.engine("MXNet"); // SSD-pikachu model only available in MXNet
 
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()

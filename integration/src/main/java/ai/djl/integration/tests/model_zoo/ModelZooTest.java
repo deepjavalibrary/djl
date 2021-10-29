@@ -19,12 +19,11 @@ import ai.djl.repository.Artifact;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
+import ai.djl.testing.TestRequirements;
 import ai.djl.util.Utils;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Calendar;
 import java.util.List;
-import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -47,12 +46,9 @@ public class ModelZooTest {
 
     @Test
     public void testDownloadModels() throws IOException, ModelException {
-        if (!Boolean.getBoolean("nightly") || Boolean.getBoolean("offline")) {
-            throw new SkipException("Weekly only");
-        }
-        if (Calendar.SATURDAY != Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
-            throw new SkipException("Weekly only");
-        }
+        TestRequirements.nightly();
+        TestRequirements.notOffline();
+        TestRequirements.weekly();
 
         for (ModelZoo zoo : ModelZoo.listModelZoo()) {
             for (ModelLoader modelLoader : zoo.getModelLoaders()) {

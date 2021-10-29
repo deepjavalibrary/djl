@@ -13,13 +13,13 @@
 
 package ai.djl.sentencepiece;
 
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -37,9 +37,8 @@ public class SpVocabularyTest {
 
     @Test
     public void testTokenIdConversion() throws IOException {
-        if (System.getProperty("os.name").startsWith("Win")) {
-            throw new SkipException("Skip windows test.");
-        }
+        TestRequirements.notWindows();
+
         Path modelPath = Paths.get("build/test/models");
         String prefix = "sententpiece_test_model";
         SpTokenizer tokenizer = new SpTokenizer(modelPath, prefix);
