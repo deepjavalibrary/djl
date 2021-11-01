@@ -15,6 +15,8 @@ package ai.djl.repository;
 import ai.djl.util.Utils;
 import ai.djl.util.ZipUtils;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,7 +28,7 @@ public class JarRepositoryTest {
 
     @Test
     public void testResource() throws IOException {
-        Path path = Paths.get("build/resources/test/");
+        Path path = Paths.get("build/tmp/");
         Files.createDirectories(path);
 
         Path dir = Paths.get("build/testDir/");
@@ -35,16 +37,24 @@ public class JarRepositoryTest {
         Files.createFile(dir.resolve("synset.txt"));
         Path testFile = path.resolve("test.zip");
         ZipUtils.zip(dir, testFile, false);
+        Path jarFile = path.resolve("test.jar");
+        ZipUtils.zip(testFile, jarFile, false);
 
-        Repository repo = Repository.newInstance("test", "jar:///test.zip");
-        Assert.assertEquals("test", repo.getName());
-        Assert.assertTrue(repo.isRemote());
+        URL[] url = {jarFile.toUri().toURL()};
+        try {
+            Thread.currentThread().setContextClassLoader(new URLClassLoader(url));
+            Repository repo = Repository.newInstance("test", "jar:///test.zip");
+            Assert.assertEquals("test", repo.getName());
+            Assert.assertTrue(repo.isRemote());
 
-        List<MRL> list = repo.getResources();
-        Assert.assertEquals(list.size(), 1);
+            List<MRL> list = repo.getResources();
+            Assert.assertEquals(list.size(), 1);
 
-        Artifact artifact = repo.resolve(list.get(0), null);
-        repo.prepare(artifact);
-        Assert.assertEquals(1, artifact.getFiles().size());
+            Artifact artifact = repo.resolve(list.get(0), null);
+            repo.prepare(artifact);
+            Assert.assertEquals(1, artifact.getFiles().size());
+        } finally {
+            Thread.currentThread().setContextClassLoader(null);
+        }
     }
 }
