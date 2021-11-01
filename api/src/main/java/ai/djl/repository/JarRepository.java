@@ -108,7 +108,7 @@ public class JarRepository extends AbstractRepository {
         artifact.getArguments().putAll(arguments);
         Map<String, Artifact.Item> files = new ConcurrentHashMap<>();
         Artifact.Item item = new Artifact.Item();
-        item.setUri(uri.getPath());
+        item.setUri(uri.getSchemeSpecificPart());
         item.setName(""); // avoid creating extra folder
         item.setArtifact(artifact);
         item.setSize(-1);
