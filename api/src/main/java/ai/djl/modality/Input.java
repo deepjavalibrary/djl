@@ -16,9 +16,11 @@ import ai.djl.ndarray.BytesSupplier;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 /** A class stores the generic input data for inference. */
@@ -323,5 +325,28 @@ public class Input {
             return new NDList((NDArray) data);
         }
         return NDList.decode(manager, data.getAsBytes());
+    }
+
+    /** {@inheritDoc} * */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(1000);
+        sb.append("Input:\n");
+        for (Entry<String, String> property : properties.entrySet()) {
+            sb.append("Property ")
+                    .append(property.getKey())
+                    .append(": ")
+                    .append(property.getValue())
+                    .append('\n');
+        }
+        for (Pair<String, BytesSupplier> c : content) {
+            sb.append("Content ")
+                    .append(c.getKey())
+                    .append(": ")
+                    .append(c.getValue().toString())
+                    .append('\n');
+        }
+        sb.append('\n');
+        return sb.toString();
     }
 }
