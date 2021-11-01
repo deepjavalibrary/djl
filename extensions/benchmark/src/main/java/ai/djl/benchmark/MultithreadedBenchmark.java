@@ -22,6 +22,7 @@ import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -47,6 +48,15 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
         Engine engine = Engine.getEngine(arguments.getEngine());
         Device[] devices = engine.getDevices(arguments.getMaxGpus());
         int numOfThreads = arguments.getThreads();
+        int neuronCores = arguments.getNeuronCores();
+        if (neuronCores > 0) {
+            devices = new Device[neuronCores];
+            Arrays.fill(devices, Device.cpu());
+            if (numOfThreads > 1) {
+                numOfThreads = 2 * neuronCores;
+            }
+        }
+
         int delay = arguments.getDelay();
         AtomicInteger counter = new AtomicInteger(iteration);
         logger.info("Multithreading inference with {} threads.", numOfThreads);
