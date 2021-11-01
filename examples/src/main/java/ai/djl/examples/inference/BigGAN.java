@@ -36,14 +36,14 @@ public final class BigGAN {
     private BigGAN() {}
 
     public static void main(String[] args) throws ModelException, TranslateException, IOException {
-        Image[] generatedImages = BigGAN.generate();
-
-        if (generatedImages == null) {
+        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
             logger.info("This example only works for PyTorch Engine");
-        } else {
-            logger.info("Using PyTorch Engine. {} images generated.", generatedImages.length);
-            saveImages(generatedImages);
+            return;
         }
+
+        Image[] generatedImages = BigGAN.generate();
+        logger.info("Using PyTorch Engine. {} images generated.", generatedImages.length);
+        saveImages(generatedImages);
     }
 
     private static void saveImages(Image[] generatedImages) throws IOException {
@@ -58,9 +58,6 @@ public final class BigGAN {
     }
 
     public static Image[] generate() throws IOException, ModelException, TranslateException {
-        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
-            return null;
-        }
 
         Criteria<int[], Image[]> criteria =
                 Criteria.builder()

@@ -19,6 +19,7 @@ dependencies {
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
+    testImplementation(project(":testing"))
 }
 
 application {

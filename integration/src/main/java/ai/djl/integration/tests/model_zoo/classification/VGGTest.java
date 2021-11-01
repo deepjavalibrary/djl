@@ -22,6 +22,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.ParameterStore;
@@ -35,7 +36,6 @@ import ai.djl.util.PairList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class VGGTest {
@@ -44,9 +44,8 @@ public class VGGTest {
     public void testTrainWithDefaultChannels() {
         // Vgg is too large to be fit into the github action cpu main memory
         // only run the test when we have GPU
-        if (Engine.getInstance().getGpuCount() == 0) {
-            throw new SkipException("GPU only");
-        }
+        TestRequirements.gpu();
+
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optDevices(Engine.getInstance().getDevices(2));

@@ -3,6 +3,7 @@ group "ai.djl.dlr"
 dependencies {
     api project(":api")
 
+    testImplementation(project(":testing"))
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }

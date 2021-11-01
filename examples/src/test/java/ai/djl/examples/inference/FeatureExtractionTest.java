@@ -13,25 +13,22 @@
 package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
-import ai.djl.engine.Engine;
 import ai.djl.examples.inference.face.FeatureExtraction;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class FeatureExtractionTest {
 
     @Test
     public void testFeatureComparison() throws ModelException, TranslateException, IOException {
-        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
-            throw new SkipException("Only works for PyTorch engine.");
-        }
+        TestRequirements.engine("PyTorch");
 
         Path imageFile = Paths.get("src/test/resources/kana1.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);

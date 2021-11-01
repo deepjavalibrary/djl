@@ -21,12 +21,12 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.testing.Assertions;
+import ai.djl.testing.TestRequirements;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import java.nio.FloatBuffer;
 import java.util.stream.IntStream;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class NDArrayCreationOpTest {
@@ -425,10 +425,11 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testFixedSeed() {
+        TestRequirements.notEngine(
+                "TensorFlow"); // TensorFlow fixed random seed requires restart process.
+
         try (NDManager manager = NDManager.newBaseManager()) {
-            if ("TensorFlow".equals(Engine.getInstance().getEngineName())) {
-                throw new SkipException("TensorFlow fixed random seed require restart process.");
-            }
+
             int fixedSeed = 1234;
             Engine.getInstance().setRandomSeed(fixedSeed);
             NDArray expectedUniform = manager.randomUniform(-10, 10, new Shape(10, 10));

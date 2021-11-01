@@ -29,11 +29,6 @@ public final class TestUtils {
         return System.getProperty("os.name").startsWith("Win");
     }
 
-    public static boolean isMxnet() {
-        Engine engine = Engine.getInstance();
-        return "MXNet".equals(engine.getEngineName());
-    }
-
     public static boolean isEngine(String name) {
         Engine engine = Engine.getInstance();
         return name.equals(engine.getEngineName());
@@ -53,7 +48,7 @@ public final class TestUtils {
 
     public static Device[] getDevices() {
         if (!Engine.getInstance().hasCapability(StandardCapabilities.CUDNN)
-                && TestUtils.isMxnet()) {
+                && "MXNet".equals(Engine.getInstance().getEngineName())) {
             return new Device[] {
                 Device.cpu()
             }; // TODO: RNN is not implemented on MXNet without cuDNN

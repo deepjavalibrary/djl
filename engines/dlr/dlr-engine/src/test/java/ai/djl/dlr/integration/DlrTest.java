@@ -23,26 +23,28 @@ import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class DlrTest {
 
     @Test
     public void testDlr() throws ModelException, IOException, TranslateException {
+        TestRequirements.notWindows();
+
         String os;
         if (System.getProperty("os.name").toLowerCase().startsWith("mac")) {
             os = "osx";
         } else if (System.getProperty("os.name").toLowerCase().startsWith("linux")) {
             os = "linux";
         } else {
-            throw new SkipException("test only work on mac and Linux");
+            throw new IllegalStateException("Unexpected os");
         }
         ImageClassificationTranslator translator =
                 ImageClassificationTranslator.builder()

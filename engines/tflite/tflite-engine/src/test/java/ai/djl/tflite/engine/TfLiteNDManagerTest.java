@@ -15,17 +15,16 @@ package ai.djl.tflite.engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.TestRequirements;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class TfLiteNDManagerTest {
 
     @Test
     public void testNDArray() {
-        if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-            throw new SkipException("test only work on mac and Linux");
-        }
+        TestRequirements.notWindows();
+
         try (NDManager manager = TfLiteNDManager.getSystemManager().newSubManager()) {
             NDArray zeros = manager.zeros(new Shape(1, 2));
             float[] data = zeros.toFloatArray();

@@ -17,7 +17,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.AlexNet;
-import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
@@ -25,12 +24,12 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
 import java.io.IOException;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class ImperativeModelZooTest {
@@ -38,10 +37,8 @@ public class ImperativeModelZooTest {
     @Test
     public void testImperativeModelInputOutput()
             throws MalformedModelException, ModelNotFoundException, IOException {
-        // Test imperative models, only available in MXNet engine
-        if (!TestUtils.isMxnet()) {
-            throw new SkipException("Resnet50-cifar10 model only available in MXNet");
-        }
+        TestRequirements.engine("MXNet"); // Resnet50-cifar10 model only available in MXNet
+
         // from model zoo
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()

@@ -22,6 +22,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
@@ -31,7 +32,6 @@ import java.nio.FloatBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -64,9 +64,8 @@ public class XgbModelTest {
 
     @Test
     public void testNDArray() {
-        if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-            throw new SkipException("test only work on mac and Linux");
-        }
+        TestRequirements.notWindows();
+
         try (XgbNDManager manager =
                 (XgbNDManager) XgbNDManager.getSystemManager().newSubManager()) {
             NDArray zeros = manager.zeros(new Shape(1, 2));

@@ -16,13 +16,13 @@ import ai.djl.MalformedModelException;
 import ai.djl.modality.cv.Image;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.testing.TestRequirements;
 import ai.djl.zero.Performance;
 import ai.djl.zero.cv.ImageClassification.Classes;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class ImageClassificationTest {
@@ -31,9 +31,8 @@ public class ImageClassificationTest {
     public void testImageClassificationPretrained()
             throws IOException, ModelNotFoundException, MalformedModelException {
         Class<?>[] inputClasses = {Image.class, Path.class, URL.class, InputStream.class};
-        if (!Boolean.getBoolean("nightly")) {
-            throw new SkipException("Nightly only");
-        }
+        TestRequirements.nightly();
+
         for (Class<?> inputClass : inputClasses) {
             for (Classes classes : Classes.values()) {
                 for (Performance performance : Performance.values()) {

@@ -15,18 +15,17 @@ package ai.djl.dlr.engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.TestRequirements;
 import java.nio.ByteBuffer;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class DlrNDManagerTest {
 
     @Test
     public void testNDArray() {
-        if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-            throw new SkipException("test only work on mac and Linux");
-        }
+        TestRequirements.notWindows();
+
         try (DlrNDManager manager =
                 (DlrNDManager) DlrNDManager.getSystemManager().newSubManager()) {
             NDArray zeros = manager.zeros(new Shape(1, 2));

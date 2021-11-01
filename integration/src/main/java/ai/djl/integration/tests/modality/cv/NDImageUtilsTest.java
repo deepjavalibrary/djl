@@ -12,7 +12,6 @@
  */
 package ai.djl.integration.tests.modality.cv;
 
-import ai.djl.engine.Engine;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
@@ -20,18 +19,17 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
+import ai.djl.testing.TestRequirements;
 import ai.djl.util.cuda.CudaUtils;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class NDImageUtilsTest {
 
     @Test
     public void testNormalize() {
-        if ("TensorFlow".equals(Engine.getInstance().getEngineName())) {
-            throw new SkipException("TensorFlow use channels last by default.");
-        }
+        TestRequirements.notEngine("TensorFlow"); // TensorFlow use channels last by default
+
         try (NDManager manager = NDManager.newBaseManager()) {
             // test 3D C, H, W
             NDArray image = manager.ones(new Shape(3, 4, 2));
@@ -67,9 +65,8 @@ public class NDImageUtilsTest {
 
     @Test
     public void testToTensor() {
-        if ("TensorFlow".equals(Engine.getInstance().getEngineName())) {
-            throw new SkipException("TensorFlow use channels last by default.");
-        }
+        TestRequirements.notEngine("TensorFlow"); // TensorFlow use channels last by default
+
         try (NDManager manager = NDManager.newBaseManager()) {
             // test 3D C, H, W
             NDArray image = manager.randomUniform(0, 255, new Shape(4, 2, 3));

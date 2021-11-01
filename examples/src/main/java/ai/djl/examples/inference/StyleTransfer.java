@@ -46,17 +46,18 @@ public final class StyleTransfer {
     }
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
+        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
+            logger.info("This example only works for PyTorch Engine");
+            return;
+        }
+
         Artist artist = Artist.MONET;
         String imagePath = "src/test/resources/mountains.png";
         Image input = ImageFactory.getInstance().fromFile(Paths.get(imagePath));
         Image output = transfer(input, artist);
 
-        if (output == null) {
-            logger.info("This example only works for PyTorch Engine");
-        } else {
-            logger.info("Using PyTorch Engine. " + artist + " painting generated.");
-            save(output, artist.toString(), "build/output/cyclegan/");
-        }
+        logger.info("Using PyTorch Engine. " + artist + " painting generated.");
+        save(output, artist.toString(), "build/output/cyclegan/");
     }
 
     public static Image transfer(Image image, Artist artist)

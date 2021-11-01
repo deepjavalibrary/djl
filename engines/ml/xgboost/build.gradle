@@ -26,6 +26,7 @@ dependencies {
 
     exclusion project(":api")
     exclusion "commons-logging:commons-logging:${commons_logging_version}"
+    testImplementation(project(":testing"))
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }

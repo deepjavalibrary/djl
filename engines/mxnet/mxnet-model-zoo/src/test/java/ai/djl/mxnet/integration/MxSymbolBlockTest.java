@@ -32,6 +32,7 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.Assertions;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.ParameterStore;
@@ -47,7 +48,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 public class MxSymbolBlockTest {
@@ -96,11 +96,12 @@ public class MxSymbolBlockTest {
     @Test
     public void trainWithNewParam()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        if (Engine.getInstance().getGpuCount() == 0) {
+        if ("MXNet".equals(Engine.getInstance().getEngineName())) {
             // TODO: WARN The gradMeans (but not predictions or loss) changed during the upgrade
             // to MXNet 1.8. The issue affect only CPU, but GPU has not changed.
-            throw new SkipException("Ignore engine error");
+            TestRequirements.gpu();
         }
+
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
