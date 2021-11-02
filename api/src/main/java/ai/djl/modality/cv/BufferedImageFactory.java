@@ -108,7 +108,6 @@ public class BufferedImageFactory extends ImageFactory {
             BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             int[] raw = array.toUint8Array();
             IntStream.range(0, imageArea)
-                    .parallel()
                     .forEach(
                             ele -> {
                                 int x = ele % width;
@@ -127,7 +126,6 @@ public class BufferedImageFactory extends ImageFactory {
             BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             int[] raw = array.toUint8Array();
             IntStream.range(0, imageArea)
-                    .parallel()
                     .forEach(
                             ele -> {
                                 int x = ele % width;
