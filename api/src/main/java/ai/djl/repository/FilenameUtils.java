@@ -27,7 +27,7 @@ public final class FilenameUtils {
      */
     public static String getFileType(String fileName) {
         fileName = fileName.toLowerCase(Locale.ROOT);
-        if (fileName.endsWith(".zip")) {
+        if (fileName.endsWith(".zip") || fileName.endsWith(".mar")) {
             return "zip";
         } else if (fileName.endsWith(".tgz")
                 || fileName.endsWith(".tar.gz")
@@ -65,7 +65,10 @@ public final class FilenameUtils {
             return name.substring(0, name.length() - 7);
         } else if (name.endsWith(".tar.z")) {
             return name.substring(0, name.length() - 6);
-        } else if (name.endsWith(".tgz") || name.endsWith(".zip") || name.endsWith(".tar")) {
+        } else if (name.endsWith(".tgz")
+                || name.endsWith(".zip")
+                || name.endsWith(".tar")
+                || name.endsWith(".mar")) {
             return name.substring(0, name.length() - 4);
         } else if (name.endsWith(".gz")) {
             return name.substring(0, name.length() - 3);
