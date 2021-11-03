@@ -207,7 +207,7 @@ public class BlockCoreTest {
     @SuppressWarnings("try")
     @Test
     public void testLayerNorm() throws IOException, MalformedModelException {
-        TestRequirements.engine("PyTorch");
+        TestRequirements.engine("PyTorch", "MXNet");
 
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
@@ -236,7 +236,7 @@ public class BlockCoreTest {
     @SuppressWarnings("try")
     @Test
     public void test2LayerNorm() throws IOException, MalformedModelException {
-        TestRequirements.engine("PyTorch");
+        TestRequirements.engine("PyTorch", "MXNet");
 
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())

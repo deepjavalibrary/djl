@@ -638,7 +638,40 @@ class MxNDArrayEx implements NDArrayEx {
     @Override
     public NDList layerNorm(
             NDArray input, Shape normalizedShape, NDArray gamma, NDArray beta, float eps) {
-        throw new UnsupportedOperationException();
+
+        Shape originalShape = input.getShape();
+
+        long normalizedShapeSize = normalizedShape.size();
+
+        long inputShapeDims = input.getShape().dimension();
+        long normalizedShapeDims = normalizedShape.dimension();
+
+        long tempDims = inputShapeDims - normalizedShapeDims + 1;
+        long[] tempShapeRaw = new long[(int) tempDims];
+        for (int d = 0; d < tempDims - 1; d++) {
+            tempShapeRaw[d] = input.getShape().get(d);
+        }
+        tempShapeRaw[(int) tempDims - 1] = normalizedShapeSize;
+        Shape tempShape = new Shape(tempShapeRaw);
+
+        NDArray reshapedInput = input.reshape(tempShape);
+        NDArray reshapedGamma = gamma.reshape(normalizedShape.size());
+        NDArray reshapedBeta = beta.reshape(normalizedShape.size());
+
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", -1);
+        params.addParam("eps", eps);
+
+        NDList list =
+                getManager()
+                        .invoke(
+                                "_npx_layer_norm",
+                                new NDList(reshapedInput, reshapedGamma, reshapedBeta),
+                                params);
+
+        NDArray a = list.get(0);
+        NDArray b = a.reshape(originalShape);
+        return new NDList(b);
     }
 
     /** {@inheritDoc} */
