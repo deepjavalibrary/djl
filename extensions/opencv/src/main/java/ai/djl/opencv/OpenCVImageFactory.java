@@ -83,8 +83,8 @@ public class OpenCVImageFactory extends ImageFactory {
             array = array.transpose(1, 2, 0);
             shape = array.getShape();
         }
-        int width = (int) shape.get(1);
-        int height = (int) shape.get(0);
+        int width = Math.toIntExact(shape.get(1));
+        int height = Math.toIntExact(shape.get(0));
         Mat img = new Mat(height, width, CvType.CV_8UC3);
         img.put(0, 0, array.toByteArray());
         Imgproc.cvtColor(img, img, Imgproc.COLOR_RGB2BGR);
