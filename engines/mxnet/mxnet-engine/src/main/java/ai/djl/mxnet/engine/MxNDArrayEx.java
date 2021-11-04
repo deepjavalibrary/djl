@@ -652,9 +652,10 @@ class MxNDArrayEx implements NDArrayEx {
                                                 input.getShape()
                                                         .slice(
                                                                 0,
-                                                                (input.getShape().dimension()
-                                                                        - normalizedShape
-                                                                                .dimension()))
+                                                                Math.toIntExact(
+                                                                        input.getShape().dimension()
+                                                                                - normalizedShape
+                                                                                        .dimension()))
                                                         .add(normalizedShape.size())),
                                         gamma.reshape(normalizedShape.size()),
                                         beta.reshape(normalizedShape.size())),
