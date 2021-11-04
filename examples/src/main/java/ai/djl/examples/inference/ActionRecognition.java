@@ -56,6 +56,7 @@ public final class ActionRecognition {
                         .setTypes(Image.class, Classifications.class)
                         .optFilter("backbone", "inceptionv3")
                         .optFilter("dataset", "ucf101")
+                        .optEngine("MXNet")
                         .optProgress(new ProgressBar())
                         .build();
 

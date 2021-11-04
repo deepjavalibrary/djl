@@ -114,7 +114,7 @@ public abstract class Engine {
      * @return the default Engine name
      */
     public static String getDefaultEngineName() {
-        return DEFAULT_ENGINE;
+        return System.getProperty("ai.djl.default_engine", DEFAULT_ENGINE);
     }
 
     /**
@@ -130,7 +130,7 @@ public abstract class Engine {
                             + System.lineSeparator()
                             + "Please refer to https://github.com/deepjavalibrary/djl/blob/master/docs/development/troubleshooting.md for more details.");
         }
-        return getEngine(System.getProperty("ai.djl.default_engine", DEFAULT_ENGINE));
+        return getEngine(getDefaultEngineName());
     }
 
     /**

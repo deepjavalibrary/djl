@@ -14,6 +14,7 @@ package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
 import ai.djl.modality.Classifications;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
@@ -23,6 +24,8 @@ public class ActionRecognitionTest {
 
     @Test
     public void testActionRecognition() throws ModelException, TranslateException, IOException {
+        TestRequirements.engine("MXNet");
+
         Classifications result = ActionRecognition.predict();
         Classifications.Classification best = result.best();
         Assert.assertEquals(best.getClassName(), "ThrowDiscus");

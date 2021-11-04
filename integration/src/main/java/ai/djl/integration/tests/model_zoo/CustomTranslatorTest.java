@@ -31,6 +31,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.util.JsonUtils;
@@ -62,8 +63,8 @@ public class CustomTranslatorTest {
 
     @BeforeClass
     public void setup() throws IOException, ModelNotFoundException, MalformedModelException {
-        if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
-            return;
+        if (!"MXNet".equals(Engine.getDefaultEngineName())) {
+            return; // do not throw exception here
         }
 
         Utils.deleteQuietly(modelDir);
@@ -105,9 +106,7 @@ public class CustomTranslatorTest {
     @Test
     public void testImageClassificationTranslator()
             throws IOException, ModelException, TranslateException {
-        if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
-            return;
-        }
+        TestRequirements.engine("MXNet");
 
         // load RawTranslator
         runRawTranslator();
@@ -157,9 +156,7 @@ public class CustomTranslatorTest {
 
     @Test
     public void testSsdTranslator() throws IOException, ModelException, TranslateException {
-        if (!"MXNet".equals(Engine.getInstance().getEngineName())) {
-            return;
-        }
+        TestRequirements.engine("MXNet");
 
         Criteria<Image, DetectedObjects> c =
                 Criteria.builder()

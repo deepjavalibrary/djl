@@ -53,7 +53,7 @@ public final class TestRequirements {
      * @param engines the engine(s) to run the test with
      */
     public static void engine(String... engines) {
-        String engineName = Engine.getInstance().getEngineName();
+        String engineName = Engine.getDefaultEngineName();
         for (String e : engines) {
             if (engineName.equals(e)) {
                 return;
@@ -69,7 +69,7 @@ public final class TestRequirements {
      * @param engines the engine(s) to not run the test on
      */
     public static void notEngine(String... engines) {
-        String engineName = Engine.getInstance().getEngineName();
+        String engineName = Engine.getDefaultEngineName();
         for (String e : engines) {
             if (engineName.equals(e)) {
                 throw new SkipException(

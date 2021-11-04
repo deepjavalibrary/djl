@@ -45,10 +45,6 @@ public final class SuperResolution {
     private SuperResolution() {}
 
     public static void main(String[] args) throws ModelException, TranslateException, IOException {
-        if (!"TensorFlow".equals(Engine.getInstance().getEngineName())) {
-            logger.info("This example only works for TensorFlow Engine");
-            return;
-        }
         String imagePath = "src/test/resources/";
         ImageFactory imageFactory = ImageFactory.getInstance();
 
@@ -81,7 +77,7 @@ public final class SuperResolution {
     private static List<Image> group(List<Image> input, List<Image> generated) {
         NDList stitches = new NDList(input.size());
 
-        try (NDManager manager = Engine.getInstance().newBaseManager()) {
+        try (NDManager manager = Engine.getEngine("TensorFlow").newBaseManager()) {
             for (int i = 0; i < input.size(); i++) {
                 int scale = 4;
                 int width = scale * input.get(i).getWidth();
@@ -116,6 +112,7 @@ public final class SuperResolution {
                         .optOption("Tags", "serve")
                         .optOption("SignatureDefKey", "serving_default")
                         .optTranslator(new SuperResolutionTranslator())
+                        .optEngine("TensorFlow")
                         .optProgress(new ProgressBar())
                         .build();
 

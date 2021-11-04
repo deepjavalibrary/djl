@@ -14,7 +14,6 @@ package ai.djl.examples.inference;
 
 import ai.djl.Application;
 import ai.djl.ModelException;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
@@ -69,17 +68,11 @@ public final class ObjectDetectionWithTensorflowSavedModel {
     private ObjectDetectionWithTensorflowSavedModel() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        if (!"TensorFlow".equals(Engine.getInstance().getEngineName())) {
-            logger.info("This example only works for TensorFlow Engine");
-            return;
-        }
-
         DetectedObjects detection = ObjectDetectionWithTensorflowSavedModel.predict();
         logger.info("{}", detection);
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
-
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
@@ -94,6 +87,7 @@ public final class ObjectDetectionWithTensorflowSavedModel {
                         // saved_model.pb file is in the subfolder of the model archive file
                         .optModelName("ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model")
                         .optTranslator(new MyTranslator())
+                        .optEngine("TensorFlow")
                         .optProgress(new ProgressBar())
                         .build();
 

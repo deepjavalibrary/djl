@@ -96,7 +96,7 @@ public class MxSymbolBlockTest {
     @Test
     public void trainWithNewParam()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        if ("MXNet".equals(Engine.getInstance().getEngineName())) {
+        if ("MXNet".equals(Engine.getDefaultEngineName())) {
             // TODO: WARN The gradMeans (but not predictions or loss) changed during the upgrade
             // to MXNet 1.8. The issue affect only CPU, but GPU has not changed.
             TestRequirements.gpu();

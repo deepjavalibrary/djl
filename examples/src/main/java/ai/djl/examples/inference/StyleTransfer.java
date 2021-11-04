@@ -15,7 +15,6 @@ package ai.djl.examples.inference;
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
@@ -46,11 +45,6 @@ public final class StyleTransfer {
     }
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
-            logger.info("This example only works for PyTorch Engine");
-            return;
-        }
-
         Artist artist = Artist.MONET;
         String imagePath = "src/test/resources/mountains.png";
         Image input = ImageFactory.getInstance().fromFile(Paths.get(imagePath));
@@ -63,11 +57,6 @@ public final class StyleTransfer {
     public static Image transfer(Image image, Artist artist)
             throws IOException, ModelNotFoundException, MalformedModelException,
                     TranslateException {
-
-        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
-            return null;
-        }
-
         String modelName = "style_" + artist.toString().toLowerCase() + ".zip";
         String modelUrl =
                 "https://mlrepo.djl.ai/model/cv/image_generation/ai/djl/pytorch/cyclegan/0.0.1/"
@@ -80,6 +69,7 @@ public final class StyleTransfer {
                         .optModelUrls(modelUrl)
                         .optProgress(new ProgressBar())
                         .optTranslatorFactory(new StyleTransferTranslatorFactory())
+                        .optEngine("PyTorch")
                         .build();
 
         try (ZooModel<Image, Image> model = criteria.loadModel();

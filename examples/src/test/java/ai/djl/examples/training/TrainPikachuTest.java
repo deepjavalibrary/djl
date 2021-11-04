@@ -25,6 +25,7 @@ public class TrainPikachuTest {
 
     @Test
     public void testDetection() throws IOException, MalformedModelException, TranslateException {
+        TestRequirements.engine("MXNet");
         TestRequirements.nightly();
 
         String[] args;

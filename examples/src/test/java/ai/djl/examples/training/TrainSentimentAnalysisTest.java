@@ -12,8 +12,7 @@
  */
 package ai.djl.examples.training;
 
-import ai.djl.MalformedModelException;
-import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.ModelException;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -23,8 +22,8 @@ public class TrainSentimentAnalysisTest {
 
     @Test
     public void testTrainSentimentAnalysis()
-            throws MalformedModelException, ModelNotFoundException, TranslateException,
-                    IOException {
+            throws ModelException, TranslateException, IOException {
+        TestRequirements.engine("MXNet");
         TestRequirements.nightly();
         TestRequirements.gpu();
 

@@ -185,7 +185,7 @@ You can use [ModelZoo.listModels()](https://javadoc.io/static/ai.djl/api/0.13.0/
 
 #### List available models using DJL command line
 
-Use the following command to list models in examples module for MXNet engine:
+Use the following command to list models in the DJL model zoo:
 
 ```shell
 ./gradlew :examples:listmodels
@@ -200,8 +200,8 @@ Use the following command to list models in examples module for MXNet engine:
 
 ```
 
-You can list models from your model folder and only list models for specific Engine with debug log:
+You can list models from your model folder with debug log:
 
 ```shell
-./gradlew :examples:listmodels -Dai.djl.default_engine=PyTorch -Dai.djl.logging.level=debug -Dai.djl.repository.zoo.location=file:///mymodels
+./gradlew :examples:listmodels -Dai.djl.logging.level=debug -Dai.djl.repository.zoo.location=file:///mymodels
 ```

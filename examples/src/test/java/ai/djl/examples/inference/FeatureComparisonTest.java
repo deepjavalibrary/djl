@@ -30,18 +30,17 @@ public class FeatureComparisonTest {
     @Test
     public void testFeatureComparison() throws ModelException, TranslateException, IOException {
         TestRequirements.engine("PyTorch");
+        TestRequirements.nightly();
 
-        if (Boolean.getBoolean("nightly")) {
-            Path imageFile1 = Paths.get("src/test/resources/kana1.jpg");
-            Image img1 = ImageFactory.getInstance().fromFile(imageFile1);
-            Path imageFile2 = Paths.get("src/test/resources/kana2.jpg");
-            Image img2 = ImageFactory.getInstance().fromFile(imageFile2);
+        Path imageFile1 = Paths.get("src/test/resources/kana1.jpg");
+        Image img1 = ImageFactory.getInstance().fromFile(imageFile1);
+        Path imageFile2 = Paths.get("src/test/resources/kana2.jpg");
+        Image img2 = ImageFactory.getInstance().fromFile(imageFile2);
 
-            float[] feature1 = FeatureExtraction.predict(img1);
-            float[] feature2 = FeatureExtraction.predict(img2);
+        float[] feature1 = FeatureExtraction.predict(img1);
+        float[] feature2 = FeatureExtraction.predict(img2);
 
-            Assert.assertTrue(
-                    Double.compare(FeatureComparison.calculSimilar(feature1, feature2), 0.6) > 0);
-        }
+        Assert.assertTrue(
+                Double.compare(FeatureComparison.calculSimilar(feature1, feature2), 0.6) > 0);
     }
 }

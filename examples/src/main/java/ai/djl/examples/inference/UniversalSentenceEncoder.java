@@ -15,7 +15,6 @@ package ai.djl.examples.inference;
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -53,23 +52,14 @@ public final class UniversalSentenceEncoder {
         inputs.add("I am a sentence for which I would like to get its embedding");
 
         float[][] embeddings = UniversalSentenceEncoder.predict(inputs);
-        if (embeddings == null) {
-            logger.info("This example only works for TensorFlow Engine");
-        } else {
-            for (int i = 0; i < inputs.size(); i++) {
-                logger.info(
-                        "Embedding for: " + inputs.get(i) + "\n" + Arrays.toString(embeddings[i]));
-            }
+        for (int i = 0; i < inputs.size(); i++) {
+            logger.info("Embedding for: " + inputs.get(i) + "\n" + Arrays.toString(embeddings[i]));
         }
     }
 
     public static float[][] predict(List<String> inputs)
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
-        if (!"TensorFlow".equals(Engine.getInstance().getEngineName())) {
-            return null;
-        }
-
         String modelUrl =
                 "https://storage.googleapis.com/tfhub-modules/google/universal-sentence-encoder/4.tar.gz";
 
@@ -79,6 +69,7 @@ public final class UniversalSentenceEncoder {
                         .setTypes(String[].class, float[][].class)
                         .optModelUrls(modelUrl)
                         .optTranslator(new MyTranslator())
+                        .optEngine("TensorFlow")
                         .optProgress(new ProgressBar())
                         .build();
         try (ZooModel<String[], float[][]> model = criteria.loadModel();

@@ -14,6 +14,7 @@ package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
 import ai.djl.modality.cv.output.Joints;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
@@ -23,6 +24,8 @@ public class PoseEstimationTest {
 
     @Test
     public void testPoseEstimation() throws ModelException, TranslateException, IOException {
+        TestRequirements.engine("MXNet");
+
         Joints result = PoseEstimation.predict();
         Assert.assertTrue(result.getJoints().get(0).getConfidence() > 0.6d);
     }

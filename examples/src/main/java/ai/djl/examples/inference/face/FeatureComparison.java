@@ -13,7 +13,6 @@
 package ai.djl.examples.inference.face;
 
 import ai.djl.ModelException;
-import ai.djl.engine.Engine;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.translate.TranslateException;
@@ -30,11 +29,6 @@ public final class FeatureComparison {
     private FeatureComparison() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
-            logger.info("This example only works for PyTorch.");
-            return;
-        }
-
         Path imageFile1 = Paths.get("src/test/resources/kana1.jpg");
         Image img1 = ImageFactory.getInstance().fromFile(imageFile1);
         Path imageFile2 = Paths.get("src/test/resources/kana2.jpg");

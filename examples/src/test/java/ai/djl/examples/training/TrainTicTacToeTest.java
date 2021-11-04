@@ -13,6 +13,7 @@
 package ai.djl.examples.training;
 
 import ai.djl.engine.Engine;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
 import java.io.IOException;
 import org.testng.Assert;
@@ -22,6 +23,8 @@ public class TrainTicTacToeTest {
 
     @Test
     public void testTrainTicTacToe() throws IOException {
+        TestRequirements.engine("MXNet", "PyTorch");
+
         if (Boolean.getBoolean("nightly")) {
             String[] args = new String[] {"-g", "1", "-e", "6"};
             Engine.getInstance().setRandomSeed(1234);

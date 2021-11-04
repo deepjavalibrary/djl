@@ -15,6 +15,7 @@ package ai.djl.examples.inference;
 
 import ai.djl.Application;
 import ai.djl.ModelException;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.repository.zoo.Criteria;
@@ -68,6 +69,7 @@ public final class BertQaInference {
                         .optApplication(Application.NLP.QUESTION_ANSWER)
                         .setTypes(QAInput.class, String.class)
                         .optFilter("backbone", "bert")
+                        .optEngine(Engine.getDefaultEngineName())
                         .optProgress(new ProgressBar())
                         .build();
 

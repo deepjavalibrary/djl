@@ -48,7 +48,7 @@ public final class TestUtils {
 
     public static Device[] getDevices() {
         if (!Engine.getInstance().hasCapability(StandardCapabilities.CUDNN)
-                && "MXNet".equals(Engine.getInstance().getEngineName())) {
+                && "MXNet".equals(Engine.getDefaultEngineName())) {
             return new Device[] {
                 Device.cpu()
             }; // TODO: RNN is not implemented on MXNet without cuDNN
