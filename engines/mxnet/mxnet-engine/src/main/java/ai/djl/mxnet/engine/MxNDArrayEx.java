@@ -643,20 +643,22 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("axis", -1);
         params.addParam("eps", eps);
 
+        NDArray reshapedInput =
+                input.reshape(
+                        input.getShape()
+                                .slice(
+                                        0,
+                                        Math.toIntExact(
+                                                input.getShape().dimension()
+                                                        - normalizedShape.dimension()))
+                                .add(normalizedShape.size()));
+
         return new NDList(
                 getManager()
                         .invoke(
                                 "_npx_layer_norm",
                                 new NDList(
-                                        input.reshape(
-                                                input.getShape()
-                                                        .slice(
-                                                                0,
-                                                                Math.toIntExact(
-                                                                        input.getShape().dimension()
-                                                                                - normalizedShape
-                                                                                        .dimension()))
-                                                        .add(normalizedShape.size())),
+                                        reshapedInput,
                                         gamma.reshape(normalizedShape.size()),
                                         beta.reshape(normalizedShape.size())),
                                 params)
