@@ -18,6 +18,7 @@ configure([
         project(':extensions:aws-ai'),
         project(':extensions:fasttext'),
         project(':extensions:hadoop'),
+        project(':extensions:opencv'),
         project(':extensions:sentencepiece'),
         project(':model-zoo')]) {
     apply plugin: "maven-publish"

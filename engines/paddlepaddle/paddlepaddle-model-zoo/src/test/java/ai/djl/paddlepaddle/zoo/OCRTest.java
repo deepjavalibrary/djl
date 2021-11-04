@@ -115,7 +115,7 @@ public class OCRTest {
             (int) (extended[2] * width),
             (int) (extended[3] * height)
         };
-        return img.getSubimage(recovered[0], recovered[1], recovered[2], recovered[3]);
+        return img.getSubImage(recovered[0], recovered[1], recovered[2], recovered[3]);
     }
 
     private static double[] extendRect(double xmin, double ymin, double width, double height) {

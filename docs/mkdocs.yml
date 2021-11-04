@@ -131,8 +131,9 @@ nav:
   - Extensions:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'
-      - Hadoop support: 'extensions/hadoop/README.md'
       - fastText: 'extensions/fasttext/README.md'
+      - Hadoop support: 'extensions/hadoop/README.md'
+      - OpenCV: 'extensions/opencv/README.md'
       - SentencePiece: 'extensions/sentencepiece/README.md'
   - Demos:
       - Demos: 'docs/demos/README.md'

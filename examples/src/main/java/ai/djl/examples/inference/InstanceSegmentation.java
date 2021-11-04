@@ -75,12 +75,10 @@ public final class InstanceSegmentation {
         Path outputDir = Paths.get("build/output");
         Files.createDirectories(outputDir);
 
-        // Make image copy with alpha channel because original image was jpg
-        Image newImage = img.duplicate(Image.Type.TYPE_INT_ARGB);
-        newImage.drawBoundingBoxes(detection);
+        img.drawBoundingBoxes(detection);
 
         Path imagePath = outputDir.resolve("instances.png");
-        newImage.save(Files.newOutputStream(imagePath), "png");
+        img.save(Files.newOutputStream(imagePath), "png");
         logger.info("Segmentation result image has been saved in: {}", imagePath);
     }
 }

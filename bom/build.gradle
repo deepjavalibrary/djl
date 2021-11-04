@@ -27,6 +27,7 @@ dependencies {
         api "ai.djl.mxnet:mxnet-engine:${version}"
         api "ai.djl.mxnet:mxnet-model-zoo:${version}"
         api "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
+        api "ai.djl.opencv:opencv:${version}"
         api "ai.djl.onnxruntime:onnxruntime-engine:${version}"
         api "ai.djl.paddlepaddle:paddlepaddle-engine:${version}"
         api "ai.djl.paddlepaddle:paddlepaddle-model-zoo:${version}"

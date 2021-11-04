@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -53,7 +53,7 @@ public final class SuperResolution {
         ImageFactory imageFactory = ImageFactory.getInstance();
 
         List<Image> inputImages =
-                Arrays.asList(imageFactory.fromFile(Paths.get(imagePath + "fox.png")));
+                Collections.singletonList(imageFactory.fromFile(Paths.get(imagePath + "fox.png")));
 
         List<Image> enhancedImages = enhance(inputImages);
 
